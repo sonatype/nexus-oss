@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler
 import org.sonatype.nexus.repository.negativecache.NegativeCacheImpl
 import org.sonatype.nexus.repository.proxy.ProxyHandler
+import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.types.ProxyType
@@ -72,6 +73,9 @@ class RawProxyRecipe
   Provider<StorageFacetImpl> storageFacet
 
   @Inject
+  Provider<SearchFacet> searchFacet
+
+  @Inject
   TimingHandler timingHandler
 
   @Inject
@@ -99,6 +103,7 @@ class RawProxyRecipe
     repository.attach(proxyFacet.get())
     repository.attach(rawContentFacet.get())
     repository.attach(storageFacet.get())
+    repository.attach(searchFacet.get())
   }
 
   /**
