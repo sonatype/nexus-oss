@@ -148,7 +148,7 @@ extends DirectComponentSupport
         versions << new SearchResultVersionXO(
             groupId: hit.source[P_GROUP],
             artifactId: hit.source[P_NAME],
-            version: hit.source[P_VERSION] ?: '1',
+            version: hit.source[P_VERSION],
             repositoryId: hit.source[P_REPOSITORY_NAME],
             repositoryName: hit.source[P_REPOSITORY_NAME],
             name: hit.source[P_NAME],

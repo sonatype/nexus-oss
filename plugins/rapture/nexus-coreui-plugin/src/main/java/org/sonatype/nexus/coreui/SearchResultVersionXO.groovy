@@ -42,7 +42,7 @@ implements Comparable<SearchResultVersionXO>
   int compareTo(final SearchResultVersionXO o) {
     def result = repositoryName.compareTo(o.repositoryName)
     if (result == 0) {
-      result = versionScheme.parseVersion(version).compareTo(versionScheme.parseVersion(o.version))
+      result = versionScheme.parseVersion(version ?: "0").compareTo(versionScheme.parseVersion(o.version ?: "0"))
       if (result == 0) {
         result = path.compareTo(o.path)
       }
