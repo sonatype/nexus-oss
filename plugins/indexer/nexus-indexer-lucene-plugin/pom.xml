@@ -33,18 +33,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-maven-bridge-plugin</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-artifact</artifactId>
       <exclusions>
@@ -64,6 +52,18 @@
           <artifactId>plexus-component-annotations</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-maven-bridge-plugin</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
