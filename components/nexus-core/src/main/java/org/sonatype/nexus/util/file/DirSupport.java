@@ -428,7 +428,7 @@ public final class DirSupport
         final FileStore toStore = Files.getFileStore(toExistingParent);
         return fromStore.equals(toStore);
       } else {
-        log.warn("No parent path found for target while move '{}'->'{}'", from, to, new RuntimeException("marker")); // record the stack trace?
+        log.warn("No ultimate parent path found for '{}'", to, new RuntimeException("marker")); // record the stack trace?
         return false; // no ultimate parent? be on safe side
       }
     }
