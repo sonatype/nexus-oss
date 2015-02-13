@@ -109,8 +109,8 @@ public class SearchFacetImpl
     }
   }
 
-  // TODO use for re-indexing
-  private void deleteIndex() {
+  @Override
+  protected void doDelete() {
     if (client.get().admin().indices().prepareExists(getRepository().getName()).execute().actionGet().isExists()) {
       client.get().admin().indices().prepareDelete(getRepository().getName()).execute().actionGet();
     }

@@ -154,7 +154,7 @@ public abstract class FacetSupport
     doDelete();
   }
 
-  private void doDelete() throws Exception {
+  protected void doDelete() throws Exception {
     // nop
   }
 
