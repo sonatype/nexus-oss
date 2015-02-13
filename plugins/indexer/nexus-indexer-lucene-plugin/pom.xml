@@ -32,6 +32,32 @@
   </properties>
 
   <dependencies>
+    <!--
+    FIXME: nexus-restlet1x-model is being included in this plugin directly, instead of picking it up as plugin dependency.
+    -->
+
+    <dependency>
+      <groupId>org.apache.maven.indexer</groupId>
+      <artifactId>indexer-artifact</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-annotations</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.indexer</groupId>
+      <artifactId>indexer-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-annotations</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>

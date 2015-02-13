@@ -10,141 +10,166 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.storage;
 
-import java.io.InputStream;
-import java.util.Map;
+package org.sonatype.nexus.repository.storage;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
+import org.sonatype.nexus.blobstore.api.BlobStore;
+import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.stateguard.Guarded;
+import org.sonatype.nexus.orient.DatabaseInstance;
+import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
+import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
+import com.tinkerpop.blueprints.impls.orient.OrientVertexType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
-import static org.sonatype.nexus.repository.storage.StorageService.P_REPOSITORY_NAME;
-import static org.sonatype.nexus.repository.storage.StorageService.V_BUCKET;
+import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
 
 /**
  * Default {@link StorageFacet} implementation.
+ *
+ * @since 3.0
  */
 @Named
 public class StorageFacetImpl
-  extends FacetSupport
-  implements StorageFacet
+    extends FacetSupport
+    implements StorageFacet
 {
-  private final StorageService delegate;
+  public static final String CONFIG_KEY = "storage";
+
+  private final BlobStoreManager blobStoreManager;
+
+  private final Provider<DatabaseInstance> databaseInstanceProvider;
+
+  private String blobStoreName;
 
   private Object bucketId;
 
   @Inject
-  public StorageFacetImpl(final StorageService delegate) {
-    this.delegate = checkNotNull(delegate);
+  public StorageFacetImpl(final BlobStoreManager blobStoreManager,
+                          final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider)
+  {
+    this.blobStoreManager = checkNotNull(blobStoreManager);
+    this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
   }
 
   @Override
-  protected void doStart() throws Exception {
-    // determine the bucket id for the repository, creating the bucket if needed
-    try (GraphTx graph = delegate.getGraphTx()) {
+  protected void doConfigure() throws Exception {
+    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
+    blobStoreName = attributes.get("blobStoreName", String.class, "default");
+    log.debug("BLOB-store name: {}", blobStoreName);
+  }
+
+  @Override
+  protected void doInit() throws Exception {
+    initSchema();
+    initBucket();
+    super.doInit();
+  }
+
+  private void initSchema() {
+    // initialize the graph schema if needed
+    final CheckedGraphNoTx graph = new CheckedGraphNoTx(databaseInstanceProvider.get().acquire());
+    graph.setUseLightweightEdges(true);
+    try {
+      initVertexType(graph, V_ASSET, new Predicate<OrientVertexType>()
+      {
+        @SuppressWarnings("unchecked")
+        @Override
+        public boolean apply(final OrientVertexType type) {
+          type.createProperty(P_PATH, OType.STRING);
+          graph.createKeyIndex(P_PATH, Vertex.class, new Parameter("class", V_ASSET));
+          return true;
+        }
+      });
+      initVertexType(graph, V_BUCKET, new Predicate<OrientVertexType>()
+      {
+        @SuppressWarnings("unchecked")
+        @Override
+        public boolean apply(final OrientVertexType type) {
+          type.createProperty(P_REPOSITORY_NAME, OType.STRING);
+          graph.createKeyIndex(P_REPOSITORY_NAME, Vertex.class, new Parameter("type", "UNIQUE"),
+              new Parameter("class", V_BUCKET));
+          return true;
+        }
+      });
+      initVertexType(graph, V_COMPONENT, null);
+      initVertexType(graph, V_LABEL, null);
+
+      initEdgeType(graph, E_CONTAINS_COMPONENTS_WITH_LABEL, null);
+      initEdgeType(graph, E_HAS_LABEL, null);
+      initEdgeType(graph, E_OWNS_ASSET, null);
+      initEdgeType(graph, E_OWNS_COMPONENT, null);
+      initEdgeType(graph, E_PART_OF_COMPONENT, null);
+    }
+    finally {
+      graph.shutdown();
+    }
+  }
+
+  private static class CheckedGraphNoTx
+      extends OrientGraphNoTx
+  {
+    public CheckedGraphNoTx(ODatabaseDocumentTx db) {
+      super(db);
+      checkForGraphSchema(db);
+    }
+  }
+
+  private void initVertexType(CheckedGraphNoTx graph, String name, @Nullable Predicate<OrientVertexType> predicate) {
+    if (graph.getVertexType(name) == null) {
+      OrientVertexType type = graph.createVertexType(name);
+      if (predicate != null) {
+        predicate.apply(type);
+      }
+    }
+  }
+
+  private void initEdgeType(CheckedGraphNoTx graph, String name, @Nullable Predicate<OrientEdgeType> predicate) {
+    if (graph.getEdgeType(name) == null) {
+      OrientEdgeType type = graph.createEdgeType(name);
+      if (predicate != null) {
+        predicate.apply(type);
+      }
+    }
+  }
+
+  private void initBucket() {
+    // get or create the bucket for the repository and set bucketId for fast lookup later
+    try (GraphTx graphTx = openGraphTx()) {
       String repositoryName = getRepository().getName();
-      Vertex bucket = delegate.findVertexWithProperty(graph, P_REPOSITORY_NAME, repositoryName, V_BUCKET);
+      Vertex bucket = Iterables.getFirst(graphTx.getVertices(P_REPOSITORY_NAME, repositoryName), null);
       if (bucket == null) {
-        bucket = delegate.createVertex(graph, V_BUCKET);
+        bucket = graphTx.addVertex(V_BUCKET, (String) null);
         bucket.setProperty(P_REPOSITORY_NAME, repositoryName);
-        graph.commit();
+        graphTx.commit();
       }
       bucketId = bucket.getId();
     }
   }
 
-  private Vertex bucket(final GraphTx graph) {
-    return delegate.findVertex(graph, bucketId, null);
+  @Override
+  @Guarded(by = STARTED)
+  public StorageTx openTx() {
+    BlobStore blobStore = blobStoreManager.get(blobStoreName);
+    return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(), bucketId);
   }
 
-  @Override
-  @Guarded(by=STARTED)
-  public GraphTx getGraphTx() {
-    return delegate.getGraphTx();
-  }
-
-  @Override
-  @Guarded(by=STARTED)
-  public Iterable<Vertex> browseAssets(GraphTx graph) {
-    return delegate.browseAssetsOwnedBy(bucket(graph));
-  }
-
-  @Override
-  @Guarded(by=STARTED)
-  public Iterable<Vertex> browseComponents(GraphTx graph) {
-    return delegate.browseComponentsOwnedBy(bucket(graph));
-  }
-
-  @Nullable
-  @Override
-  @Guarded(by=STARTED)
-  public Vertex findAsset(final GraphTx graph, final Object vertexId) {
-    return delegate.findAssetOwnedBy(graph, vertexId, bucket(graph));
-  }
-
-  @Nullable
-  @Override
-  @Guarded(by=STARTED)
-  public Vertex findAssetWithProperty(final GraphTx graph, final String propName, final Object propValue) {
-    return delegate.findAssetWithPropertyOwnedBy(graph, propName, propValue, bucket(graph));
-  }
-
-  @Nullable
-  @Override
-  @Guarded(by=STARTED)
-  public Vertex findComponent(final GraphTx graph, final Object vertexId) {
-    return delegate.findComponentOwnedBy(graph, vertexId, bucket(graph));
-  }
-
-  @Nullable
-  @Override
-  @Guarded(by=STARTED)
-  public Vertex findComponentWithProperty(final GraphTx graph, final String propName, final Object propValue) {
-    return delegate.findComponentWithPropertyOwnedBy(graph, propName, propValue, bucket(graph));
-  }
-
-  @Override
-  @Guarded(by=STARTED)
-  public Vertex createAsset(final GraphTx graph) {
-    return delegate.createAssetOwnedBy(graph, bucket(graph));
-  }
-
-  @Override
-  @Guarded(by=STARTED)
-  public Vertex createComponent(final GraphTx graph) {
-    return delegate.createComponentOwnedBy(graph, bucket(graph));
-  }
-
-  @Override
-  @Guarded(by=STARTED)
-  public void deleteVertex(final GraphTx graph, final Vertex vertex) {
-    delegate.deleteVertex(graph, vertex);
-  }
-
-  @Override
-  @Guarded(by=STARTED)
-  public BlobRef createBlob(final InputStream inputStream, final Map<String, String> headers) {
-    return delegate.createBlob(inputStream, headers);
-  }
-
-  @Nullable
-  @Override
-  @Guarded(by=STARTED)
-  public org.sonatype.nexus.blobstore.api.Blob getBlob(final BlobRef blobRef) {
-    return delegate.getBlob(blobRef);
-  }
-
-  @Override
-  @Guarded(by=STARTED)
-  public boolean deleteBlob(final BlobRef blobRef) {
-    return delegate.deleteBlob(blobRef);
+  private GraphTx openGraphTx() {
+    return new GraphTx(databaseInstanceProvider.get().acquire());
   }
 }

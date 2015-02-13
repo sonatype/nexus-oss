@@ -12,8 +12,6 @@
  */
 package org.sonatype.security.realms.privileges.application;
 
-import java.util.List;
-
 import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -24,10 +22,7 @@ import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.realms.privileges.AbstractPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
-import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
-
-import com.google.common.collect.Lists;
 
 @Singleton
 @Typed(PrivilegeDescriptor.class)
@@ -38,10 +33,9 @@ public class ApplicationPrivilegeDescriptor
 {
   public static final String TYPE = "method";
 
-  @Override
-  public String getName() {
-    return "Application";
-  }
+  public static final String P_METHOD = "method";
+
+  public static final String P_PERMISSION = "permission";
 
   @Override
   public String getType() {
@@ -49,21 +43,13 @@ public class ApplicationPrivilegeDescriptor
   }
 
   @Override
-  public List<PrivilegePropertyDescriptor> getPropertyDescriptors() {
-    return Lists.newArrayList(
-        new ApplicationPrivilegeMethodPropertyDescriptor(),
-        new ApplicationPrivilegePermissionPropertyDescriptor()
-    );
-  }
-
-  @Override
-  public String buildPermission(CPrivilege privilege) {
+  protected String buildPermission(CPrivilege privilege) {
     if (!TYPE.equals(privilege.getType())) {
       return null;
     }
 
-    String permission = privilege.getProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID);
-    String method = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
+    String permission = privilege.getProperty(P_PERMISSION);
+    String method = privilege.getProperty(P_METHOD);
 
     if (Strings2.isEmpty(permission)) {
       permission = "*:*";
@@ -88,8 +74,8 @@ public class ApplicationPrivilegeDescriptor
     // method is of form ('*' | 'read' | 'create' | 'update' | 'delete' [, method]* )
     // so, 'read' method is correct, but so is also 'create,update,delete'
     // '*' means ALL POSSIBLE value for this "field"
-    String method = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
-    String permission = privilege.getProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID);
+    String method = privilege.getProperty(P_METHOD);
+    String permission = privilege.getProperty(P_PERMISSION);
 
     if (Strings2.isEmpty(permission)) {
       response.addValidationError("Permission cannot be empty on a privilege!");

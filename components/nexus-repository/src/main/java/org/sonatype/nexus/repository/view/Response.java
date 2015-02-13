@@ -25,6 +25,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class Response
 {
+  private final Status status;
+
   /**
    * Custom attributes to configure backing and logging.
    */
@@ -36,25 +38,29 @@ public class Response
     }
   }
 
-  private final Attributes attributes = new Attributes();
+  private Attributes attributes;
 
-  private final Status status;
-
-  private final Headers headers = new Headers();
+  private Headers headers;
 
   public Response(final Status status) {
     this.status = checkNotNull(status);
-  }
-
-  public AttributesMap getAttributes() {
-    return attributes;
   }
 
   public Status getStatus() {
     return status;
   }
 
+  public AttributesMap getAttributes() {
+    if (attributes == null) {
+      attributes = new Attributes();
+    }
+    return attributes;
+  }
+
   public Headers getHeaders() {
+    if (headers == null) {
+      headers = new Headers();
+    }
     return headers;
   }
 

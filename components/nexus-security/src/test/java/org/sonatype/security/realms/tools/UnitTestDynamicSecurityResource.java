@@ -15,8 +15,6 @@ package org.sonatype.security.realms.tools;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
-import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
-import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
 
 public class UnitTestDynamicSecurityResource
     extends AbstractDynamicSecurityResource
@@ -42,8 +40,8 @@ public class UnitTestDynamicSecurityResource
     priv.setName(privId);
     priv.setReadOnly(true);
     priv.setType(ApplicationPrivilegeDescriptor.TYPE);
-    priv.setProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID, "read");
-    priv.setProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID, "foo:bar:" + privId);
+    priv.setProperty(ApplicationPrivilegeDescriptor.P_METHOD, "read");
+    priv.setProperty(ApplicationPrivilegeDescriptor.P_PERMISSION, "foo:bar:" + privId);
 
     config.addPrivilege(priv);
 

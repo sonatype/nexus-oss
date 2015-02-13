@@ -54,7 +54,7 @@ public class HttpClientFacetImpl
   }
 
   @Override
-  protected void doInit() throws Exception {
+  protected void doConfigure() throws Exception {
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     HttpClientConfig config = marshaller.unmarshall(attributes);
     httpClient = factory.create(config);

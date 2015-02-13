@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.manager;
 
 import java.util.List;
@@ -53,11 +54,13 @@ public class RepositoryManagerImpl
 
   private final ConfigurationStore store;
 
-  private final Map<String,Recipe> recipes;
+  private final Map<String, Recipe> recipes;
 
   private final RepositoryFactory factory;
 
   private final Provider<ConfigurationFacet> configFacet;
+
+  private final RepositoryAdminSecurityResource securityResource;
 
   private final Map<String, Repository> repositories = Maps.newHashMap();
 
@@ -66,13 +69,15 @@ public class RepositoryManagerImpl
                                final ConfigurationStore store,
                                final RepositoryFactory factory,
                                final Provider<ConfigurationFacet> configFacet,
-                               final Map<String,Recipe> recipes)
+                               final Map<String, Recipe> recipes,
+                               final RepositoryAdminSecurityResource securityResource)
   {
     this.eventBus = checkNotNull(eventBus);
     this.store = checkNotNull(store);
     this.factory = checkNotNull(factory);
     this.configFacet = checkNotNull(configFacet);
     this.recipes = checkNotNull(recipes);
+    this.securityResource = checkNotNull(securityResource);
   }
 
   /**
@@ -112,6 +117,9 @@ public class RepositoryManagerImpl
 
     // verify required facets
     repository.facet(ViewFacet.class);
+
+    // configure security
+    securityResource.add(repository);
 
     return repository;
   }
@@ -183,14 +191,14 @@ public class RepositoryManagerImpl
   }
 
   @Override
-  @Guarded(by=STARTED)
+  @Guarded(by = STARTED)
   public Iterable<Repository> browse() {
     return ImmutableList.copyOf(repositories.values());
   }
 
   @Nullable
   @Override
-  @Guarded(by=STARTED)
+  @Guarded(by = STARTED)
   public Repository get(final String name) {
     checkNotNull(name);
 
@@ -198,11 +206,14 @@ public class RepositoryManagerImpl
   }
 
   @Override
-  @Guarded(by=STARTED)
+  @Guarded(by = STARTED)
   public Repository create(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
+    String repositoryName = checkNotNull(configuration.getRepositoryName());
 
-    log.debug("Creating repository: {}", configuration);
+    log.debug("Creating repository: {} -> {}", repositoryName, configuration);
+
+    // FIXME: This can leave storage/tracked inconsistent if new repository/init fails
     store.create(configuration);
     Repository repository = newRepository(configuration);
     track(repository);
@@ -215,12 +226,14 @@ public class RepositoryManagerImpl
   }
 
   @Override
-  @Guarded(by=STARTED)
+  @Guarded(by = STARTED)
   public Repository update(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
+    String repositoryName = checkNotNull(configuration.getRepositoryName());
 
-    log.debug("Updating repository: {}", configuration);
-    Repository repository = repository(configuration.getRepositoryName());
+    log.debug("Updating repository: {} -> {}", repositoryName, configuration);
+
+    Repository repository = repository(repositoryName);
 
     // TODO: Ensure configuration sanity, before we apply to repository
     repository.stop();
@@ -233,16 +246,19 @@ public class RepositoryManagerImpl
   }
 
   @Override
-  @Guarded(by=STARTED)
+  @Guarded(by = STARTED)
   public void delete(final String name) throws Exception {
     checkNotNull(name);
 
     log.debug("Deleting repository: {}", name);
+
     Repository repository = repository(name);
     Configuration configuration = repository.getConfiguration();
     repository.stop();
+    repository.delete();
     repository.destroy();
     store.delete(configuration);
+    securityResource.remove(repository);
     untrack(repository);
 
     eventBus.post(new RepositoryDeletedEvent(repository));

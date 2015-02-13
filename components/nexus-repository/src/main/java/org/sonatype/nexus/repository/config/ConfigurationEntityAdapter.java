@@ -20,6 +20,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.nexus.orient.entity.EntityAdapter;
+import org.sonatype.nexus.orient.entity.FieldCopier;
 
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
@@ -77,9 +78,9 @@ public class ConfigurationEntityAdapter
     Map<String, Map<String, Object>> attributes = document.field(P_ATTRIBUTES, OType.EMBEDDEDMAP);
 
     // deeply copy attributes to divorce from document
-    // FIXME: pre-rc2 detach is broken, so we are forced to copy to divorce
     if (attributes != null) {
-      attributes = copy(attributes);
+      //noinspection unchecked
+      attributes = FieldCopier.copy(attributes);
     }
 
     entity.setRecipeName(recipeName);

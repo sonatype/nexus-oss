@@ -26,16 +26,13 @@ import org.sonatype.nexus.proxy.repository.GroupRepository
 import org.sonatype.nexus.proxy.repository.Repository
 import org.sonatype.nexus.proxy.targets.TargetRegistry
 import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor
-import org.sonatype.nexus.security.targets.TargetPrivilegeGroupPropertyDescriptor
-import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryPropertyDescriptor
-import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryTargetPropertyDescriptor
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.security.SecuritySystem
 import org.sonatype.security.authorization.AuthorizationManager
 import org.sonatype.security.authorization.Privilege
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor
-import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor
 import org.sonatype.security.usermanagement.UserManagerImpl
 
 import javax.inject.Inject
@@ -115,10 +112,10 @@ extends DirectComponentSupport
                   type: TargetPrivilegeDescriptor.TYPE,
                   readOnly: false,
                   properties: [
-                      (ApplicationPrivilegeMethodPropertyDescriptor.ID)     : method,
-                      (TargetPrivilegeRepositoryTargetPropertyDescriptor.ID): privilegeXO.repositoryTargetId,
-                      (TargetPrivilegeRepositoryPropertyDescriptor.ID)      : repositoryId,
-                      (TargetPrivilegeGroupPropertyDescriptor.ID)           : groupId
+                      (ApplicationPrivilegeDescriptor.P_METHOD)     : method,
+                      (TargetPrivilegeDescriptor.P_TARGET_ID): privilegeXO.repositoryTargetId,
+                      (TargetPrivilegeDescriptor.P_REPOSITORY_ID)      : repositoryId,
+                      (TargetPrivilegeDescriptor.P_GROUP_ID)           : groupId
                   ]
               )
           )

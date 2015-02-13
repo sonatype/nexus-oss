@@ -158,6 +158,12 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
+      id: 'NX.coreui.controller.RepositoriesCMA',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
       id: 'NX.coreui.controller.RepositoryTargets',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');

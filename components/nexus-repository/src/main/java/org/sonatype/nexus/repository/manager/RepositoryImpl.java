@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.manager;
 
 import javax.annotation.Nonnull;
@@ -19,6 +20,7 @@ import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuard;
 import org.sonatype.nexus.common.stateguard.StateGuardAware;
 import org.sonatype.nexus.common.stateguard.Transitions;
+import org.sonatype.nexus.common.throwables.MultipleFailures;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.MissingFacetException;
@@ -28,13 +30,13 @@ import org.sonatype.nexus.repository.RepositoryStartedEvent;
 import org.sonatype.nexus.repository.RepositoryStoppedEvent;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.util.MultipleFailures;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.inject.assistedinject.Assisted;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.DELETED;
 import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.DESTROYED;
 import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.FAILED;
 import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.INITIALISED;
@@ -109,10 +111,17 @@ public class RepositoryImpl
   static final class State
   {
     public static final String NEW = "NEW";
+
     public static final String INITIALISED = "INITIALISED";
+
     public static final String STARTED = "STARTED";
+
     public static final String STOPPED = "STOPPED";
+
+    public static final String DELETED = "DELETED";
+
     public static final String DESTROYED = "DESTROYED";
+
     public static final String FAILED = "FAILED";
   }
 
@@ -133,14 +142,14 @@ public class RepositoryImpl
   //
 
   @Override
-  @Transitions(from=NEW, to=INITIALISED)
+  @Transitions(from = NEW, to = INITIALISED)
   public void init(final Configuration configuration) throws Exception {
     this.configuration = checkNotNull(configuration);
     this.name = configuration.getRepositoryName();
   }
 
   @Override
-  @Guarded(by=STOPPED)
+  @Guarded(by = STOPPED)
   public void update(final Configuration configuration) throws Exception {
     this.configuration = checkNotNull(configuration);
 
@@ -155,11 +164,11 @@ public class RepositoryImpl
         failures.add(t);
       }
     }
-    failures.propagate("Failed to update facets");
+    failures.maybePropagate("Failed to update facets");
   }
 
   @Override
-  @Transitions(from={INITIALISED, STOPPED}, to=STARTED)
+  @Transitions(from = {INITIALISED, STOPPED}, to = STARTED)
   public void start() throws Exception {
     MultipleFailures failures = new MultipleFailures();
     for (Facet facet : facets) {
@@ -172,16 +181,17 @@ public class RepositoryImpl
         failures.add(t);
       }
     }
-    failures.propagate("Failed to start facets");
+    failures.maybePropagate("Failed to start facets");
 
     eventBus.post(new RepositoryStartedEvent(this));
   }
 
   @Override
-  @Transitions(from=STARTED, to=STOPPED)
+  @Transitions(from = STARTED, to = STOPPED)
   public void stop() throws Exception {
     MultipleFailures failures = new MultipleFailures();
-    for (Facet facet : facets) {
+
+    for (Facet facet : facets.reverse()) {
       try {
         log.debug("Stopping facet: {}", facet);
         facet.stop();
@@ -191,20 +201,38 @@ public class RepositoryImpl
         failures.add(t);
       }
     }
-    failures.propagate("Failed to stop facets");
+    failures.maybePropagate("Failed to stop facets");
 
     eventBus.post(new RepositoryStoppedEvent(this));
   }
 
   @Override
-  @Transitions(to=DESTROYED)
+  @Transitions(from = STOPPED, to = DELETED)
+  public void delete() throws Exception {
+    MultipleFailures failures = new MultipleFailures();
+
+    for (Facet facet : facets.reverse()) {
+      try {
+        log.debug("Deleting facet: {}", facet);
+        facet.delete();
+      }
+      catch (Throwable t) {
+        log.error("Failed to delete facet: {}", facet, t);
+        failures.add(t);
+      }
+    }
+    failures.maybePropagate("Failed to delete facets");
+  }
+
+  @Override
+  @Transitions(to = DESTROYED)
   public void destroy() throws Exception {
     if (states.is(STARTED)) {
       stop();
     }
 
     MultipleFailures failures = new MultipleFailures();
-    for (Facet facet : facets) {
+    for (Facet facet : facets.reverse()) {
       try {
         log.debug("Destroying facet: {}", facet);
         facet.destroy();
@@ -214,7 +242,7 @@ public class RepositoryImpl
         failures.add(t);
       }
     }
-    failures.propagate("Failed to destroy facets");
+    failures.maybePropagate("Failed to destroy facets");
 
     facets.clear();
     configuration = null;
@@ -227,7 +255,7 @@ public class RepositoryImpl
   //
 
   @Override
-  @Guarded(by=INITIALISED)
+  @Guarded(by = INITIALISED)
   public void attach(final Facet facet) throws Exception {
     checkNotNull(facet);
     log.debug("Attaching facet: {}", facet);

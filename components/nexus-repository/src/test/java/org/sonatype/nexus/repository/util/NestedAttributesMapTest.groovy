@@ -17,7 +17,7 @@ import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.junit.Assert.fail
-import static org.sonatype.nexus.repository.util.NestedAttributesMap.GRANDPARENT_SEPARATOR
+import static org.sonatype.nexus.repository.util.NestedAttributesMap.SEPARATOR
 
 /**
  * Tests for {@link NestedAttributesMap}.
@@ -46,7 +46,18 @@ class NestedAttributesMapTest
     assert underTest.key == 'foo'
     assert parent.key == 'bar'
     assert child.key == 'baz'
-    assert "foo${GRANDPARENT_SEPARATOR}bar" == child.parentKey
+    assert "foo${SEPARATOR}bar" == child.parentKey
+  }
+
+  @Test
+  void 'qualifiedKey w/o parent returns key'() {
+    assert "foo" == underTest.qualifiedKey
+  }
+
+  @Test
+  void 'qualifiedKey includes parent'() {
+    assert "foo${SEPARATOR}bar" == underTest.child('bar').qualifiedKey
+    assert "foo${SEPARATOR}bar${SEPARATOR}baz" == underTest.child('bar').child('baz').qualifiedKey
   }
 
   @Test
@@ -70,6 +81,29 @@ class NestedAttributesMapTest
     }
     catch (IllegalStateException e) {
       // expected
+    }
+  }
+
+  @Test
+  void 'child require includes parent key'() {
+    try {
+      underTest.child('bar').require('baz')
+      fail()
+    }
+    catch (Exception e) {
+      log e.message
+      assert e.message.contains('baz')
+      assert e.message.contains("foo${SEPARATOR}bar")
+    }
+
+    try {
+      underTest.child('bar').child('qux').require('baz')
+      fail()
+    }
+    catch (Exception e) {
+      log e.message
+      assert e.message.contains('baz')
+      assert e.message.contains("foo${SEPARATOR}bar${SEPARATOR}qux")
     }
   }
 }

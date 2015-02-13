@@ -31,7 +31,7 @@ public class NestedAttributesMap
   extends AttributesMap
 {
   @VisibleForTesting
-  static final String GRANDPARENT_SEPARATOR = "::";
+  static final String SEPARATOR = "::";
 
   @Nullable
   private final NestedAttributesMap parent;
@@ -65,7 +65,7 @@ public class NestedAttributesMap
     if (parent != null) {
       // fully-qualify parent key if it has a grandparent
       if (parent.parent != null) {
-        return parent.getParentKey() + GRANDPARENT_SEPARATOR + parent.getKey();
+        return parent.getParentKey() + SEPARATOR + parent.getKey();
       }
       return parent.getKey();
     }
@@ -77,6 +77,25 @@ public class NestedAttributesMap
    */
   public String getKey() {
     return key;
+  }
+
+  /**
+   * Returns the key of this nested container qualified with parent if there is one.
+   */
+  @VisibleForTesting
+  String getQualifiedKey() {
+    if (parent != null) {
+      return getParentKey() + SEPARATOR + key;
+    }
+    return key;
+  }
+
+  /**
+   * Include qualified key in missing key message.
+   */
+  @Override
+  protected String missingKeyMessage(final String key) {
+    return "Missing: {" + getQualifiedKey() + "} " + key;
   }
 
   /**

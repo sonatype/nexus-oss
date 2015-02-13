@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.repository.simple.internal;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -21,89 +20,47 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.common.stateguard.Guarded;
-import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.group.GroupFacetImpl;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
-import static org.sonatype.nexus.repository.util.TypeTokens.COLLECTION_STRING;
 
 /**
- * Simple group facet.
+ * Simple {link GroupFacet}.
  *
  * @since 3.0
  */
 @Named
-@Facet.Exposed
 public class SimpleGroupFacet
-    extends FacetSupport
+    extends GroupFacetImpl
     implements SimpleIndexHtmlContents
 {
-  public static final String CONFIG_KEY = "group";
-
-  private final RepositoryManager repositoryManager;
-
-  private final Set<String> memberNames = Sets.newLinkedHashSet();
-
   private SimpleIndexHtmlFacet indexHtml;
 
   @Inject
   public SimpleGroupFacet(final RepositoryManager repositoryManager) {
-    this.repositoryManager = checkNotNull(repositoryManager);
-  }
-
-  @Override
-  protected void doInit() throws Exception {
-    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
-    memberNames.addAll(attributes.require("memberNames", COLLECTION_STRING));
-    log.debug("Members names: {}", memberNames);
+    super(repositoryManager);
   }
 
   @Override
   protected void doStart() throws Exception {
+    super.doStart();
     indexHtml = getRepository().facet(SimpleIndexHtmlFacet.class);
-    // TODO: Validate members are compatible?
   }
 
   @Override
   protected void doStop() throws Exception {
     indexHtml = null;
-  }
-
-  @Override
-  protected void doDestroy() throws Exception {
-    memberNames.clear();
-  }
-
-  /**
-   * Return list of member repositories.
-   */
-  @Guarded(by=STARTED)
-  public List<Repository> members() {
-    List<Repository> members = Lists.newArrayListWithCapacity(memberNames.size());
-    for (String name : memberNames) {
-      Repository repository = repositoryManager.get(name);
-      if (repository != null) {
-        members.add(repository);
-      }
-      else {
-        log.warn("Ignoring missing member repository: {}", name);
-      }
-    }
-    return members;
+    super.doStop();
   }
 
   //
@@ -134,15 +91,11 @@ public class SimpleGroupFacet
     return union.entrySet();
   }
 
-  //
-  // Events
-  //
-
   /**
    * Invalidate index.html cache if any member repositories are mutated.
    */
   private void maybeInvalidateIndexHtmlCache(final SimpleContentEvent event) {
-    if (memberNames.contains(event.getRepository().getName())) {
+    if (member(event.getRepository())) {
       indexHtml.invalidate();
     }
   }

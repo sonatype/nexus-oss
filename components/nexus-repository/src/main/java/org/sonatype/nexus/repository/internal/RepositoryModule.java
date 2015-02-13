@@ -23,6 +23,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 /**
  * Repository module.
+ *
+ * @since 3.0
  */
 @Named
 public class RepositoryModule

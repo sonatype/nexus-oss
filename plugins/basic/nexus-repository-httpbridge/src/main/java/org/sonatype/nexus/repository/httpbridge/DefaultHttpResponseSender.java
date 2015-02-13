@@ -45,6 +45,8 @@ public class DefaultHttpResponseSender
   public void send(final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
+    log.trace("Sending response: {}", response);
+
     // add request headers
     for (Map.Entry<String,String> header : response.getHeaders()) {
       httpResponse.addHeader(header.getKey(), header.getValue());
@@ -53,6 +55,8 @@ public class DefaultHttpResponseSender
     // write payload details if we have one
     if (response instanceof PayloadResponse) {
       Payload payload = ((PayloadResponse)response).getPayload();
+      log.trace("Attaching payload: {}", payload);
+
       if (payload.getContentType() != null) {
         httpResponse.setContentType(payload.getContentType());
       }

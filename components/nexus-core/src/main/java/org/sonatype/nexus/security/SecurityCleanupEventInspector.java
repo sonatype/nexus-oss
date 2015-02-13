@@ -23,9 +23,6 @@ import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
 import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
-import org.sonatype.nexus.security.targets.TargetPrivilegeGroupPropertyDescriptor;
-import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryPropertyDescriptor;
-import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.AuthorizationManagerImpl;
 import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
@@ -62,8 +59,8 @@ public class SecurityCleanupEventInspector
 
     try {
       // Delete target privs that match repo/groupId
-      cleanupPrivileges(TargetPrivilegeRepositoryPropertyDescriptor.ID, repositoryId);
-      cleanupPrivileges(TargetPrivilegeGroupPropertyDescriptor.ID, repositoryId);
+      cleanupPrivileges(TargetPrivilegeDescriptor.P_REPOSITORY_ID, repositoryId);
+      cleanupPrivileges(TargetPrivilegeDescriptor.P_GROUP_ID, repositoryId);
     }
     catch (NoSuchPrivilegeException | NoSuchAuthorizationManagerException e) {
       log.error("Unable to clean privileges attached to repository", e);
@@ -76,7 +73,7 @@ public class SecurityCleanupEventInspector
     String targetId = event.getTarget().getId();
 
     try {
-      cleanupPrivileges(TargetPrivilegeRepositoryTargetPropertyDescriptor.ID, targetId);
+      cleanupPrivileges(TargetPrivilegeDescriptor.P_TARGET_ID, targetId);
     }
     catch (NoSuchPrivilegeException | NoSuchAuthorizationManagerException e) {
       log.error("Unable to clean privileges attached to target: {}", targetId, e);

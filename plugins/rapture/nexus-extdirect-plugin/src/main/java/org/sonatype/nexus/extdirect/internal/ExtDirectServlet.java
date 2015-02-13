@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -253,6 +254,14 @@ public class ExtDirectServlet
             return asResponse(error(e));
           }
           return asResponse(invalid(cause));
+        }
+
+        if (e instanceof ValidationException) {
+          log.debug(
+              "Failed to invoke action method: {}, java-method: {}",
+              method.getFullName(), method.getFullJavaMethodName(), e
+          );
+          return asResponse(error(e));
         }
 
         log.error(

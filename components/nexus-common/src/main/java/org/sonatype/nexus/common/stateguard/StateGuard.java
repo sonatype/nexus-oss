@@ -13,13 +13,13 @@
 package org.sonatype.nexus.common.stateguard;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.concurrent.Locks;
 import org.sonatype.sisu.goodies.common.Loggers;
 
 import com.google.common.base.Throwables;
@@ -38,7 +38,7 @@ public class StateGuard
 {
   private final Logger log;
 
-  private final ReadWriteLock lock;
+  private final ReadWriteLock readWriteLock;
 
   @Nullable
   private final String failure;
@@ -46,39 +46,21 @@ public class StateGuard
   private String current;
 
   StateGuard(final Logger log,
-             final ReadWriteLock lock,
+             final ReadWriteLock readWriteLock,
              final String initial,
              final @Nullable String failure)
   {
     this.log = checkNotNull(log);
-    this.lock = checkNotNull(lock);
+    this.readWriteLock = checkNotNull(readWriteLock);
     this.current = checkNotNull(initial);
     this.failure = failure;
-  }
-
-  private Lock tryLock(final Lock lock) {
-    try {
-      lock.tryLock(1, TimeUnit.MINUTES);
-    }
-    catch (InterruptedException e) {
-      throw Throwables.propagate(e);
-    }
-    return lock;
-  }
-
-  private Lock readLock() {
-    return tryLock(lock.readLock());
-  }
-
-  private Lock writeLock() {
-    return tryLock(lock.writeLock());
   }
 
   /**
    * Returns the current state.
    */
   public String getCurrent() {
-    Lock lock = readLock();
+    Lock lock = Locks.read(readWriteLock);
     try {
       return current;
     }
@@ -93,7 +75,7 @@ public class StateGuard
    * Code executed after may not have the same state, to execute and ensure state is allowed use {@link #guard} instead.
    */
   public boolean is(final String state) {
-    Lock lock = readLock();
+    Lock lock = Locks.read(readWriteLock);
     try {
       return current.equals(state);
     }
@@ -111,7 +93,7 @@ public class StateGuard
     checkNotNull(allowed);
     checkArgument(allowed.length != 0);
 
-    Lock lock = readLock();
+    Lock lock = Locks.read(readWriteLock);
     try {
       _ensure(allowed);
     }
@@ -181,7 +163,7 @@ public class StateGuard
     @Override
     @Nullable
     public <V> V run(final Action<V> action) throws Exception {
-      Lock lock = writeLock();
+      Lock lock = Locks.write(readWriteLock);
       try {
         if (allowed != null) {
           _ensure(allowed);
@@ -245,7 +227,7 @@ public class StateGuard
     public <V> V run(final Action<V> action) throws Exception {
       checkNotNull(action);
 
-      Lock lock = readLock();
+      Lock lock = Locks.read(readWriteLock);
       try {
         _ensure(allowed);
         return action.run();

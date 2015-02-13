@@ -13,16 +13,24 @@
 package org.sonatype.nexus.repository.simple;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.hash.MultiHashingInputStream;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 
+import com.google.common.collect.Lists;
+import com.google.common.hash.HashCode;
 import com.google.common.io.ByteStreams;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
+import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
+import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA512;
 
 /**
  * Simple content.
@@ -31,16 +39,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class SimpleContent
 {
+  private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(MD5, SHA1, SHA512);
+
   @Nullable
   private final String type;
 
   private final byte[] bytes;
 
+  private final Map<HashAlgorithm, HashCode> hashes;
+
   public SimpleContent(final Payload payload) throws IOException {
     checkNotNull(payload);
     this.type = payload.getContentType();
-    try (InputStream input = checkNotNull(payload.openInputStream())) {
+    try (MultiHashingInputStream input = new MultiHashingInputStream(hashAlgorithms,
+        checkNotNull(payload.openInputStream()))) {
       this.bytes = ByteStreams.toByteArray(input);
+      this.hashes = input.hashes();
     }
   }
 
@@ -53,6 +67,10 @@ public class SimpleContent
     return bytes.length;
   }
 
+  public Map<HashAlgorithm, HashCode> getHashes() {
+    return hashes;
+  }
+
   public Payload toPayload() {
     return new BytesPayload(bytes, type);
   }
@@ -62,6 +80,7 @@ public class SimpleContent
     return getClass().getSimpleName() + "{" +
         "type='" + type + '\'' +
         ", size=" + bytes.length +
+        ", hashes=" + hashes +
         '}';
   }
 }

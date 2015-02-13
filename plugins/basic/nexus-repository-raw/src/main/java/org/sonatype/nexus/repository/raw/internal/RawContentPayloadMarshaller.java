@@ -19,6 +19,10 @@ import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 
+import org.joda.time.DateTime;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Converts between {@link Payload} and {@link RawContent}
  *
@@ -28,7 +32,7 @@ public class RawContentPayloadMarshaller
 {
   private RawContentPayloadMarshaller() { }
 
-  public static RawContent toContent(final Payload payload) {
+  public static RawContent toContent(final Payload payload, final DateTime updatedDate) {
     return new RawContent()
     {
       @Override
@@ -45,10 +49,18 @@ public class RawContentPayloadMarshaller
       public InputStream openInputStream() throws IOException {
         return payload.openInputStream();
       }
+
+      @Override
+      public DateTime getLastUpdated() {
+        return updatedDate;
+      }
     };
   }
 
   public static Payload toPayload(RawContent content) throws IOException {
-    return new StreamPayload(content.openInputStream(), content.getSize(), content.getContentType());
+    checkNotNull(content);
+    return new StreamPayload(content.openInputStream(),
+        content.getSize(),
+        content.getContentType());
   }
 }

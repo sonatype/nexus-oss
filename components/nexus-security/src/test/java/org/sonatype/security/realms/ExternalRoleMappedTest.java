@@ -24,8 +24,6 @@ import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
-import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
-import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
 import org.sonatype.security.usermanagement.MockUserManager;
 import org.sonatype.security.usermanagement.UserManager;
 
@@ -59,8 +57,8 @@ public class ExternalRoleMappedTest
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
 
     Map<String, String> properties = new HashMap<String, String>();
-    properties.put(ApplicationPrivilegeMethodPropertyDescriptor.ID, "read");
-    properties.put(ApplicationPrivilegePermissionPropertyDescriptor.ID, "permissionOne");
+    properties.put(ApplicationPrivilegeDescriptor.P_METHOD, "read");
+    properties.put(ApplicationPrivilegeDescriptor.P_PERMISSION, "permissionOne");
 
     securitySystem.getAuthorizationManager("default").addPrivilege(new Privilege(
         "randomId",

@@ -11,7 +11,7 @@
     </encoder>
   </appender>
 
-  <logger name="org.sonatype.nexus.repository" level="DEBUG"/>
+  <logger name="org.sonatype.nexus.repository" level="TRACE"/>
 
   <root level="${test.log.level:-INFO}">
     <appender-ref ref="CONSOLE"/>

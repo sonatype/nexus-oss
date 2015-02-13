@@ -12,11 +12,14 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.util.AttributesMap;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -48,6 +51,10 @@ public class Request
   protected Headers headers;
 
   protected Payload payload;
+
+  protected boolean multipart;
+
+  protected Iterable<Payload> multiPayloads;
 
   protected Request() {
     // empty
@@ -85,6 +92,15 @@ public class Request
   @Nullable
   public Payload getPayload() {
     return payload;
+  }
+
+  public boolean isMultipart() {
+    return multipart;
+  }
+
+  @Nullable
+  public Iterable<Payload> getMultiparts() {
+    return multiPayloads;
   }
 
   @Override

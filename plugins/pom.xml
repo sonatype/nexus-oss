@@ -348,6 +348,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-repository-nuget</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-repository-raw</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>

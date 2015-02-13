@@ -17,6 +17,8 @@ import java.io.InputStream;
 
 import javax.annotation.Nullable;
 
+import org.joda.time.DateTime;
+
 /**
  * Payload.
  *
@@ -29,8 +31,6 @@ public interface Payload
   InputStream openInputStream() throws IOException;
 
   long getSize();
-
-  // TODO: Should we split this up to mimeType and encoding?
 
   @Nullable
   String getContentType();

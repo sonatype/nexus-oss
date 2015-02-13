@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.repository.view.Payload;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Stream payload.
@@ -27,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class StreamPayload
-  implements Payload
+    implements Payload
 {
   private final InputStream stream;
 
@@ -35,14 +36,19 @@ public class StreamPayload
 
   private final String contentType;
 
-  public StreamPayload(final InputStream stream, final long size, final @Nullable String contentType) {
+  private boolean opened = false;
+
+  public StreamPayload(final InputStream stream, final long size, final @Nullable String contentType)
+  {
     this.stream = checkNotNull(stream);
     this.size = size;
     this.contentType = contentType;
   }
 
   @Override
-  public InputStream openInputStream() throws IOException {
+  public synchronized InputStream openInputStream() throws IOException {
+    checkState(!opened, "This payload's stream has been opened already.");
+    opened = true;
     return stream;
   }
 

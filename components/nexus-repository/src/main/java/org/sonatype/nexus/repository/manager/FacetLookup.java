@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -42,9 +43,9 @@ public class FacetLookup
   implements Iterable<Facet>
 {
   /**
-   * All facet instances.
+   * All facet instances.  Retain order.
    */
-  private final Set<Facet> facets = Sets.newHashSet();
+  private final Set<Facet> facets = Sets.newLinkedHashSet();
 
   /**
    * Exposed type to facet instance map.
@@ -122,5 +123,12 @@ public class FacetLookup
   @Override
   public Iterator<Facet> iterator() {
     return Iterators.unmodifiableIterator(facets.iterator());
+  }
+
+  /**
+   * Returns reversed list of all facet instances.
+   */
+  public Iterable<Facet> reverse() {
+    return ImmutableList.copyOf(facets).reverse();
   }
 }

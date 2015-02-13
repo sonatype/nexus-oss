@@ -42,26 +42,24 @@ Ext.define('NX.coreui.store.SearchFilter', {
       readOnly: true,
       criterias: [
         { id: 'format', value: 'maven2', hidden: true },
-        { id: 'groupid' },
-        { id: 'artifactid' },
+        { id: 'group.raw' },
+        { id: 'name.raw' },
         { id: 'version' },
-        { id: 'classifier'},
-        { id: 'packaging' }
+        { id: 'attributes.maven.classifier'},
+        { id: 'attributes.maven.packaging' }
       ]
     },
-    // TODO Comment for now as we do not yet support P2 search
-    //{
-    //  id: 'p2',
-    //  name: 'P2',
-    //  text: 'P2',
-    //  description: 'Search for components P2 symbolic-name',
-    //  readOnly: true,
-    //  criterias: [
-    //    { id: 'format', value: 'p2', hidden: true },
-    //    { id: 'symbolicname' },
-    //    { id: 'version' }
-    //  ]
-    //},
+    {
+      id: 'raw',
+      name: 'Raw',
+      text: NX.I18n.get('BROWSE_SEARCH_RAW_TITLE'),
+      description: NX.I18n.get('BROWSE_SEARCH_RAW_SUBTITLE'),
+      readOnly: true,
+      criterias: [
+        { id: 'format', value: 'raw', hidden: true },
+        { id: 'attributes.raw.path.tree' }
+      ]
+    },
     {
       id: 'keyword',
       name: 'Keyword',
@@ -70,26 +68,6 @@ Ext.define('NX.coreui.store.SearchFilter', {
       readOnly: true,
       criterias: [
         { id: 'keyword' }
-      ]
-    },
-    {
-      id: 'sha-1',
-      name: 'SHA-1',
-      text: NX.I18n.get('BROWSE_SEARCH_SHA_1_TITLE'),
-      description: NX.I18n.get('BROWSE_SEARCH_SHA_1_SUBTITLE'),
-      readOnly: true,
-      criterias: [
-        { id: 'sha-1' }
-      ]
-    },
-    {
-      id: 'classname',
-      name: 'Class Name',
-      text: NX.I18n.get('BROWSE_SEARCH_CLASS_TITLE'),
-      description: NX.I18n.get('BROWSE_SEARCH_CLASS_SUBTITLE'),
-      readOnly: true,
-      criterias: [
-        { id: 'classname' }
       ]
     },
     {

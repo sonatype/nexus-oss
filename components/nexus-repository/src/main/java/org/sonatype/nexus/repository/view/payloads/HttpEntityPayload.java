@@ -21,6 +21,7 @@ import org.sonatype.nexus.repository.view.Payload;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,9 +33,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class HttpEntityPayload
     implements Payload
 {
+  private final HttpResponse response;
+
   private final HttpEntity entity;
 
-  public HttpEntityPayload(final HttpEntity entity) {
+  public HttpEntityPayload(final HttpResponse response, final HttpEntity entity) {
+    this.response = checkNotNull(response);
     this.entity = checkNotNull(entity);
   }
 

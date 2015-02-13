@@ -26,7 +26,7 @@ import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
-import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -146,10 +146,10 @@ public class AuthorizationManagerImpl
     privilege.setType(secPriv.getType());
     privilege.setProperties(Maps.newHashMap(secPriv.getProperties()));
 
-    // HACK: expose the real shiro permission string
+    // expose permission string representation
     PrivilegeDescriptor descriptor = descriptor(secPriv.getType());
     if (descriptor != null) {
-      privilege.setPermission(descriptor.buildPermission(secPriv));
+      privilege.setPermission(descriptor.createPermission(secPriv).toString());
     }
 
     return privilege;
@@ -259,7 +259,7 @@ public class AuthorizationManagerImpl
   }
 
   private void addInheritedPrivileges(CPrivilege privilege) {
-    String methodProperty = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
+    String methodProperty = privilege.getProperty(ApplicationPrivilegeDescriptor.P_METHOD);
 
     if (methodProperty != null) {
       List<String> inheritedMethods = privInheritance.getInheritedMethods(methodProperty);
@@ -274,7 +274,7 @@ public class AuthorizationManagerImpl
       if (buf.length() > 0) {
         buf.setLength(buf.length() - 1);
 
-        privilege.setProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID, buf.toString());
+        privilege.setProperty(ApplicationPrivilegeDescriptor.P_METHOD, buf.toString());
       }
     }
   }

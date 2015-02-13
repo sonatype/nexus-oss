@@ -12,14 +12,7 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import java.io.InputStream;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
 import org.sonatype.nexus.repository.Facet;
-
-import com.tinkerpop.blueprints.Vertex;
 
 /**
  * Storage {@link Facet}, providing component and asset storage for a repository.
@@ -30,73 +23,50 @@ import com.tinkerpop.blueprints.Vertex;
 public interface StorageFacet
   extends Facet
 {
-  /**
-   * Gets a transaction for working with the graph.
-   */
-  GraphTx getGraphTx();
+  static String E_CONTAINS_COMPONENTS_WITH_LABEL = "contains_components_with_label";
+
+  static String E_HAS_LABEL = "has_label";
+
+  static String E_OWNS_ASSET = "owns_asset";
+
+  static String E_OWNS_COMPONENT = "owns_component";
+
+  static String E_PART_OF_COMPONENT = "part_of_component";
+
+  static String P_ATTRIBUTES = "attributes";
+
+  static String P_BLOB_REF = "blob_ref";
+
+  static String P_CHECKSUM = "checksum";
+
+  static String P_CONTENT_TYPE = "content_type";
+
+  static String P_FORMAT = "format";
+
+  static String P_GROUP = "group";
+
+  static String P_LAST_UPDATED = "last_updated";
+
+  static String P_NAME = "name";
+
+  static String P_PATH = "path";
+
+  static String P_REPOSITORY_NAME = "repository_name";
+
+  static String P_SIZE = "size";
+
+  static String P_VERSION = "version";
+
+  static String V_ASSET = "asset";
+
+  static String V_COMPONENT = "component";
+
+  static String V_LABEL = "label";
+
+  static String V_BUCKET = "bucket";
 
   /**
-   * Gets all assets owned by the repository.
+   * Opens a transaction.
    */
-  Iterable<Vertex> browseAssets(GraphTx graph);
-
-  /**
-   * Gets all components owned by the repository.
-   */
-  Iterable<Vertex> browseComponents(GraphTx graph);
-
-  /**
-   * Gets an asset by id, or {@code null} if not found.
-   */
-  @Nullable
-  Vertex findAsset(GraphTx graph, Object vertexId);
-
-  /**
-   * Gets an asset by some other identifying property, or {@code null} if not found.
-   */
-  @Nullable
-  Vertex findAssetWithProperty(GraphTx graph, String propName, Object propValue);
-
-  /**
-   * Gets a component by id, or {@code null} if not found.
-   */
-  @Nullable
-  Vertex findComponent(GraphTx graph, Object vertexId);
-
-  /**
-   * Gets a component by some other identifying property, or {@code null} if not found.
-   */
-  @Nullable
-  Vertex findComponentWithProperty(GraphTx graph, String propName, Object propValue);
-
-  /**
-   * Creates a new asset.
-   */
-  Vertex createAsset(GraphTx graph);
-
-  /**
-   * Creates a new component.
-   */
-  Vertex createComponent(GraphTx graph);
-
-  /**
-   * Deletes an existing vertex.
-   */
-  void deleteVertex(GraphTx graph, Vertex vertex);
-
-  /**
-   * Creates a new Blob.
-   */
-  BlobRef createBlob(InputStream inputStream, Map<String, String> headers);
-
-  /**
-   * Gets a Blob.
-   */
-  @Nullable
-  org.sonatype.nexus.blobstore.api.Blob getBlob(BlobRef blobRef);
-
-  /**
-   * Deletes a Blob.
-   */
-  boolean deleteBlob(BlobRef blobRef);
+  StorageTx openTx();
 }

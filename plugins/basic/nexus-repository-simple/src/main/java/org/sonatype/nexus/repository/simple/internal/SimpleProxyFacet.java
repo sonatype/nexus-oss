@@ -20,8 +20,11 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
+import org.sonatype.nexus.repository.negativecache.NegativeCacheKey;
+import org.sonatype.nexus.repository.negativecache.NegativeCacheKeySource;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
+import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 
 import org.apache.http.HttpEntity;
@@ -45,6 +48,7 @@ import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 @Named
 public class SimpleProxyFacet
     extends SimpleStorageFacet
+    implements NegativeCacheKeySource
 {
   public static final String CONFIG_KEY = "proxy";
 
@@ -53,7 +57,7 @@ public class SimpleProxyFacet
   private HttpClientFacet httpClient;
 
   @Override
-  protected void doInit() throws Exception {
+  protected void doConfigure() throws Exception {
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     String url = attributes.require("remoteUrl", String.class);
     if (!url.endsWith("/")) {
@@ -79,7 +83,7 @@ public class SimpleProxyFacet
   }
 
   @Nullable
-  @Guarded(by=STARTED)
+  @Guarded(by = STARTED)
   public SimpleContent get(final String name) {
     checkNotNull(name);
 
@@ -97,6 +101,11 @@ public class SimpleProxyFacet
     }
 
     return content;
+  }
+
+  @Override
+  public NegativeCacheKey cacheKey(final Context context) {
+    return new NegativeCacheKey(ContextHelper.contentName(context));
   }
 
   @Nullable
@@ -117,7 +126,7 @@ public class SimpleProxyFacet
       HttpEntity entity = response.getEntity();
       try {
         log.debug("Entity: {}", entity);
-        content = new SimpleContent(new HttpEntityPayload(entity));
+        content = new SimpleContent(new HttpEntityPayload(response, entity));
       }
       finally {
         EntityUtils.consume(entity);

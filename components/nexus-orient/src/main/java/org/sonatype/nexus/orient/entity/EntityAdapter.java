@@ -13,8 +13,6 @@
 package org.sonatype.nexus.orient.entity;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -22,9 +20,6 @@ import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
@@ -300,52 +295,5 @@ public abstract class EntityAdapter<T extends Entity>
     ORecordVersion version = new OSimpleVersion();
     version.getSerializer().fromString(metadata.getVersion().getValue(), version);
     return version;
-  }
-
-  //
-  // Object copy helpers
-  //
-
-  private Object maybeCopy(final Object source) {
-    if (source instanceof Map) {
-      return copy((Map) source);
-    }
-    else if (source instanceof List) {
-      return copy((List) source);
-    }
-    else if (source instanceof Set) {
-      return copy((Set)source);
-    }
-    return source;
-  }
-
-  @SuppressWarnings("unchecked")
-  protected Map copy(final Map<?, ?> source) {
-    Map target = Maps.newHashMapWithExpectedSize(source.size());
-    for (Map.Entry<?, ?> entry : source.entrySet()) {
-      Object value = maybeCopy(entry.getValue());
-      target.put(entry.getKey(), value);
-    }
-    return target;
-  }
-
-  @SuppressWarnings("unchecked")
-  protected List copy(final List<?> source) {
-    List target = Lists.newArrayListWithExpectedSize(source.size());
-    for (Object value : source) {
-      value = maybeCopy(value);
-      target.add(value);
-    }
-    return target;
-  }
-
-  @SuppressWarnings("unchecked")
-  protected Set copy(final Set<?> source) {
-    Set target = Sets.newHashSetWithExpectedSize(source.size());
-    for (Object value : source) {
-      value = maybeCopy(value);
-      target.add(value);
-    }
-    return target;
   }
 }

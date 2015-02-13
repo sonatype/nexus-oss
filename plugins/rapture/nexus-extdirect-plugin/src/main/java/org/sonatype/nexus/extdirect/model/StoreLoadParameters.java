@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Ext Store load parameters.
  *
  * @see <a href="http://docs.sencha.com/extjs/4.2.2/#!/api/Ext.toolbar.Paging">Ext.toolbar.Paging</a>
- *
  * @since 3.0
  */
 public class StoreLoadParameters
@@ -55,6 +54,10 @@ public class StoreLoadParameters
 
   public void setLimit(final Integer limit) {
     this.limit = limit;
+  }
+
+  public List<Filter> getFilters() {
+    return filter;
   }
 
   public String getFilter(String property) {

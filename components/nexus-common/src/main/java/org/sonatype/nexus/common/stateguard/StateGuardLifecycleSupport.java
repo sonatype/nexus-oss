@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.common.stateguard;
 
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import javax.annotation.Nonnull;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;

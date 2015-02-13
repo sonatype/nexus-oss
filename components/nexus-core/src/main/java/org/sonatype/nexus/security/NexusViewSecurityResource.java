@@ -132,7 +132,7 @@ public class NexusViewSecurityResource
     priv.setName(name);
     priv.setDescription(description);
     priv.setType(RepositoryViewPrivilegeDescriptor.TYPE);
-    priv.setProperty(RepositoryPropertyDescriptor.ID, repoId);
+    priv.setProperty(RepositoryViewPrivilegeDescriptor.P_REPOSITORY_ID, repoId);
 
     return priv;
   }

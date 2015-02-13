@@ -24,8 +24,6 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.realms.AuthenticatingRealmImpl;
 import org.sonatype.security.realms.AuthorizingRealmImpl;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
-import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
-import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
@@ -159,8 +157,8 @@ public class EmptyRoleTest
     priv.setName("somepriv");
     priv.setType(ApplicationPrivilegeDescriptor.TYPE);
     priv.setDescription("somedescription");
-    priv.setProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID, "app:config");
-    priv.setProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID, "read");
+    priv.setProperty(ApplicationPrivilegeDescriptor.P_PERMISSION, "app:config");
+    priv.setProperty(ApplicationPrivilegeDescriptor.P_METHOD, "read");
 
     this.lookup(DefaultConfigurationManager.class).createPrivilege(priv);
 

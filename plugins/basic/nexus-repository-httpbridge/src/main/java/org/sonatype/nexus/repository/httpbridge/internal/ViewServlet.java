@@ -26,9 +26,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
-import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.ViewFacet;
@@ -86,7 +86,7 @@ public class ViewServlet
   {
     String uri = httpRequest.getRequestURI();
     if (httpRequest.getQueryString() != null) {
-      uri = String.format("%s?%s", uri, httpRequest.getQueryString());
+      uri = uri + "?" + httpRequest.getQueryString();
     }
 
     if (log.isDebugEnabled()) {
@@ -114,7 +114,7 @@ public class ViewServlet
     // resolve repository for request
     RepositoryPath path = path(httpRequest);
     if (path == null) {
-      send(HttpResponses.notFound("Repository not found"), httpResponse);
+      send(HttpResponses.badRequest("Invalid repository path"), httpResponse);
       return;
     }
     log.debug("Parsed path: {}", path);
@@ -129,13 +129,18 @@ public class ViewServlet
     // dispatch request and send response
     ViewFacet facet = repo.facet(ViewFacet.class);
     log.debug("Dispatching to view facet: {}", facet);
-    Response response = facet.dispatch(new HttpRequest(httpRequest, path.getRemainingPath()));
+    Response response = facet.dispatch(new HttpRequestAdapter(httpRequest, path.getRemainingPath()));
 
     HttpResponseSender sender = sender(repo);
     log.debug("HTTP response sender: {}", sender);
     sender.send(response, httpResponse);
   }
 
+  /**
+   * Send with default sender.
+   *
+   * Needed in a few places _before_ we have a repository instance to determine its specific sender.
+   */
   private void send(final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {

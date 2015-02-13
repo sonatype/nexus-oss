@@ -17,7 +17,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.httpbridge.HttpResponses;
+import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
 import org.sonatype.nexus.repository.view.Context;
@@ -25,7 +25,7 @@ import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
+import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 
 /**
  * Simple content proxy handler.

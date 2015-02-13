@@ -59,6 +59,16 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-security</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-elasticsearch</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-testsupport</artifactId>
       <scope>test</scope>

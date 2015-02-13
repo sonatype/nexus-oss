@@ -25,21 +25,21 @@
 
 ## Hosted
 
-    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted1/README.md
-    curl -v --upload-file ./README.md http://localhost:8081/repository/simplehosted1/no-type-README.md
-    curl -v -X GET http://localhost:8081/repository/simplehosted1/
-    curl -v -X GET http://localhost:8081/repository/simplehosted1/index.html
-    curl -v -X GET http://localhost:8081/repository/simplehosted1/README.md
-    curl -v -X DELETE http://localhost:8081/repository/simplehosted1/README.md
-    curl -v -X DELETE http://localhost:8081/repository/simplehosted1/no-type-README.md
+    curl -v --user 'admin:admin123' -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted1/README.md
+    curl -v --user 'admin:admin123' --upload-file ./README.md http://localhost:8081/repository/simplehosted1/no-type-README.md
+    curl -v --user 'admin:admin123' -X GET http://localhost:8081/repository/simplehosted1/
+    curl -v --user 'admin:admin123' -X GET http://localhost:8081/repository/simplehosted1/index.html
+    curl -v --user 'admin:admin123' -X GET http://localhost:8081/repository/simplehosted1/README.md
+    curl -v --user 'admin:admin123' -X DELETE http://localhost:8081/repository/simplehosted1/README.md
+    curl -v --user 'admin:admin123' -X DELETE http://localhost:8081/repository/simplehosted1/no-type-README.md
 
 ## Group
 
-    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted1/A.md
-    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted2/B.md
-    curl -v -X GET http://localhost:8081/repository/simplegroup1/
+    curl -v --user 'admin:admin123' -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted1/A.md
+    curl -v --user 'admin:admin123' -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted2/B.md
+    curl -v --user 'admin:admin123' -X GET http://localhost:8081/repository/simplegroup1/
 
 ## Proxy
 
-    curl -v -X GET http://localhost:8081/repository/simpleproxy1/4.12/junit-4.12.pom
-    curl -v -X GET http://localhost:8081/repository/simpleproxy1/maven-metadata.xml
+    curl -v --user 'admin:admin123' -X GET http://localhost:8081/repository/simpleproxy1/4.12/junit-4.12.pom
+    curl -v --user 'admin:admin123' -X GET http://localhost:8081/repository/simpleproxy1/maven-metadata.xml

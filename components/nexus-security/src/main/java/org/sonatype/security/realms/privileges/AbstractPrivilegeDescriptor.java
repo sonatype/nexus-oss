@@ -28,7 +28,10 @@ import org.apache.shiro.authz.Permission;
 
 /**
  * Abstract {@link PrivilegeDescriptor}.
+ *
+ * @deprecated Use {@link PrivilegeDescriptorSupport} instead.
  */
+@Deprecated
 public abstract class AbstractPrivilegeDescriptor
     implements PrivilegeDescriptor
 {
@@ -38,6 +41,8 @@ public abstract class AbstractPrivilegeDescriptor
   public void installDependencies(final ConfigurationIdGenerator idGenerator) {
     this.idGenerator = idGenerator;
   }
+
+  protected abstract String buildPermission(CPrivilege privilege);
 
   @Override
   public Permission createPermission(final CPrivilege privilege) {

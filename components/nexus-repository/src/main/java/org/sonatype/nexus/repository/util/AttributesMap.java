@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.util;
 
+import java.lang.reflect.Constructor;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,6 +22,7 @@ import javax.annotation.Nullable;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
@@ -44,15 +46,6 @@ public class AttributesMap
 
   public AttributesMap() {
     this(Maps.<String, Object>newHashMap());
-  }
-
-  /**
-   * Return the key for given type-key.
-   */
-  private String key(final Class type) {
-    checkNotNull(type);
-    // TODO: Strip off anonymous class turds?
-    return type.getName();
   }
 
   /**
@@ -95,8 +88,31 @@ public class AttributesMap
    */
   @Nullable
   public <T> T get(final Class<T> type) {
-    Object value = get(key(type));
+    Object value = get(AttributeKey.get(type));
     return type.cast(value);
+  }
+
+  /**
+   * Get attribute value or create attribute value if not set.
+   *
+   * @return Existing or newly created attribute value.
+   */
+  public <T> T getOrCreate(final Class<T> type) {
+    T value = get(type);
+    if (value == null) {
+      try {
+        // create new attribute value with accessible=true ctor to allow construction of private/package-private
+        Constructor<T> ctor = type.getDeclaredConstructor();
+        log.trace("Creating '{}' with constructor: {}", type, ctor);
+        ctor.setAccessible(true);
+        value = ctor.newInstance();
+      }
+      catch (Exception e) {
+        throw Throwables.propagate(e);
+      }
+      set(type, value);
+    }
+    return value;
   }
 
   /**
@@ -152,11 +168,18 @@ public class AttributesMap
   }
 
   /**
+   * Allow customization of missing key message.
+   */
+  protected String missingKeyMessage(final String key) {
+    return "Missing: " + key;
+  }
+
+  /**
    * Get required attribute value for given key.
    */
   public Object require(final String key) {
     Object value = get(key);
-    checkState(value != null, "Missing: %s", key);
+    checkState(value != null, missingKeyMessage(key));
     return value;
   }
 
@@ -165,7 +188,7 @@ public class AttributesMap
    */
   public <T> T require(final Class<T> type) {
     T value = get(type);
-    checkState(value != null, "Missing: %s", key(type));
+    checkState(value != null, missingKeyMessage(AttributeKey.get(type)));
     return value;
   }
 
@@ -196,7 +219,9 @@ public class AttributesMap
       return remove(key);
     }
     Object replaced = backing.put(key, value);
-    log.trace("Set: {}={} ({})", key, value, value.getClass().getName());
+    if (log.isTraceEnabled()) {
+      log.trace("Set: {}={} ({})", key, value, value.getClass().getName());
+    }
     return replaced;
   }
 
@@ -205,7 +230,7 @@ public class AttributesMap
    */
   @Nullable
   public <T> Object set(final Class<T> type, final @Nullable T value) {
-    return set(key(type), value);
+    return set(AttributeKey.get(type), value);
   }
 
   /**
@@ -226,7 +251,7 @@ public class AttributesMap
    */
   @Nullable
   public Object remove(final Class type) {
-    return remove(key(type));
+    return remove(AttributeKey.get(type));
   }
 
   /**
@@ -241,7 +266,7 @@ public class AttributesMap
    * Check if attributes contains given type-key.
    */
   public boolean contains(final Class type) {
-    return contains(key(type));
+    return contains(AttributeKey.get(type));
   }
 
   /**

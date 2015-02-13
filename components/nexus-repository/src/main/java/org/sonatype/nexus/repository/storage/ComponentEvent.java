@@ -12,29 +12,15 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Component event.
  *
  * @since 3.0
  */
 public abstract class ComponentEvent
+  extends VertexEvent
 {
-  private final Component component;
-
-  public ComponentEvent(final Component component) {
-    this.component = checkNotNull(component);
-  }
-
-  public Component getComponent() {
-    return component;
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "component=" + component +
-        '}';
+  public ComponentEvent(final Object vertexId) {
+    super(vertexId);
   }
 }

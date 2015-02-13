@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.security;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -22,10 +20,8 @@ import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.realms.privileges.AbstractPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
-import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
-import com.google.common.collect.Lists;
 import org.codehaus.plexus.util.StringUtils;
 
 @Singleton
@@ -36,17 +32,7 @@ public class RepositoryViewPrivilegeDescriptor
 {
   public static final String TYPE = "repository";
 
-  @Override
-  public String getName() {
-    return "Repository View";
-  }
-
-  @Override
-  public List<PrivilegePropertyDescriptor> getPropertyDescriptors() {
-    List<PrivilegePropertyDescriptor> descriptors = Lists.newArrayList();
-    descriptors.add(new RepositoryPropertyDescriptor());
-    return descriptors;
-  }
+  public static final String P_REPOSITORY_ID = "repositoryId";
 
   @Override
   public String getType() {
@@ -54,12 +40,12 @@ public class RepositoryViewPrivilegeDescriptor
   }
 
   @Override
-  public String buildPermission(CPrivilege privilege) {
+  protected String buildPermission(CPrivilege privilege) {
     if (!TYPE.equals(privilege.getType())) {
       return null;
     }
 
-    String repoId = privilege.getProperty(RepositoryPropertyDescriptor.ID);
+    String repoId = privilege.getProperty(P_REPOSITORY_ID);
 
     if (StringUtils.isEmpty(repoId)) {
       repoId = "*";

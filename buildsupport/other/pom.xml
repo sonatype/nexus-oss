@@ -164,10 +164,24 @@
         <artifactId>redline</artifactId>
         <version>1.2.0</version>
       </dependency>
+      
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.elasticsearch</artifactId>
+        <version>1.4.1_1</version>
+      </dependency>
+      
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.stax-utils</artifactId>
         <version>20070216_1</version>
+      </dependency>
+      
+      <!-- needed by elastic search -->
+      <dependency>
+        <groupId>com.vividsolutions</groupId>
+        <artifactId>jts</artifactId>
+        <version>1.13</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

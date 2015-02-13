@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.util.AttributeKey;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
@@ -34,6 +35,8 @@ public class TimingHandler
   extends ComponentSupport
   implements Handler
 {
+  public static final String ELAPSED_KEY = AttributeKey.get(TimingHandler.class, "elapsed");
+
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
@@ -43,7 +46,9 @@ public class TimingHandler
       return context.proceed();
     }
     finally {
-      log.trace("Timing: {}", watch);
+      String elapsed = watch.toString();
+      context.getAttributes().set(ELAPSED_KEY, elapsed);
+      log.trace("Timing: {}", elapsed);
     }
   }
 }

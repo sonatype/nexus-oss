@@ -12,8 +12,7 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.net.URI;
 
 import javax.annotation.Nullable;
 
@@ -22,7 +21,7 @@ import javax.annotation.Nullable;
  *
  * @since 3.0
  */
-public class RepositoryPath
+class RepositoryPath
 {
   private final String repositoryName;
 
@@ -53,19 +52,44 @@ public class RepositoryPath
   // Parser
   //
 
-  private static final Pattern PATTERN = Pattern.compile("/?([^/]*)(.*)");
-
   /**
    * @return The parsed path or {@code null}
    */
   @Nullable
-  public static RepositoryPath parse(final @Nullable String path) {
-    if (path != null) {
-      Matcher matcher = PATTERN.matcher(path);
-      if (matcher.matches()) {
-        return new RepositoryPath(matcher.group(1), matcher.group(2));
-      }
+  public static RepositoryPath parse(final @Nullable String input) {
+    // input not be null or empty
+    if (input == null || input.isEmpty()) {
+      return null;
     }
-    return null;
+
+    // input must start with '/'
+    if (!(input.charAt(0) == '/')) {
+      return null;
+    }
+
+    // input must have another '/' after initial '/'
+    int i = input.indexOf('/', 1);
+    if (i == -1) {
+      return null;
+    }
+
+    // pull off repository-name part
+    String repo = input.substring(1, i);
+
+    // repository must not be a relative token
+    if (repo.equals(".") || repo.equals("..")) {
+      return null;
+    }
+
+    // pull off remaining-path part and normalize
+    String path = input.substring(i, input.length());
+    path = URI.create(path).normalize().toString();
+
+    // path must not contain any relative tokens
+    if (path.contains("/..")) {
+      return null;
+    }
+
+    return new RepositoryPath(repo, path);
   }
 }

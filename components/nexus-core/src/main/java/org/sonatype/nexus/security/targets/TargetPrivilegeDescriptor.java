@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.security.targets;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -23,11 +21,9 @@ import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.realms.privileges.AbstractPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
-import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
-import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
-import com.google.common.collect.Lists;
 import org.codehaus.plexus.util.StringUtils;
 
 @Singleton
@@ -38,19 +34,11 @@ public class TargetPrivilegeDescriptor
 {
   public static final String TYPE = "target";
 
-  @Override
-  public String getName() {
-    return "Repository Target";
-  }
+  public static final String P_GROUP_ID = "repositoryGroupId";
 
-  @Override
-  public List<PrivilegePropertyDescriptor> getPropertyDescriptors() {
-    return Lists.newArrayList(
-        new ApplicationPrivilegeMethodPropertyDescriptor(),
-        new TargetPrivilegeRepositoryTargetPropertyDescriptor(),
-        new TargetPrivilegeRepositoryPropertyDescriptor(),
-        new TargetPrivilegeGroupPropertyDescriptor());
-  }
+  public static final String P_REPOSITORY_ID = "repositoryId";
+
+  public static final String P_TARGET_ID = "repositoryTargetId";
 
   @Override
   public String getType() {
@@ -58,15 +46,15 @@ public class TargetPrivilegeDescriptor
   }
 
   @Override
-  public String buildPermission(CPrivilege privilege) {
+  protected String buildPermission(CPrivilege privilege) {
     if (!TYPE.equals(privilege.getType())) {
       return null;
     }
 
-    String method = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
-    String repositoryTargetId = privilege.getProperty(TargetPrivilegeRepositoryTargetPropertyDescriptor.ID);
-    String repositoryId = privilege.getProperty(TargetPrivilegeRepositoryPropertyDescriptor.ID);
-    String groupId = privilege.getProperty(TargetPrivilegeGroupPropertyDescriptor.ID);
+    String method = privilege.getProperty(ApplicationPrivilegeDescriptor.P_METHOD);
+    String repositoryTargetId = privilege.getProperty(P_TARGET_ID);
+    String repositoryId = privilege.getProperty(P_REPOSITORY_ID);
+    String groupId = privilege.getProperty(P_GROUP_ID);
 
     StringBuilder basePermString = new StringBuilder();
 
@@ -114,10 +102,10 @@ public class TargetPrivilegeDescriptor
     // method is of form ('*' | 'read' | 'create' | 'update' | 'delete' [, method]* )
     // so, 'read' method is correct, but so is also 'create,update,delete'
     // '*' means ALL POSSIBLE value for this "field"
-    String method = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
-    String repositoryId = privilege.getProperty(TargetPrivilegeRepositoryPropertyDescriptor.ID);
-    String repositoryTargetId = privilege.getProperty(TargetPrivilegeRepositoryTargetPropertyDescriptor.ID);
-    String repositoryGroupId = privilege.getProperty(TargetPrivilegeGroupPropertyDescriptor.ID);
+    String method = privilege.getProperty(ApplicationPrivilegeDescriptor.P_METHOD);
+    String repositoryId = privilege.getProperty(P_REPOSITORY_ID);
+    String repositoryTargetId = privilege.getProperty(P_TARGET_ID);
+    String repositoryGroupId = privilege.getProperty(P_GROUP_ID);
 
     if (StringUtils.isEmpty(repositoryTargetId)) {
       ValidationMessage message = new ValidationMessage("repositoryTargetId", "Privilege ID '"

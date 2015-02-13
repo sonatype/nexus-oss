@@ -27,46 +27,104 @@ import static org.hamcrest.Matchers.nullValue;
 public class RepositoryPathTest
     extends TestSupport
 {
-  @Test
-  public void nullPath() {
-    RepositoryPath parsedPath = RepositoryPath.parse(null);
-    assertThat(parsedPath, nullValue());
+  private void assertNullPath(final String input) {
+    RepositoryPath path = RepositoryPath.parse(input);
+    assertThat(path, nullValue());
   }
 
-  @Test
-  public void emptyPath() {
-    checkPaths("", "", "");
-  }
-
-  @Test
-  public void bareSlash() {
-    checkPaths("/", "", "");
-  }
-
-  @Test
-  public void repoOnly() {
-    checkPaths("/repo", "repo", "");
-  }
-
-  @Test
-  public void repoOnlyWithFinalSlash() {
-    checkPaths("/repo/", "repo", "/");
-  }
-
-  @Test
-  public void repoOnlyWithTwoFinalSlashes() {
-    checkPaths("/repo//", "repo", "//");
-  }
-
-  @Test
-  public void noRepo() {
-    checkPaths("//path", "", "/path");
-  }
-
-  private void checkPaths(final String path, final String expectedRepoName, final String expectedRemainingPath) {
+  private void assertPath(final String path, final String expectedRepoName, final String expectedRemainingPath) {
     final RepositoryPath parsedPath = RepositoryPath.parse(path);
     assertThat(parsedPath, notNullValue());
     assertThat(parsedPath.getRepositoryName(), is(expectedRepoName));
     assertThat(parsedPath.getRemainingPath(), is(expectedRemainingPath));
+  }
+
+
+  @Test
+  public void nullPath() {
+    assertNullPath(null);
+  }
+
+  @Test
+  public void emptyPath() {
+    assertNullPath("");
+  }
+
+  @Test
+  public void bareSlash() {
+    assertNullPath("/");
+  }
+
+  @Test
+  public void missingRepoPathSeperator() {
+    assertNullPath("/repo");
+  }
+
+  @Test
+  public void missingLeadingSlash() {
+    assertNullPath("repo");
+  }
+
+  @Test
+  public void repoDots() {
+    // repository name can not be a . or ..
+    assertNullPath("/./");
+    assertNullPath("/../");
+  }
+
+  @Test
+  public void repoAndRootPath() {
+    // allow root path
+    assertPath("/repo/", "repo", "/");
+  }
+
+  @Test
+  public void repoAndSimplePath() {
+    assertPath("/repo/path", "repo", "/path");
+  }
+
+  @Test
+  public void complexPath() {
+    assertPath("/repo/foo/bar/baz", "repo", "/foo/bar/baz");
+  }
+
+  @Test
+  public void sillySlashes() {
+    assertPath("/repo/foo/////bar/baz", "repo", "/foo/bar/baz");
+  }
+
+  @Test
+  public void relativePath() {
+    assertPath("/repo/foo/../bar/../baz", "repo", "/baz");
+  }
+
+  @Test
+  public void invalidRelative1() {
+    assertNullPath("/repo/..");
+  }
+
+  @Test
+  public void invalidRelative2() {
+    assertNullPath("/repo/../bar");
+  }
+
+  @Test
+  public void invalidRelative3() {
+    assertNullPath("/repo/foo/../../bar");
+  }
+
+  @Test
+  public void dotReference1() {
+    assertPath("/repo/foo/./baz", "repo", "/foo/baz");
+  }
+
+  @Test
+  public void dotReference2() {
+    assertPath("/repo/foo/././baz", "repo", "/foo/baz");
+  }
+
+  @Test
+  public void fileWithDot() {
+    assertPath("/repo/foo/baz.bar", "repo", "/foo/baz.bar");
   }
 }
