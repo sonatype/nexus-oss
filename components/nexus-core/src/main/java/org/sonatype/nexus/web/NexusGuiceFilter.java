@@ -12,9 +12,10 @@
  */
 package org.sonatype.nexus.web;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.web.internal.DynamicFilterPipeline;
 
-import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceFilter;
 
 /**
@@ -23,17 +24,7 @@ import com.google.inject.servlet.GuiceFilter;
 public final class NexusGuiceFilter
     extends GuiceFilter
 {
-  /*
-   * Guice @Inject instead of JSR330 so Resin/CDI won't try to inject this and fail!
-   */
-  @com.google.inject.Inject
-  static Injector injector; // defer creation of pipeline until constructor is called
-
-  public NexusGuiceFilter() {
-    super(injector.getInstance(DynamicFilterPipeline.class));
-  }
-
-  @com.google.inject.Inject
+  @Inject
   NexusGuiceFilter(DynamicFilterPipeline pipeline) {
     super(pipeline);
   }
