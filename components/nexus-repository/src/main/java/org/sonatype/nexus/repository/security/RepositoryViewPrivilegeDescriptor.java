@@ -55,7 +55,7 @@ public class RepositoryViewPrivilegeDescriptor
     String format = readProperty(privilege, P_FORMAT, ALL);
     String name = readProperty(privilege, P_REPOSITORY, ALL);
     List<String> actions = readListProperty(privilege, P_ACTIONS, ALL);
-    return new RepositoryAdminPermission(format, name, actions);
+    return new RepositoryViewPermission(format, name, actions);
   }
 
   //
