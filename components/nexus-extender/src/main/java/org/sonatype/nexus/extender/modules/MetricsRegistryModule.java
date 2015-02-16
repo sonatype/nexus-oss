@@ -15,22 +15,21 @@ package org.sonatype.nexus.extender.modules;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
 import com.codahale.metrics.health.HealthCheckRegistry;
+import com.google.inject.AbstractModule;
 
 /**
- * Provides instrumentation of methods annotated with metrics annotations.
+ * Provides access to the shared metrics and healthcheck registries.
  * 
  * @since 3.0
  */
-public class InstrumentationModule
-    extends com.palominolabs.metrics.guice.InstrumentationModule
+public class MetricsRegistryModule
+    extends AbstractModule
 {
-  @Override
-  protected MetricRegistry createMetricRegistry() {
-    return SharedMetricRegistries.getOrCreate("nexus");
-  }
+  static final HealthCheckRegistry HEALTH_CHECK_REGISTRY = new HealthCheckRegistry();
 
   @Override
-  protected HealthCheckRegistry createHealthCheckRegistry() {
-    return MetricsRegistryModule.HEALTH_CHECK_REGISTRY;
+  protected void configure() {
+    bind(MetricRegistry.class).toInstance(SharedMetricRegistries.getOrCreate("nexus"));
+    bind(HealthCheckRegistry.class).toInstance(HEALTH_CHECK_REGISTRY);
   }
 }
