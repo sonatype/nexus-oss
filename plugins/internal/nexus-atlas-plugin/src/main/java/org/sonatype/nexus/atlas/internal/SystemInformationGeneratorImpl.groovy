@@ -109,25 +109,23 @@ class SystemInformationGeneratorImpl
     def reportFileStores = {
       def data = [:]
       def fs = FileSystems.default
-      def ignoreIOex = { def defaultValue, Closure callMe ->
+      def ignoreEx = { def defaultValue, Closure callMe ->
         try {
           return callMe.call()
         }
         catch (e) {
-          if (!e.class.isAssignableFrom(IOException.class)) {
-            throw e
-          }
+          log.debug "FileStore exception, defaulting to {}", defaultValue, e
           return defaultValue
         }
       }
       fs.fileStores.each { store ->
         data[store.name()] = [
             'description': store.toString(), // seems to be the only place where mount-point is exposed
-            'type': ignoreIOex('n/a') {store.type()},
-            'totalSpace': ignoreIOex(-1) {store.totalSpace},
-            'usableSpace': ignoreIOex(-1) {store.usableSpace},
-            'unallocatedSpace': ignoreIOex(-1) {store.unallocatedSpace},
-            'readOnly': ignoreIOex(false) {store.readOnly}
+            'type': ignoreEx('n/a') {store.type()},
+            'totalSpace': ignoreEx(-1) {store.totalSpace},
+            'usableSpace': ignoreEx(-1) {store.usableSpace},
+            'unallocatedSpace': ignoreEx(-1) {store.unallocatedSpace},
+            'readOnly': ignoreEx(false) {store.readOnly}
         ]
       }
 
