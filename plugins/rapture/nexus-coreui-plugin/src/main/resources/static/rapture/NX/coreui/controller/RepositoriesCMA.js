@@ -64,7 +64,7 @@ Ext.define('NX.coreui.controller.RepositoriesCMA', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('nexus:repositories', 'read');
+      return NX.Permissions.check('nexus:repositories', 'read') && NX.State.getUser();
     }
   },
   permission: 'nexus:repositories',
