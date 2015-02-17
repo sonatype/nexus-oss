@@ -60,7 +60,7 @@ public class AnonymousFilter
       String principal = settingsManager.getAnonymousUsername();
       // FIXME: Expose realm name in settings
       String realmName = AuthorizingRealmImpl.NAME;
-      log.info("Binding anonymous subject: principal={}, realmName={}", principal, realmName);
+      log.trace("Binding anonymous subject: principal={}, realmName={}", principal, realmName);
 
       subject = new Subject.Builder()
           .principals(new SimplePrincipalCollection(principal, realmName))
@@ -70,7 +70,7 @@ public class AnonymousFilter
       // TODO: Sort out if we need sessionCreationEnabled(false), this presently causes the UI to freak-out
 
       ThreadContext.bind(subject);
-      log.info("Bound anonymous subject: {}", subject);
+      log.trace("Bound anonymous subject: {}", subject);
     }
 
     return true;
@@ -82,13 +82,13 @@ public class AnonymousFilter
   {
     Subject subject = (Subject) request.getAttribute(ORIGINAL_SUBJECT);
     if (subject != null) {
-      log.info("Binding original subject: {}", subject);
+      log.trace("Binding original subject: {}", subject);
       ThreadContext.bind(subject);
     }
 
     // TODO: Sort out if this is needed here or not
     //else {
-    //  log.info("Unbinding subject");
+    //  log.trace("Unbinding subject");
     //  ThreadContext.unbindSubject();
     //}
   }
