@@ -19,12 +19,12 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.authorization.AbstractReadOnlyAuthorizationManager;
-import org.sonatype.security.authorization.AuthorizationManager;
-import org.sonatype.security.authorization.NoSuchPrivilegeException;
-import org.sonatype.security.authorization.NoSuchRoleException;
-import org.sonatype.security.authorization.Privilege;
-import org.sonatype.security.authorization.Role;
+import org.sonatype.nexus.security.authz.AbstractReadOnlyAuthorizationManager;
+import org.sonatype.nexus.security.authz.AuthorizationManager;
+import org.sonatype.nexus.security.privilege.NoSuchPrivilegeException;
+import org.sonatype.nexus.security.privilege.Privilege;
+import org.sonatype.nexus.security.role.NoSuchRoleException;
+import org.sonatype.nexus.security.role.Role;
 
 import org.eclipse.sisu.Description;
 

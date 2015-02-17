@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.rutauth.internal;
 
-import org.sonatype.nexus.security.filter.authc.HttpHeaderAuthenticationToken;
+import org.sonatype.nexus.security.authc.HttpHeaderAuthenticationToken;
 
 /**
  * Rut Auth specific {@link HttpHeaderAuthenticationToken}.

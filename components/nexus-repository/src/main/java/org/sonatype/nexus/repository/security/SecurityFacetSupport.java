@@ -19,6 +19,7 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.view.Request;
+import org.sonatype.nexus.security.SecurityHelper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -33,11 +34,11 @@ public class SecurityFacetSupport
 {
   private final SecurityHelper securityHelper;
 
-  private final RepositoryFormatSecurityResource securityResource;
+  private final RepositoryFormatSecurityConfigurationResource securityResource;
 
   @Inject
   public SecurityFacetSupport(final SecurityHelper securityHelper,
-                              final RepositoryFormatSecurityResource securityResource)
+                              final RepositoryFormatSecurityConfigurationResource securityResource)
   {
     this.securityHelper = checkNotNull(securityHelper);
     this.securityResource = checkNotNull(securityResource);

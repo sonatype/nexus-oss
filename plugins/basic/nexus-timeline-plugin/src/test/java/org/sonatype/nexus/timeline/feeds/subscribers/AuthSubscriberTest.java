@@ -13,8 +13,8 @@
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.security.auth.ClientInfo;
-import org.sonatype.nexus.security.auth.NexusAuthenticationEvent;
+import org.sonatype.nexus.security.ClientInfo;
+import org.sonatype.nexus.security.authc.NexusAuthenticationEvent;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
@@ -48,8 +48,8 @@ public class AuthSubscriberTest
     final ClientInfo authSuccess = new ClientInfo(username, "192.168.0.1", "Foo/Bar");
     final ClientInfo authFailed = new ClientInfo(username, "192.168.0.1", "Foo/Bar");
 
-    NexusAuthenticationEvent naeSuccess = new NexusAuthenticationEvent(this, authSuccess, true);
-    NexusAuthenticationEvent naeFailed = new NexusAuthenticationEvent(this, authFailed, false);
+    NexusAuthenticationEvent naeSuccess = new NexusAuthenticationEvent(authSuccess, true);
+    NexusAuthenticationEvent naeFailed = new NexusAuthenticationEvent(authFailed, false);
 
     // we send same event 5 times, but only one of them should be recorded since the rest 4 are "similar" and within
     // 2 sec

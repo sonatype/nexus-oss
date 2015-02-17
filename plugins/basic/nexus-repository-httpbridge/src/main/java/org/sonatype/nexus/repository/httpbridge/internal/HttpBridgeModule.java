@@ -14,7 +14,7 @@ package org.sonatype.nexus.repository.httpbridge.internal;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.guice.FilterChainModule;
+import org.sonatype.nexus.security.FilterChainModule;
 import org.sonatype.nexus.web.SecurityFilter;
 
 import com.google.inject.AbstractModule;

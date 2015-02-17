@@ -14,11 +14,6 @@ package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.extdirect.model.Password
-import org.sonatype.nexus.validation.Create
-import org.sonatype.security.usermanagement.UserStatus
-
-import javax.validation.constraints.NotNull
 
 /**
  * User role mappings exchange object.

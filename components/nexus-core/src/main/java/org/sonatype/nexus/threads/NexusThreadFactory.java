@@ -15,6 +15,9 @@ package org.sonatype.nexus.threads;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Nexus {@link ThreadFactory}.
+ */
 public class NexusThreadFactory
     implements ThreadFactory
 {
@@ -38,7 +41,9 @@ public class NexusThreadFactory
     this(poolId, threadGroupName, threadPriority, false);
   }
 
-  public NexusThreadFactory(final String poolId, final String threadGroupName, final int threadPriority,
+  public NexusThreadFactory(final String poolId,
+                            final String threadGroupName,
+                            final int threadPriority,
                             final boolean daemonThread)
   {
     int poolNum = poolNumber.getAndIncrement();
@@ -54,5 +59,4 @@ public class NexusThreadFactory
     result.setPriority(this.threadPriority);
     return result;
   }
-
 }

@@ -129,7 +129,7 @@ public class NexusBundleModule
   }
 
   private void maybeAddValidation(List<Module> modules) {
-    if (imports.contains("org.sonatype.nexus.validation")) {
+    if (imports.contains("org.sonatype.nexus.common.validation")) {
       modules.add(validationModule);
     }
   }

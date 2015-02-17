@@ -42,17 +42,16 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.security.PlexusConfiguredRealm;
 import org.sonatype.nexus.proxy.targets.Target;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
-import org.sonatype.nexus.security.WebSecurityUtil;
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authentication.AuthenticationException;
-import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigurationSource;
-import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.settings.PreconfiguredSecuritySettingsSource;
+import org.sonatype.nexus.security.settings.SecuritySettingsSource;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Binder;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
@@ -94,9 +93,9 @@ public class DefaultRepositoryRouterTest
         final PlexusConfiguredRealm realm = new PlexusConfiguredRealm(privileges);
         binder.bind(Key.get(Realm.class, Names.named("default"))).toInstance(realm);
 
-        binder.bind(SecurityConfigurationSource.class)
+        binder.bind(SecuritySettingsSource.class)
             .annotatedWith(Names.named("default"))
-            .toInstance(new PreconfiguredSecurityConfigurationSource(NexusAppTestSupportSecurity.security()));
+            .toInstance(new PreconfiguredSecuritySettingsSource(NexusAppTestSupportSecurity.security()));
       }
     });
   }
@@ -427,7 +426,7 @@ public class DefaultRepositoryRouterTest
   private Subject loginUser(String username)
       throws AuthenticationException
   {
-    WebSecurityUtil.setupWebContext(username);
+    //WebSecurityUtil.setupWebContext(username);
     return this.securitySystem.login(new UsernamePasswordToken(username, ""));
   }
 

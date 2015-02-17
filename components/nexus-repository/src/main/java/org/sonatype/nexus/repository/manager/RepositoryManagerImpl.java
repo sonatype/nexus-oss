@@ -60,7 +60,7 @@ public class RepositoryManagerImpl
 
   private final Provider<ConfigurationFacet> configFacet;
 
-  private final RepositoryAdminSecurityResource securityResource;
+  private final RepositoryAdminSecurityConfigurationResource securityResource;
 
   private final Map<String, Repository> repositories = Maps.newHashMap();
 
@@ -70,7 +70,7 @@ public class RepositoryManagerImpl
                                final RepositoryFactory factory,
                                final Provider<ConfigurationFacet> configFacet,
                                final Map<String, Recipe> recipes,
-                               final RepositoryAdminSecurityResource securityResource)
+                               final RepositoryAdminSecurityConfigurationResource securityResource)
   {
     this.eventBus = checkNotNull(eventBus);
     this.store = checkNotNull(store);

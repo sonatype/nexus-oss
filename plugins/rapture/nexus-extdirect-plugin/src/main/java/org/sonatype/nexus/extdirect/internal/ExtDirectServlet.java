@@ -45,7 +45,6 @@ import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.extdirect.model.Response;
-import org.sonatype.security.SecuritySystem;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -63,8 +62,6 @@ import com.softwarementors.extjs.djn.router.dispatcher.Dispatcher;
 import com.softwarementors.extjs.djn.router.processor.poll.PollRequestProcessor;
 import com.softwarementors.extjs.djn.servlet.DirectJNgineServlet;
 import com.softwarementors.extjs.djn.servlet.ssm.SsmDispatcher;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
 import org.slf4j.Logger;

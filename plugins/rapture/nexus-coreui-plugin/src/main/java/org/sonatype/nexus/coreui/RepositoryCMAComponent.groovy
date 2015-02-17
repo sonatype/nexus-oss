@@ -21,15 +21,15 @@ import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.configuration.validation.InvalidConfigurationException
 import org.sonatype.configuration.validation.ValidationMessage
 import org.sonatype.configuration.validation.ValidationResponse
+import org.sonatype.nexus.common.validation.Create
+import org.sonatype.nexus.common.validation.Update
+import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.repository.Recipe
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.RepositoryManager
-import org.sonatype.nexus.validation.Create
-import org.sonatype.nexus.validation.Update
-import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject
 import javax.inject.Named

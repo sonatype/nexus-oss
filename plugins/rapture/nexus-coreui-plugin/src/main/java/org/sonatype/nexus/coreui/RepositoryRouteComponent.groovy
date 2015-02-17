@@ -20,6 +20,9 @@ import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.configuration.validation.InvalidConfigurationException
 import org.sonatype.configuration.validation.ValidationMessage
 import org.sonatype.configuration.validation.ValidationResponse
+import org.sonatype.nexus.common.validation.Create
+import org.sonatype.nexus.common.validation.Update
+import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
@@ -27,9 +30,6 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException
 import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
-import org.sonatype.nexus.validation.Create
-import org.sonatype.nexus.validation.Update
-import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject
 import javax.inject.Named

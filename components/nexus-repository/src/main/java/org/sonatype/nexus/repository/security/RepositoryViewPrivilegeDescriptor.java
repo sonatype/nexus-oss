@@ -18,10 +18,10 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CPrivilegeBuilder;
-import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
-import org.sonatype.security.realms.privileges.PrivilegeDescriptorSupport;
+import org.sonatype.nexus.security.config.CPrivilege;
+import org.sonatype.nexus.security.config.CPrivilegeBuilder;
+import org.sonatype.nexus.security.privilege.PrivilegeDescriptor;
+import org.sonatype.nexus.security.privilege.PrivilegeDescriptorSupport;
 
 import com.google.common.base.Joiner;
 import org.apache.shiro.authz.Permission;

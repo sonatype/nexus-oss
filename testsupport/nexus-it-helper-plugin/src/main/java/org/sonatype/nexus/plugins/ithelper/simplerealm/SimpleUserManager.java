@@ -19,12 +19,12 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
-import org.sonatype.security.usermanagement.RoleIdentifier;
-import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManager;
-import org.sonatype.security.usermanagement.UserSearchCriteria;
-import org.sonatype.security.usermanagement.UserStatus;
+import org.sonatype.nexus.security.role.RoleIdentifier;
+import org.sonatype.nexus.security.user.AbstractReadOnlyUserManager;
+import org.sonatype.nexus.security.user.User;
+import org.sonatype.nexus.security.user.UserManager;
+import org.sonatype.nexus.security.user.UserSearchCriteria;
+import org.sonatype.nexus.security.user.UserStatus;
 
 import org.eclipse.sisu.Description;
 

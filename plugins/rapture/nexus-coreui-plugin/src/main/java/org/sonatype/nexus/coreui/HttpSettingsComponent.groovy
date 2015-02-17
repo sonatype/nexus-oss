@@ -18,14 +18,18 @@ import groovy.transform.PackageScope
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings
 import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings
 import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
-import org.sonatype.nexus.proxy.repository.*
-import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings
+import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings
+import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings
+import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings
+import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings
 
 import javax.inject.Inject
 import javax.inject.Named

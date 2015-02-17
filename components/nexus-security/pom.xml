@@ -49,15 +49,6 @@
       <artifactId>goodies-eventbus</artifactId>
     </dependency>
 
-    <!--
-    NOTE: Here only for javax.enterprise.inject.Typed, consider removing use and dropping dependency?
-    NOTE: ... or move this dependency to common as its part of the configuration of the container (with bloat)?
-    -->
-    <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>base-configuration</artifactId>
@@ -136,20 +127,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <!-- attach security components to nexus-core -->
-            <Fragment-Host>org.sonatype.nexus.core</Fragment-Host>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

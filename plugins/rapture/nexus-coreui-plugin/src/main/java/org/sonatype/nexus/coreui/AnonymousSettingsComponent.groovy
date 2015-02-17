@@ -20,7 +20,7 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
-import org.sonatype.security.SecuritySystem
+import org.sonatype.nexus.security.SecuritySystem
 
 import javax.inject.Inject
 import javax.inject.Named

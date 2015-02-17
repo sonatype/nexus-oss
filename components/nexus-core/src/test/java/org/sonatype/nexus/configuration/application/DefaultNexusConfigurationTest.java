@@ -23,11 +23,13 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.email.NexusEmailer;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.security.SecuritySystem;
+import org.sonatype.nexus.security.SecuritySystem;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class DefaultNexusConfigurationTest
     extends NexusAppTestSupport

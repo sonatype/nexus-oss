@@ -16,15 +16,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.guice.FilterChainModule;
-import org.sonatype.nexus.security.filter.FilterProviderSupport;
-import org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter;
+import org.sonatype.nexus.proxy.targets.NexusTargetMappingAuthorizationFilter;
+import org.sonatype.nexus.security.FilterChainModule;
+import org.sonatype.nexus.security.FilterProviderSupport;
 import org.sonatype.nexus.web.SecurityFilter;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
 
-import static org.sonatype.nexus.security.filter.FilterProviderSupport.filterKey;
+import static org.sonatype.nexus.security.FilterProviderSupport.filterKey;
 
 /**
  * Content module.

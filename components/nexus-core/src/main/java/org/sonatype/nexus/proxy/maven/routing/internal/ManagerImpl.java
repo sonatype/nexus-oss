@@ -71,7 +71,7 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.threads.FakeAlmightySubject;
+import org.sonatype.nexus.security.subject.FakeAlmightySubject;
 import org.sonatype.nexus.threads.NexusScheduledExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.sisu.goodies.common.ComponentSupport;

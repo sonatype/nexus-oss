@@ -15,6 +15,10 @@ package org.sonatype.nexus.threads;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.sonatype.nexus.security.subject.CurrentSubjectSupplier;
+
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import org.apache.shiro.concurrent.SubjectAwareScheduledExecutorService;
 import org.apache.shiro.subject.Subject;
 
@@ -22,30 +26,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A modification of Shiro's {@link SubjectAwareScheduledExecutorService} that in turn returns always the same,
- * supplied
- * {@link Subject} to bind threads with.
+ * supplied {@link Subject} to bind threads with.
  *
- * @author cstamas
  * @since 2.6
  */
 public class NexusScheduledExecutorService
     extends SubjectAwareScheduledExecutorService
 {
-  public static NexusScheduledExecutorService forFixedSubject(final ScheduledExecutorService target,
-                                                              final Subject subject)
-  {
-    return new NexusScheduledExecutorService(target, new FixedSubjectProvider(subject));
-  }
+  private final Supplier<Subject> subjectProvider;
 
-  public static NexusScheduledExecutorService forCurrentSubject(final ScheduledExecutorService target) {
-    return new NexusScheduledExecutorService(target, new CurrentSubjectProvider());
-  }
-
-  // ==
-
-  private final SubjectProvider subjectProvider;
-
-  public NexusScheduledExecutorService(final ScheduledExecutorService target, final SubjectProvider subjectProvider) {
+  public NexusScheduledExecutorService(final ScheduledExecutorService target, final Supplier<Subject> subjectProvider) {
     super(checkNotNull(target));
     this.subjectProvider = checkNotNull(subjectProvider);
   }
@@ -55,7 +45,7 @@ public class NexusScheduledExecutorService
    */
   @Override
   protected Subject getSubject() {
-    return subjectProvider.getSubject();
+    return subjectProvider.get();
   }
 
   @Override
@@ -68,5 +58,19 @@ public class NexusScheduledExecutorService
   protected <T> Callable<T> associateWithSubject(Callable<T> task) {
     Subject subject = getSubject();
     return subject.associateWith(new MDCAwareCallable(task));
+  }
+
+  //
+  // Factory access
+  //
+
+  public static NexusScheduledExecutorService forFixedSubject(final ScheduledExecutorService target,
+                                                              final Subject subject)
+  {
+    return new NexusScheduledExecutorService(target, Suppliers.ofInstance(subject));
+  }
+
+  public static NexusScheduledExecutorService forCurrentSubject(final ScheduledExecutorService target) {
+    return new NexusScheduledExecutorService(target, new CurrentSubjectSupplier());
   }
 }

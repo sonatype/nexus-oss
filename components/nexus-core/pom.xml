@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-common</artifactId>
@@ -42,11 +41,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-repository-metadata-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
     </dependency>
 
     <dependency>
@@ -85,23 +79,8 @@
     </dependency>
 
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu.goodies</groupId>
-      <artifactId>goodies-common</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-crypto</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu.goodies</groupId>
-      <artifactId>goodies-lifecycle</artifactId>
     </dependency>
 
     <dependency>
@@ -150,11 +129,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-formfields</artifactId>
     </dependency>
@@ -164,7 +138,6 @@
       <artifactId>nexus-webresources-api</artifactId>
     </dependency>
 
-    <!-- Plexus et al -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
@@ -175,7 +148,6 @@
       <artifactId>plexus-interpolation</artifactId>
     </dependency>
 
-    <!-- Serialisation -->
     <dependency>
       <groupId>org.sonatype.nexus.xstream</groupId>
       <artifactId>xstream</artifactId>
@@ -186,7 +158,6 @@
       <artifactId>jackson-databind</artifactId>
     </dependency>
 
-    <!-- Local and remote storage techs -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
@@ -197,7 +168,6 @@
       <artifactId>nexus-httpclient-api</artifactId>
     </dependency>
 
-    <!-- Maven support -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
@@ -228,42 +198,14 @@
       <artifactId>aether-spi</artifactId>
     </dependency>
 
-    <!-- Security -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-security</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-guice</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-web</artifactId>
-    </dependency>
-
-    <!-- Scheduling -->
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-scheduling</artifactId>
-    </dependency>
-
-    <!-- SISU Container -->
-    <dependency>
-      <groupId>org.eclipse.sisu</groupId>
-      <artifactId>org.eclipse.sisu.inject</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-guice</artifactId>
     </dependency>
 
     <dependency>
@@ -324,11 +266,6 @@
     </dependency>
 
     <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-core</artifactId>
     </dependency>
@@ -379,7 +316,6 @@
       <artifactId>nexus-orient</artifactId>
     </dependency>
 
-    <!--JSR-303 Validation-->
     <dependency>
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
@@ -410,7 +346,6 @@
       <artifactId>nexus-repository</artifactId>
     </dependency>
 
-    <!-- Animal Sniffer -->
     <dependency>
       <groupId>org.codehaus.mojo</groupId>
       <artifactId>animal-sniffer-annotations</artifactId>
@@ -422,7 +357,6 @@
       <artifactId>groovy-all</artifactId>
     </dependency>
 
-    <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>

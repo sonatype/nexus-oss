@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 
+import static com.google.common.net.HttpHeaders.X_FORWARDED_FOR;
+
 /**
  * Helper class to detect "real" IP address of remote client.
  * 
@@ -28,13 +30,11 @@ import org.apache.commons.lang.StringUtils;
  */
 public class RemoteIPFinder
 {
-  public static final String FORWARD_HEADER = "X-Forwarded-For";
-
   /**
    * Returns the "real" IP address (as string) of the passed in {@link HttpServletRequest}.
    */
   public static String findIP(final HttpServletRequest request) {
-    String forwardedIP = getFirstForwardedIp(request.getHeader(FORWARD_HEADER));
+    String forwardedIP = getFirstForwardedIp(request.getHeader(X_FORWARDED_FOR));
 
     if (forwardedIP != null) {
       return forwardedIP;
@@ -46,7 +46,7 @@ public class RemoteIPFinder
   /**
    * Returns the *left-most* resolvable IP from the given XFF string; otherwise null.
    */
-  public static String getFirstForwardedIp(final String forwardedFor) {
+  private static String getFirstForwardedIp(final String forwardedFor) {
     if (!StringUtils.isEmpty(forwardedFor)) {
       return resolveIp(forwardedFor.split("\\s*,\\s*"));
     }
@@ -56,7 +56,7 @@ public class RemoteIPFinder
   /**
    * Returns the *left-most* resolvable IP from the given sequence.
    */
-  public static String resolveIp(final String[] ipAddresses) {
+  private static String resolveIp(final String[] ipAddresses) {
     for (String ip : ipAddresses) {
       InetAddress ipAdd;
       try {

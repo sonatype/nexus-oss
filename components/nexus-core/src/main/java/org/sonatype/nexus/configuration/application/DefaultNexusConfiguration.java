@@ -65,13 +65,12 @@ import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authentication.AuthenticationException;
-import org.sonatype.security.usermanagement.NoSuchUserManagerException;
-import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManagerImpl;
-import org.sonatype.security.usermanagement.UserNotFoundException;
-import org.sonatype.security.usermanagement.UserStatus;
+import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.user.NoSuchUserManagerException;
+import org.sonatype.nexus.security.user.User;
+import org.sonatype.nexus.security.user.UserManager;
+import org.sonatype.nexus.security.user.UserNotFoundException;
+import org.sonatype.nexus.security.user.UserStatus;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -80,6 +79,7 @@ import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.util.ExceptionUtils;
@@ -583,7 +583,7 @@ public class DefaultNexusConfiguration
       throws InvalidConfigurationException
   {
     try {
-      final User anonymousUser = getSecuritySystem().getUser(anonymousUsername, UserManagerImpl.SOURCE);
+      final User anonymousUser = getSecuritySystem().getUser(anonymousUsername, UserManager.DEFAULT_SOURCE);
       final UserStatus oldStatus = anonymousUser.getStatus();
       if (enabled) {
         anonymousUser.setStatus(UserStatus.active);

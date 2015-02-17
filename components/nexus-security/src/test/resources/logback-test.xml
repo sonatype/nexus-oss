@@ -11,7 +11,7 @@
     </encoder>
   </appender>
 
-  <logger name="org.sonatype.security" level="TRACE"/>
+  <logger name="org.sonatype.nexus.security" level="TRACE"/>
 
   <root level="${test.log.level:-INFO}">
     <appender-ref ref="CONSOLE"/>

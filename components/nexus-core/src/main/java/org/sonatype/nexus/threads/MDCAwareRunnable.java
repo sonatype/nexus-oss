@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Runnable that properly sets MDC context before invoking the delegate. The delegate will execute in a
  * managed thread with properly set MDC context. To be used with managed threads.
  *
- * @author cstamas
  * @since 2.6
  */
 public class MDCAwareRunnable

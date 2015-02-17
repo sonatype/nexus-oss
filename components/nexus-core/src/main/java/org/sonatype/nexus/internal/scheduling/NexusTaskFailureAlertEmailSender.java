@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.internal.scheduling;
 
 import javax.inject.Inject;
@@ -31,8 +32,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link EventSubscriber} that will send alert email (if necessary) in case of a failing {@link Task}.
- *
- * @author Alin Dreghiciu
  */
 @Singleton
 @Named
@@ -40,13 +39,11 @@ public class NexusTaskFailureAlertEmailSender
     extends ComponentSupport
     implements EventSubscriber, Asynchronous
 {
-
-  private final NexusPostOffice m_postOffice;
+  private final NexusPostOffice postOffice;
 
   @Inject
-  public NexusTaskFailureAlertEmailSender(final NexusPostOffice m_postOffice)
-  {
-    this.m_postOffice = checkNotNull(m_postOffice);
+  public NexusTaskFailureAlertEmailSender(final NexusPostOffice postOffice) {
+    this.postOffice = checkNotNull(postOffice);
   }
 
   /**
@@ -59,9 +56,11 @@ public class NexusTaskFailureAlertEmailSender
     if (failedTask == null || failedTask.getConfiguration().getAlertEmail() == null) {
       return;
     }
-    m_postOffice
-        .sendNexusTaskFailure(failedTask.getConfiguration().getAlertEmail(), failedTask.getId(), failedTask.getName(),
-            failureEvent.getFailureCause());
+    postOffice.sendNexusTaskFailure(
+        failedTask.getConfiguration().getAlertEmail(),
+        failedTask.getId(),
+        failedTask.getName(),
+        failureEvent.getFailureCause()
+    );
   }
-
 }

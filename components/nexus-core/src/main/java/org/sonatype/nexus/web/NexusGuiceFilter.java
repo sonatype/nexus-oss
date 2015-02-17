@@ -12,10 +12,8 @@
  */
 package org.sonatype.nexus.web;
 
+import org.sonatype.nexus.internal.web.DynamicFilterPipeline;
 import javax.inject.Inject;
-
-import org.sonatype.nexus.web.internal.DynamicFilterPipeline;
-
 import com.google.inject.servlet.GuiceFilter;
 
 /**

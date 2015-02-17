@@ -20,10 +20,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.security.filter.authc.AuthenticationTokenFactory;
-import org.sonatype.nexus.security.filter.authc.HttpHeaderAuthenticationToken;
-import org.sonatype.nexus.security.filter.authc.HttpHeaderAuthenticationTokenFactorySupport;
-import org.sonatype.security.SecuritySystem;
+import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.authc.AuthenticationTokenFactory;
+import org.sonatype.nexus.security.authc.HttpHeaderAuthenticationToken;
+import org.sonatype.nexus.security.authc.HttpHeaderAuthenticationTokenFactorySupport;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -42,7 +42,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RutAuthAuthenticationTokenFactory
     extends HttpHeaderAuthenticationTokenFactorySupport
 {
-
   private static final Logger log = LoggerFactory.getLogger(RutAuthAuthenticationTokenFactory.class);
 
   private final SecuritySystem securitySystem;
@@ -86,5 +85,4 @@ public class RutAuthAuthenticationTokenFactory
       }
     }
   }
-
 }

@@ -19,21 +19,21 @@ import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
+import org.sonatype.nexus.common.validation.Create
+import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.repository.GroupRepository
 import org.sonatype.nexus.proxy.repository.Repository
+import org.sonatype.nexus.proxy.targets.TargetPrivilegeDescriptor
 import org.sonatype.nexus.proxy.targets.TargetRegistry
-import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor
-import org.sonatype.nexus.validation.Create
-import org.sonatype.nexus.validation.Validate
-import org.sonatype.security.SecuritySystem
-import org.sonatype.security.authorization.AuthorizationManager
-import org.sonatype.security.authorization.Privilege
-import org.sonatype.security.realms.privileges.PrivilegeDescriptor
-import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor
-import org.sonatype.security.usermanagement.UserManagerImpl
+import org.sonatype.nexus.security.SecuritySystem
+import org.sonatype.nexus.security.authz.AuthorizationManager
+import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor
+import org.sonatype.nexus.security.privilege.Privilege
+import org.sonatype.nexus.security.privilege.PrivilegeDescriptor
+import org.sonatype.nexus.security.user.UserManager
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -54,7 +54,7 @@ class PrivilegeComponent
 extends DirectComponentSupport
 {
 
-  public static final String DEFAULT_SOURCE = UserManagerImpl.SOURCE
+  public static final String DEFAULT_SOURCE = UserManager.DEFAULT_SOURCE
 
   @Inject
   SecuritySystem securitySystem
@@ -112,7 +112,7 @@ extends DirectComponentSupport
                   type: TargetPrivilegeDescriptor.TYPE,
                   readOnly: false,
                   properties: [
-                      (ApplicationPrivilegeDescriptor.P_METHOD)     : method,
+                      (MethodPrivilegeDescriptor.P_METHOD)     : method,
                       (TargetPrivilegeDescriptor.P_TARGET_ID): privilegeXO.repositoryTargetId,
                       (TargetPrivilegeDescriptor.P_REPOSITORY_ID)      : repositoryId,
                       (TargetPrivilegeDescriptor.P_GROUP_ID)           : groupId

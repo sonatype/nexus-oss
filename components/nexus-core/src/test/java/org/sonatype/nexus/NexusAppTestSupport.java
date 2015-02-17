@@ -13,31 +13,36 @@
 package org.sonatype.nexus;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.List;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventSubscriberHost;
-import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.scheduling.TaskScheduler;
+import org.sonatype.nexus.security.SecurityModule;
+import org.sonatype.nexus.security.subject.FakeAlmightySubject;
 import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
-import org.sonatype.nexus.threads.FakeAlmightySubject;
-import org.sonatype.security.guice.SecurityModule;
+import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.apache.shiro.util.ThreadContext;
+import org.codehaus.plexus.context.Context;
 import org.junit.After;
 
+import static org.junit.Assert.fail;
+
 public abstract class NexusAppTestSupport
-    extends NexusProxyTestSupport
+    extends NexusTestSupport
 {
+  public static final String PROXY_SERVER_PORT = "proxy.server.port";
 
   private TaskScheduler nexusScheduler;
 
@@ -113,14 +118,37 @@ public abstract class NexusAppTestSupport
     });
   }
 
+  @Override
+  protected void customizeContext(Context ctx) {
+    super.customizeContext(ctx);
+    ctx.put(PROXY_SERVER_PORT, String.valueOf(allocatePort()));
+  }
+
+  private int allocatePort() {
+    ServerSocket ss;
+    try {
+      ss = new ServerSocket(0);
+    }
+    catch (IOException e) {
+      return 0;
+    }
+    int port = ss.getLocalPort();
+    try {
+      ss.close();
+    }
+    catch (IOException e) {
+      // does it matter?
+      fail("Error allocating port " + e.getMessage());
+    }
+    return port;
+  }
+
   protected boolean enableAutomaticRoutingFeature() {
     return false;
   }
 
   @Override
-  protected void setUp()
-      throws Exception
-  {
+  protected void setUp() throws Exception {
     // remove Shiro thread locals, as things like DelegatingSubjects might lead us to old instance of SM
     ThreadContext.remove();
     super.setUp();
@@ -141,9 +169,7 @@ public abstract class NexusAppTestSupport
   }
 
   @Override
-  protected void tearDown()
-      throws Exception
-  {
+  protected void tearDown() throws Exception {
     // FIXME: This needs to be fired as many component relies on this to cleanup (like EHCache)
     if (eventBus != null) {
       eventBus.post(new NexusStoppedEvent(null));
@@ -166,9 +192,7 @@ public abstract class NexusAppTestSupport
     return templateManager.getTemplates().getTemplates(RepositoryTemplate.class);
   }
 
-  protected void shutDownSecurity()
-      throws Exception
-  {
+  protected void shutDownSecurity() throws Exception {
     System.out.println("== Shutting down SECURITY!");
 
     loadConfiguration();
@@ -183,23 +207,17 @@ public abstract class NexusAppTestSupport
     nexusConfiguration.saveConfiguration();
   }
 
-  protected void killActiveTasks()
-      throws Exception
-  {
+  protected void killActiveTasks() throws Exception {
     nexusScheduler.killAll();
   }
 
-  protected void wairForAsyncEventsToCalmDown()
-      throws Exception
-  {
+  protected void wairForAsyncEventsToCalmDown() throws Exception {
     while (!eventSubscriberHost.isCalmPeriod()) {
       Thread.sleep(100);
     }
   }
 
-  protected void waitForTasksToStop()
-      throws Exception
-  {
+  protected void waitForTasksToStop() throws Exception {
     if (nexusScheduler == null) {
       return;
     }

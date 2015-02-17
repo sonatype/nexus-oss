@@ -21,10 +21,10 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.security.auth.ClientInfo;
-import org.sonatype.nexus.security.auth.NexusAuthenticationEvent;
-import org.sonatype.nexus.security.auth.NexusAuthorizationEvent;
-import org.sonatype.nexus.security.auth.ResourceInfo;
+import org.sonatype.nexus.security.ClientInfo;
+import org.sonatype.nexus.security.authc.NexusAuthenticationEvent;
+import org.sonatype.nexus.security.authz.NexusAuthorizationEvent;
+import org.sonatype.nexus.security.authz.ResourceInfo;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
@@ -105,7 +105,7 @@ public class AuthSubscriber
     putIfNotNull(data, "userUa", ai.getUserAgent());
     putIfNotNull(data, "resProto", ri.getAccessProtocol());
     putIfNotNull(data, "resMethod", ri.getAccessMethod());
-    putIfNotNull(data, "resAction", ri.getAction().name());
+    putIfNotNull(data, "resAction", ri.getAction());
     putIfNotNull(data, "resUri", ri.getAccessedUri());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_AUTH,

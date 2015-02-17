@@ -12,28 +12,28 @@
  */
 package org.sonatype.nexus.coreui
 
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import groovy.transform.PackageScope
-
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
-import javax.validation.groups.Default
-
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.configuration.validation.InvalidConfigurationException
 import org.sonatype.configuration.validation.ValidationMessage
 import org.sonatype.configuration.validation.ValidationResponse
+import org.sonatype.nexus.common.validation.Create
+import org.sonatype.nexus.common.validation.Update
+import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable
-import org.sonatype.nexus.scheduling.TaskScheduler
 import org.sonatype.nexus.scheduling.TaskConfiguration
 import org.sonatype.nexus.scheduling.TaskInfo
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState
 import org.sonatype.nexus.scheduling.TaskInfo.EndState
 import org.sonatype.nexus.scheduling.TaskInfo.RunState
 import org.sonatype.nexus.scheduling.TaskInfo.State
+import org.sonatype.nexus.scheduling.TaskScheduler
 import org.sonatype.nexus.scheduling.schedule.Cron
 import org.sonatype.nexus.scheduling.schedule.Daily
 import org.sonatype.nexus.scheduling.schedule.Hourly
@@ -45,15 +45,13 @@ import org.sonatype.nexus.scheduling.schedule.Once
 import org.sonatype.nexus.scheduling.schedule.Schedule
 import org.sonatype.nexus.scheduling.schedule.Weekly
 import org.sonatype.nexus.scheduling.schedule.Weekly.Weekday
-import org.sonatype.nexus.validation.Create
-import org.sonatype.nexus.validation.Update
-import org.sonatype.nexus.validation.Validate
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.hibernate.validator.constraints.NotEmpty
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+import javax.validation.groups.Default
 
 /**
  * Task {@link DirectComponent}.

@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.gossip.support.DC;
-import org.sonatype.nexus.threads.FakeAlmightySubject;
+import org.sonatype.nexus.security.subject.FakeAlmightySubject;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.base.Throwables;

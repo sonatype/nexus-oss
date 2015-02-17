@@ -20,9 +20,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.common.io.StreamSupport;
 import org.sonatype.nexus.common.property.SystemPropertiesHelper;
+
+import static com.google.common.net.HttpHeaders.CACHE_CONTROL;
+import static com.google.common.net.HttpHeaders.EXPIRES;
+import static com.google.common.net.HttpHeaders.LOCATION;
+import static com.google.common.net.HttpHeaders.PRAGMA;
 
 /**
  * Web response related utilities, that helps in ordinary tasks with HTTP servlet responses.
@@ -34,8 +38,9 @@ import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 public class WebUtils
 {
   /**
-   * Buffer size to be used when pushing content to the {@link HttpServletResponse#getOutputStream()} stream. Default
-   * is Jetty default or 8KB.
+   * Buffer size to be used when pushing content to the {@link HttpServletResponse#getOutputStream()} stream.
+   *
+   * Default is Jetty default or 8KB.
    */
   private static final int BUFFER_SIZE = SystemPropertiesHelper
       .getInteger(WebUtils.class.getName() + ".BUFFER_SIZE", -1);
@@ -45,7 +50,7 @@ public class WebUtils
    */
   public void sendTemporaryRedirect(final HttpServletResponse response, final String url) throws IOException {
     response.setStatus(HttpServletResponse.SC_FOUND);
-    response.addHeader("Location", url);
+    response.addHeader(LOCATION, url);
     response.flushBuffer();
   }
 
@@ -55,10 +60,10 @@ public class WebUtils
    * @see <a href="https://issues.sonatype.org/browse/NEXUS-5155">NEXUS-5155</a>
    */
   public void addNoCacheResponseHeaders(final HttpServletResponse response) {
-    response.setHeader("Pragma", "no-cache"); // HTTP/1.0
-    response.setHeader("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate"); // HTTP/1.1
-    response.setHeader("Cache-Control", "post-check=0, pre-check=0"); // MS IE
-    response.setHeader("Expires", "0"); // No caching on Proxies in between client and Nexus
+    response.setHeader(PRAGMA, "no-cache"); // HTTP/1.0
+    response.setHeader(CACHE_CONTROL, "no-cache, no-store, max-age=0, must-revalidate"); // HTTP/1.1
+    response.setHeader(CACHE_CONTROL, "post-check=0, pre-check=0"); // MS IE
+    response.setHeader(EXPIRES, "0"); // No caching on Proxies in between client and Nexus
   }
 
   /**

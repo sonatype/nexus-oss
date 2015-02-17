@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Nexus customized {@link DefaultSessionManager}.
+ * Custom {@link DefaultSessionManager} for tests.
  *
  * Provides fixes for issue SHIRO-443. This subclass is put into package of Shiro to have
  * shiro-guice's TypeListener applied to it, and result in same behavior as for other Shiro classes.

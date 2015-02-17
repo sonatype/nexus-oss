@@ -52,8 +52,8 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.web.BaseUrlHolder;
-import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.web.ErrorStatusException;
+import org.sonatype.nexus.web.FailureLoggingHttpMethodPermissionFilter;
 import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.sisu.goodies.common.Throwables2;
@@ -287,7 +287,7 @@ public class ContentServlet
       responseCode = SC_NOT_FOUND;
     }
     else if (exception instanceof AccessDeniedException) {
-      request.setAttribute(Constants.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE);
+      request.setAttribute(FailureLoggingHttpMethodPermissionFilter.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE);
       // Note: we must ensure response is not committed, hence, no error page is rendered
       // this attribute above will cause filter to either 403 if
       // current user is non anonymous, or 401 and challenge if user is anonymous

@@ -443,9 +443,7 @@ public final class DirSupport
    * existing Paths that might denote a regular file or a directory. It basically delegates to {@link Files#move(Path,
    * Path, CopyOption...)} method with "replace existing" parameter.
    */
-  public static void move(final Path from, final Path to)
-      throws IOException
-  {
+  public static void move(final Path from, final Path to) throws IOException {
     if (areOnSameFileStore(from, to)) {
       sameFileStoreMove(from, to);
     } else {
@@ -457,9 +455,7 @@ public final class DirSupport
    * Invokes {@link #move(Path, Path)} if passed in "from" path exists and returns {@code true}. If
    * "from" path does not exists, {@code false} is returned.
    */
-  public static boolean moveIfExists(final Path from, final Path to)
-      throws IOException
-  {
+  public static boolean moveIfExists(final Path from, final Path to) throws IOException {
     checkNotNull(from);
     if (Files.exists(from)) {
       move(from, to);
@@ -542,5 +538,4 @@ public final class DirSupport
       checkArgument(Files.exists(path), "%s does not exists", path);
     }
   }
-
 }
