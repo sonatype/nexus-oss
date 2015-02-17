@@ -15,10 +15,10 @@ package org.sonatype.nexus.threads;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
-import org.sonatype.nexus.security.subject.CurrentSubjectProvider;
-import org.sonatype.nexus.security.subject.FixedSubjectProvider;
-import org.sonatype.nexus.security.subject.SubjectProvider;
+import org.sonatype.nexus.security.subject.CurrentSubjectSupplier;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import org.apache.shiro.concurrent.SubjectAwareExecutorService;
 import org.apache.shiro.subject.Subject;
 
@@ -26,18 +26,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A modification of Shiro's {@link org.apache.shiro.concurrent.SubjectAwareExecutorService} that in turn returns
- * always the same, supplied {@link org.apache.shiro.subject.Subject} to bind threads with.
+ * always the same, supplied {@link Subject} to bind threads with.
  *
  * @since 2.6
  */
 public class NexusExecutorService
     extends SubjectAwareExecutorService
 {
-  private final SubjectProvider subjectProvider;
+  private final Supplier<Subject> subjectSupplier;
 
-  public NexusExecutorService(final ExecutorService target, final SubjectProvider subjectProvider) {
+  public NexusExecutorService(final ExecutorService target, final Supplier<Subject> subjectSupplier) {
     super(checkNotNull(target));
-    this.subjectProvider = checkNotNull(subjectProvider);
+    this.subjectSupplier = checkNotNull(subjectSupplier);
   }
 
   /**
@@ -45,7 +45,7 @@ public class NexusExecutorService
    */
   @Override
   protected Subject getSubject() {
-    return subjectProvider.getSubject();
+    return subjectSupplier.get();
   }
 
   @Override
@@ -65,10 +65,10 @@ public class NexusExecutorService
   //
 
   public static NexusExecutorService forFixedSubject(final ExecutorService target, final Subject subject) {
-    return new NexusExecutorService(target, new FixedSubjectProvider(subject));
+    return new NexusExecutorService(target, Suppliers.ofInstance(subject));
   }
 
   public static NexusExecutorService forCurrentSubject(final ExecutorService target) {
-    return new NexusExecutorService(target, new CurrentSubjectProvider());
+    return new NexusExecutorService(target, new CurrentSubjectSupplier());
   }
 }

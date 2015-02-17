@@ -12,26 +12,20 @@
  */
 package org.sonatype.nexus.security.subject;
 
+import com.google.common.base.Supplier;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * {@link SubjectProvider} implementation that always returns the "fixed" subject.
+ * Current subject supplier.
  *
  * @since 2.6
  */
-public class FixedSubjectProvider
-    implements SubjectProvider
+public class CurrentSubjectSupplier
+    implements Supplier<Subject>
 {
-  private final Subject subject;
-
-  public FixedSubjectProvider(final Subject subject) {
-    this.subject = checkNotNull(subject);
-  }
-
   @Override
-  public Subject getSubject() {
-    return subject;
+  public Subject get() {
+    return SecurityUtils.getSubject();
   }
 }
