@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.negativecache;
 
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.view.Status;
 
 /**
  * @since 3.0
@@ -21,18 +22,11 @@ import org.sonatype.nexus.repository.Facet;
 public interface NegativeCacheFacet
     extends Facet
 {
-  /**
-   * Indicate that the item is not found
-   */
-  void cacheNotFound(NegativeCacheKey key);
+  Status get(NegativeCacheKey key);
 
-  /**
-   * Test if the item was marked as not found within the cache expiry time.
-   */
-  boolean isNotFound(NegativeCacheKey key);
+  void put(NegativeCacheKey key, Status status);
 
-  /**
-   * The item has been found, so clear away any record that the item can't be found.
-   */
-  void uncacheNotFound(NegativeCacheKey key);
+  void purge(NegativeCacheKey key);
+
+  void purge();
 }
