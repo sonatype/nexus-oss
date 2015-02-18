@@ -104,7 +104,7 @@ public class SimpleProxyFacet
   }
 
   @Override
-  public NegativeCacheKey cacheKey(final Context context) {
+  public NegativeCacheKey getCacheKey(final Context context) {
     return new NegativeCacheKey(ContextHelper.contentName(context));
   }
 
