@@ -86,7 +86,7 @@ public abstract class ProxyFacetSupport
     if (remoteUrlChanged) {
       remoteUrlChanged = false;
       try {
-        getRepository().facet(NegativeCacheFacet.class).purge();
+        getRepository().facet(NegativeCacheFacet.class).invalidate();
       }
       catch (MissingFacetException e) {
         // NCF is optional

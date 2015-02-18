@@ -110,7 +110,7 @@ public class NegativeCacheFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public void purge(final NegativeCacheKey key) {
+  public void invalidate(final NegativeCacheKey key) {
     if (cache != null) {
       log.debug("Removing {} from negative cache of {}", key, getRepository());
       cache.remove(key);
@@ -119,7 +119,7 @@ public class NegativeCacheFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public void purge() {
+  public void invalidate() {
     if (cache != null) {
       log.debug("Removing all from negative cache of {}", getRepository());
       cache.removeAll();

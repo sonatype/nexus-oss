@@ -47,7 +47,7 @@ public class NegativeCacheHandler
         negativeCache.put(key, response.getStatus());
       }
       else {
-        negativeCache.purge(key);
+        negativeCache.invalidate(key);
       }
     }
     else {

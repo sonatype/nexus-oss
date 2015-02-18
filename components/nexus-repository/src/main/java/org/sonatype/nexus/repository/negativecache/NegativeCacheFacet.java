@@ -26,7 +26,7 @@ public interface NegativeCacheFacet
 
   void put(NegativeCacheKey key, Status status);
 
-  void purge(NegativeCacheKey key);
+  void invalidate(NegativeCacheKey key);
 
-  void purge();
+  void invalidate();
 }
