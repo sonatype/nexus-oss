@@ -20,8 +20,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
+import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
@@ -55,6 +57,8 @@ public abstract class ProxyFacetSupport
 
   private HttpClientFacet httpClient;
 
+  private boolean remoteUrlChanged;
+
   @Override
   protected void doConfigure() throws Exception {
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
@@ -65,8 +69,7 @@ public abstract class ProxyFacetSupport
 
     final URI newRemoteURI = new URI(url);
     if (remoteUrl != null && !remoteUrl.equals(newRemoteURI)) {
-      log.debug("Remote URL is changing: clearing caches.");
-      // TODO: Trigger other changes based on the remoteUrl changing - perhaps it calls facet(NFC.class).clear() at this point?
+      remoteUrlChanged = true;
     }
 
     this.remoteUrl = newRemoteURI;
@@ -80,6 +83,15 @@ public abstract class ProxyFacetSupport
   @Override
   protected void doStart() throws Exception {
     httpClient = getRepository().facet(HttpClientFacet.class);
+    if(remoteUrlChanged){
+      remoteUrlChanged = false;
+      try {
+        getRepository().facet(NegativeCacheFacet.class).purge();
+      }
+      catch (MissingFacetException e) {
+        // NCF is optional
+      }
+    }
   }
 
   @Override
