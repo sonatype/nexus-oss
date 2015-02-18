@@ -83,7 +83,7 @@ public abstract class ProxyFacetSupport
   @Override
   protected void doStart() throws Exception {
     httpClient = getRepository().facet(HttpClientFacet.class);
-    if(remoteUrlChanged){
+    if (remoteUrlChanged) {
       remoteUrlChanged = false;
       try {
         getRepository().facet(NegativeCacheFacet.class).purge();
