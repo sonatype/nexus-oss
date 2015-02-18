@@ -112,6 +112,7 @@ public abstract class ProxyFacetSupport
       }
       catch (IOException e) {
         log.warn("Failed to fetch: {}", getUrl(context), e);
+        throw e;
       }
     }
     return content;
