@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -42,6 +43,7 @@ import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
 
 import com.bolyuba.nexus.plugin.npm.NpmContentClass;
@@ -56,6 +58,8 @@ import com.bolyuba.nexus.plugin.npm.service.tarball.TarballRequest;
 import com.bolyuba.nexus.plugin.npm.service.tarball.TarballSource;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.sisu.Description;
 
@@ -107,6 +111,14 @@ public class DefaultNpmProxyRepository
     this.mimeRulesSource = new NpmMimeRulesSource();
   }
 
+  @AllowConcurrentEvents
+  @Subscribe
+  public void onEvent(final RepositoryRegistryEventRemove event) {
+    if (event.getRepository() == this) {
+      getMetadataService().deleteAllMetadata();
+    }
+  }
+
   @Override
   public ProxyMetadataService getMetadataService() { return proxyMetadataService; }
 
@@ -156,6 +168,7 @@ public class DefaultNpmProxyRepository
     }
   }
 
+  // TODO: npm hosted and proxy repositories have similar retrieve code, factor it out or keep in sync
   @Override
   protected AbstractStorageItem doRetrieveLocalItem(ResourceStoreRequest storeRequest)
       throws ItemNotFoundException, LocalStorageException
@@ -165,8 +178,14 @@ public class DefaultNpmProxyRepository
         // shut down NPM MD+tarball service completely
         return delegateDoRetrieveLocalItem(storeRequest);
       }
+      PackageRequest packageRequest = null;
       try {
-        PackageRequest packageRequest = new PackageRequest(storeRequest);
+        packageRequest = new PackageRequest(storeRequest);
+      }
+      catch (IllegalArgumentException ignore) {
+        // ignore, will see is this a tarball req or just do it standard way if needed
+      }
+      if (packageRequest != null) {
         packageRequest.getStoreRequest().getRequestContext().put(NpmRepository.NPM_METADATA_SERVICED, Boolean.TRUE);
         if (packageRequest.isMetadata()) {
           ContentLocator contentLocator;
@@ -196,12 +215,10 @@ public class DefaultNpmProxyRepository
             return createStorageFileItem(storeRequest,
                 proxyMetadataService.produceRegistryRoot(packageRequest));
           }
+          log.debug("Unknown registry special {}", packageRequest.getPath());
           throw new ItemNotFoundException(
               reasonFor(storeRequest, this, "No content for path %s", storeRequest.getRequestPath()));
         }
-      }
-      catch (IllegalArgumentException ignore) {
-        // ignore, will do it standard way if needed
       }
       // this must be tarball, check it out do we have it locally, and if yes, and metadata checksum matches, give it
       final TarballRequest tarballRequest = getMetadataService().createTarballRequest(storeRequest);
@@ -367,6 +384,42 @@ public class DefaultNpmProxyRepository
     }
     finally {
       itemUidLock.unlock();
+    }
+  }
+
+  // TODO: npm hosted and proxy repositories have same deleteItem code, factor it out or keep in sync
+  @Override
+  public void deleteItem(boolean fromTask, ResourceStoreRequest storeRequest)
+      throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
+  {
+    PackageRequest packageRequest = null;
+    try {
+      packageRequest = new PackageRequest(storeRequest);
+    }
+    catch (IllegalArgumentException e) {
+      // something completely different
+    }
+    boolean supressItemNotFound = false;
+    if (packageRequest != null) {
+      if (packageRequest.isMetadata()) {
+        if (packageRequest.isRegistryRoot()) {
+          log.debug("Deleting registry root...");
+          getMetadataService().deleteAllMetadata();
+        }
+        else if (packageRequest.isPackageRoot()) {
+          log.debug("Deleting package {} root...", packageRequest.getName());
+          supressItemNotFound = getMetadataService().deletePackage(packageRequest.getName());
+        }
+      }
+    }
+    try {
+      super.deleteItem(fromTask, storeRequest);
+    }
+    catch (ItemNotFoundException e) {
+      // this allows to delete package metadata only, where no tarballs were cached/deployed for some reason
+      if (!supressItemNotFound) {
+        throw e;
+      }
     }
   }
 

@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 
 import com.bolyuba.nexus.plugin.npm.proxy.NpmProxyRepository;
 import com.bolyuba.nexus.plugin.npm.service.PackageRequest;
@@ -58,6 +59,19 @@ public class ProxyMetadataServiceImpl
     super(npmProxyRepository, metadataParser, metadataStore);
     this.registryRootUpdateLock = new Object();
     this.proxyMetadataTransport = checkNotNull(proxyMetadataTransport);
+  }
+
+  @Override
+  public boolean deleteAllMetadata() {
+    log.info("Deleting all proxied npm metadata from {}", getNpmRepository().getId());
+    return metadataStore.deletePackages(getNpmRepository());
+  }
+
+  @Override
+  public boolean deletePackage(final String packageName) {
+    checkNotNull(packageName, "null package name");
+    log.info("Deleting proxied npm package {} metadata from {}", packageName, getNpmRepository().getId());
+    return metadataStore.deletePackageByName(getNpmRepository(), packageName);
   }
 
   @Override
@@ -151,31 +165,35 @@ public class ProxyMetadataServiceImpl
             else {
               log.info("Registry root {} expired", getNpmRepository().getId());
             }
-            try (final PackageRootIterator packageRootIterator = proxyMetadataTransport
-                .fetchRegistryRoot(getNpmRepository())) {
-              int count = metadataStore.updatePackages(getNpmRepository(), packageRootIterator);
-              log.info("Registry root {} update successful ({} packages)", getNpmRepository().getId(), count);
+            if (isRemoteAccessAllowed()) {
+              try (final PackageRootIterator packageRootIterator = proxyMetadataTransport
+                  .fetchRegistryRoot(getNpmRepository())) {
+                int count = metadataStore.updatePackages(getNpmRepository(), packageRootIterator);
+                log.info("Registry root {} update successful ({} packages)", getNpmRepository().getId(), count);
+              }
+              catch (Exception e) {
+                log.warn("Registry root {} update failed: ", getNpmRepository().getId(), e.toString());
+                throw Throwables.propagate(e);
+              }
+              if (registryRoot == null) {
+                // create a fluke package root
+                final Map<String, Object> versions = Maps.newHashMap();
+                versions.put("0.0.0", "latest");
+                final Map<String, Object> distTags = Maps.newHashMap();
+                distTags.put("latest", "0.0.0");
+                final Map<String, Object> raw = Maps.newHashMap();
+                raw.put("name", REGISTRY_ROOT_PACKAGE_NAME);
+                raw.put("description", "NX registry root package");
+                raw.put("versions", versions);
+                raw.put("dist-tags", distTags);
+                registryRoot = new PackageRoot(getNpmRepository().getId(), raw);
+              }
+              registryRoot.getProperties().put(PROP_EXPIRED, Boolean.FALSE.toString());
+              registryRoot.getProperties().put(PROP_CACHED, Long.toString(now));
+              metadataStore.updatePackage(getNpmRepository(), registryRoot);
+            } else {
+              log.info("Registry root {} update not allowed", getNpmRepository().getId());
             }
-            catch (Exception e) {
-              log.warn("Registry root {} update failed: ", getNpmRepository().getId(), e.toString());
-              throw Throwables.propagate(e);
-            }
-            if (registryRoot == null) {
-              // create a fluke package root
-              final Map<String, Object> versions = Maps.newHashMap();
-              versions.put("0.0.0", "latest");
-              final Map<String, Object> distTags = Maps.newHashMap();
-              distTags.put("latest", "0.0.0");
-              final Map<String, Object> raw = Maps.newHashMap();
-              raw.put("name", REGISTRY_ROOT_PACKAGE_NAME);
-              raw.put("description", "NX registry root package");
-              raw.put("versions", versions);
-              raw.put("dist-tags", distTags);
-              registryRoot = new PackageRoot(getNpmRepository().getId(), raw);
-            }
-            registryRoot.getProperties().put(PROP_EXPIRED, Boolean.FALSE.toString());
-            registryRoot.getProperties().put(PROP_CACHED, Long.toString(now));
-            metadataStore.updatePackage(getNpmRepository(), registryRoot);
           }
         }
       }
@@ -199,7 +217,7 @@ public class ProxyMetadataServiceImpl
   private PackageRoot mayUpdatePackageRoot(final String packageName, final boolean localOnly) throws IOException {
     final long now = System.currentTimeMillis();
     PackageRoot packageRoot = metadataStore.getPackageByName(getNpmRepository(), packageName);
-    if (!localOnly && (packageRoot == null || isExpired(packageRoot, now))) {
+    if (isRemoteAccessAllowed() && !localOnly && (packageRoot == null || isExpired(packageRoot, now))) {
       packageRoot = proxyMetadataTransport.fetchPackageRoot(getNpmRepository(), packageName, packageRoot);
       if (packageRoot == null) {
         return null;
@@ -246,5 +264,16 @@ public class ProxyMetadataServiceImpl
       log.trace("NOT-EXPIRED: package {} is fresh", packageRoot.getName());
     }
     return result;
+  }
+
+  /**
+   * Returns {@code true} if remote/proxy requests are allowed on behalf of this instance's repository.
+   */
+  private boolean isRemoteAccessAllowed() {
+    final ProxyMode proxyMode = getNpmRepository().getProxyMode();
+    if (proxyMode != null) {
+      return proxyMode.shouldProxy();
+    }
+    return false;
   }
 }

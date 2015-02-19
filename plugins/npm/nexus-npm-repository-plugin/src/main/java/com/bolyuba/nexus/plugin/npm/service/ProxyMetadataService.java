@@ -29,6 +29,20 @@ public interface ProxyMetadataService
     extends Generator
 {
   /**
+   * Deletes all metadata cached by this service from the underlying store.
+   *
+   * @since 2.11.3
+   */
+  boolean deleteAllMetadata();
+
+  /**
+   * Deletes package metadata cached by this service from underlying store, returns {@code true} if package existed.
+   *
+   * @since 2.11.3
+   */
+  boolean deletePackage(String packageName);
+
+  /**
    * Expires proxy metadata cache. On next request of an expired metadata, re-fetch will be done from registry.
    */
   boolean expireMetadataCaches(PackageRequest request);

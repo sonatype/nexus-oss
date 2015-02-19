@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
 import com.bolyuba.nexus.plugin.npm.service.internal.PackageRootIterator;
 
 /**
- * Metadata generator that generates entities to be sent downstream to clint.
+ * Metadata generator that generates entities to be sent downstream to client.
  */
 public interface Generator
 {
