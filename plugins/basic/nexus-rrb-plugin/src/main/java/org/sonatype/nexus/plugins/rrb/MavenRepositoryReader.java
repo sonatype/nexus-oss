@@ -228,15 +228,16 @@ public class MavenRepositoryReader
       final BasicHttpContext httpContext = new BasicHttpContext();
       httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, proxyRepository);
 
-      HttpResponse response = client.execute(method, httpContext);
+      final HttpResponse response = client.execute(method, httpContext);
 
       int statusCode = response.getStatusLine().getStatusCode();
       logger.debug("Status code: {}", statusCode);
 
-      BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        buff.append(line).append("\n");
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          buff.append(line).append("\n");
+        }
       }
 
       // HACK: Deal with S3 edge-case
