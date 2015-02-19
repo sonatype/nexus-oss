@@ -52,11 +52,10 @@ public class DefaultHttpResponseSender
       httpResponse.addHeader(header.getKey(), header.getValue());
     }
 
+    // add status followed by payload if we have one
     Status status = response.getStatus();
     if (status.isSuccessful() || response instanceof PayloadResponse) {
       httpResponse.setStatus(status.getCode());
-
-      // write payload details if we have one
       if (response instanceof PayloadResponse) {
         Payload payload = ((PayloadResponse)response).getPayload();
         log.trace("Attaching payload: {}", payload);
@@ -64,7 +63,7 @@ public class DefaultHttpResponseSender
         if (payload.getContentType() != null) {
           httpResponse.setContentType(payload.getContentType());
         }
-        httpResponse.setContentLength((int) payload.getSize()); // HACK: Upgrade to servlet 3.1 to use proper long values
+        httpResponse.setContentLengthLong(payload.getSize());
 
         try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
           ByteStreams.copy(input, output);
@@ -74,6 +73,5 @@ public class DefaultHttpResponseSender
     else {
       httpResponse.sendError(status.getCode(), status.getMessage());
     }
-
   }
 }

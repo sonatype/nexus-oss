@@ -163,12 +163,14 @@ public class NugetGalleryFacetImpl
     }
 
     ComponentQuery componentQuery = ODataUtils.query(query, false);
+    ComponentQuery componentCountQuery = ODataUtils.query(query, true);
 
     try (StorageTx storageTx = openStorageTx()) {
 
       // NXCM-4502 add inlinecount only if requested
       if (inlineCountRequested(query)) {
-        int inlineCount = executeCount(componentQuery, storageTx);
+        // TODO: We need a count query, as this has an order by
+        int inlineCount = executeCount(componentCountQuery, storageTx);
         xml.append(ODataTemplates.interpolate(ODataTemplates.NUGET_INLINECOUNT,
             ImmutableMap.of("COUNT", String.valueOf(inlineCount))));
       }
@@ -456,7 +458,7 @@ public class NugetGalleryFacetImpl
     nugetAttr.set(P_LOCATION, data.get(LOCATION));
     nugetAttr.set(P_PACKAGE_HASH, data.get(PACKAGE_HASH));
     nugetAttr.set(P_PACKAGE_HASH_ALGORITHM, data.get(PACKAGE_HASH_ALGORITHM));
-    nugetAttr.set(P_PACKAGE_SIZE, data.get(PACKAGE_SIZE));
+    nugetAttr.set(P_PACKAGE_SIZE, Integer.parseInt(data.get(PACKAGE_SIZE)));
     nugetAttr.set(P_PROJECT_URL, data.get(PROJECT_URL));
     nugetAttr.set(P_RELEASE_NOTES, data.get(RELEASE_NOTES));
     nugetAttr.set(P_REPORT_ABUSE_URL, data.get(REPORT_ABUSE_URL));
