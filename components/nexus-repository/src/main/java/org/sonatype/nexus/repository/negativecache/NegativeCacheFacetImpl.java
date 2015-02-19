@@ -23,8 +23,10 @@ import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.sisu.goodies.common.Time;
 
+import com.google.common.annotations.VisibleForTesting;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -45,7 +47,7 @@ public class NegativeCacheFacetImpl
 
   private final CacheManager cacheManager;
 
-  private Cache cache;
+  private Ehcache cache;
 
   private Boolean enabled;
 
@@ -70,9 +72,7 @@ public class NegativeCacheFacetImpl
       doDestroy();
       if (Boolean.TRUE.equals(this.enabled)) {
         log.debug("Creating negative cache for {}", getRepository());
-        cache = new Cache(
-            "negative-cache-" + getRepository().getName(), 10000, false, false, this.timeToLive.toSeconds(), 0
-        );
+        cache = createCache("negative-cache-" + getRepository().getName(), this.timeToLive);
         cacheManager.addCache(cache);
       }
     }
@@ -92,6 +92,7 @@ public class NegativeCacheFacetImpl
   @Override
   @Guarded(by = STARTED)
   public Status get(final NegativeCacheKey key) {
+    checkNotNull(key);
     if (cache != null) {
       Element element = cache.get(key);
       return element == null || element.isExpired() ? null : (Status) element.getObjectValue();
@@ -102,6 +103,8 @@ public class NegativeCacheFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void put(final NegativeCacheKey key, final Status status) {
+    checkNotNull(key);
+    checkNotNull(status);
     if (cache != null) {
       log.debug("Adding {}={} to negative cache of {}", key, status, getRepository());
       cache.put(new Element(key, status));
@@ -111,6 +114,7 @@ public class NegativeCacheFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void invalidate(final NegativeCacheKey key) {
+    checkNotNull(key);
     if (cache != null) {
       log.debug("Removing {} from negative cache of {}", key, getRepository());
       cache.remove(key);
@@ -124,5 +128,10 @@ public class NegativeCacheFacetImpl
       log.debug("Removing all from negative cache of {}", getRepository());
       cache.removeAll();
     }
+  }
+
+  @VisibleForTesting
+  Ehcache createCache(final String name, final Time timeToLive) {
+    return new Cache(name, 10000, false, false, timeToLive.toSeconds(), 0);
   }
 }
