@@ -564,6 +564,9 @@ public class LogbackLogManager
   private LoggerLevel convert(final Level level) {
     switch (level.toInt()) {
 
+      case Level.OFF_INT:
+        return LoggerLevel.OFF;
+
       case Level.ERROR_INT:
         return LoggerLevel.ERROR;
 
