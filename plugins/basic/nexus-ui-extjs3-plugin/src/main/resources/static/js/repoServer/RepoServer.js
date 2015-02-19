@@ -97,6 +97,7 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
 
         this.createSubComponents(); // update left panel
 
+        /* NEXUS-8070: Removed feature, performs badly with external realms
         var htmlString = this.buildRecoveryText(),
             recoveryPanel = this.loginForm.findById('recovery-panel');
 
@@ -111,6 +112,7 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
               style : 'padding-left: 70px',
               html : htmlString
             });
+         */
       },
 
       // Each Sonatype server will need one of these
@@ -130,6 +132,8 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
 
         Sonatype.view.serverTabPanel.add(this.nexusPanel);
 
+
+        /* NEXUS-8070: Removed feature, performs badly with external realms
         var htmlString = this.buildRecoveryText();
 
         if (htmlString != null)
@@ -141,6 +145,7 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
             html : htmlString
           };
         }
+        */
 
         this.loginFormConfig.buttons = [{
               id : 'loginbutton',
