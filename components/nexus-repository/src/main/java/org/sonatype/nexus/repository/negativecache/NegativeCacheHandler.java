@@ -46,7 +46,7 @@ public class NegativeCacheHandler
       if (isNotFound(response)) {
         negativeCache.put(key, response.getStatus());
       }
-      else {
+      else if (response.getStatus().isSuccessful()) {
         negativeCache.invalidate(key);
       }
     }
