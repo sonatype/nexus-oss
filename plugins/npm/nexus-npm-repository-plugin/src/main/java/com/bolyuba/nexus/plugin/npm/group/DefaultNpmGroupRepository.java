@@ -124,37 +124,45 @@ public class DefaultNpmGroupRepository
       return super.doRetrieveLocalItem(storeRequest);
     }
     try {
-      PackageRequest packageRequest = new PackageRequest(storeRequest);
-      if (packageRequest.isMetadata()) {
-        ContentLocator contentLocator;
-        if (packageRequest.isRegistryRoot()) {
-          contentLocator = groupMetadataService.produceRegistryRoot(packageRequest);
-        }
-        else if (packageRequest.isPackageRoot()) {
-          contentLocator = groupMetadataService.producePackageRoot(packageRequest);
+      PackageRequest packageRequest = null;
+      try {
+        packageRequest = new PackageRequest(storeRequest);
+      } catch (IllegalArgumentException e) {
+        // something completely different
+        return super.doRetrieveLocalItem(storeRequest);
+      }
+      if (packageRequest != null) {
+        if (packageRequest.isMetadata()) {
+          ContentLocator contentLocator;
+          if (packageRequest.isRegistryRoot()) {
+            log.debug("Serving registry root...");
+            contentLocator = groupMetadataService.produceRegistryRoot(packageRequest);
+          }
+          else if (packageRequest.isPackageRoot()) {
+            log.debug("Serving package {} root...", packageRequest.getName());
+            contentLocator = groupMetadataService.producePackageRoot(packageRequest);
+          }
+          else {
+            log.debug("Serving package {} version {}...", packageRequest.getName(), packageRequest.getVersion());
+            contentLocator = groupMetadataService.producePackageVersion(packageRequest);
+          }
+          if (contentLocator != null) {
+            return new DefaultStorageFileItem(this, storeRequest, true, true, contentLocator);
+          }
         }
         else {
-          contentLocator = groupMetadataService.producePackageVersion(packageRequest);
+          // registry special
+          if (packageRequest.isRegistrySpecial() && packageRequest.getPath().startsWith("/-/all")) {
+            log.debug("Serving registry root from /-/all...");
+            return new DefaultStorageFileItem(this, storeRequest, true, true,
+                groupMetadataService.produceRegistryRoot(packageRequest));
+          }
+          log.debug("Unknown registry special {}", packageRequest.getPath());
         }
-        if (contentLocator == null) {
-          throw new ItemNotFoundException(
-              reasonFor(storeRequest, this, "No content for path %s", storeRequest.getRequestPath()));
-        }
-        return new DefaultStorageFileItem(this, storeRequest, true, true, contentLocator);
       }
-      else {
-        // registry special
-        if (packageRequest.isRegistrySpecial() && packageRequest.getPath().startsWith("/-/all")) {
-          return new DefaultStorageFileItem(this, storeRequest, true, true,
-              groupMetadataService.produceRegistryRoot(packageRequest));
-        }
-        throw new ItemNotFoundException(
-            reasonFor(storeRequest, this, "No content for path %s", storeRequest.getRequestPath()));
-      }
-    }
-    catch (IllegalArgumentException ignore) {
-      // something completely different
-      return super.doRetrieveLocalItem(storeRequest);
+      log.debug("No NPM metadata for path {}", storeRequest.getRequestPath());
+      throw new ItemNotFoundException(
+          reasonFor(storeRequest, this, "No content for path %s", storeRequest.getRequestPath()));
     }
     catch (IOException e) {
       throw new LocalStorageException("Metadata service error", e);

@@ -24,6 +24,7 @@ import com.bolyuba.nexus.plugin.npm.service.PackageRequest;
 import com.bolyuba.nexus.plugin.npm.service.PackageRoot;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link HostedMetadataService} implementation.
@@ -37,6 +38,19 @@ public class HostedMetadataServiceImpl
                                    final MetadataParser metadataParser)
   {
     super(npmHostedRepository, metadataParser, metadataStore);
+  }
+
+  @Override
+  public boolean deleteAllMetadata() {
+    log.info("Deleting all hosted npm metadata from {}", getNpmRepository().getId());
+    return metadataStore.deletePackages(getNpmRepository());
+  }
+
+  @Override
+  public boolean deletePackage(final String packageName) {
+    checkNotNull(packageName, "null package name");
+    log.info("Deleting hosted npm package {} metadata from {}", packageName, getNpmRepository().getId());
+    return metadataStore.deletePackageByName(getNpmRepository(), packageName);
   }
 
   @Override

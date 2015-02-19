@@ -50,6 +50,7 @@ import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -225,6 +226,26 @@ public class OrientMetadataStore
           return null;
         }
         return entityHandler.toEntity(doc);
+      }
+      finally {
+        db.commit();
+      }
+    }
+  }
+
+  @Override
+  public boolean deletePackages(final NpmRepository repository) {
+    checkNotNull(repository);
+    final EntityHandler<PackageRoot> entityHandler = getHandlerFor(PackageRoot.class);
+    try (ODatabaseDocumentTx db = db()) {
+      db.begin();
+      try {
+        int recordsDeleted = db.command(
+            new OCommandSQL(
+                "delete from " + entityHandler.getSchemaName() + " where repositoryId='" + repository.getId() + "'"
+            )
+        ).execute();
+        return recordsDeleted > 0;
       }
       finally {
         db.commit();

@@ -18,4 +18,17 @@ package com.bolyuba.nexus.plugin.npm.service;
 public interface HostedMetadataService
     extends Generator, Consumer
 {
+  /**
+   * Deletes all metadata hosted by this service from the underlying store.
+   *
+   * @since 2.11.3
+   */
+  boolean deleteAllMetadata();
+
+  /**
+   * Deletes package metadata hosted by this service from underlying store, returns {@code true} if package existed.
+   *
+   * @since 2.11.3
+   */
+  boolean deletePackage(String packageName);
 }

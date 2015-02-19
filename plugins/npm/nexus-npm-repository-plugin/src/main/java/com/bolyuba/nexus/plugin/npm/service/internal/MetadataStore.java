@@ -36,6 +36,13 @@ public interface MetadataStore
   PackageRoot getPackageByName(NpmRepository repository, String packageName);
 
   /**
+   * Deletes all packages from store, returns {@code true} if packages existed.
+   *
+   * @since 2.11.3
+   */
+  boolean deletePackages(NpmRepository repository);
+
+  /**
    * Deletes package from store, returns {@code true} if package existed.
    */
   boolean deletePackageByName(NpmRepository repository, String packageName);
