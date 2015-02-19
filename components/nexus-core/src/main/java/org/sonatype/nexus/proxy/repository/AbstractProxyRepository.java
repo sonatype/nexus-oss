@@ -1368,6 +1368,8 @@ public abstract class AbstractProxyRepository
 
       Exception lastException = null;
 
+      // flag that is true if we've seen content at all, so cleanup is needed
+      boolean storageCleanupNeeded = false;
       all_urls:
       for (String remoteUrl : remoteUrls) {
         int retryCount = 1;
@@ -1409,6 +1411,9 @@ public abstract class AbstractProxyRepository
 
             AbstractStorageItem remoteItem =
                 getRemoteStorage().retrieveItem(this, request, remoteUrl);
+
+            // we are here, RRS returned us content that we are about to cache
+            storageCleanupNeeded = true;
 
             remoteItem = doCacheItem(remoteItem);
 
@@ -1506,17 +1511,21 @@ public abstract class AbstractProxyRepository
       }
 
       // if we got here, requested item was not retrieved for some reason
+      if (storageCleanupNeeded || request.isRequestRemoteOnly()) {
+        sendContentValidationEvents(request, events, false);
 
-      sendContentValidationEvents(request, events, false);
-
-      try {
-        getLocalStorage().deleteItem(this, request);
-      }
-      catch (ItemNotFoundException e) {
-        // good, we want this item deleted
-      }
-      catch (UnsupportedStorageOperationException e) {
-        log.warn("Unexpected Exception in " + RepositoryStringUtils.getHumanizedNameString(this), e);
+        try {
+          final StorageItem item = getLocalStorage().retrieveItem(this, request);
+          if (!(item instanceof StorageCollectionItem)) {
+            getLocalStorage().deleteItem(this, request);
+          }
+        }
+        catch (ItemNotFoundException e) {
+          // good, we want this item deleted
+        }
+        catch (UnsupportedStorageOperationException e) {
+          log.warn("Unexpected Exception in " + RepositoryStringUtils.getHumanizedNameString(this), e);
+        }
       }
 
       if (lastException instanceof StorageException) {
@@ -1526,10 +1535,15 @@ public abstract class AbstractProxyRepository
         throw (ItemNotFoundException) lastException;
       }
 
-      // validation failed, I guess.
-      throw new ItemNotFoundException(reasonFor(request, this,
-          "Path %s fetched from remote storage of %s but failed validation.", request.getRequestPath(),
-          this));
+      if (storageCleanupNeeded) {
+        // validation failed
+        throw new ItemNotFoundException(reasonFor(request, this,
+            "Path %s fetched from remote storage of %s but failed validation.", request.getRequestPath(), this));
+      } else {
+        // request for a directory or something else
+        throw new ItemNotFoundException(reasonFor(request, this,
+            "Path %s could not be fetched from remote storage of %s", request.getRequestPath(), this), lastException);
+      }
     }
     finally {
       itemUidLock.unlock();
