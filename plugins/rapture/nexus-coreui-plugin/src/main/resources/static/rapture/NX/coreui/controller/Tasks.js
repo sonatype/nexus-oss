@@ -206,7 +206,6 @@ Ext.define('NX.coreui.controller.Tasks', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-drilldown-actions' },
         {
           xtype: 'nx-coreui-task-selecttype',
           flex: 1
