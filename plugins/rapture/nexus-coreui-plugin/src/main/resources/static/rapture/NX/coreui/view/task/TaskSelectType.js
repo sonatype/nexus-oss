@@ -38,6 +38,11 @@ Ext.define('NX.coreui.view.task.TaskSelectType', {
   ],
   plugins: [
     { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_TASKS_SELECT_LIST_FILTER_ERROR') }
-  ]
+  ],
+  listeners: {
+    beforerender: function(me) {
+      me.getStore().clearFilter();
+    }
+  }
 
 });

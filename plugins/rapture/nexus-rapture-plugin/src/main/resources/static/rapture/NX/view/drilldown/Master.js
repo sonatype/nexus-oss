@@ -46,31 +46,30 @@ Ext.define('NX.view.drilldown.Master', {
   refreshDrilldown: function(ct) {
     this.suspendEvents(false);
 
-    // Remove existing drilldown affordances
-    var columns = ct.items.items.filter(function(e) { return e.cls && e.cls == 'nx-drilldown-affordance' });
-    columns.forEach(function(e) { ct.remove(e) });
-
     // Add a drilldown affordance to the end of the list
-    ct.add(
-      {
-        width: 24,
-        hideable: false,
-        sortable: false,
-        menuDisabled: true,
-        resizable: false,
-        cls: 'nx-drilldown-affordance',
+    if(!ct.down('[cls~=nx-drilldown-affordance]')) {
+      ct.add(
+          {
+            width: 24,
+            hideable: false,
+            sortable: false,
+            menuDisabled: true,
+            resizable: false,
+            cls: 'nx-drilldown-affordance',
 
-        defaultRenderer: function() {
-          return Ext.DomHelper.markup(
-            {
-              tag: 'span',
-              html: '&#xf105;', // Right angle
-              style: 'font-family: FontAwesome;'
+            defaultRenderer: function() {
+              return Ext.DomHelper.markup(
+                  {
+                    tag: 'span',
+                    html: '&#xf105;', // Right angle
+                    style: 'font-family: FontAwesome;'
+                  }
+              )
             }
-          )
-        }
-      }
-    );
+          }
+      )  
+    }
+;
 
     this.resumeEvents();
   }
