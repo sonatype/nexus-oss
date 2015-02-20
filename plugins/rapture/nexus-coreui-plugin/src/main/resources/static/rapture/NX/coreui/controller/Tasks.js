@@ -117,7 +117,7 @@ Ext.define('NX.coreui.controller.Tasks', {
           click: me.createTask
         },
         'nx-coreui-task-selecttype': {
-          cellclick: me.showAddPanel
+          cellclick: me.showAddPanel,
         }
       }
     });
@@ -195,6 +195,9 @@ Ext.define('NX.coreui.controller.Tasks', {
   showSelectTypePanel: function() {
     var me = this,
       feature = me.getFeature();
+
+    //clear any filters that may previously have been applied
+    me.getTaskTypeStore().clearFilter();
 
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(1, NX.I18n.get('ADMIN_TASKS_SELECT_TITLE'));
