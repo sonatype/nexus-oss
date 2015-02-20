@@ -20,6 +20,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
+import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.sisu.goodies.common.Time;
 
@@ -128,6 +129,11 @@ public class NegativeCacheFacetImpl
       log.debug("Removing all from negative cache of {}", getRepository());
       cache.removeAll();
     }
+  }
+
+  @Override
+  public NegativeCacheKey getCacheKey(final Context context) {
+    return new NegativeCacheKey(context.getRequest().getPath());
   }
 
   @VisibleForTesting

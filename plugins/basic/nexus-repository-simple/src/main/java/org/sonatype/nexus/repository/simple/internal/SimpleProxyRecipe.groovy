@@ -18,7 +18,6 @@ import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
-import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
 import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.types.ProxyType
@@ -46,7 +45,7 @@ import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.or
 @Named(SimpleProxyRecipe.NAME)
 @Singleton
 class SimpleProxyRecipe
-    extends RecipeSupport
+extends RecipeSupport
 {
   static final String NAME = 'simple-proxy'
 
@@ -66,7 +65,7 @@ class SimpleProxyRecipe
   Provider<SimpleProxyFacet> proxyFacet
 
   @Inject
-  Provider<NegativeCacheFacet> negativeCacheFacet
+  Provider<SimpleNegativeCacheFacet> negativeCacheFacet
 
   @Inject
   TimingHandler timingHandler

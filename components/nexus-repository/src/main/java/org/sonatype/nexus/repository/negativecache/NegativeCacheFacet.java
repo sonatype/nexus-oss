@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.negativecache;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Status;
 
 /**
@@ -54,4 +55,12 @@ public interface NegativeCacheFacet
    * Removes all entries from negative cache.
    */
   void invalidate();
+
+  /**
+   * Retrieves the cache key based on context.
+   *
+   * @param context view context
+   * @return cache key
+   */
+  NegativeCacheKey getCacheKey(Context context);
 }
