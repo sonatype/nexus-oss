@@ -26,5 +26,11 @@ import org.sonatype.nexus.repository.view.Context;
 public interface NegativeCacheKeySource
     extends Facet
 {
+  /**
+   * Retrieves the cache key based on context.
+   *
+   * @param context view context
+   * @return cache key
+   */
   NegativeCacheKey getCacheKey(Context context);
 }

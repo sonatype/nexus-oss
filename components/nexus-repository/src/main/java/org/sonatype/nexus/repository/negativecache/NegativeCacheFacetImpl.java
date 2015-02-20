@@ -34,7 +34,7 @@ import static net.sf.ehcache.Status.STATUS_ALIVE;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 
 /**
- * EHCache based {@link NegativeCacheFacet} implementation
+ * EHCache based {@link NegativeCacheFacet} implementation.
  *
  * @since 3.0
  */

@@ -23,6 +23,10 @@ import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
+ * Handler that caches 404 responses.
+ * When context invocation returns 404, it caches the 404 status to avoid future invocations (if cached status is
+ * present).
+ *
  * @since 3.0
  */
 public class NegativeCacheHandler

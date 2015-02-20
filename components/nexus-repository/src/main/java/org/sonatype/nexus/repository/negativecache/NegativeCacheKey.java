@@ -15,7 +15,7 @@ package org.sonatype.nexus.repository.negativecache;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A key for the {@link NegativeCacheFacet} not found cache.
+ * A key for the {@link NegativeCacheFacet} negative cache.
  *
  * @since 3.0
  */

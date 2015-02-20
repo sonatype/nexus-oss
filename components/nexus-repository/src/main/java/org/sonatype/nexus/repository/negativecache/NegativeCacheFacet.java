@@ -12,21 +12,46 @@
  */
 package org.sonatype.nexus.repository.negativecache;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.view.Status;
 
 /**
+ * Negative cache management {@link Facet}.
+ *
  * @since 3.0
  */
 @Facet.Exposed
 public interface NegativeCacheFacet
     extends Facet
 {
+  /**
+   * Retrieve an entry from negative cache.
+   *
+   * @param key cache key
+   * @return cached {@link Status} or null if no cache entry found
+   */
+  @Nullable
   Status get(NegativeCacheKey key);
 
+  /**
+   * Add an entry to negative cache
+   *
+   * @param key    cache key
+   * @param status (404) status to be cached
+   */
   void put(NegativeCacheKey key, Status status);
 
+  /**
+   * Removes an entry from negative cache.
+   *
+   * @param key cache key
+   */
   void invalidate(NegativeCacheKey key);
 
+  /**
+   * Removes all entries from negative cache.
+   */
   void invalidate();
 }
