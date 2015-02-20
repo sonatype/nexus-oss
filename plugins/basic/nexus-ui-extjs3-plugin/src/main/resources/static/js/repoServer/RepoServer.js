@@ -65,54 +65,10 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
 
       },
 
-      buildRecoveryText : function() {
-        var htmlString = null;
-
-        if (sp.checkPermission('security:usersforgotid', sp.CREATE))
-        {
-          htmlString = 'Forgot your <a id="recover-username" href="#">username</a>';
-        }
-        if (sp.checkPermission('security:usersforgotpw', sp.CREATE))
-        {
-          if (htmlString != null)
-          {
-            htmlString += ' or ';
-          }
-          else
-          {
-            htmlString = 'Forgot your ';
-          }
-          htmlString += '<a id="recover-password" href="#">password</a>';
-        }
-        if (htmlString != null)
-        {
-          htmlString += '?';
-        }
-
-        return htmlString;
-      },
-
       statusComplete : function(statusResponse) {
         this.resetMainTabPanel();
 
         this.createSubComponents(); // update left panel
-
-        /* NEXUS-8070: Removed feature, performs badly with external realms
-        var htmlString = this.buildRecoveryText(),
-            recoveryPanel = this.loginForm.findById('recovery-panel');
-
-        if (recoveryPanel)
-        {
-          this.loginForm.remove(recoveryPanel);
-          recoveryPanel.destroy();
-        }
-        this.loginForm.add({
-              xtype : 'panel',
-              id : 'recovery-panel',
-              style : 'padding-left: 70px',
-              html : htmlString
-            });
-         */
       },
 
       // Each Sonatype server will need one of these
@@ -131,21 +87,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
         this.createSubComponents();
 
         Sonatype.view.serverTabPanel.add(this.nexusPanel);
-
-
-        /* NEXUS-8070: Removed feature, performs badly with external realms
-        var htmlString = this.buildRecoveryText();
-
-        if (htmlString != null)
-        {
-          this.loginFormConfig.items[2] = {
-            xtype : 'panel',
-            id : 'recovery-panel',
-            style : 'padding-left: 70px',
-            html : htmlString
-          };
-        }
-        */
 
         this.loginFormConfig.buttons = [{
               id : 'loginbutton',
@@ -199,21 +140,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
 
               this.loginWindow.closable = !anonDisabled;
               this.loginWindow.tools.close.setVisible(!anonDisabled);
-
-              panel = this.loginWindow.findById('recovery-panel');
-              if (panel && !panel.clickListenerAdded)
-              {
-                // these listeners only work if added after the window is
-                // created
-                panel.body.on('click', Ext.emptyFn, null, {
-                      delegate : 'a',
-                      preventDefault : true
-                    });
-                panel.body.on('mousedown', this.recoverLogin, this, {
-                      delegate : 'a'
-                    });
-                panel.clickListenerAdded = true;
-              }
 
               field = this.loginForm.find('name', 'username')[0];
               if (field.getRawValue())
@@ -545,24 +471,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
 
         Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
       },
-
-      recoverLogin : function(e, target) {
-        e.stopEvent();
-        if (this.loginWindow.isVisible())
-        {
-          this.loginWindow.hide();
-        }
-
-        var action = target.id;
-        if (action == 'recover-username')
-        {
-          Sonatype.utils.recoverUsername();
-        }
-        else if (action == 'recover-password')
-        {
-          Sonatype.utils.recoverPassword();
-        }
-      }
 
     };
   })();
