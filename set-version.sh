@@ -21,7 +21,7 @@ if [ -z "$newVersion" ]; then
     exit 1
 fi
 
-mvn org.eclipse.tycho:tycho-versions-plugin:0.18.0:set-version \
+mvn org.eclipse.tycho:tycho-versions-plugin:0.19.0:set-version \
     -Dtycho.mode=maven \
     -Dartifacts=nexus-oss \
     -Dproperties=nexus.version \
