@@ -117,7 +117,7 @@ Ext.define('NX.coreui.controller.Tasks', {
           click: me.createTask
         },
         'nx-coreui-task-selecttype': {
-          cellclick: me.showAddPanel,
+          cellclick: me.showAddPanel
         }
       }
     });
