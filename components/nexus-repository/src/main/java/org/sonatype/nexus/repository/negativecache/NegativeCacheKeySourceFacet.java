@@ -23,7 +23,7 @@ import org.sonatype.nexus.repository.view.Context;
  * @since 3.0
  */
 @Facet.Exposed
-public interface NegativeCacheKeySource
+public interface NegativeCacheKeySourceFacet
     extends Facet
 {
   /**

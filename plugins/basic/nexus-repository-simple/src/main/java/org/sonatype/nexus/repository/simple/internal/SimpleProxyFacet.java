@@ -21,7 +21,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheKey;
-import org.sonatype.nexus.repository.negativecache.NegativeCacheKeySource;
+import org.sonatype.nexus.repository.negativecache.NegativeCacheKeySourceFacet;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Context;
@@ -48,7 +48,7 @@ import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 @Named
 public class SimpleProxyFacet
     extends SimpleStorageFacet
-    implements NegativeCacheKeySource
+    implements NegativeCacheKeySourceFacet
 {
   public static final String CONFIG_KEY = "proxy";
 

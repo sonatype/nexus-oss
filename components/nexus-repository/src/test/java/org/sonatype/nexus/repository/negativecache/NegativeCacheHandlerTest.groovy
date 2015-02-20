@@ -38,7 +38,7 @@ extends TestSupport
 {
   private NegativeCacheHandler underTest
   private NegativeCacheFacet facet
-  private NegativeCacheKeySource source
+  private NegativeCacheKeySourceFacet source
   private NegativeCacheKey key
   private Context context
   private Request request
@@ -49,7 +49,7 @@ extends TestSupport
     underTest = new NegativeCacheHandler()
     facet = mock(NegativeCacheFacet)
     key = mock(NegativeCacheKey)
-    source = mock(NegativeCacheKeySource)
+    source = mock(NegativeCacheKeySourceFacet)
     context = mock(Context)
     request = mock(Request)
     repository = mock(Repository)
@@ -57,7 +57,7 @@ extends TestSupport
     when(context.getRepository()).thenReturn(repository)
     when(request.getAction()).thenReturn(HttpMethods.GET)
     when(repository.facet(NegativeCacheFacet)).thenReturn(facet)
-    when(repository.facet(NegativeCacheKeySource)).thenReturn(source)
+    when(repository.facet(NegativeCacheKeySourceFacet)).thenReturn(source)
     when(source.getCacheKey(context)).thenReturn(key)
   }
 
