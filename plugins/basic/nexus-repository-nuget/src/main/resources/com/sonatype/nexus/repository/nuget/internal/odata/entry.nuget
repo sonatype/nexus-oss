@@ -1,5 +1,5 @@
   <entry${NAMESPACES}>
-    <id>${BASEURI}/Packages(Id='${ID}',Version='${version}')</id>
+    <id>${BASEURI}/Packages(Id='${id}',Version='${version}')</id>
     <title type="text">${id}</title>
     <summary type="text">${summary}</summary>
     <updated>${last_updated}</updated>

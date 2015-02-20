@@ -177,6 +177,7 @@ public final class ODataUtils
     aliases.put(IS_LATEST_VERSION, nugat(P_IS_LATEST_VERSION));
     aliases.put(IS_PRERELEASE, nugat(P_IS_PRERELEASE));
     aliases.put(LAST_UPDATED, nugat(P_LAST_UPDATED));
+    aliases.put(NAME_ORDER, nugat(P_NAME_ORDER));
     aliases.put(PACKAGE_HASH, nugat(P_PACKAGE_HASH));
     aliases.put(PACKAGE_HASH_ALGORITHM, nugat(P_PACKAGE_HASH_ALGORITHM));
     aliases.put(PACKAGE_SIZE, nugat(P_PACKAGE_SIZE));

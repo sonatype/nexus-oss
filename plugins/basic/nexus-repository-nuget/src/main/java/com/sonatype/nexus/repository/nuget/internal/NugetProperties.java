@@ -56,6 +56,9 @@ public interface NugetProperties
 
   String LOCATION = "LOCATION";
 
+  // Synthetic field to support Visual Studio's order by 'name'
+  String NAME_ORDER = "NAME_ORDER";
+
   String PACKAGE_HASH = "PACKAGEHASH";
 
   String PACKAGE_HASH_ALGORITHM = "PACKAGEHASHALGORITHM";
@@ -141,6 +144,9 @@ public interface NugetProperties
 
   String P_TITLE = "title";
 
+  // Derived field to support Visual Studio's order by 'name'
+  String P_NAME_ORDER = "name_order";
+
   String P_VERSION = "version";
 
   String P_VERSION_DOWNLOAD_COUNT = "version_download_count";
@@ -159,6 +165,7 @@ public interface NugetProperties
       .put(IS_LATEST_VERSION, P_IS_LATEST_VERSION)
       .put(IS_PRERELEASE, P_IS_PRERELEASE)
       .put(LAST_UPDATED, P_LAST_UPDATED)
+      .put(NAME_ORDER, P_NAME_ORDER)
       .put(PACKAGE_HASH, P_PACKAGE_HASH)
       .put(PACKAGE_HASH_ALGORITHM, P_PACKAGE_HASH_ALGORITHM)
       .put(PACKAGE_SIZE, P_PACKAGE_SIZE)
@@ -169,5 +176,4 @@ public interface NugetProperties
       .put(VERSION, P_VERSION)
       .put(VERSION_DOWNLOAD_COUNT, P_VERSION_DOWNLOAD_COUNT)
       .build();
-
 }
