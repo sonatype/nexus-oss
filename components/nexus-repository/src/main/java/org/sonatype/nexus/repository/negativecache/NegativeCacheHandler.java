@@ -14,10 +14,12 @@ package org.sonatype.nexus.repository.negativecache;
 
 import javax.annotation.Nonnull;
 
+import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
+import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -26,6 +28,8 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
  * Handler that caches 404 responses.
  * When context invocation returns 404, it caches the 404 status to avoid future invocations (if cached status is
  * present).
+ * The cache key is looked up from an optional {@link NegativeCacheKeySource}. If repository does not have the facet,
+ * a default key is created from {@link Request#getPath()}.
  *
  * @since 3.0
  */
@@ -66,6 +70,11 @@ public class NegativeCacheHandler
   }
 
   protected NegativeCacheKey getCacheKey(final Context context) {
-    return context.getRepository().facet(NegativeCacheKeySource.class).getCacheKey(context);
+    try {
+      return context.getRepository().facet(NegativeCacheKeySource.class).getCacheKey(context);
+    }
+    catch (MissingFacetException e) {
+      return new NegativeCacheKey(context.getRequest().getPath());
+    }
   }
 }
