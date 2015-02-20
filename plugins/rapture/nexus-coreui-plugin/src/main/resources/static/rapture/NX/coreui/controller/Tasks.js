@@ -196,6 +196,9 @@ Ext.define('NX.coreui.controller.Tasks', {
     var me = this,
       feature = me.getFeature();
 
+    //clear any filters that may previously have been applied
+    me.getTaskTypeStore().clearFilter();
+
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(1, NX.I18n.get('ADMIN_TASKS_SELECT_TITLE'));
     me.loadCreateWizard(1, true, Ext.widget({
@@ -206,7 +209,6 @@ Ext.define('NX.coreui.controller.Tasks', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-drilldown-actions' },
         {
           xtype: 'nx-coreui-task-selecttype',
           flex: 1
