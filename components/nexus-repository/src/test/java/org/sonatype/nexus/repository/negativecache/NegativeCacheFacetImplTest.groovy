@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.negativecache
 
+import com.google.common.collect.Lists
 import com.google.common.collect.Maps
 import net.sf.ehcache.Cache
 import net.sf.ehcache.CacheManager
@@ -248,6 +249,30 @@ extends TestSupport
     underTest.start()
     underTest.invalidate()
     verify(cache).removeAll()
+  }
+
+  /**
+   * Given:
+   * - configuration present
+   * - enabled = true
+   * - cached entries
+   * Then:
+   * - invalidate removes all child keys from cache
+   */
+  @Test
+  void 'invalidate subset removes key and all child keys'() {
+    NegativeCacheKey key1 = mock(NegativeCacheKey)
+    NegativeCacheKey key2 = mock(NegativeCacheKey)
+    when(cache.getKeys()).thenReturn(Lists.newArrayList(key1, key2))
+    when(key.isParentOf(key1)).thenReturn(false)
+    when(key.isParentOf(key2)).thenReturn(true)
+    attributes.put("enabled", true)
+    underTest.init(repository)
+    underTest.start()
+    underTest.invalidateSubset(key)
+    verify(cache).remove(key)
+    verify(cache, never()).remove(key1)
+    verify(cache).remove(key2)
   }
 
 }

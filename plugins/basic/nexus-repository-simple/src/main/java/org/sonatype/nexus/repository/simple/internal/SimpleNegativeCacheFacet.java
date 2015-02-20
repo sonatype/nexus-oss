@@ -18,6 +18,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacetImpl;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheKey;
+import org.sonatype.nexus.repository.negativecache.ValueNegativeCacheKey;
 import org.sonatype.nexus.repository.view.Context;
 
 import net.sf.ehcache.CacheManager;
@@ -39,7 +40,7 @@ public class SimpleNegativeCacheFacet
 
   @Override
   public NegativeCacheKey getCacheKey(final Context context) {
-    return new NegativeCacheKey(ContextHelper.contentName(context));
+    return new ValueNegativeCacheKey(ContextHelper.contentName(context));
   }
 
 }

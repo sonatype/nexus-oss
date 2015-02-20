@@ -123,6 +123,16 @@ public class NegativeCacheFacetImpl
   }
 
   @Override
+  public void invalidateSubset(final NegativeCacheKey key) {
+    invalidate(key);
+    for (Object entry : cache.getKeys()) {
+      if (!key.equals(entry) && key.isParentOf((NegativeCacheKey) entry)) {
+        invalidate((NegativeCacheKey) entry);
+      }
+    }
+  }
+
+  @Override
   @Guarded(by = STARTED)
   public void invalidate() {
     if (cache != null) {
@@ -133,7 +143,7 @@ public class NegativeCacheFacetImpl
 
   @Override
   public NegativeCacheKey getCacheKey(final Context context) {
-    return new NegativeCacheKey(context.getRequest().getPath());
+    return new PathNegativeCacheKey(context.getRequest().getPath());
   }
 
   @VisibleForTesting

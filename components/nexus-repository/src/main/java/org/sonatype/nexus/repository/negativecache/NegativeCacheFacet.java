@@ -52,6 +52,13 @@ public interface NegativeCacheFacet
   void invalidate(NegativeCacheKey key);
 
   /**
+   * Removes entry for passed in parent key and all is children (using {@link NegativeCacheKey#isParentOf(NegativeCacheKey)}).
+   *
+   * @param key parent cache key
+   */
+  void invalidateSubset(NegativeCacheKey key);
+
+  /**
    * Removes all entries from negative cache.
    */
   void invalidate();
