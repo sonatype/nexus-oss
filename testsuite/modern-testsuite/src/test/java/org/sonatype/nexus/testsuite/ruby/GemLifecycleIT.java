@@ -14,6 +14,8 @@ package org.sonatype.nexus.testsuite.ruby;
 
 import java.io.File;
 
+import org.sonatype.nexus.ruby.client.RubyProxyRepository;
+
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,6 +45,13 @@ public class GemLifecycleIT
   private void uploadGemWithNexusGemCommand(String repoId) throws Exception {
     log("== START {}", repoId);
     cleanup();
+    repositories().get(RubyProxyRepository.class, "gemsproxy").withMetadataMaxAge(0).save();
+
+    // start with an empty repo
+    String list = gemRunner().list(repoId);
+    assertThat(list, numberOfLines(list), is(0));
+
+    Thread.sleep(900L); // give chance for "cached" and "remote" file timestamps to drift as Last-Modified header has second resolution
 
     File nexusGem = installLatestNexusGem();
 
@@ -63,13 +72,10 @@ public class GemLifecycleIT
     assertGem(repoId, nexusGem.getName());
 
     // now we have one remote gem
-    String s = gemRunner().list(repoId);
-    // it is enough to not check it since the assertGem is checking
-    // whether the actual gem exists on the server for download.
-    // caching inside the commandline gem-tools is a problem here
-    if (repoId.equals("gemhosted")) {
-        assertThat(numberOfLines(s), is(1));
-    }
+    gemRunner().clearCache();
+    list = gemRunner().list(repoId);
+
+    assertThat(repoId + "\n" + list, numberOfLines(list), is(1));
 
     // reinstall the gem from repository
     assertThat(lastLine(gemRunner().install(repoId, "nexus")), equalTo("1 gem installed"));

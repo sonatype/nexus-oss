@@ -176,6 +176,7 @@ public abstract class RubyITSupport
     return configuration
         .setLogLevel("org.sonatype.nexus.ruby", "TRACE")
         .setLogLevel("org.sonatype.nexus.plugins.ruby", "TRACE")
+        .setLogLevel("remote.storage.outbound", "DEBUG")
         .addPlugins(
             artifactResolver().resolvePluginFromDependencyManagement(
                 "org.sonatype.nexus.plugins", "nexus-ruby-plugin"
