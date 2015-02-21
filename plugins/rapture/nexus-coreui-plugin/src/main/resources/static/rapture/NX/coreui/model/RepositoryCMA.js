@@ -24,7 +24,14 @@ Ext.define('NX.coreui.model.RepositoryCMA', {
     'name',
     'type',
     'format',
+    'online',
     'recipe',
-    'attributes'
+    'attributes',
+    {
+      name: 'onlineText',
+      convert: function(val, row) {
+        return row.data['online'] ? 'online' : 'offline';
+      }
+    }
   ]
 });

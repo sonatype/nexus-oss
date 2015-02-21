@@ -27,4 +27,9 @@ public interface ViewFacet
    * Dispatch request to router.
    */
   Response dispatch(Request request) throws Exception;
+
+  /**
+   * @return true if repository should serve inbound requests
+   */
+  boolean isOnline();
 }

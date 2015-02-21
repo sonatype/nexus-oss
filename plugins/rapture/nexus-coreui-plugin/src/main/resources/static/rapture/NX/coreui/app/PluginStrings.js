@@ -371,6 +371,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_CMA_SETTINGS_RECIPE_PLACEHOLDER: 'Select a recipe',
     ADMIN_REPOSITORIES_CMA_SETTINGS_ATTRIBUTES: 'Attributes',
     ADMIN_REPOSITORIES_CMA_LIST_EMPTY_STATE: 'No repositories defined',
+    ADMIN_REPOSITORIES_LIST_ONLINE_COLUMN: 'Online',
 
     // Admin -> Repository -> Routing
     ADMIN_ROUTING_TITLE: 'Routing',
