@@ -31,6 +31,7 @@ import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.security.BreadActions;
 import org.sonatype.nexus.repository.security.RepositoryViewPermission;
 import org.sonatype.nexus.repository.security.SecurityHelper;
+import org.sonatype.nexus.repository.view.ViewFacet;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -211,7 +212,8 @@ public class SearchServiceImpl
   private String[] getSearchableIndexes() {
     List<String> indexes = Lists.newArrayList();
     for (Repository repository : repositoryManager.browse()) {
-      if (securityHelper.allPermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))) {
+      if (repository.facet(ViewFacet.class).isOnline()
+          && securityHelper.allPermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))) {
         indexes.add(repository.getName());
       }
     }
