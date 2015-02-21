@@ -12,6 +12,8 @@
  */
 package com.sonatype.nexus.repository.nuget.internal;
 
+import java.util.Map;
+
 import org.sonatype.nexus.repository.view.matchers.token.TokenParser;
 
 import org.hamcrest.Matchers;
@@ -20,21 +22,33 @@ import org.junit.Test;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class NugetRouteMatchingTest
+public class NugetFeedHandlerPatternTest
 {
   @Test
   public void feedRoute() {
-    final TokenParser tokenParser = new TokenParser(NugetHostedRecipe.FEED_PATTERN);
+    final TokenParser tokenParser = new TokenParser(NugetFeedHandler.FEED_PATTERN);
 
-    String search = "/Search()";
-    assertThat(tokenParser.parse(search), is(Matchers.notNullValue()));
+    String path = "/Search()";
+    assertThat(tokenParser.parse(path), is(Matchers.notNullValue()));
   }
 
   @Test
-  public void feedCountRoute(){
-    final TokenParser tokenParser = new TokenParser(NugetHostedRecipe.FEED_COUNT_PATTERN);
+  public void feedCountRoute() {
+    final TokenParser tokenParser = new TokenParser(NugetFeedHandler.FEED_COUNT_PATTERN);
 
-    String search = "/Search()/$count";
-    assertThat(tokenParser.parse(search), is(Matchers.notNullValue()));
+    String path = "/Search()/$count";
+    assertThat(tokenParser.parse(path), is(Matchers.notNullValue()));
+  }
+
+  @Test
+  public void packageEntryRoute() {
+    final TokenParser tokenParser = new TokenParser(NugetFeedHandler.PACKAGE_ENTRY_PATTERN);
+
+    String path = "/Packages(Id='fire',Version='1.1.2-beta')";
+    final Map<String, String> tokens = tokenParser.parse(path);
+    assertThat(tokens, is(Matchers.notNullValue()));
+
+    assertThat(tokens.get("id"), is("fire"));
+    assertThat(tokens.get("version"), is("1.1.2-beta"));
   }
 }

@@ -90,6 +90,9 @@ public class NugetGalleryFacetImpl
 {
   public static final String NUGET = "nuget";
 
+  public static final String WITH_NAMESPACES =
+      " xmlns:d=\"http://schemas.microsoft.com/ado/2007/08/dataservices\" xmlns:m=\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\" xmlns=\"http://www.w3.org/2005/Atom\"";
+
   public static final String NO_NAMESPACES = "";
 
   protected Clock clock = new Clock();
@@ -146,17 +149,13 @@ public class NugetGalleryFacetImpl
 
   //@Override
   @Guarded(by = STARTED)
-  public String feed(final String base, final String name, final Parameters parameters) {
+  public String feed(final String base, final String operation, final Parameters parameters) {
     Map<String, String> query = asMap(parameters);
 
     log.debug("Select: " + query);
 
-    final Map<String, String> extra =
-        ImmutableMap.of("BASEURI", base, "ENDPOINT", name, LAST_UPDATED,
-            ODataFeedUtils.datetime(System.currentTimeMillis()), "NAMESPACES", NO_NAMESPACES);
-
     final StringBuilder xml = new StringBuilder();
-    xml.append(ODataTemplates.interpolate(ODataTemplates.NUGET_FEED, extra));
+    xml.append(interpolateTemplate(ODataTemplates.NUGET_FEED, extraTemplateVars(base, operation)));
 
     // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
     if (!query.containsKey("$orderby")) {
@@ -177,8 +176,9 @@ public class NugetGalleryFacetImpl
       if (inlineCountRequested(query)) {
         // TODO: We need a count query, as this has an order by
         int inlineCount = executeCount(componentCountQuery, storageTx);
-        xml.append(ODataTemplates.interpolate(ODataTemplates.NUGET_INLINECOUNT,
-            ImmutableMap.of("COUNT", String.valueOf(inlineCount))));
+        xml.append(interpolateTemplate(ODataTemplates.NUGET_INLINECOUNT,
+            ImmutableMap.of("COUNT", String.valueOf(inlineCount))
+        ));
       }
 
       final Iterable<OrientVertex> components = storageTx.findComponents(componentQuery.getWhere(),
@@ -188,12 +188,12 @@ public class NugetGalleryFacetImpl
       for (OrientVertex component : components) {
         n++;
 
-        final NestedAttributesMap nugetAttributes = storageTx.getAttributes(component).child(NUGET);
-        final Map<String, ?> data = toData(nugetAttributes, extra);
+        final NestedAttributesMap nugetAttributes = nugetAttribs(storageTx, component);
+        final Map<String, ?> data = toData(nugetAttributes, extraTemplateVars(base, operation));
 
-        xml.append(ODataTemplates.interpolate(ODataTemplates.NUGET_ENTRY, data));
+        xml.append(interpolateTemplate(ODataTemplates.NUGET_ENTRY, data));
         if (n == ODataUtils.PAGE_SIZE) {
-          xml.append("  <link rel=\"next\" href=\"").append(base).append('/').append(name);
+          xml.append("  <link rel=\"next\" href=\"").append(base).append('/').append(operation);
           xml.append('?').append(ODataFeedUtils.skipLink(data, query)).append("\"/>\n");
           break;
         }
@@ -213,7 +213,8 @@ public class NugetGalleryFacetImpl
     return query;
   }
 
-  private Map<String, ?> toData(final NestedAttributesMap nugetAttributes, Map<String, String> extra)
+  @VisibleForTesting
+  Map<String, ?> toData(final NestedAttributesMap nugetAttributes, Map<String, String> extra)
   {
     Map<String, Object> data = Maps.newHashMap();
 
@@ -226,6 +227,37 @@ public class NugetGalleryFacetImpl
     }
 
     return data;
+  }
+
+  @Override
+  public String entry(final String base, final String id, final String version) {
+    final Map<String, String> extra = ImmutableMap.of("BASEURI", base, "NAMESPACES", WITH_NAMESPACES);
+
+    final StringBuilder xml = new StringBuilder();
+    try (StorageTx tx = openStorageTx()) {
+      final OrientVertex component = findComponent(tx, id, version);
+      final Map<String, ?> entryData = toData(nugetAttribs(tx, component), extra);
+
+      final String nugetEntry = ODataTemplates.NUGET_ENTRY;
+      xml.append(interpolateTemplate(nugetEntry, entryData));
+    }
+    return xml.toString();
+  }
+
+  @VisibleForTesting
+  String interpolateTemplate(final String template, final Map<String, ?> entryData) {
+    return ODataTemplates
+        .interpolate(template, entryData);
+  }
+
+  @VisibleForTesting
+  NestedAttributesMap nugetAttribs(final StorageTx tx, final OrientVertex component) {
+    return tx.getAttributes(component).child(NUGET);
+  }
+
+  private Map<String, String> extraTemplateVars(final String base, final String operation) {
+    return ImmutableMap.of("BASEURI", base, "ENDPOINT", operation, LAST_UPDATED,
+        ODataFeedUtils.datetime(System.currentTimeMillis()), "NAMESPACES", NO_NAMESPACES);
   }
 
   @Override
@@ -373,7 +405,7 @@ public class NugetGalleryFacetImpl
     SortedSet<OrientVertex> allReleases = Sets.newTreeSet(new ComponentVersionComparator());
 
     for (OrientVertex version : versions) {
-      final NestedAttributesMap nugetAttributes = storageTx.getAttributes(version).child(NUGET);
+      final NestedAttributesMap nugetAttributes = nugetAttribs(storageTx, version);
 
       final boolean isPrerelease = checkNotNull(nugetAttributes.get(P_IS_PRERELEASE, Boolean.class));
       if (!isPrerelease) {
@@ -389,7 +421,7 @@ public class NugetGalleryFacetImpl
     OrientVertex absoluteLatestVersion = allReleases.isEmpty() ? null : allReleases.last();
 
     for (OrientVertex component : allReleases) {
-      final NestedAttributesMap nugetAttributes = storageTx.getAttributes(component).child(NUGET);
+      final NestedAttributesMap nugetAttributes = nugetAttribs(storageTx, component);
 
       nugetAttributes.set(P_IS_LATEST_VERSION, component.equals(latestVersion));
       nugetAttributes.set(P_IS_ABSOLUTE_LATEST_VERSION, component.equals(absoluteLatestVersion));

@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.stateguard.Guarded;
@@ -34,6 +35,7 @@ import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
+import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import com.tinkerpop.blueprints.impls.orient.OrientVertexType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -50,6 +52,8 @@ public class StorageFacetImpl
     implements StorageFacet
 {
   public static final String CONFIG_KEY = "storage";
+
+  private static final long DELETE_BATCH_SIZE = 100L;
 
   private final BlobStoreManager blobStoreManager;
 
@@ -163,8 +167,53 @@ public class StorageFacetImpl
   }
 
   @Override
+  protected void doDelete() throws Exception {
+    // delete all assets, blobs, components, and finally, the bucket.
+    // TODO: This could take a while for large repos.
+    //       Hide the bucket right away, but figure out a way to do the deletions asynchronously.
+    try (StorageTx tx = openStorageTx()) {
+      OrientVertex bucket = tx.getBucket();
+      deleteAll(tx, tx.browseAssets(bucket), new Predicate<OrientVertex>()
+      {
+        @Override
+        public boolean apply(final OrientVertex vertex) {
+          BlobRef blobRef = BlobRef.parse(checkNotNull((String) vertex.getProperty(P_BLOB_REF)));
+          tx.deleteBlob(blobRef);
+          return true;
+        }
+      });
+      deleteAll(tx, tx.browseComponents(bucket), null);
+      tx.deleteVertex(bucket);
+      tx.commit();
+    }
+  }
+
+  /**
+   * Deletes all given vertices in batches. If a predicate is specified, it will be executed before each delete.
+   */
+  private void deleteAll(StorageTx tx, Iterable<OrientVertex> vertices, @Nullable Predicate<OrientVertex> predicate) {
+    long count = 0;
+    for (OrientVertex vertex : vertices) {
+      if (predicate != null) {
+        predicate.apply(vertex);
+      }
+      tx.deleteVertex(vertex);
+      count++;
+      if (count == DELETE_BATCH_SIZE) {
+        tx.commit();
+        count = 0;
+      }
+    }
+    tx.commit();
+  }
+
+  @Override
   @Guarded(by = STARTED)
   public StorageTx openTx() {
+    return openStorageTx();
+  }
+
+  private StorageTx openStorageTx() {
     BlobStore blobStore = blobStoreManager.get(blobStoreName);
     return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(), bucketId);
   }

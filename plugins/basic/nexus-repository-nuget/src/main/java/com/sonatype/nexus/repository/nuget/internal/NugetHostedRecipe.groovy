@@ -32,6 +32,7 @@ import javax.inject.Named
 import javax.inject.Provider
 import javax.inject.Singleton
 
+import static com.sonatype.nexus.repository.nuget.internal.NugetFeedHandler.*
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 
 /**
@@ -45,11 +46,6 @@ class NugetHostedRecipe
     extends RecipeSupport
 {
   static final String NAME = "nuget-hosted"
-
-  public static final String FEED_COUNT_PATTERN = "/{operation}({paramString:.*}){count:/\\\\\$count}"
-
-  public static final String FEED_PATTERN = "/{operation}({paramString:.*})"
-
 
   @Inject
   Provider<NugetSecurityFacet> securityFacet
@@ -109,19 +105,13 @@ class NugetHostedRecipe
         .handler(staticFeedHandler)
         .create());
 
-    // TODO: .meta (what is this?)
-
-    // $count
-    // Packages
-    // Search
-    // FindPackagesById
-    // TODO: Individual package entry
-
-    // Metadata operations
-    // <galleryBase>/Operation(param1='whatever',...)/?queryParameters
+    // Metadata feed operations
+    // <galleryBase>/Operation()/?queryParameters
+    // includes $count, Packages, Search, and FindPackagesById
     // TODO: Are the parentheses optional? They are in the old code
     router.route(new Route.Builder()
-        .matcher(LogicMatchers.or(new TokenMatcher(FEED_COUNT_PATTERN), new TokenMatcher(FEED_PATTERN)))
+        .matcher(LogicMatchers.or(new TokenMatcher(FEED_COUNT_PATTERN), new TokenMatcher(FEED_PATTERN),
+        new TokenMatcher(PACKAGE_ENTRY_PATTERN)))
         .handler(timingHandler)
     //        .handler(securityHandler)
         .handler(feedHandler)

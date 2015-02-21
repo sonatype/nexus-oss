@@ -40,6 +40,9 @@ abstract class AbstractNugetHandler
     extends ComponentSupport
     implements Handler
 {
+
+  public static final String XML_CONTENT_TYPE = "application/xml";
+
   protected Response convertToXmlError(final Exception e) {
     if (e instanceof NugetPackageException) {
       log.debug("Invalid package being uploaded", e);
@@ -64,8 +67,9 @@ abstract class AbstractNugetHandler
   }
 
   protected Response xmlPayload(final int code, final String content) {
-    final StringPayload stringPayload = new StringPayload(content, Charsets.UTF_8, "application/xml");
-    return new PayloadResponse(Status.failure(code), stringPayload);
+    final StringPayload stringPayload = new StringPayload(content, Charsets.UTF_8, XML_CONTENT_TYPE);
+    final Status status = code < 300 ? Status.success(code) : Status.failure(code);
+    return new PayloadResponse(status, stringPayload);
   }
 
   public String populateErrorTemplate(final int code, final String message) {

@@ -31,24 +31,35 @@ import com.google.common.base.Charsets;
 public class NugetFeedHandler
     extends AbstractNugetHandler
 {
-  public static final String FEED_CONTENT_TYPE = "application/xml";
+  public static final String FEED_COUNT_PATTERN = "/{operation}()/$count";
+
+  public static final String FEED_PATTERN = "/{operation}()";
+
+  public static final String PACKAGE_ENTRY_PATTERN = "/Packages(Id='{id}',Version='{version}')";
 
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
     final State state = context.getAttributes().get(State.class);
     final Map<String, String> tokens = state.getTokens();
-    final String operation = tokens.get("operation");
-
     final NugetGalleryFacet facet = context.getRepository().facet(NugetGalleryFacet.class);
     final Parameters queryParameters = context.getRequest().getParameters();
 
-    if (tokens.containsKey("count")) {
-      final int count = facet.count(context.getRequest().getPath(), queryParameters);
-      return HttpResponses.ok(new StringPayload(Integer.toString(count), Charsets.UTF_8, "text/plain"));
-    }
+    switch (state.pattern()) {
+      case FEED_PATTERN:
+        final String feed = facet.feed(getRepositoryBase(context), tokens.get("operation"), queryParameters);
+        return xmlPayload(200, feed);
 
-    final String feed = facet.feed(getRepositoryBase(context), operation, queryParameters);
-    return HttpResponses.ok(new StringPayload(feed, Charsets.UTF_8, FEED_CONTENT_TYPE));
+      case FEED_COUNT_PATTERN:
+        final int count = facet.count(context.getRequest().getPath(), queryParameters);
+        return HttpResponses.ok(new StringPayload(Integer.toString(count), Charsets.UTF_8, "text/plain"));
+
+      case PACKAGE_ENTRY_PATTERN:
+        final String entry = facet.entry(getRepositoryBase(context), tokens.get("id"), tokens.get("version"));
+        return xmlPayload(200, entry);
+
+      default:
+        throw new IllegalStateException("Unexpected path pattern passed to " + getClass().getSimpleName());
+    }
   }
 }
