@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.repositorycma.RepositoryCMAList', {
       width: 36,
       iconVariant: 'x16',
       iconName: function() {
-        return 'repository-default';
+        return 'repositorycma-default';
       }
     },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
