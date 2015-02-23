@@ -20,6 +20,7 @@
 Ext.define('NX.view.info.Panel', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-info-panel',
+  ui: 'nx-inset',
 
   title: 'Summary',
   autoScroll: true,

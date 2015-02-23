@@ -79,6 +79,7 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
               fieldLabel: field.useTrustStoreFieldLabel,
               boxLabel: field.useTrustStoreBoxLabel,
               useTrustStoreConfig: config,
+              cls: 'nx-clear-both',
               listeners: {
                 afterrender: me.bindConditions
               }

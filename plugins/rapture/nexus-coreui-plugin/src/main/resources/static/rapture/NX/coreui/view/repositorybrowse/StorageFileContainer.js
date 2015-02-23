@@ -18,15 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
-  extend: 'NX.ext.tab.SortedPanel',
+  extend: 'NX.ext.panel.SubsectionPanel',
   alias: 'widget.nx-coreui-repositorybrowse-storagefilecontainer',
   requires: [
     'NX.Icons'
   ],
-
-  ui: 'nx-light',
-  title: 'fun',
-  autoHideTabHeader: false,
 
   /**
    * Repository of currently shown file.
@@ -72,10 +68,6 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
       me.setTitle(segments[segments.length - 1]);
 
       me.fireEvent('updated', me, repositoryId, path);
-
-      if (!me.getActiveTab()) {
-        me.setActiveTab(0);
-      }
     }
     else {
       me.hide();

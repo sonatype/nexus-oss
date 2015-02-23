@@ -30,8 +30,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerFeature', {
 
   tabs: [
     { xtype: 'nx-coreui-ldapserver-connection', title: NX.I18n.get('ADMIN_LDAP_DETAILS_CONNECTION_TAB'), weight: 10 },
-    { xtype: 'nx-coreui-ldapserver-backup', title: NX.I18n.get('ADMIN_LDAP_DETAILS_BACKUP_TAB'), weight: 20 },
-    { xtype: 'nx-coreui-ldapserver-userandgroup', title: NX.I18n.get('ADMIN_LDAP_DETAILS_GROUP_TAB'), weight: 30 }
+    { xtype: 'nx-coreui-ldapserver-userandgroup', title: NX.I18n.get('ADMIN_LDAP_DETAILS_GROUP_TAB'), weight: 20 },
+    { xtype: 'nx-coreui-ldapserver-backup', title: NX.I18n.get('ADMIN_LDAP_DETAILS_BACKUP_TAB'), weight: 30 }
   ],
 
   actions: [

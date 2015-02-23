@@ -25,14 +25,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupForm', {
     'NX.I18n'
   ],
 
-  api: {
-    submit: 'NX.direct.ldap_LdapServer.update'
-  },
-  settingsFormSuccessMessage: function(data) {
-    return NX.I18n.get('ADMIN_LDAP_UPDATE_SUCCESS') + data['name'];
-  },
-  editableMarker: NX.I18n.get('ADMIN_LDAP_UPDATE_ERROR'),
-
   items: { xtype: 'nx-coreui-ldapserver-backup-fieldset' },
 
   /**
@@ -48,17 +40,26 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupForm', {
     Ext.override(me.getForm(), {
       /**
        * @override
-       * Override model with form values.
+       * If selected, replaced the input value of the fieldset checkbox with true
        */
       getValues: function() {
         var me = this,
-            modelData = me.getRecord().getData(false);
+          values = me.callParent(arguments);
 
-        me.getFields().each(function(field) {
-          delete modelData[field.getName()];
-        });
-        return Ext.apply(modelData, me.callParent(arguments));
+        values.backupMirrorEnabled = values.backupMirrorEnabled ? true : false;
+
+        return values;
       }
     });
+  },
+
+  /**
+   * @override
+   * Additionally, marks invalid properties.
+   */
+  markInvalid: function(errors) {
+    var me = this;
+
+    me.down('nx-coreui-ldapserver-backup-fieldset').markInvalid(errors);
   }
 });

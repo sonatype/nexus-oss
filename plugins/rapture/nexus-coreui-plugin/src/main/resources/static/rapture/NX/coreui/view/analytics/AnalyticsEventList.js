@@ -51,27 +51,27 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
     {
       header: NX.I18n.get('ADMIN_EVENTS_TYPE_COLUMN'),
       dataIndex: 'type',
-      flex: 1,
+      flex: 1
     },
     {
       header: NX.I18n.get('ADMIN_EVENTS_TIMESTAMP_COLUMN'),
       dataIndex: 'timestamp',
-      flex: 1,
+      flex: 1
     },
     {
-      header: 'Sequence',
+      header: NX.I18n.get('ADMIN_EVENTS_SEQUENCE_COLUMN'),
       dataIndex: 'sequence',
-      flex: 1,
+      flex: 1
     },
     {
       header: NX.I18n.get('ADMIN_EVENTS_DURATION_COLUMN'),
       dataIndex: 'duration',
-      flex: 1,
+      flex: 1
     },
     {
       header: NX.I18n.get('ADMIN_EVENTS_USER_COLUMN'),
       dataIndex: 'userId',
-      flex: 1,
+      flex: 1
     },
     {
       header: NX.I18n.get('ADMIN_EVENTS_ATTRIBUTES_COLUMN'),

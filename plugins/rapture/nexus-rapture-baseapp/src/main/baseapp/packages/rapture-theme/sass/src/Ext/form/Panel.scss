@@ -28,8 +28,10 @@
 );
 
 .x-panel-nx-subsection {
-
   .x-panel-header {
+    padding: 0 !important;
+  }
+  .x-panel-header-text-container {
     padding: 10px 0 10px 0 !important;
   }
 }

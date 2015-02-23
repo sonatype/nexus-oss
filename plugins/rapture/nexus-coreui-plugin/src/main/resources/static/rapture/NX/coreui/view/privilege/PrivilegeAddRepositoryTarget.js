@@ -73,6 +73,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
           name: 'repositoryId',
           itemId: 'repositoryId',
           fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_REPOSITORY'),
+          emptyText: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_REPOSITORY_PLACEHOLDER'),
           editable: false,
           store: me.repositoryStore,
           queryMode: 'local',

@@ -415,19 +415,20 @@ Ext.define('NX.coreui.controller.Search', {
   onSearchResultSelection: function(model) {
     var me = this,
         searchResultModel = model,
-        searchResultVersion = me.getSearchResultVersion(),
         searchResultDetails = me.getSearchResultDetails(),
         searchResultVersionStore = me.getSearchResultVersionStore(),
-        info = {};
+        groupInfo = {}, nameInfo = {}, formatInfo = {};
 
     me.onSearchResultVersionSelection(null);
 
     if (searchResultModel) {
-      info[NX.I18n.get('BROWSE_SEARCH_VERSIONS_GROUP')] = searchResultModel.get('groupId');
-      info[NX.I18n.get('BROWSE_SEARCH_VERSIONS_NAME')] = searchResultModel.get('artifactId');
-      info[NX.I18n.get('BROWSE_SEARCH_VERSIONS_FORMAT')] = searchResultModel.get('format');
+      groupInfo[NX.I18n.get('BROWSE_SEARCH_VERSIONS_GROUP')] = searchResultModel.get('groupId');
+      nameInfo[NX.I18n.get('BROWSE_SEARCH_VERSIONS_NAME')] = searchResultModel.get('artifactId');
+      formatInfo[NX.I18n.get('BROWSE_SEARCH_VERSIONS_FORMAT')] = searchResultModel.get('format');
 
-      searchResultDetails.items.get(0).showInfo(info);
+      searchResultDetails.down('#group').showInfo(groupInfo);
+      searchResultDetails.down('#name').showInfo(nameInfo);
+      searchResultDetails.down('#format').showInfo(formatInfo);
       searchResultVersionStore.clearFilter(true);
       searchResultVersionStore.addFilter(me.getSearchResultStore().filters.items, false);
       searchResultVersionStore.addFilter([

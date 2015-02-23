@@ -22,7 +22,6 @@ Ext.define('NX.coreui.view.capability.CapabilityAbout', {
   alias: 'widget.nx-coreui-capability-about',
   ui: 'nx-inset',
 
-  autoScroll: true,
   html: '',
 
   /**

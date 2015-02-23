@@ -47,9 +47,6 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
       title: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISH_SECTION'),
       hidden: true,
       ui: 'nx-subsection',
-      cls: 'no-border',
-
-      margin: 10,
 
       items: [
         {

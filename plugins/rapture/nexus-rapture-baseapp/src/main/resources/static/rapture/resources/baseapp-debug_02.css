@@ -14490,6 +14490,27 @@
 }
 
 /**
+ * Styles which allow for horizontal alignment of form fields
+ */
+/* line 29, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+.nx-float-left {
+  position: relative;
+  float: left !important;
+  margin-right: 5px;
+}
+
+/* line 35, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+.nx-interstitial-label {
+  font-size: 13px;
+  padding-top: 5px;
+}
+
+/* line 40, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+.nx-clear-both {
+  clear: both;
+}
+
+/**
  * @class Ext.form.Fieldset
  */
 /* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
@@ -15172,12 +15193,16 @@
   border-width: 1px !important;
 }
 
-/* line 32, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
+/* line 31, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
 .x-panel-nx-subsection .x-panel-header {
+  padding: 0 !important;
+}
+/* line 34, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
+.x-panel-nx-subsection .x-panel-header-text-container {
   padding: 10px 0 10px 0 !important;
 }
 
-/* line 37, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
+/* line 39, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
 .x-panel-nx-subsection-framed {
   border: 1px #333333 solid;
 }

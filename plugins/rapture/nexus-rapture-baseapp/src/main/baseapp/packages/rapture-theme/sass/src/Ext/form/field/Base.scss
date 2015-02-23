@@ -21,3 +21,22 @@
   background-color: $color-gainsboro;
   opacity: 0.6;
 }
+
+/**
+ * Styles which allow for horizontal alignment of form fields
+ */
+
+.nx-float-left {
+  position: relative;
+  float: left !important;
+  margin-right: 5px;
+}
+
+.nx-interstitial-label {
+  font-size: 13px;
+  padding-top: 5px;
+}
+
+.nx-clear-both {
+  clear: both;
+}

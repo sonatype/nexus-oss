@@ -25,15 +25,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
     'NX.I18n'
   ],
 
-  api: {
-    submit: 'NX.direct.ldap_LdapServer.update'
-  },
-  settingsFormSuccessMessage: function(data) {
-    return NX.I18n.get('ADMIN_LDAP_UPDATE_SUCCESS') + data['name'];
-  },
-
-  editableMarker: NX.I18n.get('ADMIN_LDAP_UPDATE_ERROR'),
-
   items: { xtype: 'nx-coreui-ldapserver-userandgroup-fieldset' },
 
   /**
@@ -46,27 +37,20 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
 
     me.callParent(arguments);
 
-    Ext.override(me.getForm(), {
-      /**
-       * @override
-       * Override model with form values.
-       */
-      getValues: function() {
-        var me = this,
-            modelData = me.getRecord().getData(false);
-
-        me.getFields().each(function(field) {
-          delete modelData[field.getName()];
-        });
-        return Ext.apply(modelData, me.callParent(arguments));
-      }
-
-    });
-
     me.getDockedItems('toolbar[dock="bottom"]')[0].add(
         { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_MAPPING_BUTTON'), formBind: true, action: 'verifyusermapping' },
         { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_LOGIN_BUTTON'), formBind: true, action: 'verifylogin' }
     );
+  },
+
+  /**
+   * @override
+   * Additionally, marks invalid properties.
+   */
+  markInvalid: function(errors) {
+    var me = this;
+
+    me.down('nx-coreui-ldapserver-userandgroup-fieldset').markInvalid(errors);
   }
 
 });

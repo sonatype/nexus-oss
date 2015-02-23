@@ -25,7 +25,6 @@ Ext.define('NX.coreui.view.capability.CapabilityStatus', {
     'NX.I18n'
   ],
 
-  autoScroll: true,
   html: '',
 
   /**

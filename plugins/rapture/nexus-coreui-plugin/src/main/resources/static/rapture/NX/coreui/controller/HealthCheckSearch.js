@@ -81,7 +81,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
    */
   loadHealthCheckSearchResultVersion: function() {
     var me = this,
-        searchResultDetails = me.getSearchResultDetails().down('#secondaryInfo'),
+        searchResultDetails = me.getSearchResultDetails().down('#popular'),
         searchResultModel,
         groupId = undefined, artifactId = undefined, versions = [], info = {};
 

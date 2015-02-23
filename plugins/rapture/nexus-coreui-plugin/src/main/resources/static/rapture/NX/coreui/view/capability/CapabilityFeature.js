@@ -30,9 +30,7 @@ Ext.define('NX.coreui.view.capability.CapabilityFeature', {
 
   tabs: [
     { xtype: 'nx-coreui-capability-summary', weight: 10 },
-    { xtype: 'nx-coreui-capability-settings', title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SETTINGS_TAB'), weight: 20 },
-    { xtype: 'nx-coreui-capability-status', title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_STATUS_TAB'), weight: 30 },
-    { xtype: 'nx-coreui-capability-about', title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_ABOUT_TAB'), weight: 40 }
+    { xtype: 'nx-coreui-capability-settings', title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SETTINGS_TAB'), weight: 20 }
   ],
 
   actions: [

@@ -32,25 +32,93 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
 
   items: [
     {
+      xtype: 'hiddenfield',
+      name: 'id'
+    },
+    {
       name: 'name',
       itemId: 'name',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_NAME'),
+      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_NAME')
+    },
+    {
+      xtype: 'label',
+      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_ADDRESS'),
+      style: {
+        fontWeight: 'bold',
+        display: 'block',
+        marginTop: '10px',
+        marginBottom: '5px'
+      }
+    },
+    {
+      xtype: 'label',
+      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_ADDRESS_HELP'),
+      style: {
+        fontSize: '10px',
+        display: 'block',
+        marginBottom: '1px'
+      }
     },
     {
       xtype: 'combo',
       name: 'protocol',
       itemId: 'protocol',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL'),
+      cls: 'nx-float-left',
+      blankText: 'Required',
+      width: 85,
       emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_PLACEHOLDER'),
       editable: false,
       store: [
         ['ldap', NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_PLAIN_ITEM')],
         ['ldaps', NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_SECURE_ITEM')]
       ],
-      queryMode: 'local',
-      useTrustStore: function (combo) {
-        var form = combo.up('form');
-        if (combo.getValue() === 'ldaps' && form.down('#host').getValue() && form.down('#port').getValue()) {
+      queryMode: 'local'
+    },
+    {
+      xtype: 'label',
+      cls: 'nx-float-left nx-interstitial-label',
+      text: '://'
+    },
+    {
+      name: 'host',
+      itemId: 'host',
+      cls: 'nx-float-left',
+      blankText: 'Required',
+      width: 405,
+      emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST_PLACEHOLDER'),
+      listeners: {
+        change: function(){
+          var protocol = this.up('form').down('#protocol');
+          protocol.fireEvent('change', protocol, protocol.getValue(), protocol.getValue());
+        }
+      }
+    },
+    {
+      xtype: 'label',
+      cls: 'nx-float-left nx-interstitial-label',
+      text: ':'
+    },
+    {
+      xtype: 'numberfield',
+      name: 'port',
+      itemId: 'port',
+      cls: 'nx-float-left',
+      blankText: 'Required',
+      width: 75,
+      emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PORT_PLACEHOLDER'),
+      minValue: 1,
+      maxValue: 65535,
+      allowDecimals: false,
+      allowExponential: false,
+      listeners: {
+        change: function(){
+          var protocol = this.up('form').down('#protocol');
+          protocol.fireEvent('change', protocol, protocol.getValue(), protocol.getValue());
+        }
+      },
+      useTrustStore: function (field) {
+        var form = field.up('form');
+        if (form.down('#protocol').getValue() === 'ldaps' && form.down('#host').getValue() && field.getValue()) {
           return {
             name: 'useTrustStore',
             host: form.down('#host'),
@@ -61,37 +129,10 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       }
     },
     {
-      name: 'host',
-      itemId: 'host',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST'),
-      listeners: {
-        change: function(){
-          var protocol = this.up('form').down('#protocol');
-          protocol.fireEvent('change', protocol, protocol.getValue(), protocol.getValue());
-        }
-      }
-    },
-    {
-      xtype: 'numberfield',
-      name: 'port',
-      itemId: 'port',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_PORT'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PORT_HELP'),
-      minValue: 1,
-      maxValue: 65535,
-      allowDecimals: false,
-      allowExponential: false,
-      listeners: {
-        change: function(){
-          var protocol = this.up('form').down('#protocol');
-          protocol.fireEvent('change', protocol, protocol.getValue(), protocol.getValue());
-        }
-      }
-    },
-    {
       name: 'searchBase',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_BASE'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_BASE_HELP')
+      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_BASE_HELP'),
+      cls: 'nx-clear-both'
     },
     {
       xtype: 'combo',
@@ -137,22 +178,64 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       authScheme: ['simple', 'DIGEST-MD5', 'CRAM-MD5']
     },
     {
+      xtype: 'label',
+      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES'),
+      style: {
+        fontWeight: 'bold',
+        display: 'block',
+        marginTop: '10px',
+        marginBottom: '5px'
+      }
+    },
+    {
+      xtype: 'label',
+      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES_HELP'),
+      style: {
+        fontSize: '10px',
+        display: 'block',
+        marginBottom: '1px'
+      }
+    },
+    {
+      xtype: 'label',
+      cls: 'nx-float-left nx-interstitial-label',
+      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES_1')
+    },
+    {
       xtype: 'numberfield',
       name: 'connectionTimeout',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_TIMEOUT'),
+      cls: 'nx-float-left',
+      width: 70,
       value: 30
+    },
+    {
+      xtype: 'label',
+      cls: 'nx-float-left nx-interstitial-label',
+      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES_2')
     },
     {
       xtype: 'numberfield',
       name: 'connectionRetryDelay',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_RETRY'),
+      cls: 'nx-float-left',
+      width: 70,
       value: 300
+    },
+    {
+      xtype: 'label',
+      cls: 'nx-float-left nx-interstitial-label',
+      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES_3')
     },
     {
       xtype: 'numberfield',
       name: 'maxIncidentsCount',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_MAX_INCIDENTS_COUNT'),
+      cls: 'nx-float-left',
+      width: 55,
       value: 3
+    },
+    {
+      xtype: 'label',
+      cls: 'nx-float-left nx-interstitial-label',
+      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES_4')
     }
   ],
 

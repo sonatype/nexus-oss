@@ -13,33 +13,36 @@
 /*global Ext, NX*/
 
 /**
- * LDAP Server "Connection" form.
+ * Add LDAP users and groups window.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.ldap.LdapServerConnectionForm', {
-  extend: 'NX.view.SettingsForm',
-  alias: 'widget.nx-coreui-ldapserver-connection-form',
+Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupAdd', {
+  extend: 'NX.view.AddWindow',
+  alias: 'widget.nx-coreui-ldapserver-userandgroup-add',
   requires: [
     'NX.Conditions',
     'NX.I18n'
   ],
-
-  items: { xtype: 'nx-coreui-ldapserver-connection-fieldset' },
+  ui: 'nx-inset',
 
   /**
    * @override
    */
-  initComponent: function() {
+  initComponent: function () {
     var me = this;
 
-    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('security:ldapconfig', 'update');
+    me.items = {
+      xtype: 'nx-coreui-ldapserver-userandgroup-form',
+
+      buttons: [
+        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_SUBMIT_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
+        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+          this.up('nx-drilldown').showChild(0, true);
+        }}
+      ]
+    };
 
     me.callParent(arguments);
-
-    me.getDockedItems('toolbar[dock="bottom"]')[0].add(
-        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_CONNECTION_VERIFY_BUTTON'), formBind: true, action: 'verifyconnection' }
-    );
   }
-
 });

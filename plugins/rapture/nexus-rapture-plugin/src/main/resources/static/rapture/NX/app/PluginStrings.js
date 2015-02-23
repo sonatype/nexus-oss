@@ -148,6 +148,7 @@ Ext.define('NX.app.PluginStrings', {
     // Buttons
     GLOBAL_BUTTON_SAVE: 'Save',
     GLOBAL_BUTTON_DISCARD: 'Discard',
+    GLOBAL_BUTTON_NEXT: 'Next',
 
     // Item selector
     GLOBAL_ITEM_SELECTOR_FILTER: 'Filter',

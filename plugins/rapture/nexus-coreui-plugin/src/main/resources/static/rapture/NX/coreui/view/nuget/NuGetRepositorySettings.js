@@ -41,7 +41,6 @@ Ext.define('NX.coreui.view.nuget.NuGetRepositorySettings', {
         xtype: 'form',
         title: 'Package Source',
         ui: 'nx-subsection',
-        cls: 'no-border',
 
         items: [
           {

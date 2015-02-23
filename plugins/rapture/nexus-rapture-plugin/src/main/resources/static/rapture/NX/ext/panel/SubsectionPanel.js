@@ -13,36 +13,50 @@
 /*global Ext, NX*/
 
 /**
- * Search result details panel.
+ * A panel that groups content by subsection.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.SearchResultDetails', {
+Ext.define('NX.ext.panel.SubsectionPanel', {
   extend: 'Ext.panel.Panel',
-  alias: 'widget.nx-coreui-search-result-details',
-  requires: [
-    'NX.Icons'
-  ],
-  ui: 'nx-inset',
+  alias: 'widget.nx-subsection-panel',
 
   layout: {
-    type: 'hbox',
+    type: 'vbox',
     align: 'stretch'
   },
+
+  padding: '12px',
+
+  autoScroll: true,
 
   /**
    * @override
    */
-  initComponent: function () {
-    var me = this;
+  listeners: {
+    add: function (me, component) {
+      var thisTitle = component.title || '',
+        thisWeight = component.weight || 1000,
+        position = 0;
 
-    me.items = [
-      { xtype: 'nx-info', itemId: 'group' },
-      { xtype: 'nx-info', itemId: 'name' },
-      { xtype: 'nx-info', itemId: 'format' },
-      { xtype: 'nx-info', itemId: 'popular' }
-    ];
+      me.suspendEvents();
+      me.remove(component, false);
 
-    me.callParent();
+      me.items.each(function (item) {
+        var thatTitle = item.title || '',
+          thatWeight = item.weight || 1000;
+
+        if (thisWeight < thatWeight
+          || (thisWeight === thatWeight && thisTitle < thatTitle)) {
+          return false;
+        }
+        position++;
+        return true;
+      });
+
+      component.setUI('nx-subsection');
+      me.insert(position, component);
+      me.resumeEvents();
+    }
   }
 });
