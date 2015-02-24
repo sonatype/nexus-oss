@@ -24,16 +24,8 @@ Ext.define('NX.coreui.model.RepositoryCMA', {
     'name',
     'type',
     'format',
-    'remoteStatus',
-    'remoteStatusReason',
-    'online',
     'recipe',
-    'attributes',
-    {
-      name: 'onlineText',
-      convert: function(val, row) {
-        return row.data['online'] ? 'online' : 'offline';
-      }
-    }
+    'status',
+    'attributes'
   ]
 });

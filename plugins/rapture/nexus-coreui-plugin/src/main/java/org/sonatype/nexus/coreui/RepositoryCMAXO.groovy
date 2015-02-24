@@ -34,11 +34,7 @@ class RepositoryCMAXO
   @NotEmpty(groups = Create)
   String recipe
 
-  Boolean online
-
-  String remoteStatus
-
-  String remoteStatusReason
+  String status
 
   String attributes
 }
