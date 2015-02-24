@@ -38,5 +38,7 @@ class RepositoryCMAXO
   @NotEmpty(groups = Create)
   String recipe
 
+  Boolean online
+
   String attributes
 }

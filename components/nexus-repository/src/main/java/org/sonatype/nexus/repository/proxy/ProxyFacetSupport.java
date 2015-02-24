@@ -18,9 +18,11 @@ import java.net.URI;
 import javax.annotation.Nonnull;
 
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
 import org.sonatype.nexus.repository.proxy.availability.AutoBlockedState;
 import org.sonatype.nexus.repository.proxy.availability.AutoBlockingAvailableState;
 import org.sonatype.nexus.repository.proxy.availability.AvailabilityState;
@@ -55,6 +57,8 @@ public abstract class ProxyFacetSupport
 
   private AvailabilityState availabilityState;
 
+  private boolean remoteUrlChanged;
+
   @Override
   protected void doConfigure() throws Exception {
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
@@ -65,8 +69,7 @@ public abstract class ProxyFacetSupport
 
     final URI newRemoteURI = new URI(url);
     if (remoteUrl != null && !remoteUrl.equals(newRemoteURI)) {
-      log.debug("Remote URL is changing: clearing caches.");
-      // TODO: Trigger other changes based on the remoteUrl changing - perhaps it calls facet(NFC.class).clear() at this point?
+      remoteUrlChanged = true;
     }
 
     this.remoteUrl = newRemoteURI;
@@ -83,6 +86,15 @@ public abstract class ProxyFacetSupport
   @Override
   protected void doStart() throws Exception {
     availabilityState = createAvailabilityState();
+    if (remoteUrlChanged) {
+      remoteUrlChanged = false;
+      try {
+        getRepository().facet(NegativeCacheFacet.class).invalidate();
+      }
+      catch (MissingFacetException e) {
+        // NCF is optional
+      }
+    }
   }
 
   @Override
@@ -113,6 +125,7 @@ public abstract class ProxyFacetSupport
       }
       catch (IOException e) {
         log.warn("Failed to fetch: {}", getUrl(context), e);
+        throw e;
       }
     }
     return content;

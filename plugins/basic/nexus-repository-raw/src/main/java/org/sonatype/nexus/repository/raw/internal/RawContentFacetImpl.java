@@ -29,15 +29,12 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.content.InvalidContentException;
-import org.sonatype.nexus.repository.negativecache.NegativeCacheKey;
-import org.sonatype.nexus.repository.negativecache.NegativeCacheKeySource;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
-import org.sonatype.nexus.repository.view.Context;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -67,7 +64,7 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
  */
 public class RawContentFacetImpl
     extends FacetSupport
-    implements RawContentFacet, NegativeCacheKeySource
+    implements RawContentFacet
 {
   public static final String CONFIG_KEY = "rawContent";
 
@@ -249,11 +246,6 @@ public class RawContentFacetImpl
 
       tx.commit();
     }
-  }
-
-  @Override
-  public NegativeCacheKey cacheKey(final Context context) {
-    return new NegativeCacheKey(context.getRequest().getPath());
   }
 
   private StorageFacet getStorage() {

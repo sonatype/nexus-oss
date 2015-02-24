@@ -29,6 +29,7 @@ import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.RepositoryManager
 import org.sonatype.nexus.repository.proxy.ProxyFacet
+import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.validation.Validate
@@ -114,6 +115,7 @@ extends DirectComponentSupport
         format: input.format,
         availabilityStatus: availabilityState?.status,
         availabilityStatusReason: availabilityState?.statusReason,
+        online: input.facet(ViewFacet).online,
         attributes: asAttributes(input.configuration.attributes)
     )
   }

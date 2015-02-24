@@ -10,34 +10,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.negativecache;
+package org.sonatype.nexus.repository.simple.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
+import org.sonatype.nexus.repository.negativecache.NegativeCacheFacetImpl;
+import org.sonatype.nexus.repository.negativecache.NegativeCacheKey;
+import org.sonatype.nexus.repository.negativecache.ValueNegativeCacheKey;
+import org.sonatype.nexus.repository.view.Context;
+
+import net.sf.ehcache.CacheManager;
 
 /**
+ * Simple {@link NegativeCacheFacet}.
+ *
  * @since 3.0
  */
 @Named
-public class NegativeCacheImpl
-    extends FacetSupport
-    implements NegativeCacheFacet
+public class SimpleNegativeCacheFacet
+    extends NegativeCacheFacetImpl
 {
-  @Override
-  public void cacheNotFound(final NegativeCacheKey key) {
-    // TODO: implement
+
+  @Inject
+  public SimpleNegativeCacheFacet(final CacheManager cacheManager) {
+    super(cacheManager);
   }
 
   @Override
-  public boolean isNotFound(final NegativeCacheKey key) {
-    // TODO: implement
-    return false;
+  public NegativeCacheKey getCacheKey(final Context context) {
+    return new ValueNegativeCacheKey(ContextHelper.contentName(context));
   }
 
-  @Override
-  public void uncacheNotFound(final NegativeCacheKey key) {
-    // TODO: implement
-  }
 }
