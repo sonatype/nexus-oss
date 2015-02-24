@@ -27,12 +27,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.nexus.repository.view.ViewFacet;
 
 import com.google.common.base.Throwables;
@@ -132,7 +130,7 @@ public class ViewServlet
     ViewFacet facet = repo.facet(ViewFacet.class);
     if (!facet.isOnline()) {
       // TODO change Status.failure(HttpStatus.SERVICE_UNAVAILABLE, "Repository offline") with HttpResponses.serviceUnavailable when NFC merged
-      send(new Response(Status.failure(HttpStatus.SERVICE_UNAVAILABLE, "Repository offline")), httpResponse);
+      send(HttpResponses.serviceUnavailable("Repository offline"), httpResponse);
     }
     log.debug("Dispatching to view facet: {}", facet);
 
