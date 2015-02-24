@@ -12,17 +12,53 @@
  */
 package org.sonatype.nexus.repository.proxy.remote;
 
+import java.io.IOException;
+import java.net.URI;
+
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 
 /**
  * @since 3.0
  */
-public abstract class UnknownConnection
+public class UnknownConnection
     extends RemoteConnectionSupport
 {
 
-  public UnknownConnection(final ProxyFacetSupport proxyFacet) {
-    super(proxyFacet);
+  private boolean autoBlock;
+
+  public UnknownConnection(final ProxyFacetSupport proxyFacetSupport, final boolean autoBlock) {
+    super(proxyFacetSupport);
+    this.autoBlock = autoBlock;
+  }
+
+  @Override
+  public GetResult get(final URI uri) throws IOException {
+    try {
+      GetResult result = super.get(uri);
+      proxyFacet.setRemoteConnection(
+          autoBlock
+              ? new AutoBlockingAvailableConnection(proxyFacet)
+              : new AvailableConnection(proxyFacet)
+      );
+      return result;
+    }
+    catch (IOException e) {
+      if (isRemoteUnavailable(e)) {
+        proxyFacet.setRemoteConnection(
+            autoBlock
+                ? new AutoBlockedUnavailableConnection(proxyFacet, e)
+                : new UnavailableConnection(proxyFacet, e)
+        );
+      }
+      else {
+        proxyFacet.setRemoteConnection(
+            autoBlock
+                ? new AutoBlockingAvailableConnection(proxyFacet)
+                : new AvailableConnection(proxyFacet)
+        );
+      }
+      throw e;
+    }
   }
 
   @Override

@@ -23,14 +23,10 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
-import org.sonatype.nexus.repository.proxy.remote.AutoBlockedUnavailableConnection;
-import org.sonatype.nexus.repository.proxy.remote.AutoBlockingAvailableConnection;
-import org.sonatype.nexus.repository.proxy.remote.AvailableConnection;
 import org.sonatype.nexus.repository.proxy.remote.GetResult;
 import org.sonatype.nexus.repository.proxy.remote.ManuallyBlockedConnection;
 import org.sonatype.nexus.repository.proxy.remote.RemoteConnection;
 import org.sonatype.nexus.repository.proxy.remote.RemoteConnectionStatus;
-import org.sonatype.nexus.repository.proxy.remote.UnavailableConnection;
 import org.sonatype.nexus.repository.proxy.remote.UnknownConnection;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Context;
@@ -185,38 +181,7 @@ public abstract class ProxyFacetSupport
     if (!enabled) {
       return new ManuallyBlockedConnection();
     }
-    return new UnknownConnection(this)
-    {
-      @Override
-      public GetResult get(final URI uri) throws IOException {
-        try {
-          GetResult result = super.get(uri);
-          setRemoteConnection(
-              autoBlock
-                  ? new AutoBlockingAvailableConnection(ProxyFacetSupport.this)
-                  : new AvailableConnection(ProxyFacetSupport.this)
-          );
-          return result;
-        }
-        catch (IOException e) {
-          if (isRemoteUnavailable(e)) {
-            setRemoteConnection(
-                autoBlock
-                    ? new AutoBlockedUnavailableConnection(ProxyFacetSupport.this, e)
-                    : new UnavailableConnection(ProxyFacetSupport.this, e)
-            );
-          }
-          else {
-            setRemoteConnection(
-                autoBlock
-                    ? new AutoBlockingAvailableConnection(ProxyFacetSupport.this)
-                    : new AvailableConnection(ProxyFacetSupport.this)
-            );
-          }
-          throw e;
-        }
-      }
-    };
+    return new UnknownConnection(this, autoBlock);
   }
 
   private boolean isStale(final Context context) throws IOException {
