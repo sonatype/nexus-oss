@@ -10,17 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.proxy.remote;
+package org.sonatype.nexus.repository.proxy.connection;
 
 import java.io.IOException;
 import java.net.URI;
 
+import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 /**
  * @since 3.0
  */
-public interface RemoteConnection
+public class ManuallyBlockedConnection
+    extends ComponentSupport
+    implements RemoteConnection
 {
-  GetResult get(final URI uri) throws IOException;
 
-  RemoteConnectionStatus getStatus();
+  @Override
+  public GetResult get(final URI uri) throws IOException {
+    return new GetResult(HttpStatus.SERVICE_UNAVAILABLE);
+  }
+
+  @Override
+  public RemoteConnectionStatus getStatus() {
+    return new RemoteConnectionStatus("Remote Manually Blocked");
+  }
+
 }

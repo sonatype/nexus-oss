@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.proxy.remote;
+package org.sonatype.nexus.repository.proxy.connection;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,22 +20,30 @@ import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 /**
  * @since 3.0
  */
-public class AvailableConnection
+public class UnavailableConnection
     extends RemoteConnectionSupport
 {
 
-  public AvailableConnection(final ProxyFacetSupport proxyFacet) {
+  private IOException exception;
+
+  public UnavailableConnection(final ProxyFacetSupport proxyFacet,
+                               final IOException e)
+  {
     super(proxyFacet);
+    this.exception = e;
   }
 
   @Override
   public GetResult get(final URI uri) throws IOException {
     try {
-      return super.get(uri);
+      GetResult result = super.get(uri);
+      proxyFacet.setRemoteConnection(new AvailableConnection(proxyFacet));
+      return result;
     }
     catch (IOException e) {
-      if (isRemoteUnavailable(e)) {
-        proxyFacet.setRemoteConnection(new UnavailableConnection(proxyFacet, e));
+      exception = e;
+      if (!isRemoteUnavailable(e)) {
+        proxyFacet.setRemoteConnection(new AvailableConnection(proxyFacet));
       }
       throw e;
     }
@@ -43,7 +51,7 @@ public class AvailableConnection
 
   @Override
   public RemoteConnectionStatus getStatus() {
-    return new RemoteConnectionStatus("Remote Available");
+    return new RemoteConnectionStatus("Remote Unavailable", exception.getMessage());
   }
 
 }
