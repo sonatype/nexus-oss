@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.search;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +27,13 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.security.BreadActions;
+import org.sonatype.nexus.repository.security.RepositoryViewPermission;
+import org.sonatype.nexus.repository.security.SecurityHelper;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import org.elasticsearch.action.search.SearchResponse;
@@ -56,13 +62,21 @@ public class SearchServiceImpl
 
   private final Provider<Client> client;
 
+  private final RepositoryManager repositoryManager;
+
+  private final SecurityHelper securityHelper;
+
   private final List<IndexSettingsContributor> indexSettingsContributors;
 
   @Inject
   public SearchServiceImpl(final Provider<Client> client,
+                           final RepositoryManager repositoryManager,
+                           final SecurityHelper securityHelper,
                            final List<IndexSettingsContributor> indexSettingsContributors)
   {
     this.client = checkNotNull(client);
+    this.repositoryManager = checkNotNull(repositoryManager);
+    this.securityHelper = checkNotNull(securityHelper);
     this.indexSettingsContributors = checkNotNull(indexSettingsContributors);
   }
 
@@ -133,6 +147,10 @@ public class SearchServiceImpl
       // no repositories were created yet, so there is no point in searching
       return null;
     }
+    String[] searchableIndexes = getSearchableIndexes();
+    if (searchableIndexes.length == 0) {
+      return Collections.emptyList();
+    }
     return new Iterable<SearchHit>()
     {
       @Override
@@ -188,6 +206,16 @@ public class SearchServiceImpl
         };
       }
     };
+  }
+
+  private String[] getSearchableIndexes() {
+    List<String> indexes = Lists.newArrayList();
+    for (Repository repository : repositoryManager.browse()) {
+      if (securityHelper.allPermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))) {
+        indexes.add(repository.getName());
+      }
+    }
+    return indexes.toArray(new String[indexes.size()]);
   }
 
 }

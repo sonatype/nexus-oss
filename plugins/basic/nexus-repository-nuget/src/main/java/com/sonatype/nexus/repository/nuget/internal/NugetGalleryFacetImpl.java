@@ -91,7 +91,8 @@ public class NugetGalleryFacetImpl
   public static final String NUGET = "nuget";
 
   public static final String WITH_NAMESPACES =
-      " xmlns:d=\"http://schemas.microsoft.com/ado/2007/08/dataservices\" xmlns:m=\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\" xmlns=\"http://www.w3.org/2005/Atom\"";
+      " xmlns:d=\"http://schemas.microsoft.com/ado/2007/08/dataservices\" " +
+          "xmlns:m=\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\" xmlns=\"http://www.w3.org/2005/Atom\"";
 
   public static final String NO_NAMESPACES = "";
 
@@ -273,7 +274,6 @@ public class NugetGalleryFacetImpl
       }
 
       recordMetadata.putAll(packageMetadata);
-
 
       // TODO: Do something cleaner with this derived data, as well as the derived stuff inside createOrUpdateComponent
       // Note: These are defaults that hold for locally-published packages,
