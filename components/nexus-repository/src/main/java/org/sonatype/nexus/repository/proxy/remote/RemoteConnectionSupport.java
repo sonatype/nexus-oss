@@ -36,17 +36,17 @@ import org.apache.http.util.EntityUtils;
 /**
  * @since 3.0
  */
-public abstract class RemoteStateSupport
+public abstract class RemoteConnectionSupport
     extends ComponentSupport
-    implements RemoteState
+    implements RemoteConnection
 {
   protected final ProxyFacetSupport proxyFacet;
 
-  public RemoteStateSupport(final ProxyFacetSupport proxyFacet) {
+  public RemoteConnectionSupport(final ProxyFacetSupport proxyFacet) {
     this.proxyFacet = proxyFacet;
   }
 
-  public FetchResult fetch(final URI uri) throws IOException {
+  public GetResult get(final URI uri) throws IOException {
     HttpClient client = proxyFacet.getRepository().facet(HttpClientFacet.class).getHttpClient();
 
     HttpGet request = new HttpGet(uri);
@@ -71,7 +71,7 @@ public abstract class RemoteStateSupport
         EntityUtils.consume(entity);
       }
     }
-    return new FetchResult(status.getStatusCode(), payload);
+    return new GetResult(status.getStatusCode(), payload);
   }
 
   protected boolean isRemoteUnavailable(final Exception e) {

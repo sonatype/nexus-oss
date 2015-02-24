@@ -20,43 +20,38 @@ import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 /**
  * @since 3.0
  */
-public class UnavailableState
-    extends RemoteStateSupport
+public class UnavailableConnection
+    extends RemoteConnectionSupport
 {
 
   private IOException exception;
 
-  public UnavailableState(final ProxyFacetSupport proxyFacet,
-                          final IOException e)
+  public UnavailableConnection(final ProxyFacetSupport proxyFacet,
+                               final IOException e)
   {
     super(proxyFacet);
     this.exception = e;
   }
 
   @Override
-  public FetchResult fetch(final URI uri) throws IOException {
+  public GetResult get(final URI uri) throws IOException {
     try {
-      FetchResult result = super.fetch(uri);
-      proxyFacet.setRemoteState(new AvailableState(proxyFacet));
+      GetResult result = super.get(uri);
+      proxyFacet.setRemoteConnection(new AvailableConnection(proxyFacet));
       return result;
     }
     catch (IOException e) {
       exception = e;
       if (!isRemoteUnavailable(e)) {
-        proxyFacet.setRemoteState(new AvailableState(proxyFacet));
+        proxyFacet.setRemoteConnection(new AvailableConnection(proxyFacet));
       }
       throw e;
     }
   }
 
   @Override
-  public String getStatus() {
-    return "Remote Unavailable";
-  }
-
-  @Override
-  public String getStatusReason() {
-    return exception.getMessage();
+  public RemoteConnectionStatus getStatus() {
+    return new RemoteConnectionStatus("Remote Unavailable", exception.getMessage());
   }
 
 }

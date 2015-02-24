@@ -12,27 +12,38 @@
  */
 package org.sonatype.nexus.repository.proxy.remote;
 
+import java.io.IOException;
+import java.net.URI;
+
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 
 /**
  * @since 3.0
  */
-public abstract class UnknownState
-    extends RemoteStateSupport
+public class AutoBlockingAvailableConnection
+    extends RemoteConnectionSupport
 {
 
-  public UnknownState(final ProxyFacetSupport proxyFacet) {
+  public AutoBlockingAvailableConnection(final ProxyFacetSupport proxyFacet) {
     super(proxyFacet);
   }
 
   @Override
-  public String getStatus() {
-    return "Remote Status Unknown";
+  public GetResult get(final URI uri) throws IOException {
+    try {
+      return super.get(uri);
+    }
+    catch (IOException e) {
+      if (isRemoteUnavailable(e)) {
+        proxyFacet.setRemoteConnection(new AutoBlockedUnavailableConnection(proxyFacet, e));
+      }
+      throw e;
+    }
   }
 
   @Override
-  public String getStatusReason() {
-    return null;
+  public RemoteConnectionStatus getStatus() {
+    return new RemoteConnectionStatus("Remote Available");
   }
 
 }

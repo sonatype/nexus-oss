@@ -104,10 +104,10 @@ extends DirectComponentSupport
   RepositoryCMAXO asRepository(Repository input) {
     def status = input.facet(ViewFacet).online ? 'Online' : 'Offline'
     try {
-      def remoteStatus = input.facet(ProxyFacet).remoteStatus
-      status += " - ${remoteStatus.status}"
-      if (remoteStatus.statusReason) {
-        status += "<br/><i>${remoteStatus.statusReason}</i>"
+      def remoteStatus = input.facet(ProxyFacet).remoteConnectionStatus
+      status += " - ${remoteStatus.description}"
+      if (remoteStatus.reason) {
+        status += "<br/><i>${remoteStatus.reason}</i>"
       }
     }
     catch (MissingFacetException e) {

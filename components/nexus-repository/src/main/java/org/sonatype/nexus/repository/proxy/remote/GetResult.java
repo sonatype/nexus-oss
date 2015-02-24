@@ -12,33 +12,32 @@
  */
 package org.sonatype.nexus.repository.proxy.remote;
 
-import java.io.IOException;
-import java.net.URI;
-
-import org.sonatype.nexus.repository.http.HttpStatus;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.repository.view.Payload;
 
 /**
  * @since 3.0
  */
-public class ManuallyBlockedState
-    extends ComponentSupport
-    implements RemoteState
+public class GetResult
 {
 
-  @Override
-  public FetchResult fetch(final URI uri) throws IOException {
-    return new FetchResult(HttpStatus.SERVICE_UNAVAILABLE);
+  private final int status;
+
+  private final Payload payload;
+
+  public GetResult(final int status) {
+    this(status, null);
   }
 
-  @Override
-  public String getStatus() {
-    return "Remote Manually Blocked";
+  public GetResult(final int status, final Payload payload) {
+    this.status = status;
+    this.payload = payload;
   }
 
-  @Override
-  public String getStatusReason() {
-    return null;
+  public int getStatus() {
+    return status;
   }
 
+  public Payload getPayload() {
+    return payload;
+  }
 }

@@ -12,32 +12,38 @@
  */
 package org.sonatype.nexus.repository.proxy.remote;
 
-import org.sonatype.nexus.repository.view.Payload;
+import java.io.IOException;
+import java.net.URI;
+
+import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 
 /**
  * @since 3.0
  */
-public class FetchResult
+public class AvailableConnection
+    extends RemoteConnectionSupport
 {
 
-  private final int status;
-
-  private final Payload payload;
-
-  public FetchResult(final int status) {
-    this(status, null);
+  public AvailableConnection(final ProxyFacetSupport proxyFacet) {
+    super(proxyFacet);
   }
 
-  public FetchResult(final int status, final Payload payload) {
-    this.status = status;
-    this.payload = payload;
+  @Override
+  public GetResult get(final URI uri) throws IOException {
+    try {
+      return super.get(uri);
+    }
+    catch (IOException e) {
+      if (isRemoteUnavailable(e)) {
+        proxyFacet.setRemoteConnection(new UnavailableConnection(proxyFacet, e));
+      }
+      throw e;
+    }
   }
 
-  public int getStatus() {
-    return status;
+  @Override
+  public RemoteConnectionStatus getStatus() {
+    return new RemoteConnectionStatus("Remote Available");
   }
 
-  public Payload getPayload() {
-    return payload;
-  }
 }

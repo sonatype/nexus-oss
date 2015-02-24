@@ -15,40 +15,12 @@ package org.sonatype.nexus.repository.proxy.remote;
 import java.io.IOException;
 import java.net.URI;
 
-import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
-
 /**
  * @since 3.0
  */
-public class AvailableState
-    extends RemoteStateSupport
+public interface RemoteConnection
 {
+  GetResult get(final URI uri) throws IOException;
 
-  public AvailableState(final ProxyFacetSupport proxyFacet) {
-    super(proxyFacet);
-  }
-
-  @Override
-  public FetchResult fetch(final URI uri) throws IOException {
-    try {
-      return super.fetch(uri);
-    }
-    catch (IOException e) {
-      if (isRemoteUnavailable(e)) {
-        proxyFacet.setRemoteState(new UnavailableState(proxyFacet, e));
-      }
-      throw e;
-    }
-  }
-
-  @Override
-  public String getStatus() {
-    return "Remote Available";
-  }
-
-  @Override
-  public String getStatusReason() {
-    return null;
-  }
-
+  RemoteConnectionStatus getStatus();
 }

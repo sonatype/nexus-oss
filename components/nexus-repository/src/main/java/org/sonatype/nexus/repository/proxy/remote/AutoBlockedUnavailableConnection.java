@@ -23,16 +23,16 @@ import org.joda.time.DateTime;
 /**
  * @since 3.0
  */
-public class AutoBlockedUnavailableState
-    extends RemoteStateSupport
+public class AutoBlockedUnavailableConnection
+    extends RemoteConnectionSupport
 {
 
   private DateTime blockedUntil;
 
   private IOException exception;
 
-  public AutoBlockedUnavailableState(final ProxyFacetSupport proxyFacet,
-                                     final IOException e)
+  public AutoBlockedUnavailableConnection(final ProxyFacetSupport proxyFacet,
+                                          final IOException e)
   {
     super(proxyFacet);
     this.exception = e;
@@ -40,11 +40,11 @@ public class AutoBlockedUnavailableState
   }
 
   @Override
-  public FetchResult fetch(final URI uri) throws IOException {
+  public GetResult get(final URI uri) throws IOException {
     if (blockedUntil.isBeforeNow()) {
       try {
-        FetchResult result = super.fetch(uri);
-        proxyFacet.setRemoteState(new AutoBlockingAvailableState(proxyFacet));
+        GetResult result = super.get(uri);
+        proxyFacet.setRemoteConnection(new AutoBlockingAvailableConnection(proxyFacet));
         return result;
       }
       catch (IOException e) {
@@ -53,7 +53,7 @@ public class AutoBlockedUnavailableState
           blockedUntil = DateTime.now().plus(increment());
         }
         else {
-          proxyFacet.setRemoteState(new AutoBlockingAvailableState(proxyFacet));
+          proxyFacet.setRemoteConnection(new AutoBlockingAvailableConnection(proxyFacet));
         }
       }
     }
@@ -61,13 +61,8 @@ public class AutoBlockedUnavailableState
   }
 
   @Override
-  public String getStatus() {
-    return "Remote Automatically Blocked and Unavailable";
-  }
-
-  @Override
-  public String getStatusReason() {
-    return exception.getMessage();
+  public RemoteConnectionStatus getStatus() {
+    return new RemoteConnectionStatus("Remote Automatically Blocked and Unavailable", exception.getMessage());
   }
 
   private long increment() {

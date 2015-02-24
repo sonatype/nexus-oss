@@ -15,11 +15,25 @@ package org.sonatype.nexus.repository.proxy.remote;
 import java.io.IOException;
 import java.net.URI;
 
+import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 /**
  * @since 3.0
  */
-public interface RemoteState
-    extends RemoteStatus
+public class ManuallyBlockedConnection
+    extends ComponentSupport
+    implements RemoteConnection
 {
-  FetchResult fetch(final URI uri) throws IOException;
+
+  @Override
+  public GetResult get(final URI uri) throws IOException {
+    return new GetResult(HttpStatus.SERVICE_UNAVAILABLE);
+  }
+
+  @Override
+  public RemoteConnectionStatus getStatus() {
+    return new RemoteConnectionStatus("Remote Manually Blocked");
+  }
+
 }

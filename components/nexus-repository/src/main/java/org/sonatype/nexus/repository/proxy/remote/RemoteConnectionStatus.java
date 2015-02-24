@@ -12,17 +12,30 @@
  */
 package org.sonatype.nexus.repository.proxy.remote;
 
-import java.io.IOException;
-import java.net.URI;
-
 /**
  * @since 3.0
  */
-public interface RemoteStatus
+public class RemoteConnectionStatus
 {
-  FetchResult fetch(final URI uri) throws IOException;
+  private final String description;
 
-  String getStatus();
+  private final String reason;
 
-  String getStatusReason();
+  public RemoteConnectionStatus(final String description) {
+    this(description, null);
+  }
+
+  public RemoteConnectionStatus(final String description, final String reason) {
+    this.description = description;
+    this.reason = reason;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getReason() {
+    return reason;
+  }
+
 }

@@ -23,15 +23,15 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
-import org.sonatype.nexus.repository.proxy.remote.AutoBlockedUnavailableState;
-import org.sonatype.nexus.repository.proxy.remote.AutoBlockingAvailableState;
-import org.sonatype.nexus.repository.proxy.remote.AvailableState;
-import org.sonatype.nexus.repository.proxy.remote.FetchResult;
-import org.sonatype.nexus.repository.proxy.remote.ManuallyBlockedState;
-import org.sonatype.nexus.repository.proxy.remote.RemoteState;
-import org.sonatype.nexus.repository.proxy.remote.RemoteStatus;
-import org.sonatype.nexus.repository.proxy.remote.UnavailableState;
-import org.sonatype.nexus.repository.proxy.remote.UnknownState;
+import org.sonatype.nexus.repository.proxy.remote.AutoBlockedUnavailableConnection;
+import org.sonatype.nexus.repository.proxy.remote.AutoBlockingAvailableConnection;
+import org.sonatype.nexus.repository.proxy.remote.AvailableConnection;
+import org.sonatype.nexus.repository.proxy.remote.GetResult;
+import org.sonatype.nexus.repository.proxy.remote.ManuallyBlockedConnection;
+import org.sonatype.nexus.repository.proxy.remote.RemoteConnection;
+import org.sonatype.nexus.repository.proxy.remote.RemoteConnectionStatus;
+import org.sonatype.nexus.repository.proxy.remote.UnavailableConnection;
+import org.sonatype.nexus.repository.proxy.remote.UnknownConnection;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
@@ -57,7 +57,7 @@ public abstract class ProxyFacetSupport
 
   private int artifactMaxAgeMinutes;
 
-  private RemoteState remoteState;
+  private RemoteConnection remoteConnection;
 
   private boolean remoteUrlChanged;
 
@@ -87,8 +87,8 @@ public abstract class ProxyFacetSupport
 
   @Override
   protected void doStart() throws Exception {
-    remoteState = createRemoteState();
-    log.debug("Remote status set to '{}'", remoteState.getStatus());
+    remoteConnection = createRemoteState();
+    log.debug("Remote connection status set to '{}'", remoteConnection.getStatus().getDescription());
 
     if (remoteUrlChanged) {
       remoteUrlChanged = false;
@@ -114,21 +114,21 @@ public abstract class ProxyFacetSupport
 
     if (content == null || isStale(context)) {
       try {
-        final FetchResult remote = remoteState.fetch(remoteUrl.resolve(getUrl(context)));
-        if (remote.getPayload() != null) {
+        final GetResult result = remoteConnection.get(remoteUrl.resolve(getUrl(context)));
+        if (result.getPayload() != null) {
 
           // TODO: Introduce content validation.. perhaps content's type not matching path's implied type.
 
-          store(context, remote.getPayload());
+          store(context, result.getPayload());
 
-          content = remote.getPayload();
+          content = result.getPayload();
         }
-        else if (remote.getStatus() == HttpStatus.NOT_MODIFIED) {
+        else if (result.getStatus() == HttpStatus.NOT_MODIFIED) {
           indicateUpToDate(context);
         }
       }
       catch (IOException e) {
-        log.warn("Failed to fetch: {}", getUrl(context), e);
+        log.warn("Failed to get: {}", getUrl(context), e);
         throw e;
       }
     }
@@ -136,14 +136,17 @@ public abstract class ProxyFacetSupport
   }
 
   @Override
-  public RemoteStatus getRemoteStatus() {
-    return remoteState;
+  public RemoteConnectionStatus getRemoteConnectionStatus() {
+    return remoteConnection.getStatus();
   }
 
-  public void setRemoteState(final RemoteState remoteState) {
-    checkNotNull(remoteState);
-    log.debug("Remote status changed from '{}' to '{}'", this.remoteState.getStatus(), remoteState.getStatus());
-    this.remoteState = remoteState;
+  public void setRemoteConnection(final RemoteConnection remoteConnection) {
+    checkNotNull(remoteConnection);
+    log.debug(
+        "Remote connection status changed from '{}' to '{}'",
+        this.remoteConnection.getStatus().getDescription(), remoteConnection.getStatus().getDescription()
+    );
+    this.remoteConnection = remoteConnection;
   }
 
   public Repository getRepository() {
@@ -178,36 +181,36 @@ public abstract class ProxyFacetSupport
    */
   protected abstract String getUrl(final @Nonnull Context context);
 
-  private RemoteState createRemoteState() {
+  private RemoteConnection createRemoteState() {
     if (!enabled) {
-      return new ManuallyBlockedState();
+      return new ManuallyBlockedConnection();
     }
-    return new UnknownState(this)
+    return new UnknownConnection(this)
     {
       @Override
-      public FetchResult fetch(final URI uri) throws IOException {
+      public GetResult get(final URI uri) throws IOException {
         try {
-          FetchResult result = super.fetch(uri);
-          setRemoteState(
+          GetResult result = super.get(uri);
+          setRemoteConnection(
               autoBlock
-                  ? new AutoBlockingAvailableState(ProxyFacetSupport.this)
-                  : new AvailableState(ProxyFacetSupport.this)
+                  ? new AutoBlockingAvailableConnection(ProxyFacetSupport.this)
+                  : new AvailableConnection(ProxyFacetSupport.this)
           );
           return result;
         }
         catch (IOException e) {
           if (isRemoteUnavailable(e)) {
-            setRemoteState(
+            setRemoteConnection(
                 autoBlock
-                    ? new AutoBlockedUnavailableState(ProxyFacetSupport.this, e)
-                    : new UnavailableState(ProxyFacetSupport.this, e)
+                    ? new AutoBlockedUnavailableConnection(ProxyFacetSupport.this, e)
+                    : new UnavailableConnection(ProxyFacetSupport.this, e)
             );
           }
           else {
-            setRemoteState(
+            setRemoteConnection(
                 autoBlock
-                    ? new AutoBlockingAvailableState(ProxyFacetSupport.this)
-                    : new AvailableState(ProxyFacetSupport.this)
+                    ? new AutoBlockingAvailableConnection(ProxyFacetSupport.this)
+                    : new AvailableConnection(ProxyFacetSupport.this)
             );
           }
           throw e;
