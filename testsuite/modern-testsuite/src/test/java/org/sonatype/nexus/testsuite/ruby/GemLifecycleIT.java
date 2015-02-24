@@ -48,8 +48,8 @@ public class GemLifecycleIT
     repositories().get(RubyProxyRepository.class, "gemsproxy").withMetadataMaxAge(0).save();
 
     // start with an empty repo
-    String list = gemRunner().list(repoId);
-    assertThat(list, numberOfLines(list), is(0));
+    assertFileDownloadSize(repoId, "latest_specs.4.8.gz", equalTo(24l));
+    assertFileDownloadSize(repoId, "specs.4.8.gz", equalTo(24l));
 
     Thread.sleep(900L); // give chance for "cached" and "remote" file timestamps to drift as Last-Modified header has second resolution
 
@@ -71,11 +71,9 @@ public class GemLifecycleIT
 
     assertGem(repoId, nexusGem.getName());
 
-    // now we have one remote gem
-    gemRunner().clearCache();
-    list = gemRunner().list(repoId);
-
-    assertThat(repoId + "\n" + list, numberOfLines(list), is(1));
+    // now we have one remote gem - i.e. a bigger size of the index files
+    assertFileDownloadSize(repoId, "latest_specs.4.8.gz", equalTo(76l));
+    assertFileDownloadSize(repoId, "specs.4.8.gz", equalTo(76l));
 
     // reinstall the gem from repository
     assertThat(lastLine(gemRunner().install(repoId, "nexus")), equalTo("1 gem installed"));
