@@ -38,6 +38,8 @@ Ext.define('NX.coreui.view.repositorycma.RepositoryCMAList', {
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_TYPE_COLUMN'), dataIndex: 'type' },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_FORMAT_COLUMN'), dataIndex: 'format' },
+    { header: 'State', dataIndex: 'availabilityStatus' },
+    { header: 'Reason', dataIndex: 'availabilityStatusReason' }
   ],
 
   viewConfig: {

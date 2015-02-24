@@ -24,6 +24,8 @@ Ext.define('NX.coreui.model.RepositoryCMA', {
     'name',
     'type',
     'format',
+    'availabilityStatus',
+    'availabilityStatusReason',
     'recipe',
     'attributes'
   ]

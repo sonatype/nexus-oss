@@ -23,10 +23,12 @@ import org.sonatype.configuration.validation.ValidationMessage
 import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.repository.MissingFacetException
 import org.sonatype.nexus.repository.Recipe
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.RepositoryManager
+import org.sonatype.nexus.repository.proxy.ProxyFacet
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.validation.Validate
@@ -99,10 +101,19 @@ extends DirectComponentSupport
   }
 
   RepositoryCMAXO asRepository(Repository input) {
+    def availabilityState = null
+    try {
+      availabilityState = input.facet(ProxyFacet).availabilityState
+    }
+    catch (MissingFacetException e) {
+      // no proxy, no availability state
+    }
     return new RepositoryCMAXO(
         name: input.name,
         type: input.type,
         format: input.format,
+        availabilityStatus: availabilityState?.status,
+        availabilityStatusReason: availabilityState?.statusReason,
         attributes: asAttributes(input.configuration.attributes)
     )
   }
