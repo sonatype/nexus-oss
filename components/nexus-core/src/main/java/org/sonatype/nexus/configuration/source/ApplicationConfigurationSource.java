@@ -14,7 +14,6 @@ package org.sonatype.nexus.configuration.source;
 
 import java.io.IOException;
 
-import org.sonatype.configuration.source.ConfigurationSource;
 import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
@@ -25,24 +24,12 @@ import org.sonatype.nexus.configuration.model.Configuration;
  * @author cstamas
  */
 public interface ApplicationConfigurationSource
-    extends ConfigurationSource<Configuration>
 {
-  /**
-   * Returns the configuration that this configuration uses for defaulting.
-   *
-   * @return a config source that is default source for this config or null
-   */
-  ApplicationConfigurationSource getDefaultsSource();
+  void storeConfiguration() throws IOException;
 
-  /**
-   * Backup the current configuration.
-   */
-  void backupConfiguration()
-      throws IOException;
+  Configuration getConfiguration();
 
-  /**
-   * Is nexus instance upgraded
-   */
-  boolean isInstanceUpgraded();
+  void setConfiguration(Configuration configuration);
 
+  Configuration loadConfiguration() throws IOException;
 }

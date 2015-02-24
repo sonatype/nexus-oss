@@ -17,10 +17,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.sonatype.configuration.validation.ValidationMessage;
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 
 import com.google.common.collect.Sets;
@@ -80,17 +80,15 @@ public class AbstractGroupRepositoryConfiguration
 
     if (!allReposesIds.containsAll(memberRepositoryIds)) {
       ValidationMessage message =
-          new ValidationMessage(MEMBER_REPOSITORIES, "Group repository points to nonexistent members!",
-              "The source nexus repository is not existing.");
+          new ValidationMessage(MEMBER_REPOSITORIES, "Group repository points to nonexistent members!");
 
-      response.addValidationError(message);
+      response.addError(message);
     }
 
     final Set<String> uniqueReposesIds = Sets.newHashSet(memberRepositoryIds);
     if (uniqueReposesIds.size() != memberRepositoryIds.size()) {
-      response.addValidationError(new ValidationMessage(
+      response.addError(new ValidationMessage(
           MEMBER_REPOSITORIES,
-          "Group repository has same member multiple times!",
           "Group repository has same member multiple times!"
       ));
     }

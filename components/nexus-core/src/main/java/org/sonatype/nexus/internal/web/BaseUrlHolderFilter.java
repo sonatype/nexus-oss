@@ -24,7 +24,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.configuration.GlobalRestApiSettings;
 import org.sonatype.nexus.web.BaseUrlHolder;
 
 import com.google.common.annotations.VisibleForTesting;

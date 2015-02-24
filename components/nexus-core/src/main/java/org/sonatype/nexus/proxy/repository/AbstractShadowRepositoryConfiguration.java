@@ -14,10 +14,10 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.List;
 
-import org.sonatype.configuration.validation.ValidationMessage;
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -70,10 +70,9 @@ public abstract class AbstractShadowRepositoryConfiguration
       String id = ((CRepository) owner.getConfiguration(false)).getId();
       ValidationMessage message =
           new ValidationMessage("shadowOf", "Master repository id=\"" + getMasterRepositoryId()
-              + "\" not found for ShadowRepository with id=\"" + id + "\"!",
-              "The source nexus repository is not existing.");
+              + "\" not found for ShadowRepository with id=\"" + id + "\"!");
 
-      response.addValidationError(message);
+      response.addError(message);
     }
 
     return response;

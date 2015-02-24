@@ -20,18 +20,7 @@ public class NoSuchRoleMappingException
 {
   private static final long serialVersionUID = -8368148376838186349L;
 
-  public NoSuchRoleMappingException() {
-  }
-
-  public NoSuchRoleMappingException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public NoSuchRoleMappingException(String message) {
-    super(message);
-  }
-
-  public NoSuchRoleMappingException(Throwable cause) {
-    super(cause);
+  public NoSuchRoleMappingException(final String userId) {
+    super("No user-role mapping for user: '" + userId + "'");
   }
 }

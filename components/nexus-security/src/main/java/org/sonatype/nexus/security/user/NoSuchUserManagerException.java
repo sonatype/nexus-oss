@@ -13,25 +13,14 @@
 package org.sonatype.nexus.security.user;
 
 /**
- * Thrown when UserManager could not be found.
+ * Thrown when {@link UserManager} could not be found.
  */
 public class NoSuchUserManagerException
     extends Exception
 {
   private static final long serialVersionUID = -2561129270233203244L;
 
-  public NoSuchUserManagerException() {
-  }
-
-  public NoSuchUserManagerException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public NoSuchUserManagerException(String message) {
-    super(message);
-  }
-
-  public NoSuchUserManagerException(Throwable cause) {
-    super(cause);
+  public NoSuchUserManagerException(final String source) {
+    super("User-manager with source '" + source + "' could not be found");
   }
 }

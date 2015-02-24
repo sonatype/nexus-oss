@@ -26,7 +26,6 @@ import com.google.common.base.Preconditions;
 @Named
 public class PasswordHelper
 {
-
   private static final String ENC = "CMMDwoV";
 
   private final MavenCipher mavenCipher;
@@ -42,8 +41,7 @@ public class PasswordHelper
     return encrypt(password, ENC);
   }
 
-  public String encrypt(String password, String encoding)
-  {
+  public String encrypt(String password, String encoding) {
     // check if the password is encrypted
     if (mavenCipher.isPasswordCipher(password)) {
       return password;
@@ -59,8 +57,7 @@ public class PasswordHelper
     return decrypt(encodedPassword, ENC);
   }
 
-  public String decrypt(String encodedPassword, String encoding)
-  {
+  public String decrypt(String encodedPassword, String encoding) {
     // check if the password is encrypted
     if (!mavenCipher.isPasswordCipher(encodedPassword)) {
       return encodedPassword;

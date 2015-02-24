@@ -276,6 +276,7 @@ public class UserPrincipalsHelperTest
       return Collections.emptySet();
     }
 
+    @Override
     public User getUser(String userId) {
       for (final User user : listUsers()) {
         if (user.getUserId().equals(userId)) {
@@ -285,6 +286,7 @@ public class UserPrincipalsHelperTest
       return null;
     }
 
+    @Override
     public Set<String> listUserIds() {
       final Set<String> userIds = new HashSet<String>();
       for (final User user : listUsers()) {
@@ -293,6 +295,7 @@ public class UserPrincipalsHelperTest
       return userIds;
     }
 
+    @Override
     public Set<User> searchUsers(UserSearchCriteria criteria) {
       return filterListInMemeory(listUsers(), criteria);
     }

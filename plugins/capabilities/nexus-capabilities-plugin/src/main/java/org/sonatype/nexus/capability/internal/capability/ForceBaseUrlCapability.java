@@ -22,8 +22,8 @@ import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.nexus.capability.support.WithoutConfiguration;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.GlobalRestApiSettings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.capability.support.WithoutConfiguration.WITHOUT_CONFIGURATION;
@@ -40,17 +40,17 @@ public class ForceBaseUrlCapability
 
   private final GlobalRestApiSettings globalRestApiSettings;
 
-  private final NexusConfiguration nexusConfiguration;
+  private final ApplicationConfiguration applicationConfiguration;
 
   private final Provider<SystemStatus> systemStatusProvider;
 
   @Inject
   public ForceBaseUrlCapability(final GlobalRestApiSettings globalRestApiSettings,
-                                final NexusConfiguration nexusConfiguration,
+                                final ApplicationConfiguration applicationConfiguration,
                                 final Provider<SystemStatus> systemStatusProvider)
   {
     this.globalRestApiSettings = checkNotNull(globalRestApiSettings, "globalRestApiSettings");
-    this.nexusConfiguration = checkNotNull(nexusConfiguration, "nexusConfiguration");
+    this.applicationConfiguration = checkNotNull(applicationConfiguration);
     this.systemStatusProvider = checkNotNull(systemStatusProvider, "systemStatusProvider");
   }
 
@@ -63,7 +63,7 @@ public class ForceBaseUrlCapability
   protected void onActivate(final WithoutConfiguration config) throws Exception {
     if (!globalRestApiSettings.isForceBaseUrl()) {
       globalRestApiSettings.setForceBaseUrl(true);
-      nexusConfiguration.saveConfiguration();
+      applicationConfiguration.saveConfiguration();
     }
   }
 
@@ -71,7 +71,7 @@ public class ForceBaseUrlCapability
   protected void onPassivate(final WithoutConfiguration config) throws Exception {
     if (SystemState.STOPPING != systemStatusProvider.get().getState()) {
       globalRestApiSettings.setForceBaseUrl(false);
-      nexusConfiguration.saveConfiguration();
+      applicationConfiguration.saveConfiguration();
     }
   }
 

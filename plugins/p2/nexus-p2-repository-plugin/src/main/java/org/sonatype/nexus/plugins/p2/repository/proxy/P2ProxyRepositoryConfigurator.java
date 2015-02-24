@@ -16,8 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.plugins.p2.repository.proxy.validator.P2ChecksumContentValidator;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfigurator;
@@ -33,7 +32,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class P2ProxyRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
-
   private final ItemContentValidator checksumValidator;
 
   private final ItemContentValidator fileTypeItemContentValidator;
@@ -48,9 +46,9 @@ public class P2ProxyRepositoryConfigurator
   }
 
   @Override
-  public void doApplyConfiguration(final Repository repository, final ApplicationConfiguration configuration,
+  public void doApplyConfiguration(final Repository repository,
+                                   final ApplicationConfiguration configuration,
                                    final CRepositoryCoreConfiguration coreConfiguration)
-      throws ConfigurationException
   {
     super.doApplyConfiguration(repository, configuration, coreConfiguration);
 

@@ -19,7 +19,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.plugins.mavenbridge.internal.DefaultNexusAether;
 import org.sonatype.sisu.maven.bridge.Names;
 
@@ -34,15 +34,15 @@ import org.sonatype.sisu.maven.bridge.Names;
 public class NexusLocalRepositoryFileProvider
     implements Provider<File>
 {
-  private final ApplicationConfiguration applicationConfiguration;
+  private final ApplicationDirectories applicationDirectories;
 
   @Inject
-  public NexusLocalRepositoryFileProvider(final ApplicationConfiguration applicationConfiguration) {
-    this.applicationConfiguration = applicationConfiguration;
+  public NexusLocalRepositoryFileProvider(final ApplicationDirectories applicationDirectories) {
+    this.applicationDirectories = applicationDirectories;
   }
 
   @Override
   public File get() {
-    return applicationConfiguration.getWorkingDirectory(DefaultNexusAether.LOCAL_REPO_DIR);
+    return applicationDirectories.getWorkDirectory(DefaultNexusAether.LOCAL_REPO_DIR);
   }
 }

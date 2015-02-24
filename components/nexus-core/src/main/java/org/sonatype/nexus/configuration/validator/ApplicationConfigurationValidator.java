@@ -12,44 +12,27 @@
  */
 package org.sonatype.nexus.configuration.validator;
 
-import java.util.List;
-
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
-import org.sonatype.nexus.configuration.model.CRestApiSettings;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CScheduleConfig;
-import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
  * The validator used to validate current configuration in boot-up sequence.
- *
- * @author cstamas
- * @deprecated see Configurable
  */
 public interface ApplicationConfigurationValidator
-    extends ConfigurationValidator
 {
+  ValidationResponse validateModel(Configuration request);
+
   /**
    * Validates a repository configuration.
    */
   ValidationResponse validateRepository(ApplicationValidationContext ctx, CRepository repository);
-
-  /**
-   * Validates remote connection settings.
-   */
-  ValidationResponse validateRemoteConnectionSettings(ApplicationValidationContext ctx,
-                                                      CRemoteConnectionSettings settings);
 
   /**
    * Validates remote proxy settings.
@@ -58,29 +41,9 @@ public interface ApplicationConfigurationValidator
                                                      CRemoteHttpProxySettings settings);
 
   /**
-   * Validates remote authentication.
-   */
-  ValidationResponse validateRemoteAuthentication(ApplicationValidationContext ctx, CRemoteAuthentication settings);
-
-  /**
-   * Validates rest api settings.
-   */
-  ValidationResponse validateRestApiSettings(ApplicationValidationContext ctx, CRestApiSettings settings);
-
-  /**
    * Validates Nexus built-in HTTP proxy settings.
    */
   ValidationResponse validateHttpProxySettings(ApplicationValidationContext ctx, CHttpProxySettings settings);
-
-  /**
-   * Validates routing.
-   */
-  ValidationResponse validateRouting(ApplicationValidationContext ctx, CRouting settings);
-
-  /**
-   * Validates remote nexus instance.
-   */
-  ValidationResponse validateRemoteNexusInstance(ApplicationValidationContext ctx, CRemoteNexusInstance settings);
 
   /**
    * Validates repository grouping.
@@ -98,22 +61,7 @@ public interface ApplicationConfigurationValidator
   ValidationResponse validateRepositoryTarget(ApplicationValidationContext ctx, CRepositoryTarget settings);
 
   /**
-   * Validates scheduled task.
-   */
-  ValidationResponse validateScheduledTask(ApplicationValidationContext ctx, CScheduledTask settings);
-
-  /**
-   * Validates schedule.
-   */
-  ValidationResponse validateSchedule(ApplicationValidationContext ctx, CScheduleConfig settings);
-
-  /**
    * Validates smtp
    */
   ValidationResponse validateSmtpConfiguration(ApplicationValidationContext ctx, CSmtpConfiguration settings);
-
-  /**
-   * Validate mirror config
-   */
-  ValidationResponse validateRepositoryMirrors(ApplicationValidationContext ctx, List<CMirror> mirrors);
 }

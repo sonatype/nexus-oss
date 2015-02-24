@@ -17,7 +17,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.CapabilityRegistryEvent.Ready;
-import org.sonatype.nexus.capability.internal.storage.LegacyCapabilityStorageConverter;
 import org.sonatype.nexus.capability.internal.storage.OrientCapabilityStorage;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
@@ -46,27 +45,20 @@ public class CapabilityRegistryBooter
 
   private final Provider<OrientCapabilityStorage> capabilityStorageProvider;
 
-  private final Provider<LegacyCapabilityStorageConverter> legacyCapabilityStorageConverterProvider;
-
   @Inject
   public CapabilityRegistryBooter(final EventBus eventBus,
                                   final Provider<DefaultCapabilityRegistry> capabilityRegistryProvider,
-                                  final Provider<OrientCapabilityStorage> capabilityStorageProvider,
-                                  final Provider<LegacyCapabilityStorageConverter> legacyCapabilityStorageConverterProvider)
+                                  final Provider<OrientCapabilityStorage> capabilityStorageProvider)
   {
     this.eventBus = checkNotNull(eventBus);
     this.capabilityRegistryProvider = checkNotNull(capabilityRegistryProvider);
     this.capabilityStorageProvider = checkNotNull(capabilityStorageProvider);
-    this.legacyCapabilityStorageConverterProvider = checkNotNull(legacyCapabilityStorageConverterProvider);
   }
 
   @Subscribe
   public void handle(final NexusInitializedEvent event) {
     try {
       capabilityStorageProvider.get().start();
-
-      // maybe upgrade from legacy xml configuration
-      legacyCapabilityStorageConverterProvider.get().maybeConvert();
 
       DefaultCapabilityRegistry registry = capabilityRegistryProvider.get();
       registry.load();

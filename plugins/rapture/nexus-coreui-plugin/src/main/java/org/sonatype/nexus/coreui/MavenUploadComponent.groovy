@@ -23,10 +23,10 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.sonatype.configuration.validation.InvalidConfigurationException
-import org.sonatype.configuration.validation.ValidationMessage
-import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.common.validation.Validate
+import org.sonatype.nexus.common.validation.ValidationMessage
+import org.sonatype.nexus.common.validation.ValidationResponse
+import org.sonatype.nexus.common.validation.ValidationResponseException
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.proxy.access.AccessManager
@@ -77,8 +77,8 @@ extends DirectComponentSupport
   {
     if (files.size() == 0) {
       def validations = new ValidationResponse()
-      validations.addValidationError(new ValidationMessage('*', 'At least one file should be uploaded'))
-      throw new InvalidConfigurationException(validations)
+      validations.addError(new ValidationMessage('*', 'At least one file should be uploaded'))
+      throw new ValidationResponseException(validations)
     }
 
     UploadContext uploadContext = createUploadContext(params, files)
@@ -156,8 +156,8 @@ extends DirectComponentSupport
     }
     if (poms.size() > 1) {
       def validations = new ValidationResponse()
-      validations.addValidationError(new ValidationMessage('*', 'Only one POM file can be uploaded'))
-      throw new InvalidConfigurationException(validations)
+      validations.addError(new ValidationMessage('*', 'Only one POM file can be uploaded'))
+      throw new ValidationResponseException(validations)
     }
     FileItem pom = poms[0]
     if (pom) {
@@ -174,19 +174,19 @@ extends DirectComponentSupport
 
     def validations = new ValidationResponse()
     if (!context.groupId) {
-      validations.addValidationError(new ValidationMessage('groupId', 'May not be null'))
+      validations.addError(new ValidationMessage('groupId', 'May not be null'))
     }
     if (!context.artifactId) {
-      validations.addValidationError(new ValidationMessage('artifactId', 'May not be null'))
+      validations.addError(new ValidationMessage('artifactId', 'May not be null'))
     }
     if (!context.version) {
-      validations.addValidationError(new ValidationMessage('version', 'May not be null'))
+      validations.addError(new ValidationMessage('version', 'May not be null'))
     }
     if (!context.repositoryId) {
-      validations.addValidationError(new ValidationMessage('repositoryId', 'May not be null'))
+      validations.addError(new ValidationMessage('repositoryId', 'May not be null'))
     }
     if (!validations.valid) {
-      throw new InvalidConfigurationException(validations)
+      throw new ValidationResponseException(validations)
     }
     return context
   }
@@ -222,20 +222,20 @@ extends DirectComponentSupport
     def validations = new ValidationResponse()
     if (Gav.isSnapshot(version)) {
       if (RepositoryPolicy.RELEASE == mavenRepository.repositoryPolicy) {
-        validations.addValidationError(new ValidationMessage(
+        validations.addError(new ValidationMessage(
             'version', 'Snapshot artifacts are not allowed by repository policy'
         ))
       }
     }
     else {
       if (RepositoryPolicy.SNAPSHOT == mavenRepository.repositoryPolicy) {
-        validations.addValidationError(new ValidationMessage(
+        validations.addError(new ValidationMessage(
             'version', 'Release artifacts are not allowed by repository policy'
         ))
       }
     }
     if (!validations.valid) {
-      throw new InvalidConfigurationException(validations)
+      throw new ValidationResponseException(validations)
     }
   }
 

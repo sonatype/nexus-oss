@@ -25,7 +25,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.property.SystemPropertiesHelper;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -41,6 +41,8 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Named
 @Singleton
 public class DefaultWastebasket
@@ -53,7 +55,7 @@ public class DefaultWastebasket
 
   protected static final long ALL = -1L;
 
-  private final ApplicationConfiguration applicationConfiguration;
+  private final ApplicationDirectories applicationDirectories;
 
   private Walker walker;
 
@@ -62,11 +64,11 @@ public class DefaultWastebasket
   private DeleteOperation deleteOperation;
 
   @Inject
-  public DefaultWastebasket(final ApplicationConfiguration applicationConfiguration,
+  public DefaultWastebasket(final ApplicationDirectories applicationDirectories,
                             final Walker walker,
                             final RepositoryRegistry repositoryRegistry)
   {
-    this.applicationConfiguration = applicationConfiguration;
+    this.applicationDirectories = checkNotNull(applicationDirectories);
     this.walker = walker;
     this.repositoryRegistry = repositoryRegistry;
     this.deleteOperation = getDefaultDeleteOperation();
@@ -83,10 +85,6 @@ public class DefaultWastebasket
       log.warn("Bad value {}={}", DEFAULT_DELETE_OPERATION_KEY, defaultOperationString, e);
       return DeleteOperation.MOVE_TO_TRASH;
     }
-  }
-
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return applicationConfiguration;
   }
 
   protected Walker getWalker() {
@@ -149,8 +147,7 @@ public class DefaultWastebasket
 
     // NEXUS-4078: deleting "legacy" trash too for now
     // NEXUS-4468 legacy was not being cleaned up
-    final File basketFile =
-        getApplicationConfiguration().getWorkingDirectory(AbstractRepositoryFolderCleaner.GLOBAL_TRASH_KEY);
+    final File basketFile = applicationDirectories.getWorkDirectory(AbstractRepositoryFolderCleaner.GLOBAL_TRASH_KEY);
 
     // check for existence, is this needed at all?
     if (basketFile.isDirectory()) {

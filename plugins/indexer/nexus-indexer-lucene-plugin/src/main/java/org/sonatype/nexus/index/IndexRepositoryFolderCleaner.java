@@ -35,7 +35,7 @@ public class IndexRepositoryFolderCleaner
     }
 
     File indexContextFolder =
-        new File(getApplicationConfiguration().getWorkingDirectory(
+        new File(getApplicationDirectories().getWorkDirectory(
             DefaultIndexerManager.INDEXER_WORKING_DIRECTORY_KEY), repository.getId()
             + DefaultIndexerManager.CTX_SUFIX);
 

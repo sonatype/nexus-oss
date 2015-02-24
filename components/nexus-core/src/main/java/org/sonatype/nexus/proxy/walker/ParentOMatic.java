@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.util.Node;
-import org.sonatype.nexus.util.PathUtils;
+import org.sonatype.nexus.proxy.utils.Node;
+import org.sonatype.nexus.proxy.utils.PathUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;

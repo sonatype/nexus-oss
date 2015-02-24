@@ -25,10 +25,12 @@ import org.sonatype.nexus.security.role.Role;
 public class MockAuthorizationManager
     extends AbstractReadOnlyAuthorizationManager
 {
+  @Override
   public String getSource() {
     return "Mock";
   }
 
+  @Override
   public Set<Role> listRoles() {
     Set<Role> roles = new HashSet<Role>();
 
@@ -39,20 +41,23 @@ public class MockAuthorizationManager
     return roles;
   }
 
+  @Override
   public Role getRole(String roleId) throws NoSuchRoleException {
     for (Role role : this.listRoles()) {
       if (roleId.equals(role.getRoleId())) {
         return role;
       }
     }
-    throw new NoSuchRoleException("Role: " + roleId + " could not be found.");
+    throw new NoSuchRoleException(roleId);
   }
 
+  @Override
   public Set<Privilege> listPrivileges() {
     return new HashSet<Privilege>();
   }
 
+  @Override
   public Privilege getPrivilege(String privilegeId) throws NoSuchPrivilegeException {
-    throw new NoSuchPrivilegeException("Privilege: " + privilegeId + " could not be found.");
+    throw new NoSuchPrivilegeException(privilegeId);
   }
 }

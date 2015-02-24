@@ -55,7 +55,8 @@ public class NexusViewSecurityConfigurationResource
   private final SecurityConfigurationManager configManager;
 
   @Inject
-  public NexusViewSecurityConfigurationResource(final EventBus eventBus, final RepositoryRegistry repoRegistry,
+  public NexusViewSecurityConfigurationResource(final EventBus eventBus,
+                                                final RepositoryRegistry repoRegistry,
                                                 final RepositoryTypeRegistry repoTypeRegistry,
                                                 final SecurityConfigurationManager configManager)
   {
@@ -152,5 +153,4 @@ public class NexusViewSecurityConfigurationResource
     setDirty(true);
     configManager.cleanRemovedPrivilege(createPrivilegeId(event.getRepository().getId()));
   }
-
 }

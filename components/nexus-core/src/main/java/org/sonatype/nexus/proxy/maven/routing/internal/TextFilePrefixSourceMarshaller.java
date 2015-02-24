@@ -31,8 +31,8 @@ import com.google.common.base.CharMatcher;
 import com.google.common.io.Closer;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sonatype.nexus.util.PathUtils.elementsOf;
-import static org.sonatype.nexus.util.PathUtils.pathFrom;
+import static org.sonatype.nexus.proxy.utils.PathUtils.elementsOf;
+import static org.sonatype.nexus.proxy.utils.PathUtils.pathFrom;
 
 /**
  * Marshals entries into raw streams and other way around. This is a simple text based file with prefixes with dead

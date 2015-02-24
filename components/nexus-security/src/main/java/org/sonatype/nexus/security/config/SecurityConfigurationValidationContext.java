@@ -17,10 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.configuration.validation.ValidationContext;
-
 public class SecurityConfigurationValidationContext
-    implements ValidationContext
 {
   private List<String> existingPrivilegeIds;
 

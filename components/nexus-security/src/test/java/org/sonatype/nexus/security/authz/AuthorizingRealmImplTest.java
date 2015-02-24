@@ -15,7 +15,6 @@ package org.sonatype.nexus.security.authz;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.security.AbstractSecurityTestCase;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CRole;
@@ -74,11 +73,11 @@ public class AuthorizingRealmImplTest
     Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:ui:delete")));
   }
 
-  private void buildTestAuthorizationConfig() throws InvalidConfigurationException {
+  private void buildTestAuthorizationConfig() throws Exception {
     buildTestAuthorizationConfig("username");
   }
 
-  private void buildTestAuthorizationConfig(String userId) throws InvalidConfigurationException {
+  private void buildTestAuthorizationConfig(String userId) throws Exception {
     CPrivilege priv = new CPrivilege();
     priv.setId("priv");
     priv.setName("somepriv");

@@ -14,9 +14,9 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.Collections;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
-import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.AuthenticationInfoConverter;
+import org.sonatype.nexus.configuration.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;

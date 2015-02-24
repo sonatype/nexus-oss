@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -59,7 +59,7 @@ public class P2ProxyMirrorsTest
 
     startNx();
 
-    lookup(NexusConfiguration.class);
+    lookup(ApplicationConfiguration.class);
 
     repository = (P2ProxyRepository) lookup(RepositoryRegistry.class).getRepository("p2-repo");
     repository.setChecksumPolicy(ChecksumPolicy.IGNORE);

@@ -29,29 +29,31 @@ import org.sonatype.nexus.security.config.SecurityConfigurationManager;
 import com.google.common.collect.Sets;
 import org.eclipse.sisu.Description;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * This allows you to easily search for users that have added roles.
  * For example if your users generally come from an external Realm (LDAP) you could see which users have had roles
  * added to them.
  */
 @Singleton
-@Named("allConfigured")
+@Named(ConfiguredUsersUserManager.SOURCE)
 @Description("All Configured Users")
 public class ConfiguredUsersUserManager
     extends AbstractReadOnlyUserManager
 {
+  public static final String SOURCE = "allConfigured";
+
   private final SecuritySystem securitySystem;
 
   private final SecurityConfigurationManager configuration;
-
-  public static final String SOURCE = "allConfigured";
 
   @Inject
   public ConfiguredUsersUserManager(final SecuritySystem securitySystem,
                                     final SecurityConfigurationManager configuration)
   {
-    this.securitySystem = securitySystem;
-    this.configuration = configuration;
+    this.securitySystem = checkNotNull(securitySystem);
+    this.configuration = checkNotNull(configuration);
   }
 
   @Override
@@ -61,23 +63,23 @@ public class ConfiguredUsersUserManager
 
   @Override
   public Set<User> listUsers() {
-    Set<User> users = new HashSet<User>();
+    Set<User> users = new HashSet<>();
 
-    List<CUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
+    List<CUserRoleMapping> userRoleMappings = configuration.listUserRoleMappings();
     for (CUserRoleMapping userRoleMapping : userRoleMappings) {
       try {
-        User user = this.getSecuritySystem().getUser(userRoleMapping.getUserId(), userRoleMapping.getSource());
+        User user = securitySystem.getUser(userRoleMapping.getUserId(), userRoleMapping.getSource());
         if (user != null) {
           users.add(user);
         }
       }
       catch (UserNotFoundException e) {
-        log.warn("User: '{}' of source: '{}' could not be found.",
+        log.warn("User: '{}' of source: '{}' could not be found",
             userRoleMapping.getUserId(), userRoleMapping.getSource());
-        log.debug("Most likely caused by a user role mapping that is invalid.", e);
+        log.debug("Most likely caused by a user role mapping that is invalid", e);
       }
       catch (NoSuchUserManagerException e) {
-        log.warn("User: '{}' of source: '{}' could not be found.",
+        log.warn("User: '{}' of source: '{}' could not be found",
             userRoleMapping.getUserId(), userRoleMapping.getSource(), e);
       }
     }
@@ -87,9 +89,9 @@ public class ConfiguredUsersUserManager
 
   @Override
   public Set<String> listUserIds() {
-    Set<String> userIds = new HashSet<String>();
+    Set<String> userIds = new HashSet<>();
 
-    List<CUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
+    List<CUserRoleMapping> userRoleMappings = configuration.listUserRoleMappings();
     for (CUserRoleMapping userRoleMapping : userRoleMappings) {
       String userId = userRoleMapping.getUserId();
       if (Strings2.isNotEmpty(userId)) {
@@ -101,24 +103,20 @@ public class ConfiguredUsersUserManager
   }
 
   @Override
-  public User getUser(String userId) {
+  public User getUser(final String userId) {
     // this resource will only list the users
     return null;
   }
 
   @Override
-  public Set<User> searchUsers(UserSearchCriteria criteria) {
+  public Set<User> searchUsers(final UserSearchCriteria criteria) {
     // we only want to do this if the criteria is set to the source
-    if (this.getSource().equals(criteria.getSource())) {
-      return this.filterListInMemeory(this.listUsers(), criteria);
+    if (getSource().equals(criteria.getSource())) {
+      return filterListInMemeory(listUsers(), criteria);
     }
     else {
-      return new HashSet<User>();
+      return new HashSet<>();
     }
-  }
-
-  private SecuritySystem getSecuritySystem() {
-    return this.securitySystem;
   }
 
   @Override
@@ -134,7 +132,7 @@ public class ConfiguredUsersUserManager
     }
 
     if (criteria.getOneOfRoleIds() != null && !criteria.getOneOfRoleIds().isEmpty()) {
-      Set<String> userRoles = new HashSet<String>();
+      Set<String> userRoles = new HashSet<>();
       if (usersRoles != null) {
         userRoles.addAll(usersRoles);
       }

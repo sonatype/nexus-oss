@@ -32,8 +32,8 @@ public abstract class AbstractUserManager
     extends ComponentSupport
     implements UserManager
 {
-  protected Set<User> filterListInMemeory(Set<User> users, UserSearchCriteria criteria) {
-    HashSet<User> result = new HashSet<User>();
+  protected Set<User> filterListInMemeory(final Set<User> users, final UserSearchCriteria criteria) {
+    HashSet<User> result = new HashSet<>();
 
     for (User user : users) {
       if (userMatchesCriteria(user, criteria)) {
@@ -45,8 +45,8 @@ public abstract class AbstractUserManager
     return result;
   }
 
-  protected boolean userMatchesCriteria(User user, UserSearchCriteria criteria) {
-    Set<String> userRoles = new HashSet<String>();
+  protected boolean userMatchesCriteria(final User user, final UserSearchCriteria criteria) {
+    Set<String> userRoles = new HashSet<>();
     if (user.getRoles() != null) {
       for (RoleIdentifier roleIdentifier : user.getRoles()) {
         userRoles.add(roleIdentifier.getRoleId());
@@ -56,10 +56,10 @@ public abstract class AbstractUserManager
     return matchesCriteria(user.getUserId(), user.getSource(), userRoles, criteria);
   }
 
-  protected boolean matchesCriteria(String userId,
-                                    String userSource,
-                                    Collection<String> usersRoles,
-                                    UserSearchCriteria criteria)
+  protected boolean matchesCriteria(final String userId,
+                                    final String userSource,
+                                    final Collection<String> usersRoles,
+                                    final UserSearchCriteria criteria)
   {
     if (Strings2.isNotEmpty(criteria.getUserId())
         && !userId.toLowerCase().startsWith(criteria.getUserId().toLowerCase())) {
@@ -71,7 +71,7 @@ public abstract class AbstractUserManager
     }
 
     if (criteria.getOneOfRoleIds() != null && !criteria.getOneOfRoleIds().isEmpty()) {
-      Set<String> userRoles = new HashSet<String>();
+      Set<String> userRoles = new HashSet<>();
       if (usersRoles != null) {
         userRoles.addAll(usersRoles);
       }

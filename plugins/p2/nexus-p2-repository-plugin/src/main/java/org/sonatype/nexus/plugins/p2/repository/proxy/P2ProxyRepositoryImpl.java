@@ -65,7 +65,9 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import com.google.common.hash.Hashing;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -74,7 +76,6 @@ import org.codehaus.plexus.util.xml.pull.MXSerializer;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.sisu.Description;
 
-import static org.sonatype.nexus.util.DigesterUtils.getSha1Digest;
 
 @Named(P2ProxyRepositoryImpl.ROLE_HINT)
 @Typed(Repository.class)
@@ -158,6 +159,10 @@ public class P2ProxyRepositoryImpl
     return (P2ProxyRepositoryConfiguration) super.getExternalConfiguration(forModification);
   }
 
+  private String sha1(final String value) {
+    return Hashing.sha1().hashString(value, Charsets.UTF_8).toString();
+  }
+
   protected void configureMirrors(final ResourceStoreRequest incomingRequest) {
     log.debug("Repository " + getId() + ": configureMirrors: mirrorsConfigured=" + mirrorsConfigured);
     AbstractStorageItem mirrorsItem = null;
@@ -238,9 +243,7 @@ public class P2ProxyRepositoryImpl
           if (mirrorUrl != null) {
             // TODO: validate that this is valid way to generate id
             // or if should be pulled from xml
-            final Mirror mirror = new Mirror(
-                getSha1Digest(mirrorUrl), mirrorUrl, getRemoteUrl()
-            );
+            final Mirror mirror = new Mirror(sha1(mirrorUrl), mirrorUrl, getRemoteUrl());
             mirrorMap.put(mirror.getId(), mirror);
           }
         }
@@ -275,12 +278,12 @@ public class P2ProxyRepositoryImpl
         if (mirrorUrl != null) {
           // TODO: validate that this is valid way to generate id
           // or if should be pulled from xml
-          final Mirror mirror = new Mirror(getSha1Digest(mirrorUrl), mirrorUrl, remoteRepoUrl);
+          final Mirror mirror = new Mirror(sha1(mirrorUrl), mirrorUrl, remoteRepoUrl);
           mirrorMap.put(mirror.getId(), mirror);
         }
       }
     }
-    final Mirror mirror = new Mirror(getSha1Digest(remoteRepoUrl), remoteRepoUrl, remoteRepoUrl);
+    final Mirror mirror = new Mirror(sha1(remoteRepoUrl), remoteRepoUrl, remoteRepoUrl);
     mirrorMap.put(mirror.getId(), mirror);
   }
 

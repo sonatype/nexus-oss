@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.config.CRole;
 import org.sonatype.nexus.security.config.CUser;
@@ -127,6 +126,7 @@ public class UserManagerImpl
     }
   }
 
+  @Override
   public Set<User> listUsers() {
     Set<User> users = new HashSet<User>();
 
@@ -137,6 +137,7 @@ public class UserManagerImpl
     return users;
   }
 
+  @Override
   public Set<String> listUserIds() {
     Set<String> userIds = new HashSet<String>();
 
@@ -147,19 +148,23 @@ public class UserManagerImpl
     return userIds;
   }
 
+  @Override
   public User getUser(String userId) throws UserNotFoundException {
     return toUser(configuration.readUser(userId));
   }
 
+  @Override
   public String getSource() {
     return DEFAULT_SOURCE;
   }
 
+  @Override
   public boolean supportsWrite() {
     return true;
   }
 
-  public User addUser(final User user, String password) throws InvalidConfigurationException {
+  @Override
+  public User addUser(final User user, String password) {
     final CUser secUser = this.toUser(user);
     secUser.setPassword(this.hashPassword(password));
 
@@ -169,15 +174,15 @@ public class UserManagerImpl
     return user;
   }
 
-  public void changePassword(final String userId, final String newPassword)
-    throws UserNotFoundException, InvalidConfigurationException
-  {
+  @Override
+  public void changePassword(final String userId, final String newPassword) throws UserNotFoundException {
     final CUser secUser = configuration.readUser(userId);
     secUser.setPassword(hashPassword(newPassword));
     configuration.updateUser(secUser);
   }
 
-  public User updateUser(final User user) throws UserNotFoundException, InvalidConfigurationException {
+  @Override
+  public User updateUser(final User user) throws UserNotFoundException {
     // we need to pull the users password off off the old user object
     CUser oldSecUser = configuration.readUser(user.getUserId());
     CUser newSecUser = toUser(user);
@@ -187,10 +192,12 @@ public class UserManagerImpl
     return user;
   }
 
+  @Override
   public void deleteUser(final String userId) throws UserNotFoundException {
     configuration.deleteUser(userId);
   }
 
+  @Override
   public Set<RoleIdentifier> getUsersRoles(final String userId, final String source) throws UserNotFoundException {
     final Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
 
@@ -212,6 +219,7 @@ public class UserManagerImpl
     return roles;
   }
 
+  @Override
   public Set<User> searchUsers(final UserSearchCriteria criteria) {
     final Set<User> users = new HashSet<User>();
 
@@ -257,8 +265,9 @@ public class UserManagerImpl
     return clearPassword;
   }
 
+  @Override
   public void setUsersRoles(final String userId, final String userSource, final Set<RoleIdentifier> roleIdentifiers)
-      throws UserNotFoundException, InvalidConfigurationException
+      throws UserNotFoundException
   {
     // delete if no roleIdentifiers
     if (roleIdentifiers == null || roleIdentifiers.isEmpty()) {
@@ -296,6 +305,7 @@ public class UserManagerImpl
     }
   }
 
+  @Override
   public String getAuthenticationRealmName() {
     return AuthenticatingRealmImpl.NAME;
   }

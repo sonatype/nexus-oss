@@ -24,10 +24,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationMessage;
-import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.common.text.Strings2;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.security.authz.AuthorizationConfigurationChanged;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CRole;
@@ -133,13 +133,11 @@ public class SecurityConfigurationManagerImpl
   }
 
   @Override
-  public void createPrivilege(CPrivilege privilege) throws InvalidConfigurationException {
+  public void createPrivilege(CPrivilege privilege) {
     createPrivilege(privilege, initializeContext());
   }
 
-  private void createPrivilege(CPrivilege privilege, SecurityConfigurationValidationContext context)
-      throws InvalidConfigurationException
-  {
+  private void createPrivilege(CPrivilege privilege, SecurityConfigurationValidationContext context) {
     if (context == null) {
       context = initializeContext();
     }
@@ -151,16 +149,16 @@ public class SecurityConfigurationManagerImpl
       logValidationWarnings(vr);
     }
     else {
-      throw new InvalidConfigurationException(vr);
+      throw new ValidationResponseException(vr);
     }
   }
 
   @Override
-  public void createRole(CRole role) throws InvalidConfigurationException {
+  public void createRole(CRole role) {
     createRole(role, initializeContext());
   }
 
-  private void createRole(CRole role, SecurityConfigurationValidationContext context) throws InvalidConfigurationException {
+  private void createRole(CRole role, SecurityConfigurationValidationContext context) {
     if (context == null) {
       context = initializeContext();
     }
@@ -172,23 +170,21 @@ public class SecurityConfigurationManagerImpl
       logValidationWarnings(vr);
     }
     else {
-      throw new InvalidConfigurationException(vr);
+      throw new ValidationResponseException(vr);
     }
   }
 
   @Override
-  public void createUser(CUser user, Set<String> roles) throws InvalidConfigurationException {
+  public void createUser(CUser user, Set<String> roles) {
     createUser(user, null, roles, initializeContext());
   }
 
   @Override
-  public void createUser(CUser user, String password, Set<String> roles) throws InvalidConfigurationException {
+  public void createUser(CUser user, String password, Set<String> roles) {
     createUser(user, password, roles, initializeContext());
   }
 
-  private void createUser(CUser user, String password, Set<String> roles, SecurityConfigurationValidationContext context)
-      throws InvalidConfigurationException
-  {
+  private void createUser(CUser user, String password, Set<String> roles, SecurityConfigurationValidationContext context) {
     if (context == null) {
       context = initializeContext();
     }
@@ -205,7 +201,7 @@ public class SecurityConfigurationManagerImpl
       logValidationWarnings(vr);
     }
     else {
-      throw new InvalidConfigurationException(vr);
+      throw new ValidationResponseException(vr);
     }
   }
 
@@ -277,12 +273,12 @@ public class SecurityConfigurationManagerImpl
   }
 
   @Override
-  public void updatePrivilege(CPrivilege privilege) throws InvalidConfigurationException, NoSuchPrivilegeException {
+  public void updatePrivilege(CPrivilege privilege) throws NoSuchPrivilegeException {
     updatePrivilege(privilege, initializeContext());
   }
 
   private void updatePrivilege(CPrivilege privilege, SecurityConfigurationValidationContext context)
-      throws InvalidConfigurationException, NoSuchPrivilegeException
+      throws NoSuchPrivilegeException
   {
     if (context == null) {
       context = initializeContext();
@@ -295,18 +291,16 @@ public class SecurityConfigurationManagerImpl
       logValidationWarnings(vr);
     }
     else {
-      throw new InvalidConfigurationException(vr);
+      throw new ValidationResponseException(vr);
     }
   }
 
   @Override
-  public void updateRole(CRole role) throws InvalidConfigurationException, NoSuchRoleException {
+  public void updateRole(CRole role) throws NoSuchRoleException {
     updateRole(role, initializeContext());
   }
 
-  private void updateRole(CRole role, SecurityConfigurationValidationContext context)
-      throws InvalidConfigurationException, NoSuchRoleException
-  {
+  private void updateRole(CRole role, SecurityConfigurationValidationContext context) throws NoSuchRoleException {
     if (context == null) {
       context = initializeContext();
     }
@@ -318,12 +312,12 @@ public class SecurityConfigurationManagerImpl
       logValidationWarnings(vr);
     }
     else {
-      throw new InvalidConfigurationException(vr);
+      throw new ValidationResponseException(vr);
     }
   }
 
   @Override
-  public void updateUser(CUser user) throws InvalidConfigurationException, UserNotFoundException {
+  public void updateUser(CUser user) throws UserNotFoundException {
     Set<String> roles = Collections.emptySet();
     try {
       roles = readUserRoleMapping(user.getId(), UserManager.DEFAULT_SOURCE).getRoles();
@@ -335,12 +329,12 @@ public class SecurityConfigurationManagerImpl
   }
 
   @Override
-  public void updateUser(CUser user, Set<String> roles) throws InvalidConfigurationException, UserNotFoundException {
+  public void updateUser(CUser user, Set<String> roles) throws UserNotFoundException {
     updateUser(user, roles, initializeContext());
   }
 
   private void updateUser(CUser user, Set<String> roles, SecurityConfigurationValidationContext context)
-      throws InvalidConfigurationException, UserNotFoundException
+      throws UserNotFoundException
   {
     if (context == null) {
       context = initializeContext();
@@ -353,18 +347,16 @@ public class SecurityConfigurationManagerImpl
       logValidationWarnings(vr);
     }
     else {
-      throw new InvalidConfigurationException(vr);
+      throw new ValidationResponseException(vr);
     }
   }
 
   @Override
-  public void createUserRoleMapping(CUserRoleMapping userRoleMapping) throws InvalidConfigurationException {
+  public void createUserRoleMapping(CUserRoleMapping userRoleMapping) {
     createUserRoleMapping(userRoleMapping, initializeContext());
   }
 
-  private void createUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityConfigurationValidationContext context)
-      throws InvalidConfigurationException
-  {
+  private void createUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityConfigurationValidationContext context) {
     if (context == null) {
       context = this.initializeContext();
     }
@@ -374,10 +366,10 @@ public class SecurityConfigurationManagerImpl
       readUserRoleMapping(userRoleMapping.getUserId(), userRoleMapping.getSource());
 
       ValidationResponse vr = new ValidationResponse();
-      vr.addValidationError(new ValidationMessage("*", "User Role Mapping for user '"
+      vr.addError(new ValidationMessage("*", "User Role Mapping for user '"
           + userRoleMapping.getUserId() + "' already exists."));
 
-      throw new InvalidConfigurationException(vr);
+      throw new ValidationResponseException(vr);
     }
     catch (NoSuchRoleMappingException e) {
       // expected
@@ -385,8 +377,8 @@ public class SecurityConfigurationManagerImpl
 
     ValidationResponse vr = validator.validateUserRoleMapping(context, userRoleMapping, false);
 
-    if (vr.getValidationErrors().size() > 0) {
-      throw new InvalidConfigurationException(vr);
+    if (vr.getErrors().size() > 0) {
+      throw new ValidationResponseException(vr);
     }
 
     getDefaultConfiguration().addUserRoleMapping(userRoleMapping);
@@ -394,16 +386,16 @@ public class SecurityConfigurationManagerImpl
   }
 
   private void logValidationWarnings(final ValidationResponse vr) {
-    final List<ValidationMessage> validationWarnings = vr.getValidationWarnings();
-    if (validationWarnings != null && validationWarnings.size() > 0) {
-      final StringBuilder sb = new StringBuilder();
+    final List<ValidationMessage> validationWarnings = vr.getWarnings();
+    if (validationWarnings.size() > 0) {
+      final StringBuilder buff = new StringBuilder();
       for (ValidationMessage msg : validationWarnings) {
-        if (sb.length() >= 0) {
-          sb.append(",");
+        if (buff.length() >= 0) {
+          buff.append(",");
         }
-        sb.append(" ").append(msg.toString());
+        buff.append(" ").append(msg.toString());
       }
-      log.warn("Security configuration has validation warnings:" + sb.toString());
+      log.warn("Security configuration has validation warnings: {}", buff);
     }
   }
 
@@ -414,7 +406,7 @@ public class SecurityConfigurationManagerImpl
       return mapping;
     }
     else {
-      throw new NoSuchRoleMappingException("No User Role Mapping for user: " + userId);
+      throw new NoSuchRoleMappingException(userId);
     }
   }
 
@@ -424,14 +416,12 @@ public class SecurityConfigurationManagerImpl
   }
 
   @Override
-  public void updateUserRoleMapping(CUserRoleMapping userRoleMapping)
-      throws InvalidConfigurationException, NoSuchRoleMappingException
-  {
+  public void updateUserRoleMapping(CUserRoleMapping userRoleMapping) throws NoSuchRoleMappingException {
     updateUserRoleMapping(userRoleMapping, initializeContext());
   }
 
   private void updateUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityConfigurationValidationContext context)
-      throws InvalidConfigurationException, NoSuchRoleMappingException
+      throws NoSuchRoleMappingException
   {
     if (context == null) {
       context = initializeContext();
@@ -439,16 +429,16 @@ public class SecurityConfigurationManagerImpl
 
     if (readUserRoleMapping(userRoleMapping.getUserId(), userRoleMapping.getSource()) == null) {
       ValidationResponse vr = new ValidationResponse();
-      vr.addValidationError(new ValidationMessage("*", "No User Role Mapping found for user '"
+      vr.addError(new ValidationMessage("*", "No User Role Mapping found for user '"
           + userRoleMapping.getUserId() + "'."));
 
-      throw new InvalidConfigurationException(vr);
+      throw new ValidationResponseException(vr);
     }
 
     ValidationResponse vr = validator.validateUserRoleMapping(context, userRoleMapping, true);
 
-    if (vr.getValidationErrors().size() > 0) {
-      throw new InvalidConfigurationException(vr);
+    if (vr.getErrors().size() > 0) {
+      throw new ValidationResponseException(vr);
     }
 
     getDefaultConfiguration().updateUserRoleMapping(userRoleMapping);
@@ -459,7 +449,7 @@ public class SecurityConfigurationManagerImpl
     boolean found = getDefaultConfiguration().removeUserRoleMapping(userId, source);
 
     if (!found) {
-      throw new NoSuchRoleMappingException("No User Role Mapping for user: " + userId);
+      throw new NoSuchRoleMappingException(userId);
     }
   }
 
@@ -592,9 +582,7 @@ public class SecurityConfigurationManagerImpl
     return configuration;
   }
 
-  private SecurityConfiguration appendConfig(final SecurityConfiguration to,
-                                                  final SecurityConfiguration from)
-  {
+  private SecurityConfiguration appendConfig(final SecurityConfiguration to, final SecurityConfiguration from) {
     for (CPrivilege privilege : from.getPrivileges()) {
       privilege.setReadOnly(true);
       to.addPrivilege(privilege);

@@ -99,6 +99,6 @@ public class UserPrincipalsHelper
         }
       }
     }
-    throw new NoSuchUserManagerException("No UserManager for realm: " + primaryRealmName);
+    throw new NoSuchUserManagerException(primaryRealmName);
   }
 }

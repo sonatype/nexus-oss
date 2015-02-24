@@ -25,14 +25,17 @@ import org.sonatype.nexus.security.role.RoleIdentifier;
 public class MockUserManager
     extends AbstractReadOnlyUserManager
 {
+  @Override
   public String getSource() {
     return "Mock";
   }
 
+  @Override
   public String getAuthenticationRealmName() {
     return "Mock";
   }
 
+  @Override
   public Set<User> listUsers() {
     Set<User> users = new HashSet<User>();
 
@@ -51,6 +54,7 @@ public class MockUserManager
     return users;
   }
 
+  @Override
   public Set<String> listUserIds() {
     Set<String> userIds = new HashSet<String>();
     for (User user : this.listUsers()) {
@@ -59,10 +63,12 @@ public class MockUserManager
     return userIds;
   }
 
+  @Override
   public Set<User> searchUsers(UserSearchCriteria criteria) {
     return null;
   }
 
+  @Override
   public User getUser(String userId) throws UserNotFoundException {
     for (User user : this.listUsers()) {
       if (user.getUserId().equals(userId)) {

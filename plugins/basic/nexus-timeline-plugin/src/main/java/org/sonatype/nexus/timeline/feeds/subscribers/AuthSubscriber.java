@@ -18,10 +18,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.security.ClientInfo;
+import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.authc.NexusAuthenticationEvent;
 import org.sonatype.nexus.security.authz.NexusAuthorizationEvent;
 import org.sonatype.nexus.security.authz.ResourceInfo;
@@ -44,7 +44,7 @@ public class AuthSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
-  private final NexusConfiguration nexusConfiguration;
+  private final SecuritySystem securitySystem;
 
   private volatile NexusAuthenticationEvent lastNexusAuthenticationEvent;
 
@@ -52,10 +52,10 @@ public class AuthSubscriber
 
   @Inject
   public AuthSubscriber(final FeedRecorder feedRecorder,
-                        final NexusConfiguration nexusConfiguration)
+                        final SecuritySystem securitySystem)
   {
     super(feedRecorder);
-    this.nexusConfiguration = checkNotNull(nexusConfiguration);
+    this.securitySystem = checkNotNull(securitySystem);
   }
 
   @Subscribe
@@ -122,7 +122,7 @@ public class AuthSubscriber
 
   protected boolean isRecordedAuthcEvent(final NexusAuthenticationEvent nae) {
     // we record everything except anonymous related ones
-    if (StringUtils.equals(nexusConfiguration.getAnonymousUsername(), nae.getClientInfo().getUserid())) {
+    if (StringUtils.equals(securitySystem.getAnonymousUsername(), nae.getClientInfo().getUserid())) {
       return false;
     }
 
@@ -150,7 +150,7 @@ public class AuthSubscriber
       return false;
     }
     // we record everything except anonymous related ones
-    if (StringUtils.equals(nexusConfiguration.getAnonymousUsername(), nae.getClientInfo().getUserid())) {
+    if (StringUtils.equals(securitySystem.getAnonymousUsername(), nae.getClientInfo().getUserid())) {
       return false;
     }
 

@@ -14,10 +14,10 @@ package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.util.List;
 
+import org.sonatype.nexus.proxy.utils.Node;
+import org.sonatype.nexus.proxy.utils.PathUtils;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
-import org.sonatype.nexus.util.Node;
-import org.sonatype.nexus.util.PathUtils;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;

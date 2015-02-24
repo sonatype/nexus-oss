@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.email;
 
-import org.sonatype.nexus.util.Tokens;
+import org.sonatype.nexus.common.text.Strings2;
 
 /**
  * SMTP configuration.
@@ -107,7 +107,7 @@ public class SmtpConfiguration
         "hostname='" + hostname + '\'' +
         ", port=" + port +
         ", username='" + username + '\'' +
-        ", password='" + Tokens.mask(password) + '\'' +
+        ", password='" + Strings2.mask(password) + '\'' +
         ", systemEmailAddress='" + systemEmailAddress + '\'' +
         ", debugMode=" + debugMode +
         ", sslEnabled=" + sslEnabled +

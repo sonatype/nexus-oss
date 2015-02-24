@@ -28,10 +28,10 @@ public abstract class AbstractDynamicSecurityConfigurationResource
     this.dirty = dirty;
   }
 
-  protected abstract MemorySecurityConfiguration doGetConfiguration();
+  protected abstract SecurityConfiguration doGetConfiguration();
 
-  public MemorySecurityConfiguration getConfiguration() {
-    MemorySecurityConfiguration config = doGetConfiguration();
+  public SecurityConfiguration getConfiguration() {
+    SecurityConfiguration config = doGetConfiguration();
     // unset the dirty flag
     this.setDirty(false);
     return config;

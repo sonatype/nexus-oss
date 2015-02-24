@@ -44,9 +44,9 @@ import org.eclipse.sisu.Description;
 public class SimpleAuthorizationManager
     extends AbstractReadOnlyAuthorizationManager
 {
-
   public static final String SOURCE = "Simple";
 
+  @Override
   public String getSource() {
     return SOURCE;
   }
@@ -60,6 +60,7 @@ public class SimpleAuthorizationManager
     return roleIds;
   }
 
+  @Override
   public Set<Role> listRoles() {
     Set<Role> roles = new HashSet<Role>();
     for (String roleId : this.listRoleIds()) {
@@ -79,25 +80,23 @@ public class SimpleAuthorizationManager
     return role;
   }
 
-  public Privilege getPrivilege(String privilegeId)
-      throws NoSuchPrivilegeException
-  {
+  @Override
+  public Privilege getPrivilege(String privilegeId) throws NoSuchPrivilegeException {
     return null;
   }
 
-  public Role getRole(String roleId)
-      throws NoSuchRoleException
-  {
+  @Override
+  public Role getRole(String roleId) throws NoSuchRoleException {
     for (Role role : this.listRoles()) {
       if (role.getRoleId().equals(roleId)) {
         return role;
       }
     }
-    throw new NoSuchRoleException("Role '" + roleId + "' not found.");
+    throw new NoSuchRoleException(roleId);
   }
 
+  @Override
   public Set<Privilege> listPrivileges() {
     return null;
   }
-
 }

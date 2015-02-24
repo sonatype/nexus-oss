@@ -14,7 +14,7 @@ package org.sonatype.nexus.proxy.item;
 
 import org.sonatype.nexus.proxy.item.uid.Attribute;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.util.PathUtils;
+import org.sonatype.nexus.proxy.utils.PathUtils;
 
 /**
  * Repository item UID represents a key that uniquely identifies a resource in a repository. Every Item originating

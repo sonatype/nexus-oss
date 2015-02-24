@@ -24,7 +24,7 @@ public class UserSearchCriteria
 {
   private String userId;
 
-  private Set<String> oneOfRoleIds = new HashSet<String>();
+  private Set<String> oneOfRoleIds = new HashSet<>();
 
   private String source;
 
@@ -33,11 +33,11 @@ public class UserSearchCriteria
   public UserSearchCriteria() {
   }
 
-  public UserSearchCriteria(String userId) {
+  public UserSearchCriteria(final String userId) {
     this.userId = userId;
   }
 
-  public UserSearchCriteria(String userId, Set<String> oneOfRoleIds, String source) {
+  public UserSearchCriteria(final String userId, final Set<String> oneOfRoleIds, final String source) {
     this.userId = userId;
     this.oneOfRoleIds = oneOfRoleIds;
     this.source = source;
@@ -47,7 +47,7 @@ public class UserSearchCriteria
     return userId;
   }
 
-  public void setUserId(String userId) {
+  public void setUserId(final String userId) {
     this.userId = userId;
   }
 
@@ -55,7 +55,7 @@ public class UserSearchCriteria
     return oneOfRoleIds;
   }
 
-  public void setOneOfRoleIds(Set<String> oneOfRoleIds) {
+  public void setOneOfRoleIds(final Set<String> oneOfRoleIds) {
     this.oneOfRoleIds = oneOfRoleIds;
   }
 
@@ -63,7 +63,7 @@ public class UserSearchCriteria
     return source;
   }
 
-  public void setSource(String source) {
+  public void setSource(final String source) {
     this.source = source;
   }
 
@@ -71,7 +71,7 @@ public class UserSearchCriteria
     return email;
   }
 
-  public void setEmail(String email) {
+  public void setEmail(final String email) {
     this.email = email;
   }
 }

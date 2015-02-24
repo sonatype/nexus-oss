@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
@@ -49,17 +49,17 @@ public class YumRegistryImpl
 
   private final Map<String, Yum> yums = new ConcurrentHashMap<String, Yum>();
 
-  private final NexusConfiguration nexusConfiguration;
+  private ApplicationDirectories applicationDirectories;
 
   private final YumFactory yumFactory;
 
   private int maxNumberOfParallelThreads;
 
   @Inject
-  public YumRegistryImpl(final NexusConfiguration nexusConfiguration,
+  public YumRegistryImpl(final ApplicationDirectories applicationDirectories,
                          final YumFactory yumFactory)
   {
-    this.nexusConfiguration = checkNotNull(nexusConfiguration);
+    this.applicationDirectories = checkNotNull(applicationDirectories);
     this.yumFactory = checkNotNull(yumFactory);
     this.maxNumberOfParallelThreads = DEFAULT_MAX_NUMBER_PARALLEL_THREADS;
   }
@@ -128,7 +128,7 @@ public class YumRegistryImpl
 
   @Override
   public File getTemporaryDirectory() {
-    return new File(nexusConfiguration.getTemporaryDirectory(), "nexus-yum-repository-plugin");
+    return new File(applicationDirectories.getTemporaryDirectory(), "nexus-yum-repository-plugin");
   }
 
   private void createVirtualYumConfigFile(final MavenRepository repository) {

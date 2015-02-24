@@ -18,12 +18,12 @@ import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.configuration.validation.InvalidConfigurationException
-import org.sonatype.configuration.validation.ValidationMessage
-import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.common.validation.Create
 import org.sonatype.nexus.common.validation.Update
 import org.sonatype.nexus.common.validation.Validate
+import org.sonatype.nexus.common.validation.ValidationMessage
+import org.sonatype.nexus.common.validation.ValidationResponse
+import org.sonatype.nexus.common.validation.ValidationResponseException
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable
@@ -347,15 +347,15 @@ class TaskComponent
       }
       catch (Exception e) {
         def response = new ValidationResponse()
-        response.addValidationError(new ValidationMessage('cronExpression', e.getMessage()))
-        throw new InvalidConfigurationException(response)
+        response.addError(new ValidationMessage('cronExpression', e.getMessage()))
+        throw new ValidationResponseException(response)
       }
     }
     if (taskXO.schedule != 'manual') {
       if (!taskXO.startDate) {
         def response = new ValidationResponse()
-        response.addValidationError(new ValidationMessage('startDate', 'May not be null'))
-        throw new InvalidConfigurationException(response)
+        response.addError(new ValidationMessage('startDate', 'May not be null'))
+        throw new ValidationResponseException(response)
       }
       def date = Calendar.instance
       date.setTimeInMillis(taskXO.startDate.time)
@@ -369,12 +369,12 @@ class TaskComponent
             if (currentDate.get(Calendar.YEAR) == date.get(Calendar.YEAR)
                 && currentDate.get(Calendar.MONTH) == date.get(Calendar.MONTH)
                 && currentDate.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR)) {
-              response.addValidationError(new ValidationMessage('startTime', 'Time is in the past'))
+              response.addError(new ValidationMessage('startTime', 'Time is in the past'))
             }
             else {
-              response.addValidationError(new ValidationMessage('startDate', 'Date is in the past'))
+              response.addError(new ValidationMessage('startDate', 'Date is in the past'))
             }
-            throw new InvalidConfigurationException(response)
+            throw new ValidationResponseException(response)
           }
           return new Once(date.time)
         case 'hourly':

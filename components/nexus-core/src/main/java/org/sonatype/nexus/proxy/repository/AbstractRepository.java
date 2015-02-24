@@ -20,7 +20,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -31,7 +30,6 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -211,9 +209,7 @@ public abstract class AbstractRepository
   protected abstract CRepositoryExternalConfigurationHolderFactory<?> getExternalConfigurationHolderFactory();
 
   @Override
-  protected void doConfigure()
-      throws ConfigurationException
-  {
+  protected void doConfigure() {
     super.doConfigure();
     if (notFoundCache == null) {
       this.notFoundCache = cacheManager.getPathCache(getId());
@@ -221,9 +217,7 @@ public abstract class AbstractRepository
   }
 
   @Override
-  public boolean commitChanges()
-      throws ConfigurationException
-  {
+  public boolean commitChanges() {
     boolean wasDirty = super.commitChanges();
 
     if (wasDirty) {

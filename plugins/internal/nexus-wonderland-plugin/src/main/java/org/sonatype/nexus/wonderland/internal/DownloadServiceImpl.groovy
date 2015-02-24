@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.wonderland.internal
 
-import org.sonatype.nexus.configuration.application.ApplicationDirectories
+import org.sonatype.nexus.configuration.ApplicationDirectories
 import org.sonatype.nexus.wonderland.AuthTicketService
 import org.sonatype.nexus.wonderland.DownloadService
 import org.sonatype.sisu.goodies.common.ComponentSupport

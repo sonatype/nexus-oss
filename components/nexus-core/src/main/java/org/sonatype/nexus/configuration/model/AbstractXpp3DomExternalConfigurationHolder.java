@@ -17,11 +17,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.reflection.Reflector;
@@ -72,9 +71,7 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
     }
   }
 
-  public final void validate(ApplicationConfiguration applicationConfiguration, CoreConfiguration owner)
-      throws ConfigurationException
-  {
+  public final void validate(ApplicationConfiguration applicationConfiguration, CoreConfiguration owner) {
     checkValidationResponse(doValidateChanges(applicationConfiguration, owner, configuration));
   }
 
@@ -83,11 +80,9 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
 
   // ==
 
-  protected void checkValidationResponse(ValidationResponse response)
-      throws ConfigurationException
-  {
+  protected void checkValidationResponse(ValidationResponse response) {
     if (!response.isValid()) {
-      throw new InvalidConfigurationException(response);
+      throw new ValidationResponseException(response);
     }
   }
 

@@ -12,8 +12,7 @@
  */
 package org.sonatype.nexus.configuration.model;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 
 /**
  * @since 2.6
@@ -50,9 +49,7 @@ public class CRemoteProxySettingsCoreConfiguration
   }
 
   @Override
-  public void commitChanges()
-      throws ConfigurationException
-  {
+  public void commitChanges() {
     if (nullified) {
       // nullified, nothing to validate and the super.commitChanges() will not work
       getApplicationConfiguration().getConfigurationModel().setRemoteProxySettings(null);

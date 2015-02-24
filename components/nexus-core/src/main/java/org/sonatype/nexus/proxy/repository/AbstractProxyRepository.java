@@ -24,8 +24,10 @@ import javax.inject.Inject;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.common.property.SystemPropertiesHelper;
+import org.sonatype.nexus.common.sequence.ConstantNumberSequence;
+import org.sonatype.nexus.common.sequence.FibonacciNumberSequence;
+import org.sonatype.nexus.common.sequence.NumberSequence;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -63,9 +65,6 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
-import org.sonatype.nexus.util.sequence.ConstantNumberSequence;
-import org.sonatype.nexus.util.sequence.FibonacciNumberSequence;
-import org.sonatype.nexus.util.sequence.NumberSequence;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -212,17 +211,13 @@ public abstract class AbstractProxyRepository
   }
 
   @Override
-  protected void doConfigure()
-      throws ConfigurationException
-  {
+  protected void doConfigure() {
     super.doConfigure();
     createRepositoryStatusCheckerThread();
   }
 
   @Override
-  public boolean commitChanges()
-      throws ConfigurationException
-  {
+  public boolean commitChanges() {
     boolean result = super.commitChanges();
 
     if (result) {

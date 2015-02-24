@@ -20,8 +20,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path.Node;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -40,15 +40,15 @@ public class ValidationResponse
 
   private Map<String, String> errors;
 
-  public ValidationResponse(final InvalidConfigurationException cause) {
+  public ValidationResponse(final ValidationResponseException cause) {
     super(false, Lists.newArrayList());
     checkNotNull(cause, "cause may not be null");
-    if (cause.getValidationResponse() == null || cause.getValidationResponse().getValidationErrors().size() == 0) {
+    if (cause.getErrors().isEmpty()) {
       messages = Lists.newArrayList();
       messages.add(cause.getMessage());
     }
     else {
-      convertValidationMessages(cause.getValidationResponse().getValidationErrors());
+      convertValidationMessages(cause.getErrors());
     }
   }
 

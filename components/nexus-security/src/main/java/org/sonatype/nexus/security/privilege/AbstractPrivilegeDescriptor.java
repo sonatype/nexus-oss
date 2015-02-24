@@ -16,9 +16,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.sonatype.configuration.validation.ValidationMessage;
-import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.common.text.Strings2;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponse;
 import org.sonatype.nexus.security.authz.WildcardPermission2;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.ConfigurationIdGenerator;
@@ -69,24 +69,21 @@ public abstract class AbstractPrivilegeDescriptor
     if (!update && (Strings2.isEmpty(privilege.getId()) || "0".equals(privilege.getId()) || (existingIds.contains(privilege.getId())))) {
       String newId = idGenerator.generateId();
 
-      ValidationMessage message = new ValidationMessage("id",
-          "Fixed wrong privilege ID from '" + privilege.getId() + "' to '" + newId + "'");
-      response.addValidationWarning(message);
+      ValidationMessage message = new ValidationMessage("id", "Fixed wrong privilege ID from '" + privilege.getId() + "' to '" + newId + "'");
+      response.addWarning(message);
       privilege.setId(newId);
       response.setModified(true);
     }
 
     if (Strings2.isEmpty(privilege.getType())) {
-      ValidationMessage message = new ValidationMessage("type",
-          "Cannot have an empty type", "Privilege cannot have an invalid type");
+      ValidationMessage message = new ValidationMessage("type", "Cannot have an empty type");
 
-      response.addValidationError(message);
+      response.addError(message);
     }
 
     if (Strings2.isEmpty(privilege.getName())) {
-      ValidationMessage message = new ValidationMessage("name",
-          "Privilege ID '" + privilege.getId() + "' requires a name.", "Name is required.");
-      response.addValidationError(message);
+      ValidationMessage message = new ValidationMessage("name", "Privilege ID '" + privilege.getId() + "' requires a name.");
+      response.addError(message);
     }
 
     return response;

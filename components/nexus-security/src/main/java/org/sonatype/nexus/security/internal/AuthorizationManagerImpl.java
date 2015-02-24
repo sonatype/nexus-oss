@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.security.authz.AuthorizationConfigurationChanged;
 import org.sonatype.nexus.security.authz.AuthorizationManager;
 import org.sonatype.nexus.security.config.CPrivilege;
@@ -71,66 +70,83 @@ public class AuthorizationManagerImpl
     this.privilegeDescriptors = checkNotNull(privilegeDescriptors);
   }
 
+  @Override
   public String getSource() {
     return SOURCE;
   }
 
-  protected Role toRole(CRole secRole) {
-    Role role = new Role();
-
-    role.setRoleId(secRole.getId());
-    role.setVersion(secRole.getVersion());
-    role.setName(secRole.getName());
-    role.setSource(SOURCE);
-    role.setDescription(secRole.getDescription());
-    role.setReadOnly(secRole.isReadOnly());
-    role.setPrivileges(Sets.newHashSet(secRole.getPrivileges()));
-    role.setRoles(Sets.newHashSet(secRole.getRoles()));
-
-    return role;
+  private Role convert(final CRole source) {
+    Role target = new Role();
+    target.setRoleId(source.getId());
+    target.setVersion(source.getVersion());
+    target.setName(source.getName());
+    target.setSource(SOURCE);
+    target.setDescription(source.getDescription());
+    target.setReadOnly(source.isReadOnly());
+    target.setPrivileges(Sets.newHashSet(source.getPrivileges()));
+    target.setRoles(Sets.newHashSet(source.getRoles()));
+    return target;
   }
 
-  protected CRole toRole(Role role) {
-    CRole secRole = new CRole();
+  private CRole convert(final Role source) {
+    CRole target = new CRole();
+    target.setId(source.getRoleId());
+    target.setVersion(source.getVersion());
+    target.setName(source.getName());
+    target.setDescription(source.getDescription());
+    target.setReadOnly(source.isReadOnly());
 
-    secRole.setId(role.getRoleId());
-    secRole.setVersion(role.getVersion());
-    secRole.setName(role.getName());
-    secRole.setDescription(role.getDescription());
-    secRole.setReadOnly(role.isReadOnly());
-    // null check
-    if (role.getPrivileges() != null) {
-      secRole.setPrivileges(Sets.newHashSet(role.getPrivileges()));
+    if (source.getPrivileges() != null) {
+      target.setPrivileges(Sets.newHashSet(source.getPrivileges()));
     }
     else {
-      secRole.setPrivileges(Sets.<String>newHashSet());
+      target.setPrivileges(Sets.<String>newHashSet());
     }
 
-    // null check
-    if (role.getRoles() != null) {
-      secRole.setRoles(Sets.newHashSet(role.getRoles()));
+    if (source.getRoles() != null) {
+      target.setRoles(Sets.newHashSet(source.getRoles()));
     }
     else {
-      secRole.setRoles(Sets.<String>newHashSet());
+      target.setRoles(Sets.<String>newHashSet());
     }
 
-    return secRole;
+    return target;
   }
 
-  protected CPrivilege toPrivilege(Privilege privilege) {
-    CPrivilege secPriv = new CPrivilege();
-    secPriv.setId(privilege.getId());
-    secPriv.setVersion(privilege.getVersion());
-    secPriv.setName(privilege.getName());
-    secPriv.setDescription(privilege.getDescription());
-    secPriv.setReadOnly(privilege.isReadOnly());
-    secPriv.setType(privilege.getType());
-    if (privilege.getProperties() != null) {
-      secPriv.setProperties(Maps.newHashMap(privilege.getProperties()));
+  private CPrivilege convert(final Privilege source) {
+    CPrivilege target = new CPrivilege();
+    target.setId(source.getId());
+    target.setVersion(source.getVersion());
+    target.setName(source.getName());
+    target.setDescription(source.getDescription());
+    target.setReadOnly(source.isReadOnly());
+    target.setType(source.getType());
+    if (source.getProperties() != null) {
+      target.setProperties(Maps.newHashMap(source.getProperties()));
     }
 
-    return secPriv;
+    return target;
   }
+
+  private Privilege convert(final CPrivilege source) {
+    Privilege target = new Privilege();
+    target.setId(source.getId());
+    target.setVersion(source.getVersion());
+    target.setName(source.getName());
+    target.setDescription(source.getDescription());
+    target.setReadOnly(source.isReadOnly());
+    target.setType(source.getType());
+    target.setProperties(Maps.newHashMap(source.getProperties()));
+
+    // expose permission string representation
+    PrivilegeDescriptor descriptor = descriptor(source.getType());
+    if (descriptor != null) {
+      target.setPermission(descriptor.createPermission(source).toString());
+    }
+
+    return target;
+  }
+
 
   @Nullable
   private PrivilegeDescriptor descriptor(final String type) {
@@ -142,67 +158,53 @@ public class AuthorizationManagerImpl
     return null;
   }
 
-  protected Privilege toPrivilege(CPrivilege secPriv) {
-    Privilege privilege = new Privilege();
-    privilege.setId(secPriv.getId());
-    privilege.setVersion(secPriv.getVersion());
-    privilege.setName(secPriv.getName());
-    privilege.setDescription(secPriv.getDescription());
-    privilege.setReadOnly(secPriv.isReadOnly());
-    privilege.setType(secPriv.getType());
-    privilege.setProperties(Maps.newHashMap(secPriv.getProperties()));
-
-    // expose permission string representation
-    PrivilegeDescriptor descriptor = descriptor(secPriv.getType());
-    if (descriptor != null) {
-      privilege.setPermission(descriptor.createPermission(secPriv).toString());
-    }
-
-    return privilege;
-  }
-
   // //
   // ROLE CRUDS
   // //
 
+  @Override
   public Set<Role> listRoles() {
     Set<Role> roles = new HashSet<Role>();
     List<CRole> secRoles = this.configuration.listRoles();
 
     for (CRole CRole : secRoles) {
-      roles.add(this.toRole(CRole));
+      roles.add(this.convert(CRole));
     }
 
     return roles;
   }
 
+  @Override
   public Role getRole(String roleId) throws NoSuchRoleException {
-    return this.toRole(this.configuration.readRole(roleId));
+    return this.convert(this.configuration.readRole(roleId));
   }
 
-  public Role addRole(Role role) throws InvalidConfigurationException {
+  @Override
+  public Role addRole(Role role) {
     // the roleId of the secRole might change, so we need to keep the reference
-    final CRole secRole = this.toRole(role);
+    final CRole secRole = this.convert(role);
 
     configuration.createRole(secRole);
 
     // notify any listeners that the config changed
     this.fireAuthorizationChangedEvent();
 
-    return this.toRole(secRole);
+    return this.convert(secRole);
   }
 
-  public Role updateRole(Role role) throws NoSuchRoleException, InvalidConfigurationException {
-    final CRole secRole = this.toRole(role);
+  @Override
+  public Role updateRole(Role role) throws NoSuchRoleException {
+    final CRole secRole = this.convert(role);
 
     configuration.updateRole(secRole);
 
     // notify any listeners that the config changed
     this.fireAuthorizationChangedEvent();
 
-    return this.toRole(secRole);
+    return this.convert(secRole);
   }
 
+  @Override
   public void deleteRole(final String roleId) throws NoSuchRoleException {
     configuration.deleteRole(roleId);
 
@@ -214,23 +216,26 @@ public class AuthorizationManagerImpl
   // PRIVILEGE CRUDS
   // //
 
+  @Override
   public Set<Privilege> listPrivileges() {
     Set<Privilege> privileges = new HashSet<Privilege>();
     List<CPrivilege> secPrivs = this.configuration.listPrivileges();
 
     for (CPrivilege CPrivilege : secPrivs) {
-      privileges.add(this.toPrivilege(CPrivilege));
+      privileges.add(this.convert(CPrivilege));
     }
 
     return privileges;
   }
 
+  @Override
   public Privilege getPrivilege(String privilegeId) throws NoSuchPrivilegeException {
-    return this.toPrivilege(this.configuration.readPrivilege(privilegeId));
+    return this.convert(this.configuration.readPrivilege(privilegeId));
   }
 
-  public Privilege addPrivilege(Privilege privilege) throws InvalidConfigurationException {
-    final CPrivilege secPriv = this.toPrivilege(privilege);
+  @Override
+  public Privilege addPrivilege(Privilege privilege) {
+    final CPrivilege secPriv = this.convert(privilege);
     // create implies read, so we need to add logic for that
     addInheritedPrivileges(secPriv);
 
@@ -239,20 +244,22 @@ public class AuthorizationManagerImpl
     // notify any listeners that the config changed
     this.fireAuthorizationChangedEvent();
 
-    return this.toPrivilege(secPriv);
+    return this.convert(secPriv);
   }
 
-  public Privilege updatePrivilege(Privilege privilege) throws NoSuchPrivilegeException, InvalidConfigurationException {
-    final CPrivilege secPriv = this.toPrivilege(privilege);
+  @Override
+  public Privilege updatePrivilege(Privilege privilege) throws NoSuchPrivilegeException {
+    final CPrivilege secPriv = this.convert(privilege);
 
     configuration.updatePrivilege(secPriv);
 
     // notify any listeners that the config changed
     this.fireAuthorizationChangedEvent();
 
-    return this.toPrivilege(secPriv);
+    return this.convert(secPriv);
   }
 
+  @Override
   public void deletePrivilege(final String privilegeId) throws NoSuchPrivilegeException {
     configuration.deletePrivilege(privilegeId);
 
@@ -260,18 +267,18 @@ public class AuthorizationManagerImpl
     this.fireAuthorizationChangedEvent();
   }
 
+  @Override
   public boolean supportsWrite() {
     return true;
   }
 
-  private void addInheritedPrivileges(CPrivilege privilege) {
+  private void addInheritedPrivileges(final CPrivilege privilege) {
     String methodProperty = privilege.getProperty(MethodPrivilegeDescriptor.P_METHOD);
 
     if (methodProperty != null) {
       List<String> inheritedMethods = privInheritance.getInheritedMethods(methodProperty);
 
       StringBuffer buf = new StringBuffer();
-
       for (String method : inheritedMethods) {
         buf.append(method);
         buf.append(",");
@@ -279,7 +286,6 @@ public class AuthorizationManagerImpl
 
       if (buf.length() > 0) {
         buf.setLength(buf.length() - 1);
-
         privilege.setProperty(MethodPrivilegeDescriptor.P_METHOD, buf.toString());
       }
     }

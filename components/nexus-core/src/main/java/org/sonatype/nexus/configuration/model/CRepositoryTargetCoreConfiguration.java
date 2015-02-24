@@ -14,7 +14,7 @@ package org.sonatype.nexus.configuration.model;
 
 import java.util.List;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 
 public class CRepositoryTargetCoreConfiguration
     extends AbstractCoreConfiguration<List<CRepositoryTarget>>

@@ -20,134 +20,116 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.security.settings.SecuritySettings;
 import org.sonatype.nexus.security.settings.SecuritySettingsManager;
 import org.sonatype.nexus.security.settings.SecuritySettingsSource;
-import org.sonatype.nexus.security.settings.SecuritySettingsValidationContext;
-import org.sonatype.nexus.security.settings.SecuritySettingsValidator;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+/**
+ * Default {@link SecuritySettingsManager} implementation.
+ */
 @Named
 @Singleton
 public class SecuritySettingsManagerImpl
     extends ComponentSupport
     implements SecuritySettingsManager
 {
-  private final SecuritySettingsSource configurationSource;
+  private final SecuritySettingsSource source;
 
-  private final SecuritySettingsValidator validator;
+  private SecuritySettings model = null;
 
-  /**
-   * This will hold the current configuration in memory, to reload, will need to set this to null
-   */
-  private SecuritySettings configuration = null;
-
-  private ReentrantLock lock = new ReentrantLock();
+  private final ReentrantLock lock = new ReentrantLock();
 
   @Inject
-  public SecuritySettingsManagerImpl(final SecuritySettingsSource configurationSource,
-                                     final SecuritySettingsValidator validator)
-  {
-    this.configurationSource = configurationSource;
-    this.validator = validator;
+  public SecuritySettingsManagerImpl(final SecuritySettingsSource source) {
+    this.source = source;
   }
 
-  public boolean isAnonymousAccessEnabled() {
-    return this.getConfiguration().isAnonymousAccessEnabled();
-  }
-
-  public void setAnonymousAccessEnabled(boolean anonymousAccessEnabled) {
-    this.getConfiguration().setAnonymousAccessEnabled(anonymousAccessEnabled);
-  }
-
-  public String getAnonymousPassword() {
-    return this.getConfiguration().getAnonymousPassword();
-  }
-
-  public void setAnonymousPassword(String anonymousPassword) throws InvalidConfigurationException {
-    ValidationResponse vr = validator.validateAnonymousPassword(this.initializeContext(), anonymousPassword);
-
-    if (vr.isValid()) {
-      this.getConfiguration().setAnonymousPassword(anonymousPassword);
-    }
-    else {
-      throw new InvalidConfigurationException(vr);
-    }
-  }
-
-  public String getAnonymousUsername() {
-    return this.getConfiguration().getAnonymousUsername();
-  }
-
-  public void setAnonymousUsername(String anonymousUsername) throws InvalidConfigurationException {
-    ValidationResponse vr = validator.validateAnonymousUsername(this.initializeContext(), anonymousUsername);
-
-    if (vr.isValid()) {
-      this.getConfiguration().setAnonymousUsername(anonymousUsername);
-    }
-    else {
-      throw new InvalidConfigurationException(vr);
-    }
-  }
-
-  public List<String> getRealms() {
-    return Collections.unmodifiableList(this.getConfiguration().getRealms());
-  }
-
-  public void setRealms(List<String> realms) throws InvalidConfigurationException {
-    ValidationResponse vr = validator.validateRealms(this.initializeContext(), realms);
-
-    if (vr.isValid()) {
-      this.getConfiguration().setRealms(realms);
-    }
-    else {
-      throw new InvalidConfigurationException(vr);
-    }
-  }
-
-  private SecuritySettings getConfiguration() {
-    if (configuration != null) {
-      return configuration;
+  private SecuritySettings getModel() {
+    // FIXME this has race-condition potential
+    if (model != null) {
+      return model;
     }
 
     lock.lock();
-
     try {
-      this.configurationSource.loadConfiguration();
-
-      configuration = this.configurationSource.getConfiguration();
+      source.load();
+      model = source.get();
     }
     finally {
       lock.unlock();
     }
 
-    return configuration;
+    return model;
   }
 
+  @Override
+  public boolean isAnonymousAccessEnabled() {
+    return getModel().isAnonymousAccessEnabled();
+  }
+
+  @Override
+  public void setAnonymousAccessEnabled(final boolean enabled) {
+    getModel().setAnonymousAccessEnabled(enabled);
+  }
+
+  @Override
+  public String getAnonymousPassword() {
+    return getModel().getAnonymousPassword();
+  }
+
+  @Override
+  public void setAnonymousPassword(final String password) {
+    getModel().setAnonymousPassword(password);
+  }
+
+  @Override
+  public String getAnonymousUsername() {
+    return getModel().getAnonymousUsername();
+  }
+
+  @Override
+  public void setAnonymousUsername(final String username) {
+    getModel().setAnonymousUsername(username);
+  }
+
+  @Override
+  public List<String> getRealms() {
+    return Collections.unmodifiableList(getModel().getRealms());
+  }
+
+  @Override
+  public void setRealms(final List<String> realms) {
+    ValidationResponse response = new ValidationResponse();
+    if (realms.isEmpty()) {
+      response.addError("At least one realm must be configured");
+      throw new ValidationResponseException(response);
+    }
+
+    getModel().setRealms(realms);
+  }
+
+  @Override
   public void clearCache() {
-    // Just to make sure we aren't fiddling w/ save/loading process
     lock.lock();
-    configuration = null;
-    lock.unlock();
+    try {
+      model = null;
+    }
+    finally {
+      lock.unlock();
+    }
   }
 
+  @Override
   public void save() {
     lock.lock();
-
     try {
-      this.configurationSource.storeConfiguration();
+      source.save();
     }
     finally {
       lock.unlock();
     }
-  }
-
-  private SecuritySettingsValidationContext initializeContext() {
-    SecuritySettingsValidationContext context = new SecuritySettingsValidationContext();
-    context.setSecuritySettings(this.getConfiguration());
-
-    return context;
   }
 }

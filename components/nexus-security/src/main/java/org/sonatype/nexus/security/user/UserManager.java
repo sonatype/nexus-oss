@@ -14,8 +14,6 @@ package org.sonatype.nexus.security.user;
 
 import java.util.Set;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-
 import org.apache.shiro.realm.Realm;
 
 /**
@@ -31,7 +29,7 @@ public interface UserManager
   String getSource();
 
   /**
-   * The name of the {@link Realm} is assocated with.
+   * The name of the {@link Realm} is associated with.
    */
   String getAuthenticationRealmName();
 
@@ -45,20 +43,21 @@ public interface UserManager
    */
   Set<User> listUsers();
 
+  // FIXME: This is only used by tests
   /**
-   * Retrieve all userids (if managing full object list is to heavy handed)
+   * Retrieve all user ids.
    */
   Set<String> listUserIds();
 
   /**
    * Add a user.
    */
-  User addUser(User user, String password) throws InvalidConfigurationException;
+  User addUser(User user, String password);
 
   /**
    * Update a user.
    */
-  User updateUser(User user) throws UserNotFoundException, InvalidConfigurationException;
+  User updateUser(User user) throws UserNotFoundException;
 
   /**
    * Delete a user based on id.
@@ -78,5 +77,5 @@ public interface UserManager
   /**
    * Update a users password.
    */
-  void changePassword(String userId, String newPassword) throws UserNotFoundException, InvalidConfigurationException;
+  void changePassword(String userId, String newPassword) throws UserNotFoundException;
 }

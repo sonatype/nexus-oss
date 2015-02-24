@@ -19,6 +19,7 @@ import java.security.cert.CertificateParsingException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -33,7 +34,6 @@ import com.sonatype.nexus.ssl.plugin.SSLPlugin;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 import com.sonatype.nexus.ssl.plugin.internal.CertificateRetriever;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -67,18 +67,18 @@ public class CertificatesResource
 
   private final TrustStore trustStore;
 
-  private final ApplicationConfiguration applicationConfiguration;
+  private final Provider<RemoteStorageContext> remoteStorageContextProvider;
 
   private final CertificateRetriever certificateRetriever;
 
   @Inject
   public CertificatesResource(final CertificateRetriever certificateRetriever,
-                              final ApplicationConfiguration applicationConfiguration,
+                              final @Named("global") Provider<RemoteStorageContext> remoteStorageContextProvider,
                               final RepositoryRegistry repositoryRegistry,
                               final TrustStore trustStore)
   {
     this.certificateRetriever = checkNotNull(certificateRetriever);
-    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+    this.remoteStorageContextProvider = checkNotNull(remoteStorageContextProvider);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.trustStore = checkNotNull(trustStore);
   }
@@ -92,7 +92,7 @@ public class CertificatesResource
                     final @QueryParam("protocolHint") String protocolHint)
       throws Exception
   {
-    RemoteStorageContext remoteStorageContext = applicationConfiguration.getGlobalRemoteStorageContext();
+    RemoteStorageContext remoteStorageContext = remoteStorageContextProvider.get();
     String actualProtocolHint = protocolHint;
     String actualHost = host;
     String actualPort = port;

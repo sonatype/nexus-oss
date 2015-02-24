@@ -304,5 +304,4 @@
     <password>smtp-password</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  <notification />
 </nexusConfiguration>

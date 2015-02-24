@@ -19,7 +19,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
 import org.sonatype.micromailer.EmailerConfiguration;
@@ -28,10 +27,11 @@ import org.sonatype.micromailer.MailRequestStatus;
 import org.sonatype.micromailer.MailType;
 import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.configuration.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfigurationCoreConfiguration;
 import org.sonatype.nexus.email.EmailerException;
@@ -189,32 +189,24 @@ public class DefaultNexusEmailer
   // ==
 
   @Override
-  protected void initializeConfiguration()
-      throws ConfigurationException
-  {
+  protected void initializeConfiguration() {
     if (getApplicationConfiguration().getConfigurationModel() != null) {
       configure(getApplicationConfiguration());
     }
   }
 
   @Override
-  protected CoreConfiguration<CSmtpConfiguration> wrapConfiguration(Object configuration)
-      throws ConfigurationException
-  {
+  protected CoreConfiguration<CSmtpConfiguration> wrapConfiguration(Object configuration) {
     if (configuration instanceof ApplicationConfiguration) {
       return new CSmtpConfigurationCoreConfiguration((ApplicationConfiguration) configuration);
     }
     else {
-      throw new ConfigurationException("The passed configuration object is of class \""
-          + configuration.getClass().getName() + "\" and not the required \""
-          + ApplicationConfiguration.class.getName() + "\"!");
+      throw new ConfigurationException("The passed configuration object is of class \"" + configuration.getClass().getName() + "\" and not the required \"" + ApplicationConfiguration.class.getName() + "\"!");
     }
   }
 
   @Override
-  public void doConfigure()
-      throws ConfigurationException
-  {
+  public void doConfigure() {
     super.doConfigure();
 
     configureEmailer();

@@ -16,13 +16,13 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationMessage;
-import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
-import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.AuthenticationInfoConverter;
+import org.sonatype.nexus.configuration.GlobalRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
@@ -57,9 +57,9 @@ public abstract class AbstractProxyRepositoryConfigurator
   }
 
   @Override
-  public void doApplyConfiguration(Repository repository, ApplicationConfiguration configuration,
+  public void doApplyConfiguration(Repository repository,
+                                   ApplicationConfiguration configuration,
                                    CRepositoryCoreConfiguration coreConfig)
-      throws ConfigurationException
   {
     super.doApplyConfiguration(repository, configuration, coreConfig);
 
@@ -115,12 +115,10 @@ public abstract class AbstractProxyRepositoryConfigurator
       }
       catch (RemoteStorageException e) {
         ValidationResponse response = new ApplicationValidationResponse();
+        ValidationMessage error = new ValidationMessage("remoteStorageUrl", e.getMessage());
+        response.addError(error);
 
-        ValidationMessage error = new ValidationMessage("remoteStorageUrl", e.getMessage(), e.getMessage());
-
-        response.addValidationError(error);
-
-        throw new InvalidConfigurationException(response);
+        throw new ValidationResponseException(response);
       }
     }
   }
@@ -166,10 +164,9 @@ public abstract class AbstractProxyRepositoryConfigurator
     }
   }
 
-  protected RemoteRepositoryStorage getRemoteRepositoryStorage(final String repoId, 
-                                                               final String remoteUrl,
-                                                               final String provider)
-      throws InvalidConfigurationException
+  private RemoteRepositoryStorage getRemoteRepositoryStorage(final String repoId,
+                                                             final String remoteUrl,
+                                                             final String provider)
   {
     try {
       final String mungledHint = remoteProviderHintFactory.getRoleHint(remoteUrl, provider);
@@ -177,12 +174,10 @@ public abstract class AbstractProxyRepositoryConfigurator
       if (result != null) {
         return result;
       }
-      throw new InvalidConfigurationException("Repository " + repoId
-          + " have remote storage with unsupported provider: " + provider);
+      throw new ConfigurationException("Repository " + repoId + " have remote storage with unsupported provider: " + provider);
     }
     catch (IllegalArgumentException e) {
-      throw new InvalidConfigurationException("Repository " + repoId
-          + " have remote storage with unsupported provider: " + provider, e);
+      throw new ConfigurationException("Repository " + repoId + " have remote storage with unsupported provider: " + provider, e);
     }
   }
 }

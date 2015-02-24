@@ -37,11 +37,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.analytics.EventDataBuilder;
 import org.sonatype.nexus.analytics.EventRecorder;
-import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
+import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.extdirect.model.Response;
@@ -83,7 +82,6 @@ import static org.sonatype.nexus.extdirect.model.Responses.success;
 public class ExtDirectServlet
     extends DirectJNgineServlet
 {
-
   private static final Logger log = LoggerFactory.getLogger(ExtDirectServlet.class);
 
   private final ApplicationDirectories directories;
@@ -213,7 +211,7 @@ public class ExtDirectServlet
         }
         finally {
           // Record analytics event
-          if (builder != null) {
+          if (eventRecorder != null && builder != null) {
             if (response != null) {
               builder.set("success", response.isSuccess());
             }
@@ -227,24 +225,18 @@ public class ExtDirectServlet
       }
 
       private Response handleException(final RegisteredMethod method, final Throwable e) {
-        if (e instanceof InvalidConfigurationException) {
-          log.debug(
-              "Failed to invoke action method: {}, java-method: {}",
-              method.getFullName(), method.getFullJavaMethodName(), e
-          );
-          InvalidConfigurationException cause = (InvalidConfigurationException) e;
-          ValidationResponse vr = cause.getValidationResponse();
-          if (vr == null || vr.getValidationErrors() == null || vr.getValidationErrors().size() == 0) {
+        // debug logging for sanity
+        log.debug("Failed to invoke action method: {}, java-method: {}",
+            method.getFullName(), method.getFullJavaMethodName(), e);
+
+        if (e instanceof ValidationResponseException) {
+          ValidationResponseException cause = (ValidationResponseException) e;
+          if (cause.getErrors().isEmpty()) {
             return asResponse(error(e));
           }
           return asResponse(invalid(cause));
         }
-
-        if (e instanceof ConstraintViolationException) {
-          log.debug(
-              "Failed to invoke action method: {}, java-method: {}",
-              method.getFullName(), method.getFullJavaMethodName(), e
-          );
+        else if (e instanceof ConstraintViolationException) {
           ConstraintViolationException cause = (ConstraintViolationException) e;
           Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
           if (violations == null || violations.size() == 0) {
@@ -252,19 +244,14 @@ public class ExtDirectServlet
           }
           return asResponse(invalid(cause));
         }
-
-        if (e instanceof ValidationException) {
-          log.debug(
-              "Failed to invoke action method: {}, java-method: {}",
-              method.getFullName(), method.getFullJavaMethodName(), e
-          );
+        else if (e instanceof ValidationException) {
           return asResponse(error(e));
         }
 
-        log.error(
-            "Failed to invoke action method: {}, java-method: {}",
-            method.getFullName(), method.getFullJavaMethodName(), e
-        );
+        // Not validation exception, log error
+        log.error("Failed to invoke action method: {}, java-method: {}",
+            method.getFullName(), method.getFullJavaMethodName(), e);
+
         return asResponse(error(e));
       }
 

@@ -16,8 +16,7 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -41,14 +40,7 @@ public abstract class AbstractRepositoryTemplateProvider
 
   private RepositoryTypeRegistry repositoryTypeRegistry;
 
-  private NexusConfiguration nexusConfiguration;
-
   private RemoteProviderHintFactory remoteProviderHintFactory;
-
-  @Inject
-  public void setNexusConfiguration(final NexusConfiguration nexusConfiguration) {
-    this.nexusConfiguration = checkNotNull(nexusConfiguration);
-  }
 
   @Inject
   public void setRemoteProviderHintFactory(final RemoteProviderHintFactory remoteProviderHintFactory) {
@@ -60,10 +52,8 @@ public abstract class AbstractRepositoryTemplateProvider
     this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
   }
 
-  protected Repository createRepository(CRepository repository)
-      throws ConfigurationException, IOException
-  {
-    return nexusConfiguration.createRepository(repository);
+  protected Repository createRepository(CRepository repository) throws IOException {
+    return getApplicationConfiguration().createRepository(repository);
   }
 
   public RemoteProviderHintFactory getRemoteProviderHintFactory() {
@@ -78,9 +68,7 @@ public abstract class AbstractRepositoryTemplateProvider
     return getTemplates().getTemplates(filters);
   }
 
-  public ManuallyConfiguredRepositoryTemplate createManuallyTemplate(CRepositoryCoreConfiguration configuration)
-      throws ConfigurationException
-  {
+  public ManuallyConfiguredRepositoryTemplate createManuallyTemplate(CRepositoryCoreConfiguration configuration) {
     final CRepository repoConfig = configuration.getConfiguration(false);
 
     RepositoryTypeDescriptor rtd =

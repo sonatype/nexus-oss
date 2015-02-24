@@ -29,10 +29,11 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.nexus.rapture.Rapture;
 import org.sonatype.nexus.rapture.StateContributor;
-import org.sonatype.nexus.util.DigesterUtils;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.hash.Hashing;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.softwarementors.extjs.djn.config.annotations.DirectAction;
@@ -180,7 +181,7 @@ public class StateComponent
   public static String hash(final Object value) {
     if (value != null) {
       // TODO is there another way to not use serialized json? :D
-      return DigesterUtils.getSha1Digest(gson.toJson(value));
+      return Hashing.sha1().hashString(gson.toJson(value), Charsets.UTF_8).toString();
     }
     return null;
   }
@@ -195,7 +196,7 @@ public class StateComponent
         String newDigest = null;
         if (value != null) {
           // TODO is there another way to not use serialized json? :D
-          newDigest = DigesterUtils.getSha1Digest(gson.toJson(value));
+          newDigest = Hashing.sha1().hashString(gson.toJson(value), Charsets.UTF_8).toString();
         }
         if (ObjectUtils.equals(currentDigest, newDigest)) {
           shouldSend = false;

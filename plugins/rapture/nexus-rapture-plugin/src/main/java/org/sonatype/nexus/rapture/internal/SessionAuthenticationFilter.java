@@ -20,7 +20,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.util.Tokens;
+import org.sonatype.nexus.common.text.Strings2;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -93,7 +93,7 @@ public class SessionAuthenticationFilter
   private String decodeBase64Param(final ServletRequest request, final String name) {
     String encoded = WebUtils.getCleanParam(request, name);
     if (encoded != null) {
-      return Tokens.decodeBase64String(encoded);
+      return Strings2.decodeBase64(encoded);
     }
     return null;
   }

@@ -13,25 +13,14 @@
 package org.sonatype.nexus.security.authz;
 
 /**
- * Thrown when an AuthorizationManager could not be found.
+ * Thrown when an {@link AuthorizationManager} could not be found.
  */
 public class NoSuchAuthorizationManagerException
     extends Exception
 {
   private static final long serialVersionUID = -9130834235862218360L;
 
-  public NoSuchAuthorizationManagerException() {
-  }
-
-  public NoSuchAuthorizationManagerException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public NoSuchAuthorizationManagerException(String message) {
-    super(message);
-  }
-
-  public NoSuchAuthorizationManagerException(Throwable cause) {
-    super(cause);
+  public NoSuchAuthorizationManagerException(final String source) {
+    super("Authorization-manager with source '" + source + "' could not be found");
   }
 }

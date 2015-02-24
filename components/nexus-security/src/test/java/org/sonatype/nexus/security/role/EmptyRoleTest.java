@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.security.AbstractSecurityTestCase;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.authz.AuthorizationManager;
@@ -151,7 +150,7 @@ public class EmptyRoleTest
     return user;
   }
 
-  private String createTestPriv() throws InvalidConfigurationException {
+  private String createTestPriv() throws Exception {
     CPrivilege priv = new CPrivilege();
     priv.setId("priv-" + Math.random());
     priv.setName("somepriv");

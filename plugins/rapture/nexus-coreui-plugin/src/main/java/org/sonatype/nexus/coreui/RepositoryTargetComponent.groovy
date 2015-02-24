@@ -18,13 +18,13 @@ import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.configuration.validation.InvalidConfigurationException
-import org.sonatype.configuration.validation.ValidationMessage
-import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.common.validation.Create
 import org.sonatype.nexus.common.validation.Update
 import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.configuration.application.NexusConfiguration
+import org.sonatype.nexus.common.validation.ValidationMessage
+import org.sonatype.nexus.common.validation.ValidationResponse
+import org.sonatype.nexus.common.validation.ValidationResponseException
+import org.sonatype.nexus.configuration.ApplicationConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
@@ -60,7 +60,7 @@ extends DirectComponentSupport
   RepositoryTypeRegistry repositoryTypeRegistry
 
   @Inject
-  NexusConfiguration nexusConfiguration
+  ApplicationConfiguration nexusConfiguration
 
   /**
    * Retrieves repository targets.
@@ -147,7 +147,7 @@ extends DirectComponentSupport
 
     def contentClass = repositoryTypeRegistry.contentClasses[target.format]
     if (!contentClass) {
-      validations.addValidationError(new ValidationMessage('format', 'Repository type does not exist'))
+      validations.addError(new ValidationMessage('format', 'Repository type does not exist'))
     }
 
     def invalidPatterns = []
@@ -160,13 +160,13 @@ extends DirectComponentSupport
       }
     }
     if (invalidPatterns.size() > 0) {
-      validations.addValidationError(new ValidationMessage(
+      validations.addError(new ValidationMessage(
           'patterns', 'The following are not valid regular expressions: ' + invalidPatterns.join(','))
       )
     }
 
     if (!validations.valid) {
-      throw new InvalidConfigurationException(validations)
+      throw new ValidationResponseException(validations)
     }
   }
 

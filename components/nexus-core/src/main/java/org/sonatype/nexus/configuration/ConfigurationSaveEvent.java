@@ -12,15 +12,13 @@
  */
 package org.sonatype.nexus.configuration;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-
 /**
  * An event fired on configuration save.
  *
  * @author cstamas
  */
 public class ConfigurationSaveEvent
-    extends ConfigurationIOEvent
+    extends ConfigurationEvent
 {
   public ConfigurationSaveEvent(ApplicationConfiguration configuration) {
     super(configuration);

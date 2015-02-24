@@ -14,21 +14,26 @@ package org.sonatype.nexus.security.config;
 
 import java.util.Set;
 
-import org.sonatype.configuration.validation.ValidationRequest;
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponse;
 
 public interface SecurityConfigurationValidator
 {
-  ValidationResponse validateModel(ValidationRequest<MemorySecurityConfiguration> request);
+  ValidationResponse validateModel(SecurityConfiguration model);
 
-  ValidationResponse validatePrivilege(SecurityConfigurationValidationContext ctx, CPrivilege privilege, boolean update);
+  ValidationResponse validatePrivilege(SecurityConfigurationValidationContext ctx,
+                                       CPrivilege privilege,
+                                       boolean update);
 
   ValidationResponse validateRoleContainment(SecurityConfigurationValidationContext ctx);
 
   ValidationResponse validateRole(SecurityConfigurationValidationContext ctx, CRole role, boolean update);
 
-  ValidationResponse validateUser(SecurityConfigurationValidationContext ctx, CUser user, Set<String> roles, boolean update);
+  ValidationResponse validateUser(SecurityConfigurationValidationContext ctx,
+                                  CUser user,
+                                  Set<String> roles,
+                                  boolean update);
 
-  ValidationResponse validateUserRoleMapping(SecurityConfigurationValidationContext ctx, CUserRoleMapping userRoleMapping,
+  ValidationResponse validateUserRoleMapping(SecurityConfigurationValidationContext ctx,
+                                             CUserRoleMapping userRoleMapping,
                                              boolean update);
 }

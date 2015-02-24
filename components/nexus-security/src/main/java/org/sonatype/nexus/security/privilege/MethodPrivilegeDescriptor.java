@@ -15,9 +15,9 @@ package org.sonatype.nexus.security.privilege;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.validation.ValidationMessage;
-import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.common.text.Strings2;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponse;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.SecurityConfigurationValidationContext;
 
@@ -74,11 +74,11 @@ public class MethodPrivilegeDescriptor
     String permission = privilege.getProperty(P_PERMISSION);
 
     if (Strings2.isEmpty(permission)) {
-      response.addValidationError("Permission cannot be empty on a privilege!");
+      response.addError("Permission cannot be empty on a privilege!");
     }
 
     if (Strings2.isEmpty(method)) {
-      response.addValidationError("Method cannot be empty on a privilege!");
+      response.addError("Method cannot be empty on a privilege!");
     }
     else {
       String[] methods = null;
@@ -106,9 +106,8 @@ public class MethodPrivilegeDescriptor
       if (!valid) {
         ValidationMessage message =
             new ValidationMessage("method", "Privilege ID '" + privilege.getId()
-                + "' Method is wrong! (Allowed methods are: create, delete, read and update)",
-                "Invalid method selected.");
-        response.addValidationError(message);
+                + "' Method is wrong! (Allowed methods are: create, delete, read and update)");
+        response.addError(message);
       }
     }
 

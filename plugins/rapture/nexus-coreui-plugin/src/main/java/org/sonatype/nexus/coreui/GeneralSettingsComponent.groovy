@@ -18,11 +18,11 @@ import groovy.transform.PackageScope
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.sonatype.configuration.validation.InvalidConfigurationException
-import org.sonatype.configuration.validation.ValidationMessage
-import org.sonatype.configuration.validation.ValidationResponse
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings
-import org.sonatype.nexus.configuration.application.NexusConfiguration
+import org.sonatype.nexus.common.validation.ValidationMessage
+import org.sonatype.nexus.common.validation.ValidationResponse
+import org.sonatype.nexus.common.validation.ValidationResponseException
+import org.sonatype.nexus.configuration.ApplicationConfiguration
+import org.sonatype.nexus.configuration.GlobalRestApiSettings
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 
@@ -48,7 +48,7 @@ extends DirectComponentSupport
   GlobalRestApiSettings globalRestApiSettings
 
   @Inject
-  NexusConfiguration nexusConfiguration
+  ApplicationConfiguration nexusConfiguration
 
   /**
    * Retrieves general system settings.
@@ -84,11 +84,11 @@ extends DirectComponentSupport
         new URL(generalSettingsXO.baseUrl)
       }
       catch (MalformedURLException e) {
-        validations.addValidationError(new ValidationMessage('baseUrl', e.message))
+        validations.addError(new ValidationMessage('baseUrl', e.message))
       }
     }
     if (!validations.valid) {
-      throw new InvalidConfigurationException(validations)
+      throw new ValidationResponseException(validations)
     }
   }
 

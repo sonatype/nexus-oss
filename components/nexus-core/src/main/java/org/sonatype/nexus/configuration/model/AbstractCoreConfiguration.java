@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.configuration.model;
 
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 public abstract class AbstractCoreConfiguration<C>
     extends AbstractRevertableConfiguration<C>

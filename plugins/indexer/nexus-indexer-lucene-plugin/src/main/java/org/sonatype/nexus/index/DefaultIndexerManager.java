@@ -41,7 +41,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.io.DirSupport;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -273,7 +273,7 @@ public class DefaultIndexerManager
   private IndexPacker indexPacker;
 
   @Inject
-  private NexusConfiguration nexusConfiguration;
+  private ApplicationDirectories applicationDirectories;
 
   @Inject
   private RepositoryRegistry repositoryRegistry;
@@ -410,7 +410,7 @@ public class DefaultIndexerManager
 
   protected File getWorkingDirectory() {
     if (workingDirectory == null) {
-      workingDirectory = nexusConfiguration.getWorkingDirectory(INDEXER_WORKING_DIRECTORY_KEY);
+      workingDirectory = applicationDirectories.getWorkDirectory(INDEXER_WORKING_DIRECTORY_KEY);
     }
 
     return workingDirectory;
@@ -418,7 +418,7 @@ public class DefaultIndexerManager
 
   protected File getTempDirectory() {
     if (tempDirectory == null) {
-      tempDirectory = nexusConfiguration.getTemporaryDirectory();
+      tempDirectory = applicationDirectories.getTemporaryDirectory();
     }
     return tempDirectory;
   }

@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.yum.internal.createrepo
 
+import com.google.common.io.BaseEncoding
 import com.google.common.io.CountingInputStream
 import org.redline_rpm.ReadableChannelWrapper
 import org.redline_rpm.header.AbstractHeader
@@ -20,7 +21,6 @@ import org.redline_rpm.header.Flags
 import org.redline_rpm.header.Format
 import org.redline_rpm.header.Header
 import org.redline_rpm.header.Signature
-import org.sonatype.nexus.util.DigesterUtils
 
 import java.nio.channels.Channels
 import java.security.DigestInputStream
@@ -94,7 +94,7 @@ class YumPackageParser
       }
     }
     yumPackage.with {
-      checksum = DigesterUtils.getDigestAsString(digestStream.messageDigest.digest())
+      checksum = BaseEncoding.base16().lowerCase().encode(digestStream.messageDigest.digest())
       pkgId = checksum
       sizePackage = countingStream.count
     }

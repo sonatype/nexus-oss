@@ -25,9 +25,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationMessage;
-import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.capability.Capability;
 import org.sonatype.nexus.capability.CapabilityDescriptor;
 import org.sonatype.nexus.capability.CapabilityDescriptorRegistry;
@@ -45,6 +42,9 @@ import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.ValidatorRegistry;
 import org.sonatype.nexus.capability.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.capability.internal.storage.CapabilityStorageItem;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.PasswordHelper;
 import org.sonatype.nexus.formfields.Encrypted;
 import org.sonatype.nexus.formfields.FormField;
@@ -119,7 +119,7 @@ public class DefaultCapabilityRegistry
                                  final boolean enabled,
                                  final String notes,
                                  final Map<String, String> properties)
-      throws InvalidConfigurationException, IOException
+      throws IOException
   {
     try {
       lock.writeLock().lock();
@@ -161,7 +161,7 @@ public class DefaultCapabilityRegistry
                                     final boolean enabled,
                                     final String notes,
                                     final Map<String, String> properties)
-      throws InvalidConfigurationException, IOException
+      throws IOException
   {
     try {
       lock.writeLock().lock();
@@ -234,13 +234,7 @@ public class DefaultCapabilityRegistry
       validateId(id);
 
       final DefaultCapabilityReference reference = get(id);
-
-      try {
-        return update(reference.context().id(), true, reference.notes(), reference.properties());
-      }
-      catch (InvalidConfigurationException e) {
-        throw new RuntimeException("Unexpected", e);
-      }
+      return update(reference.context().id(), true, reference.notes(), reference.properties());
     }
     finally {
       lock.writeLock().unlock();
@@ -257,13 +251,7 @@ public class DefaultCapabilityRegistry
       validateId(id);
 
       final DefaultCapabilityReference reference = get(id);
-
-      try {
-        return update(reference.context().id(), false, reference.notes(), reference.properties());
-      }
-      catch (InvalidConfigurationException e) {
-        throw new RuntimeException("Unexpected", e);
-      }
+      return update(reference.context().id(), false, reference.notes(), reference.properties());
     }
     finally {
       lock.writeLock().unlock();
@@ -406,36 +394,30 @@ public class DefaultCapabilityRegistry
     );
   }
 
-  private void validateType(final CapabilityType type)
-      throws InvalidConfigurationException
-  {
+  private void validateType(final CapabilityType type) {
     final ValidationResponse vr = new ValidationResponse();
 
     if (type == null) {
-      vr.addValidationError(new ValidationMessage("typeId", "Type must be provided"));
+      vr.addError(new ValidationMessage("typeId", "Type must be provided"));
     }
     else {
       if (capabilityFactoryRegistry.get(type) == null || capabilityDescriptorRegistry.get(type) == null) {
-        vr.addValidationError(new ValidationMessage("typeId", "Type '" + type + "' is not supported"));
+        vr.addError(new ValidationMessage("typeId", "Type '" + type + "' is not supported"));
       }
     }
 
-    if (!vr.getValidationErrors().isEmpty()) {
-      throw new InvalidConfigurationException(vr);
+    if (!vr.getErrors().isEmpty()) {
+      throw new ValidationResponseException(vr);
     }
   }
 
-  private void validateId(final CapabilityIdentity id)
-      throws CapabilityNotFoundException
-  {
+  private void validateId(final CapabilityIdentity id) throws CapabilityNotFoundException {
     if (get(id) == null) {
       throw new CapabilityNotFoundException(id);
     }
   }
 
-  private void validate(final Collection<Validator> validators, final Map<String, String> properties)
-      throws InvalidConfigurationException
-  {
+  private void validate(final Collection<Validator> validators, final Map<String, String> properties) {
     if (validators != null && !validators.isEmpty()) {
       final ValidationResponse vr = new ValidationResponse();
 
@@ -443,7 +425,7 @@ public class DefaultCapabilityRegistry
         final ValidationResult validationResult = validator.validate(properties);
         if (!validationResult.isValid()) {
           for (final ValidationResult.Violation violation : validationResult.violations()) {
-            vr.addValidationError(new ValidationMessage(
+            vr.addError(new ValidationMessage(
                 violation.key(),
                 violation.message()
             ));
@@ -451,8 +433,8 @@ public class DefaultCapabilityRegistry
         }
       }
 
-      if (!vr.getValidationErrors().isEmpty()) {
-        throw new InvalidConfigurationException(vr);
+      if (!vr.getErrors().isEmpty()) {
+        throw new ValidationResponseException(vr);
       }
     }
   }

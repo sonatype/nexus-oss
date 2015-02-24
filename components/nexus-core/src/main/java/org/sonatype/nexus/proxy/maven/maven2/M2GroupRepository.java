@@ -56,8 +56,8 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.util.DigesterUtils;
 
+import com.google.common.hash.Hashing;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.sisu.Description;
@@ -284,12 +284,10 @@ public class M2GroupRepository
       StorageItem item = createMergedMetadataItem(request, resultOutputStream.toByteArray(), items);
 
       // build checksum files
-      String md5Digest = DigesterUtils.getMd5Digest(resultOutputStream.toByteArray());
-
-      String sha1Digest = DigesterUtils.getSha1Digest(resultOutputStream.toByteArray());
+      String md5Digest = Hashing.md5().hashBytes(resultOutputStream.toByteArray()).toString();
+      String sha1Digest = Hashing.sha1().hashBytes(resultOutputStream.toByteArray()).toString();
 
       storeMergedMetadataItemDigest(request, md5Digest, items, "MD5");
-
       storeMergedMetadataItemDigest(request, sha1Digest, items, "SHA1");
 
       resultOutputStream.close();

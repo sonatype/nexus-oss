@@ -15,11 +15,11 @@ package org.sonatype.nexus.wonderland.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.util.Tokens;
 import org.sonatype.nexus.wonderland.WonderlandPlugin;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.crypto.RandomBytesGenerator;
 
+import com.google.common.io.BaseEncoding;
 import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -52,7 +52,7 @@ public class AuthTicketGenerator
   }
 
   protected String encode(final byte[] bytes) {
-    return Tokens.encodeBase64String(bytes);
+    return BaseEncoding.base64().encode(bytes);
   }
 
   public String generate(final int size) {

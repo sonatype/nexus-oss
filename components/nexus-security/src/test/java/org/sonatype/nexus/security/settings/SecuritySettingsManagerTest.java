@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.sonatype.nexus.security.AbstractSecurityTest;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;

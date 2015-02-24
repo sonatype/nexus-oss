@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.atlas.internal.customizers
 
-import org.sonatype.nexus.configuration.application.ApplicationDirectories
+import org.sonatype.nexus.configuration.ApplicationDirectories
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer
 import org.sonatype.nexus.supportzip.FileContentSourceSupport

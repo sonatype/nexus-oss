@@ -15,10 +15,7 @@ package org.sonatype.nexus.configuration.validator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.configuration.validation.ValidationContext;
-
 public class ApplicationValidationContext
-    implements ValidationContext
 {
   private List<String> existingRepositoryIds;
 

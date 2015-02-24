@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.security.settings;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Pre-configured security settings source.
  *
@@ -21,25 +23,25 @@ package org.sonatype.nexus.security.settings;
 public class PreconfiguredSecuritySettingsSource
     implements SecuritySettingsSource
 {
-  private final SecuritySettings configuration;
+  private final SecuritySettings model;
 
-  public PreconfiguredSecuritySettingsSource(final SecuritySettings configuration) {
-    this.configuration = configuration;
+  public PreconfiguredSecuritySettingsSource(final SecuritySettings model) {
+    this.model = checkNotNull(model);
   }
 
   @Override
-  public SecuritySettings getConfiguration() {
-    return configuration;
+  public SecuritySettings get() {
+    return model;
   }
 
   @Override
-  public void storeConfiguration() {
+  public void save() {
     // do nothing
   }
 
   @Override
-  public SecuritySettings loadConfiguration() {
-    return getConfiguration();
+  public SecuritySettings load() {
+    return get();
   }
 }
 

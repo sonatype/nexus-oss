@@ -12,9 +12,6 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.io.IOException;
-
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -25,7 +22,6 @@ import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepositoryConfigu
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 
@@ -41,9 +37,7 @@ public class M1LayoutedM2ShadowRepositoryTest
     return new M2TestsuiteEnvironmentBuilder("repo1", "repo2", "repo3");
   }
 
-  private void addShadowReposes()
-      throws ConfigurationException, IOException, ComponentLookupException
-  {
+  private void addShadowReposes() throws Exception {
     for (ProxyRepository master : getRepositoryRegistry().getRepositoriesWithFacet(ProxyRepository.class)) {
       M1LayoutedM2ShadowRepository shadow =
           (M1LayoutedM2ShadowRepository) getContainer().lookup(ShadowRepository.class, "m2-m1-shadow");
@@ -70,7 +64,6 @@ public class M1LayoutedM2ShadowRepositoryTest
 
       getRepositoryRegistry().addRepository(shadow);
     }
-
   }
 
   @Test

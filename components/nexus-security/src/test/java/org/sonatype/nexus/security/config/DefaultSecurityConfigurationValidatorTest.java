@@ -14,8 +14,7 @@ package org.sonatype.nexus.security.config;
 
 import java.util.ArrayList;
 
-import org.sonatype.configuration.validation.ValidationRequest;
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponse;
 
 import org.eclipse.sisu.launch.InjectedTestCase;
 
@@ -32,46 +31,46 @@ public class DefaultSecurityConfigurationValidatorTest
   }
 
   public void testBad1() throws Exception {
-    ValidationResponse response = configurationValidator.validateModel(new ValidationRequest<>(
+    ValidationResponse response = configurationValidator.validateModel(
         DefaultSecurityConfigurationValidatorTestSecurity.securityModel1()
-    ));
+    );
 
     assertFalse(response.isValid());
 
     assertFalse(response.isModified());
 
     // emails are not longer unique!
-    assertEquals(11, response.getValidationErrors().size());
+    assertEquals(11, response.getErrors().size());
 
-    assertEquals(0, response.getValidationWarnings().size());
+    assertEquals(0, response.getWarnings().size());
   }
 
   public void testBad2() throws Exception {
-    ValidationResponse response = configurationValidator.validateModel(new ValidationRequest<>(
+    ValidationResponse response = configurationValidator.validateModel(
         DefaultSecurityConfigurationValidatorTestSecurity.securityModel2()
-    ));
+    );
 
     assertFalse(response.isValid());
 
     assertTrue(response.isModified());
 
-    assertEquals(3, response.getValidationWarnings().size());
+    assertEquals(3, response.getWarnings().size());
 
-    assertEquals(10, response.getValidationErrors().size());
+    assertEquals(10, response.getErrors().size());
   }
 
   public void testBad3() throws Exception {
-    ValidationResponse response = configurationValidator.validateModel(new ValidationRequest<>(
+    ValidationResponse response = configurationValidator.validateModel(
         DefaultSecurityConfigurationValidatorTestSecurity.securityModel3()
-    ));
+    );
 
     assertFalse(response.isValid());
 
     assertTrue(response.isModified());
 
-    assertEquals(1, response.getValidationWarnings().size());
+    assertEquals(1, response.getWarnings().size());
 
-    assertEquals(2, response.getValidationErrors().size());
+    assertEquals(2, response.getErrors().size());
   }
 
   public void testRoles() throws Exception {
@@ -123,7 +122,7 @@ public class DefaultSecurityConfigurationValidatorTest
     ValidationResponse vr = configurationValidator.validateRoleContainment(context);
 
     assertFalse(vr.isValid());
-    assertEquals(vr.getValidationErrors().size(), 3);
+    assertEquals(vr.getErrors().size(), 3);
 
   }
 
@@ -153,10 +152,10 @@ public class DefaultSecurityConfigurationValidatorTest
     ValidationResponse vr = configurationValidator.validateRole(context, role1, true);
 
     assertTrue(vr.isValid());
-    assertEquals(vr.getValidationErrors().size(), 0);
-    assertEquals(vr.getValidationWarnings().size(), 1);
+    assertEquals(vr.getErrors().size(), 0);
+    assertEquals(vr.getWarnings().size(), 1);
     assertEquals(
-        vr.getValidationWarnings().get(0).getMessage(),
+        vr.getWarnings().get(0).getMessage(),
         "Role ID 'role1' Invalid privilege id 'foo' found."
     );
   }

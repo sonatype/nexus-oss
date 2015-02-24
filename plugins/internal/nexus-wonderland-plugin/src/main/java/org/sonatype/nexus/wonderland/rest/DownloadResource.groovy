@@ -14,7 +14,7 @@ package org.sonatype.nexus.wonderland.rest
 
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.jetbrains.annotations.NonNls
-import org.sonatype.nexus.util.Tokens
+import org.sonatype.nexus.common.text.Strings2
 import org.sonatype.nexus.wonderland.DownloadService
 import org.sonatype.siesta.Resource
 import org.sonatype.sisu.goodies.common.ComponentSupport
@@ -78,7 +78,7 @@ class DownloadResource
     def authTicket
     if (authTicketParam) {
       // query-param needs to be base64 decoded
-      authTicket = Tokens.decodeBase64String(authTicketParam)
+      authTicket = Strings2.decodeBase64(authTicketParam)
     }
     else {
       authTicket = authTicketHeader

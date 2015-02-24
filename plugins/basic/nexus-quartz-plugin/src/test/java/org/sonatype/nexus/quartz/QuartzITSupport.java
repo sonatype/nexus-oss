@@ -17,8 +17,8 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.quartz.internal.QuartzSupportImpl;
 import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
