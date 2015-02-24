@@ -10,51 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.proxy.availability;
+package org.sonatype.nexus.repository.proxy.remote;
 
-import java.io.IOException;
-import java.net.URI;
-
-import org.sonatype.nexus.repository.proxy.FetchResult;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 
 /**
  * @since 3.0
  */
-public class UnavailableState
-    extends AvailabilityStateSupport
+public abstract class UnknownState
+    extends RemoteStateSupport
 {
 
-  private IOException exception;
-
-  public UnavailableState(final ProxyFacetSupport proxyFacet,
-                          final IOException e)
-  {
+  public UnknownState(final ProxyFacetSupport proxyFacet) {
     super(proxyFacet);
-    this.exception = e;
-  }
-
-  @Override
-  public FetchResult fetch(final URI uri) throws IOException {
-    try {
-      FetchResult result = super.fetch(uri);
-      proxyFacet.setAvailabilityState(new AvailableState(proxyFacet));
-      return result;
-    }
-    catch (IOException e) {
-      exception = e;
-      throw e;
-    }
   }
 
   @Override
   public String getStatus() {
-    return "Remote Unavailable";
+    return "Unknown";
   }
 
   @Override
   public String getStatusReason() {
-    return exception.getMessage();
+    return null;
   }
 
 }

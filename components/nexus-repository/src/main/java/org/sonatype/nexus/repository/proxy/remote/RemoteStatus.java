@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.proxy.availability;
+package org.sonatype.nexus.repository.proxy.remote;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,7 +20,7 @@ import org.sonatype.nexus.repository.proxy.FetchResult;
 /**
  * @since 3.0
  */
-public interface AvailabilityState
+public interface RemoteStatus
 {
   FetchResult fetch(final URI uri) throws IOException;
 

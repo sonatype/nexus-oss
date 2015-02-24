@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.proxy.availability;
+package org.sonatype.nexus.repository.proxy.remote;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,13 +36,13 @@ import org.apache.http.util.EntityUtils;
 /**
  * @since 3.0
  */
-public abstract class AvailabilityStateSupport
+public abstract class RemoteStateSupport
     extends ComponentSupport
-    implements AvailabilityState
+    implements RemoteState
 {
   protected final ProxyFacetSupport proxyFacet;
 
-  public AvailabilityStateSupport(final ProxyFacetSupport proxyFacet) {
+  public RemoteStateSupport(final ProxyFacetSupport proxyFacet) {
     this.proxyFacet = proxyFacet;
   }
 

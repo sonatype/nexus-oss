@@ -48,8 +48,8 @@ Ext.define('NX.coreui.view.repositorycma.RepositoryCMAList', {
       sortable: true,
       menuDisabled: false
     },
-    { header: 'State', dataIndex: 'availabilityStatus' },
-    { header: 'Reason', dataIndex: 'availabilityStatusReason' }
+    { header: 'Status', dataIndex: 'remoteStatus' },
+    { header: 'Reason', dataIndex: 'remoteStatusReason' }
   ],
 
   viewConfig: {

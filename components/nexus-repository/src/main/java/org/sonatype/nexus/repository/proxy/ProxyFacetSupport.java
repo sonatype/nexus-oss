@@ -23,13 +23,14 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
-import org.sonatype.nexus.repository.proxy.availability.AutoBlockedState;
-import org.sonatype.nexus.repository.proxy.availability.AutoBlockingAvailableState;
-import org.sonatype.nexus.repository.proxy.availability.AvailabilityState;
-import org.sonatype.nexus.repository.proxy.availability.AvailableState;
-import org.sonatype.nexus.repository.proxy.availability.ManuallyBlockedState;
-import org.sonatype.nexus.repository.proxy.availability.UnavailableState;
-import org.sonatype.nexus.repository.proxy.availability.UnknownState;
+import org.sonatype.nexus.repository.proxy.remote.AutoBlockedState;
+import org.sonatype.nexus.repository.proxy.remote.AutoBlockingAvailableState;
+import org.sonatype.nexus.repository.proxy.remote.RemoteState;
+import org.sonatype.nexus.repository.proxy.remote.AvailableState;
+import org.sonatype.nexus.repository.proxy.remote.ManuallyBlockedState;
+import org.sonatype.nexus.repository.proxy.remote.RemoteStatus;
+import org.sonatype.nexus.repository.proxy.remote.UnavailableState;
+import org.sonatype.nexus.repository.proxy.remote.UnknownState;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
@@ -55,7 +56,7 @@ public abstract class ProxyFacetSupport
 
   private int artifactMaxAgeMinutes;
 
-  private AvailabilityState availabilityState;
+  private RemoteState remoteState;
 
   private boolean remoteUrlChanged;
 
@@ -85,7 +86,7 @@ public abstract class ProxyFacetSupport
 
   @Override
   protected void doStart() throws Exception {
-    availabilityState = createAvailabilityState();
+    remoteState = createRemoteState();
     if (remoteUrlChanged) {
       remoteUrlChanged = false;
       try {
@@ -110,7 +111,7 @@ public abstract class ProxyFacetSupport
 
     if (content == null || isStale(context)) {
       try {
-        final FetchResult remote = availabilityState.fetch(remoteUrl.resolve(getUrl(context)));
+        final FetchResult remote = remoteState.fetch(remoteUrl.resolve(getUrl(context)));
         if (remote.getPayload() != null) {
 
           // TODO: Introduce content validation.. perhaps content's type not matching path's implied type.
@@ -132,12 +133,12 @@ public abstract class ProxyFacetSupport
   }
 
   @Override
-  public AvailabilityState getAvailabilityState() {
-    return availabilityState;
+  public RemoteStatus getRemoteStatus() {
+    return remoteState;
   }
 
-  public void setAvailabilityState(final AvailabilityState availabilityState) {
-    this.availabilityState = availabilityState;
+  public void setRemoteState(final RemoteState remoteState) {
+    this.remoteState = remoteState;
   }
 
   public Repository getRepository() {
@@ -172,7 +173,7 @@ public abstract class ProxyFacetSupport
    */
   protected abstract String getUrl(final @Nonnull Context context);
 
-  private AvailabilityState createAvailabilityState() {
+  private RemoteState createRemoteState() {
     if (!enabled) {
       return new ManuallyBlockedState();
     }
@@ -182,7 +183,7 @@ public abstract class ProxyFacetSupport
       public FetchResult fetch(final URI uri) throws IOException {
         try {
           FetchResult result = super.fetch(uri);
-          setAvailabilityState(
+          setRemoteState(
               autoBlock
                   ? new AutoBlockingAvailableState(ProxyFacetSupport.this)
                   : new AvailableState(ProxyFacetSupport.this)
@@ -190,7 +191,7 @@ public abstract class ProxyFacetSupport
           return result;
         }
         catch (IOException e) {
-          setAvailabilityState(
+          setRemoteState(
               autoBlock
                   ? new AutoBlockedState(ProxyFacetSupport.this, e)
                   : new UnavailableState(ProxyFacetSupport.this, e)

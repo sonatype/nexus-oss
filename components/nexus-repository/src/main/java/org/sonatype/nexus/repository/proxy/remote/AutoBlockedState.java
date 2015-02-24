@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.proxy.availability;
+package org.sonatype.nexus.repository.proxy.remote;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,7 +25,7 @@ import org.joda.time.DateTime;
  * @since 3.0
  */
 public class AutoBlockedState
-    extends AvailabilityStateSupport
+    extends RemoteStateSupport
 {
 
   private DateTime blockedUntil;
@@ -45,7 +45,7 @@ public class AutoBlockedState
     if (blockedUntil.isBeforeNow()) {
       try {
         FetchResult result = super.fetch(uri);
-        proxyFacet.setAvailabilityState(new AutoBlockingAvailableState(proxyFacet));
+        proxyFacet.setRemoteState(new AutoBlockingAvailableState(proxyFacet));
         return result;
       }
       catch (IOException e) {

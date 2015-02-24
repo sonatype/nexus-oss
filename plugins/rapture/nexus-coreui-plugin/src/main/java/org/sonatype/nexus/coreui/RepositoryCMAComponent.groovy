@@ -102,9 +102,9 @@ extends DirectComponentSupport
   }
 
   RepositoryCMAXO asRepository(Repository input) {
-    def availabilityState = null
+    def remoteStatus = null
     try {
-      availabilityState = input.facet(ProxyFacet).availabilityState
+      remoteStatus = input.facet(ProxyFacet).remoteStatus
     }
     catch (MissingFacetException e) {
       // no proxy, no availability state
@@ -113,8 +113,8 @@ extends DirectComponentSupport
         name: input.name,
         type: input.type,
         format: input.format,
-        availabilityStatus: availabilityState?.status,
-        availabilityStatusReason: availabilityState?.statusReason,
+        remoteStatus: remoteStatus?.status,
+        remoteStatusReason: remoteStatus?.statusReason,
         online: input.facet(ViewFacet).online,
         attributes: asAttributes(input.configuration.attributes)
     )

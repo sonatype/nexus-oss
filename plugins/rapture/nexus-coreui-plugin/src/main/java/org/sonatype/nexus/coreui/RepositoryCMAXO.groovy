@@ -31,14 +31,14 @@ class RepositoryCMAXO
 
   String format
 
-  String availabilityStatus
-
-  String availabilityStatusReason
-
   @NotEmpty(groups = Create)
   String recipe
 
   Boolean online
+
+  String remoteStatus
+
+  String remoteStatusReason
 
   String attributes
 }
