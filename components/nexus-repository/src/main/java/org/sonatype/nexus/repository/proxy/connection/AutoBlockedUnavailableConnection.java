@@ -65,6 +65,7 @@ public class AutoBlockedUnavailableConnection
     return new RemoteConnectionStatus("Remote Automatically Blocked and Unavailable", exception.getMessage());
   }
 
+  // TODO Use NumberSequence
   private long increment() {
     return Time.minutes(1).toMillis();
   }
