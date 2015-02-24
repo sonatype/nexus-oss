@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.sonatype.nexus.repository.http.HttpStatus;
-import org.sonatype.nexus.repository.proxy.FetchResult;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**

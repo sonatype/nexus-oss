@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
 import org.sonatype.nexus.repository.proxy.remote.AutoBlockedUnavailableState;
 import org.sonatype.nexus.repository.proxy.remote.AutoBlockingAvailableState;
 import org.sonatype.nexus.repository.proxy.remote.AvailableState;
+import org.sonatype.nexus.repository.proxy.remote.FetchResult;
 import org.sonatype.nexus.repository.proxy.remote.ManuallyBlockedState;
 import org.sonatype.nexus.repository.proxy.remote.RemoteState;
 import org.sonatype.nexus.repository.proxy.remote.RemoteStatus;

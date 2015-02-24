@@ -15,13 +15,11 @@ package org.sonatype.nexus.repository.proxy.remote;
 import java.io.IOException;
 import java.net.URI;
 
-import org.sonatype.nexus.repository.proxy.FetchResult;
-
 /**
  * @since 3.0
  */
 public interface RemoteState
-  extends RemoteStatus
+    extends RemoteStatus
 {
   FetchResult fetch(final URI uri) throws IOException;
 }

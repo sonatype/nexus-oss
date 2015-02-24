@@ -15,7 +15,6 @@ package org.sonatype.nexus.repository.proxy.remote;
 import java.io.IOException;
 import java.net.URI;
 
-import org.sonatype.nexus.repository.proxy.FetchResult;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 
 /**
