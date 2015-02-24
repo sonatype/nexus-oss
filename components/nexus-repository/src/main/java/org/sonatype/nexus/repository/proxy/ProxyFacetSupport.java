@@ -87,6 +87,8 @@ public abstract class ProxyFacetSupport
   @Override
   protected void doStart() throws Exception {
     remoteState = createRemoteState();
+    log.debug("Remote status set to '{}'", remoteState.getStatus());
+
     if (remoteUrlChanged) {
       remoteUrlChanged = false;
       try {
@@ -138,6 +140,8 @@ public abstract class ProxyFacetSupport
   }
 
   public void setRemoteState(final RemoteState remoteState) {
+    checkNotNull(remoteState);
+    log.debug("Remote status changed from '{}' to '{}'", this.remoteState.getStatus(), remoteState.getStatus());
     this.remoteState = remoteState;
   }
 
