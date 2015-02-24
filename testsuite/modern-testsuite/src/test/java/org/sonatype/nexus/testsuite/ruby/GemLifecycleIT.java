@@ -13,9 +13,10 @@
 package org.sonatype.nexus.testsuite.ruby;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.sonatype.nexus.ruby.client.RubyProxyRepository;
-
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,14 +30,17 @@ public class GemLifecycleIT
     extends RubyITSupport
 {
 
+  private static final String GEMSPROXY = "gemsproxy";
+  private static final String GEMSHOST = "gemshost";
+
   public GemLifecycleIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
   }
 
   @Test
   public void uploadGemWithNexusGemCommand() throws Exception {
-    uploadGemWithNexusGemCommand("gemshost");
-    uploadGemWithNexusGemCommand("gemsproxy");
+    uploadGemWithNexusGemCommand(GEMSHOST);
+    uploadGemWithNexusGemCommand(GEMSPROXY);
     uploadGemWithNexusGemCommand("gemshostgroup");
     uploadGemWithNexusGemCommand("gemsproxygroup");
     uploadGemWithNexusGemCommand("gemsgroup");
@@ -82,22 +86,77 @@ public class GemLifecycleIT
     // mismatch filenames on upload
     assertThat(lastLine(gemRunner().nexus(config, winGem)), equalTo("something went wrong"));
 
+    // delete nexus gem
     moreAsserts(repoId, gemName, gemspecName, 
         "api/v1/dependencies/" + nexusGem.getName().replaceFirst("-.*$", ".ruby"));
 
+    // now use the "right" filename on upload
     winGem = testData().resolveFile("win-2-x86-mswin32-60.gem");
     assertThat(lastLine(gemRunner().nexus(config, winGem)), equalTo("Created"));
-
     assertGem(repoId, winGem.getName());
 
-    // just cleanup
-    assertFileRemoval("gemshost", "gems/" + winGem.getName(), is(true));
+    if (repoId.equals(GEMSHOST)) {
+      doTestRebuildRubygemsMetadata();
+    }
+    else if (repoId.equals(GEMSPROXY)) {
+      doTestPurgeBrokenFiles();
+    }
+
+    // just cleanup remaining gems on hosted
+    assertFileRemoval(GEMSHOST, "gems/" + winGem.getName(), is(true));
 
     log("== END {}", repoId);
   }
 
-  private void deleteHostedFiles(String gemName, String gemspecName, String dependencyName) {
-    String repoId = "gemshost";
+  private void doTestPurgeBrokenFiles() throws InterruptedException, IOException {
+    String repoId = GEMSPROXY;
+    File storage = new File(nexus().getWorkDirectory(), "storage/" + repoId);
+
+    File gemspecRz = new File(storage, "quick/Marshal.4.8/w/win-2-x86-mswin32-60.gemspec.rz");
+    FileUtils.write(gemspecRz, "");
+
+    File dependency = new File(storage, "api/v1/dependencies/win.ruby");
+    FileUtils.write(dependency, "hop");
+
+    scheduler().run("PurgeBrokenRubygemsMetadataTask", null);
+    Thread.sleep(200); // give some time to server to at least perform schedule
+    scheduler().waitForAllTasksToStop(); // wait for it
+
+    assertThat("deleted corrupted gemspec.rz file", gemspecRz.exists(), is(false));
+    assertThat("deleted corrupted dependency file", dependency.exists(), is(false));
+  }
+
+  private void doTestRebuildRubygemsMetadata() throws InterruptedException, IOException {
+    String repoId = GEMSHOST;
+    assertFileDownloadSize(repoId, "latest_specs.4.8.gz", equalTo(80l));
+    assertFileDownloadSize(repoId, "specs.4.8.gz", equalTo(80l));
+    assertFileDownloadSize(repoId, "prerelease_specs.4.8.gz", equalTo(24l));
+
+    File storage = new File(nexus().getWorkDirectory(), "storage/" + repoId);
+    assertThat("delete specs.4.8.gz", new File(storage, "specs.4.8.gz").delete());
+    assertThat("delete latest_specs.4.8.gz", new File(storage, "latest_specs.4.8.gz").delete());
+    assertThat("delete prerelease_specs.4.8.gz", new File(storage, "prerelease_specs.4.8.gz").delete());
+
+    File gemspecRz = new File(storage, "quick/Marshal.4.8/w/win-2-x86-mswin32-60.gemspec.rz");
+    long len = gemspecRz.length();
+    FileUtils.write(gemspecRz, "");
+
+    File dependency = new File(storage, "api/v1/dependencies/hulohup.ruby");
+    FileUtils.write(dependency, "hop");
+
+    scheduler().run("RebuildRubygemsMetadataTask", null);
+    Thread.sleep(200); // give some time to server to at least perform schedule
+    scheduler().waitForAllTasksToStop(); // wait for it
+
+    assertFileDownloadSize(repoId, "latest_specs.4.8.gz", equalTo(80l));
+    assertFileDownloadSize(repoId, "specs.4.8.gz", equalTo(80l));
+    assertFileDownloadSize(repoId, "prerelease_specs.4.8.gz", equalTo(24l));
+    assertThat("recreated gemspec.rz", gemspecRz.length(), equalTo(len));
+    assertThat("deleted corrupted dependency file", dependency.exists(), is(false));
+  }
+
+  private void deleteHostedFiles(String gemName, String gemspecName, String dependencyName) throws IOException {
+    String repoId = GEMSHOST;
     // can not delete gemspec files
     assertFileRemoval(repoId, gemspecName, is(false));
 
@@ -116,8 +175,8 @@ public class GemLifecycleIT
     // TODO specs index files
   }
 
-  private void deleteProxiedFiles(String gemName, String gemspecName, String dependencyName) {
-    String repoId = "gemsproxy";
+  private void deleteProxiedFiles(String gemName, String gemspecName, String dependencyName) throws IOException {
+    String repoId = GEMSPROXY;
     gemName = gemName.replace("nexus", "n/nexus");
     gemspecName = gemspecName.replace("nexus", "n/nexus");
 
@@ -143,7 +202,7 @@ public class GemLifecycleIT
     // TODO specs index files
   }
 
-  private void moreAsserts(String repoId, String gemName, String gemspecName, String dependencyName) {
+  private void moreAsserts(String repoId, String gemName, String gemspecName, String dependencyName) throws IOException {
     if (repoId.contains("proxy")) {
       deleteProxiedFiles(gemName, gemspecName, dependencyName);
     }

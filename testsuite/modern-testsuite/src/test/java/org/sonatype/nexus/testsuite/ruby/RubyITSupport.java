@@ -13,10 +13,12 @@
 package org.sonatype.nexus.testsuite.ruby;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.inject.Inject;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
@@ -27,6 +29,7 @@ import org.sonatype.nexus.ruby.GemRunner;
 import org.sonatype.nexus.ruby.client.RubyGroupRepository;
 import org.sonatype.nexus.ruby.client.RubyHostedRepository;
 import org.sonatype.nexus.ruby.client.RubyProxyRepository;
+import org.sonatype.nexus.testsuite.client.Scheduler;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy;
@@ -146,21 +149,22 @@ public abstract class RubyITSupport
     return new BundleRunner(ruby());
   }
 
+  protected File assertFileDownload(String repoId, String name, Matcher<Boolean> matcher) {
+    File download = downloadFile(repoId, name);
+    // from version 2.4.0-03 onwards count empty files as non-existing
+    assertThat(name, download.exists() && download.length() > 0, matcher);
+    return download;
+  }
+
   protected File assertFileDownloadSize(String repoId, String name, Matcher<Long> matcher) {
-    File download = new File(util.createTempDir(), "null");
-    try {
-      content().download(new Location(repoId, name), download);
-    }
-    catch (Exception e) {
-      // just ignore it and let matcher test
-    }
+    File download = downloadFile(repoId, name);
     assertThat("exists " + name, download.exists(), is(true));
     assertThat("size of " + name, download.length(), matcher);
     download.deleteOnExit();
     return download;
   }
 
-  protected File assertFileDownload(String repoId, String name, Matcher<Boolean> matcher) {
+  protected File downloadFile(String repoId, String name) {
     File download = new File(util.createTempDir(), "null");
     try {
       content().download(new Location(repoId, name), download);
@@ -168,21 +172,23 @@ public abstract class RubyITSupport
     catch (Exception e) {
       // just ignore it and let matcher test
     }
-    // from version 2.4.0-03 onwards count empty files as non-existing
-    assertThat(name, download.exists() && download.length() > 0, matcher);
     download.deleteOnExit();
     return download;
   }
 
-  protected void assertFileRemoval(String repoId, String name, Matcher<Boolean> matcher) {
-    try {
-      content().delete(new Location(repoId, name));
-      assertThat(name, true, matcher);
-    }
-    catch (Exception e) {
-      // just ignore it and let matcher test
-      assertThat(name, false, matcher);
-    }
+  protected void assertFileRemoval(String repoId, String name, Matcher<Boolean> matcher) throws IOException {
+      try {
+        content().delete(new Location(repoId, name));
+        assertThat(name, true, matcher);
+      }
+      catch (NexusClientBadRequestException e) {
+        // no allowed
+        assertThat(name, false, matcher);
+      }
+      catch (NexusClientNotFoundException e) {
+        // not found
+        assertThat(name, false, matcher);
+      }
   }
 
   @Override
@@ -228,6 +234,10 @@ public abstract class RubyITSupport
   }
 
   // == Client
+
+  protected Scheduler scheduler() {
+    return client().getSubsystem(Scheduler.class);
+  }
 
   protected Content content() {
     return client().getSubsystem(Content.class);
