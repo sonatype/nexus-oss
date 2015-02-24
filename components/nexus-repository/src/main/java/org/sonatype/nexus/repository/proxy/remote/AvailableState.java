@@ -35,7 +35,9 @@ public class AvailableState
       return super.fetch(uri);
     }
     catch (IOException e) {
-      proxyFacet.setRemoteState(new UnavailableState(proxyFacet, e));
+      if (isRemoteUnavailable(e)) {
+        proxyFacet.setRemoteState(new UnavailableState(proxyFacet, e));
+      }
       throw e;
     }
   }

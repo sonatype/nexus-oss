@@ -43,6 +43,9 @@ public class UnavailableState
     }
     catch (IOException e) {
       exception = e;
+      if (!isRemoteUnavailable(e)) {
+        proxyFacet.setRemoteState(new AvailableState(proxyFacet));
+      }
       throw e;
     }
   }

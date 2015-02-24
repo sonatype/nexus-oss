@@ -35,7 +35,9 @@ public class AutoBlockingAvailableState
       return super.fetch(uri);
     }
     catch (IOException e) {
-      proxyFacet.setRemoteState(new AutoBlockedState(proxyFacet, e));
+      if (isRemoteUnavailable(e)) {
+        proxyFacet.setRemoteState(new AutoBlockedUnavailableState(proxyFacet, e));
+      }
       throw e;
     }
   }

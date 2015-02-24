@@ -31,6 +31,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -72,6 +73,13 @@ public abstract class RemoteStateSupport
       }
     }
     return new FetchResult(status.getStatusCode(), payload);
+  }
+
+  protected boolean isRemoteUnavailable(final Exception e) {
+    if (e instanceof ConnectionPoolTimeoutException) {
+      return false;
+    }
+    return true;
   }
 
   /**

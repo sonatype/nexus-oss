@@ -24,7 +24,7 @@ import org.joda.time.DateTime;
 /**
  * @since 3.0
  */
-public class AutoBlockedState
+public class AutoBlockedUnavailableState
     extends RemoteStateSupport
 {
 
@@ -32,8 +32,8 @@ public class AutoBlockedState
 
   private IOException exception;
 
-  public AutoBlockedState(final ProxyFacetSupport proxyFacet,
-                          final IOException e)
+  public AutoBlockedUnavailableState(final ProxyFacetSupport proxyFacet,
+                                     final IOException e)
   {
     super(proxyFacet);
     this.exception = e;
@@ -50,7 +50,12 @@ public class AutoBlockedState
       }
       catch (IOException e) {
         exception = e;
-        blockedUntil = DateTime.now().plus(increment());
+        if (isRemoteUnavailable(e)) {
+          blockedUntil = DateTime.now().plus(increment());
+        }
+        else {
+          proxyFacet.setRemoteState(new AutoBlockingAvailableState(proxyFacet));
+        }
       }
     }
     throw exception;
@@ -58,7 +63,7 @@ public class AutoBlockedState
 
   @Override
   public String getStatus() {
-    return "Automatically blocked";
+    return "Remote Automatically Blocked and Unavailable";
   }
 
   @Override

@@ -23,11 +23,11 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
-import org.sonatype.nexus.repository.proxy.remote.AutoBlockedState;
+import org.sonatype.nexus.repository.proxy.remote.AutoBlockedUnavailableState;
 import org.sonatype.nexus.repository.proxy.remote.AutoBlockingAvailableState;
-import org.sonatype.nexus.repository.proxy.remote.RemoteState;
 import org.sonatype.nexus.repository.proxy.remote.AvailableState;
 import org.sonatype.nexus.repository.proxy.remote.ManuallyBlockedState;
+import org.sonatype.nexus.repository.proxy.remote.RemoteState;
 import org.sonatype.nexus.repository.proxy.remote.RemoteStatus;
 import org.sonatype.nexus.repository.proxy.remote.UnavailableState;
 import org.sonatype.nexus.repository.proxy.remote.UnknownState;
@@ -191,11 +191,20 @@ public abstract class ProxyFacetSupport
           return result;
         }
         catch (IOException e) {
-          setRemoteState(
-              autoBlock
-                  ? new AutoBlockedState(ProxyFacetSupport.this, e)
-                  : new UnavailableState(ProxyFacetSupport.this, e)
-          );
+          if (isRemoteUnavailable(e)) {
+            setRemoteState(
+                autoBlock
+                    ? new AutoBlockedUnavailableState(ProxyFacetSupport.this, e)
+                    : new UnavailableState(ProxyFacetSupport.this, e)
+            );
+          }
+          else {
+            setRemoteState(
+                autoBlock
+                    ? new AutoBlockingAvailableState(ProxyFacetSupport.this)
+                    : new AvailableState(ProxyFacetSupport.this)
+            );
+          }
           throw e;
         }
       }
