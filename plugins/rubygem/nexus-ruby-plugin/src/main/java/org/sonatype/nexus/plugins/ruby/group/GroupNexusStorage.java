@@ -114,9 +114,7 @@ public class GroupNexusStorage
 
     boolean outdated = true; // outdated is true if there are no local-specs
     if (localItem != null) {
-      // using the timestamp from the file since localSpecsItem.getModified() produces something but
-      // not from .nexus/attributes/* file !!!
-      long modified = ((FileContentLocator) localItem.getContentLocator()).getFile().lastModified();
+      long modified = localItem.getModified();
       outdated = false;
       for (StorageItem item : items) {
         outdated = outdated || (item.getModified() > modified);
