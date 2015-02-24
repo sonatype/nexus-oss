@@ -1618,7 +1618,8 @@ public abstract class AbstractProxyRepository
     }
     // else check age
     else {
-      return ((System.currentTimeMillis() - item.getRemoteChecked()) > (maxAge * 60L * 1000L));
+      // include 0: if isOld check happens in same milli as file was checked, and maxAge is 0 => true
+      return ((System.currentTimeMillis() - item.getRemoteChecked()) >= (maxAge * 60L * 1000L));
     }
   }
 
