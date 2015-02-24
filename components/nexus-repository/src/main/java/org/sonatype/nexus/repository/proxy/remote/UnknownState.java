@@ -27,7 +27,7 @@ public abstract class UnknownState
 
   @Override
   public String getStatus() {
-    return "Unknown";
+    return "Remote Status Unknown";
   }
 
   @Override
