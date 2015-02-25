@@ -17,6 +17,7 @@ import java.io.File;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.testsuite.client.Scheduler;
 import org.sonatype.nexus.testsuite.npm.NpmITSupport;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
 import com.bolyuba.nexus.plugin.npm.client.NpmHostedRepository;
 import com.google.common.base.Charsets;
@@ -46,6 +47,8 @@ public class RebuildNpmMetadataIT
         new File(hostRepositoryStorage, "commonjs/-/commonjs-0.0.1.tgz"), false);
     FileUtils.copyFile(testData().resolveFile("uppercase-0.1.1.tgz"),
         new File(hostRepositoryStorage, "uppercase/-/uppercase-0.1.1.tgz"), false);
+    FileUtils.copyFile(testData().resolveFile("boxeen-0.1.0.tgz"),
+        new File(hostRepositoryStorage, "uppercase/-/uppercase-0.1.0.tgz"), false);
 
     final Scheduler scheduler = client().getSubsystem(Scheduler.class);
     scheduler.run("NpmHostedMetadataRebuildTask", null);
@@ -74,6 +77,20 @@ public class RebuildNpmMetadataIT
       assertThat(packageRootString, containsString("uppercase"));
       assertThat(packageRootString, containsString("0.1.1"));
       assertThat(packageRootString, containsString("x-nx-rebuilt"));
+    }
+
+    // download package root of boxeen (that contains invalid UTF character)
+    {
+      final File packageRootFile = new File(localDirectory, "boxeen.json");
+      content().download(Location.repositoryLocation(testMethodName(), "boxeen"), packageRootFile);
+      assertThat(packageRootFile, exists());
+      final String packageRootString = Files.toString(packageRootFile, Charsets.UTF_8);
+
+      assertThat(packageRootString, containsString("boxeen"));
+      assertThat(packageRootString, containsString("0.1.0"));
+      assertThat(packageRootString, containsString("Sérgio Ramos")); // invalid é
+      assertThat(packageRootString, containsString("x-nx-rebuilt"));
+      assertThat(nexus().getNexusLog(), FileMatchers.contains("contains non-UTF package.json, parsing as ISO-8859-1:"));
     }
   }
 }

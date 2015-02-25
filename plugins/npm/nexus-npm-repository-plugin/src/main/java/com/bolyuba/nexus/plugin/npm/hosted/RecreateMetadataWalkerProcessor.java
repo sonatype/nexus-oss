@@ -200,7 +200,7 @@ public class RecreateMetadataWalkerProcessor
       catch (JsonParseException e) {
         // fallback
         if (e.getMessage().contains("Invalid UTF-8 middle byte")) {
-          log.debug("JSON UTF-8 problem for package {} : {}, attempting with charset ISO-8859-2...",
+          log.debug("Tarball {} contains non-UTF package.json, parsing as ISO-8859-1: {}",
               file.getRepositoryItemUid(), e.getMessage());
           // try again, but assume ISO8859-1 encoding now, that is illegal for JSON
           return objectMapper.readValue(new String(bos.toByteArray(), Charsets.ISO_8859_1),
