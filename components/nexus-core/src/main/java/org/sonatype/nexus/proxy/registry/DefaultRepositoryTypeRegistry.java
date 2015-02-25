@@ -50,14 +50,11 @@ public class DefaultRepositoryTypeRegistry
 
   private final Map<String, ContentClass> contentClasses;
 
-  private ConcurrentMap<String, ContentClass> repoCachedContentClasses;
-
   private Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> repositoryTypeDescriptorsMap;
 
   @Inject
   public DefaultRepositoryTypeRegistry(final Map<String, ContentClass> contentClasses) {
     this.contentClasses = checkNotNull(contentClasses);
-    this.repoCachedContentClasses = Maps.newConcurrentMap();
 
     Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> result = ArrayListMultimap.create();
     // fill in the defaults
@@ -207,16 +204,9 @@ public class DefaultRepositoryTypeRegistry
 
   @Override
   public ContentClass getRepositoryContentClass(Class<? extends Repository> role, String hint) {
-    if (!getRepositoryRoles().contains(role)) {
-      return null;
+    if (getRepositoryRoles().contains(role)) {
+      return contentClasses.get(hint);
     }
-
-    ContentClass result = null;
-    final String cacheKey = role + ":" + hint;
-
-    if (repoCachedContentClasses.containsKey(cacheKey)) {
-      result = repoCachedContentClasses.get(cacheKey);
-    }
-    return result;
+    return null;
   }
 }
