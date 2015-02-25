@@ -13,31 +13,25 @@
 package org.sonatype.nexus.repository.proxy;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
+import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.content.InvalidContentException;
-import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
+import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
+import org.sonatype.nexus.repository.proxy.connection.GetResult;
+import org.sonatype.nexus.repository.proxy.connection.ManuallyBlockedConnection;
+import org.sonatype.nexus.repository.proxy.connection.RemoteConnection;
+import org.sonatype.nexus.repository.proxy.connection.RemoteConnectionStatus;
+import org.sonatype.nexus.repository.proxy.connection.UnknownConnection;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.payloads.BytesPayload;
-import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 
-import com.google.common.io.ByteStreams;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -53,9 +47,13 @@ public abstract class ProxyFacetSupport
 
   private URI remoteUrl;
 
+  private Boolean enabled;
+
+  private Boolean autoBlock;
+
   private int artifactMaxAgeMinutes;
 
-  private HttpClientFacet httpClient;
+  private RemoteConnection remoteConnection;
 
   private boolean remoteUrlChanged;
 
@@ -75,6 +73,9 @@ public abstract class ProxyFacetSupport
     this.remoteUrl = newRemoteURI;
     log.debug("Remote URL: {}", remoteUrl);
 
+    this.enabled = attributes.get("enabled", Boolean.class, true);
+    this.autoBlock = attributes.get("autoBlock", Boolean.class, true);
+
     artifactMaxAgeMinutes = attributes.require("artifactMaxAge", Integer.class);
     log.debug("Artifact max age: {}", artifactMaxAgeMinutes);
   }
@@ -82,7 +83,15 @@ public abstract class ProxyFacetSupport
 
   @Override
   protected void doStart() throws Exception {
-    httpClient = getRepository().facet(HttpClientFacet.class);
+    if (!enabled) {
+      remoteConnection = new ManuallyBlockedConnection();
+    }
+    else {
+      remoteConnection = new UnknownConnection(this, autoBlock);
+    }
+    log.debug("Remote connection status set to '{}'", remoteConnection.getStatus().getDescription());
+    // TODO start periodic status check thread
+
     if (remoteUrlChanged) {
       remoteUrlChanged = false;
       try {
@@ -96,7 +105,7 @@ public abstract class ProxyFacetSupport
 
   @Override
   protected void doStop() throws Exception {
-    httpClient = null;
+    // TODO stop periodic status check thread
   }
 
   @Override
@@ -112,22 +121,44 @@ public abstract class ProxyFacetSupport
 
     if (content == null || isStale(context)) {
       try {
-        final Payload remote = fetch(context);
-        if (remote != null) {
+        final GetResult result = remoteConnection.get(remoteUrl.resolve(getUrl(context)));
+        if (result.getPayload() != null) {
 
           // TODO: Introduce content validation.. perhaps content's type not matching path's implied type.
 
-          store(context, remote);
+          store(context, result.getPayload());
 
-          content = remote;
+          content = result.getPayload();
+        }
+        else if (result.getStatus() == HttpStatus.NOT_MODIFIED) {
+          indicateUpToDate(context);
         }
       }
       catch (IOException e) {
-        log.warn("Failed to fetch: {}", getUrl(context), e);
+        log.warn("Failed to get: {}", getUrl(context), e);
         throw e;
       }
     }
     return content;
+  }
+
+  @Override
+  public RemoteConnectionStatus getRemoteConnectionStatus() {
+    return remoteConnection.getStatus();
+  }
+
+  public void setRemoteConnection(final RemoteConnection remoteConnection) {
+    checkNotNull(remoteConnection);
+    log.debug(
+        "Remote connection status changed from '{}' to '{}'",
+        this.remoteConnection.getStatus().getDescription(), remoteConnection.getStatus().getDescription()
+    );
+    this.remoteConnection = remoteConnection;
+    // TODO reset periodic status check thread
+  }
+
+  public Repository getRepository() {
+    return super.getRepository();
   }
 
   /**
@@ -141,39 +172,6 @@ public abstract class ProxyFacetSupport
    */
   protected abstract void store(final Context context, final Payload payload)
       throws IOException, InvalidContentException;
-
-  @Nullable
-  protected Payload fetch(final Context context) throws IOException {
-    HttpClient client = httpClient.getHttpClient();
-
-    HttpGet request = new HttpGet(remoteUrl.resolve(getUrl(context)));
-    log.debug("Fetching: {}", request);
-
-    HttpResponse response = client.execute(request);
-    log.debug("Response: {}", response);
-
-    StatusLine status = response.getStatusLine();
-    log.debug("Status: {}", status);
-
-    Payload payload = null;
-    if (status.getStatusCode() == HttpStatus.SC_OK) {
-      HttpEntity entity = response.getEntity();
-      try {
-        log.debug("Entity: {}", entity);
-        final HttpEntityPayload httpEntityPayload = new HttpEntityPayload(response, entity);
-
-        payload = readFully(httpEntityPayload);
-      }
-      finally {
-        EntityUtils.consume(entity);
-      }
-    }
-    else if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
-      indicateUpToDate(context);
-    }
-
-    return payload;
-  }
 
   /**
    * For whatever component/asset is implied by the Context, return the date it was last deemed up to date, or {@code
@@ -191,15 +189,6 @@ public abstract class ProxyFacetSupport
    */
   protected abstract String getUrl(final @Nonnull Context context);
 
-  /**
-   * Read an incoming Payload into memory.
-   */
-  private Payload readFully(final Payload payload) throws IOException {
-    try (InputStream stream = payload.openInputStream()) {
-      return new BytesPayload(ByteStreams.toByteArray(stream), payload.getContentType());
-    }
-  }
-
   private boolean isStale(final Context context) throws IOException {
     if (artifactMaxAgeMinutes < 0) {
       log.trace("Artifact max age checking disabled.");
@@ -216,4 +205,5 @@ public abstract class ProxyFacetSupport
     final DateTime earliestFreshDate = new DateTime().minusMinutes(artifactMaxAgeMinutes);
     return lastUpdated.isBefore(earliestFreshDate);
   }
+
 }

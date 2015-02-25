@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.proxy;
 import java.io.IOException;
 
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.proxy.connection.RemoteConnectionStatus;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 
@@ -26,4 +27,6 @@ public interface ProxyFacet
     extends Facet
 {
   Payload get(Context context) throws IOException;
+
+  RemoteConnectionStatus getRemoteConnectionStatus();
 }
