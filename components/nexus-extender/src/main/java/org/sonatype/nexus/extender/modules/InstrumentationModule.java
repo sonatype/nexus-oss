@@ -24,8 +24,6 @@ import com.codahale.metrics.health.HealthCheckRegistry;
 public class InstrumentationModule
     extends com.palominolabs.metrics.guice.InstrumentationModule
 {
-  private static final HealthCheckRegistry sharedHealthCheckRegistry = new HealthCheckRegistry();
-
   @Override
   protected MetricRegistry createMetricRegistry() {
     return SharedMetricRegistries.getOrCreate("nexus");
@@ -33,6 +31,6 @@ public class InstrumentationModule
 
   @Override
   protected HealthCheckRegistry createHealthCheckRegistry() {
-    return sharedHealthCheckRegistry;
+    return MetricsRegistryModule.HEALTH_CHECK_REGISTRY;
   }
 }

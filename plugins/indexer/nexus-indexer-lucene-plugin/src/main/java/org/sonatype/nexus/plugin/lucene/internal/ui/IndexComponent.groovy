@@ -12,14 +12,12 @@
  */
 package org.sonatype.nexus.plugin.lucene.internal.ui
 
-import org.sonatype.nexus.scheduling.TaskScheduler
-import org.sonatype.nexus.scheduling.TaskConfiguration
-
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
+import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.index.tasks.RepairIndexTask
@@ -27,7 +25,8 @@ import org.sonatype.nexus.index.tasks.UpdateIndexTask
 import org.sonatype.nexus.proxy.maven.MavenRepository
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.repository.Repository
-import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.scheduling.TaskConfiguration
+import org.sonatype.nexus.scheduling.TaskScheduler
 
 import javax.inject.Inject
 import javax.inject.Named

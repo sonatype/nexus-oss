@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.proxy.maven.packaging;
 
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
@@ -27,7 +27,7 @@ public class DefaultArtifactPackagingMapperTest
     extends TestSupport
 {
   @Mock
-  private NexusConfiguration nexusConfiguration;
+  private ApplicationConfiguration nexusConfiguration;
   
   @Before
   public void prepare() {

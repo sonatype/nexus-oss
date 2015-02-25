@@ -28,12 +28,12 @@ import org.sonatype.nexus.capability.CapabilityRegistry
 import org.sonatype.nexus.capability.Tag
 import org.sonatype.nexus.capability.Taggable
 import org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder
+import org.sonatype.nexus.common.validation.Create
+import org.sonatype.nexus.common.validation.Update
+import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable
-import org.sonatype.nexus.validation.Create
-import org.sonatype.nexus.validation.Update
-import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject
 import javax.inject.Named

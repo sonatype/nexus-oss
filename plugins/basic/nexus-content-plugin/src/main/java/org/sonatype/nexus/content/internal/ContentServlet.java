@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.common.property.SystemPropertiesHelper;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -51,9 +50,10 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.web.BaseUrlHolder;
-import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.web.ErrorStatusException;
+import org.sonatype.nexus.web.FailureLoggingHttpMethodPermissionFilter;
 import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.sisu.goodies.common.Throwables2;
@@ -130,7 +130,7 @@ public class ContentServlet
 
   private final Logger logger = LoggerFactory.getLogger(ContentServlet.class);
 
-  private final NexusConfiguration nexusConfiguration;
+  private final SecuritySystem securitySystem;
 
   private final RepositoryRouter repositoryRouter;
 
@@ -139,12 +139,12 @@ public class ContentServlet
   private final WebUtils webUtils;
 
   @Inject
-  public ContentServlet(final NexusConfiguration nexusConfiguration,
+  public ContentServlet(final SecuritySystem securitySystem,
                         final RepositoryRouter repositoryRouter,
                         final ContentRenderer contentRenderer,
                         final WebUtils webUtils)
   {
-    this.nexusConfiguration = checkNotNull(nexusConfiguration);
+    this.securitySystem = checkNotNull(securitySystem);
     this.repositoryRouter = checkNotNull(repositoryRouter);
     this.contentRenderer = checkNotNull(contentRenderer);
     this.webUtils = checkNotNull(webUtils);
@@ -172,7 +172,7 @@ public class ContentServlet
     // honor the localOnly, remoteOnly and asExpired (but remoteOnly and asExpired only for non-anon users)
     // as those two actually makes Nexus perform a remote request
     result.setRequestLocalOnly(isLocal(request, resourceStorePath));
-    if (!Objects.equals(nexusConfiguration.getAnonymousUsername(),
+    if (!Objects.equals(securitySystem.getAnonymousUsername(),
         result.getRequestContext().get(AccessManager.REQUEST_USER))) {
       result.setRequestRemoteOnly(REQ_QP_FORCE_REMOTE_VALUE.equals(request.getParameter(REQ_QP_FORCE_PARAMETER)));
       result.setRequestAsExpired(REQ_QP_FORCE_EXPIRED_VALUE.equals(request.getParameter(REQ_QP_FORCE_PARAMETER)));
@@ -287,7 +287,7 @@ public class ContentServlet
       responseCode = SC_NOT_FOUND;
     }
     else if (exception instanceof AccessDeniedException) {
-      request.setAttribute(Constants.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE);
+      request.setAttribute(FailureLoggingHttpMethodPermissionFilter.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE);
       // Note: we must ensure response is not committed, hence, no error page is rendered
       // this attribute above will cause filter to either 403 if
       // current user is non anonymous, or 401 and challenge if user is anonymous

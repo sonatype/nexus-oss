@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus
 
-import org.sonatype.security.configuration.model.SecurityConfiguration
-import org.sonatype.security.model.CUser
-import org.sonatype.security.model.CUserRoleMapping
-import org.sonatype.security.model.Configuration
+import org.sonatype.nexus.security.config.CUser
+import org.sonatype.nexus.security.config.CUserRoleMapping
+import org.sonatype.nexus.security.config.MemorySecurityConfiguration
+import org.sonatype.nexus.security.settings.SecuritySettings
 
 /**
  * @since 3.0
@@ -23,8 +23,8 @@ import org.sonatype.security.model.Configuration
 class NexusAppTestSupportSecurity
 {
 
-  static SecurityConfiguration security() {
-    return new SecurityConfiguration(
+  static SecuritySettings security() {
+    return new SecuritySettings(
         anonymousAccessEnabled: false,
         anonymousUsername: 'anonymous',
         realms: [
@@ -34,8 +34,8 @@ class NexusAppTestSupportSecurity
     )
   }
 
-  static Configuration securityModel() {
-    return new Configuration(
+  static MemorySecurityConfiguration securityModel() {
+    return new MemorySecurityConfiguration(
         users: [
             new CUser(
                 id: 'admin',

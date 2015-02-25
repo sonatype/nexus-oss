@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.security.SecurityFacetSupport;
-import org.sonatype.nexus.repository.security.SecurityHelper;
+import org.sonatype.nexus.security.SecurityHelper;
 
 /**
  * Simple security facet.
@@ -30,7 +30,7 @@ public class SimpleSecurityFacet
 {
   @Inject
   public SimpleSecurityFacet(final SecurityHelper securityHelper,
-                             final SimpleFormatSecurityResource securityResource)
+                             final SimpleFormatSecurityConfigurationResource securityResource)
   {
     super(securityHelper, securityResource);
   }

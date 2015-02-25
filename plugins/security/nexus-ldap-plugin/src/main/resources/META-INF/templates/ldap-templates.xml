@@ -16,7 +16,6 @@
 
   <template>
     <name>Active Directory</name>
-
     <userAndGroupConfig>
       <userIdAttribute>sAMAccountName</userIdAttribute>
       <userMemberOfAttribute>memberOf</userMemberOfAttribute>
@@ -26,12 +25,10 @@
       <emailAddressAttribute>mail</emailAddressAttribute>
       <ldapGroupsAsRoles>true</ldapGroupsAsRoles>
     </userAndGroupConfig>
-
   </template>
 
   <template>
     <name>Posix with Static Groups</name>
-
     <userAndGroupConfig>
       <userIdAttribute>uid</userIdAttribute>
       <userObjectClass>posixAccount</userObjectClass>
@@ -45,43 +42,33 @@
       <groupMemberAttribute>memberUid</groupMemberAttribute>
       <groupMemberFormat>${username}</groupMemberFormat>
       <groupObjectClass>posixGroup</groupObjectClass>
-
     </userAndGroupConfig>
-
   </template>
 
   <template>
     <name>Posix with Dynamic Groups</name>
-
     <userAndGroupConfig>
       <userIdAttribute>uid</userIdAttribute>
       <userObjectClass>posixAccount</userObjectClass>
       <userBaseDn>ou=people</userBaseDn>
       <userRealNameAttribute>cn</userRealNameAttribute>
       <emailAddressAttribute>mail</emailAddressAttribute>
-
       <ldapGroupsAsRoles>true</ldapGroupsAsRoles>
       <userMemberOfAttribute>memberOf</userMemberOfAttribute>
-
     </userAndGroupConfig>
-
   </template>
-
 
   <template>
     <name>Generic Ldap Server</name>
-
     <userAndGroupConfig>
       <userIdAttribute>uid</userIdAttribute>
       <userObjectClass>inetOrgPerson</userObjectClass>
       <userRealNameAttribute>cn</userRealNameAttribute>
       <userPasswordAttribute>userPassword</userPasswordAttribute>
       <emailAddressAttribute>mail</emailAddressAttribute>
-
       <ldapGroupsAsRoles>true</ldapGroupsAsRoles>
       <userMemberOfAttribute>memberOf</userMemberOfAttribute>
     </userAndGroupConfig>
-
   </template>
 
 </templates>

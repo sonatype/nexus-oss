@@ -14,8 +14,8 @@ package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.validation.Create
-import org.sonatype.nexus.validation.Update
+import org.sonatype.nexus.common.validation.Create
+import org.sonatype.nexus.common.validation.Update
 
 /**
  * Task exchange object.

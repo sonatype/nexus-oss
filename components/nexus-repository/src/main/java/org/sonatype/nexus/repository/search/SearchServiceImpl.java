@@ -30,8 +30,8 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.security.BreadActions;
 import org.sonatype.nexus.repository.security.RepositoryViewPermission;
-import org.sonatype.nexus.repository.security.SecurityHelper;
 import org.sonatype.nexus.repository.view.ViewFacet;
+import org.sonatype.nexus.security.SecurityHelper;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;

@@ -14,7 +14,7 @@ package org.sonatype.nexus.threads;
 
 import java.util.Map;
 
-import org.sonatype.security.UserIdMdcHelper;
+import org.sonatype.nexus.security.UserIdMdcHelper;
 
 import com.google.common.collect.Maps;
 import org.slf4j.MDC;
@@ -22,7 +22,6 @@ import org.slf4j.MDC;
 /**
  * Simple helper class to manipulate MDC.
  *
- * @author cstamas
  * @since 2.6
  */
 public class MDCUtils

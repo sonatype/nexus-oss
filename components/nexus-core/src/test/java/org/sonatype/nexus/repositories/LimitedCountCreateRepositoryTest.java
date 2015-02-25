@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.repositories;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.NexusAppTestSupport;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;

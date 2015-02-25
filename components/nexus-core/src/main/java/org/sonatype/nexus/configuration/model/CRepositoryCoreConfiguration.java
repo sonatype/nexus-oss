@@ -12,18 +12,18 @@
  */
 package org.sonatype.nexus.configuration.model;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.configuration.validation.ValidationMessage;
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class CRepositoryCoreConfiguration
     extends AbstractCoreConfiguration<CRepository>
@@ -47,16 +47,16 @@ public class CRepositoryCoreConfiguration
 
   @Override
   protected void copyTransients(CRepository source, CRepository destination) {
-    ((CRepository) destination).setExternalConfiguration(((CRepository) source).getExternalConfiguration());
+    destination.setExternalConfiguration(source.getExternalConfiguration());
 
-    ((CRepository) destination).externalConfigurationImple = ((CRepository) source).externalConfigurationImple;
+    destination.externalConfigurationImple = source.externalConfigurationImple;
 
-    ((CRepository) destination).defaultLocalStorageUrl = ((CRepository) source).defaultLocalStorageUrl;
+    destination.defaultLocalStorageUrl = source.defaultLocalStorageUrl;
 
     // trick with RemoteStorage, which is an object, and XStream will not "overlap" it properly (ie. destionation !=
     // null but source == null)
-    if (((CRepository) source).getRemoteStorage() == null) {
-      ((CRepository) destination).setRemoteStorage(null);
+    if (source.getRemoteStorage() == null) {
+      destination.setRemoteStorage(null);
     }
   }
 
@@ -86,7 +86,7 @@ public class CRepositoryCoreConfiguration
           .createExternalConfigurationHolder(repositoryModel);
     }
 
-    return new DefaultExternalConfiguration<AbstractXpp3DomExternalConfigurationHolder>(getApplicationConfiguration(),
+    return new DefaultExternalConfiguration<>(getApplicationConfiguration(),
         this, (AbstractXpp3DomExternalConfigurationHolder) repositoryModel.externalConfigurationImple);
   }
 
@@ -102,7 +102,7 @@ public class CRepositoryCoreConfiguration
   }
 
   @Override
-  public void validateChanges() throws ConfigurationException {
+  public void validateChanges() {
     super.validateChanges();
     if (getExternalConfiguration() != null) {
       getExternalConfiguration().validateChanges();
@@ -110,7 +110,7 @@ public class CRepositoryCoreConfiguration
   }
 
   @Override
-  public void commitChanges() throws ConfigurationException {
+  public void commitChanges() {
     super.commitChanges();
     if (getExternalConfiguration() != null) {
       getExternalConfiguration().commitChanges();
@@ -129,27 +129,27 @@ public class CRepositoryCoreConfiguration
 
   @Override
   public ValidationResponse doValidateChanges(CRepository changedConfiguration) {
-    CRepository cfg = (CRepository) changedConfiguration;
+    CRepository cfg = changedConfiguration;
 
     ValidationResponse response = new ApplicationValidationResponse();
 
     // ID
     if (StringUtils.isBlank(cfg.getId())) {
-      response.addValidationError(new ValidationMessage("id", "Repository ID must not be blank!"));
+      response.addError(new ValidationMessage("id", "Repository ID must not be blank!"));
     }
     else if (!cfg.getId().matches(REPOSITORY_ID_PATTERN)) {
-      response.addValidationError(new ValidationMessage("id",
+      response.addError(new ValidationMessage("id",
           "Only letters, digits, underscores, hyphens, and dots are allowed in Repository ID"));
     }
 
     // ID not 'all'
     if ("all".equals(cfg.getId())) {
-      response.addValidationError(new ValidationMessage("id", "Repository ID can't be 'all', reserved word"));
+      response.addError(new ValidationMessage("id", "Repository ID can't be 'all', reserved word"));
     }
 
     // Name
     if (StringUtils.isBlank(cfg.getName())) {
-      response.addValidationWarning(new ValidationMessage("id", "Repository with ID='" + cfg.getId()
+      response.addWarning(new ValidationMessage("id", "Repository with ID='" + cfg.getId()
           + "' has no name, defaulted it's name to it's ID."));
 
       cfg.setName(cfg.getId());
@@ -162,14 +162,14 @@ public class CRepositoryCoreConfiguration
       LocalStatus.valueOf(cfg.getLocalStatus());
     }
     catch (Exception e) {
-      response.addValidationError(new ValidationMessage("localStatus", "LocalStatus of repository with ID=\""
+      response.addError(new ValidationMessage("localStatus", "LocalStatus of repository with ID=\""
           + cfg.getId() + "\" has unacceptable value \"" + cfg.getLocalStatus() + "\"! (Allowed values are: \""
           + LocalStatus.IN_SERVICE + "\" and \"" + LocalStatus.OUT_OF_SERVICE + "\")", e));
     }
 
     // indexable
     if (cfg.isIndexable() && (!"maven2".equals(cfg.getProviderHint()))) {
-      response.addValidationWarning(new ValidationMessage("indexable", "Indexing isn't supported for \""
+      response.addWarning(new ValidationMessage("indexable", "Indexing isn't supported for \""
           + cfg.getProviderHint() + "\" repositories, only Maven2 repositories are indexable!"));
 
       cfg.setIndexable(false);

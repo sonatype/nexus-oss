@@ -28,17 +28,10 @@ public class LimitedInputStream
 
   private long readAlready = 0;
 
-  public LimitedInputStream(InputStream is, long from, long count)
-      throws IOException
-  {
-    super();
-
+  public LimitedInputStream(InputStream is, long from, long count) throws IOException {
     this.is = is;
-
     this.from = from;
-
     this.count = count;
-
     is.skip(from);
   }
 
@@ -55,9 +48,7 @@ public class LimitedInputStream
   }
 
   @Override
-  public int read()
-      throws IOException
-  {
+  public int read() throws IOException {
     if (readAlready > count) {
       return -1;
     }
@@ -67,15 +58,11 @@ public class LimitedInputStream
     return is.read();
   }
 
-  public int available()
-      throws IOException
-  {
+  public int available() throws IOException {
     return is.available();
   }
 
-  public void close()
-      throws IOException
-  {
+  public void close() throws IOException {
     is.close();
   }
 
@@ -83,14 +70,11 @@ public class LimitedInputStream
     is.mark(readlimit);
   }
 
-  public synchronized void reset()
-      throws IOException
-  {
+  public synchronized void reset() throws IOException {
     is.reset();
   }
 
   public boolean markSupported() {
     return is.markSupported();
   }
-
 }

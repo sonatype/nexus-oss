@@ -14,14 +14,14 @@ package org.sonatype.nexus.rapture.internal;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.guice.FilterChainModule;
+import org.sonatype.nexus.security.FilterChainModule;
 import org.sonatype.nexus.web.CookieFilter;
 import org.sonatype.nexus.web.SecurityFilter;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
 
-import static org.sonatype.nexus.security.filter.FilterProviderSupport.filterKey;
+import static org.sonatype.nexus.security.FilterProviderSupport.filterKey;
 
 /**
  * Rapture Guice module.

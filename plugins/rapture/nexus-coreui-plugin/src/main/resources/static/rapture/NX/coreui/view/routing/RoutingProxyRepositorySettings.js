@@ -90,8 +90,6 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
         hidden: true,
         ui: 'nx-subsection',
 
-        margin: 10,
-
         items: [
           {
             xtype: 'displayfield',
@@ -126,8 +124,6 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
         title: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_DISCOVERY_SECTION'),
         hidden: true,
         ui: 'nx-subsection',
-
-        margin: 10,
 
         items: [
           {

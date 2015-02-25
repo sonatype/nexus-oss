@@ -14,8 +14,6 @@ package org.sonatype.nexus.configuration;
 
 import java.util.Date;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-
 /**
  * The abstract event that is occured when configuration related change had occured.
  *

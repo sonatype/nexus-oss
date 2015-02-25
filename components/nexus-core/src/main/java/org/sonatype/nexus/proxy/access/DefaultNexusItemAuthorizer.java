@@ -27,7 +27,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.targets.TargetMatch;
 import org.sonatype.nexus.proxy.targets.TargetSet;
-import org.sonatype.security.SecuritySystem;
+import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.shiro.subject.Subject;

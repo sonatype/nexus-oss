@@ -22,26 +22,24 @@ import org.apache.shiro.authz.annotation.RequiresUser
 import org.apache.shiro.subject.Subject
 import org.eclipse.sisu.inject.BeanLocator
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.configuration.validation.InvalidConfigurationException
-import org.sonatype.configuration.validation.ValidationMessage
-import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.micromailer.Address
+import org.sonatype.nexus.common.text.Strings2
+import org.sonatype.nexus.common.validation.Create
+import org.sonatype.nexus.common.validation.Update
+import org.sonatype.nexus.common.validation.Validate
+import org.sonatype.nexus.common.validation.ValidationMessage
+import org.sonatype.nexus.common.validation.ValidationResponse
+import org.sonatype.nexus.common.validation.ValidationResponseException
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
-import org.sonatype.nexus.security.UserAccountManager
-import org.sonatype.nexus.util.Tokens
-import org.sonatype.nexus.validation.Create
-import org.sonatype.nexus.validation.Update
-import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.security.SecuritySystem
+import org.sonatype.nexus.security.role.RoleIdentifier
+import org.sonatype.nexus.security.user.User
+import org.sonatype.nexus.security.user.UserManager
+import org.sonatype.nexus.security.user.UserSearchCriteria
 import org.sonatype.nexus.wonderland.AuthTicketService
-import org.sonatype.security.SecuritySystem
-import org.sonatype.security.usermanagement.RoleIdentifier
-import org.sonatype.security.usermanagement.User
-import org.sonatype.security.usermanagement.UserManager
-import org.sonatype.security.usermanagement.UserManagerImpl
-import org.sonatype.security.usermanagement.UserSearchCriteria
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -63,13 +61,10 @@ class UserComponent
 extends DirectComponentSupport
 {
 
-  public static final String DEFAULT_SOURCE = UserManagerImpl.SOURCE
+  public static final String DEFAULT_SOURCE = UserManager.DEFAULT_SOURCE
 
   @Inject
   SecuritySystem securitySystem
-
-  @Inject
-  UserAccountManager userAccountManager
 
   @Inject
   AuthTicketService authTickets
@@ -115,9 +110,9 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresUser
+  @RequiresPermissions('security:users')
   UserAccountXO readAccount() {
-    String currentUserId = securitySystem.getSubject().getPrincipal().toString()
-    User user = userAccountManager.readAccount(currentUserId)
+    User user = securitySystem.currentUser()
     return new UserAccountXO(
         userId: user.userId,
         firstName: user.firstName,
@@ -210,15 +205,16 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresUser
   @RequiresAuthentication
+  @RequiresPermissions('security:users')
   @Validate
   UserAccountXO updateAccount(final @NotNull(message = '[userAccountXO] may not be null') @Valid UserAccountXO userAccountXO) {
-    String currentUserId = securitySystem.getSubject().getPrincipal().toString()
-    userAccountManager.updateAccount(userAccountManager.readAccount(currentUserId).with {
+    User user = securitySystem.currentUser().with {
       firstName = userAccountXO.firstName
       lastName = userAccountXO.lastName
       emailAddress = userAccountXO.email
       return it
-    })
+    }
+    securitySystem.updateUser(user)
     return readAccount()
   }
 
@@ -241,7 +237,7 @@ extends DirectComponentSupport
       if (isAnonymousUser(userId)) {
         throw new Exception("Password cannot be changed for user ${userId}, since is marked as the Anonymous user")
       }
-      securitySystem.changePassword(userId, Tokens.decodeBase64String(password))
+      securitySystem.changePassword(userId, Strings2.decodeBase64(password))
     }
     else {
       throw new IllegalAccessException('Invalid authentication ticket')
@@ -265,6 +261,8 @@ extends DirectComponentSupport
       if (isAnonymousUser(userId)) {
         throw new Exception("Password cannot be reset for user ${userId}, since is marked as the Anonymous user")
       }
+
+      // FIXME: This api has been removed, should sort out why this extdirect endpoint still exists
       securitySystem.resetPassword(userId)
     }
     else {
@@ -342,8 +340,8 @@ extends DirectComponentSupport
         if (e.cause?.message) {
           message += ': ' + e.cause.message
         }
-        validations.addValidationError(new ValidationMessage('email', message))
-        throw new InvalidConfigurationException(validations)
+        validations.addError(new ValidationMessage('email', message))
+        throw new ValidationResponseException(validations)
       }
     }
     return email

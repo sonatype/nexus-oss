@@ -23,8 +23,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.UserIdMdcHelper;
+import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.UserIdMdcHelper;
 
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.mgt.WebSecurityManager;

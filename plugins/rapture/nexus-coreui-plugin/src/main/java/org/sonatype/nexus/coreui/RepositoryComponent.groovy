@@ -12,24 +12,24 @@
  */
 package org.sonatype.nexus.coreui
 
-import groovy.transform.PackageScope
-import org.sonatype.nexus.scheduling.TaskScheduler
-import org.sonatype.nexus.scheduling.TaskConfiguration
-
 import com.google.common.base.Predicate
 import com.google.common.base.Predicates
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod
+import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.codehaus.plexus.util.StringUtils
 import org.codehaus.plexus.util.xml.Xpp3Dom
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.configuration.validation.InvalidConfigurationException
-import org.sonatype.configuration.validation.ValidationMessage
-import org.sonatype.configuration.validation.ValidationResponse
-import org.sonatype.nexus.configuration.application.NexusConfiguration
+import org.sonatype.nexus.common.validation.Create
+import org.sonatype.nexus.common.validation.Update
+import org.sonatype.nexus.common.validation.Validate
+import org.sonatype.nexus.common.validation.ValidationMessage
+import org.sonatype.nexus.common.validation.ValidationResponse
+import org.sonatype.nexus.common.validation.ValidationResponseException
+import org.sonatype.nexus.configuration.ApplicationConfiguration
 import org.sonatype.nexus.configuration.model.CLocalStorage
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings
@@ -66,14 +66,13 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory
 import org.sonatype.nexus.rapture.TrustStoreKeys
+import org.sonatype.nexus.scheduling.TaskConfiguration
+import org.sonatype.nexus.scheduling.TaskScheduler
 import org.sonatype.nexus.tasks.ExpireCacheTask
 import org.sonatype.nexus.templates.TemplateManager
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
 import org.sonatype.nexus.templates.repository.RepositoryTemplate
 import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemplate
-import org.sonatype.nexus.validation.Create
-import org.sonatype.nexus.validation.Update
-import org.sonatype.nexus.validation.Validate
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -116,7 +115,7 @@ extends DirectComponentSupport
   TemplateManager templateManager
 
   @Inject
-  NexusConfiguration nexusConfiguration
+  ApplicationConfiguration nexusConfiguration
 
   @Inject
   DefaultRepositoryTemplateProvider repositoryTemplateProvider
@@ -579,8 +578,8 @@ extends DirectComponentSupport
     }
     catch (RemoteStorageException e) {
       def validations = new ValidationResponse()
-      validations.addValidationError(new ValidationMessage("remoteStorageUrl", e.getMessage()))
-      throw new InvalidConfigurationException(validations);
+      validations.addError(new ValidationMessage("remoteStorageUrl", e.getMessage()))
+      throw new ValidationResponseException(validations);
     }
     repo.autoBlockActive = repositoryXO.autoBlockActive
     repo.fileTypeValidation = repositoryXO.fileTypeValidation

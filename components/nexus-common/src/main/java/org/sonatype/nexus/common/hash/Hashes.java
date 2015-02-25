@@ -14,16 +14,20 @@ package org.sonatype.nexus.common.hash;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 
+import com.google.common.hash.Funnels;
 import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hasher;
 import com.google.common.hash.HashingInputStream;
 import com.google.common.io.ByteStreams;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Helper for computing {@link HashCode}es from {@link InputStream}s.
+ * {@link HashCode} helpers.
  *
  * @since 3.0
  */
@@ -36,7 +40,7 @@ public final class Hashes
   /**
    * Computes the hash of the given stream using the given algorithm.
    */
-  public static HashCode hash(HashAlgorithm algorithm, InputStream inputStream) throws IOException {
+  public static HashCode hash(final HashAlgorithm algorithm, final InputStream inputStream) throws IOException {
     checkNotNull(algorithm);
     checkNotNull(inputStream);
 
@@ -49,8 +53,10 @@ public final class Hashes
   /**
    * Computes the hash of the given stream using multiple algorithms in one pass.
    */
-  public static Map<HashAlgorithm, HashCode> hash(Iterable<HashAlgorithm> algorithms, InputStream inputStream)
-      throws IOException {
+  public static Map<HashAlgorithm, HashCode> hash(final Iterable<HashAlgorithm> algorithms,
+                                                  final InputStream inputStream)
+      throws IOException
+  {
     checkNotNull(algorithms);
     checkNotNull(inputStream);
 
@@ -58,5 +64,15 @@ public final class Hashes
       ByteStreams.copy(hashingStream, ByteStreams.nullOutputStream());
       return hashingStream.hashes();
     }
+  }
+
+  /**
+   * Computes the hash of the given stream using the given function.
+   */
+  public static HashCode hash(final HashFunction function, final InputStream input) throws IOException {
+    Hasher hasher = function.newHasher();
+    OutputStream output = Funnels.asOutputStream(hasher);
+    ByteStreams.copy(input, output);
+    return hasher.hash();
   }
 }

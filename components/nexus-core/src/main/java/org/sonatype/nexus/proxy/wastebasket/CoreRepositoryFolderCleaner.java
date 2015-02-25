@@ -25,11 +25,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class CoreRepositoryFolderCleaner
     extends AbstractRepositoryFolderCleaner
 {
-  public void cleanRepositoryFolders(final Repository repository, boolean deleteForever)
-      throws IOException
-  {
-    File defaultStorageFolder =
-        new File(new File(getApplicationConfiguration().getWorkingDirectory(), "storage"), repository.getId());
+  public void cleanRepositoryFolders(final Repository repository, boolean deleteForever) throws IOException {
+    File defaultStorageFolder = new File(getApplicationDirectories().getWorkDirectory("storage"), repository.getId());
 
     String defaultStorageURI = defaultStorageFolder.toURI().toURL().toString();
     defaultStorageURI = defaultStorageURI.endsWith("/") ? defaultStorageURI : defaultStorageURI + "/";

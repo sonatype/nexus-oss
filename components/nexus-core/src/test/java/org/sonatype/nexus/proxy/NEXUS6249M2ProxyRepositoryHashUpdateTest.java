@@ -31,18 +31,18 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.util.DigesterUtils;
 import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Server;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
+import com.google.common.hash.Hashing;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.After;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 
 /**
  * UT for NEXUS-6249: The remote hashes should get updated when remote content is re-cached.
@@ -70,14 +70,17 @@ public class NEXUS6249M2ProxyRepositoryHashUpdateTest
     {
       System.out.println(request.getMethod() + " " + request.getRequestURI());
       // see if client wants content or .sha1?
-      String content = request.getPathInfo().endsWith(".sha1") ? DigesterUtils
-          .getSha1Digest(this.content) : this.content;
+      String content = request.getPathInfo().endsWith(".sha1") ? sha1(this.content) : this.content;
       response.addDateHeader("Last-Modified", System.currentTimeMillis()); // just say now always to make Nx pull it
       response.setContentType("text/plain");
       final byte[] payload = content.getBytes(Charsets.UTF_8);
       response.setContentLength(payload.length);
       response.getOutputStream().write(payload);
       return false;
+    }
+
+    private String sha1(final String value) {
+      return Hashing.sha1().hashString(value, Charsets.UTF_8).toString();
     }
 
     public String getContent() {

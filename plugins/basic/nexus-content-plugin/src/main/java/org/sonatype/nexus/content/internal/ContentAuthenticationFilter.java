@@ -21,8 +21,8 @@ import javax.servlet.ServletResponse;
 
 import org.sonatype.nexus.content.ContentRestrictedToken;
 import org.sonatype.nexus.content.ContentRestrictionConstituent;
-import org.sonatype.nexus.security.filter.authc.AuthenticationTokenFactory;
-import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
+import org.sonatype.nexus.security.authc.AuthenticationTokenFactory;
+import org.sonatype.nexus.web.NexusHttpAuthenticationFilter;
 
 import com.google.common.base.Throwables;
 import org.apache.shiro.authc.AuthenticationToken;

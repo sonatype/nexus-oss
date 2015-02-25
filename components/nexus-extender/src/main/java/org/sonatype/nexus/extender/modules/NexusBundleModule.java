@@ -45,6 +45,8 @@ public class NexusBundleModule
 
   private static final SecurityFilterModule securityFilterModule = new SecurityFilterModule();
 
+  private static final MetricsRegistryModule metricsRegistryModule = new MetricsRegistryModule();
+
   private static final InstrumentationModule instrumentationModule = new InstrumentationModule();
 
   private static final ValidationModule validationModule = new ValidationModule();
@@ -77,6 +79,7 @@ public class NexusBundleModule
 
     maybeAddShiroAOP(modules);
     maybeAddSecurityFilter(modules);
+    maybeAddMetricsRegistry(modules);
     maybeAddInstrumentation(modules);
     maybeAddValidation(modules);
     maybeAddWebResources(modules);
@@ -113,6 +116,12 @@ public class NexusBundleModule
     }
   }
 
+  private void maybeAddMetricsRegistry(List<Module> modules) {
+    if (imports.contains("com.codahale.metrics")) {
+      modules.add(metricsRegistryModule);
+    }
+  }
+
   private void maybeAddInstrumentation(List<Module> modules) {
     if (imports.contains("com.codahale.metrics.annotation")) {
       modules.add(instrumentationModule);
@@ -120,7 +129,7 @@ public class NexusBundleModule
   }
 
   private void maybeAddValidation(List<Module> modules) {
-    if (imports.contains("org.sonatype.nexus.validation")) {
+    if (imports.contains("org.sonatype.nexus.common.validation")) {
       modules.add(validationModule);
     }
   }

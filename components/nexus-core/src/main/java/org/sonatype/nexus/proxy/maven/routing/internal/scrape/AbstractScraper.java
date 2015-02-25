@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.httpclient.Page;
 import org.sonatype.nexus.proxy.maven.routing.internal.AbstractPrioritized;
 import org.sonatype.nexus.proxy.maven.routing.internal.ArrayListPrefixSource;
-import org.sonatype.nexus.util.PathUtils;
+import org.sonatype.nexus.proxy.utils.PathUtils;
 
 import com.google.common.base.Function;
 

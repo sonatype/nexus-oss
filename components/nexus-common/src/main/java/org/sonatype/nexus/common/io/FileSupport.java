@@ -84,9 +84,7 @@ public final class FileSupport
   /**
    * Shorthand method for method {@link #readFile(Path, Charset)} that uses {@link #DEFAULT_CHARSET}.
    */
-  public static String readFile(final Path file)
-      throws IOException
-  {
+  public static String readFile(final Path file) throws IOException {
     return readFile(file, DEFAULT_CHARSET);
   }
 
@@ -95,9 +93,7 @@ public final class FileSupport
    * ensure this is actually suitable, as file is relatively small. This method does not have any protection
    * to filter out such bad/malicious attempts.
    */
-  public static String readFile(final Path file, final Charset charset)
-      throws IOException
-  {
+  public static String readFile(final Path file, final Charset charset) throws IOException {
     validateFile(file);
     checkNotNull(charset);
     try (final BufferedReader reader = Files.newBufferedReader(file, charset)) {
@@ -122,9 +118,7 @@ public final class FileSupport
   /**
    * Shorthand method for method {@link #writeFile(Path, Charset, String)} that uses {@link #DEFAULT_CHARSET}.
    */
-  public static void writeFile(final Path file, final String payload)
-      throws IOException
-  {
+  public static void writeFile(final Path file, final String payload) throws IOException {
     writeFile(file, DEFAULT_CHARSET, payload);
   }
 
@@ -132,9 +126,7 @@ public final class FileSupport
    * Writes out the content of a string payload into a file using given charset. The file will be overwritten
    * if exists and parent directories will be created if needed.
    */
-  public static void writeFile(final Path file, final Charset charset, final String payload)
-      throws IOException
-  {
+  public static void writeFile(final Path file, final Charset charset, final String payload) throws IOException {
     checkNotNull(file);
     checkNotNull(charset);
     checkNotNull(payload);
@@ -156,5 +148,4 @@ public final class FileSupport
       checkArgument(Files.isRegularFile(path), "%s is not a regular file", path);
     }
   }
-
 }

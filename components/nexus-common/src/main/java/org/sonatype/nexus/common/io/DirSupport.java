@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileStore;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -32,6 +33,8 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -48,6 +51,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class DirSupport
 {
+  private static final Logger log = LoggerFactory.getLogger(DirSupport.class);
+
   public static final Set<FileVisitOption> DEFAULT_FILE_VISIT_OPTIONS = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
 
   private DirSupport() {
@@ -394,24 +399,63 @@ public final class DirSupport
   // MOVE: recursive copy of whole directory tree and then deleting it
 
   /**
+   * Perform a move of existing directory (empty or not, does not matter) on same FileStore (volume or partition).
+   */
+  private static void sameFileStoreMove(final Path from, final Path to) throws IOException {
+    Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
+  }
+
+  /**
+   * Perform a pseudo-move of existing directory (empty or not, does not matter) between different FileStores (volume or
+   * partition) using {@link #copyDeleteMove(Path, Path, Predicate)} method.
+   */
+  private static void crossFileStoreMove(final Path from, final Path to) throws IOException {
+    copyDeleteMove(from, to, null);
+  }
+
+  /**
+   * Return {@code true} if paths {@code from} and {@code to} are located on same FileStore (volume or
+   * partition). The {@code from} must exists, while {@code to} does not have to.
+   */
+  private static boolean areOnSameFileStore(final Path from, final Path to) {
+    try {
+      final FileStore fromStore = Files.getFileStore(from); // from must exist
+      Path toExistingParent = to.normalize(); // to usually does not exists, is about to be created as part of move
+      while (toExistingParent != null && !Files.exists(toExistingParent)) {
+        toExistingParent = toExistingParent.getParent();
+      }
+      if (toExistingParent != null) {
+        final FileStore toStore = Files.getFileStore(toExistingParent);
+        return fromStore.equals(toStore);
+      } else {
+        log.warn("No ultimate parent path found for '{}'", to, new RuntimeException("marker")); // record the stack trace?
+        return false; // no ultimate parent? be on safe side
+      }
+    }
+    catch (IOException e) {
+      return false; // be on safe side
+    }
+  }
+
+  /**
    * Performs a move operation. It will attempt a real move (if source and target are on same file store), but will
    * fallback to a sequence of "copy" and then "delete" (not a real move!). This method accepts
    * existing Paths that might denote a regular file or a directory. It basically delegates to {@link Files#move(Path,
    * Path, CopyOption...)} method with "replace existing" parameter.
    */
-  public static void move(final Path from, final Path to)
-      throws IOException
-  {
-    Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
+  public static void move(final Path from, final Path to) throws IOException {
+    if (areOnSameFileStore(from, to)) {
+      sameFileStoreMove(from, to);
+    } else {
+      crossFileStoreMove(from, to);
+    }
   }
 
   /**
    * Invokes {@link #move(Path, Path)} if passed in "from" path exists and returns {@code true}. If
    * "from" path does not exists, {@code false} is returned.
    */
-  public static boolean moveIfExists(final Path from, final Path to)
-      throws IOException
-  {
+  public static boolean moveIfExists(final Path from, final Path to) throws IOException {
     checkNotNull(from);
     if (Files.exists(from)) {
       move(from, to);
@@ -494,5 +538,4 @@ public final class DirSupport
       checkArgument(Files.exists(path), "%s does not exists", path);
     }
   }
-
 }

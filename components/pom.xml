@@ -29,7 +29,6 @@
 
   <modules>
     <module>nexus-common</module>
-    <module>base-configuration</module>
     <module>nexus-analytics-api</module>
     <module>nexus-blobstore-api</module>
     <module>nexus-blobstore-file</module>
@@ -37,7 +36,6 @@
     <module>nexus-client</module>
     <!--<module>nexus-client-core</module>-->
     <module>nexus-commands</module>
-    <module>nexus-configuration-model</module>
     <module>nexus-core</module>
     <module>nexus-ehcache</module>
     <module>nexus-elasticsearch</module>
@@ -53,8 +51,6 @@
     <module>nexus-oss-edition</module>
     <module>nexus-plugin-api</module>
     <module>nexus-repository</module>
-    <module>nexus-repository-metadata-api</module>
-    <module>nexus-repository-metadata-model</module>
     <module>nexus-security</module>
     <module>nexus-supportzip-api</module>
     <module>nexus-webresources-api</module>

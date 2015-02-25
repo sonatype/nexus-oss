@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy.storage.remote;
 
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
@@ -74,8 +73,7 @@ public interface RemoteStorageContext
 
   /**
    * Returns {@code true} if this context has an instance of {@link RemoteProxySettings}. Note: since NEXUS-5690 is
-   * implemented (in 2.7), this method is used only on global {@link RemoteStorageContext}, see
-   * {@link NexusConfiguration#getGlobalRemoteStorageContext()}.
+   * implemented (in 2.7), this method is used only on global {@link RemoteStorageContext}.
    * 
    * @see <a href="https://issues.sonatype.org/browse/NEXUS-5690">NEXUS-5690 Remove per repository http proxy
    *      configuration</a>
@@ -85,7 +83,7 @@ public interface RemoteStorageContext
   /**
    * Returns the {@link RemoteProxySettings}, that comes from this or parent remote storage context (globally defined
    * HTTP Proxy). Note: since NEXUS-5690 is implemented (in 2.7), this method is used only on global
-   * {@link RemoteStorageContext}, see {@link NexusConfiguration#getGlobalRemoteStorageContext()}.
+   * {@link RemoteStorageContext}.
    * 
    * @see <a href="https://issues.sonatype.org/browse/NEXUS-5690">NEXUS-5690 Remove per repository http proxy
    *      configuration</a>
@@ -95,7 +93,7 @@ public interface RemoteStorageContext
   /**
    * Sets the {@link RemoteProxySettings} in this context, parent is unchanged. The newly set value will override the
    * value from parent. Note: since NEXUS-5690 is implemented (in 2.7), this method is used only on global
-   * {@link RemoteStorageContext}, see {@link NexusConfiguration#getGlobalRemoteStorageContext()}.
+   * {@link RemoteStorageContext}.
    * 
    * @see <a href="https://issues.sonatype.org/browse/NEXUS-5690">NEXUS-5690 Remove per repository http proxy
    *      configuration</a>
@@ -104,8 +102,7 @@ public interface RemoteStorageContext
 
   /**
    * Removes the {@link RemoteProxySettings} from this context, parent is unchanged. Note: since NEXUS-5690 is
-   * implemented (in 2.7), this method is used only on global {@link RemoteStorageContext},
-   * see {@link NexusConfiguration#getGlobalRemoteStorageContext()}.
+   * implemented (in 2.7), this method is used only on global {@link RemoteStorageContext}.
    * 
    * @see <a href="https://issues.sonatype.org/browse/NEXUS-5690">NEXUS-5690 Remove per repository http proxy
    *      configuration</a>

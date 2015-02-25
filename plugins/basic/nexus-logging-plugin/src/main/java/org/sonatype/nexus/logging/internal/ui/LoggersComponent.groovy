@@ -19,10 +19,10 @@ import groovy.transform.WithWriteLock
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
+import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.log.LogManager
-import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject
 import javax.inject.Named

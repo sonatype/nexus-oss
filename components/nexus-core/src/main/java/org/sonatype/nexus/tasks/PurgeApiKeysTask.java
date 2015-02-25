@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.scheduling.TaskSupport;
-import org.sonatype.security.events.AuthorizationConfigurationChanged;
+import org.sonatype.nexus.security.authz.AuthorizationConfigurationChanged;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 @Named

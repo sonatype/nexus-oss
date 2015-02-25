@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.AbstractXpp3DomExternalConfigurationHolder;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;

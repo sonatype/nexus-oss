@@ -48,7 +48,7 @@ Ext.define('NX.coreui.controller.RepositoriesCMA', {
     { ref: 'settings', selector: 'nx-coreui-repositorycma-feature nx-coreui-repositorycma-settings' }
   ],
   icons: {
-    'repository-default': {
+    'repositorycma-default': {
       file: 'database_green.png',
       variants: ['x16', 'x32']
     }
@@ -64,7 +64,7 @@ Ext.define('NX.coreui.controller.RepositoriesCMA', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('nexus:repositories', 'read');
+      return NX.Permissions.check('nexus:repositories', 'read') && NX.State.getUser();
     }
   },
   permission: 'nexus:repositories',

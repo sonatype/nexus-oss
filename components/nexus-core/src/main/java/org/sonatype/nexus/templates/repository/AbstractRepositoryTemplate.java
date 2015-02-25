@@ -14,7 +14,8 @@ package org.sonatype.nexus.templates.repository;
 
 import java.io.IOException;
 
-import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
@@ -35,15 +36,15 @@ public abstract class AbstractRepositoryTemplate
 
   private ConfigurableRepository configurableRepository;
 
-  public AbstractRepositoryTemplate(AbstractRepositoryTemplateProvider provider, String id, String description,
-                                    ContentClass contentClass, Class<?> mainFacet)
+  public AbstractRepositoryTemplate(AbstractRepositoryTemplateProvider provider,
+                                    String id,
+                                    String description,
+                                    ContentClass contentClass,
+                                    Class<?> mainFacet)
   {
     super(provider, id, description);
-
     this.provider = provider;
-
     this.contentClass = contentClass;
-
     if (mainFacet != null) {
       this.mainFacet = mainFacet;
     }
@@ -78,9 +79,10 @@ public abstract class AbstractRepositoryTemplate
       configurableRepository = new ConfigurableRepository(getTemplateProvider().getApplicationConfiguration());
 
       try {
+        // FIXME: This will always throw validation exceptions
         configurableRepository.configure(getCoreConfiguration());
       }
-      catch (ConfigurationException e) {
+      catch (ConfigurationException | ValidationResponseException e) {
         // will not happen, since ConfigurableRepository will not validate!
         // TODO: get rid of this exception from here
       }
@@ -88,17 +90,14 @@ public abstract class AbstractRepositoryTemplate
     return configurableRepository;
   }
 
-  public Repository create()
-      throws ConfigurationException, IOException
-  {
+  public Repository create() throws IOException {
     getCoreConfiguration().validateChanges();
 
     // to merge in user changes to CoreConfiguration
     getCoreConfiguration().commitChanges();
 
     // create a repository
-    Repository repository =
-        getTemplateProvider().createRepository(getCoreConfiguration().getConfiguration(false));
+    Repository repository = getTemplateProvider().createRepository(getCoreConfiguration().getConfiguration(false));
 
     // reset the template
     setCoreConfiguration(null);
@@ -127,7 +126,6 @@ public abstract class AbstractRepositoryTemplate
 
   public static class ProviderHint
   {
-
     private final String value;
 
     public ProviderHint(final String value) {
@@ -137,7 +135,5 @@ public abstract class AbstractRepositoryTemplate
     public String getValue() {
       return value;
     }
-
   }
-
 }

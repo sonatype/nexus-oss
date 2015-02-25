@@ -23,7 +23,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.httpclient.Page;
 import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableUtil;
-import org.sonatype.nexus.util.PathUtils;
+import org.sonatype.nexus.proxy.utils.PathUtils;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

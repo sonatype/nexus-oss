@@ -21,7 +21,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Callable that properly sets MDC context before invoking the delegate. The delegate will execute in a
  * managed thread with properly set MDC context. To be used with managed threads.
  *
- * @author cstamas
  * @since 2.6
  */
 public class MDCAwareCallable<T>
@@ -37,9 +36,7 @@ public class MDCAwareCallable<T>
   }
 
   @Override
-  public T call()
-      throws Exception
-  {
+  public T call() throws Exception {
     MDCUtils.setContextMap(mdcContext);
     return delegate.call();
   }

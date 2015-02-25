@@ -15,44 +15,40 @@ package org.sonatype.nexus.configuration.source;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
+import java.net.URL;
+import java.util.Map;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.ApplicationInterpolatorProvider;
+import javax.inject.Inject;
+
+import org.sonatype.nexus.common.throwables.ConfigurationException;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.InterpolatorFilterReader;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.eclipse.sisu.Parameters;
 
 /**
- * Abstract class that encapsulates Modello model loading and saving with interpolation.
- *
- * @author cstamas
+ * Support for {@link ApplicationConfigurationSource} implementations.
  */
 public abstract class AbstractApplicationConfigurationSource
-    extends AbstractConfigurationSource
+    extends ComponentSupport
     implements ApplicationConfigurationSource
 {
-  /**
-   * The application interpolation provider.
-   */
-  private final ApplicationInterpolatorProvider interpolatorProvider;
+  private Interpolator interpolator;
 
-  /**
-   * The configuration.
-   */
   private Configuration configuration;
 
-  /**
-   * Flag to mark instance upgrade.
-   */
-  private boolean instanceUpgraded;
-
-  public AbstractApplicationConfigurationSource(final ApplicationInterpolatorProvider interpolatorProvider) {
-    this.interpolatorProvider = checkNotNull(interpolatorProvider);
+  @Inject
+  public void installDependencies(final @Parameters Map<String, String> parameters) {
+    interpolator = new RegexBasedInterpolator();
+    interpolator.addValueSource(new MapBasedValueSource(parameters));
+    interpolator.addValueSource(new MapBasedValueSource(System.getenv()));
+    interpolator.addValueSource(new MapBasedValueSource(System.getProperties()));
   }
 
   @Override
@@ -65,86 +61,27 @@ public abstract class AbstractApplicationConfigurationSource
     this.configuration = configuration;
   }
 
-  /**
-   * Called by subclasses when loaded configuration is rejected for some reason.
-   */
-  protected void rejectConfiguration(String message, Throwable e) {
-    this.configuration = null;
+  protected void loadConfiguration(final URL url) throws IOException {
+    log.info("Loading configuration: {}", url);
 
-    if (message != null) {
-      log.debug(message, e);
-    }
-  }
-
-  /**
-   * Load configuration.
-   *
-   * @param file the file
-   * @return the configuration
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
-  protected void loadConfiguration(InputStream is)
-      throws IOException, ConfigurationException
-  {
-    Reader fr = null;
-
-    try {
+    try (InputStream is = url.openStream()) {
       NexusConfigurationXpp3Reader reader = new NexusConfigurationXpp3Reader();
-
-      fr = new InputStreamReader(is);
-
-      InterpolatorFilterReader ip = new InterpolatorFilterReader(fr, interpolatorProvider.getInterpolator());
-
-      // read again with interpolation
-      configuration = reader.read(ip);
+      InterpolatorFilterReader filter = new InterpolatorFilterReader(new InputStreamReader(is), interpolator);
+      configuration = reader.read(filter);
     }
     catch (XmlPullParserException e) {
       configuration = null;
-
-      throw new ConfigurationException("Nexus configuration file was not loaded, it has the wrong structure.", e);
-    }
-    finally {
-      if (fr != null) {
-        fr.close();
-      }
+      log.error("Invalid configuration: {}", url, e);
+      throw new ConfigurationException("Invalid configuration: ", e);
     }
 
-    // check the model version if loaded
-    if (configuration != null && !Configuration.MODEL_VERSION.equals(configuration.getVersion())) {
-      final String message = "Nexus configuration file was loaded but discarded, it has the wrong version number."
-          + (" (expected " + Configuration.MODEL_VERSION + ", actual " + configuration.getVersion() + ")");
-
-      rejectConfiguration(message, null);
-
+    if (!Configuration.MODEL_VERSION.equals(configuration.getVersion())) {
+      String message = String.format("Invalid configuration; version mismatch expected=%s, found=%s",
+          Configuration.MODEL_VERSION, configuration.getVersion());
+      log.error(message);
       throw new ConfigurationException(message);
     }
 
-    if (getConfiguration() != null) {
-      log.info("Configuration loaded successfully.");
-    }
+    log.info("Loaded");
   }
-
-  /**
-   * Returns the default source of ConfigurationSource. May be null.
-   */
-  @Override
-  public ApplicationConfigurationSource getDefaultsSource() {
-    return null;
-  }
-
-  /**
-   * Is nexus instance upgraded
-   */
-  @Override
-  public boolean isInstanceUpgraded() {
-    return instanceUpgraded;
-  }
-
-  /**
-   * Setter for nexus instance upgraded
-   */
-  public void setInstanceUpgraded(boolean instanceUpgraded) {
-    this.instanceUpgraded = instanceUpgraded;
-  }
-
 }

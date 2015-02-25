@@ -12,24 +12,24 @@
  */
 package org.sonatype.nexus.rutauth.internal;
 
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManager;
-import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.user.User;
+import org.sonatype.nexus.security.user.UserManager;
+import org.sonatype.nexus.security.user.UserNotFoundException;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
-
-import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**

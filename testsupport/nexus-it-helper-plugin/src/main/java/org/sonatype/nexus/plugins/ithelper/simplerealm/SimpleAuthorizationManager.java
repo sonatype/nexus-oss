@@ -19,12 +19,12 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.authorization.AbstractReadOnlyAuthorizationManager;
-import org.sonatype.security.authorization.AuthorizationManager;
-import org.sonatype.security.authorization.NoSuchPrivilegeException;
-import org.sonatype.security.authorization.NoSuchRoleException;
-import org.sonatype.security.authorization.Privilege;
-import org.sonatype.security.authorization.Role;
+import org.sonatype.nexus.security.authz.AbstractReadOnlyAuthorizationManager;
+import org.sonatype.nexus.security.authz.AuthorizationManager;
+import org.sonatype.nexus.security.privilege.NoSuchPrivilegeException;
+import org.sonatype.nexus.security.privilege.Privilege;
+import org.sonatype.nexus.security.role.NoSuchRoleException;
+import org.sonatype.nexus.security.role.Role;
 
 import org.eclipse.sisu.Description;
 
@@ -44,9 +44,9 @@ import org.eclipse.sisu.Description;
 public class SimpleAuthorizationManager
     extends AbstractReadOnlyAuthorizationManager
 {
-
   public static final String SOURCE = "Simple";
 
+  @Override
   public String getSource() {
     return SOURCE;
   }
@@ -60,6 +60,7 @@ public class SimpleAuthorizationManager
     return roleIds;
   }
 
+  @Override
   public Set<Role> listRoles() {
     Set<Role> roles = new HashSet<Role>();
     for (String roleId : this.listRoleIds()) {
@@ -79,25 +80,23 @@ public class SimpleAuthorizationManager
     return role;
   }
 
-  public Privilege getPrivilege(String privilegeId)
-      throws NoSuchPrivilegeException
-  {
+  @Override
+  public Privilege getPrivilege(String privilegeId) throws NoSuchPrivilegeException {
     return null;
   }
 
-  public Role getRole(String roleId)
-      throws NoSuchRoleException
-  {
+  @Override
+  public Role getRole(String roleId) throws NoSuchRoleException {
     for (Role role : this.listRoles()) {
       if (role.getRoleId().equals(roleId)) {
         return role;
       }
     }
-    throw new NoSuchRoleException("Role '" + roleId + "' not found.");
+    throw new NoSuchRoleException(roleId);
   }
 
+  @Override
   public Set<Privilege> listPrivileges() {
     return null;
   }
-
 }

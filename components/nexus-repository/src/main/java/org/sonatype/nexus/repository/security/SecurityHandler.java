@@ -49,7 +49,7 @@ public class SecurityHandler
       try {
         return context.proceed();
       }
-      catch (AuthorizationException | org.sonatype.security.authorization.AuthorizationException e) {
+      catch (AuthorizationException e) {
         log.trace("Not authorized", e);
       }
     }

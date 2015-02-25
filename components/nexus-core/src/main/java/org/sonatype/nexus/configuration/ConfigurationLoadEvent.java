@@ -12,15 +12,13 @@
  */
 package org.sonatype.nexus.configuration;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-
 /**
  * An event fired on configuration load.
  *
  * @author cstamas
  */
 public class ConfigurationLoadEvent
-    extends ConfigurationIOEvent
+    extends ConfigurationEvent
 {
   public ConfigurationLoadEvent(ApplicationConfiguration configuration) {
     super(configuration);

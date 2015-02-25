@@ -20,6 +20,7 @@ import java.util.Map;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -66,5 +67,13 @@ public class HashesTest
 
   private static InputStream inputStream() {
     return new ByteArrayInputStream(DATA.getBytes(Charsets.UTF_8));
+  }
+
+  @Test
+  public void hashStreamWithFunction() throws Exception {
+    byte[] bytes = DATA.getBytes(Charsets.UTF_8);
+    String expected = Hashing.sha1().hashBytes(bytes).toString();
+    HashCode found = Hashes.hash(Hashing.sha1(), new ByteArrayInputStream(bytes));
+    assertThat(found.toString(), is(expected));
   }
 }

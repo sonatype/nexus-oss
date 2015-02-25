@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
 
 import javax.inject.Named;
 
-import org.sonatype.security.UserIdMdcHelper;
+import org.sonatype.nexus.security.UserIdMdcHelper;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Key;

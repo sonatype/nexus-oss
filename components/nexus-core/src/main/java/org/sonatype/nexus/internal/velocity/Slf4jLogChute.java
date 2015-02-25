@@ -21,11 +21,8 @@ import org.slf4j.Logger;
 
 /**
  * LogChute backed by SLF4J. Copied from SISU Velocity.
- *
- * @author cstamas
- * @since 2.8
  */
-public class Slf4jLogChute
+class Slf4jLogChute
     implements LogChute
 {
   /**

@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.atlas.internal.customizers
 
-import org.sonatype.nexus.configuration.application.ApplicationDirectories
+import org.sonatype.nexus.configuration.ApplicationDirectories
 import org.sonatype.nexus.log.LogManager
 import org.sonatype.nexus.supportzip.FileContentSourceSupport
 import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport

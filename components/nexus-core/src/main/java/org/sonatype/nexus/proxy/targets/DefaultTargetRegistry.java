@@ -26,12 +26,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRepositoryTargetCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
@@ -65,11 +65,11 @@ public class DefaultTargetRegistry
   // eagerly rebuilt on every configuration change
   private Map<String, Target> targets;
 
-  // ==
-
   @Inject
-  public DefaultTargetRegistry(EventBus eventBus, ApplicationConfiguration applicationConfiguration,
-      RepositoryTypeRegistry repositoryTypeRegistry, ApplicationConfigurationValidator validator)
+  public DefaultTargetRegistry(EventBus eventBus,
+                               ApplicationConfiguration applicationConfiguration,
+                               RepositoryTypeRegistry repositoryTypeRegistry,
+                               ApplicationConfigurationValidator validator)
   {
     super("Repository Target Registry", eventBus, applicationConfiguration);
     this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
@@ -77,26 +77,24 @@ public class DefaultTargetRegistry
   }
 
   @Override
-  protected void initializeConfiguration() throws ConfigurationException {
+  protected void initializeConfiguration() {
     if (getApplicationConfiguration().getConfigurationModel() != null) {
       configure(getApplicationConfiguration());
     }
   }
 
   @Override
-  protected CoreConfiguration<List<CRepositoryTarget>> wrapConfiguration(Object configuration) throws ConfigurationException {
+  protected CoreConfiguration<List<CRepositoryTarget>> wrapConfiguration(Object configuration) {
     if (configuration instanceof ApplicationConfiguration) {
       return new CRepositoryTargetCoreConfiguration((ApplicationConfiguration) configuration);
     }
     else {
-      throw new ConfigurationException("The passed configuration object is of class \""
-          + configuration.getClass().getName() + "\" and not the required \""
-          + ApplicationConfiguration.class.getName() + "\"!");
+      throw new ConfigurationException("The passed configuration object is of class \"" + configuration.getClass().getName() + "\" and not the required \"" + ApplicationConfiguration.class.getName() + "\"!");
     }
   }
 
   @Override
-  protected void doConfigure() throws ConfigurationException {
+  protected void doConfigure() {
     super.doConfigure();
     // rebuild the view
     rebuildView();
@@ -106,7 +104,7 @@ public class DefaultTargetRegistry
    * Gets the effective configuration and rebuilds the "view" of live target objects, that is a map, keyed by target
    * IDs.
    */
-  protected void rebuildView() {
+  private void rebuildView() {
     synchronized (getCurrentCoreConfiguration()) {
       // rebuild the view
       List<CRepositoryTarget> ctargets = getCurrentConfiguration(false);
@@ -123,7 +121,7 @@ public class DefaultTargetRegistry
 
   // ==
 
-  protected Target convert(CRepositoryTarget target) {
+  private Target convert(CRepositoryTarget target) {
     ContentClass contentClass = getContentClassById(target.getContentClass());
 
     // If content class is null, we have a target for a repo type that no longer exists
@@ -135,7 +133,7 @@ public class DefaultTargetRegistry
     return null;
   }
 
-  protected CRepositoryTarget convert(Target target) {
+  private CRepositoryTarget convert(Target target) {
     CRepositoryTarget result = new CRepositoryTarget();
     result.setId(target.getId());
     result.setName(target.getName());
@@ -146,28 +144,31 @@ public class DefaultTargetRegistry
     return result;
   }
 
-  protected void validate(CRepositoryTarget target) throws InvalidConfigurationException {
+  private void validate(CRepositoryTarget target) {
     ValidationResponse response = validator.validateRepositoryTarget(null, target);
     if (!response.isValid()) {
-      throw new InvalidConfigurationException(response);
+      throw new ValidationResponseException(response);
     }
   }
 
-  protected ContentClass getContentClassById(String id) {
+  private ContentClass getContentClassById(String id) {
     return repositoryTypeRegistry.getContentClasses().get(id);
   }
 
   // ==
 
+  @Override
   public Collection<Target> getRepositoryTargets() {
     return Collections.unmodifiableCollection(targets.values());
   }
 
+  @Override
   public Target getRepositoryTarget(String id) {
     return targets.get(id);
   }
 
-  public synchronized boolean addRepositoryTarget(Target target) throws ConfigurationException {
+  @Override
+  public synchronized boolean addRepositoryTarget(Target target) {
     CRepositoryTarget cnf = convert(target);
     validate(cnf);
     removeRepositoryTarget(cnf.getId(), true);
@@ -176,11 +177,12 @@ public class DefaultTargetRegistry
     return true;
   }
 
+  @Override
   public synchronized boolean removeRepositoryTarget(String id) {
     return removeRepositoryTarget(id, false);
   }
 
-  protected boolean removeRepositoryTarget(String id, boolean forUpdate) {
+  private boolean removeRepositoryTarget(String id, boolean forUpdate) {
     final List<CRepositoryTarget> targets = getCurrentConfiguration(true);
     for (Iterator<CRepositoryTarget> ti = targets.iterator(); ti.hasNext();) {
       CRepositoryTarget cTarget = ti.next();
@@ -197,6 +199,7 @@ public class DefaultTargetRegistry
     return false;
   }
 
+  @Override
   public Set<Target> getTargetsForContentClass(ContentClass contentClass) {
     log.debug("Resolving targets for contentClass='{}'", contentClass.getId());
 
@@ -209,6 +212,7 @@ public class DefaultTargetRegistry
     return result;
   }
 
+  @Override
   public Set<Target> getTargetsForContentClassPath(ContentClass contentClass, String path) {
     log.debug("Resolving targets for contentClass='{}' for path='{}'", contentClass.getId(), path);
 
@@ -221,6 +225,7 @@ public class DefaultTargetRegistry
     return result;
   }
 
+  @Override
   public TargetSet getTargetsForRepositoryPath(Repository repository, String path) {
     log.debug("Resolving targets for repository='{}' for path='{}'", repository.getId(), path);
 
@@ -233,6 +238,7 @@ public class DefaultTargetRegistry
     return result;
   }
 
+  @Override
   public boolean hasAnyApplicableTarget(Repository repository) {
     log.debug("Looking for any targets for repository='{}'", repository.getId());
 

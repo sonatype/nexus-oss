@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.plugins.mavenbridge.NexusAether;
 import org.sonatype.nexus.plugins.mavenbridge.workspace.NexusWorkspace;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -38,15 +38,15 @@ public class DefaultNexusAether
 {
   public static final String LOCAL_REPO_DIR = "maven2-local-repository";
 
-  private final ApplicationConfiguration applicationConfiguration;
+  private final ApplicationDirectories applicationDirectories;
 
   private final RepositorySystem repositorySystem;
 
   @Inject
-  public DefaultNexusAether(final ApplicationConfiguration applicationConfiguration,
+  public DefaultNexusAether(final ApplicationDirectories applicationDirectories,
                             final RepositorySystem repositorySystem)
   {
-    this.applicationConfiguration = applicationConfiguration;
+    this.applicationDirectories = applicationDirectories;
     this.repositorySystem = repositorySystem;
   }
 
@@ -77,7 +77,7 @@ public class DefaultNexusAether
 
     // can't aether work _without_ local repo?
     LocalRepository localRepo =
-        new LocalRepository(applicationConfiguration.getWorkingDirectory(LOCAL_REPO_DIR));
+        new LocalRepository(applicationDirectories.getWorkDirectory(LOCAL_REPO_DIR));
     session.setLocalRepositoryManager(getRepositorySystem().newLocalRepositoryManager(session, localRepo));
 
     // session.setIgnoreMissingArtifactDescriptor( false );

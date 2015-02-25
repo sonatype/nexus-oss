@@ -35,6 +35,9 @@ Ext.define('NX.coreui.view.task.TaskSelectType', {
       }
     },
     { header: NX.I18n.get('ADMIN_TASKS_SELECT_TYPE_NAME_COLUMN'), dataIndex: 'name', flex: 1 }
+  ],
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_TASKS_SELECT_LIST_FILTER_ERROR') }
   ]
 
 });

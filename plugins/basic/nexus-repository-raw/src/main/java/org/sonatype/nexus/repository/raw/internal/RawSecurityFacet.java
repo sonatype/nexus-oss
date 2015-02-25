@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.security.SecurityFacetSupport;
-import org.sonatype.nexus.repository.security.SecurityHelper;
+import org.sonatype.nexus.security.SecurityHelper;
 
 /**
  * RAW security facet.
@@ -30,7 +30,7 @@ public class RawSecurityFacet
 {
   @Inject
   public RawSecurityFacet(final SecurityHelper securityHelper,
-                          final RawFormatSecurityResource securityResource)
+                          final RawFormatSecurityConfigurationResource securityResource)
   {
     super(securityHelper, securityResource);
   }

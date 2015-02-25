@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.configuration;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
 
 /**

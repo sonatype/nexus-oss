@@ -39,7 +39,7 @@ import javax.management.ObjectName;
 import org.sonatype.nexus.common.io.FileSupport;
 import org.sonatype.nexus.common.io.LimitedInputStream;
 import org.sonatype.nexus.common.io.StreamSupport;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationCustomizer;
 import org.sonatype.nexus.log.LogConfigurationCustomizer.Configuration;

@@ -15,8 +15,8 @@ package org.sonatype.nexus.obr.proxy;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.StorageException;
@@ -29,9 +29,9 @@ public class ObrRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator
 {
   @Override
-  public void doApplyConfiguration(final Repository repository, final ApplicationConfiguration configuration,
+  public void doApplyConfiguration(final Repository repository,
+                                   final ApplicationConfiguration configuration,
                                    final CRepositoryCoreConfiguration coreConfig)
-      throws ConfigurationException
   {
     repository.setIndexable(false);
 

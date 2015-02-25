@@ -19,7 +19,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.Email
 import org.sonatype.micromailer.Address
-import org.sonatype.nexus.configuration.application.NexusConfiguration
+import org.sonatype.nexus.common.validation.Validate
+import org.sonatype.nexus.configuration.ApplicationConfiguration
 import org.sonatype.nexus.email.EmailerException
 import org.sonatype.nexus.email.NexusEmailer
 import org.sonatype.nexus.email.SmtpConfiguration
@@ -28,7 +29,6 @@ import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.rapture.TrustStoreKeys
-import org.sonatype.nexus.validation.Validate
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -62,7 +62,7 @@ extends DirectComponentSupport
   SmtpSettingsValidator smtpSettingsValidator
 
   @Inject
-  NexusConfiguration nexusConfiguration
+  ApplicationConfiguration nexusConfiguration
 
   @Inject
   @Nullable

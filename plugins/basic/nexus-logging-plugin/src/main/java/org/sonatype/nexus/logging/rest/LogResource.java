@@ -32,6 +32,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 /**
@@ -46,7 +47,6 @@ public class LogResource
     extends ComponentSupport
     implements Resource
 {
-
   public static final String RESOURCE_URI = LoggingPlugin.REST_PREFIX + "/log";
 
   private final LogManager logManager;
@@ -85,8 +85,7 @@ public class LogResource
       throw new NotFoundException("nexus.log not found");
     }
     return Response.ok(log)
-        .header("Content-Disposition", "attachment; filename=\"nexus.log\"")
+        .header(CONTENT_DISPOSITION, "attachment; filename=\"nexus.log\"")
         .build();
   }
-
 }

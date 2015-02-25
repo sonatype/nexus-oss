@@ -21,7 +21,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -91,9 +90,7 @@ public abstract class AbstractGroupRepository
   }
 
   @Override
-  protected void prepareForSave()
-      throws ConfigurationException
-  {
+  protected void prepareForSave() {
     super.prepareForSave();
 
     boolean membersChanged = false;
