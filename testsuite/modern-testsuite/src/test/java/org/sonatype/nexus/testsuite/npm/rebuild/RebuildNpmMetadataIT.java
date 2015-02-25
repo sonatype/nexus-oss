@@ -90,7 +90,7 @@ public class RebuildNpmMetadataIT
       assertThat(packageRootString, containsString("0.1.0"));
       assertThat(packageRootString, containsString("Sérgio Ramos")); // invalid é
       assertThat(packageRootString, containsString("x-nx-rebuilt"));
-      assertThat(nexus().getNexusLog(), FileMatchers.contains("contains non-UTF package.json, parsing as ISO-8859-1:"));
+      assertThat(nexus().getNexusLog(), FileMatchers.contains("boxeen-0.1.0.tgz contains non-UTF package.json, parsing as ISO-8859-1:"));
     }
   }
 }
