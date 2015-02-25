@@ -63,7 +63,7 @@ public class UnknownConnection
 
   @Override
   public RemoteConnectionStatus getStatus() {
-    return new RemoteConnectionStatus("Remote Status Unknown");
+    return new RemoteConnectionStatus("Remote Status Unknown", validUntil());
   }
 
 }

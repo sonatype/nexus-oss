@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.repository.proxy.connection;
 
+import org.joda.time.DateTime;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @since 3.0
  */
@@ -21,13 +25,16 @@ public class RemoteConnectionStatus
 
   private final String reason;
 
-  public RemoteConnectionStatus(final String description) {
-    this(description, null);
+  private final DateTime validUntil;
+
+  public RemoteConnectionStatus(final String description, final DateTime validUntil) {
+    this(description, null, validUntil);
   }
 
-  public RemoteConnectionStatus(final String description, final String reason) {
-    this.description = description;
+  public RemoteConnectionStatus(final String description, final String reason, final DateTime validUntil) {
+    this.description = checkNotNull(description);
     this.reason = reason;
+    this.validUntil = checkNotNull(validUntil);
   }
 
   public String getDescription() {
@@ -36,6 +43,10 @@ public class RemoteConnectionStatus
 
   public String getReason() {
     return reason;
+  }
+
+  public DateTime validUntil() {
+    return validUntil;
   }
 
 }

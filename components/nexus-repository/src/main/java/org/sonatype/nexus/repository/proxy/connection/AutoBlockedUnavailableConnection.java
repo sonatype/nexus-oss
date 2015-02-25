@@ -15,10 +15,9 @@ package org.sonatype.nexus.repository.proxy.connection;
 import java.io.IOException;
 import java.net.URI;
 
+import org.sonatype.nexus.common.sequence.FibonacciNumberSequence;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.sisu.goodies.common.Time;
-
-import org.joda.time.DateTime;
 
 /**
  * @since 3.0
@@ -27,21 +26,19 @@ public class AutoBlockedUnavailableConnection
     extends RemoteConnectionSupport
 {
 
-  private DateTime blockedUntil;
-
   private IOException exception;
 
   public AutoBlockedUnavailableConnection(final ProxyFacetSupport proxyFacet,
                                           final IOException e)
   {
-    super(proxyFacet);
+    // TODO shall the 20 seconds be configurable?
+    super(proxyFacet, new FibonacciNumberSequence(Time.seconds(20).toMillis()));
     this.exception = e;
-    blockedUntil = DateTime.now().plus(increment());
   }
 
   @Override
   public GetResult get(final URI uri) throws IOException {
-    if (blockedUntil.isBeforeNow()) {
+    if (validUntil().isBeforeNow()) {
       try {
         GetResult result = super.get(uri);
         proxyFacet.setRemoteConnection(new AutoBlockingAvailableConnection(proxyFacet));
@@ -49,10 +46,7 @@ public class AutoBlockedUnavailableConnection
       }
       catch (IOException e) {
         exception = e;
-        if (isRemoteUnavailable(e)) {
-          blockedUntil = DateTime.now().plus(increment());
-        }
-        else {
+        if (!isRemoteUnavailable(e)) {
           proxyFacet.setRemoteConnection(new AutoBlockingAvailableConnection(proxyFacet));
         }
       }
@@ -62,13 +56,9 @@ public class AutoBlockedUnavailableConnection
 
   @Override
   public RemoteConnectionStatus getStatus() {
-    return new RemoteConnectionStatus("Remote Automatically Blocked and Unavailable", exception.getMessage());
+    return new RemoteConnectionStatus(
+        "Remote Automatically Blocked and Unavailable", exception.getMessage(), validUntil()
+    );
   }
-
-  // TODO Use NumberSequence
-  private long increment() {
-    return Time.minutes(1).toMillis();
-  }
-
 
 }

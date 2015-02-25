@@ -16,12 +16,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
+import org.sonatype.nexus.common.sequence.ConstantNumberSequence;
+import org.sonatype.nexus.common.sequence.NumberSequence;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.common.Time;
 
 import com.google.common.io.ByteStreams;
 import org.apache.http.HttpEntity;
@@ -32,6 +35,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.util.EntityUtils;
+import org.joda.time.DateTime;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @since 3.0
@@ -42,36 +48,54 @@ public abstract class RemoteConnectionSupport
 {
   protected final ProxyFacetSupport proxyFacet;
 
+  private final NumberSequence expirationSequence;
+
+  private DateTime validUntil;
+
   public RemoteConnectionSupport(final ProxyFacetSupport proxyFacet) {
-    this.proxyFacet = proxyFacet;
+    // TODO shall the 5 minutes be configurable?
+    this(proxyFacet, new ConstantNumberSequence(Time.minutes(5).toMillis()));
+  }
+
+  public RemoteConnectionSupport(final ProxyFacetSupport proxyFacet,
+                                 final NumberSequence expirationSequence)
+  {
+    this.proxyFacet = checkNotNull(proxyFacet);
+    this.expirationSequence = checkNotNull(expirationSequence);
+    this.validUntil = DateTime.now().plus(expirationSequence.peek());
   }
 
   public GetResult get(final URI uri) throws IOException {
-    HttpClient client = proxyFacet.getRepository().facet(HttpClientFacet.class).getHttpClient();
+    try {
+      HttpClient client = proxyFacet.getRepository().facet(HttpClientFacet.class).getHttpClient();
 
-    HttpGet request = new HttpGet(uri);
-    log.debug("Fetching: {}", request);
+      HttpGet request = new HttpGet(uri);
+      log.debug("Fetching: {}", request);
 
-    HttpResponse response = client.execute(request);
-    log.debug("Response: {}", response);
+      HttpResponse response = client.execute(request);
+      log.debug("Response: {}", response);
 
-    StatusLine status = response.getStatusLine();
-    log.debug("Status: {}", status);
+      StatusLine status = response.getStatusLine();
+      log.debug("Status: {}", status);
 
-    Payload payload = null;
-    if (status.getStatusCode() == HttpStatus.SC_OK) {
-      HttpEntity entity = response.getEntity();
-      try {
-        log.debug("Entity: {}", entity);
-        final HttpEntityPayload httpEntityPayload = new HttpEntityPayload(response, entity);
+      Payload payload = null;
+      if (status.getStatusCode() == HttpStatus.SC_OK) {
+        HttpEntity entity = response.getEntity();
+        try {
+          log.debug("Entity: {}", entity);
+          final HttpEntityPayload httpEntityPayload = new HttpEntityPayload(response, entity);
 
-        payload = readFully(httpEntityPayload);
+          payload = readFully(httpEntityPayload);
+        }
+        finally {
+          EntityUtils.consume(entity);
+        }
       }
-      finally {
-        EntityUtils.consume(entity);
-      }
+      return new GetResult(status.getStatusCode(), payload);
     }
-    return new GetResult(status.getStatusCode(), payload);
+    finally {
+      prolongValidity();
+    }
   }
 
   protected boolean isRemoteUnavailable(final Exception e) {
@@ -79,6 +103,14 @@ public abstract class RemoteConnectionSupport
       return false;
     }
     return true;
+  }
+
+  private void prolongValidity() {
+    validUntil = DateTime.now().plus(expirationSequence.next());
+  }
+
+  protected DateTime validUntil() {
+    return validUntil;
   }
 
   /**

@@ -51,7 +51,7 @@ public class UnavailableConnection
 
   @Override
   public RemoteConnectionStatus getStatus() {
-    return new RemoteConnectionStatus("Remote Unavailable", exception.getMessage());
+    return new RemoteConnectionStatus("Remote Unavailable", exception.getMessage(), validUntil());
   }
 
 }

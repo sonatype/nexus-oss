@@ -43,7 +43,7 @@ public class AutoBlockingAvailableConnection
 
   @Override
   public RemoteConnectionStatus getStatus() {
-    return new RemoteConnectionStatus("Remote Available");
+    return new RemoteConnectionStatus("Remote Available", validUntil());
   }
 
 }

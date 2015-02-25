@@ -85,7 +85,7 @@ public abstract class ProxyFacetSupport
   protected void doStart() throws Exception {
     remoteConnection = createRemoteState();
     log.debug("Remote connection status set to '{}'", remoteConnection.getStatus().getDescription());
-
+    // TODO start periodic status check thread
     if (remoteUrlChanged) {
       remoteUrlChanged = false;
       try {
@@ -99,6 +99,7 @@ public abstract class ProxyFacetSupport
 
   @Override
   protected void doDestroy() throws Exception {
+    // TODO stop periodic status check thread
     remoteUrl = null;
   }
 
@@ -143,6 +144,7 @@ public abstract class ProxyFacetSupport
         this.remoteConnection.getStatus().getDescription(), remoteConnection.getStatus().getDescription()
     );
     this.remoteConnection = remoteConnection;
+    // TODO reset periodic status check thread
   }
 
   public Repository getRepository() {

@@ -18,6 +18,8 @@ import java.net.URI;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import org.joda.time.DateTime;
+
 /**
  * @since 3.0
  */
@@ -33,7 +35,7 @@ public class ManuallyBlockedConnection
 
   @Override
   public RemoteConnectionStatus getStatus() {
-    return new RemoteConnectionStatus("Remote Manually Blocked");
+    return new RemoteConnectionStatus("Remote Manually Blocked", new DateTime(Long.MAX_VALUE));
   }
 
 }
