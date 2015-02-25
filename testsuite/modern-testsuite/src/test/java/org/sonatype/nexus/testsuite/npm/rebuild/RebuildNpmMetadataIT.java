@@ -48,7 +48,7 @@ public class RebuildNpmMetadataIT
     FileUtils.copyFile(testData().resolveFile("uppercase-0.1.1.tgz"),
         new File(hostRepositoryStorage, "uppercase/-/uppercase-0.1.1.tgz"), false);
     FileUtils.copyFile(testData().resolveFile("boxeen-0.1.0.tgz"),
-        new File(hostRepositoryStorage, "uppercase/-/uppercase-0.1.0.tgz"), false);
+        new File(hostRepositoryStorage, "boxeen/-/boxeen-0.1.0.tgz"), false);
 
     final Scheduler scheduler = client().getSubsystem(Scheduler.class);
     scheduler.run("NpmHostedMetadataRebuildTask", null);
