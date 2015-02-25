@@ -24,13 +24,13 @@ public class UnavailableConnection
     extends RemoteConnectionSupport
 {
 
-  private IOException exception;
+  private IOException cause;
 
   public UnavailableConnection(final ProxyFacetSupport proxyFacet,
-                               final IOException e)
+                               final IOException cause)
   {
     super(proxyFacet);
-    this.exception = e;
+    this.cause = cause;
   }
 
   @Override
@@ -41,7 +41,7 @@ public class UnavailableConnection
       return result;
     }
     catch (IOException e) {
-      exception = e;
+      cause = e;
       if (!isRemoteUnavailable(e)) {
         proxyFacet.setRemoteConnection(new AvailableConnection(proxyFacet));
       }
@@ -51,7 +51,7 @@ public class UnavailableConnection
 
   @Override
   public RemoteConnectionStatus getStatus() {
-    return new RemoteConnectionStatus("Remote Unavailable", exception.getMessage(), validUntil());
+    return new RemoteConnectionStatus("Remote Unavailable", getReason(cause), validUntil());
   }
 
 }

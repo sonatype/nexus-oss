@@ -26,14 +26,14 @@ public class AutoBlockedUnavailableConnection
     extends RemoteConnectionSupport
 {
 
-  private IOException exception;
+  private IOException cause;
 
   public AutoBlockedUnavailableConnection(final ProxyFacetSupport proxyFacet,
-                                          final IOException e)
+                                          final IOException cause)
   {
     // TODO shall the 20 seconds be configurable?
     super(proxyFacet, new FibonacciNumberSequence(Time.seconds(20).toMillis()));
-    this.exception = e;
+    this.cause = cause;
   }
 
   @Override
@@ -45,19 +45,19 @@ public class AutoBlockedUnavailableConnection
         return result;
       }
       catch (IOException e) {
-        exception = e;
+        cause = e;
         if (!isRemoteUnavailable(e)) {
           proxyFacet.setRemoteConnection(new AutoBlockingAvailableConnection(proxyFacet));
         }
       }
     }
-    throw exception;
+    throw cause;
   }
 
   @Override
   public RemoteConnectionStatus getStatus() {
     return new RemoteConnectionStatus(
-        "Remote Automatically Blocked and Unavailable", exception.getMessage(), validUntil()
+        "Remote Automatically Blocked and Unavailable", getReason(cause), validUntil()
     );
   }
 

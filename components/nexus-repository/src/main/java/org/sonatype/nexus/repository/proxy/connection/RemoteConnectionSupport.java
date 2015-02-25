@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 import org.sonatype.nexus.common.sequence.ConstantNumberSequence;
 import org.sonatype.nexus.common.sequence.NumberSequence;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
@@ -111,6 +113,13 @@ public abstract class RemoteConnectionSupport
 
   protected DateTime validUntil() {
     return validUntil;
+  }
+
+  protected String getReason(final Exception e) {
+    if (e instanceof SSLPeerUnverifiedException) {
+      return "Untrusted Remote";
+    }
+    return e.getMessage();
   }
 
   /**
