@@ -83,9 +83,15 @@ public abstract class ProxyFacetSupport
 
   @Override
   protected void doStart() throws Exception {
-    remoteConnection = createRemoteState();
+    if (!enabled) {
+      remoteConnection = new ManuallyBlockedConnection();
+    }
+    else {
+      remoteConnection = new UnknownConnection(this, autoBlock);
+    }
     log.debug("Remote connection status set to '{}'", remoteConnection.getStatus().getDescription());
     // TODO start periodic status check thread
+
     if (remoteUrlChanged) {
       remoteUrlChanged = false;
       try {
@@ -98,8 +104,12 @@ public abstract class ProxyFacetSupport
   }
 
   @Override
-  protected void doDestroy() throws Exception {
+  protected void doStop() throws Exception {
     // TODO stop periodic status check thread
+  }
+
+  @Override
+  protected void doDestroy() throws Exception {
     remoteUrl = null;
   }
 
@@ -178,13 +188,6 @@ public abstract class ProxyFacetSupport
    * Provide the relative URL to the
    */
   protected abstract String getUrl(final @Nonnull Context context);
-
-  private RemoteConnection createRemoteState() {
-    if (!enabled) {
-      return new ManuallyBlockedConnection();
-    }
-    return new UnknownConnection(this, autoBlock);
-  }
 
   private boolean isStale(final Context context) throws IOException {
     if (artifactMaxAgeMinutes < 0) {
