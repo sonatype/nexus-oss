@@ -27,14 +27,16 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.Iso8601Date;
 
-import com.bolyuba.nexus.plugin.npm.internal.Version;
 import com.bolyuba.nexus.plugin.npm.service.HostedMetadataService;
 import com.bolyuba.nexus.plugin.npm.service.PackageRoot;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -92,7 +94,7 @@ public class RecreateMetadataWalkerProcessor
   public void onCollectionExit(final WalkerContext context, final StorageCollectionItem coll)
       throws Exception
   {
-    final TreeMap<Version, Map<String, Object>> versions = Maps.newTreeMap();
+    final TreeMap<String, Map<String, Object>> versions = Maps.newTreeMap(new AlphanumComparator());
 
     // collect all the possible tarballs
     final Collection<StorageItem> items = coll.list();
@@ -114,7 +116,7 @@ public class RecreateMetadataWalkerProcessor
           log.info("Malformed package.json in {}", file.getRepositoryItemUid());
           continue;
         }
-        final Version version = Version.parse(String.valueOf(versionJson.get("version")));
+        final String version = String.valueOf(versionJson.get("version"));
         final Map<String, Object> dist = Maps.newHashMap();
         dist.put("tarball", "generated-on-request"); // We lost original value, but does not matter as is NX hosted
         dist.put("shasum", file.getRepositoryItemAttributes().get(StorageFileItem.DIGEST_SHA1_KEY));
@@ -137,7 +139,7 @@ public class RecreateMetadataWalkerProcessor
     rootJson.put("versions", Maps.<String, Object>newHashMap());
     rootJson.put("x-nx-rebuilt", Iso8601Date.format(new Date()));
 
-    for (Version version : versions.keySet()) {
+    for (String version : versions.keySet()) {
       try {
         processPackageJson(rootJson, versions.get(version));
       }
@@ -179,8 +181,8 @@ public class RecreateMetadataWalkerProcessor
           if (indexOfSlash > 0) {
             tarEntryName = tarEntry.getName().substring(indexOfSlash);
           }
+          log.debug("tarEntry={}, name={}", tarEntry.getName(), tarEntryName);
         }
-        log.debug("tarEntry={}, name={}", tarEntry.getName(), tarEntryName);
       }
       while (tarEntryName != null && !PACKAGE_JSON_PATH.equals(tarEntryName));
       // checks for corrupted data, we do want to report these
@@ -191,9 +193,21 @@ public class RecreateMetadataWalkerProcessor
       // do this in memory, as package.json is expected to be fairly small (few kb at most)
       final ByteArrayOutputStream bos = new ByteArrayOutputStream(Ints.checkedCast(tarEntry.getSize()));
       StreamSupport.copy(tarArchiveInputStream, bos, StreamSupport.BUFFER_SIZE);
-      final Map<String, Object> packageJson = objectMapper
-          .readValue(bos.toByteArray(), new TypeReference<HashMap<String, Object>>() { });
-      return packageJson;
+
+      try {
+        return objectMapper.readValue(bos.toByteArray(), new TypeReference<HashMap<String, Object>>() { });
+      }
+      catch (JsonParseException e) {
+        // fallback
+        if (e.getMessage().contains("Invalid UTF-8 middle byte")) {
+          log.debug("Tarball {} contains non-UTF package.json, parsing as ISO-8859-1: {}",
+              file.getRepositoryItemUid(), e.getMessage());
+          // try again, but assume ISO8859-1 encoding now, that is illegal for JSON
+          return objectMapper.readValue(new String(bos.toByteArray(), Charsets.ISO_8859_1),
+              new TypeReference<HashMap<String, Object>>() { });
+        }
+        throw e;
+      }
     }
   }
 
