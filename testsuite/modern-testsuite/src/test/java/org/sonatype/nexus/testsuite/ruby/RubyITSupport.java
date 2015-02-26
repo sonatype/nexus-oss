@@ -146,6 +146,20 @@ public abstract class RubyITSupport
     return new BundleRunner(ruby());
   }
 
+  protected File assertFileDownloadSize(String repoId, String name, Matcher<Long> matcher) {
+    File download = new File(util.createTempDir(), "null");
+    try {
+      content().download(new Location(repoId, name), download);
+    }
+    catch (Exception e) {
+      // just ignore it and let matcher test
+    }
+    assertThat("exists " + name, download.exists(), is(true));
+    assertThat("size of " + name, download.length(), matcher);
+    download.deleteOnExit();
+    return download;
+  }
+
   protected File assertFileDownload(String repoId, String name, Matcher<Boolean> matcher) {
     File download = new File(util.createTempDir(), "null");
     try {
@@ -176,6 +190,7 @@ public abstract class RubyITSupport
     return configuration
         .setLogLevel("org.sonatype.nexus.ruby", "TRACE")
         .setLogLevel("org.sonatype.nexus.plugins.ruby", "TRACE")
+        .setLogLevel("remote.storage.outbound", "DEBUG")
         .addPlugins(
             artifactResolver().resolvePluginFromDependencyManagement(
                 "org.sonatype.nexus.plugins", "nexus-ruby-plugin"

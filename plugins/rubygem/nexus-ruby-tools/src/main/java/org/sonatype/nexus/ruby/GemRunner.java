@@ -26,8 +26,6 @@ public class GemRunner
 {
   private final String baseUrl;
 
-  private boolean listRemoteFirstRun = true;
-
   public GemRunner(ScriptingContainer ruby, String baseUrl) {
     super(ruby, newScript(ruby));
     this.baseUrl = baseUrl;
@@ -84,6 +82,14 @@ public class GemRunner
     return callMethod("exec", args.toArray(), String.class);
   }
 
+  public String clearCache() {
+    List<String> args = new ArrayList<String>();
+    args.add("sources");
+    args.add("--clear-all");
+
+    return callMethod("exec", args.toArray(), String.class);
+  }
+
   public String list() {
     return list(null);
   }
@@ -95,12 +101,6 @@ public class GemRunner
       args.add("-l");
     }
     else {
-      if (this.listRemoteFirstRun) {
-        this.listRemoteFirstRun = false;
-      }
-      else {
-        System.err.println(">>>>>>>>>>>>> repeated calls here only show the cached first call");
-      }
       args.add("-r");
       setSource(args, repoId);
     }

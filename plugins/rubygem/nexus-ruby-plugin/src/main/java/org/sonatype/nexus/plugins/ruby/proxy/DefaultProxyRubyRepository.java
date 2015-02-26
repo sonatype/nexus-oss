@@ -116,7 +116,7 @@ public class DefaultProxyRubyRepository
 
   @Override
   protected boolean isOld(StorageItem item) {
-    if (item.getName().contains("specs.4.8")) {
+    if (item.getName().endsWith("specs.4.8")) {
       // whenever there is retrieve call to the ungzipped file it will be forwarded to call for the gzipped file
       return false;
     }
