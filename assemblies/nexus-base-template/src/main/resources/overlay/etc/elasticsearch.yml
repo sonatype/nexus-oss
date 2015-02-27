@@ -4,6 +4,7 @@ http.enabled: false
 node.local: true
 discovery.zen.ping.multicast.enabled: false
 path.data: ${nexus-work}/elasticsearch
+script.groovy.sandbox.enabled: false
 
 ##################### Elasticsearch Configuration Example #####################
 
