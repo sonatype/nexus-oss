@@ -25,6 +25,7 @@ import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Get;
 import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Head;
 
+import com.google.inject.Module;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
@@ -39,10 +40,13 @@ import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.packer.IndexPacker;
 import org.apache.maven.index.packer.IndexPackingRequest;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.eclipse.sisu.plexus.PlexusSpaceModule;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.URLClassSpace;
 import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertTrue;
 
 // This is an IT just because it runs longer then 15 seconds
 public class ReindexIT
@@ -163,7 +167,7 @@ public class ReindexIT
    */
   protected void reindexRemoteRepositoryAndPublish(File repositoryRoot, String repositoryId,
                                                    boolean deleteIndexFiles, int shiftDays)
-      throws IOException, ComponentLookupException
+      throws IOException
   {
     File indexDirectory = getIndexFamilyDirectory(repositoryId);
 
@@ -171,7 +175,7 @@ public class ReindexIT
 
     IndexingContext ctx =
         nexusIndexer.addIndexingContextForced(repositoryId + "-temp", repositoryId, repositoryRoot, directory,
-            null, null, new IndexCreatorHelper(getContainer()).getFullCreators());
+            null, null, new IndexCreatorHelper(getTestInjector()).getFullCreators());
 
     // shifting if needed (very crude way to do it, but heh)
     shiftContextInTime(ctx, shiftDays);
@@ -354,4 +358,8 @@ public class ReindexIT
     validateIndexWithIdentify(true, "f0a0d2e29ed910808c33135a3a5a51bba6358f7b", "log4j", "log4j", "1.2.15");
   }
 
+  @Override
+  protected Module spaceModule() {
+    return new PlexusSpaceModule(new URLClassSpace(getClassLoader()), BeanScanning.INDEX);
+  }
 }

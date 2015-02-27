@@ -28,9 +28,13 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
+import com.google.inject.Module;
 import junit.framework.Assert;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelSource;
+import org.eclipse.sisu.plexus.PlexusSpaceModule;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.URLClassSpace;
 import org.junit.Test;
 
 public class MavenBridgeIT
@@ -103,5 +107,10 @@ public class MavenBridgeIT
     // for debug
     //MavenXpp3Writer w = new MavenXpp3Writer();
     //w.write( System.out, model );
+  }
+
+  @Override
+  protected Module spaceModule() {
+    return new PlexusSpaceModule(new URLClassSpace(getClassLoader()), BeanScanning.INDEX);
   }
 }

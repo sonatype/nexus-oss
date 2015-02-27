@@ -15,6 +15,7 @@ package org.sonatype.nexus;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
+import java.util.Properties;
 
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.events.EventSubscriberHost;
@@ -33,7 +34,6 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.apache.shiro.util.ThreadContext;
-import org.codehaus.plexus.context.Context;
 import org.junit.After;
 
 import static org.junit.Assert.fail;
@@ -118,8 +118,8 @@ public abstract class NexusAppTestSupport
   }
 
   @Override
-  protected void customizeContext(Context ctx) {
-    super.customizeContext(ctx);
+  protected void customizeProperties(Properties ctx) {
+    super.customizeProperties(ctx);
     ctx.put(PROXY_SERVER_PORT, String.valueOf(allocatePort()));
   }
 

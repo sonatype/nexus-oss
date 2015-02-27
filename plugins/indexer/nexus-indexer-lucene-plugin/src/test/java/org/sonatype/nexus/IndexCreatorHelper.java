@@ -15,9 +15,10 @@ package org.sonatype.nexus;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.apache.maven.index.context.IndexCreator;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * Creators that can be used in tests.
@@ -30,11 +31,10 @@ public class IndexCreatorHelper
 
   private List<IndexCreator> m_minCreators = new ArrayList<IndexCreator>();
 
-  public IndexCreatorHelper(PlexusContainer testCaseContainer)
-      throws ComponentLookupException
+  public IndexCreatorHelper(Injector injector)
   {
-    IndexCreator min = testCaseContainer.lookup(IndexCreator.class, "min");
-    IndexCreator jar = testCaseContainer.lookup(IndexCreator.class, "jarContent");
+    IndexCreator min = injector.getInstance(Key.get(IndexCreator.class, Names.named("min")));
+    IndexCreator jar = injector.getInstance(Key.get(IndexCreator.class, Names.named("jarContent")));
 
     m_minCreators.add(min);
 

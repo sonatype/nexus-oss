@@ -24,20 +24,24 @@ import java.util.Random;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
 import com.google.common.collect.Lists;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.name.Names;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.DefaultContext;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.LoggerManager;
+import org.eclipse.sisu.bean.BeanManager;
+import org.eclipse.sisu.bean.LifecycleModule;
+import org.eclipse.sisu.inject.BeanLocator;
+import org.eclipse.sisu.inject.DefaultBeanLocator;
+import org.eclipse.sisu.inject.MutableBeanLocator;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.SpaceModule;
+import org.eclipse.sisu.space.URLClassSpace;
+import org.eclipse.sisu.wire.ParameterKeys;
+import org.eclipse.sisu.wire.WireModule;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -67,11 +71,15 @@ public abstract class NexusTestSupport
     System.setProperty("user.dir", util.getBaseDir().getAbsolutePath());
   }
 
-  private PlexusContainer container;
+  private Module bootModule;
+
+  private Injector testInjector;
+
+  private Properties testProperties;
 
   private Properties sysPropsBackup;
 
-  private File plexusHomeDir = null;
+  private File testHomeDir = null;
 
   private File appsHomeDir = null;
 
@@ -96,10 +104,10 @@ public abstract class NexusTestSupport
   protected void setUp() throws Exception {
     sysPropsBackup = System.getProperties();
 
-    // simply to make sure customizeContext is handled before anything else
-    getContainer();
+    // simply to make sure customizeProperties is handled before anything else
+    getTestInjector();
 
-    plexusHomeDir.mkdirs();
+    testHomeDir.mkdirs();
     appsHomeDir.mkdirs();
     workHomeDir.mkdirs();
     confHomeDir.mkdirs();
@@ -108,85 +116,72 @@ public abstract class NexusTestSupport
     tempDir.mkdirs();
   }
 
-  protected void setupContainer() {
-    final DefaultContext context = new DefaultContext();
-    context.put("basedir", getBasedir());
-    customizeContext(context);
+  protected void setupTestInjector() {
+    testProperties = new Properties();
+    testProperties.put("basedir", getBasedir());
 
-    final boolean hasPlexusHome = context.contains("plexus.home");
-    if (!hasPlexusHome) {
-      final File f = getTestFile("target/plexus-home");
+    customizeProperties(testProperties);
+
+    final boolean hasTestHome = testProperties.contains("test.home");
+    if (!hasTestHome) {
+      final File f = getTestFile("target/test-home");
       if (!f.isDirectory()) {
         f.mkdir();
       }
 
-      context.put("plexus.home", f.getAbsolutePath());
+      testProperties.put("test.home", f.getAbsolutePath());
     }
 
-    final String config = getCustomConfigurationName();
-    final ContainerConfiguration containerConfiguration =
-        new DefaultContainerConfiguration().setName("test").setContext(context.getContextData());
+    bootModule = new AbstractModule()
+    {
+      private final MutableBeanLocator beanLocator = new DefaultBeanLocator();
 
-    if (config != null) {
-      containerConfiguration.setContainerConfiguration(config);
-    }
-    else {
-      final String resource = getConfigurationName(null);
-      containerConfiguration.setContainerConfiguration(resource);
-    }
+      private final LifecycleModule lifecycleModule = new LifecycleModule();
 
-    customizeContainerConfiguration(containerConfiguration);
+      @Override
+      protected void configure() {
+        bind(MutableBeanLocator.class).toInstance(beanLocator);
+        bind(ParameterKeys.PROPERTIES).toInstance(getTestProperties());
+        install(lifecycleModule);
+      }
+    };
 
     try {
-      List<Module> modules = Lists.newLinkedList();
-      Module[] customModules = getTestCustomModules();
-      if (customModules != null) {
-        modules.addAll(Lists.newArrayList(customModules));
-      }
+      final List<Module> modules = Lists.newLinkedList();
+
+      modules.add(bootModule());
+      modules.add(spaceModule());
       customizeModules(modules);
 
-      container = new DefaultPlexusContainer(containerConfiguration, modules.toArray(new Module[modules.size()]));
+      testInjector = Guice.createInjector(new WireModule(modules));
     }
-    catch (final PlexusContainerException e) {
+    catch (final Exception e) {
       e.printStackTrace();
-      Assert.fail("Failed to create plexus container.");
+      Assert.fail("Failed to create test injector.");
     }
   }
 
-  /**
-   * @deprecated Use {@link #customizeModules(List)} instead.
-   */
-  @Deprecated
-  protected Module[] getTestCustomModules() {
-    return null;
+  protected Module bootModule() {
+    return bootModule;
+  }
+
+  protected Module spaceModule() {
+    return new SpaceModule(new URLClassSpace(getClassLoader()), BeanScanning.INDEX);
   }
 
   protected void customizeModules(final List<Module> modules) {
     // empty
   }
 
-  /**
-   * @deprecated Avoid usage of Plexus apis.
-   */
-  @Deprecated
-  protected void customizeContainerConfiguration(final ContainerConfiguration containerConfiguration) {
-    containerConfiguration.setAutoWiring(true);
-    containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-  }
-
-  /**
-   * @deprecated Avoid usage of Plexus apis.
-   */
-  @Deprecated
-  protected void customizeContext(final Context ctx) {
-    plexusHomeDir = new File(
-        getBasedir(), "target/plexus-home-" + new Random(System.currentTimeMillis()).nextLong()
+  protected void customizeProperties(final Properties ctx) {
+    testHomeDir = new File(
+        getBasedir(), "target/test-home-" + new Random(System.currentTimeMillis()).nextLong()
     );
-    appsHomeDir = new File(plexusHomeDir, "apps");
-    workHomeDir = new File(plexusHomeDir, "nexus-work");
+    appsHomeDir = new File(testHomeDir, "apps");
+    workHomeDir = new File(testHomeDir, "nexus-work");
     confHomeDir = new File(workHomeDir, "etc");
-    baseHomeDir = new File(plexusHomeDir, "nexus-base");
-    nexusappHomeDir = new File(plexusHomeDir, "nexus-app");
+    baseHomeDir = new File(testHomeDir, "nexus-base");
+    nexusappHomeDir = new File(testHomeDir, "nexus-app");
     tempDir = new File(workHomeDir, "tmp");
 
     ctx.put(WORK_CONFIGURATION_KEY, workHomeDir.getAbsolutePath());
@@ -195,6 +190,17 @@ public abstract class NexusTestSupport
     ctx.put(NEXUS_BASE_CONFIGURATION_KEY, baseHomeDir.getAbsolutePath());
     ctx.put(NEXUS_APP_CONFIGURATION_KEY, nexusappHomeDir.getAbsolutePath());
     ctx.put("java.io.tmpdir", tempDir.getAbsolutePath());
+  }
+
+  protected Properties getTestProperties() {
+    return testProperties;
+  }
+
+  protected Injector getTestInjector() {
+    if (testInjector == null) {
+      setupTestInjector();
+    }
+    return testInjector;
   }
 
   /**
@@ -207,17 +213,17 @@ public abstract class NexusTestSupport
 
   protected void tearDown() throws Exception {
     try {
-      if (container != null) {
-        container.dispose();
-
-        container = null;
+      if (testInjector != null) {
+        testInjector.getInstance(BeanManager.class).unmanage();
       }
     }
     finally {
+      bootModule = null;
+      testInjector = null;
+
       System.setProperties(sysPropsBackup);
     }
-
-    cleanDir(plexusHomeDir);
+    cleanDir(testHomeDir);
   }
 
   protected void cleanDir(File dir) {
@@ -229,50 +235,6 @@ public abstract class NexusTestSupport
         // couldn't delete directory, too bad
       }
     }
-  }
-
-  /**
-   * @deprecated Avoid usage of Plexus apis.
-   */
-  @Deprecated
-  protected PlexusContainer getContainer() {
-    if (container == null) {
-      setupContainer();
-    }
-
-    return container;
-  }
-
-  /**
-   * @deprecated Avoid usage of Plexus apis (this is used to access plexus xml configuration files).
-   */
-  @Deprecated
-  protected InputStream getConfiguration() throws Exception {
-    return getConfiguration(null);
-  }
-
-  /**
-   * @deprecated Avoid usage of Plexus apis (this is used to access plexus xml configuration files).
-   */
-  @Deprecated
-  protected InputStream getConfiguration(final String subname) throws Exception {
-    return getResourceAsStream(getConfigurationName(subname));
-  }
-
-  /**
-   * @deprecated Avoid usage of Plexus apis (this is used to access plexus xml configuration files).
-   */
-  @Deprecated
-  protected String getCustomConfigurationName() {
-    return null;
-  }
-
-  /**
-   * @deprecated Avoid usage of Plexus apis (this is used to access plexus xml configuration files).
-   */
-  @Deprecated
-  protected String getConfigurationName(final String subname) {
-    return getClass().getName().replace('.', '/') + ".xml";
   }
 
   protected InputStream getResourceAsStream(final String resource) {
@@ -287,34 +249,14 @@ public abstract class NexusTestSupport
   // Container access
   // ----------------------------------------------------------------------
 
-  /**
-   * @deprecated Avoid usage of Plexus apis (string role/hint lookup is plexus specific).
-   */
-  protected Object lookup(final String componentKey) throws Exception {
-    return getContainer().lookup(componentKey);
+  public <T> T lookup(final Class<T> componentClass) {
+    return getTestInjector().getInstance(BeanLocator.class).locate( //
+        Key.get(componentClass)).iterator().next().getValue();
   }
 
-  /**
-   * @deprecated Avoid usage of Plexus apis (string role/hint lookup is plexus specific).
-   */
-  @Deprecated
-  protected Object lookup(final String role, final String roleHint) throws Exception {
-    return getContainer().lookup(role, roleHint);
-  }
-
-  protected <T> T lookup(final Class<T> componentClass) throws Exception {
-    return getContainer().lookup(componentClass);
-  }
-
-  protected <T> T lookup(final Class<T> componentClass, final String roleHint) throws Exception {
-    return getContainer().lookup(componentClass, roleHint);
-  }
-
-  /**
-   * @deprecated Avoid usage of Plexus apis.
-   */
-  protected void release(final Object component) throws Exception {
-    getContainer().release(component);
+  public <T> T lookup(final Class<T> componentClass, final String roleHint) {
+    return getTestInjector().getInstance(BeanLocator.class).locate( //
+        Key.get(componentClass, Names.named(roleHint))).iterator().next().getValue();
   }
 
   // ----------------------------------------------------------------------
@@ -337,30 +279,6 @@ public abstract class NexusTestSupport
 
   public String getBasedir() {
     return util.getBaseDir().getAbsolutePath();
-  }
-
-  /**
-   * @deprecated Avoid usage of Plexus apis.
-   */
-  protected LoggerManager getLoggerManager() throws ComponentLookupException {
-    LoggerManager loggerManager = getContainer().lookup(LoggerManager.class);
-    // system property helps configure logger - see NXCM-3230
-    String testLogLevel = System.getProperty("test.log.level");
-    if (testLogLevel != null) {
-      if (testLogLevel.equalsIgnoreCase("DEBUG")) {
-        loggerManager.setThresholds(Logger.LEVEL_DEBUG);
-      }
-      else if (testLogLevel.equalsIgnoreCase("INFO")) {
-        loggerManager.setThresholds(Logger.LEVEL_INFO);
-      }
-      else if (testLogLevel.equalsIgnoreCase("WARN")) {
-        loggerManager.setThresholds(Logger.LEVEL_WARN);
-      }
-      else if (testLogLevel.equalsIgnoreCase("ERROR")) {
-        loggerManager.setThresholds(Logger.LEVEL_ERROR);
-      }
-    }
-    return loggerManager;
   }
 
   // ========================= CUSTOM NEXUS =====================

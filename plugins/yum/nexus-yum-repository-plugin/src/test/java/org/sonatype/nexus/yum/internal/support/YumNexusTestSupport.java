@@ -51,9 +51,6 @@ import com.google.code.tempusfugit.temporal.Timeout;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.apache.commons.lang.RandomStringUtils;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -141,12 +138,6 @@ public class YumNexusTestSupport
   }
 
   @Override
-  protected void customizeContainerConfiguration(final ContainerConfiguration configuration) {
-    super.customizeContainerConfiguration(configuration);
-    configuration.setClassPathScanning(PlexusConstants.SCANNING_ON);
-  }
-
-  @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
     YumStore store = mock(YumStore.class);
@@ -178,21 +169,15 @@ public class YumNexusTestSupport
   {
     for (Field field : getAllFields()) {
       if (field.getAnnotation(Inject.class) != null) {
-        lookupField(field, "");
-        continue;
-      }
-
-      Requirement requirement = field.getAnnotation(Requirement.class);
-      if (requirement != null) {
-        lookupField(field, requirement.hint());
+        lookupField(field);
       }
     }
   }
 
-  private void lookupField(Field field, String hint)
+  private void lookupField(Field field)
       throws Exception
   {
-    Object value = lookup(field.getType(), hint);
+    Object value = lookup(field.getType());
     if (!field.isAccessible()) {
       field.setAccessible(true);
       field.set(this, value);

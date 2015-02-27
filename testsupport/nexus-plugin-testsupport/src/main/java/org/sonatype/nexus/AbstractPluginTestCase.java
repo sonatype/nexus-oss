@@ -15,16 +15,16 @@ package org.sonatype.nexus;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
-
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.eclipse.sisu.plexus.PlexusAnnotatedBeanModule;
-import org.eclipse.sisu.plexus.PlexusBeanModule;
+import com.google.common.collect.Lists;
+import com.google.inject.Guice;
+import com.google.inject.Module;
+import org.eclipse.sisu.space.BeanScanning;
 import org.eclipse.sisu.space.ClassSpace;
+import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.space.URLClassSpace;
+import org.eclipse.sisu.wire.WireModule;
 import org.junit.Assert;
 
 /**
@@ -41,25 +41,23 @@ public abstract class AbstractPluginTestCase
   protected String[] sourceDirectories = {"target/classes", "target/test-classes"};
 
   @Override
-  protected void setupContainer() {
-    super.setupContainer();
+  protected void setupTestInjector() {
+    super.setupTestInjector();
 
     try {
-      final List<URL> scanList = new ArrayList<URL>();
-
       final String[] sourceDirs = getSourceDirectories();
-      for (String sourceDir : sourceDirs) {
-        scanList.add(getTestFile(sourceDir).toURI().toURL());
+      final URL[] scanUrls = new URL[sourceDirs.length];
+      for (int i = 0; i < sourceDirs.length; i++) {
+        scanUrls[i] = getTestFile(sourceDirs[i]).toURI().toURL();
       }
 
-      final ClassSpace annSpace =
-          new URLClassSpace(getContainer().getContainerRealm(), scanList.toArray(new URL[scanList.size()]));
-      final PlexusBeanModule nexusPluginModule =
-          new PlexusAnnotatedBeanModule(annSpace, new HashMap<String, String>());
-      final List<PlexusBeanModule> modules = Arrays.<PlexusBeanModule>asList(nexusPluginModule);
+      final List<Module> modules = Lists.newLinkedList();
 
-      // register new injector
-      ((DefaultPlexusContainer) getContainer()).addPlexusInjector(modules);
+      modules.add(bootModule());
+      final ClassSpace pluginSpace = new URLClassSpace(getClassLoader(), scanUrls);
+      modules.add(new SpaceModule(pluginSpace, BeanScanning.INDEX));
+
+      Guice.createInjector(new WireModule(modules));
     }
     catch (Exception e) {
       e.printStackTrace();

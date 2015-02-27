@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 
+import com.google.inject.Module;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.maven.index.NexusIndexer;
@@ -26,6 +27,9 @@ import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.creator.MavenArchetypeArtifactInfoIndexCreator;
 import org.apache.maven.index.creator.MavenPluginArtifactInfoIndexCreator;
 import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
+import org.eclipse.sisu.plexus.PlexusSpaceModule;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.URLClassSpace;
 
 public abstract class AbstractMacPluginTest
     extends NexusAppTestSupport
@@ -62,5 +66,10 @@ public abstract class AbstractMacPluginTest
     nexusIndexer = lookup(NexusIndexer.class);
 
     macPlugin = lookup(MacPlugin.class);
+  }
+
+  @Override
+  protected Module spaceModule() {
+    return new PlexusSpaceModule(new URLClassSpace(getClassLoader()), BeanScanning.INDEX);
   }
 }

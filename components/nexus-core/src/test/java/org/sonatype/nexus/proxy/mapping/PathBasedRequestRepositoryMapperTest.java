@@ -118,7 +118,7 @@ public class PathBasedRequestRepositoryMapperTest
 
     }
 
-    groupRepo = (M2GroupRepository) getContainer().lookup(GroupRepository.class, "maven2");
+    groupRepo = (M2GroupRepository) lookup(GroupRepository.class, "maven2");
 
     CRepository repoGroupConf = new DefaultCRepository();
 

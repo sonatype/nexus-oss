@@ -27,7 +27,6 @@ import org.sonatype.nexus.proxy.targets.DefaultTargetRegistry;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.DirectoryWalkListener;
 import org.codehaus.plexus.util.DirectoryWalker;
 
@@ -56,8 +55,6 @@ public abstract class AbstractMavenRepoContentTests
       throws Exception
   {
     super.setUp();
-
-    getLoggerManager().setThresholds(Logger.LEVEL_DEBUG);
 
     startNx();
 
@@ -120,7 +117,7 @@ public abstract class AbstractMavenRepoContentTests
 
     // make apache-snapshots point to local fake repo
     ((MavenProxyRepository) apacheSnapshots).setRemoteUrl("http://localhost:" +
-        super.getContainer().getContext().get(PROXY_SERVER_PORT) + "/apache-snapshots/");
+        getTestProperties().get(PROXY_SERVER_PORT) + "/apache-snapshots/");
     ((MavenProxyRepository) apacheSnapshots).setDownloadRemoteIndexes(false);
     nexusConfiguration().saveConfiguration();
     // saving the configuration will trigger an re-indexing task for apache-snapshots

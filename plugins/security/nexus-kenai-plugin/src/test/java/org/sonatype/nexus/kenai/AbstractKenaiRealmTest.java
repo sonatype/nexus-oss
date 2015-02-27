@@ -22,8 +22,6 @@ import org.sonatype.tests.http.server.fluent.Server;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
 import org.junit.Rule;
 
 import static org.mockito.Mockito.mock;
@@ -58,12 +56,6 @@ public abstract class AbstractKenaiRealmTest
         binder.bind(Kenai.class).toInstance(mockKenai());
       }
     });
-  }
-
-  @Override
-  protected void customizeContainerConfiguration(final ContainerConfiguration configuration) {
-    super.customizeContainerConfiguration(configuration);
-    configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
   }
 
   protected Kenai mockKenai() {

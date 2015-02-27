@@ -21,12 +21,16 @@ import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+import com.google.inject.Module;
 import org.apache.lucene.search.Query;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.context.IndexingContext;
+import org.eclipse.sisu.plexus.PlexusSpaceModule;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.URLClassSpace;
 
 import static org.junit.Assert.fail;
 
@@ -137,5 +141,10 @@ public abstract class AbstractIndexerManagerTest
     });
 
     assertEquals(1, contextDirs.length);
+  }
+
+  @Override
+  protected Module spaceModule() {
+    return new PlexusSpaceModule(new URLClassSpace(getClassLoader()), BeanScanning.INDEX);
   }
 }
