@@ -28,7 +28,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 public interface SpecsHelper {
 
   /**
-   * create an emptry spec index, i.e. create mashaled ruby object for an empty spec index
+   * create an emptry spec index, i.e. create marshaled ruby object for an empty spec index
    * @return the stream to data
    */
   ByteArrayInputStream createEmptySpecs();

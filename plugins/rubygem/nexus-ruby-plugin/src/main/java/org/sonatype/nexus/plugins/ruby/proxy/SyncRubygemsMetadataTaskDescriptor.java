@@ -43,7 +43,7 @@ public class SyncRubygemsMetadataTaskDescriptor
   }
 
   public String getName() {
-    return "Synchronize Proxied Rubygems Metadata Files";
+    return "Rubygems: Synchronize Proxied Index Files";
   }
 
   @SuppressWarnings("rawtypes")

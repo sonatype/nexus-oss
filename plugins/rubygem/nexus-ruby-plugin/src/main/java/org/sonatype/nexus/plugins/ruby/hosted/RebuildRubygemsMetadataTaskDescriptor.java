@@ -43,7 +43,7 @@ public class RebuildRubygemsMetadataTaskDescriptor
   }
 
   public String getName() {
-    return "Rebuild Hosted Rubygems Metadata Files";
+    return "Rubygems: Rebuild Hosted Index Files";
   }
 
   @SuppressWarnings("rawtypes")

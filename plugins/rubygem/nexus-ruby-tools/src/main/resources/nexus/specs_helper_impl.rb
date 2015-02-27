@@ -60,7 +60,7 @@ module Nexus
     def add_spec( spec, source, type )
       case type.to_s.downcase.to_sym
       when :latest
-        do_add_spec( spec, source, true )
+        do_add_spec( spec, source, true ) unless spec.version.prerelease?
       when :release
         do_add_spec( spec, source ) unless spec.version.prerelease?
       when :prerelease
