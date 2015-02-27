@@ -56,8 +56,8 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Ve
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryMetadataManager;
-import org.sonatype.nexus.util.DigesterUtils;
 
+import com.google.common.hash.Hashing;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
@@ -360,10 +360,10 @@ public class M2Repository
           if (M2ArtifactRecognizer.isChecksum(request.getRequestPath())) {
             String digest;
             if (request.getRequestPath().endsWith(".md5")) {
-              digest = DigesterUtils.getMd5Digest(mdOutput.toByteArray());
+              digest = Hashing.md5().hashBytes(mdOutput.toByteArray()).toString();
             }
             else {
-              digest = DigesterUtils.getSha1Digest(mdOutput.toByteArray());
+              digest = Hashing.sha1().hashBytes(mdOutput.toByteArray()).toString();
             }
             content = (digest + '\n').getBytes("UTF-8");
           }

@@ -15,8 +15,6 @@ package org.sonatype.nexus.configuration;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-
 /**
  * An event fired on configuration change (upon succesful save). This event is meant for component outside of
  * "configuration framework", for any other component interested in configuration change (like feed generators, mail

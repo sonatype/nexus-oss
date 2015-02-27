@@ -10,17 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.security.SecuritySystem
+import org.sonatype.nexus.security.settings.SecuritySettingsManager
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -37,11 +38,10 @@ import javax.validation.constraints.NotNull
 @Singleton
 @DirectAction(action = 'coreui_AnonymousSettings')
 class AnonymousSettingsComponent
-extends DirectComponentSupport
+    extends DirectComponentSupport
 {
-
   @Inject
-  NexusConfiguration nexusConfiguration
+  SecuritySettingsManager securitySettingsManager
 
   @Inject
   SecuritySystem securitySystem
@@ -53,11 +53,11 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:settings:read')
   AnonymousSettingsXO read() {
-    boolean customUser = nexusConfiguration.anonymousUsername != 'anonymous'
+    boolean customUser = securitySettingsManager.anonymousUsername != 'anonymous'
     return new AnonymousSettingsXO(
-        enabled: nexusConfiguration.anonymousAccessEnabled,
+        enabled: securitySettingsManager.anonymousAccessEnabled,
         useCustomUser: customUser,
-        username: customUser ? nexusConfiguration.anonymousUsername : null,
+        username: customUser ? securitySettingsManager.anonymousUsername : null,
         password: customUser ? Password.fakePassword() : null
     )
   }
@@ -69,12 +69,14 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
-  AnonymousSettingsXO update(final @NotNull(message = '[anonymousXO] may not be null') @Valid AnonymousSettingsXO anonymousXO) {
+  AnonymousSettingsXO update(
+      final @NotNull(message = '[anonymousXO] may not be null') @Valid AnonymousSettingsXO anonymousXO)
+  {
     def username, password
     if (anonymousXO.enabled) {
       if (anonymousXO.useCustomUser) {
         username = anonymousXO.username
-        password = anonymousXO.password?.valueIfValid ?: nexusConfiguration.anonymousPassword
+        password = anonymousXO.password?.valueIfValid ?: securitySettingsManager.anonymousPassword
       }
       else {
         username = 'anonymous'
@@ -85,9 +87,9 @@ extends DirectComponentSupport
       username = null
       password = null
     }
-    nexusConfiguration.setAnonymousAccess(anonymousXO.enabled, username, password)
-    nexusConfiguration.saveConfiguration()
+
+    // FIXME: This should be isolated into securitySettingsManager
+    securitySystem.setAnonymousAccess(anonymousXO.enabled, username, password)
     return read()
   }
-
 }

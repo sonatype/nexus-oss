@@ -17,13 +17,13 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.configuration.validation.InvalidConfigurationException
-import org.sonatype.configuration.validation.ValidationMessage
-import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.common.validation.Create
 import org.sonatype.nexus.common.validation.Update
 import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.configuration.application.NexusConfiguration
+import org.sonatype.nexus.common.validation.ValidationMessage
+import org.sonatype.nexus.common.validation.ValidationResponse
+import org.sonatype.nexus.common.validation.ValidationResponseException
+import org.sonatype.nexus.configuration.ApplicationConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.proxy.NoSuchRepositoryException
@@ -56,7 +56,7 @@ extends DirectComponentSupport
   RequestRepositoryMapper repositoryMapper
 
   @Inject
-  NexusConfiguration nexusConfiguration
+  ApplicationConfiguration nexusConfiguration
 
   @Inject
   RepositoryRegistry repositoryRegistry
@@ -165,26 +165,26 @@ extends DirectComponentSupport
       Pattern.compile(routeXO.pattern)
     }
     catch (PatternSyntaxException e) {
-      validations.addValidationError(new ValidationMessage('pattern', 'Not a valid regular expression'))
+      validations.addError(new ValidationMessage('pattern', 'Not a valid regular expression'))
     }
 
     if (routeXO.mappingType == RepositoryPathMapping.MappingType.BLOCKING) {
       if (routeXO.mappedRepositoriesIds && !routeXO.mappedRepositoriesIds.empty) {
-        validations.addValidationError(new ValidationMessage(
+        validations.addError(new ValidationMessage(
             '*', 'Blocking rule does not allow selecting repositories')
         )
       }
     }
     else {
       if (!routeXO.mappedRepositoriesIds || routeXO.mappedRepositoriesIds.empty) {
-        validations.addValidationError(new ValidationMessage(
+        validations.addError(new ValidationMessage(
             'mappedRepositories', 'At least one repository must be selected')
         )
       }
     }
 
     if (!validations.valid) {
-      throw new InvalidConfigurationException(validations)
+      throw new ValidationResponseException(validations)
     }
   }
 

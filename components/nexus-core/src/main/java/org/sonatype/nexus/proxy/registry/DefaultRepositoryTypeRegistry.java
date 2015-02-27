@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
 import org.sonatype.nexus.proxy.maven.maven1.M1GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
@@ -51,17 +50,11 @@ public class DefaultRepositoryTypeRegistry
 
   private final Map<String, ContentClass> contentClasses;
 
-  private final ApplicationRuntimeConfigurationBuilder applicationRuntimeConfigurationBuilder;
-
-  private ConcurrentMap<String, ContentClass> repoCachedContentClasses;
-
   private Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> repositoryTypeDescriptorsMap;
 
   @Inject
-  public DefaultRepositoryTypeRegistry(final Map<String, ContentClass> contentClasses, final ApplicationRuntimeConfigurationBuilder applicationRuntimeConfigurationBuilder) {
+  public DefaultRepositoryTypeRegistry(final Map<String, ContentClass> contentClasses) {
     this.contentClasses = checkNotNull(contentClasses);
-    this.applicationRuntimeConfigurationBuilder = checkNotNull(applicationRuntimeConfigurationBuilder);
-    this.repoCachedContentClasses = Maps.newConcurrentMap();
 
     Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> result = ArrayListMultimap.create();
     // fill in the defaults
@@ -211,35 +204,9 @@ public class DefaultRepositoryTypeRegistry
 
   @Override
   public ContentClass getRepositoryContentClass(Class<? extends Repository> role, String hint) {
-    if (!getRepositoryRoles().contains(role)) {
-      return null;
+    if (getRepositoryRoles().contains(role)) {
+      return contentClasses.get(hint);
     }
-
-    ContentClass result = null;
-    final String cacheKey = role + ":" + hint;
-
-    if (repoCachedContentClasses.containsKey(cacheKey)) {
-      result = repoCachedContentClasses.get(cacheKey);
-    }
-    else {
-      // TODO: My assumption is that this code is never called
-      // or, it get
-      try {
-        Repository repository = null;
-        try {
-          repository = applicationRuntimeConfigurationBuilder.createRepository(role, hint);
-          result = repository.getRepositoryContentClass();
-          repoCachedContentClasses.put(cacheKey, result);
-        }
-        finally {
-          applicationRuntimeConfigurationBuilder.releaseRepository(repository);
-        }
-      }
-      catch (Exception e) {
-        logger.warn("Container lookup failed", e);
-        result = null;
-      }
-    }
-    return result;
+    return null;
   }
 }

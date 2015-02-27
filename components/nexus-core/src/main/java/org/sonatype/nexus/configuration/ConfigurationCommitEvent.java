@@ -12,15 +12,13 @@
  */
 package org.sonatype.nexus.configuration;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-
 /**
  * An event fired on configuration commit, when configurable components should commit config changes.
  *
  * @author cstamas
  */
 public class ConfigurationCommitEvent
-    extends ConfigurationIOEvent
+    extends ConfigurationEvent
 {
   public ConfigurationCommitEvent(ApplicationConfiguration configuration) {
     super(configuration);

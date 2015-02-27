@@ -18,7 +18,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.common.io.DirSupport;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 public abstract class AbstractRepositoryFolderCleaner
@@ -27,15 +27,15 @@ public abstract class AbstractRepositoryFolderCleaner
 {
   public static final String GLOBAL_TRASH_KEY = "trash";
 
-  private ApplicationConfiguration applicationConfiguration;
+  private ApplicationDirectories applicationDirectories;
 
-  @Inject
-  public void setApplicationConfiguration(final ApplicationConfiguration applicationConfiguration) {
-    this.applicationConfiguration = applicationConfiguration;
+  protected ApplicationDirectories getApplicationDirectories() {
+    return applicationDirectories;
   }
 
-  protected ApplicationConfiguration getApplicationConfiguration() {
-    return applicationConfiguration;
+  @Inject
+  public void setApplicationDirectories(final ApplicationDirectories applicationDirectories) {
+    this.applicationDirectories = applicationDirectories;
   }
 
   /**
@@ -44,11 +44,8 @@ public abstract class AbstractRepositoryFolderCleaner
    * @param file          file to be deleted
    * @param deleteForever if it's true, delete the file forever, if it's false, move the file to trash
    */
-  protected void delete(final File file, final boolean deleteForever)
-      throws IOException
-  {
-    File basketFile =
-        new File(getApplicationConfiguration().getWorkingDirectory(GLOBAL_TRASH_KEY), file.getName());
+  protected void delete(final File file, final boolean deleteForever) throws IOException {
+    File basketFile = new File(applicationDirectories.getWorkDirectory(GLOBAL_TRASH_KEY), file.getName());
     if (!deleteForever) {
       // move to trash
       DirSupport.moveIfExists(file.toPath(), basketFile.toPath());

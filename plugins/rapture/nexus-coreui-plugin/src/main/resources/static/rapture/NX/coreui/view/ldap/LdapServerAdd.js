@@ -42,27 +42,27 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
         return NX.I18n.get('ADMIN_LDAP_CREATE_SUCCESS') + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('security:ldapconfig', 'create'),
-          editableMarker: NX.I18n.get('ADMIN_LDAP_CREATE_ERROR'),
-          items: {
-            xtype: 'tabpanel',
-            ui: 'nx-light',
-            items: [
-              {
-                xtype: 'nx-coreui-ldapserver-connection-fieldset',
-                title: NX.I18n.get('ADMIN_LDAP_DETAILS_CONNECTION_TAB'),
-                ui: 'nx-inset'
-              },
-              {
-                xtype: 'nx-coreui-ldapserver-backup-fieldset',
-                title: NX.I18n.get('ADMIN_LDAP_DETAILS_BACKUP_TAB'),
-                ui: 'nx-inset'
-              },
-              {
-                xtype: 'nx-coreui-ldapserver-userandgroup-fieldset',
-                title: NX.I18n.get('ADMIN_LDAP_DETAILS_GROUP_TAB'),
-                ui: 'nx-inset'
-              }
-            ]
+      editableMarker: NX.I18n.get('ADMIN_LDAP_CREATE_ERROR'),
+      items: {
+        xtype: 'tabpanel',
+        ui: 'nx-light',
+        items: [
+          {
+            xtype: 'nx-coreui-ldapserver-connection-fieldset',
+            title: NX.I18n.get('ADMIN_LDAP_DETAILS_CONNECTION_TAB'),
+            ui: 'nx-inset'
+          },
+          {
+            xtype: 'nx-coreui-ldapserver-backup-fieldset',
+            title: NX.I18n.get('ADMIN_LDAP_DETAILS_BACKUP_TAB'),
+            ui: 'nx-inset'
+          },
+          {
+            xtype: 'nx-coreui-ldapserver-userandgroup-fieldset',
+            title: NX.I18n.get('ADMIN_LDAP_DETAILS_GROUP_TAB'),
+            ui: 'nx-inset'
+          }
+        ]
       },
 
       buttons: [

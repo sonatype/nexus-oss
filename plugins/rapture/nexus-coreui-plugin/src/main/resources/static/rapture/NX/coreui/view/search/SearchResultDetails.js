@@ -23,6 +23,7 @@ Ext.define('NX.coreui.view.search.SearchResultDetails', {
   requires: [
     'NX.Icons'
   ],
+  ui: 'nx-inset',
 
   layout: {
     type: 'hbox',
@@ -36,16 +37,10 @@ Ext.define('NX.coreui.view.search.SearchResultDetails', {
     var me = this;
 
     me.items = [
-      {
-        xtype: 'nx-info',
-        itemId: 'mainInfo',
-        flex: 1
-      },
-      {
-        xtype: 'nx-info',
-        itemId: 'secondaryInfo',
-        flex: 1
-      }
+      { xtype: 'nx-info', itemId: 'group' },
+      { xtype: 'nx-info', itemId: 'name' },
+      { xtype: 'nx-info', itemId: 'format' },
+      { xtype: 'nx-info', itemId: 'popular' }
     ];
 
     me.callParent();

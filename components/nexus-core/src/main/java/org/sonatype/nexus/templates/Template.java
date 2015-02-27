@@ -14,8 +14,6 @@ package org.sonatype.nexus.templates;
 
 import java.io.IOException;
 
-import org.sonatype.configuration.ConfigurationException;
-
 /**
  * A template for creation of various objects.
  *
@@ -48,6 +46,5 @@ public interface Template
   /**
    * Instantianates this template, creates resulting object (needs cast).
    */
-  Object create()
-      throws ConfigurationException, IOException;
+  Object create() throws IOException;
 }

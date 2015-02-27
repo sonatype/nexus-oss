@@ -15,7 +15,6 @@ package org.sonatype.nexus.configuration;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
 
 /**

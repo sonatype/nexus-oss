@@ -12,10 +12,8 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.io.IOException;
 import java.util.Collections;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -23,7 +21,6 @@ import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepositoryConfigu
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 
@@ -37,9 +34,7 @@ public class M2LayoutedM1ShadowRepositoryTest
     return new M1TestsuiteEnvironmentBuilder(Collections.singletonList("repo1-m1"));
   }
 
-  private void addShadowReposes()
-      throws ConfigurationException, IOException, ComponentLookupException
-  {
+  private void addShadowReposes() throws Exception {
     String masterId = "repo1-m1";
 
     M2LayoutedM1ShadowRepository shadow =

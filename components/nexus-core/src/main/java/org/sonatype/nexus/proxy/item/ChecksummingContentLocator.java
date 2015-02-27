@@ -18,7 +18,8 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
 import org.sonatype.nexus.proxy.RequestContext;
-import org.sonatype.nexus.util.DigesterUtils;
+
+import com.google.common.io.BaseEncoding;
 
 /**
  * A content locator that wraps another content locator, but also calculates hash of it while reading it and putting
@@ -103,7 +104,7 @@ public class ChecksummingContentLocator
         throws IOException
     {
       if (!context.containsKey(contextKey, false)) {
-        context.put(contextKey, DigesterUtils.getDigestAsString(getMessageDigest().digest()));
+        context.put(contextKey, BaseEncoding.base16().lowerCase().encode(getMessageDigest().digest()));
       }
     }
   }

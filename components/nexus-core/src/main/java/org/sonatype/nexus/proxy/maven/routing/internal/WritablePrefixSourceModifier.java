@@ -22,8 +22,8 @@ import org.sonatype.nexus.proxy.maven.routing.WritablePrefixSource;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.util.PathUtils.elementsOf;
-import static org.sonatype.nexus.util.PathUtils.pathFrom;
+import static org.sonatype.nexus.proxy.utils.PathUtils.elementsOf;
+import static org.sonatype.nexus.proxy.utils.PathUtils.pathFrom;
 
 /**
  * A modifier for {@link WritablePrefixSource}, that makes you able to "edit" it by adding and removing entries from

@@ -12,14 +12,34 @@
  */
 package org.sonatype.nexus.configuration.validator;
 
-import org.sonatype.configuration.validation.ValidationResponse;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.validation.ValidationResponse;
+
+/**
+ * Application {@link ValidationResponse} which sets {@link ApplicationValidationContext}.
+ */
 public class ApplicationValidationResponse
     extends ValidationResponse
 {
-  public ApplicationValidationResponse() {
-    super();
+  public ApplicationValidationResponse(final @Nullable ApplicationValidationContext ctx) {
+    if (ctx == null) {
+      setContext(new ApplicationValidationContext());
+    }
+    else {
+      setContext(ctx);
+    }
+  }
 
-    setContext(new ApplicationValidationContext());
+  public ApplicationValidationResponse() {
+    this(null);
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  @Nonnull
+  @Override
+  public ApplicationValidationContext getContext() {
+    return (ApplicationValidationContext) super.getContext();
   }
 }

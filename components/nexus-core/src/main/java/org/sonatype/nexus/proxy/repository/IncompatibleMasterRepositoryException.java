@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
 
 /**
  * Throws when an incompatible master is assigned to a shadow repository.

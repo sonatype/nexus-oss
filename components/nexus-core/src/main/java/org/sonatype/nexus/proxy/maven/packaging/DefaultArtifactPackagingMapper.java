@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
@@ -68,7 +68,7 @@ public class DefaultArtifactPackagingMapper
   private volatile Map<String, String> packaging2extensionMapping;
 
   @Inject
-  public DefaultArtifactPackagingMapper(final NexusConfiguration nexusConfiguration) {
+  public DefaultArtifactPackagingMapper(final ApplicationConfiguration nexusConfiguration) {
     setPropertiesFile(new File(nexusConfiguration.getConfigurationDirectory(), MAPPING_PROPERTIES_FILE));
   }
 

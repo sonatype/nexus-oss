@@ -14,7 +14,7 @@ package org.sonatype.nexus.templates;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 
 import org.codehaus.plexus.util.StringUtils;
 

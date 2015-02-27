@@ -26,12 +26,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryGroupingCoreConfiguration;
@@ -100,32 +100,24 @@ public class DefaultRequestRepositoryMapper
   // ==
 
   @Override
-  protected void initializeConfiguration()
-      throws ConfigurationException
-  {
+  protected void initializeConfiguration() {
     if (getApplicationConfiguration().getConfigurationModel() != null) {
       configure(getApplicationConfiguration());
     }
   }
 
   @Override
-  protected CoreConfiguration<CRepositoryGrouping> wrapConfiguration(Object configuration)
-      throws ConfigurationException
-  {
+  protected CoreConfiguration<CRepositoryGrouping> wrapConfiguration(Object configuration) {
     if (configuration instanceof ApplicationConfiguration) {
       return new CRepositoryGroupingCoreConfiguration((ApplicationConfiguration) configuration);
     }
     else {
-      throw new ConfigurationException("The passed configuration object is of class \""
-          + configuration.getClass().getName() + "\" and not the required \""
-          + ApplicationConfiguration.class.getName() + "\"!");
+      throw new ConfigurationException("The passed configuration object is of class \"" + configuration.getClass().getName() + "\" and not the required \"" + ApplicationConfiguration.class.getName() + "\"!");
     }
   }
 
   @Override
-  public boolean commitChanges()
-      throws ConfigurationException
-  {
+  public boolean commitChanges() {
     boolean wasDirty = super.commitChanges();
     if (wasDirty) {
       compiled = false;
@@ -136,8 +128,9 @@ public class DefaultRequestRepositoryMapper
   // ==
 
   @Override
-  public List<Repository> getMappedRepositories(Repository repository, ResourceStoreRequest request,
-                                                List<Repository> resolvedRepositories)
+  public List<Repository> getMappedRepositories(final Repository repository,
+                                                final ResourceStoreRequest request,
+                                                final List<Repository> resolvedRepositories)
       throws NoSuchRepositoryException
   {
     if (!compiled) {
@@ -303,9 +296,7 @@ public class DefaultRequestRepositoryMapper
 
   // ==
 
-  protected synchronized void compile()
-      throws NoSuchRepositoryException
-  {
+  private synchronized void compile() throws NoSuchRepositoryException {
     if (compiled) {
       return;
     }
@@ -346,9 +337,7 @@ public class DefaultRequestRepositoryMapper
     compiled = true;
   }
 
-  protected RepositoryPathMapping convert(CPathMappingItem item)
-      throws IllegalArgumentException
-  {
+  protected RepositoryPathMapping convert(CPathMappingItem item) {
     MappingType type = null;
 
     if (CPathMappingItem.BLOCKING_RULE_TYPE.equals(item.getRouteType())) {
@@ -399,28 +388,18 @@ public class DefaultRequestRepositoryMapper
   // ==
 
   @Override
-  public boolean addMapping(RepositoryPathMapping mapping)
-      throws ConfigurationException
-  {
+  public boolean addMapping(RepositoryPathMapping mapping) {
     removeMapping(mapping.getId());
 
     CPathMappingItem pathItem = convert(mapping);
-
-    // validate
-    this.validate(pathItem);
+    ValidationResponse response = this.validator.validateGroupsSettingPathMappingItem(null, pathItem);
+    if (!response.isValid()) {
+      throw new ValidationResponseException(response);
+    }
 
     getCurrentConfiguration(true).addPathMapping(convert(mapping));
 
     return true;
-  }
-
-  protected void validate(CPathMappingItem pathItem)
-      throws InvalidConfigurationException
-  {
-    ValidationResponse response = this.validator.validateGroupsSettingPathMappingItem(null, pathItem);
-    if (!response.isValid()) {
-      throw new InvalidConfigurationException(response);
-    }
   }
 
   @Override
@@ -474,5 +453,4 @@ public class DefaultRequestRepositoryMapper
       }
     }
   }
-
 }

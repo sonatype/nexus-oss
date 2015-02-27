@@ -13,25 +13,18 @@
 package org.sonatype.nexus.security.role;
 
 /**
- * Thrown when a Role could not be found.
+ * Thrown when a {@link Role} could not be found.
  */
 public class NoSuchRoleException
     extends Exception
 {
   private static final long serialVersionUID = -3551757972830003397L;
 
-  public NoSuchRoleException() {
+  public NoSuchRoleException(final String roleId, Throwable cause) {
+    super("Role '" + roleId + "' not found", cause);
   }
 
-  public NoSuchRoleException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public NoSuchRoleException(String message) {
-    super(message);
-  }
-
-  public NoSuchRoleException(Throwable cause) {
-    super(cause);
+  public NoSuchRoleException(final String role) {
+    this(role, null);
   }
 }

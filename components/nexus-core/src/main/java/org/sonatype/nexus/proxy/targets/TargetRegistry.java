@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.targets;
 import java.util.Collection;
 import java.util.Set;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -40,8 +39,7 @@ public interface TargetRegistry
   /**
    * Adds new target.
    */
-  boolean addRepositoryTarget(Target target)
-      throws ConfigurationException;
+  boolean addRepositoryTarget(Target target);
 
   /**
    * Removes target by id.

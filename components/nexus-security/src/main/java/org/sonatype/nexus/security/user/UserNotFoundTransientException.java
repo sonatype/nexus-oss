@@ -21,15 +21,7 @@ public class UserNotFoundTransientException
 {
   private static final long serialVersionUID = 7565547428483146620L;
 
-  public UserNotFoundTransientException(String userId, String message, Throwable cause) {
+  public UserNotFoundTransientException(final String userId, final String message, final Throwable cause) {
     super(userId, message, cause);
-  }
-
-  public UserNotFoundTransientException(String userId, String message) {
-    super(userId, message);
-  }
-
-  public UserNotFoundTransientException(String userId) {
-    super(userId);
   }
 }

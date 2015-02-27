@@ -12,9 +12,11 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.AbstractRemovableConfigurable;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import javax.inject.Inject;
+
+import org.sonatype.nexus.common.throwables.ConfigurationException;
+import org.sonatype.nexus.configuration.AbstractConfigurable;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -22,11 +24,12 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.mirror.DefaultPublishedMirrors;
 import org.sonatype.nexus.proxy.mirror.PublishedMirrors;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.codehaus.plexus.util.StringUtils;
 
 public class ConfigurableRepository
-    extends AbstractRemovableConfigurable<CRepository>
+    extends AbstractConfigurable<CRepository>
 {
   private PublishedMirrors pMirrors;
   
@@ -41,6 +44,23 @@ public class ConfigurableRepository
   }
 
   @Override
+  @Inject
+  public void setEventBus(final EventBus eventBus) {
+    super.setEventBus(eventBus);
+    registerWithEventBus();
+  }
+
+  @Override
+  @Inject
+  public void setApplicationConfiguration(final ApplicationConfiguration applicationConfiguration) {
+    super.setApplicationConfiguration(applicationConfiguration);
+  }
+
+  public void dispose() {
+    unregisterFromEventBus();
+  }
+
+  @Override
   public CRepositoryCoreConfiguration getCurrentCoreConfiguration() {
     return (CRepositoryCoreConfiguration)super.getCurrentCoreConfiguration();
   }
@@ -50,9 +70,7 @@ public class ConfigurableRepository
   }
 
   @Override
-  protected CRepositoryCoreConfiguration wrapConfiguration(Object configuration)
-      throws ConfigurationException
-  {
+  protected CRepositoryCoreConfiguration wrapConfiguration(Object configuration) {
     if (configuration instanceof CRepository) {
       return new CRepositoryCoreConfiguration(getApplicationConfiguration(), (CRepository) configuration,
           getExternalConfigurationHolderFactory());
@@ -61,9 +79,7 @@ public class ConfigurableRepository
       return (CRepositoryCoreConfiguration) configuration;
     }
     else {
-      throw new ConfigurationException("The passed configuration object is of class \""
-          + configuration.getClass().getName() + "\" and not the required \"" + CRepository.class.getName()
-          + "\"!");
+      throw new ConfigurationException("The passed configuration object is of class \"" + configuration.getClass().getName() + "\" and not the required \"" + CRepository.class.getName() + "\"!");
     }
   }
 

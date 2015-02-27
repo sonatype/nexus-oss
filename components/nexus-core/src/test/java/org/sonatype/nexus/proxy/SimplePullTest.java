@@ -192,13 +192,12 @@ public class SimplePullTest
     // we should have listed in root only those things/dirs we pulled, se above!
     // ".nexus" is here too!
     // Expected results:
-    // test:/.meta (coll)
     // test:/.nexus (coll)
     // repo1:/activemq (coll)
     // repo1:/rome (coll)
     // repo2:/xstream (coll)
     // repo3:/repo3.txt (file)
-    assertEquals(6, dir.size());
+    assertEquals(5, dir.size());
 
     // SO FAR, IT's OLD Unit test, except CacheCreate events were changed (it was Cache event).
     // Now below, we add some more, to cover NXCM-3525 too:

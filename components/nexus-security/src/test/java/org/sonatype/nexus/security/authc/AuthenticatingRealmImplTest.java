@@ -16,7 +16,6 @@ package org.sonatype.nexus.security.authc;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.security.AbstractSecurityTestCase;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CRole;
@@ -132,11 +131,11 @@ public class AuthenticatingRealmImplTest
     assertThat(passwordService.passwordsMatch(password, updatedUser.getPassword()), is(true));
   }
 
-  private void buildTestAuthenticationConfig(String status) throws InvalidConfigurationException {
+  private void buildTestAuthenticationConfig(String status) throws Exception {
     buildTestAuthenticationConfig(status, this.hashPassword("password"));
   }
 
-  private void buildTestAuthenticationConfig(String status, String hash) throws InvalidConfigurationException {
+  private void buildTestAuthenticationConfig(String status, String hash) throws Exception {
     CPrivilege priv = new CPrivilege();
     priv.setId("priv");
     priv.setName("name");
@@ -177,7 +176,7 @@ public class AuthenticatingRealmImplTest
     return Hashing.sha1().hashString(password, Charsets.UTF_8).toString();
   }
 
-  private void buildLegacyTestAuthenticationConfig(String password) throws InvalidConfigurationException {
+  private void buildLegacyTestAuthenticationConfig(String password) throws Exception {
     buildTestAuthenticationConfig(CUser.STATUS_ACTIVE, legacyHashPassword(password));
   }
 }

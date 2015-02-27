@@ -23,10 +23,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CRoutingCoreConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -52,8 +52,8 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.targets.TargetSet;
+import org.sonatype.nexus.proxy.utils.PathUtils;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.util.PathUtils;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -98,25 +98,19 @@ public class DefaultRepositoryRouter
 
   // =
 
-  protected void initializeConfiguration()
-      throws ConfigurationException
-  {
+  protected void initializeConfiguration() {
     if (getApplicationConfiguration().getConfigurationModel() != null) {
       configure(getApplicationConfiguration());
     }
   }
 
   @Override
-  protected CoreConfiguration<CRouting> wrapConfiguration(Object configuration)
-      throws ConfigurationException
-  {
+  protected CoreConfiguration<CRouting> wrapConfiguration(Object configuration) {
     if (configuration instanceof ApplicationConfiguration) {
       return new CRoutingCoreConfiguration((ApplicationConfiguration) configuration);
     }
     else {
-      throw new ConfigurationException("The passed configuration object is of class \""
-          + configuration.getClass().getName() + "\" and not the required \""
-          + ApplicationConfiguration.class.getName() + "\"!");
+      throw new ConfigurationException("The passed configuration object is of class \"" + configuration.getClass().getName() + "\" and not the required \"" + ApplicationConfiguration.class.getName() + "\"!");
     }
   }
 

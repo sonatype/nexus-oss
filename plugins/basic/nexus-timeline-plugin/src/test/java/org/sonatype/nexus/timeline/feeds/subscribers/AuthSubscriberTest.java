@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.security.ClientInfo;
+import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.authc.NexusAuthenticationEvent;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -36,12 +36,12 @@ public class AuthSubscriberTest
   private DummyFeedRecorder feedRecorder = new DummyFeedRecorder();
 
   @Mock
-  private NexusConfiguration nexusConfiguration;
+  private SecuritySystem securitySystem;
 
   @Before
   public void setUp() throws Exception {
-    underTest = new AuthSubscriber(feedRecorder, nexusConfiguration);
-    when(nexusConfiguration.getAnonymousUsername()).thenReturn("anonymous");
+    underTest = new AuthSubscriber(feedRecorder, securitySystem);
+    when(securitySystem.getAnonymousUsername()).thenReturn("anonymous");
   }
 
   public void perform(final String username, final int expected) throws Exception {

@@ -13,14 +13,11 @@
 package org.sonatype.nexus.configuration.source;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.ApplicationInterpolatorProvider;
 import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
@@ -34,67 +31,23 @@ import org.sonatype.nexus.configuration.model.Configuration;
 public class StaticConfigurationSource
     extends AbstractApplicationConfigurationSource
 {
-
-  @Inject
-  public StaticConfigurationSource(ApplicationInterpolatorProvider interpolatorProvider) {
-    super(interpolatorProvider);
-  }
-
-  /**
-   * Gets the configuration using getResourceAsStream from "/META-INF/nexus/nexus.xml".
-   */
   @Override
-  public InputStream getConfigurationAsStream()
-      throws IOException
-  {
-    InputStream result = getClass().getResourceAsStream("/META-INF/nexus/nexus.xml");
-
-    if (result != null) {
-      return result;
-    }
-    else {
+  public Configuration loadConfiguration() throws IOException {
+    URL url = getClass().getResource("/META-INF/nexus/nexus.xml");
+    if (url == null) {
       log.info("No edition-specific configuration found, falling back to Core default configuration.");
-
-      return getClass().getResourceAsStream("/META-INF/nexus/default-oss-nexus.xml");
+      url = getClass().getResource("/META-INF/nexus/default-oss-nexus.xml");
     }
-  }
-
-  @Override
-  public Configuration loadConfiguration()
-      throws ConfigurationException, IOException
-  {
-    loadConfiguration(getConfigurationAsStream());
+    loadConfiguration(url);
 
     return getConfiguration();
   }
 
   /**
-   * This method will always throw UnsupportedOperationException, since NexusDefaultsConfigurationSource is read
-   * only.
+   * The 'static' source is immutable.
    */
   @Override
-  public void storeConfiguration()
-      throws IOException
-  {
-    throw new UnsupportedOperationException("The NexusDefaultsConfigurationSource is static source!");
+  public void storeConfiguration() throws IOException {
+    throw new UnsupportedOperationException();
   }
-
-  /**
-   * Static configuration has no default source, hence it cannot be defalted. Always returns false.
-   */
-  @Override
-  public boolean isConfigurationDefaulted() {
-    return false;
-  }
-
-  /**
-   * This method will always throw UnsupportedOperationException, since StaticConfigurationSource is read only.
-   */
-  @Override
-  public void backupConfiguration()
-      throws IOException
-  {
-    throw new UnsupportedOperationException("The NexusDefaultsConfigurationSource is static source!");
-  }
-
 }

@@ -12,40 +12,44 @@
  */
 package org.sonatype.nexus.security.user;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-
 /**
- * An abstract UserManager, that just throws exceptions for all the write methods.
+ * Read-only {@link UserManager}, which just throws exceptions for all the write methods.
  *
- * Any call to theses methods should be checked by the <code>supportsWrite()</code> method,
- * so this should never be called.
+ * Any call to theses methods should be guarded by {@code #supportsWrite}.
  */
 public abstract class AbstractReadOnlyUserManager
     extends AbstractUserManager
 {
+  /**
+   * @return Always {@code false}
+   */
+  @Override
   public boolean supportsWrite() {
     return false;
   }
 
-  public User addUser(User user, String password) throws InvalidConfigurationException {
-    throwException();
-    return null;
+  @Override
+  public User addUser(final User user, final String password) {
+    throw unsupported();
   }
 
-  public void changePassword(String userId, String newPassword) throws UserNotFoundException {
-    throwException();
+  @Override
+  public void changePassword(final String userId, final String newPassword) throws UserNotFoundException {
+    throw unsupported();
   }
 
-  public void deleteUser(String userId) throws UserNotFoundException {
-    throwException();
+  @Override
+  public void deleteUser(final String userId) throws UserNotFoundException {
+    throw unsupported();
   }
 
-  public User updateUser(User user) throws UserNotFoundException, InvalidConfigurationException {
-    throwException();
-    return null;
+  @Override
+  public User updateUser(final User user) throws UserNotFoundException {
+    throw unsupported();
   }
 
-  private void throwException() {
+  private IllegalStateException unsupported() {
+    // TODO: Should probably use UnsupportedOperationException
     throw new IllegalStateException("UserManager: '" + getSource() + "' does not support write operations.");
   }
 }

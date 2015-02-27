@@ -35,6 +35,7 @@ import org.apache.karaf.features.FeaturesService.Option;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,13 +146,20 @@ public class BootstrapListener
     if (editionName != null && editionName.length() > 0) {
       log.info("Installing {}", editionName);
 
-      // edition might already be installed in the cache; if so then skip installation
-      FeaturesService featuresService = ctx.getService(ctx.getServiceReference(FeaturesService.class));
-      Feature editionFeature = featuresService.getFeature(editionName);
+      final ServiceTracker<?, FeaturesService> tracker = new ServiceTracker<>(ctx, FeaturesService.class, null);
+      tracker.open();
+      try {
+        FeaturesService featuresService = tracker.waitForService(1000);
+        Feature editionFeature = featuresService.getFeature(editionName);
 
-      if (!featuresService.isInstalled(editionFeature)) {
-        EnumSet<Option> options = EnumSet.of(ContinueBatchOnFailure, NoCleanIfFailure, NoAutoRefreshBundles);
-        featuresService.installFeature(editionFeature, options);
+        // edition might already be installed in the cache; if so then skip installation
+        if (!featuresService.isInstalled(editionFeature)) {
+          EnumSet<Option> options = EnumSet.of(ContinueBatchOnFailure, NoCleanIfFailure, NoAutoRefreshBundles);
+          featuresService.installFeature(editionFeature, options);
+        }
+      }
+      finally {
+        tracker.close();
       }
     }
   }

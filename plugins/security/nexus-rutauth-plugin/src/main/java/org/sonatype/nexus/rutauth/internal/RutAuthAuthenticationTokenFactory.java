@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.authc.AuthenticationTokenFactory;
 import org.sonatype.nexus.security.authc.HttpHeaderAuthenticationToken;
@@ -80,7 +79,7 @@ public class RutAuthAuthenticationTokenFactory
         securitySystem.setRealms(newRealms);
         log.info("Automatically enabled '{}'", RutAuthRealm.DESCRIPTION);
       }
-      catch (InvalidConfigurationException e) {
+      catch (Exception e) {
         log.warn("Could not automatically enable '{}'", RutAuthRealm.DESCRIPTION, e);
       }
     }

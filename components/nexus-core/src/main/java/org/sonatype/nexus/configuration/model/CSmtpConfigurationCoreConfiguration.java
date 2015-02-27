@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.configuration.model;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 
 public class CSmtpConfigurationCoreConfiguration
     extends AbstractCoreConfiguration<CSmtpConfiguration>

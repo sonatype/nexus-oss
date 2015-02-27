@@ -83,26 +83,26 @@ public class OrientSecuritySettingsSource
   }
 
   @Override
-  public SecuritySettings getConfiguration() {
+  public SecuritySettings get() {
     return configuration;
   }
 
   @Override
-  public SecuritySettings loadConfiguration() {
+  public SecuritySettings load() {
     try (ODatabaseDocumentTx db = openDb()) {
       ODocument doc = get(db);
       if (doc == null) {
-        saveConfiguration(securityDefaults.loadConfiguration());
+        saveConfiguration(securityDefaults.load());
         doc = get(db);
       }
       configuration = entityAdapter.read(doc);
-      return getConfiguration();
+      return get();
     }
   }
 
   @Override
-  public void storeConfiguration() {
-    saveConfiguration(getConfiguration());
+  public void save() {
+    saveConfiguration(get());
   }
 
   private void saveConfiguration(final SecuritySettings configuration) {

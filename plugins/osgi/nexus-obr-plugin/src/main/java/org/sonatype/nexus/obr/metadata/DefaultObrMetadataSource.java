@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.obr.ObrPluginConfiguration;
 import org.sonatype.nexus.obr.util.ObrUtils;
@@ -48,23 +48,21 @@ public class DefaultObrMetadataSource
 
   private final ObrPluginConfiguration obrConfiguration;
 
-  private final NexusConfiguration nexusConfiguration;
+  private final ApplicationDirectories applicationDirectories;
 
   private final MimeSupport mimeSupport;
 
   @Inject
   public DefaultObrMetadataSource(final ObrPluginConfiguration obrConfiguration,
-                                  final NexusConfiguration nexusConfiguration,
+                                  final ApplicationDirectories applicationDirectories,
                                   final MimeSupport mimeSupport)
   {
     this.obrConfiguration = checkNotNull(obrConfiguration);
-    this.nexusConfiguration = checkNotNull(nexusConfiguration);
+    this.applicationDirectories = checkNotNull(applicationDirectories);
     this.mimeSupport = checkNotNull(mimeSupport);
   }
 
-  public ObrResourceReader getReader(final ObrSite site)
-      throws StorageException
-  {
+  public ObrResourceReader getReader(final ObrSite site) throws StorageException {
     try {
       return new DefaultObrResourceReader(site, obrConfiguration.isBundleCacheActive());
     }
@@ -94,11 +92,9 @@ public class DefaultObrMetadataSource
     return null;
   }
 
-  public ObrResourceWriter getWriter(final RepositoryItemUid uid)
-      throws StorageException
-  {
+  public ObrResourceWriter getWriter(final RepositoryItemUid uid) throws StorageException {
     try {
-      return new DefaultObrResourceWriter(uid, nexusConfiguration.getTemporaryDirectory(), mimeSupport);
+      return new DefaultObrResourceWriter(uid, applicationDirectories.getTemporaryDirectory(), mimeSupport);
     }
     catch (final IOException e) {
       throw new StorageException(e);
