@@ -159,7 +159,7 @@ extends DirectComponentSupport
   /**
    * Retrieve repositories status.
    */
-  @DirectPollMethod(event = "coreui_legacy_Repository_readStatus")
+  @DirectPollMethod(event = "coreui_Repository_readStatus")
   @RequiresPermissions('nexus:repostatus:read')
   List<RepositoryStatusXO> readStatus(final Map<String, String> params) {
     return readStatus(Boolean.valueOf(params['forceCheck']))
