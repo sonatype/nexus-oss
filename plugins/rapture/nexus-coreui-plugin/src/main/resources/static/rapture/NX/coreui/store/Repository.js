@@ -13,7 +13,7 @@
 /*global Ext, NX*/
 
 /**
- * Repository store.
+ * Repository CMA format.
  *
  * @since 3.0
  */
@@ -31,11 +31,11 @@ Ext.define('NX.coreui.store.Repository', {
     reader: {
       type: 'json',
       root: 'data',
-      idProperty: 'id',
       successProperty: 'success'
     }
   },
 
   sortOnLoad: true,
   sorters: { property: 'name', direction: 'ASC' }
+
 });

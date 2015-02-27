@@ -15,10 +15,6 @@ package org.sonatype.nexus.coreui
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.common.validation.Create
-import org.sonatype.nexus.common.validation.Update
-import org.sonatype.nexus.proxy.repository.LocalStatus
-
-import javax.validation.constraints.NotNull
 
 /**
  * Repository exchange object.
@@ -28,29 +24,15 @@ import javax.validation.constraints.NotNull
 @ToString(includePackage = false, includeNames = true)
 class RepositoryXO
 {
-  @NotEmpty(groups = Update.class)
-  String id
-
   @NotEmpty
   String name
 
-  @NotNull
-  Boolean browseable
-
-  @NotNull
-  Boolean exposed
-
-  @NotEmpty(groups = Create.class)
-  String template
-
   String type
-  String provider
-  String providerName
+
   String format
-  String formatName
-  LocalStatus localStatus
-  String url
-  String defaultLocalStorageUrl
-  String overrideLocalStorageUrl
-  String userManaged
+
+  @NotEmpty(groups = Create)
+  String recipe
+
+  String attributes
 }

@@ -52,6 +52,12 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-coreui_legacy-plugin</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-groovy-plugin</artifactId>
       <scope>provided</scope>
     </dependency>

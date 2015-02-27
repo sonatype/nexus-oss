@@ -20,10 +20,11 @@
 Ext.define('NX.coreui.controller.RepositoryRoutes', {
   extend: 'NX.controller.Drilldown',
   requires: [
+    'NX.coreui_legacy.store.Repository',
     'NX.Dialogs',
     'NX.Messages',
     'NX.Permissions',
-    'NX.I18n'
+    'NX.I18n',
   ],
 
   masters: 'nx-coreui-repositoryroute-list',
@@ -33,7 +34,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
   ],
   stores: [
     'RepositoryRoute',
-    'Repository'
+    'NX.coreui_legacy.store.Repository'
   ],
   views: [
     'repositoryroute.RepositoryRouteAdd',

@@ -26,7 +26,7 @@ Ext.define('NX.coreui.store.RepositoryFormat', {
     paramsAsHash: false,
 
     api: {
-      read: 'NX.direct.coreui_Repository.readFormats'
+      read: 'NX.direct.coreui_legacy_Repository.readFormats'
     },
 
     reader: {

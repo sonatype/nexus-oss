@@ -22,7 +22,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
   alias: 'widget.nx-coreui-repositoryroute-settings-form',
   requires: [
     'NX.Conditions',
-    'NX.coreui.store.RepositoryReference',
+    'NX.coreui_legacy.store.RepositoryReference',
     'NX.coreui.model.Reference',
     'NX.I18n'
   ],
@@ -44,13 +44,13 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
 
     me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:routes', 'update');
 
-    me.groupStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
+    me.groupStore = Ext.create('NX.coreui_legacy.store.RepositoryReference', { remoteFilter: true });
     me.mon(me.groupStore, 'load', function(store) {
       store.add(Ext.create('NX.coreui.model.Reference', { id: '*', name: NX.I18n.get('ADMIN_ROUTING_SETTINGS_GROUP_ALL_ITEM') }));
     });
     me.groupStore.filter({ property: 'type', value: 'group' });
 
-    me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference');
+    me.repositoryStore = Ext.create('NX.coreui_legacy.store.RepositoryReference');
     me.repositoryStore.load();
 
     me.items = [

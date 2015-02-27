@@ -23,7 +23,8 @@ Ext.define('NX.coreui.controller.Search', {
     'NX.Bookmarks',
     'NX.Conditions',
     'NX.Permissions',
-    'NX.I18n'
+    'NX.I18n',
+    'NX.coreui_legacy.store.SearchResult'
   ],
 
   masters: ['nx-coreui-search-result-list', 'nx-coreui-search-result-version-list'],
@@ -31,7 +32,7 @@ Ext.define('NX.coreui.controller.Search', {
   stores: [
     'SearchFilter',
     'SearchCriteria',
-    'SearchResult',
+    'NX.coreui_legacy.store.SearchResult',
     'SearchResultVersion'
   ],
   models: [

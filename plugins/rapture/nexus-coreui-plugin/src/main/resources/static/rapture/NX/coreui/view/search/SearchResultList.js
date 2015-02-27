@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
     'NX.I18n'
   ],
 
-  store: 'SearchResult',
+  store: 'NX.coreui_legacy.store.SearchResult',
 
   viewConfig: {
     emptyText: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_EMPTY_STATE'),

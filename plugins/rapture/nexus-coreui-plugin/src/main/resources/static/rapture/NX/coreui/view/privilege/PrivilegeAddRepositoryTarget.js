@@ -22,7 +22,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
   alias: 'widget.nx-coreui-privilege-add-repositorytarget',
   requires: [
     'NX.Conditions',
-    'NX.coreui.store.RepositoryReference',
+    'NX.coreui_legacy.store.RepositoryReference',
     'NX.coreui.store.RepositoryTarget',
     'NX.coreui.model.Reference',
     'NX.I18n'
@@ -34,7 +34,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
   initComponent: function () {
     var me = this;
 
-    me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference');
+    me.repositoryStore = Ext.create('NX.coreui_legacy.store.RepositoryReference');
     me.mon(me.repositoryStore, 'load', function (store) {
       store.add(Ext.create('NX.coreui.model.Reference', { id: '', name: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_ALL') }));
     });
