@@ -19,9 +19,9 @@ import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.httpclient.Page;
 import org.sonatype.nexus.httpclient.Page.UnexpectedPageResponse;
 import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableUtil;
+import org.sonatype.nexus.proxy.utils.Node;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
-import org.sonatype.nexus.util.Node;
 
 import com.google.common.base.Throwables;
 import org.jsoup.nodes.Element;

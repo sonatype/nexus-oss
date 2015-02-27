@@ -14,13 +14,11 @@ package org.sonatype.nexus.proxy.storage.local.fs;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -47,8 +45,6 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 
 import com.google.common.primitives.Ints;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 

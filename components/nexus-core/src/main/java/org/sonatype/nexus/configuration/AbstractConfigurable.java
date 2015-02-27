@@ -12,8 +12,7 @@
  */
 package org.sonatype.nexus.configuration;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -23,8 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class is a special in configuration framework, extended by other framework classes. You do not want to extend
- * this class (most probably), but rather go for {@link AbstractLastingConfigurable} or
- * {@link AbstractRemovableConfigurable} class.
+ * this class (most probably), but rather go for {@link AbstractLastingConfigurable}.
  *
  * @author cstamas
  */
@@ -47,11 +45,7 @@ public abstract class AbstractConfigurable<C>
    */
   private boolean registeredWithEventBus;
 
-  /**
-   * Constructor used by {@link AbstractRemovableConfigurable}.
-   */
-  public AbstractConfigurable() {
-  }
+  protected AbstractConfigurable() {}
 
   /**
    * Constructor used by {@link AbstractLastingConfigurable}.
@@ -76,9 +70,7 @@ public abstract class AbstractConfigurable<C>
     return coreConfiguration != null && coreConfiguration.getConfiguration(false) != null;
   }
 
-  protected void initializeConfiguration()
-      throws ConfigurationException
-  {
+  protected void initializeConfiguration() {
     // someone needs this, someone not
     // for example, whoever is configured using framework, will not need this,
     // but we still have components on their own, like DefaultTaskConfigManager
@@ -143,9 +135,7 @@ public abstract class AbstractConfigurable<C>
   }
 
   @Override
-  public final void configure(Object config)
-      throws ConfigurationException
-  {
+  public final void configure(Object config) {
     this.coreConfiguration = wrapConfiguration(config);
 
     // "pull" the config to make it dirty
@@ -161,9 +151,7 @@ public abstract class AbstractConfigurable<C>
     return cc != null && cc.isDirty();
   }
 
-  protected void prepareForSave()
-      throws ConfigurationException
-  {
+  protected void prepareForSave() {
     if (isDirty()) {
       getCurrentCoreConfiguration().validateChanges();
 
@@ -175,9 +163,7 @@ public abstract class AbstractConfigurable<C>
   }
 
   @Override
-  public boolean commitChanges()
-      throws ConfigurationException
-  {
+  public boolean commitChanges() {
     if (isDirty()) {
       doConfigure();
       return true;
@@ -201,9 +187,7 @@ public abstract class AbstractConfigurable<C>
 
   // ==
 
-  protected void doConfigure()
-      throws ConfigurationException
-  {
+  protected void doConfigure() {
     // 1st, validate
     getCurrentCoreConfiguration().validateChanges();
 
@@ -247,7 +231,5 @@ public abstract class AbstractConfigurable<C>
     return getCurrentCoreConfiguration().getConfiguration(forWrite);
   }
 
-  protected abstract CoreConfiguration<C> wrapConfiguration(Object configuration)
-      throws ConfigurationException;
-
+  protected abstract CoreConfiguration<C> wrapConfiguration(Object configuration);
 }

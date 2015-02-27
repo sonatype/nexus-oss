@@ -17,22 +17,9 @@ package org.sonatype.nexus.security.settings;
  */
 public interface SecuritySettingsSource
 {
-  /**
-   * Persists the current configuration.
-   */
-  void storeConfiguration();
+  SecuritySettings get();
 
-  /**
-   * Gets the current configuration.
-   *
-   * @return the configuration, null if not loaded
-   */
-  SecuritySettings getConfiguration();
+  SecuritySettings load();
 
-  /**
-   * Forces reloading the user configuration.
-   *
-   * @return the configuration
-   */
-  SecuritySettings loadConfiguration();
+  void save();
 }

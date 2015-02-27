@@ -160,12 +160,12 @@ public class GenerateMetadataTask
 
     final Repository repository = findRepository();
     final RepositoryItemUid mdUid = repository.createUid("/" + PATH_OF_REPOMD_XML);
+    final File repoBaseDir = getRepoDir();
     try {
       mdUid.getLock().lock(Action.update);
 
       LOG.debug("Generating Yum-Repository for '{}' ...", getRpmDir());
 
-      final File repoBaseDir = getRepoDir();
       final File repoRepodataDir = new File(repoBaseDir, PATH_OF_REPODATA);
       final File repoTmpDir = new File(repoBaseDir, REPO_TMP_FOLDER + File.separator + UUID.randomUUID().toString());
       DirSupport.mkdir(repoTmpDir);
@@ -197,26 +197,26 @@ public class GenerateMetadataTask
       finally {
         deleteQuietly(repoTmpDir);
       }
-
-      // TODO dubious
-      Thread.sleep(100);
-
-      final MavenRepository mavenRepository = repository.adaptToFacet(MavenRepository.class);
-      if (mavenRepository != null) {
-        try {
-          routingManager.forceUpdatePrefixFile(mavenRepository);
-        }
-        catch (Exception e) {
-          log.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
-        }
-      }
-
-      regenerateMetadataForGroups();
-      return new YumRepositoryImpl(repoBaseDir, repositoryId, getVersion());
     }
     finally {
       mdUid.getLock().unlock();
     }
+
+    // TODO dubious
+    Thread.sleep(100);
+
+    final MavenRepository mavenRepository = repository.adaptToFacet(MavenRepository.class);
+    if (mavenRepository != null) {
+      try {
+        routingManager.forceUpdatePrefixFile(mavenRepository);
+      }
+      catch (Exception e) {
+        log.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
+      }
+    }
+
+    regenerateMetadataForGroups();
+    return new YumRepositoryImpl(repoBaseDir, repositoryId, getVersion());
   }
 
   private File resolveYumGroups() {

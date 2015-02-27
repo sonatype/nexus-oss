@@ -35,7 +35,7 @@ Ext.define('NX.coreui_legacy.view.repository.RepositorySettingsGroupForm', {
   initComponent: function() {
     var me = this;
 
-    me.repositoryStore = Ext.create('RepositoryReference', { remoteFilter: true });
+    me.repositoryStore = Ext.create('NX.coreui_legacy.store.RepositoryReference', { remoteFilter: true });
     me.repositoryStore.filter([
       { property: 'format', value: me.template.format },
       { property: 'includeNexusManaged', value: 'true' }

@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.capability.CapabilityReference;
 import org.sonatype.nexus.capability.CapabilityRegistry;
 import org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder;
@@ -59,7 +58,7 @@ public class KenaiImpl
   }
 
   @Override
-  public Kenai configure(final KenaiConfiguration config) throws InvalidConfigurationException, IOException {
+  public Kenai configure(final KenaiConfiguration config) throws IOException {
     CapabilityReference ref = capabilityReference();
     if (ref != null) {
       capabilityRegistry.update(
@@ -138,7 +137,7 @@ public class KenaiImpl
         securitySystem.setRealms(realms);
       }
     }
-    catch (InvalidConfigurationException e) {
+    catch (Exception e) {
       throw Throwables.propagate(e);
     }
   }

@@ -19,7 +19,7 @@ import java.net.URLConnection;
 import java.util.zip.ZipInputStream;
 
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -40,7 +40,7 @@ public abstract class AbstractObrMetadataTest
 
   protected M2Repository testRepository;
 
-  protected NexusConfiguration nexusConfig;
+  protected ApplicationConfiguration nexusConfig;
 
   @Override
   protected void setUp()
@@ -48,7 +48,7 @@ public abstract class AbstractObrMetadataTest
   {
     super.setUp();
 
-    nexusConfig = lookup(NexusConfiguration.class);
+    nexusConfig = lookup(ApplicationConfiguration.class);
 
     obrMetadataSource = lookup(ObrMetadataSource.class, "obr-bindex");
 

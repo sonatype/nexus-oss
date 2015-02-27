@@ -19,26 +19,14 @@ import org.sonatype.nexus.AbstractApplicationStatusSource;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 
-import org.codehaus.plexus.util.StringUtils;
-
 @Singleton
 @Named
 public class OSSApplicationStatusSource
     extends AbstractApplicationStatusSource
     implements ApplicationStatusSource
 {
-  private static final String FORMATTED_APP_NAME_BASE = "Sonatype Nexus&trade;";
-
   public OSSApplicationStatusSource() {
-    super();
     getSystemStatusInternal().setVersion(discoverApplicationVersion());
-    getSystemStatusInternal().setApiVersion(getSystemStatusInternal().getVersion());
-    getSystemStatusInternal().setFormattedAppName(
-        FORMATTED_APP_NAME_BASE + " "
-            + (StringUtils.isEmpty(getSystemStatusInternal().getEditionLong())
-            ? ""
-            : getSystemStatusInternal().getEditionLong() + " Edition ")
-            + getSystemStatusInternal().getVersion());
   }
 
   @Override

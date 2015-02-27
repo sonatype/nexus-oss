@@ -18,8 +18,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
-import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
+import org.sonatype.nexus.configuration.GlobalRemoteProxySettings;
+import org.sonatype.nexus.configuration.GlobalRemoteProxySettingsChangedEvent;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;

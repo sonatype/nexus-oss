@@ -29,10 +29,10 @@ Ext.define('NX.coreui.controller.Repositories', {
   masters: 'nx-coreui-repository-list',
 
   models: [
-    'Repository'
+    'NX.coreui.store.Repository'
   ],
   stores: [
-    'Repository',
+    'NX.coreui.store.Repository',
     'RepositoryRecipe'
   ],
   views: [
@@ -48,7 +48,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     { ref: 'settings', selector: 'nx-coreui-repository-feature nx-coreui-repository-settings' }
   ],
   icons: {
-    'repository-default': {
+    'repositorycma-default': {
       file: 'database_green.png',
       variants: ['x16', 'x32']
     }

@@ -14,9 +14,9 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.List;
 
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -67,9 +67,9 @@ public class AnAbstractGroupRepositoryConfigurationTest
     );
 
     assertThat(validationResponse.isValid(), is(false));
-    assertThat(validationResponse.getValidationErrors().size(), is(1));
+    assertThat(validationResponse.getErrors().size(), is(1));
     assertThat(
-        validationResponse.getValidationErrors().get(0).getMessage(),
+        validationResponse.getErrors().get(0).getMessage(),
         is("Group repository has same member multiple times!")
     );
   }

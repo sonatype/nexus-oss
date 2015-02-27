@@ -12,15 +12,13 @@
  */
 package org.sonatype.nexus.configuration;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-
 /**
  * An event fired after unsuccesful configuration prepare4save, when configurable components should rollback configs.
  *
  * @author cstamas
  */
 public class ConfigurationRollbackEvent
-    extends ConfigurationIOEvent
+    extends ConfigurationEvent
 {
   public ConfigurationRollbackEvent(ApplicationConfiguration configuration) {
     super(configuration);

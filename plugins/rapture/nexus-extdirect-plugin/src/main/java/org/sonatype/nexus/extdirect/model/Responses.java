@@ -13,13 +13,11 @@
 package org.sonatype.nexus.extdirect.model;
 
 import java.util.List;
-import java.util.Set;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
 
 /**
  * Ext.Direct response builder.
@@ -44,7 +42,7 @@ public class Responses
     return new ErrorResponse(message);
   }
 
-  public static ValidationResponse invalid(final InvalidConfigurationException cause) {
+  public static ValidationResponse invalid(final ValidationResponseException cause) {
     return new ValidationResponse(cause);
   }
 

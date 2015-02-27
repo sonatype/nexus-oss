@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.DefaultAttributes;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.util.PathUtils;
+import org.sonatype.nexus.proxy.utils.PathUtils;
 
 import com.google.common.base.Strings;
 

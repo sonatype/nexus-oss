@@ -65,10 +65,7 @@ public class MemorySecurityConfiguration
   private void addUser(final CUser user) {
     checkNotNull(user, "user");
     checkNotNull(user.getId(), "user id");
-    checkState(
-        users.putIfAbsent(user.getId(), user) == null,
-        user.getId() + " already exists"
-    );
+    checkState(users.putIfAbsent(user.getId(), user) == null, "%s already exists", user.getId());
   }
 
   @Override
@@ -96,7 +93,7 @@ public class MemorySecurityConfiguration
     checkNotNull(user, "user");
     checkNotNull(user.getId(), "user id");
     if (users.replace(user.getId(), user) == null) {
-      throw new UserNotFoundException("User " + user.getId() + " not found");
+      throw new UserNotFoundException(user.getId());
     }
 
     CUserRoleMapping mapping = new CUserRoleMapping();
@@ -140,7 +137,7 @@ public class MemorySecurityConfiguration
     checkNotNull(mapping.getSource(), "source");
     checkState(
         userRoleMappings.putIfAbsent(userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping) == null,
-        mapping.getUserId() + " / " + mapping.getSource() + " already exists"
+        "%s/%s already exists", mapping.getUserId(), mapping.getSource()
     );
   }
 
@@ -159,7 +156,7 @@ public class MemorySecurityConfiguration
     checkNotNull(mapping.getUserId(), "user id");
     checkNotNull(mapping.getSource(), "source");
     if (userRoleMappings.replace(userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping) == null) {
-      throw new NoSuchRoleMappingException("User " + mapping.getUserId() + " role mappings not found");
+      throw new NoSuchRoleMappingException(mapping.getUserId());
     }
   }
 
@@ -185,7 +182,7 @@ public class MemorySecurityConfiguration
   public void addPrivilege(final CPrivilege privilege) {
     checkNotNull(privilege, "privilege");
     checkNotNull(privilege.getId(), "privilege id");
-    checkState(privileges.putIfAbsent(privilege.getId(), privilege) == null, privilege.getId() + " already exists");
+    checkState(privileges.putIfAbsent(privilege.getId(), privilege) == null, "%s already exists", privilege.getId());
   }
 
   public void setPrivileges(final Collection<CPrivilege> privileges) {
@@ -202,7 +199,7 @@ public class MemorySecurityConfiguration
     checkNotNull(privilege, "privilege");
     checkNotNull(privilege.getId(), "privilege id");
     if (privileges.replace(privilege.getId(), privilege) == null) {
-      throw new NoSuchPrivilegeException("Privilege " + privilege.getId() + " not found");
+      throw new NoSuchPrivilegeException(privilege.getId());
     }
   }
 
@@ -227,7 +224,7 @@ public class MemorySecurityConfiguration
   public void addRole(final CRole role) {
     checkNotNull(role, "role");
     checkNotNull(role.getId(), "role id");
-    checkState(roles.putIfAbsent(role.getId(), role) == null, role.getId() + " already exists");
+    checkState(roles.putIfAbsent(role.getId(), role) == null, "%s already exists", role.getId());
   }
 
   public void setRoles(final Collection<CRole> roles) {
@@ -244,7 +241,7 @@ public class MemorySecurityConfiguration
     checkNotNull(role, "role");
     checkNotNull(role.getId(), "role id");
     if (roles.replace(role.getId(), role) == null) {
-      throw new NoSuchRoleException("Role " + role.getId() + " not found");
+      throw new NoSuchRoleException(role.getId());
     }
   }
 
@@ -264,7 +261,6 @@ public class MemorySecurityConfiguration
     copy.userRoleMappings.putAll(this.userRoleMappings);
 
     return copy;
-
   }
 
   private String userRoleMappingKey(final String userId, final String source) {

@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.repositories;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.templates.repository.maven.Maven2GroupRepositoryTemplate;
@@ -26,7 +26,7 @@ import org.junit.Test;
 public class CreateGroupRepositoryTest
     extends NexusAppTestSupport
 {
-  private NexusConfiguration nexusConfiguration;
+  private ApplicationConfiguration nexusConfiguration;
 
   @Override
   protected boolean runWithSecurityDisabled() {
@@ -34,19 +34,14 @@ public class CreateGroupRepositoryTest
   }
 
   @Override
-  protected void setUp()
-      throws Exception
-  {
+  protected void setUp() throws Exception {
     super.setUp();
     startNx();
-    this.nexusConfiguration = this.lookup(NexusConfiguration.class);
+    this.nexusConfiguration = this.lookup(ApplicationConfiguration.class);
   }
 
   @Test
-  public void testCreateRepo()
-      throws Exception
-  {
-
+  public void testCreateRepo() throws Exception {
     String groupId = "group-id";
 
     Maven2GroupRepositoryTemplate template =
@@ -95,9 +90,7 @@ public class CreateGroupRepositoryTest
   }
 
   @Test
-  public void testCreateRepoWithInvalidMember()
-      throws Exception
-  {
+  public void testCreateRepoWithInvalidMember() throws Exception {
     String groupId = "group-id";
 
     Maven2GroupRepositoryTemplate template =
@@ -116,7 +109,7 @@ public class CreateGroupRepositoryTest
       template.create();
       Assert.fail("Expected NoSuchRepositoryException");
     }
-    catch (ConfigurationException e) {
+    catch (ValidationResponseException e) {
       // expected
     }
 
@@ -139,9 +132,7 @@ public class CreateGroupRepositoryTest
   }
 
   @Test
-  public void testCreateWithNoId()
-      throws Exception
-  {
+  public void testCreateWithNoId() throws Exception {
     String groupId = null;
 
     Maven2GroupRepositoryTemplate template =
@@ -159,15 +150,13 @@ public class CreateGroupRepositoryTest
       template.create();
       Assert.fail("expected ConfigurationException");
     }
-    catch (ConfigurationException e) {
+    catch (ValidationResponseException e) {
       // expected
     }
   }
 
   @Test
-  public void testCreateWithEmptyId()
-      throws Exception
-  {
+  public void testCreateWithEmptyId() throws Exception {
     String groupId = "";
 
     Maven2GroupRepositoryTemplate template =
@@ -185,9 +174,8 @@ public class CreateGroupRepositoryTest
       template.create();
       Assert.fail("expected ConfigurationException");
     }
-    catch (ConfigurationException e) {
+    catch (ValidationResponseException e) {
       // expected
     }
   }
-
 }

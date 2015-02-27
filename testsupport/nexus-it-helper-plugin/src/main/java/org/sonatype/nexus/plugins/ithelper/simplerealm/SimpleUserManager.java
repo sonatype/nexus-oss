@@ -44,7 +44,6 @@ import org.eclipse.sisu.Description;
 public class SimpleUserManager
     extends AbstractReadOnlyUserManager
 {
-
   public static final String SOURCE = "Simple";
 
   /**
@@ -52,10 +51,12 @@ public class SimpleUserManager
    */
   private UserStore userStore = new UserStore();
 
+  @Override
   public String getSource() {
     return SOURCE;
   }
 
+  @Override
   public User getUser(String userId) {
     SimpleUser user = this.userStore.getUser(userId);
     if (user != null) {
@@ -65,6 +66,7 @@ public class SimpleUserManager
     return null;
   }
 
+  @Override
   public Set<String> listUserIds() {
     // just return the userIds, if you can optimize for speed, do so
     Set<String> userIds = new HashSet<String>();
@@ -75,6 +77,7 @@ public class SimpleUserManager
     return userIds;
   }
 
+  @Override
   public Set<User> listUsers() {
     // return all the users in the system
     Set<User> users = new HashSet<User>();
@@ -85,6 +88,7 @@ public class SimpleUserManager
     return users;
   }
 
+  @Override
   public Set<User> searchUsers(UserSearchCriteria criteria) {
     // if your users are not all in memory, for performance reasons
     //you would want to do the filtering yourself
@@ -108,8 +112,8 @@ public class SimpleUserManager
     return user;
   }
 
+  @Override
   public String getAuthenticationRealmName() {
     return "Simple";
   }
-
 }

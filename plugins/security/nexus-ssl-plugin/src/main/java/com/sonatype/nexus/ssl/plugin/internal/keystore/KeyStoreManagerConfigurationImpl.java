@@ -21,7 +21,7 @@ import javax.inject.Singleton;
 
 import com.sonatype.nexus.ssl.plugin.SSLPlugin;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManagerConfigurationSupport;
 

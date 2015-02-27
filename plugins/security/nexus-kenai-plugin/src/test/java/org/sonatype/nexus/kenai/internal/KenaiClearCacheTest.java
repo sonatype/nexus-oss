@@ -14,7 +14,7 @@ package org.sonatype.nexus.kenai.internal;
 
 import java.util.Collections;
 
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.kenai.AbstractKenaiRealmTest;
 import org.sonatype.nexus.security.SecuritySystem;
 
@@ -43,8 +43,8 @@ public class KenaiClearCacheTest
 
     // to start the hobelevanc and make it use Kenai realm
     startNx();
-    lookup(NexusConfiguration.class).setRealms(Collections.singletonList("kenai"));
-    lookup(NexusConfiguration.class).saveConfiguration();
+    lookup(SecuritySystem.class).setRealms(Collections.singletonList("kenai"));
+    lookup(ApplicationConfiguration.class).saveConfiguration();
 
     securitySystem = lookup(SecuritySystem.class);
   }

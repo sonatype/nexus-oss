@@ -19,9 +19,9 @@ import org.apache.commons.lang.StringUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings
-import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings
-import org.sonatype.nexus.configuration.application.NexusConfiguration
+import org.sonatype.nexus.configuration.ApplicationConfiguration
+import org.sonatype.nexus.configuration.GlobalRemoteConnectionSettings
+import org.sonatype.nexus.configuration.GlobalRemoteProxySettings
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
@@ -56,7 +56,7 @@ extends DirectComponentSupport
   GlobalRemoteProxySettings proxySettings
 
   @Inject
-  NexusConfiguration nexusConfiguration
+  ApplicationConfiguration nexusConfiguration
 
   /**
    * Retrieves HTTP system settings

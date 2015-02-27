@@ -13,25 +13,14 @@
 package org.sonatype.nexus.security.privilege;
 
 /**
- * Thrown when a Privilege could not be found.
+ * Thrown when a {@link Privilege} could not be found.
  */
 public class NoSuchPrivilegeException
     extends Exception
 {
   private static final long serialVersionUID = 820651866330926246L;
 
-  public NoSuchPrivilegeException() {
-  }
-
-  public NoSuchPrivilegeException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public NoSuchPrivilegeException(String message) {
-    super(message);
-  }
-
-  public NoSuchPrivilegeException(Throwable cause) {
-    super(cause);
+  public NoSuchPrivilegeException(final String privilegeId) {
+    super("Privilege '" + privilegeId + "' not found");
   }
 }

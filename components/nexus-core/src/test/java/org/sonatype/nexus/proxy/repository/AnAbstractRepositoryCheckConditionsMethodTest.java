@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
 import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeSource;
 import org.sonatype.nexus.proxy.maven.uid.MavenRepositoryItemUidAttributeSource;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.locks.LocalResourceLockFactory;
@@ -70,9 +71,8 @@ public class AnAbstractRepositoryCheckConditionsMethodTest
 
     abstractRepository = mock(AbstractRepository.class);
     // FIXME: HACK Warning, ComponentSupport uses method call on itself to init log, so in mock the log variable is null
-    // FIXME: maybe move this code into own "helper" class a la Spring's ReflectionTestUtils
-    Field logField = AbstractRepository.class.getSuperclass().getSuperclass().getSuperclass().getSuperclass()
-        .getDeclaredField("log");
+    // FIXME: Force the field, due to use of calling real method in mock test
+    Field logField = ComponentSupport.class.getDeclaredField("log");
     logField.setAccessible(true);
     logField.set(abstractRepository, LoggerFactory.getLogger(AbstractRepository.class));
 

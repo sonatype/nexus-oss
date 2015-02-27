@@ -28,7 +28,6 @@ import org.sonatype.nexus.security.user.UserNotFoundException;
  * @since 3.0
  */
 public interface SecurityConfiguration
-    extends org.sonatype.configuration.Configuration
 {
   List<CUser> getUsers();
 

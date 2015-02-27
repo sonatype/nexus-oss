@@ -18,12 +18,12 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationMessage;
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
+import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -56,7 +56,6 @@ public abstract class AbstractRepositoryConfigurator
   public final void applyConfiguration(final Repository target,
                                        final ApplicationConfiguration configuration,
                                        final CRepositoryCoreConfiguration config)
-      throws ConfigurationException
   {
     doApplyConfiguration(target, configuration, config);
   }
@@ -69,9 +68,9 @@ public abstract class AbstractRepositoryConfigurator
     doPrepareForSave(target, configuration, config);
   }
 
-  protected void doApplyConfiguration(Repository repository, ApplicationConfiguration configuration,
+  protected void doApplyConfiguration(Repository repository,
+                                      ApplicationConfiguration configuration,
                                       CRepositoryCoreConfiguration coreConfiguration)
-      throws ConfigurationException
   {
     // Setting common things on a repository
 
@@ -86,7 +85,7 @@ public abstract class AbstractRepositoryConfigurator
     }
     catch (MalformedURLException e) {
       // will not happen, not user settable
-      throw new InvalidConfigurationException("Malformed URL for LocalRepositoryStorage!", e);
+      throw new ConfigurationException("Malformed URL for LocalRepositoryStorage!", e);
     }
 
     String localUrl;
@@ -125,14 +124,11 @@ public abstract class AbstractRepositoryConfigurator
     }
     catch (LocalStorageException e) {
       ValidationResponse response = new ApplicationValidationResponse();
-
       ValidationMessage error =
-          new ValidationMessage("overrideLocalStorageUrl", "Repository has an invalid local storage URL '"
-              + localUrl, "Invalid file location");
+          new ValidationMessage("overrideLocalStorageUrl", "Repository has an invalid local storage URL '" + localUrl);
+      response.addError(error);
 
-      response.addValidationError(error);
-
-      throw new InvalidConfigurationException(response);
+      throw new ValidationResponseException(response);
     }
 
     // clear the NotFoundCache
@@ -141,7 +137,8 @@ public abstract class AbstractRepositoryConfigurator
     }
   }
 
-  protected void doPrepareForSave(Repository repository, ApplicationConfiguration configuration,
+  protected void doPrepareForSave(Repository repository,
+                                  ApplicationConfiguration configuration,
                                   CRepositoryCoreConfiguration coreConfiguration)
   {
     // Setting common things on a repository
@@ -153,15 +150,11 @@ public abstract class AbstractRepositoryConfigurator
     return repositoryRegistry;
   }
 
-  protected LocalRepositoryStorage getLocalRepositoryStorage(String repoId, String provider)
-      throws InvalidConfigurationException
-  {
+  private LocalRepositoryStorage getLocalRepositoryStorage(String repoId, String provider) {
     final LocalRepositoryStorage result = localRepositoryStorages.get(provider);
     if (result != null) {
       return result;
     }
-    throw new InvalidConfigurationException("Repository " + repoId
-        + " have local storage with unsupported provider: " + provider);
+    throw new ConfigurationException("Repository " + repoId + " have local storage with unsupported provider: " + provider);
   }
-
 }

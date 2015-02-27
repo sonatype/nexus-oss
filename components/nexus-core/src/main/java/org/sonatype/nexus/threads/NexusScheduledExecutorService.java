@@ -57,7 +57,7 @@ public class NexusScheduledExecutorService
   @Override
   protected <T> Callable<T> associateWithSubject(Callable<T> task) {
     Subject subject = getSubject();
-    return subject.associateWith(new MDCAwareCallable(task));
+    return subject.associateWith(new MDCAwareCallable<>(task));
   }
 
   //

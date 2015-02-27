@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
  * Global security settings.
  */
 public class SecuritySettings
-    implements org.sonatype.configuration.Configuration, java.io.Serializable
 {
   private boolean anonymousAccessEnabled = false;
 
@@ -31,38 +30,37 @@ public class SecuritySettings
   private List<String> realms;
 
   public boolean isAnonymousAccessEnabled() {
-    return this.anonymousAccessEnabled;
+    return anonymousAccessEnabled;
   }
 
-  public void setAnonymousAccessEnabled(boolean anonymousAccessEnabled) {
-    this.anonymousAccessEnabled = anonymousAccessEnabled;
+  public void setAnonymousAccessEnabled(final boolean enabled) {
+    this.anonymousAccessEnabled = enabled;
   }
 
   public String getAnonymousUsername() {
-    return this.anonymousUsername;
+    return anonymousUsername;
   }
 
-  public void setAnonymousUsername(String anonymousUsername) {
-    this.anonymousUsername = anonymousUsername;
+  public void setAnonymousUsername(final String username) {
+    this.anonymousUsername = username;
   }
 
   public String getAnonymousPassword() {
-    return this.anonymousPassword;
+    return anonymousPassword;
   }
 
-  public void setAnonymousPassword(String anonymousPassword) {
-    this.anonymousPassword = anonymousPassword;
+  public void setAnonymousPassword(final String password) {
+    this.anonymousPassword = password;
   }
 
-  public java.util.List<String> getRealms() {
-    if (this.realms == null) {
-      this.realms = Lists.newArrayList();
+  public List<String> getRealms() {
+    if (realms == null) {
+      realms = Lists.newArrayList();
     }
-
-    return this.realms;
+    return realms;
   }
 
-  public void setRealms(List<String> realms) {
+  public void setRealms(final List<String> realms) {
     this.realms = realms;
   }
 }

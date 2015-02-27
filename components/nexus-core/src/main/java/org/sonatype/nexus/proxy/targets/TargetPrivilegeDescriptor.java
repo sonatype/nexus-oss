@@ -16,8 +16,8 @@ package org.sonatype.nexus.proxy.targets;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.validation.ValidationMessage;
-import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.validation.ValidationMessage;
+import org.sonatype.nexus.common.validation.ValidationResponse;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.SecurityConfigurationValidationContext;
 import org.sonatype.nexus.security.privilege.AbstractPrivilegeDescriptor;
@@ -109,8 +109,8 @@ public class TargetPrivilegeDescriptor
 
     if (StringUtils.isEmpty(repositoryTargetId)) {
       ValidationMessage message = new ValidationMessage("repositoryTargetId", "Privilege ID '"
-          + privilege.getId() + "' requires a repositoryTargetId.", "Repository Target is required.");
-      response.addValidationError(message);
+          + privilege.getId() + "' requires a repositoryTargetId.");
+      response.addError(message);
     }
 
     if (!StringUtils.isEmpty(repositoryId) && !StringUtils.isEmpty(repositoryGroupId)) {
@@ -119,13 +119,12 @@ public class TargetPrivilegeDescriptor
           "Privilege ID '"
               + privilege.getId()
               + "' cannot be assigned to both a group and repository."
-              + "  Either assign a group, a repository or neither (which assigns to ALL repositories).",
-          "Cannot select both a Repository and Repository Group.");
-      response.addValidationError(message);
+              + "  Either assign a group, a repository or neither (which assigns to ALL repositories).");
+      response.addError(message);
     }
 
     if (StringUtils.isEmpty(method)) {
-      response.addValidationError("Method cannot be empty on a privilege!");
+      response.addError("Method cannot be empty on a privilege!");
     }
     else {
       String[] methods = null;
@@ -155,9 +154,8 @@ public class TargetPrivilegeDescriptor
         ValidationMessage message = new ValidationMessage(
             "method",
             "Privilege ID '" + privilege.getId()
-                + "' Method is wrong! (Allowed methods are: create, delete, read and update)",
-            "Invalid method selected.");
-        response.addValidationError(message);
+                + "' Method is wrong! (Allowed methods are: create, delete, read and update)");
+        response.addError(message);
       }
     }
 

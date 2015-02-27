@@ -37,10 +37,12 @@ public class MockUserLocator
     userIds.add("jcoder");
   }
 
+  @Override
   public String getSource() {
     return "test";
   }
 
+  @Override
   public User getUser(String userId) {
     if (this.userIds.contains(userId)) {
       return this.toUser(userId);
@@ -48,10 +50,12 @@ public class MockUserLocator
     return null;
   }
 
+  @Override
   public Set<String> listUserIds() {
     return userIds;
   }
 
+  @Override
   public Set<User> listUsers() {
     Set<User> users = new HashSet<User>();
 
@@ -62,6 +66,7 @@ public class MockUserLocator
     return users;
   }
 
+  @Override
   public Set<User> searchUsers(UserSearchCriteria criteria) {
     return this.filterListInMemeory(this.listUsers(), criteria);
   }
@@ -77,6 +82,7 @@ public class MockUserLocator
     return user;
   }
 
+  @Override
   public String getAuthenticationRealmName() {
     return null;
   }

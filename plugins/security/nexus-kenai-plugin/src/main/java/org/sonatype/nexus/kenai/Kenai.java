@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.nexus.common.validation.ValidationResponseException;
 
 /**
  * Kenai facade.
@@ -29,9 +29,9 @@ public interface Kenai
   /**
    * Configure Kenai.
    *
-   * @throws InvalidConfigurationException If configuration is invalid
+   * @throws ValidationResponseException If configuration is invalid
    */
-  Kenai configure(KenaiConfiguration config) throws InvalidConfigurationException, IOException;
+  Kenai configure(KenaiConfiguration config) throws IOException;
 
   /**
    * Returns current Kenai configuration (null if not yet configured)

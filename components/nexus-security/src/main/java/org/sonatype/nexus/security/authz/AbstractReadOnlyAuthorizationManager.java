@@ -12,52 +12,59 @@
  */
 package org.sonatype.nexus.security.authz;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.security.privilege.NoSuchPrivilegeException;
 import org.sonatype.nexus.security.privilege.Privilege;
 import org.sonatype.nexus.security.role.NoSuchRoleException;
 import org.sonatype.nexus.security.role.Role;
 
 /**
- * An abstract AuthorizationManager, that just throws exceptions for all the write methods. Any call to theses methods
- * should be checked by the <code>supportsWrite()</code> method, so this should never be called.
+ * Read-only {@link AuthorizationManager}, which just throws exceptions for all the write methods.
+ *
+ * Any call to theses methods should be guarded by {@code #supportsWrite}.
  */
 public abstract class AbstractReadOnlyAuthorizationManager
     implements AuthorizationManager
 {
+  /**
+   * @return Always {@code false}
+   */
+  @Override
   public boolean supportsWrite() {
     return false;
   }
 
-  public Privilege addPrivilege(Privilege privilege) throws InvalidConfigurationException {
-    throwException();
-    return null;
+  @Override
+  public Privilege addPrivilege(final Privilege privilege) {
+    throw unsupported();
   }
 
-  public Role addRole(Role role) throws InvalidConfigurationException {
-    throwException();
-    return null;
+  @Override
+  public Role addRole(final Role role) {
+    throw unsupported();
   }
 
-  public void deletePrivilege(String privilegeId) throws NoSuchPrivilegeException {
-    throwException();
+  @Override
+  public void deletePrivilege(final String privilegeId) throws NoSuchPrivilegeException {
+    throw unsupported();
   }
 
-  public void deleteRole(String roleId) throws NoSuchRoleException {
-    throwException();
+  @Override
+  public void deleteRole(final String roleId) throws NoSuchRoleException {
+    throw unsupported();
   }
 
-  public Privilege updatePrivilege(Privilege privilege) throws NoSuchPrivilegeException, InvalidConfigurationException {
-    throwException();
-    return null;
+  @Override
+  public Privilege updatePrivilege(final Privilege privilege) throws NoSuchPrivilegeException {
+    throw unsupported();
   }
 
-  public Role updateRole(Role role) throws NoSuchRoleException, InvalidConfigurationException {
-    throwException();
-    return null;
+  @Override
+  public Role updateRole(final Role role) throws NoSuchRoleException {
+    throw unsupported();
   }
 
-  private void throwException() {
+  private IllegalStateException unsupported() {
+    // TODO: Should probably use UnsupportedOperationException
     throw new IllegalStateException("AuthorizationManager: '" + getSource() + "' does not support write operations.");
   }
 }

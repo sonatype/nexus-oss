@@ -84,14 +84,12 @@ public class LdapAuthorizationManager
   }
 
   @Override
-  public Role getRole(String roleId)
-      throws NoSuchRoleException
-  {
+  public Role getRole(String roleId) throws NoSuchRoleException {
     try {
       String roleName = this.ldapManager.getGroupName(roleId);
 
       if (roleName == null) {
-        throw new NoSuchRoleException("Role: " + roleId + " was not found in LDAP.");
+        throw new NoSuchRoleException(roleId);
       }
 
       Role role = new Role();
@@ -101,11 +99,8 @@ public class LdapAuthorizationManager
 
       return role;
     }
-    catch (LdapDAOException e) {
-      throw new NoSuchRoleException("Role: " + roleId + " was not found in LDAP.", e);
-    }
-    catch (NoSuchLdapGroupException e) {
-      throw new NoSuchRoleException("Role: " + roleId + " was not found in LDAP.", e);
+    catch (LdapDAOException | NoSuchLdapGroupException e) {
+      throw new NoSuchRoleException(roleId, e);
     }
   }
 
@@ -115,10 +110,7 @@ public class LdapAuthorizationManager
   }
 
   @Override
-  public Privilege getPrivilege(String privilegeId)
-      throws NoSuchPrivilegeException
-  {
+  public Privilege getPrivilege(String privilegeId) throws NoSuchPrivilegeException {
     return null;
   }
-
 }

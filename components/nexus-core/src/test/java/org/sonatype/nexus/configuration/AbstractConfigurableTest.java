@@ -12,13 +12,12 @@
  */
 package org.sonatype.nexus.configuration;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
 import org.mockito.Mock;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -42,9 +41,7 @@ public class AbstractConfigurableTest
     AbstractConfigurable configurable = new AbstractConfigurable(eventBus, applicationConfiguration)
     {
       @Override
-      protected CoreConfiguration wrapConfiguration(final Object configuration)
-          throws ConfigurationException
-      {
+      protected CoreConfiguration wrapConfiguration(final Object configuration) {
         return null;
       }
 

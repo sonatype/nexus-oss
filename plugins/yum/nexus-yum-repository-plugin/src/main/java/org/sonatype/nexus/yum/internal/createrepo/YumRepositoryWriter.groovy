@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus.yum.internal.createrepo
 
+import com.google.common.io.BaseEncoding
 import com.google.common.io.CountingOutputStream
 import javanet.staxutils.IndentingXMLStreamWriter
 import org.apache.commons.io.IOUtils
-import org.sonatype.nexus.util.DigesterUtils
 
 import javax.xml.stream.XMLOutputFactory
 import javax.xml.stream.XMLStreamWriter
@@ -338,14 +338,14 @@ implements Closeable
 
     String getOpenChecksum() {
       if (!openChecksum) {
-        openChecksum = DigesterUtils.getDigestAsString(openDigestStream.messageDigest.digest())
+        openChecksum = BaseEncoding.base16().lowerCase().encode(openDigestStream.messageDigest.digest())
       }
       return openChecksum
     }
 
     String getCompressedChecksum() {
       if (!compressedChecksum) {
-        compressedChecksum = DigesterUtils.getDigestAsString(compressedDigestStream.messageDigest.digest())
+        compressedChecksum = BaseEncoding.base16().lowerCase().encode(compressedDigestStream.messageDigest.digest())
       }
       return compressedChecksum
     }

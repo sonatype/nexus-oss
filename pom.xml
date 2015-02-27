@@ -161,12 +161,6 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>base-configuration</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-analytics-api</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
@@ -198,12 +192,6 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-commands</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-configuration-model</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -306,18 +294,6 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-repository-metadata-api</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-repository-metadata-model</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-security</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
@@ -347,6 +323,12 @@
       </dependency>
 
       <!-- testsupport -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-pax-exam</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -649,6 +631,23 @@
               <id>xstream</id>
             </excludedArtifactIds>
           </configuration>
+        </plugin>
+
+        <!--
+        Generate Pax-Exam test-dependency XML.
+        -->
+        <plugin>
+          <groupId>org.apache.servicemix.tooling</groupId>
+          <artifactId>depends-maven-plugin</artifactId>
+          <version>1.2</version>
+          <executions>
+            <execution>
+              <id>generate-depends-file</id>
+              <goals>
+                <goal>generate-depends-file</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
 
         <plugin>
@@ -1218,6 +1217,19 @@
                       </pluginExecutionFilter>
                       <action>
                         <ignore/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.servicemix.tooling</groupId>
+                        <artifactId>depends-maven-plugin</artifactId>
+                        <versionRange>[1.2,)</versionRange>
+                        <goals>
+                          <goal>generate-depends-file</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <execute/>
                       </action>
                     </pluginExecution>
                   </pluginExecutions>

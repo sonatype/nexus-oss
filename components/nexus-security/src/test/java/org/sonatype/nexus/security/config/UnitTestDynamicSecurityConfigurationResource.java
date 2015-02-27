@@ -27,7 +27,8 @@ public class UnitTestDynamicSecurityConfigurationResource
     return privId;
   }
 
-  protected MemorySecurityConfiguration doGetConfiguration() {
+  @Override
+  protected SecurityConfiguration doGetConfiguration() {
     configCalledAfterSetDirty = true;
 
     setConfigCalledAfterSetDirty(true);
@@ -61,5 +62,4 @@ public class UnitTestDynamicSecurityConfigurationResource
     }
     super.setDirty(dirty);
   }
-
 }

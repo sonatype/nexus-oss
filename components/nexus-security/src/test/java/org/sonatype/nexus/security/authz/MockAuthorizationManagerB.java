@@ -27,10 +27,12 @@ import org.sonatype.nexus.security.role.Role;
 public class MockAuthorizationManagerB
     extends AbstractReadOnlyAuthorizationManager
 {
+  @Override
   public String getSource() {
     return "sourceB";
   }
 
+  @Override
   public Set<Role> listRoles() {
     Set<Role> roles = new HashSet<Role>();
 
@@ -54,14 +56,17 @@ public class MockAuthorizationManagerB
     return roles;
   }
 
+  @Override
   public Privilege getPrivilege(String privilegeId) throws NoSuchPrivilegeException {
     return null;
   }
 
+  @Override
   public Role getRole(String roleId) throws NoSuchRoleException {
     return null;
   }
 
+  @Override
   public Set<Privilege> listPrivileges() {
     return null;
   }

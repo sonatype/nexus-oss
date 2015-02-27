@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     'NX.I18n'
   ],
 
-  store: 'Repository',
+  store: 'NX.coreui.store.Repository',
 
   columns: [
     {
@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
       width: 36,
       iconVariant: 'x16',
       iconName: function() {
-        return 'repository-default';
+        return 'repositorycma-default';
       }
     },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },

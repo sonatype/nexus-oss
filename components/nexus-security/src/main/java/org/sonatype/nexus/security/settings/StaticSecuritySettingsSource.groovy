@@ -46,7 +46,7 @@ class StaticSecuritySettingsSource
    * The 'static' source is immutable.
    */
   @Override
-  void storeConfiguration() {
+  void save() {
     throw new UnsupportedOperationException()
   }
 }

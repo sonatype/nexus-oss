@@ -14,7 +14,6 @@ package org.sonatype.nexus.templates.repository;
 
 import java.io.IOException;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
@@ -36,6 +35,5 @@ public interface RepositoryTemplate
 
   ConfigurableRepository getConfigurableRepository();
 
-  Repository create()
-      throws ConfigurationException, IOException;
+  Repository create() throws IOException;
 }

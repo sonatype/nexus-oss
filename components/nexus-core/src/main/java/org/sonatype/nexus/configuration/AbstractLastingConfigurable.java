@@ -14,12 +14,12 @@ package org.sonatype.nexus.configuration;
 
 import javax.inject.Inject;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.common.throwables.ConfigurationException;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.base.Throwables;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
+
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
