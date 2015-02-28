@@ -18,6 +18,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -25,6 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named("memory")
 @Singleton
+@VisibleForTesting
 public class MemoryRealmConfigurationStore
   extends ComponentSupport
   implements RealmConfigurationStore

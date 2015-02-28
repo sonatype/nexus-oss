@@ -51,7 +51,9 @@ public class AnonymousManagerImpl
                               final @Named("initial") Provider<AnonymousConfiguration> defaults)
   {
     this.store = checkNotNull(store);
+    log.debug("Store: {}", store);
     this.defaults = checkNotNull(defaults);
+    log.debug("Defaults: {}", defaults);
   }
 
   //
@@ -82,6 +84,8 @@ public class AnonymousManagerImpl
 
   /**
    * Return configuration, loading if needed.
+   *
+   * The result model should be considered _immutable_ unless copied.
    */
   private AnonymousConfiguration getConfigurationInternal() {
     synchronized (lock) {

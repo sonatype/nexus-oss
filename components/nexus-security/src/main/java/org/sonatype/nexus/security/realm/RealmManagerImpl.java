@@ -74,7 +74,9 @@ public class RealmManagerImpl
   {
     this.eventBus = checkNotNull(eventBus);
     this.store = checkNotNull(store);
+    log.debug("Store: {}", store);
     this.defaults = checkNotNull(defaults);
+    log.debug("Defaults: {}", defaults);
     this.realmSecurityManager = checkNotNull(realmSecurityManager);
     this.availableRealms = checkNotNull(availableRealms);
   }
@@ -138,6 +140,8 @@ public class RealmManagerImpl
 
   /**
    * Return configuration, loading if needed.
+   *
+   * The result model should be considered _immutable_ unless copied.
    */
   private RealmConfiguration getConfigurationInternal() {
     synchronized (lock) {
