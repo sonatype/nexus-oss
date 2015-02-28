@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.ldap;
 
 import java.util.ArrayList;
@@ -24,12 +25,16 @@ import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration;
 import org.sonatype.nexus.security.internal.AuthenticatingRealmImpl;
+import org.sonatype.nexus.security.realm.MemoryRealmConfigurationStore;
+import org.sonatype.nexus.security.realm.RealmConfigurationStore;
 import org.sonatype.nexus.security.role.Role;
 import org.sonatype.nexus.security.role.RoleIdentifier;
 import org.sonatype.nexus.security.user.User;
 import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.nexus.security.user.UserSearchCriteria;
 
+import com.google.inject.Binder;
+import com.google.inject.Module;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -61,6 +66,20 @@ public class LdapUserManagerIT
 
   private UserManager getUserManager() throws Exception {
     return this.lookup(UserManager.class, LdapPlugin.USER_SOURCE);
+  }
+
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    modules.add(new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        binder.bind(RealmConfigurationStore.class)
+            //.annotatedWith(Names.named("default"))
+            .to(MemoryRealmConfigurationStore.class);
+      }
+    });
+    super.customizeModules(modules);
   }
 
   @Override
