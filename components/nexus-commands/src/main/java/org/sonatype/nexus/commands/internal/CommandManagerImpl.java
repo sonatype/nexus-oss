@@ -64,7 +64,7 @@ public class CommandManagerImpl
     checkNotNull(function);
     checkNotNull(config);
 
-    log.info("Registering function: {} with config: {}", function, config);
+    log.debug("Registering function: {} with config: {}", function, config);
     bundleContext.registerService(Function.class, function, config);
   }
 }
