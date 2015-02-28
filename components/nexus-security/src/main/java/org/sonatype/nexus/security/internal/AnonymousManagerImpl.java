@@ -10,24 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.security.anonymous;
+package org.sonatype.nexus.security.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.security.anonymous.AnonymousConfiguration;
+import org.sonatype.nexus.security.anonymous.AnonymousConfigurationStore;
+import org.sonatype.nexus.security.anonymous.AnonymousManager;
+import org.sonatype.nexus.security.anonymous.AnonymousPrincipalCollection;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.Mutex;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-// TODO: Move to internal
 
 /**
  * Default {@link AnonymousManagerImpl}.
@@ -129,23 +129,11 @@ public class AnonymousManagerImpl
     return getConfigurationInternal().isEnabled();
   }
 
-  /**
-   * Used to help identify if a {@link Subject} is anonymous.
-   */
-  @VisibleForTesting
-  static class AnonymousPrincipalCollection
-    extends SimplePrincipalCollection
-  {
-    AnonymousPrincipalCollection(final Object principal, final String realmName) {
-      super(principal, realmName);
-    }
-  }
-
   @Override
   public Subject buildSubject() {
     AnonymousConfiguration model = getConfigurationInternal();
 
-    log.info("Building anonymous subject with user-id: {}, realm-name: {}", model.getUserId(), model.getRealmName());
+    log.trace("Building anonymous subject with user-id: {}, realm-name: {}", model.getUserId(), model.getRealmName());
 
     // custom principals to aid with anonymous subject detection
     PrincipalCollection principals = new AnonymousPrincipalCollection(

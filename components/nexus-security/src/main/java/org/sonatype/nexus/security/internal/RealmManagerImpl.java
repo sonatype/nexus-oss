@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.security.realm;
+package org.sonatype.nexus.security.internal;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +26,9 @@ import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.security.SecurityConfigurationChanged;
 import org.sonatype.nexus.security.UserPrincipalsExpired;
 import org.sonatype.nexus.security.authz.AuthorizationConfigurationChanged;
+import org.sonatype.nexus.security.realm.RealmConfiguration;
+import org.sonatype.nexus.security.realm.RealmConfigurationStore;
+import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.sisu.goodies.common.Mutex;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
