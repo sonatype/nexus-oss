@@ -133,12 +133,15 @@ public class DefaultSecuritySystem
   public synchronized void start() throws Exception {
     checkState(!started, "Already started");
 
+    log.info("Starting");
+
+    // FIXME: Sort out overlap in responsibility between lifecycle here and RealmManagerImpl
+    // FIXME: Wonder if a provider to handle configuration of RealmSecurityManager here is better?
+
     // prepare security manager
     if (realmSecurityManager instanceof Initializable) {
       ((Initializable)realmSecurityManager).init();
     }
-
-    // FIXME: Sort out overlap in responsibility between lifecycle here and RealmManagerImpl
 
     // prepare shiro cache
     EhCacheManager shiroCacheManager = new EhCacheManager();
@@ -153,6 +156,8 @@ public class DefaultSecuritySystem
   @Override
   public synchronized void stop() throws Exception {
     // FIXME: We never guard started=true ?!
+
+    log.info("Stopping");
 
     realmManager.stop();
 
