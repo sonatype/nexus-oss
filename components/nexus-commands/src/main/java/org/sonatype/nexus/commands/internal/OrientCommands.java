@@ -10,12 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.commands.orient;
+package org.sonatype.nexus.commands.internal;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -23,14 +21,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.commands.AbstractCompletableCommand;
+import org.sonatype.nexus.commands.CommandHelper;
+import org.sonatype.nexus.commands.CommandManager;
+import org.sonatype.nexus.common.text.Strings2;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.orientechnologies.common.console.annotation.ConsoleCommand;
 import com.orientechnologies.orient.console.OConsoleDatabaseApp;
-import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
-import org.apache.felix.service.command.Function;
 import org.apache.karaf.shell.commands.Action;
 import org.apache.karaf.shell.commands.CommandException;
 import org.apache.karaf.shell.commands.basic.AbstractCommand;
@@ -38,7 +37,6 @@ import org.apache.karaf.shell.console.Completer;
 import org.apache.karaf.shell.console.SubShellAction;
 import org.apache.karaf.shell.console.completer.NullCompleter;
 import org.eclipse.sisu.EagerSingleton;
-import org.osgi.framework.BundleContext;
 
 import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
@@ -53,20 +51,18 @@ import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
 public class OrientCommands
     extends OConsoleDatabaseApp
 {
-  private static final String NL = System.getProperty("line.separator");
-
   private static final String SCOPE = "orient";
 
   @Inject
-  public OrientCommands(final BundleContext ctx) {
+  public OrientCommands(final CommandManager commandManager) {
     super(new String[0]);
 
     // define our own Karaf sub-shell: type 'orient' to enter, and 'exit' to leave
-    ctx.registerService(Function.class, createShellCommand(), config("*", SCOPE));
+    commandManager.register(createShellCommand(), CommandHelper.config("*", SCOPE));
 
     for (Method method : getConsoleMethods().keySet()) {
       if (method.isAnnotationPresent(ConsoleCommand.class)) {
-        ctx.registerService(Function.class, createOrientCommand(method), config(SCOPE, method.getName()));
+        commandManager.register(createOrientCommand(method), CommandHelper.config(SCOPE, method.getName()));
       }
     }
 
@@ -126,13 +122,6 @@ public class OrientCommands
     };
   }
 
-  private static Dictionary<String, ?> config(final String scope, final String function) {
-    Hashtable<String, String> props = new Hashtable<String, String>();
-    props.put(CommandProcessor.COMMAND_SCOPE, scope);
-    props.put(CommandProcessor.COMMAND_FUNCTION, function);
-    return props;
-  }
-
   public Object execute(final Method method, final String command, final List<Object> params) {
     if (params.isEmpty() || !"--help".equals(params.get(0))) {
 
@@ -140,7 +129,7 @@ public class OrientCommands
       List<?> expression = ImmutableList.builder().add(command).addAll(params).build();
       OrientCommands.this.execute(Joiner.on(' ').useForNull("null").join(expression));
 
-      return NL;
+      return Strings2.NL;
     }
 
     syntaxError(command, method);
