@@ -32,7 +32,7 @@ public class HelloFunction
 {
   @Override
   public Object execute(final CommandSession commandSession, final List<Object> list) throws Exception {
-    System.out.println("HELLO!");
+    commandSession.getConsole().println("Hello!");
     return null;
   }
 }
