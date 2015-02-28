@@ -14,7 +14,6 @@ package org.sonatype.nexus.kenai.internal;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,7 +24,7 @@ import org.sonatype.nexus.capability.CapabilityRegistry;
 import org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder;
 import org.sonatype.nexus.kenai.Kenai;
 import org.sonatype.nexus.kenai.KenaiConfiguration;
-import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
@@ -44,16 +43,15 @@ public class KenaiImpl
     extends ComponentSupport
     implements Kenai
 {
+  private final RealmManager realmManager;
 
   private final CapabilityRegistry capabilityRegistry;
 
-  private final SecuritySystem securitySystem;
-
   @Inject
-  public KenaiImpl(final SecuritySystem securitySystem,
+  public KenaiImpl(final RealmManager realmManager,
                    final CapabilityRegistry capabilityRegistry)
   {
-    this.securitySystem = checkNotNull(securitySystem);
+    this.realmManager = checkNotNull(realmManager);
     this.capabilityRegistry = checkNotNull(capabilityRegistry);
   }
 
@@ -115,31 +113,14 @@ public class KenaiImpl
 
   @Override
   public boolean isRealmActive() {
-    return securitySystem.getRealms().contains(KenaiRealm.ROLE);
+    return realmManager.isRealmEnabled(KenaiRealm.ROLE);
   }
 
   @Override
   public void setRealmActive(boolean realmActive) {
     log.debug("Realm active: {}", realmActive);
 
-    List<String> realms = securitySystem.getRealms();
-    boolean currentlyActive = realms.contains(KenaiRealm.ROLE);
-
-    try {
-      if (realmActive && !currentlyActive) {
-        realms.add(KenaiRealm.ROLE);
-        log.info("Activating Kenai security realm");
-        securitySystem.setRealms(realms);
-      }
-      else if (!realmActive && currentlyActive) {
-        realms.remove(KenaiRealm.ROLE);
-        log.info("Deactivating Kenai security realm");
-        securitySystem.setRealms(realms);
-      }
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+    realmManager.enableRealm(KenaiRealm.ROLE, realmActive);
   }
 
   private CapabilityReference capabilityReference() {
@@ -150,5 +131,4 @@ public class KenaiImpl
     }
     return refs.iterator().next();
   }
-
 }

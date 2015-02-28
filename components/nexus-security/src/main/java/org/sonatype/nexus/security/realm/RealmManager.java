@@ -22,13 +22,36 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 public interface RealmManager
   extends Lifecycle
 {
+  /**
+   * Returns copy of current realm configuration.
+   */
   RealmConfiguration getConfiguration();
 
+  /**
+   * Installs new realm configuration.
+   */
   void setConfiguration(RealmConfiguration configuration);
 
+  /**
+   * Check if given realm-name is enabled.
+   */
   boolean isRealmEnabled(String realmName);
 
+  /**
+   * Helper to enable or disable given realm-name.
+   *
+   * @see #enableRealm
+   * @see #disableRealm
+   */
+  void enableRealm(String realmName, boolean enable);
+
+  /**
+   * Enable given realm-name, if not already enabled.
+   */
   void enableRealm(String realmName);
 
+  /**
+   * Disable given realm-name, if not already disabled.
+   */
   void disableRealm(String realmName);
 }

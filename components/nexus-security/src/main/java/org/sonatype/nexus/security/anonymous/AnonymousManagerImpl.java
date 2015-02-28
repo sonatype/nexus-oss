@@ -20,7 +20,9 @@ import javax.inject.Singleton;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.Mutex;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -125,6 +127,18 @@ public class AnonymousManagerImpl
   @Override
   public boolean isEnabled() {
     return getConfigurationInternal().isEnabled();
+  }
+
+  /**
+   * Used to help identify if a {@link Subject} is anonymous.
+   */
+  @VisibleForTesting
+  static class AnonymousPrincipalCollection
+    extends SimplePrincipalCollection
+  {
+    AnonymousPrincipalCollection(final Object principal, final String realmName) {
+      super(principal, realmName);
+    }
   }
 
   @Override

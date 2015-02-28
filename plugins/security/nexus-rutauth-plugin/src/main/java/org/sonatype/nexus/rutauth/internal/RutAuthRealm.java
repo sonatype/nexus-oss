@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.security.user.User;
 import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.nexus.security.user.UserNotFoundException;
@@ -53,14 +53,14 @@ public class RutAuthRealm
 
   public static final String DESCRIPTION = "Rut Auth Realm";
 
-  private final SecuritySystem securitySystem;
+  private final RealmManager realmManager;
 
   private final List<UserManager> userManagers;
 
   @Inject
-  public RutAuthRealm(final SecuritySystem securitySystem, final List<UserManager> userManagers) {
-    this.securitySystem = checkNotNull(securitySystem, "securitySystem");
-    this.userManagers = checkNotNull(userManagers, "userManagers");
+  public RutAuthRealm(final RealmManager realmManager, final List<UserManager> userManagers) {
+    this.realmManager = checkNotNull(realmManager);
+    this.userManagers = checkNotNull(userManagers);
     setName(ID);
     // Any credentials will be a match as we only get the principal
     setCredentialsMatcher(new CredentialsMatcher()
@@ -81,7 +81,7 @@ public class RutAuthRealm
   protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token) throws AuthenticationException {
     final String rutUserId = token.getPrincipal().toString();
     final SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    final List<String> configuredRealms = securitySystem.getRealms();
+    final List<String> configuredRealms = realmManager.getConfiguration().getRealmNames();
     for (UserManager userManager : userManagers) {
       if (configuredRealms.contains(userManager.getAuthenticationRealmName())) {
         try {

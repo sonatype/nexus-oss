@@ -27,7 +27,7 @@ import org.sonatype.nexus.ldap.LdapRealm;
 import org.sonatype.nexus.ldap.internal.events.LdapClearCacheEvent;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Validator;
-import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -55,7 +55,7 @@ public class DefaultLdapConfigurationManager
 
   private final EventBus eventBus;
 
-  private final SecuritySystem securitySystem;
+  private final RealmManager realmManager;
 
   /**
    * Configuration cache.
@@ -68,12 +68,12 @@ public class DefaultLdapConfigurationManager
   public DefaultLdapConfigurationManager(final LdapConfigurationSource configurationSource,
                                          final Validator validator,
                                          final EventBus eventBus,
-                                         final SecuritySystem securitySystem)
+                                         final RealmManager realmManager)
   {
     this.configurationSource = checkNotNull(configurationSource);
     this.validator = checkNotNull(validator);
     this.eventBus = checkNotNull(eventBus);
-    this.securitySystem = checkNotNull(securitySystem);
+    this.realmManager = checkNotNull(realmManager);
     this.cache = Maps.newLinkedHashMap();
     this.cachePrimed = false;
   }
@@ -181,16 +181,7 @@ public class DefaultLdapConfigurationManager
    * @since 2.7.0
    */
   private void mayActivateLdapRealm() {
-    try {
-      final List<String> activeRealms = securitySystem.getRealms();
-      if (!activeRealms.contains(LdapPlugin.REALM_NAME)) {
-        activeRealms.add(LdapPlugin.REALM_NAME);
-        securitySystem.setRealms(activeRealms);
-      }
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+    realmManager.enableRealm(LdapPlugin.REALM_NAME);
   }
 
   /**
@@ -199,16 +190,7 @@ public class DefaultLdapConfigurationManager
    * @since 2.7.0
    */
   private void mayDeactivateLdapRealm() {
-    try {
-      final List<String> activeRealms = securitySystem.getRealms();
-      if (activeRealms.contains(LdapPlugin.REALM_NAME)) {
-        activeRealms.remove(LdapPlugin.REALM_NAME);
-        securitySystem.setRealms(activeRealms);
-      }
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+    realmManager.disableRealm(LdapPlugin.REALM_NAME);
   }
 
   /**

@@ -36,7 +36,6 @@ import org.sonatype.nexus.security.authz.AuthorizationConfigurationChanged;
 import org.sonatype.nexus.security.authz.AuthorizationManager;
 import org.sonatype.nexus.security.authz.NoSuchAuthorizationManagerException;
 import org.sonatype.nexus.security.privilege.Privilege;
-import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.security.role.Role;
 import org.sonatype.nexus.security.role.RoleIdentifier;
@@ -148,6 +147,7 @@ public class DefaultSecuritySystem
     shiroCacheManager.setCacheManager(cacheManager);
     realmSecurityManager.setCacheManager(shiroCacheManager);
 
+    // TODO: Sort out better means to invoke lifecycle here, realm-manager is only here for start/stop now
     realmManager.start();
 
     started = true;
@@ -602,18 +602,5 @@ public class DefaultSecuritySystem
       throw new NoSuchUserManagerException(source);
     }
     return userManagers.get(source);
-  }
-
-
-  @Override
-  public List<String> getRealms() {
-    return realmManager.getConfiguration().getRealmNames();
-  }
-
-  @Override
-  public void setRealms(final List<String> realms) {
-    RealmConfiguration model = new RealmConfiguration();
-    model.setRealmNames(realms);
-    realmManager.setConfiguration(model);
   }
 }

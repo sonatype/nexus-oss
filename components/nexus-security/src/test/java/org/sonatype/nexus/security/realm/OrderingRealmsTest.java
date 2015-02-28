@@ -12,13 +12,11 @@
  */
 package org.sonatype.nexus.security.realm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.user.User;
 
+import com.google.common.collect.ImmutableList;
 import junit.framework.Assert;
 
 public class OrderingRealmsTest
@@ -26,11 +24,12 @@ public class OrderingRealmsTest
 {
   public void testOrderedGetUser() throws Exception {
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
+    RealmManager realmManager = lookup(RealmManager.class);
+    RealmConfiguration realmConfiguration;
 
-    List<String> realmHints = new ArrayList<String>();
-    realmHints.add("MockRealmA");
-    realmHints.add("MockRealmB");
-    securitySystem.setRealms(realmHints);
+    realmConfiguration = new RealmConfiguration();
+    realmConfiguration.setRealmNames(ImmutableList.of("MockRealmA", "MockRealmB"));
+    realmManager.setConfiguration(realmConfiguration);
 
     User jcoder = securitySystem.getUser("jcoder");
     Assert.assertNotNull(jcoder);
@@ -39,10 +38,9 @@ public class OrderingRealmsTest
     Assert.assertEquals("MockUserManagerA", jcoder.getSource());
 
     // now change the order
-    realmHints.clear();
-    realmHints.add("MockRealmB");
-    realmHints.add("MockRealmA");
-    securitySystem.setRealms(realmHints);
+    realmConfiguration = new RealmConfiguration();
+    realmConfiguration.setRealmNames(ImmutableList.of("MockRealmB", "MockRealmA")); // order changed
+    realmManager.setConfiguration(realmConfiguration);
 
     jcoder = securitySystem.getUser("jcoder");
     Assert.assertNotNull(jcoder);

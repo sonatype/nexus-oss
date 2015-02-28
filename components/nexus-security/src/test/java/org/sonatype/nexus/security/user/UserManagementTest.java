@@ -18,6 +18,8 @@ import java.util.Set;
 
 import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.realm.RealmConfiguration;
+import org.sonatype.nexus.security.realm.RealmManager;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
@@ -36,7 +38,10 @@ public class UserManagementTest
 
     securitySystem = getSecuritySystem();
 
-    securitySystem.setRealms(ImmutableList.of("MockRealmA", "MockRealmB"));
+    RealmManager realmManager = lookup(RealmManager.class);
+    RealmConfiguration model = new RealmConfiguration();
+    model.setRealmNames(ImmutableList.of("MockRealmA", "MockRealmB"));
+    realmManager.setConfiguration(model);
   }
 
   @Override

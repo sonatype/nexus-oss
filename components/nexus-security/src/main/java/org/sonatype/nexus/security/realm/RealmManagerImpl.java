@@ -234,6 +234,16 @@ public class RealmManagerImpl
   }
 
   @Override
+  public void enableRealm(final String realmName, final boolean enable) {
+    if (enable) {
+      enableRealm(realmName);
+    }
+    else {
+      disableRealm(realmName);
+    }
+  }
+
+  @Override
   public void enableRealm(final String realmName) {
     checkNotNull(realmName);
 

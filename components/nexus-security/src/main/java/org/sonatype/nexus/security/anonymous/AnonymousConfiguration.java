@@ -36,6 +36,8 @@ public class AnonymousConfiguration
     this.enabled = enabled;
   }
 
+  // TODO: Sort out nullability of user-id and realm-name
+
   public String getUserId() {
     return userId;
   }

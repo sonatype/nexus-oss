@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.ldap;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,13 +25,16 @@ import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration;
 import org.sonatype.nexus.security.internal.AuthenticatingRealmImpl;
 import org.sonatype.nexus.security.realm.MemoryRealmConfigurationStore;
+import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmConfigurationStore;
+import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.security.role.Role;
 import org.sonatype.nexus.security.role.RoleIdentifier;
 import org.sonatype.nexus.security.user.User;
 import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.nexus.security.user.UserSearchCriteria;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.junit.Assert;
@@ -75,7 +77,6 @@ public class LdapUserManagerIT
       @Override
       public void configure(final Binder binder) {
         binder.bind(RealmConfigurationStore.class)
-            //.annotatedWith(Names.named("default"))
             .to(MemoryRealmConfigurationStore.class);
       }
     });
@@ -221,20 +222,21 @@ public class LdapUserManagerIT
     SecuritySystem securitySystem = this.getSecuritySystem();
     securitySystem.start();
 
-    List<String> realms = new ArrayList<String>();
-    realms.add(AuthenticatingRealmImpl.NAME);
-    realms.add(LdapPlugin.REALM_NAME);
+    RealmManager realmManager = lookup(RealmManager.class);
+    RealmConfiguration realmConfiguration;
 
-    securitySystem.setRealms(realms);
+    realmConfiguration = new RealmConfiguration();
+    realmConfiguration.setRealmNames(ImmutableList.of(AuthenticatingRealmImpl.NAME, LdapPlugin.REALM_NAME));
+    realmManager.setConfiguration(realmConfiguration);
 
     // the user developer is in both realms, we need to make sure the order is honored
     User user = securitySystem.getUser("brianf");
     Assert.assertEquals("default", user.getSource());
 
-    realms.clear();
-    realms.add(LdapPlugin.REALM_NAME);
-    realms.add(AuthenticatingRealmImpl.NAME);
-    securitySystem.setRealms(realms);
+    // change realm order
+    realmConfiguration = new RealmConfiguration();
+    realmConfiguration.setRealmNames(ImmutableList.of(LdapPlugin.REALM_NAME, AuthenticatingRealmImpl.NAME));
+    realmManager.setConfiguration(realmConfiguration);
 
     // now the user should belong to the LDAP realm
 

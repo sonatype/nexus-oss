@@ -20,7 +20,6 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.security.authz.AuthorizationManager;
 import org.sonatype.nexus.security.authz.NoSuchAuthorizationManagerException;
 import org.sonatype.nexus.security.privilege.Privilege;
-import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.security.role.Role;
 import org.sonatype.nexus.security.role.RoleIdentifier;
 import org.sonatype.nexus.security.user.InvalidCredentialsException;
@@ -29,6 +28,7 @@ import org.sonatype.nexus.security.user.User;
 import org.sonatype.nexus.security.user.UserNotFoundException;
 import org.sonatype.nexus.security.user.UserSearchCriteria;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -76,7 +76,10 @@ public interface SecuritySystem
 
   /**
    * Finds the current logged in Subject.
+   *
+   * @deprecated Use {@link SecurityHelper#subject} or {@link SecurityUtils#getSubject()}.
    */
+  @Deprecated
   Subject getSubject();
 
   /**
@@ -250,18 +253,6 @@ public interface SecuritySystem
   // //
   // Application configuration, TODO: I don't think all of these need to be exposed, but they currently are
   // //
-
-  /**
-   * @deprecated use {@link RealmManager} instead.
-   */
-  @Deprecated
-  List<String> getRealms();
-
-  /**
-   * @deprecated use {@link RealmManager} instead.
-   */
-  @Deprecated
-  void setRealms(List<String> realms);
 
   /**
    * Returns the configured shiro SecurityManager

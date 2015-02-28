@@ -12,12 +12,12 @@
  */
 package org.sonatype.nexus.kenai.internal;
 
-import java.util.Collections;
-
-import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.kenai.AbstractKenaiRealmTest;
 import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.realm.RealmConfiguration;
+import org.sonatype.nexus.security.realm.RealmManager;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
@@ -43,8 +43,12 @@ public class KenaiClearCacheTest
 
     // to start the hobelevanc and make it use Kenai realm
     startNx();
-    lookup(SecuritySystem.class).setRealms(Collections.singletonList("kenai"));
-    lookup(ApplicationConfiguration.class).saveConfiguration();
+
+    RealmManager realmManager = lookup(RealmManager.class);
+
+    RealmConfiguration realmConfiguration = new RealmConfiguration();
+    realmConfiguration.setRealmNames(ImmutableList.of(KenaiRealm.ROLE));
+    realmManager.setConfiguration(realmConfiguration);
 
     securitySystem = lookup(SecuritySystem.class);
   }

@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +29,10 @@ import org.sonatype.nexus.proxy.security.PlexusConfiguredRealm;
 import org.sonatype.nexus.proxy.targets.Target;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
 import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.realm.RealmConfiguration;
+import org.sonatype.nexus.security.realm.RealmManager;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.inject.Binder;
 import com.google.inject.Key;
@@ -87,17 +89,17 @@ public class AccessTest
     }
 
     // add target
-    Target t1 =
-        new Target("maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays.asList(new String[]{".*"}));
+    Target t1 = new Target("maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays.asList(new String[]{".*"}));
 
     targetRegistry.addRepositoryTarget(t1);
 
     getApplicationConfiguration().saveConfiguration();
 
     // setup security
-    // setup security
-    final SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
-    securitySystem.setRealms(Collections.singletonList("default"));
+    RealmManager realmManager = lookup(RealmManager.class);
+    RealmConfiguration realmConfiguration = new RealmConfiguration();
+    realmConfiguration.setRealmNames(ImmutableList.of("default"));
+    realmManager.setConfiguration(realmConfiguration);
   }
 
   @Override

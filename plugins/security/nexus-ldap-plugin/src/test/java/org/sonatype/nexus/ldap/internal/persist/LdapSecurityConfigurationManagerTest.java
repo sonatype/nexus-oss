@@ -19,9 +19,16 @@ import java.util.List;
 import org.sonatype.nexus.ldap.internal.LdapTestSupport;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.nexus.security.realm.MemoryRealmConfigurationStore;
+import org.sonatype.nexus.security.realm.RealmConfigurationStore;
+import org.sonatype.nexus.security.realm.RealmManager;
 
 import com.google.common.collect.Maps;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class LdapSecurityConfigurationManagerTest
@@ -30,6 +37,37 @@ public class LdapSecurityConfigurationManagerTest
   @Override
   protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
     return Maps.newLinkedHashMap();
+  }
+
+  // HACK: This test fixture doesn't properly manage injected component lifecycles
+  // HACK: So we have to do a bullshit dance to make the test work properly
+
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    modules.add(new Module() {
+      @Override
+      public void configure(final Binder binder) {
+        binder.bind(RealmConfigurationStore.class).to(MemoryRealmConfigurationStore.class);
+      }
+    });
+    super.customizeModules(modules);
+  }
+
+  // HACK: Not using setUp/tearDown here as super-class has non-standard names due to never migrating fully to junit4
+
+  @Before
+  public void startRealmManager() throws Exception {
+    lookup(RealmManager.class).start();
+  }
+
+  @After
+  public void stopRealmManager() throws Exception {
+    try {
+      lookup(RealmManager.class).stop();
+    }
+    catch (Exception e) {
+      util.getLog().warn("Failed to stop realm-manager", e);
+    }
   }
 
   @Test

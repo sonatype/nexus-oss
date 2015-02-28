@@ -21,13 +21,28 @@ import org.apache.shiro.subject.Subject;
  */
 public interface AnonymousManager
 {
+  /**
+   * Returns copy of current anonymous configuration.
+   */
   AnonymousConfiguration getConfiguration();
 
+  /**
+   * Installs new anonymous configuration.
+   */
   void setConfiguration(AnonymousConfiguration configuration);
 
+  /**
+   * Check if anonymous access is enabled.
+   */
   boolean isEnabled();
 
+  /**
+   * Build anonymous subject.
+   */
   Subject buildSubject();
 
+  /**
+   * Check if given subject is anonymous.
+   */
   boolean isAnonymous(Subject subject);
 }

@@ -14,6 +14,8 @@ package org.sonatype.nexus.security.realm;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
@@ -34,7 +36,7 @@ public class RealmConfiguration
     return realmNames;
   }
 
-  public void setRealmNames(final List<String> realmNames) {
+  public void setRealmNames(final @Nullable List<String> realmNames) {
     this.realmNames = realmNames;
   }
 

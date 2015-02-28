@@ -19,10 +19,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.authc.AuthenticationTokenFactory;
 import org.sonatype.nexus.security.authc.HttpHeaderAuthenticationToken;
 import org.sonatype.nexus.security.authc.HttpHeaderAuthenticationTokenFactorySupport;
+import org.sonatype.nexus.security.realm.RealmManager;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -43,13 +43,13 @@ public class RutAuthAuthenticationTokenFactory
 {
   private static final Logger log = LoggerFactory.getLogger(RutAuthAuthenticationTokenFactory.class);
 
-  private final SecuritySystem securitySystem;
+  private final RealmManager realmManager;
 
   private String headerName;
 
   @Inject
-  public RutAuthAuthenticationTokenFactory(final SecuritySystem securitySystem) {
-    this.securitySystem = checkNotNull(securitySystem, "securitySystem");
+  public RutAuthAuthenticationTokenFactory(final RealmManager realmManager) {
+    this.realmManager = checkNotNull(realmManager);
   }
 
   @Override
@@ -71,17 +71,6 @@ public class RutAuthAuthenticationTokenFactory
   }
 
   private void maybeConfigureRealm() {
-    List<String> realms = securitySystem.getRealms();
-    if (!realms.contains(RutAuthRealm.ID)) {
-      List<String> newRealms = Lists.newArrayList(realms);
-      newRealms.add(RutAuthRealm.ID);
-      try {
-        securitySystem.setRealms(newRealms);
-        log.info("Automatically enabled '{}'", RutAuthRealm.DESCRIPTION);
-      }
-      catch (Exception e) {
-        log.warn("Could not automatically enable '{}'", RutAuthRealm.DESCRIPTION, e);
-      }
-    }
+    realmManager.enableRealm(RutAuthRealm.ID);
   }
 }
