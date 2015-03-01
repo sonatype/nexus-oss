@@ -48,6 +48,7 @@ public class ActionMediator
     Command command = beanEntry.getImplementationClass().getAnnotation(Command.class);
     if (command != null) {
       Dictionary<String,?> config = CommandHelper.config(command);
+      // TODO info -> debug
       log.info("Adding action: {}, config: {}", beanEntry, config);
       ServiceRegistration<Function> registration = bundleContext.registerService(
           Function.class,
@@ -67,6 +68,7 @@ public class ActionMediator
     // FIXME: No idea if this is sane or proper
     ServiceRegistration<Function> registration = registrations.remove(beanEntry);
     if (registration != null) {
+      // TODO info -> debug
       log.info("Removing action: {}", beanEntry);
       registration.unregister();
     }
