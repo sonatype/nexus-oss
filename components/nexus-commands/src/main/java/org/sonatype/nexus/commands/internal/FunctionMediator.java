@@ -28,7 +28,7 @@ import org.eclipse.sisu.Mediator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-// TODO: Probably only need to support Action, but for now for testing register Function too
+// TODO: Probably only need to support Action, but for now for testing registration of Functions too
 
 /**
  * Manages registration of Karaf {@link Function} instances.
