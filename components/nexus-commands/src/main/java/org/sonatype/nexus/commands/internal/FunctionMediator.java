@@ -32,12 +32,12 @@ public class FunctionMediator
   implements Mediator<Named, Function, CommandManager>
 {
   @Override
-  public void add(final BeanEntry<Named, Function> beanEntry, final CommandManager functions) throws Exception {
-    functions.register(beanEntry.getValue());
+  public void add(final BeanEntry<Named, Function> beanEntry, final CommandManager commands) throws Exception {
+    commands.register(beanEntry.getValue());
   }
 
   @Override
-  public void remove(final BeanEntry<Named, Function> beanEntry, final CommandManager functions) throws Exception {
+  public void remove(final BeanEntry<Named, Function> beanEntry, final CommandManager commands) throws Exception {
     // TODO: How to remove?
   }
 }
