@@ -23,6 +23,10 @@ import org.apache.felix.service.command.Function;
  */
 public interface CommandManager
 {
+  //void register(Action action);
+  //
+  //void register(Action action, Dictionary<String, ?> config);
+
   void register(Function function);
 
   void register(Function function, Dictionary<String, ?> config);

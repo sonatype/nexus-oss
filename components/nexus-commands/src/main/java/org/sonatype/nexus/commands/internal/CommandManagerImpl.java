@@ -46,6 +46,28 @@ public class CommandManagerImpl
     this.bundleContext = checkNotNull(bundleContext);
   }
 
+  //@Override
+  //public void register(final Action action) {
+  //  checkNotNull(action);
+  //
+  //  Command command = action.getClass().getAnnotation(Command.class);
+  //  if (command == null) {
+  //    log.warn("Missing @Command annotation on action: {}", action.getClass().getName());
+  //    return;
+  //  }
+  //
+  //  register(action, CommandHelper.config(command));
+  //}
+  //
+  //@Override
+  //public void register(final Action action, final Dictionary<String, ?> config) {
+  //  checkNotNull(action);
+  //  checkNotNull(config);
+  //
+  //  log.info("Registering action: {} with config: {}", action, config);
+  //  bundleContext.registerService(Action.class, action, config);
+  //}
+
   @Override
   public void register(final Function function) {
     checkNotNull(function);
@@ -64,7 +86,7 @@ public class CommandManagerImpl
     checkNotNull(function);
     checkNotNull(config);
 
-    log.debug("Registering function: {} with config: {}", function, config);
+    log.info("Registering function: {} with config: {}", function, config);
     bundleContext.registerService(Function.class, function, config);
   }
 }

@@ -33,11 +33,13 @@ public class FunctionMediator
 {
   @Override
   public void add(final BeanEntry<Named, Function> beanEntry, final CommandManager commands) throws Exception {
+    log.info("Add: {}", beanEntry);
     commands.register(beanEntry.getValue());
   }
 
   @Override
   public void remove(final BeanEntry<Named, Function> beanEntry, final CommandManager commands) throws Exception {
+    log.info("Remove: {}", beanEntry);
     // TODO: How to remove?
   }
 }
