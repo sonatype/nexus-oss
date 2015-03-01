@@ -12,24 +12,34 @@
  */
 package org.sonatype.nexus.commands;
 
-import java.util.Dictionary;
+import org.apache.karaf.shell.commands.Action;
+import org.apache.karaf.shell.commands.CommandWithAction;
+import org.apache.karaf.shell.commands.basic.AbstractCommand;
+import org.eclipse.sisu.BeanEntry;
 
-import org.apache.felix.service.command.Function;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Function manager.
+ * Adapts Sisu {@link BeanEntry} (carrying {@link Action}) to a Karaf {@link CommandWithAction}.
  *
  * @since 3.0
  */
-public interface CommandManager
+public class BeanEntryCommand
+  extends AbstractCommand
 {
-  //void register(Action action);
-  //
-  //void register(Action action, Dictionary<String, ?> config);
+  private final BeanEntry<?, Action> beanEntry;
 
-  void register(Function function);
+  public BeanEntryCommand(final BeanEntry<?, Action> beanEntry) {
+    this.beanEntry = checkNotNull(beanEntry);
+  }
 
-  void register(Function function, Dictionary<String, ?> config);
+  @Override
+  public Action createNewAction() {
+    return beanEntry.getValue();
+  }
 
-  // TODO: Unregister?
+  @Override
+  public String toString() {
+    return beanEntry.toString();
+  }
 }

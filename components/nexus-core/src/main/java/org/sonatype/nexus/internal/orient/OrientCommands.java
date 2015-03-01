@@ -22,7 +22,6 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.commands.AbstractCompletableCommand;
 import org.sonatype.nexus.commands.CommandHelper;
-import org.sonatype.nexus.commands.CommandManager;
 import org.sonatype.nexus.common.text.Strings2;
 
 import com.google.common.base.Joiner;
@@ -30,6 +29,7 @@ import com.google.common.collect.ImmutableList;
 import com.orientechnologies.common.console.annotation.ConsoleCommand;
 import com.orientechnologies.orient.console.OConsoleDatabaseApp;
 import org.apache.felix.service.command.CommandSession;
+import org.apache.felix.service.command.Function;
 import org.apache.karaf.shell.commands.Action;
 import org.apache.karaf.shell.commands.CommandException;
 import org.apache.karaf.shell.commands.basic.AbstractCommand;
@@ -37,6 +37,7 @@ import org.apache.karaf.shell.console.Completer;
 import org.apache.karaf.shell.console.SubShellAction;
 import org.apache.karaf.shell.console.completer.NullCompleter;
 import org.eclipse.sisu.EagerSingleton;
+import org.osgi.framework.BundleContext;
 
 import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
@@ -54,15 +55,16 @@ public class OrientCommands
   private static final String SCOPE = "orient";
 
   @Inject
-  public OrientCommands(final CommandManager commandManager) {
+  public OrientCommands(final BundleContext bundleContext) {
     super(new String[0]);
 
     // define our own Karaf sub-shell: type 'orient' to enter, and 'exit' to leave
-    commandManager.register(createShellCommand(), CommandHelper.config("*", SCOPE));
+    bundleContext.registerService(Function.class, createShellCommand(), CommandHelper.config("*", SCOPE));
 
     for (Method method : getConsoleMethods().keySet()) {
       if (method.isAnnotationPresent(ConsoleCommand.class)) {
-        commandManager.register(createOrientCommand(method), CommandHelper.config(SCOPE, method.getName()));
+        bundleContext.registerService(Function.class, createOrientCommand(method),
+            CommandHelper.config(SCOPE, method.getName()));
       }
     }
 

@@ -10,16 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.commands.internal;
+
+import java.util.Dictionary;
+import java.util.Map;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.commands.CommandManager;
+import org.sonatype.nexus.commands.BeanEntryCommand;
+import org.sonatype.nexus.commands.CommandHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.Maps;
+import org.apache.felix.service.command.Function;
 import org.apache.karaf.shell.commands.Action;
+import org.apache.karaf.shell.commands.Command;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.Mediator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * Manages registration of Karaf {@link Action} instances.
@@ -28,18 +38,40 @@ import org.eclipse.sisu.Mediator;
  */
 @Named
 public class ActionMediator
-  extends ComponentSupport
-  implements Mediator<Named, Action, CommandManager>
+    extends ComponentSupport
+    implements Mediator<Named, Action, BundleContext>
 {
+  private final Map<BeanEntry, ServiceRegistration<Function>> registrations = Maps.newConcurrentMap();
+
   @Override
-  public void add(final BeanEntry<Named, Action> beanEntry, final CommandManager commands) throws Exception {
-    log.info("Add: {}", beanEntry);
-    //commands.register(beanEntry.getValue());
+  public void add(final BeanEntry<Named, Action> beanEntry, final BundleContext bundleContext) throws Exception {
+    Command command = beanEntry.getImplementationClass().getAnnotation(Command.class);
+    if (command != null) {
+      Dictionary<String,?> config = CommandHelper.config(command);
+      log.info("Adding action: {}, config: {}", beanEntry, config);
+      ServiceRegistration<Function> registration = bundleContext.registerService(
+          Function.class,
+          new BeanEntryCommand(beanEntry),
+          config
+      );
+
+      registrations.put(beanEntry, registration);
+    }
+    else {
+      log.warn("Missing @Command annotation on action: {}", beanEntry);
+    }
   }
 
   @Override
-  public void remove(final BeanEntry<Named, Action> beanEntry, final CommandManager commands) throws Exception {
-    log.info("Remove: {}", beanEntry);
-    // TODO: How to remove?
+  public void remove(final BeanEntry<Named, Action> beanEntry, final BundleContext bundleContext) throws Exception {
+    // FIXME: No idea if this is sane or proper
+    ServiceRegistration<Function> registration = registrations.remove(beanEntry);
+    if (registration != null) {
+      log.info("Removing action: {}", beanEntry);
+      registration.unregister();
+    }
+    else {
+      log.warn("Missing registration: {}", beanEntry);
+    }
   }
 }

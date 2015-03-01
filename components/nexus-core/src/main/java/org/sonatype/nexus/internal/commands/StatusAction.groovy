@@ -13,7 +13,7 @@
 package org.sonatype.nexus.internal.commands
 
 import org.apache.felix.service.command.CommandSession
-import org.apache.felix.service.command.Function
+import org.apache.karaf.shell.commands.Action
 import org.apache.karaf.shell.commands.Command
 import org.sonatype.nexus.SystemStatus
 
@@ -23,29 +23,30 @@ import javax.inject.Provider
 import javax.inject.Singleton
 
 /**
- * Dump system status.
+ * Display Nexus system status.
  *
  * @since 3.0
  */
 @Named
 @Singleton
 @Command(scope='nexus', name='status', description = 'Nexus system status')
-class StatusFunction
-  implements Function
+class StatusAction
+  implements Action
 {
   @Inject
   Provider<SystemStatus> systemStatusProvider
 
   @Override
-  def execute(CommandSession commandSession, List<Object> list) {
-    def console = commandSession.console
+  def execute(final CommandSession session) {
     SystemStatus status = systemStatusProvider.get()
-    console.println "Version: $status.version"
-    console.println "Edition: $status.editionShort"
-    console.println "State: $status.state"
-    console.println "License installed: $status.licenseInstalled"
-    console.println "License expired: $status.licenseExpired"
-    console.println "License trial: $status.trialLicense"
-    return null;
+    session.console.with {
+      println "Version: $status.version"
+      println "Edition: $status.editionShort"
+      println "State: $status.state"
+      println "License installed: $status.licenseInstalled"
+      println "License expired: $status.licenseExpired"
+      println "License trial: $status.trialLicense"
+    }
+    return null
   }
 }

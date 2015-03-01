@@ -12,14 +12,23 @@
  */
 package org.sonatype.nexus.commands.internal;
 
+import java.util.Dictionary;
+import java.util.Map;
+
 import javax.inject.Named;
 
-import org.sonatype.nexus.commands.CommandManager;
+import org.sonatype.nexus.commands.CommandHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.Maps;
 import org.apache.felix.service.command.Function;
+import org.apache.karaf.shell.commands.Command;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.Mediator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+
+// TODO: Probably only need to support Action, but for now for testing register Function too
 
 /**
  * Manages registration of Karaf {@link Function} instances.
@@ -29,17 +38,39 @@ import org.eclipse.sisu.Mediator;
 @Named
 public class FunctionMediator
   extends ComponentSupport
-  implements Mediator<Named, Function, CommandManager>
+  implements Mediator<Named, Function, BundleContext>
 {
+  private final Map<BeanEntry,ServiceRegistration<Function>> registrations = Maps.newConcurrentMap();
+
   @Override
-  public void add(final BeanEntry<Named, Function> beanEntry, final CommandManager commands) throws Exception {
-    log.info("Add: {}", beanEntry);
-    commands.register(beanEntry.getValue());
+  public void add(final BeanEntry<Named, Function> beanEntry, final BundleContext bundleContext) throws Exception {
+    Command command = beanEntry.getImplementationClass().getAnnotation(Command.class);
+    if (command != null) {
+      Dictionary<String,?> config = CommandHelper.config(command);
+      log.info("Adding function: {}, config: {}", beanEntry, config);
+      ServiceRegistration<Function> registration = bundleContext.registerService(
+          Function.class,
+          beanEntry.getValue(),
+          config
+      );
+
+      registrations.put(beanEntry, registration);
+    }
+    else {
+      log.warn("Missing @Command annotation on function: {}", beanEntry);
+    }
   }
 
   @Override
-  public void remove(final BeanEntry<Named, Function> beanEntry, final CommandManager commands) throws Exception {
-    log.info("Remove: {}", beanEntry);
-    // TODO: How to remove?
+  public void remove(final BeanEntry<Named, Function> beanEntry, final BundleContext bundleContext) throws Exception {
+    // FIXME: No idea if this is sane or proper
+    ServiceRegistration<Function> registration = registrations.remove(beanEntry);
+    if (registration != null) {
+      log.info("Removing function: {}", beanEntry);
+      registration.unregister();
+    }
+    else {
+      log.warn("Missing registration: {}", beanEntry);
+    }
   }
 }

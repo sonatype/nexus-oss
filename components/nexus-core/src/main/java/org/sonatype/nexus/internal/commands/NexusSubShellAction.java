@@ -25,7 +25,7 @@ import org.apache.karaf.shell.console.SubShellAction;
  */
 @Named
 @Singleton
-@Command(scope = "*", name = "nexus")
+@Command(scope = "*", name = "nexus", description = "Nexus commands")
 public class NexusSubShellAction
   extends SubShellAction
 {
