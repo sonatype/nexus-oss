@@ -15,7 +15,10 @@ package org.sonatype.nexus.security.authc;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,4 +36,20 @@ public class NexusBasicHttpAuthenticationFilter
   public static final String NAME = "nx-basic-authc";
 
   protected final Logger log = LoggerFactory.getLogger(getClass());
+
+  public NexusBasicHttpAuthenticationFilter() {
+    setApplicationName("Sonatype Nexus");
+  }
+
+  @Override
+  public boolean onPreHandle(final ServletRequest request, final ServletResponse response, final Object mappedValue)
+      throws Exception
+  {
+    // TODO: Sort out if this is proper, or if we should use noSessionCreation filter?
+
+    // Basic auth should never create sessions
+    request.setAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
+
+    return super.onPreHandle(request, response, mappedValue);
+  }
 }

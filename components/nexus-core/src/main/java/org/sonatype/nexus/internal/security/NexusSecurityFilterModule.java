@@ -23,6 +23,7 @@ import org.sonatype.nexus.security.anonymous.AnonymousConfigurationStore;
 import org.sonatype.nexus.security.anonymous.AnonymousFilter;
 import org.sonatype.nexus.security.authc.NexusApiKeyAuthenticationFilter;
 import org.sonatype.nexus.security.authc.NexusAuthenticationFilter;
+import org.sonatype.nexus.security.authc.NexusBasicHttpAuthenticationFilter;
 import org.sonatype.nexus.security.authz.NexusHttpMethodPermissionFilter;
 import org.sonatype.nexus.security.realm.RealmConfigurationStore;
 
@@ -40,6 +41,7 @@ public class NexusSecurityFilterModule
   @Override
   protected void configure() {
     bind(filterKey(AnonymousFilter.NAME)).to(AnonymousFilter.class);
+    bind(filterKey(NexusBasicHttpAuthenticationFilter.NAME)).to(NexusBasicHttpAuthenticationFilter.class);
     bind(filterKey(NexusHttpMethodPermissionFilter.NAME)).to(NexusHttpMethodPermissionFilter.class);
 
     // FIXME: Sort out, and deal with naming the "authcBasic" are presently auth-token bits
