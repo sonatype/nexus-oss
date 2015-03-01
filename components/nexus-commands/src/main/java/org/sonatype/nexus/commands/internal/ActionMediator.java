@@ -47,6 +47,8 @@ public class ActionMediator
   public void add(final BeanEntry<Named, Action> beanEntry, final BundleContext bundleContext) throws Exception {
     Command command = beanEntry.getImplementationClass().getAnnotation(Command.class);
     if (command != null) {
+      // TODO: warn if @Singleton is present, this is probably not desired due to @Option/@Argument processing ?
+
       Dictionary<String,?> config = CommandHelper.config(command);
       // TODO info -> debug
       log.info("Adding action: {}, config: {}", beanEntry, config);
