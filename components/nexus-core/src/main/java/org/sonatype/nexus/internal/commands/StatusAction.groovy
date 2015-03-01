@@ -20,7 +20,6 @@ import org.sonatype.nexus.SystemStatus
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
-import javax.inject.Singleton
 
 /**
  * Display Nexus system status.
@@ -28,7 +27,6 @@ import javax.inject.Singleton
  * @since 3.0
  */
 @Named
-@Singleton
 @Command(name='status', scope = 'nexus', description = 'Nexus system status')
 class StatusAction
   implements Action

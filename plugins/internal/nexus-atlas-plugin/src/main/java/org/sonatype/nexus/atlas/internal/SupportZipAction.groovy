@@ -21,7 +21,6 @@ import org.sonatype.nexus.supportzip.SupportZipGenerator
 
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * Action to generate a support ZIP.
@@ -29,7 +28,6 @@ import javax.inject.Singleton
  * @since 3.0
  */
 @Named
-@Singleton
 @Command(name = 'support-zip', scope = 'nexus', description = 'Generate a support ZIP')
 class SupportZipAction
     implements Action
