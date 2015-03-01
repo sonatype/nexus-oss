@@ -20,13 +20,22 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 
 /**
+ * A
+ *
  * @since 3.0
  */
 @Facet.Exposed
 public interface ProxyFacet
     extends Facet
 {
+  /**
+   * Obtain the content which the user has requested, either by retrieving cached content, or by fetching new or
+   * updated content from the upstream repository.
+   */
   Payload get(Context context) throws IOException;
 
+  /**
+   * Returns the root of the remote repository.
+   */
   URI getRemoteUrl();
 }

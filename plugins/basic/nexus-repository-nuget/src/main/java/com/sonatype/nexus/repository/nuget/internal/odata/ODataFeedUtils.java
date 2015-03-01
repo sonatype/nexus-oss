@@ -112,18 +112,15 @@ public class ODataFeedUtils
     return ODataTemplates.interpolate(ODataTemplates.NUGET_ROOT, data);
   }
 
-  // TODO: Move over to ODataFeedUtils
   public static String metadata() {
     return ODataTemplates.NUGET_META;
   }
 
-  // TODO: Move over to ODataFeedUtils
   public static String error(final int code, final String message) {
     final Map<String, String> data = ImmutableMap.of("CODE", Integer.toString(code), "MESSAGE", message);
     return ODataTemplates.interpolate(ODataTemplates.NUGET_ERROR, data);
   }
 
-  // TODO: Move over to ODataFeedUtils
   public static String datetime(final long millis) {
     return ISO_PRINTER.print(millis);
   }

@@ -27,7 +27,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 
 /**
- * A format-neutral proxy handler.
+ * A format-neutral proxy handler which delegates to an instance of {@link ProxyFacet} for content.
  *
  * @since 3.0
  */

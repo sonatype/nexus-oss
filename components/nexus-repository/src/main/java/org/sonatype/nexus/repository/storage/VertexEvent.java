@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -21,20 +23,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public abstract class VertexEvent
 {
-  private final Object vertexId;
+  private final OrientVertex vertex;
 
-  public VertexEvent(final Object vertexId) {
-    this.vertexId = checkNotNull(vertexId);
+  public VertexEvent(final OrientVertex vertex) {
+    this.vertex = checkNotNull(vertex);
   }
 
-  public Object getVertexId() {
-    return vertexId;
+  public OrientVertex getVertex() {
+    return vertex;
   }
 
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "vertexId=" + vertexId +
+        "vertexId=" + vertex +
         '}';
   }
 }

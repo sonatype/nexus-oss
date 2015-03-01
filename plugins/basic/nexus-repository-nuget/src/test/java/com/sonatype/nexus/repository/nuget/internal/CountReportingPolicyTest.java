@@ -14,7 +14,7 @@ package com.sonatype.nexus.repository.nuget.internal;
 
 import org.junit.Test;
 
-import static com.sonatype.nexus.repository.nuget.internal.CountReportingPolicy.determineReportedCount;
+import static com.sonatype.nexus.repository.nuget.internal.proxy.CountReportingPolicy.determineReportedCount;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;

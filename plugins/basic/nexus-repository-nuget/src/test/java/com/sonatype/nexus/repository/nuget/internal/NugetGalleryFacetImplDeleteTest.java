@@ -12,22 +12,32 @@
  */
 package com.sonatype.nexus.repository.nuget.internal;
 
+import org.sonatype.nexus.repository.Repository;
+
 import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
+import org.sonatype.nexus.repository.storage.ComponentDeletedEvent;
+import org.sonatype.nexus.repository.storage.ComponentEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,13 +47,29 @@ import static org.mockito.Mockito.when;
 public class NugetGalleryFacetImplDeleteTest
     extends TestSupport
 {
+  
   @Test
   public void deleteRemovesComponentAssetAndBlob() throws Exception {
     final String packageId = "screwdriver";
     final String version = "0.1.1";
 
-    final NugetGalleryFacetImpl galleryFacet = spy(new NugetGalleryFacetImpl(mock(ComponentMetadataFactory.class)));
+    final EventBus eventBus = mock(EventBus.class);
+    final Repository repository = mock(Repository.class);
 
+    final NugetGalleryFacetImpl galleryFacet = Mockito.spy(new NugetGalleryFacetImpl(
+        mock(ComponentMetadataFactory.class)
+    )
+    {
+      @Override
+      protected EventBus getEventBus() {
+        return eventBus;
+      }
+
+      @Override
+      protected Repository getRepository() {
+        return repository;
+      }
+    });
     final StorageTx tx = mock(StorageTx.class);
     doReturn(tx).when(galleryFacet).openStorageTx();
 
@@ -63,5 +89,11 @@ public class NugetGalleryFacetImplDeleteTest
     verify(tx).deleteVertex(component);
     verify(tx).deleteVertex(asset);
     verify(tx).deleteBlob(eq(blobRef));
+    ArgumentCaptor<ComponentEvent> o = ArgumentCaptor.forClass(ComponentEvent.class);
+    verify(eventBus, times(1)).post(o.capture());
+    ComponentEvent actual = o.getValue();
+    assertThat(actual, instanceOf(ComponentDeletedEvent.class));
+    assertThat(actual.getVertex(), is(component));
+    assertThat(actual.getRepository(), is(repository));
   }
 }

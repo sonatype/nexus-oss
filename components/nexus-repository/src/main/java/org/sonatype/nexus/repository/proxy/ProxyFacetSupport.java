@@ -43,6 +43,8 @@ import org.joda.time.DateTime;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * A support class which implements basic payload logic; subclasses provide format-specific operations.
+ *
  * @since 3.0
  */
 public abstract class ProxyFacetSupport

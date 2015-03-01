@@ -50,9 +50,6 @@ abstract class NugetRecipeSupport
   Provider<ConfigurableViewFacet> viewFacet
 
   @Inject
-  Provider<NugetProxyGalleryFacet> galleryFacet
-
-  @Inject
   Provider<StorageFacet> storageFacet
 
   @Inject

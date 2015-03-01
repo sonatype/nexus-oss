@@ -32,6 +32,7 @@ import com.sonatype.nexus.repository.nuget.internal.odata.NugetPackageUtils;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
+import com.sonatype.nexus.repository.nuget.internal.util.TempStreamSupplier;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
@@ -45,6 +46,9 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
+import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
+import org.sonatype.nexus.repository.storage.ComponentDeletedEvent;
+import org.sonatype.nexus.repository.storage.ComponentUpdatedEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
@@ -285,14 +289,23 @@ public class NugetGalleryFacetImpl
       recordMetadata.put(CREATED, creationTime);
       recordMetadata.put(LAST_UPDATED, creationTime);
       recordMetadata.put(PUBLISHED, creationTime);
-
+      OrientVertex component;
       try (InputStream in = tempStream.get()) {
-        createOrUpdatePackage(storageTx, recordMetadata, in);
+        component = createOrUpdatePackage(storageTx, recordMetadata, in);
       }
 
-      maintainAggregateInfo(storageTx, recordMetadata.get(ID));
+      String id = recordMetadata.get(ID);
+      maintainAggregateInfo(storageTx, id);
 
+      boolean isNew = component.getIdentity().isNew();  // must check before commit
       storageTx.commit();
+
+      if (isNew) {
+        getEventBus().post(new ComponentCreatedEvent(component, getRepository()));
+      }
+      else {
+        getEventBus().post(new ComponentUpdatedEvent(component, getRepository()));
+      }
     }
   }
 
@@ -337,7 +350,7 @@ public class NugetGalleryFacetImpl
       tx.commit();
 
       deleteFromIndex(component);
-
+      getEventBus().post(new ComponentDeletedEvent(component, getRepository()));
       return true;
     }
   }
@@ -376,7 +389,7 @@ public class NugetGalleryFacetImpl
   }
 
   @VisibleForTesting
-  void createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata,
+  OrientVertex createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata,
                              final InputStream packageStream)
   {
     final OrientVertex bucket = storageTx.getBucket();
@@ -384,6 +397,8 @@ public class NugetGalleryFacetImpl
     putInIndex(component);
 
     createOrUpdateAsset(storageTx, bucket, component, packageStream);
+    putInIndex(component);
+    return component;
   }
 
   private String blobName(OrientVertex component) {
@@ -517,7 +532,8 @@ public class NugetGalleryFacetImpl
   /**
    * Is this repository an authoritative source for the packages and metadata it contains?
    */
-  protected boolean isRepoAuthoritative() {
+  @VisibleForTesting
+  boolean isRepoAuthoritative() {
     return HostedType.NAME.equals(getRepository().getType().getValue());
   }
 
@@ -531,8 +547,7 @@ public class NugetGalleryFacetImpl
       storedMetadata.set(P_VERSION_DOWNLOAD_COUNT, 0);
     }
     else {
-      final int value = Integer.parseInt(incomingMetadata.get(DOWNLOAD_COUNT));
-      storedMetadata.set(P_DOWNLOAD_COUNT, value);
+      storedMetadata.set(P_DOWNLOAD_COUNT, Integer.parseInt(incomingMetadata.get(DOWNLOAD_COUNT)));
       storedMetadata.set(P_VERSION_DOWNLOAD_COUNT, Integer.parseInt(incomingMetadata.get(VERSION_DOWNLOAD_COUNT)));
     }
 
