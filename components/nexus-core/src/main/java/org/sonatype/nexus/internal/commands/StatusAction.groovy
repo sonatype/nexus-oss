@@ -29,7 +29,7 @@ import javax.inject.Singleton
  */
 @Named
 @Singleton
-@Command(scope='nexus', name='status', description = 'Nexus system status')
+@Command(name='status', scope = 'nexus', description = 'Nexus system status')
 class StatusAction
   implements Action
 {
