@@ -34,8 +34,13 @@ public class BeanEntryCommand
   }
 
   @Override
+  public Class<? extends org.apache.felix.gogo.commands.Action> getActionClass() {
+    return beanEntry.getImplementationClass();
+  }
+
+  @Override
   public Action createNewAction() {
-    return beanEntry.getValue();
+    return beanEntry.getProvider().get();
   }
 
   @Override
