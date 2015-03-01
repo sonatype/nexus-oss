@@ -13,7 +13,6 @@
 package org.sonatype.nexus.internal.commands;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.SubShellAction;
@@ -24,8 +23,7 @@ import org.apache.karaf.shell.console.SubShellAction;
  * @since 3.0
  */
 @Named
-@Singleton
-@Command(scope = "*", name = "nexus", description = "Nexus commands")
+@Command(name = "nexus", scope = "*", description = "Nexus commands")
 public class NexusSubShellAction
   extends SubShellAction
 {
