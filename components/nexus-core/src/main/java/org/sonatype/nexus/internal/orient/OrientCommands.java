@@ -63,6 +63,9 @@ public class OrientCommands
 
   private final BundleContext bundleContext;
 
+  // TODO: Consider a mass-command register/unregister component with mediator to avoid needing eager-singleton
+  // TODO: and injected bundle-context
+
   @Inject
   public OrientCommands(final @Nullable BundleContext bundleContext) {
     super(new String[0]);

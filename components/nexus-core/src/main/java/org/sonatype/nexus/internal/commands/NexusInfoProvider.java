@@ -25,7 +25,7 @@ import org.apache.karaf.shell.commands.InfoProvider;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// FIXME: Sort out why this does not get picked up, missing some annoation or mismatch in Sisu integration?
+// FIXME: This needs to be manually registered in the service-registry for this to get picked up ATM
 
 /**
  * Contributes {@code Nexus} section to {@code shell:info} command.

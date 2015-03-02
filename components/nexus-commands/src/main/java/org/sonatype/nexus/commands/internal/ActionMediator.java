@@ -65,6 +65,8 @@ public class ActionMediator
     }
   }
 
+  // TODO: Use scope:name as key
+
   @Override
   public void remove(final BeanEntry<Named, Action> beanEntry, final BundleContext bundleContext) throws Exception {
     // FIXME: No idea if this is sane or proper

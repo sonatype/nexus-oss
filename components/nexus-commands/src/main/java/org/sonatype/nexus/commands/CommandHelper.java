@@ -44,4 +44,6 @@ public class CommandHelper
     checkNotNull(command);
     return config(command.scope(), command.name());
   }
+
+  // TODO: registration key helper for Command/Dictionary?
 }
