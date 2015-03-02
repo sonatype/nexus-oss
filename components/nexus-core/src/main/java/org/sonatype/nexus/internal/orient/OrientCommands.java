@@ -18,6 +18,7 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -45,7 +46,6 @@ import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Registers OrientDB commands with Karaf's shell; handles execution requests and displays results.
@@ -64,10 +64,11 @@ public class OrientCommands
   private final BundleContext bundleContext;
 
   @Inject
-  public OrientCommands(final BundleContext bundleContext) {
+  public OrientCommands(final @Nullable BundleContext bundleContext) {
     super(new String[0]);
 
-    this.bundleContext = checkNotNull(bundleContext);
+    // HACK: should be non-null, but in test env is null
+    this.bundleContext = bundleContext;
 
     // define our own Karaf sub-shell: type 'orient' to enter, and 'exit' to leave
     register(createShellCommand(), CommandHelper.config("*", SCOPE));
@@ -82,6 +83,12 @@ public class OrientCommands
   }
 
   private void register(final Function function, final Dictionary<String,?> config) {
+    // HACK: should be non-null, but in test env is null
+    if (bundleContext == null) {
+      log.warn("Unable to register function, bundle-context is null: {}, config: {}", function, config);
+      return;
+    }
+
     // TODO info -> debug
     log.info("Registering function: {}, config: {}", function, config);
     ServiceRegistration<Function> registration = bundleContext.registerService(Function.class, function, config);
