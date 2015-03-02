@@ -10,8 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.blobstore.api.configuration
+package org.sonatype.nexus.internal.blobstore
 
+import org.sonatype.nexus.blobstore.api.configuration.BlobStoreConfiguration
 import org.sonatype.nexus.orient.DatabaseInstanceRule
 import org.sonatype.nexus.orient.HexRecordIdObfuscator
 import org.sonatype.sisu.litmus.testsupport.TestSupport
@@ -58,12 +59,9 @@ class ConfigurationStoreImplTest
   @Test
   public void 'Can update an existing BlobStoreConfiguration'() throws Exception {
     BlobStoreConfiguration entity = createConfig()
-    def version = entity.entityMetadata.version.value
-    entity.name = 'baz'
+    entity.path = 'baz'
     underTest.update(entity)
-
-    assert entity.entityMetadata.version.value == '2'
-    assert version != entity.entityMetadata.version.value
+    assert underTest.list().find { it.name == entity.name && it.path == 'baz' }
   }
 
   @Test
@@ -74,7 +72,6 @@ class ConfigurationStoreImplTest
     assert list[0].name == entity.name
     assert list[0].path == entity.path
   }
-
 
   @Test
   public void 'Can delete an existing BlobStoreConfiguration'() throws Exception {
@@ -111,18 +108,13 @@ class ConfigurationStoreImplTest
   }
 
   private BlobStoreConfiguration createConfig(name = 'foo', path = 'bar') {
-    def entity = new BlobStoreConfiguration(
+    def entity = new BlobStoreConfigurationEntity(
         name: name,
         path: path
         //TODO - where to enforce path validation rules, and are these rules already defined somewhere in Nexus for 
         // reuse?
     )
-    assert entity.entityMetadata == null
-
     underTest.create(entity)
-
-    assert entity.entityMetadata != null
-    assert entity.entityMetadata.version.value == '1'
     return entity
   }
 }

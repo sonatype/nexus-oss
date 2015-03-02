@@ -16,11 +16,16 @@ import java.util.List;
 
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
+/**
+ * since 3.0
+ */
 public interface ConfigurationStore
   extends Lifecycle  
 {
   List<BlobStoreConfiguration> list();
 
+  BlobStoreConfiguration newInstance();
+  
   void create(BlobStoreConfiguration configuration);
 
   void update(BlobStoreConfiguration configuration);

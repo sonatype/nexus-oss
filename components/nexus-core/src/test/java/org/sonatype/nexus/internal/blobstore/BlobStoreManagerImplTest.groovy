@@ -66,7 +66,7 @@ class BlobStoreManagerImplTest
     BlobStore blobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfiguration))
     when(store.list()).thenReturn(
-        Lists.newArrayList(new BlobStoreConfiguration(name: 'test', path: temporaryFolder.root.absolutePath)))
+        Lists.newArrayList(new BlobStoreConfigurationEntity(name: 'test', path: temporaryFolder.root.absolutePath)))
 
     underTest.doStart()
 
@@ -78,7 +78,7 @@ class BlobStoreManagerImplTest
   public void 'Can create a BlobStore'() throws Exception {
     BlobStore blobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfiguration))
-    BlobStoreConfiguration configuration = new BlobStoreConfiguration(name: 'test', path: temporaryFolder.root.absolutePath)
+    BlobStoreConfigurationEntity configuration = new BlobStoreConfigurationEntity(name: 'test', path: temporaryFolder.root.absolutePath)
     
     BlobStore createdBlobStore = underTest.create(configuration)
 
@@ -94,7 +94,7 @@ class BlobStoreManagerImplTest
     BlobStore blobStore = mock(BlobStore)
     BlobStore replacementBlobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).blobStore('test')
-    BlobStoreConfiguration configuration = new BlobStoreConfiguration(name: 'test',
+    BlobStoreConfigurationEntity configuration = new BlobStoreConfigurationEntity(name: 'test',
         path: temporaryFolder.root.absolutePath)
     doReturn(replacementBlobStore).when(underTest).newBlobStore(configuration)
     
@@ -107,7 +107,7 @@ class BlobStoreManagerImplTest
 
   @Test
   public void 'Can delete an existing BlobStore'() throws Exception {
-    BlobStoreConfiguration configuration = new BlobStoreConfiguration(name: 'test',
+    BlobStoreConfigurationEntity configuration = new BlobStoreConfigurationEntity(name: 'test',
         path: temporaryFolder.root.absolutePath)
     BlobStore blobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).blobStore('test')
@@ -121,14 +121,13 @@ class BlobStoreManagerImplTest
   
   @Test
   public void 'BlobStores will be eagerly created if not already configured'() {
-    doReturn(null).when(underTest).blobStore('test')
     BlobStore blobStore = mock(BlobStore)
-    doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfiguration))
-    
+    doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfigurationEntity))
+    doReturn(mock(BlobStoreConfiguration)).when(store).newInstance()    
     BlobStore autoCreatedBlobStore = underTest.get('test')
     
     verify(blobStore).start()
-    verify(store).create(any(BlobStoreConfiguration))
+    verify(store).create(any(BlobStoreConfigurationEntity))
     assert blobStore == autoCreatedBlobStore
   }
 }

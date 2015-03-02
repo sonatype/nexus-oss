@@ -10,19 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.blobstore.api.configuration;
+package org.sonatype.nexus.internal.blobstore;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.blobstore.api.configuration.BlobStoreConfiguration;
+import org.sonatype.nexus.blobstore.api.configuration.ConfigurationStore;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.orient.DatabaseInstance;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
@@ -64,9 +70,12 @@ public class ConfigurationStoreImpl
   @Override
   @Guarded(by = STARTED)
   public List<BlobStoreConfiguration> list() {
-    try (ODatabaseDocumentTx db = openDb()) {
-      return entityAdapter.browse(db, Lists.<BlobStoreConfiguration>newArrayList());
-    }
+    return asConfig(internalList());
+  }
+
+  @Override
+  public BlobStoreConfiguration newInstance() {
+    return entityAdapter.newEntity();
   }
 
   @Override
@@ -75,17 +84,28 @@ public class ConfigurationStoreImpl
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
-      entityAdapter.add(db, configuration);
+      entityAdapter.add(db, new BlobStoreConfigurationEntity(configuration.getName(), configuration.getPath()));
     }
+  }
+  
+  private BlobStoreConfigurationEntity find(final BlobStoreConfiguration configuration) {
+    return Iterables.find(internalList(), new Predicate<BlobStoreConfigurationEntity>()
+    {
+      @Override
+      public boolean apply(@Nullable final BlobStoreConfigurationEntity input) {
+        return input.getName().equals(configuration.getName());
+      }
+    });
   }
 
   @Override
   @Guarded(by = STARTED)
   public void update(final BlobStoreConfiguration configuration) {
     checkNotNull(configuration);
-
+    BlobStoreConfigurationEntity blobStoreConfigurationEntity = find(configuration);
+    blobStoreConfigurationEntity.setPath(configuration.getPath());
     try (ODatabaseDocumentTx db = openDb()) {
-      entityAdapter.edit(db, configuration);
+      entityAdapter.edit(db, blobStoreConfigurationEntity);
     }
   }
 
@@ -95,7 +115,24 @@ public class ConfigurationStoreImpl
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
-      entityAdapter.delete(db, configuration);
+      entityAdapter.delete(db, find(configuration));
     }
+  }
+
+  private List<BlobStoreConfigurationEntity> internalList() {
+    try (ODatabaseDocumentTx db = openDb()) {
+      return entityAdapter.browse(db, Lists.<BlobStoreConfigurationEntity>newArrayList());
+    }
+  }
+
+  private List<BlobStoreConfiguration> asConfig(final List<BlobStoreConfigurationEntity> browse) {
+    return Lists.transform(browse, new Function<BlobStoreConfigurationEntity, BlobStoreConfiguration>()
+    {
+      @Nullable
+      @Override
+      public BlobStoreConfiguration apply(final BlobStoreConfigurationEntity input) {
+        return input;
+      }
+    });
   }
 }
