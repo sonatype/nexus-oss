@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.internal.commands
 
-import org.apache.felix.service.command.CommandSession
-import org.apache.karaf.shell.commands.Action
 import org.apache.karaf.shell.commands.Command
+import org.apache.karaf.shell.console.AbstractAction
 import org.sonatype.nexus.SystemStatus
 
 import javax.inject.Inject
@@ -29,22 +28,20 @@ import javax.inject.Provider
 @Named
 @Command(name='status', scope = 'nexus', description = 'Nexus system status')
 class StatusAction
-  implements Action
+  extends AbstractAction
 {
   @Inject
   Provider<SystemStatus> systemStatusProvider
 
   @Override
-  def execute(final CommandSession session) {
-    SystemStatus status = systemStatusProvider.get()
-    session.console.with {
-      println "Version: $status.version"
-      println "Edition: $status.editionShort"
-      println "State: $status.state"
-      println "License installed: $status.licenseInstalled"
-      println "License expired: $status.licenseExpired"
-      println "License trial: $status.trialLicense"
-    }
+  protected def doExecute() {
+    def status = systemStatusProvider.get()
+    println "Version: $status.version"
+    println "Edition: $status.editionShort"
+    println "State: $status.state"
+    println "License installed: $status.licenseInstalled"
+    println "License expired: $status.licenseExpired"
+    println "License trial: $status.trialLicense"
     return null
   }
 }

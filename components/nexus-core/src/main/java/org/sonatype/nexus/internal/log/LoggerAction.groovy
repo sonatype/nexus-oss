@@ -12,11 +12,10 @@
  */
 package org.sonatype.nexus.internal.log
 
-import org.apache.felix.service.command.CommandSession
-import org.apache.karaf.shell.commands.Action
 import org.apache.karaf.shell.commands.Argument
 import org.apache.karaf.shell.commands.Command
 import org.apache.karaf.shell.commands.Option
+import org.apache.karaf.shell.console.AbstractAction
 import org.sonatype.nexus.log.LogManager
 import org.sonatype.nexus.log.LoggerLevel
 
@@ -31,7 +30,7 @@ import javax.inject.Named
 @Named
 @Command(name='logger', scope = 'nexus', description = 'Set or display logger level')
 class LoggerAction
-  implements Action
+  extends AbstractAction
 {
   @Inject
   LogManager logManager
@@ -49,7 +48,7 @@ class LoggerAction
   LoggerLevel level
 
   @Override
-  def execute(final CommandSession session) {
+  protected def doExecute() {
     if (delete) {
       logManager.unsetLoggerLevel(name)
     }
@@ -63,11 +62,12 @@ class LoggerAction
       else {
         level = logManager.getLoggerLevel(name)
       }
+
       if (level) {
-        session.console.println("$name = $level")
+        println "$name = $level"
       }
       else {
-        session.console.println("$name is not set")
+        println "$name is not set"
       }
     }
     return null

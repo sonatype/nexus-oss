@@ -13,10 +13,9 @@
 
 package org.sonatype.nexus.atlas.internal
 
-import org.apache.felix.service.command.CommandSession
-import org.apache.karaf.shell.commands.Action
 import org.apache.karaf.shell.commands.Command
 import org.apache.karaf.shell.commands.Option
+import org.apache.karaf.shell.console.AbstractAction
 import org.sonatype.nexus.supportzip.SupportZipGenerator
 
 import javax.inject.Inject
@@ -30,7 +29,7 @@ import javax.inject.Named
 @Named
 @Command(name = 'support-zip', scope = 'nexus', description = 'Generate a support ZIP')
 class SupportZipAction
-    implements Action
+    extends AbstractAction
 {
   @Inject
   SupportZipGenerator supportZipGenerator
@@ -60,7 +59,7 @@ class SupportZipAction
   boolean limitZipSize = false
 
   @Override
-  def execute(final CommandSession session) {
+  protected def doExecute() {
     def request = new SupportZipGenerator.Request(
         systemInformation: systemInformation,
         threadDump: threadDump,
@@ -72,11 +71,11 @@ class SupportZipAction
         limitZipSize: limitZipSize
     )
 
-    session.console.println('Generating support ZIP...')
+    println 'Generating support ZIP...'
 
     def result = supportZipGenerator.generate(request)
 
-    session.console.println("Generated support ZIP: ${result.file}")
+    println "Generated support ZIP: ${result.file}"
 
     return null
   }

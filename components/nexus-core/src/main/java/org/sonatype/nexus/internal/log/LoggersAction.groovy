@@ -12,10 +12,9 @@
  */
 package org.sonatype.nexus.internal.log
 
-import org.apache.felix.service.command.CommandSession
-import org.apache.karaf.shell.commands.Action
 import org.apache.karaf.shell.commands.Command
 import org.apache.karaf.shell.commands.Option
+import org.apache.karaf.shell.console.AbstractAction
 import org.apache.karaf.shell.table.ShellTable
 import org.sonatype.nexus.log.LogManager
 
@@ -30,7 +29,7 @@ import javax.inject.Named
 @Named
 @Command(name='loggers', scope = 'nexus', description = 'Display loggers')
 class LoggersAction
-  implements Action
+  extends AbstractAction
 {
   @Inject
   LogManager logManager
@@ -39,7 +38,7 @@ class LoggersAction
   Boolean reset
 
   @Override
-  def execute(final CommandSession session) {
+  protected def doExecute() {
     if (reset) {
       logManager.resetLoggers()
       return null
@@ -54,8 +53,7 @@ class LoggersAction
       table.addRow().addContent(name, loggers[name])
     }
 
-    // FIXME: session.console does not work with grep command, but System.out does?!
-    table.print session.console
+    table.print System.out
     return null
   }
 }
