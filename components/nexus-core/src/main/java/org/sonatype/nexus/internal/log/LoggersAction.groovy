@@ -54,6 +54,7 @@ class LoggersAction
       table.addRow().addContent(name, loggers[name])
     }
 
+    // FIXME: session.console does not work with grep command, but System.out does?!
     table.print session.console
     return null
   }
