@@ -31,9 +31,5 @@
     -->
     <bundle>wrap:${mvn:shiro-guice}$overwrite=merge&amp;Import-Package=*</bundle>
     <bundle>wrap:${mvn:xstream}$overwrite=merge&amp;-exportcontents=*&amp;DynamicImport-Package=*</bundle>
-    <!--
-    Install nexus-specific shell commands
-    -->
-    <feature>nexus-commands</feature>
   </feature>
 </features>
