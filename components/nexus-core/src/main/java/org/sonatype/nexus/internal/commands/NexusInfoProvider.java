@@ -25,8 +25,6 @@ import org.apache.karaf.shell.commands.InfoProvider;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// FIXME: This needs to be manually registered in the service-registry for this to get picked up ATM
-
 /**
  * Contributes {@code Nexus} section to {@code shell:info} command.
  *

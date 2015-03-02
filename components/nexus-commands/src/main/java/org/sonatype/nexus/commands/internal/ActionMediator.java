@@ -14,22 +14,20 @@
 package org.sonatype.nexus.commands.internal;
 
 import java.util.Dictionary;
-import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import org.sonatype.nexus.commands.BeanEntryCommand;
 import org.sonatype.nexus.commands.CommandHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.collect.Maps;
 import org.apache.felix.service.command.Function;
 import org.apache.karaf.shell.commands.Action;
 import org.apache.karaf.shell.commands.Command;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.Mediator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Manages registration of Karaf {@link Action} instances.
@@ -41,43 +39,36 @@ public class ActionMediator
     extends ComponentSupport
     implements Mediator<Named, Action, BundleContext>
 {
-  private final Map<BeanEntry, ServiceRegistration<Function>> registrations = Maps.newConcurrentMap();
+  /**
+   * Returns command annotation for given bean-entry if one exists.
+   */
+  @Nullable
+  private Command command(final BeanEntry<?,Action> beanEntry) {
+    return beanEntry.getImplementationClass().getAnnotation(Command.class);
+  }
 
   @Override
   public void add(final BeanEntry<Named, Action> beanEntry, final BundleContext bundleContext) throws Exception {
-    Command command = beanEntry.getImplementationClass().getAnnotation(Command.class);
+    Command command = command(beanEntry);
     if (command != null) {
       // TODO: warn if @Singleton is present, this is probably not desired due to @Option/@Argument processing ?
 
-      Dictionary<String,?> config = CommandHelper.config(command);
+      Dictionary<String, ?> config = CommandHelper.config(command);
       // TODO info -> debug
       log.info("Adding action: {}, config: {}", beanEntry, config);
-      ServiceRegistration<Function> registration = bundleContext.registerService(
+      bundleContext.registerService(
           Function.class,
           new BeanEntryCommand(beanEntry),
           config
       );
-
-      registrations.put(beanEntry, registration);
     }
     else {
       log.warn("Missing @Command annotation on action: {}", beanEntry);
     }
   }
 
-  // TODO: Use scope:name as key
-
   @Override
   public void remove(final BeanEntry<Named, Action> beanEntry, final BundleContext bundleContext) throws Exception {
-    // FIXME: No idea if this is sane or proper
-    ServiceRegistration<Function> registration = registrations.remove(beanEntry);
-    if (registration != null) {
-      // TODO info -> debug
-      log.info("Removing action: {}", beanEntry);
-      registration.unregister();
-    }
-    else {
-      log.warn("Missing registration: {}", beanEntry);
-    }
+    // TODO: implement remove
   }
 }
