@@ -15,6 +15,7 @@ package org.sonatype.nexus.internal.log
 import org.apache.felix.service.command.CommandSession
 import org.apache.karaf.shell.commands.Action
 import org.apache.karaf.shell.commands.Command
+import org.apache.karaf.shell.commands.Option
 import org.apache.karaf.shell.table.ShellTable
 import org.sonatype.nexus.log.LogManager
 
@@ -22,7 +23,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 /**
- * Display configured loggers.
+ * Action to display configured loggers.
  *
  * @since 3.0
  */
@@ -34,8 +35,16 @@ class LoggersAction
   @Inject
   LogManager logManager
 
+  @Option(name='-r', aliases = ['--reset'], description = 'Reset loggers')
+  Boolean reset
+
   @Override
   def execute(final CommandSession session) {
+    if (reset) {
+      logManager.resetLoggers()
+      return null
+    }
+
     def table = new ShellTable()
     table.column('Name')
     table.column('Level').alignRight()
