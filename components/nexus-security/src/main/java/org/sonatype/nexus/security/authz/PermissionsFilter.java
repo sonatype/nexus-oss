@@ -32,7 +32,7 @@ public class PermissionsFilter
   public static final String NAME = "nx-perms";
 
   /**
-   * Helper to build filter-chain configuration.
+   * Helper to build filter configuration.
    */
   public static String config(final String... permissions) {
     checkNotNull(permissions);

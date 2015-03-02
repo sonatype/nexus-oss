@@ -41,6 +41,10 @@ public class NexusBasicHttpAuthenticationFilter
     setApplicationName("Sonatype Nexus");
   }
 
+  // TODO: Should we default to permissive?  And if so, what implications does this have?
+
+  // TODO: Should we build in browser detecting to avoid sending 401?
+
   @Override
   public boolean onPreHandle(final ServletRequest request, final ServletResponse response, final Object mappedValue)
       throws Exception

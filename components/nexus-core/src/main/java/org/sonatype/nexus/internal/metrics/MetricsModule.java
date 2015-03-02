@@ -91,6 +91,8 @@ public class MetricsModule
       @Override
       protected void configure() {
         // TODO: Expose resource permissions for ping/threads/metrics/healthcheck?
+        // TODO: Maybe consider re-implementing as JAX-RS endpoints?
+
         addFilterChain(MOUNT_POINT + "/**",
             NexusBasicHttpAuthenticationFilter.NAME,
             AnonymousFilter.NAME,
