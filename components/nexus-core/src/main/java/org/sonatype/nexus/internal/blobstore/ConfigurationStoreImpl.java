@@ -70,12 +70,9 @@ public class ConfigurationStoreImpl
   @Override
   @Guarded(by = STARTED)
   public List<BlobStoreConfiguration> list() {
-    return asConfig(internalList());
-  }
-
-  @Override
-  public BlobStoreConfiguration newInstance() {
-    return entityAdapter.newEntity();
+    try(ODatabaseDocumentTx db = openDb()) {
+      return Lists.newArrayList(entityAdapter.get(db));
+    }
   }
 
   @Override
@@ -84,28 +81,7 @@ public class ConfigurationStoreImpl
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
-      entityAdapter.add(db, new BlobStoreConfigurationEntity(configuration.getName(), configuration.getPath()));
-    }
-  }
-  
-  private BlobStoreConfigurationEntity find(final BlobStoreConfiguration configuration) {
-    return Iterables.find(internalList(), new Predicate<BlobStoreConfigurationEntity>()
-    {
-      @Override
-      public boolean apply(@Nullable final BlobStoreConfigurationEntity input) {
-        return input.getName().equals(configuration.getName());
-      }
-    });
-  }
-
-  @Override
-  @Guarded(by = STARTED)
-  public void update(final BlobStoreConfiguration configuration) {
-    checkNotNull(configuration);
-    BlobStoreConfigurationEntity blobStoreConfigurationEntity = find(configuration);
-    blobStoreConfigurationEntity.setPath(configuration.getPath());
-    try (ODatabaseDocumentTx db = openDb()) {
-      entityAdapter.edit(db, blobStoreConfigurationEntity);
+      entityAdapter.create(db, configuration);
     }
   }
 
@@ -115,24 +91,7 @@ public class ConfigurationStoreImpl
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
-      entityAdapter.delete(db, find(configuration));
+      entityAdapter.delete(db, configuration.getName());
     }
-  }
-
-  private List<BlobStoreConfigurationEntity> internalList() {
-    try (ODatabaseDocumentTx db = openDb()) {
-      return entityAdapter.browse(db, Lists.<BlobStoreConfigurationEntity>newArrayList());
-    }
-  }
-
-  private List<BlobStoreConfiguration> asConfig(final List<BlobStoreConfigurationEntity> browse) {
-    return Lists.transform(browse, new Function<BlobStoreConfigurationEntity, BlobStoreConfiguration>()
-    {
-      @Nullable
-      @Override
-      public BlobStoreConfiguration apply(final BlobStoreConfigurationEntity input) {
-        return input;
-      }
-    });
   }
 }

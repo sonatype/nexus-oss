@@ -12,16 +12,29 @@
  */
 package org.sonatype.nexus.internal.blobstore;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.blobstore.api.configuration.BlobStoreConfiguration;
 import org.sonatype.nexus.orient.OClassNameBuilder;
-import org.sonatype.nexus.orient.entity.EntityAdapter;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.OCommandSQL;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 
 /**
  * since 3.0
@@ -29,50 +42,106 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 @Named
 @Singleton
 public class ConfigurationEntityAdapter
-    extends EntityAdapter<BlobStoreConfigurationEntity>
+    extends ComponentSupport
 {
 
   private static final String DB_CLASS = new OClassNameBuilder()
       .prefix("blobstore")
-      .type(BlobStoreConfigurationEntity.class)
+      .type("configuration")
       .build();
 
-  private static final String P_BLOBSTORE_NAME = "name";
+  private static final String P_NAME = "name";
 
-  private static final String P_BLOBSTORE_PATH = "path";
+  private static final String P_PATH = "path";
 
-  private static final String I_BLOBSTORE_NAME = "blobstore_name_idx";
+  private static final String I_NAME = "blobstore_name_idx";
 
-  private static final String I_BLOBSTORE_PATH = "blobstore_path_idx";
+  private static final String I_PATH = "blobstore_path_idx";
 
-  public ConfigurationEntityAdapter() {
-    super(DB_CLASS);
+  public OClass register(final ODatabaseDocumentTx db) {
+    checkNotNull(db);
+    
+    OSchema schema = db.getMetadata().getSchema();
+    OClass type = schema.getClass(DB_CLASS);
+    if(type == null) {
+      type = schema.createClass(DB_CLASS);
+      type.createProperty(P_NAME, OType.STRING).setMandatory(true).setNotNull(true);
+      type.createProperty(P_PATH, OType.STRING).setMandatory(true).setNotNull(true);
+      type.createIndex(I_NAME, INDEX_TYPE.UNIQUE, P_NAME);
+      type.createIndex(I_PATH, INDEX_TYPE.UNIQUE, P_PATH);
+      
+      log.info("Created schema: {}, properties: {}", type, type.properties());
+    }
+    return type;
+  }
+  
+  public ODocument create(final ODatabaseDocumentTx db, final BlobStoreConfiguration entity) {
+    checkNotNull(db);
+    checkNotNull(entity);
+
+    ODocument doc = db.newInstance(DB_CLASS);
+    return write(doc, entity);   
   }
 
-  @Override
-  protected void defineType(final OClass type) {
-    type.createProperty(P_BLOBSTORE_NAME, OType.STRING).setMandatory(true).setNotNull(true);
-    type.createProperty(P_BLOBSTORE_PATH, OType.STRING).setMandatory(true).setNotNull(true);
-    type.createIndex(I_BLOBSTORE_NAME, INDEX_TYPE.UNIQUE, P_BLOBSTORE_NAME);
-    type.createIndex(I_BLOBSTORE_PATH, INDEX_TYPE.UNIQUE, P_BLOBSTORE_PATH);
+  /**
+   * Browse all documents.
+   */
+  public Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
+    checkNotNull(db);
+    return db.browseClass(DB_CLASS);
+  }
+  
+  public Iterable<BlobStoreConfiguration> get(final ODatabaseDocumentTx db) {
+    return Iterables.transform(browse(db), new Function<ODocument, BlobStoreConfiguration>()
+    {
+      @Nullable
+      @Override
+      public BlobStoreConfiguration apply(final ODocument input) {
+        return input == null ? null : read(input);
+      }
+    });
+  }
+  
+  @Nullable
+  public ODocument get(final ODatabaseDocumentTx db, final String name) {
+    OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
+        "SELECT FROM " + DB_CLASS + " WHERE " + P_NAME + " = ?"
+    );
+    List<ODocument> results = db.command(query).execute(name);
+    if (results.isEmpty()) {
+      return null;
+    }
+    return results.get(0);  
   }
 
-  @Override
-  protected BlobStoreConfigurationEntity newEntity() {
-    return new BlobStoreConfigurationEntity();
+  /**
+   * Deletes a privilege.
+   *
+   * @return true if privilege was deleted
+   */
+  public boolean delete(final ODatabaseDocumentTx db, final String name) {
+    OCommandSQL command = new OCommandSQL(
+        "DELETE FROM " + DB_CLASS + " WHERE " + P_NAME + " = ?"
+    );
+    int records = db.command(command).execute(name);
+    return records == 1;
   }
-
-  @Override
-  protected void readFields(final ODocument document, final BlobStoreConfigurationEntity entity) {
-    String blobStoreName = document.field(P_BLOBSTORE_NAME, OType.STRING);
-    String path = document.field(P_BLOBSTORE_PATH, OType.STRING);
+  
+  private BlobStoreConfiguration read(final ODocument document) {
+    final BlobStoreConfiguration entity = new BlobStoreConfiguration();
+    String blobStoreName = document.field(P_NAME, OType.STRING);
+    String path = document.field(P_PATH, OType.STRING);
     entity.setName(blobStoreName);
     entity.setPath(path);
+    return entity;
   }
 
-  @Override
-  protected void writeFields(final ODocument document, final BlobStoreConfigurationEntity entity) {
-    document.field(P_BLOBSTORE_NAME, entity.getName());
-    document.field(P_BLOBSTORE_PATH, entity.getPath());
+  private ODocument write(final ODocument document, final BlobStoreConfiguration entity) {
+    checkNotNull(document);
+    checkNotNull(entity);
+
+    document.field(P_NAME, entity.getName());
+    document.field(P_PATH, entity.getPath());
+    return document.save();
   }
 }

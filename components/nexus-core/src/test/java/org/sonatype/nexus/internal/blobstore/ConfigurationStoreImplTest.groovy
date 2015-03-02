@@ -37,9 +37,7 @@ class ConfigurationStoreImplTest
 
   @Before
   void setup() {
-    def entityAdapter = new ConfigurationEntityAdapter()
-    entityAdapter.installDependencies(new HexRecordIdObfuscator())
-    underTest = new ConfigurationStoreImpl(Providers.of(database.instance), entityAdapter)
+    underTest = new ConfigurationStoreImpl(Providers.of(database.instance), new ConfigurationEntityAdapter())
     underTest.start()
   }
 
@@ -54,14 +52,6 @@ class ConfigurationStoreImplTest
   @Test
   public void 'Can create a new BlobStoreConfiguration'() throws Exception {
     createConfig()
-  }
-
-  @Test
-  public void 'Can update an existing BlobStoreConfiguration'() throws Exception {
-    BlobStoreConfiguration entity = createConfig()
-    entity.path = 'baz'
-    underTest.update(entity)
-    assert underTest.list().find { it.name == entity.name && it.path == 'baz' }
   }
 
   @Test
@@ -108,7 +98,7 @@ class ConfigurationStoreImplTest
   }
 
   private BlobStoreConfiguration createConfig(name = 'foo', path = 'bar') {
-    def entity = new BlobStoreConfigurationEntity(
+    def entity = new BlobStoreConfiguration(
         name: name,
         path: path
         //TODO - where to enforce path validation rules, and are these rules already defined somewhere in Nexus for 

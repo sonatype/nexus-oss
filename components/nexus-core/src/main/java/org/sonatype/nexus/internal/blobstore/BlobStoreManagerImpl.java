@@ -141,24 +141,6 @@ public class BlobStoreManagerImpl
     return blobStore;
   }
 
-  @Override
-  @Guarded(by = STARTED)
-  public BlobStore update(final BlobStoreConfiguration configuration) throws Exception {
-    checkNotNull(configuration);
-    String name = checkNotNull(configuration.getName());
-    String path = checkNotNull(configuration.getPath());
-    
-    log.debug("Updating BlobStore: {}, {}", name, path);
-    
-    //TODO - changing the path will leave behind previous content, but is that sensible?
-    BlobStore blobStore = blobStore(name);
-    store.update(configuration);
-    blobStore.stop();
-    blobStore = newBlobStore(configuration);
-    blobStore.start();
-    track(configuration.getName(), blobStore);
-    return blobStore;
-  }
 
   @Override
   @Guarded(by = STARTED)
@@ -168,17 +150,15 @@ public class BlobStoreManagerImpl
     log.debug("Deleting BlobStore: {}", name);
     BlobStore blobStore = blobStore(name);
     blobStore.stop();
-    Iterable<BlobStoreConfiguration> filtered = Iterables.filter(store.list(), new Predicate<BlobStoreConfiguration>()
+    BlobStoreConfiguration blobStoreConfiguration = Iterables.find(store.list(), new Predicate<BlobStoreConfiguration>()
     {
       @Override
       public boolean apply(final BlobStoreConfiguration input) {
         return input.getName().equals(name);
       }
     });
-    if(!filtered.iterator().hasNext()) {
-      throw new IllegalStateException("Could not find configuration to delete: " + name);
-    }
-    store.delete(filtered.iterator().next());
+
+    store.delete(blobStoreConfiguration);
     untrack(name);
     
     //TODO - event publishing
@@ -197,7 +177,7 @@ public class BlobStoreManagerImpl
       if (blobStore == null) {
         // create and start
         try {
-          BlobStoreConfiguration configuration = store.newInstance(); 
+          BlobStoreConfiguration configuration = new BlobStoreConfiguration(); 
           configuration.setName(name);
           configuration.setPath(basedir.toAbsolutePath().toString());
           blobStore = create(configuration);

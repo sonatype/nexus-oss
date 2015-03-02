@@ -24,11 +24,7 @@ public interface ConfigurationStore
 {
   List<BlobStoreConfiguration> list();
 
-  BlobStoreConfiguration newInstance();
-  
   void create(BlobStoreConfiguration configuration);
-
-  void update(BlobStoreConfiguration configuration);
 
   void delete(BlobStoreConfiguration configuration);
 }

@@ -15,13 +15,33 @@ package org.sonatype.nexus.blobstore.api.configuration;
 /**
  * @since 3.0
  */
-public interface BlobStoreConfiguration
+public class BlobStoreConfiguration
 {
-  String getName();
+  private String name;
+  
+  private String path;
 
-  void setName(String name);
+  public BlobStoreConfiguration() {
+  }
 
-  String getPath();
+  public BlobStoreConfiguration(final String name, final String path) {
+    this.name = name;
+    this.path = path;
+  }
 
-  void setPath(String path);
+  public String getName() {
+    return name;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
+  }
+
+  public String getPath() {
+    return path;
+  }
+
+  public void setPath(final String path) {
+    this.path = path;
+  }
 }

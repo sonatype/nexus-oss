@@ -29,8 +29,6 @@ public interface BlobStoreManager
 
   BlobStore create(BlobStoreConfiguration blobStoreConfiguration) throws Exception;
 
-  BlobStore update(BlobStoreConfiguration blobStoreConfiguration) throws Exception;
-
   void delete(String name) throws Exception;
   
   BlobStore get(String name);
