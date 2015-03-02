@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.store.MavenUploadRepositoryHosted', {
-  extend: 'NX.coreui.store.RepositoryReference',
+  extend: 'NX.coreui_legacy.store.RepositoryReference',
 
   remoteFilter: true,
   filters: [

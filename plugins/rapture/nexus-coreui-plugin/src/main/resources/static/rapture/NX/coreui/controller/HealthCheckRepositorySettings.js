@@ -28,7 +28,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
     'healthcheck.HealthCheckEula'
   ],
   refs: [
-    { ref: 'feature', selector: 'nx-coreui-repository-feature' },
+    { ref: 'feature', selector: 'nx-coreui_legacy-repository-feature' },
     { ref: 'panel', selector: 'nx-coreui-healthcheck-repository-settings' }
   ],
 
@@ -40,7 +40,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
 
     me.listen({
       component: {
-        'nx-coreui-repository-list': {
+        'nx-coreui_legacy-repository-list': {
           selection: me.onSelection
         },
         'nx-coreui-healthcheck-repository-settings': {
@@ -79,8 +79,8 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
    * @private
    * Add "Health Check" panel to repository tabs if we have a proxy, if not already present and/or load health check
    * settings into the panel.
-   * @param {NX.coreui.view.repository.RepositoryList} grid repository grid
-   * @param {NX.coreui.model.Repository} model selected repository
+   * @param {NX.coreui_legacy.view.repository.RepositoryList} grid repository grid
+   * @param {NX.coreui_legacy.model.Repository} model selected repository
    */
   onSelection: function(grid, model) {
     var me = this,
@@ -90,7 +90,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
         ((model.get('format') !== 'maven2') || model.get('repositoryPolicy') === 'RELEASE'))) {
 
       if (!panel) {
-        me.getFeature().addTab({ xtype: 'nx-coreui-healthcheck-repository-settings', title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_HEALTH_CHECK_TAB') });
+        me.getFeature().addTab({ xtype: 'nx-coreui-healthcheck-repository-settings', title: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_DETAILS_HEALTH_CHECK_TAB') });
         panel = me.getPanel();
       }
       panel.setRepository(model);

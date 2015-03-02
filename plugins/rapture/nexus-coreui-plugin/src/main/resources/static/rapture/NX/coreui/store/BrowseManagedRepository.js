@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.store.BrowseManagedRepository', {
-  extend: 'NX.coreui.store.Repository',
+  extend: 'NX.coreui_legacy.store.Repository',
 
   remoteFilter: true,
   filters: [

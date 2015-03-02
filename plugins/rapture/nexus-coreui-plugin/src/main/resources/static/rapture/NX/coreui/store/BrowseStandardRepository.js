@@ -18,6 +18,6 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.store.BrowseStandardRepository', {
-  extend: 'NX.coreui.store.Repository'
+  extend: 'NX.coreui_legacy.store.Repository'
 
 });

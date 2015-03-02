@@ -25,9 +25,12 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
     'NX.I18n'
   ],
 
-  /**
-   * @cfg template repository template object
-   */
+  api: {
+    submit: 'NX.direct.coreui_Repository.update'
+  },
+  settingsFormSuccessMessage: function(data) {
+    return NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_SUCCESS') + data['name'];
+  },
 
   editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_ERROR'),
 
@@ -36,17 +39,24 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
 
     me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:repositories', 'update');
 
-    me.items = me.items || [];
-    Ext.Array.insert(me.items, 0, [
+    me.items = [
       {
-        xtype: 'nx-coreui-repository-settings-common'
+        xtype: 'textfield',
+        name: 'name',
+        itemId: 'name',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME'),
+        readOnly: true
+      },
+      {
+        xtype: 'textarea',
+        name: 'attributes',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ATTRIBUTES'),
+        height: 300,
+        allowBlank: true,
+        cls: 'nx-log-viewer-field'
       }
-    ]);
+    ];
 
     me.callParent(arguments);
-
-    me.down('#providerName').setValue(me.template.providerName);
-    me.down('#formatName').setValue(me.template.formatName);
   }
-
 });
