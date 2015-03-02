@@ -81,7 +81,6 @@ public class NugetGalleryFacetImplDeleteTest
     doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
     when(tx.findAssets(eq(component))).thenReturn(asList(asset));
     when(asset.getProperty(eq(StorageFacet.P_BLOB_REF))).thenReturn(blobRef.toString());
-    doNothing().when(galleryFacet).deleteFromIndex(any(OrientVertex.class));
 
     galleryFacet.delete(packageId, version);
 

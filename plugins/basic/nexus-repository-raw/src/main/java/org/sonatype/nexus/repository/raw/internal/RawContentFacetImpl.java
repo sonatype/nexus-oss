@@ -148,8 +148,6 @@ public class RawContentFacetImpl
       }
 
       tx.commit();
-
-      putInIndex(component);
     }
   }
 
@@ -220,8 +218,6 @@ public class RawContentFacetImpl
       tx.deleteVertex(component);
 
       tx.commit();
-
-      deleteFromIndex(component);
 
       return true;
     }
@@ -300,21 +296,4 @@ public class RawContentFacetImpl
     };
   }
 
-  private void putInIndex(final OrientVertex component) {
-    try {
-      getRepository().facet(SearchFacet.class).put(componentMetadataFactory.from(component));
-    }
-    catch (MissingFacetException e) {
-      // skip indexing if no search facet
-    }
-  }
-
-  private void deleteFromIndex(final OrientVertex component) {
-    try {
-      getRepository().facet(SearchFacet.class).delete(component.getId().toString());
-    }
-    catch (MissingFacetException e) {
-      // skip indexing if no search facet
-    }
-  }
 }
