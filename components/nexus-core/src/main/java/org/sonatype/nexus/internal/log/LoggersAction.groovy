@@ -40,11 +40,12 @@ class LoggersAction
     table.column('Name')
     table.column('Level').alignRight()
 
-    logManager.loggers.each { name, level ->
-      table.addRow().addContent(name, level.name())
+    def loggers = logManager.loggers
+    loggers.keySet().sort().each { name ->
+      table.addRow().addContent(name, loggers[name])
     }
 
-    table.print(session.console)
+    table.print session.console
     return null
   }
 }
