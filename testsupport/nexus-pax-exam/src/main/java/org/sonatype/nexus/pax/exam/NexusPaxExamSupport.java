@@ -48,7 +48,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceCo
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.useOwnKarafExamSystemConfiguration;
 
 /**
- * Abstract class for testing Nexus distributions, test classes can inject any component from the distribution. <br>
+ * Provides support for testing Nexus with Pax-Exam, test-cases can inject any component from the distribution. <br>
  * <br>
  * Extend this class and choose the base distribution (and any optional plugins) that you want to test against:
  * 
@@ -65,7 +65,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.useOwnKar
  * @since 3.0
  */
 @RunWith(PaxExam.class)
-public abstract class AbstractNexusPaxExamIT
+public abstract class NexusPaxExamSupport
 {
   private static final String BASEDIR = new File(System.getProperty("basedir", "")).getAbsolutePath();
 

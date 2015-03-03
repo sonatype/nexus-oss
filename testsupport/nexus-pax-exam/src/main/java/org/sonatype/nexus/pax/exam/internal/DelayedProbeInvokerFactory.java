@@ -22,8 +22,8 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.util.tracker.ServiceTracker;
 
-import static org.sonatype.nexus.pax.exam.AbstractNexusPaxExamIT.NEXUS_PAX_EXAM_TIMEOUT_DEFAULT;
-import static org.sonatype.nexus.pax.exam.AbstractNexusPaxExamIT.NEXUS_PAX_EXAM_TIMEOUT_KEY;
+import static org.sonatype.nexus.pax.exam.NexusPaxExamSupport.NEXUS_PAX_EXAM_TIMEOUT_DEFAULT;
+import static org.sonatype.nexus.pax.exam.NexusPaxExamSupport.NEXUS_PAX_EXAM_TIMEOUT_KEY;
 
 /**
  * Delayed {@link ProbeInvokerFactory} that waits for Nexus to start before invoking the testsuite.
