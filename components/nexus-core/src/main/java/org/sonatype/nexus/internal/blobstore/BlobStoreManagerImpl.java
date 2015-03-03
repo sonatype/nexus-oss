@@ -24,8 +24,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
-import org.sonatype.nexus.blobstore.api.configuration.BlobStoreConfiguration;
-import org.sonatype.nexus.blobstore.api.configuration.ConfigurationStore;
+import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
+import org.sonatype.nexus.blobstore.api.ConfigurationStore;
 import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.FileBlobStore;
 import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
@@ -73,7 +73,7 @@ public class BlobStoreManagerImpl
   @Override
   protected void doStart() throws Exception { 
     //TODO - appropriate place to insist on starting the store before this? new BlobStoreLifecycle impl, add to RepositoryLifecycle or...
-    store.start();
+    //store.start();
     List<BlobStoreConfiguration> configurations = store.list();
     if (configurations.isEmpty()) {
       log.debug("No BlobStores configured");

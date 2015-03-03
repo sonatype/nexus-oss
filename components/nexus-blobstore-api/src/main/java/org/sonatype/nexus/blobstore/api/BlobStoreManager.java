@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.blobstore.api;
 
-import org.sonatype.nexus.blobstore.api.configuration.BlobStoreConfiguration;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**

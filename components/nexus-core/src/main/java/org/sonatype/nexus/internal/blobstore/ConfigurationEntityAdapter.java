@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.blobstore.api.configuration.BlobStoreConfiguration;
+import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.nexus.orient.entity.FieldCopier;
 import org.sonatype.sisu.goodies.common.ComponentSupport;

@@ -12,9 +12,8 @@
  */
 package org.sonatype.nexus.internal.blobstore
 
-import org.sonatype.nexus.blobstore.api.configuration.BlobStoreConfiguration
+import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
 import org.sonatype.nexus.orient.DatabaseInstanceRule
-import org.sonatype.nexus.orient.HexRecordIdObfuscator
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import com.google.inject.util.Providers
