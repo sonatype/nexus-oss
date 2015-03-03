@@ -36,5 +36,7 @@ class RepositoryXO
 
   Boolean online
 
+  String status
+
   String attributes
 }

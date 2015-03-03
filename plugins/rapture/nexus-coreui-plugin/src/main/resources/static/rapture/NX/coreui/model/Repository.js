@@ -26,12 +26,7 @@ Ext.define('NX.coreui.model.Repository', {
     'format',
     'recipe',
     'online',
-    'attributes',
-    {
-      name: 'onlineText',
-      convert: function(val, row) {
-        return row.data['online'] ? 'online' : 'offline';
-      }
-    }
+    'status',
+    'attributes'
   ]
 });

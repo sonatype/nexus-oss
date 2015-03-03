@@ -51,14 +51,6 @@ Ext.define('NX.coreui.controller.Repositories', {
     'repository-default': {
       file: 'database_green.png',
       variants: ['x16', 'x32']
-    },
-    'repository-online': {
-      file: 'tick.png',
-      variants: ['x16']
-    },
-    'repository-offline': {
-      file: 'cross.png',
-      variants: ['x16']
     }
   },
   features: {

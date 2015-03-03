@@ -27,6 +27,10 @@ public class ConnectionConfig
 
   private Integer retries;
 
+  private Boolean blocked;
+
+  private Boolean autoBlock;
+
   private Boolean useTrustStore;
 
   public String getUserAgentCustomisation() {
@@ -59,6 +63,22 @@ public class ConnectionConfig
 
   public void setRetries(final Integer retries) {
     this.retries = retries;
+  }
+
+  public Boolean isBlocked() {
+    return blocked;
+  }
+
+  public void setBlocked(final Boolean blocked) {
+    this.blocked = blocked;
+  }
+
+  public Boolean shouldAutoBlock() {
+    return autoBlock;
+  }
+
+  public void setAutoBlock(final Boolean autoBlock) {
+    this.autoBlock = autoBlock;
   }
 
   public Boolean getUseTrustStore() {
