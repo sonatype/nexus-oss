@@ -17,14 +17,26 @@ import java.util.List;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
+ * Service for managing BlobStoreConfigurations.
+ *
  * since 3.0
  */
 public interface ConfigurationStore
-  extends Lifecycle  
+    extends Lifecycle
 {
+
+  /**
+   * @return all BlobStoreConfigurations
+   */
   List<BlobStoreConfiguration> list();
 
+  /**
+   * Persist a new BlobStoreConfiguration.
+   */
   void create(BlobStoreConfiguration configuration);
 
+  /**
+   * Delete an existing BlobStoreConfiguration.
+   */
   void delete(BlobStoreConfiguration configuration);
 }
