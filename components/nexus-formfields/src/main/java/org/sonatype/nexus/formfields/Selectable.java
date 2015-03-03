@@ -26,7 +26,7 @@ public interface Selectable
   /**
    * Returns Ext.Direct API name used to configure Ext proxy.
    * E.g.
-   * "coreui_Repository.readReferences"
+   * "coreui_legacy_Repository.readReferences"
    * "coreui_RepositoryTarget.read"
    *
    * @since 3.0

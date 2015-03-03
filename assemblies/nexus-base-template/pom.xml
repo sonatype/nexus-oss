@@ -268,6 +268,15 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-coreui_legacy-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-repository-httpbridge</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
@@ -433,6 +442,7 @@
             <feature>nexus-rapture-plugin</feature>
             <feature>nexus-extdirect-plugin</feature>
             <feature>nexus-coreui-plugin</feature>
+            <feature>nexus-coreui_legacy-plugin</feature>
             <feature>nexus-repository-httpbridge</feature>
             <feature>nexus-repository-nuget</feature>
             <feature>nexus-repository-raw</feature>

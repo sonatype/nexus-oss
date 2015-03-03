@@ -38,7 +38,7 @@ public class M2LayoutedM1ShadowRepositoryTest
     String masterId = "repo1-m1";
 
     M2LayoutedM1ShadowRepository shadow =
-        (M2LayoutedM1ShadowRepository) getContainer().lookup(ShadowRepository.class, "m1-m2-shadow");
+        (M2LayoutedM1ShadowRepository) lookup(ShadowRepository.class, "m1-m2-shadow");
 
     CRepository repoConf = new DefaultCRepository();
 

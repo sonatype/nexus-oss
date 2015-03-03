@@ -29,7 +29,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
     'routing.RoutingProxyRepositorySettings'
   ],
   refs: [
-    { ref: 'feature', selector: 'nx-coreui-repository-feature' },
+    { ref: 'feature', selector: 'nx-coreui_legacy-repository-feature' },
     { ref: 'hostedPanel', selector: 'nx-coreui-routing-hosted-repository-settings' },
     { ref: 'proxyPanel', selector: 'nx-coreui-routing-proxy-repository-settings' }
   ],
@@ -42,7 +42,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
 
     me.listen({
       component: {
-        'nx-coreui-repository-list': {
+        'nx-coreui_legacy-repository-list': {
           selection: me.onSelection
         },
         'nx-coreui-routing-hosted-repository-settings': {
@@ -85,8 +85,8 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
   /**
    * @private
    * Add "Routing" panel to repository tabs, if not already present and/or load routing settings into the panel.
-   * @param {NX.coreui.view.repository.RepositoryList} grid repository grid
-   * @param {NX.coreui.model.Repository} model selected repository
+   * @param {NX.coreui_legacy.view.repository.RepositoryList} grid repository grid
+   * @param {NX.coreui_legacy.model.Repository} model selected repository
    */
   onSelection: function(grid, model) {
     var me = this,
@@ -98,7 +98,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
       if (!hostedPanel) {
         me.getFeature().addTab({
           xtype: 'nx-coreui-routing-hosted-repository-settings',
-          title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_ROUTING_TAB')
+          title: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_DETAILS_ROUTING_TAB')
         });
         hostedPanel = me.getHostedPanel();
       }
@@ -115,7 +115,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
       if (!proxyPanel) {
         me.getFeature().addTab({
           xtype: 'nx-coreui-routing-proxy-repository-settings',
-          title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_ROUTING_TAB')
+          title: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_DETAILS_ROUTING_TAB')
         });
         proxyPanel = me.getProxyPanel();
       }
@@ -169,7 +169,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
     NX.direct.coreui_RoutingRepositorySettings.updatePrefixFile(panel.getRepository().getId(), function(response) {
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: NX.I18n.format('ADMIN_REPOSITORIES_ROUTING_DISCOVERY_SUCCESS', panel.getRepository().get('name')), type: 'success'
+          text: NX.I18n.format('LEGACY_ADMIN_REPOSITORIES_ROUTING_DISCOVERY_SUCCESS', panel.getRepository().get('name')), type: 'success'
         });
         me.loadSettings(panel);
       }

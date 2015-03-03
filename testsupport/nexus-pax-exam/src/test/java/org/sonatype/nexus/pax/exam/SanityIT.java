@@ -31,7 +31,7 @@ import static org.ops4j.pax.exam.CoreOptions.options;
  * @since 3.0
  */
 public class SanityIT
-    extends AbstractNexusPaxExamIT
+    extends NexusPaxExamSupport
 {
   @Configuration
   public static Option[] config() {

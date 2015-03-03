@@ -148,7 +148,7 @@ public class SearchServiceImpl
       // no repositories were created yet, so there is no point in searching
       return null;
     }
-    String[] searchableIndexes = getSearchableIndexes();
+    final String[] searchableIndexes = getSearchableIndexes();
     if (searchableIndexes.length == 0) {
       return Collections.emptyList();
     }
@@ -171,7 +171,7 @@ public class SearchServiceImpl
               return false;
             }
             if (response == null) {
-              response = client.get().prepareSearch()
+              response = client.get().prepareSearch(searchableIndexes)
                   .setTypes(TYPE)
                   .setQuery(query)
                   .setScroll(new TimeValue(1, TimeUnit.MINUTES))

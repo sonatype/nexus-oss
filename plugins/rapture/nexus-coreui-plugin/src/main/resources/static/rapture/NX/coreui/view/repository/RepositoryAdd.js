@@ -26,30 +26,47 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
   ],
   ui: 'nx-inset',
 
-  editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_ERROR'),
+  defaultFocus: 'recipe',
 
-  defaultFocus: 'id',
-
-  initComponent: function () {
+  /**
+   * @override
+   */
+  initComponent: function() {
     var me = this;
 
-    me.editableCondition = NX.Conditions.isPermitted('nexus:repositories', 'create');
+    me.items = {
+      xtype: 'nx-coreui-repository-settings-form',
+      api: {
+        submit: 'NX.direct.coreui_Repository.create'
+      },
+      settingsFormSuccessMessage: function(data) {
+        return NX.I18n.get('ADMIN_REPOSITORIES_CREATE_SUCCESS') + data['name'];
+      },
+      editableCondition: NX.Conditions.isPermitted('nexus:repositories', 'create'),
+      editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_ERROR'),
 
-    me.items.buttons = [
-      { text: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
-      { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
-        this.up('nx-drilldown').showChild(0, true);
-      }}
-    ];
+      buttons: [
+        { text: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
+        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function() {
+          this.up('nx-drilldown').showChild(0, true);
+        }}
+      ]
+    };
 
-    me.callParent(arguments);
+    me.callParent();
 
-    me.down('#id').setReadOnly(false);
-
-    me.down('form').add({
-      xtype: 'hiddenfield',
-      name: 'template',
-      value: me.template.id
+    me.down('#name').setReadOnly(false);
+    me.down('nx-settingsform').add(0, {
+      xtype: 'combo',
+      name: 'recipe',
+      itemId: 'recipe',
+      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_RECIPE'),
+      emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_RECIPE_PLACEHOLDER'),
+      editable: false,
+      store: 'RepositoryRecipe',
+      queryMode: 'local',
+      displayField: 'name',
+      valueField: 'id'
     });
   }
 });

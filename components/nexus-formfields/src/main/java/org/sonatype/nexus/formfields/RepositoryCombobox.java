@@ -133,7 +133,7 @@ public class RepositoryCombobox
    */
   @Override
   public String getStoreApi() {
-    return "coreui_Repository." + (generateAllRepositoriesEntry ? "readReferencesAddingEntryForAll" : "readReferences");
+    return "coreui_legacy_Repository." + (generateAllRepositoriesEntry ? "readReferencesAddingEntryForAll" : "readReferences");
   }
 
   /**
