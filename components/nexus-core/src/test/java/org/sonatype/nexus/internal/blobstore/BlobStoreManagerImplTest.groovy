@@ -114,6 +114,7 @@ class BlobStoreManagerImplTest
   private BlobStoreConfiguration createConfig(name = 'foo', path = 'bar') {
     def entity = new BlobStoreConfiguration(
         name: name,
+        recipeName: 'file',
         attributes: [file:[path:path]]
     )
     return entity

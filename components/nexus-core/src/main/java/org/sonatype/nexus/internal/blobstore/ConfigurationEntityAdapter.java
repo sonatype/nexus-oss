@@ -53,6 +53,8 @@ public class ConfigurationEntityAdapter
       .build();
 
   private static final String P_NAME = "name";
+  
+  private static final String P_RECIPE_NAME = "recipe_name";
 
   private static final String P_ATTRIBUTES = "attributes";
 
@@ -68,6 +70,7 @@ public class ConfigurationEntityAdapter
     if(type == null) {
       type = schema.createClass(DB_CLASS);
       type.createProperty(P_NAME, OType.STRING).setMandatory(true).setNotNull(true);
+      type.createProperty(P_RECIPE_NAME, OType.STRING).setMandatory(true).setNotNull(true);
       type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP).setMandatory(true).setNotNull(true);
       type.createIndex(I_NAME, INDEX_TYPE.UNIQUE, P_NAME);
       type.createIndex(I_ATTRIBUTES, INDEX_TYPE.UNIQUE, P_ATTRIBUTES);
@@ -132,6 +135,7 @@ public class ConfigurationEntityAdapter
   private BlobStoreConfiguration read(final ODocument document) {
     final BlobStoreConfiguration entity = new BlobStoreConfiguration();
     String blobStoreName = document.field(P_NAME, OType.STRING);
+    String recipeName = document.field(P_RECIPE_NAME, OType.STRING);
     Map<String, Map<String, Object>> attributes = document.field(P_ATTRIBUTES, OType.EMBEDDEDMAP);
     
     // deeply copy attributes to divorce from document
@@ -141,6 +145,7 @@ public class ConfigurationEntityAdapter
     }
     
     entity.setName(blobStoreName);
+    entity.setRecipeName(recipeName);
     entity.setAttributes(attributes);
     return entity;
   }
@@ -150,6 +155,7 @@ public class ConfigurationEntityAdapter
     checkNotNull(entity);
 
     document.field(P_NAME, entity.getName());
+    document.field(P_RECIPE_NAME, entity.getRecipeName());
     document.field(P_ATTRIBUTES, entity.getAttributes());
     return document.save();
   }

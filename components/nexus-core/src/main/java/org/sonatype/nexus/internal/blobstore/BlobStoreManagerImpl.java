@@ -180,7 +180,8 @@ public class BlobStoreManagerImpl
         // create and start
         try {
           BlobStoreConfiguration configuration = new BlobStoreConfiguration(); 
-          configuration.setName(name);
+          configuration.setName(name);       
+          configuration.setRecipeName("file");
           configuration.setAttributes(toPathAttributes(basedir.toAbsolutePath().toString()));
           blobStore = create(configuration);
         }
@@ -191,14 +192,6 @@ public class BlobStoreManagerImpl
 
       return blobStore;
     }
-  }
-
-  private Map<String, Map<String, Object>> toPathAttributes(final String path) {
-    Map<String, Map<String, Object>> map = Maps.newHashMap();
-    HashMap<String, Object> attributes = Maps.newHashMap();
-    attributes.put("path", path);
-    map.put("file", attributes);
-    return map;
   }
 
   @VisibleForTesting
@@ -216,15 +209,23 @@ public class BlobStoreManagerImpl
     );
   }
 
-  private String getPath(final Map<String, Map<String, Object>> attributes) {
-    return (String) attributes.get("file").get("path");
-  }
-
   @VisibleForTesting
   BlobStore blobStore(final String name) {
     BlobStore blobStore = stores.get(name);
     checkState(blobStore != null, "Missing BlobStore: %s", name);
     return blobStore;
+  }
+
+  private String getPath(final Map<String, Map<String, Object>> attributes) {
+    return (String) attributes.get("file").get("path");
+  }
+
+  private Map<String, Map<String, Object>> toPathAttributes(final String path) {
+    Map<String, Map<String, Object>> map = Maps.newHashMap();
+    HashMap<String, Object> attributes = Maps.newHashMap();
+    attributes.put("path", path);
+    map.put("file", attributes);
+    return map;
   }
 
   private void track(final String name, final BlobStore blobStore)

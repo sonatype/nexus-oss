@@ -100,6 +100,7 @@ class ConfigurationStoreImplTest
   private BlobStoreConfiguration createConfig(name = 'foo', path = 'bar') {
     def entity = new BlobStoreConfiguration(
         name: name,
+        recipeName: 'file',
         attributes: [file:[path:path]]
         //TODO - where to enforce path validation rules, and are these rules already defined somewhere in Nexus for 
         // reuse?

@@ -21,6 +21,8 @@ public class BlobStoreConfiguration
 {
   private String name;
   
+  private String recipeName;
+  
   private Map<String, Map<String, Object>> attributes;
   
   public String getName() {
@@ -29,6 +31,14 @@ public class BlobStoreConfiguration
 
   public void setName(final String name) {
     this.name = name;
+  }
+
+  public String getRecipeName() {
+    return recipeName;
+  }
+
+  public void setRecipeName(final String recipeName) {
+    this.recipeName = recipeName;
   }
 
   public Map<String, Map<String, Object>> getAttributes() {
