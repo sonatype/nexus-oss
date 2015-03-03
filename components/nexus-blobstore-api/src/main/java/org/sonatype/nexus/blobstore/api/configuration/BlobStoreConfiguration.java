@@ -48,4 +48,13 @@ public class BlobStoreConfiguration
   public void setAttributes(final Map<String, Map<String, Object>> attributes) {
     this.attributes = attributes;
   }
+
+  @Override
+  public String toString() {
+    return "BlobStoreConfiguration{" +
+        "name='" + name + '\'' +
+        ", recipeName='" + recipeName + '\'' +
+        ", attributes=" + attributes +
+        '}';
+  }
 }
