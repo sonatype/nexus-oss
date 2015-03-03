@@ -25,18 +25,18 @@ import org.junit.Test
 
 import static org.junit.Assert.fail
 
-class ConfigurationStoreImplTest
+class BlobStoreConfigurationStoreImplTest
     extends TestSupport
 {
 
   @Rule
   public DatabaseInstanceRule database = new DatabaseInstanceRule('test')
 
-  private ConfigurationStoreImpl underTest
+  private BlobStoreConfigurationStoreImpl underTest
 
   @Before
   void setup() {
-    underTest = new ConfigurationStoreImpl(Providers.of(database.instance), new ConfigurationEntityAdapter())
+    underTest = new BlobStoreConfigurationStoreImpl(Providers.of(database.instance), new ConfigurationEntityAdapter())
     underTest.start()
   }
 

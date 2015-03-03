@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
-import org.sonatype.nexus.blobstore.api.ConfigurationStore;
+import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore;
 import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.FileBlobStore;
 import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
@@ -61,10 +61,10 @@ public class BlobStoreManagerImpl
 
   private final Map<String, BlobStore> stores = Maps.newHashMap();
 
-  private final ConfigurationStore store;
+  private final BlobStoreConfigurationStore store;
 
   @Inject
-  public BlobStoreManagerImpl(final ApplicationDirectories directories, ConfigurationStore store) {
+  public BlobStoreManagerImpl(final ApplicationDirectories directories, BlobStoreConfigurationStore store) {
     checkNotNull(directories);
     this.basedir = directories.getWorkDirectory(BASEDIR).toPath();
     this.store = store;

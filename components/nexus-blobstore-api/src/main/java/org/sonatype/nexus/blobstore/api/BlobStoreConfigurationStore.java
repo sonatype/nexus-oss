@@ -21,7 +21,7 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
  *
  * since 3.0
  */
-public interface ConfigurationStore
+public interface BlobStoreConfigurationStore
     extends Lifecycle
 {
 

@@ -20,7 +20,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
-import org.sonatype.nexus.blobstore.api.ConfigurationStore;
+import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.orient.DatabaseInstance;
@@ -36,17 +36,17 @@ import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.St
  */
 @Named
 @Singleton
-public class ConfigurationStoreImpl
+public class BlobStoreConfigurationStoreImpl
     extends StateGuardLifecycleSupport
-    implements ConfigurationStore
+    implements BlobStoreConfigurationStore
 {
   private final Provider<DatabaseInstance> databaseInstance;
 
   private final ConfigurationEntityAdapter entityAdapter;
 
   @Inject
-  public ConfigurationStoreImpl(final @Named("config") Provider<DatabaseInstance> databaseInstance,
-                                final ConfigurationEntityAdapter entityAdapter)
+  public BlobStoreConfigurationStoreImpl(final @Named("config") Provider<DatabaseInstance> databaseInstance,
+                                         final ConfigurationEntityAdapter entityAdapter)
   {
     this.databaseInstance = databaseInstance;
     this.entityAdapter = entityAdapter;

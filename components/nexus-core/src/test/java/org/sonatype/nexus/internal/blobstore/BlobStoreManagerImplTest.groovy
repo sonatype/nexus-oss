@@ -14,7 +14,7 @@ package org.sonatype.nexus.internal.blobstore
 
 import org.sonatype.nexus.blobstore.api.BlobStore
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
-import org.sonatype.nexus.blobstore.api.ConfigurationStore
+import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore
 import org.sonatype.nexus.configuration.ApplicationDirectories
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
@@ -44,7 +44,7 @@ class BlobStoreManagerImplTest
   ApplicationDirectories directories
 
   @Mock
-  ConfigurationStore store
+  BlobStoreConfigurationStore store
 
   BlobStoreManagerImpl underTest
 
