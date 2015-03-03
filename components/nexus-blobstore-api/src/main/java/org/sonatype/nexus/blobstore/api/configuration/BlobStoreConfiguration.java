@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.blobstore.api.configuration;
 
+import java.util.Map;
+
 /**
  * @since 3.0
  */
@@ -19,16 +21,8 @@ public class BlobStoreConfiguration
 {
   private String name;
   
-  private String path;
-
-  public BlobStoreConfiguration() {
-  }
-
-  public BlobStoreConfiguration(final String name, final String path) {
-    this.name = name;
-    this.path = path;
-  }
-
+  private Map<String, Map<String, Object>> attributes;
+  
   public String getName() {
     return name;
   }
@@ -37,11 +31,11 @@ public class BlobStoreConfiguration
     this.name = name;
   }
 
-  public String getPath() {
-    return path;
+  public Map<String, Map<String, Object>> getAttributes() {
+    return attributes;
   }
 
-  public void setPath(final String path) {
-    this.path = path;
+  public void setAttributes(final Map<String, Map<String, Object>> attributes) {
+    this.attributes = attributes;
   }
 }

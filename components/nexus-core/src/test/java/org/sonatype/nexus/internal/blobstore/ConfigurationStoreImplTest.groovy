@@ -60,7 +60,7 @@ class ConfigurationStoreImplTest
     List<BlobStoreConfiguration> list = underTest.list()
     assert list.size() == 1
     assert list[0].name == entity.name
-    assert list[0].path == entity.path
+    assert list[0].attributes == entity.attributes
   }
 
   @Test
@@ -89,7 +89,7 @@ class ConfigurationStoreImplTest
     BlobStoreConfiguration entity = createConfig()
 
     try {
-      createConfig('name2', entity.path)
+      createConfig('name2', entity.attributes)
       fail()
     }
     catch (ORecordDuplicatedException e) {
@@ -100,7 +100,7 @@ class ConfigurationStoreImplTest
   private BlobStoreConfiguration createConfig(name = 'foo', path = 'bar') {
     def entity = new BlobStoreConfiguration(
         name: name,
-        path: path
+        attributes: [file:[path:path]]
         //TODO - where to enforce path validation rules, and are these rules already defined somewhere in Nexus for 
         // reuse?
     )

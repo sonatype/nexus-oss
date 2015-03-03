@@ -65,8 +65,7 @@ class BlobStoreManagerImplTest
   public void 'Can start with existing configuration'() throws Exception {
     BlobStore blobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfiguration))
-    when(store.list()).thenReturn(
-        Lists.newArrayList(new BlobStoreConfiguration(name: 'test', path: temporaryFolder.root.absolutePath)))
+    when(store.list()).thenReturn(Lists.newArrayList(createConfig('test', temporaryFolder.root.absolutePath)))
 
     underTest.doStart()
 
@@ -77,7 +76,7 @@ class BlobStoreManagerImplTest
   public void 'Can create a BlobStore'() throws Exception {
     BlobStore blobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfiguration))
-    BlobStoreConfiguration configuration = new BlobStoreConfiguration(name: 'test', path: temporaryFolder.root.absolutePath)
+    BlobStoreConfiguration configuration = createConfig('test',temporaryFolder.root.absolutePath)
     
     BlobStore createdBlobStore = underTest.create(configuration)
 
@@ -90,8 +89,7 @@ class BlobStoreManagerImplTest
 
   @Test
   public void 'Can delete an existing BlobStore'() throws Exception {
-    BlobStoreConfiguration configuration = new BlobStoreConfiguration(name: 'test',
-        path: temporaryFolder.root.absolutePath)
+    BlobStoreConfiguration configuration = createConfig('test', temporaryFolder.root.absolutePath)
     BlobStore blobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).blobStore('test')
     when(store.list()).thenReturn(Lists.newArrayList(configuration));
@@ -111,5 +109,13 @@ class BlobStoreManagerImplTest
     verify(blobStore).start()
     verify(store).create(any(BlobStoreConfiguration))
     assert blobStore == autoCreatedBlobStore
+  }
+
+  private BlobStoreConfiguration createConfig(name = 'foo', path = 'bar') {
+    def entity = new BlobStoreConfiguration(
+        name: name,
+        attributes: [file:[path:path]]
+    )
+    return entity
   }
 }

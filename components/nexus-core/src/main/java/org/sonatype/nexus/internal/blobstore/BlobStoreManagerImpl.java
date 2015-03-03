@@ -12,8 +12,10 @@
  */
 package org.sonatype.nexus.internal.blobstore;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -127,8 +129,8 @@ public class BlobStoreManagerImpl
   @Guarded(by = STARTED)
   public BlobStore create(final BlobStoreConfiguration configuration) throws Exception {
     checkNotNull(configuration);
-    log.debug("Creating blob-store: {} with content root: {}", configuration.getName(),
-        configuration.getPath());
+    log.debug("Creating blob-store: {} with attributes: {}", configuration.getName(),
+        configuration.getAttributes());
 
     store.create(configuration);
 
@@ -179,7 +181,7 @@ public class BlobStoreManagerImpl
         try {
           BlobStoreConfiguration configuration = new BlobStoreConfiguration(); 
           configuration.setName(name);
-          configuration.setPath(basedir.toAbsolutePath().toString());
+          configuration.setAttributes(toPathAttributes(basedir.toAbsolutePath().toString()));
           blobStore = create(configuration);
         }
         catch (Exception e) {
@@ -191,9 +193,17 @@ public class BlobStoreManagerImpl
     }
   }
 
+  private Map<String, Map<String, Object>> toPathAttributes(final String path) {
+    Map<String, Map<String, Object>> map = Maps.newHashMap();
+    HashMap<String, Object> attributes = Maps.newHashMap();
+    attributes.put("path", path);
+    map.put("file", attributes);
+    return map;
+  }
+
   @VisibleForTesting
   BlobStore newBlobStore(final BlobStoreConfiguration blobStoreConfiguration) {
-    Path root = Paths.get(blobStoreConfiguration.getPath()).resolve(blobStoreConfiguration.getName());
+    Path root = Paths.get(getPath(blobStoreConfiguration.getAttributes())).resolve(blobStoreConfiguration.getName());
     Path content = root.resolve("content");
     Path metadata = root.resolve("metadata");
     BlobMetadataStore metadataStore = MapdbBlobMetadataStore.create(metadata.toFile());
@@ -204,6 +214,10 @@ public class BlobStoreManagerImpl
         new SimpleFileOperations(),
         metadataStore
     );
+  }
+
+  private String getPath(final Map<String, Map<String, Object>> attributes) {
+    return (String) attributes.get("file").get("path");
   }
 
   @VisibleForTesting

@@ -13,6 +13,7 @@
 package org.sonatype.nexus.internal.blobstore;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.inject.Named;
@@ -20,6 +21,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.api.configuration.BlobStoreConfiguration;
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.entity.FieldCopier;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Function;
@@ -52,11 +54,11 @@ public class ConfigurationEntityAdapter
 
   private static final String P_NAME = "name";
 
-  private static final String P_PATH = "path";
+  private static final String P_ATTRIBUTES = "attributes";
 
   private static final String I_NAME = "blobstore_name_idx";
 
-  private static final String I_PATH = "blobstore_path_idx";
+  private static final String I_ATTRIBUTES = "blobstore_path_idx";
 
   public OClass register(final ODatabaseDocumentTx db) {
     checkNotNull(db);
@@ -66,9 +68,9 @@ public class ConfigurationEntityAdapter
     if(type == null) {
       type = schema.createClass(DB_CLASS);
       type.createProperty(P_NAME, OType.STRING).setMandatory(true).setNotNull(true);
-      type.createProperty(P_PATH, OType.STRING).setMandatory(true).setNotNull(true);
+      type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP).setMandatory(true).setNotNull(true);
       type.createIndex(I_NAME, INDEX_TYPE.UNIQUE, P_NAME);
-      type.createIndex(I_PATH, INDEX_TYPE.UNIQUE, P_PATH);
+      type.createIndex(I_ATTRIBUTES, INDEX_TYPE.UNIQUE, P_ATTRIBUTES);
       
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }
@@ -130,9 +132,16 @@ public class ConfigurationEntityAdapter
   private BlobStoreConfiguration read(final ODocument document) {
     final BlobStoreConfiguration entity = new BlobStoreConfiguration();
     String blobStoreName = document.field(P_NAME, OType.STRING);
-    String path = document.field(P_PATH, OType.STRING);
+    Map<String, Map<String, Object>> attributes = document.field(P_ATTRIBUTES, OType.EMBEDDEDMAP);
+    
+    // deeply copy attributes to divorce from document
+    if (attributes != null) {
+      //noinspection unchecked
+      attributes = FieldCopier.copy(attributes);
+    }
+    
     entity.setName(blobStoreName);
-    entity.setPath(path);
+    entity.setAttributes(attributes);
     return entity;
   }
 
@@ -141,7 +150,7 @@ public class ConfigurationEntityAdapter
     checkNotNull(entity);
 
     document.field(P_NAME, entity.getName());
-    document.field(P_PATH, entity.getPath());
+    document.field(P_ATTRIBUTES, entity.getAttributes());
     return document.save();
   }
 }
