@@ -20,8 +20,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
+import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
@@ -41,6 +43,8 @@ import org.joda.time.DateTime;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * A support class which implements basic payload logic; subclasses provide format-specific operations.
+ *
  * @since 3.0
  */
 public abstract class ProxyFacetSupport
@@ -55,6 +59,8 @@ public abstract class ProxyFacetSupport
 
   private HttpClientFacet httpClient;
 
+  private boolean remoteUrlChanged;
+
   @Override
   protected void doConfigure() throws Exception {
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
@@ -65,8 +71,7 @@ public abstract class ProxyFacetSupport
 
     final URI newRemoteURI = new URI(url);
     if (remoteUrl != null && !remoteUrl.equals(newRemoteURI)) {
-      log.debug("Remote URL is changing: clearing caches.");
-      // TODO: Trigger other changes based on the remoteUrl changing - perhaps it calls facet(NFC.class).clear() at this point?
+      remoteUrlChanged = true;
     }
 
     this.remoteUrl = newRemoteURI;
@@ -80,6 +85,15 @@ public abstract class ProxyFacetSupport
   @Override
   protected void doStart() throws Exception {
     httpClient = getRepository().facet(HttpClientFacet.class);
+    if (remoteUrlChanged) {
+      remoteUrlChanged = false;
+      try {
+        getRepository().facet(NegativeCacheFacet.class).invalidate();
+      }
+      catch (MissingFacetException e) {
+        // NCF is optional
+      }
+    }
   }
 
   @Override
@@ -90,6 +104,10 @@ public abstract class ProxyFacetSupport
   @Override
   protected void doDestroy() throws Exception {
     remoteUrl = null;
+  }
+
+  public URI getRemoteUrl() {
+    return remoteUrl;
   }
 
   @Override
@@ -112,6 +130,7 @@ public abstract class ProxyFacetSupport
       }
       catch (IOException e) {
         log.warn("Failed to fetch: {}", getUrl(context), e);
+        throw e;
       }
     }
     return content;
@@ -131,9 +150,11 @@ public abstract class ProxyFacetSupport
 
   @Nullable
   protected Payload fetch(final Context context) throws IOException {
+    final String url = getUrl(context);
+
     HttpClient client = httpClient.getHttpClient();
 
-    HttpGet request = new HttpGet(remoteUrl.resolve(getUrl(context)));
+    HttpGet request = new HttpGet(remoteUrl.resolve(url));
     log.debug("Fetching: {}", request);
 
     HttpResponse response = client.execute(request);

@@ -1,0 +1,40 @@
+{
+  "mappings": {
+    "component": {
+      "dynamic_templates": [
+        {
+          "attributes.nuget": {
+            "path_match": "attributes.nuget.*",
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        }
+      ],
+      "properties": {
+        "attributes": {
+          "properties": {
+            "nuget": {
+              "properties": {
+                "tags": {
+                  "type": "string",
+                  "index": "analyzed"
+                },
+                "summary": {
+                  "type": "string",
+                  "index": "analyzed"
+                },
+                "description": {
+                  "type": "string",
+                  "index": "analyzed"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

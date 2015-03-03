@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.proxy;
 
+import java.io.IOException;
+
 import javax.annotation.Nonnull;
 
 import org.sonatype.nexus.repository.http.HttpMethods;
@@ -25,7 +27,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 
 /**
- * A format-neutral proxy handler.
+ * A format-neutral proxy handler which delegates to an instance of {@link ProxyFacet} for content.
  *
  * @since 3.0
  */
@@ -42,13 +44,16 @@ public class ProxyHandler
       return HttpResponses.methodNotAllowed(action, GET);
     }
 
-    final Payload payload = proxyFacet(context).get(context);
-
-    if (payload != null) {
-      return HttpResponses.ok(payload);
+    try {
+      Payload payload = proxyFacet(context).get(context);
+      if (payload != null) {
+        return HttpResponses.ok(payload);
+      }
+      return HttpResponses.notFound();
     }
-
-    return HttpResponses.notFound();
+    catch (IOException e) {
+      return HttpResponses.serviceUnavailable();
+    }
   }
 
   private ProxyFacet proxyFacet(final Context context) {

@@ -10,34 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.negativecache;
+package org.sonatype.nexus.blobstore.api.configuration;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.List;
 
-import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
- * @since 3.0
+ * since 3.0
  */
-@Named
-public class NegativeCacheImpl
-    extends FacetSupport
-    implements NegativeCacheFacet
+public interface ConfigurationStore
+  extends Lifecycle  
 {
-  @Override
-  public void cacheNotFound(final NegativeCacheKey key) {
-    // TODO: implement
-  }
+  List<BlobStoreConfiguration> list();
 
-  @Override
-  public boolean isNotFound(final NegativeCacheKey key) {
-    // TODO: implement
-    return false;
-  }
+  BlobStoreConfiguration newInstance();
+  
+  void create(BlobStoreConfiguration configuration);
 
-  @Override
-  public void uncacheNotFound(final NegativeCacheKey key) {
-    // TODO: implement
-  }
+  void update(BlobStoreConfiguration configuration);
+
+  void delete(BlobStoreConfiguration configuration);
 }

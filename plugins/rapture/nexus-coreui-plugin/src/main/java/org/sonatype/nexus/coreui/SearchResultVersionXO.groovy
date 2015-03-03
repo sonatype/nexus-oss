@@ -22,20 +22,21 @@ import org.eclipse.aether.util.version.GenericVersionScheme
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-@EqualsAndHashCode(includes = ["repositoryId", "groupId", "artifactId", "version"])
+@EqualsAndHashCode(includes = ["repositoryId", "group", "name", "version"])
 class SearchResultVersionXO
 implements Comparable<SearchResultVersionXO>
 {
   private static final versionScheme = new GenericVersionScheme()
 
-  String groupId
-  String artifactId
+  String groupingKey
+
+  String group
+  String name
   String version
   Integer versionOrder
   String repositoryId
   String repositoryName
   String path
-  String name
   String type
 
   @Override
@@ -44,7 +45,7 @@ implements Comparable<SearchResultVersionXO>
     if (result == 0) {
       result = versionScheme.parseVersion(version ?: "0").compareTo(versionScheme.parseVersion(o.version ?: "0"))
       if (result == 0) {
-        result = path.compareTo(o.path)
+        result = (path ?: "").compareTo(o.path ?: "")
       }
     }
     return result

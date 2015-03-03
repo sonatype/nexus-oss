@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.blobstore.api;
 
+import org.sonatype.nexus.blobstore.api.configuration.BlobStoreConfiguration;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
@@ -23,5 +24,15 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 public interface BlobStoreManager
   extends Lifecycle
 {
+
+  Iterable<BlobStore> browse();
+
+  BlobStore create(BlobStoreConfiguration blobStoreConfiguration) throws Exception;
+
+  BlobStore update(BlobStoreConfiguration blobStoreConfiguration) throws Exception;
+
+  void delete(String name) throws Exception;
+  
   BlobStore get(String name);
+  
 }

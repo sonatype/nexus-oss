@@ -12,16 +12,15 @@
  */
 package com.sonatype.nexus.repository.nuget.internal
 
-import org.sonatype.nexus.repository.*
-import org.sonatype.nexus.repository.security.SecurityHandler
-import org.sonatype.nexus.repository.storage.StorageFacet
+import org.sonatype.nexus.repository.Facet
+import org.sonatype.nexus.repository.Format
+import org.sonatype.nexus.repository.Repository
+import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
-import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import org.sonatype.nexus.repository.view.matchers.AlwaysMatcher
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -39,33 +38,12 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 @Named(NugetHostedRecipe.NAME)
 @Singleton
 class NugetHostedRecipe
-    extends RecipeSupport
+    extends NugetRecipeSupport
 {
   static final String NAME = "nuget-hosted"
 
   @Inject
-  Provider<NugetSecurityFacet> securityFacet
-
-  @Inject
-  Provider<ConfigurableViewFacet> viewFacet
-
-  @Inject
   Provider<NugetGalleryFacetImpl> galleryFacet
-
-  @Inject
-  Provider<StorageFacet> storageFacet
-
-  @Inject
-  TimingHandler timingHandler
-
-  @Inject
-  NugetGalleryHandler galleryHandler
-
-  @Inject
-  SecurityHandler securityHandler
-
-  @Inject
-  NugetContentHandler contentHandler
 
   @Inject
   public NugetHostedRecipe(@Named(HostedType.NAME) final Type type,
@@ -77,30 +55,25 @@ class NugetHostedRecipe
   @Override
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(storageFacet.get())
+    repository.attach(searchFacet.get())
     repository.attach(galleryFacet.get())
     repository.attach(securityFacet.get())
     repository.attach(configure(viewFacet.get()))
   }
 
-  private Facet configure(final ConfigurableViewFacet facet) {
+  protected Facet configure(final ConfigurableViewFacet facet) {
     Router.Builder router = new Router.Builder()
 
-    // Metadata operations
-    // <galleryBase>/Operation(param1='whatever',...)/?queryParameters
-    router.route(new Route.Builder()
-        .matcher(new TokenMatcher("/{operation}({paramString:.*})"))
-        .handler(timingHandler)
-    //        .handler(securityHandler)
-        .handler(galleryHandler)
-        .handler(notFound())
-        .create())
+    addFeedRoutes(router)
 
-    // Temporary means of uploading .nupkg archives to rip out their .nuspec
+    addPackageRoute(router)
+
+    // Uploading packages
     router.route(new Route.Builder()
         .matcher(new AlwaysMatcher())
         .handler(timingHandler)
     //            .handler(securityHandler)
-        .handler(contentHandler)
+        .handler(pushHandler)
         .create())
 
     // By default, return a 404

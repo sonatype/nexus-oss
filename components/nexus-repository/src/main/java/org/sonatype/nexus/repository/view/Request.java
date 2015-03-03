@@ -44,6 +44,8 @@ public class Request
 
   protected String action;
 
+  protected String requestUrl;
+
   protected String path;
 
   protected Parameters parameters;
@@ -77,6 +79,10 @@ public class Request
     return action;
   }
 
+  public String getRequestUrl() {
+    return requestUrl;
+  }
+
   public String getPath() {
     return path;
   }
@@ -108,6 +114,7 @@ public class Request
     // Excluding some members which could lead to very verbose logging
     return getClass().getSimpleName() + "{" +
         "action='" + action + '\'' +
+        ", requestUrl='" + requestUrl + '\'' +
         ", path='" + path + '\'' +
         ", parameters=" + parameters +
         ", payload=" + payload +

@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+
 /**
  * Asset updated event.
  *
@@ -20,7 +22,7 @@ package org.sonatype.nexus.repository.storage;
 public class AssetUpdatedEvent
   extends AssetEvent
 {
-  public AssetUpdatedEvent(final Object vertexId) {
-    super(vertexId);
+  public AssetUpdatedEvent(final OrientVertex vertex) {
+    super(vertex);
   }
 }

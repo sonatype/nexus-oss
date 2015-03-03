@@ -26,4 +26,6 @@ public interface HttpClientFacet
   extends Facet
 {
   HttpClient getHttpClient();
+
+  RemoteConnectionStatus getStatus();
 }

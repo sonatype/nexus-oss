@@ -33,40 +33,41 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
 
 /**
- * Default {@link IndexDataProducer} implementation that indexes all properties of a component & its assets.
+ * Default {@link ComponentMetadataProducer} implementation that uses all properties of a component & its assets as
+ * metadata.
  *
  * @since 3.0
  */
 @Named
 @Singleton
-public class DefaultIndexDataProducer
-    implements IndexDataProducer
+public class DefaultComponentMetadataProducer
+    implements ComponentMetadataProducer
 {
 
   @Override
-  public String getIndexData(final OrientVertex component) {
+  public String getMetadata(final OrientVertex component) {
     checkNotNull(component);
-    Map<String, Object> source = Maps.newHashMap();
+    Map<String, Object> metadata = Maps.newHashMap();
     for (String key : component.getPropertyKeys()) {
-      source.put(key, component.getProperty(key));
+      metadata.put(key, component.getProperty(key));
     }
     List<Map<String, Object>> assets = Lists.newArrayList();
     for (Vertex vertex : component.getVertices(Direction.IN, E_PART_OF_COMPONENT)) {
       OrientVertex asset = (OrientVertex) vertex;
-      Map<String, Object> assetSource = Maps.newHashMap();
+      Map<String, Object> assetMetadata = Maps.newHashMap();
       for (String key : asset.getPropertyKeys()) {
         if (!P_BLOB_REF.equals(key) && !P_SIZE.equals(key)) {
-          assetSource.put(key, asset.getProperty(key));
+          assetMetadata.put(key, asset.getProperty(key));
         }
       }
-      assets.add(assetSource);
+      assets.add(assetMetadata);
     }
     if (!assets.isEmpty()) {
-      source.put("assets", assets.toArray(new Map[assets.size()]));
+      metadata.put("assets", assets.toArray(new Map[assets.size()]));
     }
 
     try {
-      return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(source);
+      return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(metadata);
     }
     catch (JsonProcessingException e) {
       throw Throwables.propagate(e);

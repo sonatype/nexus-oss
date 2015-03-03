@@ -83,25 +83,26 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     var me = this,
         searchResultDetails = me.getSearchResultDetails().down('#popular'),
         searchResultModel,
-        groupId = undefined, artifactId = undefined, versions = [], info = {};
+        groupingKey = undefined, group = undefined, name = undefined, versions = [], info = {};
 
     if (me.getSearchResultVersion()) {
 
       me.getSearchResultVersionStore().each(function(searchResultVersionModel) {
-        groupId = searchResultVersionModel.get('groupId');
-        artifactId = searchResultVersionModel.get('artifactId');
+        groupingKey = searchResultVersionModel.get('groupingKey');
+        group = searchResultVersionModel.get('group');
+        name = searchResultVersionModel.get('name');
         if (versions.indexOf(searchResultVersionModel.get('version')) === -1) {
           versions.push(searchResultVersionModel.get('version'));
         }
       });
-      if (groupId && artifactId) {
-        searchResultModel = me.getSearchResultStore().getById(groupId + ':' + artifactId);
+      if (group && name) {
+        searchResultModel = me.getSearchResultStore().getById(groupingKey);
         searchResultModel.set('healthCheckLoading', true);
         searchResultModel.commit();
         info[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(searchResultModel);
         searchResultDetails.showInfo(info);
         me.getSearchResultVersion().getView().refresh();
-        NX.direct.healthcheck_Search.read(groupId, artifactId, versions, function(response) {
+        NX.direct.healthcheck_Search.read(group, name, versions, function(response) {
           searchResultModel.set('healthCheckLoading', false);
           if (Ext.isObject(response) && response.success) {
             searchResultModel.beginEdit();
@@ -297,9 +298,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
    */
   renderPreconditions: function(model, metadata) {
     var me = this,
-        searchResultModel = me.getSearchResultStore().getById(
-            model.get('groupId') + ':' + model.get('artifactId')
-        );
+        searchResultModel = me.getSearchResultStore().getById(model.get('groupingKey'));
 
     // FIXME: resolve use of undefined "opaqueWarning" css class and potentially replace icons with glyphs
 

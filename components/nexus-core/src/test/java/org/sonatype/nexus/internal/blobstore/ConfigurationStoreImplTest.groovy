@@ -1,0 +1,120 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-2015 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.nexus.internal.blobstore
+
+import org.sonatype.nexus.blobstore.api.configuration.BlobStoreConfiguration
+import org.sonatype.nexus.orient.DatabaseInstanceRule
+import org.sonatype.nexus.orient.HexRecordIdObfuscator
+import org.sonatype.sisu.litmus.testsupport.TestSupport
+
+import com.google.inject.util.Providers
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException
+import org.junit.After
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+
+import static org.junit.Assert.fail
+
+class ConfigurationStoreImplTest
+    extends TestSupport
+{
+
+  @Rule
+  public DatabaseInstanceRule database = new DatabaseInstanceRule('test')
+
+  private ConfigurationStoreImpl underTest
+
+  @Before
+  void setup() {
+    def entityAdapter = new ConfigurationEntityAdapter()
+    entityAdapter.installDependencies(new HexRecordIdObfuscator())
+    underTest = new ConfigurationStoreImpl(Providers.of(database.instance), entityAdapter)
+    underTest.start()
+  }
+
+  @After
+  void tearDown() {
+    if (underTest) {
+      underTest.stop()
+      underTest = null
+    }
+  }
+
+  @Test
+  public void 'Can create a new BlobStoreConfiguration'() throws Exception {
+    createConfig()
+  }
+
+  @Test
+  public void 'Can update an existing BlobStoreConfiguration'() throws Exception {
+    BlobStoreConfiguration entity = createConfig()
+    entity.path = 'baz'
+    underTest.update(entity)
+    assert underTest.list().find { it.name == entity.name && it.path == 'baz' }
+  }
+
+  @Test
+  public void 'Can list the persisted configurations'() throws Exception {
+    BlobStoreConfiguration entity = createConfig()
+    List<BlobStoreConfiguration> list = underTest.list()
+    assert list.size() == 1
+    assert list[0].name == entity.name
+    assert list[0].path == entity.path
+  }
+
+  @Test
+  public void 'Can delete an existing BlobStoreConfiguration'() throws Exception {
+    BlobStoreConfiguration entity = createConfig()
+    assert underTest.list()
+    underTest.delete(entity)
+    assert !underTest.list()
+  }
+
+  @Test
+  public void 'Names are unique'() throws Exception {
+    BlobStoreConfiguration entity = createConfig()
+
+    try {
+      createConfig(entity.name, 'path2')
+      fail()
+    }
+    catch (ORecordDuplicatedException e) {
+      assert e.toString().contains('blobstore_name_idx')
+    }
+  }
+
+  @Test
+  public void 'Paths are unique'() throws Exception {
+    BlobStoreConfiguration entity = createConfig()
+
+    try {
+      createConfig('name2', entity.path)
+      fail()
+    }
+    catch (ORecordDuplicatedException e) {
+      assert e.toString().contains('blobstore_path_idx')
+    }
+  }
+
+  private BlobStoreConfiguration createConfig(name = 'foo', path = 'bar') {
+    def entity = new BlobStoreConfigurationEntity(
+        name: name,
+        path: path
+        //TODO - where to enforce path validation rules, and are these rules already defined somewhere in Nexus for 
+        // reuse?
+    )
+    underTest.create(entity)
+    return entity
+  }
+}

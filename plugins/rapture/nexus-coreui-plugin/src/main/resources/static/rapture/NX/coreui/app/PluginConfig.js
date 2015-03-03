@@ -206,6 +206,24 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
+      id: 'NX.coreui.controller.SearchMaven',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.SearchNuget',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.SearchRaw',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
       id: 'NX.coreui.controller.SmtpSettings',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');

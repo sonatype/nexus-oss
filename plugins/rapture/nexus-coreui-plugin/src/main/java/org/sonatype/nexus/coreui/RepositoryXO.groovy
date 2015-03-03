@@ -34,5 +34,9 @@ class RepositoryXO
   @NotEmpty(groups = Create)
   String recipe
 
+  Boolean online
+
+  String status
+
   String attributes
 }

@@ -39,7 +39,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("ConstantConditions")
-public class NugetContentHandlerTest
+public class NugetPushHandlerTest
     extends TestSupport
 {
   Context context = mock(Context.class);
@@ -50,7 +50,7 @@ public class NugetContentHandlerTest
 
   NugetGalleryFacet nugetGalleryFacet = mock(NugetGalleryFacet.class);
 
-  NugetContentHandler underTest = new NugetContentHandler();
+  NugetPushHandler underTest = new NugetPushHandler();
 
   @Before
   public void setup() throws Exception {

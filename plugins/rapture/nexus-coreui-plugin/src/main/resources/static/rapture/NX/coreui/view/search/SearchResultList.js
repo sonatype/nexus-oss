@@ -40,8 +40,8 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
         return 'search-component';
       }
     },
-    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_GROUP_COLUMN'), dataIndex: 'groupId', flex: 2 },
-    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_NAME_COLUMN'), dataIndex: 'artifactId', flex: 1 },
+    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
+    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_GROUP_COLUMN'), dataIndex: 'group', flex: 2 },
     { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_FORMAT_COLUMN'), dataIndex: 'format', width: 70 }
   ]
 

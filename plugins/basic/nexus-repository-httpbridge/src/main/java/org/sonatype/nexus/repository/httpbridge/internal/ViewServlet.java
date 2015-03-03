@@ -126,10 +126,17 @@ public class ViewServlet
     }
     log.debug("Repository: {}", repo);
 
-    // dispatch request and send response
     ViewFacet facet = repo.facet(ViewFacet.class);
+    if (!facet.isOnline()) {
+      send(HttpResponses.serviceUnavailable("Repository offline"), httpResponse);
+      return;
+    }
     log.debug("Dispatching to view facet: {}", facet);
-    Response response = facet.dispatch(new HttpRequestAdapter(httpRequest, path.getRemainingPath()));
+
+    // dispatch request and send response
+    final HttpRequestAdapter request = new HttpRequestAdapter(httpRequest,
+        path.getRemainingPath());
+    Response response = facet.dispatch(request);
 
     HttpResponseSender sender = sender(repo);
     log.debug("HTTP response sender: {}", sender);

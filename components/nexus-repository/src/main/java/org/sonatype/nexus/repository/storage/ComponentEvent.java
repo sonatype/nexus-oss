@@ -12,15 +12,26 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import org.sonatype.nexus.repository.Repository;
+
+import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+
 /**
  * Component event.
  *
  * @since 3.0
  */
 public abstract class ComponentEvent
-  extends VertexEvent
+    extends VertexEvent
 {
-  public ComponentEvent(final Object vertexId) {
-    super(vertexId);
+  private final Repository repository;
+
+  public ComponentEvent(final OrientVertex vertex, final Repository repository) {
+    super(vertex);
+    this.repository = repository;
+  }
+
+  public Repository getRepository() {
+    return repository;
   }
 }

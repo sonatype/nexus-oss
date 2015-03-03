@@ -10,23 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.search;
+package com.sonatype.nexus.repository.nuget.internal;
 
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import java.util.Map;
 
 /**
- * Producer of metadata to be indexed in JSON format.
- *
  * @since 3.0
  */
-public interface IndexDataProducer
+public interface NugetWritableGallery
 {
-
-  /**
-   * Retrieves data to be indexed for a component.
-   *
-   * @return data to be indexed in json format
-   */
-  String getIndexData(OrientVertex component);
-
+  void putMetadata(Map<String, String> metadata);
 }
