@@ -94,7 +94,7 @@ public class DefaultRepositoryRegistryTest
     gl.add("B");
     gl.add("C");
 
-    M2GroupRepository groupRepository = (M2GroupRepository) getContainer().lookup(GroupRepository.class, "maven2");
+    M2GroupRepository groupRepository = (M2GroupRepository) lookup(GroupRepository.class, "maven2");
 
     CRepository repoGroupConf = new DefaultCRepository();
 

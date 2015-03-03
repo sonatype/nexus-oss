@@ -27,7 +27,11 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+import com.google.inject.Module;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.eclipse.sisu.plexus.PlexusSpaceModule;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.URLClassSpace;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -128,5 +132,10 @@ public class MacPluginEventSubscriberIT
     assertThat(
         repository.getLocalStorage().containsItem(repository, new ResourceStoreRequest("/archetype-catalog.xml")),
         is(true));
+  }
+
+  @Override
+  protected Module spaceModule() {
+    return new PlexusSpaceModule(new URLClassSpace(getClassLoader()), BeanScanning.INDEX);
   }
 }

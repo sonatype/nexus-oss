@@ -45,7 +45,6 @@ import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
-import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
 import org.sonatype.nexus.repository.storage.ComponentDeletedEvent;
 import org.sonatype.nexus.repository.storage.ComponentUpdatedEvent;
@@ -112,8 +111,7 @@ public class NugetGalleryFacetImpl
   private final ComponentMetadataFactory componentMetadataFactory;
 
   @Inject
-  public NugetGalleryFacetImpl(final ComponentMetadataFactory componentMetadataFactory)
-  {
+  public NugetGalleryFacetImpl(final ComponentMetadataFactory componentMetadataFactory) {
     this.componentMetadataFactory = checkNotNull(componentMetadataFactory);
   }
 
@@ -212,15 +210,15 @@ public class NugetGalleryFacetImpl
   @Override
   public void putMetadata(final Map<String, String> metadata) {
     try (StorageTx tx = openStorageTx()) {
+      final OrientVertex bucket = tx.getBucket();
+      final OrientVertex component = createOrUpdateComponent(tx, bucket, metadata);
       maintainAggregateInfo(tx, metadata.get(ID));
-
       tx.commit();
     }
   }
 
   @VisibleForTesting
-  Map<String, ?> toData(final NestedAttributesMap nugetAttributes, Map<String, String> extra)
-  {
+  Map<String, ?> toData(final NestedAttributesMap nugetAttributes, Map<String, String> extra) {
     Map<String, Object> data = Maps.newHashMap();
 
     for (Entry<String, Object> attrib : nugetAttributes.entries()) {
@@ -386,7 +384,7 @@ public class NugetGalleryFacetImpl
 
   @VisibleForTesting
   OrientVertex createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata,
-                             final InputStream packageStream)
+                                     final InputStream packageStream)
   {
     final OrientVertex bucket = storageTx.getBucket();
     final OrientVertex component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
@@ -609,8 +607,7 @@ public class NugetGalleryFacetImpl
     return InlineCount.ALLPAGES.equals(parseInlineCount(query.get("$inlinecount")));
   }
 
-  private int executeCount(final ComponentQuery query, final StorageTx storageTx)
-  {
+  private int executeCount(final ComponentQuery query, final StorageTx storageTx) {
     return (int) storageTx.countComponents(query.getWhere(), query.getParameters(), getRepositories(),
         query.getQuerySuffix());
   }

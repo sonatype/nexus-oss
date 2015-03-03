@@ -105,7 +105,6 @@ public abstract class AbstractProxyTestEnvironment
 
   /*
    * (non-Javadoc)
-   * @see org.codehaus.plexus.PlexusTestCase#setUp()
    */
   @Override
   public void setUp()
@@ -135,7 +134,6 @@ public abstract class AbstractProxyTestEnvironment
 
   /*
    * (non-Javadoc)
-   * @see org.codehaus.plexus.PlexusTestCase#tearDown()
    */
   @Override
   public void tearDown()
@@ -168,22 +166,6 @@ public abstract class AbstractProxyTestEnvironment
    */
   protected abstract EnvironmentBuilder getEnvironmentBuilder()
       throws Exception;
-
-  /**
-   * Made public to reach it from {@link EnvironmentBuilder}.
-   */
-  @Override
-  public <T> T lookup(final Class<T> componentClass) throws Exception {
-    return super.lookup(componentClass);
-  }
-
-  /**
-   * Made public to reach it from {@link EnvironmentBuilder}.
-   */
-  @Override
-  public <T> T lookup(final Class<T> componentClass, final String roleHint) throws Exception {
-    return super.lookup(componentClass, roleHint);
-  }
 
   /**
    * Check for file and match contents.

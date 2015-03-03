@@ -40,7 +40,7 @@ public class M1LayoutedM2ShadowRepositoryTest
   private void addShadowReposes() throws Exception {
     for (ProxyRepository master : getRepositoryRegistry().getRepositoriesWithFacet(ProxyRepository.class)) {
       M1LayoutedM2ShadowRepository shadow =
-          (M1LayoutedM2ShadowRepository) getContainer().lookup(ShadowRepository.class, "m2-m1-shadow");
+          (M1LayoutedM2ShadowRepository) lookup(ShadowRepository.class, "m2-m1-shadow");
 
       CRepository repoConf = new DefaultCRepository();
 
