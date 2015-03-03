@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.internal.blobstore;
 
-import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
