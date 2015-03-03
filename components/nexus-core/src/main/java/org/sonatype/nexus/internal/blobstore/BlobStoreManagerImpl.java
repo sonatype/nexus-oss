@@ -64,16 +64,15 @@ public class BlobStoreManagerImpl
   private final BlobStoreConfigurationStore store;
 
   @Inject
-  public BlobStoreManagerImpl(final ApplicationDirectories directories, BlobStoreConfigurationStore store) {
+  public BlobStoreManagerImpl(final ApplicationDirectories directories, final BlobStoreConfigurationStore store) {
     checkNotNull(directories);
     this.basedir = directories.getWorkDirectory(BASEDIR).toPath();
-    this.store = store;
+    this.store = checkNotNull(store);
   }
 
   @Override
   protected void doStart() throws Exception { 
-    //TODO - appropriate place to insist on starting the store before this? new BlobStoreLifecycle impl, add to RepositoryLifecycle or...
-    //store.start();
+    store.start();
     List<BlobStoreConfiguration> configurations = store.list();
     if (configurations.isEmpty()) {
       log.debug("No BlobStores configured");
