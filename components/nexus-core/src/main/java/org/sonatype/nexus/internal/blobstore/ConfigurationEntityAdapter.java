@@ -39,6 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
+ * Manage persistence of BlobStoreConfigurations.
  * since 3.0
  */
 @Named
@@ -62,6 +63,11 @@ public class ConfigurationEntityAdapter
 
   private static final String I_ATTRIBUTES = "blobstore_path_idx";
 
+  /**
+   * Register the required schema.
+   * @param db
+   * @return the resulting Schema class
+   */
   public OClass register(final ODatabaseDocumentTx db) {
     checkNotNull(db);
     
@@ -79,7 +85,13 @@ public class ConfigurationEntityAdapter
     }
     return type;
   }
-  
+
+  /**
+   * Create a new BlobStoreConfiguration.
+   * @param db
+   * @param entity
+   * @return
+   */
   public ODocument create(final ODatabaseDocumentTx db, final BlobStoreConfiguration entity) {
     checkNotNull(db);
     checkNotNull(entity);
@@ -95,7 +107,13 @@ public class ConfigurationEntityAdapter
     checkNotNull(db);
     return db.browseClass(DB_CLASS);
   }
-  
+
+  /**
+   * Get all BlobStoreConfigurations.
+   * 
+   * @param db
+   * @return collection of BlobStoreConfigurations
+   */
   public Iterable<BlobStoreConfiguration> get(final ODatabaseDocumentTx db) {
     return Iterables.transform(browse(db), new Function<ODocument, BlobStoreConfiguration>()
     {
@@ -106,7 +124,14 @@ public class ConfigurationEntityAdapter
       }
     });
   }
-  
+
+  /**
+   * Get a BlobStoreConfiguration by name.
+   * 
+   * @param db
+   * @param name
+   * @return the configuration or null if not found
+   */
   @Nullable
   public ODocument get(final ODatabaseDocumentTx db, final String name) {
     OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
@@ -120,9 +145,9 @@ public class ConfigurationEntityAdapter
   }
 
   /**
-   * Deletes a privilege.
+   * Deletes a BlobStoreConfiguration.
    *
-   * @return true if privilege was deleted
+   * @return true if configuration was deleted
    */
   public boolean delete(final ODatabaseDocumentTx db, final String name) {
     OCommandSQL command = new OCommandSQL(
