@@ -39,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
- * Manage persistence of BlobStoreConfigurations.
+ * Manage persistence of {@link BlobStoreConfiguration}.
  * since 3.0
  */
 @Named
