@@ -34,6 +34,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.hook.ODocumentHookAbstract;
+import com.orientechnologies.orient.core.hook.ORecordHook;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Parameter;
@@ -66,8 +67,6 @@ public class StorageFacetImpl
 
   private final ComponentMetadataFactory componentMetadataFactory;
 
-  private SearchFacet searchFacet;
-
   private String blobStoreName;
 
   private Object bucketId;
@@ -94,16 +93,6 @@ public class StorageFacetImpl
     initSchema();
     initBucket();
     super.doInit();
-  }
-
-  @Override
-  protected void doStart() throws Exception {
-    try {
-      searchFacet = getRepository().facet(SearchFacet.class);
-    }
-    catch (MissingFacetException e) {
-      // no search facet, no indexing
-    }
   }
 
   private void initSchema() {
@@ -241,9 +230,24 @@ public class StorageFacetImpl
 
   private GraphTx openGraphTx() {
     ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire();
-    final GraphTx graphTx = new GraphTx(db);
-    if (searchFacet != null) {
-      db.registerHook(new ODocumentHookAbstract()
+    try {
+      return new IndexHookedGraphTx(db, getRepository().facet(SearchFacet.class));
+    }
+    catch (MissingFacetException e) {
+      // no search facet, no indexing
+      return new GraphTx(db);
+    }
+  }
+
+  private class IndexHookedGraphTx
+      extends GraphTx
+  {
+
+    private final ORecordHook hook;
+
+    public IndexHookedGraphTx(final ODatabaseDocumentTx db, final SearchFacet searchFacet) {
+      super(db);
+      database.registerHook(hook = new ODocumentHookAbstract()
       {
         @Override
         public String[] getIncludeClasses() {
@@ -258,7 +262,7 @@ public class StorageFacetImpl
         @Override
         public void onRecordAfterCreate(final ODocument doc) {
           // TODO should indexing failures affect storage? (catch and log?)
-          searchFacet.put(componentMetadataFactory.from(new OrientVertex(graphTx, doc)));
+          searchFacet.put(componentMetadataFactory.from(new OrientVertex(IndexHookedGraphTx.this, doc)));
         }
 
         @Override
@@ -269,10 +273,15 @@ public class StorageFacetImpl
         @Override
         public void onRecordAfterDelete(final ODocument doc) {
           // TODO should indexing failures affect storage? (catch and log?)
-          searchFacet.delete(new OrientVertex(graphTx, doc).getId().toString());
+          searchFacet.delete(new OrientVertex(IndexHookedGraphTx.this, doc).getId().toString());
         }
       });
     }
-    return graphTx;
+
+    @Override
+    public void close() {
+      database.unregisterHook(hook);
+      super.close();
+    }
   }
 }
