@@ -145,22 +145,14 @@ public class BlobStoreManagerImpl
 
   @Override
   @Guarded(by = STARTED)
-  public void delete(final String name) throws Exception {
-    checkNotNull(name);
+  public void delete(BlobStoreConfiguration configuration) throws Exception {
+    checkNotNull(configuration);
     
-    log.debug("Deleting BlobStore: {}", name);
-    BlobStore blobStore = blobStore(name);
+    log.debug("Deleting BlobStore: {}", configuration);
+    BlobStore blobStore = blobStore(configuration.getName());
     blobStore.stop();
-    BlobStoreConfiguration blobStoreConfiguration = Iterables.find(store.list(), new Predicate<BlobStoreConfiguration>()
-    {
-      @Override
-      public boolean apply(final BlobStoreConfiguration input) {
-        return input.getName().equals(name);
-      }
-    });
-
-    store.delete(blobStoreConfiguration);
-    untrack(name);
+    store.delete(configuration);
+    untrack(configuration.getName());
     
     //TODO - event publishing
   }

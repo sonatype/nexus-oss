@@ -29,7 +29,7 @@ public interface BlobStoreManager
 
   BlobStore create(BlobStoreConfiguration blobStoreConfiguration) throws Exception;
 
-  void delete(String name) throws Exception;
+  void delete(BlobStoreConfiguration blobStoreConfiguration) throws Exception;
   
   BlobStore get(String name);
   

@@ -94,7 +94,7 @@ class BlobStoreManagerImplTest
     doReturn(blobStore).when(underTest).blobStore('test')
     when(store.list()).thenReturn(Lists.newArrayList(configuration));
     
-    underTest.delete(configuration.getName())
+    underTest.delete(configuration)
     
     verify(blobStore).stop();
     verify(store).delete(configuration);
