@@ -3,7 +3,7 @@
  * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
- * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * This program and the accompanying materials are made available under the terms of the Eclipse License Version 1.0,
  * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
  *
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
@@ -38,7 +38,7 @@ class BlobStoreManagerImplTest
 {
 
   @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder()
+  TemporaryFolder temporaryFolder = new TemporaryFolder()
 
   @Mock
   ApplicationDirectories directories
@@ -49,20 +49,20 @@ class BlobStoreManagerImplTest
   BlobStoreManagerImpl underTest
 
   @Before
-  public void setup() {
+  void setup() {
     when(directories.getWorkDirectory(anyString())).thenReturn(temporaryFolder.root)
     underTest = spy(new BlobStoreManagerImpl(directories, store))
   }
 
   @Test
-  public void 'Can start with nothing configured'() throws Exception {
+  void 'Can start with nothing configured'() {
     when(store.list()).thenReturn(Lists.newArrayList())
     underTest.doStart()
     assert !underTest.browse()
   }
 
   @Test
-  public void 'Can start with existing configuration'() throws Exception {
+  void 'Can start with existing configuration'() {
     BlobStore blobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfiguration))
     when(store.list()).thenReturn(Lists.newArrayList(createConfig('test', temporaryFolder.root.absolutePath)))
@@ -73,7 +73,7 @@ class BlobStoreManagerImplTest
   }
 
   @Test
-  public void 'Can create a BlobStore'() throws Exception {
+  void 'Can create a BlobStore'() {
     BlobStore blobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfiguration))
     BlobStoreConfiguration configuration = createConfig('test',temporaryFolder.root.absolutePath)
@@ -88,7 +88,7 @@ class BlobStoreManagerImplTest
   }
 
   @Test
-  public void 'Can delete an existing BlobStore'() throws Exception {
+  void 'Can delete an existing BlobStore'() {
     BlobStoreConfiguration configuration = createConfig('test', temporaryFolder.root.absolutePath)
     BlobStore blobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).blobStore('test')
@@ -101,7 +101,7 @@ class BlobStoreManagerImplTest
   }
   
   @Test
-  public void 'BlobStores will be eagerly created if not already configured'() {
+  void 'BlobStores will be eagerly created if not already configured'() {
     BlobStore blobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfiguration))
     BlobStore autoCreatedBlobStore = underTest.get('test')

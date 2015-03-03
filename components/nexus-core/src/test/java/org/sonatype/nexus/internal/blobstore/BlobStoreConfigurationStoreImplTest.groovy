@@ -3,7 +3,7 @@
  * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
- * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * This program and the accompanying materials are made available under the terms of the Eclipse License Version 1.0,
  * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
  *
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
@@ -30,7 +30,7 @@ class BlobStoreConfigurationStoreImplTest
 {
 
   @Rule
-  public DatabaseInstanceRule database = new DatabaseInstanceRule('test')
+  DatabaseInstanceRule database = new DatabaseInstanceRule('test')
 
   private BlobStoreConfigurationStoreImpl underTest
 
@@ -49,12 +49,12 @@ class BlobStoreConfigurationStoreImplTest
   }
 
   @Test
-  public void 'Can create a new BlobStoreConfiguration'() throws Exception {
+  void 'Can create a new BlobStoreConfiguration'() {
     createConfig()
   }
 
   @Test
-  public void 'Can list the persisted configurations'() throws Exception {
+  void 'Can list the persisted configurations'() {
     BlobStoreConfiguration entity = createConfig()
     List<BlobStoreConfiguration> list = underTest.list()
     assert list.size() == 1
@@ -63,7 +63,7 @@ class BlobStoreConfigurationStoreImplTest
   }
 
   @Test
-  public void 'Can delete an existing BlobStoreConfiguration'() throws Exception {
+  void 'Can delete an existing BlobStoreConfiguration'() {
     BlobStoreConfiguration entity = createConfig()
     assert underTest.list()
     underTest.delete(entity)
@@ -71,7 +71,7 @@ class BlobStoreConfigurationStoreImplTest
   }
 
   @Test
-  public void 'Names are unique'() throws Exception {
+  void 'Names are unique'() {
     BlobStoreConfiguration entity = createConfig()
 
     try {
@@ -84,7 +84,7 @@ class BlobStoreConfigurationStoreImplTest
   }
 
   @Test
-  public void 'Paths are unique'() throws Exception {
+  void 'Paths are unique'() {
     BlobStoreConfiguration entity = createConfig()
 
     try {
