@@ -15,11 +15,13 @@ package org.sonatype.nexus.proxy.item;
 import java.io.InputStream;
 import java.security.MessageDigest;
 
+import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.proxy.RequestContext;
-import org.sonatype.nexus.util.DigesterUtils;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -27,7 +29,7 @@ public class ChecksummingContentLocatorTest
 {
   private static final String CONTENT = "This is a test that checksumming content locators can be re-used";
   
-  private static final Object DIGEST = DigesterUtils.getSha1Digest(CONTENT);
+  private static final Object DIGEST = HashAlgorithm.SHA1.function().hashString(CONTENT, Charsets.UTF_8).toString();
 
   @Test
   public void testCanReuseChecksummingContentLocator() throws Exception {
