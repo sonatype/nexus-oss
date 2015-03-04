@@ -13,80 +13,105 @@
 package org.sonatype.nexus.ldap.internal.persist;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.sonatype.nexus.ldap.internal.LdapTestSupport;
+import org.sonatype.nexus.ldap.internal.MockLdapConfigurationSource;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection;
+import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Host;
+import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Protocol;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
-import org.sonatype.nexus.security.realm.MemoryRealmConfigurationStore;
-import org.sonatype.nexus.security.realm.RealmConfigurationStore;
+import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
+import org.sonatype.nexus.ldap.internal.persist.entity.Validator;
 import org.sonatype.nexus.security.realm.RealmManager;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import com.google.common.collect.Maps;
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import org.junit.After;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.shiro.codec.Base64;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LdapSecurityConfigurationManagerTest
-    extends LdapTestSupport
+import static org.apache.shiro.codec.CodecSupport.PREFERRED_ENCODING;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+
+/**
+ * Tests for {@link DefaultLdapConfigurationManager}.
+ */
+public class DefaultLdapConfigurationManagerTest
+    extends TestSupport
 {
-  @Override
-  protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
-    return Maps.newLinkedHashMap();
-  }
-
-  // HACK: This test fixture doesn't properly manage injected component lifecycles
-  // HACK: So we have to do a bullshit dance to make the test work properly
-
-  @Override
-  protected void customizeModules(final List<Module> modules) {
-    modules.add(new Module() {
-      @Override
-      public void configure(final Binder binder) {
-        binder.bind(RealmConfigurationStore.class).to(MemoryRealmConfigurationStore.class);
-      }
-    });
-    super.customizeModules(modules);
-  }
-
-  // HACK: Not using setUp/tearDown here as super-class has non-standard names due to never migrating fully to junit4
+  private DefaultLdapConfigurationManager underTest;
 
   @Before
-  public void startRealmManager() throws Exception {
-    lookup(RealmManager.class).start();
+  public void setUp() throws Exception {
+    underTest = new DefaultLdapConfigurationManager(
+        new MockLdapConfigurationSource(),
+        new Validator(),
+        mock(EventBus.class),
+        mock(RealmManager.class)
+    );
   }
 
-  @After
-  public void stopRealmManager() throws Exception {
-    try {
-      lookup(RealmManager.class).stop();
-    }
-    catch (Exception e) {
-      util.getLog().warn("Failed to stop realm-manager", e);
-    }
+  private static String encodeBase64(final String value) throws Exception {
+    return Base64.encodeToString(value.getBytes(PREFERRED_ENCODING));
+  }
+
+  private Mapping buildUserAndGroupAuthConfiguration() {
+    final Mapping userGroupConf = new Mapping();
+    userGroupConf.setUserMemberOfAttribute("userMemberOfAttribute");
+    userGroupConf.setGroupBaseDn("groupBaseDn");
+    userGroupConf.setGroupIdAttribute("groupIdAttribute");
+    userGroupConf.setGroupMemberAttribute("groupMemberAttribute");
+    userGroupConf.setGroupMemberFormat("groupMemberFormat");
+    userGroupConf.setGroupObjectClass("groupObjectClass");
+    userGroupConf.setLdapGroupsAsRoles(true);
+    userGroupConf.setEmailAddressAttribute("emailAddressAttribute");
+    userGroupConf.setUserBaseDn("userBaseDn");
+    userGroupConf.setUserIdAttribute("userIdAttribute");
+    userGroupConf.setUserObjectClass("userObjectClass");
+    userGroupConf.setUserPasswordAttribute("userPasswordAttribute");
+    userGroupConf.setUserRealNameAttribute("userRealNameAttribute");
+    userGroupConf.setUserSubtree(true);
+    return userGroupConf;
+  }
+
+  private Connection buildConnectionInfo() throws Exception {
+    Connection connInfo = new Connection();
+    connInfo.setAuthScheme("ldap");
+    connInfo.setBackupHost(new Host(Protocol.ldap, "backupHost", 11111));
+    connInfo.setMaxIncidentsCount(3);
+    connInfo.setConnectionRetryDelay(300);
+    connInfo.setConnectionTimeout(15);
+    connInfo.setHost(new Host(Protocol.ldap, "localhost", 386));
+    connInfo.setSaslRealm("");
+    connInfo.setSearchBase("ou=searchbase");
+    connInfo.setSystemPassword(encodeBase64("systemPassword"));
+    connInfo.setSystemUsername(encodeBase64("systemUsername"));
+    return connInfo;
+  }
+
+  private void compareConfiguration(LdapConfiguration expected, LdapConfiguration actual) throws Exception {
+    // FIXME: The use of object-mapper here is completly unused?!
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String expectedString = objectMapper.writeValueAsString(expected);
+    final String actualString = objectMapper.writeValueAsString(actual);
+    assertThat(expected, equalTo(actual));
   }
 
   @Test
-  public void testGetConfig()
-      throws Exception
-  {
-    LdapConfigurationManager ldapConfigManager = this.lookup(LdapConfigurationManager.class);
-    List<LdapConfiguration> ldapServers = ldapConfigManager.listLdapServerConfigurations();
+  public void testGetConfig() throws Exception {
+    List<LdapConfiguration> ldapServers = underTest.listLdapServerConfigurations();
     Assert.assertNotNull(ldapServers);
     Assert.assertEquals(0, ldapServers.size());
   }
 
   @Test
-  public void testNotFoundServer()
-      throws Exception
-  {
-    LdapConfigurationManager ldapConfigManager = this.lookup(LdapConfigurationManager.class);
+  public void testNotFoundServer() throws Exception {
     try {
-      ldapConfigManager.getLdapServerConfiguration("INVALID_SERVER_NAME_AAAAA");
+      underTest.getLdapServerConfiguration("INVALID_SERVER_NAME_AAAAA");
       Assert.fail("expected LdapServerNotFoundException");
     }
     catch (LdapServerNotFoundException e) {
@@ -95,11 +120,7 @@ public class LdapSecurityConfigurationManagerTest
   }
 
   @Test
-  public void testAddAndGetServer()
-      throws Exception
-  {
-    LdapConfigurationManager ldapConfigManager = this.lookup(LdapConfigurationManager.class);
-
+  public void testAddAndGetServer() throws Exception {
     LdapConfiguration serverConfig = new LdapConfiguration();
     serverConfig.setName("testAddAndGetServer-name");
 
@@ -107,8 +128,8 @@ public class LdapSecurityConfigurationManagerTest
     serverConfig.setConnection(connInfo);
     serverConfig.setMapping(this.buildUserAndGroupAuthConfiguration());
 
-    final String id = ldapConfigManager.addLdapServerConfiguration(serverConfig);
-    LdapConfiguration result = ldapConfigManager.getLdapServerConfiguration(id);
+    final String id = underTest.addLdapServerConfiguration(serverConfig);
+    LdapConfiguration result = underTest.getLdapServerConfiguration(id);
     Assert.assertNotNull(result);
 
     // compare the results
@@ -116,11 +137,7 @@ public class LdapSecurityConfigurationManagerTest
   }
 
   @Test
-  public void testUpdateServer()
-      throws Exception
-  {
-    LdapConfigurationManager ldapConfigManager = this.lookup(LdapConfigurationManager.class);
-
+  public void testUpdateServer() throws Exception {
     LdapConfiguration serverConfig = new LdapConfiguration();
     serverConfig.setName("testUpdateServer-name");
 
@@ -128,7 +145,7 @@ public class LdapSecurityConfigurationManagerTest
     serverConfig.setMapping(this.buildUserAndGroupAuthConfiguration());
 
     // add the server
-    final String id = ldapConfigManager.addLdapServerConfiguration(serverConfig);
+    final String id = underTest.addLdapServerConfiguration(serverConfig);
 
     // NOT the same instance!
     serverConfig = new LdapConfiguration();
@@ -142,10 +159,10 @@ public class LdapSecurityConfigurationManagerTest
     serverConfig.getConnection().setAuthScheme("newScheme");
     serverConfig.getMapping().setUserBaseDn("newuserBaseDn");
     // save the updated one
-    ldapConfigManager.updateLdapServerConfiguration(serverConfig);
+    underTest.updateLdapServerConfiguration(serverConfig);
 
     // get the config
-    LdapConfiguration result = ldapConfigManager.getLdapServerConfiguration(id);
+    LdapConfiguration result = underTest.getLdapServerConfiguration(id);
 
     // manual check a couple things
     Assert.assertEquals(id + "newName", result.getName());
@@ -156,16 +173,11 @@ public class LdapSecurityConfigurationManagerTest
     this.compareConfiguration(serverConfig, result);
 
     // make sure there is only the one item
-    Assert.assertEquals(1, ldapConfigManager.listLdapServerConfigurations().size());
-
+    Assert.assertEquals(1, underTest.listLdapServerConfigurations().size());
   }
 
   @Test
-  public void testDeleteServer()
-      throws Exception
-  {
-    LdapConfigurationManager ldapConfigManager = this.lookup(LdapConfigurationManager.class);
-
+  public void testDeleteServer() throws Exception {
     LdapConfiguration serverConfig = new LdapConfiguration();
     serverConfig.setName("testDeleteServer-name");
 
@@ -173,11 +185,11 @@ public class LdapSecurityConfigurationManagerTest
     serverConfig.setConnection(connInfo);
     serverConfig.setMapping(this.buildUserAndGroupAuthConfiguration());
 
-    final String id = ldapConfigManager.addLdapServerConfiguration(serverConfig);
-    ldapConfigManager.deleteLdapServerConfiguration(id);
+    final String id = underTest.addLdapServerConfiguration(serverConfig);
+    underTest.deleteLdapServerConfiguration(id);
 
     try {
-      ldapConfigManager.getLdapServerConfiguration(id);
+      underTest.getLdapServerConfiguration(id);
       Assert.fail("Expected LdapServerNotFoundException");
     }
     catch (LdapServerNotFoundException e) {
@@ -186,12 +198,9 @@ public class LdapSecurityConfigurationManagerTest
   }
 
   @Test
-  public void testDeleteNotFoundServer()
-      throws Exception
-  {
-    LdapConfigurationManager ldapConfigManager = this.lookup(LdapConfigurationManager.class);
+  public void testDeleteNotFoundServer() throws Exception {
     try {
-      ldapConfigManager.deleteLdapServerConfiguration("A_MISSING_ID");
+      underTest.deleteLdapServerConfiguration("A_MISSING_ID");
       Assert.fail("Expected LdapServerNotFoundException");
     }
     catch (LdapServerNotFoundException e) {
@@ -200,35 +209,31 @@ public class LdapSecurityConfigurationManagerTest
   }
 
   @Test
-  public void testSetServerOrder()
-      throws Exception
-  {
-    LdapConfigurationManager ldapConfigurationManager = this.lookup(LdapConfigurationManager.class);
-
+  public void testSetServerOrder() throws Exception {
     // add 2 ldapServers
     LdapConfiguration ldapServer1 = new LdapConfiguration();
     ldapServer1.setName("testSuccess1");
     ldapServer1.setConnection(this.buildConnectionInfo());
     ldapServer1.setMapping(this.buildUserAndGroupAuthConfiguration());
-    ldapConfigurationManager.addLdapServerConfiguration(ldapServer1);
+    underTest.addLdapServerConfiguration(ldapServer1);
 
     LdapConfiguration ldapServer2 = new LdapConfiguration();
     ldapServer2.setName("testSuccess2");
     ldapServer2.setConnection(this.buildConnectionInfo());
     ldapServer2.setMapping(this.buildUserAndGroupAuthConfiguration());
-    ldapConfigurationManager.addLdapServerConfiguration(ldapServer2);
+    underTest.addLdapServerConfiguration(ldapServer2);
 
     LdapConfiguration ldapServer3 = new LdapConfiguration();
     ldapServer3.setName("testSuccess3");
     ldapServer3.setConnection(this.buildConnectionInfo());
     ldapServer3.setMapping(this.buildUserAndGroupAuthConfiguration());
-    ldapConfigurationManager.addLdapServerConfiguration(ldapServer3);
+    underTest.addLdapServerConfiguration(ldapServer3);
 
     LdapConfiguration ldapServer4 = new LdapConfiguration();
     ldapServer4.setName("testSuccess4");
     ldapServer4.setConnection(this.buildConnectionInfo());
     ldapServer4.setMapping(this.buildUserAndGroupAuthConfiguration());
-    ldapConfigurationManager.addLdapServerConfiguration(ldapServer4);
+    underTest.addLdapServerConfiguration(ldapServer4);
 
     // the order at this point is 1, 2, 3, 4
     // we will change it to 3, 1, 4, 2
@@ -238,14 +243,13 @@ public class LdapSecurityConfigurationManagerTest
     newOrder.add(ldapServer4.getId());
     newOrder.add(ldapServer2.getId());
 
-    ldapConfigurationManager.setServerOrder(newOrder);
+    underTest.setServerOrder(newOrder);
 
     // check for the same order as above
-    List<LdapConfiguration> ldapServers = ldapConfigurationManager.listLdapServerConfigurations();
+    List<LdapConfiguration> ldapServers = underTest.listLdapServerConfigurations();
     Assert.assertEquals(ldapServers.get(0).getId(), ldapServer3.getId());
     Assert.assertEquals(ldapServers.get(1).getId(), ldapServer1.getId());
     Assert.assertEquals(ldapServers.get(2).getId(), ldapServer4.getId());
     Assert.assertEquals(ldapServers.get(3).getId(), ldapServer2.getId());
   }
-
 }
