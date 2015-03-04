@@ -10,11 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.maven.tasks;
+package org.sonatype.nexus.index.releaseremover;
 
 import java.util.Collection;
 
-import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.index.AbstractIndexerManagerTest;
+import org.sonatype.nexus.index.IndexerManager;
+import org.sonatype.nexus.maven.tasks.ReleaseRemovalRequest;
+import org.sonatype.nexus.maven.tasks.ReleaseRemovalResult;
+import org.sonatype.nexus.maven.tasks.ReleaseRemover;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.OpenAccessManager;
@@ -38,16 +42,18 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 
 /**
- * @since 2.5
+ * @since 2.11.3
  */
-public class DefaultReleaseRemoverIT
-    extends AbstractMavenRepoContentTests
+public class IndexReleaseRemoverIT
+    extends AbstractIndexerManagerTest
 {
-  // we have no index backend available here!
-  private static final boolean INDEX_BACKEND = false;
+  // we test the index only
+  private static final boolean INDEX_BACKEND = true;
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
+
+  private IndexerManager indexerManager;
 
   private ReleaseRemover releaseRemover;
 
@@ -57,6 +63,15 @@ public class DefaultReleaseRemoverIT
   {
     super.setUp();
     releaseRemover = lookup(ReleaseRemover.class);
+    indexerManager = lookup(IndexerManager.class);
+  }
+
+  @Override
+  public void fillInRepo()
+      throws Exception
+  {
+    super.fillInRepo();
+    indexerManager.reindexRepository(null, releases.getId(), true);
   }
 
   @Test

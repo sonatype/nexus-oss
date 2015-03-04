@@ -47,8 +47,9 @@ public class ReleaseRemoverTask
     int numberOfVersionsToKeep = Integer.parseInt(
         getParameter(ReleaseRemovalTaskDescriptor.NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID));
     String targetId = getParameter(ReleaseRemovalTaskDescriptor.REPOSITORY_TARGET_FIELD_ID);
+    boolean indexBackend = Boolean.valueOf(getParameter(ReleaseRemovalTaskDescriptor.INDEX_BACKEND));
     return releaseRemover.removeReleases(
-        new ReleaseRemovalRequest(getRepositoryId(), numberOfVersionsToKeep, targetId));
+        new ReleaseRemovalRequest(getRepositoryId(), numberOfVersionsToKeep, indexBackend, targetId));
   }
 
   @Override

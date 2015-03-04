@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
@@ -24,10 +28,16 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
 import org.sonatype.nexus.proxy.walker.Walker;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import com.google.common.collect.Maps;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -37,8 +47,18 @@ import static org.mockito.Mockito.when;
 /**
  * @since 2.5
  */
-public class DefaultReleaseRemoverTest
+@RunWith(Parameterized.class)
+public class DefaultReleaseRemoverTest extends TestSupport
 {
+  @Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][]{
+        {false}, {true}
+    });
+  }
+
+  @Parameter
+  public boolean indexBackend;
 
   public static final String REPO_ID = "foo";
 
@@ -67,8 +87,9 @@ public class DefaultReleaseRemoverTest
     when(proxyRepositoryKind.isFacetAvailable(ProxyRepository.class)).thenReturn(true);
 
     thrown.expect(IllegalArgumentException.class);
-    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, mock(Walker.class), MAVEN_2_CONTENT_CLASS)
-        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, null));
+    final Map<String, ReleaseRemoverBackend> backendMap = Maps.newHashMap();
+    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, MAVEN_2_CONTENT_CLASS, backendMap)
+        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, indexBackend, null));
   }
 
   @Test
@@ -83,8 +104,9 @@ public class DefaultReleaseRemoverTest
     when(repository.getRepositoryContentClass()).thenReturn(MAVEN_1_CONTENT_CLASS);
 
     thrown.expect(IllegalArgumentException.class);
-    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, mock(Walker.class), MAVEN_2_CONTENT_CLASS)
-        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, null));
+    final Map<String, ReleaseRemoverBackend> backendMap = Maps.newHashMap();
+    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, MAVEN_2_CONTENT_CLASS, backendMap)
+        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, indexBackend, null));
   }
 
   @Test
@@ -101,8 +123,9 @@ public class DefaultReleaseRemoverTest
     when(repository.getLocalStatus()).thenReturn(LocalStatus.OUT_OF_SERVICE);
 
     thrown.expect(IllegalArgumentException.class);
-    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, mock(Walker.class), MAVEN_2_CONTENT_CLASS)
-        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, null));
+    final Map<String, ReleaseRemoverBackend> backendMap = Maps.newHashMap();
+    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, MAVEN_2_CONTENT_CLASS, backendMap)
+        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, indexBackend, null));
   }
 
   @Test
@@ -121,8 +144,9 @@ public class DefaultReleaseRemoverTest
     when(repositoryKind.isFacetAvailable(GroupRepository.class)).thenReturn(true);
 
     thrown.expect(IllegalArgumentException.class);
-    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, mock(Walker.class), MAVEN_2_CONTENT_CLASS)
-        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, null));
+    final Map<String, ReleaseRemoverBackend> backendMap = Maps.newHashMap();
+    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, MAVEN_2_CONTENT_CLASS, backendMap)
+        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, indexBackend, null));
   }
 
   @Test
@@ -144,8 +168,9 @@ public class DefaultReleaseRemoverTest
     when(mavenRepository.getRepositoryPolicy()).thenReturn(RepositoryPolicy.SNAPSHOT);
 
     thrown.expect(IllegalArgumentException.class);
-    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, mock(Walker.class), MAVEN_2_CONTENT_CLASS)
-        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, null));
+    final Map<String, ReleaseRemoverBackend> backendMap = Maps.newHashMap();
+    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, MAVEN_2_CONTENT_CLASS, backendMap)
+        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, indexBackend, null));
   }
 
   @Test
@@ -167,8 +192,9 @@ public class DefaultReleaseRemoverTest
     when(mavenRepository.getRepositoryPolicy()).thenReturn(RepositoryPolicy.MIXED);
 
     thrown.expect(IllegalArgumentException.class);
-    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, mock(Walker.class), MAVEN_2_CONTENT_CLASS)
-        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, null));
+    final Map<String, ReleaseRemoverBackend> backendMap = Maps.newHashMap();
+    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, MAVEN_2_CONTENT_CLASS, backendMap)
+        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, indexBackend, null));
   }
 
   @Test
@@ -183,8 +209,9 @@ public class DefaultReleaseRemoverTest
     when(targetRegistry.getRepositoryTarget(TARGET_ID)).thenReturn(null);
 
     thrown.expect(IllegalStateException.class);
-    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, mock(Walker.class), MAVEN_2_CONTENT_CLASS)
-        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, TARGET_ID));
+    final Map<String, ReleaseRemoverBackend> backendMap = Maps.newHashMap();
+    new DefaultReleaseRemover(repositoryRegistry, targetRegistry, MAVEN_2_CONTENT_CLASS, backendMap)
+        .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, indexBackend, TARGET_ID));
   }
 
   @Test
@@ -209,9 +236,12 @@ public class DefaultReleaseRemoverTest
 
     when(mavenRepository.getLocalStatus()).thenReturn(LocalStatus.IN_SERVICE);
 
+    final Map<String, ReleaseRemoverBackend> backendMap = Maps.newHashMap();
+    backendMap.put(ReleaseRemoverBackend.WALKER, mock(ReleaseRemoverBackend.class));
+    backendMap.put(ReleaseRemoverBackend.INDEX, mock(ReleaseRemoverBackend.class));
     ReleaseRemovalResult releaseRemovalResult =
-        new DefaultReleaseRemover(repositoryRegistry, targetRegistry, mock(Walker.class), MAVEN_2_CONTENT_CLASS)
-            .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, ""));
+        new DefaultReleaseRemover(repositoryRegistry, targetRegistry, MAVEN_2_CONTENT_CLASS, backendMap)
+            .removeReleases(new ReleaseRemovalRequest(REPO_ID, 1, indexBackend, ""));
     assertThat("Default state until after a 'real' walk should be failed", releaseRemovalResult.isSuccessful(),
         is(false));
     assertThat(releaseRemovalResult.getDeletedFileCount(), is(0));
