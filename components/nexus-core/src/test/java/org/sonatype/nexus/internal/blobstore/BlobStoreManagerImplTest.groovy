@@ -38,7 +38,7 @@ class BlobStoreManagerImplTest
 {
 
   @Rule
-  TemporaryFolder temporaryFolder = new TemporaryFolder()
+  public TemporaryFolder temporaryFolder = new TemporaryFolder()
 
   @Mock
   ApplicationDirectories directories

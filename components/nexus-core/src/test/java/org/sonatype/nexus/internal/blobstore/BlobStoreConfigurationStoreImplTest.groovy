@@ -30,7 +30,7 @@ class BlobStoreConfigurationStoreImplTest
 {
 
   @Rule
-  DatabaseInstanceRule database = new DatabaseInstanceRule('test')
+  public DatabaseInstanceRule database = new DatabaseInstanceRule('test')
 
   private BlobStoreConfigurationStoreImpl underTest
 
