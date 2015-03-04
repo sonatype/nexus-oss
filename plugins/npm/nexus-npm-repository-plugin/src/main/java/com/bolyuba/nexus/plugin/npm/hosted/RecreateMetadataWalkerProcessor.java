@@ -184,7 +184,7 @@ public class RecreateMetadataWalkerProcessor
           log.debug("tarEntry={}, name={}", tarEntry.getName(), tarEntryName);
         }
       }
-      while (tarEntryName != null && !PACKAGE_JSON_PATH.equals(tarEntryName));
+      while (tarEntryName != null && !PACKAGE_JSON_PATH.equalsIgnoreCase(tarEntryName));
       // checks for corrupted data, we do want to report these
       checkArgument(tarEntryName != null, "Tar does not contains %s?", PACKAGE_JSON_PATH);
       checkArgument(tarEntry.isFile(), "Tar content %s not a file?", PACKAGE_JSON_PATH);
