@@ -58,6 +58,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.maven.tasks.descriptors.ReleaseRemovalTaskDescriptor.ID;
 
 /**
+ * Release remover based on {@link Walker} for repository crawling and collecting items to be removed.
+ *
  * @since 2.11.3
  */
 @Named(ReleaseRemoverBackend.WALKER)
@@ -86,9 +88,9 @@ public class WalkerReleaseRemoverBackend
   {
     TaskUtil.checkInterruption();
 
-    log.debug(
-        "Collecting deletable releases on repository '" + repository.getId() + "' from storage directory "
-            + repository.getLocalUrl());
+    log.debug("Collecting deletable releases on repository '{}' from storage directory {}",
+        repository.getId(),
+        repository.getLocalUrl());
 
     DefaultWalkerContext ctxMain =
         new DefaultWalkerContext(repository, new ResourceStoreRequest("/"),
@@ -126,11 +128,9 @@ public class WalkerReleaseRemoverBackend
 
     private final ReleaseRemovalRequest request;
 
-    private final Map<Version, List<StorageFileItem>> deletableVersionsAndFiles =
-        new HashMap<Version, List<StorageFileItem>>();
+    private final Map<Version, List<StorageFileItem>> deletableVersionsAndFiles = Maps.newHashMap();
 
-    private final Map<Gav, Map<Version, List<StorageFileItem>>> groupArtifactToVersions =
-        new HashMap<Gav, Map<Version, List<StorageFileItem>>>();
+    private final Map<Gav, Map<Version, List<StorageFileItem>>> groupArtifactToVersions = Maps.newHashMap();
 
     private final ReleaseRemovalResult result;
 
@@ -139,7 +139,8 @@ public class WalkerReleaseRemoverBackend
     private int deletedFiles = 0;
 
     private ReleaseRemovalWalkerProcessor(final MavenRepository repository,
-                                          final ReleaseRemovalRequest request, final ReleaseRemovalResult result,
+                                          final ReleaseRemovalRequest request,
+                                          final ReleaseRemovalResult result,
                                           final Target repositoryTarget)
     {
       this.repository = repository;

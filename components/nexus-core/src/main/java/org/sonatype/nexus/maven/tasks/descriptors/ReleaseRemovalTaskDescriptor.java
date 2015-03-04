@@ -53,7 +53,7 @@ public class ReleaseRemovalTaskDescriptor
       new RepoTargetComboFormField(REPOSITORY_TARGET_FIELD_ID, "Repository Target",
           "Select a repository target to apply", FormField.OPTIONAL),
       new CheckboxFormField(INDEX_BACKEND, "Use index",
-          "Removal should happen by crawling the repository (unchecked) or by using Maven Index?", FormField.MANDATORY)
+          "Use Maven Index to walk the repository? Defaults to crawling if unchecked", FormField.MANDATORY)
   );
 
   public String getId() {

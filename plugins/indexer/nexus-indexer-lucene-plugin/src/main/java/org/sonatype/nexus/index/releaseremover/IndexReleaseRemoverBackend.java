@@ -28,6 +28,7 @@ import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.index.DefaultIndexerManager.Runnable;
+import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.maven.tasks.ReleaseRemovalRequest;
 import org.sonatype.nexus.maven.tasks.ReleaseRemovalResult;
 import org.sonatype.nexus.maven.tasks.ReleaseRemoverBackend;
@@ -57,6 +58,10 @@ import org.apache.maven.index.expr.SourcedSearchExpression;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * Release remover based on {@link IndexerManager} and Maven Indexer for collecting items to be inspected for removal.
+ * Hence, depends on index state, and items not on index (for any reason), will not be considered for removal, nor will
+ * participate in number of versions to keep calculations.
+ *
  * @since 2.11.3
  */
 @Named(ReleaseRemoverBackend.INDEX)
@@ -85,8 +90,9 @@ public class IndexReleaseRemoverBackend
   {
     TaskUtil.checkInterruption();
 
+    int deletedFiles = 0;
+    boolean successful = true; // be optimistic
     try {
-      int deletedFiles = 0;
       // collect all known groupIds
       final Set<String> groupIds = Sets.newHashSet();
       indexerManager.shared(repository, new Runnable()
@@ -152,19 +158,20 @@ public class IndexReleaseRemoverBackend
                 deletedFiles += deleted;
               }
               catch (Exception e) {
+                successful = false;
                 log.warn("Could not delete {}:{}:{} in {}, skipping it", groupId, artifactId, version, repository, e);
               }
             }
           }
         }
       }
-      result.setDeletedFileCount(deletedFiles);
-      result.setSuccessful(true);
     }
     catch (NoSuchRepositoryException e) {
       // repository removed/put out of service during run? abort
       log.warn("Repository {} unavailable, bailing out", repository, e);
     }
+    result.setDeletedFileCount(deletedFiles);
+    result.setSuccessful(successful);
   }
 
   /**

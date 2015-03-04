@@ -48,7 +48,7 @@ public class IndexReleaseRemoverIT
     extends AbstractIndexerManagerTest
 {
   // we test the index only
-  public static final boolean indexBackend = true;
+  private static final boolean INDEX_BACKEND = true;
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -81,7 +81,7 @@ public class IndexReleaseRemoverIT
     fillInRepo();
     ((AbstractRepository) releases).setAccessManager(new OpenAccessManager());
     ReleaseRemovalResult releaseRemovalResult =
-        releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, indexBackend, ""));
+        releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, INDEX_BACKEND, ""));
     // pom + jar + sha1 for both
     assertThat(releaseRemovalResult.getDeletedFileCount(), is(6));
     assertThat(releaseRemovalResult.isSuccessful(), is(true));
@@ -108,7 +108,7 @@ public class IndexReleaseRemoverIT
         new Target("test", "test", new Maven2ContentClass(), Lists.newArrayList(".*/org/sonatype/.*")));
     targetRegistry.commitChanges();
     ReleaseRemovalResult releaseRemovalResult =
-        releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, indexBackend, "test"));
+        releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, INDEX_BACKEND, "test"));
     assertThat(releaseRemovalResult.getDeletedFileCount(), is(6));
     assertThat(releaseRemovalResult.isSuccessful(), is(true));
   }
@@ -123,7 +123,7 @@ public class IndexReleaseRemoverIT
         new Target("test", "test", new Maven2ContentClass(), Lists.newArrayList(".*/com/sonatype/.*")));
     targetRegistry.commitChanges();
     ReleaseRemovalResult releaseRemovalResult =
-        releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, indexBackend, "test"));
+        releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, INDEX_BACKEND, "test"));
     assertThat(releaseRemovalResult.getDeletedFileCount(), is(0));
     assertThat(releaseRemovalResult.isSuccessful(), is(true));
     try {
@@ -139,7 +139,7 @@ public class IndexReleaseRemoverIT
       throws Exception
   {
     thrown.expect(IllegalStateException.class);
-    releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, indexBackend, "test"));
+    releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, INDEX_BACKEND, "test"));
   }
 
 
@@ -150,7 +150,7 @@ public class IndexReleaseRemoverIT
     fillInRepo();
     ((AbstractRepository) releases).setAccessManager(new OpenAccessManager());
     ReleaseRemovalResult releaseRemovalResult =
-        releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, indexBackend, "3"));
+        releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, INDEX_BACKEND, "3"));
     // pom + jar + sha1 for both, but sources jar and associated sha1 should be left alone
     assertThat(releaseRemovalResult.getDeletedFileCount(), is(4));
     assertThat(releaseRemovalResult.isSuccessful(), is(true));

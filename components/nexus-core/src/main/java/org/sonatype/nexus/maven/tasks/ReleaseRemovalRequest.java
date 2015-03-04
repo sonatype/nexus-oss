@@ -27,24 +27,24 @@ public class ReleaseRemovalRequest
 
   private final int numberOfVersionsToKeep;
 
-  private final boolean indexBackend;
+  private final boolean useIndex;
 
   private final String targetId;
 
   /**
    * @param repositoryId           the repository to target
    * @param numberOfVersionsToKeep the number of released versions to keep for Group/Artifact in the repository
-   * @param indexBackend           use index instead of walker
+   * @param useIndex               use index instead of walker
    * @param targetId               (optional) Repository Target id to be applied
    */
   public ReleaseRemovalRequest(final String repositoryId,
                                final int numberOfVersionsToKeep,
-                               final boolean indexBackend,
+                               final boolean useIndex,
                                final @Nullable String targetId)
   {
     this.repositoryId = checkNotNull(repositoryId);
     this.numberOfVersionsToKeep = checkNotNull(numberOfVersionsToKeep);
-    this.indexBackend = indexBackend;
+    this.useIndex = useIndex;
     this.targetId = targetId;
   }
 
@@ -56,10 +56,11 @@ public class ReleaseRemovalRequest
     return numberOfVersionsToKeep;
   }
 
-  public boolean isIndexBackend() {
-    return indexBackend;
+  public boolean isUseIndex() {
+    return useIndex;
   }
 
+  @Nullable
   public String getTargetId() {
     return targetId;
   }

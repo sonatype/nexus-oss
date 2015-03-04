@@ -128,7 +128,7 @@ public class DefaultReleaseRemover
 
     try {
       final ReleaseRemoverBackend backend;
-      if (request.isIndexBackend()) {
+      if (request.isUseIndex()) {
         backend = checkNotNull(backends.get(ReleaseRemoverBackend.INDEX), "Index backend not found");
       }
       else {
