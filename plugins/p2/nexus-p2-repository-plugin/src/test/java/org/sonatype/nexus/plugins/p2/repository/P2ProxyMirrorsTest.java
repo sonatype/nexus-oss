@@ -28,8 +28,6 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.templates.TemplateProvider;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -39,12 +37,6 @@ public class P2ProxyMirrorsTest
 {
 
   private P2ProxyRepository repository;
-
-  @Override
-  protected void customizeContainerConfiguration(final ContainerConfiguration configuration) {
-    super.customizeContainerConfiguration(configuration);
-    configuration.setClassPathScanning(PlexusConstants.SCANNING_ON);
-  }
 
   @Override
   public void setUp()

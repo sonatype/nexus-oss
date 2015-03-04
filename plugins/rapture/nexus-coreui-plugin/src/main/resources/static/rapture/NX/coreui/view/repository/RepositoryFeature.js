@@ -24,20 +24,13 @@ Ext.define('NX.coreui.view.repository.RepositoryFeature', {
     'NX.I18n'
   ],
 
-  iconName: 'repository-default',
+  iconName: 'repositorycma-default',
 
   masters: { xtype: 'nx-coreui-repository-list' },
 
-  tabs: [
-    { xtype: 'nx-coreui-repository-settings', title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_TAB'), weight: 10 }
-  ],
+  tabs: { xtype: 'nx-coreui-repository-settings' },
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
-    { xtype: 'button', text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_MORE_BUTTON'), glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more',
-      menu: []
-    },
-    '-',
-    { xtype: 'button', text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_BROWSE_BUTTON'), glyph: 'xf0e8@FontAwesome' /* fa-sitemap */, action: 'browse' }
+    { xtype: 'button', text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ]
 });

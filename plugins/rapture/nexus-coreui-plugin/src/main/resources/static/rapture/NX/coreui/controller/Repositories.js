@@ -20,12 +20,8 @@
 Ext.define('NX.coreui.controller.Repositories', {
   extend: 'NX.controller.Drilldown',
   requires: [
-    'Ext.direct.Manager',
-    'NX.util.Url',
-    'NX.Conditions',
     'NX.Dialogs',
     'NX.Messages',
-    'NX.Bookmarks',
     'NX.Permissions',
     'NX.I18n'
   ],
@@ -33,41 +29,27 @@ Ext.define('NX.coreui.controller.Repositories', {
   masters: 'nx-coreui-repository-list',
 
   models: [
-    'Repository'
+    'NX.coreui.store.Repository'
   ],
   stores: [
-    'Repository',
-    'RepositoryTemplate'
+    'NX.coreui.store.Repository',
+    'RepositoryRecipe'
   ],
   views: [
-    'repository.RepositoryAddGroup',
-    'repository.RepositoryAddHosted',
-    'repository.RepositoryAddHostedMaven',
-    'repository.RepositoryAddProxy',
-    'repository.RepositoryAddProxyMaven',
-    'repository.RepositoryAddVirtual',
+    'repository.RepositoryAdd',
     'repository.RepositoryFeature',
     'repository.RepositoryList',
-    'repository.RepositorySelectTemplate',
     'repository.RepositorySettings',
-    'repository.RepositorySettingsCommon',
-    'repository.RepositorySettingsGroupForm',
-    'repository.RepositorySettingsHostedForm',
-    'repository.RepositorySettingsHostedMavenForm',
-    'repository.RepositorySettingsLocalStorage',
-    'repository.RepositorySettingsProxyForm',
-    'repository.RepositorySettingsProxyMavenForm',
-    'repository.RepositorySettingsVirtualForm'
+    'repository.RepositorySettingsForm'
   ],
   refs: [
     { ref: 'feature', selector: 'nx-coreui-repository-feature' },
     { ref: 'list', selector: 'nx-coreui-repository-list' },
-    { ref: 'settings', selector: 'nx-coreui-repository-settings' },
-    { ref: 'selectTemplate', selector: 'nx-coreui-repository-selecttemplate' }
+    { ref: 'settings', selector: 'nx-coreui-repository-feature nx-coreui-repository-settings' }
   ],
   icons: {
-    'repository-default': {
-      file: 'database.png',
+    'repositorycma-default': {
+      file: 'database_green.png',
       variants: ['x16', 'x32']
     }
   },
@@ -78,7 +60,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     description: NX.I18n.get('ADMIN_REPOSITORIES_SUBTITLE'),
     view: { xtype: 'nx-coreui-repository-feature' },
     iconConfig: {
-      file: 'database.png',
+      file: 'database_green.png',
       variants: ['x16', 'x32']
     },
     visible: function() {
@@ -98,29 +80,18 @@ Ext.define('NX.coreui.controller.Repositories', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRelatedStores
-        },
-        '#State': {
-          receivingchanged: me.onStateReceivingChanged
+          refresh: me.loadRecipe
         }
       },
       component: {
         'nx-coreui-repository-list': {
-          beforerender: me.loadRelatedStores,
-          afterrender: me.startStatusPolling,
-          beforedestroy: me.stopStatusPolling
-        },
-        'nx-coreui-repository-feature button[action=browse]': {
-          click: me.navigateToBrowseMode
+          beforerender: me.loadRecipe
         },
         'nx-coreui-repository-list button[action=new]': {
-          click: me.showSelectTemplatePanel
+          click: me.showAddWindow
         },
         'nx-coreui-repository-settings-form': {
           submitted: me.onSettingsSubmitted
-        },
-        'nx-coreui-repository-selecttemplate': {
-          cellclick: me.showAddRepositoryPanel
         }
       }
     });
@@ -135,204 +106,37 @@ Ext.define('NX.coreui.controller.Repositories', {
 
   /**
    * @override
-   * Create & show settings panel for selected repository based on type/provider/format.
    */
   onSelection: function(list, model) {
-    var me = this,
-        moreButton = list.up('nx-feature-content').down('button[action=more]'),
-        settingsPanel = me.getSettings(),
-        settingsForm = settingsPanel.down('nx-settingsform'),
-        settingsFormClass, template;
+    var me = this;
 
     if (Ext.isDefined(model)) {
-      Ext.suspendLayouts();
-      me.fillMoreButtonMenu(moreButton, model);
-      template = {
-        type: model.get('type').toLowerCase(),
-        provider: model.get('provider'),
-        format: model.get('format')
-      };
-      settingsFormClass = me.findComponent('settings', template, true);
-      if (!settingsForm || settingsFormClass.xtype !== settingsForm.xtype) {
-        settingsPanel.removeAll();
-        settingsPanel.add({ xtype: settingsFormClass.xtype, template: template });
-      }
-      settingsPanel.loadRecord(model);
-
-      Ext.resumeLayouts(true);
+      me.getSettings().loadRecord(model);
     }
   },
 
   /**
    * @private
    */
-  showSelectTemplatePanel: function() {
+  showAddWindow: function() {
     var me = this,
-      feature = me.getFeature();
+        feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TITLE'));
-    me.loadCreateWizard(1, true, Ext.widget({
-      xtype: 'panel',
-      layout: {
-        type: 'vbox',
-        align: 'stretch',
-        pack: 'start'
-      },
-      items: [
-        { xtype: 'nx-drilldown-actions' },
-        {
-          xtype: 'nx-coreui-repository-selecttemplate',
-          flex: 1
-        }
-      ]
-    }));
+    feature.setItemName(1, NX.I18n.get('ADMIN_REPOSITORIES_CREATE_TITLE'));
+    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-repository-add'));
   },
 
   /**
    * @private
    */
-  showAddRepositoryPanel: function(list, td, cellIndex, model) {
-    var me = this,
-      template = Ext.apply({}, model.data),
-      cmpClass = me.findComponent('add', template, false),
-      feature = me.getFeature();
-
-    if (cmpClass) {
-      // Show the second panel in the create wizard, and set the breadcrumb
-      feature.setItemName(2, NX.I18n.format('ADMIN_REPOSITORIES_CREATE_TITLE', template.providerName));
-      me.loadCreateWizard(2, true, cmpClass.create({ template: template }));
-    }
-  },
-
-  /**
-   * Add menu entries to 'More' button, based on current selected repository.
-   * @param {Ext.button.Button} button 'More' button
-   * @param {NX.coreui.model.Repository} model repository model
-   */
-  fillMoreButtonMenu: function(button, model) {
-    var me = this,
-        type = model.get('type'),
-        provider = model.get('provider'),
-        localStatus = model.get('localStatus'),
-        proxyMode = model.get('proxyMode'),
-        userManaged = model.get('userManaged');
-
-    me.removeMenuItem(button, 'expirecache');
-    if (NX.Conditions.isPermitted("nexus:cache", "delete")
-        && type !== 'virtual' && localStatus === 'IN_SERVICE' && userManaged) {
-      button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_EXPIRE_ITEM'), action: 'expirecache', handler: Ext.bind(me.expireCache, me, [model])
-      });
-    }
-
-    me.removeMenuItem(button, 'rebuildmetadata');
-    if (NX.Conditions.isPermitted("nexus:metadata", "delete")
-        && (provider === 'maven2' || provider === 'maven1')
-        && (type === 'hosted' || type === 'group') && localStatus === 'IN_SERVICE' && userManaged) {
-      button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_REBUILD_ITEM'), action: 'rebuildmetadata', handler: Ext.bind(me.rebuildMavenMetadata, me, [model])
-      });
-    }
-
-    me.removeMenuItem(button, 'blockproxy');
-    if (NX.Conditions.isPermitted("nexus:repostatus", "update")
-        && type === 'proxy' && proxyMode === 'ALLOW') {
-      button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_BLOCK_ITEM'), action: 'blockproxy', handler: Ext.bind(me.blockProxy, me, [model])
-      });
-    }
-
-    me.removeMenuItem(button, 'allowproxy');
-    if (NX.Conditions.isPermitted("nexus:repostatus", "update")
-        && type === 'proxy' && proxyMode !== 'ALLOW') {
-      button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_ALLOW_ITEM'), action: 'allowproxy', handler: Ext.bind(me.allowProxy, me, [model])
-      });
-    }
-
-    me.removeMenuItem(button, 'putoutofservice');
-    if (NX.Conditions.isPermitted("nexus:repostatus", "update")
-        && type !== 'group' && localStatus === 'IN_SERVICE') {
-      button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_POOS_ITEM'), action: 'putoutofservice', handler: Ext.bind(me.putOutOfService, me, [model])
-      });
-    }
-
-    me.removeMenuItem(button, 'putinservice');
-    if (NX.Conditions.isPermitted("nexus:repostatus", "update")
-        && type !== 'group' && localStatus !== 'IN_SERVICE') {
-      button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_PRIS_ITEM'), action: 'putinservice', handler: Ext.bind(me.putInService, me, [model])
-      });
-    }
-
-    me.removeMenuItem(button, 'repairindex');
-    me.removeMenuItem(button, 'updateindex');
-    if (NX.Conditions.isPermitted("nexus:index", "delete")
-        && (provider === 'maven2' || provider === 'maven1')
-        && type !== 'virtual') {
-      button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_REPAIR_ITEM'), action: 'repairindex', handler: Ext.bind(me.repairIndex, me, [model])
-      });
-      button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_UPDATE_ITEM'), action: 'updateindex', handler: Ext.bind(me.updateIndex, me, [model])
-      });
-    }
-  },
-
-  /**
-   * Removes from 'More' button, if present, menu item with specified action.
-   * @param {Ext.button.Button} button 'More' button
-   * @param actionName menu item action name to be removed
-   */
-  removeMenuItem: function(button, actionName) {
-    var menuItem;
-
-    menuItem = button.down('menuitem[action=' + actionName + ']');
-    if (menuItem) {
-      button.menu.remove(menuItem);
-    }
-  },
-
-  /**
-   * @private
-   * (Re)load repository status / template stores.
-   */
-  loadRelatedStores: function() {
+  loadRecipe: function() {
     var me = this,
         list = me.getList();
 
     if (list) {
-      me.getRepositoryTemplateStore().load();
-      NX.direct.coreui_Repository.readStatus(true, function(response) {
-        if (Ext.isObject(response) && response.success) {
-          me.updateRepositoryModels(response.data);
-        }
-      });
+      me.getRepositoryRecipeStore().load();
     }
-  },
-
-  /**
-   * @private
-   * Finds a component specific to action / template.
-   * @return {Ext.Class|*} class specific to action / template or undefined if none found
-   */
-  findComponent: function(action, template, findForm) {
-    var me = this,
-        suffix = findForm ? '-form' : '',
-        cmpName = 'widget.nx-repository-' + action + '-' + template.type + '-' + template.provider + suffix,
-        cmpClass;
-
-    cmpClass = Ext.ClassManager.getByAlias(cmpName);
-    if (!cmpClass) {
-      cmpClass = Ext.ClassManager.getByAlias('widget.nx-repository-' + action + '-' + template.type + suffix);
-    }
-    if (cmpClass) {
-      return cmpClass;
-    }
-    me.logWarn('Could not find component for: ' + cmpName);
-    return undefined;
   },
 
   /**
@@ -344,247 +148,23 @@ Ext.define('NX.coreui.controller.Repositories', {
 
     if (win) {
       me.loadStoreAndSelect(action.result.data.id, false);
-    } else {
+    }
+    else {
       me.loadStore(Ext.emptyFn);
     }
   },
 
   /**
-   * @override
-   * Delete repository.
-   * @param model repository to be deleted
+   * @private
    */
   deleteModel: function(model) {
     var me = this,
         description = me.getDescription(model);
 
     NX.direct.coreui_Repository.remove(model.getId(), function(response) {
-      me.loadStore();
+      me.loadStore(Ext.emptyFn);
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({
-          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_DELETE_SUCCESS', description), type: 'success'
-        });
-      }
-    });
-  },
-
-  /**
-   * @private
-   * Start polling for repository statuses.
-   */
-  startStatusPolling: function() {
-    var me = this;
-
-    if (me.statusProvider) {
-      me.statusProvider.disconnect();
-    }
-    me.statusProvider = Ext.direct.Manager.addProvider({
-      type: 'polling',
-      url: NX.direct.api.POLLING_URLS.coreui_Repository_readStatus,
-      interval: 5000,
-      baseParams: {
-      },
-      listeners: {
-        data: function(provider, event) {
-          if (event.data && event.data.success && event.data.data) {
-            me.updateRepositoryModels(event.data.data);
-          }
-        },
-        scope: me
-      }
-    });
-    me.logDebug('Repository status pooling started');
-  },
-
-  /**
-   * @private
-   * Stop polling for repository statuses.
-   */
-  stopStatusPolling: function() {
-    var me = this;
-
-    if (me.statusProvider) {
-      me.statusProvider.disconnect();
-    }
-    me.logDebug('Repository status pooling stopped');
-  },
-
-  /**
-   * Start / Stop status pooling when server is disconnected/connected.
-   * @param receiving if we are receiving or not status from server (server connected/disconnected)
-   */
-  onStateReceivingChanged: function(receiving) {
-    var me = this;
-
-    if (me.getList() && receiving) {
-      me.startStatusPolling();
-    }
-    else {
-      me.stopStatusPolling();
-    }
-  },
-
-  /**
-   * @private
-   * Updates Repository store records with values returned by status polling.
-   * @param {Array} repositoryStatuses array of status objects
-   */
-  updateRepositoryModels: function(repositoryStatuses) {
-    var me = this;
-
-    Ext.Array.each(repositoryStatuses, function(repositoryStatus) {
-      var repositoryModel = me.getRepositoryStore().getById(repositoryStatus.id);
-      if (repositoryModel) {
-        repositoryModel.set('localStatus', repositoryStatus['localStatus']);
-        repositoryModel.set('proxyMode', repositoryStatus['proxyMode']);
-        repositoryModel.set('remoteStatus', repositoryStatus['remoteStatus']);
-        repositoryModel.set('remoteStatusReason', repositoryStatus['remoteStatusReason']);
-        repositoryModel.commit(true);
-      }
-    });
-  },
-
-  /**
-   * @private
-   * Navigate to same repository in browse mode.
-   */
-  navigateToBrowseMode: function() {
-    var me = this,
-        list = me.getList();
-
-    NX.Bookmarks.navigateTo(NX.Bookmarks.fromSegments([
-      'browse/repository/standard', list.getSelectionModel().getSelection()[0].getId(), '/'
-    ]));
-  },
-
-  /**
-   * Expire cache for repository.
-   * @param {NX.coreui.model.Repository} model repository model
-   */
-  expireCache: function(model) {
-    NX.direct.coreui_Repository.clearCache(model.getId(), '/', function(response) {
-      if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({
-          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_EXPIRE_SUCCESS', model.get('name')),
-          type: 'success'
-        });
-      }
-    });
-  },
-
-  /**
-   * Rebuild metadata for repository.
-   * @param {NX.coreui.model.Repository} model repository model
-   */
-  rebuildMavenMetadata: function(model) {
-    NX.direct.coreui_Maven.rebuildMetadata(model.getId(), '/', function(response) {
-      if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({
-          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_REBUILD_SUCCESS', model.get('name')),
-          type: 'success'
-        });
-      }
-    });
-  },
-
-  /**
-   * Block proxy-ing for selected repository.
-   * @param {NX.coreui.model.Repository} model repository model
-   */
-  blockProxy: function(model) {
-    var me = this;
-
-    NX.direct.coreui_Repository.updateStatus(model.getId(), undefined, 'BLOCKED_MANUAL', function(response) {
-      if (Ext.isObject(response) && response.success) {
-        me.loadStore();
-        NX.Messages.add({
-          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_BLOCK_SUCCESS', model.get('name')),
-          type: 'success'
-        });
-      }
-    });
-  },
-
-  /**
-   * Allow proxy-ing for selected repository.
-   * @param {NX.coreui.model.Repository} model repository model
-   */
-  allowProxy: function(model) {
-    var me = this;
-
-    NX.direct.coreui_Repository.updateStatus(model.getId(), undefined, 'ALLOW', function(response) {
-      if (Ext.isObject(response) && response.success) {
-        me.loadStore();
-        NX.Messages.add({
-          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_ALLOW_SUCCESS', model.get('name')),
-          type: 'success'
-        });
-      }
-    });
-  },
-
-  /**
-   * Put selected repository out of service.
-   * @param {NX.coreui.model.Repository} model repository model
-   */
-  putOutOfService: function(model) {
-    var me = this;
-
-    NX.direct.coreui_Repository.updateStatus(model.getId(), 'OUT_OF_SERVICE', undefined, function(response) {
-      if (Ext.isObject(response) && response.success) {
-        me.loadStore();
-        NX.Messages.add({
-          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_POOS_SUCCESS', model.get('name')),
-          type: 'success'
-        });
-      }
-    });
-  },
-
-  /**
-   * Put selected repository in service.
-   * @param {NX.coreui.model.Repository} model repository model
-   */
-  putInService: function(model) {
-    var me = this;
-
-    NX.direct.coreui_Repository.updateStatus(model.getId(), 'IN_SERVICE', undefined, function(response) {
-      if (Ext.isObject(response) && response.success) {
-        me.loadStore();
-        NX.Messages.add({
-          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_PRIS_SUCCESS', model.get('name')),
-          type: 'success'
-        });
-      }
-    });
-  },
-
-  /**
-   * Repair index for selected repository.
-   * @param {NX.coreui.model.Repository} model repository model
-   */
-  repairIndex: function(model) {
-    NX.direct.indexerLucene_Index.repair(model.getId(), '/', function(response) {
-      if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({
-          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_REPAIR_SUCCESS', model.get('name')),
-          type: 'success'
-        });
-      }
-    });
-  },
-
-  /**
-   * Update index for selected repository.
-   * @param {NX.coreui.model.Repository} model repository model
-   */
-  updateIndex: function(model) {
-    NX.direct.indexerLucene_Index.update(model.getId(), '/', function(response) {
-      if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({
-          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_UPDATE_SUCCESS', model.get('name')),
-          type: 'success'
-        });
+        NX.Messages.add({ text: 'Repository deleted: ' + description, type: 'success' });
       }
     });
   }

@@ -19,49 +19,12 @@
  */
 Ext.define('NX.coreui.model.Repository', {
   extend: 'Ext.data.Model',
+  idProperty: 'name',
   fields: [
-    'id',
     'name',
     'type',
-    'provider',
-    'providerName',
     'format',
-    'formatName',
-    'exposed',
-    'localStatus',
-    'url',
-    'defaultLocalStorageUrl',
-    'overrideLocalStorageUrl',
-    'userManaged',
-    'browseable',                         // hosted/proxy
-    'writePolicy',                        // hosted
-    'indexable',                          // hosted maven
-    'repositoryPolicy',                   // hosted/proxy maven
-    'proxyMode',                          // proxy
-    'remoteStatus',                       // proxy
-    'remoteStatusReason',                 // proxy
-    'remoteStorageUrl',                   // proxy
-    'useTrustStoreForRemoteStorageUrl',   // proxy
-    'autoBlockActive',                    // proxy
-    'fileTypeValidation',                 // proxy
-    'authEnabled',                        // proxy
-    'authUsername',                       // proxy
-    'authPassword',                       // proxy
-    'authNtlmHost',                       // proxy
-    'authNtlmDomain',                     // proxy
-    'httpRequestSettings',                // proxy
-    'userAgentCustomisation',             // proxy
-    'urlParameters',                      // proxy
-    'timeout',                            // proxy
-    'retries',                            // proxy
-    'notFoundCacheTTL',                   // proxy
-    'itemMaxAge',                         // proxy
-    'downloadRemoteIndexes',              // proxy maven
-    'checksumPolicy',                     // proxy maven
-    'artifactMaxAge',                     // proxy maven
-    'metadataMaxAge',                     // proxy maven
-    'memberRepositoryIds',                // group,
-    'synchronizeAtStartup',               // virtual
-    'shadowOf'                            // virtual
+    'recipe',
+    'attributes'
   ]
 });

@@ -27,9 +27,13 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
+import com.google.inject.Module;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.sisu.plexus.PlexusSpaceModule;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.URLClassSpace;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -141,4 +145,8 @@ public class ResolvingIT
     return result;
   }
 
+  @Override
+  protected Module spaceModule() {
+    return new PlexusSpaceModule(new URLClassSpace(getClassLoader()), BeanScanning.INDEX);
+  }
 }

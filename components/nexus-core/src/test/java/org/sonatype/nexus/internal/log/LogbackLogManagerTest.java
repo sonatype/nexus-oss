@@ -13,14 +13,13 @@
 package org.sonatype.nexus.internal.log;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.Properties;
 import java.util.Set;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogManager;
 
-import org.codehaus.plexus.context.Context;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -46,8 +45,8 @@ public class LogbackLogManagerTest
   }
 
   @Override
-  protected void customizeContext(Context ctx) {
-    super.customizeContext(ctx);
+  protected void customizeProperties(Properties ctx) {
+    super.customizeProperties(ctx);
 
     try {
       System.setProperty(WORK_CONFIGURATION_KEY, (String) ctx.get(WORK_CONFIGURATION_KEY));

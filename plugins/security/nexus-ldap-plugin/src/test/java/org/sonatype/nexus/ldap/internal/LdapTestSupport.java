@@ -40,8 +40,6 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.codec.Base64;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
 import org.junit.After;
 import org.junit.Before;
 
@@ -73,13 +71,6 @@ public abstract class LdapTestSupport
     catch (UnsupportedEncodingException e) {
       throw Throwables.propagate(e);
     }
-  }
-
-  @Override
-  protected void customizeContainerConfiguration(final ContainerConfiguration configuration) {
-    super.customizeContainerConfiguration(configuration);
-    configuration.setAutoWiring(true);
-    configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
   }
 
   @Override
