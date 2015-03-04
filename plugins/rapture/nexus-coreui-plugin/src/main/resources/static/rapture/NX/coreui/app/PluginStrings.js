@@ -221,6 +221,28 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_NAME: 'Name',
     ADMIN_REPOSITORIES_SETTINGS_ATTRIBUTES: 'Attributes',
 
+    // Admin -> Repository -> Blobstores
+    ADMIN_BLOBSTORES_TITLE: 'Blobstores',
+    ADMIN_BLOBSTORES_SUBTITLE: 'Manage blobstores',
+    ADMIN_BLOBSTORES_CREATE_TITLE: 'Create blobstore',
+    ADMIN_BLOBSTORES_CREATE_SUCCESS: 'Blobstore created: ',
+    ADMIN_BLOBSTORES_CREATE_ERROR: 'You do not have permission to create blobstores',
+    ADMIN_BLOBSTORES_UPDATE_SUCCESS: 'Blobstore updated: ',
+    ADMIN_BLOBSTORES_UPDATE_ERROR: 'You do not have permission to update blobstores',
+    ADMIN_BLOBSTORES_LIST_NEW_BUTTON: 'Create blobstore',
+    ADMIN_BLOBSTORES_LIST_NAME_COLUMN: 'Name',
+    ADMIN_BLOBSTORES_LIST_TYPE_COLUMN: 'Type',
+    ADMIN_BLOBSTORES_LIST_FORMAT_COLUMN: 'Format',
+    ADMIN_BLOBSTORES_LIST_STATUS_COLUMN: 'Status',
+    ADMIN_BLOBSTORES_LIST_FILTER_ERROR: 'No blobstores matched "$filter"',
+    ADMIN_BLOBSTORES_LIST_EMPTY_STATE: 'No blobstores defined',
+    ADMIN_BLOBSTORES_DETAILS_DELETE_BUTTON: 'Delete blobstore',
+    ADMIN_BLOBSTORES_DETAILS_SETTINGS_TAB: 'Settings',
+    ADMIN_BLOBSTORES_SETTINGS_TYPE: 'Type',
+    ADMIN_BLOBSTORES_SETTINGS_TYPE_PLACEHOLDER: 'Select a type',
+    ADMIN_BLOBSTORES_SETTINGS_NAME: 'Name',
+    ADMIN_BLOBSTORES_SETTINGS_ATTRIBUTES: 'Attributes',
+
     // Admin -> Repository -> Routing
     ADMIN_ROUTING_TITLE: 'Routing',
     ADMIN_ROUTING_SUBTITLE: 'Manage repository routes',
