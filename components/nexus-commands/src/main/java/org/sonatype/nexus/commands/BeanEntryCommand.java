@@ -13,16 +13,8 @@
 
 package org.sonatype.nexus.commands;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
 import org.apache.karaf.shell.commands.Action;
 import org.apache.karaf.shell.commands.CommandWithAction;
-import org.apache.karaf.shell.commands.basic.AbstractCommand;
-import org.apache.karaf.shell.console.CompletableFunction;
-import org.apache.karaf.shell.console.Completer;
 import org.eclipse.sisu.BeanEntry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -33,8 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class BeanEntryCommand
-    extends AbstractCommand
-    implements CompletableFunction
+    extends AbstractCompletableCommand
 {
   private final BeanEntry<?, Action> beanEntry;
 
@@ -55,25 +46,5 @@ public class BeanEntryCommand
   @Override
   public String toString() {
     return beanEntry.toString();
-  }
-
-  //
-  // CompletableFunction
-  //
-
-  // TODO: Sort out how we can apply completer configuration in a Sisu-friendly manner
-  // TODO: ... perhaps some custom annotations to provide configuration of named completer impl?
-  // NOTE: Both return values appear to be nullable, but not marked on interface
-
-  @Override
-  @Nullable
-  public List<Completer> getCompleters() {
-    return null;
-  }
-
-  @Override
-  @Nullable
-  public Map<String, Completer> getOptionalCompleters() {
-    return null;
   }
 }

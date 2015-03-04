@@ -38,7 +38,7 @@ public class InfoProviderMediator
   public void add(final BeanEntry<Named, InfoProvider> beanEntry, final BundleContext bundleContext)
       throws Exception
   {
-    log.info("Adding: {}", beanEntry);
+    log.debug("Adding: {}", beanEntry);
     bundleContext.registerService(InfoProvider.class, beanEntry.getValue(), null);
   }
 

@@ -13,10 +13,8 @@
 package org.sonatype.nexus.internal.orient;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -33,14 +31,10 @@ import com.orientechnologies.orient.console.OConsoleDatabaseApp;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Function;
 import org.apache.karaf.shell.commands.Action;
-import org.apache.karaf.shell.commands.CommandException;
 import org.apache.karaf.shell.commands.basic.AbstractCommand;
-import org.apache.karaf.shell.console.Completer;
 import org.apache.karaf.shell.console.SubShellAction;
-import org.apache.karaf.shell.console.completer.NullCompleter;
 import org.eclipse.sisu.EagerSingleton;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,18 +86,14 @@ public class OrientCommands
       return;
     }
 
-    // TODO info -> debug
-    log.info("Registering function: {}, config: {}", function, config);
-    ServiceRegistration<Function> registration = bundleContext.registerService(Function.class, function, config);
-    // TODO: Handling unregistration?
+    log.debug("Registering function: {}, config: {}", function, config);
+    bundleContext.registerService(Function.class, function, config);
   }
 
   @Override
   protected void printApplicationInfo() {
     // hide banner as it doesn't apply here
   }
-
-  // TODO: Why is this not implementing Function, seems like unused Action support here mostly?
 
   private AbstractCommand createOrientCommand(final Method method) {
     return new AbstractCompletableCommand()
@@ -113,20 +103,7 @@ public class OrientCommands
 
       @Override
       public Object execute(final CommandSession session, final List<Object> params) throws Exception {
-        try {
-          return OrientCommands.this.execute(method, command, params);
-        }
-        catch (Throwable e) {
-          throw new CommandException(e);
-        }
-      }
-
-      public List<Completer> getCompleters() {
-        return Collections.<Completer> singletonList(NullCompleter.INSTANCE);
-      }
-
-      public Map<String, Completer> getOptionalCompleters() {
-        return Collections.emptyMap();
+        return OrientCommands.this.execute(method, command, params);
       }
 
       @Override
@@ -163,7 +140,7 @@ public class OrientCommands
 
       // rebuild expression so OrientDB can re-parse it to handle optional params, etc.
       List<?> expression = ImmutableList.builder().add(command).addAll(params).build();
-      OrientCommands.this.execute(Joiner.on(' ').useForNull("null").join(expression));
+      execute(Joiner.on(' ').useForNull("null").join(expression));
 
       return Strings2.NL;
     }

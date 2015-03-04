@@ -54,8 +54,7 @@ public class ActionMediator
       // TODO: warn if @Singleton is present, this is probably not desired due to @Option/@Argument processing ?
 
       Dictionary<String, ?> config = CommandHelper.config(command);
-      // TODO info -> debug
-      log.info("Adding action: {}, config: {}", beanEntry, config);
+      log.debug("Adding action: {}, config: {}", beanEntry, config);
       bundleContext.registerService(
           Function.class,
           new BeanEntryCommand(beanEntry),
