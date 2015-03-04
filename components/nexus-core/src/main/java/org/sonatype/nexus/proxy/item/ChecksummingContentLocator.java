@@ -52,6 +52,8 @@ public class ChecksummingContentLocator
   public InputStream getContent()
       throws IOException
   {
+    messageDigest.reset(); // in case someone previously called getContent() but didn't complete the hash
+
     return new DigestCalculatingInputStream(getTarget().getContent(), messageDigest, contextKey, context);
   }
 
