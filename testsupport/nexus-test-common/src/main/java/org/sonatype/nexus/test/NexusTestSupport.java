@@ -150,8 +150,8 @@ public abstract class NexusTestSupport
       final List<Module> modules = Lists.newLinkedList();
 
       modules.add(bootModule());
-      modules.add(spaceModule());
       customizeModules(modules);
+      modules.add(spaceModule());
 
       testInjector = Guice.createInjector(new WireModule(modules));
     }
