@@ -16,6 +16,7 @@ import org.apache.karaf.shell.commands.Argument
 import org.apache.karaf.shell.commands.Command
 import org.apache.karaf.shell.console.AbstractAction
 import org.codehaus.groovy.control.CompilerConfiguration
+import org.eclipse.sisu.inject.BeanLocator
 import org.slf4j.LoggerFactory
 import org.sonatype.nexus.common.guice.GlobalComponentLookupHelper
 import org.sonatype.nexus.configuration.ApplicationDirectories
@@ -38,7 +39,10 @@ class GroovyAction
   ClassLoader classLoader
 
   @Inject
-  GlobalComponentLookupHelper container
+  BeanLocator beanLocator
+
+  @Inject
+  GlobalComponentLookupHelper lookupHelper
 
   @Inject
   ApplicationDirectories applicationDirectories
@@ -51,8 +55,11 @@ class GroovyAction
 
   @Override
   protected def doExecute() {
+    assert file.exists() : "Missing file: $file"
+
     Binding binding = new Binding()
-    binding.setVariable('container', container)
+    binding.setVariable('beanLocator', beanLocator)
+    binding.setVariable('container', lookupHelper)
     binding.setVariable('session', session)
     binding.setVariable('args', args)
 
@@ -62,7 +69,7 @@ class GroovyAction
 
     GroovyShell shell = new GroovyShell(classLoader, binding, cc)
 
-    log.info "Parsing script from file: $file"
+    log.debug "Parsing script from file: $file"
     Script script = shell.parse(file)
     binding.setVariable('log', LoggerFactory.getLogger(script.getClass()))
 
