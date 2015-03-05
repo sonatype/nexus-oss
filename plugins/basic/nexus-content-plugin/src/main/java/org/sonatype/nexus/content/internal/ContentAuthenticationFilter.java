@@ -22,7 +22,7 @@ import javax.servlet.ServletResponse;
 import org.sonatype.nexus.content.ContentRestrictedToken;
 import org.sonatype.nexus.content.ContentRestrictionConstituent;
 import org.sonatype.nexus.security.authc.AuthenticationTokenFactory;
-import org.sonatype.nexus.web.NexusHttpAuthenticationFilter;
+import org.sonatype.nexus.security.authc.NexusBasicHttpAuthenticationFilter;
 
 import com.google.common.base.Throwables;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -37,7 +37,7 @@ import org.apache.shiro.web.filter.authc.AuthenticationFilter;
  * @since 2.1
  */
 public class ContentAuthenticationFilter
-    extends NexusHttpAuthenticationFilter
+    extends NexusBasicHttpAuthenticationFilter
 {
   private final List<ContentRestrictionConstituent> constituents;
 
@@ -70,7 +70,7 @@ public class ContentAuthenticationFilter
   @Override
   protected AuthenticationToken createToken(final ServletRequest request, final ServletResponse response) {
     if (isRestricted(request)) {
-      getLogger().debug("Content authentication for request is restricted");
+      log.debug("Content authentication for request is restricted");
 
       // We know our super-class makes UsernamePasswordTokens, ask super to pull out the relevant details
       UsernamePasswordToken basis = (UsernamePasswordToken) super.createToken(request, response);
@@ -88,7 +88,8 @@ public class ContentAuthenticationFilter
   }
 
   @Override
-  protected boolean isAccessAllowed(final ServletRequest request, final ServletResponse response,
+  protected boolean isAccessAllowed(final ServletRequest request,
+                                    final ServletResponse response,
                                     final Object mappedValue)
   {
     if (!isRestricted(request) && isLoginAttempt(request, response)) {
@@ -117,15 +118,15 @@ public class ContentAuthenticationFilter
         try {
           AuthenticationToken token = factory.createToken(request, response);
           if (token != null) {
-            getLogger().debug("Token '{}' created by {}", token, factory);
+            log.debug("Token '{}' created by {}", token, factory);
             return token;
           }
         }
         catch (Exception e) {
-          getLogger().warn(
+          log.warn(
               "Factory {} failed to create an authentication token {}/{}",
               factory, e.getClass().getName(), e.getMessage(),
-              getLogger().isDebugEnabled() ? e : null
+              log.isDebugEnabled() ? e : null
           );
         }
       }

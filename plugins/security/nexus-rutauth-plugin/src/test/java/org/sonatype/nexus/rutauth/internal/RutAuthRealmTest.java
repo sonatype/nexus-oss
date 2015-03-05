@@ -12,7 +12,8 @@
  */
 package org.sonatype.nexus.rutauth.internal;
 
-import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.realm.RealmConfiguration;
+import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.security.user.User;
 import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.nexus.security.user.UserNotFoundException;
@@ -41,7 +42,7 @@ public class RutAuthRealmTest
     extends TestSupport
 {
   @Mock
-  private SecuritySystem securitySystem;
+  private RealmManager realmManager;
 
   @Mock
   private UserManager redUserManager;
@@ -53,13 +54,15 @@ public class RutAuthRealmTest
 
   @Before
   public void prepare() throws Exception {
-    when(securitySystem.getRealms()).thenReturn(ImmutableList.of("RED", "GREEN", "BLUE"));
+    RealmConfiguration realmConfiguration = new RealmConfiguration();
+    realmConfiguration.setRealmNames(ImmutableList.of("RED", "GREEN", "BLUE"));
+    when(realmManager.getConfiguration()).thenReturn(realmConfiguration);
 
     when(redUserManager.getAuthenticationRealmName()).thenReturn("RED");
     when(blueUserManager.getAuthenticationRealmName()).thenReturn("BLUE");
 
     // GREEN has no UserManager
-    testSubject = new RutAuthRealm(securitySystem, ImmutableList.of(redUserManager, blueUserManager));
+    testSubject = new RutAuthRealm(realmManager, ImmutableList.of(redUserManager, blueUserManager));
   }
 
   @Test
@@ -104,5 +107,4 @@ public class RutAuthRealmTest
     assertThat(auinfo.getPrincipals().getPrimaryPrincipal().toString(), equalTo("joe"));
     assertThat(auinfo.getPrincipals().getRealmNames(), hasItems("RED"));
   }
-
 }

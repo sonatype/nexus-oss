@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import com.google.inject.Key
@@ -22,7 +23,8 @@ import org.eclipse.sisu.inject.BeanLocator
 import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.security.SecuritySystem
+import org.sonatype.nexus.security.realm.RealmConfiguration
+import org.sonatype.nexus.security.realm.RealmManager
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -39,11 +41,10 @@ import javax.validation.constraints.NotNull
 @Singleton
 @DirectAction(action = 'coreui_RealmSettings')
 class RealmSettingsComponent
-extends DirectComponentSupport
+    extends DirectComponentSupport
 {
-
   @Inject
-  SecuritySystem securitySystem
+  RealmManager realmManager
 
   @Inject
   BeanLocator beanLocator
@@ -56,7 +57,7 @@ extends DirectComponentSupport
   @RequiresPermissions('nexus:settings:read')
   RealmSettingsXO read() {
     return new RealmSettingsXO(
-        realms: securitySystem.realms
+        realms: realmManager.getConfiguration().realmNames
     )
   }
 
@@ -83,9 +84,12 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
   @Validate
-  RealmSettingsXO update(final @NotNull(message = '[realmSettings] may not be null') @Valid RealmSettingsXO realmSettingsXO) {
-    securitySystem.realms = realmSettingsXO.realms
+  RealmSettingsXO update(
+      final @NotNull(message = '[realmSettings] may not be null') @Valid RealmSettingsXO realmSettingsXO)
+  {
+    realmManager.configuration = new RealmConfiguration(
+        realmNames: realmSettingsXO.realms
+    )
     return read()
   }
-
 }

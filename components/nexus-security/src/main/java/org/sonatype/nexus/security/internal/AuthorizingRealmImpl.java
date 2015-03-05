@@ -101,7 +101,7 @@ public class AuthorizingRealmImpl
     // if the user belongs to this realm, we are most likely using this realm stand alone, or for testing
     if (!realmNames.contains(this.getName())) {
       // make sure the realm is enabled
-      Collection<Realm> configureadRealms = this.securitySystem.getSecurityManager().getRealms();
+      Collection<Realm> configureadRealms = this.securitySystem.getRealmSecurityManager().getRealms();
       boolean foundRealm = false;
       for (Realm realm : configureadRealms) {
         if (realmNames.contains(realm.getName())) {

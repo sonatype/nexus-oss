@@ -399,9 +399,8 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_ANONYMOUS_UPDATE_ERROR: 'You do not have permission to configure the anonymous user',
     ADMIN_ANONYMOUS_UPDATE_SUCCESS: 'Anonymous security settings $action',
     ADMIN_ANONYMOUS_ALLOW: 'Allow anonymous users to access the server',
-    ADMIN_ANONYMOUS_CUSTOMIZE: 'Customize the anonymous credentials (normally not needed)',
     ADMIN_ANONYMOUS_USERNAME: 'Username',
-    ADMIN_ANONYMOUS_PASSWORD: 'Password',
+    ADMIN_ANONYMOUS_REALMNAME: 'Realm',
 
     // Admin -> Security -> LDAP
     ADMIN_LDAP_TITLE: 'LDAP',

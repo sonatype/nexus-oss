@@ -17,7 +17,7 @@ import java.util.Map;
 import javax.inject.Named;
 
 import org.sonatype.nexus.security.FilterChainModule;
-import org.sonatype.nexus.security.authz.AnonymousFilter;
+import org.sonatype.nexus.security.anonymous.AnonymousFilter;
 import org.sonatype.nexus.web.SecurityFilter;
 
 import com.google.common.collect.Maps;

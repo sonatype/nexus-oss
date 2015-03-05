@@ -35,6 +35,7 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.security.SecuritySystem
+import org.sonatype.nexus.security.anonymous.AnonymousManager
 import org.sonatype.nexus.security.role.RoleIdentifier
 import org.sonatype.nexus.security.user.User
 import org.sonatype.nexus.security.user.UserManager
@@ -65,6 +66,9 @@ extends DirectComponentSupport
 
   @Inject
   SecuritySystem securitySystem
+
+  @Inject
+  AnonymousManager anonymousManager
 
   @Inject
   AuthTicketService authTickets
@@ -317,7 +321,8 @@ extends DirectComponentSupport
   }
 
   private boolean isAnonymousUser(final String userId) {
-    return securitySystem.isAnonymousAccessEnabled() && securitySystem.anonymousUsername == userId
+    def config = anonymousManager.configuration
+    return config.enabled && config.userId == userId
   }
 
   private boolean isCurrentUser(final String userId) {

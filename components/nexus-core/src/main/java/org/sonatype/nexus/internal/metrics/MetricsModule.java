@@ -13,6 +13,9 @@
 package org.sonatype.nexus.internal.metrics;
 
 import org.sonatype.nexus.security.FilterChainModule;
+import org.sonatype.nexus.security.anonymous.AnonymousFilter;
+import org.sonatype.nexus.security.authc.NexusBasicHttpAuthenticationFilter;
+import org.sonatype.nexus.security.authz.PermissionsFilter;
 import org.sonatype.nexus.web.SecurityFilter;
 
 import com.codahale.metrics.Clock;
@@ -88,7 +91,12 @@ public class MetricsModule
       @Override
       protected void configure() {
         // TODO: Expose resource permissions for ping/threads/metrics/healthcheck?
-        addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic,perms[nexus:metrics-endpoints]");
+        // TODO: Maybe consider re-implementing as JAX-RS endpoints?
+
+        addFilterChain(MOUNT_POINT + "/**",
+            NexusBasicHttpAuthenticationFilter.NAME,
+            AnonymousFilter.NAME,
+            PermissionsFilter.config("nexus:metrics-endpoints"));
       }
     });
 

@@ -13,7 +13,8 @@
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
 import org.sonatype.nexus.security.ClientInfo;
-import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.anonymous.AnonymousConfiguration;
+import org.sonatype.nexus.security.anonymous.AnonymousManager;
 import org.sonatype.nexus.security.authc.NexusAuthenticationEvent;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -31,17 +32,22 @@ import static org.mockito.Mockito.when;
 public class AuthSubscriberTest
     extends TestSupport
 {
+  private static final String ANONYMOUS = "anonymous";
+
   private AuthSubscriber underTest;
 
   private DummyFeedRecorder feedRecorder = new DummyFeedRecorder();
 
   @Mock
-  private SecuritySystem securitySystem;
+  private AnonymousManager anonymousManager;
 
   @Before
   public void setUp() throws Exception {
-    underTest = new AuthSubscriber(feedRecorder, securitySystem);
-    when(securitySystem.getAnonymousUsername()).thenReturn("anonymous");
+    AnonymousConfiguration anonymousConfiguration = new AnonymousConfiguration();
+    anonymousConfiguration.setUserId(ANONYMOUS);
+    when(anonymousManager.getConfiguration()).thenReturn(anonymousConfiguration);
+
+    underTest = new AuthSubscriber(anonymousManager, feedRecorder);
   }
 
   public void perform(final String username, final int expected) throws Exception {
@@ -78,6 +84,6 @@ public class AuthSubscriberTest
 
   @Test
   public void testAnon() throws Exception {
-    perform("anonymous", 0);
+    perform(ANONYMOUS, 0);
   }
 }

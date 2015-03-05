@@ -44,7 +44,7 @@ public class SessionAuthenticationFilter
 {
   private static final Logger log = LoggerFactory.getLogger(SessionAuthenticationFilter.class);
 
-  public static final String NAME = "session-authc";
+  public static final String NAME = "nx-session-authc";
 
   public static final String P_USERNAME = "username";
 

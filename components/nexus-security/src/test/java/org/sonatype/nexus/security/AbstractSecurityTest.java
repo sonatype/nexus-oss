@@ -13,21 +13,30 @@
 package org.sonatype.nexus.security;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.sonatype.nexus.common.io.DirSupport;
+import org.sonatype.nexus.security.realm.RealmConfiguration;
+import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
 import com.google.inject.Binder;
+import com.google.inject.name.Names;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.util.ThreadContext;
+import org.eclipse.sisu.launch.InjectedTestCase;
 import org.eclipse.sisu.space.BeanScanning;
 
 public abstract class AbstractSecurityTest
-    extends SecurityTestSupport
+    extends InjectedTestCase
 {
-  protected File PLEXUS_HOME = util.resolveFile("target/plexus-home/");
+  // FIXME: Convert to junit4
 
-  protected File APP_CONF = new File(PLEXUS_HOME, "etc");
+  protected final TestUtil util = new TestUtil(this);
+
+  private File PLEXUS_HOME = util.resolveFile("target/plexus-home/");
+
+  private File APP_CONF = new File(PLEXUS_HOME, "etc");
 
   @Override
   public void configure(Properties properties) {
@@ -37,8 +46,16 @@ public abstract class AbstractSecurityTest
 
   @Override
   public void configure(final Binder binder) {
-    super.configure(binder);
     binder.install(new SecurityModule());
+
+    RealmConfiguration realmConfiguration = new RealmConfiguration();
+    realmConfiguration.setRealmNames(Arrays.asList(
+        "MockRealmA",
+        "MockRealmB"
+    ));
+    binder.bind(RealmConfiguration.class)
+        .annotatedWith(Names.named("initial"))
+        .toInstance(realmConfiguration);
   }
 
   @Override
@@ -54,12 +71,20 @@ public abstract class AbstractSecurityTest
   protected void tearDown() throws Exception {
     try {
       getSecuritySystem().stop();
+    }
+    catch (Exception e) {
+      util.getLog().warn("Failed to stop security-system", e);
+    }
+
+    try {
       lookup(CacheManager.class).shutdown();
     }
-    finally {
-      ThreadContext.remove();
-      super.tearDown();
+    catch (Exception e) {
+      util.getLog().warn("Failed to shutdown cache-manager", e);
     }
+
+    ThreadContext.remove();
+    super.tearDown();
   }
 
   @Override

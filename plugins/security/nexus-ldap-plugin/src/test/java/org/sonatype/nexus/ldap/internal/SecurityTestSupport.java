@@ -17,9 +17,6 @@ import java.util.List;
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration;
 import org.sonatype.nexus.security.config.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.nexus.security.config.SecurityConfigurationSource;
-import org.sonatype.nexus.security.settings.PreconfiguredSecuritySettingsSource;
-import org.sonatype.nexus.security.settings.SecuritySettings;
-import org.sonatype.nexus.security.settings.SecuritySettingsSource;
 import org.sonatype.nexus.test.NexusTestSupport;
 
 import com.google.inject.AbstractModule;
@@ -33,18 +30,6 @@ public abstract class SecurityTestSupport
   @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
-    final SecuritySettings securityConfig = getSecurityConfig();
-    if (securityConfig != null) {
-      modules.add(new AbstractModule()
-      {
-        @Override
-        protected void configure() {
-          bind(SecuritySettingsSource.class)
-              .annotatedWith(Names.named("default"))
-              .toInstance(new PreconfiguredSecuritySettingsSource(securityConfig));
-        }
-      });
-    }
     final MemorySecurityConfiguration securityModelConfig = getSecurityModelConfig();
     if (securityModelConfig != null) {
       modules.add(new AbstractModule()
@@ -59,12 +44,7 @@ public abstract class SecurityTestSupport
     }
   }
 
-  protected SecuritySettings getSecurityConfig() {
-    return null;
-  }
-
   protected MemorySecurityConfiguration getSecurityModelConfig() {
     return null;
   }
-
 }

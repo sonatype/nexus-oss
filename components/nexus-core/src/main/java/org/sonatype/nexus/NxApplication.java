@@ -141,7 +141,6 @@ public class NxApplication
       applicationConfiguration.loadConfiguration(true);
       // essential services
       securitySystem.start();
-      securitySystem.getAnonymousUsername();
       applicationConfiguration.createInternals();
 
       // notify about start other components participating in configuration framework

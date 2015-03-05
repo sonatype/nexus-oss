@@ -15,25 +15,12 @@ package org.sonatype.nexus
 import org.sonatype.nexus.security.config.CUser
 import org.sonatype.nexus.security.config.CUserRoleMapping
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
-import org.sonatype.nexus.security.settings.SecuritySettings
 
 /**
  * @since 3.0
  */
 class NexusAppTestSupportSecurity
 {
-
-  static SecuritySettings security() {
-    return new SecuritySettings(
-        anonymousAccessEnabled: false,
-        anonymousUsername: 'anonymous',
-        realms: [
-            'NexusAuthenticatingRealm',
-            'NexusAuthorizingRealm'
-        ]
-    )
-  }
-
   static MemorySecurityConfiguration securityModel() {
     return new MemorySecurityConfiguration(
         users: [

@@ -23,11 +23,16 @@ import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapUserException;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.realms.LdapManager;
+import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+// TODO: Should really rename to IT as this takes a while to run with all its BS sleeping.
+
+@Category(Slow.class)
 public class ConnectionBlackListTest
     extends LdapTestSupport
 {

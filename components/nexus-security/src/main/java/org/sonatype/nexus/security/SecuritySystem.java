@@ -28,6 +28,7 @@ import org.sonatype.nexus.security.user.User;
 import org.sonatype.nexus.security.user.UserNotFoundException;
 import org.sonatype.nexus.security.user.UserSearchCriteria;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -47,12 +48,12 @@ public interface SecuritySystem
   /**
    * Starts the SecuritySystem. Before this method is called the state is unknown.
    */
-  void start();
+  void start() throws Exception;
 
   /**
    * Stops the SecuritySystem. Provides a way to clean up resources.
    */
-  void stop();
+  void stop() throws Exception;
 
   // *********************
   // * authentication
@@ -75,7 +76,10 @@ public interface SecuritySystem
 
   /**
    * Finds the current logged in Subject.
+   *
+   * @deprecated Use {@link SecurityHelper#subject} or {@link SecurityUtils#getSubject()}.
    */
+  @Deprecated
   Subject getSubject();
 
   /**
@@ -251,31 +255,7 @@ public interface SecuritySystem
   // //
 
   /**
-   * Get the currently configured realms.
-   *
-   * @return The currently configured realms.
-   */
-  List<String> getRealms();
-
-  /**
-   * Set the currently configured realms.
-   */
-  void setRealms(List<String> realms);
-
-  /**
    * Returns the configured shiro SecurityManager
    */
-  RealmSecurityManager getSecurityManager();
-
-  //
-  // Anonymous
-  //
-
-  void setAnonymousAccess(boolean enabled, String username, String password);
-
-  boolean isAnonymousAccessEnabled();
-
-  String getAnonymousUsername();
-
-  String getAnonymousPassword();
+  RealmSecurityManager getRealmSecurityManager();
 }

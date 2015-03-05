@@ -12,8 +12,14 @@
  */
 package org.sonatype.nexus.commands;
 
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import org.apache.karaf.shell.commands.basic.AbstractCommand;
 import org.apache.karaf.shell.console.CompletableFunction;
+import org.apache.karaf.shell.console.Completer;
 
 /**
  * Helper class that ties {@link AbstractCommand} and {@link CompletableFunction} together.
@@ -24,4 +30,17 @@ public abstract class AbstractCompletableCommand
     extends AbstractCommand
     implements CompletableFunction
 {
+  // NOTE: Both return values appear to be nullable, but not marked on interface
+
+  @Override
+  @Nullable
+  public List<Completer> getCompleters() {
+    return null;
+  }
+
+  @Override
+  @Nullable
+  public Map<String, Completer> getOptionalCompleters() {
+    return null;
+  }
 }

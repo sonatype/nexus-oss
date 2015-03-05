@@ -43,51 +43,28 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
             xtype: 'checkbox',
             name: 'enabled',
             value: true,
-            boxLabel: NX.I18n.get('ADMIN_ANONYMOUS_ALLOW'),
-            listeners: {
-              change: me.handleUseCustomUser,
-              afterrender: me.handleUseCustomUser
-            }
+            boxLabel: NX.I18n.get('ADMIN_ANONYMOUS_ALLOW')
           },
           {
-            xtype: 'nx-optionalfieldset',
-            title: NX.I18n.get('ADMIN_ANONYMOUS_CUSTOMIZE'),
-            itemId: 'useCustomUser',
-            checkboxToggle: true,
-            checkboxName: 'useCustomUser',
-            collapsed: true,
-            items: [
-              {
-                xtype: 'textfield',
-                name: 'username',
-                fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME'),
-                allowBlank: false
-              },
-              {
-                xtype: 'nx-password',
-                name: 'password',
-                fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_PASSWORD'),
-                allowBlank: false
-              }
-            ]
+            xtype: 'textfield',
+            name: 'userId',
+            fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME'),
+            allowBlank: false
+          },
+          {
+            xtype: 'combo',
+            name: 'realmName',
+            fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_REALMNAME'),
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'id',
+            store: 'RealmType',
+            editable: false
           }
         ]
       }
     ];
 
     me.callParent(arguments);
-  },
-
-  handleUseCustomUser: function (checkbox) {
-    var useCustomUser = checkbox.up('form').down('#useCustomUser');
-
-    if (checkbox.getValue()) {
-      useCustomUser.enable();
-    }
-    else {
-      useCustomUser.collapse();
-      useCustomUser.disable();
-    }
   }
-
 });

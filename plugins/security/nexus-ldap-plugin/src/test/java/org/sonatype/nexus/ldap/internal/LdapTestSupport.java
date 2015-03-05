@@ -13,7 +13,6 @@
 package org.sonatype.nexus.ldap.internal;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,21 +32,15 @@ import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.security.SecurityModule;
 import org.sonatype.nexus.security.SecuritySystem;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import net.sf.ehcache.CacheManager;
-import org.apache.shiro.codec.Base64;
 import org.junit.After;
 import org.junit.Before;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.shiro.codec.CodecSupport.PREFERRED_ENCODING;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -63,15 +56,6 @@ public abstract class LdapTestSupport
   protected LinkedHashMap<String, LdapConfiguration> ldapClientConfigurations = Maps.newLinkedHashMap();
 
   protected LdapConfigurationSource ldapConfigurationSource = new MockLdapConfigurationSource();
-
-  public static String encodeBase64(final String value) {
-    try {
-      return Base64.encodeToString(value.getBytes(PREFERRED_ENCODING));
-    }
-    catch (UnsupportedEncodingException e) {
-      throw Throwables.propagate(e);
-    }
-  }
 
   @Override
   protected void customizeModules(final List<Module> modules) {
@@ -230,50 +214,5 @@ public abstract class LdapTestSupport
 
   protected File resolveDefaultLdifFile() {
     return util.resolveFile("src/test/resources/defaults/ut/default-ldap.ldif");
-  }
-
-  // ==
-
-  protected Mapping buildUserAndGroupAuthConfiguration() {
-    final Mapping userGroupConf = new Mapping();
-    userGroupConf.setUserMemberOfAttribute("userMemberOfAttribute");
-    userGroupConf.setGroupBaseDn("groupBaseDn");
-    userGroupConf.setGroupIdAttribute("groupIdAttribute");
-    userGroupConf.setGroupMemberAttribute("groupMemberAttribute");
-    userGroupConf.setGroupMemberFormat("groupMemberFormat");
-    userGroupConf.setGroupObjectClass("groupObjectClass");
-    userGroupConf.setLdapGroupsAsRoles(true);
-    userGroupConf.setEmailAddressAttribute("emailAddressAttribute");
-    userGroupConf.setUserBaseDn("userBaseDn");
-    userGroupConf.setUserIdAttribute("userIdAttribute");
-    userGroupConf.setUserObjectClass("userObjectClass");
-    userGroupConf.setUserPasswordAttribute("userPasswordAttribute");
-    userGroupConf.setUserRealNameAttribute("userRealNameAttribute");
-    userGroupConf.setUserSubtree(true);
-    return userGroupConf;
-  }
-
-  protected Connection buildConnectionInfo() throws UnsupportedEncodingException {
-    Connection connInfo = new Connection();
-    connInfo.setAuthScheme("ldap");
-    connInfo.setBackupHost(new Host(Protocol.ldap, "backupHost", 11111));
-    connInfo.setMaxIncidentsCount(3);
-    connInfo.setConnectionRetryDelay(300);
-    connInfo.setConnectionTimeout(15);
-    connInfo.setHost(new Host(Protocol.ldap, "localhost", 386));
-    connInfo.setSaslRealm("");
-    connInfo.setSearchBase("ou=searchbase");
-    connInfo.setSystemPassword(encodeBase64("systemPassword"));
-    connInfo.setSystemUsername(encodeBase64("systemUsername"));
-    return connInfo;
-  }
-
-  protected void compareConfiguration(LdapConfiguration expected, LdapConfiguration actual)
-      throws Exception
-  {
-    final ObjectMapper objectMapper = new ObjectMapper();
-    final String expectedString = objectMapper.writeValueAsString(expected);
-    final String actualString = objectMapper.writeValueAsString(actual);
-    assertThat(expected, equalTo(actual));
   }
 }

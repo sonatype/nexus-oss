@@ -19,9 +19,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.extdirect.model.Password
-import org.sonatype.nexus.security.SecuritySystem
-import org.sonatype.nexus.security.settings.SecuritySettingsManager
+import org.sonatype.nexus.security.anonymous.AnonymousConfiguration
+import org.sonatype.nexus.security.anonymous.AnonymousManager
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -41,10 +40,7 @@ class AnonymousSettingsComponent
     extends DirectComponentSupport
 {
   @Inject
-  SecuritySettingsManager securitySettingsManager
-
-  @Inject
-  SecuritySystem securitySystem
+  AnonymousManager anonymousManager
 
   /**
    * Retrieves anonymous security settings.
@@ -53,12 +49,11 @@ class AnonymousSettingsComponent
   @DirectMethod
   @RequiresPermissions('nexus:settings:read')
   AnonymousSettingsXO read() {
-    boolean customUser = securitySettingsManager.anonymousUsername != 'anonymous'
+    def config = anonymousManager.configuration
     return new AnonymousSettingsXO(
-        enabled: securitySettingsManager.anonymousAccessEnabled,
-        useCustomUser: customUser,
-        username: customUser ? securitySettingsManager.anonymousUsername : null,
-        password: customUser ? Password.fakePassword() : null
+        enabled: config.enabled,
+        userId: config.userId,
+        realmName: config.realmName
     )
   }
 
@@ -72,24 +67,11 @@ class AnonymousSettingsComponent
   AnonymousSettingsXO update(
       final @NotNull(message = '[anonymousXO] may not be null') @Valid AnonymousSettingsXO anonymousXO)
   {
-    def username, password
-    if (anonymousXO.enabled) {
-      if (anonymousXO.useCustomUser) {
-        username = anonymousXO.username
-        password = anonymousXO.password?.valueIfValid ?: securitySettingsManager.anonymousPassword
-      }
-      else {
-        username = 'anonymous'
-        password = 'anonymous' // FIXME is there another way to get default anonymous user/password
-      }
-    }
-    else {
-      username = null
-      password = null
-    }
-
-    // FIXME: This should be isolated into securitySettingsManager
-    securitySystem.setAnonymousAccess(anonymousXO.enabled, username, password)
+    anonymousManager.configuration = new AnonymousConfiguration(
+        enabled: anonymousXO.enabled,
+        userId: anonymousXO.userId,
+        realmName: anonymousXO.realmName
+    )
     return read()
   }
 }

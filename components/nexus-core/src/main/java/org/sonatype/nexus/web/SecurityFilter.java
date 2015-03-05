@@ -54,7 +54,7 @@ public class SecurityFilter
                         final FilterChainResolver filterChainResolver)
   {
     checkNotNull(securitySystem);
-    WebSecurityManager sm = (WebSecurityManager)securitySystem.getSecurityManager();
+    WebSecurityManager sm = (WebSecurityManager)securitySystem.getRealmSecurityManager();
     log.trace("Security manager: {}", sm);
     setSecurityManager(sm);
 

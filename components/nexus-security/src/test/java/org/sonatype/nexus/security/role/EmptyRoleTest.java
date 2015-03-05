@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.security.role;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,10 +24,13 @@ import org.sonatype.nexus.security.internal.AuthenticatingRealmImpl;
 import org.sonatype.nexus.security.internal.AuthorizingRealmImpl;
 import org.sonatype.nexus.security.internal.SecurityConfigurationManagerImpl;
 import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
+import org.sonatype.nexus.security.realm.RealmConfiguration;
+import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.security.user.User;
 import org.sonatype.nexus.security.user.UserSearchCriteria;
 import org.sonatype.nexus.security.user.UserStatus;
 
+import com.google.common.collect.ImmutableList;
 import junit.framework.Assert;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -84,7 +86,12 @@ public class EmptyRoleTest
 
   public void testAuthorizeUserWithEmptyRole() throws Exception {
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
-    securitySystem.setRealms(Arrays.asList(AuthenticatingRealmImpl.NAME, AuthorizingRealmImpl.NAME));
+
+    RealmManager realmManager = lookup(RealmManager.class);
+    RealmConfiguration realmConfiguration = new RealmConfiguration();
+    realmConfiguration.setRealmNames(ImmutableList.of(AuthenticatingRealmImpl.NAME, AuthorizingRealmImpl.NAME));
+    realmManager.setConfiguration(realmConfiguration);
+
     AuthorizationManager authManager = securitySystem.getAuthorizationManager("default");
 
     // create an empty role

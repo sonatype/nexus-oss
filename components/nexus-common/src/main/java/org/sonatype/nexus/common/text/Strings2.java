@@ -29,7 +29,7 @@ public final class Strings2
    * Platform new-line separator.
    */
   @NonNls
-  public static final String NL = System.getProperty("line.separator");
+  public static final String NL = System.lineSeparator();
 
   /**
    * Password mask.

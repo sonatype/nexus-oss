@@ -13,7 +13,6 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
-import org.sonatype.nexus.extdirect.model.Password
 
 /**
  * Anonymous Security Settings exchange object.
@@ -24,7 +23,6 @@ import org.sonatype.nexus.extdirect.model.Password
 class AnonymousSettingsXO
 {
   Boolean enabled
-  Boolean useCustomUser
-  String username
-  Password password
+  String userId
+  String realmName
 }

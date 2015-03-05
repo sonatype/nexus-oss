@@ -307,6 +307,16 @@
     </dependency>
 
     <dependency>
+      <groupId>com.orientechnologies</groupId>
+      <artifactId>orientdb-tools</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-commands</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
     </dependency>

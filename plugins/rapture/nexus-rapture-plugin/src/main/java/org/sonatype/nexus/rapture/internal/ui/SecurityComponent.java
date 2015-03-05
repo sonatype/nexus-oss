@@ -28,6 +28,8 @@ import org.sonatype.nexus.common.validation.Validate;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.rapture.StateContributor;
 import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.anonymous.AnonymousConfiguration;
+import org.sonatype.nexus.security.anonymous.AnonymousManager;
 import org.sonatype.nexus.security.privilege.Privilege;
 import org.sonatype.nexus.wonderland.AuthTicketService;
 
@@ -70,13 +72,17 @@ public class SecurityComponent
 
   private final SecuritySystem securitySystem;
 
+  private final AnonymousManager anonymousManager;
+
   private final AuthTicketService authTickets;
 
   @Inject
   public SecurityComponent(final SecuritySystem securitySystem,
+                           final AnonymousManager anonymousManager,
                            final AuthTicketService authTickets)
   {
     this.securitySystem = checkNotNull(securitySystem);
+    this.anonymousManager = checkNotNull(anonymousManager);
     this.authTickets = checkNotNull(authTickets);
   }
 
@@ -132,7 +138,7 @@ public class SecurityComponent
 
     // Ask the sec-manager to authenticate, this won't alter the current subject
     try {
-      securitySystem.getSecurityManager().authenticate(new UsernamePasswordToken(username, password));
+      securitySystem.getRealmSecurityManager().authenticate(new UsernamePasswordToken(username, password));
     }
     catch (AuthenticationException e) {
       throw new Exception("Authentication failed", e);
@@ -160,7 +166,8 @@ public class SecurityComponent
       Object principal = subject.getPrincipal();
       if (principal != null) {
         userXO.setId(principal.toString());
-        if (securitySystem.isAnonymousAccessEnabled() && userXO.getId().equals(securitySystem.getAnonymousUsername())) {
+        AnonymousConfiguration anonymousConfiguration = anonymousManager.getConfiguration();
+        if (anonymousConfiguration.isEnabled() && userXO.getId().equals(anonymousConfiguration.getUserId())) {
           userXO = null;
         }
       }
@@ -189,9 +196,9 @@ public class SecurityComponent
   public Map<String, Object> getState() {
     HashMap<String, Object> state = Maps.newHashMap();
     state.put("user", getUser());
-    state.put(
-        "anonymousUsername", securitySystem.isAnonymousAccessEnabled() ? securitySystem.getAnonymousUsername() : null
-    );
+
+    AnonymousConfiguration anonymousConfiguration = anonymousManager.getConfiguration();
+    state.put("anonymousUsername", anonymousConfiguration.isEnabled() ? anonymousConfiguration.getUserId() : null);
     return state;
   }
 

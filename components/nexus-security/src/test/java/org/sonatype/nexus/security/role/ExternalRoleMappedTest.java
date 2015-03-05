@@ -12,10 +12,8 @@
  */
 package org.sonatype.nexus.security.role;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.security.AbstractSecurityTestCase;
@@ -24,9 +22,12 @@ import org.sonatype.nexus.security.internal.AuthorizingRealmImpl;
 import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
 import org.sonatype.nexus.security.privilege.Privilege;
 import org.sonatype.nexus.security.realm.MockRealm;
+import org.sonatype.nexus.security.realm.RealmConfiguration;
+import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.security.user.MockUserManager;
 import org.sonatype.nexus.security.user.UserManager;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
@@ -73,10 +74,10 @@ public class ExternalRoleMappedTest
         Collections.singleton("randomId")));
 
     // add MockRealm to config
-    List<String> realms = new ArrayList<String>();
-    realms.add("Mock");
-    realms.add(AuthorizingRealmImpl.NAME);
-    securitySystem.setRealms(realms);
+    RealmManager realmManager = lookup(RealmManager.class);
+    RealmConfiguration realmConfiguration = new RealmConfiguration();
+    realmConfiguration.setRealmNames(ImmutableList.of("Mock", AuthorizingRealmImpl.NAME));
+    realmManager.setConfiguration(realmConfiguration);
 
     // jcohen has the role mockrole1, there is also test role with the same ID, which means jcohen automaticly has
     // this test role

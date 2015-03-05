@@ -16,13 +16,9 @@ import java.io.File;
 import java.util.Properties;
 
 import org.sonatype.nexus.common.io.DirSupport;
-import org.sonatype.nexus.security.config.MemorySecurityConfiguration;
 import org.sonatype.nexus.security.config.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.nexus.security.config.SecurityConfiguration;
 import org.sonatype.nexus.security.config.SecurityConfigurationSource;
-import org.sonatype.nexus.security.settings.PreconfiguredSecuritySettingsSource;
-import org.sonatype.nexus.security.settings.SecuritySettings;
-import org.sonatype.nexus.security.settings.SecuritySettingsSource;
 import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
@@ -39,9 +35,9 @@ public abstract class AbstractSecurityTestCase
 
   protected final TestUtil util = new TestUtil(this);
 
-  protected File PLEXUS_HOME = util.resolveFile("target/plexus_home");
+  private File PLEXUS_HOME = util.resolveFile("target/plexus_home");
 
-  protected File CONFIG_DIR = new File(PLEXUS_HOME, "etc");
+  private File CONFIG_DIR = new File(PLEXUS_HOME, "etc");
 
   @Override
   public void configure(Properties properties) {
@@ -52,19 +48,13 @@ public abstract class AbstractSecurityTestCase
   @Override
   public void configure(final Binder binder) {
     binder.install(new SecurityModule());
-    binder.bind(SecuritySettingsSource.class)
-        .annotatedWith(Names.named("default"))
-        .toInstance(new PreconfiguredSecuritySettingsSource(getSecurityConfig()));
+
     binder.bind(SecurityConfigurationSource.class)
         .annotatedWith(Names.named("default"))
         .toInstance(new PreconfiguredSecurityConfigurationSource(getSecurityModelConfig()));
   }
 
-  protected SecuritySettings getSecurityConfig() {
-    return AbstractSecurityTestCaseSecurity.security();
-  }
-
-  protected MemorySecurityConfiguration getSecurityModelConfig() {
+  protected SecurityConfiguration getSecurityModelConfig() {
     return AbstractSecurityTestCaseSecurity.securityModel();
   }
 
@@ -85,19 +75,27 @@ public abstract class AbstractSecurityTestCase
   protected void tearDown() throws Exception {
     try {
       lookup(SecuritySystem.class).stop();
+    }
+    catch (Exception e) {
+      util.getLog().warn("Failed to stop security-system", e);
+    }
+
+    try {
       lookup(CacheManager.class).shutdown();
     }
-    finally {
-      super.tearDown();
+    catch (Exception e) {
+      util.getLog().warn("Failed to shutdown cache-manager", e);
     }
+
+    super.tearDown();
   }
 
   protected SecuritySystem getSecuritySystem() {
     return lookup(SecuritySystem.class);
   }
 
-  public UserManager getUserManager() {
-    return this.lookup(UserManager.class);
+  protected UserManager getUserManager() {
+    return lookup(UserManager.class);
   }
 
   protected SecurityConfiguration getSecurityConfiguration() {

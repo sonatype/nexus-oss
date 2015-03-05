@@ -28,29 +28,23 @@ import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.web.FailureLoggingHttpMethodPermissionFilter;
-import org.sonatype.sisu.goodies.common.Loggers;
+import org.sonatype.nexus.security.authz.NexusHttpMethodPermissionFilter;
 
 import com.google.common.base.Strings;
 import org.apache.shiro.web.util.WebUtils;
-import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A filter that maps the targetId from the Request.
- *
- * @author cstamas
  */
 public class NexusTargetMappingAuthorizationFilter
-    extends FailureLoggingHttpMethodPermissionFilter
+    extends NexusHttpMethodPermissionFilter
 {
   /**
    * Request attribute key used to cache action, as in case of PUT verb it is doing heavy lifting.
    */
   private static final String ACTION_KEY = NexusTargetMappingAuthorizationFilter.class.getName() + ".action";
-
-  private static final Logger log = Loggers.getLogger(NexusTargetMappingAuthorizationFilter.class);
 
   private final RepositoryRouter rootRouter;
 

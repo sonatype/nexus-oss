@@ -78,4 +78,6 @@ public class GlobalComponentLookupHelper
     }
     return null;
   }
+
+  // TODO: Consider adding lookup(Class) and lookup(Key) helpers?
 }

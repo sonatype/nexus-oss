@@ -244,29 +244,6 @@ public class UserManagerTest
     Assert.assertTrue("did not find admin user in role mapping", found);
   }
 
-  public void testSetUserRolesForAnonymous() throws Exception {
-    SecuritySystem securitySystem = this.getSecuritySystem();
-
-    User anon = securitySystem.getUser(securitySystem.getAnonymousUsername(), "default");
-
-    Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
-
-    roles.add(new RoleIdentifier("default", "role3"));
-
-    securitySystem.setUsersRoles(anon.getUserId(), anon.getSource(), roles);
-
-    boolean found = false;
-    for (CUserRoleMapping roleMapping : getSecurityConfiguration().getUserRoleMappings()) {
-      if (roleMapping.getUserId().equals(securitySystem.getAnonymousUsername())) {
-        found = true;
-
-        assertThat(roleMapping.getRoles(), contains("role3"));
-      }
-    }
-
-    Assert.assertTrue("did not find anon user in role mapping", found);
-  }
-
   private List<String> getRoleIds(User user) {
     List<String> roleIds = new ArrayList<String>();
 
