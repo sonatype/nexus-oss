@@ -92,26 +92,28 @@ public class ChecksumReconciler
    */
   void reconcileItemChecksum(final Repository repo, final StorageFileItem item) throws Exception {
     final String attributeChecksum = item.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_SHA1_KEY);
+    if (attributeChecksum != null) {
 
-    message.reset();
-    // look for checksums affected by the link persister pre-fetching the first 8 bytes (see NEXUS-8178)
-    try (final InputStream is = new DigestInputStream(item.getContentLocator().getContent(), message)) {
-      final byte[] buf = new byte[8];
-      ByteStreams.read(is, buf, 0, 8);
-      message.update(buf);
-      ByteStreams.copy(is, ByteStreams.nullOutputStream());
-    }
-
-    if (attributeChecksum != null && attributeChecksum.equals(DigesterUtils.getDigestAsString(message.digest()))) {
-      log.info("Reconciling attribute checksums for {}", item);
-      final RepositoryItemUid uid = item.getRepositoryItemUid();
-      uid.getLock().lock(Action.update);
-      try {
-        digestCalculatingInspector.processStorageItem(item);
-        repo.getAttributesHandler().storeAttributes(item);
+      message.reset();
+      // look for checksums affected by the link persister pre-fetching the first 8 bytes (see NEXUS-8178)
+      try (final InputStream is = new DigestInputStream(item.getContentLocator().getContent(), message)) {
+        final byte[] buf = new byte[8];
+        ByteStreams.read(is, buf, 0, 8);
+        message.update(buf);
+        ByteStreams.copy(is, ByteStreams.nullOutputStream());
       }
-      finally {
-        uid.getLock().unlock();
+
+      if (attributeChecksum.equals(DigesterUtils.getDigestAsString(message.digest()))) {
+        log.info("Reconciling attribute checksums for {}", item);
+        final RepositoryItemUid uid = item.getRepositoryItemUid();
+        uid.getLock().lock(Action.update);
+        try {
+          digestCalculatingInspector.processStorageItem(item);
+          repo.getAttributesHandler().storeAttributes(item);
+        }
+        finally {
+          uid.getLock().unlock();
+        }
       }
     }
   }
