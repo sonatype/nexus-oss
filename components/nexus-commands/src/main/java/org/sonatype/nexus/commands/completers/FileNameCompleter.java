@@ -10,37 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.commands;
+
+package org.sonatype.nexus.commands.completers;
 
 import java.util.List;
-import java.util.Map;
 
-import javax.annotation.Nullable;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.apache.karaf.shell.commands.basic.AbstractCommand;
-import org.apache.karaf.shell.console.CompletableFunction;
 import org.apache.karaf.shell.console.Completer;
 
 /**
- * Helper class that ties {@link AbstractCommand} and {@link CompletableFunction} together.
- * 
+ * File name completer.
+ *
  * @since 3.0
  */
-public abstract class AbstractCompletableCommand
-    extends AbstractCommand
-    implements CompletableFunction
+@Named("file-name")
+@Singleton
+public class FileNameCompleter
+    implements Completer
 {
-  // NOTE: Both return values appear to be nullable, but not marked on interface
+  // NOTE: Not using org.apache.karaf.shell.console.completer.FileCompleter as it has a pointless constructor
 
-  @Override
-  @Nullable
-  public List<Completer> getCompleters() {
-    return null;
-  }
+  private final jline.console.completer.FileNameCompleter delegate = new jline.console.completer.FileNameCompleter();
 
+  // NOTE: List<String> vs. List<CharSequence> mismatch between Karaf and JLine Completer API
+
+  @SuppressWarnings("unchecked")
   @Override
-  @Nullable
-  public Map<String, Completer> getOptionalCompleters() {
-    return null;
+  public int complete(final String buffer, final int cursor, final List candidates) {
+    return delegate.complete(buffer, cursor, candidates);
   }
 }
