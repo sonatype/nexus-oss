@@ -15,32 +15,26 @@ package org.sonatype.nexus.coreui
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.elasticsearch.action.admin.indices.validate.query.ValidateQueryResponse
-import org.elasticsearch.action.search.SearchResponse
-import org.elasticsearch.client.Client
-import org.elasticsearch.common.unit.TimeValue
 import org.elasticsearch.index.query.BoolFilterBuilder
 import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.FilterBuilders
 import org.elasticsearch.index.query.FilteredQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
-import org.elasticsearch.indices.IndexMissingException
 import org.elasticsearch.search.SearchHit
 import org.sonatype.nexus.coreui.search.SearchContribution
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
+import org.sonatype.nexus.repository.search.CustomFilterBuilders
+import org.sonatype.nexus.repository.search.SearchService
 
 import javax.annotation.Nullable
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Provider
 import javax.inject.Singleton
 import javax.validation.ValidationException
-import java.util.concurrent.TimeUnit
 
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME
@@ -59,10 +53,8 @@ class SearchComponent
 extends DirectComponentSupport
 {
 
-  static final String COMPONENT = 'component'
-
   @Inject
-  Provider<Client> client
+  SearchService searchService
 
   @Inject
   Map<String, SearchContribution> searchContributions
@@ -81,41 +73,24 @@ extends DirectComponentSupport
       return null
     }
 
-    SearchResponse response = client.get().prepareSearch()
-        .setTypes(COMPONENT)
-        .setQuery(query)
-        .setScroll(new TimeValue(10, TimeUnit.SECONDS))
-        .setSize(100)
-        .execute()
-        .actionGet()
-
     List<SearchResultXO> gas = []
-
-      repeat:
-    while (response.hits.hits.length > 0) {
-      for (SearchHit hit : response.hits.hits) {
-        if (gas.size() < 100) {
-          // TODO check security
-          def group = hit.source[P_GROUP]
-          def name = hit.source[P_NAME]
-          def ga = new SearchResultXO(
-              id: "${group}:${name}",
-              groupId: group,
-              artifactId: name,
-              format: hit.source[P_FORMAT]
-          )
-          if (!gas.contains(ga)) {
-            gas.add(ga)
-          }
-        }
-        else {
-          break repeat
+    for (SearchHit hit : browse(query)) {
+      if (gas.size() < 100) {
+        def group = hit.source[P_GROUP]
+        def name = hit.source[P_NAME]
+        def ga = new SearchResultXO(
+            groupingKey: group ? "${group}:${name}" : name,
+            group: group,
+            name: name,
+            format: hit.source[P_FORMAT]
+        )
+        if (!gas.contains(ga)) {
+          gas.add(ga)
         }
       }
-      response = client.get().prepareSearchScroll(response.getScrollId())
-          .setScroll(new TimeValue(10, TimeUnit.SECONDS))
-          .execute()
-          .actionGet();
+      else {
+        break
+      }
     }
 
     return gas
@@ -136,39 +111,35 @@ extends DirectComponentSupport
       return null
     }
 
-    SearchResponse response = client.get().prepareSearch()
-        .setTypes(COMPONENT)
-        .setQuery(query)
-        .setScroll(new TimeValue(10, TimeUnit.SECONDS))
-        .setSize(100)
-        .execute()
-        .actionGet()
-
     def versions = [] as SortedSet<SearchResultVersionXO>
-    while (response.hits.hits.length > 0) {
-      response.hits.hits.each { hit ->
-        // TODO check security
-        versions << new SearchResultVersionXO(
-            groupId: hit.source[P_GROUP],
-            artifactId: hit.source[P_NAME],
-            version: hit.source[P_VERSION],
-            repositoryId: hit.source[P_REPOSITORY_NAME],
-            repositoryName: hit.source[P_REPOSITORY_NAME],
-            name: hit.source[P_NAME],
-            // FIXME: how we get the path
-            path: hit.source[P_ATTRIBUTES]['raw']['path']
-        )
-      }
-      response = client.get().prepareSearchScroll(response.getScrollId())
-          .setScroll(new TimeValue(10, TimeUnit.SECONDS))
-          .execute()
-          .actionGet();
+    browse(query).each { hit ->
+      def group = hit.source[P_GROUP]
+      def name = hit.source[P_NAME]
+      versions << new SearchResultVersionXO(
+          groupingKey: group ? "${group}:${name}" : name,
+          group: group,
+          name: name,
+          version: hit.source[P_VERSION],
+          repositoryId: hit.source[P_REPOSITORY_NAME],
+          repositoryName: hit.source[P_REPOSITORY_NAME],
+          // FIXME: how we get the path
+          //path: hit.source[P_ATTRIBUTES]['raw']['path']
+      )
     }
 
     def versionOrder = 0
     return versions.collect { version ->
       version.versionOrder = versionOrder++
       return version
+    }
+  }
+
+  private Iterable<SearchHit> browse(final QueryBuilder query) {
+    try {
+      return searchService.browse(query)
+    }
+    catch (IllegalArgumentException e) {
+      throw new ValidationException(e.getMessage())
     }
   }
 
@@ -192,21 +163,12 @@ extends DirectComponentSupport
     if (!queryBuilder.hasClauses() && !filterBuilder.hasClauses()) {
       return null
     }
+    filterBuilder.must(CustomFilterBuilders.visibleToCurrentUserFilter());
     FilteredQueryBuilder query = QueryBuilders.filteredQuery(
         queryBuilder.hasClauses() ? queryBuilder : null,
         filterBuilder.hasClauses() ? filterBuilder : null
     )
     log.debug('Query: {}', query)
-
-    try {
-      if (!client.get().admin().indices().prepareValidateQuery().setQuery(query).execute().actionGet().valid) {
-        throw new ValidationException("Invalid query")
-      }
-    }
-    catch (IndexMissingException e) {
-      // no repositories were created yet, so there is no point in searching
-      return null;
-    }
 
     return query
   }

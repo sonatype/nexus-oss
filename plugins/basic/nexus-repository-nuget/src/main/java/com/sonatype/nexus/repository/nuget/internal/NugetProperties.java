@@ -12,6 +12,10 @@
  */
 package com.sonatype.nexus.repository.nuget.internal;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+
 /**
  * @since 3.0
  */
@@ -51,6 +55,9 @@ public interface NugetProperties
   String LICENSE_URL = "LICENSEURL";
 
   String LOCATION = "LOCATION";
+
+  // Synthetic field to support Visual Studio's order by 'name'
+  String NAME_ORDER = "NAME_ORDER";
 
   String PACKAGE_HASH = "PACKAGEHASH";
 
@@ -105,6 +112,8 @@ public interface NugetProperties
 
   String P_IS_PRERELEASE = "is_prerelease";
 
+  String P_KEYWORDS = "keywords"; // to support search
+
   String P_LANGUAGE = "language";
 
   String P_LAST_UPDATED = "last_updated";
@@ -135,7 +144,36 @@ public interface NugetProperties
 
   String P_TITLE = "title";
 
+  // Derived field to support Visual Studio's order by 'name'
+  String P_NAME_ORDER = "name_order";
+
   String P_VERSION = "version";
 
   String P_VERSION_DOWNLOAD_COUNT = "version_download_count";
+
+  /*
+  * A map from ODATA element name to the orientDB component attribute name under 'attributes.nuget'.
+   */
+  Map<String, String> ATTRIB_NAMES = new ImmutableMap.Builder<String, String>()
+      .put(AUTHORS, P_AUTHORS)
+      .put(COPYRIGHT, P_COPYRIGHT)
+      .put(CREATED, P_CREATED)
+      .put(DESCRIPTION, P_DESCRIPTION)
+      .put(DOWNLOAD_COUNT, P_DOWNLOAD_COUNT)
+      .put(ID, P_ID)
+      .put(IS_ABSOLUTE_LATEST_VERSION, P_IS_ABSOLUTE_LATEST_VERSION)
+      .put(IS_LATEST_VERSION, P_IS_LATEST_VERSION)
+      .put(IS_PRERELEASE, P_IS_PRERELEASE)
+      .put(LAST_UPDATED, P_LAST_UPDATED)
+      .put(NAME_ORDER, P_NAME_ORDER)
+      .put(PACKAGE_HASH, P_PACKAGE_HASH)
+      .put(PACKAGE_HASH_ALGORITHM, P_PACKAGE_HASH_ALGORITHM)
+      .put(PACKAGE_SIZE, P_PACKAGE_SIZE)
+      .put(PUBLISHED, P_PUBLISHED)
+      .put(REQUIRE_LICENSE_ACCEPTANCE, P_REQUIRE_LICENSE_ACCEPTANCE)
+      .put(SUMMARY, P_SUMMARY)
+      .put(TITLE, P_TITLE)
+      .put(VERSION, P_VERSION)
+      .put(VERSION_DOWNLOAD_COUNT, P_VERSION_DOWNLOAD_COUNT)
+      .build();
 }

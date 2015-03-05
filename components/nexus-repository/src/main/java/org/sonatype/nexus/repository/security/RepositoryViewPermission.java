@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class RepositoryViewPermission
-  extends WildcardPermission
+    extends WildcardPermission
 {
   public static final String SYSTEM = "nexus";
 
@@ -52,6 +52,10 @@ public class RepositoryViewPermission
         name,
         Joiner.on(',').join(actions)
     ));
+  }
+
+  public RepositoryViewPermission(final String format, final String name, final String... actions) {
+    this(format, name, Arrays.asList(actions));
   }
 
   public RepositoryViewPermission(final Repository repository, final String... actions) {

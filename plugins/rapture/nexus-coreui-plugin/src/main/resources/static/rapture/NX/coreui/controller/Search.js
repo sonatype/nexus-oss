@@ -98,37 +98,28 @@ Ext.define('NX.coreui.controller.Search', {
       }
     }, me);
 
+    me.registerFilter([
+      {
+        id: 'keyword',
+        name: 'Keyword',
+        text: 'Keyword',
+        description: 'Search for components by keyword',
+        readOnly: true,
+        criterias: [
+          { id: 'keyword' }
+        ]
+      },
+      {
+        id: 'custom',
+        name: 'Custom',
+        text: NX.I18n.get('BROWSE_SEARCH_CUSTOM_TITLE'),
+        description: NX.I18n.get('BROWSE_SEARCH_CUSTOM_SUBTITLE'),
+        readOnly: true
+      }
+    ], me);
+
     me.getSearchFilterStore().each(function(model) {
-      if (model.getId() === 'keyword') {
-        me.getApplication().getFeaturesController().registerFeature({
-          mode: 'browse',
-          path: '/Search',
-          text: NX.I18n.get('BROWSE_SEARCH_TITLE'),
-          description: NX.I18n.get('BROWSE_SEARCH_SUBTITLE'),
-          group: true,
-          view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '' },
-          iconName: 'search-default',
-          weight: 20,
-          expanded: false,
-          visible: function() {
-            return NX.Permissions.check('nexus:repositories', 'read');
-          }
-        }, me);
-      }
-      else {
-        me.getApplication().getFeaturesController().registerFeature({
-          mode: 'browse',
-          path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
-          view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '/' + model.getId() },
-          iconName: 'search-default',
-          text: model.get('text'),
-          description: model.get('description'),
-          authenticationRequired: false,
-          visible: function() {
-            return NX.Permissions.check('nexus:repositories', 'read');
-          }
-        }, me);
-      }
+      me.registerFeature(model, me);
     });
 
     me.listen({
@@ -165,10 +156,83 @@ Ext.define('NX.coreui.controller.Search', {
   },
 
   /**
+   * @public
+   * Register a set of criterias.
+   * @param {Array/Object} criterias to be registered
+   * @param {Ext.util.Observable} [owner] to be watched to automatically unregister the criterias if owner is destroyed
+   */
+  registerCriteria: function(criterias, owner) {
+    var me = this,
+        models;
+
+    models = me.getSearchCriteriaStore().add(criterias);
+    if (owner) {
+      owner.on('destroy', function() {
+        me.getSearchCriteriaStore().remove(models)
+      }, me);
+    }
+  },
+
+  /**
+   * @public
+   * Register a set of filters.
+   * @param {Array/Object} filters to be registered
+   * @param {Ext.util.Observable} [owner] to be watched to automatically unregister the criterias if owner is destroyed
+   */
+  registerFilter: function(filters, owner) {
+    var me = this;
+
+    Ext.each(Ext.Array.from(filters), function(filter) {
+      me.registerFeature(me.getSearchFilterModel().create(filter), owner);
+    });
+  },
+
+  /**
+   * @private
+   * Register feature for model.
+   * @param {NX.coreui.model.SearchFilter} model to be registered
+   * @param {Ext.util.Observable} [owner] to be watched to automatically unregister the criterias if owner is destroyed
+   */
+  registerFeature: function(model, owner) {
+    var me = this;
+
+    if (model.getId() === 'keyword') {
+      me.getApplication().getFeaturesController().registerFeature({
+        mode: 'browse',
+        path: '/Search',
+        text: NX.I18n.get('BROWSE_SEARCH_TITLE'),
+        description: NX.I18n.get('BROWSE_SEARCH_SUBTITLE'),
+        group: true,
+        view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '' },
+        iconName: 'search-default',
+        weight: 20,
+        expanded: false,
+        visible: function() {
+          return NX.Permissions.check('nexus:repositories', 'read');
+        }
+      }, owner);
+    }
+    else {
+      me.getApplication().getFeaturesController().registerFeature({
+        mode: 'browse',
+        path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
+        view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '/' + model.getId() },
+        iconName: 'search-default',
+        text: model.get('text'),
+        description: model.get('description'),
+        authenticationRequired: false,
+        visible: function() {
+          return NX.Permissions.check('nexus:repositories', 'read');
+        }
+      }, owner);
+    }
+  },
+
+  /**
    * @private
    * Avoid store load; manage load of search results by ourselves.
    */
-  loadStore: function(){
+  loadStore: function() {
     // do nothing for now
   },
 
@@ -201,7 +265,7 @@ Ext.define('NX.coreui.controller.Search', {
         bookmarkSegments = NX.Bookmarks.getBookmark().getSegments(),
         bookmarkValues = {},
         filterSegments,
-        criterias = {},
+        criterias = {}, criteriasPerGroup = {},
         searchCriteria, queryIndex, pair;
 
     // Extract the filter object from the URI
@@ -256,12 +320,27 @@ Ext.define('NX.coreui.controller.Search', {
     });
 
     searchCriteriaStore.each(function(criteria) {
-      addCriteriaMenu.push({
+      var addTo = addCriteriaMenu,
+          group = criteria.get('group');
+
+      if (group) {
+        if (!criteriasPerGroup[group]) {
+          criteriasPerGroup[group] = [];
+        }
+        addTo = criteriasPerGroup[group];
+      }
+      addTo.push({
         text: criteria.get('config').fieldLabel,
         criteria: criteria,
         criteriaId: criteria.getId(),
         action: 'add',
         hidden: Ext.isDefined(criterias[criteria.getId()])
+      });
+    });
+    Ext.Object.each(criteriasPerGroup, function (key, value) {
+      addCriteriaMenu.push({
+          text: key,
+          menu: value
       });
     });
 
@@ -394,14 +473,15 @@ Ext.define('NX.coreui.controller.Search', {
    */
   onSelection: function(list, model) {
     var me = this,
-      listType;
+        listType;
 
     // Figure out what kind of list we’re dealing with
     listType = model.id.replace(/^.*?model\./, '').replace(/\-.*$/, '');
 
     if (listType == "SearchResult") {
       me.onSearchResultSelection(model);
-    } else if (listType == "SearchResultVersion") {
+    }
+    else if (listType == "SearchResultVersion") {
       me.onSearchResultVersionSelection(model);
     }
   },
@@ -434,11 +514,11 @@ Ext.define('NX.coreui.controller.Search', {
       searchResultVersionStore.addFilter([
         {
           property: 'group.raw',
-          value: searchResultModel.get('groupId')
+          value: searchResultModel.get('group')
         },
         {
           property: 'name.raw',
-          value: searchResultModel.get('artifactId')
+          value: searchResultModel.get('name')
         }
       ]);
     }
@@ -468,7 +548,8 @@ Ext.define('NX.coreui.controller.Search', {
       var type = searchResultVersionModel.get('type');
       if (NX.getApplication().getIconController().findIcon('repository-item-type-' + type, 'x16')) {
         icon = type;
-      } else {
+      }
+      else {
         icon = 'default';
       }
       storageFileContainer.up('nx-drilldown-item').setItemClass(NX.Icons.cls('repository-item-type-' + icon, 'x16'));

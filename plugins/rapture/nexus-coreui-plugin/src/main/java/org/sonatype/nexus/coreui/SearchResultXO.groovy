@@ -21,11 +21,11 @@ import groovy.transform.ToString
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-@EqualsAndHashCode(includes = ["format", "groupId", "artifactId"])
+@EqualsAndHashCode(includes = ["format", "group", "name"])
 class SearchResultXO
 {
-  String id
-  String groupId
-  String artifactId
+  String groupingKey
+  String group
+  String name
   String format
 }

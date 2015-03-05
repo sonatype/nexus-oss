@@ -32,12 +32,13 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
       width: 36,
       iconVariant: 'x16',
       iconName: function() {
-        return 'repositorycma-default';
+        return 'repository-default';
       }
     },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_TYPE_COLUMN'), dataIndex: 'type' },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_FORMAT_COLUMN'), dataIndex: 'format' },
+    { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_STATUS_COLUMN'), dataIndex: 'status', flex: 1 }
   ],
 
   viewConfig: {

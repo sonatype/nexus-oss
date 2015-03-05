@@ -35,12 +35,17 @@ public class TokenMatcher
 {
   public static interface State
   {
+    String pattern();
+
     Map<String, String> getTokens();
   }
 
   private final TokenParser parser;
 
+  private final String pattern;
+
   public TokenMatcher(final String pattern) {
+    this.pattern = checkNotNull(pattern);
     this.parser = new TokenParser(pattern);
   }
 
@@ -59,6 +64,11 @@ public class TokenMatcher
     // matched expose tokens in context
     context.getAttributes().set(State.class, new State()
     {
+      @Override
+      public String pattern() {
+        return pattern;
+      }
+
       @Override
       public Map<String, String> getTokens() {
         return tokens;

@@ -15,6 +15,7 @@ package org.sonatype.nexus.elasticsearch.internal;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Map;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -26,6 +27,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.Node;
+import org.elasticsearch.script.NativeScriptFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -49,8 +51,11 @@ public class NodeProvider
   // FIXME: Replace with ApplicationDirectories once we we have access to that class
 
   @Inject
-  public NodeProvider(final @Named("${nexus-app}") File appDir) {
+  public NodeProvider(final @Named("${nexus-app}") File appDir,
+                      final Map<String, NativeScriptFactory> scripts)
+  {
     this.appDir = checkNotNull(appDir);
+    ScriptBridgePlugin.setScripts(scripts);
   }
 
   @Override
@@ -79,7 +84,7 @@ public class NodeProvider
     log.info("Creating node with config: {}", url);
 
     ImmutableSettings.Builder builder = ImmutableSettings.settingsBuilder()
-        .classLoader(Node.class.getClassLoader())
+        .classLoader(NodeProvider.class.getClassLoader())
         .loadFromUrl(url);
 
     return nodeBuilder().settings(builder).node();

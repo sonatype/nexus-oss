@@ -16,6 +16,7 @@
 
     orient:connect plocal:../sonatype-work/nexus/db/config admin admin
     orient:insert 'into repository_configuration SET repository_name="nugethosted1", recipe_name="nuget-hosted"'
+    orient:insert 'into repository_configuration SET repository_name="nugetproxy", recipe_name="nuget-proxy", attributes={"proxy": { "remoteUrl": "http://www.nuget.org/api/v2/", "artifactMaxAge" : 5 }, "httpclient":{"connection":{"timeout":20000, "retries":2}}}'
     system:shutdown --force --reboot
 
 # Interact
@@ -23,3 +24,24 @@
 ## Hosted
 
     curl -X PUT -v -include -F package=@src/test/resources/SONATYPE.TEST.1.0.nupkg http://localhost:8081/repository/nugethosted1/upload
+    curl -X GET -v http://localhost:8081/repository/nugethosted1/SONATYPE.TEST/1.0
+    curl -X DELETE -v http://localhost:8081/repository/nugethosted1/SONATYPE.TEST/1.0
+
+### Viewing Components in OrientDB
+
+    orient:connect plocal:../sonatype-work/nexus/db/component admin admin
+    orient:select * from component
+    orient:exportrecord json
+
+# Typical Visual Studio Queries
+
+## Default Search when VS is opened
+
+    curl -X GET -v "http://localhost:8081/repository/nugethosted1/Search()/$count?$filter=IsLatestVersion&searchTerm=''&targetFramework='net45'&includePrerelease=false"
+    curl -X GET -v "http://localhost:8081/repository/nugethosted1/Search()?$filter=IsLatestVersion&$orderby=DownloadCount%20desc,Id&$skip=0&$top=30&searchTerm=''&targetFramework='net45'&includePrerelease=false"
+
+## Searching for 'Web'
+
+    curl -X GET -v http://localhost:8081/repository/nugethosted1/Search()/$count?$filter=IsLatestVersion&searchTerm='Web'&targetFramework='net45'&includePrerelease=false
+    curl -X GET -v http://localhost:8081/repository/nugethosted1/Search()?$filter=IsLatestVersion&$skip=0&$top=30&searchTerm='Web'&targetFramework='net45'&includePrerelease=false
+

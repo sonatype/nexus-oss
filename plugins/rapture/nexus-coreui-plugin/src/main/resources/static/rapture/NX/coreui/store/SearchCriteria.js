@@ -68,36 +68,27 @@ Ext.define('NX.coreui.store.SearchCriteria', {
       }
     },
     {
-      id: 'attributes.maven.classifier',
-      config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_CLASSIFIER')
-      }
-    },
-    {
-      id: 'attributes.maven.packaging',
-      config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_PACKAGING')
-      }
-    },
-    {
       id: 'assets.attributes.checksum.sha1',
+      group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_CHECKSUM'),
       config: {
         fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_SHA_1'),
         width: 250
       }
     },
     {
-      id: 'assets.attributes.checksum.md5',
+      id: 'assets.attributes.checksum.sha512',
+      group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_CHECKSUM'),
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MD5'),
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_SHA_512'),
         width: 250
       }
     },
     {
-      id: 'attributes.raw.path.tree',
+      id: 'assets.attributes.checksum.md5',
+      group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_CHECKSUM'),
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_PATH'),
-        width: 300
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MD5'),
+        width: 250
       }
     }
   ],

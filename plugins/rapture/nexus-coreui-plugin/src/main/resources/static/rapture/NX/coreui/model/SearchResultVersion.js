@@ -21,14 +21,14 @@ Ext.define('NX.coreui.model.SearchResultVersion', {
   extend: 'Ext.data.Model',
   idProperty: 'version',
   fields: [
-    'groupId',
-    'artifactId',
+    'groupingKey',
+    'group',
+    'name',
     'version',
     'versionOrder',
     'repositoryId',
     'repositoryName',
     'path',
-    'name',
     'type'
   ]
 });

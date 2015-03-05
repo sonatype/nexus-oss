@@ -14,13 +14,19 @@ package org.sonatype.nexus.repository.negativecache;
 
 import javax.annotation.Nonnull;
 
-import org.sonatype.nexus.repository.http.HttpResponses;
+import org.sonatype.nexus.repository.http.HttpMethods;
+import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
+import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
+ * Handler that caches 404 responses.
+ * When context invocation returns 404, it caches the 404 status to avoid future invocations (if cached status is
+ * present).
+ *
  * @since 3.0
  */
 public class NegativeCacheHandler
@@ -30,35 +36,33 @@ public class NegativeCacheHandler
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
-    assert "GET".equals(context.getRequest().getAction());
-
-    NegativeCacheKey key = cacheKey(context);
-
-    final NegativeCacheFacet nfc = context.getRepository().facet(NegativeCacheFacet.class);
-
-    if (nfc.isNotFound(key)) {
-      return HttpResponses.notFound();
+    String action = context.getRequest().getAction();
+    if (!HttpMethods.GET.equals(action)) {
+      return context.proceed();
     }
+    NegativeCacheFacet negativeCache = context.getRepository().facet(NegativeCacheFacet.class);
+    NegativeCacheKey key = negativeCache.getCacheKey(context);
 
-    final Response response = context.proceed();
-
-    if (indicatesNotFound(response)) {
-      nfc.cacheNotFound(key);
-      return HttpResponses.notFound();
+    Response response;
+    Status status = negativeCache.get(key);
+    if (status == null) {
+      response = context.proceed();
+      if (isNotFound(response)) {
+        negativeCache.put(key, response.getStatus());
+      }
+      else if (response.getStatus().isSuccessful()) {
+        negativeCache.invalidate(key);
+      }
     }
-
-    nfc.uncacheNotFound(key);
+    else {
+      response = new Response(status);
+      log.debug("Found {} in negative cache, returning {}", key, response);
+    }
     return response;
   }
 
-  /**
-   * Does this {@link Response} represent a 'not found' situation?
-   */
-  private boolean indicatesNotFound(final Response response) {
-    return false;
+  private boolean isNotFound(final Response response) {
+    return HttpStatus.NOT_FOUND == response.getStatus().getCode();
   }
 
-  private NegativeCacheKey cacheKey(final Context context) {
-    return context.getRepository().facet(NegativeCacheKeySource.class).cacheKey(context);
-  }
 }

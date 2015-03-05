@@ -40,13 +40,12 @@ public class SecurityHandler
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
-    Repository repository = context.getRepository();
-    SecurityFacet securityFacet = repository.facet(SecurityFacet.class);
+    SecurityFacet securityFacet = context.getRepository().facet(SecurityFacet.class);
 
     // TODO: May need to check/set some authorized flag in request-context to support group security?
     // TODO: NX2 group security applies to all members, so checks on members when accessed via group are not checked
 
-    if (securityFacet.permitted(context.getRequest(), repository)) {
+    if (securityFacet.permitted(context.getRequest())) {
       try {
         return context.proceed();
       }

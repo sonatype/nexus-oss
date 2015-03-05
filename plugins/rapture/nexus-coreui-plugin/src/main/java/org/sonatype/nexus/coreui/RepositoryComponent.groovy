@@ -26,10 +26,13 @@ import org.sonatype.nexus.common.validation.ValidationResponse
 import org.sonatype.nexus.common.validation.ValidationResponseException
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.repository.MissingFacetException
 import org.sonatype.nexus.repository.Recipe
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
+import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
+import org.sonatype.nexus.repository.view.ViewFacet
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -99,10 +102,23 @@ extends DirectComponentSupport
   }
 
   RepositoryXO asRepository(Repository input) {
+    def status = input.facet(ViewFacet).online ? 'Online' : 'Offline'
+    try {
+      def remoteStatus = input.facet(HttpClientFacet).status
+      status += " - ${remoteStatus.description}"
+      if (remoteStatus.reason) {
+        status += "<br/><i>${remoteStatus.reason}</i>"
+      }
+    }
+    catch (MissingFacetException e) {
+      // no proxy, no remote status
+    }
     return new RepositoryXO(
         name: input.name,
         type: input.type,
         format: input.format,
+        online: input.facet(ViewFacet).online,
+        status: status,
         attributes: asAttributes(input.configuration.attributes)
     )
   }

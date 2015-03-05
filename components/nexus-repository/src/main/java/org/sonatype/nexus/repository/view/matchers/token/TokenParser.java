@@ -90,6 +90,10 @@ public class TokenParser
     return values;
   }
 
+  public String getPattern() {
+    return pattern.toString();
+  }
+
   private String regexp(final List<Token> tokens) {
     StringBuilder b = new StringBuilder();
     for (Token token : tokens) {

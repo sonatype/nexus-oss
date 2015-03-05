@@ -18,22 +18,30 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.MissingFacetException;
+import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
+import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.hook.ODocumentHookAbstract;
+import com.orientechnologies.orient.core.hook.ORecordHook;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
+import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import com.tinkerpop.blueprints.impls.orient.OrientVertexType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -51,9 +59,13 @@ public class StorageFacetImpl
 {
   public static final String CONFIG_KEY = "storage";
 
+  private static final long DELETE_BATCH_SIZE = 100L;
+
   private final BlobStoreManager blobStoreManager;
 
   private final Provider<DatabaseInstance> databaseInstanceProvider;
+
+  private final ComponentMetadataFactory componentMetadataFactory;
 
   private String blobStoreName;
 
@@ -61,10 +73,12 @@ public class StorageFacetImpl
 
   @Inject
   public StorageFacetImpl(final BlobStoreManager blobStoreManager,
-                          final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider)
+                          final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
+                          final ComponentMetadataFactory componentMetadataFactory)
   {
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
+    this.componentMetadataFactory = checkNotNull(componentMetadataFactory);
   }
 
   @Override
@@ -163,13 +177,111 @@ public class StorageFacetImpl
   }
 
   @Override
+  protected void doDelete() throws Exception {
+    // delete all assets, blobs, components, and finally, the bucket.
+    // TODO: This could take a while for large repos.
+    //       Hide the bucket right away, but figure out a way to do the deletions asynchronously.
+    try (StorageTx tx = openStorageTx()) {
+      OrientVertex bucket = tx.getBucket();
+      deleteAll(tx, tx.browseAssets(bucket), new Predicate<OrientVertex>()
+      {
+        @Override
+        public boolean apply(final OrientVertex vertex) {
+          BlobRef blobRef = BlobRef.parse(checkNotNull((String) vertex.getProperty(P_BLOB_REF)));
+          tx.deleteBlob(blobRef);
+          return true;
+        }
+      });
+      deleteAll(tx, tx.browseComponents(bucket), null);
+      tx.deleteVertex(bucket);
+      tx.commit();
+    }
+  }
+
+  /**
+   * Deletes all given vertices in batches. If a predicate is specified, it will be executed before each delete.
+   */
+  private void deleteAll(StorageTx tx, Iterable<OrientVertex> vertices, @Nullable Predicate<OrientVertex> predicate) {
+    long count = 0;
+    for (OrientVertex vertex : vertices) {
+      if (predicate != null) {
+        predicate.apply(vertex);
+      }
+      tx.deleteVertex(vertex);
+      count++;
+      if (count == DELETE_BATCH_SIZE) {
+        tx.commit();
+        count = 0;
+      }
+    }
+    tx.commit();
+  }
+
+  @Override
   @Guarded(by = STARTED)
   public StorageTx openTx() {
+    return openStorageTx();
+  }
+
+  private StorageTx openStorageTx() {
     BlobStore blobStore = blobStoreManager.get(blobStoreName);
     return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(), bucketId);
   }
 
   private GraphTx openGraphTx() {
-    return new GraphTx(databaseInstanceProvider.get().acquire());
+    ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire();
+    try {
+      return new IndexHookedGraphTx(db, getRepository().facet(SearchFacet.class));
+    }
+    catch (MissingFacetException e) {
+      // no search facet, no indexing
+      return new GraphTx(db);
+    }
+  }
+
+  private class IndexHookedGraphTx
+      extends GraphTx
+  {
+
+    private final ORecordHook hook;
+
+    public IndexHookedGraphTx(final ODatabaseDocumentTx db, final SearchFacet searchFacet) {
+      super(db);
+      database.registerHook(hook = new ODocumentHookAbstract()
+      {
+        @Override
+        public String[] getIncludeClasses() {
+          return new String[]{V_COMPONENT};
+        }
+
+        @Override
+        public DISTRIBUTED_EXECUTION_MODE getDistributedExecutionMode() {
+          return DISTRIBUTED_EXECUTION_MODE.TARGET_NODE;
+        }
+
+        @Override
+        public void onRecordAfterCreate(final ODocument doc) {
+          // TODO should indexing failures affect storage? (catch and log?)
+          searchFacet.put(componentMetadataFactory.from(new OrientVertex(IndexHookedGraphTx.this, doc)));
+        }
+
+        @Override
+        public void onRecordAfterUpdate(final ODocument doc) {
+          onRecordAfterCreate(doc);
+        }
+
+        @Override
+        public void onRecordAfterDelete(final ODocument doc) {
+          // TODO should indexing failures affect storage? (catch and log?)
+          searchFacet.delete(new OrientVertex(IndexHookedGraphTx.this, doc).getId().toString());
+        }
+      });
+    }
+
+    @Override
+    public void close() {
+      database.unregisterHook(hook);
+      super.close();
+    }
   }
 }

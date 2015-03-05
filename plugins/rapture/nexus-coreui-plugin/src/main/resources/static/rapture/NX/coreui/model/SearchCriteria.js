@@ -21,6 +21,7 @@ Ext.define('NX.coreui.model.SearchCriteria', {
   extend: 'Ext.data.Model',
   fields: [
     'id',
+    'group',
     'config'
   ]
 });

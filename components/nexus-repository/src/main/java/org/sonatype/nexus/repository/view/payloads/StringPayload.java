@@ -33,14 +33,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StringPayload
     implements Payload
 {
-  private final String content;
+  private final byte[] contentBytes;
 
   private final Charset charset;
 
   private final String contentType;
 
   public StringPayload(final String content, final Charset charset, final @Nullable String contentType) {
-    this.content = checkNotNull(content);
+    this.contentBytes = checkNotNull(content).getBytes(charset);
     this.charset = checkNotNull(charset);
     this.contentType = contentType;
   }
@@ -55,12 +55,12 @@ public class StringPayload
 
   @Override
   public InputStream openInputStream() throws IOException {
-    return new ByteArrayInputStream(content.getBytes(charset));
+    return new ByteArrayInputStream(contentBytes);
   }
 
   @Override
   public long getSize() {
-    return content.length();
+    return contentBytes.length;
   }
 
   @Nullable
@@ -72,7 +72,7 @@ public class StringPayload
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "size=" + content.length() +
+        "size=" + contentBytes.length +
         ", charset=" + charset +
         ", contentType='" + contentType + '\'' +
         '}';

@@ -55,8 +55,8 @@ Ext.define('NX.coreui.controller.StorageFileMavenInfo', {
         if (!panel) {
           panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefilemaveninfo', weight: 20 });
         }
-        info[NX.I18n.get('BROWSE_SEARCH_MAVEN_GROUP')] = response.data['groupId'];
-        info[NX.I18n.get('BROWSE_SEARCH_MAVEN_ARTIFACT')] = response.data['artifactId'];
+        info[NX.I18n.get('BROWSE_SEARCH_MAVEN_GROUP')] = response.data['group'];
+        info[NX.I18n.get('BROWSE_SEARCH_MAVEN_ARTIFACT')] = response.data['name'];
         info[NX.I18n.get('BROWSE_SEARCH_MAVEN_VERSION')] = response.data['version'];
         if (response.data['classifier']) {
           info[NX.I18n.get('BROWSE_SEARCH_MAVEN_CLASSIFIER')] = response.data['classifier'];

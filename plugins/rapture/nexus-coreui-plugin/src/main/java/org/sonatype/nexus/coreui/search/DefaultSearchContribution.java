@@ -31,7 +31,9 @@ public class DefaultSearchContribution
 
   @Override
   public void contribute(final BoolFilterBuilder filter, final String type, final String value) {
-    filter.must(FilterBuilders.termFilter(type, value));
+    if (value != null) {
+      filter.must(FilterBuilders.termFilter(type, value));
+    }
   }
 
 }

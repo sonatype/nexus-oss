@@ -41,10 +41,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 class HttpRequestAdapter
     extends Request
 {
-  public HttpRequestAdapter(final HttpServletRequest httpServletRequest, final String path) {
+  public HttpRequestAdapter(final HttpServletRequest httpServletRequest,
+                            final String path)
+  {
     checkNotNull(httpServletRequest);
 
     this.action = httpServletRequest.getMethod();
+    this.requestUrl = httpServletRequest.getRequestURL().toString();
     this.path = checkNotNull(path);
     this.parameters = new HttpParametersAdapter(httpServletRequest);
     this.headers = new HttpHeadersAdapter(httpServletRequest);

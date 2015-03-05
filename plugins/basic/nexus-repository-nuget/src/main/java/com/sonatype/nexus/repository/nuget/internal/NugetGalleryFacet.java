@@ -16,8 +16,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.view.Parameters;
+import org.sonatype.nexus.repository.view.Payload;
+
+import org.joda.time.DateTime;
 
 /**
  * Provides persistent storage for Nuget content.
@@ -26,56 +30,53 @@ import org.sonatype.nexus.repository.view.Parameters;
  */
 @Facet.Exposed
 public interface NugetGalleryFacet
-    extends Facet
+    extends Facet, NugetWritableGallery
 {
-  /**
-   * Returns the count of packages matching the given query; scoped to the given repositories.
-   *
-   * @param path       Typically a feed name plus "/$count"
-   * @param parameters containing the query elements
-   * @return Package count
-   */
-  int count(final String path, final Parameters parameters);
-
-  /**
-   * Returns named feed of packages matching the given query; scoped to the given repositories.
-   *
-   * @param base  Base URI
-   * @param name  Feed name
-   * @param query OData query
-   * @return NuGet feed
-   */
-  String feed(String base, String name, final Parameters query);
-
-  /**
-   * Returns the package entry for the given Id and Version; scoped to the given repositories.
-   *
-   * @param base    Base URI
-   * @param id      Package Id
-   * @param version Package Version
-   * @return NuGet entry; {@code null} if not found
-   */
-  String entry(String base, String id, String version);
-
-  /**
-   * Locates the package with the same Id and Version; scoped to the given repositories.
-   *
-   * @param id      Package Id
-   * @param version Package Version
-   * @return Package location; {@code null} if unknown
-   */
-  String locate(String id, String version);
-
-  /**
-   * Identifies the given package and returns its Id and Version coordinates.
-   *
-   * @param location Package location
-   * @return Id and Version coordinates; {@code null} if unknown
-   */
-  String[] identify(String location);
-
   /**
    * Add or update a package to the nuget gallery.
    */
   void put(InputStream inputStream) throws IOException, NugetPackageException;
+
+  /**
+   * Get a package, or {@code null} if not found.
+   */
+  @Nullable
+  Payload get(String id, String version) throws IOException;
+
+  /**
+   * Gets the last updated date of a package, or {@code null} if not found.
+   */
+  DateTime getLastUpdatedDate(String id, String version);
+
+  /**
+   * Delete a package and return whether it existed.
+   */
+  boolean delete(String id, String version) throws IOException;
+
+  /**
+   * Returns named feed of packages matching the given query.
+   *
+   * @param base       Base URI
+   * @param operation  Feed name
+   * @param parameters OData query parameters
+   * @return NuGet feed XML
+   */
+  public String feed(final String base, final String operation, final Map<String, String> parameters);
+
+  /**
+   * Returns entry XML for a given package ID and version.
+   *
+   * @param base    Base URI
+   * @param id      package id
+   * @param version package version
+   */
+  public String entry(final String base, final String id, final String version);
+
+  /**
+   * Returns the number of matching packages
+   *
+   * @param operation       typically a feed name followed by "/$count"
+   * @param parameters OData query parameters
+   */
+  public int count(final String operation, final Map<String, String> parameters);
 }
