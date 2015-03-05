@@ -102,7 +102,7 @@ public class ChecksumReconciler
       ByteStreams.copy(is, ByteStreams.nullOutputStream());
     }
 
-    if (attributeChecksum.equals(DigesterUtils.getDigestAsString(message.digest()))) {
+    if (attributeChecksum != null && attributeChecksum.equals(DigesterUtils.getDigestAsString(message.digest()))) {
       log.info("Reconciling attribute checksums for {}", item);
       final RepositoryItemUid uid = item.getRepositoryItemUid();
       uid.getLock().lock(Action.update);
