@@ -30,7 +30,6 @@ import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Adapts Sisu {@link BeanEntry} (carrying {@link Action}) to a Karaf {@link CommandWithAction}.
@@ -60,19 +59,28 @@ public class BeanEntryCommand
         continue;
       }
 
-      // TODO: Log warning/errors instead of throwing exceptions on configuration mismatches?
-
       Argument argument = field.getAnnotation(Argument.class);
       Option option = field.getAnnotation(Option.class);
-      checkState(argument != null || option != null, "Missing @Argument or @Option");
+      if (argument == null && option == null) {
+        log.warn("Missing @Argument or @Option on field: {}", field);
+        continue;
+      }
 
       Completer completer = lookupCompleter(complete.value());
-      checkState(completer != null, "Missing completer with name: %s", complete.value());
+      if (completer == null) {
+        log.warn("Missing completer with name: {}", complete.value());
+        continue;
+      }
+
+      // Expose target field to aware completers
+      if (completer instanceof CompleterTargetAware) {
+        ((CompleterTargetAware)completer).setCompleterTarget(field);
+      }
 
       if (argument != null) {
         addArgumentCompleter(argument.index(), completer);
       }
-      else if (option != null) {
+      else { // option
         addOptionCompleter(option.name(), completer);
       }
     }
