@@ -39,12 +39,10 @@ public class ReconcileChecksumsTaskDescriptor
   private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(REPO_OR_GROUP_FIELD_ID,
       FormField.MANDATORY);
 
-  private final StringTextFormField resourceStorePathField =
-      new StringTextFormField(
-          RESOURCE_STORE_PATH_FIELD_ID,
-          "Repository path",
-          "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
-          FormField.OPTIONAL);
+  private final StringTextFormField resourceStorePathField = new StringTextFormField(RESOURCE_STORE_PATH_FIELD_ID,
+      "Repository path",
+      "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+      FormField.OPTIONAL);
 
   public String getId() {
     return ID;
@@ -54,8 +52,9 @@ public class ReconcileChecksumsTaskDescriptor
     return "Reconcile Repository Checksums";
   }
 
+  @Override
   public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
+    final List<FormField> fields = new ArrayList<FormField>();
 
     fields.add(repoField);
 

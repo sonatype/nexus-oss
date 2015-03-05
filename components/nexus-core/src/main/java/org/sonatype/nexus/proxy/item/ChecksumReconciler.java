@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -28,6 +29,7 @@ import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.util.DigesterUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -35,7 +37,7 @@ import com.google.common.io.ByteStreams;
 
 /**
  * Reconciles any item attribute checksums affected by NEXUS-8178.
- * 
+ *
  * @since 2.11.3
  */
 @Named
@@ -74,7 +76,15 @@ public class ChecksumReconciler
       }
     });
 
-    walker.walk(context);
+    try {
+      walker.walk(context);
+    }
+    catch (final WalkerException e) {
+      if (!(e.getWalkerContext().getStopCause() instanceof ItemNotFoundException)) {
+        // everything that is not ItemNotFound should be reported, otherwise just neglect it
+        throw e;
+      }
+    }
   }
 
   /**

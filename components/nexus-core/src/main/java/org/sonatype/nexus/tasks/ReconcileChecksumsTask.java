@@ -25,7 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reconcile checksums task.
- * 
+ *
  * @since 2.11.3
  */
 @Named(ReconcileChecksumsTaskDescriptor.ID)
@@ -40,7 +40,7 @@ public class ReconcileChecksumsTask
   private final ChecksumReconciler checksumReconciler;
 
   @Inject
-  public ReconcileChecksumsTask(ChecksumReconciler checksumReconciler) {
+  public ReconcileChecksumsTask(final ChecksumReconciler checksumReconciler) {
     this.checksumReconciler = checkNotNull(checksumReconciler);
   }
 
@@ -56,14 +56,14 @@ public class ReconcileChecksumsTask
 
   @Override
   public Object doRun() throws Exception {
-    ResourceStoreRequest request = new ResourceStoreRequest(getResourceStorePath());
+    final ResourceStoreRequest request = new ResourceStoreRequest(getResourceStorePath());
 
     if (getRepositoryId() != null) {
-      Repository repo = getRepositoryRegistry().getRepository(getRepositoryId());
+      final Repository repo = getRepositoryRegistry().getRepository(getRepositoryId());
       checksumReconciler.reconcileChecksums(repo, request);
     }
     else {
-      for (Repository repo : getRepositoryRegistry().getRepositories()) {
+      for (final Repository repo : getRepositoryRegistry().getRepositories()) {
         checksumReconciler.reconcileChecksums(repo, request);
       }
     }
