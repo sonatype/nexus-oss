@@ -85,15 +85,17 @@ public class TokenParser
 
     Map<String, String> values = new HashMap<>();
     for (int i = 0; i < matcher.groupCount(); i++) {
-      if (values.containsKey(variables.get(i).getName())) {
-        if (!Objects.equals(values.get(variables.get(i).getName()), matcher.group(i + 1))) {
-          log.trace("Variable '{}' values mismatch: '{}' vs '{}'", variables.get(i).getName(),
-              values.get(variables.get(i).getName()), matcher.group(i + 1));
+      final String name = variables.get(i).getName();
+      final String value = matcher.group(i + 1);
+      if (values.containsKey(name)) {
+        final String existingValue = values.get(name);
+        if (!Objects.equals(existingValue, value)) {
+          log.trace("Variable '{}' values mismatch: '{}' vs '{}'", name, existingValue, value);
           return null;
         }
       }
       else {
-        values.put(variables.get(i).getName(), matcher.group(i + 1));
+        values.put(name, value);
       }
     }
 
