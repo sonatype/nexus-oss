@@ -16,6 +16,7 @@ import org.apache.karaf.shell.commands.Argument
 import org.apache.karaf.shell.commands.Command
 import org.apache.karaf.shell.commands.Option
 import org.apache.karaf.shell.console.AbstractAction
+import org.sonatype.nexus.commands.Complete
 import org.sonatype.nexus.log.LogManager
 import org.sonatype.nexus.log.LoggerLevel
 
@@ -42,9 +43,11 @@ class LoggerAction
   Boolean effective
 
   @Argument(name="name", index = 0, required = true, description = 'Logger name')
+  @Complete('logger-name')
   String name
 
   @Argument(name="level", index = 1, description = 'Logger level')
+  @Complete('logger-level')
   LoggerLevel level
 
   @Override
