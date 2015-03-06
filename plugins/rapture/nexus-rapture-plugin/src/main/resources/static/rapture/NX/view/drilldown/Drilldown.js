@@ -474,7 +474,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
     if (parent && breadcrumb.getWidth() + padding > parent.getWidth()) {
 
       // Yes. Take measurements and get a list of buttons sorted by length (longest first)
-      buttons = breadcrumb.query('button').splice(1).sort(function(a,b) { return a.getWidth() < b.getWidth(); });
+      buttons = breadcrumb.query('button').splice(1);
       availableWidth = parent.getWidth();
 
       // What is the width of the breadcrumb, sans buttons?
@@ -492,16 +492,17 @@ Ext.define('NX.view.drilldown.Drilldown', {
    * @private
    * Reduce the width of a set of buttons, longest first, to a specified width
    *
-   * @param buttons The list of buttons to resize (sorted descending by width)
+   * @param buttons The list of buttons to resize
    * @param width The desired resize width (sum of all buttons)
    * @param minPerButton The minimum to resize each button (until all buttons are at this minimum)
    */
   reduceButtonWidth: function(buttons, width, minPerButton) {
     var me = this,
       currentWidth = 0,
-      currentButtonWidth,
-      nextButtonWidth,
       setToWidth;
+
+    // Sort the buttons by width
+    buttons = buttons.sort(function(a,b) { return b.getWidth() - a.getWidth() });
 
     // Calculate the current width of the buttons
     for (var i = 0; i < buttons.length; ++i) {
@@ -510,6 +511,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
 
     // Find the next button to resize
     for (var i = 0; i < buttons.length; ++i) {
+
       // Shorten the longest button
       if (i < buttons.length - 1 && buttons[i].getWidth() > buttons[i+1].getWidth()) {
 
