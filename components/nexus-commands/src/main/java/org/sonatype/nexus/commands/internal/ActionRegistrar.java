@@ -14,6 +14,7 @@ package org.sonatype.nexus.commands.internal;
 
 import java.util.Dictionary;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -47,12 +48,17 @@ public class ActionRegistrar
 
   @Inject
   public ActionRegistrar(final BeanLocator beanLocator,
-                         final BundleContext bundleContext)
+                         final @Nullable BundleContext bundleContext)
   {
     this.beanLocator = checkNotNull(beanLocator);
-    checkNotNull(bundleContext);
 
-    beanLocator.watch(Key.get(Action.class, Named.class), new ActionMediator(), bundleContext);
+    // HACK: BundleContext may be null in present injected-UT environment
+    if (bundleContext != null) {
+      beanLocator.watch(Key.get(Action.class, Named.class), new ActionMediator(), bundleContext);
+    }
+    else {
+      log.warn("BundleContext is not available, unable to watch action components for registration");
+    }
   }
 
   private class ActionMediator
