@@ -478,10 +478,10 @@ Ext.define('NX.coreui_legacy.controller.Repositories', {
    * @param {NX.coreui_legacy.model.Repository} model repository model
    */
   rebuildMavenMetadata: function(model) {
-    NX.direct.coreui_legacy_Maven.rebuildMetadata(model.getId(), '/', function(response) {
+    NX.direct.coreui_Maven.rebuildMetadata(model.getId(), '/', function(response) {
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: NX.I18n.format('LEGACY_ADMIN_REPOSITORIES_DETAILS_REBUILD_SUCCESS', model.get('name')),
+          text: NX.I18n.format('LEGACY_ADMIN_REPOSITORIES_DETAILS_REBUILD_SUCCESS', model.getId()),
           type: 'success'
         });
       }
