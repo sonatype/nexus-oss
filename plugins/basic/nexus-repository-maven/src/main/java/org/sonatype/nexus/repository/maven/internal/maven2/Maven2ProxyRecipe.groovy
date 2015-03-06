@@ -28,7 +28,6 @@ import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.maven.internal.MavenTokenizerHandler
 import org.sonatype.nexus.repository.maven.internal.policy.MavenPolicyHandler
-import org.sonatype.nexus.repository.maven.internal.policy.MavenRepositoryPolicyHandler
 import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacetImpl
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
 import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler

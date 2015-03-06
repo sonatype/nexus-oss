@@ -26,9 +26,8 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.maven.internal.MavenTokenizerHandler
-import org.sonatype.nexus.repository.maven.internal.policy.MavenPolicyHandler
-import org.sonatype.nexus.repository.maven.internal.policy.MavenRepositoryPolicyHandler
 import org.sonatype.nexus.repository.maven.internal.hosted.MavenHostedHandler
+import org.sonatype.nexus.repository.maven.internal.policy.MavenPolicyHandler
 import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacetImpl
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
