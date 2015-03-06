@@ -502,13 +502,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
       setToWidth;
 
     // Sort the buttons by width
-    buttons = buttons.sort(
-      function(a,b) {
-        return a.getWidth() < b.getWidth() ? 1
-             : a.getWidth() > b.getWidth() ? -1
-             : 0;
-      }
-    );
+    buttons = buttons.sort(function(a,b) { return b.getWidth() - a.getWidth() });
 
     // Calculate the current width of the buttons
     for (var i = 0; i < buttons.length; ++i) {
