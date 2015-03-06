@@ -52,7 +52,6 @@ public class Maven2PathParser
 
   @Override
   public Coordinates parsePath(final String path) {
-    final Gav gav = m2GavCalculator.pathToGav(path);
     final String fileName = path.substring(path.lastIndexOf('/') + 1);
     HashType hashType = null;
     for (HashType ht : HashType.values()) {
@@ -61,6 +60,7 @@ public class Maven2PathParser
         break;
       }
     }
+    final Gav gav = m2GavCalculator.pathToGav(path);
     if (gav == null) {
       return new Coordinates(path, fileName, hashType);
     }
@@ -76,8 +76,11 @@ public class Maven2PathParser
       }
 
       String classifier = gav.getClassifier();
-      if (classifier != null && Strings.isNullOrEmpty(classifier.trim())) {
-        classifier = null;
+      if (classifier != null) {
+        classifier = classifier.trim();
+        if (Strings.isNullOrEmpty(classifier)) {
+          classifier = null;
+        }
       }
 
       return new ArtifactCoordinates(
