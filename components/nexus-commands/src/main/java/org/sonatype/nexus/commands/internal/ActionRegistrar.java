@@ -14,7 +14,6 @@ package org.sonatype.nexus.commands.internal;
 
 import java.util.Dictionary;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -59,17 +58,9 @@ public class ActionRegistrar
   private class ActionMediator
       implements Mediator<Named, Action, BundleContext>
   {
-    /**
-     * Returns command annotation for given bean-entry if one exists.
-     */
-    @Nullable
-    private Command command(final BeanEntry<?,Action> beanEntry) {
-      return beanEntry.getImplementationClass().getAnnotation(Command.class);
-    }
-
     @Override
     public void add(final BeanEntry<Named, Action> beanEntry, final BundleContext bundleContext) throws Exception {
-      Command command = command(beanEntry);
+      Command command = beanEntry.getImplementationClass().getAnnotation(Command.class);
       if (command != null) {
         // TODO: warn if @Singleton is present, this is probably not desired due to @Option/@Argument processing ?
 
