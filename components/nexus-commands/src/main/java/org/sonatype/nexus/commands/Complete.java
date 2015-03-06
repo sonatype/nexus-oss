@@ -20,6 +20,7 @@ import java.lang.annotation.Target;
 import org.apache.karaf.shell.commands.Action;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.console.Completer;
 
 /**
  * Binds a named completer to an {@link Action} field.
@@ -32,5 +33,8 @@ import org.apache.karaf.shell.commands.Option;
 @Target({ElementType.FIELD})
 public @interface Complete
 {
+  /**
+   * Names of {@link Completer} components to install.
+   */
   String[] value();
 }
