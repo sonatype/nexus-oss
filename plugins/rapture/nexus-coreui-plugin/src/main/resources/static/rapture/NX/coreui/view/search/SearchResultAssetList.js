@@ -13,23 +13,23 @@
 /*global Ext, NX*/
 
 /**
- * Versions / search results grid.
+ * Assets / search results grid.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.SearchResultVersionList', {
+Ext.define('NX.coreui.view.search.SearchResultAssetList', {
   extend: 'NX.view.drilldown.Master',
-  alias: 'widget.nx-coreui-search-result-version-list',
+  alias: 'widget.nx-coreui-search-result-asset-list',
   requires: [
     'NX.I18n'
   ],
 
-  store: 'SearchResultVersion',
+  store: 'Asset',
 
   allowDeselect: true,
 
   viewConfig: {
-    emptyText: 'No versions found',
+    emptyText: 'No assets found',
     deferEmptyText: false
   },
 
@@ -47,16 +47,7 @@ Ext.define('NX.coreui.view.search.SearchResultVersionList', {
         return 'default';
       }
     },
-    {
-      header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_VERSION_COLUMN'),
-      dataIndex: 'versionOrder',
-      flex: 1,
-      renderer: function (value, metadata, model) {
-        return model.get('version');
-      }
-    },
-    { header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_FILE_COLUMN'), dataIndex: 'name', flex: 2.5 },
-    { header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_REPOSITORY_COLUMN'), dataIndex: 'repositoryName', flex: 1 }
+    { header: NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME_COLUMN'), dataIndex: 'name', flex: 2.5 }
   ],
 
   features: [

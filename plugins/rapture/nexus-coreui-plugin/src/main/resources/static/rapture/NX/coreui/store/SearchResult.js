@@ -19,7 +19,7 @@
  */
 Ext.define('NX.coreui.store.SearchResult', {
   extend: 'Ext.data.Store',
-  model: 'NX.coreui.model.SearchResult',
+  model: 'NX.coreui.model.Component',
 
   proxy: {
     type: 'direct',
@@ -35,6 +35,7 @@ Ext.define('NX.coreui.store.SearchResult', {
     }
   },
 
+  pageSize: 50,
   remoteFilter: true
 
 });

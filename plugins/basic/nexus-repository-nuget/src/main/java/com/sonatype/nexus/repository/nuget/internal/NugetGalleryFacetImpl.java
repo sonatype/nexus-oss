@@ -32,7 +32,7 @@ import com.sonatype.nexus.repository.nuget.internal.odata.NugetPackageUtils;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
-import com.sonatype.nexus.repository.nuget.internal.util.TempStreamSupplier;
+import org.sonatype.nexus.common.io.TempStreamSupplier;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;

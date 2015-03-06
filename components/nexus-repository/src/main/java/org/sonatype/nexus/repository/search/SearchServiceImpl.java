@@ -38,11 +38,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.internal.InternalSearchResponse;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -207,6 +209,37 @@ public class SearchServiceImpl
         };
       }
     };
+  }
+
+  @Override
+  public Iterable<SearchHit> browse(final QueryBuilder query, final int from, final int size) {
+    SearchResponse response = search(query, from, size);
+    return Arrays.asList(response.getHits().getHits());
+  }
+
+  @Override
+  public SearchResponse search(final QueryBuilder query, final int from, final int size) {
+    checkNotNull(query);
+    try {
+      if (!client.get().admin().indices().prepareValidateQuery().setQuery(query).execute().actionGet().isValid()) {
+        throw new IllegalArgumentException("Invalid query");
+      }
+    }
+    catch (IndexMissingException e) {
+      // no repositories were created yet, so there is no point in searching
+      return null;
+    }
+    final String[] searchableIndexes = getSearchableIndexes();
+    if (searchableIndexes.length == 0) {
+      return new SearchResponse(InternalSearchResponse.empty(), null, 0, 0, 0, new ShardSearchFailure[]{});
+    }
+    return client.get().prepareSearch(searchableIndexes)
+        .setTypes(TYPE)
+        .setQuery(query)
+        .setFrom(from)
+        .setSize(size)
+        .execute()
+        .actionGet();
   }
 
   private String[] getSearchableIndexes() {

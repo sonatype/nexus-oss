@@ -13,7 +13,6 @@
 package org.sonatype.nexus.repository.proxy;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
 import javax.annotation.Nonnull;
@@ -27,10 +26,8 @@ import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 
-import com.google.common.io.ByteStreams;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -124,7 +121,7 @@ public abstract class ProxyFacetSupport
 
           store(context, remote);
 
-          content = remote;
+          content = getCachedPayload(context);
         }
       }
       catch (IOException e) {

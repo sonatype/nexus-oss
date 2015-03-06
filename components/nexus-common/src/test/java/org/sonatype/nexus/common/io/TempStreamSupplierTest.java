@@ -10,14 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.nexus.repository.nuget.internal.util;
+package org.sonatype.nexus.common.io;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.apache.commons.fileupload.util.Streams;
+import com.google.common.base.Throwables;
+import com.google.common.io.CharStreams;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -33,12 +36,21 @@ public class TempStreamSupplierTest
     TempStreamSupplier underTest = new TempStreamSupplier(content());
 
     try (InputStream i1 = underTest.get(); InputStream i2 = underTest.get()) {
-      assertThat(Streams.asString(i1), is(content));
-      assertThat(Streams.asString(i2), is(content));
+      assertThat(asString(i1), is(content));
+      assertThat(asString(i2), is(content));
     }
   }
 
   private InputStream content() {
     return new ByteArrayInputStream(content.getBytes());
+  }
+
+  private String asString(InputStream in) {
+    try (InputStreamReader reader = new InputStreamReader(in)) {
+      return CharStreams.toString(reader);
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 }

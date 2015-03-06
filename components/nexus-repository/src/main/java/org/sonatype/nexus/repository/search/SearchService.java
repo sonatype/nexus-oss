@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.search;
 
 import org.sonatype.nexus.repository.Repository;
 
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
@@ -49,5 +50,15 @@ public interface SearchService
    * Search component metadata and browse results.
    */
   Iterable<SearchHit> browse(QueryBuilder query);
+
+  /**
+   * Search component metadata and browse results (paged).
+   */
+  Iterable<SearchHit> browse(QueryBuilder query, int from, int size);
+
+  /**
+   * Search component metadata and browse results (paged).
+   */
+  SearchResponse search(QueryBuilder query, int from, int size);
 
 }

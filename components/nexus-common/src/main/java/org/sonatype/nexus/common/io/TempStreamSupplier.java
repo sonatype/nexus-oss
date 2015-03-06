@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.nexus.repository.nuget.internal.util;
+package org.sonatype.nexus.common.io;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
 
 /**
- * Renders an InputStream re-readable by caching its content to a temporary file.
+ * Renders an InputStream re-readable by saving it to a temporary file that is removed when the supplier is closed.
  *
  * @since 3.0
  */

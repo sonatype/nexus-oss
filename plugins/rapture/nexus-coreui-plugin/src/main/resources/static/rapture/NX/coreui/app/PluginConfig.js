@@ -30,6 +30,12 @@ Ext.define('NX.coreui.app.PluginConfig', {
 
   controllers: [
     {
+      id: 'NX.coreui.controller.AssetInfo',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
       id: 'NX.coreui.controller.AnalyticsSettings',
       active: function () {
         return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-analytics-plugin');

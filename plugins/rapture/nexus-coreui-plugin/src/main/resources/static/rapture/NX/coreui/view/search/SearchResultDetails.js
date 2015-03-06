@@ -37,10 +37,9 @@ Ext.define('NX.coreui.view.search.SearchResultDetails', {
     var me = this;
 
     me.items = [
-      { xtype: 'nx-info', itemId: 'group' },
-      { xtype: 'nx-info', itemId: 'name' },
-      { xtype: 'nx-info', itemId: 'format' },
-      { xtype: 'nx-info', itemId: 'popular' }
+      { xtype: 'nx-info', itemId: 'info1' },
+      { xtype: 'nx-info', itemId: 'info2' },
+      { xtype: 'nx-info', itemId: 'info3' }
     ];
 
     me.callParent();
