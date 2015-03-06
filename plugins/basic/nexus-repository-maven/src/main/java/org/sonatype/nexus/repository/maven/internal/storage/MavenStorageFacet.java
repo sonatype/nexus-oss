@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.content.InvalidContentException;
-import org.sonatype.nexus.repository.maven.Content;
+import org.sonatype.nexus.repository.maven.internal.Content;
 
 import org.joda.time.DateTime;
 
@@ -37,6 +37,8 @@ public interface MavenStorageFacet
   void put(String path, Content content) throws IOException, InvalidContentException;
 
   boolean delete(String path) throws IOException;
+
+  boolean exists(String path) throws IOException;
 
   void updateLastUpdated(String path, final DateTime lastUpdated) throws IOException;
 }

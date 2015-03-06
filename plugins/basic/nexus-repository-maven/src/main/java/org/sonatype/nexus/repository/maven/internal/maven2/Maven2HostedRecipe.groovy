@@ -25,7 +25,7 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
-import org.sonatype.nexus.repository.maven.internal.MavenRepositoryPolicyHandler
+import org.sonatype.nexus.repository.maven.internal.policy.MavenRepositoryPolicyHandler
 import org.sonatype.nexus.repository.maven.internal.hosted.MavenHostedHandler
 import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacetImpl
 import org.sonatype.nexus.repository.search.SearchFacet

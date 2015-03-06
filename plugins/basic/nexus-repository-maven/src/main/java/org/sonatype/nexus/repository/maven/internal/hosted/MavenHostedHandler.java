@@ -17,7 +17,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.maven.Content;
+import org.sonatype.nexus.repository.maven.internal.Content;
 import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -29,9 +29,9 @@ import org.joda.time.DateTime;
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
-import static org.sonatype.nexus.repository.maven.internal.ContentHelper.contentName;
 import static org.sonatype.nexus.repository.maven.internal.ContentHelper.toContent;
 import static org.sonatype.nexus.repository.maven.internal.ContentHelper.toPayload;
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.name;
 
 /**
  * Maven hosted handler.
@@ -48,7 +48,7 @@ public class MavenHostedHandler
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
     final String action = context.getRequest().getAction();
-    final String name = contentName(context);
+    final String name = name(context);
     final MavenStorageFacet mavenStorageFacet = context.getRepository().facet(MavenStorageFacet.class);
 
     switch (action) {

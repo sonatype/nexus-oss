@@ -10,26 +10,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.sonatype.nexus.common.hash.HashAlgorithm;
-
-import com.google.common.hash.HashCode;
-import org.joda.time.DateTime;
+package org.sonatype.nexus.repository.maven.internal.policy;
 
 /**
+ * Maven repository policy evaluation result.
+ *
  * @since 3.0
  */
-public interface Content
+public class PolicyEvaluation
 {
-  String getContentType();
+  private final boolean aligned;
 
-  long getSize();
+  private final String message;
 
-  InputStream openInputStream() throws IOException;
+  public PolicyEvaluation(final boolean aligned, final String message) {
+    this.aligned = aligned;
+    this.message = message;
+  }
 
-  DateTime getLastUpdated();
+  public boolean isAligned() {
+    return aligned;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() +
+        "aligned=" + aligned +
+        ", message='" + message + '\'' +
+        '}';
+  }
 }

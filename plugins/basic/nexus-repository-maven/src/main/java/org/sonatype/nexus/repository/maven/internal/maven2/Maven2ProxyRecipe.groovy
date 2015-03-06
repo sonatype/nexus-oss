@@ -26,7 +26,7 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
-import org.sonatype.nexus.repository.maven.internal.MavenRepositoryPolicyHandler
+import org.sonatype.nexus.repository.maven.internal.policy.MavenRepositoryPolicyHandler
 import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacetImpl
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
 import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler

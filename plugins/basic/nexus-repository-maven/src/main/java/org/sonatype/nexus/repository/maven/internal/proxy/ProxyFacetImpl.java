@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.content.InvalidContentException;
-import org.sonatype.nexus.repository.maven.Content;
+import org.sonatype.nexus.repository.maven.internal.Content;
 import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Context;
@@ -26,9 +26,9 @@ import org.sonatype.nexus.repository.view.Payload;
 
 import org.joda.time.DateTime;
 
-import static org.sonatype.nexus.repository.maven.internal.ContentHelper.contentName;
 import static org.sonatype.nexus.repository.maven.internal.ContentHelper.toContent;
 import static org.sonatype.nexus.repository.maven.internal.ContentHelper.toPayload;
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.name;
 
 /**
  * @since 3.0
@@ -39,7 +39,7 @@ public class ProxyFacetImpl
 {
   @Override
   protected Payload getCachedPayload(final Context context) throws IOException {
-    final String name = contentName(context);
+    final String name = name(context);
     final Content content = storage().get(name);
     if (content == null) {
       return null;
@@ -49,24 +49,24 @@ public class ProxyFacetImpl
 
   @Override
   protected DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException {
-    final Content content = storage().get(contentName(context));
+    final Content content = storage().get(name(context));
     return content != null ? content.getLastUpdated() : null;
   }
 
   @Override
   protected void indicateUpToDate(final Context context) throws IOException {
-    storage().updateLastUpdated(contentName(context), new DateTime());
+    storage().updateLastUpdated(name(context), new DateTime());
   }
 
   @Override
   protected void store(final Context context, final Payload payload) throws IOException, InvalidContentException {
-    final String name = contentName(context);
+    final String name = name(context);
     storage().put(name, toContent(payload, new DateTime()));
   }
 
   @Override
   protected String getUrl(final @Nonnull Context context) {
-    return contentName(context);
+    return name(context);
   }
 
   private MavenStorageFacet storage() {

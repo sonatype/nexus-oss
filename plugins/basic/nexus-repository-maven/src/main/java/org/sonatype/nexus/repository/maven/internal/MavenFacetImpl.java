@@ -18,8 +18,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.maven.MavenFacet;
-import org.sonatype.nexus.repository.maven.VersionPolicy;
+import org.sonatype.nexus.repository.maven.internal.policy.deploy.RedeployPolicy;
+import org.sonatype.nexus.repository.maven.internal.policy.version.VersionPolicy;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -38,6 +38,8 @@ public class MavenFacetImpl
 
   private VersionPolicy versionPolicy;
 
+  private RedeployPolicy redeployPolicy;
+
   private PathParser pathParser;
 
   @Inject
@@ -50,6 +52,7 @@ public class MavenFacetImpl
     super.doConfigure();
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     this.versionPolicy = VersionPolicy.valueOf(attributes.require("repositoryPolicy", String.class));
+    this.redeployPolicy = RedeployPolicy.valueOf(attributes.require("redeployPolicy", String.class));
     this.pathParser = checkNotNull(pathParsers.get(getRepository().getFormat().getValue()),
         "No pathParser found for %s", getRepository().getFormat().getValue());
   }
@@ -57,6 +60,11 @@ public class MavenFacetImpl
   @Override
   public VersionPolicy getVersionPolicy() {
     return versionPolicy;
+  }
+
+  @Override
+  public RedeployPolicy getRedeployPolicy() {
+    return redeployPolicy;
   }
 
   @Override

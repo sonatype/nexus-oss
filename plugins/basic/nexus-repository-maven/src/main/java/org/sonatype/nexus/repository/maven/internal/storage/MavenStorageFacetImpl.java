@@ -30,8 +30,8 @@ import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
-import org.sonatype.nexus.repository.maven.Content;
-import org.sonatype.nexus.repository.maven.MavenFacet;
+import org.sonatype.nexus.repository.maven.internal.Content;
+import org.sonatype.nexus.repository.maven.internal.MavenFacet;
 import org.sonatype.nexus.repository.maven.internal.PathParser;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
@@ -210,6 +210,18 @@ public class MavenStorageFacetImpl
 
       tx.commit();
 
+      return true;
+    }
+  }
+
+  @Override
+  public boolean exists(final String path) throws IOException {
+    try (StorageTx tx = getStorage().openTx()) {
+      final OrientVertex component = getComponent(tx, path, tx.getBucket());
+      if (component == null) {
+        return false;
+      }
+      tx.commit();
       return true;
     }
   }

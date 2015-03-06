@@ -10,32 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal;
-
-import java.util.Map;
+package org.sonatype.nexus.repository.maven.internal.policy;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.maven.MavenFacet;
-import org.sonatype.nexus.repository.maven.VersionPolicy;
+import org.sonatype.nexus.repository.maven.internal.MavenFacet;
+import org.sonatype.nexus.repository.maven.internal.policy.deploy.RedeployPolicy;
+import org.sonatype.nexus.repository.maven.internal.policy.version.VersionPolicy;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import static org.sonatype.nexus.repository.maven.internal.ContentHelper.contentName;
-
 /**
- * Handler enforcing repository policy on Maven repositories.
+ * Handler enforcing repository policies on Maven repositories.
  *
  * @since 3.0
  */
 @Singleton
 @Named
-public class MavenRepositoryPolicyHandler
+public class MavenPolicyHandler
     extends ComponentSupport
     implements Handler
 {
@@ -43,13 +40,21 @@ public class MavenRepositoryPolicyHandler
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
     final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
-    final Map<String, String> coordinates = mavenFacet.getPathParser().parsePath(contentName(context));
-    if (coordinates != null) {
+
+    {
       final VersionPolicy versionPolicy = mavenFacet.getVersionPolicy();
-      final String version = coordinates.get(PathParser.VERSION);
-      if (!versionPolicy.allowsVersion(version)) {
-        return HttpResponses.badRequest(
-            "Repository policy '" + versionPolicy + "' does not allow version '" + version + "'");
+      final PolicyEvaluation versionPolicyEvaluation = versionPolicy.evaluate(context);
+      log.trace("{} = {}", versionPolicy, versionPolicyEvaluation);
+      if (!versionPolicyEvaluation.isAligned()) {
+        return HttpResponses.badRequest(versionPolicyEvaluation.getMessage());
+      }
+    }
+    {
+      final RedeployPolicy redeployPolicy = mavenFacet.getRedeployPolicy();
+      final PolicyEvaluation redeployPolicyEvaluation = redeployPolicy.evaluate(context);
+      log.trace("{} = {}", redeployPolicy, redeployPolicyEvaluation);
+      if (!redeployPolicyEvaluation.isAligned()) {
+        return HttpResponses.badRequest(redeployPolicyEvaluation.getMessage());
       }
     }
     return context.proceed();

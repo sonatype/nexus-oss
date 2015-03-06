@@ -10,12 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven;
+package org.sonatype.nexus.repository.maven.internal.policy.version;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+import org.sonatype.nexus.repository.maven.internal.PathParser;
+import org.sonatype.nexus.repository.maven.internal.policy.Policy;
+import org.sonatype.nexus.repository.maven.internal.policy.PolicyEvaluation;
+import org.sonatype.nexus.repository.view.Context;
+
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.mavenCoordinate;
 
 /**
  * Repository version policy.
@@ -23,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class VersionPolicy
+    implements Policy
 {
   private static final String SNAPSHOT_VERSION = "SNAPSHOT";
 
@@ -63,7 +70,7 @@ public class VersionPolicy
         return MIXED;
       }
       default:
-        throw new IllegalArgumentException("Unknown repository policy: " + value);
+        throw new IllegalArgumentException("Unknown version policy: " + value);
     }
   }
 
@@ -75,6 +82,24 @@ public class VersionPolicy
 
   public String getValue() {
     return value;
+  }
+
+  @Override
+  public PolicyEvaluation evaluate(final Context context) throws Exception {
+    checkNotNull(context);
+    final String version = mavenCoordinate(context, PathParser.VERSION);
+    if (version != null) {
+      if (allowsVersion(version)) {
+        return new PolicyEvaluation(true, "Repository policy '" + this + "' allows version '" + version + "'");
+      }
+      else {
+        return new PolicyEvaluation(false, "Repository policy '" + this + "' not allows version '" + version + "'");
+      }
+    }
+    else {
+      // TODO: metadata request with snapshot?
+      return new PolicyEvaluation(true, "Repository policy '" + this + "' allows non-artifacts");
+    }
   }
 
   /**

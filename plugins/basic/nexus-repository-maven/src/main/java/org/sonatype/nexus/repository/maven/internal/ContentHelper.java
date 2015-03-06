@@ -17,19 +17,12 @@ import java.io.InputStream;
 
 import javax.annotation.Nonnull;
 
-import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.maven.Content;
-import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 
-import com.google.common.net.HttpHeaders;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * @since 3.0
@@ -37,15 +30,6 @@ import static com.google.common.base.Preconditions.checkState;
 public class ContentHelper
 {
   private ContentHelper() {
-  }
-
-  @Nonnull
-  public static String contentName(final Context context) {
-    checkNotNull(context);
-    final TokenMatcher.State state = context.getAttributes().require(TokenMatcher.State.class);
-    final String name = state.getTokens().get("name");
-    checkState(name != null, "Missing token: name");
-    return name;
   }
 
   @Nonnull

@@ -34,7 +34,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
-import static org.sonatype.nexus.repository.maven.internal.ContentHelper.contentName;
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.name;
 
 /**
  * Maven group handler.
@@ -72,7 +72,7 @@ public class MavenGroupHandler
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
     final String action = context.getRequest().getAction();
-    final String name = contentName(context);
+    final String name = name(context);
     switch (action) {
       case GET: {
         // TODO: and sha1 and md5 of metadata
