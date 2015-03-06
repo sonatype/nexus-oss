@@ -100,6 +100,17 @@ public class Coordinates
   }
 
   /**
+   * Returns the "main", non-subordinate coordinate of this coordinate. The "main" coordinate is not a hash.
+   */
+  public Coordinates main() {
+    Coordinates coordinates = this;
+    while (coordinates.isSubordinate()) {
+      coordinates = coordinates.subordinateOf();
+    }
+    return coordinates;
+  }
+
+  /**
    * Returns the "parent" coordinate, that this coordinate is subordinate of, or {@code null}.
    */
   public Coordinates subordinateOf() {

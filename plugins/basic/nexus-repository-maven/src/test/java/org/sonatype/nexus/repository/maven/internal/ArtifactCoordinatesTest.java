@@ -61,6 +61,7 @@ public class ArtifactCoordinatesTest
     assertThat(coordinatesAscSha1.getExtension(), equalTo(artifactCoordinates.getExtension() + ".asc.sha1"));
     assertThat(coordinatesAscSha1.isSubordinate(), is(true));
     assertThat(coordinatesAscSha1.subordinateOf().subordinateOf(), equalTo(artifactCoordinates));
+    assertThat(coordinatesAscSha1.main(), equalTo(artifactCoordinates));
 
     ArtifactCoordinates coordinates2 = coordinatesAscSha1.subordinateOf().subordinateOf();
     assertThat(coordinates2.getPath(), equalTo(path));
@@ -101,6 +102,7 @@ public class ArtifactCoordinatesTest
     assertThat(coordinatesAscSha1.getExtension(), equalTo(artifactCoordinates.getExtension() + ".asc.sha1"));
     assertThat(coordinatesAscSha1.isSubordinate(), is(true));
     assertThat(coordinatesAscSha1.subordinateOf().subordinateOf(), equalTo(artifactCoordinates));
+    assertThat(coordinatesAscSha1.main(), equalTo(artifactCoordinates));
 
     ArtifactCoordinates coordinates2 = coordinatesAscSha1.subordinateOf().subordinateOf();
     assertThat(coordinates2.getPath(), equalTo(path));

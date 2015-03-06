@@ -132,6 +132,15 @@ public class ArtifactCoordinates
   }
 
   /**
+   * Returns the "main" non-subordinate coordinate of this coordinate. The "main" coordinate is not a hash, nor a
+   * signature, nor a hash of a signature.
+   */
+  @Override
+  public ArtifactCoordinates main() {
+    return (ArtifactCoordinates) super.main();
+  }
+
+  /**
    * Returns the "parent" coordinate, that this coordinate is subordinate of, or {@code null}.
    */
   public ArtifactCoordinates subordinateOf() {

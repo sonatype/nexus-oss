@@ -23,7 +23,6 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.http.HttpStatus;
-import org.sonatype.nexus.repository.maven.internal.Coordinates;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Request;
@@ -76,8 +75,7 @@ public class MavenGroupHandler
     final Coordinates coordinates = coordinates(context);
     switch (action) {
       case GET: {
-        // TODO: and sha1 and md5 of metadata
-        if (coordinates.getPath().endsWith("/maven-metadata.xml")) {
+        if (coordinates.main().getFileName().equals("maven-metadata.xml")) {
           return handleMerged(context);
         }
         else {
