@@ -51,7 +51,7 @@ class LoggerAction
   String name
 
   @Argument(name="level", index = 1, description = 'Logger level')
-  @Complete('enum')
+  @Complete('auto')
   LoggerLevel level
 
   @Override

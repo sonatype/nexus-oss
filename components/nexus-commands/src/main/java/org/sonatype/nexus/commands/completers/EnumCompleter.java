@@ -13,44 +13,23 @@
 
 package org.sonatype.nexus.commands.completers;
 
-import java.lang.reflect.Field;
-
-import javax.inject.Named;
-
-import org.sonatype.nexus.commands.CompleterTargetAware;
-
 import org.apache.karaf.shell.console.completer.StringsCompleter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link Enum} completer.
  *
  * @since 3.0
  */
-@Named("enum")
 public class EnumCompleter
     extends StringsCompleter
-    implements CompleterTargetAware
 {
-  private static final Logger log = LoggerFactory.getLogger(EnumCompleter.class);
-
-  public EnumCompleter() {
+  public EnumCompleter(final Class<? extends Enum> type) {
     super(true); // case-sensitive
-
-    // NOTE: strings installed when completer target is provided
-  }
-
-  @Override
-  public void setCompleterTarget(final Field field) {
-    Class<?> type = field.getType();
-    if (type.isEnum()) {
-      for (Object constant : type.getEnumConstants()) {
-        getStrings().add(String.valueOf(constant));
-      }
-    }
-    else {
-      log.warn("Completer target field is not an enum: {}", field);
+    checkNotNull(type);
+    for (Enum n : type.getEnumConstants()) {
+      getStrings().add(n.name());
     }
   }
 }

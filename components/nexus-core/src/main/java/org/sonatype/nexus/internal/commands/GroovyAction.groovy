@@ -49,7 +49,7 @@ class GroovyAction
   ApplicationDirectories applicationDirectories
 
   @Argument(name = 'file', required = true, index = 0, description = 'Groovy script file to execute')
-  @Complete('file-name')
+  @Complete('auto')
   File file
 
   @Argument(name = 'args', index = 1, multiValued = true, description = 'Optional script arguments')
