@@ -171,6 +171,12 @@
   $border-color-pressed: $color-gainsboro,
   $border-color-disabled: $color-gainsboro,
 
+  $background-color: $color-white,
+  $background-color-over: $color-light-gray,
+  $background-color-focus: $color-white,
+  $background-color-pressed: $color-suva-gray,
+  $background-color-disabled: $color-white,
+
   $background-gradient: $color-white $color-light-gainsboro,
   $background-gradient-over: $color-light-gray $color-silver,
   $background-gradient-focus: $color-white $color-light-gainsboro,
@@ -194,6 +200,12 @@
 @include extjs-button-small-ui(
   $ui: 'nx-primary',
 
+  $background-color: $color-denim,
+  $background-color-over: $color-dark-denim,
+  $background-color-focus: $color-denim,
+  $background-color-pressed: $color-dark-cerulean,
+  $background-color-disabled: $color-denim,
+
   $background-gradient: $color-denim $color-light-cobalt,
   $background-gradient-over: $color-dark-denim $color-smalt,
   $background-gradient-focus: $color-denim $color-light-cobalt,
@@ -207,6 +219,12 @@
 
 @include extjs-button-small-ui(
   $ui: 'nx-danger',
+
+  $background-color: $color-light-cerise,
+  $background-color-over: $color-old-rose,
+  $background-color-focus: $color-light-cerise,
+  $background-color-pressed: $color-shiraz,
+  $background-color-disabled: $color-light-cerise,
 
   $background-gradient: $color-light-cerise $color-brick-red,
   $background-gradient-over: $color-old-rose $color-fire-brick,
@@ -222,6 +240,12 @@
 @include extjs-button-small-ui(
   $ui: 'nx-warning',
 
+  $background-color: $color-sea-buckthorn,
+  $background-color-over: $color-zest,
+  $background-color-focus: $color-sea-buckthorn,
+  $background-color-pressed: $color-afghan-tan,
+  $background-color-disabled: $color-sea-buckthorn,
+
   $background-gradient: $color-sea-buckthorn $color-tahiti-gold,
   $background-gradient-over: $color-zest $color-rich-gold,
   $background-gradient-focus: $color-sea-buckthorn $color-tahiti-gold,
@@ -235,6 +259,12 @@
 
 @include extjs-button-small-ui(
   $ui: 'nx-success',
+
+  $background-color: $color-elf-green,
+  $background-color-over: $color-salem,
+  $background-color-focus: $color-elf-green,
+  $background-color-pressed: $color-fun-green,
+  $background-color-disabled: $color-elf-green,
 
   $background-gradient: $color-elf-green $color-dark-pigment-green,
   $background-gradient-over: $color-salem $color-jewel,
