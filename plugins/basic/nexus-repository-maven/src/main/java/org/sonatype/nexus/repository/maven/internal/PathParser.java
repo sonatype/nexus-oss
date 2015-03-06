@@ -26,4 +26,9 @@ public interface PathParser
    */
   @Nonnull
   Coordinates parsePath(String path);
+
+  /**
+   * Returns {@code true} if version string represents a Maven SNAPSHOT version.
+   */
+  boolean isSnapshotVersion(String version);
 }

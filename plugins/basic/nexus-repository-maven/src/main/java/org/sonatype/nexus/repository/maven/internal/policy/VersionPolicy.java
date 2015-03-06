@@ -13,7 +13,6 @@
 package org.sonatype.nexus.repository.maven.internal.policy;
 
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -24,21 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class VersionPolicy
 {
-  // TODO: this is format specific, so move this out from here
-  private static final String SNAPSHOT_VERSION = "SNAPSHOT";
-
-  private static final Pattern VERSION_FILE_PATTERN =
-      Pattern.compile(
-          "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$|^([0-9]{8}.[0-9]{6})-([0-9]+)$|^(.*)([0-9]{8}.[0-9]{6})-([0-9]+)$");
-
-  /**
-   * Returns {@code true} if passed in version represents a Maven SNAPSHOT version.
-   */
-  public static boolean isSnapshotVersion(final String version) {
-    checkNotNull(version);
-    return VERSION_FILE_PATTERN.matcher(version).matches() || version.endsWith(SNAPSHOT_VERSION);
-  }
-
   private static final String V_RELEASE = "release";
 
   private static final String V_SNAPSHOT = "snapshot";
@@ -76,15 +60,6 @@ public class VersionPolicy
 
   public String getValue() {
     return value;
-  }
-
-  /**
-   * Returns {@code true} if passed in version is in align with this policy.
-   */
-  public boolean allowsVersion(final String version) {
-    checkNotNull(version);
-    final boolean isSnapshot = isSnapshotVersion(version);
-    return (this == SNAPSHOT && isSnapshot) || (this == RELEASE && !isSnapshot) || (this == MIXED);
   }
 
   @Override

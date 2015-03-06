@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.maven.internal.maven2;
 
+import java.util.regex.Pattern;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -25,6 +27,8 @@ import org.sonatype.nexus.repository.maven.internal.PathParser;
 
 import com.google.common.base.Strings;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Maven 2 path parser.
  *
@@ -35,6 +39,12 @@ import com.google.common.base.Strings;
 public class Maven2PathParser
     implements PathParser
 {
+  private static final String SNAPSHOT_VERSION = "SNAPSHOT";
+
+  private static final Pattern VERSION_FILE_PATTERN =
+      Pattern.compile(
+          "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$|^([0-9]{8}.[0-9]{6})-([0-9]+)$|^(.*)([0-9]{8}.[0-9]{6})-([0-9]+)$");
+
   // TODO: TokenParser not capable to do this (yet)
   // TODO: this is legacy, but here only to make it work
   // TODO: consider moving/updating/fleshing out it from nx2 codebase, or improve TokenParser
@@ -83,5 +93,11 @@ public class Maven2PathParser
           signatureType
       );
     }
+  }
+
+  @Override
+  public boolean isSnapshotVersion(final String version) {
+    checkNotNull(version);
+    return VERSION_FILE_PATTERN.matcher(version).matches() || version.endsWith(SNAPSHOT_VERSION);
   }
 }

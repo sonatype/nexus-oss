@@ -17,8 +17,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.http.HttpResponses;
+import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenFacet;
-import org.sonatype.nexus.repository.maven.internal.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.storage.MavenContentsFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -26,7 +26,7 @@ import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
-import static org.sonatype.nexus.repository.maven.internal.ContextHelper.coordinates;
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.artifactCoordinates;
 
 /**
  * Handler enforcing redeploy policy on Maven repositories.
@@ -43,11 +43,14 @@ public class RedeployPolicyHandler
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
     if (PUT.equals(context.getRequest().getAction())) {
-      final Coordinates coordinates = coordinates(context);
-      final boolean contentExists = context.getRepository().facet(MavenContentsFacet.class).exists(coordinates);
-      final RedeployPolicy redeployPolicy = context.getRepository().facet(MavenFacet.class).getRedeployPolicy();
-      if (!redeployPolicy.allowsPut(coordinates, contentExists)) {
-        return HttpResponses.badRequest("Update not allowed by redeploy policy '" + redeployPolicy + "'");
+      final ArtifactCoordinates artifactCoordinates = artifactCoordinates(context);
+      if (artifactCoordinates != null) {
+        final boolean contentExists = context.getRepository().facet(MavenContentsFacet.class)
+            .exists(artifactCoordinates);
+        final RedeployPolicy redeployPolicy = context.getRepository().facet(MavenFacet.class).getRedeployPolicy();
+        if (contentExists && RedeployPolicy.DISALLOW.equals(redeployPolicy)) {
+          return HttpResponses.badRequest("Artifact redeploy not allowed");
+        }
       }
     }
     return context.proceed();

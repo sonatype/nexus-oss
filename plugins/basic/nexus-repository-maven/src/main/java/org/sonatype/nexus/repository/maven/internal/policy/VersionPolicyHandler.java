@@ -17,14 +17,16 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.maven.internal.MavenFacet;
 import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates;
+import org.sonatype.nexus.repository.maven.internal.MavenFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static org.sonatype.nexus.repository.maven.internal.ContextHelper.artifactCoordinates;
+import static org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy.RELEASE;
+import static org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy.SNAPSHOT;
 
 /**
  * Handler enforcing version policy on Maven repositories.
@@ -42,8 +44,10 @@ public class VersionPolicyHandler
   public Response handle(@Nonnull final Context context) throws Exception {
     final ArtifactCoordinates artifactCoordinates = artifactCoordinates(context);
     if (artifactCoordinates != null) {
-      final VersionPolicy versionPolicy = context.getRepository().facet(MavenFacet.class).getVersionPolicy();
-      if (!versionPolicy.allowsVersion(artifactCoordinates.getVersion())) {
+      final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
+      final VersionPolicy versionPolicy = mavenFacet.getVersionPolicy();
+      final boolean isSnapshot = mavenFacet.getPathParser().isSnapshotVersion(artifactCoordinates.getVersion());
+      if ((SNAPSHOT.equals(versionPolicy) && !isSnapshot) || (RELEASE.equals(versionPolicy) && isSnapshot)) {
         return HttpResponses.badRequest(
             "VersionPolicy '" + versionPolicy + "' forbids version '" + artifactCoordinates.getVersion() + "'");
       }

@@ -14,9 +14,6 @@ package org.sonatype.nexus.repository.maven.internal.policy;
 
 import java.util.Locale;
 
-import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates;
-import org.sonatype.nexus.repository.maven.internal.Coordinates;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -56,18 +53,6 @@ public class RedeployPolicy
 
   public String getValue() {
     return value;
-  }
-
-  public boolean allowsPut(final Coordinates coordinates, final boolean exists) throws Exception {
-    if (!(coordinates instanceof ArtifactCoordinates)) {
-      return true;
-    }
-    if (exists) {
-      if (this.equals(DISALLOW)) {
-        return false;
-      }
-    }
-    return true;
   }
 
   @Override
