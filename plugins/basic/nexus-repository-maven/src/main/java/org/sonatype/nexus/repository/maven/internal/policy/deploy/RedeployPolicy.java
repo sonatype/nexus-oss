@@ -14,7 +14,8 @@ package org.sonatype.nexus.repository.maven.internal.policy.deploy;
 
 import java.util.Locale;
 
-import org.sonatype.nexus.repository.maven.internal.MavenTokenizerHandler.State;
+import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates;
+import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.policy.Policy;
 import org.sonatype.nexus.repository.maven.internal.policy.PolicyEvaluation;
 import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacet;
@@ -22,7 +23,7 @@ import org.sonatype.nexus.repository.view.Context;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
-import static org.sonatype.nexus.repository.maven.internal.ContextHelper.mavenState;
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.coordinates;
 
 /**
  * Repository redeploy policy for Maven artifacts, is artifact overwrite allowed or not.
@@ -69,26 +70,26 @@ public class RedeployPolicy
     if (!PUT.equals(context.getRequest().getAction())) {
       return new PolicyEvaluation(true, "Redeploy policy '" + this + "' always allows non-PUT requests");
     }
-    final State mavenState = mavenState(context);
-    if (mavenState.getCoordinates() == null) {
+    final Coordinates coordinates = coordinates(context);
+    if (!(coordinates instanceof ArtifactCoordinates)) {
       return new PolicyEvaluation(true,
-          "Redeploy policy '" + this + "' always allows non-artifact deploy of " + mavenState.getPath());
+          "Redeploy policy '" + this + "' always allows non-artifact deploy of " + coordinates.getPath());
     }
     final MavenStorageFacet mavenStorageFacet = context.getRepository().facet(MavenStorageFacet.class);
-    final boolean exists = mavenStorageFacet.exists(mavenState.getPath());
+    final boolean exists = mavenStorageFacet.exists(coordinates);
 
     if (exists) {
       if (this.equals(DISALLOW)) {
         return new PolicyEvaluation(false,
-            "Redeploy policy '" + this + "' disallows redeploy of " + mavenState.getPath());
+            "Redeploy policy '" + this + "' disallows redeploy of " + coordinates.getPath());
       }
       else {
-        return new PolicyEvaluation(true, "Redeploy policy '" + this + "' allows redeploy of " + mavenState.getPath());
+        return new PolicyEvaluation(true, "Redeploy policy '" + this + "' allows redeploy of " + coordinates.getPath());
       }
     }
     else {
       return new PolicyEvaluation(true,
-          "Redeploy policy '" + this + "' allows initial deploy of " + mavenState.getPath());
+          "Redeploy policy '" + this + "' allows initial deploy of " + coordinates.getPath());
     }
   }
 

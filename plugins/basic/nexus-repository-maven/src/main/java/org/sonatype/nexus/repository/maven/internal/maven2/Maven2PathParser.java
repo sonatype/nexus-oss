@@ -12,18 +12,18 @@
  */
 package org.sonatype.nexus.repository.maven.internal.maven2;
 
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.M2GavCalculator;
-import org.sonatype.nexus.repository.maven.internal.PathParser;
+import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates;
+import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates.SignatureType;
+import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.context.Coordinates.HashType;
+import org.sonatype.nexus.repository.maven.internal.context.PathParser;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 
 /**
  * Maven 2 path parser.
@@ -41,26 +41,47 @@ public class Maven2PathParser
   private final M2GavCalculator m2GavCalculator = new M2GavCalculator();
 
   @Override
-  public Map<String, String> parsePath(final String path) {
+  public Coordinates parsePath(final String path) {
     final Gav gav = m2GavCalculator.pathToGav(path);
+    final String fileName = path.substring(path.lastIndexOf('/') + 1);
+    HashType hashType = null;
+    for (HashType ht : HashType.values()) {
+      if (fileName.endsWith("." + ht.getExt())) {
+        hashType = ht;
+        break;
+      }
+    }
     if (gav == null) {
-      return null;
+      return new Coordinates(path, fileName, hashType);
     }
-    Map<String, String> coordinates = Maps.newHashMap();
-    coordinates.put(GROUP_ID, gav.getGroupId());
-    coordinates.put(ARTIFACT_ID, gav.getArtifactId());
-    coordinates.put(VERSION, gav.getVersion());
-    coordinates.put(BASE_VERSION, gav.getBaseVersion());
-    if (!Strings.isNullOrEmpty(gav.getClassifier())) {
-      coordinates.put(CLASSIFIER, gav.getClassifier());
-    }
-    coordinates.put(EXTENSION, gav.getExtension());
-    return coordinates;
-  }
+    else {
+      SignatureType signatureType = null;
+      if (gav.getSignatureType() != null) {
+        if (gav.getSignatureType() == Gav.SignatureType.gpg) {
+          signatureType = SignatureType.GPG;
+        }
+        else {
+          throw new RuntimeException("Unknown signature type: " + gav.getSignatureType());
+        }
+      }
 
-  @Override
-  public String assemblePath(final Map<String, String> coordinates) {
-    // TODO: currenrtly not used, might drop?
-    throw new RuntimeException("not implemented");
+      String classifier = gav.getClassifier();
+      if (classifier != null && Strings.isNullOrEmpty(classifier.trim())) {
+        classifier = null;
+      }
+
+      return new ArtifactCoordinates(
+          path,
+          fileName,
+          hashType,
+          gav.getGroupId(),
+          gav.getArtifactId(),
+          gav.getVersion(),
+          gav.getBaseVersion(),
+          classifier,
+          gav.getExtension(),
+          signatureType
+      );
+    }
   }
 }

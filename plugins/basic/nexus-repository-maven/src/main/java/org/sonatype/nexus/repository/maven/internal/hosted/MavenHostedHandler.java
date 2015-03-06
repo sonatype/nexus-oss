@@ -18,6 +18,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.maven.internal.Content;
+import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -31,6 +32,7 @@ import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 import static org.sonatype.nexus.repository.maven.internal.ContentHelper.toContent;
 import static org.sonatype.nexus.repository.maven.internal.ContentHelper.toPayload;
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.coordinates;
 import static org.sonatype.nexus.repository.maven.internal.ContextHelper.name;
 
 /**
@@ -48,28 +50,28 @@ public class MavenHostedHandler
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
     final String action = context.getRequest().getAction();
-    final String name = name(context);
+    final Coordinates coordinates = coordinates(context);
     final MavenStorageFacet mavenStorageFacet = context.getRepository().facet(MavenStorageFacet.class);
 
     switch (action) {
       case GET: {
-        final Content content = mavenStorageFacet.get(name);
+        final Content content = mavenStorageFacet.get(coordinates);
         if (content == null) {
-          return HttpResponses.notFound(name);
+          return HttpResponses.notFound(coordinates.getPath());
         }
         return HttpResponses.ok(toPayload(content));
       }
 
       case PUT: {
         final Content content = toContent(context.getRequest().getPayload(), new DateTime());
-        mavenStorageFacet.put(name, content);
+        mavenStorageFacet.put(coordinates, content);
         return HttpResponses.created();
       }
 
       case DELETE: {
-        final boolean deleted = mavenStorageFacet.delete(name);
+        final boolean deleted = mavenStorageFacet.delete(coordinates);
         if (!deleted) {
-          return HttpResponses.notFound(name);
+          return HttpResponses.notFound(coordinates.getPath());
         }
         return HttpResponses.noContent();
       }

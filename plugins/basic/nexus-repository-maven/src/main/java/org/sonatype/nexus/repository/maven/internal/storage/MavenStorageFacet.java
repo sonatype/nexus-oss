@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.Content;
+import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
 
 import org.joda.time.DateTime;
 
@@ -32,13 +33,13 @@ public interface MavenStorageFacet
     extends Facet
 {
   @Nullable
-  Content get(String path) throws IOException;
+  Content get(Coordinates coordinates) throws IOException;
 
-  void put(String path, Content content) throws IOException, InvalidContentException;
+  void put(Coordinates coordinates, Content content) throws IOException, InvalidContentException;
 
-  boolean delete(String path) throws IOException;
+  boolean delete(Coordinates coordinates) throws IOException;
 
-  boolean exists(String path) throws IOException;
+  boolean exists(Coordinates coordinates) throws IOException;
 
-  void updateLastUpdated(String path, final DateTime lastUpdated) throws IOException;
+  void updateLastUpdated(Coordinates coordinates, final DateTime lastUpdated) throws IOException;
 }

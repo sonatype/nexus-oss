@@ -26,7 +26,7 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
-import org.sonatype.nexus.repository.maven.internal.MavenTokenizerHandler
+import org.sonatype.nexus.repository.maven.internal.context.CoordinatesHandler
 import org.sonatype.nexus.repository.maven.internal.policy.MavenPolicyHandler
 import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacetImpl
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
@@ -91,7 +91,7 @@ class Maven2ProxyRecipe
   Provider<MavenStorageFacetImpl> mavenStorageFacet
 
   @Inject
-  MavenTokenizerHandler mavenTokenizerHandler
+  CoordinatesHandler coordinatesHandler
 
   @Inject
   MavenPolicyHandler mavenPolicyHandler
@@ -124,7 +124,7 @@ class Maven2ProxyRecipe
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
         .handler(negativeCacheHandler)
-        .handler(mavenTokenizerHandler)
+        .handler(coordinatesHandler)
         .handler(mavenPolicyHandler)
         .handler(proxyHandler)
         .handler(notFound())

@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Request;
@@ -34,6 +35,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.coordinates;
 import static org.sonatype.nexus.repository.maven.internal.ContextHelper.name;
 
 /**
@@ -72,11 +74,11 @@ public class MavenGroupHandler
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
     final String action = context.getRequest().getAction();
-    final String name = name(context);
+    final Coordinates coordinates = coordinates(context);
     switch (action) {
       case GET: {
         // TODO: and sha1 and md5 of metadata
-        if (name.endsWith("/maven-metadata.xml")) {
+        if (coordinates.getPath().endsWith("/maven-metadata.xml")) {
           return handleMerged(context);
         }
         else {

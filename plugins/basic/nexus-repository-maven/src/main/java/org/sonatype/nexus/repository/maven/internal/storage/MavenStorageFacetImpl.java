@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -31,8 +30,8 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.Content;
-import org.sonatype.nexus.repository.maven.internal.MavenFacet;
-import org.sonatype.nexus.repository.maven.internal.PathParser;
+import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates;
+import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
@@ -82,28 +81,28 @@ public class MavenStorageFacetImpl
 
   @Nullable
   @Override
-  public Content get(final String path) {
+  public Content get(final Coordinates coordinates) {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex component = getComponent(tx, path, tx.getBucket());
+      final OrientVertex component = getComponent(tx, coordinates.getPath(), tx.getBucket());
       if (component == null) {
         return null;
       }
 
       final OrientVertex asset = getAsset(component);
-      final BlobRef blobRef = getBlobRef(path, asset);
+      final BlobRef blobRef = getBlobRef(coordinates.getPath(), asset);
       final Blob blob = tx.getBlob(blobRef);
-      checkState(blob != null, "asset of component with at path %s refers to missing blob %s", path, blobRef);
+      checkState(blob != null, "asset of component with at path %s refers to missing blob %s", coordinates.getPath(),
+          blobRef);
 
       return marshall(asset, blob);
     }
   }
 
   @Override
-  public void put(final String path, final Content content) throws IOException, InvalidContentException {
-    final Map<String, String> coordinates = getRepository().facet(MavenFacet.class).getPathParser().parsePath(path);
+  public void put(final Coordinates coordinates, final Content content) throws IOException, InvalidContentException {
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex bucket = tx.getBucket();
-      OrientVertex component = getComponent(tx, path, bucket);
+      OrientVertex component = getComponent(tx, coordinates.getPath(), bucket);
       OrientVertex asset;
       if (component == null) {
         // CREATE
@@ -111,31 +110,33 @@ public class MavenStorageFacetImpl
 
         // Set normalized properties: format, group, and name
         component.setProperty(P_FORMAT, getRepository().getFormat().getValue()); // M1 or M2!!!
-        if (coordinates != null) {
-          component.setProperty(P_GROUP, coordinates.get(PathParser.GROUP_ID));
-          component.setProperty(P_NAME, coordinates.get(PathParser.ARTIFACT_ID));
-          component.setProperty(P_VERSION, coordinates.get(PathParser.VERSION));
+        if (coordinates instanceof ArtifactCoordinates) {
+          final ArtifactCoordinates artifactCoordinates = (ArtifactCoordinates) coordinates;
+          component.setProperty(P_GROUP, artifactCoordinates.getGroupId());
+          component.setProperty(P_NAME, artifactCoordinates.getArtifactId());
+          component.setProperty(P_VERSION, artifactCoordinates.getBaseVersion());
         }
         else {
-          component.setProperty(P_NAME, path);
+          component.setProperty(P_NAME, coordinates.getPath());
         }
 
         // Set attributes map to contain "raw" format-specific metadata (in this case, path)
-        tx.getAttributes(component).child(getRepository().getFormat().getValue()).set(P_PATH, path);
-        if (coordinates != null) {
+        tx.getAttributes(component).child(getRepository().getFormat().getValue()).set(P_PATH, coordinates.getPath());
+        if (coordinates instanceof ArtifactCoordinates) {
+          final ArtifactCoordinates artifactCoordinates = (ArtifactCoordinates) coordinates;
           tx.getAttributes(component).child(getRepository().getFormat().getValue())
-              .set(PathParser.GROUP_ID, coordinates.get(PathParser.GROUP_ID));
+              .set("groupId", artifactCoordinates.getGroupId());
           tx.getAttributes(component).child(getRepository().getFormat().getValue())
-              .set(PathParser.ARTIFACT_ID, coordinates.get(PathParser.ARTIFACT_ID));
+              .set("artifactId", artifactCoordinates.getArtifactId());
           tx.getAttributes(component).child(getRepository().getFormat().getValue())
-              .set(PathParser.VERSION, coordinates.get(PathParser.VERSION));
+              .set("version", artifactCoordinates.getVersion());
           tx.getAttributes(component).child(getRepository().getFormat().getValue())
-              .set(PathParser.BASE_VERSION, coordinates.get(PathParser.BASE_VERSION));
+              .set("baseVersion", artifactCoordinates.getBaseVersion());
           tx.getAttributes(component).child(getRepository().getFormat().getValue())
-              .set(PathParser.EXTENSION, coordinates.get(PathParser.EXTENSION));
-          if (coordinates.containsKey(PathParser.CLASSIFIER)) {
+              .set("extension", artifactCoordinates.getExtension());
+          if (artifactCoordinates.getClassifier() != null) {
             tx.getAttributes(component).child(getRepository().getFormat().getValue())
-                .set(PathParser.CLASSIFIER, coordinates.get(PathParser.CLASSIFIER));
+                .set("classifier", artifactCoordinates.getClassifier());
           }
         }
 
@@ -149,10 +150,10 @@ public class MavenStorageFacetImpl
 
       // TODO: Figure out created-by header
       final ImmutableMap<String, String> headers = ImmutableMap
-          .of(BlobStore.BLOB_NAME_HEADER, path, BlobStore.CREATED_BY_HEADER, "unknown");
+          .of(BlobStore.BLOB_NAME_HEADER, coordinates.getPath(), BlobStore.CREATED_BY_HEADER, "unknown");
 
       try (InputStream in = content.openInputStream()) {
-        tx.setBlob(in, headers, asset, hashAlgorithms, determineContentType(path, content));
+        tx.setBlob(in, headers, asset, hashAlgorithms, determineContentType(coordinates.getPath(), content));
       }
 
       final DateTime lastUpdated = content.getLastUpdated();
@@ -196,15 +197,15 @@ public class MavenStorageFacetImpl
   }
 
   @Override
-  public boolean delete(final String path) throws IOException {
+  public boolean delete(final Coordinates coordinates) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex component = getComponent(tx, path, tx.getBucket());
+      final OrientVertex component = getComponent(tx, coordinates.getPath(), tx.getBucket());
       if (component == null) {
         return false;
       }
       OrientVertex asset = getAsset(component);
 
-      tx.deleteBlob(getBlobRef(path, asset));
+      tx.deleteBlob(getBlobRef(coordinates.getPath(), asset));
       tx.deleteVertex(asset);
       tx.deleteVertex(component);
 
@@ -215,9 +216,9 @@ public class MavenStorageFacetImpl
   }
 
   @Override
-  public boolean exists(final String path) throws IOException {
+  public boolean exists(final Coordinates coordinates) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex component = getComponent(tx, path, tx.getBucket());
+      final OrientVertex component = getComponent(tx, coordinates.getPath(), tx.getBucket());
       if (component == null) {
         return false;
       }
@@ -227,13 +228,13 @@ public class MavenStorageFacetImpl
   }
 
   @Override
-  public void updateLastUpdated(final String path, final DateTime lastUpdated) throws IOException {
+  public void updateLastUpdated(final Coordinates coordinates, final DateTime lastUpdated) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       OrientVertex bucket = tx.getBucket();
-      OrientVertex component = tx.findComponentWithProperty(P_PATH, path, bucket);
+      OrientVertex component = tx.findComponentWithProperty(P_PATH, coordinates.getPath(), bucket);
 
       if (component == null) {
-        log.debug("Updating lastUpdated time for nonexistant raw component {}", path);
+        log.debug("Updating lastUpdated time for nonexistant raw component {}", coordinates.getPath());
         return;
       }
 

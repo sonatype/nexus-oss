@@ -15,6 +15,8 @@ package org.sonatype.nexus.repository.maven.internal;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates;
+import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
@@ -41,25 +43,19 @@ public class ContextHelper
   }
 
   @Nonnull
-  public static MavenTokenizerHandler.State mavenState(final Context context) {
+  public static Coordinates coordinates(final Context context) {
     checkNotNull(context);
-    final MavenTokenizerHandler.State state = context.getAttributes().require(MavenTokenizerHandler.State.class);
-    checkState(state != null, "Missing maven state");
-    return state;
-  }
-
-  @Nonnull
-  public static String mavenPath(final Context context) {
-    return mavenState(context).getPath();
+    final Coordinates coordinates = context.getAttributes().require(Coordinates.class);
+    checkState(coordinates != null, "Missing maven coordinates");
+    return coordinates;
   }
 
   @Nullable
-  public static String mavenCoordinate(final Context context, final String key) {
-    checkNotNull(key);
-    final MavenTokenizerHandler.State state = mavenState(context);
-    if (state.getCoordinates() == null) {
-      return null;
+  public static ArtifactCoordinates artifactCoordinates(final Context context) {
+    final Coordinates coordinates = coordinates(context);
+    if (coordinates instanceof ArtifactCoordinates) {
+      return (ArtifactCoordinates) coordinates;
     }
-    return state.getCoordinates().get(key);
+    return null;
   }
 }

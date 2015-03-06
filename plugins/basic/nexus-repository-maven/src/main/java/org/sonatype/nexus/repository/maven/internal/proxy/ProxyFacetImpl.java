@@ -28,6 +28,7 @@ import org.joda.time.DateTime;
 
 import static org.sonatype.nexus.repository.maven.internal.ContentHelper.toContent;
 import static org.sonatype.nexus.repository.maven.internal.ContentHelper.toPayload;
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.coordinates;
 import static org.sonatype.nexus.repository.maven.internal.ContextHelper.name;
 
 /**
@@ -39,8 +40,7 @@ public class ProxyFacetImpl
 {
   @Override
   protected Payload getCachedPayload(final Context context) throws IOException {
-    final String name = name(context);
-    final Content content = storage().get(name);
+    final Content content = storage().get(coordinates(context));
     if (content == null) {
       return null;
     }
@@ -49,19 +49,18 @@ public class ProxyFacetImpl
 
   @Override
   protected DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException {
-    final Content content = storage().get(name(context));
+    final Content content = storage().get(coordinates(context));
     return content != null ? content.getLastUpdated() : null;
   }
 
   @Override
   protected void indicateUpToDate(final Context context) throws IOException {
-    storage().updateLastUpdated(name(context), new DateTime());
+    storage().updateLastUpdated(coordinates(context), new DateTime());
   }
 
   @Override
   protected void store(final Context context, final Payload payload) throws IOException, InvalidContentException {
-    final String name = name(context);
-    storage().put(name, toContent(payload, new DateTime()));
+    storage().put(coordinates(context), toContent(payload, new DateTime()));
   }
 
   @Override

@@ -10,13 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal;
+package org.sonatype.nexus.repository.maven.internal.context;
 
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
-import org.sonatype.nexus.repository.storage.StorageFacet;
+import javax.annotation.Nonnull;
 
 /**
  * Component responsible for parsing artifact paths into map of coordinates and other way around.
@@ -25,27 +21,9 @@ import org.sonatype.nexus.repository.storage.StorageFacet;
  */
 public interface PathParser
 {
-  String GROUP_ID = StorageFacet.P_GROUP;
-
-  String ARTIFACT_ID = StorageFacet.P_NAME;
-
-  String VERSION = StorageFacet.P_VERSION;
-
-  String BASE_VERSION = "baseVersion";
-
-  String CLASSIFIER = "classifier";
-
-  String EXTENSION = "extension";
-
   /**
-   * Parses Maven artifact path into coordinate elements. Returns {@code null} if path cannot be parsed, ie. does not
-   * conform to the layout, or, represents a path that cannot be described with coordinates.
+   * Parses Maven path into {@link Coordinates}.
    */
-  @Nullable
-  public Map<String, String> parsePath(String path);
-
-  /**
-   * Assembles Maven artifact path from coordinates supplied.
-   */
-  public String assemblePath(Map<String, String> coordinates);
+  @Nonnull
+  Coordinates parsePath(String path);
 }

@@ -15,13 +15,13 @@ package org.sonatype.nexus.repository.maven.internal.policy.version;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import org.sonatype.nexus.repository.maven.internal.PathParser;
+import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates;
 import org.sonatype.nexus.repository.maven.internal.policy.Policy;
 import org.sonatype.nexus.repository.maven.internal.policy.PolicyEvaluation;
 import org.sonatype.nexus.repository.view.Context;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.maven.internal.ContextHelper.mavenCoordinate;
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.artifactCoordinates;
 
 /**
  * Repository version policy.
@@ -87,13 +87,15 @@ public class VersionPolicy
   @Override
   public PolicyEvaluation evaluate(final Context context) throws Exception {
     checkNotNull(context);
-    final String version = mavenCoordinate(context, PathParser.VERSION);
-    if (version != null) {
-      if (allowsVersion(version)) {
-        return new PolicyEvaluation(true, "Repository policy '" + this + "' allows version '" + version + "'");
+    final ArtifactCoordinates artifactCoordinates = artifactCoordinates(context);
+    if (artifactCoordinates != null) {
+      if (allowsVersion(artifactCoordinates.getVersion())) {
+        return new PolicyEvaluation(true,
+            "Repository policy '" + this + "' allows version '" + artifactCoordinates.getVersion() + "'");
       }
       else {
-        return new PolicyEvaluation(false, "Repository policy '" + this + "' not allows version '" + version + "'");
+        return new PolicyEvaluation(false,
+            "Repository policy '" + this + "' not allows version '" + artifactCoordinates.getVersion() + "'");
       }
     }
     else {

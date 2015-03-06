@@ -25,7 +25,7 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
-import org.sonatype.nexus.repository.maven.internal.MavenTokenizerHandler
+import org.sonatype.nexus.repository.maven.internal.context.CoordinatesHandler
 import org.sonatype.nexus.repository.maven.internal.group.MavenGroupHandler
 import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacetImpl
 import org.sonatype.nexus.repository.search.SearchFacet
@@ -75,7 +75,7 @@ class Maven2GroupRecipe
   Provider<MavenStorageFacetImpl> mavenStorageFacet
 
   @Inject
-  MavenTokenizerHandler mavenTokenizerHandler
+  CoordinatesHandler coordinatesHandler
 
   @Inject
   MavenGroupHandler mavenGroupHandler
@@ -103,7 +103,7 @@ class Maven2GroupRecipe
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
         .handler(securityHandler)
-        .handler(mavenTokenizerHandler)
+        .handler(coordinatesHandler)
         .handler(mavenGroupHandler)
         .create())
 

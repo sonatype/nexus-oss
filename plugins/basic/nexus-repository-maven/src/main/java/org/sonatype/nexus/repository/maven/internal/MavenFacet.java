@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.maven.internal;
 
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.maven.internal.context.PathParser;
 import org.sonatype.nexus.repository.maven.internal.policy.deploy.RedeployPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.version.VersionPolicy;
 
