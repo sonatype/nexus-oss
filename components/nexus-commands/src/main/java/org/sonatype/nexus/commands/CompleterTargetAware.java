@@ -14,10 +14,14 @@ package org.sonatype.nexus.commands;
 
 import java.lang.reflect.Field;
 
+import javax.inject.Singleton;
+
 import org.apache.karaf.shell.console.Completer;
 
 /**
  * Allows {@link Completer} instances to be aware of the target field they are completing for.
+ *
+ * Components that use this feature should be sure to not bind as {@link Singleton}.
  *
  * @since 3.0
  */
