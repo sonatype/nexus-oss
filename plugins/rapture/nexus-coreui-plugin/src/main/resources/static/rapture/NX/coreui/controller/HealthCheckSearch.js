@@ -88,7 +88,8 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
         id: model.getId(),
         group: model.get('group'),
         name: model.get('name'),
-        version: model.get('version')
+        version: model.get('version'),
+        format: model.get('format')
       });
     });
 

@@ -37,7 +37,7 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreAdd', {
     me.items = {
       xtype: 'nx-coreui-blobstore-settings-form',
       api: {
-        submit: 'NX.direct.coreui_blobstore.create'
+        submit: 'NX.direct.coreui_Blobstore.create'
       },
       settingsFormSuccessMessage: function(data) {
         return NX.I18n.get('ADMIN_BLOBSTORES_CREATE_SUCCESS') + data['name'];

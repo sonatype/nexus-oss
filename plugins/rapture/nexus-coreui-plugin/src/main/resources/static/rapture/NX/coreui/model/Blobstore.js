@@ -23,6 +23,9 @@ Ext.define('NX.coreui.model.Blobstore', {
   fields: [
     'name',
     'type',
-    'attributes'
+    'attributes',
+    'blobCount',
+    'totalSize',
+    'availableSpace'
   ]
 });

@@ -25,6 +25,7 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobStore;
+import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.api.BlobStoreListener;
 import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
@@ -57,17 +58,21 @@ public class FileBlobStore
 
   private final BlobMetadataStore metadataStore;
 
+  private final BlobStoreConfiguration blobStoreConfiguration;
+
   private volatile BlobStoreListener listener;
 
   public FileBlobStore(final Path root,
                        final LocationStrategy locationStrategy,
                        final FileOperations fileOperations,
-                       final BlobMetadataStore metadataStore)
+                       final BlobMetadataStore metadataStore,
+                       final BlobStoreConfiguration blobStoreConfiguration)
   {
     this.root = checkNotNull(root);
     this.locationStrategy = checkNotNull(locationStrategy);
     this.fileOperations = checkNotNull(fileOperations);
     this.metadataStore = checkNotNull(metadataStore);
+    this.blobStoreConfiguration = checkNotNull(blobStoreConfiguration);
   }
 
   @Override
@@ -262,6 +267,11 @@ public class FileBlobStore
     catch (Exception e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  @Override
+  public BlobStoreConfiguration getBlobStoreConfiguration() {
+    return blobStoreConfiguration;
   }
 
   private void checkExists(final Path path, final BlobId blobId) throws IOException {

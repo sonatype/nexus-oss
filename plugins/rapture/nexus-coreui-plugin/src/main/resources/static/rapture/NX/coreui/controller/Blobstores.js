@@ -29,7 +29,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
   masters: 'nx-coreui-blobstore-list',
 
   models: [
-    'NX.coreui.store.Blobstore'
+    'Blobstore'
   ],
   stores: [
     'NX.coreui.store.Blobstore',

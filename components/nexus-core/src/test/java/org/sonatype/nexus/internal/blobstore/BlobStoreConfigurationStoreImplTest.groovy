@@ -83,19 +83,6 @@ class BlobStoreConfigurationStoreImplTest
     }
   }
 
-  @Test
-  void 'Paths are unique'() {
-    BlobStoreConfiguration entity = createConfig()
-
-    try {
-      createConfig('name2', entity.attributes)
-      fail()
-    }
-    catch (ORecordDuplicatedException e) {
-      assert e.toString().contains('blobstore_path_idx')
-    }
-  }
-
   private BlobStoreConfiguration createConfig(name = 'foo', path = 'bar') {
     def entity = new BlobStoreConfiguration(
         name: name,

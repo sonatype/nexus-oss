@@ -61,8 +61,6 @@ public class ConfigurationEntityAdapter
 
   private static final String I_NAME = "blobstore_name_idx";
 
-  private static final String I_ATTRIBUTES = "blobstore_path_idx";
-
   /**
    * Register the required schema.
    * @param db
@@ -79,7 +77,6 @@ public class ConfigurationEntityAdapter
       type.createProperty(P_RECIPE_NAME, OType.STRING).setMandatory(true).setNotNull(true);
       type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP).setMandatory(true).setNotNull(true);
       type.createIndex(I_NAME, INDEX_TYPE.UNIQUE, P_NAME);
-      type.createIndex(I_ATTRIBUTES, INDEX_TYPE.UNIQUE, P_ATTRIBUTES);
       
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }

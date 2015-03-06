@@ -20,6 +20,7 @@ import java.util.Random;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
+import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -62,7 +63,7 @@ public class FileBlobStoreIT
 
     this.metadataStore = MapdbBlobMetadataStore.create(metadata.toFile());
     this.underTest = new FileBlobStore(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(),
-        metadataStore);
+        metadataStore, new BlobStoreConfiguration());
     underTest.start();
   }
 

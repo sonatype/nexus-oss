@@ -97,4 +97,9 @@ public interface BlobStore
    * tasks need doing.
    */
   void compact();
+
+  /**
+   * Returns the configuration entity for the BlobStore.
+   */
+  BlobStoreConfiguration getBlobStoreConfiguration();
 }
