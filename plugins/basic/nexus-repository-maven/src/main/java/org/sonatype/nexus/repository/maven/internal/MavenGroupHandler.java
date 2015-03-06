@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal.group;
+package org.sonatype.nexus.repository.maven.internal;
 
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +23,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.http.HttpStatus;
-import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.Coordinates;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Request;
@@ -36,7 +36,6 @@ import com.google.common.collect.Sets;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 import static org.sonatype.nexus.repository.maven.internal.ContextHelper.coordinates;
-import static org.sonatype.nexus.repository.maven.internal.ContextHelper.name;
 
 /**
  * Maven group handler.

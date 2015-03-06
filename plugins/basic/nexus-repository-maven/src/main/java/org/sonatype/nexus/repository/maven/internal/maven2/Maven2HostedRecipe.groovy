@@ -25,10 +25,11 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
-import org.sonatype.nexus.repository.maven.internal.context.CoordinatesHandler
-import org.sonatype.nexus.repository.maven.internal.hosted.MavenHostedHandler
-import org.sonatype.nexus.repository.maven.internal.policy.MavenPolicyHandler
-import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacetImpl
+import org.sonatype.nexus.repository.maven.internal.CoordinatesHandler
+import org.sonatype.nexus.repository.maven.internal.MavenHostedHandler
+import org.sonatype.nexus.repository.maven.internal.policy.RedeployPolicyHandler
+import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicyHandler
+import org.sonatype.nexus.repository.maven.internal.storage.MavenContentsFacetImpl
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
@@ -73,13 +74,16 @@ class Maven2HostedRecipe
   SecurityHandler securityHandler
 
   @Inject
-  Provider<MavenStorageFacetImpl> mavenStorageFacet
+  Provider<MavenContentsFacetImpl> mavenStorageFacet
 
   @Inject
   CoordinatesHandler coordinatesHandler
 
   @Inject
-  MavenPolicyHandler mavenPolicyHandler
+  VersionPolicyHandler mavenVersionPolicyHandler
+
+  @Inject
+  RedeployPolicyHandler mavenRedeployPolicyHandler
 
   @Inject
   MavenHostedHandler mavenHostedHandler
@@ -108,7 +112,8 @@ class Maven2HostedRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(coordinatesHandler)
-        .handler(mavenPolicyHandler)
+        .handler(mavenVersionPolicyHandler)
+        .handler(mavenRedeployPolicyHandler)
         .handler(mavenHostedHandler)
         .handler(notFound())
         .create())

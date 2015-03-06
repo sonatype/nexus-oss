@@ -26,9 +26,9 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
-import org.sonatype.nexus.repository.maven.internal.context.CoordinatesHandler
-import org.sonatype.nexus.repository.maven.internal.policy.MavenPolicyHandler
-import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacetImpl
+import org.sonatype.nexus.repository.maven.internal.CoordinatesHandler
+import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicyHandler
+import org.sonatype.nexus.repository.maven.internal.storage.MavenContentsFacetImpl
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
 import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler
 import org.sonatype.nexus.repository.proxy.ProxyHandler
@@ -88,13 +88,13 @@ class Maven2ProxyRecipe
   ProxyHandler proxyHandler
 
   @Inject
-  Provider<MavenStorageFacetImpl> mavenStorageFacet
+  Provider<MavenContentsFacetImpl> mavenStorageFacet
 
   @Inject
   CoordinatesHandler coordinatesHandler
 
   @Inject
-  MavenPolicyHandler mavenPolicyHandler
+  VersionPolicyHandler mavenVersionPolicyHandler
 
   @Inject
   public Maven2ProxyRecipe(final @Named(ProxyType.NAME) Type type,
@@ -125,7 +125,7 @@ class Maven2ProxyRecipe
         .handler(timingHandler)
         .handler(negativeCacheHandler)
         .handler(coordinatesHandler)
-        .handler(mavenPolicyHandler)
+        .handler(mavenVersionPolicyHandler)
         .handler(proxyHandler)
         .handler(notFound())
         .create())

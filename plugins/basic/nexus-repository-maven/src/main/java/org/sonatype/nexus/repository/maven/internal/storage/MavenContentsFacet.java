@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.Content;
-import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.Coordinates;
 
 import org.joda.time.DateTime;
 
@@ -29,7 +29,7 @@ import org.joda.time.DateTime;
  * @since 3.0
  */
 @Facet.Exposed
-public interface MavenStorageFacet
+public interface MavenContentsFacet
     extends Facet
 {
   @Nullable

@@ -10,18 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal.policy.version;
+package org.sonatype.nexus.repository.maven.internal.policy;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates;
-import org.sonatype.nexus.repository.maven.internal.policy.Policy;
-import org.sonatype.nexus.repository.maven.internal.policy.PolicyEvaluation;
-import org.sonatype.nexus.repository.view.Context;
-
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.maven.internal.ContextHelper.artifactCoordinates;
 
 /**
  * Repository version policy.
@@ -29,8 +23,8 @@ import static org.sonatype.nexus.repository.maven.internal.ContextHelper.artifac
  * @since 3.0
  */
 public class VersionPolicy
-    implements Policy
 {
+  // TODO: this is format specific, so move this out from here
   private static final String SNAPSHOT_VERSION = "SNAPSHOT";
 
   private static final Pattern VERSION_FILE_PATTERN =
@@ -82,26 +76,6 @@ public class VersionPolicy
 
   public String getValue() {
     return value;
-  }
-
-  @Override
-  public PolicyEvaluation evaluate(final Context context) throws Exception {
-    checkNotNull(context);
-    final ArtifactCoordinates artifactCoordinates = artifactCoordinates(context);
-    if (artifactCoordinates != null) {
-      if (allowsVersion(artifactCoordinates.getVersion())) {
-        return new PolicyEvaluation(true,
-            "Repository policy '" + this + "' allows version '" + artifactCoordinates.getVersion() + "'");
-      }
-      else {
-        return new PolicyEvaluation(false,
-            "Repository policy '" + this + "' not allows version '" + artifactCoordinates.getVersion() + "'");
-      }
-    }
-    else {
-      // TODO: metadata request with snapshot?
-      return new PolicyEvaluation(true, "Repository policy '" + this + "' allows non-artifacts");
-    }
   }
 
   /**

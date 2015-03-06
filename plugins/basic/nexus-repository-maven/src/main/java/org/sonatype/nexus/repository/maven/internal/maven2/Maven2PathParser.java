@@ -17,11 +17,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.M2GavCalculator;
-import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates;
-import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates.SignatureType;
-import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
-import org.sonatype.nexus.repository.maven.internal.context.Coordinates.HashType;
-import org.sonatype.nexus.repository.maven.internal.context.PathParser;
+import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates;
+import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates.SignatureType;
+import org.sonatype.nexus.repository.maven.internal.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.Coordinates.HashType;
+import org.sonatype.nexus.repository.maven.internal.PathParser;
 
 import com.google.common.base.Strings;
 

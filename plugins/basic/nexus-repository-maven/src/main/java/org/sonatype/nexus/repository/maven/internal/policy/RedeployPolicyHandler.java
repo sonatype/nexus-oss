@@ -10,38 +10,46 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal.context;
+package org.sonatype.nexus.repository.maven.internal.policy;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.maven.internal.MavenFacet;
+import org.sonatype.nexus.repository.maven.internal.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.storage.MavenContentsFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import static org.sonatype.nexus.repository.maven.internal.ContextHelper.name;
+import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.coordinates;
 
 /**
- * Maven coordinates handler, that prepares the coordinates for every incoming request.
+ * Handler enforcing redeploy policy on Maven repositories.
  *
  * @since 3.0
  */
 @Singleton
 @Named
-public class CoordinatesHandler
+public class RedeployPolicyHandler
     extends ComponentSupport
     implements Handler
 {
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
-    final String path = name(context);
-    final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
-    final Coordinates coordinates = mavenFacet.getPathParser().parsePath(path);
-    context.getAttributes().set(Coordinates.class, coordinates);
+    if (PUT.equals(context.getRequest().getAction())) {
+      final Coordinates coordinates = coordinates(context);
+      final boolean contentExists = context.getRepository().facet(MavenContentsFacet.class).exists(coordinates);
+      final RedeployPolicy redeployPolicy = context.getRepository().facet(MavenFacet.class).getRedeployPolicy();
+      if (!redeployPolicy.allowsPut(coordinates, contentExists)) {
+        return HttpResponses.badRequest("Update not allowed by redeploy policy '" + redeployPolicy + "'");
+      }
+    }
     return context.proceed();
   }
 }

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal.hosted;
+package org.sonatype.nexus.repository.maven.internal;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -18,8 +18,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.maven.internal.Content;
-import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
-import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacet;
+import org.sonatype.nexus.repository.maven.internal.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.storage.MavenContentsFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
@@ -33,7 +33,6 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 import static org.sonatype.nexus.repository.maven.internal.ContentHelper.toContent;
 import static org.sonatype.nexus.repository.maven.internal.ContentHelper.toPayload;
 import static org.sonatype.nexus.repository.maven.internal.ContextHelper.coordinates;
-import static org.sonatype.nexus.repository.maven.internal.ContextHelper.name;
 
 /**
  * Maven hosted handler.
@@ -51,11 +50,11 @@ public class MavenHostedHandler
   public Response handle(final @Nonnull Context context) throws Exception {
     final String action = context.getRequest().getAction();
     final Coordinates coordinates = coordinates(context);
-    final MavenStorageFacet mavenStorageFacet = context.getRepository().facet(MavenStorageFacet.class);
+    final MavenContentsFacet mavenContentsFacet = context.getRepository().facet(MavenContentsFacet.class);
 
     switch (action) {
       case GET: {
-        final Content content = mavenStorageFacet.get(coordinates);
+        final Content content = mavenContentsFacet.get(coordinates);
         if (content == null) {
           return HttpResponses.notFound(coordinates.getPath());
         }
@@ -64,12 +63,12 @@ public class MavenHostedHandler
 
       case PUT: {
         final Content content = toContent(context.getRequest().getPayload(), new DateTime());
-        mavenStorageFacet.put(coordinates, content);
+        mavenContentsFacet.put(coordinates, content);
         return HttpResponses.created();
       }
 
       case DELETE: {
-        final boolean deleted = mavenStorageFacet.delete(coordinates);
+        final boolean deleted = mavenContentsFacet.delete(coordinates);
         if (!deleted) {
           return HttpResponses.notFound(coordinates.getPath());
         }

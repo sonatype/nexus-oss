@@ -10,20 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal.policy.deploy;
+package org.sonatype.nexus.repository.maven.internal.policy;
 
 import java.util.Locale;
 
-import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates;
-import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
-import org.sonatype.nexus.repository.maven.internal.policy.Policy;
-import org.sonatype.nexus.repository.maven.internal.policy.PolicyEvaluation;
-import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacet;
-import org.sonatype.nexus.repository.view.Context;
+import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates;
+import org.sonatype.nexus.repository.maven.internal.Coordinates;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
-import static org.sonatype.nexus.repository.maven.internal.ContextHelper.coordinates;
 
 /**
  * Repository redeploy policy for Maven artifacts, is artifact overwrite allowed or not.
@@ -31,7 +25,6 @@ import static org.sonatype.nexus.repository.maven.internal.ContextHelper.coordin
  * @since 3.0
  */
 public class RedeployPolicy
-    implements Policy
 {
   private static final String V_ALLOW = "allow";
 
@@ -65,32 +58,16 @@ public class RedeployPolicy
     return value;
   }
 
-  @Override
-  public PolicyEvaluation evaluate(final Context context) throws Exception {
-    if (!PUT.equals(context.getRequest().getAction())) {
-      return new PolicyEvaluation(true, "Redeploy policy '" + this + "' always allows non-PUT requests");
-    }
-    final Coordinates coordinates = coordinates(context);
+  public boolean allowsPut(final Coordinates coordinates, final boolean exists) throws Exception {
     if (!(coordinates instanceof ArtifactCoordinates)) {
-      return new PolicyEvaluation(true,
-          "Redeploy policy '" + this + "' always allows non-artifact deploy of " + coordinates.getPath());
+      return true;
     }
-    final MavenStorageFacet mavenStorageFacet = context.getRepository().facet(MavenStorageFacet.class);
-    final boolean exists = mavenStorageFacet.exists(coordinates);
-
     if (exists) {
       if (this.equals(DISALLOW)) {
-        return new PolicyEvaluation(false,
-            "Redeploy policy '" + this + "' disallows redeploy of " + coordinates.getPath());
-      }
-      else {
-        return new PolicyEvaluation(true, "Redeploy policy '" + this + "' allows redeploy of " + coordinates.getPath());
+        return false;
       }
     }
-    else {
-      return new PolicyEvaluation(true,
-          "Redeploy policy '" + this + "' allows initial deploy of " + coordinates.getPath());
-    }
+    return true;
   }
 
   @Override

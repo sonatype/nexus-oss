@@ -30,8 +30,8 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.Content;
-import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates;
-import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates;
+import org.sonatype.nexus.repository.maven.internal.Coordinates;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
@@ -50,14 +50,14 @@ import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 import static org.sonatype.nexus.repository.storage.StorageFacet.*;
 
 /**
- * A {@link MavenStorageFacet} that persists to a {@link StorageFacet}.
+ * A {@link MavenContentsFacet} that persists to a {@link StorageFacet}.
  *
  * @since 3.0
  */
 @Named
-public class MavenStorageFacetImpl
+public class MavenContentsFacetImpl
     extends FacetSupport
-    implements MavenStorageFacet
+    implements MavenContentsFacet
 {
   public static final String CONFIG_KEY = "mavenStorage";
 
@@ -68,7 +68,7 @@ public class MavenStorageFacetImpl
   private boolean strictContentTypeValidation = false;
 
   @Inject
-  public MavenStorageFacetImpl(final MimeSupport mimeSupport)
+  public MavenContentsFacetImpl(final MimeSupport mimeSupport)
   {
     this.mimeSupport = checkNotNull(mimeSupport);
   }

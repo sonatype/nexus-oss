@@ -18,43 +18,34 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.maven.internal.MavenFacet;
-import org.sonatype.nexus.repository.maven.internal.policy.deploy.RedeployPolicy;
-import org.sonatype.nexus.repository.maven.internal.policy.version.VersionPolicy;
+import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import static org.sonatype.nexus.repository.maven.internal.ContextHelper.artifactCoordinates;
+
 /**
- * Handler enforcing repository policies on Maven repositories.
+ * Handler enforcing version policy on Maven repositories.
  *
  * @since 3.0
  */
 @Singleton
 @Named
-public class MavenPolicyHandler
+public class VersionPolicyHandler
     extends ComponentSupport
     implements Handler
 {
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
-    final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
-
-    {
-      final VersionPolicy versionPolicy = mavenFacet.getVersionPolicy();
-      final PolicyEvaluation versionPolicyEvaluation = versionPolicy.evaluate(context);
-      log.trace("{} = {}", versionPolicy, versionPolicyEvaluation);
-      if (!versionPolicyEvaluation.isAligned()) {
-        return HttpResponses.badRequest(versionPolicyEvaluation.getMessage());
-      }
-    }
-    {
-      final RedeployPolicy redeployPolicy = mavenFacet.getRedeployPolicy();
-      final PolicyEvaluation redeployPolicyEvaluation = redeployPolicy.evaluate(context);
-      log.trace("{} = {}", redeployPolicy, redeployPolicyEvaluation);
-      if (!redeployPolicyEvaluation.isAligned()) {
-        return HttpResponses.badRequest(redeployPolicyEvaluation.getMessage());
+    final ArtifactCoordinates artifactCoordinates = artifactCoordinates(context);
+    if (artifactCoordinates != null) {
+      final VersionPolicy versionPolicy = context.getRepository().facet(MavenFacet.class).getVersionPolicy();
+      if (!versionPolicy.allowsVersion(artifactCoordinates.getVersion())) {
+        return HttpResponses.badRequest(
+            "VersionPolicy '" + versionPolicy + "' forbids version '" + artifactCoordinates.getVersion() + "'");
       }
     }
     return context.proceed();

@@ -18,9 +18,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.maven.internal.context.PathParser;
-import org.sonatype.nexus.repository.maven.internal.policy.deploy.RedeployPolicy;
-import org.sonatype.nexus.repository.maven.internal.policy.version.VersionPolicy;
+import org.sonatype.nexus.repository.maven.internal.policy.RedeployPolicy;
+import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;

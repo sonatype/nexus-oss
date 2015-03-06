@@ -25,9 +25,9 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
-import org.sonatype.nexus.repository.maven.internal.context.CoordinatesHandler
-import org.sonatype.nexus.repository.maven.internal.group.MavenGroupHandler
-import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacetImpl
+import org.sonatype.nexus.repository.maven.internal.CoordinatesHandler
+import org.sonatype.nexus.repository.maven.internal.MavenGroupHandler
+import org.sonatype.nexus.repository.maven.internal.storage.MavenContentsFacetImpl
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
@@ -72,7 +72,7 @@ class Maven2GroupRecipe
   SecurityHandler securityHandler
 
   @Inject
-  Provider<MavenStorageFacetImpl> mavenStorageFacet
+  Provider<MavenContentsFacetImpl> mavenStorageFacet
 
   @Inject
   CoordinatesHandler coordinatesHandler

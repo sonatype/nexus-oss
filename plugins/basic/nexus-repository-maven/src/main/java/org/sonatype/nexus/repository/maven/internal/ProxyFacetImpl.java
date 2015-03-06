@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal.proxy;
+package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.Content;
-import org.sonatype.nexus.repository.maven.internal.storage.MavenStorageFacet;
+import org.sonatype.nexus.repository.maven.internal.storage.MavenContentsFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
@@ -68,7 +68,7 @@ public class ProxyFacetImpl
     return name(context);
   }
 
-  private MavenStorageFacet storage() {
-    return getRepository().facet(MavenStorageFacet.class);
+  private MavenContentsFacet storage() {
+    return getRepository().facet(MavenContentsFacet.class);
   }
 }

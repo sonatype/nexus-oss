@@ -15,8 +15,6 @@ package org.sonatype.nexus.repository.maven.internal;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.repository.maven.internal.context.ArtifactCoordinates;
-import org.sonatype.nexus.repository.maven.internal.context.Coordinates;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
