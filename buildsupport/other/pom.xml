@@ -183,6 +183,12 @@
         <artifactId>jts</artifactId>
         <version>1.13</version>
       </dependency>
+
+      <dependency>
+        <groupId>javax.transaction</groupId>
+        <artifactId>javax.transaction-api</artifactId>
+        <version>1.2</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

@@ -17,8 +17,8 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
+import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
 import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler
-import org.sonatype.nexus.repository.negativecache.NegativeCacheImpl
 import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -61,7 +61,7 @@ class RawProxyRecipe
   Provider<HttpClientFacet> httpClientFacet
 
   @Inject
-  Provider<NegativeCacheImpl> negativeCacheFacet
+  Provider<NegativeCacheFacet> negativeCacheFacet
 
   @Inject
   Provider<RawProxyFacet> proxyFacet

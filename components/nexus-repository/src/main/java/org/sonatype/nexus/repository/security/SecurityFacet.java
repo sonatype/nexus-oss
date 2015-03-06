@@ -25,5 +25,8 @@ import org.sonatype.nexus.repository.view.Request;
 public interface SecurityFacet
   extends Facet
 {
-  boolean permitted(Request request, Repository repository);
+  /**
+   * Check if the given request is permitted on the the repository.
+   */
+  boolean permitted(Request request);
 }

@@ -48,7 +48,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     { ref: 'settings', selector: 'nx-coreui-repository-feature nx-coreui-repository-settings' }
   ],
   icons: {
-    'repositorycma-default': {
+    'repository-default': {
       file: 'database_green.png',
       variants: ['x16', 'x32']
     }

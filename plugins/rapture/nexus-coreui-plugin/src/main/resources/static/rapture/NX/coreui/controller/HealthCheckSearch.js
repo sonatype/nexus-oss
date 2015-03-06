@@ -27,15 +27,15 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
   ],
 
   models: [
-    'SearchResult',
-    'SearchResultVersion'
+    'Asset',
+    'Component'
   ],
   stores: [
-    'SearchResult',
-    'SearchResultVersion'
+    'Asset',
+    'SearchResult'
   ],
   refs: [
-    { ref: 'searchResultVersion', selector: 'nx-coreui-search-result-version-list' },
+    { ref: 'searchResult', selector: 'nx-coreui-search-result-list' },
     { ref: 'searchResultDetails', selector: 'nx-coreui-search-result-details' }
   ],
 
@@ -49,17 +49,27 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       store: {
         '#SearchResult': {
           load: me.setHealthCheckSearchResultFields
-        },
-        '#SearchResultVersion': {
-          load: me.loadHealthCheckSearchResultVersion
         }
       },
       component: {
-        'nx-coreui-search-result-version-list': {
-          afterrender: me.bindHealthCheckColumns
+        'nx-coreui-search-result-list': {
+          afterrender: me.bindHealthCheckColumns,
+          selection: me.onSelection
         }
       }
     });
+  },
+
+  /**
+   * @private
+   */
+  onSelection: function(list, model) {
+    var me = this,
+        searchResultDetails = me.getSearchResultDetails(),
+        info3 = {};
+
+    info3[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(model);
+    searchResultDetails.down('#info3').showInfo(info3);
   },
 
   /**
@@ -67,82 +77,56 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
    * Sets Health Check fields on search results.
    */
   setHealthCheckSearchResultFields: function() {
-    var me = this;
+    var me = this,
+        components = [];
 
-    me.getSearchResultStore().each(function(searchResultModel) {
-      searchResultModel.set('healthCheckLoading', true);
-      searchResultModel.commit();
+    me.getSearchResultStore().each(function(model) {
+      model.beginEdit();
+      model.set('healthCheckLoading', true);
+      model.endEdit();
+      components.push({
+        id: model.getId(),
+        group: model.get('group'),
+        name: model.get('name'),
+        version: model.get('version'),
+        format: model.get('format')
+      });
+    });
+
+    if (me.getSearchResult()) {
+      me.getSearchResult().getView().refresh();
+    }
+
+    NX.direct.healthcheck_Search.read(components, function(response) {
+      var success = Ext.isObject(response) && response.success;
+      me.getSearchResultStore().each(function(model) {
+        model.beginEdit();
+        model.set('healthCheckLoading', false);
+        model.set('healthCheckError', !success);
+        model.endEdit();
+      });
+      if (success) {
+        Ext.Array.each(response.data, function(entry) {
+          var model = me.getSearchResultStore().getById(entry.id);
+          if (model) {
+            model.beginEdit();
+            Ext.Object.each(entry['healthCheck'], function(key, value) {
+              model.set('healthCheck' + Ext.String.capitalize(key), value);
+            });
+            model.endEdit();
+          }
+        });
+      }
+      if (me.getSearchResult()) {
+        me.getSearchResult().getView().refresh();
+      }
     });
   },
 
   /**
    * @private
-   * Load Health Check details if search result version grid is active.
-   */
-  loadHealthCheckSearchResultVersion: function() {
-    var me = this,
-        searchResultDetails = me.getSearchResultDetails().down('#popular'),
-        searchResultModel,
-        groupId = undefined, artifactId = undefined, versions = [], info = {};
-
-    if (me.getSearchResultVersion()) {
-
-      me.getSearchResultVersionStore().each(function(searchResultVersionModel) {
-        groupId = searchResultVersionModel.get('groupId');
-        artifactId = searchResultVersionModel.get('artifactId');
-        if (versions.indexOf(searchResultVersionModel.get('version')) === -1) {
-          versions.push(searchResultVersionModel.get('version'));
-        }
-      });
-      if (groupId && artifactId) {
-        searchResultModel = me.getSearchResultStore().getById(groupId + ':' + artifactId);
-        searchResultModel.set('healthCheckLoading', true);
-        searchResultModel.commit();
-        info[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(searchResultModel);
-        searchResultDetails.showInfo(info);
-        me.getSearchResultVersion().getView().refresh();
-        NX.direct.healthcheck_Search.read(groupId, artifactId, versions, function(response) {
-          searchResultModel.set('healthCheckLoading', false);
-          if (Ext.isObject(response) && response.success) {
-            searchResultModel.beginEdit();
-            searchResultModel.set('healthCheckCapped', response.data['capped']);
-            searchResultModel.set('healthCheckDisabled', response.data['disabled']);
-            searchResultModel.set('healthCheckError', response.data['error']);
-            searchResultModel.set('healthCheckMostPopularVersion', response.data['mostPopularVersion']);
-            searchResultModel.endEdit();
-            info[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(searchResultModel);
-            searchResultDetails.showInfo(info);
-            Ext.Object.each(response.data.versions, function(key, value) {
-              var searchResultVersionModel = me.getSearchResultVersionStore().getById(key);
-              if (searchResultVersionModel) {
-                searchResultVersionModel.beginEdit();
-                searchResultVersionModel.set('healthCheckAge', value['age']);
-                searchResultVersionModel.set('healthCheckPopularity', value['popularity']);
-                searchResultVersionModel.set('healthCheckSecurityAlerts', value['securityAlerts']);
-                searchResultVersionModel.set('healthCheckCriticalSecurityAlerts', value['criticalSecurityAlerts']);
-                searchResultVersionModel.set('healthCheckSevereSecurityAlerts', value['severeSecurityAlerts']);
-                searchResultVersionModel.set('healthCheckModerateSecurityAlerts', value['moderateSecurityAlerts']);
-                searchResultVersionModel.set('healthCheckLicenseThreat', value['licenseThreat']);
-                searchResultVersionModel.set('healthCheckLicenseThreatName', value['licenseThreatName']);
-                searchResultVersionModel.endEdit(true);
-              }
-            });
-          }
-          else {
-            searchResultModel.set('healthCheckError', true);
-          }
-          if (me.getSearchResultVersion()) {
-            me.getSearchResultVersion().getView().refresh();
-          }
-        });
-      }
-    }
-  },
-
-  /**
-   * @private
    * Add/Remove Health Check columns based on nexus:healthcheck:read permission.
-   * @param {NX.coreui.view.search.SearchResultVersionList} grid search result version grid
+   * @param {NX.coreui.view.search.SearchResultList} grid search result grid
    */
   bindHealthCheckColumns: function(grid) {
     var me = this;
@@ -160,15 +144,15 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
 
   /**
    * @private
-   * Add Health Check columns to search result version grid.
-   * @param {NX.coreui.view.search.SearchResultVersionList} grid search result version grid
+   * Add Health Check columns to search result grid.
+   * @param {NX.coreui.view.search.SearchResultList} grid search result grid
    */
   addHealthCheckColumns: function(grid) {
     var me = this,
         view = grid.getView();
 
-    if (!grid.healthCheckColumns) {
-      grid.healthCheckColumns = [
+    if (!grid['healthCheckColumns']) {
+      grid['healthCheckColumns'] = [
         Ext.create('Ext.grid.column.Column', {
           header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_AGE_COLUMN'),
           dataIndex: 'healthCheckAge',
@@ -192,30 +176,30 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
 
   /**
    * @private
-   * Remove Health Check columns from search result version grid.
-   * @param {NX.coreui.view.search.SearchResultVersionList} grid search result version grid
+   * Remove Health Check columns from search result grid.
+   * @param {NX.coreui.view.search.SearchResultList} grid search result grid
    */
   removeHealthCheckColumns: function(grid) {
-    if (grid.healthCheckColumns) {
-      grid.headerCt.remove(grid.healthCheckColumns);
+    if (grid['healthCheckColumns']) {
+      grid.headerCt.remove(grid['healthCheckColumns']);
       grid.getView().refresh();
-      delete grid.healthCheckColumns;
+      delete grid['healthCheckColumns'];
     }
   },
 
   /**
    * @private
    * Render most popular version field.
-   * @param {NX.coreui.model.SearchResult} searchResultModel search result model
+   * @param {NX.coreui.model.Component} componentModel component model
    * @returns {string} rendered value
    */
-  renderMostPopularVersion: function(searchResultModel) {
+  renderMostPopularVersion: function(componentModel) {
     var me = this,
         result, metadata = {};
 
-    result = me.renderPreconditions(searchResultModel, metadata);
+    result = me.renderPreconditions(componentModel, metadata);
     if (!result) {
-      result = searchResultModel.get('healthCheckMostPopularVersion');
+      result = componentModel.get('healthCheckMostPopularVersion');
       if (!result) {
         result = me.renderNotAvailable(metadata);
       }
@@ -228,16 +212,16 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
    * Render age column.
    * @param {number} value age
    * @param metadata column metadata
-   * @param {NX.coreui.model.SearchResultVersion} searchResultVersionModel search result version model
+   * @param {NX.coreui.model.Component} model component model
    * @returns {string} rendered value
    */
-  renderAgeColumn: function(value, metadata, searchResultVersionModel) {
+  renderAgeColumn: function(value, metadata, model) {
     var me = this,
         result, age, dayAge;
 
-    result = me.renderPreconditions(searchResultVersionModel, metadata);
+    result = me.renderPreconditions(model, metadata);
     if (!result) {
-      age = searchResultVersionModel.get('healthCheckAge');
+      age = model.get('healthCheckAge');
       if (age === 0 || age > 0) {
         // convert millis to a day count
         dayAge = age / (1000 * 60 * 60 * 24);
@@ -261,16 +245,16 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
    * Render popularity column.
    * @param {number} value popularity
    * @param metadata column metadata
-   * @param {NX.coreui.model.SearchResultVersion} searchResultVersionModel search result version model
+   * @param {NX.coreui.model.Component} model component model
    * @returns {string} rendered value
    */
-  renderPopularityColumn: function(value, metadata, searchResultVersionModel) {
+  renderPopularityColumn: function(value, metadata, model) {
     var me = this,
         result, popularity;
 
-    result = me.renderPreconditions(searchResultVersionModel, metadata);
+    result = me.renderPreconditions(model, metadata);
     if (!result) {
-      popularity = searchResultVersionModel.get('healthCheckPopularity');
+      popularity = model.get('healthCheckPopularity');
       if (popularity === 0 || popularity > 0) {
         if (popularity > 100) {
           popularity = 100;
@@ -291,30 +275,27 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
   /**
    * @private
    * Render value based on preconditions.
-   * @param {NX.coreui.model.SearchResult|NX.coreui.model.SearchResultVersion} model search result / version model
+   * @param {NX.coreui.model.Component|NX.coreui.model.SearchResultVersion} model component / version model
    * @param metadata column metadata
    * @returns {*} rendered value
    */
   renderPreconditions: function(model, metadata) {
-    var me = this,
-        searchResultModel = me.getSearchResultStore().getById(
-            model.get('groupId') + ':' + model.get('artifactId')
-        );
+    var me = this;
 
     // FIXME: resolve use of undefined "opaqueWarning" css class and potentially replace icons with glyphs
 
-    if (searchResultModel.get('healthCheckLoading')) {
+    if (model.get('healthCheckLoading')) {
       return 'Loading...';
     }
-    else if (searchResultModel.get('healthCheckDisabled')) {
+    else if (model.get('healthCheckDisabled')) {
       metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_DISABLED') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('information.png') + '">';
     }
-    else if (searchResultModel.get('healthCheckError')) {
+    else if (model.get('healthCheckError')) {
       metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_ERROR') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('exclamation.gif') + '">';
     }
-    else if (searchResultModel.get('healthCheckCapped') || (model && model.get('capped'))) {
+    else if (model.get('healthCheckCapped') || (model && model.get('capped'))) {
       metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_QUOTA_REACHED') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('warning.gif') + '">';
     }
@@ -328,7 +309,6 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
    * @returns {string} rendered value
    */
   renderNotAvailable: function(metadata) {
-    var me = this;
     metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_NOT_AVAILABLE') + '"';
     return '<span class="fa fa-ban"/>';
   },

@@ -32,6 +32,7 @@ import static org.sonatype.nexus.repository.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
 import static org.sonatype.nexus.repository.http.HttpStatus.NO_CONTENT;
 import static org.sonatype.nexus.repository.http.HttpStatus.OK;
+import static org.sonatype.nexus.repository.http.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.sonatype.nexus.repository.http.HttpStatus.UNAUTHORIZED;
 
 /**
@@ -131,5 +132,13 @@ public class HttpResponses
     String allow = Joiner.on(',').join(allowedMethods);
     response.getHeaders().set(HttpHeaders.ALLOW, allow);
     return response;
+  }
+
+  public static Response serviceUnavailable(final @Nullable String message) {
+    return new Response(Status.failure(SERVICE_UNAVAILABLE, message));
+  }
+
+  public static Response serviceUnavailable() {
+    return serviceUnavailable(null);
   }
 }

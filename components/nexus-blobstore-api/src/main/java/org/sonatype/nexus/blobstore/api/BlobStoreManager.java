@@ -23,5 +23,29 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 public interface BlobStoreManager
   extends Lifecycle
 {
+  /**
+   * @return all BlobStores
+   */
+  Iterable<BlobStore> browse();
+
+  /**
+   * Create a new BlobStore
+   */
+  BlobStore create(BlobStoreConfiguration blobStoreConfiguration) throws Exception;
+
+  /**
+   * Delete an existing BlobStore
+   */
+  void delete(BlobStoreConfiguration blobStoreConfiguration) throws Exception;
+
+  /**
+   * Lookup a BlobStore by name
+   */
   BlobStore get(String name);
+
+  /**
+   * Delete a BlobStore by name
+   */
+  void delete(String name) throws Exception;
+  
 }

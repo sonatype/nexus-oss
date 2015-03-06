@@ -26,33 +26,34 @@ Ext.define('NX.coreui.controller.Search', {
     'NX.I18n'
   ],
 
-  masters: ['nx-coreui-search-result-list', 'nx-coreui-search-result-version-list'],
+  masters: ['nx-coreui-search-result-list', 'nx-coreui-search-result-asset-list'],
 
   stores: [
+    'Asset',
     'SearchFilter',
     'SearchCriteria',
     'SearchResult',
-    'SearchResultVersion'
   ],
   models: [
     'SearchFilter'
   ],
 
   views: [
+    'component.AssetContainer',
     'search.SearchFeature',
+    'search.SearchResultAssetList',
     'search.SearchResultDetails',
     'search.SearchResultList',
-    'search.SearchResultVersionList',
     'search.TextSearchCriteria',
     'search.SaveSearchFilter'
   ],
 
   refs: [
-    { ref: 'feature', selector: 'nx-searchfeature' },
+    { ref: 'feature', selector: 'nx-coreui-searchfeature' },
     { ref: 'searchResult', selector: 'nx-coreui-search-result-list' },
-    { ref: 'searchResultDetails', selector: 'nx-searchfeature #searchResultDetails' },
-    { ref: 'searchResultVersion', selector: 'nx-coreui-search-result-version-list' },
-    { ref: 'storageFileContainer', selector: 'nx-searchfeature nx-coreui-repositorybrowse-storagefilecontainer' },
+    { ref: 'searchResultDetails', selector: 'nx-coreui-searchfeature #searchResultDetails' },
+    { ref: 'searchResultAssets', selector: 'nx-coreui-search-result-asset-list' },
+    { ref: 'assetContainer', selector: 'nx-coreui-searchfeature nx-coreui-component-assetcontainer' },
     { ref: 'quickSearch', selector: 'nx-header-panel #quicksearch' }
   ],
 
@@ -98,37 +99,28 @@ Ext.define('NX.coreui.controller.Search', {
       }
     }, me);
 
+    me.registerFilter([
+      {
+        id: 'keyword',
+        name: 'Keyword',
+        text: 'Keyword',
+        description: 'Search for components by keyword',
+        readOnly: true,
+        criterias: [
+          { id: 'keyword' }
+        ]
+      },
+      {
+        id: 'custom',
+        name: 'Custom',
+        text: NX.I18n.get('BROWSE_SEARCH_CUSTOM_TITLE'),
+        description: NX.I18n.get('BROWSE_SEARCH_CUSTOM_SUBTITLE'),
+        readOnly: true
+      }
+    ], me);
+
     me.getSearchFilterStore().each(function(model) {
-      if (model.getId() === 'keyword') {
-        me.getApplication().getFeaturesController().registerFeature({
-          mode: 'browse',
-          path: '/Search',
-          text: NX.I18n.get('BROWSE_SEARCH_TITLE'),
-          description: NX.I18n.get('BROWSE_SEARCH_SUBTITLE'),
-          group: true,
-          view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '' },
-          iconName: 'search-default',
-          weight: 20,
-          expanded: false,
-          visible: function() {
-            return NX.Permissions.check('nexus:repositories', 'read');
-          }
-        }, me);
-      }
-      else {
-        me.getApplication().getFeaturesController().registerFeature({
-          mode: 'browse',
-          path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
-          view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '/' + model.getId() },
-          iconName: 'search-default',
-          text: model.get('text'),
-          description: model.get('description'),
-          authenticationRequired: false,
-          visible: function() {
-            return NX.Permissions.check('nexus:repositories', 'read');
-          }
-        }, me);
-      }
+      me.registerFeature(model, me);
     });
 
     me.listen({
@@ -138,18 +130,18 @@ Ext.define('NX.coreui.controller.Search', {
         }
       },
       component: {
-        'nx-searchfeature': {
+        'nx-coreui-searchfeature': {
           afterrender: me.initCriterias
         },
-        'nx-searchfeature menuitem[action=add]': {
+        'nx-coreui-searchfeature menuitem[action=add]': {
           click: me.addCriteria
         },
-        'nx-searchfeature component[searchCriteria=true]': {
+        'nx-coreui-searchfeature component[searchCriteria=true]': {
           search: me.onSearchCriteriaChange,
           searchcleared: me.onSearchCriteriaChange,
           criteriaremoved: me.removeCriteria
         },
-        'nx-searchfeature button[action=save]': {
+        'nx-coreui-searchfeature button[action=save]': {
           click: me.showSaveSearchFilterWindow
         },
         'nx-coreui-search-save button[action=add]': {
@@ -165,10 +157,83 @@ Ext.define('NX.coreui.controller.Search', {
   },
 
   /**
+   * @public
+   * Register a set of criterias.
+   * @param {Array/Object} criterias to be registered
+   * @param {Ext.util.Observable} [owner] to be watched to automatically unregister the criterias if owner is destroyed
+   */
+  registerCriteria: function(criterias, owner) {
+    var me = this,
+        models;
+
+    models = me.getSearchCriteriaStore().add(criterias);
+    if (owner) {
+      owner.on('destroy', function() {
+        me.getSearchCriteriaStore().remove(models)
+      }, me);
+    }
+  },
+
+  /**
+   * @public
+   * Register a set of filters.
+   * @param {Array/Object} filters to be registered
+   * @param {Ext.util.Observable} [owner] to be watched to automatically unregister the criterias if owner is destroyed
+   */
+  registerFilter: function(filters, owner) {
+    var me = this;
+
+    Ext.each(Ext.Array.from(filters), function(filter) {
+      me.registerFeature(me.getSearchFilterModel().create(filter), owner);
+    });
+  },
+
+  /**
+   * @private
+   * Register feature for model.
+   * @param {NX.coreui.model.SearchFilter} model to be registered
+   * @param {Ext.util.Observable} [owner] to be watched to automatically unregister the criterias if owner is destroyed
+   */
+  registerFeature: function(model, owner) {
+    var me = this;
+
+    if (model.getId() === 'keyword') {
+      me.getApplication().getFeaturesController().registerFeature({
+        mode: 'browse',
+        path: '/Search',
+        text: NX.I18n.get('BROWSE_SEARCH_TITLE'),
+        description: NX.I18n.get('BROWSE_SEARCH_SUBTITLE'),
+        group: true,
+        view: { xtype: 'nx-coreui-searchfeature', searchFilter: model, bookmarkEnding: '' },
+        iconName: 'search-default',
+        weight: 20,
+        expanded: false,
+        visible: function() {
+          return NX.Permissions.check('nexus:repositories', 'read');
+        }
+      }, owner);
+    }
+    else {
+      me.getApplication().getFeaturesController().registerFeature({
+        mode: 'browse',
+        path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
+        view: { xtype: 'nx-coreui-searchfeature', searchFilter: model, bookmarkEnding: '/' + model.getId() },
+        iconName: 'search-default',
+        text: model.get('text'),
+        description: model.get('description'),
+        authenticationRequired: false,
+        visible: function() {
+          return NX.Permissions.check('nexus:repositories', 'read');
+        }
+      }, owner);
+    }
+  },
+
+  /**
    * @private
    * Avoid store load; manage load of search results by ourselves.
    */
-  loadStore: function(){
+  loadStore: function() {
     // do nothing for now
   },
 
@@ -201,7 +266,7 @@ Ext.define('NX.coreui.controller.Search', {
         bookmarkSegments = NX.Bookmarks.getBookmark().getSegments(),
         bookmarkValues = {},
         filterSegments,
-        criterias = {},
+        criterias = {}, criteriasPerGroup = {},
         searchCriteria, queryIndex, pair;
 
     // Extract the filter object from the URI
@@ -239,9 +304,9 @@ Ext.define('NX.coreui.controller.Search', {
       var criteriaModel = searchCriteriaStore.getById(id);
 
       if (criteriaModel) {
-        var cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-' + criteriaModel.getId());
+        var cmpClass = Ext.ClassManager.getByAlias('widget.nx-coreui-searchcriteria-' + criteriaModel.getId());
         if (!cmpClass) {
-          cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-text');
+          cmpClass = Ext.ClassManager.getByAlias('widget.nx-coreui-searchcriteria-text');
         }
         searchCriteria = searchCriteriaPanel.add(cmpClass.create(Ext.apply(criteriaModel.get('config'), {
           criteriaId: criteriaModel.getId(),
@@ -256,12 +321,27 @@ Ext.define('NX.coreui.controller.Search', {
     });
 
     searchCriteriaStore.each(function(criteria) {
-      addCriteriaMenu.push({
+      var addTo = addCriteriaMenu,
+          group = criteria.get('group');
+
+      if (group) {
+        if (!criteriasPerGroup[group]) {
+          criteriasPerGroup[group] = [];
+        }
+        addTo = criteriasPerGroup[group];
+      }
+      addTo.push({
         text: criteria.get('config').fieldLabel,
         criteria: criteria,
         criteriaId: criteria.getId(),
         action: 'add',
         hidden: Ext.isDefined(criterias[criteria.getId()])
+      });
+    });
+    Ext.Object.each(criteriasPerGroup, function(key, value) {
+      addCriteriaMenu.push({
+        text: key,
+        menu: value
       });
     });
 
@@ -282,7 +362,7 @@ Ext.define('NX.coreui.controller.Search', {
    * @override
    */
   getDescription: function(model) {
-    return model.getId();
+    return model.get('name');
   },
 
   /**
@@ -296,12 +376,12 @@ Ext.define('NX.coreui.controller.Search', {
         searchCriteriaPanel = searchPanel.down('#criteria'),
         addButton = searchCriteriaPanel.down('#addButton'),
         criteria = menuitem.criteria,
-        cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-' + criteria.getId()),
+        cmpClass = Ext.ClassManager.getByAlias('widget.nx-coreui-searchcriteria-' + criteria.getId()),
         cmp;
 
     menuitem.hide();
     if (!cmpClass) {
-      cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-text');
+      cmpClass = Ext.ClassManager.getByAlias('widget.nx-coreui-searchcriteria-text');
     }
     searchCriteriaPanel.remove(addButton, false);
     cmp = cmpClass.create(
@@ -388,57 +468,56 @@ Ext.define('NX.coreui.controller.Search', {
   },
 
   /**
-   * When a list managed by this controller is clicked, route the event to the proper handler
-   *
    * @override
+   * When a list managed by this controller is clicked, route the event to the proper handler
    */
   onSelection: function(list, model) {
     var me = this,
-      listType;
+        modelType;
 
     // Figure out what kind of list we’re dealing with
-    listType = model.id.replace(/^.*?model\./, '').replace(/\-.*$/, '');
+    modelType = model.id.replace(/^.*?model\./, '').replace(/\-.*$/, '');
 
-    if (listType == "SearchResult") {
+    if (modelType == "Component") {
       me.onSearchResultSelection(model);
-    } else if (listType == "SearchResultVersion") {
-      me.onSearchResultVersionSelection(model);
+    }
+    else if (modelType == "Asset") {
+      me.onSearchResultAssetSelection(model);
     }
   },
 
   /**
    * @private
-   * Show details and load version of selected search result.
-   * @param list search result grid selection model
-   * @param model selected search result
+   * Show details and load assets of selected component.
+   * @param {NX.coreui.model.Component} model selected component
    */
   onSearchResultSelection: function(model) {
     var me = this,
-        searchResultModel = model,
         searchResultDetails = me.getSearchResultDetails(),
-        searchResultVersionStore = me.getSearchResultVersionStore(),
-        groupInfo = {}, nameInfo = {}, formatInfo = {};
+        assetsStore = me.getAssetStore(),
+        info1 = {}, info2 = {};
 
-    me.onSearchResultVersionSelection(null);
+    me.getAssetContainer().componentModel = model;
+    me.onSearchResultAssetSelection(null);
 
-    if (searchResultModel) {
-      groupInfo[NX.I18n.get('BROWSE_SEARCH_VERSIONS_GROUP')] = searchResultModel.get('groupId');
-      nameInfo[NX.I18n.get('BROWSE_SEARCH_VERSIONS_NAME')] = searchResultModel.get('artifactId');
-      formatInfo[NX.I18n.get('BROWSE_SEARCH_VERSIONS_FORMAT')] = searchResultModel.get('format');
+    if (model) {
+      info1[NX.I18n.get('BROWSE_SEARCH_ASSETS_REPOSITORY')] = model.get('repositoryName');
+      info1[NX.I18n.get('BROWSE_SEARCH_ASSETS_FORMAT')] = model.get('format');
+      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_GROUP')] = model.get('group');
+      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME')] = model.get('name');
+      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_VERSION')] = model.get('version');
 
-      searchResultDetails.down('#group').showInfo(groupInfo);
-      searchResultDetails.down('#name').showInfo(nameInfo);
-      searchResultDetails.down('#format').showInfo(formatInfo);
-      searchResultVersionStore.clearFilter(true);
-      searchResultVersionStore.addFilter(me.getSearchResultStore().filters.items, false);
-      searchResultVersionStore.addFilter([
+      searchResultDetails.down('#info1').showInfo(info1);
+      searchResultDetails.down('#info2').showInfo(info2);
+      assetsStore.clearFilter(true);
+      assetsStore.addFilter([
         {
-          property: 'group.raw',
-          value: searchResultModel.get('groupId')
+          property: 'repositoryName',
+          value: model.get('repositoryName')
         },
         {
-          property: 'name.raw',
-          value: searchResultModel.get('artifactId')
+          property: 'componentId',
+          value: model.getId()
         }
       ]);
     }
@@ -446,35 +525,24 @@ Ext.define('NX.coreui.controller.Search', {
 
   /**
    * @private
-   * Show storage file of selected version of search result.
-   * @param list search result grid selection model
-   * @param model selected search result
+   * Show asset.
+   * @param {NX.coreui.model.Asset} model selected asset
    */
-  onSearchResultVersionSelection: function(model) {
+  onSearchResultAssetSelection: function(model) {
     var me = this,
-        searchResultVersionModel = model,
-        storageFileContainer = me.getStorageFileContainer();
+        assetContainer = me.getAssetContainer(),
+        feature = me.getFeature();
 
-    if (searchResultVersionModel) {
-      storageFileContainer.showStorageFile(
-          searchResultVersionModel.get('repositoryId'),
-          searchResultVersionModel.get('path'),
-          searchResultVersionModel.get('type')
-      );
-      storageFileContainer.expand();
-
+    if (model) {
+      me.getAssetContainer().assetModel = model;
+      assetContainer.refreshInfo();
+      assetContainer.expand();
       // Set the appropriate breadcrumb icon
-      var icon;
-      var type = searchResultVersionModel.get('type');
-      if (NX.getApplication().getIconController().findIcon('repository-item-type-' + type, 'x16')) {
-        icon = type;
-      } else {
-        icon = 'default';
-      }
-      storageFileContainer.up('nx-drilldown-item').setItemClass(NX.Icons.cls('repository-item-type-' + icon, 'x16'));
+      feature.setItemClass(2, assetContainer.iconCls);
+      feature.setItemName(2, model.get('name'));
     }
     else {
-      storageFileContainer.showStorageFile();
+      assetContainer.refreshInfo();
     }
   },
 
@@ -498,7 +566,7 @@ Ext.define('NX.coreui.controller.Search', {
         criterias = [],
         model;
 
-    Ext.Array.each(Ext.ComponentQuery.query('nx-searchfeature component[searchCriteria=true]'), function(cmp) {
+    Ext.Array.each(Ext.ComponentQuery.query('nx-coreui-searchfeature component[searchCriteria=true]'), function(cmp) {
       criterias.push({
         id: cmp.criteriaId,
         value: cmp.getValue(),
@@ -517,7 +585,7 @@ Ext.define('NX.coreui.controller.Search', {
     me.getApplication().getFeaturesController().registerFeature({
       path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
       mode: 'browse',
-      view: { xtype: 'nx-searchfeature', searchFilter: model },
+      view: { xtype: 'nx-coreui-searchfeature', searchFilter: model },
       iconName: 'search-saved',
       description: model.get('description'),
       authenticationRequired: false
@@ -545,7 +613,7 @@ Ext.define('NX.coreui.controller.Search', {
     }
 
     // Add each criteria to the filter object
-    Ext.Array.each(Ext.ComponentQuery.query('nx-searchfeature component[searchCriteria=true]'), function(cmp) {
+    Ext.Array.each(Ext.ComponentQuery.query('nx-coreui-searchfeature component[searchCriteria=true]'), function(cmp) {
       if (cmp.getValue() && !cmp.isHidden()) {
         filterArray.push(cmp.criteriaId + '=' + cmp.getValue());
       }

@@ -236,6 +236,7 @@ public class RepositoryManagerImpl
     Repository repository = repository(repositoryName);
 
     // TODO: Ensure configuration sanity, before we apply to repository
+    store.update(configuration);
     repository.stop();
     repository.update(configuration);
     repository.start();

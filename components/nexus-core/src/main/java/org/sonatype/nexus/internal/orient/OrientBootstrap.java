@@ -24,12 +24,14 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycles;
 
 import com.orientechnologies.orient.core.compression.OCompression;
 import com.orientechnologies.orient.core.compression.OCompressionFactory;
+import com.orientechnologies.orient.core.sql.OSQLEngine;
+import com.orientechnologies.orient.core.sql.functions.OSQLFunctionAbstract;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Orient bootstrap.
- * 
+ *
  * @since 3.0
  */
 @Named
@@ -44,12 +46,15 @@ public class OrientBootstrap
   @Inject
   public OrientBootstrap(final Provider<DatabaseServer> databaseServer,
                          final Provider<DatabaseManager> databaseManager,
-                         final Iterable<OCompression> managedCompressions)
+                         final Iterable<OCompression> managedCompressions,
+                         final Iterable<OSQLFunctionAbstract> functions)
   {
     this.databaseServer = checkNotNull(databaseServer);
     this.databaseManager = checkNotNull(databaseManager);
     registerCompressions(checkNotNull(managedCompressions));
+    registerCustomFunctions(checkNotNull(functions));
   }
+
 
   @Override
   protected void doStart() throws Exception {
@@ -74,6 +79,14 @@ public class OrientBootstrap
       catch (final IllegalArgumentException e) {
         log.debug("An OrientDB compression named '{}' was already registered", compression.name(), e);
       }
+    }
+  }
+
+  private void registerCustomFunctions(final Iterable<OSQLFunctionAbstract> functions) {
+    log.debug("Registering custom OrientDB functions");
+    for (OSQLFunctionAbstract function : functions) {
+      log.debug("Registering OrientDB function " + function.getName());
+      OSQLEngine.getInstance().registerFunction(function.getName(), function);
     }
   }
 }

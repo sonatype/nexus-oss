@@ -75,6 +75,8 @@ public class HttpClientConfigMarshallerImpl
     attributes.set("retries", config.getRetries());
     attributes.set("urlParameters", config.getUrlParameters());
     attributes.set("userAgentCustomisation", config.getUserAgentCustomisation());
+    attributes.set("blocked", config.isBlocked());
+    attributes.set("autoBlock", config.shouldAutoBlock());
     attributes.set("useTrustStore", config.getUseTrustStore());
   }
 
@@ -133,6 +135,8 @@ public class HttpClientConfigMarshallerImpl
     config.setRetries(attributes.get("retries", Integer.class));
     config.setUrlParameters(attributes.get("urlParameters", String.class));
     config.setUserAgentCustomisation(attributes.get("userAgentCustomization", String.class));
+    config.setBlocked(attributes.get("blocked", Boolean.class, false));
+    config.setAutoBlock(attributes.get("autoBlock", Boolean.class, true));
     config.setUseTrustStore(attributes.get("useTrustStore", Boolean.class));
 
     return config;

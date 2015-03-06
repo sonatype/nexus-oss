@@ -15,12 +15,14 @@ package org.sonatype.nexus.repository.httpclient;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import org.apache.http.client.HttpClient;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 
 /**
  * Default {@link HttpClientFacet} implementation.
@@ -30,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 public class HttpClientFacetImpl
     extends FacetSupport
-  implements HttpClientFacet
+    implements HttpClientFacet
 {
   public static final String CONFIG_KEY = "httpclient";
 
@@ -38,7 +40,7 @@ public class HttpClientFacetImpl
 
   private final HttpClientConfigMarshaller marshaller;
 
-  private HttpClient httpClient;
+  private FilteredHttpClient httpClient;
 
   @Inject
   public HttpClientFacetImpl(final HttpClientFactory factory,
@@ -49,20 +51,29 @@ public class HttpClientFacetImpl
   }
 
   @Override
+  @Guarded(by = STARTED)
   public HttpClient getHttpClient() {
     return checkNotNull(httpClient);
+  }
+
+  @Override
+  @Guarded(by = STARTED)
+  public RemoteConnectionStatus getStatus() {
+    return httpClient.getStatus();
   }
 
   @Override
   protected void doConfigure() throws Exception {
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     HttpClientConfig config = marshaller.unmarshall(attributes);
-    httpClient = factory.create(config);
+    httpClient = new FilteredHttpClient(factory.create(config), config);
     log.debug("Created HTTP client: {}", httpClient);
   }
 
   @Override
-  protected void doDestroy() throws Exception {
+  protected void doStop() throws Exception {
+    log.debug("Closing HTTP client: {}", httpClient);
+    httpClient.close();
     httpClient = null;
   }
 }

@@ -47,30 +47,28 @@ public class DefaultHttpResponseSender
   {
     log.trace("Sending response: {}", response);
 
-    // add request headers
+    // add response headers
     for (Map.Entry<String,String> header : response.getHeaders()) {
       httpResponse.addHeader(header.getKey(), header.getValue());
     }
 
-    // write payload details if we have one
-    if (response instanceof PayloadResponse) {
-      Payload payload = ((PayloadResponse)response).getPayload();
-      log.trace("Attaching payload: {}", payload);
-
-      if (payload.getContentType() != null) {
-        httpResponse.setContentType(payload.getContentType());
-      }
-      httpResponse.setContentLength((int) payload.getSize()); // HACK: Upgrade to servlet 3.1 to use proper long values
-
-      try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
-        ByteStreams.copy(input, output);
-      }
-    }
-
-    // Set or send status
+    // add status followed by payload if we have one
     Status status = response.getStatus();
-    if (status.isSuccessful()) {
-      httpResponse.setStatus(status.getCode(), status.getMessage());
+    if (status.isSuccessful() || response instanceof PayloadResponse) {
+      httpResponse.setStatus(status.getCode());
+      if (response instanceof PayloadResponse) {
+        Payload payload = ((PayloadResponse)response).getPayload();
+        log.trace("Attaching payload: {}", payload);
+
+        if (payload.getContentType() != null) {
+          httpResponse.setContentType(payload.getContentType());
+        }
+        httpResponse.setContentLengthLong(payload.getSize());
+
+        try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
+          ByteStreams.copy(input, output);
+        }
+      }
     }
     else {
       httpResponse.sendError(status.getCode(), status.getMessage());

@@ -17,6 +17,8 @@ import java.net.URLEncoder;
 import java.util.Locale;
 import java.util.Map;
 
+import com.sonatype.nexus.repository.nuget.internal.NugetProperties;
+
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -82,13 +84,13 @@ public class ODataFeedUtils
     final StringBuilder token = new StringBuilder();
     if (null != orderBy) {
       for (final OrderByExpression o : parseOrderBy(orderBy)) {
-        final String name = ((EntitySimpleProperty) o.getExpression()).getPropertyName();
-        final Object value = data.get(name.toUpperCase(Locale.ENGLISH));
+        final String name = ((EntitySimpleProperty) o.getExpression()).getPropertyName().toUpperCase();
+        final Object value = data.get(NugetProperties.ATTRIB_NAMES.get(name));
         token.append(asFilterString(literal(value))).append(',');
       }
     }
-    token.append(asFilterString(literal(data.get("ID")))).append(',');
-    token.append(asFilterString(literal(data.get("VERSION"))));
+    token.append(asFilterString(literal(data.get(NugetProperties.P_ID)))).append(',');
+    token.append(asFilterString(literal(data.get(NugetProperties.P_VERSION))));
     return token.toString();
   }
 
@@ -112,18 +114,15 @@ public class ODataFeedUtils
     return ODataTemplates.interpolate(ODataTemplates.NUGET_ROOT, data);
   }
 
-  // TODO: Move over to ODataFeedUtils
   public static String metadata() {
     return ODataTemplates.NUGET_META;
   }
 
-  // TODO: Move over to ODataFeedUtils
   public static String error(final int code, final String message) {
     final Map<String, String> data = ImmutableMap.of("CODE", Integer.toString(code), "MESSAGE", message);
     return ODataTemplates.interpolate(ODataTemplates.NUGET_ERROR, data);
   }
 
-  // TODO: Move over to ODataFeedUtils
   public static String datetime(final long millis) {
     return ISO_PRINTER.print(millis);
   }

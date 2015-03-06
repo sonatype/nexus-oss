@@ -25,19 +25,15 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.content.InvalidContentException;
-import org.sonatype.nexus.repository.negativecache.NegativeCacheKey;
-import org.sonatype.nexus.repository.negativecache.NegativeCacheKeySource;
 import org.sonatype.nexus.repository.raw.RawContent;
-import org.sonatype.nexus.repository.search.SearchFacet;
-import org.sonatype.nexus.repository.search.SearchableComponentFactory;
+import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
-import org.sonatype.nexus.repository.view.Context;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -67,7 +63,7 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
  */
 public class RawContentFacetImpl
     extends FacetSupport
-    implements RawContentFacet, NegativeCacheKeySource
+    implements RawContentFacet
 {
   public static final String CONFIG_KEY = "rawContent";
 
@@ -75,16 +71,16 @@ public class RawContentFacetImpl
 
   private final MimeSupport mimeSupport;
 
-  private final SearchableComponentFactory searchableComponentFactory;
+  private final ComponentMetadataFactory componentMetadataFactory;
 
   private boolean strictContentTypeValidation = false;
 
   @Inject
   public RawContentFacetImpl(final MimeSupport mimeSupport,
-                             final SearchableComponentFactory searchableComponentFactory)
+                             final ComponentMetadataFactory componentMetadataFactory)
   {
     this.mimeSupport = checkNotNull(mimeSupport);
-    this.searchableComponentFactory = checkNotNull(searchableComponentFactory);
+    this.componentMetadataFactory = checkNotNull(componentMetadataFactory);
   }
 
   @Override
@@ -141,8 +137,10 @@ public class RawContentFacetImpl
       final ImmutableMap<String, String> headers = ImmutableMap
           .of(BlobStore.BLOB_NAME_HEADER, path, BlobStore.CREATED_BY_HEADER, "unknown");
 
-      try (InputStream in = content.openInputStream()) {
-        tx.setBlob(in, headers, asset, hashAlgorithms, determineContentType(path, content));
+      try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
+        try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
+          tx.setBlob(is1, headers, asset, hashAlgorithms, determineContentType(path, is2, content.getContentType()));
+        }
       }
 
       final DateTime lastUpdated = content.getLastUpdated();
@@ -151,12 +149,6 @@ public class RawContentFacetImpl
       }
 
       tx.commit();
-      try {
-        getRepository().facet(SearchFacet.class).put(searchableComponentFactory.from(component));
-      }
-      catch (MissingFacetException e) {
-        // skip indexing if no search facet
-      }
     }
   }
 
@@ -164,22 +156,21 @@ public class RawContentFacetImpl
    * Determines or confirms the content type for the content, or throws {@link InvalidContentException} if it cannot.
    */
   @Nonnull
-  private String determineContentType(final String path, final RawContent content) throws IOException {
-    String contentType = content.getContentType();
+  private String determineContentType(final String path, final InputStream is, final String declaredContentType)
+      throws IOException {
+    String contentType = declaredContentType;
 
     if (contentType == null) {
       log.trace("Content PUT to {} has no content type.", path);
-      try (InputStream is = content.openInputStream()) {
-        contentType = mimeSupport.detectMimeType(is, path);
-        log.trace("Mime support implies content type {}", contentType);
-      }
+      contentType = mimeSupport.detectMimeType(is, path);
+      log.trace("Mime support implies content type {}", contentType);
 
       if (contentType == null && strictContentTypeValidation) {
         throw new InvalidContentException(String.format("Content type could not be determined."));
       }
     }
     else {
-      final List<String> types = mimeSupport.detectMimeTypes(content.openInputStream(), path);
+      final List<String> types = mimeSupport.detectMimeTypes(is, path);
       if (!types.isEmpty() && !types.contains(contentType)) {
         log.debug("Discovered content type {} ", types.get(0));
         if (strictContentTypeValidation) {
@@ -228,13 +219,6 @@ public class RawContentFacetImpl
 
       tx.commit();
 
-      try {
-        getRepository().facet(SearchFacet.class).delete(component.getId().toString());
-      }
-      catch (MissingFacetException e) {
-        // skip indexing if no search facet
-      }
-
       return true;
     }
   }
@@ -258,11 +242,6 @@ public class RawContentFacetImpl
 
       tx.commit();
     }
-  }
-
-  @Override
-  public NegativeCacheKey cacheKey(final Context context) {
-    return new NegativeCacheKey(context.getRequest().getPath());
   }
 
   private StorageFacet getStorage() {
@@ -316,4 +295,5 @@ public class RawContentFacetImpl
       }
     };
   }
+
 }

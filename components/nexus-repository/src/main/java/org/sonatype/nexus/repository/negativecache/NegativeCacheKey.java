@@ -12,44 +12,16 @@
  */
 package org.sonatype.nexus.repository.negativecache;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * A key for the {@link NegativeCacheFacet} not found cache.
+ * A key for the {@link NegativeCacheFacet} negative cache.
  *
  * @since 3.0
  */
-public class NegativeCacheKey
+public interface NegativeCacheKey
 {
-  private final String key;
-
-  public NegativeCacheKey(final String key) {
-    this.key = checkNotNull(key);
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    NegativeCacheKey that = (NegativeCacheKey) o;
-
-    return key.equals(that.key);
-  }
-
-  @Override
-  public int hashCode() {
-    return key.hashCode();
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "key='" + key + '\'' +
-        '}';
-  }
+  /**
+   * @param key child key
+   * @return true  if this key is a parent of passed in key.
+   */
+  boolean isParentOf(NegativeCacheKey key);
 }

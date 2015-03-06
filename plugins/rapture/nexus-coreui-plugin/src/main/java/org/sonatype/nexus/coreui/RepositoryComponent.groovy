@@ -12,31 +12,30 @@
  */
 package org.sonatype.nexus.coreui
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Create
-import org.sonatype.nexus.common.validation.Update
-import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.common.validation.ValidationMessage
-import org.sonatype.nexus.common.validation.ValidationResponse
-import org.sonatype.nexus.common.validation.ValidationResponseException
-import org.sonatype.nexus.extdirect.DirectComponent
-import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.repository.Recipe
-import org.sonatype.nexus.repository.Repository
-import org.sonatype.nexus.repository.config.Configuration
-import org.sonatype.nexus.repository.manager.RepositoryManager
-
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
+
+import org.sonatype.nexus.common.validation.Create
+import org.sonatype.nexus.common.validation.Update
+import org.sonatype.nexus.common.validation.Validate
+import org.sonatype.nexus.extdirect.DirectComponent
+import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.repository.MissingFacetException
+import org.sonatype.nexus.repository.Recipe
+import org.sonatype.nexus.repository.Repository
+import org.sonatype.nexus.repository.config.Configuration
+import org.sonatype.nexus.repository.httpclient.HttpClientFacet
+import org.sonatype.nexus.repository.manager.RepositoryManager
+import org.sonatype.nexus.repository.view.ViewFacet
+
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Repository {@link DirectComponent}.
@@ -54,6 +53,9 @@ extends DirectComponentSupport
 
   @Inject
   Map<String, Recipe> recipes
+  
+  @Inject
+  AttributeConverter attributeConverter
 
   @DirectMethod
   List<RepositoryXO> read() {
@@ -77,7 +79,7 @@ extends DirectComponentSupport
     return asRepository(repositoryManager.create(new Configuration(
         repositoryName: repository.name,
         recipeName: repository.recipe,
-        attributes: asAttributes(repository.attributes)
+        attributes: attributeConverter.asAttributes(repository.attributes)
     )))
   }
 
@@ -86,7 +88,7 @@ extends DirectComponentSupport
   @Validate(groups = [Update.class, Default.class])
   RepositoryXO update(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repository) {
     return asRepository(repositoryManager.update(repositoryManager.get(repository.name).configuration.with {
-      attributes = asAttributes(repository.attributes)
+      attributes = attributeConverter.asAttributes(repository.attributes)
       return it
     }))
   }
@@ -99,34 +101,25 @@ extends DirectComponentSupport
   }
 
   RepositoryXO asRepository(Repository input) {
+    def status = input.facet(ViewFacet).online ? 'Online' : 'Offline'
+    try {
+      def remoteStatus = input.facet(HttpClientFacet).status
+      status += " - ${remoteStatus.description}"
+      if (remoteStatus.reason) {
+        status += "<br/><i>${remoteStatus.reason}</i>"
+      }
+    }
+    catch (MissingFacetException e) {
+      // no proxy, no remote status
+    }
     return new RepositoryXO(
         name: input.name,
         type: input.type,
         format: input.format,
-        attributes: asAttributes(input.configuration.attributes)
+        online: input.facet(ViewFacet).online,
+        status: status,
+        attributes: attributeConverter.asAttributes(input.configuration.attributes)
     )
-  }
-
-  Map<String, Map<String, Object>> asAttributes(final String attributes) {
-    if (!attributes) {
-      return null;
-    }
-    TypeReference<Map<String, Map<String, Object>>> typeRef = new TypeReference<Map<String, Map<String, Object>>>() {}
-    try {
-      return new ObjectMapper().readValue(attributes, typeRef)
-    }
-    catch (Exception e) {
-      def validations = new ValidationResponse()
-      validations.addError(new ValidationMessage('attributes', e.message))
-      throw new ValidationResponseException(validations)
-    }
-  }
-
-  String asAttributes(final Map<String, Map<String, Object>> attributes) {
-    if (!attributes) {
-      return null;
-    }
-    return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(attributes)
   }
 
 }

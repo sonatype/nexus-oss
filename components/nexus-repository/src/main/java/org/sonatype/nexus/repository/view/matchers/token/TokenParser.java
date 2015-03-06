@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,10 +85,25 @@ public class TokenParser
 
     Map<String, String> values = new HashMap<>();
     for (int i = 0; i < matcher.groupCount(); i++) {
-      values.put(variables.get(i).getName(), matcher.group(i + 1));
+      final String name = variables.get(i).getName();
+      final String value = matcher.group(i + 1);
+      if (values.containsKey(name)) {
+        final String existingValue = values.get(name);
+        if (!Objects.equals(existingValue, value)) {
+          log.trace("Variable '{}' values mismatch: '{}' vs '{}'", name, existingValue, value);
+          return null;
+        }
+      }
+      else {
+        values.put(name, value);
+      }
     }
 
     return values;
+  }
+
+  public String getPattern() {
+    return pattern.toString();
   }
 
   private String regexp(final List<Token> tokens) {

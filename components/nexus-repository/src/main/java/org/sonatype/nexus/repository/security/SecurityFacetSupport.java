@@ -54,17 +54,14 @@ public class SecurityFacetSupport
     securityResource.remove(getRepository());
   }
 
-  /**
-   * Check if the given request is permitted on the the repository.
-   */
-  public boolean permitted(final Request request, final Repository repository) {
+  @Override
+  public boolean permitted(final Request request) {
     checkNotNull(request);
-    checkNotNull(repository);
 
     // determine permission action from request
     String action = action(request);
 
-    return securityHelper.allPermitted(new RepositoryViewPermission(repository, action));
+    return securityHelper.allPermitted(new RepositoryViewPermission(getRepository(), action));
   }
 
   /**

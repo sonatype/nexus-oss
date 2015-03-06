@@ -22,13 +22,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
  * Test for {@link TokenParser}.
  */
 public class TokenParserTest
-  extends TestSupport
+    extends TestSupport
 {
   @Test
   public void simplePattern() {
@@ -111,5 +112,30 @@ public class TokenParserTest
 
     assertThat(tokens.get("singleSegment"), is(equalTo("1")));
     assertThat(tokens.get("manySegments"), is(equalTo("2/3/4/5")));
+  }
+
+  @Test
+  public void sameNamedVariables() {
+    final String pattern = "/{group:.+}/{name}/{version}/{name}-{version}.{ext}";
+    final TokenParser parser = new TokenParser(pattern);
+    log(parser);
+
+    Map<String, String> tokens;
+
+    // matching regexp but groups are unrelated
+    tokens = parser.parse("/org/eclipse/jetty/jetty-io/maven-metadata.xml");
+    assertThat(tokens, is(nullValue()));
+
+    // matching regexp but jetty-io1 vs jetty-io2
+    tokens = parser.parse("/org/eclipse/jetty/jetty-io1/8.1.16.v20140903/jetty-io2-8.1.16.v20140903.pom");
+    assertThat(tokens, is(nullValue()));
+
+    tokens = parser.parse("/org/eclipse/jetty/jetty-io/8.1.16.v20140903/jetty-io-8.1.16.v20140903.pom");
+    assertThat(tokens, is(notNullValue()));
+    assertThat(tokens.entrySet(), hasSize(4));
+    assertThat(tokens.get("group"), is(equalTo("org/eclipse/jetty")));
+    assertThat(tokens.get("name"), is(equalTo("jetty-io")));
+    assertThat(tokens.get("version"), is(equalTo("8.1.16.v20140903")));
+    assertThat(tokens.get("ext"), is(equalTo("pom")));
   }
 }

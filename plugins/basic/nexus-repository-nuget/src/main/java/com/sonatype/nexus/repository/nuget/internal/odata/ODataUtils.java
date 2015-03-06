@@ -84,11 +84,7 @@ public final class ODataUtils
         else {
           q.where(" OR ");
         }
-        q.where("id LIKE ").param(term);
-        q.where(" OR title LIKE ").param(term);
-        q.where(" OR description LIKE ").param(term);
-        q.where(" OR tags LIKE ").param(term);
-        q.where(" OR authors LIKE ").param(term);
+        q.where(nugat(P_KEYWORDS) + " LIKE ").param(term.toLowerCase());
       }
     }
     if (hasTerms) {
@@ -100,14 +96,14 @@ public final class ODataUtils
       if (q.hasWhere()) {
         q.where(" AND ");
       }
-      q.where(nugat("id") + " = ").param(id);
+      q.where(jsonAttrib(ID) + " = ").param(id);
     }
 
     if ("false".equalsIgnoreCase(StringUtils.strip(query.get("includePrerelease"), "\" '"))) {
       if (q.hasWhere()) {
         q.where(" AND ");
       }
-      q.where(" " + nugat("prerelease") + "=false ");
+      q.where(" " + jsonAttrib(IS_PRERELEASE) + "=false ");
     }
 
     final QueryInfo odata;
@@ -181,6 +177,7 @@ public final class ODataUtils
     aliases.put(IS_LATEST_VERSION, nugat(P_IS_LATEST_VERSION));
     aliases.put(IS_PRERELEASE, nugat(P_IS_PRERELEASE));
     aliases.put(LAST_UPDATED, nugat(P_LAST_UPDATED));
+    aliases.put(NAME_ORDER, nugat(P_NAME_ORDER));
     aliases.put(PACKAGE_HASH, nugat(P_PACKAGE_HASH));
     aliases.put(PACKAGE_HASH_ALGORITHM, nugat(P_PACKAGE_HASH_ALGORITHM));
     aliases.put(PACKAGE_SIZE, nugat(P_PACKAGE_SIZE));
@@ -197,8 +194,14 @@ public final class ODataUtils
   /**
    * Converts an ODATA element name into the name of the json attribute we store it under in orient.
    */
+  private static String jsonAttrib(String elementName) {
+    return COLUMN_ALIASES.get(elementName);
+  }
+
+  /**
+   * Fully qualifies a nuget attribute reference.
+   */
   private static String nugat(final String column) {
     return "attributes.nuget." + column;
   }
-
 }

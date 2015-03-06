@@ -12,9 +12,15 @@
  */
 package org.sonatype.nexus.repository.negativecache;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.view.Context;
+import org.sonatype.nexus.repository.view.Status;
 
 /**
+ * Negative cache management {@link Facet}.
+ *
  * @since 3.0
  */
 @Facet.Exposed
@@ -22,17 +28,46 @@ public interface NegativeCacheFacet
     extends Facet
 {
   /**
-   * Indicate that the item is not found
+   * Retrieve an entry from negative cache.
+   *
+   * @param key cache key
+   * @return cached {@link Status} or null if no cache entry found
    */
-  void cacheNotFound(NegativeCacheKey key);
+  @Nullable
+  Status get(NegativeCacheKey key);
 
   /**
-   * Test if the item was marked as not found within the cache expiry time.
+   * Add an entry to negative cache
+   *
+   * @param key    cache key
+   * @param status (404) status to be cached
    */
-  boolean isNotFound(NegativeCacheKey key);
+  void put(NegativeCacheKey key, Status status);
 
   /**
-   * The item has been found, so clear away any record that the item can't be found.
+   * Removes an entry from negative cache.
+   *
+   * @param key cache key
    */
-  void uncacheNotFound(NegativeCacheKey key);
+  void invalidate(NegativeCacheKey key);
+
+  /**
+   * Removes entry for passed in parent key and all is children (using {@link NegativeCacheKey#isParentOf(NegativeCacheKey)}).
+   *
+   * @param key parent cache key
+   */
+  void invalidateSubset(NegativeCacheKey key);
+
+  /**
+   * Removes all entries from negative cache.
+   */
+  void invalidate();
+
+  /**
+   * Retrieves the cache key based on context.
+   *
+   * @param context view context
+   * @return cache key
+   */
+  NegativeCacheKey getCacheKey(Context context);
 }

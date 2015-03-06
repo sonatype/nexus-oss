@@ -17,7 +17,7 @@
     orient:connect plocal:../sonatype-work/nexus/db/config admin admin
     orient:insert 'into repository_configuration SET repository_name="simplehosted1", recipe_name="simple-hosted"'
     orient:insert 'into repository_configuration SET repository_name="simplehosted2", recipe_name="simple-hosted"'
-    orient:insert 'into repository_configuration SET repository_name="simpleproxy1", recipe_name="simple-proxy", attributes={"proxy": { "remoteUrl": "http://repo1.maven.org/maven2/junit/junit" }}'
+    orient:insert 'into repository_configuration SET repository_name="simpleproxy1", recipe_name="simple-proxy", attributes={"proxy": { "remoteUrl": "http://repo1.maven.org/maven2/junit/junit" }, "httpclient":{"connection":{"timeout":20000, "retries":2}}}'
     orient:insert 'into repository_configuration SET repository_name="simplegroup1", recipe_name="simple-group", attributes={"group": { "memberNames": ["simplehosted1", "simplehosted2", "simpleproxy1"] }}'
     system:shutdown --force --reboot
 

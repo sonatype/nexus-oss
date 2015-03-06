@@ -280,6 +280,36 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
+                id: 'blobstores-create', // 5
+                type: 'method',
+                name: 'Blobstores - (create,read)',
+                description: 'Give permission to create,read new blobstores.',
+                properties: [
+                    'method'    : 'create,read',
+                    'permission': 'nexus:blobstores'
+                ]
+            ),
+            new CPrivilege(
+                id: 'blobstores-read', // 6
+                type: 'method',
+                name: 'Blobstores - (read)',
+                description: 'Give permission to read existing blobstore configuration.',
+                properties: [
+                    'method'    : 'read',
+                    'permission': 'nexus:blobstores'
+                ]
+            ),
+            new CPrivilege(
+                id: 'blobstores-delete', // 8
+                type: 'method',
+                name: 'Blobstores - (delete,read)',
+                description: 'Give permission to delete,read existing blobstores.',
+                properties: [
+                    'method'    : 'delete,read',
+                    'permission': 'nexus:blobstores'
+                ]
+            ),
+            new CPrivilege(
                 id: 'repotemplates-create', // 9
                 type: 'method',
                 name: 'Repository Templates - (create,read)',

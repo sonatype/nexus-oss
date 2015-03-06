@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import org.sonatype.nexus.repository.Repository;
+
+import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+
 /**
  * Component deleted event.
  *
@@ -20,7 +24,7 @@ package org.sonatype.nexus.repository.storage;
 public class ComponentDeletedEvent
   extends ComponentEvent
 {
-  public ComponentDeletedEvent(final Object vertexId) {
-    super(vertexId);
+  public ComponentDeletedEvent(final OrientVertex vertex, final Repository repository) {
+    super(vertex, repository);
   }
 }

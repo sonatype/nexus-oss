@@ -19,10 +19,11 @@
  */
 Ext.define('NX.coreui.model.SearchResult', {
   extend: 'Ext.data.Model',
+  idProperty: 'groupingKey',
   fields: [
-    'id',
-    'groupId',
-    'artifactId',
+    'groupingKey',
+    'group',
+    'name',
     'format'
   ]
 });

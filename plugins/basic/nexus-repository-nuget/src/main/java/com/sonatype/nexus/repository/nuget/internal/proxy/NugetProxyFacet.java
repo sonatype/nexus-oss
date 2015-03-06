@@ -1,0 +1,120 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-2015 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package com.sonatype.nexus.repository.nuget.internal.proxy;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+
+import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacet;
+import com.sonatype.nexus.repository.nuget.internal.odata.ODataConsumer;
+
+import org.sonatype.nexus.repository.content.InvalidContentException;
+import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
+import org.sonatype.nexus.repository.view.Context;
+import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
+
+import org.joda.time.DateTime;
+
+/**
+ * Serves NuGet packages, and also exposes proxy configuration and content-fetching.
+ *
+ * @since 3.0
+ */
+public class NugetProxyFacet
+    extends ProxyFacetSupport
+{
+  private final NugetFeedFetcher fetcher;
+
+  @Inject
+  public NugetProxyFacet(NugetFeedFetcher fetcher) {
+    this.fetcher = fetcher;
+  }
+
+  @Override
+  protected Payload getCachedPayload(final Context context) throws IOException {
+    String[] coords = coords(context);
+    return gallery().get(coords[0], coords[1]);
+  }
+
+  @Override
+  protected Payload fetch(final Context context) throws IOException {
+    // Here we override the default fetch behavior because we need to first fetch
+    // the remote entry and cache it, then from that, determine the remote URL of
+    // the actual package content, and get it.
+
+    // Determine the remote entry URL
+    String[] coords = coords(context);
+    String suffix = "Packages(Id='" + coords[0] + "',Version='" + coords[1] + "')";
+    URI remoteEntryUri = getRemoteUrl().resolve(suffix);
+
+    // Cache the metadata from the remote, grabbing the content location as we go
+    final StringBuilder contentLocation = new StringBuilder();
+    fetcher.cachePackageFeed(getRepository(), remoteEntryUri, 2, true, new ODataConsumer()
+    {
+      @Override
+      public void consume(final Map<String, String> data) {
+        if (contentLocation.length() == 0) {
+          contentLocation.append(data.get("LOCATION"));
+        }
+        gallery().putMetadata(data);
+      }
+    });
+    if (contentLocation.length() == 0) {
+      throw new IOException("Package content not found in remote repository");
+    }
+
+    // Request the remote package content and return it as a payload
+    return fetch(contentLocation.toString(), context);
+  }
+
+  @Override
+  protected void store(final Context context, final Payload payload) throws IOException, InvalidContentException {
+    // The metadata will have been cached by this time, so we just need to set the content
+    String[] coords = coords(context);
+    try (InputStream in = payload.openInputStream()) {
+      gallery().putContent(coords[0], coords[1], in);
+    }
+  }
+
+  @Override
+  protected DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException {
+    String[] coords = coords(context);
+    return gallery().getLastUpdatedDate(coords[0], coords[1]);
+  }
+
+  @Override
+  protected void indicateUpToDate(final Context context) throws IOException {
+    // TODO: this will never happen; super.fetch's http GET request isn't conditional.
+  }
+
+  @Override
+  protected String getUrl(final @Nonnull Context context) {
+    // Unnecessary to implement this, as we override fetch in a way that doesn't use it
+    throw new UnsupportedOperationException();
+  }
+
+  private NugetGalleryFacet gallery() {
+    return getRepository().facet(NugetGalleryFacet.class);
+  }
+
+  private static String[] coords(Context context) {
+    Map<String, String> tokens = context.getAttributes().require(TokenMatcher.State.class).getTokens();
+    return new String[] { tokens.get("id"), tokens.get("version") };
+  }
+}
