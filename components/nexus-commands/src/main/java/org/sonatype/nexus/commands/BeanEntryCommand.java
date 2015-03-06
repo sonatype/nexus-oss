@@ -82,28 +82,28 @@ public class BeanEntryCommand
   @Nullable
   private Completer discoverCompleter(final Field field) {
     Complete complete = field.getAnnotation(Complete.class);
+
+    // skip if no completion configuration is present
     if (complete == null) {
       return null;
     }
 
     List<Completer> completers = Lists.newArrayList();
     for (String name : complete.value()) {
-      Completer completer;
       if ("null".equals(name)) {
-        completer = NullCompleter.INSTANCE;
+        completers.add(NullCompleter.INSTANCE);
       }
       else {
-        completer = lookupCompleter(name);
-        if (completer instanceof CompleterTargetAware) {
-          ((CompleterTargetAware) completer).setCompleterTarget(field);
+        Completer completer = lookupCompleter(name);
+        if (completer != null) {
+          if (completer instanceof CompleterTargetAware) {
+            ((CompleterTargetAware) completer).setCompleterTarget(field);
+          }
+          completers.add(completer);
         }
-      }
-
-      if (completer != null) {
-        completers.add(completer);
-      }
-      else {
-        log.warn("Missing completer with name: {}", name);
+        else {
+          log.warn("Missing completer with name: {}", name);
+        }
       }
     }
 
