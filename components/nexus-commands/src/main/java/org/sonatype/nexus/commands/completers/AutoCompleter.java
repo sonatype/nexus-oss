@@ -29,6 +29,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Completer which attempts to automatically detect which completer to install.
  *
+ * Supports:
+ *
+ * <ul>
+ *   <li>{@link Enum} to {@link EnumCompleter}</li>
+ *   <li>{@link File} to {@link FileNameCompleter}</li>
+ * </ul>
+ *
  * @since 3.0
  */
 @Named("auto")
