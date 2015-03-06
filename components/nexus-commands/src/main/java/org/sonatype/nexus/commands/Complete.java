@@ -32,5 +32,5 @@ import org.apache.karaf.shell.commands.Option;
 @Target({ElementType.FIELD})
 public @interface Complete
 {
-  String value();
+  String[] value();
 }

@@ -36,8 +36,6 @@ public class LoggerNameCompleter
 {
   private final LogManager logManager;
 
-  private final StringsCompleter delegate = new StringsCompleter();
-
   @Inject
   public LoggerNameCompleter(final LogManager logManager) {
     this.logManager = checkNotNull(logManager);
@@ -45,7 +43,7 @@ public class LoggerNameCompleter
 
   @Override
   public int complete(final String buffer, final int cursor, final List<String> candidates) {
-    delegate.getStrings().clear();
+    StringsCompleter delegate = new StringsCompleter();
     delegate.getStrings().addAll(logManager.getLoggers().keySet());
     return delegate.complete(buffer, cursor, candidates);
   }

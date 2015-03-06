@@ -42,24 +42,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @EagerSingleton
 public class ActionRegistrar
+    extends ComponentSupport
 {
+  private final BeanLocator beanLocator;
+
   @Inject
   public ActionRegistrar(final BeanLocator beanLocator,
                          final BundleContext bundleContext)
   {
-    beanLocator.watch(Key.get(Action.class, Named.class), new ActionMediator(beanLocator), bundleContext);
+    this.beanLocator = checkNotNull(beanLocator);
+    checkNotNull(bundleContext);
+
+    beanLocator.watch(Key.get(Action.class, Named.class), new ActionMediator(), bundleContext);
   }
 
-  private static class ActionMediator
-      extends ComponentSupport
+  private class ActionMediator
       implements Mediator<Named, Action, BundleContext>
   {
-    private final BeanLocator beanLocator;
-
-    public ActionMediator(final BeanLocator beanLocator) {
-      this.beanLocator = checkNotNull(beanLocator);
-    }
-
     /**
      * Returns command annotation for given bean-entry if one exists.
      */

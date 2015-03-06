@@ -16,9 +16,11 @@ package org.sonatype.nexus.commands;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.karaf.shell.commands.Action;
@@ -26,6 +28,8 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.CommandWithAction;
 import org.apache.karaf.shell.commands.Option;
 import org.apache.karaf.shell.console.Completer;
+import org.apache.karaf.shell.console.completer.AggregateCompleter;
+import org.apache.karaf.shell.console.completer.NullCompleter;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
 
@@ -54,8 +58,8 @@ public class BeanEntryCommand
 
   private void discoverCompleters(final Class<Action> type) {
     for (Field field : type.getDeclaredFields()) {
-      Complete complete = field.getAnnotation(Complete.class);
-      if (complete == null) {
+      Completer completer = discoverCompleter(field);
+      if (completer == null) {
         continue;
       }
 
@@ -66,23 +70,51 @@ public class BeanEntryCommand
         continue;
       }
 
-      Completer completer = lookupCompleter(complete.value());
-      if (completer == null) {
-        log.warn("Missing completer with name: {}", complete.value());
-        continue;
-      }
-
-      // Expose target field to aware completers
-      if (completer instanceof CompleterTargetAware) {
-        ((CompleterTargetAware)completer).setCompleterTarget(field);
-      }
-
       if (argument != null) {
         addArgumentCompleter(argument.index(), completer);
       }
       else { // option
         addOptionCompleter(option.name(), completer);
       }
+    }
+  }
+
+  @Nullable
+  private Completer discoverCompleter(final Field field) {
+    Complete complete = field.getAnnotation(Complete.class);
+    if (complete == null) {
+      return null;
+    }
+
+    List<Completer> completers = Lists.newArrayList();
+    for (String name : complete.value()) {
+      Completer completer;
+      if ("null".equals(name)) {
+        completer = NullCompleter.INSTANCE;
+      }
+      else {
+        completer = lookupCompleter(name);
+        if (completer instanceof CompleterTargetAware) {
+          ((CompleterTargetAware) completer).setCompleterTarget(field);
+        }
+      }
+
+      if (completer != null) {
+        completers.add(completer);
+      }
+      else {
+        log.warn("Missing completer with name: {}", name);
+      }
+    }
+
+    log.trace("Discovered completers: {}", completers);
+
+    // wrap with aggregate if > 1 completer
+    if (completers.size() == 1) {
+      return completers.get(0);
+    }
+    else {
+      return new AggregateCompleter(completers);
     }
   }
 
