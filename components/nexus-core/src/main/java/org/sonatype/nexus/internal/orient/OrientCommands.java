@@ -20,8 +20,8 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.commands.AbstractCompletableCommand;
 import org.sonatype.nexus.commands.CommandHelper;
+import org.sonatype.nexus.commands.CommandSupport;
 import org.sonatype.nexus.common.text.Strings2;
 
 import com.google.common.base.Joiner;
@@ -96,7 +96,7 @@ public class OrientCommands
   }
 
   private AbstractCommand createOrientCommand(final Method method) {
-    return new AbstractCompletableCommand()
+    return new CommandSupport()
     {
       // OrientDB expects the method name to be transformed from camel-case into lower-case with spaces
       private final String command = LOWER_CAMEL.to(LOWER_UNDERSCORE, method.getName()).replace('_', ' ');

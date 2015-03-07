@@ -18,6 +18,7 @@ import org.apache.karaf.shell.console.AbstractAction
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.eclipse.sisu.inject.BeanLocator
 import org.slf4j.LoggerFactory
+import org.sonatype.nexus.commands.Complete
 import org.sonatype.nexus.common.guice.GlobalComponentLookupHelper
 import org.sonatype.nexus.configuration.ApplicationDirectories
 
@@ -48,6 +49,7 @@ class GroovyAction
   ApplicationDirectories applicationDirectories
 
   @Argument(name = 'file', required = true, index = 0, description = 'Groovy script file to execute')
+  @Complete('auto')
   File file
 
   @Argument(name = 'args', index = 1, multiValued = true, description = 'Optional script arguments')

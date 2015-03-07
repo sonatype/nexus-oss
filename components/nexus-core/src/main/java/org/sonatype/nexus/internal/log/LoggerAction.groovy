@@ -16,6 +16,7 @@ import org.apache.karaf.shell.commands.Argument
 import org.apache.karaf.shell.commands.Command
 import org.apache.karaf.shell.commands.Option
 import org.apache.karaf.shell.console.AbstractAction
+import org.sonatype.nexus.commands.Complete
 import org.sonatype.nexus.log.LogManager
 import org.sonatype.nexus.log.LoggerLevel
 
@@ -41,10 +42,16 @@ class LoggerAction
   @Option(name='-e', aliases = ['--effective'], description = 'Return effective logger level')
   Boolean effective
 
+  // FIXME: Presently a strict flag is set on some Karaf stuff related to completion, and
+  // FIXME: ... unless you use the logger-name completer, then the level completion will not get picked up
+  // FIXME: ... unsure where, but looks like if a completer fails, all completers after it are ignored
+
   @Argument(name="name", index = 0, required = true, description = 'Logger name')
+  @Complete('logger-name')
   String name
 
   @Argument(name="level", index = 1, description = 'Logger level')
+  @Complete('auto')
   LoggerLevel level
 
   @Override

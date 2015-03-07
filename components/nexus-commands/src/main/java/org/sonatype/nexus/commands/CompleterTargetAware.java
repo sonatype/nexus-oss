@@ -12,35 +12,20 @@
  */
 package org.sonatype.nexus.commands;
 
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
 
-import javax.annotation.Nullable;
+import javax.inject.Singleton;
 
-import org.apache.karaf.shell.commands.basic.AbstractCommand;
-import org.apache.karaf.shell.console.CompletableFunction;
 import org.apache.karaf.shell.console.Completer;
 
 /**
- * Helper class that ties {@link AbstractCommand} and {@link CompletableFunction} together.
- * 
+ * Allows {@link Completer} instances to be aware of the target field they are completing for.
+ *
+ * Components that use this feature should be sure to not bind as {@link Singleton}.
+ *
  * @since 3.0
  */
-public abstract class AbstractCompletableCommand
-    extends AbstractCommand
-    implements CompletableFunction
+public interface CompleterTargetAware
 {
-  // NOTE: Both return values appear to be nullable, but not marked on interface
-
-  @Override
-  @Nullable
-  public List<Completer> getCompleters() {
-    return null;
-  }
-
-  @Override
-  @Nullable
-  public Map<String, Completer> getOptionalCompleters() {
-    return null;
-  }
+  void setCompleterTarget(Field field);
 }
