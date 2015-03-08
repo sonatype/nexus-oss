@@ -14,11 +14,14 @@ package org.sonatype.nexus.capability.internal.storage;
 
 import java.util.Map;
 
+import org.sonatype.nexus.common.entity.Entity;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 // TODO: Rename CapabilityStorageItem -> StorageItem?
 
 public class CapabilityStorageItem
+  extends Entity
 {
   private int version;
 
