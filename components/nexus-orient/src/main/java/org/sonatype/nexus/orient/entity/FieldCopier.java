@@ -30,6 +30,8 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
  */
 public class FieldCopier
 {
+  private FieldCopier() {}
+
   private static Object maybeCopy(final Object source) {
     if (source instanceof ODocument) {
       return copy((ODocument)source);
