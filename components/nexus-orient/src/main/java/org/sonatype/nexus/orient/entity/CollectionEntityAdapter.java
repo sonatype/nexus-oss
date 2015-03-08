@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.sonatype.nexus.common.entity.Entity;
 
+import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -48,10 +49,11 @@ public abstract class CollectionEntityAdapter<T extends Entity>
     return entities;
   }
 
-  // TODO: Could consider using countClass and Lists.newArrayListWithExpectedSize() ?
-  //public List<T> browse(final ODatabaseDocumentTx db) {
-  //  return browse(db, Lists.<T>newLinkedList());
-  //}
+  public List<T> browse(final ODatabaseDocumentTx db) {
+    // TODO: Could consider using countClass and Lists.newArrayListWithExpectedSize() ?
+
+    return browse(db, Lists.<T>newLinkedList());
+  }
 
   /**
    * Edit entity.
