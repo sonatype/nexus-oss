@@ -12,18 +12,17 @@
  */
 package org.sonatype.nexus.internal.blobstore
 
-import org.sonatype.nexus.blobstore.api.BlobStore
-import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
-import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore
-import org.sonatype.nexus.configuration.ApplicationDirectories
-import org.sonatype.sisu.litmus.testsupport.TestSupport
-
 import com.google.common.collect.Lists
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.mockito.Mock
+import org.sonatype.nexus.blobstore.api.BlobStore
+import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
+import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore
+import org.sonatype.nexus.configuration.ApplicationDirectories
+import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
@@ -33,10 +32,12 @@ import static org.mockito.Mockito.spy
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
+/**
+ * Tests for {@link BlobStoreManagerImpl}.
+ */
 class BlobStoreManagerImplTest
     extends TestSupport
 {
-
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder()
 

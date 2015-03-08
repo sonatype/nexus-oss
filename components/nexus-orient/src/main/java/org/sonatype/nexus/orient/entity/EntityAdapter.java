@@ -16,6 +16,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.common.entity.Entity;
+import org.sonatype.nexus.common.entity.EntityId;
+import org.sonatype.nexus.common.entity.EntityMetadata;
+import org.sonatype.nexus.common.entity.EntityVersion;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 

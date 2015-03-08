@@ -47,5 +47,5 @@ public interface BlobStoreManager
    * Delete a BlobStore by name
    */
   void delete(String name) throws Exception;
-  
+
 }

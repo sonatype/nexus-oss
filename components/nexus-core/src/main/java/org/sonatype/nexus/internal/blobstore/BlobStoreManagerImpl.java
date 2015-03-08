@@ -234,8 +234,7 @@ public class BlobStoreManagerImpl
     return map;
   }
 
-  private void track(final String name, final BlobStore blobStore)
-  {
+  private void track(final String name, final BlobStore blobStore) {
     log.debug("Tracking: {}", name);
     stores.put(name, blobStore);
   }
@@ -257,10 +256,10 @@ public class BlobStoreManagerImpl
         return path.equals(getPath(input.getAttributes()));
       }
     });
-    if(duplicatePath) {
+    if (duplicatePath) {
       ValidationResponse validations = new ValidationResponse();
       validations.addError(
-          new ValidationMessage("attributes", "Specified path is already used by another BlobStore: " + path)); 
+          new ValidationMessage("attributes", "Specified path is already used by another BlobStore: " + path));
       throw new ValidationResponseException(validations);
     }
   }

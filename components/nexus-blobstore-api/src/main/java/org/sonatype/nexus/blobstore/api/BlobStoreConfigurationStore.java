@@ -17,14 +17,13 @@ import java.util.List;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
- * Service for managing BlobStoreConfigurations.
+ * {@link BlobStoreConfiguration} store.
  *
  * since 3.0
  */
 public interface BlobStoreConfigurationStore
     extends Lifecycle
 {
-
   /**
    * @return all BlobStoreConfigurations
    */

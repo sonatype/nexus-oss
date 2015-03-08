@@ -42,11 +42,11 @@ public class BlobStoreConfigurationStoreImpl
 {
   private final Provider<DatabaseInstance> databaseInstance;
 
-  private final ConfigurationEntityAdapter entityAdapter;
+  private final BlobStoreConfigurationEntityAdapter entityAdapter;
 
   @Inject
   public BlobStoreConfigurationStoreImpl(final @Named("config") Provider<DatabaseInstance> databaseInstance,
-                                         final ConfigurationEntityAdapter entityAdapter)
+                                         final BlobStoreConfigurationEntityAdapter entityAdapter)
   {
     this.databaseInstance = databaseInstance;
     this.entityAdapter = entityAdapter;
@@ -67,7 +67,7 @@ public class BlobStoreConfigurationStoreImpl
   @Guarded(by = STARTED)
   public List<BlobStoreConfiguration> list() {
     try(ODatabaseDocumentTx db = openDb()) {
-      return Lists.newArrayList(entityAdapter.get(db));
+      return entityAdapter.browse(db, Lists.<BlobStoreConfiguration>newArrayList());
     }
   }
 
@@ -77,7 +77,7 @@ public class BlobStoreConfigurationStoreImpl
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
-      entityAdapter.create(db, configuration);
+      entityAdapter.add(db, configuration);
     }
   }
 
@@ -87,7 +87,7 @@ public class BlobStoreConfigurationStoreImpl
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
-      entityAdapter.delete(db, configuration.getName());
+      entityAdapter.delete(db, configuration);
     }
   }
 }
