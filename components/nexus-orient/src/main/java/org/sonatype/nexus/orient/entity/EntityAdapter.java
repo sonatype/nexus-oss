@@ -79,7 +79,7 @@ public abstract class EntityAdapter<T extends Entity>
     checkNotNull(db);
 
     OSchema schema = db.getMetadata().getSchema();
-    type = schema.getClass(typeName);
+    OClass type = schema.getClass(typeName);
     if (type == null) {
       type = schema.createClass(typeName);
       defineType(type);
@@ -89,6 +89,8 @@ public abstract class EntityAdapter<T extends Entity>
           type.properties(),
           type.getIndexes()
       );
+
+      this.type = type;
     }
   }
 
