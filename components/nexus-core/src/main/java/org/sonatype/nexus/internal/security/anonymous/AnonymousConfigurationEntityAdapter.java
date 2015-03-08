@@ -24,7 +24,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
- * {@link AnonymousConfiguration} entity adapter.
+ * {@link AnonymousConfiguration} entity-adapter.
  *
  * @since 3.0
  */
@@ -40,9 +40,9 @@ public class AnonymousConfigurationEntityAdapter
 
   public static final String P_ENABLED = "enabled";
 
-  public static final String P_USER_ID = "userId";
+  public static final String P_USER_ID = "user_id";
 
-  public static final String P_REALM_NAME = "realmName";
+  public static final String P_REALM_NAME = "realm_name";
 
   public AnonymousConfigurationEntityAdapter() {
     super(DB_CLASS);

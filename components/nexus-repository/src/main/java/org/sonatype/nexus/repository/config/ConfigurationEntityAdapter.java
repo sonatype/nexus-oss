@@ -28,7 +28,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
- * {@link Configuration} entity adapter.
+ * {@link Configuration} entity-adapter.
  *
  * @since 3.0
  */
@@ -78,10 +78,7 @@ public class ConfigurationEntityAdapter
     Map<String, Map<String, Object>> attributes = document.field(P_ATTRIBUTES, OType.EMBEDDEDMAP);
 
     // deeply copy attributes to divorce from document
-    if (attributes != null) {
-      //noinspection unchecked
-      attributes = FieldCopier.copy(attributes);
-    }
+    attributes = FieldCopier.copyIf(attributes);
 
     entity.setRecipeName(recipeName);
     entity.setRepositoryName(repositoryName);

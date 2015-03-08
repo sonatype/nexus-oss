@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -63,6 +65,18 @@ public class FieldCopier
       target.put(entry.getKey(), value);
     }
     return target;
+  }
+
+  /**
+   * Copy given map if non-null.
+   */
+  @SuppressWarnings("unchecked")
+  @Nullable
+  public static <T extends Map<?,?>> T copyIf(final @Nullable T source) {
+    if (source != null) {
+      return (T) copy(source);
+    }
+    return null;
   }
 
   @SuppressWarnings("unchecked")

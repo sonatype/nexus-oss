@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.sonatype.nexus.common.entity.Entity;
 
-import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -36,7 +35,7 @@ public abstract class CollectionEntityAdapter<T extends Entity>
 
   // TODO: Consider adding direct lookup helpers based on EntityId?
 
-  // TODO: Add iterator-based browse to avoid needing full memory copies to browse large collections?
+  // TODO: Add (closable) iterator/iterable-based "browse" to avoid needing full memory copies for large collections?
 
   /**
    * Browse all entities, appending to given collection.
@@ -49,10 +48,10 @@ public abstract class CollectionEntityAdapter<T extends Entity>
     return entities;
   }
 
-  public List<T> browse(final ODatabaseDocumentTx db) {
-    // TODO: Could consider using countClass and Lists.newArrayListWithExpectedSize() ?
-    return browse(db, Lists.<T>newLinkedList());
-  }
+  // TODO: Could consider using countClass and Lists.newArrayListWithExpectedSize() ?
+  //public List<T> browse(final ODatabaseDocumentTx db) {
+  //  return browse(db, Lists.<T>newLinkedList());
+  //}
 
   /**
    * Edit entity.
