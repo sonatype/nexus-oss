@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Support for entity adapter implementations.
+ * Support for entity-adapter implementations.
  *
  * @since 3.0
  */
@@ -112,7 +112,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Browse all documents.
    */
-  protected Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
+  protected Iterable<ODocument> browseDocuments(final ODatabaseDocumentTx db) {
     checkNotNull(db);
     return db.browseClass(typeName);
   }
@@ -120,7 +120,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Read entity from document.
    */
-  protected T read(final ODocument document) {
+  protected T readEntity(final ODocument document) {
     checkNotNull(document);
 
     T entity = newEntity();
@@ -131,9 +131,9 @@ public abstract class EntityAdapter<T extends Entity>
   }
 
   /**
-   * Edit document from entity.
+   * Write document from entity.
    */
-  protected ODocument edit(final ODocument document, final T entity) {
+  protected ODocument writeEntity(final ODocument document, final T entity) {
     checkNotNull(document);
     checkNotNull(entity);
 
@@ -148,7 +148,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Edit entity.
    */
-  protected ODocument edit(final ODatabaseDocumentTx db, final T entity) {
+  protected ODocument editEntity(final ODatabaseDocumentTx db, final T entity) {
     checkNotNull(db);
     checkNotNull(entity);
 
@@ -156,13 +156,13 @@ public abstract class EntityAdapter<T extends Entity>
     ODocument document = db.getRecord(rid);
     checkState(document != null);
 
-    return edit(document, entity);
+    return writeEntity(document, entity);
   }
 
   /**
    * Add new entity.
    */
-  protected ODocument add(final ODatabaseDocumentTx db, final T entity) {
+  protected ODocument addEntity(final ODatabaseDocumentTx db, final T entity) {
     checkNotNull(db);
     checkNotNull(entity);
 
@@ -170,13 +170,13 @@ public abstract class EntityAdapter<T extends Entity>
     checkState(entity.getEntityMetadata() == null);
 
     ODocument doc = db.newInstance(typeName);
-    return edit(doc, entity);
+    return writeEntity(doc, entity);
   }
 
   /**
    * Delete an entity.
    */
-  protected void delete(final ODatabaseDocumentTx db, final T entity) {
+  protected void deleteEntity(final ODatabaseDocumentTx db, final T entity) {
     checkNotNull(db);
     checkNotNull(entity);
 

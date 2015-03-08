@@ -65,75 +65,73 @@ class ConfigurationEntityAdapterTest
       def attr = config.attributes('baz')
       attr.set('a', 'b')
 
-      def doc = underTest.add(db, config)
-      log doc.toJSON()
+      underTest.add(db, config)
     }
     finally {
       db.close()
     }
   }
 
-  @Test
-  void 'read simple entity'() {
-    def db = database.instance.connect()
-    try {
-      underTest.register(db)
+  // FIXME: Below use protected bits to test, not easy to expose for testing w/o exposing too much api in impls
+  // FIXME: Groovy may or may not ignore access modifiers in the future so should sort out how to better test
 
-      def config1 = new Configuration()
-      config1.recipeName = 'foo'
-      config1.repositoryName = 'bar'
-      def attr1 = config1.attributes('baz')
-      attr1.set('a', 'b')
+//  @Test
+//  void 'read simple entity'() {
+//    def db = database.instance.connect()
+//    try {
+//      underTest.register(db)
+//
+//      def config1 = new Configuration()
+//      config1.recipeName = 'foo'
+//      config1.repositoryName = 'bar'
+//      def attr1 = config1.attributes('baz')
+//      attr1.set('a', 'b')
+//
+//      def doc = underTest.add(db, config1)
+//      log doc.toJSON()
+//
+//      def config2 = underTest.readEntity(doc)
+//      assert config2.recipeName == 'foo'
+//      assert config2.repositoryName == 'bar'
+//      assert config2.attributes != null
+//      assert config2.attributes.size() == 1
+//      log config2.attributes.getClass()
+//
+//      def attr2 = config2.attributes('baz')
+//      assert attr2 != null
+//      assert attr2.get('a') == 'b'
+//    }
+//    finally {
+//      db.close()
+//    }
+//  }
 
-      def doc = underTest.add(db, config1)
-      log doc.toJSON()
-
-      def config2 = underTest.read(doc)
-      assert config2.recipeName == 'foo'
-      assert config2.repositoryName == 'bar'
-      assert config2.attributes != null
-      assert config2.attributes.size() == 1
-      log config2.attributes.getClass()
-
-      def attr2 = config2.attributes('baz')
-      assert attr2 != null
-      assert attr2.get('a') == 'b'
-    }
-    finally {
-      db.close()
-    }
-  }
-
-  @Test
-  void 'read detached entity'() {
-    def detached
-    def db = database.instance.connect()
-    try {
-      underTest.register(db)
-
-      def config1 = new Configuration()
-      config1.recipeName = 'foo'
-      config1.repositoryName = 'bar'
-      def attr1 = config1.attributes('baz')
-      attr1.set('a', 'b')
-
-      def doc = underTest.add(db, config1)
-
-      // FIXME: Detach broken in pre rc2, have to manually copy
-//      println "DETACHED: " + doc.detach()
-
-      detached = underTest.read(doc)
-    }
-    finally {
-      db.close()
-    }
-
-    def attr2 = detached.attributes('baz')
-    assert attr2 != null
-    assert attr2.get('a') == 'b'
-
-    def attr3 = detached.attributes('more')
-    assert attr3 != null
-    attr3.set('a', 'b')
-  }
+//  @Test
+//  void 'read detached entity'() {
+//    def detached
+//    def db = database.instance.connect()
+//    try {
+//      underTest.register(db)
+//
+//      def config1 = new Configuration()
+//      config1.recipeName = 'foo'
+//      config1.repositoryName = 'bar'
+//      def attr1 = config1.attributes('baz')
+//      attr1.set('a', 'b')
+//
+//      def doc = underTest.add(db, config1)
+//      detached = underTest.readEntity(doc)
+//    }
+//    finally {
+//      db.close()
+//    }
+//
+//    def attr2 = detached.attributes('baz')
+//    assert attr2 != null
+//    assert attr2.get('a') == 'b'
+//
+//    def attr3 = detached.attributes('more')
+//    assert attr3 != null
+//    attr3.set('a', 'b')
+//  }
 }

@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.sonatype.nexus.common.entity.Entity;
 
+import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -33,31 +34,44 @@ public abstract class CollectionEntityAdapter<T extends Entity>
     super(typeName);
   }
 
+  // TODO: Consider adding direct lookup helpers based on EntityId?
+
+  // TODO: Add iterator-based browse to avoid needing full memory copies to browse large collections?
+
   /**
    * Browse all entities, appending to given collection.
    */
   public List<T> browse(final ODatabaseDocumentTx db, final List<T> entities) {
     checkNotNull(entities);
-    for (ODocument document : browse(db)) {
-      entities.add(read(document));
+    for (ODocument document : browseDocuments(db)) {
+      entities.add(readEntity(document));
     }
     return entities;
   }
 
-  // FIXME: Cleanup support class api and signatures here, return value is never used and probably should not be exposed
-
-  @Override
-  public ODocument edit(final ODatabaseDocumentTx db, final T entity) {
-    return super.edit(db, entity);
+  public List<T> browse(final ODatabaseDocumentTx db) {
+    // TODO: Could consider using countClass and Lists.newArrayListWithExpectedSize() ?
+    return browse(db, Lists.<T>newLinkedList());
   }
 
-  @Override
-  public ODocument add(final ODatabaseDocumentTx db, final T entity) {
-    return super.add(db, entity);
+  /**
+   * Edit entity.
+   */
+  public void edit(final ODatabaseDocumentTx db, final T entity) {
+    super.editEntity(db, entity);
   }
 
-  @Override
+  /**
+   * Add entity.
+   */
+  public void add(final ODatabaseDocumentTx db, final T entity) {
+    super.addEntity(db, entity);
+  }
+
+  /**
+   * Delete entity.
+   */
   public void delete(final ODatabaseDocumentTx db, final T entity) {
-    super.delete(db, entity);
+    super.deleteEntity(db, entity);
   }
 }

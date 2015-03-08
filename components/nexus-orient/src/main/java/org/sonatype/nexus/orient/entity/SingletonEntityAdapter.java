@@ -33,42 +33,53 @@ public abstract class SingletonEntityAdapter<T extends Entity>
     super(typeName);
   }
 
+  // TODO: Add support to verify there is only 1 entity (or none) when registering type
+
   /**
    * Find the singleton record, or null if not set.
    */
   @Nullable
   private ODocument find(final ODatabaseDocumentTx db) {
-    Iterable<ODocument> documents = browse(db);
+    Iterable<ODocument> documents = browseDocuments(db);
     if (documents.iterator().hasNext()) {
       return documents.iterator().next();
     }
     return null;
   }
 
+  /**
+   * Get singleton entity or null if not set.
+   */
   @Nullable
   public T get(final ODatabaseDocumentTx db) {
     checkNotNull(db);
 
     ODocument document = find(db);
     if (document != null) {
-      return read(document);
+      return readEntity(document);
     }
     return null;
   }
 
+  /**
+   * Set singleton entity.
+   */
   public void set(final ODatabaseDocumentTx db, final T entity) {
     checkNotNull(db);
     checkNotNull(entity);
 
     ODocument document = find(db);
     if (document == null) {
-      add(db, entity);
+      addEntity(db, entity);
     }
     else {
-      edit(db, entity);
+      editEntity(db, entity);
     }
   }
 
+  /**
+   * Remove singleton entity.
+   */
   public void remove(final ODatabaseDocumentTx db) {
     checkNotNull(db);
 
