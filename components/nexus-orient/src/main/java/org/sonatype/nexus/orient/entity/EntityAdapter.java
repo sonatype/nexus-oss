@@ -23,7 +23,6 @@ import org.sonatype.nexus.common.entity.EntityVersion;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
@@ -113,8 +112,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Browse all documents.
    */
-  @VisibleForTesting
-  Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
+  protected Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
     checkNotNull(db);
     return db.browseClass(typeName);
   }
@@ -133,8 +131,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Read entity from document.
    */
-  @VisibleForTesting
-  T read(final ODocument document) {
+  protected T read(final ODocument document) {
     checkNotNull(document);
 
     T entity = newEntity();
@@ -161,8 +158,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Edit document from entity.
    */
-  @VisibleForTesting
-  ODocument edit(final ODocument document, final T entity) {
+  protected ODocument edit(final ODocument document, final T entity) {
     checkNotNull(document);
     checkNotNull(entity);
 
@@ -210,7 +206,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Attached {@link EntityMetadata} captures native details to simplify resolution w/o encoding.
    */
-  private static class AttachedEntityMetadata
+  protected static class AttachedEntityMetadata
       implements EntityMetadata
   {
     private final EntityAdapter owner;
@@ -260,7 +256,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Set metadata on entity.
    */
-  private void setMetadata(final T entity, final ODocument doc) {
+  protected void setMetadata(final T entity, final ODocument doc) {
     checkNotNull(entity != null);
     assert entity != null;
     entity.setEntityMetadata(new AttachedEntityMetadata(this, doc));
@@ -269,7 +265,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Get metadata from entity.
    */
-  private EntityMetadata getMetadata(final T entity) {
+  protected EntityMetadata getMetadata(final T entity) {
     checkNotNull(entity != null);
     assert entity != null;
     EntityMetadata metadata = entity.getEntityMetadata();
@@ -280,7 +276,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Return record identity of entity.
    */
-  private ORID recordIdentity(final T entity) {
+  protected ORID recordIdentity(final T entity) {
     EntityMetadata metadata = getMetadata(entity);
     if (metadata instanceof AttachedEntityMetadata) {
       return ((AttachedEntityMetadata) metadata).rid;
@@ -291,7 +287,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Return record version of entity.
    */
-  private ORecordVersion recordVersion(final T entity) {
+  protected ORecordVersion recordVersion(final T entity) {
     EntityMetadata metadata = getMetadata(entity);
     if (metadata instanceof AttachedEntityMetadata) {
       return ((AttachedEntityMetadata) metadata).rversion;
