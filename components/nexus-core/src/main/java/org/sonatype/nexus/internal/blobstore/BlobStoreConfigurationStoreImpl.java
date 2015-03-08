@@ -32,6 +32,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
 
 /**
+ * Default {@link BlobStoreConfigurationStore} implementation.
+ *
  * @since 3.0
  */
 @Named
