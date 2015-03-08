@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.orient.entity;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.sonatype.nexus.common.entity.Entity;
@@ -35,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Entity adapter.
+ * Support for entity adapter implementations.
  *
  * @since 3.0
  */
@@ -50,6 +48,10 @@ public abstract class EntityAdapter<T extends Entity>
 
   public EntityAdapter(final String typeName) {
     this.typeName = checkNotNull(typeName);
+  }
+
+  protected String getTypeName() {
+    return typeName;
   }
 
   @Inject
@@ -107,25 +109,12 @@ public abstract class EntityAdapter<T extends Entity>
 
   protected abstract void writeFields(final ODocument document, final T entity);
 
-  // TODO: Clean up api and return types
-
   /**
    * Browse all documents.
    */
   protected Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
     checkNotNull(db);
     return db.browseClass(typeName);
-  }
-
-  /**
-   * Browse all entities, appending to given collection.
-   */
-  public List<T> browse(final ODatabaseDocumentTx db, final List<T> entities) {
-    checkNotNull(entities);
-    for (ODocument document : browse(db)) {
-      entities.add(read(document));
-    }
-    return entities;
   }
 
   /**
@@ -139,20 +128,6 @@ public abstract class EntityAdapter<T extends Entity>
     setMetadata(entity, document);
 
     return entity;
-  }
-
-  /**
-   * Edit entity.
-   */
-  public ODocument edit(final ODatabaseDocumentTx db, final T entity) {
-    checkNotNull(db);
-    checkNotNull(entity);
-
-    ORID rid = recordIdentity(entity);
-    ODocument document = db.getRecord(rid);
-    checkState(document != null);
-
-    return edit(document, entity);
   }
 
   /**
@@ -171,9 +146,23 @@ public abstract class EntityAdapter<T extends Entity>
   }
 
   /**
+   * Edit entity.
+   */
+  protected ODocument edit(final ODatabaseDocumentTx db, final T entity) {
+    checkNotNull(db);
+    checkNotNull(entity);
+
+    ORID rid = recordIdentity(entity);
+    ODocument document = db.getRecord(rid);
+    checkState(document != null);
+
+    return edit(document, entity);
+  }
+
+  /**
    * Add new entity.
    */
-  public ODocument add(final ODatabaseDocumentTx db, final T entity) {
+  protected ODocument add(final ODatabaseDocumentTx db, final T entity) {
     checkNotNull(db);
     checkNotNull(entity);
 
@@ -187,7 +176,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Delete an entity.
    */
-  public void delete(final ODatabaseDocumentTx db, final T entity) {
+  protected void delete(final ODatabaseDocumentTx db, final T entity) {
     checkNotNull(db);
     checkNotNull(entity);
 

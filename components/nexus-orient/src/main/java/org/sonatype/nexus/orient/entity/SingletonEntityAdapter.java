@@ -22,7 +22,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Single record {@link EntityAdapter}.
+ * Single record entity-adapter.
  *
  * @since 3.0
  */
@@ -32,9 +32,6 @@ public abstract class SingletonEntityAdapter<T extends Entity>
   public SingletonEntityAdapter(final String typeName) {
     super(typeName);
   }
-
-  // TODO: Sort out api, may need to extract base-class to avoid leaking in public api which is not relevant for
-  // TODO: ... single record entity-adapter usage.
 
   /**
    * Find the singleton record, or null if not set.

@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.orient.OClassNameBuilder;
-import org.sonatype.nexus.orient.entity.EntityAdapter;
+import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 import org.sonatype.nexus.orient.entity.FieldCopier;
 
 import com.orientechnologies.orient.core.metadata.schema.OClass;
@@ -36,7 +36,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 @Named
 @Singleton
 public class BlobStoreConfigurationEntityAdapter
-    extends EntityAdapter<BlobStoreConfiguration>
+    extends CollectionEntityAdapter<BlobStoreConfiguration>
 {
   private static final String DB_CLASS = new OClassNameBuilder()
       .prefix("repository")
