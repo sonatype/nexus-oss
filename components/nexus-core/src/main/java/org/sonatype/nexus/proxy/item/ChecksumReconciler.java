@@ -24,6 +24,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
+import org.sonatype.nexus.proxy.maven.MUtils;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
@@ -48,15 +49,20 @@ public class ChecksumReconciler
 
   private final DigestCalculatingInspector digestCalculatingInspector;
 
-  private final MessageDigest message;
+  private final MessageDigest sha1;
+
+  private final MessageDigest md5;
 
   @Inject
   public ChecksumReconciler(final Walker walker, final DigestCalculatingInspector digestCalculatingInspector)
       throws NoSuchAlgorithmException
   {
     this.walker = walker;
+
     this.digestCalculatingInspector = digestCalculatingInspector;
-    message = MessageDigest.getInstance("SHA1");
+
+    sha1 = MessageDigest.getInstance("SHA1");
+    md5 = MessageDigest.getInstance("MD5");
   }
 
   /**
@@ -91,30 +97,78 @@ public class ChecksumReconciler
    * Checks the checksum cached in the item's attributes to see if it needs reconciling with the stored content.
    */
   void reconcileItemChecksum(final Repository repo, final StorageFileItem item) throws Exception {
-    final String attributeChecksum = item.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_SHA1_KEY);
-    if (attributeChecksum != null) {
+    final String itemPath = item.getPath();
+    if (!itemPath.endsWith(".sha1") && !itemPath.endsWith(".md5")) {
+      final String attributeSHA1 = item.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_SHA1_KEY);
+      if (attributeSHA1 != null) {
 
-      message.reset();
-      // look for checksums affected by the link persister pre-fetching the first 8 bytes (see NEXUS-8178)
-      try (final InputStream is = new DigestInputStream(item.getContentLocator().getContent(), message)) {
-        final byte[] buf = new byte[8];
-        ByteStreams.read(is, buf, 0, 8);
-        message.update(buf);
-        ByteStreams.copy(is, ByteStreams.nullOutputStream());
+        sha1.reset();
+        md5.reset();
+
+        // look for checksums affected by the link persister pre-fetching the first 8 bytes (see NEXUS-8178)
+        try (final InputStream is = new DigestInputStream(new DigestInputStream( //
+            item.getContentLocator().getContent(), sha1), md5)) {
+
+          final byte[] buf = new byte[8];
+          ByteStreams.read(is, buf, 0, 8);
+          sha1.update(buf);
+          md5.update(buf);
+
+          ByteStreams.copy(is, ByteStreams.nullOutputStream());
+        }
+
+        final String affectedSHA1 = DigesterUtils.getDigestAsString(sha1.digest());
+
+        if (attributeSHA1.equals(affectedSHA1)) {
+          log.info("Reconciling attribute checksums for {}", item);
+          final RepositoryItemUid uid = item.getRepositoryItemUid();
+          uid.getLock().lock(Action.update);
+          try {
+            digestCalculatingInspector.processStorageItem(item);
+            repo.getAttributesHandler().storeAttributes(item);
+          }
+          finally {
+            uid.getLock().unlock();
+          }
+        }
+
+        reconcileChecksumFile(repo, itemPath + ".sha1", affectedSHA1,
+            item.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_SHA1_KEY));
+
+        final String affectedMD5 = DigesterUtils.getDigestAsString(md5.digest());
+
+        reconcileChecksumFile(repo, itemPath + ".md5", affectedMD5,
+            item.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_MD5_KEY));
       }
+    }
+  }
 
-      if (attributeChecksum.equals(DigesterUtils.getDigestAsString(message.digest()))) {
-        log.info("Reconciling attribute checksums for {}", item);
+  /**
+   * Reconciles checksum file with the new value, but only if the file exists and contains the old value.
+   */
+  private void reconcileChecksumFile(final Repository repo, final String path, final String oldValue,
+      final String newValue)
+  {
+    try {
+      final ResourceStoreRequest request = new ResourceStoreRequest(path, true, false);
+      if (repo.getLocalStorage().containsItem(repo, request)) {
+        final StorageFileItem item = (StorageFileItem) repo.getLocalStorage().retrieveItem(repo, request);
         final RepositoryItemUid uid = item.getRepositoryItemUid();
         uid.getLock().lock(Action.update);
         try {
-          digestCalculatingInspector.processStorageItem(item);
-          repo.getAttributesHandler().storeAttributes(item);
+          if (oldValue.equals(MUtils.readDigestFromFileItem(item))) {
+            log.info("Reconciling checksum in {}", item);
+            item.setContentLocator(new StringContentLocator(newValue));
+            repo.getLocalStorage().storeItem(repo, item);
+          }
         }
         finally {
           uid.getLock().unlock();
         }
       }
+    }
+    catch (final Exception e) {
+      log.warn("Problem reconciling {} with new checksum", path, e);
     }
   }
 }
