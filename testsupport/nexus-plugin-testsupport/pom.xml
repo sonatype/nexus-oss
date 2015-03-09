@@ -45,6 +45,11 @@
       <artifactId>junit-runner</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+    </dependency>
+
     <!--
     FIXME: These 'tests' classifier artifacts mess up mavens dependency resolution and causes IDEA to build incorrect module dependency defs
     HACK: exclude all transitive deps using * globs.

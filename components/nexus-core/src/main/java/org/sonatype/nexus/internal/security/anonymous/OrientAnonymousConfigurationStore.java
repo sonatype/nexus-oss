@@ -28,7 +28,6 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -77,37 +76,18 @@ public class OrientAnonymousConfigurationStore
     return databaseInstance.get().acquire();
   }
 
-  @Nullable
-  private ODocument get(final ODatabaseDocumentTx db) {
-    Iterable<ODocument> documents = entityAdapter.browse(db);
-    if (documents.iterator().hasNext()) {
-      return documents.iterator().next();
-    }
-    return null;
-  }
-
   @Override
   @Nullable
   public AnonymousConfiguration load() {
     try (ODatabaseDocumentTx db = openDb()) {
-      ODocument doc = get(db);
-      if (doc != null) {
-        return entityAdapter.read(doc);
-      }
+      return entityAdapter.get(db);
     }
-    return null;
   }
 
   @Override
   public void save(final AnonymousConfiguration configuration) {
     try (ODatabaseDocumentTx db = openDb()) {
-      ODocument doc = get(db);
-      if (doc == null) {
-        entityAdapter.create(db, configuration);
-      }
-      else {
-        entityAdapter.write(doc, configuration);
-      }
+      entityAdapter.set(db, configuration);
     }
   }
 }

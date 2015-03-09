@@ -11,13 +11,14 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.repository.config;
+package org.sonatype.nexus.internal.blobstore;
 
 import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 import org.sonatype.nexus.orient.entity.FieldCopier;
@@ -28,67 +29,69 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
- * {@link Configuration} entity-adapter.
+ * {@link BlobStoreConfiguration} entity-adapter.
  *
- * @since 3.0
+ * since 3.0
  */
 @Named
 @Singleton
-public class ConfigurationEntityAdapter
-    extends CollectionEntityAdapter<Configuration>
+public class BlobStoreConfigurationEntityAdapter
+    extends CollectionEntityAdapter<BlobStoreConfiguration>
 {
   private static final String DB_CLASS = new OClassNameBuilder()
       .prefix("repository")
-      .type(Configuration.class)
+      .type(BlobStoreConfiguration.class)
       .build();
 
-  private static final String P_REPOSITORY_NAME = "repository_name";
+  private static final String P_NAME = "name";
 
   private static final String P_RECIPE_NAME = "recipe_name";
 
   private static final String P_ATTRIBUTES = "attributes";
 
-  private static final String I_REPOSITORY_NAME = "repository_name_idx";
+  private static final String I_NAME = "name_idx";
 
-  public ConfigurationEntityAdapter() {
+  public BlobStoreConfigurationEntityAdapter() {
     super(DB_CLASS);
   }
 
   @Override
   protected void defineType(final OClass type) {
-    type.createProperty(P_REPOSITORY_NAME, OType.STRING)
+    type.createProperty(P_NAME, OType.STRING)
         .setMandatory(true)
         .setNotNull(true);
     type.createProperty(P_RECIPE_NAME, OType.STRING)
         .setMandatory(true)
         .setNotNull(true);
-    type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
-    type.createIndex(I_REPOSITORY_NAME, INDEX_TYPE.UNIQUE, P_REPOSITORY_NAME);
+    type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP)
+        .setMandatory(true)
+        .setNotNull(true);
+    type.createIndex(I_NAME, INDEX_TYPE.UNIQUE, P_NAME);
   }
 
   @Override
-  protected Configuration newEntity() {
-    return new Configuration();
+  protected BlobStoreConfiguration newEntity() {
+    return new BlobStoreConfiguration();
   }
 
   @Override
-  protected void readFields(final ODocument document, final Configuration entity) {
+  protected void readFields(final ODocument document, final BlobStoreConfiguration entity) {
+    String name = document.field(P_NAME, OType.STRING);
     String recipeName = document.field(P_RECIPE_NAME, OType.STRING);
-    String repositoryName = document.field(P_REPOSITORY_NAME, OType.STRING);
     Map<String, Map<String, Object>> attributes = document.field(P_ATTRIBUTES, OType.EMBEDDEDMAP);
 
     // deeply copy attributes to divorce from document
     attributes = FieldCopier.copyIf(attributes);
 
+    entity.setName(name);
     entity.setRecipeName(recipeName);
-    entity.setRepositoryName(repositoryName);
     entity.setAttributes(attributes);
   }
 
   @Override
-  protected void writeFields(final ODocument document, final Configuration entity) {
+  protected void writeFields(final ODocument document, final BlobStoreConfiguration entity) {
+    document.field(P_NAME, entity.getName());
     document.field(P_RECIPE_NAME, entity.getRecipeName());
-    document.field(P_REPOSITORY_NAME, entity.getRepositoryName());
     document.field(P_ATTRIBUTES, entity.getAttributes());
   }
 }

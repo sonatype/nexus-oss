@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.security.anonymous;
 
+import org.sonatype.nexus.common.entity.Entity;
+
 import com.google.common.base.Throwables;
 
 /**
@@ -20,6 +22,7 @@ import com.google.common.base.Throwables;
  * @since 3.0
  */
 public class AnonymousConfiguration
+  extends Entity
   implements Cloneable
 {
   private boolean enabled;

@@ -18,93 +18,53 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.entity.SingletonEntityAdapter;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * {@link RealmConfiguration} entity adapter.
+ * {@link RealmConfiguration} entity-adapter.
  *
  * @since 3.0
  */
 @Named
 @Singleton
 public class RealmConfigurationEntityAdapter
-    extends ComponentSupport
+    extends SingletonEntityAdapter<RealmConfiguration>
 {
   public static final String DB_CLASS = new OClassNameBuilder()
       .prefix("security")
-      .type("realm")
+      .type(RealmConfiguration.class)
       .build();
 
-  public static final String P_REALM_NAMES = "realmNames";
+  public static final String P_REALM_NAMES = "realm_names";
 
-  /**
-   * Register schema.
-   */
-  public OClass register(final ODatabaseDocumentTx db) {
-    checkNotNull(db);
-
-    OSchema schema = db.getMetadata().getSchema();
-    OClass type = schema.getClass(DB_CLASS);
-    if (type == null) {
-      type = schema.createClass(DB_CLASS);
-      type.createProperty(P_REALM_NAMES, OType.EMBEDDEDLIST);
-
-      log.info("Created schema: {}, properties: {}", type, type.properties());
-    }
-    return type;
+  public RealmConfigurationEntityAdapter() {
+    super(DB_CLASS);
   }
 
-  /**
-   * Create a new document and write entity.
-   */
-  public ODocument create(final ODatabaseDocumentTx db, final RealmConfiguration entity) {
-    checkNotNull(db);
-    checkNotNull(entity);
-
-    ODocument doc = db.newInstance(DB_CLASS);
-    return write(doc, entity);
+  @Override
+  protected void defineType(final OClass type) {
+    type.createProperty(P_REALM_NAMES, OType.EMBEDDEDLIST);
   }
 
-  /**
-   * Write entity to document.
-   */
-  public ODocument write(final ODocument document, final RealmConfiguration entity) {
-    checkNotNull(document);
-    checkNotNull(entity);
-
-    document.field(P_REALM_NAMES, entity.getRealmNames());
-
-    return document.save();
+  @Override
+  protected RealmConfiguration newEntity() {
+    return new RealmConfiguration();
   }
 
-  /**
-   * Read entity from document.
-   */
-  public RealmConfiguration read(final ODocument document) {
-    checkNotNull(document);
-
+  @Override
+  protected void readFields(final ODocument document, final RealmConfiguration entity) {
     List<String> realms = document.field(P_REALM_NAMES, OType.EMBEDDEDLIST);
 
-    RealmConfiguration entity = new RealmConfiguration();
     entity.setRealmNames(realms);
-
-    return entity;
   }
 
-  /**
-   * Browse all documents.
-   */
-  public Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
-    checkNotNull(db);
-    return db.browseClass(DB_CLASS);
+  @Override
+  protected void writeFields(final ODocument document, final RealmConfiguration entity) {
+    document.field(P_REALM_NAMES, entity.getRealmNames());
   }
 }

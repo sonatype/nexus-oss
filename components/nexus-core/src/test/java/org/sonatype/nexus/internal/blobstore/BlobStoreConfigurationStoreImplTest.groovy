@@ -12,23 +12,24 @@
  */
 package org.sonatype.nexus.internal.blobstore
 
-import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
-import org.sonatype.nexus.orient.DatabaseInstanceRule
-import org.sonatype.sisu.litmus.testsupport.TestSupport
-
 import com.google.inject.util.Providers
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
+import org.sonatype.nexus.orient.DatabaseInstanceRule
+import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.junit.Assert.fail
 
+/**
+ * Tests for {@link BlobStoreConfigurationStoreImpl}.
+ */
 class BlobStoreConfigurationStoreImplTest
     extends TestSupport
 {
-
   @Rule
   public DatabaseInstanceRule database = new DatabaseInstanceRule('test')
 
@@ -36,7 +37,10 @@ class BlobStoreConfigurationStoreImplTest
 
   @Before
   void setup() {
-    underTest = new BlobStoreConfigurationStoreImpl(Providers.of(database.instance), new ConfigurationEntityAdapter())
+    underTest = new BlobStoreConfigurationStoreImpl(
+        Providers.of(database.instance),
+        new BlobStoreConfigurationEntityAdapter()
+    )
     underTest.start()
   }
 
@@ -79,7 +83,8 @@ class BlobStoreConfigurationStoreImplTest
       fail()
     }
     catch (ORecordDuplicatedException e) {
-      assert e.toString().contains('blobstore_name_idx')
+      // FIXME: This is fragile for refactoring
+      assert e.toString().contains('name_idx')
     }
   }
 

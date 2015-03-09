@@ -17,7 +17,7 @@ import java.io.Serializable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A unique identifier for a blob within a specific BlobStore.
+ * A unique identifier for a blob within a specific {@link BlobStore}.
  *
  * @since 3.0
  */

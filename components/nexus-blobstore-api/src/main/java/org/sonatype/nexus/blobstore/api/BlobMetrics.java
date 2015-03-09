@@ -17,7 +17,7 @@ import java.io.Serializable;
 import org.joda.time.DateTime;
 
 /**
- * A simple POJO implementation of BlobMetrics.
+ * Provides basic metrics about a BLOB.
  *
  * @since 3.0
  */

@@ -19,8 +19,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Blob reference.
- *
  * Provides a pointer to a blob on a given node, in a given store.
  *
  * @since 3.0

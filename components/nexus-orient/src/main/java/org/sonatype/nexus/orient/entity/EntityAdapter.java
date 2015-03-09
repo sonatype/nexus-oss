@@ -12,14 +12,15 @@
  */
 package org.sonatype.nexus.orient.entity;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
+import org.sonatype.nexus.common.entity.Entity;
+import org.sonatype.nexus.common.entity.EntityId;
+import org.sonatype.nexus.common.entity.EntityMetadata;
+import org.sonatype.nexus.common.entity.EntityVersion;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
@@ -32,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Entity adapter.
+ * Support for entity-adapter implementations.
  *
  * @since 3.0
  */
@@ -47,6 +48,10 @@ public abstract class EntityAdapter<T extends Entity>
 
   public EntityAdapter(final String typeName) {
     this.typeName = checkNotNull(typeName);
+  }
+
+  protected String getTypeName() {
+    return typeName;
   }
 
   @Inject
@@ -74,7 +79,7 @@ public abstract class EntityAdapter<T extends Entity>
     checkNotNull(db);
 
     OSchema schema = db.getMetadata().getSchema();
-    type = schema.getClass(typeName);
+    OClass type = schema.getClass(typeName);
     if (type == null) {
       type = schema.createClass(typeName);
       defineType(type);
@@ -84,6 +89,8 @@ public abstract class EntityAdapter<T extends Entity>
           type.properties(),
           type.getIndexes()
       );
+
+      this.type = type;
     }
   }
 
@@ -104,33 +111,18 @@ public abstract class EntityAdapter<T extends Entity>
 
   protected abstract void writeFields(final ODocument document, final T entity);
 
-  // TODO: Clean up api and return types
-
   /**
    * Browse all documents.
    */
-  @VisibleForTesting
-  Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
+  protected Iterable<ODocument> browseDocuments(final ODatabaseDocumentTx db) {
     checkNotNull(db);
     return db.browseClass(typeName);
   }
 
   /**
-   * Browse all entities, appending to given collection.
-   */
-  public List<T> browse(final ODatabaseDocumentTx db, final List<T> entities) {
-    checkNotNull(entities);
-    for (ODocument document : browse(db)) {
-      entities.add(read(document));
-    }
-    return entities;
-  }
-
-  /**
    * Read entity from document.
    */
-  @VisibleForTesting
-  T read(final ODocument document) {
+  protected T readEntity(final ODocument document) {
     checkNotNull(document);
 
     T entity = newEntity();
@@ -141,24 +133,9 @@ public abstract class EntityAdapter<T extends Entity>
   }
 
   /**
-   * Edit entity.
+   * Write document from entity.
    */
-  public ODocument edit(final ODatabaseDocumentTx db, final T entity) {
-    checkNotNull(db);
-    checkNotNull(entity);
-
-    ORID rid = recordIdentity(entity);
-    ODocument document = db.getRecord(rid);
-    checkState(document != null);
-
-    return edit(document, entity);
-  }
-
-  /**
-   * Edit document from entity.
-   */
-  @VisibleForTesting
-  ODocument edit(final ODocument document, final T entity) {
+  protected ODocument writeEntity(final ODocument document, final T entity) {
     checkNotNull(document);
     checkNotNull(entity);
 
@@ -171,9 +148,23 @@ public abstract class EntityAdapter<T extends Entity>
   }
 
   /**
+   * Edit entity.
+   */
+  protected ODocument editEntity(final ODatabaseDocumentTx db, final T entity) {
+    checkNotNull(db);
+    checkNotNull(entity);
+
+    ORID rid = recordIdentity(entity);
+    ODocument document = db.getRecord(rid);
+    checkState(document != null);
+
+    return writeEntity(document, entity);
+  }
+
+  /**
    * Add new entity.
    */
-  public ODocument add(final ODatabaseDocumentTx db, final T entity) {
+  protected ODocument addEntity(final ODatabaseDocumentTx db, final T entity) {
     checkNotNull(db);
     checkNotNull(entity);
 
@@ -181,13 +172,13 @@ public abstract class EntityAdapter<T extends Entity>
     checkState(entity.getEntityMetadata() == null);
 
     ODocument doc = db.newInstance(typeName);
-    return edit(doc, entity);
+    return writeEntity(doc, entity);
   }
 
   /**
    * Delete an entity.
    */
-  public void delete(final ODatabaseDocumentTx db, final T entity) {
+  protected void deleteEntity(final ODatabaseDocumentTx db, final T entity) {
     checkNotNull(db);
     checkNotNull(entity);
 
@@ -206,7 +197,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Attached {@link EntityMetadata} captures native details to simplify resolution w/o encoding.
    */
-  private static class AttachedEntityMetadata
+  protected static class AttachedEntityMetadata
       implements EntityMetadata
   {
     private final EntityAdapter owner;
@@ -256,7 +247,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Set metadata on entity.
    */
-  private void setMetadata(final T entity, final ODocument doc) {
+  protected void setMetadata(final T entity, final ODocument doc) {
     checkNotNull(entity != null);
     assert entity != null;
     entity.setEntityMetadata(new AttachedEntityMetadata(this, doc));
@@ -265,7 +256,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Get metadata from entity.
    */
-  private EntityMetadata getMetadata(final T entity) {
+  protected EntityMetadata getMetadata(final T entity) {
     checkNotNull(entity != null);
     assert entity != null;
     EntityMetadata metadata = entity.getEntityMetadata();
@@ -276,7 +267,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Return record identity of entity.
    */
-  private ORID recordIdentity(final T entity) {
+  protected ORID recordIdentity(final T entity) {
     EntityMetadata metadata = getMetadata(entity);
     if (metadata instanceof AttachedEntityMetadata) {
       return ((AttachedEntityMetadata) metadata).rid;
@@ -287,7 +278,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Return record version of entity.
    */
-  private ORecordVersion recordVersion(final T entity) {
+  protected ORecordVersion recordVersion(final T entity) {
     EntityMetadata metadata = getMetadata(entity);
     if (metadata instanceof AttachedEntityMetadata) {
       return ((AttachedEntityMetadata) metadata).rversion;

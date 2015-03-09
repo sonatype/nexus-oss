@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.orient.entity;
 
+import org.sonatype.nexus.common.entity.EntityId;
+import org.sonatype.nexus.common.entity.EntityMetadata;
+import org.sonatype.nexus.common.entity.EntityVersion;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**

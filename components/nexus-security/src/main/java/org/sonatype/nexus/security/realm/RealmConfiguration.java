@@ -16,6 +16,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.entity.Entity;
+
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
@@ -25,6 +27,7 @@ import com.google.common.collect.Lists;
  * @since 3.0
  */
 public class RealmConfiguration
+  extends Entity
   implements Cloneable
 {
   private List<String> realmNames;

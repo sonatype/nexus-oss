@@ -19,6 +19,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 /**
+ * Tests for {@link BlobRef}.
+ *
  * @since 3.0
  */
 public class BlobRefTest

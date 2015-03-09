@@ -15,16 +15,15 @@ package org.sonatype.nexus.capability.internal.storage;
 import java.util.Map;
 
 import org.sonatype.nexus.capability.CapabilityIdentity;
-import org.sonatype.nexus.orient.DatabaseInstance;
+import org.sonatype.nexus.orient.DatabaseInstanceRule;
 import org.sonatype.nexus.orient.HexRecordIdObfuscator;
-import org.sonatype.nexus.orient.MemoryDatabaseManager;
-import org.sonatype.nexus.orient.MinimalDatabaseServer;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;
 import com.google.inject.util.Providers;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,23 +38,21 @@ import static org.hamcrest.Matchers.notNullValue;
 public class OrientCapabilityStorageTest
   extends TestSupport
 {
-  private MinimalDatabaseServer databaseServer;
-
-  private MemoryDatabaseManager databaseManager;
+  @Rule
+  public DatabaseInstanceRule database = new DatabaseInstanceRule("test");
 
   private OrientCapabilityStorage underTest;
 
   @Before
   public void setUp() throws Exception {
-    this.databaseServer = new MinimalDatabaseServer();
-    databaseServer.start();
+    CapabilityStorageItemEntityAdapter entityAdapter = new CapabilityStorageItemEntityAdapter();
+    entityAdapter.installDependencies(new HexRecordIdObfuscator());
 
-    this.databaseManager = new MemoryDatabaseManager();
-    databaseManager.start();
+    this.underTest = new OrientCapabilityStorage(
+        Providers.of(database.getInstance()),
+        entityAdapter
+    );
 
-    DatabaseInstance databaseInstance = databaseManager.instance("test");
-
-    this.underTest = new OrientCapabilityStorage(Providers.of(databaseInstance), new HexRecordIdObfuscator());
     underTest.start();
   }
 
@@ -64,16 +61,6 @@ public class OrientCapabilityStorageTest
     if (underTest != null) {
       underTest.stop();
       underTest = null;
-    }
-
-    if (databaseManager != null) {
-      databaseManager.stop();
-      databaseManager = null;
-    }
-
-    if (databaseServer != null) {
-      databaseServer.stop();
-      databaseServer = null;
     }
   }
 

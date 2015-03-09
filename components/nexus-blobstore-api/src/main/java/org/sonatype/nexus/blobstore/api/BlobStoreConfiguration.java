@@ -14,10 +14,15 @@ package org.sonatype.nexus.blobstore.api;
 
 import java.util.Map;
 
+import org.sonatype.nexus.common.entity.Entity;
+
 /**
+ * {@link BlobStore} configuration.
+ *
  * @since 3.0
  */
 public class BlobStoreConfiguration
+  extends Entity
 {
   private String name;
   
@@ -51,7 +56,7 @@ public class BlobStoreConfiguration
 
   @Override
   public String toString() {
-    return "BlobStoreConfiguration{" +
+    return getClass().getSimpleName() + "{" +
         "name='" + name + '\'' +
         ", recipeName='" + recipeName + '\'' +
         ", attributes=" + attributes +
