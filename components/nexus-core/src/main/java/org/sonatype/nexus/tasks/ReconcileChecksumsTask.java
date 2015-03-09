@@ -12,11 +12,15 @@
  */
 package org.sonatype.nexus.tasks;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.ChecksumReconciler;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.ReconcileChecksumsTaskDescriptor;
@@ -56,16 +60,32 @@ public class ReconcileChecksumsTask
 
   @Override
   public Object doRun() throws Exception {
-    final ResourceStoreRequest request = new ResourceStoreRequest(getResourceStorePath());
+    final List<Repository> targetRepositories = new ArrayList<>();
 
     if (getRepositoryId() != null) {
-      final Repository repo = getRepositoryRegistry().getRepository(getRepositoryId());
-      checksumReconciler.reconcileChecksums(repo, request);
+      // determine if we've been pointed to a group, as then we want to process its non-group members
+      final Repository selectedRepository = getRepositoryRegistry().getRepository(getRepositoryId());
+      final GroupRepository groupRepository = selectedRepository.adaptToFacet(GroupRepository.class);
+      if (groupRepository == null) {
+        targetRepositories.add(selectedRepository);
+      }
+      else {
+        targetRepositories.addAll(groupRepository.getTransitiveMemberRepositories());
+      }
     }
     else {
+      // 'all repos' case, ignore groups as their members are already included
       for (final Repository repo : getRepositoryRegistry().getRepositories()) {
-        checksumReconciler.reconcileChecksums(repo, request);
+        if (repo.adaptToFacet(GroupRepository.class) == null) {
+          targetRepositories.add(repo);
+        }
       }
+    }
+
+    final ResourceStoreRequest request = new ResourceStoreRequest(getResourceStorePath());
+
+    for (final Repository repo : targetRepositories) {
+      checksumReconciler.reconcileChecksums(repo, request);
     }
 
     return null;
