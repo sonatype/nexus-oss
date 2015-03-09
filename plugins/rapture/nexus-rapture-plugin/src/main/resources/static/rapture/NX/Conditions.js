@@ -26,7 +26,8 @@ Ext.define('NX.Conditions', {
     'NX.util.condition.GridHasSelection',
     'NX.util.condition.IsPermitted',
     'NX.util.condition.StoreHasRecords',
-    'NX.util.condition.WatchState'
+    'NX.util.condition.WatchState',
+    'NX.util.condition.NeverPermitted'
   ],
 
   /**
@@ -88,6 +89,14 @@ Ext.define('NX.Conditions', {
    */
   or: function () {
     return Ext.create('NX.util.condition.Disjunction', { conditions: Array.prototype.slice.call(arguments) });
+  },
+
+  /**
+   * No-op condition that is never satisfied.
+   * @returns {NX.util.condition.NeverPermitted}
+   */
+  never: function() {
+    return Ext.create('NX.util.condition.NeverPermitted');
   }
 
 });

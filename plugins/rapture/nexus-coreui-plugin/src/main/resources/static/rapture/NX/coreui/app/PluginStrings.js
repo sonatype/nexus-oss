@@ -233,7 +233,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_BLOBSTORES_CREATE_SUCCESS: 'Blobstore created: ',
     ADMIN_BLOBSTORES_CREATE_ERROR: 'You do not have permission to create blobstores',
     ADMIN_BLOBSTORES_UPDATE_SUCCESS: 'Blobstore updated: ',
-    ADMIN_BLOBSTORES_UPDATE_ERROR: 'You do not have permission to update blobstores',
+    ADMIN_BLOBSTORES_UPDATE_ERROR: 'Update is not supported for blobstores',
     ADMIN_BLOBSTORES_LIST_NEW_BUTTON: 'Create blobstore',
     ADMIN_BLOBSTORES_LIST_NAME_COLUMN: 'Name',
     ADMIN_BLOBSTORES_LIST_TYPE_COLUMN: 'Type',
