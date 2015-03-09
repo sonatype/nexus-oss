@@ -74,7 +74,7 @@ Ext.define('NX.app.PluginStrings', {
 
     // Sign in
     GLOBAL_SIGN_IN_TITLE: 'Sign In',
-    GLOBAL_SIGN_IN_MASK: 'Signing in…',
+    GLOBAL_SIGN_IN_MASK: 'Signing in&hellip;',
     GLOBAL_SIGN_IN_USERNAME_PLACEHOLDER: 'Username',
     GLOBAL_SIGN_IN_PASSWORD_PLACEHOLDER: 'Password',
     GLOBAL_SIGN_IN_REMEMBER_ME: 'Remember me',
@@ -122,9 +122,9 @@ Ext.define('NX.app.PluginStrings', {
     // Authentication modal
     GLOBAL_AUTHENTICATE_TITLE: 'Authenticate',
     GLOBAL_AUTHENTICATE_HELP: 'You have requested an operation which requires validation of your credentials.',
-    GLOBAL_AUTHENTICATE_MASK: 'Authenticate…',
+    GLOBAL_AUTHENTICATE_MASK: 'Authenticate&hellip;',
     GLOBAL_AUTHENTICATE_SUBMIT_BUTTON: 'Authenticate',
-    GLOBAL_AUTHENTICATE_RETRIEVING_MASK: 'Retrieving authentication token…',
+    GLOBAL_AUTHENTICATE_RETRIEVING_MASK: 'Retrieving authentication token&hellip;',
     GLOBAL_AUTHENTICATE_CANCEL_BUTTON: 'Cancel',
 
     // Expiry modal
