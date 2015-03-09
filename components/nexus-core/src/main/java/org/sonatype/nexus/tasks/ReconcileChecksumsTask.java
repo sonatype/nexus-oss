@@ -48,7 +48,7 @@ public class ReconcileChecksumsTask
   /**
    * System property used to control throttling
    */
-  public static final String MAX_RATE_KEY = ReconcileChecksumsTask.class + ".maxRate";
+  public static final String MAX_RATE_KEY = ReconcileChecksumsTask.class.getName() + ".maxRate";
 
   private static final int MAX_RATE = SystemPropertiesHelper.getInteger(MAX_RATE_KEY, 100);
 
