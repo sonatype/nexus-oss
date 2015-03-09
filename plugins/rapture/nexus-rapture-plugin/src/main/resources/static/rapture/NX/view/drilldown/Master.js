@@ -53,7 +53,7 @@ Ext.define('NX.view.drilldown.Master', {
     // Add a drilldown affordance to the end of the list
     ct.add(
       {
-        width: 24,
+        width: 28,
         hideable: false,
         sortable: false,
         menuDisabled: true,

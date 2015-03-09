@@ -70,7 +70,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_HEADER_HELP_SUPPORT_TOOLTIP: 'Sonatype Nexus product support',
 
     // Footer
-    GLOBAL_FOOTER_COPYRIGHT: 'Copyright © 2008-2015, Sonatype Inc. All rights reserved.',
+    GLOBAL_FOOTER_COPYRIGHT: 'Copyright &copy; 2008-2015, Sonatype Inc. All rights reserved.',
 
     // Sign in
     GLOBAL_SIGN_IN_TITLE: 'Sign In',
