@@ -14,6 +14,8 @@ package org.sonatype.nexus.common.entity;
 
 import java.io.Serializable;
 
+import javax.annotation.Nonnull;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -32,6 +34,7 @@ public class EntityVersion
     this.value = checkNotNull(value);
   }
 
+  @Nonnull
   public String getValue() {
     return value;
   }
