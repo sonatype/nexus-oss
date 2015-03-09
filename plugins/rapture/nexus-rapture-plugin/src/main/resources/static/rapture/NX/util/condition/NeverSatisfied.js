@@ -15,27 +15,12 @@
  *
  * @since 3.0
  */
-Ext.define('NX.util.condition.NeverPermitted', {
+Ext.define('NX.util.condition.NeverSatisfied', {
   extend: 'NX.util.condition.Condition',
-
-  bind: function() {
-    var me = this;
-    if(!me.bounded)
-    {
-      me.callParent();
-      me.evaluate();
-    }
-    return me;
-  },
   
-  evaluate: function () {
-    var me = this;
-    me.setSatisfied(false);
-  },
-
   toString: function () {
     var me = this;
-    return me.self.getName() + '{ never permitted }';
+    return me.self.getName() + '{ never satisfied }';
   }
 
 });

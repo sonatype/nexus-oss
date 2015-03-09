@@ -27,7 +27,7 @@ Ext.define('NX.Conditions', {
     'NX.util.condition.IsPermitted',
     'NX.util.condition.StoreHasRecords',
     'NX.util.condition.WatchState',
-    'NX.util.condition.NeverPermitted'
+    'NX.util.condition.NeverSatisfied'
   ],
 
   /**
@@ -93,10 +93,10 @@ Ext.define('NX.Conditions', {
 
   /**
    * No-op condition that is never satisfied.
-   * @returns {NX.util.condition.NeverPermitted}
+   * @returns {NX.util.condition.NeverSatisfied}
    */
   never: function() {
-    return Ext.create('NX.util.condition.NeverPermitted');
+    return Ext.create('NX.util.condition.NeverSatisfied');
   }
 
 });
