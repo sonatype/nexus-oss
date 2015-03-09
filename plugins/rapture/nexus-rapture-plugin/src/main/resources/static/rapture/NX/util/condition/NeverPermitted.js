@@ -18,6 +18,16 @@
 Ext.define('NX.util.condition.NeverPermitted', {
   extend: 'NX.util.condition.Condition',
 
+  bind: function() {
+    var me = this;
+    if(!me.bounded)
+    {
+      me.callParent();
+      me.evaluate();
+    }
+    return me;
+  },
+  
   evaluate: function () {
     var me = this;
     me.setSatisfied(false);
