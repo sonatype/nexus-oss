@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
-  extend: 'NX.view.AddWindow',
+  extend: 'NX.view.AddPanel',
   alias: 'widget.nx-coreui-sslcertificate-add-from-server',
   requires: [
     'NX.Icons',

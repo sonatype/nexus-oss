@@ -268,7 +268,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
     }
 
     // Set focus on the default field (if available) or the panel itself
-    form = items[index].down('nx-addwindow[defaultFocus]');
+    form = items[index].down('nx-addpanel[defaultFocus]');
     if (form) {
       form.down('[name=' + form.defaultFocus + ']').focus();
     } else {
