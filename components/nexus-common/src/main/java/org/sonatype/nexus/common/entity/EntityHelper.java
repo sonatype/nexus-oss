@@ -38,6 +38,7 @@ public class EntityHelper
   @Nonnull
   public static EntityId id(final Entity entity) {
     EntityId id = metadata(entity).getId();
+    // sanity id should never be null
     checkState(id != null, "Missing entity-id");
     //noinspection ConstantConditions
     return id;
@@ -46,6 +47,7 @@ public class EntityHelper
   @Nonnull
   public static EntityVersion version(final Entity entity) {
     EntityVersion version = metadata(entity).getVersion();
+    // sanity version should never be null
     checkState(version != null, "Missing entity-version");
     //noinspection ConstantConditions
     return version;
