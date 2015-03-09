@@ -22,8 +22,12 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.ChecksumReconciler;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.walker.FixedRateWalkerThrottleController;
+import org.sonatype.nexus.proxy.walker.WalkerThrottleController;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.ReconcileChecksumsTaskDescriptor;
+import org.sonatype.nexus.util.LinearNumberSequence;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -40,6 +44,13 @@ public class ReconcileChecksumsTask
    * System event action: reconcileChecksums
    */
   public static final String ACTION = "RECONCILECHECKSUMS";
+
+  /**
+   * System property used to control throttling
+   */
+  public static final String MAX_RATE_KEY = ReconcileChecksumsTask.class + ".maxRate";
+
+  private static final int MAX_RATE = SystemPropertiesHelper.getInteger(MAX_RATE_KEY, 100);
 
   private final ChecksumReconciler checksumReconciler;
 
@@ -82,7 +93,12 @@ public class ReconcileChecksumsTask
       }
     }
 
-    final ResourceStoreRequest request = new ResourceStoreRequest(getResourceStorePath());
+    final ResourceStoreRequest request = new ResourceStoreRequest(getResourceStorePath(), true, false);
+
+    if (MAX_RATE > 0) {
+      request.getRequestContext().put(WalkerThrottleController.CONTEXT_KEY,
+          new FixedRateWalkerThrottleController(MAX_RATE, new LinearNumberSequence(0, 1, 1, 0)));
+    }
 
     for (final Repository repo : targetRepositories) {
       checksumReconciler.reconcileChecksums(repo, request);
