@@ -27,7 +27,9 @@ import org.sonatype.nexus.proxy.walker.WalkerThrottleController;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.ReconcileChecksumsTaskDescriptor;
 import org.sonatype.nexus.util.LinearNumberSequence;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
+
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -45,13 +47,6 @@ public class ReconcileChecksumsTask
    */
   public static final String ACTION = "RECONCILECHECKSUMS";
 
-  /**
-   * System property used to control throttling
-   */
-  public static final String MAX_RATE_KEY = ReconcileChecksumsTask.class.getName() + ".maxRate";
-
-  private static final int MAX_RATE = SystemPropertiesHelper.getInteger(MAX_RATE_KEY, 100);
-
   private final ChecksumReconciler checksumReconciler;
 
   @Inject
@@ -67,6 +62,24 @@ public class ReconcileChecksumsTask
   @Override
   protected String getRepositoryPathFieldId() {
     return ReconcileChecksumsTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
+  }
+
+  public long getModifiedSinceMillis() {
+    final String value = getParameter(ReconcileChecksumsTaskDescriptor.MODIFIED_SINCE_DATE_ID);
+    return StringUtils.isNotBlank(value) ? DateTime.parse(value).getMillis() : -1;
+  }
+
+  public void setModifiedSinceDate(final String modifiedSinceDate) {
+    addParameter(ReconcileChecksumsTaskDescriptor.MODIFIED_SINCE_DATE_ID, modifiedSinceDate);
+  }
+
+  public int getWalkingLimitTps() {
+    final String value = getParameter(ReconcileChecksumsTaskDescriptor.WALKING_LIMIT_TPS_FIELD_ID);
+    return StringUtils.isNotBlank(value) ? Integer.parseInt(value) : -1;
+  }
+
+  public void setWalkingLimitTps(final int walkingLimitTps) {
+    addParameter(ReconcileChecksumsTaskDescriptor.WALKING_LIMIT_TPS_FIELD_ID, Integer.toString(walkingLimitTps));
   }
 
   @Override
@@ -95,13 +108,14 @@ public class ReconcileChecksumsTask
 
     final ResourceStoreRequest request = new ResourceStoreRequest(getResourceStorePath(), true, false);
 
-    if (MAX_RATE > 0) {
+    final int limitTps = getWalkingLimitTps();
+    if (limitTps > 0) {
       request.getRequestContext().put(WalkerThrottleController.CONTEXT_KEY,
-          new FixedRateWalkerThrottleController(MAX_RATE, new LinearNumberSequence(0, 1, 1, 0)));
+          new FixedRateWalkerThrottleController(limitTps, new LinearNumberSequence(0, 1, 1, 0)));
     }
 
     for (final Repository repo : targetRepositories) {
-      checksumReconciler.reconcileChecksums(repo, request);
+      checksumReconciler.reconcileChecksums(repo, request, getModifiedSinceMillis());
     }
 
     return null;
