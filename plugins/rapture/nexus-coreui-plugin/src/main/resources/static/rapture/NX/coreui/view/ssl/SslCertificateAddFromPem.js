@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
-  extend: 'NX.view.AddWindow',
+  extend: 'NX.view.AddPanel',
   alias: 'widget.nx-coreui-sslcertificate-add-from-pem',
   requires: [
     'NX.Icons',

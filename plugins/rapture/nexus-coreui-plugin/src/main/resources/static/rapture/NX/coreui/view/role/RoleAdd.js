@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.role.RoleAdd', {
-  extend: 'NX.view.AddWindow',
+  extend: 'NX.view.AddPanel',
   alias: 'widget.nx-coreui-role-add',
   requires: [
     'NX.Conditions',

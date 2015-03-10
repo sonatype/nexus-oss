@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.repository.RepositoryAdd', {
-  extend: 'NX.view.AddWindow',
+  extend: 'NX.view.AddPanel',
   alias: 'widget.nx-coreui-repository-add',
   requires: [
     'NX.Conditions',

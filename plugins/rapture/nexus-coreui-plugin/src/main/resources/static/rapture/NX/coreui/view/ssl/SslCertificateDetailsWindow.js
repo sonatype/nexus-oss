@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
-  extend: 'NX.view.AddWindow',
+  extend: 'NX.view.AddPanel',
   alias: 'widget.nx-coreui-sslcertificate-details-window',
   requires: [
     'NX.Conditions',

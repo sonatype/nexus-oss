@@ -98,21 +98,15 @@ Ext.define('NX.coreui.controller.Log', {
    * Shows mark log window.
    */
   showMarkWindow: function () {
-    var me = this,
-      feature = me.getFeature();
-
-    feature.setItemName(1, NX.I18n.get('ADMIN_LOG_VIEWER_MARK_TITLE'));
-    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-log-mark'));
+    Ext.widget({ xtype: 'nx-coreui-log-mark' });
   },
 
   /**
    * @private
    */
   onLogMarked: function (form) {
-    var me = this;
-
     this.retrieveLog();
-    me.loadView(null, null, true);
+    form.up('window').close();
   },
 
   /**
