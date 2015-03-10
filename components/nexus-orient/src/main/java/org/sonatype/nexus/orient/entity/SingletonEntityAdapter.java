@@ -73,7 +73,7 @@ public abstract class SingletonEntityAdapter<T extends Entity>
       addEntity(db, entity);
     }
     else {
-      editEntity(db, entity);
+      writeEntity(document, entity);
     }
   }
 
