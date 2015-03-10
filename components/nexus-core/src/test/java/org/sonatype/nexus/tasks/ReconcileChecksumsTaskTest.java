@@ -20,6 +20,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MUtils;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -94,8 +95,27 @@ public class ReconcileChecksumsTaskTest
     assertThat(MUtils.readDigestFromFileItem((StorageFileItem) snapshots.retrieveItem(metadataMD5)),
         is("ec91980b1f83604ed72d749eebacea53"));
 
-    task.setRepositoryId(snapshots.getId());
     task.setResourceStorePath("/org/sonatype/");
+    task.setModifiedSinceDate(DateTime.now().plusYears(1).toString("yyyy-MM-dd"));
+
+    nexusScheduler.submit("testAffectedSubTree", task).get();
+
+    item = snapshots.retrieveItem(metadataXML);
+
+    sha1sum = item.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_SHA1_KEY);
+    md5sum = item.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_MD5_KEY);
+
+    // checksums still need to be reconciled
+    assertThat(sha1sum, is("18da84408c713e55a3c55dc34a1ccff78086fd46"));
+    assertThat(md5sum, is("ec91980b1f83604ed72d749eebacea53"));
+
+    // associated checksum files still need to be reconciled
+    assertThat(MUtils.readDigestFromFileItem((StorageFileItem) snapshots.retrieveItem(metadataSHA1)),
+        is("18da84408c713e55a3c55dc34a1ccff78086fd46"));
+    assertThat(MUtils.readDigestFromFileItem((StorageFileItem) snapshots.retrieveItem(metadataMD5)),
+        is("ec91980b1f83604ed72d749eebacea53"));
+
+    task.setModifiedSinceDate("2015-01-01");
 
     nexusScheduler.submit("testAffectedSubTree", task).get();
 
