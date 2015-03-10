@@ -89,9 +89,8 @@ public abstract class EntityAdapter<T extends Entity>
           type.properties(),
           type.getIndexes()
       );
-
-      this.type = type;
     }
+    this.type = type;
   }
 
   protected abstract void defineType(final OClass type);
