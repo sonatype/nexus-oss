@@ -349,9 +349,9 @@
                 <copy file="${com.google.code.findbugs:jsr305:jar}" todir="${project.build.directory}/assembly/lib"/>
                 <copy file="${org.sonatype.nexus.assemblies:karaf-nexus-branding:jar}" todir="${project.build.directory}/assembly/lib"/>
 
-                <!-- delete some cruft which karaf includes by default -->
                 <delete>
                   <fileset dir="${project.build.directory}/assembly">
+                    <!-- delete some cruft which karaf includes by default -->
                     <include name="**/README"/>
                     <include name="etc/all.policy"/>
                     <include name="etc/distribution.info"/>
@@ -362,6 +362,9 @@
                     <include name="etc/org.apache.karaf.features.repos.cfg"/>
                     <include name="etc/org.apache.karaf.command.acl.*.cfg"/>
                     <include name="etc/jmx.acl.*.cfg"/>
+
+                    <!-- remove xercesImpl -->
+                    <include name="lib/endorsed/xercesImpl*.jar"/>
                   </fileset>
                 </delete>
 
