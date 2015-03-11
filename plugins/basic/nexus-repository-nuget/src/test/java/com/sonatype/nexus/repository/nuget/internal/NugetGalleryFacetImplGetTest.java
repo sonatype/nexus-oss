@@ -17,7 +17,6 @@ import java.io.InputStream;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobRef;
-import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Payload;
@@ -42,7 +41,7 @@ public class NugetGalleryFacetImplGetTest
 {
   @Test
   public void testPayloadMadeFromBlob() throws Exception {
-    final NugetGalleryFacetImpl galleryFacet = spy(new NugetGalleryFacetImpl(mock(ComponentMetadataFactory.class)));
+    final NugetGalleryFacetImpl galleryFacet = spy(new NugetGalleryFacetImpl());
 
     final String contentType = "application/zip";
     final long size = 2000000L;
