@@ -43,25 +43,25 @@ public class MavenMetadataHandler
   public Response handle(final @Nonnull Context context) throws Exception {
     final String action = context.getRequest().getAction();
     final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
-    final Coordinates coordinates = context.getAttributes().require(Coordinates.class);
+    final Path path = context.getAttributes().require(Path.class);
     switch (action) {
       case GET: {
-        final Payload content = mavenFacet.getMetadata(coordinates);
+        final Payload content = mavenFacet.getMetadata(path);
         if (content == null) {
-          return HttpResponses.notFound(coordinates.getPath());
+          return HttpResponses.notFound(path.getPath());
         }
         return HttpResponses.ok(content);
       }
 
       case PUT: {
-        mavenFacet.putMetadata(coordinates, context.getRequest().getPayload());
+        mavenFacet.putMetadata(path, context.getRequest().getPayload());
         return HttpResponses.created();
       }
 
       case DELETE: {
-        final boolean deleted = mavenFacet.deleteMetadata(coordinates);
+        final boolean deleted = mavenFacet.deleteMetadata(path);
         if (!deleted) {
-          return HttpResponses.notFound(coordinates.getPath());
+          return HttpResponses.notFound(path.getPath());
         }
         return HttpResponses.noContent();
       }

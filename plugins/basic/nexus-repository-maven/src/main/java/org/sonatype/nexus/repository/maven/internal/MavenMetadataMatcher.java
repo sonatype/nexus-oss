@@ -17,7 +17,7 @@ import org.sonatype.nexus.repository.view.Matcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
- * Matcher that matches for Maven repository metadata only, and sets {@link Coordinates} in context attributes.
+ * Matcher that matches for Maven repository metadata only, and sets {@link Path} in context attributes.
  *
  * @since 3.0
  */
@@ -30,9 +30,9 @@ public class MavenMetadataMatcher
   @Override
   public boolean matches(final Context context) {
     final String path = context.getRequest().getPath();
-    final Coordinates coordinates = new Coordinates(path);
-    if (coordinates.main().getFileName().equals(MAVEN_METADATA_FILENAME)) {
-      context.getAttributes().set(Coordinates.class, coordinates);
+    final Path repositoryPath = new Path(path);
+    if (repositoryPath.main().getFileName().equals(MAVEN_METADATA_FILENAME)) {
+      context.getAttributes().set(Path.class, repositoryPath);
       return true;
     }
     return false;

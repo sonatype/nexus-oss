@@ -32,22 +32,19 @@ public interface MavenFacet
     extends Facet
 {
   @Nonnull
-  ArtifactCoordinatesParser getArtifactCoordinatesParser();
-
-  @Nonnull
   VersionPolicy getVersionPolicy();
 
   @Nullable
-  Payload getArtifact(ArtifactCoordinates coordinates) throws IOException;
+  Payload getArtifact(ArtifactPath coordinates) throws IOException;
 
-  void putArtifact(ArtifactCoordinates coordinates, Payload content) throws IOException, InvalidContentException;
+  void putArtifact(ArtifactPath coordinates, Payload content) throws IOException, InvalidContentException;
 
-  boolean deleteArtifact(ArtifactCoordinates coordinates) throws IOException;
+  boolean deleteArtifact(ArtifactPath coordinates) throws IOException;
 
   @Nullable
-  Payload getMetadata(Coordinates coordinates) throws IOException;
+  Payload getMetadata(Path path) throws IOException;
 
-  void putMetadata(Coordinates coordinates, Payload content) throws IOException, InvalidContentException;
+  void putMetadata(Path path, Payload content) throws IOException, InvalidContentException;
 
-  boolean deleteMetadata(Coordinates coordinates) throws IOException;
+  boolean deleteMetadata(Path path) throws IOException;
 }

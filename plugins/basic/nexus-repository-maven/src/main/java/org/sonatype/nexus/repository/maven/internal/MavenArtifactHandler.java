@@ -44,10 +44,10 @@ public class MavenArtifactHandler
   public Response handle(final @Nonnull Context context) throws Exception {
     final String action = context.getRequest().getAction();
     final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
-    final ArtifactCoordinates coordinates = context.getAttributes().require(ArtifactCoordinates.class);
+    final ArtifactPath coordinates = context.getAttributes().require(ArtifactPath.class);
 
     final VersionPolicy versionPolicy = context.getRepository().facet(MavenFacet.class).getVersionPolicy();
-    if (!versionPolicy.allowsCoordinates(coordinates)) {
+    if (!allowsArtifactRepositoryPath(versionPolicy, coordinates)) {
       return HttpResponses.badRequest(
           "Repository version policy '" + versionPolicy + "' does not allow version '" +
               coordinates.getVersion() + "'");
@@ -77,5 +77,15 @@ public class MavenArtifactHandler
       default:
         return HttpResponses.methodNotAllowed(context.getRequest().getAction(), GET, PUT, DELETE);
     }
+  }
+
+  private boolean allowsArtifactRepositoryPath(final VersionPolicy versionPolicy, final ArtifactPath path) {
+    if (versionPolicy == VersionPolicy.SNAPSHOT) {
+      return path.isSnapshot();
+    }
+    if (versionPolicy == VersionPolicy.RELEASE) {
+      return !path.isSnapshot();
+    }
+    return true;
   }
 }

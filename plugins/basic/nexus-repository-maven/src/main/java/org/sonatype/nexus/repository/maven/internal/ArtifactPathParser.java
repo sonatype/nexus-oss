@@ -15,15 +15,15 @@ package org.sonatype.nexus.repository.maven.internal;
 import javax.annotation.Nullable;
 
 /**
- * Component responsible for parsing request paths into artifact coordinates.
+ * Component responsible for parsing request paths into {@link ArtifactPath}.
  *
  * @since 3.0
  */
-public interface ArtifactCoordinatesParser
+public interface ArtifactPathParser
 {
   /**
-   * Parses path into {@link ArtifactCoordinates} if possible, otherwise returns {@code null}.
+   * Parses path into {@link ArtifactPath} if possible, otherwise returns {@code null}.
    */
   @Nullable
-  ArtifactCoordinates parsePath(String path);
+  ArtifactPath parsePath(String path);
 }

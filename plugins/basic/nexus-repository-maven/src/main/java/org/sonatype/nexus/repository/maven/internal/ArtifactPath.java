@@ -20,15 +20,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Maven repository artifact coordinates. Every artifact in repository have Maven Coordinates, may have hashes and
+ * Maven repository artifact path, a path that conforms Maven repository layout and can be "reverse engineered" into
+ * artifact GAV coordinates. Every artifact in repository have Maven GAV, may have hashes or
  * signatures.
  *
- * @see Coordinates
+ * @see Path
  * @since 3.0
  */
 @Immutable
-public class ArtifactCoordinates
-    extends Coordinates
+public class ArtifactPath
+    extends Path
 {
   public static enum SignatureType
   {
@@ -61,15 +62,15 @@ public class ArtifactCoordinates
 
   private final SignatureType signatureType;
 
-  public ArtifactCoordinates(final String path,
-                             final boolean snapshot,
-                             final String groupId,
-                             final String artifactId,
-                             final String version,
-                             final String baseVersion,
-                             final @Nullable String classifier,
-                             final String extension,
-                             final @Nullable SignatureType signatureType)
+  public ArtifactPath(final String path,
+                      final boolean snapshot,
+                      final String groupId,
+                      final String artifactId,
+                      final String version,
+                      final String baseVersion,
+                      final @Nullable String classifier,
+                      final String extension,
+                      final @Nullable SignatureType signatureType)
   {
     super(path);
     this.snapshot = snapshot;
@@ -122,7 +123,7 @@ public class ArtifactCoordinates
   }
 
   /**
-   * Returns {@code true} if this coordinate is subordinate of another coordinate.
+   * Returns {@code true} if this path is subordinate of another path.
    *
    * @see {@link #subordinateOf()}
    */
@@ -132,28 +133,28 @@ public class ArtifactCoordinates
   }
 
   /**
-   * Returns {@code true} if this coordinate represents a signature.
+   * Returns {@code true} if this path represents a signature.
    */
   public boolean isSignature() {
     return signatureType != null;
   }
 
   /**
-   * Returns the "main" non-subordinate coordinate of this coordinate. The "main" coordinate is not a hash, nor a
+   * Returns the "main" non-subordinate path of this path. The "main" path is not a hash, nor a
    * signature, nor a hash of a signature.
    */
   @Override
-  public ArtifactCoordinates main() {
-    return (ArtifactCoordinates) super.main();
+  public ArtifactPath main() {
+    return (ArtifactPath) super.main();
   }
 
   /**
-   * Returns the "parent" coordinate, that this coordinate is subordinate of, or {@code null}.
+   * Returns the "parent" path, that this path is subordinate of, or {@code null}.
    */
-  public ArtifactCoordinates subordinateOf() {
+  public ArtifactPath subordinateOf() {
     if (isHash()) {
       int hashSuffixLen = hashType.getExt().length() + 1; // the dot
-      return new ArtifactCoordinates(
+      return new ArtifactPath(
           path.substring(0, path.length() - hashSuffixLen),
           snapshot,
           groupId,
@@ -167,7 +168,7 @@ public class ArtifactCoordinates
     }
     else if (isSignature()) {
       int signatureSuffixLen = signatureType.getExt().length() + 1; // the dot
-      return new ArtifactCoordinates(
+      return new ArtifactPath(
           path.substring(0, path.length() - signatureSuffixLen),
           snapshot,
           groupId,
@@ -183,13 +184,13 @@ public class ArtifactCoordinates
   }
 
   /**
-   * Returns coordinates of passed in hash type that is subordinate of this coordinate. This coordinate cannot be hash.
+   * Returns path of passed in hash type that is subordinate of this path. This path cannot be hash.
    */
   @Override
-  public ArtifactCoordinates hash(final HashType hashType) {
+  public ArtifactPath hash(final HashType hashType) {
     checkNotNull(hashType);
-    checkArgument(!isHash(), "This coordinate is already a hash: " + this);
-    return new ArtifactCoordinates(
+    checkArgument(!isHash(), "This path is already a hash: " + this);
+    return new ArtifactPath(
         path + "." + hashType.getExt(),
         snapshot,
         groupId,
@@ -203,14 +204,14 @@ public class ArtifactCoordinates
   }
 
   /**
-   * Returns coordinates of passed in signature type that is subordinate of this coordinate. This coordinate cannot be
+   * Returns path of passed in signature type that is subordinate of this path. This path cannot be
    * hash nor signature.
    */
-  public ArtifactCoordinates signature(final SignatureType signatureType) {
+  public ArtifactPath signature(final SignatureType signatureType) {
     checkNotNull(signatureType);
-    checkArgument(!isHash(), "This coordinate is already a hash: " + this);
-    checkArgument(!isSignature(), "This coordinate is already a signature: " + this);
-    return new ArtifactCoordinates(
+    checkArgument(!isHash(), "This path is already a hash: " + this);
+    checkArgument(!isSignature(), "This path is already a signature: " + this);
+    return new ArtifactPath(
         path + "." + signatureType.getExt(),
         snapshot,
         groupId,
@@ -228,14 +229,14 @@ public class ArtifactCoordinates
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ArtifactCoordinates)) {
+    if (!(o instanceof ArtifactPath)) {
       return false;
     }
     if (!super.equals(o)) {
       return false;
     }
 
-    ArtifactCoordinates that = (ArtifactCoordinates) o;
+    ArtifactPath that = (ArtifactPath) o;
 
     if (!artifactId.equals(that.artifactId)) {
       return false;

@@ -12,14 +12,11 @@
  */
 package org.sonatype.nexus.repository.maven.internal.maven2;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.M2GavCalculator;
-import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates;
-import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates.SignatureType;
-import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinatesParser;
+import org.sonatype.nexus.repository.maven.internal.ArtifactPath;
+import org.sonatype.nexus.repository.maven.internal.ArtifactPath.SignatureType;
+import org.sonatype.nexus.repository.maven.internal.ArtifactPathParser;
 
 import com.google.common.base.Strings;
 
@@ -28,10 +25,8 @@ import com.google.common.base.Strings;
  *
  * @since 3.0
  */
-@Singleton
-@Named(Maven2Format.NAME)
-public class Maven2ArtifactCoordinatesParser
-    implements ArtifactCoordinatesParser
+public class Maven2ArtifactPathParser
+    implements ArtifactPathParser
 {
   // TODO: TokenParser not capable to do this (yet)
   // TODO: this is legacy, but here only to make it work
@@ -39,7 +34,7 @@ public class Maven2ArtifactCoordinatesParser
   private final M2GavCalculator m2GavCalculator = new M2GavCalculator();
 
   @Override
-  public ArtifactCoordinates parsePath(final String path) {
+  public ArtifactPath parsePath(final String path) {
     final Gav gav = m2GavCalculator.pathToGav(path);
     if (gav == null) {
       return null;
@@ -63,7 +58,7 @@ public class Maven2ArtifactCoordinatesParser
         }
       }
 
-      return new ArtifactCoordinates(
+      return new ArtifactPath(
           path,
           gav.isSnapshot(),
           gav.getGroupId(),

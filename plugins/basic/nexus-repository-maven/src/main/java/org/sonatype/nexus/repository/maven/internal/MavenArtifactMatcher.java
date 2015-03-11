@@ -16,8 +16,10 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Matcher that matches for Maven artifacts only, and sets {@link ArtifactCoordinates} in context attributes.
+ * Matcher that matches for Maven artifacts only, and sets {@link ArtifactPath} in context attributes.
  *
  * @since 3.0
  */
@@ -25,13 +27,18 @@ public class MavenArtifactMatcher
     extends ComponentSupport
     implements Matcher
 {
+  private final ArtifactPathParser artifactPathParser;
+
+  public MavenArtifactMatcher(final ArtifactPathParser artifactPathParser) {
+    this.artifactPathParser = checkNotNull(artifactPathParser);
+  }
+
   @Override
   public boolean matches(final Context context) {
     final String path = context.getRequest().getPath();
-    final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
-    final ArtifactCoordinates coordinates = mavenFacet.getArtifactCoordinatesParser().parsePath(path);
+    final ArtifactPath coordinates = artifactPathParser.parsePath(path);
     if (coordinates != null) {
-      context.getAttributes().set(ArtifactCoordinates.class, coordinates);
+      context.getAttributes().set(ArtifactPath.class, coordinates);
       return true;
     }
     return false;

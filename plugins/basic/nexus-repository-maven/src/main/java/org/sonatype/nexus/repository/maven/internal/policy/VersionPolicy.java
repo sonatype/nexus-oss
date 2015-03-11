@@ -12,91 +12,16 @@
  */
 package org.sonatype.nexus.repository.maven.internal.policy;
 
-import java.util.Locale;
-
-import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Repository version policy.
  *
  * @since 3.0
  */
-public class VersionPolicy
+public enum VersionPolicy
 {
-  private static final String V_RELEASE = "release";
+  RELEASE,
 
-  private static final String V_SNAPSHOT = "snapshot";
+  SNAPSHOT,
 
-  private static final String V_MIXED = "mixed";
-
-  public static final VersionPolicy RELEASE = new VersionPolicy(V_RELEASE);
-
-  public static final VersionPolicy SNAPSHOT = new VersionPolicy(V_SNAPSHOT);
-
-  public static final VersionPolicy MIXED = new VersionPolicy(V_MIXED);
-
-  public static VersionPolicy valueOf(final String value) {
-    checkNotNull(value);
-    switch (value.toLowerCase(Locale.US)) {
-      case V_RELEASE: {
-        return RELEASE;
-      }
-      case V_SNAPSHOT: {
-        return SNAPSHOT;
-      }
-      case V_MIXED: {
-        return MIXED;
-      }
-      default:
-        throw new IllegalArgumentException("Unknown version policy: " + value);
-    }
-  }
-
-  private final String value;
-
-  private VersionPolicy(final String value) {
-    this.value = checkNotNull(value);
-  }
-
-  public boolean allowsCoordinates(final ArtifactCoordinates coordinates) {
-    checkNotNull(coordinates);
-    if (this.equals(SNAPSHOT)) {
-      return coordinates.isSnapshot();
-    }
-    if (this.equals(RELEASE)) {
-      return !coordinates.isSnapshot();
-    }
-    return true;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    VersionPolicy policy = (VersionPolicy) o;
-    if (!value.equals(policy.value)) {
-      return false;
-    }
-    return true;
-  }
-
-  @Override
-  public int hashCode() {
-    return value.hashCode();
-  }
-
-  @Override
-  public String toString() {
-    return value;
-  }
+  MIXED // TODO: do we want this one?
 }

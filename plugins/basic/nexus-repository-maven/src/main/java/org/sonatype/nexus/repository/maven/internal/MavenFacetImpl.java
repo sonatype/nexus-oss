@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
@@ -32,10 +31,7 @@ import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
-import org.sonatype.nexus.repository.maven.internal.ArtifactCoordinates;
-import org.sonatype.nexus.repository.maven.internal.Coordinates;
-import org.sonatype.nexus.repository.maven.internal.Coordinates.HashType;
-import org.sonatype.nexus.repository.maven.internal.MavenChecksumReader;
+import org.sonatype.nexus.repository.maven.internal.Path.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
@@ -114,22 +110,17 @@ public class MavenFacetImpl
 
   private final MimeSupport mimeSupport;
 
-  private final Map<String, ArtifactCoordinatesParser> artifactCoordinatesParsers;
-
   public static final String CONFIG_KEY = "maven";
 
   // ==
-
-  private ArtifactCoordinatesParser artifactCoordinatesParser;
 
   private VersionPolicy versionPolicy;
 
   private boolean strictContentTypeValidation = false;
 
   @Inject
-  public MavenFacetImpl(final MimeSupport mimeSupport, final Map<String, ArtifactCoordinatesParser> artifactCoordinatesParsers) {
+  public MavenFacetImpl(final MimeSupport mimeSupport) {
     this.mimeSupport = checkNotNull(mimeSupport);
-    this.artifactCoordinatesParsers = checkNotNull(artifactCoordinatesParsers);
   }
 
   @Override
@@ -139,17 +130,6 @@ public class MavenFacetImpl
     this.versionPolicy = VersionPolicy.valueOf(
         attributes.require("versionPolicy", String.class)
     );
-    this.artifactCoordinatesParser = checkNotNull(
-        artifactCoordinatesParsers.get(getRepository().getFormat().getValue()),
-        "No ArtifactCoordinatesParser for format %s",
-        getRepository().getFormat().getValue()
-    );
-  }
-
-  @Nonnull
-  @Override
-  public ArtifactCoordinatesParser getArtifactCoordinatesParser() {
-    return artifactCoordinatesParser;
   }
 
   @Override
@@ -159,7 +139,7 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
-  public Payload getArtifact(final ArtifactCoordinates coordinates) throws IOException {
+  public Payload getArtifact(final ArtifactPath coordinates) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex component = findArtifactComponent(tx, getComponentKey(coordinates), tx.getBucket());
       if (component == null) {
@@ -187,7 +167,7 @@ public class MavenFacetImpl
   }
 
   @Override
-  public void putArtifact(final ArtifactCoordinates coordinates, final Payload content)
+  public void putArtifact(final ArtifactPath coordinates, final Payload content)
       throws IOException, InvalidContentException
   {
     if (coordinates.isHash()) {
@@ -250,7 +230,7 @@ public class MavenFacetImpl
     }
   }
 
-  private void putArtifactHash(final ArtifactCoordinates coordinates, final Payload content)
+  private void putArtifactHash(final ArtifactPath coordinates, final Payload content)
       throws IOException, InvalidContentException
   {
     try (StorageTx tx = getStorage().openTx()) {
@@ -273,7 +253,7 @@ public class MavenFacetImpl
   }
 
   @Override
-  public boolean deleteArtifact(final ArtifactCoordinates coordinates) throws IOException {
+  public boolean deleteArtifact(final ArtifactPath coordinates) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex component = findArtifactComponent(tx, getComponentKey(coordinates), tx.getBucket());
       if (component == null) {
@@ -296,14 +276,14 @@ public class MavenFacetImpl
     }
   }
 
-  private String getComponentKey(final ArtifactCoordinates coordinates) {
+  private String getComponentKey(final ArtifactPath coordinates) {
     // TODO: maybe sha1() the resulting string?
     return coordinates.getGroupId()
         + ":" + coordinates.getArtifactId()
         + ":" + coordinates.getBaseVersion();
   }
 
-  private String getAssetKey(final ArtifactCoordinates coordinates) {
+  private String getAssetKey(final ArtifactPath coordinates) {
     // TODO: maybe sha1() the resulting string?
     if (Strings.isNullOrEmpty(coordinates.getClassifier())) {
       return coordinates.getGroupId()
@@ -369,22 +349,23 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
-  public Payload getMetadata(final Coordinates coordinates) {
+  public Payload getMetadata(final Path path) {
     try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(coordinates), tx.getBucket());
+      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(path), tx.getBucket());
       if (asset == null) {
         return null;
       }
 
-      if (coordinates.getHashType() == null) {
-        final BlobRef blobRef = getBlobRef(coordinates, asset);
+      if (path.getHashType() == null) {
+        final BlobRef blobRef = getBlobRef(path, asset);
         final Blob blob = tx.getBlob(blobRef);
-        checkState(blob != null, "asset of component with at path %s refers to missing blob %s", coordinates.getPath(),
+        checkState(blob != null, "asset of component with at path %s refers to missing blob %s",
+            path.getPath(),
             blobRef);
         return marshall(asset, blob);
       }
       else {
-        final String extHash = getExtHashCode(tx, asset, coordinates.getHashType());
+        final String extHash = getExtHashCode(tx, asset, path.getHashType());
         if (extHash == null) {
           return null; // unknown external hash
         }
@@ -394,35 +375,35 @@ public class MavenFacetImpl
   }
 
   @Override
-  public void putMetadata(final Coordinates coordinates, final Payload content)
+  public void putMetadata(final Path path, final Payload content)
       throws IOException, InvalidContentException
   {
-    if (coordinates.isHash()) {
-      putMetadataHash(coordinates, content);
+    if (path.isHash()) {
+      putMetadataHash(path, content);
     }
     try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(coordinates), tx.getBucket());
+      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(path), tx.getBucket());
       if (asset == null) {
         asset = tx.createAsset(tx.getBucket());
 
         asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
-        asset.setProperty(StorageFacet.P_NAME, coordinates.getFileName());
-        asset.setProperty(StorageFacet.P_PATH, coordinates.getPath());
+        asset.setProperty(StorageFacet.P_NAME, path.getFileName());
+        asset.setProperty(StorageFacet.P_PATH, path.getPath());
 
-        getFormatAttributes(tx, asset).set(StorageFacet.P_NAME, coordinates.getFileName());
-        getFormatAttributes(tx, asset).set(StorageFacet.P_PATH, coordinates.getPath());
+        getFormatAttributes(tx, asset).set(StorageFacet.P_NAME, path.getFileName());
+        getFormatAttributes(tx, asset).set(StorageFacet.P_PATH, path.getPath());
       }
 
       // TODO: Figure out created-by header
       final ImmutableMap<String, String> headers = ImmutableMap.of(
-          BlobStore.BLOB_NAME_HEADER, coordinates.getPath(),
+          BlobStore.BLOB_NAME_HEADER, path.getPath(),
           BlobStore.CREATED_BY_HEADER, "unknown"
       );
 
       try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
         try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
           tx.setBlob(is1, headers, asset, hashAlgorithms,
-              determineContentType(coordinates, is2, content.getContentType()));
+              determineContentType(path, is2, content.getContentType()));
         }
       }
 
@@ -431,39 +412,39 @@ public class MavenFacetImpl
     }
   }
 
-  private void putMetadataHash(final Coordinates coordinates, final Payload content)
+  private void putMetadataHash(final Path path, final Payload content)
       throws IOException, InvalidContentException
   {
     try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(coordinates), tx.getBucket());
+      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(path), tx.getBucket());
       if (asset == null) {
-        throw new InvalidContentException("No asset for hash: " + coordinates.getPath());
+        throw new InvalidContentException("No asset for hash: " + path.getPath());
       }
 
-      setAssetHashCode(tx, asset, coordinates, content);
+      setAssetHashCode(tx, asset, path, content);
 
       tx.commit();
     }
   }
 
   @Override
-  public boolean deleteMetadata(final Coordinates coordinates) throws IOException {
+  public boolean deleteMetadata(final Path path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(coordinates), tx.getBucket());
+      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(path), tx.getBucket());
       if (asset == null) {
         return false;
       }
 
-      tx.deleteBlob(getBlobRef(coordinates, asset));
+      tx.deleteBlob(getBlobRef(path, asset));
       tx.deleteVertex(asset);
       tx.commit();
       return true;
     }
   }
 
-  private String getMetadataKey(final Coordinates coordinates) {
+  private String getMetadataKey(final Path path) {
     // TODO: maybe sha1() the resulting string?
-    return coordinates.getPath();
+    return path.getPath();
   }
 
   /**
@@ -471,7 +452,7 @@ public class MavenFacetImpl
    * compares the two, throws if not. Finally, if all ok, stores the supplied hash in format specific attributes of the
    * asset, see {@link #putExtHashCode(StorageTx, OrientVertex, HashType, String)}.
    */
-  private void setAssetHashCode(final StorageTx tx, final OrientVertex asset, final Coordinates coordinates,
+  private void setAssetHashCode(final StorageTx tx, final OrientVertex asset, final Path path,
                                 final Payload content)
       throws IOException, InvalidContentException
   {
@@ -480,20 +461,20 @@ public class MavenFacetImpl
     final String artifactHash = MavenChecksumReader.readChecksum(content);
     if (artifactHash == null) {
       // we could not interpret the payload
-      throw new InvalidContentException("Unrecognized checksum for path: " + coordinates.getPath());
+      throw new InvalidContentException("Unrecognized checksum for path: " + path.getPath());
     }
     final String existingHash = tx.getAttributes(asset).child(StorageFacet.P_CHECKSUM)
-        .get(coordinates.getHashType().getHashAlgorithm().name(), String.class);
+        .get(path.getHashType().getHashAlgorithm().name(), String.class);
     checkArgument(existingHash != null);
 
     if (!Objects.equals(artifactHash, existingHash)) {
       tx.rollback();
       throw new InvalidContentException(
-          "Invalid hash for " + coordinates.getPath() + ": expected '" + existingHash + "' got '" + artifactHash +
+          "Invalid hash for " + path.getPath() + ": expected '" + existingHash + "' got '" + artifactHash +
               "'");
     }
 
-    putExtHashCode(tx, asset, coordinates.getHashType(), artifactHash);
+    putExtHashCode(tx, asset, path.getHashType(), artifactHash);
   }
 
   /**
@@ -516,7 +497,7 @@ public class MavenFacetImpl
   @Nullable
   private String getExtHashCode(final StorageTx tx,
                                 final OrientVertex vertex,
-                                final Coordinates.HashType hashType)
+                                final Path.HashType hashType)
   {
     final NestedAttributesMap hashes = getFormatAttributes(tx, vertex).child(P_EXT_CHECKSUM);
     final String hashCodeString = hashes.get(hashType.getHashAlgorithm().name(), String.class);
@@ -528,7 +509,7 @@ public class MavenFacetImpl
 
   private void putExtHashCode(final StorageTx tx,
                               final OrientVertex vertex,
-                              final Coordinates.HashType hashType,
+                              final Path.HashType hashType,
                               final String hashCode)
   {
     final NestedAttributesMap hashes = getFormatAttributes(tx, vertex).child(P_EXT_CHECKSUM);
@@ -539,7 +520,7 @@ public class MavenFacetImpl
    * Determines or confirms the content type for the content, or throws {@link InvalidContentException} if it cannot.
    */
   @Nonnull
-  private String determineContentType(final Coordinates coordinates,
+  private String determineContentType(final Path path,
                                       final InputStream is,
                                       final String declaredContentType)
       throws IOException
@@ -547,8 +528,8 @@ public class MavenFacetImpl
     String contentType = declaredContentType;
 
     if (contentType == null) {
-      log.trace("Content PUT to {} has no content type.", coordinates);
-      contentType = mimeSupport.detectMimeType(is, coordinates.getPath());
+      log.trace("Content PUT to {} has no content type.", path);
+      contentType = mimeSupport.detectMimeType(is, path.getPath());
       log.trace("Mime support implies content type {}", contentType);
 
       if (contentType == null && strictContentTypeValidation) {
@@ -556,7 +537,7 @@ public class MavenFacetImpl
       }
     }
     else {
-      final List<String> types = mimeSupport.detectMimeTypes(is, coordinates.getPath());
+      final List<String> types = mimeSupport.detectMimeTypes(is, path.getPath());
       if (!types.isEmpty() && !types.contains(contentType)) {
         log.debug("Discovered content type {} ", types.get(0));
         if (strictContentTypeValidation) {
@@ -575,9 +556,10 @@ public class MavenFacetImpl
   /**
    * Creates a content out of a Blob, for content originating from Blobs.
    */
-  private BlobRef getBlobRef(final Coordinates coordinates, final OrientVertex asset) {
+  private BlobRef getBlobRef(final Path path, final OrientVertex asset) {
     String blobRefStr = asset.getProperty(StorageFacet.P_BLOB_REF);
-    checkState(blobRefStr != null, "asset of component at path %s has missing blob reference", coordinates.getPath());
+    checkState(blobRefStr != null, "asset of component at path %s has missing blob reference",
+        path.getPath());
     return BlobRef.parse(blobRefStr);
   }
 

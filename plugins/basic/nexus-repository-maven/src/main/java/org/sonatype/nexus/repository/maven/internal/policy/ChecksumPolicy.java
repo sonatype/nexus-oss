@@ -12,85 +12,18 @@
  */
 package org.sonatype.nexus.repository.maven.internal.policy;
 
-import java.util.Locale;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Maven proxy checksum policy for Maven artifacts, enforcing them during transport or not.
  *
  * @since 3.0
  */
-public class ChecksumPolicy
+public enum ChecksumPolicy
 {
-  private static final String V_IGNORE = "ignore";
+  IGNORE,
 
-  private static final String V_WARN = "warn";
+  WARN,
 
-  private static final String V_STRICT_IF_EXISTS = "strictIfExists";
+  STRICT_IF_EXISTS,
 
-  private static final String V_STRICT = "strict";
-
-  public static final ChecksumPolicy IGNORE = new ChecksumPolicy(V_IGNORE);
-
-  public static final ChecksumPolicy WARN = new ChecksumPolicy(V_WARN);
-
-  public static final ChecksumPolicy STRICT_IF_EXISTS = new ChecksumPolicy(V_STRICT_IF_EXISTS);
-
-  public static final ChecksumPolicy STRICT = new ChecksumPolicy(V_STRICT);
-
-  public static ChecksumPolicy valueOf(final String value) {
-    checkNotNull(value);
-    switch (value.toLowerCase(Locale.US)) {
-      case V_IGNORE: {
-        return IGNORE;
-      }
-      case V_WARN: {
-        return WARN;
-      }
-      case V_STRICT_IF_EXISTS: {
-        return STRICT_IF_EXISTS;
-      }
-      case V_STRICT: {
-        return STRICT;
-      }
-      default:
-        throw new IllegalArgumentException("Unknown checksum policy: " + value);
-    }
-  }
-
-  private final String value;
-
-  private ChecksumPolicy(final String value) {
-    this.value = checkNotNull(value);
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    ChecksumPolicy policy = (ChecksumPolicy) o;
-    if (!value.equals(policy.value)) {
-      return false;
-    }
-    return true;
-  }
-
-  @Override
-  public int hashCode() {
-    return value.hashCode();
-  }
-
-  @Override
-  public String toString() {
-    return value;
-  }
+  STRICT
 }

@@ -22,14 +22,14 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Maven non-artifact repository coordinates. Every item in repository may have hashes, stored on paths with proper
+ * Maven non-artifact repository path. Every item in repository may have hashes, stored on paths with proper
  * suffixes.
  *
- * @see ArtifactCoordinates
+ * @see ArtifactPath
  * @since 3.0
  */
 @Immutable
-public class Coordinates
+public class Path
 {
   public static enum HashType
   {
@@ -61,7 +61,7 @@ public class Coordinates
 
   protected final HashType hashType;
 
-  public Coordinates(final String path)
+  public Path(final String path)
   {
     this.path = checkNotNull(path);
     this.fileName = this.path.substring(path.lastIndexOf('/') + 1);
@@ -91,7 +91,7 @@ public class Coordinates
   }
 
   /**
-   * Returns {@code true} if this coordinate is subordinate of another coordinate.
+   * Returns {@code true} if this path is subordinate of another path.
    *
    * @see {@link #subordinateOf()}
    */
@@ -100,30 +100,30 @@ public class Coordinates
   }
 
   /**
-   * Returns {@code true} if this coordinate represents a hash.
+   * Returns {@code true} if this path represents a hash.
    */
   public boolean isHash() {
     return hashType != null;
   }
 
   /**
-   * Returns the "main", non-subordinate coordinate of this coordinate. The "main" coordinate is not a hash.
+   * Returns the "main", non-subordinate path of this path. The "main" path is never a hash.
    */
-  public Coordinates main() {
-    Coordinates coordinates = this;
-    while (coordinates.isSubordinate()) {
-      coordinates = coordinates.subordinateOf();
+  public Path main() {
+    Path path = this;
+    while (path.isSubordinate()) {
+      path = path.subordinateOf();
     }
-    return coordinates;
+    return path;
   }
 
   /**
-   * Returns the "parent" coordinate, that this coordinate is subordinate of, or {@code null}.
+   * Returns the "parent" path, that this path is subordinate of, or {@code null}.
    */
-  public Coordinates subordinateOf() {
+  public Path subordinateOf() {
     if (isHash()) {
       int hashSuffixLen = hashType.getExt().length() + 1; // the dot
-      return new Coordinates(
+      return new Path(
           path.substring(0, path.length() - hashSuffixLen)
       );
     }
@@ -131,12 +131,12 @@ public class Coordinates
   }
 
   /**
-   * Returns coordinates of passed in hash type that is subordinate of this coordinate. This coordinate cannot be hash.
+   * Returns path of passed in hash type that is subordinate of this path. This path cannot be hash.
    */
-  public Coordinates hash(final HashType hashType) {
+  public Path hash(final HashType hashType) {
     checkNotNull(hashType);
-    checkArgument(!isHash(), "This coordinate is already a hash: " + this);
-    return new Coordinates(
+    checkArgument(!isHash(), "This path is already a hash: " + this);
+    return new Path(
         path + "." + hashType.getExt()
     );
   }
@@ -146,11 +146,11 @@ public class Coordinates
     if (this == o) {
       return true;
     }
-    if (!(o instanceof Coordinates)) {
+    if (!(o instanceof Path)) {
       return false;
     }
 
-    Coordinates that = (Coordinates) o;
+    Path that = (Path) o;
 
     if (!fileName.equals(that.fileName)) {
       return false;

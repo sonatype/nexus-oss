@@ -44,20 +44,20 @@ public class MavenProxyFacet
     super.doConfigure();
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     checksumPolicy = ChecksumPolicy.valueOf(
-        attributes.get("checksumPolicy", String.class, ChecksumPolicy.WARN.getValue())
+        attributes.get("checksumPolicy", String.class, ChecksumPolicy.WARN.name())
     );
   }
 
   @Override
   protected Payload getCachedPayload(final Context context) throws IOException {
     final MavenFacet contentsFacet = getRepository().facet(MavenFacet.class);
-    if (context.getAttributes().contains(ArtifactCoordinates.class)) {
-      final ArtifactCoordinates coordinates = context.getAttributes().require(ArtifactCoordinates.class);
+    if (context.getAttributes().contains(ArtifactPath.class)) {
+      final ArtifactPath coordinates = context.getAttributes().require(ArtifactPath.class);
       return contentsFacet.getArtifact(coordinates);
     }
-    else if (context.getAttributes().contains(Coordinates.class)) {
-      final Coordinates coordinates = context.getAttributes().require(Coordinates.class);
-      return contentsFacet.getMetadata(coordinates);
+    else if (context.getAttributes().contains(Path.class)) {
+      final Path path = context.getAttributes().require(Path.class);
+      return contentsFacet.getMetadata(path);
     }
     return null;
   }
@@ -65,13 +65,13 @@ public class MavenProxyFacet
   @Override
   protected void store(final Context context, final Payload payload) throws IOException, InvalidContentException {
     final MavenFacet contentsFacet = getRepository().facet(MavenFacet.class);
-    if (context.getAttributes().contains(ArtifactCoordinates.class)) {
-      final ArtifactCoordinates coordinates = context.getAttributes().require(ArtifactCoordinates.class);
+    if (context.getAttributes().contains(ArtifactPath.class)) {
+      final ArtifactPath coordinates = context.getAttributes().require(ArtifactPath.class);
       contentsFacet.putArtifact(coordinates, payload);
     }
-    else if (context.getAttributes().contains(Coordinates.class)) {
-      final Coordinates coordinates = context.getAttributes().require(Coordinates.class);
-      contentsFacet.putMetadata(coordinates, payload);
+    else if (context.getAttributes().contains(Path.class)) {
+      final Path path = context.getAttributes().require(Path.class);
+      contentsFacet.putMetadata(path, payload);
     }
   }
 

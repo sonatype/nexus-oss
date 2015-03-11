@@ -98,7 +98,7 @@ class Maven2HostedRecipe
     Router.Builder builder = new Router.Builder()
 
     builder.route(new Route.Builder()
-        .matcher(new MavenArtifactMatcher())
+        .matcher(new MavenArtifactMatcher(new Maven2ArtifactPathParser()))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(mavenArtifactHandler)
