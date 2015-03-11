@@ -562,9 +562,6 @@ public class MavenFacetImpl
     return getRepository().facet(StorageFacet.class);
   }
 
-  /**
-   * Creates a content out of a Blob, for content originating from Blobs.
-   */
   private BlobRef getBlobRef(final Path path, final OrientVertex asset) {
     String blobRefStr = asset.getProperty(StorageFacet.P_BLOB_REF);
     checkState(blobRefStr != null, "asset of component at path %s has missing blob reference",
@@ -572,6 +569,9 @@ public class MavenFacetImpl
     return BlobRef.parse(blobRefStr);
   }
 
+  /**
+   * Creates a payload out of a Blob, for content originating from Blobs.
+   */
   private Payload marshall(final OrientVertex asset, final Blob blob) {
     final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
     return new BlobPayload(blob, contentType);
