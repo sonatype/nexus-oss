@@ -36,9 +36,9 @@ public class MavenArtifactMatcher
   @Override
   public boolean matches(final Context context) {
     final String path = context.getRequest().getPath();
-    final ArtifactPath coordinates = artifactPathParser.parsePath(path);
-    if (coordinates != null) {
-      context.getAttributes().set(ArtifactPath.class, coordinates);
+    final ArtifactPath artifactPath = artifactPathParser.parsePath(path);
+    if (artifactPath != null) {
+      context.getAttributes().set(ArtifactPath.class, artifactPath);
       return true;
     }
     return false;

@@ -35,11 +35,11 @@ public interface MavenFacet
   VersionPolicy getVersionPolicy();
 
   @Nullable
-  Payload getArtifact(ArtifactPath coordinates) throws IOException;
+  Payload getArtifact(ArtifactPath path) throws IOException;
 
-  void putArtifact(ArtifactPath coordinates, Payload content) throws IOException, InvalidContentException;
+  void putArtifact(ArtifactPath path, Payload content) throws IOException, InvalidContentException;
 
-  boolean deleteArtifact(ArtifactPath coordinates) throws IOException;
+  boolean deleteArtifact(ArtifactPath path) throws IOException;
 
   @Nullable
   Payload getMetadata(Path path) throws IOException;

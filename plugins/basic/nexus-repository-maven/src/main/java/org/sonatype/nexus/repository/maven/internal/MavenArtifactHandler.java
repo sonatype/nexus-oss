@@ -44,31 +44,31 @@ public class MavenArtifactHandler
   public Response handle(final @Nonnull Context context) throws Exception {
     final String action = context.getRequest().getAction();
     final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
-    final ArtifactPath coordinates = context.getAttributes().require(ArtifactPath.class);
+    final ArtifactPath artifactPath = context.getAttributes().require(ArtifactPath.class);
 
     final VersionPolicy versionPolicy = context.getRepository().facet(MavenFacet.class).getVersionPolicy();
-    if (!allowsArtifactRepositoryPath(versionPolicy, coordinates)) {
+    if (!allowsArtifactRepositoryPath(versionPolicy, artifactPath)) {
       return HttpResponses.badRequest(
-          "Repository version policy: " + versionPolicy + " does not allow version: " + coordinates.getVersion());
+          "Repository version policy: " + versionPolicy + " does not allow version: " + artifactPath.getVersion());
     }
     switch (action) {
       case GET: {
-        final Payload content = mavenFacet.getArtifact(coordinates);
+        final Payload content = mavenFacet.getArtifact(artifactPath);
         if (content == null) {
-          return HttpResponses.notFound(coordinates.getPath());
+          return HttpResponses.notFound(artifactPath.getPath());
         }
         return HttpResponses.ok(content);
       }
 
       case PUT: {
-        mavenFacet.putArtifact(coordinates, context.getRequest().getPayload());
+        mavenFacet.putArtifact(artifactPath, context.getRequest().getPayload());
         return HttpResponses.created();
       }
 
       case DELETE: {
-        final boolean deleted = mavenFacet.deleteArtifact(coordinates);
+        final boolean deleted = mavenFacet.deleteArtifact(artifactPath);
         if (!deleted) {
-          return HttpResponses.notFound(coordinates.getPath());
+          return HttpResponses.notFound(artifactPath.getPath());
         }
         return HttpResponses.noContent();
       }
