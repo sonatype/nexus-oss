@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.internal.blobstore
 
+import org.sonatype.nexus.blobstore.api.BlobStoreFactory
+
 import com.google.common.collect.Lists
 import org.junit.Before
 import org.junit.Rule
@@ -46,13 +48,16 @@ class BlobStoreManagerImplTest
 
   @Mock
   BlobStoreConfigurationStore store
+  
+  @Mock
+  BlobStoreFactory factory
 
   BlobStoreManagerImpl underTest
 
   @Before
   void setup() {
     when(directories.getWorkDirectory(anyString())).thenReturn(temporaryFolder.root)
-    underTest = spy(new BlobStoreManagerImpl(directories, store, factory))
+    underTest = spy(new BlobStoreManagerImpl(directories, store, factory, [:]))
   }
 
   @Test

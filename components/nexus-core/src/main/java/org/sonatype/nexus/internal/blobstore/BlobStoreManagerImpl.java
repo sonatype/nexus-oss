@@ -216,33 +216,11 @@ public class BlobStoreManagerImpl
   BlobStore newBlobStore(final BlobStoreConfiguration blobStoreConfiguration) throws Exception {
     String recipeName = blobStoreConfiguration.getRecipeName();
     Recipe recipe = recipes.get(recipeName);
-    //Recipe recipe = new Recipe()
-    //{
-    //  @Override
-    //  public Type getType() {
-    //    return new FileType();
-    //  }
-    //
-    //  @Override
-    //  public void apply(@Nonnull final BlobStore blobStore) throws Exception {
-    //    Path root = Paths.get(getPath(blobStore.getBlobStoreConfiguration().getAttributes()));
-    //    Path content = root.resolve("content");
-    //    File metadataFile = root.resolve("metadata").toFile();
-    //    content.toFile().mkdirs();
-    //    metadataFile.mkdirs();
-    //    blobStore.attach(new FileBlobStorageFacet(
-    //        content,
-    //        new VolumeChapterLocationStrategy(),
-    //        new SimpleFileOperations(),
-    //        MapdbBlobMetadataStore.create(metadataFile)));
-    //  }
-    //};
     BlobStore blobStore = factory.create(recipe.getType());
     blobStore.init(blobStoreConfiguration);
     recipe.apply(blobStore);
     blobStore.facet(BlobStorageFacet.class);
     return blobStore;
-
   }
 
   @VisibleForTesting
