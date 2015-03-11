@@ -48,7 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Strings.nullToEmpty;
 
 /**
  * Repository view servlet.
@@ -183,7 +182,7 @@ public class ViewServlet
   @VisibleForTesting
   Response describe(final Request request, final Response response, final Exception exception) {
     final Description description = new Description(ImmutableMap.<String, Object>of(
-        "path", nullToEmpty(request.getPath()),
+        "path", request.getPath(),
         "nexusUrl", BaseUrlHolder.get()
     ));
     if (exception != null) {

@@ -26,9 +26,9 @@ import com.google.common.collect.Maps;
  */
 public class Description
 {
-  private Map<String, Object> parameters;
+  final private Map<String, Object> parameters;
 
-  private List<DescriptionItem> items = Lists.newArrayList();
+  final private List<DescriptionItem> items = Lists.newArrayList();
 
   public Description(final Map<String, Object> parameters) {
     this.parameters = parameters;
@@ -67,6 +67,6 @@ public class Description
   }
 
   public List<DescriptionItem> getItems() {
-    return Collections.unmodifiableList(items);
+    return items;
   }
 }
