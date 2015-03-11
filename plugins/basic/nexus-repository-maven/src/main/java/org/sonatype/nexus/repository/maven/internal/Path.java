@@ -109,6 +109,7 @@ public class Path
   /**
    * Returns the "main", non-subordinate path of this path. The "main" path is never a hash.
    */
+  @Nonnull
   public Path main() {
     Path path = this;
     while (path.isSubordinate()) {
@@ -120,6 +121,7 @@ public class Path
   /**
    * Returns the "parent" path, that this path is subordinate of, or {@code null}.
    */
+  @Nullable
   public Path subordinateOf() {
     if (isHash()) {
       int hashSuffixLen = hashType.getExt().length() + 1; // the dot
@@ -133,6 +135,7 @@ public class Path
   /**
    * Returns path of passed in hash type that is subordinate of this path. This path cannot be hash.
    */
+  @Nonnull
   public Path hash(final HashType hashType) {
     checkNotNull(hashType);
     checkArgument(!isHash(), "This path is already a hash: " + this);

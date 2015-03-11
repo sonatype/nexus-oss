@@ -151,6 +151,7 @@ public class ArtifactPath
   /**
    * Returns the "parent" path, that this path is subordinate of, or {@code null}.
    */
+  @Nullable
   public ArtifactPath subordinateOf() {
     if (isHash()) {
       int hashSuffixLen = hashType.getExt().length() + 1; // the dot
@@ -186,6 +187,7 @@ public class ArtifactPath
   /**
    * Returns path of passed in hash type that is subordinate of this path. This path cannot be hash.
    */
+  @Nonnull
   @Override
   public ArtifactPath hash(final HashType hashType) {
     checkNotNull(hashType);
@@ -207,6 +209,7 @@ public class ArtifactPath
    * Returns path of passed in signature type that is subordinate of this path. This path cannot be
    * hash nor signature.
    */
+  @Nonnull
   public ArtifactPath signature(final SignatureType signatureType) {
     checkNotNull(signatureType);
     checkArgument(!isHash(), "This path is already a hash: " + this);
