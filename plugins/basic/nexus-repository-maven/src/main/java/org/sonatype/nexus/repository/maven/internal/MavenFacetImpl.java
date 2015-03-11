@@ -175,63 +175,65 @@ public class MavenFacetImpl
     if (path.isHash()) {
       putArtifactHash(path, content);
     }
-    try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex bucket = tx.getBucket();
-      final String componentKey = getComponentKey(path);
-      OrientVertex component = findArtifactComponent(tx, componentKey, bucket);
-      if (component == null) {
-        component = tx.createComponent(bucket);
+    else {
+      try (StorageTx tx = getStorage().openTx()) {
+        final OrientVertex bucket = tx.getBucket();
+        final String componentKey = getComponentKey(path);
+        OrientVertex component = findArtifactComponent(tx, componentKey, bucket);
+        if (component == null) {
+          component = tx.createComponent(bucket);
 
-        // Set normalized properties: format, group, and name
-        component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue()); // M1 or M2!!!
-        component.setProperty(StorageFacet.P_GROUP, path.getGroupId());
-        component.setProperty(StorageFacet.P_NAME, path.getArtifactId());
-        component.setProperty(StorageFacet.P_VERSION, path.getVersion());
+          // Set normalized properties: format, group, and name
+          component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue()); // M1 or M2!!!
+          component.setProperty(StorageFacet.P_GROUP, path.getGroupId());
+          component.setProperty(StorageFacet.P_NAME, path.getArtifactId());
+          component.setProperty(StorageFacet.P_VERSION, path.getVersion());
 
-        final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
-        componentAttributes.set(P_COMPONENT_KEY, componentKey);
-        componentAttributes.set(P_GROUP_ID, path.getGroupId());
-        componentAttributes.set(P_ARTIFACT_ID, path.getArtifactId());
-        componentAttributes.set(P_VERSION, path.getVersion());
-        // TODO: do we want always to store this? In case of release repo this makes no sense
-        // TODO: store it only if V != bV?
-        componentAttributes.set(P_BASE_VERSION, path.getBaseVersion());
-        componentAttributes.set(P_SNAPSHOT, path.isSnapshot());
-      }
-
-      final String assetKey = getAssetKey(path);
-      OrientVertex asset = selectArtifactAsset(tx, component, assetKey);
-      if (asset == null) {
-        asset = tx.createAsset(bucket);
-        asset.addEdge(StorageFacet.E_PART_OF_COMPONENT, component);
-        final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
-        assetAttributes.set(P_ASSET_KEY, assetKey);
-        assetAttributes.set(P_GROUP_ID, path.getGroupId());
-        assetAttributes.set(P_ARTIFACT_ID, path.getArtifactId());
-        assetAttributes.set(P_VERSION, path.getVersion());
-        if (path.getClassifier() != null) {
-          assetAttributes.set(P_CLASSIFIER, path.getClassifier());
+          final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
+          componentAttributes.set(P_COMPONENT_KEY, componentKey);
+          componentAttributes.set(P_GROUP_ID, path.getGroupId());
+          componentAttributes.set(P_ARTIFACT_ID, path.getArtifactId());
+          componentAttributes.set(P_VERSION, path.getVersion());
+          // TODO: do we want always to store this? In case of release repo this makes no sense
+          // TODO: store it only if V != bV?
+          componentAttributes.set(P_BASE_VERSION, path.getBaseVersion());
+          componentAttributes.set(P_SNAPSHOT, path.isSnapshot());
         }
-        assetAttributes.set(P_EXTENSION, path.getExtension());
-        assetAttributes.set(P_SNAPSHOT, path.isSnapshot());
-      }
 
-      // TODO: Figure out created-by header
-      final ImmutableMap<String, String> headers = ImmutableMap.of(
-          BlobStore.BLOB_NAME_HEADER, path.getPath(),
-          BlobStore.CREATED_BY_HEADER, "unknown"
-      );
-
-      try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
-        try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
-          tx.setBlob(is1, headers, asset, hashAlgorithms,
-              determineContentType(path, is2, content.getContentType()));
+        final String assetKey = getAssetKey(path);
+        OrientVertex asset = selectArtifactAsset(tx, component, assetKey);
+        if (asset == null) {
+          asset = tx.createAsset(bucket);
+          asset.addEdge(StorageFacet.E_PART_OF_COMPONENT, component);
+          final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
+          assetAttributes.set(P_ASSET_KEY, assetKey);
+          assetAttributes.set(P_GROUP_ID, path.getGroupId());
+          assetAttributes.set(P_ARTIFACT_ID, path.getArtifactId());
+          assetAttributes.set(P_VERSION, path.getVersion());
+          if (path.getClassifier() != null) {
+            assetAttributes.set(P_CLASSIFIER, path.getClassifier());
+          }
+          assetAttributes.set(P_EXTENSION, path.getExtension());
+          assetAttributes.set(P_SNAPSHOT, path.isSnapshot());
         }
+
+        // TODO: Figure out created-by header
+        final ImmutableMap<String, String> headers = ImmutableMap.of(
+            BlobStore.BLOB_NAME_HEADER, path.getPath(),
+            BlobStore.CREATED_BY_HEADER, "unknown"
+        );
+
+        try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
+          try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
+            tx.setBlob(is1, headers, asset, hashAlgorithms,
+                determineContentType(path, is2, content.getContentType()));
+          }
+        }
+
+        asset.setProperty(StorageFacet.P_LAST_UPDATED, new Date());
+
+        tx.commit();
       }
-
-      asset.setProperty(StorageFacet.P_LAST_UPDATED, new Date());
-
-      tx.commit();
     }
   }
 
@@ -388,37 +390,39 @@ public class MavenFacetImpl
     if (path.isHash()) {
       putMetadataHash(path, content);
     }
-    try (StorageTx tx = getStorage().openTx()) {
-      final String metadataKey = getMetadataKey(path);
-      OrientVertex asset = findMetadataAsset(tx, metadataKey, tx.getBucket());
-      if (asset == null) {
-        asset = tx.createAsset(tx.getBucket());
+    else {
+      try (StorageTx tx = getStorage().openTx()) {
+        final String metadataKey = getMetadataKey(path);
+        OrientVertex asset = findMetadataAsset(tx, metadataKey, tx.getBucket());
+        if (asset == null) {
+          asset = tx.createAsset(tx.getBucket());
 
-        asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
-        asset.setProperty(StorageFacet.P_NAME, path.getFileName());
-        asset.setProperty(StorageFacet.P_PATH, path.getPath());
+          asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
+          asset.setProperty(StorageFacet.P_NAME, path.getFileName());
+          asset.setProperty(StorageFacet.P_PATH, path.getPath());
 
-        final NestedAttributesMap formatAttributes = getFormatAttributes(tx, asset);
-        formatAttributes.set(P_ASSET_KEY, metadataKey);
-        formatAttributes.set(StorageFacet.P_NAME, path.getFileName());
-        formatAttributes.set(StorageFacet.P_PATH, path.getPath());
-      }
-
-      // TODO: Figure out created-by header
-      final ImmutableMap<String, String> headers = ImmutableMap.of(
-          BlobStore.BLOB_NAME_HEADER, path.getPath(),
-          BlobStore.CREATED_BY_HEADER, "unknown"
-      );
-
-      try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
-        try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
-          tx.setBlob(is1, headers, asset, hashAlgorithms,
-              determineContentType(path, is2, content.getContentType()));
+          final NestedAttributesMap formatAttributes = getFormatAttributes(tx, asset);
+          formatAttributes.set(P_ASSET_KEY, metadataKey);
+          formatAttributes.set(StorageFacet.P_NAME, path.getFileName());
+          formatAttributes.set(StorageFacet.P_PATH, path.getPath());
         }
-      }
 
-      asset.setProperty(StorageFacet.P_LAST_UPDATED, new Date());
-      tx.commit();
+        // TODO: Figure out created-by header
+        final ImmutableMap<String, String> headers = ImmutableMap.of(
+            BlobStore.BLOB_NAME_HEADER, path.getPath(),
+            BlobStore.CREATED_BY_HEADER, "unknown"
+        );
+
+        try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
+          try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
+            tx.setBlob(is1, headers, asset, hashAlgorithms,
+                determineContentType(path, is2, content.getContentType()));
+          }
+        }
+
+        asset.setProperty(StorageFacet.P_LAST_UPDATED, new Date());
+        tx.commit();
+      }
     }
   }
 
