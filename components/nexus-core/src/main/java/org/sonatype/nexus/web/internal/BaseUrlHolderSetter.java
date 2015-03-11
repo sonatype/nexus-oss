@@ -24,6 +24,7 @@ import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
+import com.google.inject.OutOfScopeException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -58,34 +59,38 @@ public class BaseUrlHolderSetter
 
   @Nullable
   private String detect() {
+    // force base-url always wins if set
     if (settings.isEnabled() && settings.isForceBaseUrl() && !Strings.isNullOrEmpty(settings.getBaseUrl())) {
-      // force base-url
       return settings.getBaseUrl();
     }
-    else {
-      final HttpServletRequest request = requestProvider.get();
 
-      if (request != null) {
-        // detect from request
-        StringBuilder buff = new StringBuilder();
-        String requestUrl = request.getRequestURL().toString();
-        String pathInfo = request.getPathInfo();
-        if (!Strings.isNullOrEmpty(pathInfo)) {
-          requestUrl = requestUrl.substring(0, requestUrl.length() - pathInfo.length());
-        }
+    // attempt to detect from request
+    try {
+      HttpServletRequest request = requestProvider.get();
+      assert request != null;
 
-        String servletPath = request.getServletPath();
-        if (!Strings.isNullOrEmpty(servletPath)) {
-          requestUrl = requestUrl.substring(0, requestUrl.length() - servletPath.length());
-        }
-        buff.append(requestUrl);
-
-        return buff.toString();
+      StringBuilder buff = new StringBuilder();
+      String requestUrl = request.getRequestURL().toString();
+      String pathInfo = request.getPathInfo();
+      if (!Strings.isNullOrEmpty(pathInfo)) {
+        requestUrl = requestUrl.substring(0, requestUrl.length() - pathInfo.length());
       }
-      else if (!Strings.isNullOrEmpty(settings.getBaseUrl())) {
-        // no request in context, non-forced base-url
-        return settings.getBaseUrl();
+
+      String servletPath = request.getServletPath();
+      if (!Strings.isNullOrEmpty(servletPath)) {
+        requestUrl = requestUrl.substring(0, requestUrl.length() - servletPath.length());
       }
+      buff.append(requestUrl);
+
+      return buff.toString();
+    }
+    catch (OutOfScopeException e) {
+      // ignore not in scope of http request
+    }
+
+    // no request in context, non-forced base-url
+    if (!Strings.isNullOrEmpty(settings.getBaseUrl())) {
+      return settings.getBaseUrl();
     }
 
     // unable to determine base-url
