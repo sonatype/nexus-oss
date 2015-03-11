@@ -35,7 +35,7 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
  */
 @Singleton
 @Named
-public class MavenArtifactHandler
+public class HostedArtifactHandler
     extends ComponentSupport
     implements Handler
 {

@@ -34,7 +34,7 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
  */
 @Singleton
 @Named
-public class MavenMetadataHandler
+public class HostedMetadataHandler
     extends ComponentSupport
     implements Handler
 {

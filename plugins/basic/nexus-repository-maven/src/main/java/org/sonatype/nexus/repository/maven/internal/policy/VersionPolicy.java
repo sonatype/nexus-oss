@@ -23,5 +23,5 @@ public enum VersionPolicy
 
   SNAPSHOT,
 
-  MIXED // TODO: do we want this one?
+  MIXED // TODO: do we want this one? ie. allow mixed proxy and/or for groups?
 }

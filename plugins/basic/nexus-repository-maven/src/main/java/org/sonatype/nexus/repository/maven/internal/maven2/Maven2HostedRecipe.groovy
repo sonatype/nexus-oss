@@ -22,9 +22,9 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
-import org.sonatype.nexus.repository.maven.internal.MavenArtifactHandler
+import org.sonatype.nexus.repository.maven.internal.HostedArtifactHandler
 import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
-import org.sonatype.nexus.repository.maven.internal.MavenMetadataHandler
+import org.sonatype.nexus.repository.maven.internal.HostedMetadataHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
 import org.sonatype.nexus.repository.search.SearchFacet
@@ -73,10 +73,10 @@ class Maven2HostedRecipe
   Provider<MavenFacetImpl> mavenFacet
 
   @Inject
-  MavenArtifactHandler mavenArtifactHandler
+  HostedArtifactHandler hostedArtifactHandler
 
   @Inject
-  MavenMetadataHandler mavenMetadataHandler
+  HostedMetadataHandler hostedMetadataHandler
 
   @Inject
   Maven2HostedRecipe(@Named(HostedType.NAME) final Type type,
@@ -101,14 +101,14 @@ class Maven2HostedRecipe
         .matcher(new MavenArtifactMatcher(new Maven2ArtifactPathParser()))
         .handler(timingHandler)
         .handler(securityHandler)
-        .handler(mavenArtifactHandler)
+        .handler(hostedArtifactHandler)
         .create())
 
     builder.route(new Route.Builder()
         .matcher(new MavenMetadataMatcher())
         .handler(timingHandler)
         .handler(securityHandler)
-        .handler(mavenMetadataHandler)
+        .handler(hostedMetadataHandler)
         .create())
 
     builder.defaultHandlers(notFound())
