@@ -58,6 +58,14 @@ public class Maven2ArtifactPathParser
         }
       }
 
+      String ext = gav.getExtension(); // it will trim off .sha1 or .asc but we do need those
+      if (signatureType != null) {
+        ext = ext + "." + signatureType.getExt();
+      }
+      if (gav.getHashType() != null) {
+        ext = ext + "." + gav.getHashType().name();
+      }
+
       return new ArtifactPath(
           path,
           gav.isSnapshot(),
@@ -66,7 +74,7 @@ public class Maven2ArtifactPathParser
           gav.getVersion(),
           gav.getBaseVersion(),
           classifier,
-          gav.getExtension(),
+          ext,
           signatureType
       );
     }

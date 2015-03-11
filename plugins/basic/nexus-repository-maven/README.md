@@ -14,9 +14,21 @@
 -->
 # Configure Repositories via UI
 
+Use this config to create Maven2 hosted repository, use name `maven2-hosted`:
+
+```
 {
   "maven" : {
-    "versionPolicy" : "release",
+    "versionPolicy" : "SNAPSHOT",
     "strictContentTypeValidation" : false
   }
 }
+
+```
+
+The kick it with deploy: I use Maven master checkout, and following line
+
+```
+mvn clean deploy -Dtest=et -DfailIfNoTests=false -DaltDeploymentRepository=local-nexus-admin::default::http://localhost:8081/repository/maven2-hosted/
+```
+

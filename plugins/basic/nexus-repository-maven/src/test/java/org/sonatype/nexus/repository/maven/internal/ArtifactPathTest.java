@@ -21,7 +21,6 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -39,11 +38,8 @@ public class ArtifactPathTest
     final Maven2ArtifactPathParser pathParser = new Maven2ArtifactPathParser();
 
     final String path = "/org/eclipse/jetty/jetty-io/8.1.16.v20140903/jetty-io-8.1.16.v20140903.pom";
-    final Path repositoryPath = pathParser.parsePath(path);
-    assertThat(repositoryPath, is(notNullValue()));
-    assertThat(repositoryPath, instanceOf(ArtifactPath.class));
-
-    final ArtifactPath artifactCoordinates = (ArtifactPath) repositoryPath;
+    final ArtifactPath artifactCoordinates = pathParser.parsePath(path);
+    assertThat(artifactCoordinates, is(notNullValue()));
 
     assertThat(artifactCoordinates.getPath(), equalTo(path));
     assertThat(artifactCoordinates.getFileName(), equalTo("jetty-io-8.1.16.v20140903.pom"));
@@ -55,14 +51,14 @@ public class ArtifactPathTest
     assertThat(artifactCoordinates.getClassifier(), nullValue());
     assertThat(artifactCoordinates.getExtension(), equalTo("pom"));
 
-    assertThat(repositoryPath.isSubordinate(), is(false));
-    Path pathSha1 = repositoryPath.hash(HashType.SHA1);
+    assertThat(artifactCoordinates.isSubordinate(), is(false));
+    ArtifactPath pathSha1 = artifactCoordinates.hash(HashType.SHA1);
     assertThat(pathSha1.isSubordinate(), is(true));
-    assertThat(pathSha1.subordinateOf(), equalTo(repositoryPath));
+    assertThat(pathSha1.subordinateOf(), equalTo(artifactCoordinates));
 
     ArtifactPath coordinatesAscSha1 = artifactCoordinates.signature(SignatureType.GPG).hash(HashType.SHA1);
     assertThat(coordinatesAscSha1.getPath(), equalTo(path + ".asc.sha1"));
-    assertThat(coordinatesAscSha1.getFileName(), equalTo(repositoryPath.getFileName() + ".asc.sha1"));
+    assertThat(coordinatesAscSha1.getFileName(), equalTo(artifactCoordinates.getFileName() + ".asc.sha1"));
     assertThat(coordinatesAscSha1.getExtension(), equalTo(artifactCoordinates.getExtension() + ".asc.sha1"));
     assertThat(coordinatesAscSha1.isSubordinate(), is(true));
     assertThat(coordinatesAscSha1.subordinateOf().subordinateOf(), equalTo(artifactCoordinates));
@@ -70,7 +66,7 @@ public class ArtifactPathTest
 
     ArtifactPath coordinates2 = coordinatesAscSha1.subordinateOf().subordinateOf();
     assertThat(coordinates2.getPath(), equalTo(path));
-    assertThat(coordinates2.getFileName(), equalTo(repositoryPath.getFileName()));
+    assertThat(coordinates2.getFileName(), equalTo(artifactCoordinates.getFileName()));
     assertThat(coordinates2.getExtension(), equalTo(artifactCoordinates.getExtension()));
     assertThat(coordinates2.isSubordinate(), is(false));
   }
@@ -80,11 +76,8 @@ public class ArtifactPathTest
     final Maven2ArtifactPathParser pathParser = new Maven2ArtifactPathParser();
 
     final String path = "/org/eclipse/jetty/jetty-io/8.1.16-SNAPSHOT/jetty-io-8.1.16-20140903.180000-1.pom";
-    final Path repositoryPath = pathParser.parsePath(path);
-    assertThat(repositoryPath, is(notNullValue()));
-    assertThat(repositoryPath, instanceOf(ArtifactPath.class));
-
-    final ArtifactPath artifactCoordinates = (ArtifactPath) repositoryPath;
+    final ArtifactPath artifactCoordinates = pathParser.parsePath(path);
+    assertThat(artifactCoordinates, is(notNullValue()));
 
     assertThat(artifactCoordinates.getPath(), equalTo(path));
     assertThat(artifactCoordinates.getFileName(), equalTo("jetty-io-8.1.16-20140903.180000-1.pom"));
@@ -96,14 +89,14 @@ public class ArtifactPathTest
     assertThat(artifactCoordinates.getClassifier(), nullValue());
     assertThat(artifactCoordinates.getExtension(), equalTo("pom"));
 
-    assertThat(repositoryPath.isSubordinate(), is(false));
-    Path pathSha1 = repositoryPath.hash(HashType.SHA1);
+    assertThat(artifactCoordinates.isSubordinate(), is(false));
+    ArtifactPath pathSha1 = artifactCoordinates.hash(HashType.SHA1);
     assertThat(pathSha1.isSubordinate(), is(true));
-    assertThat(pathSha1.subordinateOf(), equalTo(repositoryPath));
+    assertThat(pathSha1.subordinateOf(), equalTo(artifactCoordinates));
 
     ArtifactPath coordinatesAscSha1 = artifactCoordinates.signature(SignatureType.GPG).hash(HashType.SHA1);
     assertThat(coordinatesAscSha1.getPath(), equalTo(path + ".asc.sha1"));
-    assertThat(coordinatesAscSha1.getFileName(), equalTo(repositoryPath.getFileName() + ".asc.sha1"));
+    assertThat(coordinatesAscSha1.getFileName(), equalTo(artifactCoordinates.getFileName() + ".asc.sha1"));
     assertThat(coordinatesAscSha1.getExtension(), equalTo(artifactCoordinates.getExtension() + ".asc.sha1"));
     assertThat(coordinatesAscSha1.isSubordinate(), is(true));
     assertThat(coordinatesAscSha1.subordinateOf().subordinateOf(), equalTo(artifactCoordinates));
@@ -111,8 +104,41 @@ public class ArtifactPathTest
 
     ArtifactPath coordinates2 = coordinatesAscSha1.subordinateOf().subordinateOf();
     assertThat(coordinates2.getPath(), equalTo(path));
-    assertThat(coordinates2.getFileName(), equalTo(repositoryPath.getFileName()));
+    assertThat(coordinates2.getFileName(), equalTo(artifactCoordinates.getFileName()));
     assertThat(coordinates2.getExtension(), equalTo(artifactCoordinates.getExtension()));
     assertThat(coordinates2.isSubordinate(), is(false));
+  }
+
+  @Test
+  public void jarSnapshotHash() {
+    final Maven2ArtifactPathParser pathParser = new Maven2ArtifactPathParser();
+
+    final String path = "/org/apache/maven/maven-repository-metadata/3.3.0-SNAPSHOT/maven-repository-metadata-3.3.0-20150311.160242-1.jar.sha1";
+    final ArtifactPath artifactCoordinates = pathParser.parsePath(path);
+    assertThat(artifactCoordinates, is(notNullValue()));
+
+    assertThat(artifactCoordinates.getPath(), equalTo(path));
+    assertThat(artifactCoordinates.getFileName(),
+        equalTo("maven-repository-metadata-3.3.0-20150311.160242-1.jar.sha1"));
+    assertThat(artifactCoordinates.getHashType(), equalTo(HashType.SHA1));
+    assertThat(artifactCoordinates.getGroupId(), equalTo("org.apache.maven"));
+    assertThat(artifactCoordinates.getArtifactId(), equalTo("maven-repository-metadata"));
+    assertThat(artifactCoordinates.getVersion(), equalTo("3.3.0-20150311.160242-1"));
+    assertThat(artifactCoordinates.getBaseVersion(), equalTo("3.3.0-SNAPSHOT"));
+    assertThat(artifactCoordinates.getClassifier(), nullValue());
+    assertThat(artifactCoordinates.getExtension(), equalTo("jar.sha1"));
+
+    assertThat(artifactCoordinates.isSubordinate(), is(true));
+    ArtifactPath main = artifactCoordinates.subordinateOf();
+    assertThat(main.isSubordinate(), is(false));
+    assertThat(artifactCoordinates.subordinateOf(), equalTo(main));
+
+    ArtifactPath coordinatesAscSha1 = artifactCoordinates.main().signature(SignatureType.GPG).hash(HashType.SHA1);
+    assertThat(coordinatesAscSha1.getPath(), equalTo(artifactCoordinates.main().getPath() + ".asc.sha1"));
+    assertThat(coordinatesAscSha1.getFileName(), equalTo(artifactCoordinates.main().getFileName() + ".asc.sha1"));
+    assertThat(coordinatesAscSha1.getExtension(), equalTo(artifactCoordinates.main().getExtension() + ".asc.sha1"));
+    assertThat(coordinatesAscSha1.isSubordinate(), is(true));
+    assertThat(coordinatesAscSha1.subordinateOf().subordinateOf(), equalTo(artifactCoordinates.subordinateOf()));
+    assertThat(coordinatesAscSha1.main(), equalTo(artifactCoordinates.main()));
   }
 }

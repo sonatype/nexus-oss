@@ -95,11 +95,9 @@ public class MavenFacetImpl
 
   private static final String P_BASE_VERSION = "baseVersion";
 
-  // artifact asset properties
+  // shared for both artifact and metadata assets
 
   private static final String P_ASSET_KEY = "key"; // asset key: G:A:V[:C]:E for fast look-ups
-
-  // shared for both artifact and metadata assets
 
   private static final String P_EXT_CHECKSUM = "extChecksum"; // similar to P_CHECKSUM, child map of hashes got externally
 
@@ -144,7 +142,7 @@ public class MavenFacetImpl
   @Override
   public Payload getArtifact(final ArtifactPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex component = findArtifactComponent(tx, getComponentKey(path), tx.getBucket());
+      final OrientVertex component = findArtifactComponent(tx, getComponentKey(path.main()), tx.getBucket());
       if (component == null) {
         return null;
       }
@@ -242,12 +240,12 @@ public class MavenFacetImpl
   {
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex bucket = tx.getBucket();
-      OrientVertex component = findArtifactComponent(tx, getComponentKey(path), bucket);
+      OrientVertex component = findArtifactComponent(tx, getComponentKey(path.main()), bucket);
       if (component == null) {
         // does not exists? Reject it
         throw new InvalidContentException("No component for hash: " + path.getPath());
       }
-      final OrientVertex asset = selectArtifactAsset(tx, component, getAssetKey(path));
+      final OrientVertex asset = selectArtifactAsset(tx, component, getAssetKey(path.main()));
       if (asset == null) {
         // does not exists? Reject it
         throw new InvalidContentException("No asset for hash: " + path.getPath());
@@ -360,7 +358,7 @@ public class MavenFacetImpl
   @Override
   public Payload getMetadata(final Path path) {
     try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(path), tx.getBucket());
+      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(path.main()), tx.getBucket());
       if (asset == null) {
         return null;
       }
@@ -391,7 +389,8 @@ public class MavenFacetImpl
       putMetadataHash(path, content);
     }
     try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(path), tx.getBucket());
+      final String metadataKey = getMetadataKey(path);
+      OrientVertex asset = findMetadataAsset(tx, metadataKey, tx.getBucket());
       if (asset == null) {
         asset = tx.createAsset(tx.getBucket());
 
@@ -399,8 +398,10 @@ public class MavenFacetImpl
         asset.setProperty(StorageFacet.P_NAME, path.getFileName());
         asset.setProperty(StorageFacet.P_PATH, path.getPath());
 
-        getFormatAttributes(tx, asset).set(StorageFacet.P_NAME, path.getFileName());
-        getFormatAttributes(tx, asset).set(StorageFacet.P_PATH, path.getPath());
+        final NestedAttributesMap formatAttributes = getFormatAttributes(tx, asset);
+        formatAttributes.set(P_ASSET_KEY, metadataKey);
+        formatAttributes.set(StorageFacet.P_NAME, path.getFileName());
+        formatAttributes.set(StorageFacet.P_PATH, path.getPath());
       }
 
       // TODO: Figure out created-by header
@@ -425,7 +426,7 @@ public class MavenFacetImpl
       throws IOException, InvalidContentException
   {
     try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(path), tx.getBucket());
+      OrientVertex asset = findMetadataAsset(tx, getMetadataKey(path.main()), tx.getBucket());
       if (asset == null) {
         throw new InvalidContentException("No asset for hash: " + path.getPath());
       }
@@ -467,7 +468,7 @@ public class MavenFacetImpl
                                          final OrientVertex bucket)
   {
     final String metadataKeyName =
-        StorageFacet.P_ATTRIBUTES + "." + getRepository().getFormat().getValue() + "." + StorageFacet.P_PATH;
+        StorageFacet.P_ATTRIBUTES + "." + getRepository().getFormat().getValue() + "." + P_ASSET_KEY;
     return tx.findAssetWithProperty(metadataKeyName, metadataKey, bucket);
   }
 
