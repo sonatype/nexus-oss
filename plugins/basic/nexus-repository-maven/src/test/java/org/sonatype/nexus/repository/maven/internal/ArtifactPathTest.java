@@ -129,7 +129,7 @@ public class ArtifactPathTest
     assertThat(artifactCoordinates.getExtension(), equalTo("jar.sha1"));
 
     assertThat(artifactCoordinates.isSubordinate(), is(true));
-    ArtifactPath main = artifactCoordinates.subordinateOf();
+    ArtifactPath main = artifactCoordinates.main();
     assertThat(main.isSubordinate(), is(false));
     assertThat(artifactCoordinates.subordinateOf(), equalTo(main));
 
