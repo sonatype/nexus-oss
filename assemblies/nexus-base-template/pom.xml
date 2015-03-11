@@ -372,15 +372,6 @@
                 <replace file="${project.build.directory}/assembly/bin/karaf" token="-Dcom.sun.management.jmxremote"/>
                 <replace file="${project.build.directory}/assembly/bin/karaf.bat" token="-Dcom.sun.management.jmxremote"/>
 
-                <replace file="${project.build.directory}/assembly/etc/config.properties">
-                  <!-- include a few additional extra packages required by our environment -->
-                  <replacefilter token="packages.extra="
-                                 value="packages.extra= \${line.separator} sun.security.ssl, \${line.separator} com.sun.net.httpserver, \${line.separator} javax.annotation;version=1.2, \${line.separator} javax.annotation.security;version=1.2, \${line.separator} org.xerial.snappy,"/>
-                  <!-- comment this so mvn: protocol is active as soon as possible -->
-                  <replacefilter token="org.ops4j.pax.url.mvn.requireConfigAdminConfig"
-                                 value="#org.ops4j.pax.url.mvn.requireConfigAdminConfig"/>
-                </replace>
-
                 <!-- trim out various enterprise/deployment features we don't need at the moment -->
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg">
                   <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.3/xml/features"/>
