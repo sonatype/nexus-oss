@@ -21,7 +21,6 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobStore;
-import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -42,9 +41,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link FileBlobStore}.
+ * Tests for {@link FileBlobStorageFacet}.
  */
-public class FileBlobStoreTest
+public class FileBlobStorageFacetTest
     extends TestSupport
 {
   private LocationStrategy locationStrategy;
@@ -55,7 +54,7 @@ public class FileBlobStoreTest
 
   private Path root;
 
-  private FileBlobStore underTest;
+  private FileBlobStorageFacet underTest;
 
   @Before
   public void setUp() throws Exception {
@@ -64,7 +63,7 @@ public class FileBlobStoreTest
     metadataStore = mock(BlobMetadataStore.class);
 
     root = util.createTempDir().toPath();
-    underTest = new FileBlobStore(root, locationStrategy, fileOps, metadataStore, new BlobStoreConfiguration());
+    underTest = new FileBlobStorageFacet(root, locationStrategy, fileOps, metadataStore);
     underTest.start();
   }
 
@@ -93,7 +92,7 @@ public class FileBlobStoreTest
 
     when(metadataStore.add(any(BlobMetadata.class))).thenReturn(fakeId);
     when(locationStrategy.location(fakeId)).thenReturn("fakePath");
-    final Path fakePath = root.resolve("fakePath" + FileBlobStore.BLOB_CONTENT_SUFFIX);
+    final Path fakePath = root.resolve("fakePath" + FileBlobStorageFacet.BLOB_CONTENT_SUFFIX);
     when(fileOps.create(fakePath, inputStream)).thenReturn(new StreamMetrics(contentSize, fakeSHA1));
 
     final Blob blob = underTest.create(inputStream, headers);
@@ -116,7 +115,7 @@ public class FileBlobStoreTest
     when(metadata.getMetrics()).thenReturn(mock(BlobMetrics.class));
 
     when(locationStrategy.location(fakeId)).thenReturn("fakePath");
-    final Path fakePath = root.resolve("fakePath" + FileBlobStore.BLOB_CONTENT_SUFFIX);
+    final Path fakePath = root.resolve("fakePath" + FileBlobStorageFacet.BLOB_CONTENT_SUFFIX);
     when(fileOps.exists(fakePath)).thenReturn(true);
 
     when(fileOps.openInputStream(fakePath)).thenReturn(mock(InputStream.class));

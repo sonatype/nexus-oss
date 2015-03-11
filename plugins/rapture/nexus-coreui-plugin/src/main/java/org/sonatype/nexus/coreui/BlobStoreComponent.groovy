@@ -19,6 +19,7 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
 
+import org.sonatype.nexus.blobstore.api.BlobStorageFacet
 import org.sonatype.nexus.blobstore.api.BlobStore
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
 import org.sonatype.nexus.blobstore.api.BlobStoreManager
@@ -78,9 +79,9 @@ class BlobStoreComponent
     return new BlobStoreXO(name: blobStore.blobStoreConfiguration.name,
         type: blobStore.blobStoreConfiguration.recipeName,
         attributes: attributeConverter.asAttributes(blobStore.blobStoreConfiguration.attributes),
-        blobCount: blobStore.metrics.blobCount,
-        totalSize: blobStore.metrics.totalSize,
-        availableSpace: blobStore.metrics.availableSpace
+        blobCount: blobStore.facet(BlobStorageFacet).metrics.blobCount,
+        totalSize: blobStore.facet(BlobStorageFacet).metrics.totalSize,
+        availableSpace: blobStore.facet(BlobStorageFacet).metrics.availableSpace
     )
   }
 }

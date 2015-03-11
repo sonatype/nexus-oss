@@ -12,11 +12,13 @@
  */
 package org.sonatype.nexus.blobstore.file;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -24,8 +26,8 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
+import org.sonatype.nexus.blobstore.api.BlobStorageFacet;
 import org.sonatype.nexus.blobstore.api.BlobStore;
-import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.api.BlobStoreListener;
 import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
@@ -34,6 +36,7 @@ import org.sonatype.nexus.common.collect.AutoClosableIterable;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.base.Throwables;
+import com.google.inject.Inject;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -44,35 +47,38 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class FileBlobStore
+public class FileBlobStorageFacet
     extends LifecycleSupport
-    implements BlobStore
+    implements BlobStorageFacet
 {
   public static final String BLOB_CONTENT_SUFFIX = ".blob";
 
-  private final Path root;
+  private Path root;
+
+  private BlobMetadataStore metadataStore;
+
+  private BlobStore blobStore;
 
   private final LocationStrategy locationStrategy;
 
   private final FileOperations fileOperations;
 
-  private final BlobMetadataStore metadataStore;
-
-  private final BlobStoreConfiguration blobStoreConfiguration;
-
   private volatile BlobStoreListener listener;
 
-  public FileBlobStore(final Path root,
-                       final LocationStrategy locationStrategy,
-                       final FileOperations fileOperations,
-                       final BlobMetadataStore metadataStore,
-                       final BlobStoreConfiguration blobStoreConfiguration)
+  @Inject
+  public FileBlobStorageFacet(final LocationStrategy locationStrategy,
+                              final FileOperations fileOperations)
   {
-    this.root = checkNotNull(root);
     this.locationStrategy = checkNotNull(locationStrategy);
     this.fileOperations = checkNotNull(fileOperations);
-    this.metadataStore = checkNotNull(metadataStore);
-    this.blobStoreConfiguration = checkNotNull(blobStoreConfiguration);
+  }
+
+  public FileBlobStorageFacet(final Path root, final LocationStrategy locationStrategy,
+                              final FileOperations fileOperations, final BlobMetadataStore metadataStore)
+  {
+    this(locationStrategy, fileOperations);
+    this.root = root;
+    this.metadataStore = metadataStore;
   }
 
   @Override
@@ -269,17 +275,33 @@ public class FileBlobStore
     }
   }
 
-  @Override
-  public BlobStoreConfiguration getBlobStoreConfiguration() {
-    return blobStoreConfiguration;
-  }
-
   private void checkExists(final Path path, final BlobId blobId) throws IOException {
     if (!fileOperations.exists(path)) {
       // I'm not completely happy with this, since it means that blob store clients can get a blob, be satisfied
       // that it exists, and then discover that it doesn't, mid-operation
       throw new BlobStoreException("Blob has been deleted", blobId);
     }
+  }
+
+  @Override
+  public void init(final BlobStore target) throws Exception {
+    this.blobStore = checkNotNull(target);
+    Path blobDir = Paths.get(getPath(target.getBlobStoreConfiguration().getAttributes()));
+    Path content = blobDir.resolve("content");
+    File metadataFile = blobDir.resolve("metadata").toFile();
+    content.toFile().mkdirs();
+    metadataFile.mkdirs();
+    this.root = content;
+    this.metadataStore = MapdbBlobMetadataStore.create(metadataFile);
+  }
+
+  @Override
+  public void delete() throws Exception {
+    this.blobStore = null;
+  }
+
+  private String getPath(final Map<String, Map<String, Object>> attributes) {
+    return (String) attributes.get("file").get("path");
   }
 
   class FileBlob

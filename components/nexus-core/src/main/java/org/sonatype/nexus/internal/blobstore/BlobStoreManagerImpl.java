@@ -19,15 +19,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.blobstore.api.BlobStorageFacet;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore;
+import org.sonatype.nexus.blobstore.api.BlobStoreFactory;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
-import org.sonatype.nexus.blobstore.file.FileBlobStore;
+import org.sonatype.nexus.blobstore.api.Recipe;
+import org.sonatype.nexus.blobstore.api.Type;
+import org.sonatype.nexus.blobstore.file.FileBlobStorageFacet;
+import org.sonatype.nexus.blobstore.file.FileType;
 import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
 import org.sonatype.nexus.blobstore.file.VolumeChapterLocationStrategy;
@@ -64,15 +70,23 @@ public class BlobStoreManagerImpl
 
   private final Path basedir;
 
-  private final Map<String, BlobStore> stores = Maps.newHashMap();
-
   private final BlobStoreConfigurationStore store;
 
+  private final BlobStoreFactory factory;
+
+  private final Map<String, Recipe> recipes;
+
+
+  private final Map<String, BlobStore> stores = Maps.newHashMap();
+
   @Inject
-  public BlobStoreManagerImpl(final ApplicationDirectories directories, final BlobStoreConfigurationStore store) {
+  public BlobStoreManagerImpl(final ApplicationDirectories directories, final BlobStoreConfigurationStore store,
+                              final BlobStoreFactory factory, final Map<String, Recipe> recipes) {
     checkNotNull(directories);
     this.basedir = directories.getWorkDirectory(BASEDIR).toPath();
     this.store = checkNotNull(store);
+    this.factory = checkNotNull(factory);
+    this.recipes = checkNotNull(recipes);
   }
 
   @Override
@@ -199,20 +213,36 @@ public class BlobStoreManagerImpl
   }
 
   @VisibleForTesting
-  BlobStore newBlobStore(final BlobStoreConfiguration blobStoreConfiguration) {
-    Path root = Paths.get(getPath(blobStoreConfiguration.getAttributes()));
-    Path content = root.resolve("content");
-    File metadataFile = root.resolve("metadata").toFile();
-    content.toFile().mkdirs();
-    metadataFile.mkdirs();
-    //TODO - validation that directories exist
-    return new FileBlobStore(
-        content,
-        new VolumeChapterLocationStrategy(),
-        new SimpleFileOperations(),
-        MapdbBlobMetadataStore.create(metadataFile),
-        blobStoreConfiguration
-    );
+  BlobStore newBlobStore(final BlobStoreConfiguration blobStoreConfiguration) throws Exception {
+    String recipeName = blobStoreConfiguration.getRecipeName();
+    Recipe recipe = recipes.get(recipeName);
+    //Recipe recipe = new Recipe()
+    //{
+    //  @Override
+    //  public Type getType() {
+    //    return new FileType();
+    //  }
+    //
+    //  @Override
+    //  public void apply(@Nonnull final BlobStore blobStore) throws Exception {
+    //    Path root = Paths.get(getPath(blobStore.getBlobStoreConfiguration().getAttributes()));
+    //    Path content = root.resolve("content");
+    //    File metadataFile = root.resolve("metadata").toFile();
+    //    content.toFile().mkdirs();
+    //    metadataFile.mkdirs();
+    //    blobStore.attach(new FileBlobStorageFacet(
+    //        content,
+    //        new VolumeChapterLocationStrategy(),
+    //        new SimpleFileOperations(),
+    //        MapdbBlobMetadataStore.create(metadataFile)));
+    //  }
+    //};
+    BlobStore blobStore = factory.create(recipe.getType());
+    blobStore.init(blobStoreConfiguration);
+    recipe.apply(blobStore);
+    blobStore.facet(BlobStorageFacet.class);
+    return blobStore;
+
   }
 
   @VisibleForTesting

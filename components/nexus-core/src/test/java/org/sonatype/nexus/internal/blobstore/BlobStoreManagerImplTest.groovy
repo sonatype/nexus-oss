@@ -52,7 +52,7 @@ class BlobStoreManagerImplTest
   @Before
   void setup() {
     when(directories.getWorkDirectory(anyString())).thenReturn(temporaryFolder.root)
-    underTest = spy(new BlobStoreManagerImpl(directories, store))
+    underTest = spy(new BlobStoreManagerImpl(directories, store, factory))
   }
 
   @Test

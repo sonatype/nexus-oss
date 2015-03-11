@@ -32,13 +32,18 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-common</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-assistedinject</artifactId>
+    </dependency>
     
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
   </dependencies>
 
 </project>
