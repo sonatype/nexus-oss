@@ -37,7 +37,7 @@ import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.payloads.StreamPayload;
+import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 
 import com.google.common.base.Charsets;
@@ -565,7 +565,7 @@ public class MavenFacetImpl
 
   private Payload marshall(final OrientVertex asset, final Blob blob) {
     final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
-    return new StreamPayload(blob.getInputStream(), blob.getMetrics().getContentSize(), contentType);
+    return new BlobPayload(blob, contentType);
   }
 
   /**
