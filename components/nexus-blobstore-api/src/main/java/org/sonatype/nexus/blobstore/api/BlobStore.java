@@ -19,8 +19,6 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 /**
  * A generic storage bin for binary objects of all sizes.
  *
- * In general, most methods can throw {@link BlobStoreException} for conditions such as network connectivity problems,
- * or file IO issues, blob store misconfiguration, or internal corruption.
  *
  * @since 3.0
  */
@@ -46,14 +44,32 @@ public interface BlobStore
   
   String getName();
 
-  
+  /**
+   * Attach a facet to the BlobStore.
+   * 
+   * Facet must be initialized.
+   */
   void attach(Facet facet) throws Exception;
-  
-  // TODO - KR custom exception here?
-  @Nonnull
-  <T extends Facet> T facet(Class<T> type) throws IllegalStateException;
 
+  /**
+   * Returns a facet instance for the given type.
+   *
+   * @throws MissingFacetException  Requested facet type was not previously attached.
+   */
+  @Nonnull
+  <T extends Facet> T facet(Class<T> type) throws MissingFacetException;
+
+  /**
+   * Delete the BlobStore.
+   * 
+   * BlobStore must have previously been stopped.
+   */
   void delete() throws Exception;
-  
+
+  /**
+   * Initialize the BlobStore.
+   *
+   * Called when a new BlobStore is created or a BlobStore is restored from persistent storage on startup.
+   */
   void init(BlobStoreConfiguration configuration);
 }
