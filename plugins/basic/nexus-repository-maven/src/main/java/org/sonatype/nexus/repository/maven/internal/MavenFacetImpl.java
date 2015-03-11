@@ -114,9 +114,9 @@ public class MavenFacetImpl
 
   // ==
 
-  private VersionPolicy versionPolicy;
+  private boolean strictContentTypeValidation;
 
-  private boolean strictContentTypeValidation = false;
+  private VersionPolicy versionPolicy;
 
   @Inject
   public MavenFacetImpl(final MimeSupport mimeSupport) {
@@ -127,6 +127,8 @@ public class MavenFacetImpl
   protected void doConfigure() throws Exception {
     super.doConfigure();
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
+    this.strictContentTypeValidation = attributes.get("strictContentTypeValidation", Boolean.class, Boolean.FALSE)
+        .booleanValue();
     this.versionPolicy = VersionPolicy.valueOf(
         attributes.require("versionPolicy", String.class)
     );

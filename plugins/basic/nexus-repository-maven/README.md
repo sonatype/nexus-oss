@@ -15,14 +15,8 @@
 # Configure Repositories via UI
 
 {
-  "mavenStorage" : {
-    "strictContentTypeValidation" : false
-  },
   "maven" : {
-    "versionPolicy" : "release"
-  },
-  "proxy" : {
-    "remoteUrl" : "http://repo1.maven.org/maven2/",
-    "artifactMaxAge" : 3600
+    "versionPolicy" : "release",
+    "strictContentTypeValidation" : false
   }
 }
