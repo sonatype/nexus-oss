@@ -48,7 +48,6 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
@@ -153,6 +152,7 @@ public class MavenFacetImpl
       if (asset == null) {
         return null;
       }
+      final NestedAttributesMap formatAttributes = getFormatAttributes(tx, asset);
       if (path.getHashType() == null) {
         final BlobRef blobRef = getBlobRef(path, asset);
         final Blob blob = tx.getBlob(blobRef);
@@ -161,7 +161,7 @@ public class MavenFacetImpl
         return marshall(asset, blob);
       }
       else {
-        final String extHash = getExtHashCode(tx, asset, path.getHashType());
+        final String extHash = getExtHashCode(formatAttributes, path.getHashType());
         if (extHash == null) {
           return null; // unknown external hash
         }
@@ -253,7 +253,9 @@ public class MavenFacetImpl
         throw new InvalidContentException("No asset for hash: " + path.getPath());
       }
 
-      setAssetHashCode(tx, asset, path, content);
+      final String assetHash = tx.getAttributes(asset).child(StorageFacet.P_CHECKSUM).require(
+          path.getHashType().getHashAlgorithm().name(), String.class);
+      setAssetExtHashCode(getFormatAttributes(tx, asset), assetHash, path, content);
 
       tx.commit();
     }
@@ -362,7 +364,7 @@ public class MavenFacetImpl
       if (asset == null) {
         return null;
       }
-
+      final NestedAttributesMap formatAttributes = getFormatAttributes(tx, asset);
       if (path.getHashType() == null) {
         final BlobRef blobRef = getBlobRef(path, asset);
         final Blob blob = tx.getBlob(blobRef);
@@ -372,7 +374,7 @@ public class MavenFacetImpl
         return marshall(asset, blob);
       }
       else {
-        final String extHash = getExtHashCode(tx, asset, path.getHashType());
+        final String extHash = getExtHashCode(formatAttributes, path.getHashType());
         if (extHash == null) {
           return null; // unknown external hash
         }
@@ -428,7 +430,9 @@ public class MavenFacetImpl
         throw new InvalidContentException("No asset for hash: " + path.getPath());
       }
 
-      setAssetHashCode(tx, asset, path, content);
+      final String assetHash = tx.getAttributes(asset).child(StorageFacet.P_CHECKSUM).require(
+          path.getHashType().getHashAlgorithm().name(), String.class);
+      setAssetExtHashCode(getFormatAttributes(tx, asset), assetHash, path, content);
 
       tx.commit();
     }
@@ -455,34 +459,6 @@ public class MavenFacetImpl
   }
 
   /**
-   * Assumes payload is a hash file, parses it like that. Takes existing -- same type -- hash from asset attributes and
-   * compares the two, throws if not. Finally, if all ok, stores the supplied hash in format specific attributes of the
-   * asset, see {@link #putExtHashCode(StorageTx, OrientVertex, HashType, String)}.
-   */
-  private void setAssetHashCode(final StorageTx tx, final OrientVertex asset, final Path path,
-                                final Payload content)
-      throws IOException, InvalidContentException
-  {
-    final String artifactHash = DigestExtractor.extract(content);
-    if (artifactHash == null) {
-      // we could not interpret the payload
-      throw new InvalidContentException("Unrecognized checksum for path: " + path.getPath());
-    }
-    final String existingHash = tx.getAttributes(asset).child(StorageFacet.P_CHECKSUM)
-        .get(path.getHashType().getHashAlgorithm().name(), String.class);
-    checkArgument(existingHash != null);
-
-    if (!Objects.equals(artifactHash, existingHash)) {
-      tx.rollback();
-      throw new InvalidContentException(
-          "Invalid hash for " + path.getPath() + ": expected '" + existingHash + "' got '" + artifactHash +
-              "'");
-    }
-
-    putExtHashCode(tx, asset, path.getHashType(), artifactHash);
-  }
-
-  /**
    * Finds metadata by key.
    */
   @Nullable
@@ -495,16 +471,45 @@ public class MavenFacetImpl
     return tx.findAssetWithProperty(metadataKeyName, metadataKey, bucket);
   }
 
+  private NestedAttributesMap getAttributes(final StorageTx tx, final OrientVertex vertex) {
+    return tx.getAttributes(vertex);
+  }
+
   private NestedAttributesMap getFormatAttributes(final StorageTx tx, final OrientVertex vertex) {
-    return tx.getAttributes(vertex).child(getRepository().getFormat().getValue());
+    return getAttributes(tx, vertex).child(getRepository().getFormat().getValue());
+  }
+
+  /**
+   * Assumes payload is a hash file, parses it like that. Takes existing -- same type -- hash from asset attributes and
+   * compares the two, throws if not. Finally, if all ok, stores the supplied hash in format specific attributes of the
+   * asset, see {@link #putExtHashCode(NestedAttributesMap, HashType, String)}.
+   */
+  private void setAssetExtHashCode(final NestedAttributesMap formatAttributes,
+                                   final String assetHash,
+                                   final Path path,
+                                   final Payload content)
+      throws IOException, InvalidContentException
+  {
+    final String newHash = DigestExtractor.extract(content);
+    if (newHash == null) {
+      // we could not interpret the payload
+      throw new InvalidContentException("Unrecognized checksum for path: " + path.getPath());
+    }
+
+    if (!Objects.equals(newHash, assetHash)) {
+      throw new InvalidContentException(
+          "Invalid hash for " + path.getPath() + ": expected '" + assetHash + "' got '" + newHash +
+              "'");
+    }
+
+    putExtHashCode(formatAttributes, path.getHashType(), newHash);
   }
 
   @Nullable
-  private String getExtHashCode(final StorageTx tx,
-                                final OrientVertex vertex,
+  private String getExtHashCode(final NestedAttributesMap formatAttributes,
                                 final Path.HashType hashType)
   {
-    final NestedAttributesMap hashes = getFormatAttributes(tx, vertex).child(P_EXT_CHECKSUM);
+    final NestedAttributesMap hashes = formatAttributes.child(P_EXT_CHECKSUM);
     final String hashCodeString = hashes.get(hashType.getHashAlgorithm().name(), String.class);
     if (hashCodeString == null) {
       return null;
@@ -512,12 +517,11 @@ public class MavenFacetImpl
     return hashCodeString;
   }
 
-  private void putExtHashCode(final StorageTx tx,
-                              final OrientVertex vertex,
+  private void putExtHashCode(final NestedAttributesMap formatAttributes,
                               final Path.HashType hashType,
                               final String hashCode)
   {
-    final NestedAttributesMap hashes = getFormatAttributes(tx, vertex).child(P_EXT_CHECKSUM);
+    final NestedAttributesMap hashes = formatAttributes.child(P_EXT_CHECKSUM);
     hashes.set(hashType.getHashAlgorithm().name(), hashCode);
   }
 
