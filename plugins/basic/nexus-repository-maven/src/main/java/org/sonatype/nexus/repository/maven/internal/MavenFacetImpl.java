@@ -92,7 +92,9 @@ public class MavenFacetImpl
 
   // artifact component properties
 
-  private static final String P_COMPONENT_KEY = "key"; // component key: G:A:bV for fast look-ups
+  private static final String P_COMPONENT_KEY = "key"; // component key: G:A:V for fast look-ups
+
+  private static final String P_BASE_VERSION = "baseVersion";
 
   // artifact asset properties
 
@@ -186,13 +188,16 @@ public class MavenFacetImpl
         component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue()); // M1 or M2!!!
         component.setProperty(StorageFacet.P_GROUP, path.getGroupId());
         component.setProperty(StorageFacet.P_NAME, path.getArtifactId());
-        component.setProperty(StorageFacet.P_VERSION, path.getBaseVersion());
+        component.setProperty(StorageFacet.P_VERSION, path.getVersion());
 
         final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
         componentAttributes.set(P_COMPONENT_KEY, componentKey);
         componentAttributes.set(P_GROUP_ID, path.getGroupId());
         componentAttributes.set(P_ARTIFACT_ID, path.getArtifactId());
-        componentAttributes.set(P_VERSION, path.getBaseVersion());
+        componentAttributes.set(P_VERSION, path.getVersion());
+        // TODO: do we want always to store this? In case of release repo this makes no sense
+        // TODO: store it only if V != bV?
+        componentAttributes.set(P_BASE_VERSION, path.getBaseVersion());
         componentAttributes.set(P_SNAPSHOT, path.isSnapshot());
       }
 
@@ -282,7 +287,7 @@ public class MavenFacetImpl
     // TODO: maybe sha1() the resulting string?
     return path.getGroupId()
         + ":" + path.getArtifactId()
-        + ":" + path.getBaseVersion();
+        + ":" + path.getVersion();
   }
 
   private String getAssetKey(final ArtifactPath path) {
