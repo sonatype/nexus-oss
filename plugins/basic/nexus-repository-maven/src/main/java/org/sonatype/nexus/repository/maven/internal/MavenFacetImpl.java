@@ -456,9 +456,7 @@ public class MavenFacetImpl
                                 final Payload content)
       throws IOException, InvalidContentException
   {
-    // TODO: sort hash parsing, this might be text produced by some tool like sha1sum is!
-    // TODO: sanity check for size!
-    final String artifactHash = MavenChecksumReader.readChecksum(content);
+    final String artifactHash = DigestExtractor.extract(content);
     if (artifactHash == null) {
       // we could not interpret the payload
       throw new InvalidContentException("Unrecognized checksum for path: " + path.getPath());

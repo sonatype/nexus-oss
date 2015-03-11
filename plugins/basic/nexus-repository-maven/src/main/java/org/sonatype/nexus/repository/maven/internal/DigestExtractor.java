@@ -18,48 +18,59 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.io.LimitedInputStream;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.io.CharStreams;
-import org.codehaus.plexus.util.StringUtils;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Utility class for reading up Maven .sha1/.md5 files that might be created by vast different tools out there.
+ * Utility class for extracting digest strings from Maven .sha1/.md5 files that originates from external source, and
+ * might be created by vastly different tools out there.
  *
  * @since 3.0
  */
-public class MavenChecksumReader
-    extends ComponentSupport
+public class DigestExtractor
 {
-  private MavenChecksumReader() {}
+  private static final int MAX_CHARS_NEEDED = 120;
+
+  private DigestExtractor() {}
 
   /**
-   * Reads the checksum file from a payload.
+   * Extract the digest string from a payload, that carries a payload of a Maven sha1/md5 file.
    *
-   * @see {@link #readChecksum(String)}
+   * @see {@link #extract(String)}
    */
   @Nullable
-  public static String readChecksum(final Payload payload)
+  public static String extract(final Payload payload)
       throws IOException
   {
-    // TODO: either check payload size or ensure we read only first few bytes
-    try (InputStreamReader isr = new InputStreamReader(payload.openInputStream(), Charsets.UTF_8)) {
-      return readChecksum(CharStreams.toString(isr));
+    checkNotNull(payload);
+    try (InputStreamReader isr = new InputStreamReader(
+        new LimitedInputStream(payload.openInputStream(), 0, MAX_CHARS_NEEDED),
+        Charsets.UTF_8)) {
+      return extract(CharStreams.toString(isr));
     }
   }
 
   /**
-   * Reads the checksum from a string. If result appears to be a checksum (cannot be 100% sure), it is returned,
+   * Extract the checksum from a string. If result appears to be a digest (cannot be 100% sure), it is returned,
    * otherwise {@code null}.
    */
   @Nullable
-  public static String readChecksum(final String input) {
-    // TODO: remove this
-    String raw = StringUtils.chomp(input).trim();
+  public static String extract(final String input) {
+    checkNotNull(input);
+    // we need most of MAX_CHARS_NEEDED characters from input
+    String raw = input.length() > MAX_CHARS_NEEDED ? input.substring(0, MAX_CHARS_NEEDED) : input;
+    // if multiline, we need the 1st line only
+    raw = raw.indexOf('\n') > -1 ? raw.substring(0, raw.indexOf('\n')) : raw;
+    // trim whatever we have
+    raw = raw.trim();
 
+    // check did we end up with empty string
     if (Strings.isNullOrEmpty(raw)) {
       return null;
     }
@@ -93,13 +104,6 @@ public class MavenChecksumReader
       digest = compress(raw.substring(0, raw.lastIndexOf(" ")).trim());
     }
 
-    if (!isDigest(digest)) {
-      // we have to return some string even if it's not a valid digest, because 'null' is treated as
-      // "checksum does not exist" elsewhere (AbstractChecksumContentValidator)
-      // -> fallback to original behavior
-      digest = raw.split(" ", 2)[0];
-    }
-
     if (isDigest(digest)) {
       return digest;
     }
@@ -109,7 +113,7 @@ public class MavenChecksumReader
   }
 
   /**
-   * Returns {@code true} if the string "looks like" maven hash file content (md5 or sha1).
+   * Returns {@code true} if the input string "looks like" digest hex (md5 or sha1).
    */
   public static boolean isDigest(final String digest) {
     return digest.length() >= 32 && digest.matches("^[a-z0-9]+$");

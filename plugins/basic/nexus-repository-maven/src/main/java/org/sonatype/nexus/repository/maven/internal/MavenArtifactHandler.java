@@ -49,8 +49,7 @@ public class MavenArtifactHandler
     final VersionPolicy versionPolicy = context.getRepository().facet(MavenFacet.class).getVersionPolicy();
     if (!allowsArtifactRepositoryPath(versionPolicy, coordinates)) {
       return HttpResponses.badRequest(
-          "Repository version policy '" + versionPolicy + "' does not allow version '" +
-              coordinates.getVersion() + "'");
+          "Repository version policy: " + versionPolicy + " does not allow version: " + coordinates.getVersion());
     }
     switch (action) {
       case GET: {
