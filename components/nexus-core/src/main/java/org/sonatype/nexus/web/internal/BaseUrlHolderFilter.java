@@ -37,17 +37,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Filter to set the value for {@link BaseUrlHolder}.
  *
  * @since 2.8
+ *
+ * @see BaseUrlHolderSetter
  */
 @Named
 @Singleton
 public class BaseUrlHolderFilter
   implements Filter
 {
-  private final GlobalRestApiSettings settings;
+  private final BaseUrlHolderSetter baseUrlHolderSetter;
 
   @Inject
-  public BaseUrlHolderFilter(final GlobalRestApiSettings settings) {
-    this.settings = checkNotNull(settings);
+  public BaseUrlHolderFilter(final BaseUrlHolderSetter baseUrlHolderSetter) {
+    this.baseUrlHolderSetter = checkNotNull(baseUrlHolderSetter);
   }
 
   @Override
@@ -64,42 +66,12 @@ public class BaseUrlHolderFilter
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
       throws IOException, ServletException
   {
-    String baseUrl = calculateBaseUrl((HttpServletRequest) request);
-    BaseUrlHolder.set(baseUrl);
+    baseUrlHolderSetter.set();
     try {
       chain.doFilter(request, response);
     }
     finally {
       BaseUrlHolder.unset();
     }
-  }
-
-  /**
-   * Calculates the "application root" URL, as seen by client (from {@link HttpServletRequest} made by it),
-   * or if "force base URL" configuration is set, to that URL.
-   */
-  @VisibleForTesting
-  String calculateBaseUrl(final HttpServletRequest request) {
-    StringBuilder buff = new StringBuilder();
-
-    if (settings.isEnabled() && settings.isForceBaseUrl() && !Strings.isNullOrEmpty(settings.getBaseUrl())) {
-      buff.append(settings.getBaseUrl());
-    }
-    else {
-      String requestUrl = request.getRequestURL().toString();
-      String pathInfo = request.getPathInfo();
-      if (!Strings.isNullOrEmpty(pathInfo)) {
-        requestUrl = requestUrl.substring(0, requestUrl.length() - pathInfo.length());
-      }
-
-      String servletPath = request.getServletPath();
-      if (!Strings.isNullOrEmpty(servletPath)) {
-        requestUrl = requestUrl.substring(0, requestUrl.length() - servletPath.length());
-      }
-
-      buff.append(requestUrl);
-    }
-
-    return buff.toString();
   }
 }
