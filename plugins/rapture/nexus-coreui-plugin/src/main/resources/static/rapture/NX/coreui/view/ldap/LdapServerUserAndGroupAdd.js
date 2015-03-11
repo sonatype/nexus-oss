@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupAdd', {
-  extend: 'NX.view.AddWindow',
+  extend: 'NX.view.AddPanel',
   alias: 'widget.nx-coreui-ldapserver-userandgroup-add',
   requires: [
     'NX.Conditions',
