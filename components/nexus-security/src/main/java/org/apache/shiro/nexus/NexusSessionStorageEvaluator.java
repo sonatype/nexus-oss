@@ -30,6 +30,9 @@ public class NexusSessionStorageEvaluator
 {
   private static final Logger log = LoggerFactory.getLogger(NexusSessionStorageEvaluator.class);
 
+  /**
+   * Disable storage for anonymous subject.
+   */
   @Override
   public boolean isSessionStorageEnabled(final Subject subject) {
     // HACK: info -> debug/trace
