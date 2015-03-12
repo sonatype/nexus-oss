@@ -64,11 +64,13 @@ public class DescriptionUtils
 
     if (request.isMultipart()) {
       for (Payload payload : request.getMultiparts()) {
-        desc.add("Request payload", toMap(payload));
+        desc.add("Payload", toMap(payload));
       }
     }
     else {
-      desc.add("Payload", request.getPayload());
+      if (request.getPayload() != null) {
+        desc.add("Payload", toMap(request.getPayload()));
+      }
     }
 
     desc.addTable("Headers", toMap(request.getHeaders()));
@@ -85,7 +87,7 @@ public class DescriptionUtils
     if (response instanceof PayloadResponse) {
       final PayloadResponse payloadResponse = (PayloadResponse) response;
       final Payload payload = payloadResponse.getPayload();
-      desc.addTable("Response payload", toMap(payload));
+      desc.addTable("Payload", toMap(payload));
     }
   }
 
