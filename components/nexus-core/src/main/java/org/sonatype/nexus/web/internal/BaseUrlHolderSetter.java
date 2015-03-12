@@ -24,14 +24,13 @@ import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
-import com.google.inject.OutOfScopeException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helper to set {@link BaseUrlHolder}.
  *
- * @since 2.8
+ * @since 2.11.3
  */
 @Named
 @Singleton
@@ -50,6 +49,9 @@ public class BaseUrlHolderSetter
     this.requestProvider = checkNotNull(requestProvider);
   }
 
+  /**
+   * Detect and set (if non-null) the base-url.
+   */
   public void set() {
     String url = detect();
     if (url != null) {
@@ -57,6 +59,23 @@ public class BaseUrlHolderSetter
     }
   }
 
+  /**
+   * Return the current HTTP servlet-request if there is one in the current scope.
+   */
+  @Nullable
+  private HttpServletRequest httpRequest() {
+    try {
+      return requestProvider.get();
+    }
+    catch (Exception e) {
+      log.trace("Unable to resolve HTTP servlet-request", e);
+      return null;
+    }
+  }
+
+  /**
+   * Detect base-url from forced settings, request or non-forced settings.
+   */
   @Nullable
   private String detect() {
     // force base-url always wins if set
@@ -64,11 +83,9 @@ public class BaseUrlHolderSetter
       return settings.getBaseUrl();
     }
 
-    // attempt to detect from request
-    try {
-      HttpServletRequest request = requestProvider.get();
-      assert request != null;
-
+    // attempt to detect from HTTP request
+    HttpServletRequest request = httpRequest();
+    if (request != null) {
       StringBuilder buff = new StringBuilder();
       String requestUrl = request.getRequestURL().toString();
       String pathInfo = request.getPathInfo();
@@ -83,9 +100,6 @@ public class BaseUrlHolderSetter
       buff.append(requestUrl);
 
       return buff.toString();
-    }
-    catch (OutOfScopeException e) {
-      // ignore not in scope of http request
     }
 
     // no request in context, non-forced base-url
