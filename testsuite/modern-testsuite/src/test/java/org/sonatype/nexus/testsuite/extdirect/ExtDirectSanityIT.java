@@ -16,9 +16,9 @@ package org.sonatype.nexus.testsuite.extdirect;
 
 //import org.sonatype.nexus.client.jersey.JerseyNexusClient;
 
-import org.sonatype.nexus.testsuite.NexusCoreITSupport;
+//import org.sonatype.nexus.testsuite.NexusCoreITSupport;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+//import com.fasterxml.jackson.annotation.JsonProperty;
 import org.junit.Ignore;
 
 /**
@@ -28,12 +28,8 @@ import org.junit.Ignore;
  */
 @Ignore("FIXME: Updates for REST client required")
 public class ExtDirectSanityIT
-    extends NexusCoreITSupport
+//    extends NexusCoreITSupport
 {
-
-  public ExtDirectSanityIT(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
-  }
 
   ///**
   // * Verify that generated Ext.Direct api contains discovered "Test" resource.
@@ -75,57 +71,57 @@ public class ExtDirectSanityIT
   //  assertThat(result.result.data, is(notNullValue()));
   //}
 
-  public static class ExtDirectPayload
-  {
-    private static int count = 0;
-
-    @JsonProperty("action")
-    private String action;
-
-    @JsonProperty("method")
-    private String method;
-
-    @JsonProperty("data")
-    private Object data;
-
-    @JsonProperty("type")
-    private String type = "rpc";
-
-    @JsonProperty("tid")
-    private int tid;
-
-    public ExtDirectPayload() {
-      tid = ++count;
-    }
-
-  }
-
-  public static class ExtDirectResponse
-  {
-    @JsonProperty("action")
-    private String action;
-
-    @JsonProperty("method")
-    private String method;
-
-    @JsonProperty("result")
-    private Result result;
-
-    @JsonProperty("type")
-    private String type = "rpc";
-
-    @JsonProperty("tid")
-    private int tid;
-
-    public static class Result
-    {
-      @JsonProperty("success")
-      private boolean success;
-
-      @JsonProperty("data")
-      private String data;
-    }
-
-  }
+//  public static class ExtDirectPayload
+//  {
+//    private static int count = 0;
+//
+//    @JsonProperty("action")
+//    private String action;
+//
+//    @JsonProperty("method")
+//    private String method;
+//
+//    @JsonProperty("data")
+//    private Object data;
+//
+//    @JsonProperty("type")
+//    private String type = "rpc";
+//
+//    @JsonProperty("tid")
+//    private int tid;
+//
+//    public ExtDirectPayload() {
+//      tid = ++count;
+//    }
+//
+//  }
+//
+//  public static class ExtDirectResponse
+//  {
+//    @JsonProperty("action")
+//    private String action;
+//
+//    @JsonProperty("method")
+//    private String method;
+//
+//    @JsonProperty("result")
+//    private Result result;
+//
+//    @JsonProperty("type")
+//    private String type = "rpc";
+//
+//    @JsonProperty("tid")
+//    private int tid;
+//
+//    public static class Result
+//    {
+//      @JsonProperty("success")
+//      private boolean success;
+//
+//      @JsonProperty("data")
+//      private String data;
+//    }
+//
+//  }
 
 }

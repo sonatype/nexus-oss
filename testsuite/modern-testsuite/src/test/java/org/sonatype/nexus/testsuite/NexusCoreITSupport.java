@@ -12,35 +12,31 @@
  */
 package org.sonatype.nexus.testsuite;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
-
-import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
+//import java.text.SimpleDateFormat;
+//import java.util.Date;
+//
+//import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
+//import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
+//
+//import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
 
 /**
  * Support for Core integration tests.
  *
  * @since 2.4
  */
-@NexusStartAndStopStrategy(EACH_TEST)
+//@NexusStartAndStopStrategy(EACH_TEST)
 public abstract class NexusCoreITSupport
-    extends NexusRunningParametrizedITSupport
+//    extends NexusRunningParametrizedITSupport
 {
 
-  protected NexusCoreITSupport(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
-  }
-
-  /**
-   * Creates unique name with given prefix.
-   *
-   * @return a unique name.
-   */
-  public static String uniqueName(final String prefix) {
-    return prefix + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date());
-  }
+//  /**
+//   * Creates unique name with given prefix.
+//   *
+//   * @return a unique name.
+//   */
+//  public static String uniqueName(final String prefix) {
+//    return prefix + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date());
+//  }
 
 }

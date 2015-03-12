@@ -12,34 +12,30 @@
  */
 package org.sonatype.nexus.testsuite.capabilities;
 
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
-
-import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
+//import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+//import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
+//import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
+//
+//import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
 
 //import org.sonatype.nexus.capabilities.client.Capabilities;
 //import org.sonatype.nexus.capabilities.client.Capability;
 //import static org.sonatype.nexus.capabilities.client.Filter.capabilitiesThat;
 
-@NexusStartAndStopStrategy(EACH_TEST)
+//@NexusStartAndStopStrategy(EACH_TEST)
 public abstract class CapabilitiesITSupport
-    extends NexusRunningParametrizedITSupport
+//    extends NexusRunningParametrizedITSupport
 {
 
-  public CapabilitiesITSupport(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
-  }
-
-  @Override
-  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return configuration
-        .setLogPattern("%d{HH:mm:ss.SSS} %-5level - %msg%n")
-        .setLogLevel("org.sonatype.nexus.plugins.capabilities", "DEBUG")
-        .setLogLevel("org.sonatype.sisu.goodies.eventbus", "DEBUG")
-        .setSystemProperty("guava.eventBus", "default")
-        .addFeatures("nexus-capabilities-testsuite-plugin");
-  }
+//  @Override
+//  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
+//    return configuration
+//        .setLogPattern("%d{HH:mm:ss.SSS} %-5level - %msg%n")
+//        .setLogLevel("org.sonatype.nexus.plugins.capabilities", "DEBUG")
+//        .setLogLevel("org.sonatype.sisu.goodies.eventbus", "DEBUG")
+//        .setSystemProperty("guava.eventBus", "default")
+//        .addFeatures("nexus-capabilities-testsuite-plugin");
+//  }
 
   //protected void removeAllMessageCapabilities() {
   //  final Collection<Capability> messageCapabilities = capabilities().get(

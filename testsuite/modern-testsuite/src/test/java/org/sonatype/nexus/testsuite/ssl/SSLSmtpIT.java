@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus.testsuite.ssl;
 
-import javax.inject.Inject;
-
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.sisu.bl.support.port.PortReservationService;
+//import javax.inject.Inject;
+//
+//import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+//import org.sonatype.sisu.bl.support.port.PortReservationService;
 
 import org.junit.Ignore;
 
@@ -24,23 +24,19 @@ import org.junit.Ignore;
  */
 @Ignore("FIXME: Updates for REST client required")
 public class SSLSmtpIT
-    extends SSLITSupport
+//    extends SSLITSupport
 {
 
-  @Inject
-  private PortReservationService portReservationService;
-
-  public SSLSmtpIT(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
-  }
-
-  @Override
-  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return super.configureNexus(configuration)
-        .setSystemProperty(
-            "org.sonatype.nexus.ssl.smtp.checkServerIdentity", "false"
-        );
-  }
+//  @Inject
+//  private PortReservationService portReservationService;
+//
+//  @Override
+//  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
+//    return super.configureNexus(configuration)
+//        .setSystemProperty(
+//            "org.sonatype.nexus.ssl.smtp.checkServerIdentity", "false"
+//        );
+//  }
 
   ///**
   // * Verify SMTP trust store key.

@@ -12,17 +12,17 @@
  */
 package org.sonatype.nexus.testsuite.ssl;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
-
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-
-import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
+//import java.text.SimpleDateFormat;
+//import java.util.Date;
+//
+//import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+//import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
+//import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
+//
+//import org.junit.Rule;
+//import org.junit.rules.ExpectedException;
+//
+//import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
 
 //import com.sonatype.nexus.ssl.client.Certificates;
 //import com.sonatype.nexus.ssl.client.TrustStore;
@@ -31,30 +31,27 @@ import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Str
 /**
  * Support for ssl integration tests.
  */
-@NexusStartAndStopStrategy(EACH_TEST)
+//@NexusStartAndStopStrategy(EACH_TEST)
 public class SSLITSupport
-    extends NexusRunningParametrizedITSupport
+//    extends NexusRunningParametrizedITSupport
 {
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
+//  @Rule
+//  public ExpectedException thrown = ExpectedException.none();
+//
+//  @Override
+//  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
+//    return configuration
+//        .setLogLevel("org.sonatype.siesta", "TRACE")
+//        .setLogLevel("com.sonatype.nexus.ssl", "DEBUG")
+//        .setLogLevel("org.sonatype.sisu.goodies.ssl", "DEBUG")
+//        .setLogLevel("org.sonatype.licensing", "TRACE");
+//  }
+//
+//  public static String uniqueName(final String prefix) {
+//    return prefix + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date());
+//  }
 
-  public SSLITSupport(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
-  }
-
-  @Override
-  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return configuration
-        .setLogLevel("org.sonatype.siesta", "TRACE")
-        .setLogLevel("com.sonatype.nexus.ssl", "DEBUG")
-        .setLogLevel("org.sonatype.sisu.goodies.ssl", "DEBUG")
-        .setLogLevel("org.sonatype.licensing", "TRACE");
-  }
-
-  public static String uniqueName(final String prefix) {
-    return prefix + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date());
-  }
   //
   //public TrustStore truststore() {
   //  return client().getSubsystem(TrustStore.class);

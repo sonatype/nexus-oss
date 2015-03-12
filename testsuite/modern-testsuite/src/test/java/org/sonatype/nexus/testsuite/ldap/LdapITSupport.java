@@ -12,17 +12,17 @@
  */
 package org.sonatype.nexus.testsuite.ldap;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
-
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-
-import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
+//import java.text.SimpleDateFormat;
+//import java.util.Date;
+//
+//import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+//import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
+//import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
+//
+//import org.junit.Rule;
+//import org.junit.rules.ExpectedException;
+//
+//import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
 
 //import com.sonatype.nexus.ssl.client.Certificates;
 //import com.sonatype.nexus.ssl.client.TrustStore;
@@ -31,31 +31,27 @@ import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Str
 /**
  * Support for LDAP integration tests.
  */
-@NexusStartAndStopStrategy(EACH_TEST)
+//@NexusStartAndStopStrategy(EACH_TEST)
 public class LdapITSupport
-    extends NexusRunningParametrizedITSupport
+//    extends NexusRunningParametrizedITSupport
 {
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
-
-  public LdapITSupport(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
-  }
-
-  @Override
-  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return configuration
-        .setLogLevel("com.sonatype.nexus.ssl", "DEBUG")
-        .setLogLevel("org.sonatype.sisu.goodies.ssl", "DEBUG")
-        .setLogLevel("com.sonatype.nexus.ssl", "DEBUG")
-        .setLogLevel("com.sonatype.nexus.ldap", "DEBUG")
-        .setLogLevel("com.sonatype.security.ldap", "DEBUG");
-  }
-
-  public static String uniqueName(final String prefix) {
-    return prefix + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date());
-  }
+//  @Rule
+//  public ExpectedException thrown = ExpectedException.none();
+//
+//  @Override
+//  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
+//    return configuration
+//        .setLogLevel("com.sonatype.nexus.ssl", "DEBUG")
+//        .setLogLevel("org.sonatype.sisu.goodies.ssl", "DEBUG")
+//        .setLogLevel("com.sonatype.nexus.ssl", "DEBUG")
+//        .setLogLevel("com.sonatype.nexus.ldap", "DEBUG")
+//        .setLogLevel("com.sonatype.security.ldap", "DEBUG");
+//  }
+//
+//  public static String uniqueName(final String prefix) {
+//    return prefix + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date());
+//  }
 
   //public TrustStore truststore() {
   //  return client().getSubsystem(TrustStore.class);

@@ -15,30 +15,26 @@ package org.sonatype.nexus.testsuite.ldap;
 //import org.sonatype.sisu.siesta.common.validation.ValidationErrorsException;
 
 import org.junit.Ignore;
-import org.junit.Test;
+//import org.junit.Test;
 
 /**
  * ITs related to trust store keys.
  */
 @Ignore("FIXME: Updates for REST client required")
 public class LdapIT
-    extends LdapITSupport
+//    extends LdapITSupport
 {
 
-  public LdapIT(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
-  }
-
-  /**
-   * Verify LDAP trust store key cannot be enabled for an inexistent LDAP server.
-   */
-  @Test
-  public void ldapTrustStoreKeysCannotBeEnabledForInexistentLdapServer()
-      throws Exception
-  {
-    //thrown.expect(ValidationErrorsException.class);
-
-    //truststore().enableFor(ldapTrustStoreKey(uniqueName("ldap")));
-  }
+//  /**
+//   * Verify LDAP trust store key cannot be enabled for an inexistent LDAP server.
+//   */
+//  @Test
+//  public void ldapTrustStoreKeysCannotBeEnabledForInexistentLdapServer()
+//      throws Exception
+//  {
+//    thrown.expect(ValidationErrorsException.class);
+//
+//    truststore().enableFor(ldapTrustStoreKey(uniqueName("ldap")));
+//  }
 
 }

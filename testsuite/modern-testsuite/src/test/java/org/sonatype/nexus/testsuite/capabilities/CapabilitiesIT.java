@@ -13,8 +13,8 @@
 package org.sonatype.nexus.testsuite.capabilities;
 
 import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
+//import org.junit.Rule;
+//import org.junit.rules.ExpectedException;
 
 //import org.sonatype.nexus.capabilities.client.Capability;
 //import org.sonatype.nexus.testsuite.capabilities.client.CapabilityA;
@@ -34,15 +34,11 @@ import org.junit.rules.ExpectedException;
 
 @Ignore("FIXME: Updates for REST client required")
 public class CapabilitiesIT
-    extends CapabilitiesITSupport
+//    extends CapabilitiesITSupport
 {
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
-
-  public CapabilitiesIT(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
-  }
+//  @Rule
+//  public ExpectedException thrown = ExpectedException.none();
 
   //@Test
   //public void crudTypedA() {

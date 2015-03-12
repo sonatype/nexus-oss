@@ -21,12 +21,8 @@ import org.junit.Ignore;
  */
 @Ignore("FIXME: Updates for REST client required")
 public class SSLTrustStoreIT
-    extends SSLITSupport
+//    extends SSLITSupport
 {
-
-  public SSLTrustStoreIT(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
-  }
 
   //@Before
   //public void prepare() {

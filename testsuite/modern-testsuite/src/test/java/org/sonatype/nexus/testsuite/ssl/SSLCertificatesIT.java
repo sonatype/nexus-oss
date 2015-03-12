@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.testsuite.ssl;
 
-import javax.inject.Inject;
-
-import org.sonatype.sisu.bl.support.port.PortReservationService;
-import org.sonatype.tests.http.server.fluent.Server;
-
-import com.icegreen.greenmail.util.GreenMail;
-import org.junit.After;
+//import javax.inject.Inject;
+//
+//import org.sonatype.sisu.bl.support.port.PortReservationService;
+//import org.sonatype.tests.http.server.fluent.Server;
+//
+//import com.icegreen.greenmail.util.GreenMail;
+//import org.junit.After;
 import org.junit.Ignore;
 
 //import com.sonatype.nexus.ssl.client.Certificate;
@@ -28,37 +28,33 @@ import org.junit.Ignore;
  */
 @Ignore("FIXME: Updates for REST client required")
 public class SSLCertificatesIT
-    extends SSLITSupport
+//    extends SSLITSupport
 {
 
-  private Server httpServer;
-
-  private GreenMail mailServer;
-
-  @Inject
-  private PortReservationService portReservationService;
-
-  public SSLCertificatesIT(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
-  }
-
-  @After
-  public void stopHttpServer()
-      throws Exception
-  {
-    if (httpServer != null) {
-      httpServer.stop();
-    }
-  }
-
-  @After
-  public void stopMailServer()
-      throws Exception
-  {
-    if (mailServer != null) {
-      mailServer.stop();
-    }
-  }
+//  private Server httpServer;
+//
+//  private GreenMail mailServer;
+//
+//  @Inject
+//  private PortReservationService portReservationService;
+//
+//  @After
+//  public void stopHttpServer()
+//      throws Exception
+//  {
+//    if (httpServer != null) {
+//      httpServer.stop();
+//    }
+//  }
+//
+//  @After
+//  public void stopMailServer()
+//      throws Exception
+//  {
+//    if (mailServer != null) {
+//      mailServer.stop();
+//    }
+//  }
 
   ///**
   // * Verify that we can retrieve certificate from host:port.
