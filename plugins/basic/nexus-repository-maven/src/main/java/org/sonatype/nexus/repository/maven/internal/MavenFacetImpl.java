@@ -447,12 +447,14 @@ public class MavenFacetImpl
   private void verifyAssetChecksum(final StorageTx tx, final Path checksumPath)
       throws IOException, InvalidContentException
   {
+    checkState(checksumPath.isHash()); // sanity check, if not, bad call is made here
     if (ChecksumPolicy.IGNORE == this.checksumPolicy) {
       return; // just ignore it
     }
     final OrientVertex mainAsset = findAsset(tx, checksumPath.subordinateOf(), tx.getBucket());
     final String internalChecksum = tx.getAttributes(mainAsset).child(StorageFacet.P_CHECKSUM).require(
         checksumPath.getHashType().getHashAlgorithm().name(), String.class);
+    checkState(!Strings.isNullOrEmpty(internalChecksum)); // sanity check, this MUST exists
 
     final OrientVertex checksumAsset = findAsset(tx, checksumPath, tx.getBucket());
     final BlobRef blobRef = getBlobRef(checksumPath, checksumAsset);
@@ -460,18 +462,24 @@ public class MavenFacetImpl
     final String externalChecksum = DigestExtractor.extract(blob);
     if (Strings.isNullOrEmpty(externalChecksum)) {
       // we could not interpret the stored payload
-      throw new InvalidContentException("Unrecognized checksum for path: " + checksumPath.getPath());
-    }
-
-    if (!Objects.equals(internalChecksum, externalChecksum)) {
-      final String message =
-          "Invalid checksum for " + checksumPath.getPath() + ": expected '" + internalChecksum + "' got '" +
-              externalChecksum + "'";
+      final String message = "Unrecognized checksum for path: " + checksumPath.getPath();
       if (ChecksumPolicy.WARN == this.checksumPolicy) {
         log.warn(message);
       }
       else {
         throw new InvalidContentException(message);
+      }
+    } else {
+      if (!Objects.equals(internalChecksum, externalChecksum)) {
+        final String message =
+            "Invalid checksum for " + checksumPath.getPath() + ": expected '" + internalChecksum + "' got '" +
+                externalChecksum + "'";
+        if (ChecksumPolicy.WARN == this.checksumPolicy) {
+          log.warn(message);
+        }
+        else {
+          throw new InvalidContentException(message);
+        }
       }
     }
   }
