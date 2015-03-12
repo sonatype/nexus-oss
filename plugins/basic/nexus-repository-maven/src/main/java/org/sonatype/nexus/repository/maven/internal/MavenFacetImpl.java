@@ -217,7 +217,6 @@ public class MavenFacetImpl
           assetAttributes.set(P_CLASSIFIER, path.getClassifier());
         }
         assetAttributes.set(P_EXTENSION, path.getExtension());
-        assetAttributes.set(P_LAST_MODIFIED, content.getLastModified().toDate());
 
         // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
       }
@@ -297,7 +296,6 @@ public class MavenFacetImpl
         assetAttributes.set(P_ASSET_KIND, ASSET_KIND_METADATA);
         assetAttributes.set(StorageFacet.P_NAME, path.getFileName());
         assetAttributes.set(StorageFacet.P_PATH, path.getPath());
-        assetAttributes.set(P_LAST_MODIFIED, content.getLastModified().toDate());
 
         // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
       }
@@ -351,7 +349,8 @@ public class MavenFacetImpl
         tx.setBlob(is, headers, asset, MavenPayload.HASH_ALGORITHMS, contentType);
       }
     }
-    asset.setProperty(StorageFacet.P_LAST_UPDATED, payload.getLastUpdated().toDate());
+    asset.setProperty(StorageFacet.P_LAST_UPDATED, new Date()); // now
+    getFormatAttributes(tx, asset).set(P_LAST_MODIFIED, payload.getLastModified().toDate());
   }
 
   /**

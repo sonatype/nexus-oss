@@ -83,11 +83,19 @@ public class MavenPayload
     return payload.getContentType();
   }
 
+  /**
+   * If this instance is read from {@link MavenFacet} then the returned value will represent when the underlying
+   * structures (internals of storage) did change last time. This is NOT like a file last modified timestamp, this is
+   * only for internal use.
+   */
   @Nonnull
   public DateTime getLastUpdated() {
     return lastUpdated;
   }
 
+  /**
+   * The file "last modified" timestamp alike value, shows when did the underlying content last changed.
+   */
   @Nonnull
   public DateTime getLastModified() {
     return lastModified;
