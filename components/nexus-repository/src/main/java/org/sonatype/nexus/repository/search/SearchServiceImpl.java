@@ -227,7 +227,7 @@ public class SearchServiceImpl
     }
     catch (IndexMissingException e) {
       // no repositories were created yet, so there is no point in searching
-      return null;
+      return new SearchResponse(InternalSearchResponse.empty(), null, 0, 0, 0, new ShardSearchFailure[]{});
     }
     final String[] searchableIndexes = getSearchableIndexes();
     if (searchableIndexes.length == 0) {

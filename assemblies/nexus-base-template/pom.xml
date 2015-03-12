@@ -349,9 +349,9 @@
                 <copy file="${com.google.code.findbugs:jsr305:jar}" todir="${project.build.directory}/assembly/lib"/>
                 <copy file="${org.sonatype.nexus.assemblies:karaf-nexus-branding:jar}" todir="${project.build.directory}/assembly/lib"/>
 
-                <!-- delete some cruft which karaf includes by default -->
                 <delete>
                   <fileset dir="${project.build.directory}/assembly">
+                    <!-- delete some cruft which karaf includes by default -->
                     <include name="**/README"/>
                     <include name="etc/all.policy"/>
                     <include name="etc/distribution.info"/>
@@ -362,21 +362,15 @@
                     <include name="etc/org.apache.karaf.features.repos.cfg"/>
                     <include name="etc/org.apache.karaf.command.acl.*.cfg"/>
                     <include name="etc/jmx.acl.*.cfg"/>
+
+                    <!-- remove xercesImpl -->
+                    <include name="lib/endorsed/xercesImpl*.jar"/>
                   </fileset>
                 </delete>
 
                 <!-- this property is no longer required for local attach in Java7; removing it avoids random port -->
                 <replace file="${project.build.directory}/assembly/bin/karaf" token="-Dcom.sun.management.jmxremote"/>
                 <replace file="${project.build.directory}/assembly/bin/karaf.bat" token="-Dcom.sun.management.jmxremote"/>
-
-                <replace file="${project.build.directory}/assembly/etc/config.properties">
-                  <!-- include a few additional extra packages required by our environment -->
-                  <replacefilter token="packages.extra="
-                                 value="packages.extra= \${line.separator} sun.security.ssl, \${line.separator} com.sun.net.httpserver, \${line.separator} javax.annotation;version=1.2, \${line.separator} javax.annotation.security;version=1.2, \${line.separator} org.xerial.snappy,"/>
-                  <!-- comment this so mvn: protocol is active as soon as possible -->
-                  <replacefilter token="org.ops4j.pax.url.mvn.requireConfigAdminConfig"
-                                 value="#org.ops4j.pax.url.mvn.requireConfigAdminConfig"/>
-                </replace>
 
                 <!-- trim out various enterprise/deployment features we don't need at the moment -->
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg">
