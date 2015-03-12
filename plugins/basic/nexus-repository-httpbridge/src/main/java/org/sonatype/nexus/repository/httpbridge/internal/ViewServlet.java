@@ -153,27 +153,28 @@ public class ViewServlet
   }
 
   @VisibleForTesting
-  void dispatchAndSend(final Request request, final ViewFacet facet, final HttpResponseSender sender,
-                       final HttpServletResponse httpResponse) throws Exception
+  void dispatchAndSend(final Request request,
+                       final ViewFacet facet,
+                       final HttpResponseSender sender,
+                       final HttpServletResponse httpResponse)
+      throws Exception
   {
     Response response = null;
+    Exception failure = null;
     try {
       response = facet.dispatch(request);
     }
     catch (Exception e) {
-      if (request.getParameters().contains("describe")) {
-        send(describe(request, response, e), httpResponse);
-        return;
-      }
-      else {
-        throw e;
-      }
+      failure = e;
     }
 
     if (request.getParameters().contains("describe")) {
-      send(describe(request, response, null), httpResponse);
+      send(describe(request, response, failure), httpResponse);
     }
     else {
+      if (failure != null) {
+        throw failure;
+      }
       log.debug("HTTP response sender: {}", sender);
       sender.send(response, httpResponse);
     }

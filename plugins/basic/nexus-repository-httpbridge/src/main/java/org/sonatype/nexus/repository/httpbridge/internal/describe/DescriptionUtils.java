@@ -21,37 +21,20 @@ import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
 /**
- * Utility methods for transforming content int
+ * Helper to render description information.
  *
  * @since 3.0
  */
 public class DescriptionUtils
 {
-  private DescriptionUtils() {
-  }
-
-  public static Map<String, Object> toMap(final Iterable<Entry<String, Object>> entries) {
-    Map<String, Object> table = Maps.newHashMap();
-    for (Entry<String, Object> entry : entries) {
-      table.put(entry.getKey(), entry.getValue());
-    }
-    return table;
-  }
-
-  public static Map<String, Object> toMap(final StringMultimap headers) {
-    Map<String, Object> table = Maps.newHashMap();
-    final Iterable<Entry<String, String>> entries = headers.entries();
-    for (Entry<String, String> e : entries) {
-      table.put(e.getKey(), e.getValue());
-    }
-    return table;
-  }
+  private DescriptionUtils() {}
 
   public static void describeRequest(final Description desc, final Request request) {
     desc.topic("Request");
@@ -64,12 +47,12 @@ public class DescriptionUtils
 
     if (request.isMultipart()) {
       for (Payload payload : request.getMultiparts()) {
-        desc.add("Payload", toMap(payload));
+        desc.addTable("Payload", toMap(payload));
       }
     }
     else {
       if (request.getPayload() != null) {
-        desc.add("Payload", toMap(request.getPayload()));
+        desc.addTable("Payload", toMap(request.getPayload()));
       }
     }
 
@@ -77,8 +60,7 @@ public class DescriptionUtils
     desc.addTable("Attributes", toMap(request.getAttributes()));
   }
 
-  public static void describeResponse(final Description desc, final Response response)
-  {
+  public static void describeResponse(final Description desc, final Response response) {
     desc.topic("Response");
 
     desc.addTable("Headers", toMap(response.getHeaders()));
@@ -101,14 +83,26 @@ public class DescriptionUtils
   public static void describeException(final Description d, final Exception e) {
     d.topic("Exception during handler processing");
 
-    Throwable ex = e;
-    while (ex != null) {
-      d.add("Exception during handler processing",
-          ImmutableMap.of(
-              "Class", ex.getClass().getSimpleName(),
-              "Message", nullToEmpty(e.getMessage())
-          ));
-      ex = ex.getCause();
+    for (Throwable cause : Throwables.getCausalChain(e)) {
+      d.addTable(cause.getClass().getName(),
+          ImmutableMap.<String, Object>of("Message", nullToEmpty(cause.getMessage())));
     }
+  }
+
+  private static Map<String, Object> toMap(final Iterable<Entry<String, Object>> entries) {
+    Map<String, Object> table = Maps.newHashMap();
+    for (Entry<String, Object> entry : entries) {
+      table.put(entry.getKey(), entry.getValue());
+    }
+    return table;
+  }
+
+  private static Map<String, Object> toMap(final StringMultimap headers) {
+    Map<String, Object> table = Maps.newHashMap();
+    final Iterable<Entry<String, String>> entries = headers.entries();
+    for (Entry<String, String> e : entries) {
+      table.put(e.getKey(), e.getValue());
+    }
+    return table;
   }
 }
