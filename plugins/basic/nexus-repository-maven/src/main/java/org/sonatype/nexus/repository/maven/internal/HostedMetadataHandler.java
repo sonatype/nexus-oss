@@ -12,21 +12,13 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
-import javax.annotation.Nonnull;
+import java.io.IOException;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.content.InvalidContentException;
-import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
-import static org.sonatype.nexus.repository.http.HttpMethods.GET;
-import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 
 /**
  * Maven metadata handler.
@@ -36,44 +28,27 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 @Singleton
 @Named
 public class HostedMetadataHandler
-    extends ComponentSupport
-    implements Handler
+    extends HostedHandlerSupport<Path>
 {
-  @Nonnull
   @Override
-  public Response handle(final @Nonnull Context context) throws Exception {
-    final String action = context.getRequest().getAction();
-    final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
-    final Path path = context.getAttributes().require(Path.class);
-    switch (action) {
-      case GET: {
-        final Payload content = mavenFacet.getMetadata(path);
-        if (content == null) {
-          return HttpResponses.notFound(path.getPath());
-        }
-        return HttpResponses.ok(content);
-      }
+  protected Path getPath(final Context context) throws IllegalArgumentException {
+    return context.getAttributes().require(Path.class);
+  }
 
-      case PUT: {
-        try {
-          mavenFacet.putMetadata(path, context.getRequest().getPayload());
-          return HttpResponses.created();
-        }
-        catch (InvalidContentException e) {
-          return HttpResponses.badRequest(e.getMessage());
-        }
-      }
+  @Override
+  protected MavenPayload get(final Context context, final Path path) throws IOException {
+    return context.getRepository().facet(MavenFacet.class).getMetadata(path);
+  }
 
-      case DELETE: {
-        final boolean deleted = mavenFacet.deleteMetadata(path);
-        if (!deleted) {
-          return HttpResponses.notFound(path.getPath());
-        }
-        return HttpResponses.noContent();
-      }
+  @Override
+  protected void put(final Context context, final Path path, final MavenPayload payload)
+      throws IOException, InvalidContentException
+  {
+    context.getRepository().facet(MavenFacet.class).putMetadata(path, payload);
+  }
 
-      default:
-        return HttpResponses.methodNotAllowed(context.getRequest().getAction(), GET, PUT, DELETE);
-    }
+  @Override
+  protected boolean delete(final Context context, final Path path) throws IOException {
+    return context.getRepository().facet(MavenFacet.class).deleteMetadata(path);
   }
 }

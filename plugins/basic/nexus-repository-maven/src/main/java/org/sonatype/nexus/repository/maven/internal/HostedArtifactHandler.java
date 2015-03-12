@@ -12,77 +12,54 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
-import javax.annotation.Nonnull;
+import java.io.IOException;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.content.InvalidContentException;
-import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
-import static org.sonatype.nexus.repository.http.HttpMethods.GET;
-import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 
 /**
- * Maven artifact handler.
+ * Maven hosted artifact handler.
  *
  * @since 3.0
  */
 @Singleton
 @Named
 public class HostedArtifactHandler
-    extends ComponentSupport
-    implements Handler
+    extends HostedHandlerSupport<ArtifactPath>
 {
-  @Nonnull
   @Override
-  public Response handle(final @Nonnull Context context) throws Exception {
-    final String action = context.getRequest().getAction();
-    final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
+  protected ArtifactPath getPath(final Context context) throws IllegalArgumentException {
     final ArtifactPath artifactPath = context.getAttributes().require(ArtifactPath.class);
-
     final VersionPolicy versionPolicy = context.getRepository().facet(MavenFacet.class).getVersionPolicy();
     if (!allowsArtifactRepositoryPath(versionPolicy, artifactPath)) {
-      return HttpResponses.badRequest(
+      throw new IllegalArgumentException(
           "Repository version policy: " + versionPolicy + " does not allow version: " + artifactPath.getVersion());
     }
-    switch (action) {
-      case GET: {
-        final Payload content = mavenFacet.getArtifact(artifactPath);
-        if (content == null) {
-          return HttpResponses.notFound(artifactPath.getPath());
-        }
-        return HttpResponses.ok(content);
-      }
-
-      case PUT: {
-        try {
-          mavenFacet.putArtifact(artifactPath, context.getRequest().getPayload());
-          return HttpResponses.created();
-        }
-        catch (InvalidContentException e) {
-          return HttpResponses.badRequest(e.getMessage());
-        }
-      }
-
-      case DELETE: {
-        final boolean deleted = mavenFacet.deleteArtifact(artifactPath);
-        if (!deleted) {
-          return HttpResponses.notFound(artifactPath.getPath());
-        }
-        return HttpResponses.noContent();
-      }
-
-      default:
-        return HttpResponses.methodNotAllowed(context.getRequest().getAction(), GET, PUT, DELETE);
-    }
+    return artifactPath;
   }
+
+  @Override
+  protected MavenPayload get(final Context context, final ArtifactPath path) throws IOException {
+    return context.getRepository().facet(MavenFacet.class).getArtifact(path);
+  }
+
+  @Override
+  protected void put(final Context context, final ArtifactPath path, final MavenPayload payload)
+      throws IOException, InvalidContentException
+  {
+    context.getRepository().facet(MavenFacet.class).putArtifact(path, payload);
+  }
+
+  @Override
+  protected boolean delete(final Context context, final ArtifactPath path) throws IOException {
+    return context.getRepository().facet(MavenFacet.class).deleteArtifact(path);
+  }
+
+  // ==
 
   private boolean allowsArtifactRepositoryPath(final VersionPolicy versionPolicy, final ArtifactPath path) {
     if (versionPolicy == VersionPolicy.SNAPSHOT) {

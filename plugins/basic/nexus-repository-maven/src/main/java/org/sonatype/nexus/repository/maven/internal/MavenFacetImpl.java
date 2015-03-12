@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
@@ -36,20 +37,20 @@ import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.hash.HashCode;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
-import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 
 /**
  * A {@link MavenFacet} that persists Maven artifacts and metadata to a {@link StorageFacet}.
@@ -95,15 +96,13 @@ public class MavenFacetImpl
 
   private static final String P_ASSET_KEY = "key"; // asset key: G:A:V[:C]:E for fast look-ups
 
+  private static final String P_LAST_MODIFIED = "lastModified";
+
   private static final String P_ASSET_KIND = "kind"; // denoting asset kind
 
   private static final String ASSET_KIND_ARTIFACT = "artifact";
 
   private static final String ASSET_KIND_METADATA = "metadata";
-
-  // ==
-
-  private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(MD5, SHA1);
 
   // ==
 
@@ -152,7 +151,7 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
-  public Payload getArtifact(final ArtifactPath path) throws IOException {
+  public MavenPayload getArtifact(final ArtifactPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex component = findComponent(tx, path, tx.getBucket());
       if (component == null) {
@@ -166,19 +165,18 @@ public class MavenFacetImpl
       final Blob blob = tx.getBlob(blobRef);
       checkState(blob != null, "asset of component with at path %s refers to missing blob %s", path.getPath(),
           blobRef);
-      return marshall(asset, blob);
+      return marshall(tx, asset, blob);
     }
   }
 
   @Override
-  public void putArtifact(final ArtifactPath path, final Payload content)
+  public void putArtifact(final ArtifactPath path, final MavenPayload content)
       throws IOException, InvalidContentException
   {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex bucket = tx.getBucket();
-      OrientVertex component = findComponent(tx, path, bucket);
+      OrientVertex component = findComponent(tx, path, tx.getBucket());
       if (component == null) {
-        component = tx.createComponent(bucket);
+        component = tx.createComponent(tx.getBucket());
 
         // Set normalized properties: format, group, and name
         component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue()); // M1 or M2!!!
@@ -199,7 +197,7 @@ public class MavenFacetImpl
 
       OrientVertex asset = selectComponentAsset(tx, component, path);
       if (asset == null) {
-        asset = tx.createAsset(bucket);
+        asset = tx.createAsset(tx.getBucket());
         asset.addEdge(StorageFacet.E_PART_OF_COMPONENT, component);
         asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
         asset.setProperty(StorageFacet.P_PATH, path.getPath());
@@ -218,6 +216,7 @@ public class MavenFacetImpl
           assetAttributes.set(P_CLASSIFIER, path.getClassifier());
         }
         assetAttributes.set(P_EXTENSION, path.getExtension());
+        assetAttributes.set(P_LAST_MODIFIED, content.getLastModified().toDate());
 
         // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
       }
@@ -230,12 +229,12 @@ public class MavenFacetImpl
 
       try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
         try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
-          tx.setBlob(is1, headers, asset, hashAlgorithms,
+          tx.setBlob(is1, headers, asset, MavenPayload.HASH_ALGORITHMS,
               determineContentType(path, is2, content.getContentType()));
         }
       }
 
-      asset.setProperty(StorageFacet.P_LAST_UPDATED, new Date());
+      asset.setProperty(StorageFacet.P_LAST_UPDATED, content.getLastUpdated().toDate());
 
       try {
         if (path.isHash()) {
@@ -277,7 +276,7 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
-  public Payload getMetadata(final Path path) {
+  public MavenPayload getMetadata(final Path path) {
     try (StorageTx tx = getStorage().openTx()) {
       OrientVertex asset = findAsset(tx, path, tx.getBucket());
       if (asset == null) {
@@ -288,12 +287,12 @@ public class MavenFacetImpl
       checkState(blob != null, "asset of component with at path %s refers to missing blob %s",
           path.getPath(),
           blobRef);
-      return marshall(asset, blob);
+      return marshall(tx, asset, blob);
     }
   }
 
   @Override
-  public void putMetadata(final Path path, final Payload content)
+  public void putMetadata(final Path path, final MavenPayload content)
       throws IOException, InvalidContentException
   {
     try (StorageTx tx = getStorage().openTx()) {
@@ -310,6 +309,7 @@ public class MavenFacetImpl
         assetAttributes.set(P_ASSET_KIND, ASSET_KIND_METADATA);
         assetAttributes.set(StorageFacet.P_NAME, path.getFileName());
         assetAttributes.set(StorageFacet.P_PATH, path.getPath());
+        assetAttributes.set(P_LAST_MODIFIED, content.getLastModified().toDate());
 
         // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
       }
@@ -322,12 +322,12 @@ public class MavenFacetImpl
 
       try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
         try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
-          tx.setBlob(is1, headers, asset, hashAlgorithms,
+          tx.setBlob(is1, headers, asset, MavenPayload.HASH_ALGORITHMS,
               determineContentType(path, is2, content.getContentType()));
         }
       }
 
-      asset.setProperty(StorageFacet.P_LAST_UPDATED, new Date());
+      asset.setProperty(StorageFacet.P_LAST_UPDATED, content.getLastUpdated().toDate());
 
       try {
         if (path.isHash()) {
@@ -529,8 +529,21 @@ public class MavenFacetImpl
   /**
    * Creates a payload out of a Blob, for content originating from Blobs.
    */
-  private Payload marshall(final OrientVertex asset, final Blob blob) {
+  private MavenPayload marshall(final StorageTx tx, final OrientVertex asset, final Blob blob) {
     final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
-    return new BlobPayload(blob, contentType);
+    final Date lastUpdated = asset.getProperty(StorageFacet.P_LAST_UPDATED);
+    checkNotNull(lastUpdated);
+    final Date lastModified = getFormatAttributes(tx, asset).require(P_LAST_MODIFIED, Date.class);
+    checkNotNull(lastModified);
+
+    final NestedAttributesMap checksums = getAttributes(tx, asset).child(StorageFacet.P_CHECKSUM);
+    final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
+    for (HashAlgorithm algorithm : MavenPayload.HASH_ALGORITHMS) {
+      final HashCode hashCode = HashCode.fromString(checksums.require(algorithm.name(), String.class));
+      hashCodes.put(algorithm, hashCode);
+    }
+
+    return new MavenPayload(new BlobPayload(blob, contentType), new DateTime(lastUpdated.getTime()),
+        new DateTime(lastModified.getTime()), hashCodes);
   }
 }
