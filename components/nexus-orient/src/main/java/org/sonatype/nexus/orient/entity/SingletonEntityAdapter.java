@@ -17,6 +17,8 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.common.entity.Entity;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.dictionary.ODictionary;
+import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,23 +31,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class SingletonEntityAdapter<T extends Entity>
   extends EntityAdapter<T>
 {
+  /**
+   * Singleton record dictionary-index key.
+   */
+  private final String key;
+
   public SingletonEntityAdapter(final String typeName) {
     super(typeName);
+    this.key = String.format("%s.SINGLETON", typeName);
+    log.debug("Singleton key: {}", key);
   }
 
   // TODO: Add support to verify there is only 1 entity (or none) when registering type
-
-  /**
-   * Find the singleton record, or null if not set.
-   */
-  @Nullable
-  private ODocument find(final ODatabaseDocumentTx db) {
-    Iterable<ODocument> documents = browseDocuments(db);
-    if (documents.iterator().hasNext()) {
-      return documents.iterator().next();
-    }
-    return null;
-  }
+  // TODO: Do we need to use some form of database-lock to prevent race on instance creation?
 
   /**
    * Get singleton entity or null if not set.
@@ -54,7 +52,7 @@ public abstract class SingletonEntityAdapter<T extends Entity>
   public T get(final ODatabaseDocumentTx db) {
     checkNotNull(db);
 
-    ODocument document = find(db);
+    ODocument document = db.getDictionary().get(key);
     if (document != null) {
       return readEntity(document);
     }
@@ -68,9 +66,11 @@ public abstract class SingletonEntityAdapter<T extends Entity>
     checkNotNull(db);
     checkNotNull(entity);
 
-    ODocument document = find(db);
+    ODictionary<ORecord> dictionary = db.getDictionary();
+    ODocument document = dictionary.get(key);
     if (document == null) {
-      addEntity(db, entity);
+      document = addEntity(db, entity);
+      dictionary.put(key, document);
     }
     else {
       writeEntity(document, entity);
@@ -83,9 +83,11 @@ public abstract class SingletonEntityAdapter<T extends Entity>
   public void remove(final ODatabaseDocumentTx db) {
     checkNotNull(db);
 
-    ODocument document = find(db);
+    ODictionary<ORecord> dictionary = db.getDictionary();
+    ODocument document = dictionary.get(key);
     if (document != null) {
       db.delete(document);
+      dictionary.remove(key);
     }
   }
 }

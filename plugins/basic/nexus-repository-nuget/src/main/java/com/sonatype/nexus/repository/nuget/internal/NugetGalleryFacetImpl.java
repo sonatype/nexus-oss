@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.sonatype.nexus.repository.nuget.internal.odata.ComponentQuery;
@@ -44,7 +43,6 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
-import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
 import org.sonatype.nexus.repository.storage.ComponentDeletedEvent;
 import org.sonatype.nexus.repository.storage.ComponentUpdatedEvent;
@@ -108,13 +106,6 @@ public class NugetGalleryFacetImpl
   private StorageFacet storage;
 
   private static final VersionScheme SCHEME = new GenericVersionScheme();
-
-  private final ComponentMetadataFactory componentMetadataFactory;
-
-  @Inject
-  public NugetGalleryFacetImpl(final ComponentMetadataFactory componentMetadataFactory) {
-    this.componentMetadataFactory = checkNotNull(componentMetadataFactory);
-  }
 
   @Override
   protected void doConfigure() throws Exception {
