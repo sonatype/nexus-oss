@@ -40,6 +40,7 @@ import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.base.Strings;
+import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -221,20 +222,7 @@ public class MavenFacetImpl
         // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
       }
 
-      // TODO: Figure out created-by header
-      final ImmutableMap<String, String> headers = ImmutableMap.of(
-          BlobStore.BLOB_NAME_HEADER, path.getPath(),
-          BlobStore.CREATED_BY_HEADER, "unknown"
-      );
-
-      try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
-        try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
-          tx.setBlob(is1, headers, asset, MavenPayload.HASH_ALGORITHMS,
-              determineContentType(path, is2, content.getContentType()));
-        }
-      }
-
-      asset.setProperty(StorageFacet.P_LAST_UPDATED, content.getLastUpdated().toDate());
+      storeAssetBlob(tx, asset, path, content);
 
       try {
         if (path.isHash()) {
@@ -314,20 +302,7 @@ public class MavenFacetImpl
         // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
       }
 
-      // TODO: Figure out created-by header
-      final ImmutableMap<String, String> headers = ImmutableMap.of(
-          BlobStore.BLOB_NAME_HEADER, path.getPath(),
-          BlobStore.CREATED_BY_HEADER, "unknown"
-      );
-
-      try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
-        try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
-          tx.setBlob(is1, headers, asset, MavenPayload.HASH_ALGORITHMS,
-              determineContentType(path, is2, content.getContentType()));
-        }
-      }
-
-      asset.setProperty(StorageFacet.P_LAST_UPDATED, content.getLastUpdated().toDate());
+      storeAssetBlob(tx, asset, path, content);
 
       try {
         if (path.isHash()) {
@@ -358,6 +333,26 @@ public class MavenFacetImpl
   }
 
   // ==
+
+  private void storeAssetBlob(final StorageTx tx,
+                              final OrientVertex asset,
+                              final Path path,
+                              final MavenPayload payload) throws IOException
+  {
+    // TODO: Figure out created-by header
+    final ImmutableMap<String, String> headers = ImmutableMap.of(
+        BlobStore.BLOB_NAME_HEADER, path.getPath(),
+        BlobStore.CREATED_BY_HEADER, "unknown"
+    );
+
+    try (TempStreamSupplier supplier = new TempStreamSupplier(payload.openInputStream())) {
+      final String contentType = determineContentType(path, supplier, payload.getContentType());
+      try (InputStream is = supplier.get()) {
+        tx.setBlob(is, headers, asset, MavenPayload.HASH_ALGORITHMS, contentType);
+      }
+    }
+    asset.setProperty(StorageFacet.P_LAST_UPDATED, payload.getLastUpdated().toDate());
+  }
 
   /**
    * Returns component key based on passed in {@link ArtifactPath} G:A:V values.
@@ -487,7 +482,7 @@ public class MavenFacetImpl
    */
   @Nonnull
   private String determineContentType(final Path path,
-                                      final InputStream is,
+                                      final Supplier<InputStream> inputStreamSupplier,
                                       final String declaredContentType)
       throws IOException
   {
@@ -495,7 +490,9 @@ public class MavenFacetImpl
 
     if (contentType == null) {
       log.trace("Content PUT to {} has no content type.", path);
-      contentType = mimeSupport.detectMimeType(is, path.getPath());
+      try (InputStream is = inputStreamSupplier.get()) {
+        contentType = mimeSupport.detectMimeType(is, path.getPath());
+      }
       log.trace("Mime support implies content type {}", contentType);
 
       if (contentType == null && strictContentTypeValidation) {
@@ -503,12 +500,14 @@ public class MavenFacetImpl
       }
     }
     else {
-      final List<String> types = mimeSupport.detectMimeTypes(is, path.getPath());
-      if (!types.isEmpty() && !types.contains(contentType)) {
-        log.debug("Discovered content type {} ", types.get(0));
-        if (strictContentTypeValidation) {
-          throw new InvalidContentException(
-              String.format("Declared content type %s, but declared %s.", contentType, types.get(0)));
+      try (InputStream is = inputStreamSupplier.get()) {
+        final List<String> types = mimeSupport.detectMimeTypes(is, path.getPath());
+        if (!types.isEmpty() && !types.contains(contentType)) {
+          log.debug("Discovered content type {} ", types.get(0));
+          if (strictContentTypeValidation) {
+            throw new InvalidContentException(
+                String.format("Declared content type %s, but declared %s.", contentType, types.get(0)));
+          }
         }
       }
     }
