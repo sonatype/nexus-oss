@@ -55,7 +55,6 @@ public class NodeProvider
                       final Map<String, NativeScriptFactory> scripts)
   {
     this.appDir = checkNotNull(appDir);
-    ScriptBridgePlugin.setScripts(scripts);
   }
 
   @Override
