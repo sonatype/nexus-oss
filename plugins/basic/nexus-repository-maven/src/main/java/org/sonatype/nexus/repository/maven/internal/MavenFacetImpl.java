@@ -202,7 +202,7 @@ public class MavenFacetImpl
       component.setProperty(StorageFacet.P_GROUP, path.getGroupId());
       component.setProperty(StorageFacet.P_NAME, path.getArtifactId());
       component.setProperty(StorageFacet.P_VERSION, path.getVersion());
-      component.setProperty(StorageFacet.P_LAST_UPDATED, content.getLastUpdated());
+      component.setProperty(StorageFacet.P_LAST_UPDATED, content.getLastUpdated().toDate());
 
       final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
       componentAttributes.set(P_COMPONENT_KEY, getComponentKey(path));
