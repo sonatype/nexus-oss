@@ -31,12 +31,12 @@ import com.sonatype.nexus.repository.nuget.internal.odata.NugetPackageUtils;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
-import org.sonatype.nexus.common.io.TempStreamSupplier;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.FacetSupport;
@@ -154,7 +154,7 @@ public class NugetGalleryFacetImpl
 
     // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
     if (!query.containsKey("$orderby")) {
-      query.put("$orderby", P_DOWNLOAD_COUNT + " desc");
+      query.put("$orderby", DOWNLOAD_COUNT + " desc");
     }
     else {
       // OrientDB only supports ordering by identifiers, not by functions
