@@ -32,6 +32,7 @@ public class NexusSessionStorageEvaluator
 
   @Override
   public boolean isSessionStorageEnabled(final Subject subject) {
+    // HACK: info -> debug/trace
     log.info("Checking if session-storage enabled for subject: {}", subject);
 
     return !(subject.getPrincipals() instanceof AnonymousPrincipalCollection) &&

@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Nexus customized {@link WebSecurityManager}.
+ * Custom {@link WebSecurityManager}.
  *
  * @since 2.7.2
  */

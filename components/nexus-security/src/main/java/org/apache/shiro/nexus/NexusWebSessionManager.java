@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.shiro.session.mgt.SessionValidationScheduler;
+import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.session.mgt.WebSessionManager;
 import org.slf4j.Logger;
@@ -37,7 +38,11 @@ public class NexusWebSessionManager
       final @Named("${nexus.sessionCookieName:-" + DEFAULT_NEXUS_SESSION_COOKIE_NAME + "}") String sessionCookieName)
   {
     setGlobalSessionTimeout(globalSessionTimeout);
-    getSessionIdCookie().setName(sessionCookieName);
+    log.info("Global session timeout: {} ms", getGlobalSessionTimeout());
+
+    Cookie cookie = getSessionIdCookie();
+    cookie.setName(sessionCookieName);
+    log.info("Session-cookie prototype: name={}", cookie.getName());
   }
 
   /**
@@ -47,7 +52,6 @@ public class NexusWebSessionManager
   protected synchronized void enableSessionValidation() {
     final SessionValidationScheduler scheduler = getSessionValidationScheduler();
     if (scheduler == null) {
-      log.info("Global session timeout: {} ms", getGlobalSessionTimeout());
       super.enableSessionValidation();
     }
   }
