@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal.describe;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -34,17 +33,13 @@ public class Description
     this.parameters = parameters;
   }
 
-  public boolean isDescribing() {
-    return true;
-  }
-
   public Description topic(final String name) {
     items.add(new DescriptionItem(name, "topic", name));
     return this;
   }
 
   public Description add(final String name, final Object value) {
-    items.add(new DescriptionItem(name, "string", "" + value));
+    items.add(new DescriptionItem(name, "string", String.valueOf(value)));
     return this;
   }
 
