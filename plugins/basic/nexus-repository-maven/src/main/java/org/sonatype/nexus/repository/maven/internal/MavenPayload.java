@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -101,6 +102,17 @@ public class MavenPayload
     return lastModified;
   }
 
+  /**
+   * Returns the set of {@link HashAlgorithm} this instance has filled in.
+   */
+  @Nonnull
+  public Set<HashAlgorithm> getHashAlgorithms() {
+    return hashCodes.keySet();
+  }
+
+  /**
+   * Returns the {@link HashCode} corresponding to given algorithm, if any.
+   */
   @Nullable
   public HashCode getHashCode(final HashAlgorithm algorithm) {
     checkNotNull(algorithm);

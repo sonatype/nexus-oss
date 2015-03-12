@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +33,14 @@ import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
+import org.sonatype.nexus.repository.maven.internal.Path.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
+import org.sonatype.nexus.repository.view.payloads.StringPayload;
 
 import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
@@ -175,63 +178,89 @@ public class MavenFacetImpl
       throws IOException, InvalidContentException
   {
     try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex component = findComponent(tx, path, tx.getBucket());
-      if (component == null) {
-        component = tx.createComponent(tx.getBucket());
-
-        // Set normalized properties: format, group, and name
-        component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue()); // M1 or M2!!!
-        component.setProperty(StorageFacet.P_PATH, path.getPath());
-        component.setProperty(StorageFacet.P_GROUP, path.getGroupId());
-        component.setProperty(StorageFacet.P_NAME, path.getArtifactId());
-        component.setProperty(StorageFacet.P_VERSION, path.getVersion());
-
-        final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
-        componentAttributes.set(P_COMPONENT_KEY, getComponentKey(path));
-        componentAttributes.set(P_GROUP_ID, path.getGroupId());
-        componentAttributes.set(P_ARTIFACT_ID, path.getArtifactId());
-        componentAttributes.set(P_VERSION, path.getVersion());
-        if (path.isSnapshot()) {
-          componentAttributes.set(P_BASE_VERSION, path.getBaseVersion());
-        }
-      }
-
-      OrientVertex asset = selectComponentAsset(tx, component, path);
-      if (asset == null) {
-        asset = tx.createAsset(tx.getBucket());
-        asset.addEdge(StorageFacet.E_PART_OF_COMPONENT, component);
-        asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
-        asset.setProperty(StorageFacet.P_PATH, path.getPath());
-        asset.setProperty(StorageFacet.P_NAME, path.getFileName());
-
-        final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
-        assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
-        assetAttributes.set(P_ASSET_KIND, ASSET_KIND_ARTIFACT);
-        assetAttributes.set(P_GROUP_ID, path.getGroupId());
-        assetAttributes.set(P_ARTIFACT_ID, path.getArtifactId());
-        assetAttributes.set(P_VERSION, path.getVersion());
-        if (path.isSnapshot()) {
-          assetAttributes.set(P_BASE_VERSION, path.getBaseVersion());
-        }
-        if (path.getClassifier() != null) {
-          assetAttributes.set(P_CLASSIFIER, path.getClassifier());
-        }
-        assetAttributes.set(P_EXTENSION, path.getExtension());
-
-        // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
-      }
-
-      storeAssetBlob(tx, asset, path, content);
-
       try {
-        if (path.isHash()) {
-          verifyAssetChecksum(tx, path);
-        }
+        putArtifactTx(tx, path, content);
         tx.commit();
       }
-      catch (InvalidContentException e) {
+      catch (IOException | InvalidContentException e) {
         tx.rollback();
         throw e;
+      }
+    }
+  }
+
+  private void putArtifactTx(final StorageTx tx, final ArtifactPath path, final MavenPayload content)
+      throws IOException, InvalidContentException
+  {
+    OrientVertex component = findComponent(tx, path, tx.getBucket());
+    if (component == null) {
+      component = tx.createComponent(tx.getBucket());
+
+      // Set normalized properties: format, group, and name
+      component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue()); // M1 or M2!!!
+      component.setProperty(StorageFacet.P_PATH, path.getPath());
+      component.setProperty(StorageFacet.P_GROUP, path.getGroupId());
+      component.setProperty(StorageFacet.P_NAME, path.getArtifactId());
+      component.setProperty(StorageFacet.P_VERSION, path.getVersion());
+
+      final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
+      componentAttributes.set(P_COMPONENT_KEY, getComponentKey(path));
+      componentAttributes.set(P_GROUP_ID, path.getGroupId());
+      componentAttributes.set(P_ARTIFACT_ID, path.getArtifactId());
+      componentAttributes.set(P_VERSION, path.getVersion());
+      if (path.isSnapshot()) {
+        componentAttributes.set(P_BASE_VERSION, path.getBaseVersion());
+      }
+    }
+
+    OrientVertex asset = selectComponentAsset(tx, component, path);
+    if (asset == null) {
+      asset = tx.createAsset(tx.getBucket());
+      asset.addEdge(StorageFacet.E_PART_OF_COMPONENT, component);
+      asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
+      asset.setProperty(StorageFacet.P_PATH, path.getPath());
+      asset.setProperty(StorageFacet.P_NAME, path.getFileName());
+
+      final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
+      assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
+      assetAttributes.set(P_ASSET_KIND, ASSET_KIND_ARTIFACT);
+      assetAttributes.set(P_GROUP_ID, path.getGroupId());
+      assetAttributes.set(P_ARTIFACT_ID, path.getArtifactId());
+      assetAttributes.set(P_VERSION, path.getVersion());
+      if (path.isSnapshot()) {
+        assetAttributes.set(P_BASE_VERSION, path.getBaseVersion());
+      }
+      if (path.getClassifier() != null) {
+        assetAttributes.set(P_CLASSIFIER, path.getClassifier());
+      }
+      assetAttributes.set(P_EXTENSION, path.getExtension());
+
+      // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
+    }
+
+    storeAssetBlob(tx, asset, path, content);
+
+    if (path.isHash()) {
+      verifyAssetChecksum(tx, path);
+    }
+    else {
+      if (!content.getHashAlgorithms().isEmpty()) {
+        for (HashType hashType : HashType.values()) {
+          final HashCode hashCode = content.getHashCode(hashType.getHashAlgorithm());
+          if (hashCode == null) {
+            continue;
+          }
+          putArtifactTx(
+              tx,
+              path.hash(hashType),
+              new MavenPayload(
+                  new StringPayload(hashCode.toString(), "text/plain"),
+                  content.getLastUpdated(),
+                  content.getLastModified(),
+                  Collections.<HashAlgorithm, HashCode>emptyMap()
+              )
+          );
+        }
       }
     }
   }
@@ -283,34 +312,60 @@ public class MavenFacetImpl
       throws IOException, InvalidContentException
   {
     try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex asset = findAsset(tx, path, tx.getBucket());
-      if (asset == null) {
-        asset = tx.createAsset(tx.getBucket());
-
-        asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
-        asset.setProperty(StorageFacet.P_NAME, path.getFileName());
-        asset.setProperty(StorageFacet.P_PATH, path.getPath());
-
-        final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
-        assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
-        assetAttributes.set(P_ASSET_KIND, ASSET_KIND_METADATA);
-        assetAttributes.set(StorageFacet.P_NAME, path.getFileName());
-        assetAttributes.set(StorageFacet.P_PATH, path.getPath());
-
-        // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
-      }
-
-      storeAssetBlob(tx, asset, path, content);
-
       try {
-        if (path.isHash()) {
-          verifyAssetChecksum(tx, path);
-        }
+        putMetadataTx(tx, path, content);
         tx.commit();
       }
-      catch (InvalidContentException e) {
+      catch (IOException | InvalidContentException e) {
         tx.rollback();
         throw e;
+      }
+    }
+  }
+
+  private void putMetadataTx(final StorageTx tx, final Path path, final MavenPayload content)
+      throws IOException, InvalidContentException
+  {
+    OrientVertex asset = findAsset(tx, path, tx.getBucket());
+    if (asset == null) {
+      asset = tx.createAsset(tx.getBucket());
+
+      asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
+      asset.setProperty(StorageFacet.P_NAME, path.getFileName());
+      asset.setProperty(StorageFacet.P_PATH, path.getPath());
+
+      final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
+      assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
+      assetAttributes.set(P_ASSET_KIND, ASSET_KIND_METADATA);
+      assetAttributes.set(StorageFacet.P_NAME, path.getFileName());
+      assetAttributes.set(StorageFacet.P_PATH, path.getPath());
+
+      // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
+    }
+
+    storeAssetBlob(tx, asset, path, content);
+
+    if (path.isHash()) {
+      verifyAssetChecksum(tx, path);
+    }
+    else {
+      if (!content.getHashAlgorithms().isEmpty()) {
+        for (HashType hashType : HashType.values()) {
+          final HashCode hashCode = content.getHashCode(hashType.getHashAlgorithm());
+          if (hashCode == null) {
+            continue;
+          }
+          putMetadataTx(
+              tx,
+              path.hash(hashType),
+              new MavenPayload(
+                  new StringPayload(hashCode.toString(), "text/plain"),
+                  content.getLastUpdated(),
+                  content.getLastModified(),
+                  Collections.<HashAlgorithm, HashCode>emptyMap()
+              )
+          );
+        }
       }
     }
   }
@@ -349,7 +404,7 @@ public class MavenFacetImpl
         tx.setBlob(is, headers, asset, MavenPayload.HASH_ALGORITHMS, contentType);
       }
     }
-    asset.setProperty(StorageFacet.P_LAST_UPDATED, new Date()); // now
+    asset.setProperty(StorageFacet.P_LAST_UPDATED, payload.getLastUpdated().toDate());
     getFormatAttributes(tx, asset).set(P_LAST_MODIFIED, payload.getLastModified().toDate());
   }
 
@@ -469,7 +524,8 @@ public class MavenFacetImpl
       else {
         throw new InvalidContentException(message);
       }
-    } else {
+    }
+    else {
       if (!Objects.equals(internalChecksum, externalChecksum)) {
         final String message =
             "Invalid checksum for " + checksumPath.getPath() + ": expected '" + internalChecksum + "' got '" +
