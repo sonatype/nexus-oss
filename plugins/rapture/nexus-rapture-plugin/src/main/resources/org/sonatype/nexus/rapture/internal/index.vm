@@ -19,6 +19,7 @@
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <meta name="description" content="Sonatype Nexus"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 
   <link rel="icon" type="image/png" href="$raptureUrl/resources/favicon.png?$urlSuffix"/>
   <!--[if IE]>
