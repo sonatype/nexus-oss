@@ -20,7 +20,6 @@
 Ext.define('NX.coreui.controller.AssetInfo', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.util.Url',
     'NX.I18n'
   ],
 
@@ -56,10 +55,7 @@ Ext.define('NX.coreui.controller.AssetInfo', {
       panel = container.add({ xtype: 'nx-coreui-component-assetinfo', weight: 10 });
     }
 
-    info[NX.I18n.get('BROWSE_ASSET_INFO_NAME')] = NX.util.Url.asLink(
-        NX.util.Url.urlOf('repository/' + componentModel.get('repositoryName') + '/' + assetModel.get('name')),
-        assetModel.get('name')
-    );
+    info[NX.I18n.get('BROWSE_ASSET_INFO_NAME')] = assetModel.get('name');
     info[NX.I18n.get('BROWSE_ASSET_INFO_CONTENT_TYPE')] = assetModel.get('contentType');
 
     panel.showInfo(info);
