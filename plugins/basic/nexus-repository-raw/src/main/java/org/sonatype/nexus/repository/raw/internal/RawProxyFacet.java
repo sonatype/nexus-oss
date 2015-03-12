@@ -56,7 +56,7 @@ public class RawProxyFacet
   }
 
   @Override
-  protected Payload fetch(String url, Context context) throws IOException {
+  protected Payload fetch(String url, Context context, Payload stale) throws IOException {
     HttpClient client = httpClient.getHttpClient();
 
     HttpGet request = new HttpGet(getRemoteUrl().resolve(url));

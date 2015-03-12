@@ -16,12 +16,29 @@
 
 Use this config to create Maven2 hosted repository, use name `maven2-hosted`:
 
+Hosted:
 ```
 {
   "maven" : {
     "versionPolicy" : "SNAPSHOT",
     "checksumPolicy" : "WARN",
     "strictContentTypeValidation" : false
+  }
+}
+
+```
+
+Proxy:
+```
+{
+  "maven" : {
+    "versionPolicy" : "SNAPSHOT",
+    "checksumPolicy" : "WARN",
+    "strictContentTypeValidation" : false
+  },
+  "proxy" : {
+    "remoteUrl" : "http://repo1.maven.org/maven2/",
+    "artifactMaxAge" : 3600
   }
 }
 

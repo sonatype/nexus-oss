@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.inject.Named;
 
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.content.InvalidContentException;
@@ -28,6 +29,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import com.google.common.net.HttpHeaders;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -37,11 +39,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.DateUtils;
 import org.joda.time.DateTime;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Maven proxy facet.
  *
  * @since 3.0
  */
+@Named
 public class MavenProxyFacet
     extends ProxyFacetSupport<MavenPayload>
 {
@@ -62,6 +67,12 @@ public class MavenProxyFacet
   protected MavenPayload fetch(final String url, final Context context, final MavenPayload stalePayload)
       throws IOException
   {
+    Path path = context.getAttributes().get(Path.class);
+    if (path == null) {
+      path = context.getAttributes().get(ArtifactPath.class);
+    }
+    checkState(path != null);
+
     HttpClient client = httpClient.getHttpClient();
 
     HttpGet request = new HttpGet(getRemoteUrl().resolve(url));
@@ -81,7 +92,10 @@ public class MavenProxyFacet
       HttpEntity entity = response.getEntity();
       log.debug("Entity: {}", entity);
       HttpEntityPayload payload = new HttpEntityPayload(response, entity);
-      final String sha1 = fetchHashCode(url, HashType.SHA1);
+      String sha1 = extractSha1(response);
+      if (sha1 == null) {
+        sha1 = fetchHashCode(url, HashType.SHA1);
+      }
       final String md5 = sha1 == null ? fetchHashCode(url, HashType.MD5) : null;
       final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
       if (!Strings.isNullOrEmpty(sha1)) {
@@ -90,8 +104,7 @@ public class MavenProxyFacet
       if (!Strings.isNullOrEmpty(md5)) {
         hashCodes.put(HashAlgorithm.MD5, HashCode.fromString(md5));
       }
-
-      final DateTime lastModified = new DateTime();
+      final DateTime lastModified = extractLastModified(response);
       return new MavenPayload(payload, new DateTime(), lastModified, hashCodes);
     }
     else if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
@@ -100,10 +113,47 @@ public class MavenProxyFacet
     return null;
   }
 
+  /**
+   * Extracts SHA1 from "NX style" ETag header.
+   */
+  private String extractSha1(final HttpResponse response) {
+    final Header etagHeader = response.getLastHeader(HttpHeaders.ETAG);
+    if (etagHeader != null) {
+      final String etag = etagHeader.getValue();
+      if (!Strings.isNullOrEmpty(etag)) {
+        int start = etag.indexOf("SHA1{"), end = etag.indexOf("}", start + 5);
+        if (start >= 0 && end > start) {
+          final String sha1 = etag.substring(start + 5, end);
+          if (DigestExtractor.isDigest(sha1)) {
+            return sha1;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  private DateTime extractLastModified(final HttpResponse response) {
+    DateTime result = new DateTime();
+    final Header lastModifiedHeader = response.getLastHeader(HttpHeaders.LAST_MODIFIED);
+    if (lastModifiedHeader != null) {
+      try {
+        result = new DateTime(DateUtils.parseDate(lastModifiedHeader.getValue()).getTime());
+      }
+      catch (Exception ex) {
+        log.warn("Could not parse date '{}', using system current time as item creation time.", lastModifiedHeader, ex);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Fetches Maven specific .sha1/.md5 files from remote.
+   */
   private String fetchHashCode(final String url, final HashType hashType) throws IOException {
     HttpClient client = httpClient.getHttpClient();
     HttpGet request = new HttpGet(getRemoteUrl().resolve(url + "." + hashType.getExt()));
-    log.debug("Fetching: {}", request);
+    log.debug("Fetching {}: {}", hashType, request);
     HttpResponse response = client.execute(request);
     log.debug("Response: {}", response);
     StatusLine status = response.getStatusLine();
@@ -148,6 +198,6 @@ public class MavenProxyFacet
 
   @Override
   protected String getUrl(final @Nonnull Context context) {
-    return context.getRequest().getPath();
+    return context.getRequest().getPath().substring(1);
   }
 }

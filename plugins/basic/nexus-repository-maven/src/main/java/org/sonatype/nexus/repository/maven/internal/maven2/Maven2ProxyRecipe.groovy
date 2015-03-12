@@ -22,10 +22,13 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
+import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenProxyFacet
+import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
+import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler
 import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -40,7 +43,7 @@ import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 
 /**
- * Maven 2 hosted repository recipe.
+ * Maven 2 proxy repository recipe.
  *
  * @since 3.0
  */
@@ -61,6 +64,12 @@ class Maven2ProxyRecipe
   Provider<StorageFacetImpl> storageFacet
 
   @Inject
+  Provider<HttpClientFacet> httpClientFacet
+
+  @Inject
+  Provider<NegativeCacheFacet> negativeCacheFacet
+
+  @Inject
   Provider<SearchFacet> searchFacet
 
   @Inject
@@ -68,6 +77,9 @@ class Maven2ProxyRecipe
 
   @Inject
   SecurityHandler securityHandler
+
+  @Inject
+  NegativeCacheHandler negativeCacheHandler
 
   @Inject
   Provider<MavenFacetImpl> mavenFacet
@@ -90,6 +102,8 @@ class Maven2ProxyRecipe
     repository.attach(securityFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(searchFacet.get());
+    repository.attach(httpClientFacet.get());
+    repository.attach(negativeCacheFacet.get());
     repository.attach(mavenFacet.get())
     repository.attach(mavenProxyFacet.get())
     repository.attach(configure(viewFacet.get()))
@@ -102,6 +116,7 @@ class Maven2ProxyRecipe
         .matcher(new MavenArtifactMatcher(new Maven2ArtifactPathParser()))
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(negativeCacheHandler)
         .handler(proxyHandler)
         .create())
 
@@ -109,6 +124,7 @@ class Maven2ProxyRecipe
         .matcher(new MavenMetadataMatcher())
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(negativeCacheHandler)
         .handler(proxyHandler)
         .create())
 
