@@ -15,7 +15,7 @@ package org.sonatype.nexus.security.role;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

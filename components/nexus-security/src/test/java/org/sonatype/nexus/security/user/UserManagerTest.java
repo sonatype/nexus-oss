@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.config.CUser;
 import org.sonatype.nexus.security.config.CUserRoleMapping;
@@ -26,8 +26,9 @@ import org.sonatype.nexus.security.config.SecurityConfiguration;
 import org.sonatype.nexus.security.config.SecurityConfigurationManager;
 import org.sonatype.nexus.security.role.RoleIdentifier;
 
-import junit.framework.Assert;
 import org.apache.shiro.authc.credential.PasswordService;
+import org.junit.Assert;
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -36,12 +37,12 @@ import static org.hamcrest.Matchers.is;
 // FIXME: resolve with other UserManager2Test
 
 public class UserManagerTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
   private PasswordService passwordService;
 
   @Override
-  protected MemorySecurityConfiguration getSecurityModelConfig() {
+  protected MemorySecurityConfiguration initialSecurityConfiguration() {
     return UserManagerTestSecurity.securityModel();
   }
 
@@ -55,6 +56,7 @@ public class UserManagerTest
     return lookup(SecurityConfigurationManager.class);
   }
 
+  @Test
   public void testGetUser() throws Exception {
     UserManager userManager = this.getUserManager();
 
@@ -74,6 +76,7 @@ public class UserManagerTest
     Assert.assertEquals(2, roleIds.size());
   }
 
+  @Test
   public void testAddUser() throws Exception {
     UserManager userManager = this.getUserManager();
 
@@ -106,10 +109,12 @@ public class UserManagerTest
     Assert.assertEquals(2, roleMapping.getRoles().size());
   }
 
+  @Test
   public void testSupportsWrite() throws Exception {
     Assert.assertTrue(this.getUserManager().supportsWrite());
   }
 
+  @Test
   public void testChangePassword() throws Exception {
     UserManager userManager = this.getUserManager();
     userManager.changePassword("test-user", "new-user-password");
@@ -118,6 +123,7 @@ public class UserManagerTest
     assertThat(this.passwordService.passwordsMatch("new-user-password", user.getPassword()), is(true));
   }
 
+  @Test
   public void testUpdateUser() throws Exception {
     UserManager userManager = this.getUserManager();
 
@@ -148,6 +154,7 @@ public class UserManagerTest
     Assert.assertEquals("roles: " + roleMapping.getRoles(), 1, roleMapping.getRoles().size());
   }
 
+  @Test
   public void testDeleteUser() throws Exception {
     UserManager userManager = this.getUserManager();
     try {
@@ -187,6 +194,7 @@ public class UserManagerTest
     }
   }
 
+  @Test
   public void testDeleteUserAndUserRoleMappings() throws Exception {
     String userId = "testDeleteUserAndUserRoleMappings";
 
@@ -221,6 +229,7 @@ public class UserManagerTest
     }
   }
 
+  @Test
   public void testSetUsersRoles() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
 

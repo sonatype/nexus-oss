@@ -12,15 +12,9 @@
  */
 package org.sonatype.nexus.index;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.HashSet;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -86,7 +80,7 @@ public class Nexus5393IndexEntryDuplicationIT
   {
     // wait a bit for async stuff
     Thread.sleep(100);
-    wairForAsyncEventsToCalmDown();
+    waitForAsyncEventsToCalmDown();
     waitForTasksToStop();
   }
 

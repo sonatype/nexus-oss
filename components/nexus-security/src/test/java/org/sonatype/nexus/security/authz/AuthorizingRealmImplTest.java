@@ -15,7 +15,7 @@ package org.sonatype.nexus.security.authz;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CRole;
 import org.sonatype.nexus.security.config.CUser;
@@ -24,17 +24,18 @@ import org.sonatype.nexus.security.internal.SecurityConfigurationManagerImpl;
 import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
 import org.sonatype.nexus.security.user.UserStatus;
 
-import junit.framework.Assert;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests for {@link AuthorizingRealmImpl}.
  */
 public class AuthorizingRealmImplTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
   private AuthorizingRealmImpl realm;
 
@@ -50,6 +51,7 @@ public class AuthorizingRealmImplTest
     configurationManager = lookup(SecurityConfigurationManagerImpl.class);
   }
 
+  @Test
   public void testAuthorization() throws Exception {
     buildTestAuthorizationConfig();
 

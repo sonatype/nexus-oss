@@ -13,17 +13,19 @@
 package org.sonatype.nexus.testsuite.security;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -39,10 +41,12 @@ import org.apache.http.cookie.SetCookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.cookie.BrowserCompatSpecFactory;
+import org.apache.http.impl.cookie.DefaultCookieSpecProvider;
+import org.apache.http.message.BasicNameValuePair;
 import org.junit.Test;
+import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static com.google.common.net.HttpHeaders.SET_COOKIE;
 import static com.google.common.net.HttpHeaders.USER_AGENT;
 import static com.google.common.net.HttpHeaders.X_REQUESTED_WITH;
@@ -58,42 +62,19 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 
-@NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
+@ExamReactorStrategy(PerClass.class)
 public class SimpleSessionCookieIT
     extends NexusHttpsITSupport
 {
+  private static final String PROTECTED_PATH = "internal/metrics";
 
-  // FIXME: Remove or replace with siesta/wonderland/session
-
-  private static final String LEGACY_LOGIN_PATH = "service/local/authentication/login";
-
-  private static final String LEGACY_LOGOUT_PATH = "service/local/authentication/logout";
-
-  private static final String EXTDIRECT_PATH = "service/extdirect";
+  private static final String SESSION_PATH = "service/rapture/session";
 
   private static final String TYPICAL_BROWSER_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36";
 
-
-  public SimpleSessionCookieIT(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
-  }
-
-  @Override
-  protected NexusBundleConfiguration configureNexus(NexusBundleConfiguration configuration) {
-    // help verify that a custom context path sets the cookie path value correctly
-    return super.configureNexus(configuration).setContextPath("/customcontextpath");
-  }
-
-  //@Before
-  //public void disableAnonymousSoThatAllRequestsRequireAuthentication() throws Exception {
-  //  Security security = client().getSubsystem(ServerConfiguration.class).security();
-  //  security.settings().withAnonymousAccessEnabled(false);
-  //  security.save();
-  //}
-
   @Test
   public void authenticatedContentCRUDActionsShouldNotCreateSession() throws Exception {
-    final String target = nexus().getUrl() + "content/repositories/releases/test.txt";
+    final String target = resolveUrl(nexusUrl, "content/repositories/releases/test.txt").toExternalForm();
 
     final HttpPut put = new HttpPut(target);
     put.setEntity(new StringEntity("text content"));
@@ -129,7 +110,17 @@ public class SimpleSessionCookieIT
     }
   }
 
-  private void assertResponseHasNoSessionCookies(final HttpResponse response) {
+  @Test
+  public void sessionCookieSpecUsingHttp() throws Exception {
+    exerciseCookieSpec(nexusUrl);
+  }
+
+  @Test
+  public void sessionCookieSpecUsingHttps() throws Exception {
+    exerciseCookieSpec(nexusSecureUrl);
+  }
+
+  private static void assertResponseHasNoSessionCookies(final HttpResponse response) {
     Header[] headers = response.getHeaders(SET_COOKIE);
     for (Header header : headers) {
       assertThat(String.format("not expecting any %s session cookie headers but got %s", SET_COOKIE, asList(headers)),
@@ -137,27 +128,7 @@ public class SimpleSessionCookieIT
     }
   }
 
-  //@Test
-  //public void sessionCookieSpecUsingHttpWithLegacyResources() throws Exception {
-  //  exerciseCookieSpec(nexus().getUrl(), true);
-  //}
-  //
-  //@Test
-  //public void sessionCookieSpecUsingHttpsWithLegacyResources() throws Exception {
-  //  exerciseCookieSpec(nexus().getSecureUrl(), true);
-  //}
-
-  @Test
-  public void sessionCookieSpecUsingHttpWithModernResources() throws Exception {
-    exerciseCookieSpec(nexus().getUrl(), false);
-  }
-
-  @Test
-  public void sessionCookieSpecUsingHttpsWithModernResources() throws Exception {
-    exerciseCookieSpec(nexus().getSecureUrl(), false);
-  }
-
-  private HttpRequestBase withCommonBrowserHeaders(HttpRequestBase req) {
+  private static HttpRequestBase withCommonBrowserHeaders(HttpRequestBase req) {
     req.setHeader(USER_AGENT, TYPICAL_BROWSER_USER_AGENT);
     req.setHeader("X-Nexus-UI", "true");
     req.setHeader(X_REQUESTED_WITH, "XMLHttpRequest");
@@ -166,30 +137,32 @@ public class SimpleSessionCookieIT
 
   /**
    * Validate Nexus Cookies during Sign-in and Sign-out
-   *
-   * @param nexusUrl           the base Nexus URL to validate against
-   * @param useLegacyResources true to use legacy resources where available, false to use modern resources
    */
-  private void exerciseCookieSpec(final URL nexusUrl, boolean useLegacyResources) throws Exception {
+  private void exerciseCookieSpec(final URL baseUrl) throws Exception {
 
     // handle cookies like a browser to aid validation
-    final CookieSpec spec = new BrowserCompatSpecFactory().create(null);
-    final CookieOrigin cookieOrigin = cookieOrigin(nexusUrl);
+    final CookieSpec spec = new DefaultCookieSpecProvider().create(null);
+    final CookieOrigin cookieOrigin = cookieOrigin(baseUrl);
     final CookieStore cookieStore = new BasicCookieStore();
     final CredentialsProvider credProvider = credentialsProvider();
     SetCookie loginCookie;
 
-    try (CloseableHttpClient client = clientBuilder().setDefaultCookieStore(cookieStore).
-        setDefaultCredentialsProvider(credProvider).build()) {
+    try (CloseableHttpClient client = clientBuilder().setDefaultCookieStore(cookieStore)
+        .setDefaultCredentialsProvider(credProvider).build()) {
 
       // 1. login with credentials and get session cookie
       // Set-Cookie: NXSESSIONID=98a766bc-bc33-4b3c-9d9f-d3bb85b0cf00; Path=/; Secure; HttpOnly
-      HttpRequestBase loginRequest = new HttpGet(nexusUrl.toExternalForm() + LEGACY_LOGIN_PATH);
+
+      HttpPost loginRequest = new HttpPost(resolveUrl(baseUrl, SESSION_PATH).toURI());
+      List<NameValuePair> params = new ArrayList<>();
+      params.add(new BasicNameValuePair("username", Strings2.encodeBase64(credentials().getUserPrincipal().getName())));
+      params.add(new BasicNameValuePair("password", Strings2.encodeBase64(credentials().getPassword())));
+      loginRequest.setEntity(new UrlEncodedFormEntity(params));
       withCommonBrowserHeaders(loginRequest);
+
       try (CloseableHttpResponse response = client.execute(loginRequest, clientContext())) {
         assertThat(response.getStatusLine().getStatusCode(), is(200));
-        assertThat("login cookie should have been stored in the cookie store", cookieStore.getCookies(),
-            hasSize(1));
+        assertThat("login cookie should have been stored in the cookie store", cookieStore.getCookies(), hasSize(1));
         assertThat("expected session cookie in cookie store", getSessionCookie(cookieStore), notNullValue());
 
         Header[] setCookieHeaders = response.getHeaders(SET_COOKIE);
@@ -199,38 +172,27 @@ public class SimpleSessionCookieIT
         loginCookie = (SetCookie) sessionCookies.get(0);
         String headerText = sessionCookieHeader.toString();
 
-        assertCommonSessionCookieAttributes(nexusUrl, loginCookie, headerText);
+        assertCommonSessionCookieAttributes(baseUrl, loginCookie, headerText);
         assertThat(String.format("expecting one cookie parsed from session %s header", SET_COOKIE), sessionCookies,
             hasSize(1));
 
-        assertThat(String
-            .format("expecting 2 %s headers for login, one session cookie, one remember me, but got %s", SET_COOKIE,
-                setCookieHeaders), setCookieHeaders, arrayWithSize(2));
+        assertThat(String.format("expecting 2 %s headers for login, one session cookie, one remember me, but got %s",
+            SET_COOKIE, setCookieHeaders), setCookieHeaders, arrayWithSize(2));
 
-        assertThat("login cookie should NOT look like deleteMe cookie", loginCookie.getValue(), not(containsString(
-            "deleteMe")));
-        assertThat("login cookie should not have an expiry date - the UA deletes the session cookie when " +
-                "replaced by a new one by same name from the server OR when the UA decides",
-            loginCookie.isPersistent(), is(false));
+        assertThat("login cookie should NOT look like deleteMe cookie", loginCookie.getValue(),
+            not(containsString("deleteMe")));
+        assertThat("login cookie should not have an expiry date - the UA deletes the session cookie when "
+            + "replaced by a new one by same name from the server OR when the UA decides", loginCookie.isPersistent(),
+            is(false));
 
-        assertThat("login session cookie with valid session id should always be marked HttpOnly",
-            headerText, containsString("; HttpOnly"));
+        assertThat("login session cookie with valid session id should always be marked HttpOnly", headerText,
+            containsString("; HttpOnly"));
       }
 
       HttpClientContext logoutContext = HttpClientContext.create();
       logoutContext.setCookieStore(cookieStore);
 
-      HttpRequestBase logoutRequest;
-      if (useLegacyResources) {
-        logoutRequest = new HttpGet(nexusUrl.toExternalForm() + LEGACY_LOGOUT_PATH);
-      }
-      else {
-        HttpPost logout = new HttpPost(nexusUrl.toExternalForm() + EXTDIRECT_PATH);
-        logout.setEntity(new StringEntity(
-            new ExtDirectTransactionBuilder().withAction("rapture_Security").withMethod("signOut").toJson()));
-        logout.setHeader(CONTENT_TYPE, "application/json");
-        logoutRequest = logout;
-      }
+      HttpDelete logoutRequest = new HttpDelete(resolveUrl(baseUrl, SESSION_PATH).toURI());
       withCommonBrowserHeaders(logoutRequest);
 
       // 2. Logout, sending valid session cookie, no credentials
@@ -249,11 +211,12 @@ public class SimpleSessionCookieIT
         SetCookie logoutCookie = (SetCookie) sessionCookies.get(0);
         final String headerText = sessionCookieHeader.toString();
 
-        assertCommonSessionCookieAttributes(nexusUrl, logoutCookie, headerText);
+        assertCommonSessionCookieAttributes(baseUrl, logoutCookie, headerText);
         assertThat("expecting one cookie in same Set-Cookie header", sessionCookies, hasSize(1));
-        assertThat(String.format(
-            "expecting 2 %s headers for logout, one session cookie delete cookie, one remember me delete cookie, but got %s",
-            SET_COOKIE, setCookieHeaders), setCookieHeaders, arrayWithSize(2));
+        assertThat(
+            String.format(
+                "expecting 2 %s headers for logout, one session cookie delete cookie, one remember me delete cookie, but got %s",
+                SET_COOKIE, setCookieHeaders), setCookieHeaders, arrayWithSize(2));
         assertThat("logout session cookie value should be dummy value", logoutCookie.getValue(), equalTo("deleteMe"));
         assertThat("logout session cookie should be expired to tell browser to delete it",
             logoutCookie.isExpired(new Date()), is(true));
@@ -265,14 +228,15 @@ public class SimpleSessionCookieIT
       }
 
       // 3. Access a protected resource again using our original login cookie, no credentials, to verify session is dead
-      HttpGet loginFailedGet = new HttpGet(nexusUrl.toExternalForm() + LEGACY_LOGIN_PATH);
+      HttpGet loginFailedGet = new HttpGet(resolveUrl(baseUrl, PROTECTED_PATH).toURI());
       cookieStore.addCookie(loginCookie);
+
       try (CloseableHttpResponse response = client.execute(loginFailedGet, HttpClientContext.create())) {
         assertThat("expected dead login session cookie to not authenticate", response.getStatusLine().getStatusCode(),
             is(401));
         Header[] setCookieHeaders = response.getHeaders(SET_COOKIE);
-        assertThat("expecting no session cookie since login was unsuccessful", getSessionCookieHeader(setCookieHeaders),
-            nullValue());
+        assertThat("expecting no session cookie since login was unsuccessful",
+            getSessionCookieHeader(setCookieHeaders), nullValue());
         assertThat("expecting no cookies since login was unsuccessful", setCookieHeaders, arrayWithSize(0));
       }
     }
@@ -281,8 +245,8 @@ public class SimpleSessionCookieIT
   /**
    * Validate standard session cookie properties
    */
-  protected void assertCommonSessionCookieAttributes(final URL nexusUrl, final SetCookie serverCookie,
-                                                     final String headerText)
+  private void assertCommonSessionCookieAttributes(final URL baseUrl, final SetCookie serverCookie,
+      final String headerText)
   {
     assertThat(serverCookie, notNullValue());
     assertThat("cookie value must be present", serverCookie.getValue(), notNullValue());
@@ -291,16 +255,15 @@ public class SimpleSessionCookieIT
     assertThat("session cookie does not currently set the domain leaving it to the Browser to do the right thing",
         headerText, not(containsString("; Domain=")));
     assertThat("browser should interpret domain as same as origin", serverCookie.getDomain(),
-        equalTo(nexusUrl.getHost()));
-    assertThat("cookie path should match Nexus context path", serverCookie.getPath(),
-        equalTo(expectedCookiePath(nexusUrl)));
-    if (nexusUrl.getProtocol().equalsIgnoreCase("https")) {
-      assertThat("session cookie should be marked Secure when cookies are served by https URLs",
-          headerText, containsString("; Secure"));
+        equalTo(baseUrl.getHost()));
+    assertThat("cookie path should match Nexus context path", serverCookie.getPath(), equalTo(cookiePath(baseUrl)));
+    if (baseUrl.getProtocol().equalsIgnoreCase("https")) {
+      assertThat("session cookie should be marked Secure when cookies are served by https URLs", headerText,
+          containsString("; Secure"));
     }
     else {
-      assertThat("session cookie should not be marked Secure when cookies are served by http URLs",
-          headerText, not(containsString("; Secure")));
+      assertThat("session cookie should not be marked Secure when cookies are served by http URLs", headerText,
+          not(containsString("; Secure")));
     }
   }
 }

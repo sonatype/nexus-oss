@@ -16,7 +16,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.AbstractApplicationStatusSource;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.NxApplication;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -24,10 +27,15 @@ import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.security.subject.FakeAlmightySubject;
+import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.util.ThreadContext;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
@@ -37,14 +45,34 @@ import org.eclipse.sisu.space.URLClassSpace;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class ResolvingIT
-    extends AbstractMavenRepoContentTests
+    extends NexusTestSupport
 {
   protected NexusMavenBridge mavenBridge;
 
   protected RepositoryRegistry repositoryRegistry;
 
   private Server server;
+
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        ThreadContext.bind(FakeAlmightySubject.forUserId("disabled-security"));
+        bind(RealmSecurityManager.class).toInstance(mock(RealmSecurityManager.class));
+
+        ApplicationStatusSource statusSource = mock(AbstractApplicationStatusSource.class);
+        when(statusSource.getSystemStatus()).thenReturn(new SystemStatus());
+        bind(ApplicationStatusSource.class).toInstance(statusSource);
+      }
+    });
+  }
 
   @Override
   protected void setUp()
@@ -56,6 +84,8 @@ public class ResolvingIT
 
     repositoryRegistry = lookup(RepositoryRegistry.class);
 
+    lookup(NxApplication.class).start();
+
     server = Server.withPort(0).serve("/*").withBehaviours(Behaviours.get(
         new File(getBasedir(), "src/test/resources/test-repo"))).start();
 
@@ -66,14 +96,11 @@ public class ResolvingIT
   }
 
   @Override
-  protected boolean runWithSecurityDisabled() {
-    return true;
-  }
-
-  @Override
   protected void tearDown()
       throws Exception
   {
+    lookup(NxApplication.class).stop();
+
     super.tearDown();
 
     if (server != null) {

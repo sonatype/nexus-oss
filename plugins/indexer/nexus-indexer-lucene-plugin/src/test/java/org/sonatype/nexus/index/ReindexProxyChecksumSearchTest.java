@@ -37,7 +37,7 @@ public class ReindexProxyChecksumSearchTest
   {
     // just fetch it to have index "primed" with it's SHA1
     central.retrieveItem(new ResourceStoreRequest("/log4j/log4j/1.2.12/log4j-1.2.12.jar"));
-    wairForAsyncEventsToCalmDown(); // indexer is async event subscriber
+    waitForAsyncEventsToCalmDown(); // indexer is async event subscriber
 
     // now search for it
     Collection<ArtifactInfo> candidates = indexerManager

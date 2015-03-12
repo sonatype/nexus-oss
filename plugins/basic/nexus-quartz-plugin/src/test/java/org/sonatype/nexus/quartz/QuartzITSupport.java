@@ -21,6 +21,7 @@ import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.quartz.internal.QuartzSupportImpl;
 import org.sonatype.nexus.scheduling.TaskScheduler;
+import org.sonatype.nexus.web.BaseUrlDetector;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
@@ -37,7 +38,6 @@ import org.eclipse.sisu.wire.WireModule;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -69,12 +69,15 @@ public abstract class QuartzITSupport
 
   static protected ApplicationConfiguration applicationConfiguration;
 
+  static protected BaseUrlDetector baseUrlDetector;
+
   @BeforeClass
   public static void prepare() throws Exception {
     applicationDirectories = mock(ApplicationDirectories.class);
     applicationConfiguration = mock(ApplicationConfiguration.class);
+    baseUrlDetector = mock(BaseUrlDetector.class);
     Guice.createInjector(new WireModule(new SetUpModule(),
-        new SpaceModule(new URLClassSpace(QuartzITSupport.class.getClassLoader()), BeanScanning.CACHE)));
+        new SpaceModule(new URLClassSpace(QuartzITSupport.class.getClassLoader()), BeanScanning.INDEX)));
     quartzSupport.start();
   }
 
@@ -106,6 +109,8 @@ public abstract class QuartzITSupport
 
       when(applicationConfiguration.getConfigurationDirectory()).thenReturn(new File(workDir, "conf"));
       binder.bind(ApplicationConfiguration.class).toInstance(applicationConfiguration);
+
+      binder.bind(BaseUrlDetector.class).toInstance(baseUrlDetector);
 
       binder.bind(ParameterKeys.PROPERTIES).toInstance(properties);
 

@@ -210,7 +210,7 @@ public abstract class NexusAppTestSupport
     nexusScheduler.killAll();
   }
 
-  protected void wairForAsyncEventsToCalmDown() throws Exception {
+  protected void waitForAsyncEventsToCalmDown() throws Exception {
     while (!eventSubscriberHost.isCalmPeriod()) {
       Thread.sleep(100);
     }

@@ -65,7 +65,7 @@ public class Nexus5393IndexEntryDuplicationLocalTest
   {
     // wait a bit for async stuff
     Thread.sleep(100);
-    wairForAsyncEventsToCalmDown();
+    waitForAsyncEventsToCalmDown();
     waitForTasksToStop();
   }
 

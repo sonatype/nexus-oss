@@ -18,7 +18,6 @@ import java.io.FileInputStream;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorSearchResponse;
@@ -43,7 +42,7 @@ public class Nexus5525IndexerManagerTest
     final File jarFile = getTestFile("src/test/resources/nexus-5525/bundle-1.0-20130318.131408-1.jar");
     final File pomFile = getTestFile("src/test/resources/nexus-5525/bundle-1.0-20130318.131408-1.pom");
     final MavenHostedRepository snapshots =
-        lookup(RepositoryRegistry.class).getRepositoryWithFacet("snapshots", MavenHostedRepository.class);
+        repositoryRegistry.getRepositoryWithFacet("snapshots", MavenHostedRepository.class);
     lookup(ArtifactPackagingMapper.class).setPropertiesFile(
         getTestFile("src/test/resources/nexus-5525/packaging2extension-mapping.properties"));
 
@@ -55,7 +54,7 @@ public class Nexus5525IndexerManagerTest
         new ResourceStoreRequest("/org/sonatype/nexus5525/bundle/1.0-SNAPSHOT/" + pomFile.getName()),
         new FileInputStream(pomFile), null);
 
-    wairForAsyncEventsToCalmDown();
+    waitForAsyncEventsToCalmDown();
 
     IteratorSearchResponse response = null;
     try {

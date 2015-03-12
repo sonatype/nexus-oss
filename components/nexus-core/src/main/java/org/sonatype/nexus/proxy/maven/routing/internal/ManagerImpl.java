@@ -482,13 +482,10 @@ public class ManagerImpl
   }
 
   /**
-   * Is visible to expose over the nexus-it-helper-plugin only, and UTs are using this. Should not be used for other
-   * means.
-   *
    * @return {@code true} if there are prefix file update jobs running, or boot of feature not yet finished.
    */
   @VisibleForTesting
-  public boolean isUpdatePrefixFileJobRunning() {
+  boolean isUpdatePrefixFileJobRunning() {
     if (config.isFeatureActive() && !periodicUpdaterDidRunAtLeastOnce) {
       log.debug("Boot process not done yet, periodic updater did not yet finish!");
       return true;

@@ -17,11 +17,13 @@ import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.user.User;
 
 import com.google.common.collect.ImmutableList;
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class OrderingRealmsTest
     extends AbstractSecurityTest
 {
+  @Test
   public void testOrderedGetUser() throws Exception {
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
     RealmManager realmManager = lookup(RealmManager.class);

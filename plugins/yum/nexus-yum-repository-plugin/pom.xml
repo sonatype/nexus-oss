@@ -67,7 +67,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-testsupport</artifactId>
+      <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -82,7 +82,6 @@
       <artifactId>tempus-fugit</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>

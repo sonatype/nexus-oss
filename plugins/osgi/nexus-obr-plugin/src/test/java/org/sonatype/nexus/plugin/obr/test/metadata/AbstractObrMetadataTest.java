@@ -16,9 +16,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 import java.util.zip.ZipInputStream;
 
-import org.sonatype.nexus.NexusAppTestSupport;
+import org.sonatype.nexus.AbstractApplicationStatusSource;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.NxApplication;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -31,9 +35,18 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.security.subject.FakeAlmightySubject;
+import org.sonatype.nexus.test.NexusTestSupport;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.util.ThreadContext;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public abstract class AbstractObrMetadataTest
-    extends NexusAppTestSupport
+    extends NexusTestSupport
 {
 
   protected ObrMetadataSource obrMetadataSource;
@@ -43,10 +56,29 @@ public abstract class AbstractObrMetadataTest
   protected ApplicationConfiguration nexusConfig;
 
   @Override
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        ThreadContext.bind(FakeAlmightySubject.forUserId("disabled-security"));
+        bind(RealmSecurityManager.class).toInstance(mock(RealmSecurityManager.class));
+
+        ApplicationStatusSource statusSource = mock(AbstractApplicationStatusSource.class);
+        when(statusSource.getSystemStatus()).thenReturn(new SystemStatus());
+        bind(ApplicationStatusSource.class).toInstance(statusSource);
+      }
+    });
+  }
+
+  @Override
   protected void setUp()
       throws Exception
   {
     super.setUp();
+
+    lookup(NxApplication.class).start();
 
     nexusConfig = lookup(ApplicationConfiguration.class);
 
@@ -67,6 +99,14 @@ public abstract class AbstractObrMetadataTest
 
     // initialize attribute cache, otherwise storeItem recurses
     testRepository.getRepositoryItemUidAttributeManager().reset();
+  }
+
+  @Override
+  protected void tearDown()
+      throws Exception
+  {
+    lookup(NxApplication.class).stop();
+    super.tearDown();
   }
 
   protected ObrSite openObrSite(final RepositoryItemUid uid)

@@ -323,7 +323,7 @@ public class RoutingAndLocalStatusTest
       // let's flip proxy1 now
       proxy1.setLocalStatus(LocalStatus.IN_SERVICE);
       getApplicationConfiguration().saveConfiguration();
-      wairForAsyncEventsToCalmDown();
+      waitForAsyncEventsToCalmDown();
       waitForRoutingBackgroundUpdates();
     }
 
@@ -353,7 +353,7 @@ public class RoutingAndLocalStatusTest
       // let's flip proxy1 now back
       proxy1.setLocalStatus(LocalStatus.OUT_OF_SERVICE);
       getApplicationConfiguration().saveConfiguration();
-      wairForAsyncEventsToCalmDown();
+      waitForAsyncEventsToCalmDown();
       waitForRoutingBackgroundUpdates();
     }
 

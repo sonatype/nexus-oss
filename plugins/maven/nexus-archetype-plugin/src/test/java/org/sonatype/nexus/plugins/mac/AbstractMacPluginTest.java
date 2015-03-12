@@ -16,8 +16,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.NexusAppTestSupport;
+import org.sonatype.nexus.AbstractApplicationStatusSource;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.security.subject.FakeAlmightySubject;
+import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
@@ -27,12 +34,17 @@ import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.creator.MavenArchetypeArtifactInfoIndexCreator;
 import org.apache.maven.index.creator.MavenPluginArtifactInfoIndexCreator;
 import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
+import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.util.ThreadContext;
 import org.eclipse.sisu.plexus.PlexusSpaceModule;
 import org.eclipse.sisu.space.BeanScanning;
 import org.eclipse.sisu.space.URLClassSpace;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public abstract class AbstractMacPluginTest
-    extends NexusAppTestSupport
+    extends NexusTestSupport
 {
   public List<IndexCreator> DEFAULT_CREATORS;
 
@@ -45,6 +57,23 @@ public abstract class AbstractMacPluginTest
   protected IndexingContext context;
 
   protected MacPlugin macPlugin;
+
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        ThreadContext.bind(FakeAlmightySubject.forUserId("disabled-security"));
+        bind(RealmSecurityManager.class).toInstance(mock(RealmSecurityManager.class));
+
+        ApplicationStatusSource statusSource = mock(AbstractApplicationStatusSource.class);
+        when(statusSource.getSystemStatus()).thenReturn(new SystemStatus());
+        bind(ApplicationStatusSource.class).toInstance(statusSource);
+      }
+    });
+  }
 
   @Override
   protected void setUp()
@@ -66,6 +95,14 @@ public abstract class AbstractMacPluginTest
     nexusIndexer = lookup(NexusIndexer.class);
 
     macPlugin = lookup(MacPlugin.class);
+  }
+
+  @Override
+  protected void tearDown()
+      throws Exception
+  {
+    lookup(EventBus.class).post(new NexusStoppedEvent(null));
+    super.tearDown();
   }
 
   @Override

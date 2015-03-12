@@ -63,41 +63,16 @@
     </dependency>
 
     <!--
-    Support use of core nexus components in test
+    Support test injection of core nexus components
     -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-core</artifactId>
     </dependency>
-
-    <!--
-    Run sanity test against OSS base distribution
-    -->
-    <dependency>
-      <groupId>org.sonatype.nexus.assemblies</groupId>
-      <artifactId>nexus-base-template</artifactId>
-      <type>zip</type>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
-      <!--
-      Allow use of 'versionAsInProject' in Pax-Exam configuration
-      -->
-      <plugin>
-        <groupId>org.apache.servicemix.tooling</groupId>
-        <artifactId>depends-maven-plugin</artifactId>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

@@ -25,7 +25,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class UserManagementTest
     extends AbstractSecurityTest
@@ -54,6 +55,7 @@ public class UserManagementTest
         .in(Singleton.class);
   }
 
+  @Test
   public void testAllUsers() throws Exception {
     Set<User> users = securitySystem.listUsers();
     Assert.assertFalse(users.isEmpty());
@@ -81,6 +83,7 @@ public class UserManagementTest
     this.verify2Jcoders(users);
   }
 
+  @Test
   public void testSearchWithCriteria() throws Exception {
     UserSearchCriteria criteria = new UserSearchCriteria();
 

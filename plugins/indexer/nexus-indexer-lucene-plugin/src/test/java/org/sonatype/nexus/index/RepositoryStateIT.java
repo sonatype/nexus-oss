@@ -80,7 +80,7 @@ public class RepositoryStateIT
   {
     releases.setIndexable(false);
     nexusConfiguration().saveConfiguration();
-    wairForAsyncEventsToCalmDown();
+    waitForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
     // ideally this test should verify that indexer manager ignores non-indexable repositories
@@ -127,7 +127,7 @@ public class RepositoryStateIT
 
     snapshots.setSearchable(false);
     nexusConfiguration().saveConfiguration();
-    wairForAsyncEventsToCalmDown();
+    waitForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
     IndexingContext ctx = indexerManager.getRepositoryIndexContext(snapshots);

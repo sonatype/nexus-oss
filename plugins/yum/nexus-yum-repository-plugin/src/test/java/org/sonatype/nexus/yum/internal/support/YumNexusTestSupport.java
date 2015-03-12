@@ -25,10 +25,11 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.NexusAppTestSupport;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.DefaultGlobalRestApiSettings;
 import org.sonatype.nexus.proxy.RequestContext;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -38,9 +39,11 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.nexus.yum.internal.createrepo.YumPackage;
 import org.sonatype.nexus.yum.internal.createrepo.YumStore;
 import org.sonatype.nexus.yum.internal.createrepo.YumStoreFactory;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestTracer;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
@@ -71,7 +74,7 @@ import static org.redline_rpm.header.Os.LINUX;
 import static org.redline_rpm.header.RpmType.BINARY;
 
 public class YumNexusTestSupport
-    extends NexusAppTestSupport
+    extends NexusTestSupport
 {
 
   private String javaTmpDir;
@@ -148,6 +151,7 @@ public class YumNexusTestSupport
     {
       @Override
       public void configure(final Binder binder) {
+        binder.bind(SystemStatus.class).toInstance(new SystemStatus());
         binder.bind(YumStoreFactory.class).toInstance(factory);
       }
     });
@@ -162,6 +166,14 @@ public class YumNexusTestSupport
     super.setUp();
     lookup(ApplicationConfiguration.class).loadConfiguration(true);
     injectFields();
+  }
+
+  @Override
+  protected void tearDown()
+      throws Exception
+  {
+    lookup(EventBus.class).post(new NexusStoppedEvent(null));
+    super.tearDown();
   }
 
   private void injectFields()

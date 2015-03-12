@@ -17,13 +17,16 @@ import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.realm.MockRealmB;
 import org.sonatype.nexus.security.user.User;
 
-import junit.framework.Assert;
+import org.junit.Test;
+
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.junit.Assert;
 
 public class CachingTest
     extends AbstractSecurityTest
 {
+  @Test
   public void testCacheClearing() throws Exception {
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
 

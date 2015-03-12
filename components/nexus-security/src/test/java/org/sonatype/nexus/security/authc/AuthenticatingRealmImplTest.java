@@ -16,7 +16,7 @@ package org.sonatype.nexus.security.authc;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CRole;
 import org.sonatype.nexus.security.config.CUser;
@@ -30,12 +30,14 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.realm.Realm;
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.fail;
 
 public class AuthenticatingRealmImplTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
   private AuthenticatingRealmImpl realm;
 
@@ -54,6 +56,7 @@ public class AuthenticatingRealmImplTest
     passwordService = lookup(PasswordService.class, "default");
   }
 
+  @Test
   public void testSuccessfulAuthentication() throws Exception {
     buildTestAuthenticationConfig(CUser.STATUS_ACTIVE);
 
@@ -63,6 +66,7 @@ public class AuthenticatingRealmImplTest
     assertThat(this.passwordService.passwordsMatch("password", password), is(true));
   }
 
+  @Test
   public void testCreateWithPassowrd() throws Exception {
     buildTestAuthenticationConfig(CUser.STATUS_ACTIVE);
 
@@ -88,6 +92,7 @@ public class AuthenticatingRealmImplTest
     assertThat(passwordService.passwordsMatch(clearPassword, password), is(true));
   }
 
+  @Test
   public void testFailedAuthentication() throws Exception {
     buildTestAuthenticationConfig(CUser.STATUS_ACTIVE);
 
@@ -103,6 +108,7 @@ public class AuthenticatingRealmImplTest
     }
   }
 
+  @Test
   public void testDisabledAuthentication() throws Exception {
     buildTestAuthenticationConfig(CUser.STATUS_DISABLED);
     UsernamePasswordToken upToken = new UsernamePasswordToken("username", "password");
@@ -117,6 +123,7 @@ public class AuthenticatingRealmImplTest
     }
   }
 
+  @Test
   public void testDetectLegacyUser() throws Exception {
     String password = "password";
     String username = "username";

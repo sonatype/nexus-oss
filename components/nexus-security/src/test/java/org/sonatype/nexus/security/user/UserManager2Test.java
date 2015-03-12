@@ -16,11 +16,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration;
 import org.sonatype.nexus.security.role.RoleIdentifier;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 // FIXME: resolve with other UserManagerTest
 
@@ -28,7 +29,7 @@ import junit.framework.Assert;
  * Tests for {@link UserManager}.
  */
 public class UserManager2Test
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
   private UserManager underTest;
 
@@ -39,10 +40,11 @@ public class UserManager2Test
   }
 
   @Override
-  protected MemorySecurityConfiguration getSecurityModelConfig() {
+  protected MemorySecurityConfiguration initialSecurityConfiguration() {
     return UserManager2TestSecurity.securityModel();
   }
 
+  @Test
   public void testListUserIds() throws Exception {
     Set<String> userIds = underTest.listUserIds();
     Assert.assertTrue(userIds.contains("test-user"));
@@ -52,6 +54,7 @@ public class UserManager2Test
     Assert.assertEquals(4, userIds.size());
   }
 
+  @Test
   public void testListUsers() throws Exception {
     Set<User> users = underTest.listUsers();
     Map<String, User> userMap = this.toUserMap(users);
@@ -63,6 +66,7 @@ public class UserManager2Test
     Assert.assertEquals(4, users.size());
   }
 
+  @Test
   public void testGetUser() throws Exception {
     User testUser = underTest.getUser("test-user");
 
@@ -78,6 +82,7 @@ public class UserManager2Test
     Assert.assertEquals(2, roleMap.size());
   }
 
+  @Test
   public void testGetUserWithEmptyRole() throws Exception {
     User testUser = underTest.getUser("test-user-with-empty-role");
 
@@ -94,6 +99,7 @@ public class UserManager2Test
     Assert.assertEquals(3, roleMap.size());
   }
 
+  @Test
   public void testSearchUser() throws Exception {
     Set<User> users = underTest.searchUsers(new UserSearchCriteria("test"));
     Map<String, User> userMap = this.toUserMap(users);

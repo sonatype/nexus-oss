@@ -17,6 +17,8 @@ import java.net.URL;
 
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -53,7 +55,7 @@ public class GroupReindexIndexerManagerTest
     // copy some _new_ stuff, not found in any of the members
     File sourceApacheSnapshotsRoot = new File(getBasedir(), "src/test/resources/reposes/apache-snapshots-2");
     File snapshotsRoot = new File(new URL(snapshots.getLocalUrl()).toURI());
-    copyDirectory(sourceApacheSnapshotsRoot, snapshotsRoot);
+    FileUtils.copyDirectory(sourceApacheSnapshotsRoot, snapshotsRoot, HiddenFileFilter.VISIBLE);
     indexerManager.reindexRepository(null, group.getId(), false);
 
     assertTrue("Index .gz file should exist.", indexFile.exists());

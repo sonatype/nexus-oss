@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 
+import org.sonatype.nexus.index.AbstractIndexerManagerTest;
 import org.sonatype.nexus.index.DefaultIndexerManager;
-import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.tests.http.runner.junit.ServerResource;
 import org.sonatype.tests.http.server.fluent.Server;
@@ -50,7 +50,7 @@ import static org.junit.Assert.assertTrue;
 
 // This is an IT just because it runs longer then 15 seconds
 public class ReindexIT
-    extends AbstractMavenRepoContentTests
+    extends AbstractIndexerManagerTest
 {
   public static final long A_DAY_MILLIS = 24 * 60 * 60 * 1000;
 
@@ -65,8 +65,6 @@ public class ReindexIT
       .serve("/central-inc3-v1/*").withBehaviours(new Get(util.resolvePath("target/test-classes/reposes-remote/central-inc3-v1")), new Head(util.resolveFile("target/test-classes/reposes-remote/central-inc3-v1")))
       .getServerProvider());
 
-  private IndexerManager indexerManager;
-
   private NexusIndexer nexusIndexer;
 
   private IndexPacker indexPacker;
@@ -76,8 +74,6 @@ public class ReindexIT
       throws Exception
   {
     super.setUp();
-
-    indexerManager = lookup(IndexerManager.class);
 
     nexusIndexer = lookup(NexusIndexer.class);
 

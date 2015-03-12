@@ -10,27 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.mavenbridge;
+package org.sonatype.nexus.testsuite;
 
-import org.sonatype.nexus.proxy.maven.gav.Gav;
+import javax.inject.Inject;
 
-import org.eclipse.aether.graph.Dependency;
-import org.junit.Assert;
+import org.sonatype.nexus.SystemState;
+import org.sonatype.nexus.SystemStatus;
+
 import org.junit.Test;
 
-public class NexusAetherIT
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+/**
+ * Sanity test of the OSS base template.
+ * 
+ * @since 3.0
+ */
+public class SanityIT
+    extends NexusCoreITSupport
 {
+  @Inject
+  private SystemStatus status;
 
   @Test
-  public void testDependency() {
-    Gav gav = new Gav("org.apache.maven", "apache-maven", "3.0-beta-1");
-
-    Dependency dep = Utils.createDependencyFromGav(gav, "compile");
-
-    Assert.assertEquals(dep.getArtifact().getGroupId(), gav.getGroupId());
-    Assert.assertEquals(dep.getArtifact().getArtifactId(), gav.getArtifactId());
-    Assert.assertEquals(dep.getArtifact().getVersion(), gav.getVersion());
-    Assert.assertEquals("compile", dep.getScope());
+  public void testNexusStarts() {
+    assertThat(SystemState.STARTED, is(status.getState()));
   }
-
 }

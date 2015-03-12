@@ -28,13 +28,14 @@ import org.sonatype.nexus.security.user.UserStatus;
 import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
-import junit.framework.Assert;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests for {@link DefaultSecuritySystem}.
@@ -59,6 +60,7 @@ public class DefaultSecuritySystemTest
     super.tearDown();
   }
 
+  @Test
   public void testLogin() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
 
@@ -76,6 +78,7 @@ public class DefaultSecuritySystemTest
     }
   }
 
+  @Test
   public void testLogout() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
 
@@ -102,6 +105,7 @@ public class DefaultSecuritySystemTest
     Assert.assertFalse(loggedinSubject.isAuthenticated());
   }
 
+  @Test
   public void testAuthorization() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
     PrincipalCollection principal = new SimplePrincipalCollection("jcool", "ANYTHING");
@@ -126,6 +130,7 @@ public class DefaultSecuritySystemTest
     securitySystem.checkPermission(principal, "from-role2:read");
   }
 
+  @Test
   public void testGetUser() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
     User jcoder = securitySystem.getUser("jcoder", "MockUserManagerA");
@@ -133,6 +138,7 @@ public class DefaultSecuritySystemTest
     Assert.assertNotNull(jcoder);
   }
 
+  @Test
   public void testAuthorizationManager() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
 
@@ -154,6 +160,7 @@ public class DefaultSecuritySystemTest
     Assert.assertTrue(role1.getPrivileges().contains("from-role1:delete"));
   }
 
+  @Test
   public void testAddUser() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
 

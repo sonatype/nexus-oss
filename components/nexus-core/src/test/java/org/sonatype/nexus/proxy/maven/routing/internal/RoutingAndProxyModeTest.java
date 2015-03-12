@@ -330,7 +330,7 @@ public class RoutingAndProxyModeTest
       proxy1.setProxyMode(ProxyMode.ALLOW);
       getApplicationConfiguration().saveConfiguration();
       Thread.yield();
-      wairForAsyncEventsToCalmDown();
+      waitForAsyncEventsToCalmDown();
       waitForRoutingBackgroundUpdates();
     }
 
@@ -360,7 +360,7 @@ public class RoutingAndProxyModeTest
       proxy1.setProxyMode(ProxyMode.BLOCKED_MANUAL);
       getApplicationConfiguration().saveConfiguration();
       Thread.yield();
-      wairForAsyncEventsToCalmDown();
+      waitForAsyncEventsToCalmDown();
       waitForRoutingBackgroundUpdates();
     }
 

@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.kenai.internal;
 
+import org.sonatype.nexus.NxApplication;
 import org.sonatype.nexus.kenai.AbstractKenaiRealmTest;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
@@ -29,20 +30,14 @@ public class KenaiClearCacheTest
   protected SecuritySystem securitySystem;
 
   @Override
-  protected boolean runWithSecurityDisabled() {
-    return false;
-  }
-
-  @Override
   protected void setUp()
       throws Exception
   {
     super.setUp();
 
-    mockKenai();
+    lookup(NxApplication.class).start();
 
-    // to start the hobelevanc and make it use Kenai realm
-    startNx();
+    mockKenai();
 
     RealmManager realmManager = lookup(RealmManager.class);
 
@@ -53,6 +48,13 @@ public class KenaiClearCacheTest
     securitySystem = lookup(SecuritySystem.class);
   }
 
+  @Override
+  protected void tearDown()
+      throws Exception
+  {
+    lookup(NxApplication.class).stop();
+    super.tearDown();
+  }
 
   @Test
   public void testClearCache()
