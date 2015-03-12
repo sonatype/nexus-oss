@@ -32,7 +32,7 @@ Proxy:
 ```
 {
   "maven" : {
-    "versionPolicy" : "SNAPSHOT",
+    "versionPolicy" : "RELEASE",
     "checksumPolicy" : "WARN",
     "strictContentTypeValidation" : false
   },
