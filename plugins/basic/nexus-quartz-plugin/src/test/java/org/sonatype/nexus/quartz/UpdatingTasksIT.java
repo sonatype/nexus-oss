@@ -14,7 +14,6 @@ package org.sonatype.nexus.quartz;
 
 import java.util.concurrent.Future;
 
-import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUidIT.Sleeper;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
