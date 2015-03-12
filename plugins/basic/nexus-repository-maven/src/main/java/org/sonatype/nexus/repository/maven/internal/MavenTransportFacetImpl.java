@@ -16,9 +16,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.maven.internal.Path.HashType;
@@ -50,6 +52,13 @@ public class MavenTransportFacetImpl
     extends FacetSupport
     implements MavenTransportFacet
 {
+  private final Clock clock;
+
+  @Inject
+  public MavenTransportFacetImpl() {
+    this.clock = new Clock();
+  }
+
   @Override
   public MavenPayload fetch(final Path path, final URI url, final MavenPayload stalePayload) throws IOException
   {
@@ -91,8 +100,9 @@ public class MavenTransportFacetImpl
       if (!Strings.isNullOrEmpty(md5)) {
         hashCodes.put(HashAlgorithm.MD5, HashCode.fromString(md5));
       }
-      final DateTime lastModified = extractLastModified(response.getLastHeader(HttpHeaders.LAST_MODIFIED));
-      return new MavenPayload(payload, new DateTime(), lastModified, hashCodes);
+      final DateTime now = clock.dateTime();
+      final DateTime lastModified = extractLastModified(now, response.getLastHeader(HttpHeaders.LAST_MODIFIED));
+      return new MavenPayload(payload, now, lastModified, hashCodes);
     }
     else if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
       return stalePayload;
@@ -122,8 +132,8 @@ public class MavenTransportFacetImpl
   /**
    * Extract last-modified date from response if possible, or "now".
    */
-  private DateTime extractLastModified(final Header lastModifiedHeader) {
-    DateTime result = new DateTime();
+  private DateTime extractLastModified(final DateTime now, final Header lastModifiedHeader) {
+    DateTime result = now;
     if (lastModifiedHeader != null) {
       try {
         result = new DateTime(DateUtils.parseDate(lastModifiedHeader.getValue()).getTime());
