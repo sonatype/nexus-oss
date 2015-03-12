@@ -144,6 +144,7 @@ public class AnonymousManagerImpl
     return new Subject.Builder()
         .principals(principals)
         .authenticated(false)
+        .sessionCreationEnabled(false)
         .buildSubject();
   }
 
