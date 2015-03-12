@@ -36,13 +36,13 @@ import org.apache.shiro.authz.Authorizer;
 import org.apache.shiro.config.ConfigurationException;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.nexus.NexusSessionDAO;
 import org.apache.shiro.nexus.NexusSessionFactory;
 import org.apache.shiro.nexus.NexusWebSecurityManager;
 import org.apache.shiro.nexus.NexusWebSessionManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionFactory;
 import org.apache.shiro.session.mgt.SessionManager;
-import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
 import org.apache.shiro.web.filter.mgt.FilterChainManager;
@@ -74,7 +74,7 @@ public class WebSecurityModule
     bind(SessionFactory.class).to(NexusSessionFactory.class).in(Singleton.class);
 
     // configure our preferred security components
-    bind(SessionDAO.class).to(EnterpriseCacheSessionDAO.class).asEagerSingleton();
+    bind(SessionDAO.class).to(NexusSessionDAO.class).asEagerSingleton();
     bind(Authenticator.class).to(FirstSuccessfulModularRealmAuthenticator.class).in(Singleton.class);
     bind(Authorizer.class).to(ExceptionCatchingModularRealmAuthorizer.class).in(Singleton.class);
 

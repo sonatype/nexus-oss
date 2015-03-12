@@ -31,7 +31,8 @@ public class NexusSessionFactory
 
   @Override
   public Session createSession(final SessionContext initData) {
-    log.debug("Creating session w/init-data: {}", initData);
+    // HACK: info -> debug
+    log.info("Creating session w/init-data: {}", initData);
     return super.createSession(initData);
   }
 }
