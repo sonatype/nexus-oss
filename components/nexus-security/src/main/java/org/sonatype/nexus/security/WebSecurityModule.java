@@ -58,7 +58,7 @@ import org.eclipse.sisu.inject.BeanLocator;
  *
  * @since 2.6.1
  *
- * @see SecurityModule
+ * @see TestSecurityModule
  */
 public class WebSecurityModule
     extends ShiroWebModule

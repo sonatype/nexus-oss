@@ -30,7 +30,7 @@ import org.apache.shiro.guice.ShiroModule;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.nexus.NexusDefaultSessionManager;
+import org.apache.shiro.nexus.TestSessionManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
@@ -43,7 +43,7 @@ import org.apache.shiro.session.mgt.eis.SessionDAO;
  *
  * @see WebSecurityModule
  */
-public class SecurityModule
+public class TestSecurityModule
     extends ShiroModule
 {
   @Override
@@ -72,9 +72,9 @@ public class SecurityModule
   @Override
   protected void bindSessionManager(final AnnotatedBindingBuilder<SessionManager> bind) {
     // workaround for NEXUS-5727, see NexusDefaultSessionManager javadoc for clues
-    bind.to(NexusDefaultSessionManager.class).asEagerSingleton();
+    bind.to(TestSessionManager.class).asEagerSingleton();
     // this is a PrivateModule, so explicitly binding the NexusDefaultSessionManager class
-    bind(NexusDefaultSessionManager.class);
+    bind(TestSessionManager.class);
   }
 
   /**

@@ -24,10 +24,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Custom {@link SessionManager} for tests.
  */
-public class NexusDefaultSessionManager
+public class TestSessionManager
     extends DefaultSessionManager
 {
-  private static final Logger log = LoggerFactory.getLogger(NexusDefaultSessionManager.class);
+  private static final Logger log = LoggerFactory.getLogger(TestSessionManager.class);
 
   @Inject
   public void configureProperties(

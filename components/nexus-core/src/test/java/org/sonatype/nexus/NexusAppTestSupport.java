@@ -23,7 +23,7 @@ import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.scheduling.TaskScheduler;
-import org.sonatype.nexus.security.SecurityModule;
+import org.sonatype.nexus.security.TestSecurityModule;
 import org.sonatype.nexus.security.subject.FakeAlmightySubject;
 import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.TemplateSet;
@@ -107,7 +107,7 @@ public abstract class NexusAppTestSupport
   @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
-    modules.add(new SecurityModule());
+    modules.add(new TestSecurityModule());
     modules.add(new Module()
     {
       @Override

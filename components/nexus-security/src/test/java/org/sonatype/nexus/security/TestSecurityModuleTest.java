@@ -31,7 +31,7 @@ import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.nexus.NexusDefaultSessionManager;
+import org.apache.shiro.nexus.TestSessionManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.eclipse.sisu.space.BeanScanning;
 import org.eclipse.sisu.space.SpaceModule;
@@ -47,9 +47,9 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.sameInstance;
 
 /**
- * Verifies functionality of SecurityModule.
+ * Verifies functionality of {@link TestSecurityModule}.
  */
-public class SecurityModuleTest
+public class TestSecurityModuleTest
     extends TestSupport
 {
   private Injector injector;
@@ -76,8 +76,8 @@ public class SecurityModuleTest
     assertThat(securityManager, instanceOf(DefaultSecurityManager.class));
     DefaultSecurityManager defaultSecurityManager = (DefaultSecurityManager) securityManager;
 
-    assertThat(defaultSecurityManager.getSessionManager(), instanceOf(NexusDefaultSessionManager.class));
-    NexusDefaultSessionManager sessionManager = (NexusDefaultSessionManager) defaultSecurityManager.getSessionManager();
+    assertThat(defaultSecurityManager.getSessionManager(), instanceOf(TestSessionManager.class));
+    TestSessionManager sessionManager = (TestSessionManager) defaultSecurityManager.getSessionManager();
     assertThat(sessionManager.getSessionDAO(), instanceOf(EnterpriseCacheSessionDAO.class));
     assertThat(((EhCacheManager) ((EnterpriseCacheSessionDAO) sessionManager.getSessionDAO()).getCacheManager()).getCacheManager(), sameInstance(injector.getInstance(CacheManagerComponent.class).getCacheManager()));
   }
@@ -90,7 +90,7 @@ public class SecurityModuleTest
   }
 
   private Module getWireModule() {
-    return new WireModule(new SecurityModule(), getTestModule(), getSpaceModule(), getPropertiesModule());
+    return new WireModule(new TestSecurityModule(), getTestModule(), getSpaceModule(), getPropertiesModule());
   }
 
   private Module getTestModule() {
