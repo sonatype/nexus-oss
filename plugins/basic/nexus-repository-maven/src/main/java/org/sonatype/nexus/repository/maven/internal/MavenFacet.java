@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.content.InvalidContentException;
+import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Payload;
 
@@ -33,6 +34,9 @@ public interface MavenFacet
 {
   @Nonnull
   VersionPolicy getVersionPolicy();
+
+  @Nonnull
+  ChecksumPolicy getChecksumPolicy();
 
   @Nullable
   Payload getArtifact(ArtifactPath path) throws IOException;

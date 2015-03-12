@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Context;
@@ -61,8 +62,13 @@ public class HostedArtifactHandler
       }
 
       case PUT: {
-        mavenFacet.putArtifact(artifactPath, context.getRequest().getPayload());
-        return HttpResponses.created();
+        try {
+          mavenFacet.putArtifact(artifactPath, context.getRequest().getPayload());
+          return HttpResponses.created();
+        }
+        catch (InvalidContentException e) {
+          return HttpResponses.badRequest(e.getMessage());
+        }
       }
 
       case DELETE: {

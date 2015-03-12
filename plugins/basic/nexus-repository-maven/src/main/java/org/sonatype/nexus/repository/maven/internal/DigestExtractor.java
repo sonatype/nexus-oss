@@ -13,11 +13,13 @@
 package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.io.LimitedInputStream;
 import org.sonatype.nexus.repository.view.Payload;
 
@@ -40,7 +42,7 @@ public class DigestExtractor
   private DigestExtractor() {}
 
   /**
-   * Extract the digest string from a payload, that carries a payload of a Maven sha1/md5 file.
+   * Extract the digest string from a payload, that carries content of a Maven sha1/md5 file.
    *
    * @see {@link #extract(String)}
    */
@@ -49,9 +51,38 @@ public class DigestExtractor
       throws IOException
   {
     checkNotNull(payload);
+    try (InputStream is = payload.openInputStream()) {
+      return extract(is);
+    }
+  }
+
+  /**
+   * Extract the digest string from a blob, that carries content of a Maven sha1/md5 file.
+   *
+   * @see {@link #extract(String)}
+   */
+  @Nullable
+  public static String extract(final Blob blob)
+      throws IOException
+  {
+    checkNotNull(blob);
+    try (InputStream is = blob.getInputStream()) {
+      return extract(is);
+    }
+  }
+
+  /**
+   * Extract the digest string from a stream, that carries a payload of a Maven sha1/md5 file.
+   *
+   * @see {@link #extract(String)}
+   */
+  @Nullable
+  public static String extract(final InputStream stream)
+      throws IOException
+  {
+    checkNotNull(stream);
     try (InputStreamReader isr = new InputStreamReader(
-        new LimitedInputStream(payload.openInputStream(), 0, MAX_CHARS_NEEDED),
-        Charsets.UTF_8)) {
+        new LimitedInputStream(stream, 0, MAX_CHARS_NEEDED), Charsets.UTF_8)) {
       return extract(CharStreams.toString(isr));
     }
   }

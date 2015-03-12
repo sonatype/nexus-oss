@@ -20,6 +20,7 @@ Use this config to create Maven2 hosted repository, use name `maven2-hosted`:
 {
   "maven" : {
     "versionPolicy" : "SNAPSHOT",
+    "checksumPolicy" : "WARN",
     "strictContentTypeValidation" : false
   }
 }

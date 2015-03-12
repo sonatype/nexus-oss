@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -54,8 +55,13 @@ public class HostedMetadataHandler
       }
 
       case PUT: {
-        mavenFacet.putMetadata(path, context.getRequest().getPayload());
-        return HttpResponses.created();
+        try {
+          mavenFacet.putMetadata(path, context.getRequest().getPayload());
+          return HttpResponses.created();
+        }
+        catch (InvalidContentException e) {
+          return HttpResponses.badRequest(e.getMessage());
+        }
       }
 
       case DELETE: {
