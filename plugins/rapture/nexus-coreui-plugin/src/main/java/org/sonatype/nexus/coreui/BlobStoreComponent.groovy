@@ -23,6 +23,7 @@ import org.sonatype.nexus.blobstore.api.BlobStorageFacet
 import org.sonatype.nexus.blobstore.api.BlobStore
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
 import org.sonatype.nexus.blobstore.api.BlobStoreManager
+import org.sonatype.nexus.blobstore.api.Recipe
 import org.sonatype.nexus.common.validation.Create
 import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponentSupport
@@ -47,6 +48,9 @@ class BlobStoreComponent
   BlobStoreManager blobStoreManager
 
   @Inject
+  Map<String, Recipe> recipes
+
+  @Inject
   AttributeConverter attributeConverter
 
   @DirectMethod
@@ -56,7 +60,9 @@ class BlobStoreComponent
 
   @DirectMethod
   List<ReferenceXO> readTypes() {
-    [new ReferenceXO(id: 'file', name: 'FileBlobStore')]
+    recipes.collect { String name, Recipe recipe ->
+      new ReferenceXO(id: name, name: recipe.type)
+    }
   }
 
   @DirectMethod

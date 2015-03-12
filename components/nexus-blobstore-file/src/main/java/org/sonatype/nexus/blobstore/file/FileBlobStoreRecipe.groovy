@@ -55,19 +55,6 @@ class FileBlobStoreRecipe
   @Override
   public void apply(@Nonnull final BlobStore blobStore) throws Exception {
     blobStore.attach(storageFacet.get());
-//    Path root = Paths.get(getPath(blobStore.getBlobStoreConfiguration().getAttributes()));
-//    Path content = root.resolve("content");
-//    File metadataFile = root.resolve("metadata").toFile();
-//    content.toFile().mkdirs();
-//    metadataFile.mkdirs();
-//    blobStore.attach(new FileBlobStorageFacet(
-//        content,
-//        new VolumeChapterLocationStrategy(),
-//        new SimpleFileOperations(),
-//        MapdbBlobMetadataStore.create(metadataFile)));
   }
 
-//  private String getPath(final Map<String, Map<String, Object>> attributes) {
-//    return (String) attributes.get("file").get("path");
-//  }
 }

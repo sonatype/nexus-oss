@@ -21,7 +21,7 @@ import org.sonatype.nexus.blobstore.api.Type;
 @Singleton
 public class FileType extends Type
 {
-  public static final String NAME = "file";
+  public static final String NAME = "FileBlobStore";
   
   public FileType() {
     super(NAME);
