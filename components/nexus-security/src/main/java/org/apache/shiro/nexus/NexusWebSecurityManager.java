@@ -17,18 +17,14 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.sonatype.nexus.security.UserIdMdcHelper;
-import org.sonatype.nexus.security.anonymous.AnonymousPrincipalCollection;
 import org.sonatype.nexus.security.authc.AuthenticationEvent;
-import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
-import org.apache.shiro.web.servlet.Cookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,24 +40,11 @@ public class NexusWebSecurityManager
 {
   private static final Logger log = LoggerFactory.getLogger(NexusWebSecurityManager.class);
 
-  private static final String DEFAULT_REMEMBER_ME_COOKIE_NAME = "NXREMEMBERME";
-
-  private static final Time DEFAULT_REMEMBER_ME_COOKIE_MAX_AGE = Time.days(30);
-
   private final Provider<EventBus> eventBus;
 
   @Inject
   public NexusWebSecurityManager(final Provider<EventBus> eventBus) {
     this.eventBus = checkNotNull(eventBus);
-
-    // TODO: Inject singleton?
-    // customize remember-me configuration
-    CookieRememberMeManager rememberMeManager = new CookieRememberMeManager();
-    Cookie cookie = rememberMeManager.getCookie();
-    // TODO: Expose for configuration, for now just use a more sane defaults
-    cookie.setName(DEFAULT_REMEMBER_ME_COOKIE_NAME);
-    cookie.setMaxAge(DEFAULT_REMEMBER_ME_COOKIE_MAX_AGE.toSecondsI());
-    setRememberMeManager(rememberMeManager);
   }
 
   /**
@@ -88,18 +71,5 @@ public class NexusWebSecurityManager
   public void logout(final Subject subject) {
     super.logout(subject);
     UserIdMdcHelper.unset();
-  }
-
-  // HACK: There is a SessionStorageEvaluator component attached to the SubjectDAO which may be more framework-proper place to put this check
-  // HACK: Subject.Builder.createSubject() will attempt to save() even if createSession(false) so we have to avoid saving in case of
-  // HACK: custom subject handling like anonymous to prevent errors in frameworks.
-
-  @Override
-  protected void save(final Subject subject) {
-    if (subject.getPrincipals() instanceof AnonymousPrincipalCollection) {
-      log.trace("Ignoring request to save anonymous subject");
-      return;
-    }
-    super.save(subject);
   }
 }
