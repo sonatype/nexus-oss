@@ -114,21 +114,21 @@ public class ViewServlet
     // resolve repository for request
     RepositoryPath path = path(httpRequest);
     if (path == null) {
-      send(HttpResponses.badRequest("Invalid repository path"), httpResponse);
+      send(HttpResponses.badRequest("Invalid repository path"), httpRequest, httpResponse);
       return;
     }
     log.debug("Parsed path: {}", path);
 
     Repository repo = repository(path.getRepositoryName());
     if (repo == null) {
-      send(HttpResponses.notFound("Repository not found"), httpResponse);
+      send(HttpResponses.notFound("Repository not found"), httpRequest, httpResponse);
       return;
     }
     log.debug("Repository: {}", repo);
 
     ViewFacet facet = repo.facet(ViewFacet.class);
     if (!facet.isOnline()) {
-      send(HttpResponses.serviceUnavailable("Repository offline"), httpResponse);
+      send(HttpResponses.serviceUnavailable("Repository offline"), httpRequest, httpResponse);
       return;
     }
     log.debug("Dispatching to view facet: {}", facet);
@@ -140,7 +140,7 @@ public class ViewServlet
 
     HttpResponseSender sender = sender(repo);
     log.debug("HTTP response sender: {}", sender);
-    sender.send(response, httpResponse);
+    sender.send(response, httpRequest, httpResponse);
   }
 
   /**
@@ -148,10 +148,10 @@ public class ViewServlet
    *
    * Needed in a few places _before_ we have a repository instance to determine its specific sender.
    */
-  private void send(final Response response, final HttpServletResponse httpResponse)
+  private void send(final Response response, final HttpServletRequest httpRequest, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
-    defaultHttpResponseSender.send(response, httpResponse);
+    defaultHttpResponseSender.send(response, httpRequest, httpResponse);
   }
 
   /**

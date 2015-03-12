@@ -20,8 +20,10 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
@@ -38,17 +40,19 @@ import com.google.common.io.ByteStreams;
 @Named
 @Singleton
 public class DefaultHttpResponseSender
-  extends ComponentSupport
-  implements HttpResponseSender
+    extends ComponentSupport
+    implements HttpResponseSender
 {
   @Override
-  public void send(final Response response, final HttpServletResponse httpResponse)
+  public void send(final Response response,
+                   final HttpServletRequest httpRequest,
+                   final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
     log.trace("Sending response: {}", response);
 
     // add response headers
-    for (Map.Entry<String,String> header : response.getHeaders()) {
+    for (Map.Entry<String, String> header : response.getHeaders()) {
       httpResponse.addHeader(header.getKey(), header.getValue());
     }
 
@@ -57,7 +61,7 @@ public class DefaultHttpResponseSender
     if (status.isSuccessful() || response instanceof PayloadResponse) {
       httpResponse.setStatus(status.getCode());
       if (response instanceof PayloadResponse) {
-        Payload payload = ((PayloadResponse)response).getPayload();
+        Payload payload = ((PayloadResponse) response).getPayload();
         log.trace("Attaching payload: {}", payload);
 
         if (payload.getContentType() != null) {
@@ -65,8 +69,11 @@ public class DefaultHttpResponseSender
         }
         httpResponse.setContentLengthLong(payload.getSize());
 
-        try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
-          ByteStreams.copy(input, output);
+        // send payload unless method is HEAD
+        if (!HttpMethods.HEAD.equals(httpRequest.getMethod())) {
+          try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
+            ByteStreams.copy(input, output);
+          }
         }
       }
     }
