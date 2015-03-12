@@ -93,10 +93,14 @@ public class MavenProxyFacet
       log.debug("Entity: {}", entity);
       HttpEntityPayload payload = new HttpEntityPayload(response, entity);
       String sha1 = extractSha1(response);
-      if (sha1 == null) {
-        sha1 = fetchHashCode(url, HashType.SHA1);
+      String md5 = null;
+      if (!path.isHash()) {
+        if (sha1 == null) {
+          sha1 = fetchHashCode(url, HashType.SHA1);
+        }
+        md5 = sha1 == null ? fetchHashCode(url, HashType.MD5) : null;
       }
-      final String md5 = sha1 == null ? fetchHashCode(url, HashType.MD5) : null;
+
       final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
       if (!Strings.isNullOrEmpty(sha1)) {
         hashCodes.put(HashAlgorithm.SHA1, HashCode.fromString(sha1));
