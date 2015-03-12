@@ -343,8 +343,6 @@ public abstract class NexusITSupport
       checkNotNull(nexus).getConfiguration().setLogLevel(logLevel);
     }
 
-    nexus.getConfiguration().addFeatures("nexus-it-helper-plugin");
-
     return nexus;
   }
 

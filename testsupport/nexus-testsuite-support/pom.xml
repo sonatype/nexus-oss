@@ -65,18 +65,6 @@
       <artifactId>nexus-groovyremote-client</artifactId>
       <version>${nexus.version}</version>
     </dependency>
-
-    <!--
-    Additional plugin/helper features
-    -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-it-helper-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -103,9 +91,6 @@
               <featuresCfgFile>${project.build.testOutputDirectory}/org.apache.karaf.features.cfg</featuresCfgFile>
               <startupPropertiesFile>${project.build.testOutputDirectory}/startup.properties</startupPropertiesFile>
               <systemDirectory>${project.build.directory}/test-features</systemDirectory>
-              <installedFeatures>
-                <feature>nexus-it-helper-plugin</feature>
-              </installedFeatures>
             </configuration>
           </execution>
         </executions>

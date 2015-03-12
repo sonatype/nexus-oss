@@ -82,15 +82,6 @@
     Additional plugin features
     -->
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-it-helper-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-groovyremote-plugin</artifactId>
       <version>${nexus.version}</version>
@@ -282,7 +273,6 @@
                   <startupPropertiesFile>${project.build.testOutputDirectory}/startup.properties</startupPropertiesFile>
                   <systemDirectory>${project.build.directory}/test-features</systemDirectory>
                   <installedFeatures>
-                    <feature>nexus-it-helper-plugin</feature>
                     <feature>nexus-groovyremote-plugin</feature>
                     <feature>nexus-capabilities-testsuite-plugin</feature>
                     <feature>nexus-kenai-plugin</feature>
