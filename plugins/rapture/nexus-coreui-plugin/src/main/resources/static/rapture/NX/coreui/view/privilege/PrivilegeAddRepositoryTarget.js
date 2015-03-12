@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
-  extend: 'NX.view.AddWindow',
+  extend: 'NX.view.AddPanel',
   alias: 'widget.nx-coreui-privilege-add-repositorytarget',
   requires: [
     'NX.Conditions',

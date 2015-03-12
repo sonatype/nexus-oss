@@ -13,7 +13,7 @@
 package org.sonatype.nexus.blobstore.api;
 
 /**
- * Provides usage metrics for the blob store.
+ * Provides usage metrics for a blob-store.
  *
  * @since 3.0
  */
@@ -35,5 +35,4 @@ public interface BlobStoreMetrics
    * may return a value set by a policy rather than some hard storage limit.
    */
   long getAvailableSpace();
-
 }

@@ -18,8 +18,9 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 /**
- * An interface for listening to blob store events. Listeners must be thread-safe, able to receive multiple events
- * concurrently.
+ * An interface for listening to blob store events.
+ *
+ * Listeners must be thread-safe, able to receive multiple events concurrently.
  *
  * @since 3.0
  */

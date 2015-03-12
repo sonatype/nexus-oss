@@ -21,20 +21,18 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.CapabilityIdentity;
+import org.sonatype.nexus.common.entity.EntityHelper;
+import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.orient.DatabaseInstance;
-import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * OrientDB implementation of {@link CapabilityStorage}.
+ * Orient {@link CapabilityStorage} implementation.
  *
  * @since 3.0
  */
@@ -46,31 +44,21 @@ public class OrientCapabilityStorage
 {
   private final Provider<DatabaseInstance> databaseInstance;
 
-  private final RecordIdObfuscator recordIdObfuscator;
-
-  private final CapabilityStorageItemEntityAdapter entityAdapter = new CapabilityStorageItemEntityAdapter();
-
-  private OClass entityType;
+  private final CapabilityStorageItemEntityAdapter entityAdapter;
 
   @Inject
   public OrientCapabilityStorage(final @Named("config") Provider<DatabaseInstance> databaseInstance,
-                                 final RecordIdObfuscator recordIdObfuscator)
+                                 final CapabilityStorageItemEntityAdapter entityAdapter)
   {
     this.databaseInstance = checkNotNull(databaseInstance);
-    this.recordIdObfuscator = checkNotNull(recordIdObfuscator);
+    this.entityAdapter = checkNotNull(entityAdapter);
   }
 
   @Override
   protected void doStart() throws Exception {
     try (ODatabaseDocumentTx db = databaseInstance.get().connect()) {
-      // register schema
-      entityType = entityAdapter.register(db);
+      entityAdapter.register(db);
     }
-  }
-
-  @Override
-  protected void doStop() throws Exception {
-    entityType = null;
   }
 
   /**
@@ -81,62 +69,32 @@ public class OrientCapabilityStorage
     return databaseInstance.get().acquire();
   }
 
-  private CapabilityIdentity convertId(final ORID rid) {
-    String encoded = recordIdObfuscator.encode(entityType, rid);
-    return new CapabilityIdentity(encoded);
-  }
-
-  private ORID convertId(final CapabilityIdentity id) {
-    return recordIdObfuscator.decode(entityType, id.toString());
+  private CapabilityIdentity identity(final CapabilityStorageItem item) {
+    EntityId id = EntityHelper.id(item);
+    return new CapabilityIdentity(id.getValue());
   }
 
   @Override
   public CapabilityIdentity add(final CapabilityStorageItem item) throws IOException {
-    ORID rid;
     try (ODatabaseDocumentTx db = openDb()) {
-      ODocument doc = entityAdapter.create(db, item);
-      rid = doc.getIdentity();
+      entityAdapter.add(db, item);
     }
 
-    log.debug("Added item with RID: {}", rid);
-    return convertId(rid);
+    return identity(item);
   }
 
   @Override
   public boolean update(final CapabilityIdentity id, final CapabilityStorageItem item) throws IOException {
-    ORID rid = convertId(id);
-
     try (ODatabaseDocumentTx db = openDb()) {
-      // load record and apply updated item attributes
-      ODocument doc = db.getRecord(rid);
-      if (doc == null) {
-        log.debug("Unable to update item with RID: {}", rid);
-        return false;
-      }
-      entityAdapter.write(doc, item);
+      return entityAdapter.edit(db, id.toString(), item);
     }
-
-    log.debug("Updated item with RID: {}", rid);
-    return true;
   }
 
   @Override
   public boolean remove(final CapabilityIdentity id) throws IOException {
-    ORID rid = convertId(id);
-
     try (ODatabaseDocumentTx db = openDb()) {
-      // if we can't load the record, then abort
-      ODocument doc = db.getRecord(rid);
-      if (doc == null) {
-        log.debug("Unable to delete item with RID: {}", rid);
-        return false;
-      }
-      // else delete the record
-      db.delete(doc);
+      return entityAdapter.delete(db, id.toString());
     }
-
-    log.debug("Deleted item with RID: {}", rid);
-    return true;
   }
 
   @Override
@@ -144,10 +102,8 @@ public class OrientCapabilityStorage
     Map<CapabilityIdentity, CapabilityStorageItem> items = Maps.newHashMap();
 
     try (ODatabaseDocumentTx db = openDb()) {
-      for (ODocument doc : entityAdapter.browse(db)) {
-        ORID rid = doc.getIdentity();
-        CapabilityStorageItem item = entityAdapter.read(doc);
-        items.put(convertId(rid), item);
+      for (CapabilityStorageItem item : entityAdapter.browse(db)) {
+        items.put(identity(item), item);
       }
     }
 

@@ -19,7 +19,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
-import org.sonatype.nexus.orient.entity.EntityAdapter;
+import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 import org.sonatype.nexus.orient.entity.FieldCopier;
 
 import com.orientechnologies.orient.core.metadata.schema.OClass;
@@ -28,14 +28,14 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
- * {@link Configuration} entity adapter.
+ * {@link Configuration} entity-adapter.
  *
  * @since 3.0
  */
 @Named
 @Singleton
 public class ConfigurationEntityAdapter
-    extends EntityAdapter<Configuration>
+    extends CollectionEntityAdapter<Configuration>
 {
   private static final String DB_CLASS = new OClassNameBuilder()
       .prefix("repository")
@@ -78,10 +78,7 @@ public class ConfigurationEntityAdapter
     Map<String, Map<String, Object>> attributes = document.field(P_ATTRIBUTES, OType.EMBEDDEDMAP);
 
     // deeply copy attributes to divorce from document
-    if (attributes != null) {
-      //noinspection unchecked
-      attributes = FieldCopier.copy(attributes);
-    }
+    attributes = FieldCopier.copyIf(attributes);
 
     entity.setRecipeName(recipeName);
     entity.setRepositoryName(repositoryName);

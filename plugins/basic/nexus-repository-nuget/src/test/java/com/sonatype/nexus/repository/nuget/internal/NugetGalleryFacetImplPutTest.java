@@ -24,7 +24,6 @@ import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
 import org.sonatype.nexus.repository.Repository;
 
 import org.sonatype.nexus.common.time.Clock;
-import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
 import org.sonatype.nexus.repository.storage.ComponentEvent;
 import org.sonatype.nexus.repository.storage.ComponentUpdatedEvent;
@@ -66,9 +65,6 @@ import static org.mockito.Mockito.when;
 public class NugetGalleryFacetImplPutTest
     extends TestSupport
 {
-  @Mock
-  private ComponentMetadataFactory componentMetadataFactory;
-  
   @Mock 
   private EventBus eventBus;
   
@@ -217,7 +213,7 @@ public class NugetGalleryFacetImplPutTest
   }
 
   private NugetGalleryFacetImpl buildSpy() {
-    final NugetGalleryFacetImpl galleryFacet = Mockito.spy(new NugetGalleryFacetImpl(componentMetadataFactory)
+    final NugetGalleryFacetImpl galleryFacet = Mockito.spy(new NugetGalleryFacetImpl()
     {
       @Override
       protected Repository getRepository() {

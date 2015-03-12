@@ -60,7 +60,12 @@
 );
 
 
-/* Fixed modals for the visual style guide */
+// Fixed modals for the visual style guide
 .fixed-modal {
   top: 0 !important;
+}
+
+// Remove footer toolbar spacing
+.x-window-body .x-toolbar-footer {
+  padding-left: 0 !important;
 }

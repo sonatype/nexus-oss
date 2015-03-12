@@ -16,7 +16,6 @@ import java.util.HashMap;
 
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
 
-import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -40,7 +39,7 @@ public class NugetGalleryFacetEntryTest
     final String packageId = "screwdriver";
     final String version = "0.1.1";
 
-    final NugetGalleryFacetImpl galleryFacet = spy(new NugetGalleryFacetImpl(mock(ComponentMetadataFactory.class)));
+    final NugetGalleryFacetImpl galleryFacet = spy(new NugetGalleryFacetImpl());
 
     final StorageTx tx = mock(StorageTx.class);
     doReturn(tx).when(galleryFacet).openStorageTx();

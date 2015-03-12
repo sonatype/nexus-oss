@@ -18,7 +18,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.log.LogConfigurationCustomizer;
 
 import static org.sonatype.nexus.log.LoggerLevel.DEFAULT;
-import static org.sonatype.nexus.log.LoggerLevel.TRACE;
 
 /**
  * Blob-store {@link LogConfigurationCustomizer}.
@@ -32,7 +31,7 @@ public class LogConfigurationCustomizerImpl
 {
   @Override
   public void customize(final Configuration config) {
-    // HACK: TRACE for testing, change to DEFAULT later
-    config.setLoggerLevel("org.sonatype.nexus.blobstore", TRACE);
+    config.setLoggerLevel("org.sonatype.nexus.blobstore", DEFAULT);
+    config.setLoggerLevel("org.sonatype.nexus.internal.blobstore", DEFAULT);
   }
 }
