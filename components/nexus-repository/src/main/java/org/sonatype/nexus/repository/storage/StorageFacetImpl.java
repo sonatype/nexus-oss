@@ -34,7 +34,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.hook.ODocumentHookAbstract;
-import com.orientechnologies.orient.core.hook.ORecordHook;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Parameter;
@@ -230,59 +229,52 @@ public class StorageFacetImpl
 
   private GraphTx openGraphTx() {
     ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire();
+    GraphTx graphTx = new GraphTx(db);
     try {
-      return new IndexHookedGraphTx(db, getRepository().facet(SearchFacet.class));
+      SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
+      graphTx.registerHook(new IndexingHook(graphTx, searchFacet));
     }
     catch (MissingFacetException e) {
       // no search facet, no indexing
-      return new GraphTx(db);
     }
+    return graphTx;
   }
 
-  private class IndexHookedGraphTx
-      extends GraphTx
+  private class IndexingHook
+      extends ODocumentHookAbstract
   {
+    private final GraphTx graphTx;
 
-    private final ORecordHook hook;
+    private final SearchFacet searchFacet;
 
-    public IndexHookedGraphTx(final ODatabaseDocumentTx db, final SearchFacet searchFacet) {
-      super(db);
-      database.registerHook(hook = new ODocumentHookAbstract()
-      {
-        {
-          setIncludeClasses(V_COMPONENT);
-        }
-
-        @Override
-        public DISTRIBUTED_EXECUTION_MODE getDistributedExecutionMode() {
-          return DISTRIBUTED_EXECUTION_MODE.TARGET_NODE;
-        }
-
-        @Override
-        public void onRecordAfterCreate(final ODocument doc) {
-          // TODO should indexing failures affect storage? (catch and log?)
-          if (doc.getIdentity().isPersistent()) {
-            searchFacet.put(componentMetadataFactory.from(new OrientVertex(IndexHookedGraphTx.this, doc)));
-          }
-        }
-
-        @Override
-        public void onRecordAfterUpdate(final ODocument doc) {
-          onRecordAfterCreate(doc);
-        }
-
-        @Override
-        public void onRecordAfterDelete(final ODocument doc) {
-          // TODO should indexing failures affect storage? (catch and log?)
-          searchFacet.delete(new OrientVertex(IndexHookedGraphTx.this, doc).getId().toString());
-        }
-      });
+    public IndexingHook(final GraphTx graphTx, final SearchFacet searchFacet) {
+      this.graphTx = graphTx;
+      this.searchFacet = searchFacet;
+      setIncludeClasses(V_COMPONENT);
     }
 
     @Override
-    public void close() {
-      database.unregisterHook(hook);
-      super.close();
+    public DISTRIBUTED_EXECUTION_MODE getDistributedExecutionMode() {
+      return DISTRIBUTED_EXECUTION_MODE.TARGET_NODE;
+    }
+
+    @Override
+    public void onRecordAfterCreate(final ODocument doc) {
+      // TODO should indexing failures affect storage? (catch and log?)
+      if (doc.getIdentity().isPersistent()) {
+        searchFacet.put(componentMetadataFactory.from(new OrientVertex(graphTx, doc)));
+      }
+    }
+
+    @Override
+    public void onRecordAfterUpdate(final ODocument doc) {
+      onRecordAfterCreate(doc);
+    }
+
+    @Override
+    public void onRecordAfterDelete(final ODocument doc) {
+      // TODO should indexing failures affect storage? (catch and log?)
+      searchFacet.delete(new OrientVertex(graphTx, doc).getId().toString());
     }
   }
 }
