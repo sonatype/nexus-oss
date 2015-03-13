@@ -249,9 +249,8 @@ public class StorageFacetImpl
       super(db);
       database.registerHook(hook = new ODocumentHookAbstract()
       {
-        @Override
-        public String[] getIncludeClasses() {
-          return new String[]{V_COMPONENT};
+        {
+          setIncludeClasses(V_COMPONENT);
         }
 
         @Override
@@ -262,7 +261,9 @@ public class StorageFacetImpl
         @Override
         public void onRecordAfterCreate(final ODocument doc) {
           // TODO should indexing failures affect storage? (catch and log?)
-          searchFacet.put(componentMetadataFactory.from(new OrientVertex(IndexHookedGraphTx.this, doc)));
+          if (doc.getIdentity().isPersistent()) {
+            searchFacet.put(componentMetadataFactory.from(new OrientVertex(IndexHookedGraphTx.this, doc)));
+          }
         }
 
         @Override
