@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,17 +28,14 @@ import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
-import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
-import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.hook.ODocumentHookAbstract;
 import com.orientechnologies.orient.core.hook.ORecordHook;
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
@@ -65,7 +64,7 @@ public class StorageFacetImpl
 
   private final Provider<DatabaseInstance> databaseInstanceProvider;
 
-  private final ComponentMetadataFactory componentMetadataFactory;
+  private final List<ORecordHookFactory> recordHookFactories;
 
   private String blobStoreName;
 
@@ -73,12 +72,12 @@ public class StorageFacetImpl
 
   @Inject
   public StorageFacetImpl(final BlobStoreManager blobStoreManager,
-                          final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
-                          final ComponentMetadataFactory componentMetadataFactory)
+                          final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider)
   {
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
-    this.componentMetadataFactory = checkNotNull(componentMetadataFactory);
+    this.recordHookFactories = Lists.newArrayList();
+    this.recordHookFactories.add(new LastUpdatedRecordHookFactory()); // always registered
   }
 
   @Override
@@ -223,65 +222,57 @@ public class StorageFacetImpl
     return openStorageTx();
   }
 
+  @Override
+  public void registerHookFactory(final ORecordHookFactory factory) {
+    checkNotNull(factory);
+    recordHookFactories.add(factory);
+  }
+
+  @Override
+  public boolean unregisterHookFactory(final ORecordHookFactory factory) {
+    return recordHookFactories.remove(factory);
+  }
+
   private StorageTx openStorageTx() {
     BlobStore blobStore = blobStoreManager.get(blobStoreName);
     return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(), bucketId);
   }
 
   private GraphTx openGraphTx() {
-    ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire();
-    try {
-      return new IndexHookedGraphTx(db, getRepository().facet(SearchFacet.class));
+    final ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire();
+    final HookedGraphTx graphTx = new HookedGraphTx(db);
+    for (ORecordHookFactory recordHookFactory : recordHookFactories) {
+      try {
+        graphTx.registerHook(checkNotNull(recordHookFactory.createHook(graphTx)));
+      }
+      catch (MissingFacetException e) {
+        // skip it, log it
+        log.warn("Could not install hook from {}: ", recordHookFactory.getClass(), e);
+      }
     }
-    catch (MissingFacetException e) {
-      // no search facet, no indexing
-      return new GraphTx(db);
-    }
+    return graphTx;
   }
 
-  private class IndexHookedGraphTx
+  private static class HookedGraphTx
       extends GraphTx
   {
+    private final List<ORecordHook> hooks;
 
-    private final ORecordHook hook;
-
-    public IndexHookedGraphTx(final ODatabaseDocumentTx db, final SearchFacet searchFacet) {
+    public HookedGraphTx(final ODatabaseDocumentTx db) {
       super(db);
-      database.registerHook(hook = new ODocumentHookAbstract()
-      {
-        {
-          setIncludeClasses(V_COMPONENT);
-        }
+      this.hooks = Lists.newArrayList();
+    }
 
-        @Override
-        public DISTRIBUTED_EXECUTION_MODE getDistributedExecutionMode() {
-          return DISTRIBUTED_EXECUTION_MODE.TARGET_NODE;
-        }
-
-        @Override
-        public void onRecordAfterCreate(final ODocument doc) {
-          // TODO should indexing failures affect storage? (catch and log?)
-          if (doc.getIdentity().isPersistent()) {
-            searchFacet.put(componentMetadataFactory.from(new OrientVertex(IndexHookedGraphTx.this, doc)));
-          }
-        }
-
-        @Override
-        public void onRecordAfterUpdate(final ODocument doc) {
-          onRecordAfterCreate(doc);
-        }
-
-        @Override
-        public void onRecordAfterDelete(final ODocument doc) {
-          // TODO should indexing failures affect storage? (catch and log?)
-          searchFacet.delete(new OrientVertex(IndexHookedGraphTx.this, doc).getId().toString());
-        }
-      });
+    public void registerHook(final ORecordHook hook) {
+      database.registerHook(hook);
+      hooks.add(hook);
     }
 
     @Override
     public void close() {
-      database.unregisterHook(hook);
+      for (ORecordHook hook : hooks) {
+        database.unregisterHook(hook);
+      }
       super.close();
     }
   }

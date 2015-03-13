@@ -69,4 +69,15 @@ public interface StorageFacet
    * Opens a transaction.
    */
   StorageTx openTx();
+
+  /**
+   * Registers a {@link LastUpdatedRecordHookFactory} with this storage facet.
+   */
+  void registerHookFactory(ORecordHookFactory factory);
+
+  /**
+   * Unregisters a {@link LastUpdatedRecordHookFactory} with this storage facet. Returns {@code true} if provided
+   * factory was registered and is removed now.
+   */
+  boolean unregisterHookFactory(ORecordHookFactory factory);
 }
