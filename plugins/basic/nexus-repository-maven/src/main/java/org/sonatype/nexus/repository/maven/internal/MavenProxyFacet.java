@@ -15,11 +15,14 @@ package org.sonatype.nexus.repository.maven.internal;
 import java.io.IOException;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Context;
+import org.sonatype.nexus.repository.view.Payload;
 
 import org.joda.time.DateTime;
 
@@ -34,15 +37,41 @@ import static com.google.common.base.Preconditions.checkState;
 public class MavenProxyFacet
     extends ProxyFacetSupport<MavenPayload>
 {
+  private static final String NOW = MavenProxyFacet.class.getName() + ".now";
+
+  private final Clock clock;
+
+  private MavenFacet mavenFacet;
+
+  private MavenTransportFacet mavenTransportFacet;
+
+  @Inject
+  public MavenProxyFacet() {
+    this.clock = new Clock();
+  }
+
+  @Override
+  protected void doConfigure() throws Exception {
+    super.doConfigure();
+    mavenFacet = getRepository().facet(MavenFacet.class);
+    mavenTransportFacet = getRepository().facet(MavenTransportFacet.class);
+  }
+
+  @Override
+  public Payload get(final Context context) throws IOException {
+    context.getAttributes().set(NOW, clock.dateTime());
+    return super.get(context);
+  }
+
   @Override
   protected MavenPayload getCachedPayload(final Context context) throws IOException {
     final ArtifactPath artifactPath = context.getAttributes().get(ArtifactPath.class);
     if (artifactPath != null) {
-      return getRepository().facet(MavenFacet.class).getArtifact(artifactPath);
+      return mavenFacet.getArtifact(artifactPath);
     }
     final Path metadataPath = context.getAttributes().get(Path.class);
     if (metadataPath != null) {
-      return getRepository().facet(MavenFacet.class).getMetadata(metadataPath);
+      return mavenFacet.getMetadata(metadataPath);
     }
     return null;
   }
@@ -57,8 +86,8 @@ public class MavenProxyFacet
     }
     checkState(path != null);
 
-    final MavenPayload payload = getRepository().facet(MavenTransportFacet.class)
-        .fetch(path, getRemoteUrl().resolve(url), stalePayload);
+    final MavenPayload payload = mavenTransportFacet
+        .fetch(path, now(context), getRemoteUrl().resolve(url), stalePayload);
     if (stalePayload != null && payload == stalePayload) {
       indicateUpToDate(context);
     }
@@ -69,32 +98,43 @@ public class MavenProxyFacet
   protected void store(final Context context, final MavenPayload payload) throws IOException, InvalidContentException {
     final ArtifactPath artifactPath = context.getAttributes().get(ArtifactPath.class);
     if (artifactPath != null) {
-      getRepository().facet(MavenFacet.class).putArtifact(artifactPath, payload);
+      mavenFacet.putArtifact(artifactPath, payload);
       return;
     }
     final Path metadataPath = context.getAttributes().get(Path.class);
     if (metadataPath != null) {
-      getRepository().facet(MavenFacet.class).putMetadata(metadataPath, payload);
+      mavenFacet.putMetadata(metadataPath, payload);
       return;
     }
-    // TODO: what here?
-    throw new IllegalArgumentException("How did we get here? Bad route?");
   }
 
   @Override
   protected DateTime getCachedPayloadLastUpdatedDate(final Context context, final MavenPayload payload)
       throws IOException
   {
-    return payload.getLastUpdated();
+    return payload.getLastVerified();
   }
 
   @Override
   protected void indicateUpToDate(final Context context) throws IOException {
-    // TODO: update P_LAST_UPDATED
+    final ArtifactPath artifactPath = context.getAttributes().get(ArtifactPath.class);
+    if (artifactPath != null) {
+      mavenFacet.verifyArtifact(artifactPath, now(context));
+      return;
+    }
+    final Path metadataPath = context.getAttributes().get(Path.class);
+    if (metadataPath != null) {
+      mavenFacet.verifyMetadata(metadataPath, now(context));
+      return;
+    }
   }
 
   @Override
   protected String getUrl(final @Nonnull Context context) {
     return context.getRequest().getPath().substring(1);
+  }
+
+  private DateTime now(final Context context) {
+    return context.getAttributes().require(NOW, DateTime.class);
   }
 }

@@ -19,6 +19,8 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
 
+import org.joda.time.DateTime;
+
 /**
  * Maven proxy facet.
  *
@@ -35,5 +37,5 @@ public interface MavenTransportFacet
    * remotely.
    */
   @Nullable
-  MavenPayload fetch(final Path path, final URI uri, final @Nullable MavenPayload stalePayload) throws IOException;
+  MavenPayload fetch(final Path path, final DateTime now, final URI uri, final @Nullable MavenPayload stalePayload) throws IOException;
 }

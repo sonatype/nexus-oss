@@ -100,7 +100,9 @@ public class MavenFacetImpl
 
   private static final String P_ASSET_KEY = "key"; // asset key: G:A:V[:C]:E for fast look-ups
 
-  private static final String P_LAST_MODIFIED = "lastModified";
+  private static final String P_LAST_MODIFIED = "lastModified"; // date
+
+  private static final String P_LAST_VERIFIED = "lastVerified"; // date
 
   private static final String P_ASSET_KIND = "kind"; // denoting asset kind
 
@@ -202,7 +204,6 @@ public class MavenFacetImpl
       component.setProperty(StorageFacet.P_GROUP, path.getGroupId());
       component.setProperty(StorageFacet.P_NAME, path.getArtifactId());
       component.setProperty(StorageFacet.P_VERSION, path.getVersion());
-      component.setProperty(StorageFacet.P_LAST_UPDATED, content.getLastUpdated().toDate());
 
       final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
       componentAttributes.set(P_COMPONENT_KEY, getComponentKey(path));
@@ -249,18 +250,20 @@ public class MavenFacetImpl
         for (HashType hashType : HashType.values()) {
           final HashCode hashCode = content.getHashCode(hashType.getHashAlgorithm());
           if (hashCode == null) {
-            continue;
+            deleteArtifactTx(tx, path.hash(hashType));
           }
-          putArtifactTx(
-              tx,
-              path.hash(hashType),
-              new MavenPayload(
-                  new StringPayload(hashCode.toString(), "text/plain"),
-                  content.getLastUpdated(),
-                  content.getLastModified(),
-                  Collections.<HashAlgorithm, HashCode>emptyMap()
-              )
-          );
+          else {
+            putArtifactTx(
+                tx,
+                path.hash(hashType),
+                new MavenPayload(
+                    new StringPayload(hashCode.toString(), "text/plain"),
+                    content.getLastModified(),
+                    content.getLastVerified(),
+                    Collections.<HashAlgorithm, HashCode>emptyMap()
+                )
+            );
+          }
         }
       }
     }
@@ -268,6 +271,42 @@ public class MavenFacetImpl
 
   @Override
   public boolean deleteArtifact(final ArtifactPath path) throws IOException {
+    try (StorageTx tx = getStorage().openTx()) {
+      try {
+        boolean result = deleteArtifactTx(tx, path);
+        tx.commit();
+        return result;
+      }
+      catch (IOException | InvalidContentException e) {
+        tx.rollback();
+        throw e;
+      }
+    }
+  }
+
+  private boolean deleteArtifactTx(final StorageTx tx, final ArtifactPath path) throws IOException {
+    final OrientVertex component = findComponent(tx, path, tx.getBucket());
+    if (component == null) {
+      return false;
+    }
+    OrientVertex asset = selectComponentAsset(tx, component, path);
+    if (asset == null) {
+      return false;
+    }
+    // TODO: clean up component w/o assets? Is this the proper way?
+    final boolean lastAsset = getComponentAssets(component).size() == 1;
+
+    tx.deleteBlob(getBlobRef(path, asset));
+    tx.deleteVertex(asset);
+    if (lastAsset) {
+      tx.deleteVertex(component);
+    }
+    tx.commit();
+    return true;
+  }
+
+  @Override
+  public boolean verifyArtifact(final ArtifactPath path, final DateTime dateTime) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex component = findComponent(tx, path, tx.getBucket());
       if (component == null) {
@@ -277,19 +316,12 @@ public class MavenFacetImpl
       if (asset == null) {
         return false;
       }
-      // TODO: clean up component w/o assets? Is this the proper way?
-      final boolean lastAsset = getComponentAssets(component).size() == 1;
 
-      tx.deleteBlob(getBlobRef(path, asset));
-      tx.deleteVertex(asset);
-      if (lastAsset) {
-        tx.deleteVertex(component);
-      }
+      getFormatAttributes(tx, asset).set(P_LAST_VERIFIED, dateTime.toDate());
       tx.commit();
       return true;
     }
   }
-
 
   @Nullable
   @Override
@@ -354,18 +386,20 @@ public class MavenFacetImpl
         for (HashType hashType : HashType.values()) {
           final HashCode hashCode = content.getHashCode(hashType.getHashAlgorithm());
           if (hashCode == null) {
-            continue;
+            deleteMetadataTx(tx, path.hash(hashType));
           }
-          putMetadataTx(
-              tx,
-              path.hash(hashType),
-              new MavenPayload(
-                  new StringPayload(hashCode.toString(), "text/plain"),
-                  content.getLastUpdated(),
-                  content.getLastModified(),
-                  Collections.<HashAlgorithm, HashCode>emptyMap()
-              )
-          );
+          else {
+            putMetadataTx(
+                tx,
+                path.hash(hashType),
+                new MavenPayload(
+                    new StringPayload(hashCode.toString(), "text/plain"),
+                    content.getLastModified(),
+                    content.getLastVerified(),
+                    Collections.<HashAlgorithm, HashCode>emptyMap()
+                )
+            );
+          }
         }
       }
     }
@@ -374,13 +408,39 @@ public class MavenFacetImpl
   @Override
   public boolean deleteMetadata(final Path path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
+      try {
+        boolean result = deleteMetadataTx(tx, path);
+        tx.commit();
+        return result;
+      }
+      catch (IOException | InvalidContentException e) {
+        tx.rollback();
+        throw e;
+      }
+    }
+  }
+
+  private boolean deleteMetadataTx(final StorageTx tx, final Path path) throws IOException {
+    OrientVertex asset = findAsset(tx, path, tx.getBucket());
+    if (asset == null) {
+      return false;
+    }
+
+    tx.deleteBlob(getBlobRef(path, asset));
+    tx.deleteVertex(asset);
+    tx.commit();
+    return true;
+  }
+
+  @Override
+  public boolean verifyMetadata(final Path path, final DateTime dateTime) throws IOException {
+    try (StorageTx tx = getStorage().openTx()) {
       OrientVertex asset = findAsset(tx, path, tx.getBucket());
       if (asset == null) {
         return false;
       }
 
-      tx.deleteBlob(getBlobRef(path, asset));
-      tx.deleteVertex(asset);
+      getFormatAttributes(tx, asset).set(P_LAST_VERIFIED, dateTime.toDate());
       tx.commit();
       return true;
     }
@@ -405,8 +465,8 @@ public class MavenFacetImpl
         tx.setBlob(is, headers, asset, MavenPayload.HASH_ALGORITHMS, contentType);
       }
     }
-    asset.setProperty(StorageFacet.P_LAST_UPDATED, payload.getLastUpdated().toDate());
     getFormatAttributes(tx, asset).set(P_LAST_MODIFIED, payload.getLastModified().toDate());
+    getFormatAttributes(tx, asset).set(P_LAST_VERIFIED, payload.getLastVerified().toDate());
   }
 
   /**
@@ -594,10 +654,11 @@ public class MavenFacetImpl
    */
   private MavenPayload marshall(final StorageTx tx, final OrientVertex asset, final Blob blob) {
     final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
-    final Date lastUpdated = asset.getProperty(StorageFacet.P_LAST_UPDATED);
-    checkNotNull(lastUpdated);
-    final Date lastModified = getFormatAttributes(tx, asset).require(P_LAST_MODIFIED, Date.class);
+    final NestedAttributesMap formatAttributes = getFormatAttributes(tx, asset);
+    final Date lastModified = formatAttributes.require(P_LAST_MODIFIED, Date.class);
     checkNotNull(lastModified);
+    final Date lastVerified = formatAttributes.require(P_LAST_VERIFIED, Date.class);
+    checkNotNull(lastVerified);
 
     final NestedAttributesMap checksums = getAttributes(tx, asset).child(StorageFacet.P_CHECKSUM);
     final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
@@ -606,7 +667,11 @@ public class MavenFacetImpl
       hashCodes.put(algorithm, hashCode);
     }
 
-    return new MavenPayload(new BlobPayload(blob, contentType), new DateTime(lastUpdated.getTime()),
-        new DateTime(lastModified.getTime()), hashCodes);
+    return new MavenPayload(
+        new BlobPayload(blob, contentType),
+        new DateTime(lastModified.getTime()),
+        new DateTime(lastVerified.getTime()),
+        hashCodes
+    );
   }
 }

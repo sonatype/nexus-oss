@@ -52,15 +52,8 @@ public class MavenTransportFacetImpl
     extends FacetSupport
     implements MavenTransportFacet
 {
-  private final Clock clock;
-
-  @Inject
-  public MavenTransportFacetImpl() {
-    this.clock = new Clock();
-  }
-
   @Override
-  public MavenPayload fetch(final Path path, final URI url, final MavenPayload stalePayload) throws IOException
+  public MavenPayload fetch(final Path path, final DateTime now, final URI url, final MavenPayload stalePayload) throws IOException
   {
     checkNotNull(path);
     checkNotNull(url);
@@ -100,9 +93,8 @@ public class MavenTransportFacetImpl
       if (!Strings.isNullOrEmpty(md5)) {
         hashCodes.put(HashAlgorithm.MD5, HashCode.fromString(md5));
       }
-      final DateTime now = clock.dateTime();
       final DateTime lastModified = extractLastModified(now, response.getLastHeader(HttpHeaders.LAST_MODIFIED));
-      return new MavenPayload(payload, now, lastModified, hashCodes);
+      return new MavenPayload(payload, lastModified, now, hashCodes);
     }
     else if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
       return stalePayload;
