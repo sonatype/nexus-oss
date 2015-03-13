@@ -165,7 +165,7 @@ public class StorageFacetImpl
 
   private void initBucket() {
     // get or create the bucket for the repository and set bucketId for fast lookup later
-    try (GraphTx graphTx = openGraphTx()) {
+    try (GraphTx graphTx = openGraphTx(false)) {
       String repositoryName = getRepository().getName();
       Vertex bucket = Iterables.getFirst(graphTx.getVertices(P_REPOSITORY_NAME, repositoryName), null);
       if (bucket == null) {
@@ -182,7 +182,7 @@ public class StorageFacetImpl
     // delete all assets, blobs, components, and finally, the bucket.
     // TODO: This could take a while for large repos.
     //       Hide the bucket right away, but figure out a way to do the deletions asynchronously.
-    try (StorageTx tx = openStorageTx()) {
+    try (StorageTx tx = openStorageTx(false)) {
       OrientVertex bucket = tx.getBucket();
       deleteAll(tx, tx.browseAssets(bucket), new Predicate<OrientVertex>()
       {
@@ -221,25 +221,29 @@ public class StorageFacetImpl
   @Override
   @Guarded(by = STARTED)
   public StorageTx openTx() {
-    return openStorageTx();
+    return openStorageTx(true);
   }
 
-  private StorageTx openStorageTx() {
+  private StorageTx openStorageTx(boolean withHooks) {
     BlobStore blobStore = blobStoreManager.get(blobStoreName);
-    return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(), bucketId);
+    return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(withHooks), bucketId);
   }
 
-  private GraphTx openGraphTx() {
+  private GraphTx openGraphTx(boolean withHooks) {
     ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire();
     GraphTx graphTx = new GraphTx(db);
-    graphTx.registerHook(new LastUpdatedHook());
-    try {
-      SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
-      graphTx.registerHook(new IndexingHook(graphTx, searchFacet));
+
+    if (withHooks) {
+      graphTx.registerHook(new LastUpdatedHook());
+      try {
+        SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
+        graphTx.registerHook(new IndexingHook(graphTx, searchFacet));
+      }
+      catch (MissingFacetException e) {
+        // no search facet, no indexing
+      }
     }
-    catch (MissingFacetException e) {
-      // no search facet, no indexing
-    }
+
     return graphTx;
   }
 
