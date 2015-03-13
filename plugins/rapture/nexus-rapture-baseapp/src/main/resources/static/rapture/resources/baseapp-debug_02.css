@@ -14515,6 +14515,15 @@
 }
 
 /**
+ * IE10 adds a second 'x' icon to text fields. Hide this.
+ */
+/* line 47, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+::-ms-clear {
+  width: 0;
+  height: 0;
+}
+
+/**
  * @class Ext.form.Fieldset
  */
 /* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
@@ -15215,10 +15224,10 @@
 * @class Ext.form.field.Trigger
 */
 /**
-* Style for the main header search field.
-*
-* cls: 'quicksearch'
-*/
+ * Style for the main header search field.
+ *
+ * cls: 'quicksearch'
+ */
 /* line 10, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Trigger.scss */
 .nx-quicksearch .x-form-trigger-wrap {
   border-radius: 11px;

@@ -40,3 +40,11 @@
 .nx-clear-both {
   clear: both;
 }
+
+/**
+ * IE10 adds a second 'x' icon to text fields. Hide this.
+ */
+::-ms-clear {
+  width: 0;
+  height: 0;
+}
