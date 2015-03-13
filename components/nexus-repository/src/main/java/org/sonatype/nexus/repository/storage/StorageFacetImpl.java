@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -230,6 +232,7 @@ public class StorageFacetImpl
   private GraphTx openGraphTx() {
     ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire();
     GraphTx graphTx = new GraphTx(db);
+    graphTx.registerHook(new LastUpdatedHook());
     try {
       SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
       graphTx.registerHook(new IndexingHook(graphTx, searchFacet));
@@ -238,6 +241,33 @@ public class StorageFacetImpl
       // no search facet, no indexing
     }
     return graphTx;
+  }
+
+  private class LastUpdatedHook
+      extends ODocumentHookAbstract
+  {
+    public LastUpdatedHook() {
+      setIncludeClasses(V_COMPONENT, V_ASSET);
+    }
+
+    @Override
+    public DISTRIBUTED_EXECUTION_MODE getDistributedExecutionMode() {
+      return DISTRIBUTED_EXECUTION_MODE.TARGET_NODE;
+    }
+
+    public RESULT onRecordBeforeCreate(final ODocument doc) {
+      setLastUpdatedToNow(doc);
+      return RESULT.RECORD_CHANGED;
+    }
+
+    public RESULT onRecordBeforeUpdate(final ODocument doc) {
+      setLastUpdatedToNow(doc);
+      return RESULT.RECORD_CHANGED;
+    }
+
+    private void setLastUpdatedToNow(ODocument doc) {
+      doc.field(P_LAST_UPDATED, new Date());
+    }
   }
 
   private class IndexingHook
