@@ -15,7 +15,6 @@ package org.sonatype.nexus.ldap.internal.realms;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.ldap.LdapPlugin;
 import org.sonatype.nexus.ldap.internal.LdapITSupport;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
@@ -24,6 +23,7 @@ import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapUserException;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
+import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;

@@ -13,24 +13,13 @@
 package org.sonatype.nexus.ldap.internal.realms;
 
 
-import org.sonatype.ldaptestsuite.LdapServer;
-import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
+import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
 
 public class NestedUsersLdapSchemaIT
     extends LdapSchemaTestSupport
 {
-  @Override
-  protected LdapServerConfiguration createServerConfiguration(final String name) {
-    return LdapServerConfiguration.builder()
-        .withWorkingDirectory(util.createTempDir())
-        .withPartitions(createPartition(name))
-        .withAdditionalSchemas("org.apache.directory.server.schema.bootstrap.NisSchema")
-        .withSasl("localhost", "ldap/localhost@EXAMPLE.COM", "ou=system", "localhost")
-        .build();
-  }
-
   @Override
   protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order,
                                                                      final LdapServer ldapServer)

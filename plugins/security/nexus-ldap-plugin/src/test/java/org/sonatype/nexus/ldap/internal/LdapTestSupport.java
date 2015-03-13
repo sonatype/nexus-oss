@@ -13,14 +13,12 @@
 package org.sonatype.nexus.ldap.internal;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
-import org.sonatype.ldaptestsuite.LdapServer;
-import org.sonatype.ldaptestsuite.LdapServerConfiguration;
-import org.sonatype.ldaptestsuite.Partition;
 import org.sonatype.nexus.ldap.internal.persist.LdapConfigurationSource;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Host;
@@ -31,6 +29,8 @@ import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.security.SecurityModule;
 import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
+import org.sonatype.sisu.litmus.testsupport.port.PortRegistry;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Binder;
@@ -49,7 +49,7 @@ import static org.mockito.Mockito.mock;
 public abstract class LdapTestSupport
     extends SecurityTestSupport
 {
-  protected LinkedHashMap<String, LdapServerConfiguration> ldapServerConfigurations = Maps.newLinkedHashMap();
+  private final PortRegistry portRegistry = new PortRegistry();
 
   protected LinkedHashMap<String, LdapServer> ldapServers = Maps.newLinkedHashMap();
 
@@ -85,14 +85,8 @@ public abstract class LdapTestSupport
   }
 
   @Before
-  public void startLdap()
-      throws Exception
-  {
-    ldapServerConfigurations = createLdapServerConfigurations();
-    for (Map.Entry<String, LdapServerConfiguration> configurationEntry : ldapServerConfigurations.entrySet()) {
-      final LdapServer ldapServer = new LdapServer(configurationEntry.getValue());
-      ldapServers.put(configurationEntry.getKey(), ldapServer);
-    }
+  public void startLdap() throws Exception {
+    createLdapServers();
     startLdapServers();
     ldapClientConfigurations = createLdapClientConfigurations();
     for (LdapConfiguration configuration : ldapClientConfigurations.values()) {
@@ -100,36 +94,70 @@ public abstract class LdapTestSupport
     }
   }
 
-  protected synchronized void startLdapServers() {
-    for (String name : ldapServerConfigurations.keySet()) {
-      startLdapServer(name);
+  protected Collection<String> getLdapServerNames() {
+    return Collections.singleton("default");
+  }
+
+  protected void createLdapServers() {
+    for (String name : getLdapServerNames()) {
+      ldapServers.put(name, createLdapServer(name));
     }
   }
 
-  protected synchronized void startLdapServer(final String name) {
+  protected LdapServer createLdapServer(final String name) {
+    return new LdapServer(util.createTempDir(), portRegistry);
+  }
+
+  protected synchronized void startLdapServers() throws Exception {
+    for (String name : getLdapServerNames()) {
+      final LdapServer ldapServer = ldapServers.get(name);
+      if (ldapServer != null) {
+        ldapServer.start();
+        ldapServer.loadData(resolveLdifFile(name));
+      }
+    }
+  }
+
+  protected synchronized void suspendLdapServers() throws Exception {
+    for (String name : getLdapServerNames()) {
+      suspendLdapServer(name);
+    }
+  }
+
+  protected synchronized void suspendLdapServer(final String name) throws Exception {
     checkArgument(ldapServers.containsKey(name), "Unknown LDAP Server %s", name);
-    final LdapServer ldapServer = ldapServers.get(name).start();
+    final LdapServer ldapServer = ldapServers.get(name);
+    if (ldapServer != null) {
+      ldapServer.suspend();
+    }
+  }
+
+  protected synchronized void resumeLdapServers() throws Exception {
+    for (String name : getLdapServerNames()) {
+      resumeLdapServer(name);
+    }
+  }
+
+  protected synchronized void resumeLdapServer(final String name) throws Exception {
+    checkArgument(ldapServers.containsKey(name), "Unknown LDAP Server %s", name);
+    final LdapServer ldapServer = ldapServers.get(name);
+    if (ldapServer != null) {
+      ldapServer.resume();
+    }
   }
 
   @After
-  public void stopLdap()
-      throws Exception
-  {
+  public void stopLdap() throws Exception {
     lookup(CacheManager.class).shutdown();
     stopLdapServers();
   }
 
-  protected synchronized void stopLdapServers() {
-    for (String name : ldapServerConfigurations.keySet()) {
-      stopLdapServer(name);
-    }
-  }
-
-  protected synchronized void stopLdapServer(final String name) {
-    checkArgument(ldapServerConfigurations.containsKey(name), "Unknown LDAP Server %s", name);
-    final LdapServer ldapServer = ldapServers.get(name);
-    if (ldapServer != null) {
-      ldapServer.stop();
+  protected synchronized void stopLdapServers() throws Exception {
+    for (String name : getLdapServerNames()) {
+      final LdapServer ldapServer = ldapServers.get(name);
+      if (ldapServer != null) {
+        ldapServer.stop();
+      }
     }
   }
 
@@ -139,8 +167,8 @@ public abstract class LdapTestSupport
     int order = 1;
     for (Entry<String, LdapServer> entry : ldapServers.entrySet()) {
       order++;
-      final LdapConfiguration ldapConfiguration = createLdapClientConfigurationForServer(
-          entry.getKey(), order, entry.getValue());
+      final LdapConfiguration ldapConfiguration = createLdapClientConfigurationForServer(entry.getKey(), order,
+          entry.getValue());
       if (ldapConfiguration != null) {
         result.put(entry.getKey(), ldapConfiguration);
       }
@@ -149,7 +177,7 @@ public abstract class LdapTestSupport
   }
 
   protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order,
-                                                                     final LdapServer ldapServer)
+      final LdapServer ldapServer)
   {
     final LdapConfiguration ldapConfiguration = new LdapConfiguration();
     ldapConfiguration.setId("unused"); // create will override it anyway
@@ -181,31 +209,10 @@ public abstract class LdapTestSupport
     return ldapConfiguration;
   }
 
-  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
-    final LinkedHashMap<String, LdapServerConfiguration> result = Maps.newLinkedHashMap();
-    result.put("default", createServerConfiguration("default"));
-    return result;
-  }
-
-  protected LdapServerConfiguration createServerConfiguration(final String name) {
-    return LdapServerConfiguration.builder()
-        .withWorkingDirectory(util.createTempDir())
-        .withPartitions(createPartition(name))
-        .build();
-  }
-
-  protected Partition createPartition(final String name) {
-    return Partition.builder()
-        .withNameAndSuffix(name, "o=sonatype")
-        .withIndexedAttributes("objectClass", "o")
-        .withRootEntryClasses("top", "organization")
-        .withLdifFile(resolveLdifFile(name)).build();
-  }
-
   protected File resolveLdifFile(final String name) {
     checkNotNull(name);
-    final File classSpecificLdif = util
-        .resolveFile("src/test/resources/" + getClass().getName().replace('.', '/') + "-" + name + "-ldap.ldif");
+    final File classSpecificLdif = util.resolveFile("src/test/resources/" + getClass().getName().replace('.', '/')
+        + "-" + name + "-ldap.ldif");
     if (classSpecificLdif.isFile()) {
       return classSpecificLdif;
     }

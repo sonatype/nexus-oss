@@ -13,20 +13,17 @@
 package org.sonatype.nexus.ldap.internal.realms;
 
 
-import org.sonatype.ldaptestsuite.LdapServer;
-import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
 
 public class CramMd5AuthLdapSchemaIT
     extends LdapSchemaTestSupport
 {
   @Override
-  protected LdapServerConfiguration createServerConfiguration(final String name) {
-    return LdapServerConfiguration.builder()
-        .withWorkingDirectory(util.createTempDir())
-        .withPartitions(createPartition(name))
-        .withSasl("localhost", "ldap/localhost@EXAMPLE.COM", "ou=system", "localhost")
-        .build();
+  protected LdapServer createLdapServer(String name) {
+    LdapServer ldapServer = super.createLdapServer(name);
+    ldapServer.setAuthenticationSasl("CRAM-MD5");
+    return ldapServer;
   }
 
   @Override

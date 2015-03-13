@@ -13,12 +13,13 @@
 package org.sonatype.nexus.ldap.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapGroupException;
@@ -38,12 +39,8 @@ public class LdapManagerTest
     extends LdapTestSupport
 {
   @Override
-  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
-    // reuse the "default" one, but add the two more
-    final LinkedHashMap<String, LdapServerConfiguration> result = super.createLdapServerConfigurations();
-    result.put("second", createServerConfiguration("second"));
-    result.put("backup", createServerConfiguration("backup"));
-    return result;
+  protected Collection<String> getLdapServerNames() {
+    return Arrays.asList("default", "second", "backup");
   }
 
   @Override

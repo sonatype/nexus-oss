@@ -17,9 +17,9 @@ import java.util.Hashtable;
 
 import javax.naming.Context;
 
-import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
+import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
 
 /**
  * Support for LDAP ITs (slow UTs) with real OrientDB backed configuration source.

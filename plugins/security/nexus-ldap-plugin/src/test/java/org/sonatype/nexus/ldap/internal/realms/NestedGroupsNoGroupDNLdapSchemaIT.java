@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.ldap.internal.realms;
 
-import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
+import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
 
 public class NestedGroupsNoGroupDNLdapSchemaIT
     extends LdapSchemaTestSupport
