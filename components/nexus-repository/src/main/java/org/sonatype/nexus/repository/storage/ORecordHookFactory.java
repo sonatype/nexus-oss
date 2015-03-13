@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.orient.graph.GraphTx;
@@ -29,8 +30,8 @@ public interface ORecordHookFactory
 {
   /**
    * Creates an instance of {@link ORecordHook} to have it installed with DB instance. Registering the hook and
-   * un-registering it is handled by {@link StorageFacetImpl}. May return {@code null} if no hook should be installed.
+   * un-registering it is handled by {@link StorageFacetImpl}.
    */
-  @Nullable
-  ORecordHook createHook(final GraphTx graphTx, final Repository repository);
+  @Nonnull
+  ORecordHook createHook(final GraphTx graphTx);
 }

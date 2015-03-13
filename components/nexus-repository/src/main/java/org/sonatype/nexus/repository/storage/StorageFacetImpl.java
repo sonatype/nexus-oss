@@ -14,7 +14,6 @@
 package org.sonatype.nexus.repository.storage;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -244,10 +243,7 @@ public class StorageFacetImpl
     final HookedGraphTx graphTx = new HookedGraphTx(db);
     for (ORecordHookFactory recordHookFactory : recordHookFactories) {
       try {
-        final ORecordHook hook = recordHookFactory.createHook(graphTx, getRepository());
-        if (hook != null) {
-          graphTx.registerHook(hook);
-        }
+        graphTx.registerHook(checkNotNull(recordHookFactory.createHook(graphTx)));
       }
       catch (MissingFacetException e) {
         // skip it, log it

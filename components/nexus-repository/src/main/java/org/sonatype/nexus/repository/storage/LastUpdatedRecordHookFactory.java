@@ -26,7 +26,7 @@ public class LastUpdatedRecordHookFactory
     implements ORecordHookFactory
 {
   @Override
-  public ORecordHook createHook(final GraphTx graphTx, final Repository repository) {
+  public ORecordHook createHook(final GraphTx graphTx) {
     return new LastUpdatedRecordHook(graphTx);
   }
 }

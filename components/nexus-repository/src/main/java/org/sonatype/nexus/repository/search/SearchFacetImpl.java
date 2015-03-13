@@ -40,7 +40,7 @@ public class SearchFacetImpl
   @Inject
   public SearchFacetImpl(final SearchService searchService, final ComponentMetadataFactory componentMetadataFactory) {
     this.searchService = checkNotNull(searchService);
-    this.searchFacetRecordHookFactory = new SearchFacetRecordHookFactory(componentMetadataFactory);
+    this.searchFacetRecordHookFactory = new SearchFacetRecordHookFactory(this, componentMetadataFactory);
   }
 
   @Override

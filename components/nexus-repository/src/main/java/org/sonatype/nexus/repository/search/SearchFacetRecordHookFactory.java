@@ -13,7 +13,6 @@
 package org.sonatype.nexus.repository.search;
 
 import org.sonatype.nexus.orient.graph.GraphTx;
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.ORecordHookFactory;
 
 import com.orientechnologies.orient.core.hook.ORecordHook;
@@ -28,14 +27,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SearchFacetRecordHookFactory
     implements ORecordHookFactory
 {
+  private final SearchFacet searchFacet;
+
   private final ComponentMetadataFactory componentMetadataFactory;
 
-  public SearchFacetRecordHookFactory(final ComponentMetadataFactory componentMetadataFactory) {
+  public SearchFacetRecordHookFactory(final SearchFacet searchFacet,
+                                      final ComponentMetadataFactory componentMetadataFactory)
+  {
+    this.searchFacet = checkNotNull(searchFacet);
     this.componentMetadataFactory = checkNotNull(componentMetadataFactory);
   }
 
   @Override
-  public ORecordHook createHook(final GraphTx graphTx, final Repository repository) {
-    return new SearchFacetRecordHook(componentMetadataFactory, graphTx, repository.facet(SearchFacet.class));
+  public ORecordHook createHook(final GraphTx graphTx) {
+    return new SearchFacetRecordHook(componentMetadataFactory, graphTx, searchFacet);
   }
 }
