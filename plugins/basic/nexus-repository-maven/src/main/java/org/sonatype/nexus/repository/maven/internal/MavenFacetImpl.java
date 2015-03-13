@@ -459,10 +459,12 @@ public class MavenFacetImpl
         BlobStore.CREATED_BY_HEADER, "unknown"
     );
 
-    try (TempStreamSupplier supplier = new TempStreamSupplier(payload.openInputStream())) {
-      final String contentType = determineContentType(path, supplier, payload.getContentType());
-      try (InputStream is = supplier.get()) {
-        tx.setBlob(is, headers, asset, MavenPayload.HASH_ALGORITHMS, contentType);
+    try (InputStream inputStream = payload.openInputStream()) {
+      try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
+        final String contentType = determineContentType(path, supplier, payload.getContentType());
+        try (InputStream is = supplier.get()) {
+          tx.setBlob(is, headers, asset, MavenPayload.HASH_ALGORITHMS, contentType);
+        }
       }
     }
     getFormatAttributes(tx, asset).set(P_LAST_MODIFIED, payload.getLastModified().toDate());
