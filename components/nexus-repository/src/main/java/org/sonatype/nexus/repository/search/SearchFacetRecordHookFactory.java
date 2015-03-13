@@ -12,14 +12,9 @@
  */
 package org.sonatype.nexus.repository.search;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.ORecordHookFactory;
-import org.sonatype.nexus.repository.storage.StorageFacet;
 
 import com.orientechnologies.orient.core.hook.ORecordHook;
 
@@ -30,14 +25,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-@Singleton
-@Named
 public class SearchFacetRecordHookFactory
     implements ORecordHookFactory
 {
   private final ComponentMetadataFactory componentMetadataFactory;
 
-  @Inject
   public SearchFacetRecordHookFactory(final ComponentMetadataFactory componentMetadataFactory) {
     this.componentMetadataFactory = checkNotNull(componentMetadataFactory);
   }

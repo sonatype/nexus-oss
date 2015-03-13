@@ -12,9 +12,6 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.Repository;
 
@@ -25,8 +22,6 @@ import com.orientechnologies.orient.core.hook.ORecordHook;
  *
  * @since 3.0
  */
-@Singleton
-@Named
 public class LastUpdatedRecordHookFactory
     implements ORecordHookFactory
 {

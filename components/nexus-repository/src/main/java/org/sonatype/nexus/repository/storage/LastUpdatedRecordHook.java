@@ -48,6 +48,15 @@ public class LastUpdatedRecordHook
 
   @Override
   public RESULT onRecordBeforeCreate(final ODocument doc) {
+    return maintainLastUpdated(doc);
+  }
+
+  @Override
+  public RESULT onRecordBeforeUpdate(final ODocument doc) {
+    return maintainLastUpdated(doc);
+  }
+
+  private RESULT maintainLastUpdated(final ODocument doc) {
     if (doc.getIdentity().isPersistent()) {
       new OrientVertex(graphTx, doc).setProperty(StorageFacet.P_LAST_UPDATED, clock.dateTime().toDate());
       return RESULT.RECORD_CHANGED;
@@ -55,10 +64,5 @@ public class LastUpdatedRecordHook
     else {
       return RESULT.RECORD_NOT_CHANGED;
     }
-  }
-
-  @Override
-  public RESULT onRecordBeforeUpdate(final ODocument doc) {
-    return onRecordBeforeCreate(doc);
   }
 }

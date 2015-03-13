@@ -65,7 +65,7 @@ public class StorageFacetImpl
 
   private final Provider<DatabaseInstance> databaseInstanceProvider;
 
-  private final Map<String, ORecordHookFactory> recordHookFactories;
+  private final List<ORecordHookFactory> recordHookFactories;
 
   private String blobStoreName;
 
@@ -73,12 +73,12 @@ public class StorageFacetImpl
 
   @Inject
   public StorageFacetImpl(final BlobStoreManager blobStoreManager,
-                          final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
-                          final Map<String, ORecordHookFactory> recordHookFactories)
+                          final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider)
   {
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
-    this.recordHookFactories = checkNotNull(recordHookFactories);
+    this.recordHookFactories = Lists.newArrayList();
+    this.recordHookFactories.add(new LastUpdatedRecordHookFactory()); // always registered
   }
 
   @Override
@@ -223,6 +223,17 @@ public class StorageFacetImpl
     return openStorageTx();
   }
 
+  @Override
+  public void registerHookFactory(final ORecordHookFactory factory) {
+    checkNotNull(factory);
+    recordHookFactories.add(factory);
+  }
+
+  @Override
+  public boolean unregisterHookFactory(final ORecordHookFactory factory) {
+    return recordHookFactories.remove(factory);
+  }
+
   private StorageTx openStorageTx() {
     BlobStore blobStore = blobStoreManager.get(blobStoreName);
     return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(), bucketId);
@@ -231,7 +242,7 @@ public class StorageFacetImpl
   private GraphTx openGraphTx() {
     final ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire();
     final HookedGraphTx graphTx = new HookedGraphTx(db);
-    for (ORecordHookFactory recordHookFactory : recordHookFactories.values()) {
+    for (ORecordHookFactory recordHookFactory : recordHookFactories) {
       try {
         final ORecordHook hook = recordHookFactory.createHook(graphTx, getRepository());
         if (hook != null) {

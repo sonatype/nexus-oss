@@ -35,9 +35,12 @@ public class SearchFacetImpl
 
   private final SearchService searchService;
 
+  private final SearchFacetRecordHookFactory searchFacetRecordHookFactory;
+
   @Inject
-  public SearchFacetImpl(final SearchService searchService) {
+  public SearchFacetImpl(final SearchService searchService, final ComponentMetadataFactory componentMetadataFactory) {
     this.searchService = checkNotNull(searchService);
+    this.searchFacetRecordHookFactory = new SearchFacetRecordHookFactory(componentMetadataFactory);
   }
 
   @Override
@@ -55,6 +58,12 @@ public class SearchFacetImpl
   @Override
   protected void doStart() throws Exception {
     searchService.createIndex(getRepository());
+    getRepository().facet(StorageFacet.class).registerHookFactory(searchFacetRecordHookFactory);
+  }
+
+  @Override
+  protected void doStop() throws Exception {
+    getRepository().facet(StorageFacet.class).unregisterHookFactory(searchFacetRecordHookFactory);
   }
 
   @Override
