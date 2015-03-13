@@ -27,7 +27,6 @@ import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.PagedResponse
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
-import org.sonatype.nexus.repository.search.CustomFilterBuilders
 import org.sonatype.nexus.repository.search.SearchService
 
 import javax.annotation.Nullable
@@ -115,7 +114,6 @@ extends DirectComponentSupport
     if (!queryBuilder.hasClauses() && !filterBuilder.hasClauses()) {
       return null
     }
-    filterBuilder.must(CustomFilterBuilders.visibleToCurrentUserFilter());
     FilteredQueryBuilder query = QueryBuilders.filteredQuery(
         queryBuilder.hasClauses() ? queryBuilder : null,
         filterBuilder.hasClauses() ? filterBuilder : null
