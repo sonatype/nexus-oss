@@ -38,6 +38,16 @@ Proxy "maven2-proxy":
   "proxy" : {
     "remoteUrl" : "http://repo1.maven.org/maven2/",
     "artifactMaxAge" : 3600
+  },
+  "httpclient" : {
+    "connection" : {
+      "timeout" : 1500,
+      "retries" : 3
+    },
+    "authentication" : {
+        "username" : "admin",
+        "password" : "admin123"
+    }
   }
 }
 ```
