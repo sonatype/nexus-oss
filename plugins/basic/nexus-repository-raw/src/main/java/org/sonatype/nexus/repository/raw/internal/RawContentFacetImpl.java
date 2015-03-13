@@ -143,11 +143,6 @@ public class RawContentFacetImpl
         }
       }
 
-      final DateTime lastUpdated = content.getLastUpdated();
-      if (lastUpdated != null) {
-        asset.setProperty(P_LAST_UPDATED, new Date(lastUpdated.getMillis()));
-      }
-
       tx.commit();
     }
   }
