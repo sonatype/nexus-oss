@@ -109,8 +109,8 @@ class Maven2ProxyRecipe
     repository.attach(httpClientFacet.get());
     repository.attach(negativeCacheFacet.get());
     repository.attach(mavenFacet.get())
-    repository.attach(mavenProxyFacet.get())
     repository.attach(mavenTransportFacet.get())
+    repository.attach(mavenProxyFacet.get())
     repository.attach(configure(viewFacet.get()))
   }
 
