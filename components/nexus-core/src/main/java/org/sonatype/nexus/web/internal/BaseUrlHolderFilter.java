@@ -23,13 +23,8 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.web.BaseUrlHolder;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -38,18 +33,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.8
  *
- * @see BaseUrlHolderSetter
+ * @see BaseUrlDetector
  */
 @Named
 @Singleton
 public class BaseUrlHolderFilter
   implements Filter
 {
-  private final BaseUrlHolderSetter baseUrlHolderSetter;
+  private final BaseUrlDetector baseUrlDetector;
 
   @Inject
-  public BaseUrlHolderFilter(final BaseUrlHolderSetter baseUrlHolderSetter) {
-    this.baseUrlHolderSetter = checkNotNull(baseUrlHolderSetter);
+  public BaseUrlHolderFilter(final BaseUrlDetector baseUrlDetector) {
+    this.baseUrlDetector = checkNotNull(baseUrlDetector);
   }
 
   @Override
@@ -66,7 +61,7 @@ public class BaseUrlHolderFilter
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
       throws IOException, ServletException
   {
-    baseUrlHolderSetter.set();
+    baseUrlDetector.set();
     try {
       chain.doFilter(request, response);
     }

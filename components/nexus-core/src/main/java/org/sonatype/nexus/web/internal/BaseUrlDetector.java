@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.web.internal;
 
 import javax.annotation.Nullable;
@@ -28,35 +29,27 @@ import com.google.common.base.Strings;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Helper to set {@link BaseUrlHolder}.
+ * Detect application base-url.
  *
+ * @see BaseUrlHolder
+ * @see BaseUrlHolderFilter
  * @since 2.11.3
  */
 @Named
 @Singleton
-public class BaseUrlHolderSetter
-  extends ComponentSupport
+public class BaseUrlDetector
+    extends ComponentSupport
 {
   private final GlobalRestApiSettings settings;
 
   private final Provider<HttpServletRequest> requestProvider;
 
   @Inject
-  public BaseUrlHolderSetter(final GlobalRestApiSettings settings,
-                             final Provider<HttpServletRequest> requestProvider)
+  public BaseUrlDetector(final GlobalRestApiSettings settings,
+                         final Provider<HttpServletRequest> requestProvider)
   {
     this.settings = checkNotNull(settings);
     this.requestProvider = checkNotNull(requestProvider);
-  }
-
-  /**
-   * Detect and set (if non-null) the base-url.
-   */
-  public void set() {
-    String url = detect();
-    if (url != null) {
-      BaseUrlHolder.set(url);
-    }
   }
 
   /**
@@ -77,7 +70,7 @@ public class BaseUrlHolderSetter
    * Detect base-url from forced settings, request or non-forced settings.
    */
   @Nullable
-  private String detect() {
+  public String detect() {
     // force base-url always wins if set
     if (settings.isEnabled() && settings.isForceBaseUrl() && !Strings.isNullOrEmpty(settings.getBaseUrl())) {
       return settings.getBaseUrl();
@@ -109,5 +102,15 @@ public class BaseUrlHolderSetter
 
     // unable to determine base-url
     return null;
+  }
+
+  /**
+   * Detect and set (if non-null) the base-url.
+   */
+  public void set() {
+    String url = detect();
+    if (url != null) {
+      BaseUrlHolder.set(url);
+    }
   }
 }

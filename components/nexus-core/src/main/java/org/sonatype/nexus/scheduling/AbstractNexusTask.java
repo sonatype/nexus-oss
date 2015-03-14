@@ -17,12 +17,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
-import org.sonatype.nexus.web.internal.BaseUrlHolderSetter;
+import org.sonatype.nexus.web.internal.BaseUrlDetector;
 import org.sonatype.scheduling.AbstractSchedulerTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskInterruptedException;
@@ -47,7 +46,7 @@ public abstract class AbstractNexusTask<T>
 
   private EventBus eventBus;
 
-  private BaseUrlHolderSetter baseUrlHolderSetter;
+  private BaseUrlDetector baseUrlDetector;
 
   protected AbstractNexusTask() {
     this(null);
@@ -78,8 +77,8 @@ public abstract class AbstractNexusTask<T>
   }
 
   @Inject
-  public void setBaseUrlHolderSetter(final BaseUrlHolderSetter baseUrlHolderSetter) {
-    this.baseUrlHolderSetter = baseUrlHolderSetter;
+  public void setBaseUrlDetector(final BaseUrlDetector baseUrlDetector) {
+    this.baseUrlDetector = baseUrlDetector;
   }
 
   protected final void notifyEventListeners(final Object event) {
@@ -148,8 +147,8 @@ public abstract class AbstractNexusTask<T>
     final long started = System.currentTimeMillis();
 
     // attempt to set the base-url for the current thread
-    if (baseUrlHolderSetter != null) {
-      baseUrlHolderSetter.set();
+    if (baseUrlDetector != null) {
+      baseUrlDetector.set();
     }
 
     // fire event
