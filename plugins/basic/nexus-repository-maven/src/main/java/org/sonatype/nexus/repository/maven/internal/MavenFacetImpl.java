@@ -242,7 +242,7 @@ public class MavenFacetImpl
     storeAssetBlob(tx, asset, path, content);
 
     if (path.isHash()) {
-      verifyAssetChecksum(tx, path);
+      verifyAssetChecksum(tx, path, asset);
     }
     else {
       if (!content.getHashAlgorithms().isEmpty()) {
@@ -347,7 +347,7 @@ public class MavenFacetImpl
     storeAssetBlob(tx, asset, path, content);
 
     if (path.isHash()) {
-      verifyAssetChecksum(tx, path);
+      verifyAssetChecksum(tx, path, asset);
     }
     else {
       if (!content.getHashAlgorithms().isEmpty()) {
@@ -502,7 +502,7 @@ public class MavenFacetImpl
    * Assumes payload is a hash file, parses it like that. Takes existing -- same type -- hash from asset attributes and
    * compares the two, throws if not.
    */
-  private void verifyAssetChecksum(final StorageTx tx, final Path checksumPath)
+  private void verifyAssetChecksum(final StorageTx tx, final Path checksumPath, final OrientVertex checksumAsset)
       throws IOException, InvalidContentException
   {
     checkState(checksumPath.isHash()); // sanity check, if not, bad call is made here
@@ -514,7 +514,6 @@ public class MavenFacetImpl
         checksumPath.getHashType().getHashAlgorithm().name(), String.class);
     checkState(!Strings.isNullOrEmpty(internalChecksum)); // sanity check, this MUST exists
 
-    final OrientVertex checksumAsset = findAsset(tx, checksumPath, tx.getBucket());
     final BlobRef blobRef = getBlobRef(checksumPath, checksumAsset);
     final Blob blob = tx.getBlob(blobRef);
     final String externalChecksum = DigestExtractor.extract(blob);
