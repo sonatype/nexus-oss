@@ -125,7 +125,7 @@ public class MavenPayload
     final HashCode sha1 = payload.getHashCode(HashAlgorithm.SHA1);
     checkArgument(sha1 != null); // sanity
     // TODO: this clearly creeps HTTP protocol in here, Date formatting and headers
-    response.getHeaders().set(HttpHeaders.ETAG, "{SHA1{" + sha1.toString() + "}}");
+    response.getHeaders().set(HttpHeaders.ETAG, "{SHA1{" + sha1 + "}}");
     response.getHeaders().set(HttpHeaders.LAST_MODIFIED, Iso8601Date.format(payload.getLastModified().toDate()));
     return response;
   }

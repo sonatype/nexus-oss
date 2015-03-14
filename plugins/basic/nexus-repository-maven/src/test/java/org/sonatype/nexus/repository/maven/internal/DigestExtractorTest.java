@@ -57,15 +57,13 @@ public class DigestExtractorTest
           },
       };
 
-  private InputStream stream(String string)
-      throws IOException
+  private InputStream stream(String string) throws IOException
   {
     return new ByteArrayInputStream(string.getBytes("UTF-8"));
   }
 
   @Test
-  public void testAcceptedDigests()
-      throws IOException
+  public void acceptedDigests() throws Exception
   {
     for (int i = 0; i < validDigests.length; i++) {
       String test = validDigests[i][0];
@@ -79,8 +77,7 @@ public class DigestExtractorTest
   }
 
   @Test
-  public void zeroLengthDigest()
-      throws IOException
+  public void zeroLengthDigest() throws Exception
   {
     final String digest = DigestExtractor.extract(new StringPayload("", "unimportant"));
     assertThat("Zero bytes checksum file", digest, is(nullValue()));

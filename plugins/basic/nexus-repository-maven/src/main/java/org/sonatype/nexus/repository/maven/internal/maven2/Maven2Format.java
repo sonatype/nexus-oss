@@ -18,7 +18,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.repository.Format;
 
 /**
- * Maven 2 aka "default" layout (since Maven 2.x) repository format.
+ * Maven 2 format.
  *
  * @since 3.0
  */
