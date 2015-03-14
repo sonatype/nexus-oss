@@ -12,7 +12,7 @@
  */
 package org.apache.shiro.nexus;
 
-import org.sonatype.nexus.security.anonymous.AnonymousPrincipalCollection;
+import org.sonatype.nexus.security.anonymous.AnonymousHelper;
 
 import org.apache.shiro.mgt.SessionStorageEvaluator;
 import org.apache.shiro.subject.Subject;
@@ -35,10 +35,6 @@ public class NexusSessionStorageEvaluator
    */
   @Override
   public boolean isSessionStorageEnabled(final Subject subject) {
-    // HACK: info -> debug/trace
-    log.info("Checking if session-storage enabled for subject: {}", subject);
-
-    return !(subject.getPrincipals() instanceof AnonymousPrincipalCollection) &&
-        super.isSessionStorageEnabled(subject);
+    return !AnonymousHelper.isAnonymous(subject) && super.isSessionStorageEnabled(subject);
   }
 }

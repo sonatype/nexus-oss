@@ -147,10 +147,4 @@ public class AnonymousManagerImpl
         .sessionCreationEnabled(false)
         .buildSubject();
   }
-
-  @Override
-  public boolean isAnonymous(final Subject subject) {
-    checkNotNull(subject);
-    return subject.getPrincipals() instanceof AnonymousPrincipalCollection;
-  }
 }
