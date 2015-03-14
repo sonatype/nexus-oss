@@ -43,7 +43,7 @@ public abstract class HostedHandlerSupport<C extends Path>
     extends ComponentSupport
     implements Handler
 {
-  private final Clock clock = new Clock();
+  protected Clock clock = new Clock();
 
   @Nonnull
   @Override

@@ -35,8 +35,6 @@ public class BlobPayload
 
   private final String contentType;
 
-  private boolean opened = false;
-
   public BlobPayload(final Blob blob, final @Nullable String contentType)
   {
     this.blob = checkNotNull(blob);
@@ -44,7 +42,7 @@ public class BlobPayload
   }
 
   @Override
-  public synchronized InputStream openInputStream() throws IOException {
+  public InputStream openInputStream() throws IOException {
     return blob.getInputStream();
   }
 

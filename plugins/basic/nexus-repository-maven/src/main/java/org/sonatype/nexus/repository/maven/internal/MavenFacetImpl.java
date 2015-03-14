@@ -231,9 +231,7 @@ public class MavenFacetImpl
       if (path.isSnapshot()) {
         assetAttributes.set(P_BASE_VERSION, path.getBaseVersion());
       }
-      if (path.getClassifier() != null) {
-        assetAttributes.set(P_CLASSIFIER, path.getClassifier());
-      }
+      assetAttributes.set(P_CLASSIFIER, path.getClassifier());
       assetAttributes.set(P_EXTENSION, path.getExtension());
 
       // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
