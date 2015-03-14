@@ -108,13 +108,11 @@ public class MavenFacetImpl
 
   private static final String ASSET_KIND_METADATA = "metadata";
 
-  // ==
+  private static final String CONFIG_KEY = "maven";
+
+  // members
 
   private final MimeSupport mimeSupport;
-
-  public static final String CONFIG_KEY = "maven";
-
-  // ==
 
   private boolean strictContentTypeValidation;
 
@@ -383,8 +381,6 @@ public class MavenFacetImpl
       return true;
     }
   }
-
-  // ==
 
   private void storeAssetBlob(final StorageTx tx,
                               final OrientVertex asset,
