@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class DigestExtractor
+class DigestExtractor
 {
   private static final int MAX_CHARS_NEEDED = 120;
 
@@ -149,8 +149,6 @@ public class DigestExtractor
   public static boolean isDigest(final String digest) {
     return digest.length() >= 32 && digest.matches("^[a-z0-9]+$");
   }
-
-  // ==
 
   private static String compress(String digest) {
     digest = digest.replaceAll(" ", "").toLowerCase(Locale.US);
