@@ -31,7 +31,7 @@ import org.joda.time.DateTime;
  */
 @Named
 public class MavenProxyFacet
-    extends ProxyFacetSupport<MavenPayload>
+    extends ProxyFacetSupport
 {
   private static final String NOW = MavenProxyFacet.class.getName() + ".now";
 
@@ -59,12 +59,12 @@ public class MavenProxyFacet
   }
 
   @Override
-  protected MavenPayload fetch(final String url, final Context context, final MavenPayload stalePayload)
+  protected MavenPayload fetch(final String url, final Context context, final Payload stalePayload)
       throws IOException
   {
     MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
     final MavenPayload payload = mavenTransportFacet
-        .fetch(mavenPath, now(context), getRemoteUrl().resolve(url), stalePayload);
+        .fetch(mavenPath, now(context), getRemoteUrl().resolve(url), (MavenPayload) stalePayload);
     if (stalePayload != null && payload == stalePayload) {
       indicateUpToDate(context);
     }
@@ -72,22 +72,22 @@ public class MavenProxyFacet
   }
 
   @Override
-  protected void store(final Context context, final MavenPayload payload) throws IOException, InvalidContentException {
+  protected void store(final Context context, final Payload payload) throws IOException, InvalidContentException {
     final MavenPath mavenPath = context.getAttributes().get(MavenPath.class);
-    mavenFacet.put(mavenPath, payload);
+    mavenFacet.put(mavenPath, (MavenPayload) payload);
   }
 
   @Override
-  protected DateTime getCachedPayloadLastUpdatedDate(final Context context, final MavenPayload payload)
+  protected DateTime getCachedPayloadLastUpdatedDate(final Context context, final Payload payload)
       throws IOException
   {
-    return payload.getLastVerified();
+    return ((MavenPayload)payload).getLastVerified();
   }
 
   @Override
   protected void indicateUpToDate(final Context context) throws IOException {
     final MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
-    mavenFacet.verifyMetadata(mavenPath, now(context));
+    mavenFacet.verify(mavenPath, now(context));
   }
 
   @Override

@@ -46,5 +46,5 @@ public interface MavenFacet
 
   boolean delete(MavenPath path) throws IOException;
 
-  boolean verifyMetadata(MavenPath path, DateTime dateTime) throws IOException;
+  boolean verify(MavenPath path, DateTime dateTime) throws IOException;
 }

@@ -23,14 +23,7 @@ import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
-import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.joda.time.DateTime;
 
 import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toContent;
@@ -41,7 +34,7 @@ import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarsha
  */
 @Named
 public class RawProxyFacet
-    extends ProxyFacetSupport<Payload>
+    extends ProxyFacetSupport
 {
   @Override
   protected Payload getCachedPayload(final Context context) throws IOException {
@@ -53,32 +46,6 @@ public class RawProxyFacet
     }
 
     return toPayload(rawContent);
-  }
-
-  @Override
-  protected Payload fetch(String url, Context context, Payload stale) throws IOException {
-    HttpClient client = httpClient.getHttpClient();
-
-    HttpGet request = new HttpGet(getRemoteUrl().resolve(url));
-    log.debug("Fetching: {}", request);
-
-    HttpResponse response = client.execute(request);
-    log.debug("Response: {}", response);
-
-    StatusLine status = response.getStatusLine();
-    log.debug("Status: {}", status);
-
-    Payload payload = null;
-    if (status.getStatusCode() == HttpStatus.SC_OK) {
-      HttpEntity entity = response.getEntity();
-      log.debug("Entity: {}", entity);
-      payload = new HttpEntityPayload(response, entity);
-    }
-    else if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
-      indicateUpToDate(context);
-    }
-
-    return payload;
   }
 
   @Override

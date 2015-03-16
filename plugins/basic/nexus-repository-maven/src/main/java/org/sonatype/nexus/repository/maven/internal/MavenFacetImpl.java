@@ -317,7 +317,7 @@ public class MavenFacetImpl
   }
 
   @Override
-  public boolean verifyMetadata(final MavenPath path, final DateTime dateTime) throws IOException {
+  public boolean verify(final MavenPath path, final DateTime dateTime) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex asset;
       if (path.getCoordinates() != null) {

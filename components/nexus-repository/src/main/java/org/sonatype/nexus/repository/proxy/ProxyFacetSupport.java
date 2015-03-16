@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public abstract class ProxyFacetSupport<P extends Payload>
+public abstract class ProxyFacetSupport
     extends FacetSupport
     implements ProxyFacet
 {
@@ -111,11 +111,11 @@ public abstract class ProxyFacetSupport<P extends Payload>
   public Payload get(final Context context) throws IOException {
     checkNotNull(context);
 
-    P content = getCachedPayload(context);
+    Payload content = getCachedPayload(context);
 
     if (content == null || isStale(context, content)) {
       try {
-        final P remote = fetch(context, content);
+        final Payload remote = fetch(context, content);
         if (remote != null) {
 
           // TODO: Introduce content validation.. perhaps content's type not matching path's implied type.
@@ -136,27 +136,51 @@ public abstract class ProxyFacetSupport<P extends Payload>
   /**
    * If we have the content cached locally already, return that - otherwise {@code null}.
    */
-  protected abstract P getCachedPayload(final Context context) throws IOException;
+  protected abstract Payload getCachedPayload(final Context context) throws IOException;
 
   /**
    * Store a new Payload, freshly fetched from the remote URL. The Context indicates which component
    * was being requested.
    */
-  protected abstract void store(final Context context, final P payload)
+  protected abstract void store(final Context context, final Payload payload)
       throws IOException, InvalidContentException;
 
   @Nullable
-  protected P fetch(final Context context, final P payload) throws IOException {
+  protected Payload fetch(final Context context, final Payload payload) throws IOException {
     return fetch(getUrl(context), context, payload);
   }
 
-  protected abstract P fetch(String url, Context context, P payload) throws IOException;
+  protected Payload fetch(String url, Context context, Payload stale) throws IOException {
+    HttpClient client = httpClient.getHttpClient();
+
+    HttpGet request = new HttpGet(getRemoteUrl().resolve(url));
+    log.debug("Fetching: {}", request);
+
+    HttpResponse response = client.execute(request);
+    log.debug("Response: {}", response);
+
+    StatusLine status = response.getStatusLine();
+    log.debug("Status: {}", status);
+
+    Payload payload = null;
+    if (status.getStatusCode() == HttpStatus.SC_OK) {
+      HttpEntity entity = response.getEntity();
+      log.debug("Entity: {}", entity);
+      payload = new HttpEntityPayload(response, entity);
+    }
+    else if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
+      indicateUpToDate(context);
+    }
+
+    return payload;
+  }
 
   /**
    * For whatever component/asset is implied by the Context, return the date it was last deemed up to date, or {@code
    * null} if it isn't present.
    */
-  protected abstract DateTime getCachedPayloadLastUpdatedDate(final Context context, final P payload) throws IOException;
+  protected abstract DateTime getCachedPayloadLastUpdatedDate(final Context context, final Payload payload)
+      throws IOException;
 
   /**
    * For whatever component/asset
@@ -168,7 +192,7 @@ public abstract class ProxyFacetSupport<P extends Payload>
    */
   protected abstract String getUrl(final @Nonnull Context context);
 
-  protected boolean isStale(final Context context, final P payload) throws IOException {
+  private boolean isStale(final Context context, final Payload payload) throws IOException {
     if (artifactMaxAgeMinutes < 0) {
       log.trace("Artifact max age checking disabled.");
       return false;

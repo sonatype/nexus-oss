@@ -44,7 +44,7 @@ import org.joda.time.DateTime;
  * @since 3.0
  */
 public class NugetProxyFacet
-    extends ProxyFacetSupport<Payload>
+    extends ProxyFacetSupport
 {
   private final NugetFeedFetcher fetcher;
 
@@ -88,32 +88,6 @@ public class NugetProxyFacet
 
     // Request the remote package content and return it as a payload
     return fetch(contentLocation.toString(), context, stalePayload);
-  }
-
-  @Override
-  protected Payload fetch(String url, Context context, Payload stalePayload) throws IOException {
-    HttpClient client = httpClient.getHttpClient();
-
-    HttpGet request = new HttpGet(getRemoteUrl().resolve(url));
-    log.debug("Fetching: {}", request);
-
-    HttpResponse response = client.execute(request);
-    log.debug("Response: {}", response);
-
-    StatusLine status = response.getStatusLine();
-    log.debug("Status: {}", status);
-
-    Payload payload = null;
-    if (status.getStatusCode() == HttpStatus.SC_OK) {
-      HttpEntity entity = response.getEntity();
-      log.debug("Entity: {}", entity);
-      payload = new HttpEntityPayload(response, entity);
-    }
-    else if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
-      indicateUpToDate(context);
-    }
-
-    return payload;
   }
 
   @Override
