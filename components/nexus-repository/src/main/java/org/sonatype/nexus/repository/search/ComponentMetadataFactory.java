@@ -19,12 +19,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Format;
-
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import org.sonatype.nexus.repository.storage.Component;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT;
 
 /**
  * {@link ComponentMetadata} factory.
@@ -47,15 +45,15 @@ public class ComponentMetadataFactory
    * Creates a component metadata out of a component using {@link ComponentMetadataProducer} specific to component
    * {@link Format}. If one is not available will use a default one ({@link DefaultComponentMetadataProducer}).
    */
-  public ComponentMetadata from(final OrientVertex component) {
+  public ComponentMetadata from(final Component component) {
     checkNotNull(component);
-    String format = component.getProperty(P_FORMAT);
+    String format = component.format();
     ComponentMetadataProducer producer = componentMetadataProducers.get(format);
     if (producer == null) {
       producer = componentMetadataProducers.get("default");
     }
     checkState(producer != null, "Could not find a component metadata producer for format: {}", format);
-    return from(component.getId().toString(), producer.getMetadata(component));
+    return from(component.id().toString(), producer.getMetadata(component));
   }
 
   /**

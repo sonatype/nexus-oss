@@ -20,6 +20,7 @@ import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.orient.DatabaseInstanceRule;
+import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
@@ -32,9 +33,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.inject.util.Providers;
-import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
-import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.junit.After;
 import org.junit.Before;
@@ -52,8 +52,6 @@ import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
 import static org.sonatype.nexus.repository.storage.StorageFacet.V_ASSET;
-import static org.sonatype.nexus.repository.storage.StorageFacet.V_BUCKET;
-import static org.sonatype.nexus.repository.storage.StorageFacet.V_COMPONENT;
 
 /**
  * Integration tests for {@link StorageFacetImpl}.
@@ -69,6 +67,14 @@ public class StorageFacetImplIT
   protected Repository testRepository1 = mock(Repository.class);
 
   protected Repository testRepository2 = mock(Repository.class);
+
+  protected TestFormat testFormat = new TestFormat();
+
+  private class TestFormat extends Format {
+    public TestFormat() {
+      super("test");
+    }
+  }
 
   @Before
   public void setUp() throws Exception {
@@ -105,22 +111,21 @@ public class StorageFacetImplIT
   public void initialState() {
     try (StorageTx tx = underTest.openTx()) {
       // We should have one bucket, which was auto-created for the repository during initialization
-      checkSize(tx.browseVertices(null), 1);
-      checkSize(tx.browseVertices(V_BUCKET), 1);
+      checkSize(tx.browseBuckets(), 1);
     }
   }
 
   @Test
   public void startWithEmptyAttributes() {
     try (StorageTx tx = underTest.openTx()) {
-      OrientVertex asset = tx.createAsset(tx.getBucket());
-      OrientVertex component = tx.createComponent(tx.getBucket());
+      Asset asset = tx.createAsset(tx.getBucket(), testFormat);
+      Component component = tx.createComponent(tx.getBucket(), testFormat);
 
-      Map<String, Object> assetAttributes = component.getProperty(P_ATTRIBUTES);
+      Map<String, Object> assetAttributes = component.vertex().getProperty(P_ATTRIBUTES);
       assertThat(assetAttributes, is(notNullValue()));
       assertThat(assetAttributes.isEmpty(), is(true));
 
-      Map<String, Object> componentAttributes = component.getProperty(P_ATTRIBUTES);
+      Map<String, Object> componentAttributes = component.vertex().getProperty(P_ATTRIBUTES);
       assertThat(componentAttributes, is(notNullValue()));
       assertThat(componentAttributes.isEmpty(), is(true));
     }
@@ -128,11 +133,10 @@ public class StorageFacetImplIT
 
   @Test
   public void getAndSetAttributes() {
-    Object vertexId;
+    ORID vertexId;
     try (StorageTx tx = underTest.openTx()) {
-      OrientVertex asset = tx.createAsset(tx.getBucket());
-      vertexId = asset.getId();
-      NestedAttributesMap map = tx.getAttributes(asset);
+      Asset asset = tx.createAsset(tx.getBucket(), testFormat);
+      NestedAttributesMap map = asset.attributes();
 
       assertThat(map.isEmpty(), is(true));
 
@@ -142,10 +146,11 @@ public class StorageFacetImplIT
       assertThat(map.isEmpty(), is(false));
 
       tx.commit();
+      vertexId = asset.id();
     }
 
     try (StorageTx tx = underTest.openTx()) {
-      NestedAttributesMap map = tx.getAttributes(tx.findVertex(vertexId, null));
+      NestedAttributesMap map = tx.findAsset(vertexId, tx.getBucket()).attributes();
 
       assertThat(map.size(), is(2));
       assertThat(map.child("bag1").size(), is(1));
@@ -159,19 +164,17 @@ public class StorageFacetImplIT
   public void findAssets() throws Exception {
     // Setup: add an asset in both repositories
     try (StorageTx tx = underTest.openTx()) {
-      checkSize(tx.browseVertices(V_BUCKET), 1);
-      OrientVertex asset1 = tx.createAsset(tx.getBucket());
-      asset1.setProperty("name", "asset1");
-      asset1.setProperty("number", 42);
+      Asset asset1 = tx.createAsset(tx.getBucket(), testFormat);
+      asset1.set("name", "asset1");
+      asset1.set("number", 42);
       tx.commit();
     }
 
     underTest.init(testRepository2);
     try (StorageTx tx = underTest.openTx()) {
-      checkSize(tx.browseVertices(V_BUCKET), 2);
-      OrientVertex asset2 = tx.createAsset(tx.getBucket());
-      asset2.setProperty("name", "asset2");
-      asset2.setProperty("number", 42);
+      Asset asset2 = tx.createAsset(tx.getBucket(), testFormat);
+      asset2.set("name", "asset2");
+      asset2.set("number", 42);
       tx.commit();
     }
 
@@ -228,15 +231,15 @@ public class StorageFacetImplIT
 
       // ..in ascending order by name with limit 1, should return asset1
       String suffix = "order by name limit 1";
-      List<OrientVertex> results = Lists.newArrayList(tx.findAssets(whereClause, parameters, null, suffix));
+      List<Asset> results = Lists.newArrayList(tx.findAssets(whereClause, parameters, null, suffix));
       checkSize(results, 1);
-      assertThat((String) results.get(0).getProperty("name"), is("asset1"));
+      assertThat((String) results.get(0).get("name"), is("asset1"));
 
       // ..in descending order by name with limit 1, should return asset2
       suffix = "order by name desc limit 1";
       results = Lists.newArrayList(tx.findAssets(whereClause, parameters, null, suffix));
       checkSize(results, 1);
-      assertThat((String) results.get(0).getProperty("name"), is("asset2"));
+      assertThat((String) results.get(0).get("name"), is("asset2"));
     }
   }
 
@@ -250,21 +253,21 @@ public class StorageFacetImplIT
     // Create a new asset with property "attributes" that's a map of maps (stored as an embeddedmap)
     Object vertexId;
     try (StorageTx tx = underTest.openTx()) {
-      Vertex bucket = tx.getBucket();
-      OrientVertex asset = tx.createAsset(bucket);
-      asset.setProperty("attributes", inputMap, OType.EMBEDDEDMAP);
+      Bucket bucket = tx.getBucket();
+      Asset asset = tx.createAsset(bucket, testFormat);
+      asset.set("attributes", inputMap);
       tx.commit();
-      vertexId = asset.getId();
+      vertexId = asset.vertex().getIdentity();
     }
 
     // Transaction 2:
     // Get the asset and make sure it contains what we expect
     try (StorageTx tx = underTest.openTx()) {
-      Vertex bucket = tx.getBucket();
-      OrientVertex asset = tx.findVertex(vertexId, null);
+      Bucket bucket = tx.getBucket();
+      Asset asset = tx.findAsset((ORID) vertexId, bucket);
       assert asset != null;
 
-      Map<String, Map<String, String>> outputMap = asset.getProperty("attributes");
+      Map<String, Map<String, String>> outputMap = asset.vertex().getProperty("attributes");
 
       assertThat(outputMap.keySet().size(), is(2));
 
@@ -296,63 +299,40 @@ public class StorageFacetImplIT
   @Test
   public void roundTripTest() {
     try (StorageTx tx = underTest.openTx()) {
-      // Make two buckets and verify state with browse and find
-      Vertex bucket1 = tx.createVertex(V_BUCKET);
-      Vertex bucket2 = tx.createVertex(V_BUCKET);
+      // Verify initial state with browse
+      Bucket bucket = tx.getBucket();
 
-      checkSize(tx.browseVertices(null), 3);
-      checkSize(tx.browseVertices(V_BUCKET), 3);
-      checkSize(tx.browseVertices(V_ASSET), 0);
-      checkSize(tx.browseVertices(V_COMPONENT), 0);
+      checkSize(tx.browseBuckets(), 1);
+      checkSize(tx.browseAssets(bucket), 0);
+      checkSize(tx.browseComponents(bucket), 0);
 
-      assertNotNull(tx.findVertex(bucket1.getId(), null));
-      assertNotNull(tx.findVertex(bucket2.getId(), null));
-      assertNotNull(tx.findVertex(bucket1.getId(), V_BUCKET));
-      assertNotNull(tx.findVertex(bucket2.getId(), V_BUCKET));
-      assertNull(tx.findVertex(bucket1.getId(), V_ASSET));
-      assertNull(tx.findVertex(bucket2.getId(), V_ASSET));
+      // Create an asset and component and verify state with browse and find
+      Asset asset = tx.createAsset(bucket, testFormat);
+      asset.set(P_PATH, "path");
+      Component component = tx.createComponent(bucket, testFormat);
+      component.set("foo", "bar");
+      tx.commit();
 
-      // Create an asset and component, one in each bucket, and verify state with browse and find
-      Vertex asset = tx.createAsset(bucket1);
-      asset.setProperty(P_PATH, "path");
-      Vertex component = tx.createComponent(bucket2);
-      component.setProperty("foo", "bar");
+      checkSize(tx.browseAssets(bucket), 1);
+      checkSize(tx.browseComponents(bucket), 1);
 
-      checkSize(tx.browseVertices(V_ASSET), 1);
-      checkSize(tx.browseVertices(V_COMPONENT), 1);
-      checkSize(tx.browseVertices(V_ASSET), 1);
-      checkSize(tx.browseAssets(bucket1), 1);
-      checkSize(tx.browseAssets(bucket2), 0);
-      checkSize(tx.browseComponents(bucket1), 0);
-      checkSize(tx.browseComponents(bucket2), 1);
+      assertNotNull(tx.findAsset(asset.id(), bucket));
+      assertNotNull(tx.findComponent(component.id(), bucket));
 
-      assertNotNull(tx.findVertex(asset.getId(), V_ASSET));
-      assertNotNull(tx.findVertex(component.getId(), V_COMPONENT));
+      assertNull(tx.findAssetWithProperty(P_PATH, "nomatch", bucket));
+      assertNotNull(tx.findAssetWithProperty(P_PATH, "path", bucket));
 
-      assertNull(tx.findVertexWithProperty(P_PATH, "nomatch", null));
-      assertNotNull(tx.findVertexWithProperty(P_PATH, "path", null));
-      assertNotNull(tx.findVertexWithProperty(P_PATH, "path", V_ASSET));
-      assertNotNull(tx.findAssetWithProperty(P_PATH, "path", bucket1));
-      assertNull(tx.findAssetWithProperty(P_PATH, "nomatch", bucket1));
-      assertNull(tx.findAssetWithProperty(P_PATH, "path", bucket2));
-      assertNull(tx.findVertex(bucket2.getId(), V_ASSET));
-
-      assertNull(tx.findVertexWithProperty("foo", "nomatch", null));
-      assertNotNull(tx.findVertexWithProperty("foo", "bar", null));
-      assertNotNull(tx.findVertexWithProperty("foo", "bar", V_COMPONENT));
-      assertNotNull(tx.findComponentWithProperty("foo", "bar", bucket2));
-      assertNull(tx.findComponentWithProperty("foo", "nomatch", bucket2));
-      assertNull(tx.findComponentWithProperty("foo", "bar", bucket1));
-      assertNull(tx.findVertex(bucket2.getId(), V_COMPONENT));
+      assertNull(tx.findComponentWithProperty("foo", "nomatch", bucket));
+      assertNotNull(tx.findComponentWithProperty("foo", "bar", bucket));
 
       // Delete both and make sure browse and find behave as expected
-      tx.deleteVertex(asset);
-      tx.deleteVertex(component);
+      tx.deleteAsset(asset);
+      tx.deleteComponent(component);
 
-      checkSize(tx.browseVertices(V_ASSET), 0);
-      checkSize(tx.browseVertices(V_COMPONENT), 0);
-      assertNull(tx.findVertex(asset.getId(), V_ASSET));
-      assertNull(tx.findVertex(component.getId(), V_COMPONENT));
+      checkSize(tx.browseAssets(bucket), 0);
+      checkSize(tx.browseComponents(bucket), 0);
+      assertNull(tx.findAsset(asset.id(), bucket));
+      assertNull(tx.findComponent(component.id(), bucket));
 
       // NOTE: It doesn't matter for this test, but you should commit when finished with one or more writes
       //       If you don't, your changes will be automatically rolled back.
