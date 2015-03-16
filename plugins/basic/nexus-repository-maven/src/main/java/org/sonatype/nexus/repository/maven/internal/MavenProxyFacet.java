@@ -15,18 +15,14 @@ package org.sonatype.nexus.repository.maven.internal;
 import java.io.IOException;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 
 import org.joda.time.DateTime;
-
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Maven proxy facet that talks to {@link MavenFacet} and {@link MavenTransportFacet}.
@@ -39,16 +35,9 @@ public class MavenProxyFacet
 {
   private static final String NOW = MavenProxyFacet.class.getName() + ".now";
 
-  private final Clock clock;
-
   private MavenFacet mavenFacet;
 
   private MavenTransportFacet mavenTransportFacet;
-
-  @Inject
-  public MavenProxyFacet() {
-    this.clock = new Clock();
-  }
 
   @Override
   protected void doConfigure() throws Exception {
@@ -59,35 +48,23 @@ public class MavenProxyFacet
 
   @Override
   public Payload get(final Context context) throws IOException {
-    context.getAttributes().set(NOW, clock.dateTime());
+    context.getAttributes().set(NOW, DateTime.now());
     return super.get(context);
   }
 
   @Override
   protected MavenPayload getCachedPayload(final Context context) throws IOException {
-    final ArtifactPath artifactPath = context.getAttributes().get(ArtifactPath.class);
-    if (artifactPath != null) {
-      return mavenFacet.getArtifact(artifactPath);
-    }
-    final Path metadataPath = context.getAttributes().get(Path.class);
-    if (metadataPath != null) {
-      return mavenFacet.getMetadata(metadataPath);
-    }
-    return null;
+    final MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
+    return mavenFacet.get(mavenPath);
   }
 
   @Override
   protected MavenPayload fetch(final String url, final Context context, final MavenPayload stalePayload)
       throws IOException
   {
-    Path path = context.getAttributes().get(Path.class);
-    if (path == null) {
-      path = context.getAttributes().get(ArtifactPath.class);
-    }
-    checkState(path != null);
-
+    MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
     final MavenPayload payload = mavenTransportFacet
-        .fetch(path, now(context), getRemoteUrl().resolve(url), stalePayload);
+        .fetch(mavenPath, now(context), getRemoteUrl().resolve(url), stalePayload);
     if (stalePayload != null && payload == stalePayload) {
       indicateUpToDate(context);
     }
@@ -96,16 +73,8 @@ public class MavenProxyFacet
 
   @Override
   protected void store(final Context context, final MavenPayload payload) throws IOException, InvalidContentException {
-    final ArtifactPath artifactPath = context.getAttributes().get(ArtifactPath.class);
-    if (artifactPath != null) {
-      mavenFacet.putArtifact(artifactPath, payload);
-      return;
-    }
-    final Path metadataPath = context.getAttributes().get(Path.class);
-    if (metadataPath != null) {
-      mavenFacet.putMetadata(metadataPath, payload);
-      return;
-    }
+    final MavenPath mavenPath = context.getAttributes().get(MavenPath.class);
+    mavenFacet.put(mavenPath, payload);
   }
 
   @Override
@@ -117,16 +86,8 @@ public class MavenProxyFacet
 
   @Override
   protected void indicateUpToDate(final Context context) throws IOException {
-    final ArtifactPath artifactPath = context.getAttributes().get(ArtifactPath.class);
-    if (artifactPath != null) {
-      mavenFacet.verifyArtifact(artifactPath, now(context));
-      return;
-    }
-    final Path metadataPath = context.getAttributes().get(Path.class);
-    if (metadataPath != null) {
-      mavenFacet.verifyMetadata(metadataPath, now(context));
-      return;
-    }
+    final MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
+    mavenFacet.verifyMetadata(mavenPath, now(context));
   }
 
   @Override

@@ -83,15 +83,17 @@ class Maven2GroupRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
+    Maven2MavenPathParser pathParser = new Maven2MavenPathParser()
+
     builder.route(new Route.Builder()
-        .matcher(new MavenArtifactMatcher(new Maven2ArtifactPathParser()))
+        .matcher(new MavenArtifactMatcher(pathParser))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(groupHandler)
         .create())
 
     builder.route(new Route.Builder()
-        .matcher(new MavenMetadataMatcher())
+        .matcher(new MavenMetadataMatcher(pathParser))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(groupHandler)

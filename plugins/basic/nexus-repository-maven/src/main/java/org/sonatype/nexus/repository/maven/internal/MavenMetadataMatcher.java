@@ -16,8 +16,10 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Matcher that matches for Maven repository metadata only, and sets {@link Path} in context attributes.
+ * Matcher that matches for Maven repository metadata only, and sets {@link MavenPath} in context attributes.
  *
  * @since 3.0
  */
@@ -27,12 +29,18 @@ public class MavenMetadataMatcher
 {
   private static final String MAVEN_METADATA_FILENAME = "maven-metadata.xml";
 
+  private final MavenPathParser mavenPathParser;
+
+  public MavenMetadataMatcher(final MavenPathParser mavenPathParser) {
+    this.mavenPathParser = checkNotNull(mavenPathParser);
+  }
+
   @Override
   public boolean matches(final Context context) {
     final String path = context.getRequest().getPath();
-    final Path repositoryPath = new Path(path);
-    if (repositoryPath.main().getFileName().equals(MAVEN_METADATA_FILENAME)) {
-      context.getAttributes().set(Path.class, repositoryPath);
+    final MavenPath mavenPath = mavenPathParser.parsePath(path);
+    if (mavenPath.main().getFileName().equals(MAVEN_METADATA_FILENAME)) {
+      context.getAttributes().set(MavenPath.class, mavenPath);
       return true;
     }
     return false;

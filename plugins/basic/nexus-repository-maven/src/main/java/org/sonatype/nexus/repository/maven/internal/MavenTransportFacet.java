@@ -37,5 +37,5 @@ public interface MavenTransportFacet
    * remotely.
    */
   @Nullable
-  MavenPayload fetch(final Path path, final DateTime now, final URI uri, final @Nullable MavenPayload stalePayload) throws IOException;
+  MavenPayload fetch(final MavenPath path, final DateTime now, final URI uri, final @Nullable MavenPayload stalePayload) throws IOException;
 }

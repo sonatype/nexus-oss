@@ -40,20 +40,11 @@ public interface MavenFacet
   ChecksumPolicy getChecksumPolicy();
 
   @Nullable
-  MavenPayload getArtifact(ArtifactPath path) throws IOException;
+  MavenPayload get(MavenPath path) throws IOException;
 
-  void putArtifact(ArtifactPath path, MavenPayload content) throws IOException, InvalidContentException;
+  void put(MavenPath path, MavenPayload content) throws IOException, InvalidContentException;
 
-  boolean deleteArtifact(ArtifactPath path) throws IOException;
+  boolean delete(MavenPath path) throws IOException;
 
-  boolean verifyArtifact(ArtifactPath path, DateTime dateTime) throws IOException;
-
-  @Nullable
-  MavenPayload getMetadata(Path path) throws IOException;
-
-  void putMetadata(Path path, MavenPayload content) throws IOException, InvalidContentException;
-
-  boolean deleteMetadata(Path path) throws IOException;
-
-  boolean verifyMetadata(Path path, DateTime dateTime) throws IOException;
+  boolean verifyMetadata(MavenPath path, DateTime dateTime) throws IOException;
 }

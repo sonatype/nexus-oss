@@ -19,7 +19,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Matcher that matches for Maven artifacts only, and sets {@link ArtifactPath} in context attributes.
+ * Matcher that matches for Maven artifacts only, and sets {@link MavenPath} in context attributes.
  *
  * @since 3.0
  */
@@ -27,18 +27,18 @@ public class MavenArtifactMatcher
     extends ComponentSupport
     implements Matcher
 {
-  private final ArtifactPathParser artifactPathParser;
+  private final MavenPathParser mavenPathParser;
 
-  public MavenArtifactMatcher(final ArtifactPathParser artifactPathParser) {
-    this.artifactPathParser = checkNotNull(artifactPathParser);
+  public MavenArtifactMatcher(final MavenPathParser mavenPathParser) {
+    this.mavenPathParser = checkNotNull(mavenPathParser);
   }
 
   @Override
   public boolean matches(final Context context) {
     final String path = context.getRequest().getPath();
-    final ArtifactPath artifactPath = artifactPathParser.parsePath(path);
-    if (artifactPath != null) {
-      context.getAttributes().set(ArtifactPath.class, artifactPath);
+    final MavenPath mavenPath = mavenPathParser.parsePath(path);
+    if (mavenPath.getCoordinates() != null) {
+      context.getAttributes().set(MavenPath.class, mavenPath);
       return true;
     }
     return false;

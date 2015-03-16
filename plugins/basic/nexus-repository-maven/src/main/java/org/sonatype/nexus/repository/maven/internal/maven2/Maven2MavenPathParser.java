@@ -14,9 +14,10 @@ package org.sonatype.nexus.repository.maven.internal.maven2;
 
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.M2GavCalculator;
-import org.sonatype.nexus.repository.maven.internal.ArtifactPath;
-import org.sonatype.nexus.repository.maven.internal.ArtifactPath.SignatureType;
-import org.sonatype.nexus.repository.maven.internal.ArtifactPathParser;
+import org.sonatype.nexus.repository.maven.internal.MavenPath;
+import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.MavenPath.SignatureType;
+import org.sonatype.nexus.repository.maven.internal.MavenPathParser;
 
 import com.google.common.base.Strings;
 
@@ -25,8 +26,8 @@ import com.google.common.base.Strings;
  *
  * @since 3.0
  */
-public class Maven2ArtifactPathParser
-    implements ArtifactPathParser
+public class Maven2MavenPathParser
+    implements MavenPathParser
 {
   // TODO: TokenParser not capable to do this (yet)
   // TODO: this is legacy, but here only to make it work
@@ -34,10 +35,10 @@ public class Maven2ArtifactPathParser
   private final M2GavCalculator m2GavCalculator = new M2GavCalculator();
 
   @Override
-  public ArtifactPath parsePath(final String path) {
+  public MavenPath parsePath(final String path) {
     final Gav gav = m2GavCalculator.pathToGav(path);
     if (gav == null) {
-      return null;
+      return new MavenPath(path, null);
     }
     else {
       SignatureType signatureType = null;
@@ -66,8 +67,7 @@ public class Maven2ArtifactPathParser
         ext = ext + "." + gav.getHashType().name();
       }
 
-      return new ArtifactPath(
-          path,
+      final Coordinates coordinates = new Coordinates(
           gav.isSnapshot(),
           gav.getGroupId(),
           gav.getArtifactId(),
@@ -77,6 +77,7 @@ public class Maven2ArtifactPathParser
           ext,
           signatureType
       );
+      return new MavenPath(path, coordinates);
     }
   }
 }

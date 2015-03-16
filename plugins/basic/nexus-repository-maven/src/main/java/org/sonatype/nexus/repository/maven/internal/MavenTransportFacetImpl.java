@@ -16,14 +16,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
-import org.sonatype.nexus.repository.maven.internal.Path.HashType;
+import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 
 import com.google.common.base.Strings;
@@ -53,7 +51,7 @@ public class MavenTransportFacetImpl
     implements MavenTransportFacet
 {
   @Override
-  public MavenPayload fetch(final Path path, final DateTime now, final URI url, final MavenPayload stalePayload) throws IOException
+  public MavenPayload fetch(final MavenPath path, final DateTime now, final URI url, final MavenPayload stalePayload) throws IOException
   {
     checkNotNull(path);
     checkNotNull(url);
