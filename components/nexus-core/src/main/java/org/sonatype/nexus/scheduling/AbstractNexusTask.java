@@ -17,11 +17,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
+import org.sonatype.nexus.web.internal.BaseUrlDetector;
 import org.sonatype.scheduling.AbstractSchedulerTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskInterruptedException;
@@ -45,6 +45,8 @@ public abstract class AbstractNexusTask<T>
   public static final long A_DAY = 24L * 60L * 60L * 1000L;
 
   private EventBus eventBus;
+
+  private BaseUrlDetector baseUrlDetector;
 
   protected AbstractNexusTask() {
     this(null);
@@ -72,6 +74,11 @@ public abstract class AbstractNexusTask<T>
   @Inject
   public void setEventBus(final EventBus eventBus) {
     this.eventBus = eventBus;
+  }
+
+  @Inject
+  public void setBaseUrlDetector(final BaseUrlDetector baseUrlDetector) {
+    this.baseUrlDetector = baseUrlDetector;
   }
 
   protected final void notifyEventListeners(final Object event) {
@@ -138,6 +145,11 @@ public abstract class AbstractNexusTask<T>
   {
     getLogger().info(getLoggedMessage("started"));
     final long started = System.currentTimeMillis();
+
+    // attempt to set the base-url for the current thread
+    if (baseUrlDetector != null) {
+      baseUrlDetector.set();
+    }
 
     // fire event
     final NexusTaskEventStarted<T> startedEvent = new NexusTaskEventStarted<T>(this);
