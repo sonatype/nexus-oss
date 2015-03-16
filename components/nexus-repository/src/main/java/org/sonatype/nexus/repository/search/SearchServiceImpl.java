@@ -26,6 +26,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.security.BreadActions;
@@ -245,9 +246,16 @@ public class SearchServiceImpl
   private String[] getSearchableIndexes() {
     List<String> indexes = Lists.newArrayList();
     for (Repository repository : repositoryManager.browse()) {
-      if (repository.facet(ViewFacet.class).isOnline()
-          && securityHelper.allPermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))) {
-        indexes.add(repository.getName());
+      try {
+        // check if search facet is available so avoid searching repositories without an index
+        repository.facet(SearchFacet.class);
+        if (repository.facet(ViewFacet.class).isOnline()
+            && securityHelper.allPermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))) {
+          indexes.add(repository.getName());
+        }
+      }
+      catch (MissingFacetException e) {
+        // no search facet, no search
       }
     }
     return indexes.toArray(new String[indexes.size()]);
