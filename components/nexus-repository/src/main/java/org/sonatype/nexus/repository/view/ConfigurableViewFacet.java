@@ -27,8 +27,8 @@ import static com.google.common.base.Preconditions.checkState;
  */
 @Named
 public class ConfigurableViewFacet
-  extends FacetSupport
-  implements ViewFacet
+    extends FacetSupport
+    implements ViewFacet
 {
   public static final String CONFIG_KEY = "view";
 

@@ -44,7 +44,9 @@ public class Router
   /**
    * Dispatch request to matching route.
    */
-  public Response dispatch(final Repository repository, final Request request) throws Exception {
+  public Response dispatch(final Repository repository, final Request request)
+      throws Exception
+  {
     checkNotNull(repository);
     checkNotNull(request);
 
@@ -54,9 +56,7 @@ public class Router
     Context context = new Context(repository, request);
     Route route = findRoute(context);
     Response response = context.start(route);
-
     logResponse(response);
-
     return response;
   }
 
