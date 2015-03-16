@@ -172,82 +172,76 @@ public class MavenFacetImpl
       throws IOException, InvalidContentException
   {
     try (StorageTx tx = getStorage().openTx()) {
-      try {
-        OrientVertex component = null;
-        OrientVertex asset;
+      OrientVertex component = null;
+      OrientVertex asset;
+      if (path.getCoordinates() != null) {
+        component = findComponent(tx, path.getCoordinates(), tx.getBucket());
+        if (component == null) {
+          component = tx.createComponent(tx.getBucket());
+
+          // Set normalized properties: format, group, and name
+          component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
+          component.setProperty(StorageFacet.P_PATH, path.getPath());
+          component.setProperty(StorageFacet.P_GROUP, path.getCoordinates().getGroupId());
+          component.setProperty(StorageFacet.P_NAME, path.getCoordinates().getArtifactId());
+          component.setProperty(StorageFacet.P_VERSION, path.getCoordinates().getVersion());
+
+          final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
+          componentAttributes.set(P_COMPONENT_KEY, getComponentKey(path.getCoordinates()));
+          componentAttributes.set(P_GROUP_ID, path.getCoordinates().getGroupId());
+          componentAttributes.set(P_ARTIFACT_ID, path.getCoordinates().getArtifactId());
+          componentAttributes.set(P_VERSION, path.getCoordinates().getVersion());
+          if (path.getCoordinates().isSnapshot()) {
+            componentAttributes.set(P_BASE_VERSION, path.getCoordinates().getBaseVersion());
+          }
+        }
+
+        asset = selectComponentAsset(tx, component, path);
+      }
+      else {
+        asset = findAsset(tx, path, tx.getBucket());
+      }
+      if (asset == null) {
+        asset = tx.createAsset(tx.getBucket());
+        if (component != null) {
+          asset.addEdge(StorageFacet.E_PART_OF_COMPONENT, component);
+        }
+        asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
+        asset.setProperty(StorageFacet.P_NAME, path.getFileName());
+        asset.setProperty(StorageFacet.P_PATH, path.getPath());
+
+        final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
+        assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
+        assetAttributes.set(P_ASSET_KIND, path.getKind().name());
         if (path.getCoordinates() != null) {
-          component = findComponent(tx, path.getCoordinates(), tx.getBucket());
-          if (component == null) {
-            component = tx.createComponent(tx.getBucket());
-
-            // Set normalized properties: format, group, and name
-            component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
-            component.setProperty(StorageFacet.P_PATH, path.getPath());
-            component.setProperty(StorageFacet.P_GROUP, path.getCoordinates().getGroupId());
-            component.setProperty(StorageFacet.P_NAME, path.getCoordinates().getArtifactId());
-            component.setProperty(StorageFacet.P_VERSION, path.getCoordinates().getVersion());
-
-            final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
-            componentAttributes.set(P_COMPONENT_KEY, getComponentKey(path.getCoordinates()));
-            componentAttributes.set(P_GROUP_ID, path.getCoordinates().getGroupId());
-            componentAttributes.set(P_ARTIFACT_ID, path.getCoordinates().getArtifactId());
-            componentAttributes.set(P_VERSION, path.getCoordinates().getVersion());
-            if (path.getCoordinates().isSnapshot()) {
-              componentAttributes.set(P_BASE_VERSION, path.getCoordinates().getBaseVersion());
-            }
+          assetAttributes.set(P_GROUP_ID, path.getCoordinates().getGroupId());
+          assetAttributes.set(P_ARTIFACT_ID, path.getCoordinates().getArtifactId());
+          assetAttributes.set(P_VERSION, path.getCoordinates().getVersion());
+          if (path.getCoordinates().isSnapshot()) {
+            assetAttributes.set(P_BASE_VERSION, path.getCoordinates().getBaseVersion());
           }
-
-          asset = selectComponentAsset(tx, component, path);
-        }
-        else {
-          asset = findAsset(tx, path, tx.getBucket());
-        }
-        if (asset == null) {
-          asset = tx.createAsset(tx.getBucket());
-          if (component != null) {
-            asset.addEdge(StorageFacet.E_PART_OF_COMPONENT, component);
-          }
-          asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
-          asset.setProperty(StorageFacet.P_NAME, path.getFileName());
-          asset.setProperty(StorageFacet.P_PATH, path.getPath());
-
-          final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
-          assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
-          assetAttributes.set(P_ASSET_KIND, path.getKind().name());
-          if (path.getCoordinates() != null) {
-            assetAttributes.set(P_GROUP_ID, path.getCoordinates().getGroupId());
-            assetAttributes.set(P_ARTIFACT_ID, path.getCoordinates().getArtifactId());
-            assetAttributes.set(P_VERSION, path.getCoordinates().getVersion());
-            if (path.getCoordinates().isSnapshot()) {
-              assetAttributes.set(P_BASE_VERSION, path.getCoordinates().getBaseVersion());
-            }
-            assetAttributes.set(P_CLASSIFIER, path.getCoordinates().getClassifier());
-            assetAttributes.set(P_EXTENSION, path.getCoordinates().getExtension());
-          }
-
-          // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
+          assetAttributes.set(P_CLASSIFIER, path.getCoordinates().getClassifier());
+          assetAttributes.set(P_EXTENSION, path.getCoordinates().getExtension());
         }
 
-        // TODO: Figure out created-by header
-        final ImmutableMap<String, String> headers = ImmutableMap.of(
-            BlobStore.BLOB_NAME_HEADER, path.getPath(),
-            BlobStore.CREATED_BY_HEADER, "unknown"
-        );
-
-        try (InputStream inputStream = content.openInputStream()) {
-          try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
-            final String contentType = determineContentType(path, supplier, content.getContentType());
-            try (InputStream is = supplier.get()) {
-              tx.setBlob(is, headers, asset, HASH_ALGORITHMS, contentType);
-            }
-          }
-        }
-        tx.commit();
+        // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
       }
-      catch (IOException | InvalidContentException e) {
-        tx.rollback();
-        throw e;
+
+      // TODO: Figure out created-by header
+      final ImmutableMap<String, String> headers = ImmutableMap.of(
+          BlobStore.BLOB_NAME_HEADER, path.getPath(),
+          BlobStore.CREATED_BY_HEADER, "unknown"
+      );
+
+      try (InputStream inputStream = content.openInputStream()) {
+        try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
+          final String contentType = determineContentType(path, supplier, content.getContentType());
+          try (InputStream is = supplier.get()) {
+            tx.setBlob(is, headers, asset, HASH_ALGORITHMS, contentType);
+          }
+        }
       }
+      tx.commit();
     }
   }
 
