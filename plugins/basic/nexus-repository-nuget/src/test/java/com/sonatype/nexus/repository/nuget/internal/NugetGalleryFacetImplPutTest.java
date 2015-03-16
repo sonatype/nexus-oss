@@ -123,7 +123,6 @@ public class NugetGalleryFacetImplPutTest
 
     assertThat(((Date) storedMap.get(P_CREATED)).getTime(), is(clock.millis()));
     assertThat(((Date) storedMap.get(P_PUBLISHED)).getTime(), is(clock.millis()));
-    assertThat(((Date) storedMap.get(P_LAST_UPDATED)).getTime(), is(clock.millis()));
     assertThat((int) storedMap.get(P_DOWNLOAD_COUNT), is(0));
     assertThat((int) storedMap.get(P_VERSION_DOWNLOAD_COUNT), is(0));
   }
@@ -146,7 +145,6 @@ public class NugetGalleryFacetImplPutTest
 
     verify(storedAttributes).set(eq(P_CREATED), eq(clock.dateTime().toDate()));
     verify(storedAttributes).set(eq(P_PUBLISHED), eq(clock.dateTime().toDate()));
-    verify(storedAttributes).set(eq(P_LAST_UPDATED), eq(clock.dateTime().toDate()));
     verify(storedAttributes).set(eq(P_DOWNLOAD_COUNT), eq(20));
     verify(storedAttributes).set(eq(P_VERSION_DOWNLOAD_COUNT), eq(12));
   }

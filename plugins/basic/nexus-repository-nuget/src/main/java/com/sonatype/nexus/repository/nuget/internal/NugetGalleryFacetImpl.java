@@ -571,7 +571,6 @@ public class NugetGalleryFacetImpl
       storedMetadata.set(P_CREATED, ODataUtils.toDate(incomingMetadata.get(CREATED)));
       storedMetadata.set(P_PUBLISHED, ODataUtils.toDate(incomingMetadata.get(PUBLISHED)));
     }
-    storedMetadata.set(P_LAST_UPDATED, now);
 
     // Populate keywords for case-insensitive search
     Joiner joiner = Joiner.on(" ").skipNulls();
