@@ -12,18 +12,18 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 /**
- * Component responsible for parsing request paths into {@link ArtifactPath}.
+ * Component responsible for parsing request paths into {@link MavenPath}.
  *
  * @since 3.0
  */
-public interface ArtifactPathParser
+public interface MavenPathParser
 {
   /**
-   * Parses path into {@link ArtifactPath} if possible, otherwise returns {@code null}.
+   * Parses path into {@link MavenPath}.
    */
-  @Nullable
-  ArtifactPath parsePath(String path);
+  @Nonnull
+  MavenPath parsePath(String path);
 }

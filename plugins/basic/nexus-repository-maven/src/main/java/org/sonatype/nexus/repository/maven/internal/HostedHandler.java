@@ -12,15 +12,17 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
-import java.io.IOException;
 import java.util.Collections;
 
 import javax.annotation.Nonnull;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpResponses;
+import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
@@ -35,30 +37,30 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 import static org.sonatype.nexus.repository.maven.internal.MavenPayload.ok;
 
 /**
- * Maven hosted handler base.
+ * Maven hosted handler.
  *
  * @since 3.0
  */
-public abstract class HostedHandlerSupport<C extends Path>
+@Singleton
+@Named
+public class HostedHandler
     extends ComponentSupport
     implements Handler
 {
-  protected Clock clock = new Clock();
-
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
-    final C path;
-    try {
-      path = getPath(context);
-    }
-    catch (IllegalArgumentException e) {
-      return HttpResponses.badRequest(e.getMessage());
+    final MavenPath path = context.getAttributes().require(MavenPath.class);
+    final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
+    final VersionPolicy versionPolicy = mavenFacet.getVersionPolicy();
+    if (path.getCoordinates() != null && !allowsArtifactRepositoryPath(versionPolicy, path.getCoordinates())) {
+      return HttpResponses.badRequest("Repository version policy: " + versionPolicy + " does not allow version: " +
+          path.getCoordinates().getVersion());
     }
     final String action = context.getRequest().getAction();
     switch (action) {
       case GET: {
-        final MavenPayload content = get(context, path);
+        final MavenPayload content = mavenFacet.get(path);
         if (content == null) {
           return HttpResponses.notFound(path.getPath());
         }
@@ -67,14 +69,14 @@ public abstract class HostedHandlerSupport<C extends Path>
 
       case PUT: {
         try {
-          final DateTime now = clock.dateTime();
+          final DateTime now = DateTime.now();
           final MavenPayload mavenPayload = new MavenPayload(
               context.getRequest().getPayload(),
               now,
               now,
               Collections.<HashAlgorithm, HashCode>emptyMap()
           );
-          put(context, path, mavenPayload);
+          mavenFacet.put(path, mavenPayload);
           return HttpResponses.created();
         }
         catch (InvalidContentException e) {
@@ -83,7 +85,7 @@ public abstract class HostedHandlerSupport<C extends Path>
       }
 
       case DELETE: {
-        final boolean deleted = delete(context, path);
+        final boolean deleted = mavenFacet.delete(path);
         if (!deleted) {
           return HttpResponses.notFound(path.getPath());
         }
@@ -95,12 +97,13 @@ public abstract class HostedHandlerSupport<C extends Path>
     }
   }
 
-  protected abstract C getPath(final Context context) throws IllegalArgumentException;
-
-  protected abstract MavenPayload get(final Context context, final C path) throws IOException;
-
-  protected abstract void put(final Context context, final C path, final MavenPayload payload)
-      throws IOException, InvalidContentException;
-
-  protected abstract boolean delete(final Context context, final C path) throws IOException;
+  private boolean allowsArtifactRepositoryPath(final VersionPolicy versionPolicy, final Coordinates coordinates) {
+    if (versionPolicy == VersionPolicy.SNAPSHOT) {
+      return coordinates.isSnapshot();
+    }
+    if (versionPolicy == VersionPolicy.RELEASE) {
+      return !coordinates.isSnapshot();
+    }
+    return true;
+  }
 }
