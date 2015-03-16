@@ -109,7 +109,7 @@ public class NugetProxyGalleryFacet
       remoteQuery.put("$top", "" + TWO_PAGES);
     }
 
-    final int remoteCount = passQueryToRemoteRepo(nugetQuery(operation, query), new FeedLoader(fetcher, this));
+    final int remoteCount = passQueryToRemoteRepo(nugetQuery(operation, remoteQuery), new FeedLoader(fetcher, this));
 
     final String feedXml = super.feed(base, operation, query);
 

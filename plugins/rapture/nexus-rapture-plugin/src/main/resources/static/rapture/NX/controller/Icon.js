@@ -100,8 +100,6 @@ Ext.define('NX.controller.Icon', {
     });
 
     // create the style sheet
-    // NOTE: This has issues on IE 11, forced compat via X-UA-Compatible meta tag
-    // NOTE: ... but may be better off rendering this server side?
     me.stylesheet = Ext.util.CSS.createStyleSheet(styles.join(' '), 'nx-icons');
 
     //<if debug>
