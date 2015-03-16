@@ -29,7 +29,7 @@ import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.TaskInterruptedException;
 import org.sonatype.nexus.scheduling.events.TaskEventCanceled;
-import org.sonatype.nexus.web.internal.BaseUrlDetector;
+import org.sonatype.nexus.web.BaseUrlDetector;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Predicate;

@@ -24,8 +24,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.sonatype.nexus.web.BaseUrlDetector;
 import org.sonatype.nexus.web.BaseUrlHolder;
-import org.sonatype.nexus.web.internal.BaseUrlDetector;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

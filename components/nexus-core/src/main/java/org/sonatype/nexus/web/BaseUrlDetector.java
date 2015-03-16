@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.web.internal;
+package org.sonatype.nexus.web;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -21,7 +21,6 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.configuration.GlobalRestApiSettings;
-import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
