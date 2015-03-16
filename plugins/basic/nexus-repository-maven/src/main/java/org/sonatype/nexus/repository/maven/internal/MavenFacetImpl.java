@@ -259,7 +259,23 @@ public class MavenFacetImpl
       // TODO: if subordinate asset (sha1/md5), should we link it somehow to main asset?
     }
 
-    storeAssetBlob(tx, asset, path, content);
+    // TODO: Figure out created-by header
+    final ImmutableMap<String, String> headers = ImmutableMap.of(
+        BlobStore.BLOB_NAME_HEADER, path.getPath(),
+        BlobStore.CREATED_BY_HEADER, "unknown"
+    );
+
+    try (InputStream inputStream = content.openInputStream()) {
+      try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
+        final String contentType = determineContentType(path, supplier, content.getContentType());
+        try (InputStream is = supplier.get()) {
+          tx.setBlob(is, headers, asset, MavenPayload.HASH_ALGORITHMS, contentType);
+        }
+      }
+    }
+    final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
+    assetAttributes.set(P_LAST_MODIFIED, content.getLastModified().toDate());
+    assetAttributes.set(P_LAST_VERIFIED, content.getLastVerified().toDate());
 
     if (path.isHash()) {
       verifyAssetChecksum(tx, path, asset);
@@ -269,18 +285,20 @@ public class MavenFacetImpl
         for (HashType hashType : HashType.values()) {
           final HashCode hashCode = content.getHashCode(hashType.getHashAlgorithm());
           if (hashCode == null) {
-            continue;
+            deleteTx(tx, path.hash(hashType));
           }
-          putTx(
-              tx,
-              path.hash(hashType),
-              new MavenPayload(
-                  new StringPayload(hashCode.toString(), "text/plain"),
-                  content.getLastModified(),
-                  content.getLastVerified(),
-                  Collections.<HashAlgorithm, HashCode>emptyMap()
-              )
-          );
+          else {
+            putTx(
+                tx,
+                path.hash(hashType),
+                new MavenPayload(
+                    new StringPayload(hashCode.toString(), "text/plain"),
+                    content.getLastModified(),
+                    content.getLastVerified(),
+                    Collections.<HashAlgorithm, HashCode>emptyMap()
+                )
+            );
+          }
         }
       }
     }
@@ -289,31 +307,42 @@ public class MavenFacetImpl
   @Override
   public boolean delete(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex component;
-      final OrientVertex asset;
-      if (path.getCoordinates() != null) {
-        component = findComponent(tx, path.getCoordinates(), tx.getBucket());
-        if (component == null) {
-          return false;
-        }
-        asset = selectComponentAsset(tx, component, path);
+      try {
+        boolean result = deleteTx(tx, path);
+        tx.commit();
+        return result;
       }
-      else {
-        component = null;
-        asset = findAsset(tx, path, tx.getBucket());
+      catch (IOException | InvalidContentException e) {
+        tx.rollback();
+        throw e;
       }
-      if (asset == null) {
+    }
+  }
+
+  private boolean deleteTx(final StorageTx tx, final MavenPath path) throws IOException {
+    final OrientVertex component;
+    final OrientVertex asset;
+    if (path.getCoordinates() != null) {
+      component = findComponent(tx, path.getCoordinates(), tx.getBucket());
+      if (component == null) {
         return false;
       }
-      final boolean lastAsset = component != null && getComponentAssets(component).size() == 1;
-      tx.deleteBlob(getBlobRef(path, asset));
-      tx.deleteVertex(asset);
-      if (lastAsset) {
-        tx.deleteVertex(component);
-      }
-      tx.commit();
-      return true;
+      asset = selectComponentAsset(tx, component, path);
     }
+    else {
+      component = null;
+      asset = findAsset(tx, path, tx.getBucket());
+    }
+    if (asset == null) {
+      return false;
+    }
+    final boolean lastAsset = component != null && getComponentAssets(component).size() == 1;
+    tx.deleteBlob(getBlobRef(path, asset));
+    tx.deleteVertex(asset);
+    if (lastAsset) {
+      tx.deleteVertex(component);
+    }
+    return true;
   }
 
   @Override
@@ -337,28 +366,6 @@ public class MavenFacetImpl
       tx.commit();
       return true;
     }
-  }
-
-  private void storeAssetBlob(final StorageTx tx,
-                              final OrientVertex asset,
-                              final MavenPath mavenPath,
-                              final MavenPayload payload) throws IOException
-  {
-    // TODO: Figure out created-by header
-    final ImmutableMap<String, String> headers = ImmutableMap.of(
-        BlobStore.BLOB_NAME_HEADER, mavenPath.getPath(),
-        BlobStore.CREATED_BY_HEADER, "unknown"
-    );
-
-    try (InputStream inputStream = payload.openInputStream()) {
-      try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
-        final String contentType = determineContentType(mavenPath, supplier, payload.getContentType());
-        try (InputStream is = supplier.get()) {
-          tx.setBlob(is, headers, asset, MavenPayload.HASH_ALGORITHMS, contentType);
-        }
-      }
-    }
-    getFormatAttributes(tx, asset).set(P_LAST_MODIFIED, payload.getLastModified().toDate());
   }
 
   /**
