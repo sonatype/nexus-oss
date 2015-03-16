@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,7 +36,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.hook.ODocumentHookAbstract;
-import com.orientechnologies.orient.core.hook.ORecordHook;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Parameter;
@@ -164,7 +165,7 @@ public class StorageFacetImpl
 
   private void initBucket() {
     // get or create the bucket for the repository and set bucketId for fast lookup later
-    try (GraphTx graphTx = openGraphTx()) {
+    try (GraphTx graphTx = openGraphTx(false)) {
       String repositoryName = getRepository().getName();
       Vertex bucket = Iterables.getFirst(graphTx.getVertices(P_REPOSITORY_NAME, repositoryName), null);
       if (bucket == null) {
@@ -181,7 +182,7 @@ public class StorageFacetImpl
     // delete all assets, blobs, components, and finally, the bucket.
     // TODO: This could take a while for large repos.
     //       Hide the bucket right away, but figure out a way to do the deletions asynchronously.
-    try (StorageTx tx = openStorageTx()) {
+    try (StorageTx tx = openStorageTx(false)) {
       OrientVertex bucket = tx.getBucket();
       deleteAll(tx, tx.browseAssets(bucket), new Predicate<OrientVertex>()
       {
@@ -220,69 +221,94 @@ public class StorageFacetImpl
   @Override
   @Guarded(by = STARTED)
   public StorageTx openTx() {
-    return openStorageTx();
+    return openStorageTx(true);
   }
 
-  private StorageTx openStorageTx() {
+  private StorageTx openStorageTx(boolean withHooks) {
     BlobStore blobStore = blobStoreManager.get(blobStoreName);
-    return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(), bucketId);
+    return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(withHooks), bucketId);
   }
 
-  private GraphTx openGraphTx() {
+  private GraphTx openGraphTx(boolean withHooks) {
     ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire();
-    try {
-      return new IndexHookedGraphTx(db, getRepository().facet(SearchFacet.class));
+    GraphTx graphTx = new GraphTx(db);
+
+    if (withHooks) {
+      graphTx.registerHook(new LastUpdatedHook());
+      try {
+        SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
+        graphTx.registerHook(new IndexingHook(graphTx, searchFacet));
+      }
+      catch (MissingFacetException e) {
+        // no search facet, no indexing
+      }
     }
-    catch (MissingFacetException e) {
-      // no search facet, no indexing
-      return new GraphTx(db);
-    }
+
+    return graphTx;
   }
 
-  private class IndexHookedGraphTx
-      extends GraphTx
+  private class LastUpdatedHook
+      extends ODocumentHookAbstract
   {
-
-    private final ORecordHook hook;
-
-    public IndexHookedGraphTx(final ODatabaseDocumentTx db, final SearchFacet searchFacet) {
-      super(db);
-      database.registerHook(hook = new ODocumentHookAbstract()
-      {
-        {
-          setIncludeClasses(V_COMPONENT);
-        }
-
-        @Override
-        public DISTRIBUTED_EXECUTION_MODE getDistributedExecutionMode() {
-          return DISTRIBUTED_EXECUTION_MODE.TARGET_NODE;
-        }
-
-        @Override
-        public void onRecordAfterCreate(final ODocument doc) {
-          // TODO should indexing failures affect storage? (catch and log?)
-          if (doc.getIdentity().isPersistent()) {
-            searchFacet.put(componentMetadataFactory.from(new OrientVertex(IndexHookedGraphTx.this, doc)));
-          }
-        }
-
-        @Override
-        public void onRecordAfterUpdate(final ODocument doc) {
-          onRecordAfterCreate(doc);
-        }
-
-        @Override
-        public void onRecordAfterDelete(final ODocument doc) {
-          // TODO should indexing failures affect storage? (catch and log?)
-          searchFacet.delete(new OrientVertex(IndexHookedGraphTx.this, doc).getId().toString());
-        }
-      });
+    public LastUpdatedHook() {
+      setIncludeClasses(V_COMPONENT, V_ASSET);
     }
 
     @Override
-    public void close() {
-      database.unregisterHook(hook);
-      super.close();
+    public DISTRIBUTED_EXECUTION_MODE getDistributedExecutionMode() {
+      return DISTRIBUTED_EXECUTION_MODE.TARGET_NODE;
+    }
+
+    public RESULT onRecordBeforeCreate(final ODocument doc) {
+      setLastUpdatedToNow(doc);
+      return RESULT.RECORD_CHANGED;
+    }
+
+    public RESULT onRecordBeforeUpdate(final ODocument doc) {
+      setLastUpdatedToNow(doc);
+      return RESULT.RECORD_CHANGED;
+    }
+
+    private void setLastUpdatedToNow(ODocument doc) {
+      doc.field(P_LAST_UPDATED, new Date());
+    }
+  }
+
+  private class IndexingHook
+      extends ODocumentHookAbstract
+  {
+    private final GraphTx graphTx;
+
+    private final SearchFacet searchFacet;
+
+    public IndexingHook(final GraphTx graphTx, final SearchFacet searchFacet) {
+      this.graphTx = graphTx;
+      this.searchFacet = searchFacet;
+      setIncludeClasses(V_COMPONENT);
+    }
+
+    @Override
+    public DISTRIBUTED_EXECUTION_MODE getDistributedExecutionMode() {
+      return DISTRIBUTED_EXECUTION_MODE.TARGET_NODE;
+    }
+
+    @Override
+    public void onRecordAfterCreate(final ODocument doc) {
+      // TODO should indexing failures affect storage? (catch and log?)
+      if (doc.getIdentity().isPersistent()) {
+        searchFacet.put(componentMetadataFactory.from(new OrientVertex(graphTx, doc)));
+      }
+    }
+
+    @Override
+    public void onRecordAfterUpdate(final ODocument doc) {
+      onRecordAfterCreate(doc);
+    }
+
+    @Override
+    public void onRecordAfterDelete(final ODocument doc) {
+      // TODO should indexing failures affect storage? (catch and log?)
+      searchFacet.delete(new OrientVertex(graphTx, doc).getId().toString());
     }
   }
 }
