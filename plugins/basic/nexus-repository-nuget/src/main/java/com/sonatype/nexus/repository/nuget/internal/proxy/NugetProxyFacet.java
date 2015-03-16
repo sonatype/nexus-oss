@@ -53,7 +53,7 @@ public class NugetProxyFacet
   }
 
   @Override
-  protected Payload fetch(final Context context) throws IOException {
+  protected Payload fetch(final Context context, final Payload stalePayload) throws IOException {
     // Here we override the default fetch behavior because we need to first fetch
     // the remote entry and cache it, then from that, determine the remote URL of
     // the actual package content, and get it.
@@ -80,7 +80,7 @@ public class NugetProxyFacet
     }
 
     // Request the remote package content and return it as a payload
-    return fetch(contentLocation.toString(), context);
+    return fetch(contentLocation.toString(), context, stalePayload);
   }
 
   @Override
@@ -93,7 +93,7 @@ public class NugetProxyFacet
   }
 
   @Override
-  protected DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException {
+  protected DateTime getCachedPayloadLastUpdatedDate(final Context context, final Payload payload) throws IOException {
     String[] coords = coords(context);
     return gallery().getLastUpdatedDate(coords[0], coords[1]);
   }

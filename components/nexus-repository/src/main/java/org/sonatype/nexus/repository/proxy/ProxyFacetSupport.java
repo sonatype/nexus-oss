@@ -51,11 +51,11 @@ public abstract class ProxyFacetSupport
 
   private URI remoteUrl;
 
-  private int artifactMaxAgeMinutes;
-
-  private HttpClientFacet httpClient;
-
   private boolean remoteUrlChanged;
+
+  protected int artifactMaxAgeMinutes;
+
+  protected HttpClientFacet httpClient;
 
   @Override
   protected void doConfigure() throws Exception {
@@ -102,6 +102,7 @@ public abstract class ProxyFacetSupport
     remoteUrl = null;
   }
 
+  @Override
   public URI getRemoteUrl() {
     return remoteUrl;
   }
@@ -112,9 +113,9 @@ public abstract class ProxyFacetSupport
 
     Payload content = getCachedPayload(context);
 
-    if (content == null || isStale(context)) {
+    if (content == null || isStale(context, content)) {
       try {
-        final Payload remote = fetch(context);
+        final Payload remote = fetch(context, content);
         if (remote != null) {
 
           // TODO: Introduce content validation.. perhaps content's type not matching path's implied type.
@@ -145,14 +146,14 @@ public abstract class ProxyFacetSupport
       throws IOException, InvalidContentException;
 
   @Nullable
-  protected Payload fetch(final Context context) throws IOException {
-    return fetch(getUrl(context), context);
+  protected Payload fetch(final Context context, final Payload payload) throws IOException {
+    return fetch(getUrl(context), context, payload);
   }
 
-  protected Payload fetch(String url, Context context) throws IOException {
+  protected Payload fetch(String url, Context context, Payload stale) throws IOException {
     HttpClient client = httpClient.getHttpClient();
 
-    HttpGet request = new HttpGet(remoteUrl.resolve(url));
+    HttpGet request = new HttpGet(getRemoteUrl().resolve(url));
     log.debug("Fetching: {}", request);
 
     HttpResponse response = client.execute(request);
@@ -178,7 +179,8 @@ public abstract class ProxyFacetSupport
    * For whatever component/asset is implied by the Context, return the date it was last deemed up to date, or {@code
    * null} if it isn't present.
    */
-  protected abstract DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException;
+  protected abstract DateTime getCachedPayloadLastUpdatedDate(final Context context, final Payload payload)
+      throws IOException;
 
   /**
    * For whatever component/asset
@@ -190,13 +192,13 @@ public abstract class ProxyFacetSupport
    */
   protected abstract String getUrl(final @Nonnull Context context);
 
-  private boolean isStale(final Context context) throws IOException {
+  private boolean isStale(final Context context, final Payload payload) throws IOException {
     if (artifactMaxAgeMinutes < 0) {
       log.trace("Artifact max age checking disabled.");
       return false;
     }
 
-    final DateTime lastUpdated = getCachedPayloadLastUpdatedDate(context);
+    final DateTime lastUpdated = getCachedPayloadLastUpdatedDate(context, payload);
 
     if (lastUpdated == null) {
       log.debug("Artifact last modified date unknown.");

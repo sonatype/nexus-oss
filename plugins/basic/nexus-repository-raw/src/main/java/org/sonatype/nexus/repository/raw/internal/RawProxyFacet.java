@@ -49,7 +49,7 @@ public class RawProxyFacet
   }
 
   @Override
-  protected DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException {
+  protected DateTime getCachedPayloadLastUpdatedDate(final Context context, final Payload payload) throws IOException {
     final RawContent rawContent = storage().get(componentPath(context));
     return rawContent != null ? rawContent.getLastUpdated() : null;
   }

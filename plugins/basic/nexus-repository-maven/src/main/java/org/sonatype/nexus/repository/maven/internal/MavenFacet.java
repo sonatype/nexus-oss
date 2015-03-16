@@ -22,6 +22,8 @@ import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 
+import org.joda.time.DateTime;
+
 /**
  * Maven facet, present on all Maven repositories.
  *
@@ -43,4 +45,6 @@ public interface MavenFacet
   void put(MavenPath path, MavenPayload content) throws IOException, InvalidContentException;
 
   boolean delete(MavenPath path) throws IOException;
+
+  boolean verify(MavenPath path, DateTime dateTime) throws IOException;
 }

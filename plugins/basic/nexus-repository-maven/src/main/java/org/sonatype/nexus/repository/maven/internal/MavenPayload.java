@@ -52,20 +52,20 @@ public class MavenPayload
 
   private final Payload payload;
 
-  private final DateTime lastUpdated;
-
   private final DateTime lastModified;
+
+  private final DateTime lastVerified;
 
   private final Map<HashAlgorithm, HashCode> hashCodes;
 
   public MavenPayload(final Payload payload,
-                      final DateTime lastUpdated,
                       final DateTime lastModified,
+                      final DateTime lastVerified,
                       final Map<HashAlgorithm, HashCode> hashCodes)
   {
     this.payload = checkNotNull(payload);
     this.lastModified = checkNotNull(lastModified);
-    this.lastUpdated = checkNotNull(lastUpdated);
+    this.lastVerified = checkNotNull(lastVerified);
     this.hashCodes = checkNotNull(hashCodes);
   }
 
@@ -85,21 +85,20 @@ public class MavenPayload
   }
 
   /**
-   * If this instance is read from {@link MavenFacet} then the returned value will represent when the underlying
-   * structures (internals of storage) did change last time. This is NOT like a file last modified timestamp, this is
-   * only for internal use.
-   */
-  @Nonnull
-  public DateTime getLastUpdated() {
-    return lastUpdated;
-  }
-
-  /**
-   * The file "last modified" timestamp alike value, shows when did the underlying content last changed.
+   * Returns time when underlying content was last changed (something like "file timestamp").
    */
   @Nonnull
   public DateTime getLastModified() {
     return lastModified;
+  }
+
+  /**
+   * Returns date equal or greater to the {@link #getLastModified()}, and means the time when system marked this
+   * payload as "checked for staleness", as verified is up to date. Mainly to be used in Proxy use cases.
+   */
+  @Nonnull
+  public DateTime getLastVerified() {
+    return lastVerified;
   }
 
   /**
