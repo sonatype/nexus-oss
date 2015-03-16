@@ -12,14 +12,13 @@
  */
 package org.sonatype.nexus.ldap;
 
-import java.util.LinkedHashMap;
+import java.util.Collection;
+import java.util.Collections;
 
-import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.nexus.ldap.internal.LdapITSupport;
 import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.nexus.security.user.UserNotFoundException;
 
-import com.google.common.collect.Maps;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
@@ -28,8 +27,8 @@ public class LdapUserManagerNotConfiguredIT
     extends LdapITSupport
 {
   @Override
-  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
-    return Maps.newLinkedHashMap();
+  protected Collection<String> getLdapServerNames() {
+    return Collections.emptyList();
   }
 
   @Test

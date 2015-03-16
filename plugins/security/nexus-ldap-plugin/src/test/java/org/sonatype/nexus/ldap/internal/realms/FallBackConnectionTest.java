@@ -12,10 +12,11 @@
  */
 package org.sonatype.nexus.ldap.internal.realms;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.nexus.ldap.internal.MockLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.FailoverLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.LdapConnector;
@@ -42,9 +43,8 @@ public class FallBackConnectionTest
   private MockLdapConnector backupConnector = null;
 
   @Override
-  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
-    // no real servers used in this test
-    return Maps.newLinkedHashMap();
+  protected Collection<String> getLdapServerNames() {
+    return Collections.emptyList();
   }
 
   protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
