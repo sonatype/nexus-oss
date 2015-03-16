@@ -20,7 +20,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.configuration.GlobalRestApiSettings;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -32,7 +32,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Detect application base-url.
  *
  * @see BaseUrlHolder
- * @see BaseUrlHolderFilter
  * @since 2.11.3
  */
 @Named
