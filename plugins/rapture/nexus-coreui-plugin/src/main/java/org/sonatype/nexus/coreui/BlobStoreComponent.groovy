@@ -19,9 +19,11 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
 
+import org.sonatype.nexus.blobstore.api.BlobStorageFacet
 import org.sonatype.nexus.blobstore.api.BlobStore
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
 import org.sonatype.nexus.blobstore.api.BlobStoreManager
+import org.sonatype.nexus.blobstore.api.Recipe
 import org.sonatype.nexus.common.validation.Create
 import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponentSupport
@@ -46,6 +48,9 @@ class BlobStoreComponent
   BlobStoreManager blobStoreManager
 
   @Inject
+  Map<String, Recipe> recipes
+
+  @Inject
   AttributeConverter attributeConverter
 
   @DirectMethod
@@ -55,7 +60,9 @@ class BlobStoreComponent
 
   @DirectMethod
   List<ReferenceXO> readTypes() {
-    [new ReferenceXO(id: 'file', name: 'FileBlobStore')]
+    recipes.collect { String name, Recipe recipe ->
+      new ReferenceXO(id: name, name: recipe.type)
+    }
   }
 
   @DirectMethod
@@ -78,9 +85,9 @@ class BlobStoreComponent
     return new BlobStoreXO(name: blobStore.blobStoreConfiguration.name,
         type: blobStore.blobStoreConfiguration.recipeName,
         attributes: attributeConverter.asAttributes(blobStore.blobStoreConfiguration.attributes),
-        blobCount: blobStore.metrics.blobCount,
-        totalSize: blobStore.metrics.totalSize,
-        availableSpace: blobStore.metrics.availableSpace
+        blobCount: blobStore.facet(BlobStorageFacet).metrics.blobCount,
+        totalSize: blobStore.facet(BlobStorageFacet).metrics.totalSize,
+        availableSpace: blobStore.facet(BlobStorageFacet).metrics.availableSpace
     )
   }
 }

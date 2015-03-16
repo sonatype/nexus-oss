@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
+import org.sonatype.nexus.blobstore.api.BlobStorageFacet;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -47,15 +48,19 @@ class BlobTx
   }
 
   public BlobRef create(InputStream inputStream, Map<String, String> headers) {
-    Blob blob = blobStore.create(inputStream, headers);
+    Blob blob = storageFacet().create(inputStream, headers);
     BlobRef blobRef = new BlobRef("NODE", "STORE", blob.getId().asUniqueString());
     newlyCreatedBlobs.add(blobRef);
     return blobRef;
   }
 
+  private BlobStorageFacet storageFacet() {
+    return blobStore.facet(BlobStorageFacet.class);
+  }
+
   @Nullable
   public Blob get(BlobRef blobRef) {
-    return blobStore.get(blobRef.getBlobId());
+    return storageFacet().get(blobRef.getBlobId());
   }
 
   public void delete(BlobRef blobRef) {
@@ -75,7 +80,7 @@ class BlobTx
   private void doDeletions(Set<BlobRef> blobRefs, String failureMessage) {
     for (BlobRef blobRef : blobRefs) {
       try {
-        blobStore.delete(blobRef.getBlobId());
+        storageFacet().delete(blobRef.getBlobId());
       }
       catch (Throwable t) {
         log.warn(failureMessage, t, blobRef);

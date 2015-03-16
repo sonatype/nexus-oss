@@ -32,7 +32,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
-import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.file.internal.MetricsInputStream;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -50,7 +49,7 @@ import static org.sonatype.nexus.blobstore.api.BlobStore.BLOB_NAME_HEADER;
 import static org.sonatype.nexus.blobstore.api.BlobStore.CREATED_BY_HEADER;
 
 /**
- * {@link FileBlobStore} concurrency tests.
+ * {@link FileBlobStorageFacet} concurrency tests.
  */
 public class FileBlobStoreConcurrencyIT
     extends TestSupport
@@ -64,7 +63,7 @@ public class FileBlobStoreConcurrencyIT
 
   private BlobMetadataStore metadataStore;
 
-  private FileBlobStore underTest;
+  private FileBlobStorageFacet underTest;
 
   @Before
   public void setUp() throws Exception {
@@ -73,8 +72,7 @@ public class FileBlobStoreConcurrencyIT
     Path metadata = root.resolve("metadata");
 
     this.metadataStore = MapdbBlobMetadataStore.create(metadata.toFile());
-    this.underTest = new FileBlobStore(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(), metadataStore,
-        new BlobStoreConfiguration());
+    this.underTest = new FileBlobStorageFacet(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(), metadataStore);
     underTest.start();
   }
 
