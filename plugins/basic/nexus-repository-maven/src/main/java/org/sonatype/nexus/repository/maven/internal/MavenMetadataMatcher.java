@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
+import org.sonatype.nexus.repository.maven.internal.MavenPath.Kind;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -27,8 +28,6 @@ public class MavenMetadataMatcher
     extends ComponentSupport
     implements Matcher
 {
-  private static final String MAVEN_METADATA_FILENAME = "maven-metadata.xml";
-
   private final MavenPathParser mavenPathParser;
 
   public MavenMetadataMatcher(final MavenPathParser mavenPathParser) {
@@ -39,7 +38,7 @@ public class MavenMetadataMatcher
   public boolean matches(final Context context) {
     final String path = context.getRequest().getPath();
     final MavenPath mavenPath = mavenPathParser.parsePath(path);
-    if (mavenPath.main().getFileName().equals(MAVEN_METADATA_FILENAME)) {
+    if (Kind.METADATA == mavenPath.getKind()) {
       context.getAttributes().set(MavenPath.class, mavenPath);
       return true;
     }

@@ -30,6 +30,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Immutable
 public class MavenPath
 {
+  private static final String MAVEN_METADATA_FILENAME = "maven-metadata.xml";
+
+  public static enum Kind
+  {
+    ARTIFACT,
+
+    METADATA,
+
+    OTHER
+  }
+
   public static enum HashType
   {
     SHA1("sha1", HashAlgorithm.SHA1),
@@ -167,6 +178,19 @@ public class MavenPath
     }
     this.hashType = ht;
     this.coordinates = coordinates;
+  }
+
+  @Nonnull
+  public Kind getKind() {
+    if (getCoordinates() != null) {
+      return Kind.ARTIFACT;
+    }
+    else if (main().getFileName().equals(MAVEN_METADATA_FILENAME)) {
+      return Kind.METADATA;
+    }
+    else {
+      return Kind.OTHER;
+    }
   }
 
   @Nonnull

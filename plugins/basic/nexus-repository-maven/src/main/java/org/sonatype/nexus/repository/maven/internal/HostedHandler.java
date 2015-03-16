@@ -12,29 +12,23 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
-import java.util.Collections;
-
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
+import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import com.google.common.hash.HashCode;
-import org.joda.time.DateTime;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
-import static org.sonatype.nexus.repository.maven.internal.MavenPayload.ok;
 
 /**
  * Maven hosted handler.
@@ -60,23 +54,16 @@ public class HostedHandler
     final String action = context.getRequest().getAction();
     switch (action) {
       case GET: {
-        final MavenPayload content = mavenFacet.get(path);
+        final Payload content = mavenFacet.get(path);
         if (content == null) {
           return HttpResponses.notFound(path.getPath());
         }
-        return ok(content);
+        return HttpResponses.ok(content);
       }
 
       case PUT: {
         try {
-          final DateTime now = DateTime.now();
-          final MavenPayload mavenPayload = new MavenPayload(
-              context.getRequest().getPayload(),
-              now,
-              now,
-              Collections.<HashAlgorithm, HashCode>emptyMap()
-          );
-          mavenFacet.put(path, mavenPayload);
+          mavenFacet.put(path, context.getRequest().getPayload());
           return HttpResponses.created();
         }
         catch (InvalidContentException e) {

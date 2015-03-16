@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
+import org.sonatype.nexus.repository.maven.internal.MavenPath.Kind;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -37,7 +38,7 @@ public class MavenArtifactMatcher
   public boolean matches(final Context context) {
     final String path = context.getRequest().getPath();
     final MavenPath mavenPath = mavenPathParser.parsePath(path);
-    if (mavenPath.getCoordinates() != null) {
+    if (Kind.ARTIFACT == mavenPath.getKind()) {
       context.getAttributes().set(MavenPath.class, mavenPath);
       return true;
     }

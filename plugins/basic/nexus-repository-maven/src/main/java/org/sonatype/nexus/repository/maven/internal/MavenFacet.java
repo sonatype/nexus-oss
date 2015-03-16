@@ -21,6 +21,7 @@ import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
+import org.sonatype.nexus.repository.view.Payload;
 
 /**
  * Maven facet, present on all Maven repositories.
@@ -38,9 +39,9 @@ public interface MavenFacet
   ChecksumPolicy getChecksumPolicy();
 
   @Nullable
-  MavenPayload get(MavenPath path) throws IOException;
+  Payload get(MavenPath path) throws IOException;
 
-  void put(MavenPath path, MavenPayload content) throws IOException, InvalidContentException;
+  void put(MavenPath path, Payload content) throws IOException, InvalidContentException;
 
   boolean delete(MavenPath path) throws IOException;
 }
