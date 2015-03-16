@@ -27,8 +27,6 @@
 
     curl -v --user 'admin:admin123' -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/rawhosted1/README.md
     curl -v --user 'admin:admin123' --upload-file ./README.md http://localhost:8081/repository/rawhosted1/no-type-README.md
-    curl -v --user 'admin:admin123' -X GET http://localhost:8081/repository/rawhosted1/
-    curl -v --user 'admin:admin123' -X GET http://localhost:8081/repository/rawhosted1/index.html
     curl -v --user 'admin:admin123' -X GET http://localhost:8081/repository/rawhosted1/README.md
     curl -v --user 'admin:admin123' -X DELETE http://localhost:8081/repository/rawhosted1/README.md
     curl -v --user 'admin:admin123' -X DELETE http://localhost:8081/repository/rawhosted1/no-type-README.md
