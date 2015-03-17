@@ -12,17 +12,21 @@
  */
 package org.sonatype.nexus.internal.blobstore
 
+import javax.inject.Provider
+
+import org.sonatype.nexus.blobstore.api.BlobStore
+import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
+import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore
+import org.sonatype.nexus.common.validation.ValidationResponseException
+import org.sonatype.nexus.configuration.ApplicationDirectories
+import org.sonatype.sisu.litmus.testsupport.TestSupport
+
 import com.google.common.collect.Lists
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.mockito.Mock
-import org.sonatype.nexus.blobstore.api.BlobStore
-import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
-import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore
-import org.sonatype.nexus.configuration.ApplicationDirectories
-import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
@@ -46,13 +50,16 @@ class BlobStoreManagerImplTest
 
   @Mock
   BlobStoreConfigurationStore store
+  
+  @Mock
+  Provider<BlobStore> provider
 
   BlobStoreManagerImpl underTest
 
   @Before
   void setup() {
     when(directories.getWorkDirectory(anyString())).thenReturn(temporaryFolder.root)
-    underTest = spy(new BlobStoreManagerImpl(directories, store))
+    underTest = spy(new BlobStoreManagerImpl(directories, store, [test: provider, File: provider]))
   }
 
   @Test
@@ -65,8 +72,8 @@ class BlobStoreManagerImplTest
   @Test
   void 'Can start with existing configuration'() {
     BlobStore blobStore = mock(BlobStore)
-    doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfiguration))
-    when(store.list()).thenReturn(Lists.newArrayList(createConfig('test', temporaryFolder.root.absolutePath)))
+    when(provider.get()).thenReturn(blobStore)
+    when(store.list()).thenReturn(Lists.newArrayList(createConfig('test')))
 
     underTest.doStart()
 
@@ -76,8 +83,8 @@ class BlobStoreManagerImplTest
   @Test
   void 'Can create a BlobStore'() {
     BlobStore blobStore = mock(BlobStore)
-    doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfiguration))
-    BlobStoreConfiguration configuration = createConfig('test',temporaryFolder.root.absolutePath)
+    when(provider.get()).thenReturn(blobStore)
+    BlobStoreConfiguration configuration = createConfig('test')
     
     BlobStore createdBlobStore = underTest.create(configuration)
 
@@ -90,7 +97,7 @@ class BlobStoreManagerImplTest
 
   @Test
   void 'Can delete an existing BlobStore'() {
-    BlobStoreConfiguration configuration = createConfig('test', temporaryFolder.root.absolutePath)
+    BlobStoreConfiguration configuration = createConfig('test')
     BlobStore blobStore = mock(BlobStore)
     doReturn(blobStore).when(underTest).blobStore('test')
     when(store.list()).thenReturn(Lists.newArrayList(configuration));
@@ -104,7 +111,8 @@ class BlobStoreManagerImplTest
   @Test
   void 'BlobStores will be eagerly created if not already configured'() {
     BlobStore blobStore = mock(BlobStore)
-    doReturn(blobStore).when(underTest).newBlobStore(any(BlobStoreConfiguration))
+    when(provider.get()).thenReturn(blobStore)
+    
     BlobStore autoCreatedBlobStore = underTest.get('test')
     
     verify(blobStore).start()
@@ -112,11 +120,44 @@ class BlobStoreManagerImplTest
     assert blobStore == autoCreatedBlobStore
   }
 
-  private BlobStoreConfiguration createConfig(name = 'foo', path = 'bar') {
+  @Test(expected = ValidationResponseException)
+  void 'Can not have two BlobStores with the same configuration'() {
+    BlobStoreConfiguration configuration = createConfig('test')
+    when(store.list()).thenReturn([configuration])
+    underTest.create(configuration)
+  }
+
+  @Test
+  void 'Can delete an existing BlobStore by name'() {
+    BlobStoreConfiguration configuration = createConfig('test')
+    BlobStore blobStore = mock(BlobStore)
+    doReturn(blobStore).when(underTest).blobStore('test')
+    when(store.list()).thenReturn([configuration])
+    when(blobStore.getBlobStoreConfiguration()).thenReturn(configuration)
+    
+    underTest.delete(configuration.getName())
+    
+    verify(blobStore).stop()
+    verify(store).delete(configuration)
+  }
+
+  @Test
+  void 'All BlobStores are stopped with the manager is stopped'() {
+    BlobStore blobStore = mock(BlobStore)
+    when(provider.get()).thenReturn(blobStore)
+    BlobStoreConfiguration configuration = createConfig('test')
+    underTest.create(configuration)
+    
+    underTest.stop()
+    
+    verify(blobStore).stop()
+  }
+
+  private BlobStoreConfiguration createConfig(name = 'foo', attributes = [file:[path:'baz']]) {
     def entity = new BlobStoreConfiguration(
         name: name,
-        recipeName: 'file',
-        attributes: [file:[path:path]]
+        type: 'test',
+        attributes: attributes
     )
     return entity
   }

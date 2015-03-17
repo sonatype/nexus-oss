@@ -12,15 +12,13 @@
  */
 package org.sonatype.nexus.internal.blobstore;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
@@ -28,9 +26,6 @@ import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.blobstore.file.FileBlobStore;
-import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
-import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
-import org.sonatype.nexus.blobstore.file.VolumeChapterLocationStrategy;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.common.validation.ValidationMessage;
@@ -39,10 +34,8 @@ import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.ApplicationDirectories;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -68,11 +61,16 @@ public class BlobStoreManagerImpl
 
   private final BlobStoreConfigurationStore store;
 
+  private final Map<String, Provider<BlobStore>> blobstorePrototypes;
+
   @Inject
-  public BlobStoreManagerImpl(final ApplicationDirectories directories, final BlobStoreConfigurationStore store) {
+  public BlobStoreManagerImpl(final ApplicationDirectories directories, final BlobStoreConfigurationStore store,
+                              Map<String, Provider<BlobStore>> blobstorePrototypes)
+  {
     checkNotNull(directories);
     this.basedir = directories.getWorkDirectory(BASEDIR).toPath();
     this.store = checkNotNull(store);
+    this.blobstorePrototypes = checkNotNull(blobstorePrototypes);
   }
 
   @Override
@@ -175,8 +173,8 @@ public class BlobStoreManagerImpl
         try {
           BlobStoreConfiguration configuration = new BlobStoreConfiguration();
           configuration.setName(name);
-          configuration.setRecipeName("file");
-          configuration.setAttributes(toPathAttributes(basedir.toAbsolutePath().toString() + '/' + name));
+          configuration.setType(FileBlobStore.TYPE);
+          configuration.setAttributes(FileBlobStore.attributes(basedir.toAbsolutePath().toString() + '/' + name));
           blobStore = create(configuration);
         }
         catch (Exception e) {
@@ -198,21 +196,10 @@ public class BlobStoreManagerImpl
     store.delete(blobStore.getBlobStoreConfiguration());
   }
 
-  @VisibleForTesting
-  BlobStore newBlobStore(final BlobStoreConfiguration blobStoreConfiguration) {
-    Path root = Paths.get(getPath(blobStoreConfiguration.getAttributes()));
-    Path content = root.resolve("content");
-    File metadataFile = root.resolve("metadata").toFile();
-    content.toFile().mkdirs();
-    metadataFile.mkdirs();
-    //TODO - validation that directories exist
-    return new FileBlobStore(
-        content,
-        new VolumeChapterLocationStrategy(),
-        new SimpleFileOperations(),
-        MapdbBlobMetadataStore.create(metadataFile),
-        blobStoreConfiguration
-    );
+  private BlobStore newBlobStore(final BlobStoreConfiguration blobStoreConfiguration) {
+    BlobStore blobStore = blobstorePrototypes.get(blobStoreConfiguration.getType()).get();
+    blobStore.init(blobStoreConfiguration);
+    return blobStore;
   }
 
   @VisibleForTesting
@@ -220,18 +207,6 @@ public class BlobStoreManagerImpl
     BlobStore blobStore = stores.get(name);
     checkState(blobStore != null, "Missing BlobStore: %s", name);
     return blobStore;
-  }
-
-  private String getPath(final Map<String, Map<String, Object>> attributes) {
-    return (String) attributes.get("file").get("path");
-  }
-
-  private Map<String, Map<String, Object>> toPathAttributes(final String path) {
-    Map<String, Map<String, Object>> map = Maps.newHashMap();
-    HashMap<String, Object> attributes = Maps.newHashMap();
-    attributes.put("path", path);
-    map.put("file", attributes);
-    return map;
   }
 
   private void track(final String name, final BlobStore blobStore) {
@@ -245,22 +220,18 @@ public class BlobStoreManagerImpl
   }
 
   /**
-   * Ensure that the path is not already used by another BlobStore
+   * Ensure that the configuration attributes are not already used by another BlobStore
    */
   private void validate(final BlobStoreConfiguration configuration) {
-    final String path = getPath(configuration.getAttributes());
-    boolean duplicatePath = Iterables.any(store.list(), new Predicate<BlobStoreConfiguration>()
-    {
-      @Override
-      public boolean apply(final BlobStoreConfiguration input) {
-        return path.equals(getPath(input.getAttributes()));
+    for (BlobStoreConfiguration blobStoreConfiguration : store.list()) {
+      if (Maps.difference(blobStoreConfiguration.getAttributes(), configuration.getAttributes()).areEqual()) {
+        ValidationResponse validations = new ValidationResponse();
+        validations.addError(
+            new ValidationMessage("attributes",
+                "Specified configuration is already used by another BlobStore: " + blobStoreConfiguration.getName())
+        );
+        throw new ValidationResponseException(validations);
       }
-    });
-    if (duplicatePath) {
-      ValidationResponse validations = new ValidationResponse();
-      validations.addError(
-          new ValidationMessage("attributes", "Specified path is already used by another BlobStore: " + path));
-      throw new ValidationResponseException(validations);
     }
   }
 }

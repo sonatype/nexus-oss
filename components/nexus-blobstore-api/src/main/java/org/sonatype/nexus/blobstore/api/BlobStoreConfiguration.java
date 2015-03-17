@@ -26,7 +26,7 @@ public class BlobStoreConfiguration
 {
   private String name;
   
-  private String recipeName;
+  private String type;
   
   private Map<String, Map<String, Object>> attributes;
   
@@ -38,12 +38,12 @@ public class BlobStoreConfiguration
     this.name = name;
   }
 
-  public String getRecipeName() {
-    return recipeName;
+  public String getType() {
+    return type;
   }
 
-  public void setRecipeName(final String recipeName) {
-    this.recipeName = recipeName;
+  public void setType(final String type) {
+    this.type = type;
   }
 
   public Map<String, Map<String, Object>> getAttributes() {
@@ -58,7 +58,7 @@ public class BlobStoreConfiguration
   public String toString() {
     return getClass().getSimpleName() + "{" +
         "name='" + name + '\'' +
-        ", recipeName='" + recipeName + '\'' +
+        ", type='" + type + '\'' +
         ", attributes=" + attributes +
         '}';
   }

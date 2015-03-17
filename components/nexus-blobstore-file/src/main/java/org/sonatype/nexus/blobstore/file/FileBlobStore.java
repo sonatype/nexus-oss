@@ -12,14 +12,18 @@
  */
 package org.sonatype.nexus.blobstore.file;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
@@ -33,7 +37,10 @@ import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
 import org.sonatype.nexus.common.collect.AutoClosableIterable;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -44,35 +51,44 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@Named(FileBlobStore.TYPE)
 public class FileBlobStore
     extends LifecycleSupport
     implements BlobStore
 {
+  public static final String TYPE = "File";
+
   public static final String BLOB_CONTENT_SUFFIX = ".blob";
 
-  private final Path root;
+  private Path root;
+
+  private BlobMetadataStore metadataStore;
 
   private final LocationStrategy locationStrategy;
 
   private final FileOperations fileOperations;
 
-  private final BlobMetadataStore metadataStore;
-
-  private final BlobStoreConfiguration blobStoreConfiguration;
-
   private volatile BlobStoreListener listener;
 
-  public FileBlobStore(final Path root,
-                       final LocationStrategy locationStrategy,
-                       final FileOperations fileOperations,
-                       final BlobMetadataStore metadataStore,
-                       final BlobStoreConfiguration blobStoreConfiguration)
+  private BlobStoreConfiguration blobStoreConfiguration;
+
+  @Inject
+  public FileBlobStore(final LocationStrategy locationStrategy,
+                              final FileOperations fileOperations)
   {
-    this.root = checkNotNull(root);
     this.locationStrategy = checkNotNull(locationStrategy);
     this.fileOperations = checkNotNull(fileOperations);
-    this.metadataStore = checkNotNull(metadataStore);
-    this.blobStoreConfiguration = checkNotNull(blobStoreConfiguration);
+  }
+
+  @VisibleForTesting
+  public FileBlobStore(final Path root, final LocationStrategy locationStrategy,
+                              final FileOperations fileOperations, final BlobMetadataStore metadataStore, 
+                              final BlobStoreConfiguration configuration)
+  {
+    this(locationStrategy, fileOperations);
+    this.root = root;
+    this.metadataStore = metadataStore;
+    this.blobStoreConfiguration = configuration;
   }
 
   @Override
@@ -271,7 +287,19 @@ public class FileBlobStore
 
   @Override
   public BlobStoreConfiguration getBlobStoreConfiguration() {
-    return blobStoreConfiguration;
+    return this.blobStoreConfiguration;
+  }
+
+  @Override
+  public void init(final BlobStoreConfiguration configuration) {
+    this.blobStoreConfiguration = configuration;
+    Path blobDir = Paths.get(getPath(configuration.getAttributes()));
+    Path content = blobDir.resolve("content");
+    File metadataFile = blobDir.resolve("metadata").toFile();
+    content.toFile().mkdirs();
+    metadataFile.mkdirs();
+    this.root = content;
+    this.metadataStore = MapdbBlobMetadataStore.create(metadataFile);
   }
 
   private void checkExists(final Path path, final BlobId blobId) throws IOException {
@@ -280,6 +308,18 @@ public class FileBlobStore
       // that it exists, and then discover that it doesn't, mid-operation
       throw new BlobStoreException("Blob has been deleted", blobId);
     }
+  }
+
+  private String getPath(final Map<String, Map<String, Object>> attributes) {
+    return (String) attributes.get("file").get("path");
+  }
+
+  public static Map<String, Map<String, Object>> attributes(final String path) {
+    Map<String, Map<String, Object>> map = Maps.newHashMap();
+    HashMap<String, Object> attributes = Maps.newHashMap();
+    attributes.put("path", path);
+    map.put("file", attributes);
+    return map;
   }
 
   class FileBlob
