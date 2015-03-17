@@ -35,6 +35,7 @@ import org.sonatype.nexus.blobstore.api.BlobStoreListener;
 import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
 import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
 import org.sonatype.nexus.common.collect.AutoClosableIterable;
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -74,7 +75,7 @@ public class FileBlobStore
 
   @Inject
   public FileBlobStore(final LocationStrategy locationStrategy,
-                              final FileOperations fileOperations)
+                       final FileOperations fileOperations)
   {
     this.locationStrategy = checkNotNull(locationStrategy);
     this.fileOperations = checkNotNull(fileOperations);
@@ -82,13 +83,13 @@ public class FileBlobStore
 
   @VisibleForTesting
   public FileBlobStore(final Path root, final LocationStrategy locationStrategy,
-                              final FileOperations fileOperations, final BlobMetadataStore metadataStore, 
-                              final BlobStoreConfiguration configuration)
+                       final FileOperations fileOperations, final BlobMetadataStore metadataStore,
+                       final BlobStoreConfiguration configuration)
   {
     this(locationStrategy, fileOperations);
-    this.root = root;
-    this.metadataStore = metadataStore;
-    this.blobStoreConfiguration = configuration;
+    this.root = checkNotNull(root);
+    this.metadataStore = checkNotNull(metadataStore);
+    this.blobStoreConfiguration = checkNotNull(configuration);
   }
 
   @Override
@@ -291,13 +292,13 @@ public class FileBlobStore
   }
 
   @Override
-  public void init(final BlobStoreConfiguration configuration) {
+  public void init(final BlobStoreConfiguration configuration) throws IOException {
     this.blobStoreConfiguration = configuration;
     Path blobDir = Paths.get(getPath(configuration.getAttributes()));
     Path content = blobDir.resolve("content");
     File metadataFile = blobDir.resolve("metadata").toFile();
-    content.toFile().mkdirs();
-    metadataFile.mkdirs();
+    DirSupport.mkdir(content);
+    DirSupport.mkdir(metadataFile);
     this.root = content;
     this.metadataStore = MapdbBlobMetadataStore.create(metadataFile);
   }

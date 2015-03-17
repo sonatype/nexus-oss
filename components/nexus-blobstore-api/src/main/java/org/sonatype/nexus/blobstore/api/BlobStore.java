@@ -106,5 +106,5 @@ public interface BlobStore
   /**
    * Initialize the BlobStore.
    */
-  void init(BlobStoreConfiguration configuration);
+  void init(BlobStoreConfiguration configuration) throws Exception;
 }

@@ -198,7 +198,16 @@ public class BlobStoreManagerImpl
 
   private BlobStore newBlobStore(final BlobStoreConfiguration blobStoreConfiguration) {
     BlobStore blobStore = blobstorePrototypes.get(blobStoreConfiguration.getType()).get();
-    blobStore.init(blobStoreConfiguration);
+    try {
+      blobStore.init(blobStoreConfiguration);
+    }
+    catch (Exception e) {
+      ValidationResponse validations = new ValidationResponse();
+      validations.addError(
+          new ValidationMessage("attributes",
+              "Unable to configure BlobStore with given attributes: " + e.getMessage()));
+      throw new ValidationResponseException(validations);  
+    }
     return blobStore;
   }
 
