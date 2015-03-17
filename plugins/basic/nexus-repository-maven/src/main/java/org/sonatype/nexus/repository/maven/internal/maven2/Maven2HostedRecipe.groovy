@@ -85,7 +85,7 @@ class Maven2HostedRecipe
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
     repository.attach(storageFacet.get())
-    repository.attach(searchFacet.get());
+    repository.attach(searchFacet.get())
     repository.attach(mavenFacet.get())
     repository.attach(configure(viewFacet.get()))
   }
