@@ -15,7 +15,6 @@ package org.sonatype.nexus.repository.httpbridge;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.repository.view.Response;
@@ -27,5 +26,5 @@ import org.sonatype.nexus.repository.view.Response;
  */
 public interface HttpResponseSender
 {
-  void send(Response response, HttpServletRequest httpRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException;
+  void send(Response response, HttpServletResponse httpServletResponse) throws ServletException, IOException;
 }
