@@ -29,6 +29,7 @@ import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.TaskInterruptedException;
 import org.sonatype.nexus.scheduling.events.TaskEventCanceled;
+import org.sonatype.nexus.web.BaseUrlDetector;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Predicate;
@@ -78,6 +79,8 @@ public class NexusTaskJobSupport<T>
 
   private final TaskFactory taskFactory;
 
+  private final BaseUrlDetector baseUrlDetector;
+
   private NexusTaskInfo<T> nexusTaskInfo;
 
   private NexusTaskFuture<T> future;
@@ -87,11 +90,13 @@ public class NexusTaskJobSupport<T>
   @Inject
   public NexusTaskJobSupport(final EventBus eventBus,
                              final Provider<QuartzTaskExecutorSPI> quartzNexusSchedulerSPIProvider,
-                             final TaskFactory taskFactory)
+                             final TaskFactory taskFactory,
+                             final BaseUrlDetector baseUrlDetector)
   {
     this.eventBus = checkNotNull(eventBus);
     this.quartzNexusSchedulerSPIProvider = checkNotNull(quartzNexusSchedulerSPIProvider);
     this.taskFactory = checkNotNull(taskFactory);
+    this.baseUrlDetector = checkNotNull(baseUrlDetector);
   }
 
   @Override
@@ -104,6 +109,9 @@ public class NexusTaskJobSupport<T>
       future = (NexusTaskFuture) context.get(NexusTaskFuture.FUTURE_KEY);
       checkState(future != null);
       future.setJobExecutingThread(Thread.currentThread());
+
+      // detect and set the application base-url
+      baseUrlDetector.set();
 
       // create TaskConfiguration, and using that the Task
       final TaskConfiguration taskConfiguration = toTaskConfiguration(context.getJobDetail().getJobDataMap());
