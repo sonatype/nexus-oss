@@ -12,14 +12,11 @@
  */
 package org.sonatype.nexus.repository.maven.internal.maven2;
 
-import org.sonatype.nexus.proxy.maven.gav.Gav;
-import org.sonatype.nexus.proxy.maven.gav.M2GavCalculator;
 import org.sonatype.nexus.repository.maven.internal.MavenPath;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.SignatureType;
 import org.sonatype.nexus.repository.maven.internal.MavenPathParser;
-
-import com.google.common.base.Strings;
 
 /**
  * Maven 2 path parser.
@@ -29,55 +26,124 @@ import com.google.common.base.Strings;
 public class Maven2MavenPathParser
     implements MavenPathParser
 {
-  // TODO: TokenParser not capable to do this (yet)
-  // TODO: this is legacy, but here only to make it work
-  // TODO: consider moving/updating/fleshing out it from nx2 codebase, or improve TokenParser
-  private final M2GavCalculator m2GavCalculator = new M2GavCalculator();
-
   @Override
   public MavenPath parsePath(final String path) {
-    final Gav gav = m2GavCalculator.pathToGav(path);
-    if (gav == null) {
-      return new MavenPath(path, null);
-    }
-    else {
+    final Coordinates coordinates = pathToCoordinates(path);
+    return new MavenPath(path, coordinates);
+  }
+
+  private Coordinates pathToCoordinates(String str) {
+    try {
+      str = str.startsWith("/") ? str.substring(1) : str;
+
+      int vEndPos = str.lastIndexOf('/');
+      if (vEndPos == -1) {
+        return null;
+      }
+
+      int aEndPos = str.lastIndexOf('/', vEndPos - 1);
+      if (aEndPos == -1) {
+        return null;
+      }
+
+      int gEndPos = str.lastIndexOf('/', aEndPos - 1);
+      if (gEndPos == -1) {
+        return null;
+      }
+
+      final String groupId = str.substring(0, gEndPos).replace('/', '.');
+      final String artifactId = str.substring(gEndPos + 1, aEndPos);
+      final String baseVersion = str.substring(aEndPos + 1, vEndPos);
+      final boolean snapshot = baseVersion.endsWith("SNAPSHOT");
+      final String fileName = str.substring(vEndPos + 1);
+      str = fileName;
+
+      StringBuilder extSuffix = new StringBuilder();
       SignatureType signatureType = null;
-      if (gav.getSignatureType() != null) {
-        if (gav.getSignatureType() == Gav.SignatureType.gpg) {
-          signatureType = SignatureType.GPG;
+      if (str.endsWith("." + HashType.SHA1.getExt())) {
+        extSuffix.insert(0, "." + HashType.SHA1.getExt());
+        str = str.substring(0, str.length() - 5);
+      }
+      else if (str.endsWith("." + HashType.MD5.getExt())) {
+        extSuffix.insert(0, "." + HashType.MD5.getExt());
+        str = str.substring(0, str.length() - 4);
+      }
+
+      if (str.endsWith("." + SignatureType.GPG.getExt())) {
+        extSuffix.insert(0, "." + SignatureType.GPG.getExt());
+        signatureType = SignatureType.GPG;
+        str = str.substring(0, str.length() - (signatureType.getExt().length() + 1));
+      }
+
+      if (str.endsWith("maven-metadata.xml")) {
+        return null;
+      }
+
+      String version = baseVersion;
+      String tail;
+      if (snapshot) {
+        int vSnapshotStart = artifactId.length() + baseVersion.length() - 9 + 2;
+        version = str.substring(vSnapshotStart, vSnapshotStart + 8);
+        if ("SNAPSHOT".equals(version)) {
+          version = baseVersion; // reset it
+          int nTailPos = artifactId.length() + baseVersion.length() + 1;
+          tail = str.substring(nTailPos);
         }
         else {
-          throw new RuntimeException("Unknown signature type: " + gav.getSignatureType());
+          StringBuilder snapshotBuildNumber = new StringBuilder(version);
+          snapshotBuildNumber
+              .append(str.substring(vSnapshotStart + version.length(), vSnapshotStart + version.length() + 8));
+
+          int buildNumberCount = 0;
+          int buildNumberPos = vSnapshotStart + snapshotBuildNumber.length();
+          while (str.charAt(buildNumberPos) >= '0' && str.charAt(buildNumberPos) <= '9') {
+            snapshotBuildNumber.append(str.charAt(buildNumberPos));
+            buildNumberPos++;
+            buildNumberCount++;
+          }
+          if (buildNumberCount == 0) {
+            return null;
+          }
+          int n = baseVersion.length() > 8 ? baseVersion.length() - 8 : 0;
+          tail = str.substring(artifactId.length() + n + snapshotBuildNumber.length() + 1);
+          version = baseVersion.substring(0, baseVersion.length() - 8) + snapshotBuildNumber;
         }
       }
-
-      String classifier = gav.getClassifier();
-      if (classifier != null) {
-        classifier = classifier.trim();
-        if (Strings.isNullOrEmpty(classifier)) {
-          classifier = null;
+      else {
+        if (!fileName.startsWith(artifactId + "-" + baseVersion + ".")
+            && !fileName.startsWith(artifactId + "-" + baseVersion + "-")) {
+          // The path does not represents an artifact (filename does not match artifactId-version)!
+          return null;
         }
+        int nTailPos = artifactId.length() + baseVersion.length() + 1;
+        tail = str.substring(nTailPos);
       }
 
-      String ext = gav.getExtension(); // it will trim off .sha1 or .asc but we do need those
-      if (signatureType != null) {
-        ext = ext + "." + signatureType.getExt();
+      int nExtPos = tail.lastIndexOf('.');
+      if (nExtPos == -1) {
+        // NX-563: not allowing extensionless paths to be interpreted as artifact
+        return null;
       }
-      if (gav.getHashType() != null) {
-        ext = ext + "." + gav.getHashType().name();
+      if (tail.endsWith(".tar.gz")) {
+        nExtPos = nExtPos - 4;
       }
 
-      final Coordinates coordinates = new Coordinates(
-          gav.isSnapshot(),
-          gav.getGroupId(),
-          gav.getArtifactId(),
-          gav.getVersion(),
-          gav.getBaseVersion(),
+      final String ext = tail.substring(nExtPos + 1);
+      final String classifier = tail.charAt(0) == '-' ? tail.substring(1, nExtPos) : null;
+
+      return new Coordinates(
+          snapshot,
+          groupId,
+          artifactId,
+          version,
+          baseVersion,
           classifier,
-          ext,
+          ext + extSuffix,
           signatureType
       );
-      return new MavenPath(path, coordinates);
+    }
+    catch (StringIndexOutOfBoundsException e) {
+      return null;
     }
   }
 }
