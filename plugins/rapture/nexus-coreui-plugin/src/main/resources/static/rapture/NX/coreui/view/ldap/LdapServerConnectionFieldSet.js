@@ -72,7 +72,13 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
         ['ldap', NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_PLAIN_ITEM')],
         ['ldaps', NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_SECURE_ITEM')]
       ],
-      queryMode: 'local'
+      queryMode: 'local',
+      listeners: {
+        change: function(){
+          var protocol = this.up('form').down('#port');
+          protocol.fireEvent('change', protocol, protocol.getValue(), protocol.getValue());
+        }
+      }
     },
     {
       xtype: 'label',
@@ -88,7 +94,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST_PLACEHOLDER'),
       listeners: {
         change: function(){
-          var protocol = this.up('form').down('#protocol');
+          var protocol = this.up('form').down('#port');
           protocol.fireEvent('change', protocol, protocol.getValue(), protocol.getValue());
         }
       }
@@ -110,12 +116,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       maxValue: 65535,
       allowDecimals: false,
       allowExponential: false,
-      listeners: {
-        change: function(){
-          var protocol = this.up('form').down('#protocol');
-          protocol.fireEvent('change', protocol, protocol.getValue(), protocol.getValue());
-        }
-      },
       useTrustStore: function (field) {
         var form = field.up('form');
         if (form.down('#protocol').getValue() === 'ldaps' && form.down('#host').getValue() && field.getValue()) {
