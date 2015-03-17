@@ -131,8 +131,6 @@ public class BlobStoreManagerImpl
     log.debug("Creating BlobStore: {} with attributes: {}", configuration.getName(),
         configuration.getAttributes());
 
-    validate(configuration);
-
     store.create(configuration);
 
     BlobStore blobStore = newBlobStore(configuration);
@@ -226,21 +224,5 @@ public class BlobStoreManagerImpl
   private void untrack(final String name) {
     log.debug("Untracking: {}", name);
     stores.remove(name);
-  }
-
-  /**
-   * Ensure that the configuration attributes are not already used by another BlobStore
-   */
-  private void validate(final BlobStoreConfiguration configuration) {
-    for (BlobStoreConfiguration blobStoreConfiguration : store.list()) {
-      if (Maps.difference(blobStoreConfiguration.getAttributes(), configuration.getAttributes()).areEqual()) {
-        ValidationResponse validations = new ValidationResponse();
-        validations.addError(
-            new ValidationMessage("attributes",
-                "Specified configuration is already used by another BlobStore: " + blobStoreConfiguration.getName())
-        );
-        throw new ValidationResponseException(validations);
-      }
-    }
   }
 }

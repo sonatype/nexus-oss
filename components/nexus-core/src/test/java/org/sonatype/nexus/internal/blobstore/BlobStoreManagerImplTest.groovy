@@ -120,13 +120,6 @@ class BlobStoreManagerImplTest
     assert blobStore == autoCreatedBlobStore
   }
 
-  @Test(expected = ValidationResponseException)
-  void 'Can not have two BlobStores with the same configuration'() {
-    BlobStoreConfiguration configuration = createConfig('test')
-    when(store.list()).thenReturn([configuration])
-    underTest.create(configuration)
-  }
-
   @Test
   void 'Can delete an existing BlobStore by name'() {
     BlobStoreConfiguration configuration = createConfig('test')
