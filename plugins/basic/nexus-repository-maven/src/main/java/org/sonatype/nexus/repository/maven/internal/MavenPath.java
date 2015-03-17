@@ -157,6 +157,8 @@ public class MavenPath
     }
   }
 
+  private final Kind kind;
+
   private final String path;
 
   private final String fileName;
@@ -178,19 +180,20 @@ public class MavenPath
     }
     this.hashType = ht;
     this.coordinates = coordinates;
+    if (coordinates != null) {
+      this.kind = Kind.ARTIFACT;
+    }
+    else if (main().getFileName().equals(MAVEN_METADATA_FILENAME)) {
+      this.kind = Kind.METADATA;
+    }
+    else {
+      this.kind = Kind.OTHER;
+    }
   }
 
   @Nonnull
   public Kind getKind() {
-    if (getCoordinates() != null) {
-      return Kind.ARTIFACT;
-    }
-    else if (main().getFileName().equals(MAVEN_METADATA_FILENAME)) {
-      return Kind.METADATA;
-    }
-    else {
-      return Kind.OTHER;
-    }
+    return kind;
   }
 
   @Nonnull
@@ -212,7 +215,7 @@ public class MavenPath
   public Coordinates getCoordinates() { return coordinates; }
 
   /**
-   * Returns {@code true} if this path is subordinate of another path.
+   * Returns {@code true} if this path is subordinate (is hash or signature) of another path.
    *
    * @see {@link #subordinateOf()}
    */
@@ -231,11 +234,11 @@ public class MavenPath
    * Returns {@code true} if this path represents a signature.
    */
   public boolean isSignature() {
-    return getCoordinates() != null && getCoordinates().getSignatureType() != null;
+    return coordinates != null && coordinates.getSignatureType() != null;
   }
 
   /**
-   * Returns the "main", non-subordinate path of this path. The "main" path is never a hash.
+   * Returns the "main", non-subordinate path of this path. The "main" path is never a hash nor a signature.
    */
   @Nonnull
   public MavenPath main() {
@@ -247,23 +250,23 @@ public class MavenPath
   }
 
   /**
-   * Returns the "parent" path, that this path is subordinate of, or {@code null}.
+   * Returns the "parent" path, that this path is subordinate of, or this instance if it is not a subordinate.
    */
-  @Nullable
+  @Nonnull
   public MavenPath subordinateOf() {
-    Coordinates mainCoordinates = null;
-    if (isHash()) {
+    if (hashType != null) {
       int hashSuffixLen = hashType.getExt().length() + 1; // the dot
-      if (getCoordinates() != null) {
+      Coordinates mainCoordinates = null;
+      if (coordinates != null) {
         mainCoordinates = new Coordinates(
-            getCoordinates().isSnapshot(),
-            getCoordinates().getGroupId(),
-            getCoordinates().getArtifactId(),
-            getCoordinates().getVersion(),
-            getCoordinates().getBaseVersion(),
-            getCoordinates().getClassifier(),
-            getCoordinates().getExtension().substring(0, getCoordinates().getExtension().length() - hashSuffixLen),
-            getCoordinates().getSignatureType()
+            coordinates.isSnapshot(),
+            coordinates.getGroupId(),
+            coordinates.getArtifactId(),
+            coordinates.getBaseVersion(),
+            coordinates.getVersion(),
+            coordinates.getClassifier(),
+            coordinates.getExtension().substring(0, coordinates.getExtension().length() - hashSuffixLen),
+            coordinates.getSignatureType()
         );
       }
       return new MavenPath(
@@ -271,16 +274,16 @@ public class MavenPath
           mainCoordinates
       );
     }
-    else if (isSignature()) { // coordinates != null && coordinates.signatureType != null
-      int signatureSuffixLen = getCoordinates().getSignatureType().getExt().length() + 1; // the dot
-      mainCoordinates = new Coordinates(
-          getCoordinates().isSnapshot(),
-          getCoordinates().getGroupId(),
-          getCoordinates().getArtifactId(),
-          getCoordinates().getVersion(),
-          getCoordinates().getBaseVersion(),
-          getCoordinates().getClassifier(),
-          getCoordinates().getExtension().substring(0, getCoordinates().getExtension().length() - signatureSuffixLen),
+    else if (coordinates != null && coordinates.getSignatureType() != null) {
+      int signatureSuffixLen = coordinates.getSignatureType().getExt().length() + 1; // the dot
+      Coordinates mainCoordinates = new Coordinates(
+          coordinates.isSnapshot(),
+          coordinates.getGroupId(),
+          coordinates.getArtifactId(),
+          coordinates.getVersion(),
+          coordinates.getBaseVersion(),
+          coordinates.getClassifier(),
+          coordinates.getExtension().substring(0, coordinates.getExtension().length() - signatureSuffixLen),
           null
       );
       return new MavenPath(
@@ -288,7 +291,7 @@ public class MavenPath
           mainCoordinates
       );
     }
-    return null;
+    return this;
   }
 
   /**
@@ -297,18 +300,18 @@ public class MavenPath
   @Nonnull
   public MavenPath hash(final HashType hashType) {
     checkNotNull(hashType);
-    checkArgument(!isHash(), "This path is already a hash: " + this);
+    checkArgument(this.hashType == null, "This path is already a hash: %s", this);
     Coordinates hashCoordinates = null;
-    if (getCoordinates() != null) {
+    if (coordinates != null) {
       hashCoordinates = new Coordinates(
-          getCoordinates().isSnapshot(),
-          getCoordinates().getGroupId(),
-          getCoordinates().getArtifactId(),
-          getCoordinates().getVersion(),
-          getCoordinates().getBaseVersion(),
-          getCoordinates().getClassifier(),
-          getCoordinates().getExtension() + "." + hashType.getExt(),
-          getCoordinates().getSignatureType()
+          coordinates.isSnapshot(),
+          coordinates.getGroupId(),
+          coordinates.getArtifactId(),
+          coordinates.getVersion(),
+          coordinates.getBaseVersion(),
+          coordinates.getClassifier(),
+          coordinates.getExtension() + "." + hashType.getExt(),
+          coordinates.getSignatureType()
       );
     }
     return new MavenPath(
@@ -324,22 +327,19 @@ public class MavenPath
   @Nonnull
   public MavenPath signature(final SignatureType signatureType) {
     checkNotNull(signatureType);
-    checkArgument(!isHash(), "This path is already a hash: " + this);
-    checkArgument(!isSignature(), "This path is already a signature: " + this);
-    checkArgument(getCoordinates() != null, "Only artifact paths may have signatures: " + this);
-    Coordinates signatureCoordinates = null;
-    if (getCoordinates() != null) {
-      signatureCoordinates = new Coordinates(
-          getCoordinates().isSnapshot(),
-          getCoordinates().getGroupId(),
-          getCoordinates().getArtifactId(),
-          getCoordinates().getVersion(),
-          getCoordinates().getBaseVersion(),
-          getCoordinates().getClassifier(),
-          getCoordinates().getExtension() + "." + signatureType.getExt(),
-          signatureType
-      );
-    }
+    checkArgument(hashType == null, "This path is already a hash: %s", this);
+    checkArgument(coordinates != null, "Only artifact paths may have signatures: %s", this);
+    checkArgument(coordinates.getSignatureType() == null, "This path is already a signature: %s", this);
+    Coordinates signatureCoordinates = new Coordinates(
+        coordinates.isSnapshot(),
+        coordinates.getGroupId(),
+        coordinates.getArtifactId(),
+        coordinates.getVersion(),
+        coordinates.getBaseVersion(),
+        coordinates.getClassifier(),
+        coordinates.getExtension() + "." + signatureType.getExt(),
+        signatureType
+    );
     return new MavenPath(
         path + "." + signatureType.getExt(),
         signatureCoordinates
@@ -355,10 +355,7 @@ public class MavenPath
       return false;
     }
     MavenPath that = (MavenPath) o;
-    if (!path.equals(that.path)) {
-      return false;
-    }
-    return true;
+    return path.equals(that.path);
   }
 
   @Override
