@@ -28,6 +28,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 
 /**
@@ -53,7 +54,8 @@ public class HostedHandler
     }
     final String action = context.getRequest().getAction();
     switch (action) {
-      case GET: {
+      case GET:
+      case HEAD: {
         final Payload content = mavenFacet.get(path);
         if (content == null) {
           return HttpResponses.notFound(path.getPath());
@@ -80,7 +82,7 @@ public class HostedHandler
       }
 
       default:
-        return HttpResponses.methodNotAllowed(context.getRequest().getAction(), GET, PUT, DELETE);
+        return HttpResponses.methodNotAllowed(context.getRequest().getAction(), GET, HEAD, PUT, DELETE);
     }
   }
 
