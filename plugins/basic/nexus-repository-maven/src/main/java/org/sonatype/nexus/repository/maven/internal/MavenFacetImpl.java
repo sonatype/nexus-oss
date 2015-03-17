@@ -163,7 +163,8 @@ public class MavenFacetImpl
       final Blob blob = tx.getBlob(blobRef);
       checkState(blob != null, "asset of component with at path %s refers to missing blob %s", path.getPath(),
           blobRef);
-      return marshall(tx, asset, blob);
+      final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
+      return new BlobPayload(blob, contentType);
     }
   }
 
@@ -408,13 +409,5 @@ public class MavenFacetImpl
     checkState(blobRefStr != null, "asset of component at path %s has missing blob reference",
         mavenPath.getPath());
     return BlobRef.parse(blobRefStr);
-  }
-
-  /**
-   * Creates a payload out of a Blob, for content originating from Blobs.
-   */
-  private Payload marshall(final StorageTx tx, final OrientVertex asset, final Blob blob) {
-    final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
-    return new BlobPayload(blob, contentType);
   }
 }
