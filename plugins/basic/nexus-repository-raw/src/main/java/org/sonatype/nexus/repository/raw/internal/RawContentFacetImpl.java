@@ -30,10 +30,6 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
-import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
-import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
-import org.sonatype.nexus.repository.storage.ComponentDeletedEvent;
-import org.sonatype.nexus.repository.storage.ComponentUpdatedEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
@@ -112,10 +108,8 @@ public class RawContentFacetImpl
       final OrientVertex bucket = tx.getBucket();
       OrientVertex component = getComponent(tx, path, bucket);
       OrientVertex asset;
-      boolean isNew = false;
       if (component == null) {
         // CREATE
-        isNew = true;
         component = tx.createComponent(bucket);
 
         // Set normalized properties: format, group, and name (version is undefined for "raw" components)
@@ -145,13 +139,6 @@ public class RawContentFacetImpl
       }
 
       tx.commit();
-
-      if (isNew) {
-        getEventBus().post(new ComponentCreatedEvent(component, getRepository()));
-      }
-      else {
-        getEventBus().post(new ComponentUpdatedEvent(component, getRepository()));
-      }
     }
   }
 
@@ -221,8 +208,6 @@ public class RawContentFacetImpl
       tx.deleteVertex(component);
 
       tx.commit();
-      
-      getEventBus().post(new ComponentDeletedEvent(component, getRepository()));
 
       return true;
     }
