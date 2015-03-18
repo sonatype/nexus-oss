@@ -141,41 +141,16 @@ public class MavenFacetImpl
   @Override
   public Payload get(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
-      if (path.getCoordinates() != null) {
-        return getArtifact(path, tx);
+      final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
+      if (asset == null) {
+        return null;
       }
-      else {
-        return getFile(path, tx);
-      }
+      final BlobRef blobRef = getBlobRef(path, asset);
+      final Blob blob = tx.getBlob(blobRef);
+      checkState(blob != null, "asset of component with at path %s refers to missing blob %s", path.getPath(), blobRef);
+      final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
+      return new BlobPayload(blob, contentType);
     }
-  }
-
-  private Payload getArtifact(final MavenPath path, final StorageTx tx) throws IOException {
-    final OrientVertex component = findComponent(tx, tx.getBucket(), path);
-    if (component == null) {
-      return null;
-    }
-    final OrientVertex asset = selectComponentAsset(tx, component, path);
-    if (asset == null) {
-      return null;
-    }
-    return getAssetPayload(path, tx, asset);
-  }
-
-  private Payload getFile(final MavenPath path, final StorageTx tx) throws IOException {
-    final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
-    if (asset == null) {
-      return null;
-    }
-    return getAssetPayload(path, tx, asset);
-  }
-
-  private BlobPayload getAssetPayload(final MavenPath path, final StorageTx tx, final OrientVertex asset) {
-    final BlobRef blobRef = getBlobRef(path, asset);
-    final Blob blob = tx.getBlob(blobRef);
-    checkState(blob != null, "asset of component with at path %s refers to missing blob %s", path.getPath(), blobRef);
-    final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
-    return new BlobPayload(blob, contentType);
   }
 
   @Override
