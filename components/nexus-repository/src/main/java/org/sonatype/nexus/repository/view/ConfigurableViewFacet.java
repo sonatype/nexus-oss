@@ -14,8 +14,8 @@ package org.sonatype.nexus.repository.view;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;

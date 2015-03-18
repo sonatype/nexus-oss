@@ -16,8 +16,8 @@ import java.util.ListIterator;
 
 import javax.annotation.Nonnull;
 
+import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.util.AttributesMap;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;

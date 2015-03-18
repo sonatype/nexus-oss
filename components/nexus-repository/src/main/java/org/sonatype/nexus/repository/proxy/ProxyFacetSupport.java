@@ -18,12 +18,12 @@ import java.net.URI;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;

@@ -12,14 +12,11 @@
  */
 package org.sonatype.nexus.repository.view;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.repository.util.AttributesMap;
+import org.sonatype.nexus.common.collect.AttributesMap;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**

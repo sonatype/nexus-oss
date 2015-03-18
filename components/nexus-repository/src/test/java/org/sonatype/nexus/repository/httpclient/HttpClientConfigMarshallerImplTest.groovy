@@ -14,7 +14,7 @@ package org.sonatype.nexus.repository.httpclient
 
 import org.junit.Before
 import org.junit.Test
-import org.sonatype.nexus.repository.util.NestedAttributesMap
+import org.sonatype.nexus.common.collect.NestedAttributesMap
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.hamcrest.Matchers.is

@@ -18,12 +18,12 @@ import java.util.Map;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.orient.DatabaseInstanceRule;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 

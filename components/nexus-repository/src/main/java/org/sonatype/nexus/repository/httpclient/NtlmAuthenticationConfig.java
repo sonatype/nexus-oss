@@ -15,7 +15,7 @@ package org.sonatype.nexus.repository.httpclient;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 
 import com.google.common.collect.Lists;
 import org.apache.http.auth.Credentials;

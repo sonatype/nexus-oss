@@ -16,8 +16,8 @@ import java.util.HashMap;
 
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
 
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.storage.StorageTx;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;

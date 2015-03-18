@@ -15,9 +15,9 @@ package org.sonatype.nexus.repository.httpclient;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import org.apache.http.client.HttpClient;
 

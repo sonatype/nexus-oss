@@ -21,10 +21,10 @@ import net.sf.ehcache.Element
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentCaptor
+import org.sonatype.nexus.common.collect.NestedAttributesMap
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.http.HttpStatus
-import org.sonatype.nexus.repository.util.NestedAttributesMap
 import org.sonatype.nexus.repository.view.Status
 import org.sonatype.sisu.goodies.common.Time
 import org.sonatype.sisu.goodies.eventbus.EventBus

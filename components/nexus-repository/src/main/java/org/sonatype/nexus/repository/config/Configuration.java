@@ -16,8 +16,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.Entity;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import com.google.common.collect.Maps;
 
