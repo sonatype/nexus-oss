@@ -62,6 +62,8 @@ public class RepositoryManagerImpl
 
   private final RepositoryAdminSecurityConfigurationResource securityResource;
 
+  private final List<InitialRepositoryConfiguration> initialRepositoryConfigurations;
+
   private final Map<String, Repository> repositories = Maps.newHashMap();
 
   @Inject
@@ -70,7 +72,8 @@ public class RepositoryManagerImpl
                                final RepositoryFactory factory,
                                final Provider<ConfigurationFacet> configFacet,
                                final Map<String, Recipe> recipes,
-                               final RepositoryAdminSecurityConfigurationResource securityResource)
+                               final RepositoryAdminSecurityConfigurationResource securityResource,
+                               final List<InitialRepositoryConfiguration> initialRepositoryConfigurations)
   {
     this.eventBus = checkNotNull(eventBus);
     this.store = checkNotNull(store);
@@ -78,6 +81,7 @@ public class RepositoryManagerImpl
     this.configFacet = checkNotNull(configFacet);
     this.recipes = checkNotNull(recipes);
     this.securityResource = checkNotNull(securityResource);
+    this.initialRepositoryConfigurations = checkNotNull(initialRepositoryConfigurations);
   }
 
   /**
@@ -146,8 +150,14 @@ public class RepositoryManagerImpl
   protected void doStart() throws Exception {
     List<Configuration> configurations = store.list();
     if (configurations.isEmpty()) {
-      log.debug("No repositories configured");
-      return;
+      log.debug("No repositories configured, installing defaults");
+      for (InitialRepositoryConfiguration configProvider : initialRepositoryConfigurations) {
+        for (Configuration configuration : configProvider.getRepositoryConfigurations()) {
+          log.debug("Provisioning default repository: {}", configuration);
+          store.create(configuration);
+        }
+      }
+      configurations = store.list();
     }
 
     log.debug("Restoring {} repositories", configurations.size());
