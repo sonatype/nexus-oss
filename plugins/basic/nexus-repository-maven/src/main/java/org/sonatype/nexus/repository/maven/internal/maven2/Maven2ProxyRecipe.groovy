@@ -45,7 +45,7 @@ import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 
 /**
- * Maven 2 hosted repository recipe.
+ * Maven 2 proxy repository recipe.
  *
  * @since 3.0
  */
@@ -54,7 +54,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 class Maven2ProxyRecipe
     extends RecipeSupport
 {
-  static final String NAME = "maven2-hosted"
+  static final String NAME = "maven2-proxy"
 
   @Inject
   Provider<Maven2SecurityFacet> securityFacet
