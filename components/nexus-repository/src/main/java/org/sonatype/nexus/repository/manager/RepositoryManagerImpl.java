@@ -50,6 +50,12 @@ public class RepositoryManagerImpl
     extends StateGuardLifecycleSupport
     implements RepositoryManager
 {
+
+  /**
+   * System property used to bypass installation of default repositories; useful for testing purposes.
+   */
+  private static final String SKIP_DEFAULT_REPOSITORIES = "skipDefaultRepositories";
+
   private final EventBus eventBus;
 
   private final ConfigurationStore store;
@@ -150,14 +156,20 @@ public class RepositoryManagerImpl
   protected void doStart() throws Exception {
     List<Configuration> configurations = store.list();
     if (configurations.isEmpty()) {
-      log.debug("No repositories configured, installing defaults");
-      for (InitialRepositoryConfiguration configProvider : initialRepositoryConfigurations) {
-        for (Configuration configuration : configProvider.getRepositoryConfigurations()) {
-          log.debug("Provisioning default repository: {}", configuration);
-          store.create(configuration);
+      log.debug("No repositories configured");
+      if (Boolean.valueOf(System.getProperty(SKIP_DEFAULT_REPOSITORIES, "false"))) {
+        log.debug("Skipping provisioning of default repositories due to '" + SKIP_DEFAULT_REPOSITORIES + "' property");
+        return;
+      } else {
+        log.debug("Provisioning default repositories");
+        for (InitialRepositoryConfiguration configProvider : initialRepositoryConfigurations) {
+          for (Configuration configuration : configProvider.getRepositoryConfigurations()) {
+            log.debug("Provisioning default repository: {}", configuration);
+            store.create(configuration);
+          }
         }
+        configurations = store.list();
       }
-      configurations = store.list();
     }
 
     log.debug("Restoring {} repositories", configurations.size());
