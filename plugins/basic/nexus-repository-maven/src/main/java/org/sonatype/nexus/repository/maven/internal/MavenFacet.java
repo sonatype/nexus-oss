@@ -23,6 +23,8 @@ import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Payload;
 
+import org.joda.time.DateTime;
+
 /**
  * Maven facet, present on all Maven repositories.
  *
@@ -44,4 +46,8 @@ public interface MavenFacet
   void put(MavenPath path, Payload content) throws IOException, InvalidContentException;
 
   boolean delete(MavenPath path) throws IOException;
+
+  DateTime getLastVerified(MavenPath path) throws IOException;
+
+  boolean setLastVerified(MavenPath path, DateTime verified) throws IOException;
 }

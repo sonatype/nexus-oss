@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -42,6 +43,7 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -91,6 +93,8 @@ public class MavenFacetImpl
   // shared properties for both artifact and metadata assets
 
   private static final String P_ASSET_KEY = "key";
+
+  private static final String P_LAST_VERIFIED = "lastVerified";
 
   private static final String CONFIG_KEY = "maven";
 
@@ -325,6 +329,36 @@ public class MavenFacetImpl
     tx.deleteVertex(asset);
     tx.commit();
     return true;
+  }
+
+  @Override
+  public DateTime getLastVerified(final MavenPath path) throws IOException {
+    try (StorageTx tx = getStorage().openTx()) {
+      final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
+      if (asset == null) {
+        return null;
+      }
+      final NestedAttributesMap attributes = getFormatAttributes(tx, asset);
+      final Date date = attributes.get(P_LAST_VERIFIED, Date.class);
+      if (date == null) {
+        return null;
+      }
+      return new DateTime(date);
+    }
+  }
+
+  @Override
+  public boolean setLastVerified(final MavenPath path, final DateTime verified) throws IOException {
+    try (StorageTx tx = getStorage().openTx()) {
+      final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
+      if (asset == null) {
+        return false;
+      }
+      final NestedAttributesMap attributes = getFormatAttributes(tx, asset);
+      attributes.set(P_LAST_VERIFIED, verified.toDate());
+      tx.commit();
+      return true;
+    }
   }
 
   /**
