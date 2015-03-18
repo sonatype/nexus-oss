@@ -203,19 +203,6 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-core</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-        <classifier>tests</classifier>
-        <exclusions>
-          <exclusion>
-            <groupId>*</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-orient</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>

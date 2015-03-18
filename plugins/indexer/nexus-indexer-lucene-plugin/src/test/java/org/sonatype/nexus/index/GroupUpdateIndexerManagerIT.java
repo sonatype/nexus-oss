@@ -68,7 +68,7 @@ public class GroupUpdateIndexerManagerIT
     group.removeMemberRepositoryId(snapshots.getId());
     nexusConfiguration().saveConfiguration();
     waitForTasksToStop();
-    wairForAsyncEventsToCalmDown();
+    waitForAsyncEventsToCalmDown();
 
     // assure context does exists (if Igor comments out few lines or so, as MI will plainly swallow targeted search
     // against nonexistent context!)
@@ -84,7 +84,7 @@ public class GroupUpdateIndexerManagerIT
     group.addMemberRepositoryId(apacheSnapshots.getId());
     nexusConfiguration().saveConfiguration();
     waitForTasksToStop();
-    wairForAsyncEventsToCalmDown();
+    waitForAsyncEventsToCalmDown();
 
     // assure context does exists (if Igor comments out few lines or so, as MI will plainly swallow targeted search
     // against nonexistent context!)
@@ -138,7 +138,7 @@ public class GroupUpdateIndexerManagerIT
     member.setIndexable(false);
     nexusConfiguration().saveConfiguration();
     waitForTasksToStop();
-    wairForAsyncEventsToCalmDown();
+    waitForAsyncEventsToCalmDown();
 
     // assure context does exists (if Igor comments out few lines or so, as MI will plainly swallow targeted search
     // against nonexistent context!)
@@ -154,7 +154,7 @@ public class GroupUpdateIndexerManagerIT
     member.setIndexable(true);
     nexusConfiguration().saveConfiguration();
     waitForTasksToStop();
-    wairForAsyncEventsToCalmDown();
+    waitForAsyncEventsToCalmDown();
 
     // assure context does exists (if Igor comments out few lines or so, as MI will plainly swallow targeted search
     // against nonexistent context!)

@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.plugins.mavenbridge;
 
-import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 import org.eclipse.aether.graph.Dependency;
@@ -20,7 +19,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class NexusAetherIT
-    extends AbstractMavenRepoContentTests
 {
 
   @Test
