@@ -94,7 +94,7 @@ class DigestExtractor
   @Nullable
   public static String extract(final String input) {
     checkNotNull(input);
-    // we need most of MAX_CHARS_NEEDED characters from input
+    // we need at most MAX_CHARS_NEEDED
     String raw = input.length() > MAX_CHARS_NEEDED ? input.substring(0, MAX_CHARS_NEEDED) : input;
     // if multiline, we need the 1st line only
     raw = raw.indexOf('\n') > -1 ? raw.substring(0, raw.indexOf('\n')) : raw;
