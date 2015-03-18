@@ -18,7 +18,7 @@ import javax.inject.Singleton
 import com.sonatype.nexus.repository.nuget.internal.proxy.NugetProxyRecipe
 
 import org.sonatype.nexus.repository.config.Configuration
-import org.sonatype.nexus.repository.manager.InitialRepositoryConfiguration
+import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
 
 /**
  * Provide default hosted and proxy repositories for NuGet.
@@ -26,8 +26,8 @@ import org.sonatype.nexus.repository.manager.InitialRepositoryConfiguration
  */
 @Named
 @Singleton
-class NugetInitialRepositoryConfiguration
-    implements InitialRepositoryConfiguration
+class NugetDefaultRepositoriesContributor
+    implements DefaultRepositoriesContributor
 
 {
   @Override

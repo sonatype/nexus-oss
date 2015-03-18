@@ -68,7 +68,7 @@ public class RepositoryManagerImpl
 
   private final RepositoryAdminSecurityConfigurationResource securityResource;
 
-  private final List<InitialRepositoryConfiguration> initialRepositoryConfigurations;
+  private final List<DefaultRepositoriesContributor> defaultRepositoriesContributors;
 
   private final Map<String, Repository> repositories = Maps.newHashMap();
 
@@ -79,7 +79,7 @@ public class RepositoryManagerImpl
                                final Provider<ConfigurationFacet> configFacet,
                                final Map<String, Recipe> recipes,
                                final RepositoryAdminSecurityConfigurationResource securityResource,
-                               final List<InitialRepositoryConfiguration> initialRepositoryConfigurations)
+                               final List<DefaultRepositoriesContributor> defaultRepositoriesContributors)
   {
     this.eventBus = checkNotNull(eventBus);
     this.store = checkNotNull(store);
@@ -87,7 +87,7 @@ public class RepositoryManagerImpl
     this.configFacet = checkNotNull(configFacet);
     this.recipes = checkNotNull(recipes);
     this.securityResource = checkNotNull(securityResource);
-    this.initialRepositoryConfigurations = checkNotNull(initialRepositoryConfigurations);
+    this.defaultRepositoriesContributors = checkNotNull(defaultRepositoriesContributors);
   }
 
   /**
@@ -162,7 +162,7 @@ public class RepositoryManagerImpl
         return;
       } else {
         log.debug("Provisioning default repositories");
-        for (InitialRepositoryConfiguration configProvider : initialRepositoryConfigurations) {
+        for (DefaultRepositoriesContributor configProvider : defaultRepositoriesContributors) {
           for (Configuration configuration : configProvider.getRepositoryConfigurations()) {
             log.debug("Provisioning default repository: {}", configuration);
             store.create(configuration);
