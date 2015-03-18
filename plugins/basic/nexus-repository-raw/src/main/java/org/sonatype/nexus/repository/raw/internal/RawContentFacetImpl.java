@@ -30,7 +30,6 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
-import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
@@ -71,16 +70,12 @@ public class RawContentFacetImpl
 
   private final MimeSupport mimeSupport;
 
-  private final ComponentMetadataFactory componentMetadataFactory;
-
   private boolean strictContentTypeValidation = false;
 
   @Inject
-  public RawContentFacetImpl(final MimeSupport mimeSupport,
-                             final ComponentMetadataFactory componentMetadataFactory)
+  public RawContentFacetImpl(final MimeSupport mimeSupport)
   {
     this.mimeSupport = checkNotNull(mimeSupport);
-    this.componentMetadataFactory = checkNotNull(componentMetadataFactory);
   }
 
   @Override
@@ -141,11 +136,6 @@ public class RawContentFacetImpl
         try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
           tx.setBlob(is1, headers, asset, hashAlgorithms, determineContentType(path, is2, content.getContentType()));
         }
-      }
-
-      final DateTime lastUpdated = content.getLastUpdated();
-      if (lastUpdated != null) {
-        asset.setProperty(P_LAST_UPDATED, new Date(lastUpdated.getMillis()));
       }
 
       tx.commit();

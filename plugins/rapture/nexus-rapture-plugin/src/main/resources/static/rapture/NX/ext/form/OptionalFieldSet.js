@@ -30,6 +30,7 @@ Ext.define('NX.ext.form.OptionalFieldSet', {
 
     me.callParent(arguments);
 
+    // When state changes, repeat the evaluation
     me.on('collapse', me.enableContainedItems, me);
     me.on('expand', me.enableContainedItems, me);
     me.on('afterrender', me.enableContainedItems, me);

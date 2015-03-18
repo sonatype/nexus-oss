@@ -25,8 +25,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupForm', {
     'NX.I18n'
   ],
 
-  items: { xtype: 'nx-coreui-ldapserver-backup-fieldset' },
-
   /**
    * @override
    */
@@ -34,23 +32,11 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupForm', {
     var me = this;
 
     me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('security:ldapconfig', 'update');
+    me.items = {
+      xtype: 'nx-coreui-ldapserver-backup-fieldset'
+    };
 
     me.callParent(arguments);
-
-    Ext.override(me.getForm(), {
-      /**
-       * @override
-       * If selected, replaced the input value of the fieldset checkbox with true
-       */
-      getValues: function() {
-        var me = this,
-          values = me.callParent(arguments);
-
-        values.backupMirrorEnabled = values.backupMirrorEnabled ? true : false;
-
-        return values;
-      }
-    });
   },
 
   /**

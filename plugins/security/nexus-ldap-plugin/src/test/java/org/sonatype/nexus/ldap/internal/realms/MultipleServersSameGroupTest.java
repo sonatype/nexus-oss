@@ -13,18 +13,17 @@
 package org.sonatype.nexus.ldap.internal.realms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.nexus.ldap.internal.MockLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.LdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapUser;
 
-import com.google.common.collect.Maps;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,11 +36,8 @@ public class MultipleServersSameGroupTest
   private MockLdapConnector twoConnector = null;
 
   @Override
-  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
-    final LinkedHashMap<String, LdapServerConfiguration> result = Maps.newLinkedHashMap();
-    result.put("one", createServerConfiguration("one"));
-    result.put("two", createServerConfiguration("two"));
-    return result;
+  protected Collection<String> getLdapServerNames() {
+    return Arrays.asList("default", "one", "two");
   }
 
   @Override

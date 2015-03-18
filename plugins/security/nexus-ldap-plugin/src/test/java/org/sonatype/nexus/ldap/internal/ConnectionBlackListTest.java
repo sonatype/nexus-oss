@@ -15,7 +15,6 @@ package org.sonatype.nexus.ldap.internal;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
@@ -24,6 +23,7 @@ import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapUserException;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.realms.LdapManager;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
+import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.junit.Assert;
@@ -56,7 +56,7 @@ public class ConnectionBlackListTest
 
     Assert.assertNotNull(ldapManager.authenticateUser("brianf", "brianf123"));
 
-    stopLdapServers();
+    suspendLdapServers();
 
     try {
       ldapManager.authenticateUser("brianf", "brianf123");
@@ -66,7 +66,7 @@ public class ConnectionBlackListTest
       // expected
     }
 
-    startLdapServers();
+    resumeLdapServers();
 
     try {
       ldapManager.authenticateUser("brianf", "brianf123");
@@ -96,11 +96,11 @@ public class ConnectionBlackListTest
     SortedSet<String> actualGroups = ldapManager.getAllGroups();
     Assert.assertEquals(expectedGroups, actualGroups);
 
-    stopLdapServers();
+    suspendLdapServers();
 
     Assert.assertEquals(0, ldapManager.getAllGroups().size());
 
-    startLdapServers();
+    resumeLdapServers();
 
     Assert.assertEquals(0, ldapManager.getAllGroups().size());
 
@@ -119,10 +119,10 @@ public class ConnectionBlackListTest
 
     Assert.assertEquals(3, ldapManager.getAllUsers().size());
 
-    stopLdapServers();
+    suspendLdapServers();
     Assert.assertEquals(0, ldapManager.getAllUsers().size());
 
-    startLdapServers();
+    resumeLdapServers();
     Assert.assertEquals(0, ldapManager.getAllUsers().size());
 
     // wait 3 more sec, then we should be good
@@ -138,7 +138,7 @@ public class ConnectionBlackListTest
 
     Assert.assertEquals("releases", ldapManager.getGroupName("releases"));
 
-    stopLdapServers();
+    suspendLdapServers();
 
     try {
       ldapManager.getGroupName("releases");
@@ -148,7 +148,7 @@ public class ConnectionBlackListTest
       // expected
     }
 
-    startLdapServers();
+    resumeLdapServers();
 
     try {
       ldapManager.getGroupName("releases");
@@ -176,7 +176,7 @@ public class ConnectionBlackListTest
     Assert.assertEquals("Brian Fox", brianf.getRealName());
     Assert.assertEquals(2, brianf.getMembership().size());
 
-    stopLdapServers();
+    suspendLdapServers();
     try {
       ldapManager.getUser("brianf");
       Assert.fail("Expected NoSuchLdapUserException");
@@ -188,7 +188,7 @@ public class ConnectionBlackListTest
       // expected: this is thrown today after merge of OSS/Pro
     }
 
-    startLdapServers();
+    resumeLdapServers();
     try {
       ldapManager.getUser("brianf");
       Assert.fail("Expected NoSuchLdapUserException");
@@ -213,7 +213,7 @@ public class ConnectionBlackListTest
 
     Assert.assertEquals(2, ldapManager.getUserRoles("brianf").size());
 
-    stopLdapServers();
+    suspendLdapServers();
     try {
       ldapManager.getUserRoles("brianf");
       Assert.fail("Expected LdapDAOException");
@@ -222,7 +222,7 @@ public class ConnectionBlackListTest
       // expected
     }
 
-    startLdapServers();
+    resumeLdapServers();
     try {
       ldapManager.getUserRoles("brianf");
       Assert.fail("Expected LdapDAOException");
@@ -246,12 +246,12 @@ public class ConnectionBlackListTest
     Assert.assertEquals(1, ldapManager.getUsers(1).size());
 
 
-    stopLdapServers();
+    suspendLdapServers();
     Assert.assertEquals(0, ldapManager.getUsers(1).size());
     Assert.assertEquals(0, ldapManager.getUsers(1).size());
     Assert.assertEquals(0, ldapManager.getUsers(1).size());
 
-    startLdapServers();
+    resumeLdapServers();
     Assert.assertEquals(0, ldapManager.getUsers(1).size());
 
     // wait 3 more sec, then we should be good
@@ -267,10 +267,10 @@ public class ConnectionBlackListTest
 
     Assert.assertEquals(3, ldapManager.searchUsers("", null).size());
 
-    stopLdapServers();
+    suspendLdapServers();
     Assert.assertEquals(0, ldapManager.searchUsers("", null).size());
 
-    startLdapServers();
+    resumeLdapServers();
     Assert.assertEquals(0, ldapManager.searchUsers("", null).size());
 
     // wait 3 more sec, then we should be good

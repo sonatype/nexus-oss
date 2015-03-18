@@ -13,11 +13,17 @@
 
 package org.sonatype.nexus.orient.graph;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.hook.ORecordHook;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 /**
  * An {@code OrientGraph} that auto-closes, rolling back any changes that haven't been explicitly committed.
+ *
+ * It also handles registering any number of hooks, which will be auto-unregistered when closed.
  *
  * @since 3.0
  */
@@ -25,13 +31,24 @@ public class GraphTx
     extends OrientGraph
     implements AutoCloseable
 {
+  private final List<ORecordHook> hooks = Lists.newArrayList();
+
   public GraphTx(final ODatabaseDocumentTx db) {
     super(db);
     setUseLightweightEdges(true);
   }
 
+  public void registerHook(ORecordHook hook) {
+    hooks.add(hook);
+    database.registerHook(hook);
+  }
+
   @Override
   public void close() {
+    for (ORecordHook hook : hooks) {
+      database.unregisterHook(hook);
+    }
+
     database.rollback(); // no-op if no changes have occurred since last commit
     shutdown();
   }
