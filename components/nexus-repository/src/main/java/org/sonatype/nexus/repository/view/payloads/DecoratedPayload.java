@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal;
+package org.sonatype.nexus.repository.view.payloads;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,30 +31,34 @@ import org.joda.time.DateTime;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Maven payload, enriches existing {@link Payload}.
+ * Decorated payload.
  *
  * @since 3.0
  */
-public class MavenPayload
+public class DecoratedPayload
     implements Payload
 {
   private final Payload payload;
 
   private final DateTime lastModified;
 
-  private final Map<HashAlgorithm, HashCode> hashCodes;
+  private final Map<HashAlgorithm, HashCode> hashes;
 
-  public MavenPayload(final Payload payload,
-                      final DateTime lastModified,
-                      final Map<HashAlgorithm, HashCode> hashCodes)
+  public DecoratedPayload(final Payload payload,
+                             final @Nullable DateTime lastModified,
+                             final @Nullable Map<HashAlgorithm, HashCode> hashes)
   {
     this.payload = checkNotNull(payload);
     this.lastModified = lastModified;
-    final Map<HashAlgorithm, HashCode> hc = Maps.newHashMap();
-    if (hashCodes != null) {
-      hc.putAll(hashCodes);
+    final Map<HashAlgorithm, HashCode> hc = Maps.newLinkedHashMap();
+    if (hashes != null) {
+      hc.putAll(hashes);
     }
-    this.hashCodes = ImmutableMap.copyOf(hc);
+    this.hashes = ImmutableMap.copyOf(hc);
+  }
+
+  public Payload getPayload() {
+    return payload;
   }
 
   @Override
@@ -73,23 +77,27 @@ public class MavenPayload
     return payload.getContentType();
   }
 
-  @Nonnull
-  public Payload getPayload() {
-    return payload;
-  }
-
-  @Nonnull
+  @Nullable
   public DateTime getLastModified() {
     return lastModified;
   }
 
   @Nonnull
   public Set<HashAlgorithm> getHashAlgorithms() {
-    return hashCodes.keySet();
+    return hashes.keySet();
   }
 
   @Nonnull
   public Map<HashAlgorithm, HashCode> getHashCodes() {
-    return hashCodes;
+    return hashes;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "payload=" + payload +
+        ", lastModified=" + lastModified +
+        ", hashes=" + hashes +
+        '}';
   }
 }
