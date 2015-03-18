@@ -37,7 +37,7 @@ public class MavenMetadataMatcher
   public boolean matches(final Context context) {
     final String path = context.getRequest().getPath();
     final MavenPath mavenPath = mavenPathParser.parsePath(path);
-    if (mavenPathParser.isMetadataPath(mavenPath)) {
+    if (mavenPathParser.isRepositoryMetadata(mavenPath)) {
       context.getAttributes().set(MavenPath.class, mavenPath);
       return true;
     }

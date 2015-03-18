@@ -30,5 +30,5 @@ public interface MavenPathParser
   /**
    * Returns {@code true} if passed in path represent repository metadata path.
    */
-  boolean isMetadataPath(MavenPath path);
+  boolean isRepositoryMetadata(MavenPath path);
 }

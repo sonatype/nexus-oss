@@ -37,7 +37,7 @@ public class Maven2MavenPathParser
   }
 
   @Override
-  public boolean isMetadataPath(final MavenPath path) {
+  public boolean isRepositoryMetadata(final MavenPath path) {
     return path.main().getFileName().equals(MAVEN2_METADATA_NAME);
   }
 
