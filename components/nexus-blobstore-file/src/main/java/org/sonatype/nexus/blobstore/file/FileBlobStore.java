@@ -60,6 +60,10 @@ public class FileBlobStore
   public static final String TYPE = "File";
 
   public static final String BLOB_CONTENT_SUFFIX = ".blob";
+  
+  private static final String CONFIG_KEY = "file";
+  
+  private static final String PATH_KEY = "path";
 
   private Path root;
 
@@ -294,7 +298,7 @@ public class FileBlobStore
   @Override
   public void init(final BlobStoreConfiguration configuration) throws IOException {
     this.blobStoreConfiguration = configuration;
-    Path blobDir = Paths.get(getPath(configuration.getAttributes()));
+    Path blobDir = Paths.get(String.valueOf(configuration.attributes(CONFIG_KEY).require(PATH_KEY)));
     Path content = blobDir.resolve("content");
     File metadataFile = blobDir.resolve("metadata").toFile();
     DirSupport.mkdir(content);
@@ -321,6 +325,14 @@ public class FileBlobStore
     attributes.put("path", path);
     map.put("file", attributes);
     return map;
+  }
+
+  public static BlobStoreConfiguration configure(final String name, final String path) {
+    BlobStoreConfiguration configuration = new BlobStoreConfiguration();
+    configuration.setName(name);
+    configuration.setType(FileBlobStore.TYPE);
+    configuration.attributes(CONFIG_KEY).set(PATH_KEY, path);
+    return configuration;
   }
 
   class FileBlob

@@ -169,10 +169,9 @@ public class BlobStoreManagerImpl
       if (blobStore == null) {
         // create and start
         try {
-          BlobStoreConfiguration configuration = new BlobStoreConfiguration();
-          configuration.setName(name);
-          configuration.setType(FileBlobStore.TYPE);
-          configuration.setAttributes(FileBlobStore.attributes(basedir.toAbsolutePath().toString() + '/' + name));
+
+          BlobStoreConfiguration configuration = FileBlobStore
+              .configure(name, basedir.toAbsolutePath().toString() + "/" + name);
           blobStore = create(configuration);
         }
         catch (Exception e) {

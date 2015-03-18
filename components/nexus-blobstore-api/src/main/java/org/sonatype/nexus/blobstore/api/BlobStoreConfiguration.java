@@ -14,7 +14,12 @@ package org.sonatype.nexus.blobstore.api;
 
 import java.util.Map;
 
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.Entity;
+
+import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link BlobStore} configuration.
@@ -52,6 +57,22 @@ public class BlobStoreConfiguration
 
   public void setAttributes(final Map<String, Map<String, Object>> attributes) {
     this.attributes = attributes;
+  }
+
+  public NestedAttributesMap attributes(final String key) {
+    checkNotNull(key);
+
+    if (attributes == null) {
+      attributes = Maps.newHashMap();
+    }
+
+    Map<String,Object> map = attributes.get(key);
+    if (map == null) {
+      map = Maps.newHashMap();
+      attributes.put(key, map);
+    }
+
+    return new NestedAttributesMap(key, map);
   }
 
   @Override
