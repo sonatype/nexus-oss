@@ -43,30 +43,31 @@ public class MavenProxyFacet
 
   @Override
   protected Payload getCachedPayload(final Context context) throws IOException {
-    final MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
-    return mavenFacet.get(mavenPath);
+    return mavenFacet.get(mavenPath(context));
   }
 
   @Override
   protected void store(final Context context, final Payload payload) throws IOException, InvalidContentException {
-    final MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
-    mavenFacet.put(mavenPath, payload);
+    mavenFacet.put(mavenPath(context), payload);
   }
 
   @Override
   protected DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException {
-    final MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
-    return mavenFacet.getLastVerified(mavenPath);
+    return mavenFacet.getLastVerified(mavenPath(context));
   }
 
   @Override
   protected void indicateUpToDate(final Context context) throws IOException {
-    final MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
-    mavenFacet.setLastVerified(mavenPath, new DateTime());
+    mavenFacet.setLastVerified(mavenPath(context), new DateTime());
   }
 
   @Override
   protected String getUrl(final @Nonnull Context context) {
     return context.getRequest().getPath().substring(1); // omit leading slash
+  }
+
+  @Nonnull
+  private MavenPath mavenPath(final @Nonnull Context context) {
+    return context.getAttributes().require(MavenPath.class);
   }
 }
