@@ -146,8 +146,9 @@ public class MavenFacetImpl
   public Payload get(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex asset;
-      if (path.getCoordinates() != null) {
-        final OrientVertex component = findComponent(tx, path.getCoordinates(), tx.getBucket());
+      final Coordinates coordinates = path.getCoordinates();
+      if (coordinates != null) {
+        final OrientVertex component = findComponent(tx, coordinates, tx.getBucket());
         if (component == null) {
           return null;
         }
@@ -175,25 +176,27 @@ public class MavenFacetImpl
     try (StorageTx tx = getStorage().openTx()) {
       OrientVertex component = null;
       OrientVertex asset;
-      if (path.getCoordinates() != null) {
-        component = findComponent(tx, path.getCoordinates(), tx.getBucket());
+      final Coordinates coordinates = path.getCoordinates();
+      if (coordinates != null) {
+        component = findComponent(tx, coordinates, tx.getBucket());
         if (component == null) {
           component = tx.createComponent(tx.getBucket());
 
           // Set normalized properties: format, group, and name
           component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
           component.setProperty(StorageFacet.P_PATH, path.getPath());
-          component.setProperty(StorageFacet.P_GROUP, path.getCoordinates().getGroupId());
-          component.setProperty(StorageFacet.P_NAME, path.getCoordinates().getArtifactId());
-          component.setProperty(StorageFacet.P_VERSION, path.getCoordinates().getVersion());
+          component.setProperty(StorageFacet.P_GROUP, coordinates.getGroupId());
+          component.setProperty(StorageFacet.P_NAME, coordinates.getArtifactId());
+          component.setProperty(StorageFacet.P_VERSION, coordinates.getVersion());
 
+          // Set format specific attributes
           final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
-          componentAttributes.set(P_COMPONENT_KEY, getComponentKey(path.getCoordinates()));
-          componentAttributes.set(P_GROUP_ID, path.getCoordinates().getGroupId());
-          componentAttributes.set(P_ARTIFACT_ID, path.getCoordinates().getArtifactId());
-          componentAttributes.set(P_VERSION, path.getCoordinates().getVersion());
-          if (path.getCoordinates().isSnapshot()) {
-            componentAttributes.set(P_BASE_VERSION, path.getCoordinates().getBaseVersion());
+          componentAttributes.set(P_COMPONENT_KEY, getComponentKey(coordinates));
+          componentAttributes.set(P_GROUP_ID, coordinates.getGroupId());
+          componentAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
+          componentAttributes.set(P_VERSION, coordinates.getVersion());
+          if (coordinates.isSnapshot()) {
+            componentAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
           }
         }
 
@@ -214,15 +217,16 @@ public class MavenFacetImpl
         final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
         assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
         assetAttributes.set(P_ASSET_KIND, path.getKind().name());
-        if (path.getCoordinates() != null) {
-          assetAttributes.set(P_GROUP_ID, path.getCoordinates().getGroupId());
-          assetAttributes.set(P_ARTIFACT_ID, path.getCoordinates().getArtifactId());
-          assetAttributes.set(P_VERSION, path.getCoordinates().getVersion());
-          if (path.getCoordinates().isSnapshot()) {
-            assetAttributes.set(P_BASE_VERSION, path.getCoordinates().getBaseVersion());
+
+        if (coordinates != null) {
+          assetAttributes.set(P_GROUP_ID, coordinates.getGroupId());
+          assetAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
+          assetAttributes.set(P_VERSION, coordinates.getVersion());
+          if (coordinates.isSnapshot()) {
+            assetAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
           }
-          assetAttributes.set(P_CLASSIFIER, path.getCoordinates().getClassifier());
-          assetAttributes.set(P_EXTENSION, path.getCoordinates().getExtension());
+          assetAttributes.set(P_CLASSIFIER, coordinates.getClassifier());
+          assetAttributes.set(P_EXTENSION, coordinates.getExtension());
         }
 
         // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
@@ -251,8 +255,9 @@ public class MavenFacetImpl
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex component;
       final OrientVertex asset;
-      if (path.getCoordinates() != null) {
-        component = findComponent(tx, path.getCoordinates(), tx.getBucket());
+      final Coordinates coordinates = path.getCoordinates();
+      if (coordinates != null) {
+        component = findComponent(tx, coordinates, tx.getBucket());
         if (component == null) {
           return false;
         }
