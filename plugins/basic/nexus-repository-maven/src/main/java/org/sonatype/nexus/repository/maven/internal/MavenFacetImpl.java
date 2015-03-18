@@ -14,7 +14,9 @@ package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,7 +43,10 @@ import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.hash.HashCode;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -92,6 +97,8 @@ public class MavenFacetImpl
 
   private static final String P_ASSET_KEY = "key";
 
+  private static final String P_CONTENT_LAST_MODIFIED = "contentLastModified";
+
   private static final String CONFIG_KEY = "maven";
 
   private static final List<HashAlgorithm> HASH_ALGORITHMS = Lists.newArrayList(SHA1, MD5);
@@ -139,7 +146,7 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
-  public Payload get(final MavenPath path) throws IOException {
+  public MavenPayload get(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
       if (asset == null) {
@@ -149,7 +156,16 @@ public class MavenFacetImpl
       final Blob blob = tx.getBlob(blobRef);
       checkState(blob != null, "asset of component with at path %s refers to missing blob %s", path.getPath(), blobRef);
       final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
-      return new BlobPayload(blob, contentType);
+
+      final NestedAttributesMap attributesMap = getFormatAttributes(tx, asset);
+      final Date lastModifiedDate = attributesMap.require(P_CONTENT_LAST_MODIFIED, Date.class);
+      final NestedAttributesMap checksumAttributes = getAttributes(tx, asset).child(StorageFacet.P_CHECKSUM);
+      final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
+      for (HashAlgorithm algorithm : HASH_ALGORITHMS) {
+        final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
+        hashCodes.put(algorithm, hashCode);
+      }
+      return new MavenPayload(new BlobPayload(blob, contentType), new DateTime(lastModifiedDate), hashCodes);
     }
   }
 
@@ -258,6 +274,9 @@ public class MavenFacetImpl
         }
       }
     }
+
+    final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
+    assetAttributes.set(P_CONTENT_LAST_MODIFIED, new Date());
   }
 
   @Override

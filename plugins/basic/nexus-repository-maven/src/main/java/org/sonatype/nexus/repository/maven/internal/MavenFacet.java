@@ -39,7 +39,7 @@ public interface MavenFacet
   ChecksumPolicy getChecksumPolicy();
 
   @Nullable
-  Payload get(MavenPath path) throws IOException;
+  MavenPayload get(MavenPath path) throws IOException;
 
   void put(MavenPath path, Payload content) throws IOException, InvalidContentException;
 
