@@ -13,6 +13,7 @@
 package com.sonatype.nexus.repository.nuget.internal
 
 import javax.inject.Named
+import javax.inject.Singleton
 
 import com.sonatype.nexus.repository.nuget.internal.proxy.NugetProxyRecipe
 
@@ -24,6 +25,7 @@ import org.sonatype.nexus.repository.manager.InitialRepositoryConfiguration
  * @since 3.0
  */
 @Named
+@Singleton
 class NugetInitialRepositoryConfiguration
     implements InitialRepositoryConfiguration
 

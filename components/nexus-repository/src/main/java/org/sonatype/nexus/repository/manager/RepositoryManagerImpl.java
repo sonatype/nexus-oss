@@ -169,6 +169,10 @@ public class RepositoryManagerImpl
           }
         }
         configurations = store.list();
+        if(configurations.isEmpty()) {
+          log.debug("No default repositories to provision");
+          return;
+        }
       }
     }
 

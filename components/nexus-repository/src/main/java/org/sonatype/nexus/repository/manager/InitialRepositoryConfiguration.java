@@ -17,6 +17,7 @@ import java.util.List;
 import org.sonatype.nexus.repository.config.Configuration;
 
 /**
+ * Provides configurations for repositories that should be provisioned by default on first system startup.
  * @since 3.0
  */
 public interface InitialRepositoryConfiguration
