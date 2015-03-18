@@ -10,12 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.pax.exam;
+package org.sonatype.nexus.testsuite;
 
 import javax.inject.Inject;
 
 import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 
 import org.junit.Test;
 import org.ops4j.pax.exam.Configuration;
@@ -26,7 +27,7 @@ import static org.hamcrest.Matchers.is;
 import static org.ops4j.pax.exam.CoreOptions.options;
 
 /**
- * Sanity test of the Pax-Exam test infrastructure.
+ * Sanity test of the OSS base template.
  * 
  * @since 3.0
  */

@@ -35,110 +35,31 @@
   </properties>
 
   <dependencies>
-
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-ldap-model</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-pax-exam</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.http-testing-harness</groupId>
-      <artifactId>junit-runner</artifactId>
+      <groupId>org.sonatype.nexus.assemblies</groupId>
+      <artifactId>nexus-base-template</artifactId>
+      <type>zip</type>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-util-ajax</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-proxy</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.icegreen</groupId>
-      <artifactId>greenmail</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-verifier</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!--
-    Additional plugin features
-    -->
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-testsuite-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-kenai-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-obr-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-rutauth-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-repository-nuget</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-site-repository-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-yum-repository-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
   </dependencies>
+
+  <build>
+    <plugins>
+      <!--
+      Allow use of 'versionAsInProject' in Pax-Exam configuration
+      -->
+      <plugin>
+        <groupId>org.apache.servicemix.tooling</groupId>
+        <artifactId>depends-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
   <profiles>
     <profile>
