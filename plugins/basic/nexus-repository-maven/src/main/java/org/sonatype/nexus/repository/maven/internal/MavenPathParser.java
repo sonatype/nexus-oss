@@ -15,7 +15,7 @@ package org.sonatype.nexus.repository.maven.internal;
 import javax.annotation.Nonnull;
 
 /**
- * Component responsible for parsing request paths into {@link MavenPath}.
+ * Component representing Maven layout specific bits, like parsing request paths into {@link MavenPath}.
  *
  * @since 3.0
  */
@@ -26,4 +26,9 @@ public interface MavenPathParser
    */
   @Nonnull
   MavenPath parsePath(String path);
+
+  /**
+   * Returns {@code true} if passed in path represent repository metadata path.
+   */
+  boolean isMetadataPath(MavenPath path);
 }

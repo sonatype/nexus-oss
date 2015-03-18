@@ -41,8 +41,6 @@ import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -93,8 +91,6 @@ public class MavenFacetImpl
   // shared properties for both artifact and metadata assets
 
   private static final String P_ASSET_KEY = "key";
-
-  private static final String P_ASSET_KIND = "kind";
 
   private static final String CONFIG_KEY = "maven";
 
@@ -216,7 +212,6 @@ public class MavenFacetImpl
 
         final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
         assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
-        assetAttributes.set(P_ASSET_KIND, path.getKind().name());
 
         if (coordinates != null) {
           assetAttributes.set(P_GROUP_ID, coordinates.getGroupId());

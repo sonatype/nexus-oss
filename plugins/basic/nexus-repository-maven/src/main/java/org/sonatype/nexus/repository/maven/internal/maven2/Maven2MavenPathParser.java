@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.maven.internal.maven2;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.maven.internal.MavenPath;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
@@ -26,13 +28,25 @@ import org.sonatype.nexus.repository.maven.internal.MavenPathParser;
 public class Maven2MavenPathParser
     implements MavenPathParser
 {
+  private static final String MAVEN2_METADATA_NAME = "maven-metadata.xml";
+
   @Override
   public MavenPath parsePath(final String path) {
-    final Coordinates coordinates = pathToCoordinates(path);
+    final Coordinates coordinates = maven2LayoutedPathToCoordinates(path);
     return new MavenPath(path, coordinates);
   }
 
-  private Coordinates pathToCoordinates(String str) {
+  @Override
+  public boolean isMetadataPath(final MavenPath path) {
+    return path.main().getFileName().equals(MAVEN2_METADATA_NAME);
+  }
+
+  /**
+   * Tries to parse a path according to Maven2 layout spec, and extract the {@link Coordinates} out of it, if possible.
+   * If path does not obeys Maven2 layout or is not an artifact path, {@code null} is returned.
+   */
+  @Nullable
+  private Coordinates maven2LayoutedPathToCoordinates(String str) {
     try {
       str = str.startsWith("/") ? str.substring(1) : str;
 

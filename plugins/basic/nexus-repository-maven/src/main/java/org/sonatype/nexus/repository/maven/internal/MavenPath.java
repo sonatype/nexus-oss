@@ -23,24 +23,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Maven repository path. Every item in repository may have hashes, stored on paths with proper
- * suffixes, and artifact paths have coordinates.
+ * suffixes, and artifact paths have non-null coordinates.
  *
  * @since 3.0
  */
 @Immutable
 public class MavenPath
 {
-  private static final String MAVEN_METADATA_FILENAME = "maven-metadata.xml";
-
-  public static enum Kind
-  {
-    ARTIFACT,
-
-    METADATA,
-
-    OTHER
-  }
-
   public static enum HashType
   {
     SHA1("sha1", HashAlgorithm.SHA1),
@@ -157,8 +146,6 @@ public class MavenPath
     }
   }
 
-  private final Kind kind;
-
   private final String path;
 
   private final String fileName;
@@ -180,20 +167,6 @@ public class MavenPath
     }
     this.hashType = ht;
     this.coordinates = coordinates;
-    if (coordinates != null) {
-      this.kind = Kind.ARTIFACT;
-    }
-    else if (main().getFileName().equals(MAVEN_METADATA_FILENAME)) {
-      this.kind = Kind.METADATA;
-    }
-    else {
-      this.kind = Kind.OTHER;
-    }
-  }
-
-  @Nonnull
-  public Kind getKind() {
-    return kind;
   }
 
   @Nonnull
@@ -206,11 +179,17 @@ public class MavenPath
     return fileName;
   }
 
+  /**
+   * Returns hash type if this path points at Maven hash file, otherwise {@code null}.
+   */
   @Nullable
   public HashType getHashType() {
     return hashType;
   }
 
+  /**
+   * Returns the Maven coordinates if this path is an artifact path, otherwise {@code null}.
+   */
   @Nullable
   public Coordinates getCoordinates() { return coordinates; }
 
