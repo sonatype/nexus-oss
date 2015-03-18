@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.httpclient;
 
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 
 /**
  * {@link HttpClientConfig} marshaller.

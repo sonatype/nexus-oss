@@ -34,8 +34,8 @@ import com.sonatype.nexus.repository.nuget.internal.NugetWritableGallery;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataConsumer;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
 
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
