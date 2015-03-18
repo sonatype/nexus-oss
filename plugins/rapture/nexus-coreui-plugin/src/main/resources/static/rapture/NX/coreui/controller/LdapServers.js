@@ -173,9 +173,13 @@ Ext.define('NX.coreui.controller.LdapServers', {
     var me = this;
 
     if (Ext.isDefined(model)) {
+      Ext.suspendLayouts();
+
       me.getConnection().loadRecord(model);
       me.getBackup().loadRecord(model);
       me.getUserAndGroup().loadRecord(model);
+
+      Ext.resumeLayouts(true);
     }
   },
 
@@ -251,9 +255,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
       values = {};
 
     // Get fields from all relevant forms
-    Ext.apply(values, connectionForm.getValues());
-    Ext.apply(values, userGroupForm.getValues());
-    Ext.apply(values, backupForm.getValues());
+    Ext.apply(values, connectionForm.getForm().getFieldValues());
+    Ext.apply(values, userGroupForm.getForm().getFieldValues());
+    Ext.apply(values, backupForm.getForm().getFieldValues());
 
     var modelData = connectionForm.getForm().getRecord().getData(false);
 
@@ -288,8 +292,8 @@ Ext.define('NX.coreui.controller.LdapServers', {
       values = {};
 
     // Get fields from all relevant forms
-    Ext.apply(values, connectionForm.getValues());
-    Ext.apply(values, userGroupForm.getValues());
+    Ext.apply(values, connectionForm.getForm().getFieldValues());
+    Ext.apply(values, userGroupForm.getForm().getFieldValues());
 
     NX.direct.ldap_LdapServer.create(values, function(response) {
       if (Ext.isObject(response)) {
