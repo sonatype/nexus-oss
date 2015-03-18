@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.sonatype.nexus.repository.maven.internal.MavenPath;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
-import org.sonatype.nexus.repository.maven.internal.MavenPath.Kind;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.SignatureType;
 import org.sonatype.nexus.repository.maven.internal.MavenPathParser;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -126,7 +125,6 @@ public class Maven2MavenPathParserMxTest
     final MavenPath mavenPath = subject.parsePath(path);
     assertThat(mavenPath, notNullValue());
     assertThat(mavenPath.getPath(), equalTo(path));
-    assertThat(mavenPath.getKind(), equalTo(Kind.ARTIFACT));
     assertThat(mavenPath.getHashType(), equalTo(hashType));
     assertThat(mavenPath.getCoordinates(), notNullValue());
     assertThat(mavenPath.getCoordinates().isSnapshot(), equalTo(snapshot));
