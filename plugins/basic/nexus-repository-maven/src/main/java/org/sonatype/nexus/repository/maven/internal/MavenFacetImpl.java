@@ -265,7 +265,7 @@ public class MavenFacetImpl
       if (asset == null) {
         return false;
       }
-      final boolean lastAsset = component != null && getComponentAssets(component).size() == 1;
+      final boolean lastAsset = component != null && tx.findAssets(component).size() == 1;
       tx.deleteBlob(getBlobRef(path, asset));
       tx.deleteVertex(asset);
       if (lastAsset) {
@@ -308,22 +308,6 @@ public class MavenFacetImpl
   }
 
   /**
-   * Returns a list of all component assets.
-   */
-  private List<OrientVertex> getComponentAssets(final OrientVertex component)
-  {
-    final List<Vertex> vertices = Lists
-        .newArrayList(component.getVertices(Direction.IN, StorageFacet.E_PART_OF_COMPONENT));
-    final List<OrientVertex> result = Lists.newArrayList();
-    for (Vertex v : vertices) {
-      if (v instanceof OrientVertex) {
-        result.add((OrientVertex) v);
-      }
-    }
-    return result;
-  }
-
-  /**
    * Selects a component asset by key.
    */
   @Nullable
@@ -332,7 +316,7 @@ public class MavenFacetImpl
                                             final MavenPath artifactPath)
   {
     final String assetKey = getAssetKey(artifactPath);
-    final List<OrientVertex> assets = getComponentAssets(component);
+    final List<OrientVertex> assets = tx.findAssets(component);
     for (OrientVertex v : assets) {
       final NestedAttributesMap attributesMap = getFormatAttributes(tx, v);
       if (assetKey.equals(attributesMap.get(P_ASSET_KEY, String.class))) {
