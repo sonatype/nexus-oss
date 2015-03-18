@@ -27,7 +27,7 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
-import org.sonatype.nexus.repository.view.payloads.DecoratedPayload;
+import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Iterables;
@@ -44,8 +44,8 @@ import org.joda.time.DateTime;
 @Named
 @Singleton
 public class DefaultHttpResponseSender
-  extends ComponentSupport
-  implements HttpResponseSender
+    extends ComponentSupport
+    implements HttpResponseSender
 {
   @Override
   public void send(final Response response, final HttpServletResponse httpResponse)
@@ -54,7 +54,7 @@ public class DefaultHttpResponseSender
     log.trace("Sending response: {}", response);
 
     // add response headers
-    for (Map.Entry<String,String> header : response.getHeaders()) {
+    for (Map.Entry<String, String> header : response.getHeaders()) {
       httpResponse.addHeader(header.getKey(), header.getValue());
     }
 
@@ -63,7 +63,7 @@ public class DefaultHttpResponseSender
     if (status.isSuccessful() || response instanceof PayloadResponse) {
       httpResponse.setStatus(status.getCode());
       if (response instanceof PayloadResponse) {
-        Payload payload = ((PayloadResponse)response).getPayload();
+        Payload payload = ((PayloadResponse) response).getPayload();
         log.trace("Attaching payload: {}", payload);
 
         if (payload.getContentType() != null) {
@@ -71,8 +71,8 @@ public class DefaultHttpResponseSender
         }
         httpResponse.setContentLengthLong(payload.getSize());
 
-        if (payload instanceof DecoratedPayload) {
-          final DecoratedPayload decoratedPayload = (DecoratedPayload) payload;
+        if (payload instanceof BlobPayload) {
+          final BlobPayload decoratedPayload = (BlobPayload) payload;
           final DateTime lastModified = decoratedPayload.getLastModified();
           if (lastModified != null) {
             httpResponse.setDateHeader(

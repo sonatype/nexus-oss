@@ -14,14 +14,22 @@ package org.sonatype.nexus.repository.view.payloads;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.Blob;
+import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.view.Payload;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.google.common.hash.HashCode;
+import org.joda.time.DateTime;
+
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * {@link Blob} backed payload.
@@ -35,10 +43,27 @@ public class BlobPayload
 
   private final String contentType;
 
-  public BlobPayload(final Blob blob, final @Nullable String contentType)
+  private final DateTime lastModified;
+
+  private final Map<HashAlgorithm, HashCode> hashes;
+
+  public BlobPayload(final Blob blob, final @Nullable String contentType) {
+    this(blob, contentType, null, null);
+  }
+
+  public BlobPayload(final Blob blob,
+                     final @Nullable String contentType,
+                     final @Nullable DateTime lastModified,
+                     final @Nullable Map<HashAlgorithm, HashCode> hashes)
   {
     this.blob = checkNotNull(blob);
     this.contentType = contentType;
+    this.lastModified = lastModified;
+    final Map<HashAlgorithm, HashCode> hc = Maps.newLinkedHashMap();
+    if (hashes != null) {
+      hc.putAll(hashes);
+    }
+    this.hashes = ImmutableMap.copyOf(hc);
   }
 
   @Override
@@ -55,6 +80,21 @@ public class BlobPayload
   @Override
   public String getContentType() {
     return contentType;
+  }
+
+  @Nullable
+  public DateTime getLastModified() {
+    return lastModified;
+  }
+
+  @Nonnull
+  public Set<HashAlgorithm> getHashAlgorithms() {
+    return hashes.keySet();
+  }
+
+  @Nonnull
+  public Map<HashAlgorithm, HashCode> getHashCodes() {
+    return hashes;
   }
 
   @Override
