@@ -12,48 +12,34 @@
  */
 package org.sonatype.sisu.locks;
 
-import java.util.Properties;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
-import com.google.inject.Provides;
-import org.eclipse.sisu.Parameters;
-import org.eclipse.sisu.launch.InjectedTestCase;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 @Category(Slow.class)
 public class MultiThreadedResourceLockIT
-    extends InjectedTestCase
 {
-  // FIXME: Convert to junit4
 
-  @Provides
-  @Parameters
-  Properties systemProperties() {
-    return System.getProperties();
-  }
-
+  @Test
   public void testLocalLocks()
       throws InterruptedException
   {
     // test local JVM locks
-    System.setProperty("resource-lock-hint", "local");
-    launchThreads();
+    launchThreads(new LocalResourceLockFactory());
   }
 
+  @Test
   public void testHazelcastLocks()
       throws InterruptedException
   {
     // test distributed locks
-    System.setProperty("resource-lock-hint", "hazelcast");
-    launchThreads();
+    launchThreads(new HazelcastResourceLockFactory(null));
   }
 
-  @Singleton
   static class TestData
   {
     volatile boolean running;
@@ -67,12 +53,11 @@ public class MultiThreadedResourceLockIT
     Throwable[] errors;
   }
 
-  @Inject
-  private TestData data;
-
-  private void launchThreads()
+  private static void launchThreads(ResourceLockFactory locks)
       throws InterruptedException
   {
+    TestData data = new TestData();
+
     data.ts = new Thread[128];
 
     data.sharedDepth = new int[data.ts.length];
@@ -80,7 +65,7 @@ public class MultiThreadedResourceLockIT
     data.errors = new Throwable[data.ts.length];
 
     for (int i = 0; i < data.ts.length; i++) {
-      final Locker locker = lookup(Locker.class);
+      final Locker locker = new Locker(locks, data);
       data.ts[i] = new Thread(locker);
       locker.setIndex(i);
     }
@@ -109,18 +94,19 @@ public class MultiThreadedResourceLockIT
     assertFalse(failed);
   }
 
-  @Named
   private static class Locker
       implements Runnable
   {
-    @Inject
-    @Named("resource-lock-hint")
     private ResourceLockFactory locks;
 
-    @Inject
     private TestData data;
 
     private int index;
+
+    public Locker(ResourceLockFactory locks, TestData data) {
+      this.locks = locks;
+      this.data = data;
+    }
 
     public void setIndex(final int index) {
       this.index = index;

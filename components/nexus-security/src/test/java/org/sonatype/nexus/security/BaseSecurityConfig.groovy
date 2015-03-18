@@ -19,9 +19,9 @@ import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 /**
  * @since 3.0
  */
-class AbstractSecurityTestCaseSecurity
+class BaseSecurityConfig
 {
-  static MemorySecurityConfiguration securityModel() {
+  static MemorySecurityConfiguration get() {
     return new MemorySecurityConfiguration(
         users: [
             new CUser(

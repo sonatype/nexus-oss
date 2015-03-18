@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CRole;
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration;
@@ -27,16 +27,18 @@ import org.sonatype.nexus.security.privilege.Privilege;
 import org.sonatype.nexus.security.role.NoSuchRoleException;
 import org.sonatype.nexus.security.role.Role;
 
-import junit.framework.Assert;
+import org.junit.Test;
+
+import org.junit.Assert;
 
 /**
  * Tests for {@link AuthorizationManager}.
  */
 public class AuthorizationManagerTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
   @Override
-  protected MemorySecurityConfiguration getSecurityModelConfig() {
+  protected MemorySecurityConfiguration initialSecurityConfiguration() {
     return AuthorizationManagerTestSecurity.securityModel();
   }
 
@@ -50,6 +52,7 @@ public class AuthorizationManagerTest
 
   // ROLES
 
+  @Test
   public void testListRoles() throws Exception {
     AuthorizationManager authzManager = this.getAuthorizationManager();
     Set<Role> roles = authzManager.listRoles();
@@ -70,6 +73,7 @@ public class AuthorizationManagerTest
     Assert.assertEquals(2, role3.getPrivileges().size());
   }
 
+  @Test
   public void testGetRole() throws Exception {
     AuthorizationManager authzManager = this.getAuthorizationManager();
 
@@ -83,6 +87,7 @@ public class AuthorizationManagerTest
     Assert.assertEquals(2, role1.getPrivileges().size());
   }
 
+  @Test
   public void testAddRole() throws Exception {
     AuthorizationManager authzManager = this.getAuthorizationManager();
 
@@ -105,6 +110,7 @@ public class AuthorizationManagerTest
     Assert.assertEquals(2, secRole.getPrivileges().size());
   }
 
+  @Test
   public void testUpdateRole() throws Exception {
     AuthorizationManager authzManager = this.getAuthorizationManager();
 
@@ -127,6 +133,7 @@ public class AuthorizationManagerTest
     Assert.assertEquals(1, secRole.getPrivileges().size());
   }
 
+  @Test
   public void testDeleteRole() throws Exception {
     AuthorizationManager authzManager = this.getAuthorizationManager();
     try {
@@ -178,6 +185,7 @@ public class AuthorizationManagerTest
 
   // Privileges
 
+  @Test
   public void testListPrivileges() throws Exception {
     AuthorizationManager authzManager = this.getAuthorizationManager();
     Set<Privilege> privileges = authzManager.listPrivileges();
@@ -199,6 +207,7 @@ public class AuthorizationManagerTest
     Assert.assertEquals("/some/path/", priv3.getPrivilegeProperty("permission"));
   }
 
+  @Test
   public void testGetPrivilege() throws Exception {
     AuthorizationManager authzManager = this.getAuthorizationManager();
 
@@ -212,6 +221,7 @@ public class AuthorizationManagerTest
     Assert.assertEquals("/some/path/", priv3.getPrivilegeProperty("permission"));
   }
 
+  @Test
   public void testAddPrivilege() throws Exception {
     AuthorizationManager authzManager = this.getAuthorizationManager();
 
@@ -238,6 +248,7 @@ public class AuthorizationManagerTest
     Assert.assertEquals("foo2", secPriv.getProperty("bar1"));
   }
 
+  @Test
   public void testUpdatePrivilege() throws Exception {
     AuthorizationManager authzManager = this.getAuthorizationManager();
 
@@ -258,6 +269,7 @@ public class AuthorizationManagerTest
     Assert.assertEquals(2, secPriv.getProperties().size());
   }
 
+  @Test
   public void testDeleteUser() throws Exception {
     AuthorizationManager authzManager = this.getAuthorizationManager();
     try {

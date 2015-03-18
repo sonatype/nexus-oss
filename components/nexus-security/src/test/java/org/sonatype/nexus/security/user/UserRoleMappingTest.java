@@ -15,20 +15,21 @@ package org.sonatype.nexus.security.user;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.config.CUser;
 import org.sonatype.nexus.security.config.CUserRoleMapping;
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration;
 import org.sonatype.nexus.security.config.SecurityConfigurationManager;
 import org.sonatype.nexus.security.internal.SecurityConfigurationManagerImpl;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class UserRoleMappingTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
   @Override
-  protected MemorySecurityConfiguration getSecurityModelConfig() {
+  protected MemorySecurityConfiguration initialSecurityConfiguration() {
     return UserRoleMappingTestSecurity.securityModel();
   }
 
@@ -36,6 +37,7 @@ public class UserRoleMappingTest
     return this.lookup(SecurityConfigurationManagerImpl.class);
   }
 
+  @Test
   public void testGetUser() throws Exception {
     SecurityConfigurationManager config = this.getConfigManager();
 
@@ -54,6 +56,7 @@ public class UserRoleMappingTest
     Assert.assertEquals(2, mapping.getRoles().size());
   }
 
+  @Test
   public void testGetUserWithEmptyRole() throws Exception {
     SecurityConfigurationManager config = this.getConfigManager();
 
@@ -84,6 +87,7 @@ public class UserRoleMappingTest
     Assert.assertEquals(3, mapping.getRoles().size());
   }
 
+  @Test
   public void testUpdateUsersRoles() throws Exception {
     SecurityConfigurationManager config = this.getConfigManager();
 

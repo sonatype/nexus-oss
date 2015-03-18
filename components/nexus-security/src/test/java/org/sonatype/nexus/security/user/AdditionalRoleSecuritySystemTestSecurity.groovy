@@ -21,7 +21,7 @@ import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 /**
  * @since 3.0
  */
-class AdditinalRoleSecuritySystemTestSecurity
+class AdditionalRoleSecuritySystemTestSecurity
 {
 
   static MemorySecurityConfiguration securityModel() {
