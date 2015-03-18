@@ -158,9 +158,10 @@ public class RepositoryManagerImpl
     if (configurations.isEmpty()) {
       log.debug("No repositories configured");
       if (Boolean.valueOf(System.getProperty(SKIP_DEFAULT_REPOSITORIES, "false"))) {
-        log.debug("Skipping provisioning of default repositories due to '" + SKIP_DEFAULT_REPOSITORIES + "' property");
+        log.debug("Skipping provisioning of default repositories due to '{}' property", SKIP_DEFAULT_REPOSITORIES);
         return;
-      } else {
+      }
+      else {
         log.debug("Provisioning default repositories");
         for (DefaultRepositoriesContributor configProvider : defaultRepositoriesContributors) {
           for (Configuration configuration : configProvider.getRepositoryConfigurations()) {
@@ -169,7 +170,7 @@ public class RepositoryManagerImpl
           }
         }
         configurations = store.list();
-        if(configurations.isEmpty()) {
+        if (configurations.isEmpty()) {
           log.debug("No default repositories to provision");
           return;
         }
