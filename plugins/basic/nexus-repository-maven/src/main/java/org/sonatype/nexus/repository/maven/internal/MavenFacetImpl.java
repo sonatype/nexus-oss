@@ -141,28 +141,41 @@ public class MavenFacetImpl
   @Override
   public Payload get(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex asset;
-      final Coordinates coordinates = path.getCoordinates();
-      if (coordinates != null) {
-        final OrientVertex component = findComponent(tx, coordinates, tx.getBucket());
-        if (component == null) {
-          return null;
-        }
-        asset = selectComponentAsset(tx, component, path);
+      if (path.getCoordinates() != null) {
+        return getArtifact(path, tx);
       }
       else {
-        asset = findAsset(tx, path, tx.getBucket());
+        return getFile(path, tx);
       }
-      if (asset == null) {
-        return null;
-      }
-      final BlobRef blobRef = getBlobRef(path, asset);
-      final Blob blob = tx.getBlob(blobRef);
-      checkState(blob != null, "asset of component with at path %s refers to missing blob %s", path.getPath(),
-          blobRef);
-      final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
-      return new BlobPayload(blob, contentType);
     }
+  }
+
+  private Payload getArtifact(final MavenPath path, final StorageTx tx) throws IOException {
+    final OrientVertex component = findComponent(tx, tx.getBucket(), path);
+    if (component == null) {
+      return null;
+    }
+    final OrientVertex asset = selectComponentAsset(tx, component, path);
+    if (asset == null) {
+      return null;
+    }
+    return getAssetPayload(path, tx, asset);
+  }
+
+  private Payload getFile(final MavenPath path, final StorageTx tx) throws IOException {
+    final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
+    if (asset == null) {
+      return null;
+    }
+    return getAssetPayload(path, tx, asset);
+  }
+
+  private BlobPayload getAssetPayload(final MavenPath path, final StorageTx tx, final OrientVertex asset) {
+    final BlobRef blobRef = getBlobRef(path, asset);
+    final Blob blob = tx.getBlob(blobRef);
+    checkState(blob != null, "asset of component with at path %s refers to missing blob %s", path.getPath(), blobRef);
+    final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
+    return new BlobPayload(blob, contentType);
   }
 
   @Override
@@ -170,110 +183,148 @@ public class MavenFacetImpl
       throws IOException, InvalidContentException
   {
     try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex component = null;
-      OrientVertex asset;
-      final Coordinates coordinates = path.getCoordinates();
-      if (coordinates != null) {
-        component = findComponent(tx, coordinates, tx.getBucket());
-        if (component == null) {
-          component = tx.createComponent(tx.getBucket());
-
-          // Set normalized properties: format, group, and name
-          component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
-          component.setProperty(StorageFacet.P_PATH, path.getPath());
-          component.setProperty(StorageFacet.P_GROUP, coordinates.getGroupId());
-          component.setProperty(StorageFacet.P_NAME, coordinates.getArtifactId());
-          component.setProperty(StorageFacet.P_VERSION, coordinates.getVersion());
-
-          // Set format specific attributes
-          final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
-          componentAttributes.set(P_COMPONENT_KEY, getComponentKey(coordinates));
-          componentAttributes.set(P_GROUP_ID, coordinates.getGroupId());
-          componentAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
-          componentAttributes.set(P_VERSION, coordinates.getVersion());
-          if (coordinates.isSnapshot()) {
-            componentAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
-          }
-        }
-
-        asset = selectComponentAsset(tx, component, path);
+      if (path.getCoordinates() != null) {
+        putArtifact(path, content, tx);
       }
       else {
-        asset = findAsset(tx, path, tx.getBucket());
-      }
-      if (asset == null) {
-        asset = tx.createAsset(tx.getBucket());
-        if (component != null) {
-          asset.addEdge(StorageFacet.E_PART_OF_COMPONENT, component);
-        }
-        asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
-        asset.setProperty(StorageFacet.P_NAME, path.getFileName());
-        asset.setProperty(StorageFacet.P_PATH, path.getPath());
-
-        final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
-        assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
-
-        if (coordinates != null) {
-          assetAttributes.set(P_GROUP_ID, coordinates.getGroupId());
-          assetAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
-          assetAttributes.set(P_VERSION, coordinates.getVersion());
-          if (coordinates.isSnapshot()) {
-            assetAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
-          }
-          assetAttributes.set(P_CLASSIFIER, coordinates.getClassifier());
-          assetAttributes.set(P_EXTENSION, coordinates.getExtension());
-        }
-
-        // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
-      }
-
-      // TODO: Figure out created-by header
-      final ImmutableMap<String, String> headers = ImmutableMap.of(
-          BlobStore.BLOB_NAME_HEADER, path.getPath(),
-          BlobStore.CREATED_BY_HEADER, "unknown"
-      );
-
-      try (InputStream inputStream = content.openInputStream()) {
-        try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
-          final String contentType = determineContentType(path, supplier, content.getContentType());
-          try (InputStream is = supplier.get()) {
-            tx.setBlob(is, headers, asset, HASH_ALGORITHMS, contentType);
-          }
-        }
+        putFile(path, content, tx);
       }
       tx.commit();
+    }
+  }
+
+  private void putArtifact(final MavenPath path, final Payload content, final StorageTx tx)
+      throws IOException, InvalidContentException
+  {
+    final Coordinates coordinates = path.getCoordinates();
+    OrientVertex component = findComponent(tx, tx.getBucket(), path);
+    if (component == null) {
+      component = tx.createComponent(tx.getBucket());
+
+      // Set normalized properties: format, group, and name
+      component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
+      component.setProperty(StorageFacet.P_PATH, path.getPath());
+      component.setProperty(StorageFacet.P_GROUP, coordinates.getGroupId());
+      component.setProperty(StorageFacet.P_NAME, coordinates.getArtifactId());
+      component.setProperty(StorageFacet.P_VERSION, coordinates.getVersion());
+
+      // Set format specific attributes
+      final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
+      componentAttributes.set(P_COMPONENT_KEY, getComponentKey(coordinates));
+      componentAttributes.set(P_GROUP_ID, coordinates.getGroupId());
+      componentAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
+      componentAttributes.set(P_VERSION, coordinates.getVersion());
+      if (coordinates.isSnapshot()) {
+        componentAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
+      }
+    }
+
+    OrientVertex asset = selectComponentAsset(tx, component, path);
+    if (asset == null) {
+      asset = tx.createAsset(tx.getBucket());
+
+      asset.addEdge(StorageFacet.E_PART_OF_COMPONENT, component);
+      asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
+      asset.setProperty(StorageFacet.P_NAME, path.getFileName());
+      asset.setProperty(StorageFacet.P_PATH, path.getPath());
+
+      final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
+      assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
+      assetAttributes.set(P_GROUP_ID, coordinates.getGroupId());
+      assetAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
+      assetAttributes.set(P_VERSION, coordinates.getVersion());
+      if (coordinates.isSnapshot()) {
+        assetAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
+      }
+      assetAttributes.set(P_CLASSIFIER, coordinates.getClassifier());
+      assetAttributes.set(P_EXTENSION, coordinates.getExtension());
+
+      // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
+    }
+
+    putAssetPayload(path, tx, asset, content);
+  }
+
+  private void putFile(final MavenPath path, final Payload content, final StorageTx tx)
+      throws IOException, InvalidContentException
+  {
+    OrientVertex asset = findAsset(tx, tx.getBucket(), path);
+    if (asset == null) {
+      asset = tx.createAsset(tx.getBucket());
+      asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
+      asset.setProperty(StorageFacet.P_NAME, path.getFileName());
+      asset.setProperty(StorageFacet.P_PATH, path.getPath());
+
+      final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
+      assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
+
+      // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
+    }
+
+    putAssetPayload(path, tx, asset, content);
+  }
+
+  private void putAssetPayload(final MavenPath path,
+                               final StorageTx tx,
+                               final OrientVertex asset,
+                               final Payload content) throws IOException
+  {
+    // TODO: Figure out created-by header
+    final ImmutableMap<String, String> headers = ImmutableMap.of(
+        BlobStore.BLOB_NAME_HEADER, path.getPath(),
+        BlobStore.CREATED_BY_HEADER, "unknown"
+    );
+
+    try (InputStream inputStream = content.openInputStream()) {
+      try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
+        final String contentType = determineContentType(path, supplier, content.getContentType());
+        try (InputStream is = supplier.get()) {
+          tx.setBlob(is, headers, asset, HASH_ALGORITHMS, contentType);
+        }
+      }
     }
   }
 
   @Override
   public boolean delete(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex component;
-      final OrientVertex asset;
-      final Coordinates coordinates = path.getCoordinates();
-      if (coordinates != null) {
-        component = findComponent(tx, coordinates, tx.getBucket());
-        if (component == null) {
-          return false;
-        }
-        asset = selectComponentAsset(tx, component, path);
+      if (path.getCoordinates() != null) {
+        return deleteArtifact(path, tx);
       }
       else {
-        component = null;
-        asset = findAsset(tx, path, tx.getBucket());
+        return deleteFile(path, tx);
       }
-      if (asset == null) {
-        return false;
-      }
-      final boolean lastAsset = component != null && tx.findAssets(component).size() == 1;
-      tx.deleteBlob(getBlobRef(path, asset));
-      tx.deleteVertex(asset);
-      if (lastAsset) {
-        tx.deleteVertex(component);
-      }
-      tx.commit();
-      return true;
     }
+  }
+
+  private boolean deleteArtifact(final MavenPath path, final StorageTx tx) throws IOException {
+    final OrientVertex component = findComponent(tx, tx.getBucket(), path);
+    if (component == null) {
+      return false;
+    }
+    final OrientVertex asset = selectComponentAsset(tx, component, path);
+    if (asset == null) {
+      return false;
+    }
+    final boolean lastAsset = tx.findAssets(component).size() == 1;
+    tx.deleteBlob(getBlobRef(path, asset));
+    tx.deleteVertex(asset);
+    if (lastAsset) {
+      tx.deleteVertex(component);
+    }
+    tx.commit();
+    return true;
+  }
+
+  private boolean deleteFile(final MavenPath path, final StorageTx tx) throws IOException {
+    final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
+    if (asset == null) {
+      return false;
+    }
+    tx.deleteBlob(getBlobRef(path, asset));
+    tx.deleteVertex(asset);
+    tx.commit();
+    return true;
   }
 
   /**
@@ -299,12 +350,12 @@ public class MavenFacetImpl
    */
   @Nullable
   private OrientVertex findComponent(final StorageTx tx,
-                                     final Coordinates coordinates,
-                                     final OrientVertex bucket)
+                                     final OrientVertex bucket,
+                                     final MavenPath mavenPath)
   {
     final String componentKeyName =
         StorageFacet.P_ATTRIBUTES + "." + getRepository().getFormat().getValue() + "." + P_COMPONENT_KEY;
-    return tx.findComponentWithProperty(componentKeyName, getComponentKey(coordinates), bucket);
+    return tx.findComponentWithProperty(componentKeyName, getComponentKey(mavenPath.getCoordinates()), bucket);
   }
 
   /**
@@ -313,9 +364,9 @@ public class MavenFacetImpl
   @Nullable
   private OrientVertex selectComponentAsset(final StorageTx tx,
                                             final OrientVertex component,
-                                            final MavenPath artifactPath)
+                                            final MavenPath mavenPath)
   {
-    final String assetKey = getAssetKey(artifactPath);
+    final String assetKey = getAssetKey(mavenPath);
     final List<OrientVertex> assets = tx.findAssets(component);
     for (OrientVertex v : assets) {
       final NestedAttributesMap attributesMap = getFormatAttributes(tx, v);
@@ -331,8 +382,8 @@ public class MavenFacetImpl
    */
   @Nullable
   private OrientVertex findAsset(final StorageTx tx,
-                                 final MavenPath mavenPath,
-                                 final OrientVertex bucket)
+                                 final OrientVertex bucket,
+                                 final MavenPath mavenPath)
   {
     final String assetKeyName =
         StorageFacet.P_ATTRIBUTES + "." + getRepository().getFormat().getValue() + "." + P_ASSET_KEY;
