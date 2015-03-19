@@ -52,7 +52,7 @@ public class DefaultHttpResponseSender
     implements HttpResponseSender
 {
   @Override
-  public void send(final @Nullable Request request, final Response response, final HttpServletRequest httpRequest, final HttpServletResponse httpResponse)
+  public void send(final @Nullable Request request, final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
     log.trace("Sending response: {}", response);
@@ -98,7 +98,7 @@ public class DefaultHttpResponseSender
           }
         }
 
-        if (!HttpMethods.HEAD.equals(httpRequest.getMethod())) {
+        if (request != null && !HttpMethods.HEAD.equals(request.getAction())) {
           try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
             ByteStreams.copy(input, output);
           }

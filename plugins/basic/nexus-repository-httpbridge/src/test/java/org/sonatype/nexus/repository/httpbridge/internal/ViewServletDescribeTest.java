@@ -52,9 +52,6 @@ public class ViewServletDescribeTest
   private ViewFacet facet;
 
   @Mock
-  private HttpServletRequest servletRequest;
-
-  @Mock
   private HttpServletResponse servletResponse;
 
   @Mock
@@ -76,10 +73,10 @@ public class ViewServletDescribeTest
     descriptionRequested(false);
     facetThrowsException(false);
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletRequest, servletResponse);
+    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
 
     verify(viewServlet, never()).describe(any(Request.class), any(Response.class), any(Exception.class));
-    verify(defaultResponseSender).send(request, facetResponse, servletRequest, servletResponse);
+    verify(defaultResponseSender).send(request, facetResponse, servletResponse);
   }
 
   @Test
@@ -87,10 +84,10 @@ public class ViewServletDescribeTest
     descriptionRequested(true);
     facetThrowsException(false);
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletRequest, servletResponse);
+    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
 
     verify(viewServlet).describe(request, facetResponse, null);
-    verify(viewServlet).send(request, descriptionResponse, servletRequest, servletResponse);
+    verify(viewServlet).send(request, descriptionResponse, servletResponse);
   }
 
   @Test(expected = RuntimeException.class)
@@ -98,7 +95,7 @@ public class ViewServletDescribeTest
     descriptionRequested(false);
     facetThrowsException(true);
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletRequest, servletResponse);
+    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
   }
 
   @Test
@@ -106,11 +103,11 @@ public class ViewServletDescribeTest
     descriptionRequested(true);
     facetThrowsException(true);
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletRequest, servletResponse);
+    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
 
     // The exception got described
     verify(viewServlet).describe(request, null, facetException);
-    verify(viewServlet).send(request, descriptionResponse, servletRequest, servletResponse);
+    verify(viewServlet).send(request, descriptionResponse, servletResponse);
   }
 
   private void facetThrowsException(final boolean facetThrowsException) throws Exception {

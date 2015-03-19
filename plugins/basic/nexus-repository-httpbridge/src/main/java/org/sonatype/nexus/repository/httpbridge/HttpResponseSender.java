@@ -29,5 +29,5 @@ import org.sonatype.nexus.repository.view.Response;
  */
 public interface HttpResponseSender
 {
-  void send(@Nullable Request request, Response response, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException;
+  void send(@Nullable Request request, Response response, HttpServletResponse httpServletResponse) throws ServletException, IOException;
 }
