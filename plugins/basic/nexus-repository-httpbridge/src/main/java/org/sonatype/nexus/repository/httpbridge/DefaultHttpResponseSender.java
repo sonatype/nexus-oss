@@ -27,14 +27,16 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
-import org.sonatype.nexus.repository.view.payloads.BlobPayload;
+import org.sonatype.nexus.repository.view.payloads.DecoratedPayload;
+import org.sonatype.nexus.repository.view.payloads.PayloadHashes;
+import org.sonatype.nexus.repository.view.payloads.PayloadHeaders;
+import org.sonatype.nexus.repository.view.payloads.PayloadTimes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Iterables;
 import com.google.common.hash.HashCode;
 import com.google.common.io.ByteStreams;
 import com.google.common.net.HttpHeaders;
-import org.joda.time.DateTime;
 
 /**
  * Default {@link HttpResponseSender}.
@@ -73,23 +75,34 @@ public class DefaultHttpResponseSender
           httpResponse.setContentLengthLong(payload.getSize());
         }
 
-        if (payload instanceof BlobPayload) {
-          final BlobPayload decoratedPayload = (BlobPayload) payload;
-          final DateTime lastModified = decoratedPayload.getLastModified();
-          if (lastModified != null && !httpResponse.containsHeader(HttpHeaders.LAST_MODIFIED)) {
+        if (payload instanceof DecoratedPayload) {
+          final DecoratedPayload decoratedPayload = (DecoratedPayload) payload;
+          final PayloadHeaders payloadHeaders = decoratedPayload.decorator(PayloadHeaders.class);
+          if (payloadHeaders != null) {
+            for (Map.Entry<String, String> header : payloadHeaders.getHeaders()) {
+              if (!httpResponse.containsHeader(header.getKey())) {
+                httpResponse.addHeader(header.getKey(), header.getValue());
+              }
+            }
+          }
+          final PayloadTimes payloadTimes = decoratedPayload.decorator(PayloadTimes.class);
+          if (payloadTimes != null && !httpResponse.containsHeader(HttpHeaders.LAST_MODIFIED)) {
             httpResponse.setDateHeader(
                 HttpHeaders.LAST_MODIFIED,
-                lastModified.getMillis()
+                payloadTimes.getLastModified().getMillis()
             );
           }
-          final HashAlgorithm hashAlgorithm = Iterables.getFirst(decoratedPayload.getHashAlgorithms(), null);
-          if (hashAlgorithm != null) {
-            final HashCode hashCode = decoratedPayload.getHashCodes().get(hashAlgorithm);
-            if (hashCode != null && !httpResponse.containsHeader(HttpHeaders.ETAG)) {
-              httpResponse.setHeader(
-                  HttpHeaders.ETAG,
-                  hashCode.toString()
-              );
+          final PayloadHashes payloadHashes = decoratedPayload.decorator(PayloadHashes.class);
+          if (payloadHashes != null) {
+            final HashAlgorithm hashAlgorithm = Iterables.getFirst(payloadHashes.getHashAlgorithms(), null);
+            if (hashAlgorithm != null) {
+              final HashCode hashCode = payloadHashes.getHashCodes().get(hashAlgorithm);
+              if (hashCode != null && !httpResponse.containsHeader(HttpHeaders.ETAG)) {
+                httpResponse.setHeader(
+                    HttpHeaders.ETAG,
+                    hashCode.toString()
+                );
+              }
             }
           }
         }

@@ -39,6 +39,9 @@ import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
+import org.sonatype.nexus.repository.view.payloads.DecoratedPayload;
+import org.sonatype.nexus.repository.view.payloads.PayloadHashes;
+import org.sonatype.nexus.repository.view.payloads.PayloadTimes;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
@@ -146,7 +149,7 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
-  public BlobPayload get(final MavenPath path) throws IOException {
+  public DecoratedPayload get(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
       if (asset == null) {
@@ -165,7 +168,10 @@ public class MavenFacetImpl
         final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
         hashCodes.put(algorithm, hashCode);
       }
-      return new BlobPayload(blob, contentType, new DateTime(lastModifiedDate), hashCodes);
+      return new DecoratedPayload(
+          new BlobPayload(blob, contentType),
+          new PayloadTimes(new DateTime(lastModifiedDate)),
+          new PayloadHashes(hashCodes));
     }
   }
 
