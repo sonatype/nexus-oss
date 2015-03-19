@@ -128,34 +128,35 @@ public class ViewServlet
     // resolve repository for request
     RepositoryPath path = path(httpRequest);
     if (path == null) {
-      send(HttpResponses.badRequest("Invalid repository path"), httpResponse);
+      send(null, HttpResponses.badRequest("Invalid repository path"), httpRequest, httpResponse);
       return;
     }
     log.debug("Parsed path: {}", path);
 
     Repository repo = repository(path.getRepositoryName());
     if (repo == null) {
-      send(HttpResponses.notFound("Repository not found"), httpResponse);
+      send(null, HttpResponses.notFound("Repository not found"), httpRequest, httpResponse);
       return;
     }
     log.debug("Repository: {}", repo);
 
     ViewFacet facet = repo.facet(ViewFacet.class);
     if (!facet.isOnline()) {
-      send(HttpResponses.serviceUnavailable("Repository offline"), httpResponse);
+      send(null, HttpResponses.serviceUnavailable("Repository offline"), httpRequest, httpResponse);
       return;
     }
     log.debug("Dispatching to view facet: {}", facet);
 
     // Dispatch the request
     final HttpRequestAdapter request = new HttpRequestAdapter(httpRequest, path.getRemainingPath());
-    dispatchAndSend(request, facet, sender(repo), httpResponse);
+    dispatchAndSend(request, facet, sender(repo), httpRequest, httpResponse);
   }
 
   @VisibleForTesting
   void dispatchAndSend(final Request request,
                        final ViewFacet facet,
                        final HttpResponseSender sender,
+                       final HttpServletRequest httpRequest,
                        final HttpServletResponse httpResponse)
       throws Exception
   {
@@ -169,14 +170,14 @@ public class ViewServlet
     }
 
     if (request.getParameters().contains("describe")) {
-      send(describe(request, response, failure), httpResponse);
+      send(request, describe(request, response, failure), httpRequest, httpResponse);
     }
     else {
       if (failure != null) {
         throw failure;
       }
       log.debug("HTTP response sender: {}", sender);
-      sender.send(response, httpResponse);
+      sender.send(request, response, httpRequest, httpResponse);
     }
   }
 
@@ -202,10 +203,10 @@ public class ViewServlet
    * Needed in a few places _before_ we have a repository instance to determine its specific sender.
    */
   @VisibleForTesting
-  void send(final Response response, final HttpServletResponse httpResponse)
+  void send(final Request request, final Response response, final HttpServletRequest httpRequest, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
-    defaultHttpResponseSender.send(response, httpResponse);
+    defaultHttpResponseSender.send(request, response, httpRequest, httpResponse);
   }
 
   /**

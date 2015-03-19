@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.httpbridge.internal;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
@@ -51,6 +52,9 @@ public class ViewServletDescribeTest
   private ViewFacet facet;
 
   @Mock
+  private HttpServletRequest servletRequest;
+
+  @Mock
   private HttpServletResponse servletResponse;
 
   @Mock
@@ -72,10 +76,10 @@ public class ViewServletDescribeTest
     descriptionRequested(false);
     facetThrowsException(false);
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
+    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletRequest, servletResponse);
 
     verify(viewServlet, never()).describe(any(Request.class), any(Response.class), any(Exception.class));
-    verify(defaultResponseSender).send(facetResponse, servletResponse);
+    verify(defaultResponseSender).send(request, facetResponse, servletRequest, servletResponse);
   }
 
   @Test
@@ -83,10 +87,10 @@ public class ViewServletDescribeTest
     descriptionRequested(true);
     facetThrowsException(false);
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
+    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletRequest, servletResponse);
 
     verify(viewServlet).describe(request, facetResponse, null);
-    verify(viewServlet).send(descriptionResponse, servletResponse);
+    verify(viewServlet).send(request, descriptionResponse, servletRequest, servletResponse);
   }
 
   @Test(expected = RuntimeException.class)
@@ -94,7 +98,7 @@ public class ViewServletDescribeTest
     descriptionRequested(false);
     facetThrowsException(true);
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
+    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletRequest, servletResponse);
   }
 
   @Test
@@ -102,11 +106,11 @@ public class ViewServletDescribeTest
     descriptionRequested(true);
     facetThrowsException(true);
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
+    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletRequest, servletResponse);
 
     // The exception got described
     verify(viewServlet).describe(request, null, facetException);
-    verify(viewServlet).send(descriptionResponse, servletResponse);
+    verify(viewServlet).send(request, descriptionResponse, servletRequest, servletResponse);
   }
 
   private void facetThrowsException(final boolean facetThrowsException) throws Exception {
