@@ -26,6 +26,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 
 /**
@@ -50,6 +51,7 @@ public class SimpleStorageHandler
     SimpleStorageFacet storage = repository.facet(SimpleStorageFacet.class);
 
     switch (method) {
+      case HEAD:
       case GET: {
         SimpleContent content = storage.get(name);
         if (content == null) {
@@ -76,7 +78,7 @@ public class SimpleStorageHandler
       }
 
       default:
-        return HttpResponses.methodNotAllowed(method, GET, PUT, DELETE);
+        return HttpResponses.methodNotAllowed(method, GET, HEAD, PUT, DELETE);
     }
   }
 }

@@ -25,6 +25,7 @@ import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
 import static org.sonatype.nexus.repository.view.ContentTypes.TEXT_HTML;
 
 /**
@@ -46,13 +47,14 @@ public class SimpleIndexHtmlHandler
     log.debug("{} repository '{}' index.html", method, repository.getName());
 
     switch (method) {
+      case HEAD:
       case GET: {
         SimpleIndexHtmlFacet indexHtml = repository.facet(SimpleIndexHtmlFacet.class);
         return HttpResponses.ok(new StringPayload(indexHtml.get(), TEXT_HTML));
       }
 
       default:
-        return HttpResponses.methodNotAllowed(method, GET);
+        return HttpResponses.methodNotAllowed(method, GET, HEAD);
     }
   }
 }
