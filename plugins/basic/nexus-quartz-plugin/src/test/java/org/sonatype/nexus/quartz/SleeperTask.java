@@ -25,7 +25,7 @@ import org.sonatype.nexus.scheduling.TaskSupport;
  */
 @Named
 public class SleeperTask
-    extends TaskSupport<String>
+    extends TaskSupport
 {
   static final String RESULT_KEY = "result";
 

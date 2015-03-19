@@ -31,23 +31,23 @@ public interface TaskExecutorSPI
    * Returns the info of a NX task by it's ID, if present. If no task present with ID then {@code null}.
    */
   @Nullable
-  <T> TaskInfo<T> getTaskById(String id);
+  TaskInfo getTaskById(String id);
 
   /**
    * Returns the list of defined NX tasks.
    */
-  List<TaskInfo<?>> listsTasks();
+  List<TaskInfo> listsTasks();
 
   /**
    * Schedules a NX task with given schedule. If given task configuration existed, it will be updated, if not,
    * added. Task must not be running.
    */
-  <T> TaskInfo<T> scheduleTask(TaskConfiguration taskConfiguration, Schedule schedule);
+  TaskInfo scheduleTask(TaskConfiguration taskConfiguration, Schedule schedule);
 
   /**
    * Reschedules a NX task with given schedule. Task might be running. If no task found, {@code null} is returned.
    */
-  <T> TaskInfo<T> rescheduleTask(String id, Schedule schedule);
+  TaskInfo rescheduleTask(String id, Schedule schedule);
 
   /**
    * Returns the count of currently running tasks.

@@ -43,7 +43,7 @@ public abstract class TaskDescriptorSupport<T extends Task>
 
   private final List<FormField> formFields;
 
-  private final Predicate<TaskInfo<?>> predicate;
+  private final Predicate<TaskInfo> predicate;
 
   /**
    * Simplified constructor that will create visible and exposed descriptor without any formField.
@@ -94,10 +94,10 @@ public abstract class TaskDescriptorSupport<T extends Task>
     this.visible = visible;
     this.exposed = exposed;
     this.formFields = ImmutableList.copyOf(formFields);
-    this.predicate = new Predicate<TaskInfo<?>>()
+    this.predicate = new Predicate<TaskInfo>()
     {
       @Override
-      public boolean apply(final TaskInfo<?> input) {
+      public boolean apply(final TaskInfo input) {
         return id.equals(input.getConfiguration().getTypeId());
       }
     };
@@ -132,12 +132,12 @@ public abstract class TaskDescriptorSupport<T extends Task>
   }
 
   @Override
-  public final Predicate<TaskInfo<?>> predicate() {
+  public final Predicate<TaskInfo> predicate() {
     return predicate;
   }
 
   @Override
-  public final List<TaskInfo<?>> filter(final List<TaskInfo<?>> tasks) {
+  public final List<TaskInfo> filter(final List<TaskInfo> tasks) {
     return newArrayList(Iterables.filter(tasks, predicate()));
   }
 }

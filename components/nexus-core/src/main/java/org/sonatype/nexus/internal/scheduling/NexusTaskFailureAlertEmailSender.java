@@ -51,8 +51,8 @@ public class NexusTaskFailureAlertEmailSender
    */
   @Subscribe
   @AllowConcurrentEvents
-  public void inspect(final TaskEventStoppedFailed<?> failureEvent) {
-    final TaskInfo<?> failedTask = failureEvent.getTaskInfo();
+  public void inspect(final TaskEventStoppedFailed failureEvent) {
+    final TaskInfo failedTask = failureEvent.getTaskInfo();
     if (failedTask == null || failedTask.getConfiguration().getAlertEmail() == null) {
       return;
     }

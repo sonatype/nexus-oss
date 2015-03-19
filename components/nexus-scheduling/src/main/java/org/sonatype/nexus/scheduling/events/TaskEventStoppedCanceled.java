@@ -20,10 +20,10 @@ import org.sonatype.nexus.scheduling.TaskInfo;
  *
  * @since 2.0
  */
-public class TaskEventStoppedCanceled<T>
-    extends TaskEventStopped<T>
+public class TaskEventStoppedCanceled
+    extends TaskEventStopped
 {
-  public TaskEventStoppedCanceled(final TaskInfo<T> taskInfo) {
+  public TaskEventStoppedCanceled(final TaskInfo taskInfo) {
     super(taskInfo);
   }
 }

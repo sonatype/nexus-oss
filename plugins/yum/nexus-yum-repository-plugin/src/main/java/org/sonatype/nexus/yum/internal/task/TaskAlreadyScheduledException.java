@@ -25,14 +25,14 @@ public class TaskAlreadyScheduledException
 
   private static final long serialVersionUID = 1L;
 
-  private final TaskInfo<?> original;
+  private final TaskInfo original;
 
-  public TaskAlreadyScheduledException(TaskInfo<?> original, String message) {
+  public TaskAlreadyScheduledException(TaskInfo original, String message) {
     super(message);
     this.original = original;
   }
 
-  public TaskInfo<?> getOriginal() {
+  public TaskInfo getOriginal() {
     return original;
   }
 }

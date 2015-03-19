@@ -55,31 +55,31 @@ public interface TaskScheduler
    * Issues a NexusTask for immediate execution, giving control over it with returned {@link Future} instance. Tasks
    * executed via this method are executed as soon as possible, and are not persisted.
    */
-  <T> TaskInfo<T> submit(TaskConfiguration configuration);
+  TaskInfo submit(TaskConfiguration configuration);
 
   /**
    * Returns the {@link TaskInfo<T>} of a task by it's ID, if present, otherwise {@code null}.
    */
   @Nullable
-  <T> TaskInfo<T> getTaskById(String id);
+  TaskInfo getTaskById(String id);
 
   /**
    * List existing tasks.
    */
-  List<TaskInfo<?>> listsTasks();
+  List<TaskInfo> listsTasks();
 
   /**
    * Schedules a tasks. If existing task with ID exists, it will be replaced. As this changes task configuration, task
    * must not be running.
    */
-  <T> TaskInfo<T> scheduleTask(TaskConfiguration configuration, Schedule schedule);
+  TaskInfo scheduleTask(TaskConfiguration configuration, Schedule schedule);
 
   /**
    * Re-schedules a tasks. Only change the task schedule. Task might even be running. Returns {@code null} if task not
    * found, or the updated task info (with new schedule).
    */
   @Nullable
-  <T> TaskInfo<T> rescheduleTask(String id, Schedule schedule);
+  TaskInfo rescheduleTask(String id, Schedule schedule);
 
   // -- tests
 
