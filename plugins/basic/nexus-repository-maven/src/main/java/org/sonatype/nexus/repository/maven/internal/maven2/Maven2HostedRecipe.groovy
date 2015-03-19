@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.maven.internal.HostedHandler
 import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
+import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
@@ -72,6 +73,9 @@ class Maven2HostedRecipe
   Provider<MavenFacetImpl> mavenFacet
 
   @Inject
+  VersionPolicyHandler versionPolicyHandler
+
+  @Inject
   HostedHandler hostedHandler
 
   @Inject
@@ -99,6 +103,7 @@ class Maven2HostedRecipe
         .matcher(new MavenArtifactMatcher(pathParser))
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(versionPolicyHandler)
         .handler(hostedHandler)
         .create())
 

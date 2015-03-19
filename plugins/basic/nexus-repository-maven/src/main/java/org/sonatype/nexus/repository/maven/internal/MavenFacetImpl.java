@@ -99,6 +99,8 @@ public class MavenFacetImpl
 
   private static final String P_CONTENT_LAST_MODIFIED = "contentLastModified";
 
+  private static final String P_LAST_VERIFIED = "lastVerified";
+
   private static final String CONFIG_KEY = "maven";
 
   private static final List<HashAlgorithm> HASH_ALGORITHMS = Lists.newArrayList(SHA1, MD5);
@@ -319,6 +321,36 @@ public class MavenFacetImpl
     tx.deleteVertex(asset);
     tx.commit();
     return true;
+  }
+
+  @Override
+  public DateTime getLastVerified(final MavenPath path) throws IOException {
+    try (StorageTx tx = getStorage().openTx()) {
+      final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
+      if (asset == null) {
+        return null;
+      }
+      final NestedAttributesMap attributes = getFormatAttributes(tx, asset);
+      final Date date = attributes.get(P_LAST_VERIFIED, Date.class);
+      if (date == null) {
+        return null;
+      }
+      return new DateTime(date);
+    }
+  }
+
+  @Override
+  public boolean setLastVerified(final MavenPath path, final DateTime verified) throws IOException {
+    try (StorageTx tx = getStorage().openTx()) {
+      final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
+      if (asset == null) {
+        return false;
+      }
+      final NestedAttributesMap attributes = getFormatAttributes(tx, asset);
+      attributes.set(P_LAST_VERIFIED, verified.toDate());
+      tx.commit();
+      return true;
+    }
   }
 
   /**
