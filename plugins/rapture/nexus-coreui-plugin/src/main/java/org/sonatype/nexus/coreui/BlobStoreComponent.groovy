@@ -14,6 +14,7 @@ package org.sonatype.nexus.coreui
 
 import javax.inject.Inject
 import javax.inject.Named
+import javax.inject.Provider
 import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
@@ -48,6 +49,9 @@ class BlobStoreComponent
   @Inject
   AttributeConverter attributeConverter
 
+  @Inject
+  Map<String, Provider<BlobStore>> blobstorePrototypes;
+
   @DirectMethod
   List<BlobStoreXO> read() {
     blobStoreManager.browse().collect { asBlobStore(it) }
@@ -55,7 +59,9 @@ class BlobStoreComponent
 
   @DirectMethod
   List<ReferenceXO> readTypes() {
-    [new ReferenceXO(id: 'file', name: 'FileBlobStore')]
+    blobstorePrototypes.collect { key, provider ->
+      new ReferenceXO(id: key, name: key) 
+    }
   }
 
   @DirectMethod
@@ -63,7 +69,7 @@ class BlobStoreComponent
   @Validate(groups = [Create.class, Default.class])
   BlobStoreXO create(final @NotNull(message = '[blobstore] may not be null') @Valid BlobStoreXO blobStore) {
     return asBlobStore(blobStoreManager.create(
-        new BlobStoreConfiguration(name: blobStore.name, recipeName: blobStore.type,
+        new BlobStoreConfiguration(name: blobStore.name, type: blobStore.type,
             attributes: attributeConverter.asAttributes(blobStore.attributes))))
   }
 
@@ -76,7 +82,7 @@ class BlobStoreComponent
 
   BlobStoreXO asBlobStore(final BlobStore blobStore) {
     return new BlobStoreXO(name: blobStore.blobStoreConfiguration.name,
-        type: blobStore.blobStoreConfiguration.recipeName,
+        type: blobStore.blobStoreConfiguration.type,
         attributes: attributeConverter.asAttributes(blobStore.blobStoreConfiguration.attributes),
         blobCount: blobStore.metrics.blobCount,
         totalSize: blobStore.metrics.totalSize,

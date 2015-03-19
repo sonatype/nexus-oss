@@ -14,6 +14,8 @@ package org.sonatype.nexus.blobstore.file;
 
 import java.util.regex.Pattern;
 
+import javax.inject.Named;
+
 import org.sonatype.nexus.blobstore.api.BlobId;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -26,6 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@Named
 public class VolumeChapterLocationStrategy
     implements LocationStrategy
 {
