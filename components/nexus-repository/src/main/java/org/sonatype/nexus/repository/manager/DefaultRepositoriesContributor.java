@@ -10,29 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.util;
+package org.sonatype.nexus.repository.manager;
 
-import com.google.common.annotations.VisibleForTesting;
+import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.sonatype.nexus.repository.config.Configuration;
 
 /**
- * Helper to build attribute keys.
- *
+ * Provides configurations for repositories that should be provisioned by default on first system startup.
  * @since 3.0
  */
-public class AttributeKey
+public interface DefaultRepositoriesContributor
 {
-  @VisibleForTesting
-  static final String SUFFIX_SEPARATOR = "#";
-
-  public static String get(final Class type) {
-    checkNotNull(type);
-    return type.getName();
-  }
-
-  public static String get(final Class type, final String suffix) {
-    checkNotNull(suffix);
-    return get(type) + SUFFIX_SEPARATOR + suffix;
-  }
+  /**
+   * Provides Configurations that should be be initially provisioned.
+   */
+  List<Configuration> getRepositoryConfigurations();
 }

@@ -19,6 +19,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import javax.inject.Named;
+
 import org.sonatype.nexus.blobstore.file.internal.MetricsInputStream;
 import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -34,6 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@Named
 public class SimpleFileOperations
     extends ComponentSupport
     implements FileOperations

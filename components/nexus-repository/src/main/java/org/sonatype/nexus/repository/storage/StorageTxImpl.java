@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.hash.MultiHashingInputStream;
 import org.sonatype.nexus.common.stateguard.Guarded;
@@ -28,7 +29,6 @@ import org.sonatype.nexus.common.stateguard.StateGuardAware;
 import org.sonatype.nexus.common.stateguard.Transitions;
 import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Function;
@@ -46,17 +46,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.storage.StorageFacet.E_OWNS_ASSET;
-import static org.sonatype.nexus.repository.storage.StorageFacet.E_OWNS_COMPONENT;
-import static org.sonatype.nexus.repository.storage.StorageFacet.E_PART_OF_COMPONENT;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_CHECKSUM;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_CONTENT_TYPE;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
-import static org.sonatype.nexus.repository.storage.StorageFacet.V_ASSET;
-import static org.sonatype.nexus.repository.storage.StorageFacet.V_COMPONENT;
+import static org.sonatype.nexus.repository.storage.StorageFacet.*;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.CLOSED;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.OPEN;
 

@@ -14,7 +14,12 @@ package org.sonatype.nexus.blobstore.api;
 
 import java.util.Map;
 
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.Entity;
+
+import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link BlobStore} configuration.
@@ -26,7 +31,7 @@ public class BlobStoreConfiguration
 {
   private String name;
   
-  private String recipeName;
+  private String type;
   
   private Map<String, Map<String, Object>> attributes;
   
@@ -38,12 +43,12 @@ public class BlobStoreConfiguration
     this.name = name;
   }
 
-  public String getRecipeName() {
-    return recipeName;
+  public String getType() {
+    return type;
   }
 
-  public void setRecipeName(final String recipeName) {
-    this.recipeName = recipeName;
+  public void setType(final String type) {
+    this.type = type;
   }
 
   public Map<String, Map<String, Object>> getAttributes() {
@@ -54,11 +59,27 @@ public class BlobStoreConfiguration
     this.attributes = attributes;
   }
 
+  public NestedAttributesMap attributes(final String key) {
+    checkNotNull(key);
+
+    if (attributes == null) {
+      attributes = Maps.newHashMap();
+    }
+
+    Map<String,Object> map = attributes.get(key);
+    if (map == null) {
+      map = Maps.newHashMap();
+      attributes.put(key, map);
+    }
+
+    return new NestedAttributesMap(key, map);
+  }
+
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
         "name='" + name + '\'' +
-        ", recipeName='" + recipeName + '\'' +
+        ", type='" + type + '\'' +
         ", attributes=" + attributes +
         '}';
   }

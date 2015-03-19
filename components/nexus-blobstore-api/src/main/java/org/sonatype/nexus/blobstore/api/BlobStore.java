@@ -102,4 +102,9 @@ public interface BlobStore
    * Returns the configuration entity for the BlobStore.
    */
   BlobStoreConfiguration getBlobStoreConfiguration();
+
+  /**
+   * Initialize the BlobStore.
+   */
+  void init(BlobStoreConfiguration configuration) throws Exception;
 }

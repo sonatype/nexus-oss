@@ -19,11 +19,11 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

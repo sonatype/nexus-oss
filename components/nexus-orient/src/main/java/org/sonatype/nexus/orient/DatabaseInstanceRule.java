@@ -34,8 +34,12 @@ public class DatabaseInstanceRule
   extends ExternalResource
 {
   static {
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
+    try {
+      SLF4JBridgeHandler.removeHandlersForRootLogger();
+      SLF4JBridgeHandler.install();
+    } catch (LinkageError e) {
+      // no-op, jul-to-slf4j not installed
+    }
   }
 
   private static final Logger log = LoggerFactory.getLogger(DatabaseInstanceRule.class);

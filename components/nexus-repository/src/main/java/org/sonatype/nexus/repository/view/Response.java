@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.view;
 
-import org.sonatype.nexus.repository.util.AttributesMap;
+import org.sonatype.nexus.common.collect.AttributesMap;
 
 import com.google.common.collect.Maps;
 
