@@ -73,12 +73,14 @@ public class DefaultHttpResponseSender
         if (payload.getContentType() != null) {
           httpResponse.setContentType(payload.getContentType());
         }
-        httpResponse.setContentLengthLong(payload.getSize());
+        if (payload.getSize() != Payload.UNKNOWN_SIZE) {
+          httpResponse.setContentLengthLong(payload.getSize());
+        }
 
         if (payload instanceof BlobPayload) {
           final BlobPayload decoratedPayload = (BlobPayload) payload;
           final DateTime lastModified = decoratedPayload.getLastModified();
-          if (lastModified != null) {
+          if (lastModified != null && !httpResponse.containsHeader(HttpHeaders.LAST_MODIFIED)) {
             httpResponse.setDateHeader(
                 HttpHeaders.LAST_MODIFIED,
                 lastModified.getMillis()
@@ -87,7 +89,7 @@ public class DefaultHttpResponseSender
           final HashAlgorithm hashAlgorithm = Iterables.getFirst(decoratedPayload.getHashAlgorithms(), null);
           if (hashAlgorithm != null) {
             final HashCode hashCode = decoratedPayload.getHashCodes().get(hashAlgorithm);
-            if (hashCode != null) {
+            if (hashCode != null && !httpResponse.containsHeader(HttpHeaders.ETAG)) {
               httpResponse.setHeader(
                   HttpHeaders.ETAG,
                   hashCode.toString()
