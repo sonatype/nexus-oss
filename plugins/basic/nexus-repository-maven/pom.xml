@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -20,29 +19,44 @@
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-plugins</artifactId>
+    <artifactId>nexus-plugins-basic</artifactId>
     <version>3.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-plugins-basic</artifactId>
+  <artifactId>nexus-repository-maven</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>pom</packaging>
+  <packaging>bundle</packaging>
 
-  <modules>
-    <module>nexus-content-plugin</module>
-    <module>nexus-groovy-plugin</module>
-    <module>nexus-logging-plugin</module>
-    <module>nexus-plugin-console-plugin</module>
-    <module>nexus-quartz-plugin</module>
-    <module>nexus-repository-httpbridge</module>
-    <module>nexus-repository-nuget</module>
-    <module>nexus-repository-maven</module>
-    <module>nexus-repository-raw</module>
-    <module>nexus-repository-simple</module>
-    <module>nexus-siesta-plugin</module>
-    <module>nexus-site-repository-plugin</module>
-    <module>nexus-timeline-plugin</module>
-    <module>nexus-webresources-plugin</module>
-  </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-repository</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-repository-httpbridge</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-testsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

@@ -22,13 +22,19 @@ import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
+import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.Iterables;
+import com.google.common.hash.HashCode;
 import com.google.common.io.ByteStreams;
+import com.google.common.net.HttpHeaders;
+import org.joda.time.DateTime;
 
 /**
  * Default {@link HttpResponseSender}.
@@ -38,8 +44,8 @@ import com.google.common.io.ByteStreams;
 @Named
 @Singleton
 public class DefaultHttpResponseSender
-  extends ComponentSupport
-  implements HttpResponseSender
+    extends ComponentSupport
+    implements HttpResponseSender
 {
   @Override
   public void send(final Response response, final HttpServletResponse httpResponse)
@@ -48,7 +54,7 @@ public class DefaultHttpResponseSender
     log.trace("Sending response: {}", response);
 
     // add response headers
-    for (Map.Entry<String,String> header : response.getHeaders()) {
+    for (Map.Entry<String, String> header : response.getHeaders()) {
       httpResponse.addHeader(header.getKey(), header.getValue());
     }
 
@@ -57,7 +63,7 @@ public class DefaultHttpResponseSender
     if (status.isSuccessful() || response instanceof PayloadResponse) {
       httpResponse.setStatus(status.getCode());
       if (response instanceof PayloadResponse) {
-        Payload payload = ((PayloadResponse)response).getPayload();
+        Payload payload = ((PayloadResponse) response).getPayload();
         log.trace("Attaching payload: {}", payload);
 
         if (payload.getContentType() != null) {
@@ -65,6 +71,28 @@ public class DefaultHttpResponseSender
         }
         httpResponse.setContentLengthLong(payload.getSize());
 
+        if (payload instanceof BlobPayload) {
+          final BlobPayload decoratedPayload = (BlobPayload) payload;
+          final DateTime lastModified = decoratedPayload.getLastModified();
+          if (lastModified != null) {
+            httpResponse.setDateHeader(
+                HttpHeaders.LAST_MODIFIED,
+                lastModified.getMillis()
+            );
+          }
+          final HashAlgorithm hashAlgorithm = Iterables.getFirst(decoratedPayload.getHashAlgorithms(), null);
+          if (hashAlgorithm != null) {
+            final HashCode hashCode = decoratedPayload.getHashCodes().get(hashAlgorithm);
+            if (hashCode != null) {
+              httpResponse.setHeader(
+                  HttpHeaders.ETAG,
+                  hashCode.toString()
+              );
+            }
+          }
+        }
+
+        // TODO: Do not do this below is verb is HEAD
         try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
           ByteStreams.copy(input, output);
         }
