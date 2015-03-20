@@ -13,20 +13,18 @@
 package org.sonatype.nexus.repository.storage;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
 
-import com.tinkerpop.blueprints.Vertex;
+import com.orientechnologies.orient.core.id.ORID;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 
 /**
  * A storage transaction.
@@ -62,41 +60,34 @@ public interface StorageTx
   /**
    * Gets the bucket for the current repository.
    */
-  OrientVertex getBucket();
+  Bucket getBucket();
+
+  /**
+   * Gets all buckets.
+   */
+  Iterable<Bucket> browseBuckets();
 
   /**
    * Gets all assets owned by the specified bucket.
    */
-  Iterable<OrientVertex> browseAssets(Vertex bucket);
+  Iterable<Asset> browseAssets(Bucket bucket);
 
   /**
    * Gets all components owned by the specified bucket.
    */
-  Iterable<OrientVertex> browseComponents(Vertex bucket);
-
-  /**
-   * Gets all vertices, optionally limited to those in the specified class.
-   */
-  Iterable<OrientVertex> browseVertices(@Nullable String className);
+  Iterable<Component> browseComponents(Bucket bucket);
 
   /**
    * Gets an asset by id, owned by the specified bucket, or {@code null} if not found.
    */
   @Nullable
-  OrientVertex findAsset(Object vertexId, Vertex bucket);
+  Asset findAsset(ORID id, Bucket bucket);
 
   /**
    * Gets an asset by some identifying property, owned by the specified bucket, or {@code null} if not found.
    */
   @Nullable
-  OrientVertex findAssetWithProperty(String propName, Object propValue, Vertex bucket);
-
-
-  /**
-   * Returns all the assets associated with a component.
-   */
-  List<OrientVertex> findAssets(Vertex component);
-
+  Asset findAssetWithProperty(String propName, Object propValue, Bucket bucket);
 
   /**
    * Gets all assets in the specified repositories that match the given where clause.
@@ -110,10 +101,10 @@ public interface StorageTx
    *                    as per the OrientDB select query syntax.
    * @see <a href="https://github.com/orientechnologies/orientdb/wiki/SQL-Query">OrientDB SELECT Query Documentation</a>
    */
-  Iterable<OrientVertex> findAssets(@Nullable String whereClause,
-                                    @Nullable Map<String, Object> parameters,
-                                    @Nullable Iterable<Repository> repositories,
-                                    @Nullable String querySuffix);
+  Iterable<Asset> findAssets(@Nullable String whereClause,
+                             @Nullable Map<String, Object> parameters,
+                             @Nullable Iterable<Repository> repositories,
+                             @Nullable String querySuffix);
 
   /**
    * Gets the number of assets matching the given where clause.
@@ -127,13 +118,13 @@ public interface StorageTx
    * Gets a component by id, owned by the specified bucket, or {@code null} if not found.
    */
   @Nullable
-  OrientVertex findComponent(Object vertexId, Vertex bucket);
+  Component findComponent(ORID id, Bucket bucket);
 
   /**
    * Gets a component by some identifying property, or {@code null} if not found.
    */
   @Nullable
-  OrientVertex findComponentWithProperty(String propName, Object propValue, Vertex bucket);
+  Component findComponentWithProperty(String propName, Object propValue, Bucket bucket);
 
   /**
    * Gets all component in the specified repositories that match the given where clause.
@@ -147,10 +138,10 @@ public interface StorageTx
    *                    as per the OrientDB select query syntax.
    * @see <a href="https://github.com/orientechnologies/orientdb/wiki/SQL-Query">OrientDB SELECT Query Documentation</a>
    */
-  Iterable<OrientVertex> findComponents(@Nullable String whereClause,
-                                        @Nullable Map<String, Object> parameters,
-                                        @Nullable Iterable<Repository> repositories,
-                                        @Nullable String querySuffix);
+  Iterable<Component> findComponents(@Nullable String whereClause,
+                                     @Nullable Map<String, Object> parameters,
+                                     @Nullable Iterable<Repository> repositories,
+                                     @Nullable String querySuffix);
 
   /**
    * Gets the number of components matching the given where clause.
@@ -161,43 +152,38 @@ public interface StorageTx
                        @Nullable String querySuffix);
 
   /**
-   * Gets a vertex by id, optionally limited by class, or {@code null} if not found.
+   * Creates a new standalone asset.
    */
-  @Nullable
-  OrientVertex findVertex(Object vertexId, @Nullable String className);
+  Asset createAsset(Bucket bucket, Format format);
 
   /**
-   * Gets a vertex by some identifying property, optionally limited by class, or {@code null} if not found.
+   * Creates a new asset that belongs to a component.
    */
-  @Nullable
-  OrientVertex findVertexWithProperty(String propName, Object propValue, @Nullable String className);
+  Asset createAsset(Bucket bucket, Component component);
 
   /**
-   * Creates a new asset owned by the specified bucket.
+   * Creates a new component.
    */
-  OrientVertex createAsset(Vertex bucket);
+  Component createComponent(Bucket bucket, Format format);
 
   /**
-   * Creates a new component owned by the specified bucket.
+   * Deletes an existing component and all constituent assets.
    */
-  OrientVertex createComponent(Vertex bucket);
+  void deleteComponent(Component component);
 
   /**
-   * Creates a new vertex of the specified class.
+   * Deletes an existing asset and requests the blob to be deleted.
    */
-  OrientVertex createVertex(String className);
+  void deleteAsset(Asset asset);
 
   /**
-   * Gets the "attributes" map of an asset or component vertex.
+   * Deletes an existing bucket and all components and assets within.
    *
-   * Changes to the map will be persisted when the transaction is committed.
+   * NOTE: This is a potentially long-lived and non-atomic operation. Items within the bucket will be
+   * sequentially deleted in batches in order to keep memory use within reason. This method will automatically
+   * commit a transaction for each batch, and will return after committing the last batch.
    */
-  NestedAttributesMap getAttributes(OrientVertex vertex);
-
-  /**
-   * Deletes an existing vertex.
-   */
-  void deleteVertex(Vertex vertex);
+  void deleteBucket(Bucket bucket);
 
   /**
    * Creates a new Blob.
@@ -208,7 +194,7 @@ public interface StorageTx
    * Creates a new Blob and updates the given asset with a reference to it, hash metadata, size, and content type.
    * The old blob, if any, will be deleted.
    */
-  BlobRef setBlob(InputStream inputStream, Map<String, String> headers, OrientVertex asset,
+  BlobRef setBlob(InputStream inputStream, Map<String, String> headers, Asset asset,
                      Iterable<HashAlgorithm> hashAlgorithms, String contentType);
 
   /**
@@ -218,7 +204,7 @@ public interface StorageTx
   Blob getBlob(BlobRef blobRef);
 
   /**
-   * Deletes a Blob.
+   * Gets a Blob, or throws an {@code IllegalStateException} if it doesn't exist.
    */
-  void deleteBlob(BlobRef blobRef);
+  Blob requireBlob(BlobRef blobRef);
 }

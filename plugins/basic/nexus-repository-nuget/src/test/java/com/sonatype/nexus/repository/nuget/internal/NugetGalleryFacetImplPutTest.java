@@ -24,6 +24,7 @@ import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
 import org.sonatype.nexus.repository.storage.ComponentEvent;
 import org.sonatype.nexus.repository.storage.ComponentUpdatedEvent;
@@ -35,7 +36,6 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.id.ORID;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -46,7 +46,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import static com.sonatype.nexus.repository.nuget.internal.NugetFormat.NAME;
 import static com.sonatype.nexus.repository.nuget.internal.NugetProperties.*;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -80,6 +79,7 @@ public class NugetGalleryFacetImplPutTest
     putPackageMetadataAndBlob(false, ComponentUpdatedEvent.class);
   }
 
+  @SuppressWarnings("unchecked")
   private void putPackageMetadataAndBlob(final boolean isNew,
                                          final Class eventClass) throws Exception {
     final NugetGalleryFacetImpl galleryFacet = buildSpy();
@@ -92,13 +92,12 @@ public class NugetGalleryFacetImplPutTest
 
     doNothing().when(galleryFacet).maintainAggregateInfo(any(StorageTx.class), eq("SONATYPE.TEST"));
 
-    OrientVertex component = mock(OrientVertex.class);
+    Component component = mock(Component.class);
     ORID orid = mock(ORID.class);
     doReturn(component).when(galleryFacet)
         .createOrUpdatePackage(any(StorageTx.class), any(Map.class), any(InputStream.class));
-    when(component.getIdentity()).thenReturn(orid);
-    when(orid.isNew()).thenReturn(isNew);
-    
+    when(component.isNew()).thenReturn(isNew);
+
     galleryFacet.put(packageStream);
 
     verify(galleryFacet).maintainAggregateInfo(tx, "SONATYPE.TEST");
@@ -106,7 +105,7 @@ public class NugetGalleryFacetImplPutTest
     verify(eventBus, times(1)).post(o.capture());
     ComponentEvent actual = o.getValue();
     assertThat(actual, instanceOf(eventClass));
-    assertThat(actual.getVertex(), is(component));
+    assertThat(actual.getComponent(), is(component));
     assertThat(actual.getRepository(), is(repository));
   }
 
@@ -158,55 +157,55 @@ public class NugetGalleryFacetImplPutTest
   public void versionsFlagForSinglePrerelease() {
     final StorageTx tx = mock(StorageTx.class);
 
-    final OrientVertex preRelease = buildVersionMock(tx, "2.1.8-greenbell", true);
+    final Component preRelease = buildVersionMock(tx, "2.1.8-greenbell", true);
 
     final NugetGalleryFacetImpl galleryFacet = buildSpy();
 
 
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(preRelease));
 
-    verifyVersionFlags(tx.getAttributes(preRelease).child(NAME), false, true);
+    verifyVersionFlags(preRelease.formatAttributes(), false, true);
   }
 
   @Test
   public void versionsFlagForSingleRelease() {
     final StorageTx tx = mock(StorageTx.class);
 
-    final OrientVertex release = buildVersionMock(tx, "2.1.8", false);
+    final Component release = buildVersionMock(tx, "2.1.8", false);
 
     final NugetGalleryFacetImpl galleryFacet = buildSpy();
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release));
 
-    verifyVersionFlags(tx.getAttributes(release).child(NAME), true, true);
+    verifyVersionFlags(release.formatAttributes(), true, true);
   }
 
   @Test
   public void versionsFlagForReleaseIsLatest() {
     final StorageTx tx = mock(StorageTx.class);
 
-    final OrientVertex release = buildVersionMock(tx, "2.1.8", false);
+    final Component release = buildVersionMock(tx, "2.1.8", false);
     // TODO: Aether doesn't correctly order 2.1.7-greenbell and 2.1.7
-    final OrientVertex preRelease = buildVersionMock(tx, "2.1.7-greenbell", true);
+    final Component preRelease = buildVersionMock(tx, "2.1.7-greenbell", true);
 
     final NugetGalleryFacetImpl galleryFacet = buildSpy();
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release, preRelease));
 
-    verifyVersionFlags(tx.getAttributes(release).child(NAME), true, true);
-    verifyVersionFlags(tx.getAttributes(preRelease).child(NAME), false, false);
+    verifyVersionFlags(release.formatAttributes(), true, true);
+    verifyVersionFlags(preRelease.formatAttributes(), false, false);
   }
 
   @Test
   public void versionsFlagForPrereleaseIsLatest() {
     final StorageTx tx = mock(StorageTx.class);
 
-    final OrientVertex preRelease = buildVersionMock(tx, "2.1.9-greenbell", true);
-    final OrientVertex release = buildVersionMock(tx, "2.1.8", false);
+    final Component preRelease = buildVersionMock(tx, "2.1.9-greenbell", true);
+    final Component release = buildVersionMock(tx, "2.1.8", false);
 
     final NugetGalleryFacetImpl galleryFacet = buildSpy();
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release, preRelease));
 
-    verifyVersionFlags(tx.getAttributes(preRelease).child(NAME), false, true);
-    verifyVersionFlags(tx.getAttributes(release).child(NAME), true, false);
+    verifyVersionFlags(preRelease.formatAttributes(), false, true);
+    verifyVersionFlags(release.formatAttributes(), true, false);
   }
 
   private NugetGalleryFacetImpl buildSpy() {
@@ -222,21 +221,20 @@ public class NugetGalleryFacetImplPutTest
     return galleryFacet;
   }
 
-  private OrientVertex buildVersionMock(final StorageTx tx, final String version, final boolean isPrerelease) {
-    final OrientVertex vertex = mock(OrientVertex.class);
-    final NestedAttributesMap attributes = mock(NestedAttributesMap.class);
+  private Component buildVersionMock(final StorageTx tx, final String version, final boolean isPrerelease) {
+    final Component component = mock(Component.class);
     final NestedAttributesMap nugetAttributes = mock(NestedAttributesMap.class);
 
-    when(tx.getAttributes(vertex)).thenReturn(attributes);
-    when(attributes.child(eq(NAME))).thenReturn(nugetAttributes);
+    when(component.formatAttributes()).thenReturn(nugetAttributes);
 
-    when(vertex.getProperty(P_VERSION)).thenReturn(version);
-    when(nugetAttributes.get(eq(P_VERSION), eq(String.class))).thenReturn(version);
-    when(nugetAttributes.get(eq(P_IS_PRERELEASE), eq(Boolean.class))).thenReturn(isPrerelease);
+    when(component.requireVersion()).thenReturn(version);
+    when(nugetAttributes.require(eq(P_VERSION))).thenReturn(version);
+    when(nugetAttributes.require(eq(P_IS_PRERELEASE), eq(Boolean.class))).thenReturn(isPrerelease);
+    when(nugetAttributes.require(eq(P_VERSION_DOWNLOAD_COUNT), eq(Integer.class))).thenReturn(0);
 
     // placebo the other values
     when(nugetAttributes.get(anyString(), eq(Integer.class))).thenReturn(0);
-    return vertex;
+    return component;
   }
 
   private void verifyVersionFlags(final NestedAttributesMap preReleaseAttributes, final boolean islatest,

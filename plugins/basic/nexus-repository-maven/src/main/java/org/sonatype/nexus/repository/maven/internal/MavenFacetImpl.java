@@ -35,6 +35,9 @@ import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
+import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.Bucket;
+import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Payload;
@@ -151,18 +154,16 @@ public class MavenFacetImpl
   @Override
   public DecoratedPayload get(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
+      final Asset asset = findAsset(tx, tx.getBucket(), path);
       if (asset == null) {
         return null;
       }
-      final BlobRef blobRef = getBlobRef(path, asset);
-      final Blob blob = tx.getBlob(blobRef);
-      checkState(blob != null, "asset of component with at path %s refers to missing blob %s", path.getPath(), blobRef);
-      final String contentType = asset.getProperty(StorageFacet.P_CONTENT_TYPE);
+      final Blob blob = tx.requireBlob(asset.requireBlobRef());
+      final String contentType = asset.contentType();
 
-      final NestedAttributesMap attributesMap = getFormatAttributes(tx, asset);
+      final NestedAttributesMap attributesMap = asset.formatAttributes();
       final Date lastModifiedDate = attributesMap.require(P_CONTENT_LAST_MODIFIED, Date.class);
-      final NestedAttributesMap checksumAttributes = getAttributes(tx, asset).child(StorageFacet.P_CHECKSUM);
+      final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
       final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
       for (HashAlgorithm algorithm : HASH_ALGORITHMS) {
         final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
@@ -193,20 +194,18 @@ public class MavenFacetImpl
   private void putArtifact(final MavenPath path, final Payload content, final StorageTx tx)
       throws IOException, InvalidContentException
   {
-    final Coordinates coordinates = path.getCoordinates();
-    OrientVertex component = findComponent(tx, tx.getBucket(), path);
+    final Coordinates coordinates = checkNotNull(path.getCoordinates());
+    Component component = findComponent(tx, tx.getBucket(), path);
     if (component == null) {
-      component = tx.createComponent(tx.getBucket());
-
-      // Set normalized properties: format, group, and name
-      component.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
-      component.setProperty(StorageFacet.P_PATH, path.getPath());
-      component.setProperty(StorageFacet.P_GROUP, coordinates.getGroupId());
-      component.setProperty(StorageFacet.P_NAME, coordinates.getArtifactId());
-      component.setProperty(StorageFacet.P_VERSION, coordinates.getVersion());
+      // Create and set top-level properties
+      component = tx.createComponent(tx.getBucket(), getRepository().getFormat())
+          .group(coordinates.getGroupId())
+          .name(coordinates.getArtifactId())
+          .version(coordinates.getVersion());
+      component.set(StorageFacet.P_PATH, path.getPath());
 
       // Set format specific attributes
-      final NestedAttributesMap componentAttributes = getFormatAttributes(tx, component);
+      final NestedAttributesMap componentAttributes = component.formatAttributes();
       componentAttributes.set(P_COMPONENT_KEY, getComponentKey(coordinates));
       componentAttributes.set(P_GROUP_ID, coordinates.getGroupId());
       componentAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
@@ -216,16 +215,14 @@ public class MavenFacetImpl
       }
     }
 
-    OrientVertex asset = selectComponentAsset(tx, component, path);
+    Asset asset = selectComponentAsset(tx, component, path);
     if (asset == null) {
-      asset = tx.createAsset(tx.getBucket());
+      asset = tx.createAsset(tx.getBucket(), component);
 
-      asset.addEdge(StorageFacet.E_PART_OF_COMPONENT, component);
-      asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
-      asset.setProperty(StorageFacet.P_NAME, path.getFileName());
-      asset.setProperty(StorageFacet.P_PATH, path.getPath());
+      asset.set(StorageFacet.P_NAME, path.getFileName());
+      asset.set(StorageFacet.P_PATH, path.getPath());
 
-      final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
+      final NestedAttributesMap assetAttributes = asset.formatAttributes();
       assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
       assetAttributes.set(P_GROUP_ID, coordinates.getGroupId());
       assetAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
@@ -245,14 +242,13 @@ public class MavenFacetImpl
   private void putFile(final MavenPath path, final Payload content, final StorageTx tx)
       throws IOException, InvalidContentException
   {
-    OrientVertex asset = findAsset(tx, tx.getBucket(), path);
+    Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
-      asset = tx.createAsset(tx.getBucket());
-      asset.setProperty(StorageFacet.P_FORMAT, getRepository().getFormat().getValue());
-      asset.setProperty(StorageFacet.P_NAME, path.getFileName());
-      asset.setProperty(StorageFacet.P_PATH, path.getPath());
+      asset = tx.createAsset(tx.getBucket(), getRepository().getFormat());
+      asset.set(StorageFacet.P_NAME, path.getFileName());
+      asset.set(StorageFacet.P_PATH, path.getPath());
 
-      final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
+      final NestedAttributesMap assetAttributes = asset.formatAttributes();
       assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
 
       // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
@@ -263,7 +259,7 @@ public class MavenFacetImpl
 
   private void putAssetPayload(final MavenPath path,
                                final StorageTx tx,
-                               final OrientVertex asset,
+                               final Asset asset,
                                final Payload content) throws IOException
   {
     // TODO: Figure out created-by header
@@ -281,8 +277,7 @@ public class MavenFacetImpl
       }
     }
 
-    final NestedAttributesMap assetAttributes = getFormatAttributes(tx, asset);
-    assetAttributes.set(P_CONTENT_LAST_MODIFIED, new Date());
+    asset.formatAttributes().set(P_CONTENT_LAST_MODIFIED, new Date());
   }
 
   @Override
@@ -298,31 +293,28 @@ public class MavenFacetImpl
   }
 
   private boolean deleteArtifact(final MavenPath path, final StorageTx tx) throws IOException {
-    final OrientVertex component = findComponent(tx, tx.getBucket(), path);
+    final Component component = findComponent(tx, tx.getBucket(), path);
     if (component == null) {
       return false;
     }
-    final OrientVertex asset = selectComponentAsset(tx, component, path);
+    final Asset asset = selectComponentAsset(tx, component, path);
     if (asset == null) {
       return false;
     }
-    final boolean lastAsset = tx.findAssets(component).size() == 1;
-    tx.deleteBlob(getBlobRef(path, asset));
-    tx.deleteVertex(asset);
-    if (lastAsset) {
-      tx.deleteVertex(component);
+    tx.deleteAsset(asset);
+    if (component.assets().isEmpty()) {
+      tx.deleteComponent(component);
     }
     tx.commit();
     return true;
   }
 
   private boolean deleteFile(final MavenPath path, final StorageTx tx) throws IOException {
-    final OrientVertex asset = findAsset(tx, tx.getBucket(), path);
+    final Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
       return false;
     }
-    tx.deleteBlob(getBlobRef(path, asset));
-    tx.deleteVertex(asset);
+    tx.deleteAsset(asset);
     tx.commit();
     return true;
   }
@@ -349,9 +341,9 @@ public class MavenFacetImpl
    * Finds component by key.
    */
   @Nullable
-  private OrientVertex findComponent(final StorageTx tx,
-                                     final OrientVertex bucket,
-                                     final MavenPath mavenPath)
+  private Component findComponent(final StorageTx tx,
+                                  final Bucket bucket,
+                                  final MavenPath mavenPath)
   {
     final String componentKeyName =
         StorageFacet.P_ATTRIBUTES + "." + getRepository().getFormat().getValue() + "." + P_COMPONENT_KEY;
@@ -362,16 +354,15 @@ public class MavenFacetImpl
    * Selects a component asset by key.
    */
   @Nullable
-  private OrientVertex selectComponentAsset(final StorageTx tx,
-                                            final OrientVertex component,
-                                            final MavenPath mavenPath)
+  private Asset selectComponentAsset(final StorageTx tx,
+                                     final Component component,
+                                     final MavenPath mavenPath)
   {
     final String assetKey = getAssetKey(mavenPath);
-    final List<OrientVertex> assets = tx.findAssets(component);
-    for (OrientVertex v : assets) {
-      final NestedAttributesMap attributesMap = getFormatAttributes(tx, v);
+    for (Asset asset : component.assets()) {
+      final NestedAttributesMap attributesMap = asset.formatAttributes();
       if (assetKey.equals(attributesMap.get(P_ASSET_KEY, String.class))) {
-        return v;
+        return asset;
       }
     }
     return null;
@@ -381,21 +372,13 @@ public class MavenFacetImpl
    * Finds asset by key.
    */
   @Nullable
-  private OrientVertex findAsset(final StorageTx tx,
-                                 final OrientVertex bucket,
-                                 final MavenPath mavenPath)
+  private Asset findAsset(final StorageTx tx,
+                          final Bucket bucket,
+                          final MavenPath mavenPath)
   {
     final String assetKeyName =
         StorageFacet.P_ATTRIBUTES + "." + getRepository().getFormat().getValue() + "." + P_ASSET_KEY;
     return tx.findAssetWithProperty(assetKeyName, getAssetKey(mavenPath), bucket);
-  }
-
-  private NestedAttributesMap getAttributes(final StorageTx tx, final OrientVertex vertex) {
-    return tx.getAttributes(vertex);
-  }
-
-  private NestedAttributesMap getFormatAttributes(final StorageTx tx, final OrientVertex vertex) {
-    return getAttributes(tx, vertex).child(getRepository().getFormat().getValue());
   }
 
   /**

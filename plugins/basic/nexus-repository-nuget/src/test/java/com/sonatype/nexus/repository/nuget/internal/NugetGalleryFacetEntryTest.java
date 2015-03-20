@@ -17,11 +17,11 @@ import java.util.HashMap;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.junit.Test;
 
 import static org.mockito.Matchers.any;
@@ -44,11 +44,11 @@ public class NugetGalleryFacetEntryTest
     final StorageTx tx = mock(StorageTx.class);
     doReturn(tx).when(galleryFacet).openStorageTx();
 
-    final OrientVertex component = mock(OrientVertex.class);
+    final Component component = mock(Component.class);
 
     // Wire the mock vertices together: component has asset, asset has blobRef
     doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
-    doReturn(mock(NestedAttributesMap.class)).when(galleryFacet).nugetAttribs(tx, component);
+    doReturn(mock(NestedAttributesMap.class)).when(component).formatAttributes();
 
     final HashMap<String, ?> data = Maps.newHashMap();
     doReturn(data).when(galleryFacet).toData(any(NestedAttributesMap.class),

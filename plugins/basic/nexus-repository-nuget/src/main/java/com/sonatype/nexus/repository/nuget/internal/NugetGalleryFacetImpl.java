@@ -33,7 +33,6 @@ import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
@@ -44,6 +43,9 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
+import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.Bucket;
+import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
 import org.sonatype.nexus.repository.storage.ComponentDeletedEvent;
 import org.sonatype.nexus.repository.storage.ComponentUpdatedEvent;
@@ -61,7 +63,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -79,9 +80,6 @@ import static org.odata4j.producer.resources.OptionsQueryParser.parseInlineCount
 import static org.odata4j.producer.resources.OptionsQueryParser.parseSkip;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseTop;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_CONTENT_TYPE;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
 
@@ -175,14 +173,14 @@ public class NugetGalleryFacetImpl
         ));
       }
 
-      final Iterable<OrientVertex> components = storageTx.findComponents(componentQuery.getWhere(),
+      final Iterable<Component> components = storageTx.findComponents(componentQuery.getWhere(),
           componentQuery.getParameters(), getRepositories(), componentQuery.getQuerySuffix());
 
       int n = 0;
-      for (OrientVertex component : components) {
+      for (Component component : components) {
         n++;
 
-        final NestedAttributesMap nugetAttributes = nugetAttribs(storageTx, component);
+        final NestedAttributesMap nugetAttributes = component.formatAttributes();
         final Map<String, ?> data = toData(nugetAttributes, extraTemplateVars(base, operation));
 
         xml.append(interpolateTemplate(ODataTemplates.NUGET_ENTRY, data));
@@ -202,8 +200,7 @@ public class NugetGalleryFacetImpl
   @Override
   public void putMetadata(final Map<String, String> metadata) {
     try (StorageTx tx = openStorageTx()) {
-      final OrientVertex bucket = tx.getBucket();
-      final OrientVertex component = createOrUpdateComponent(tx, bucket, metadata);
+      final Component component = createOrUpdateComponent(tx, tx.getBucket(), metadata);
       maintainAggregateInfo(tx, metadata.get(ID));
       tx.commit();
     }
@@ -212,8 +209,8 @@ public class NugetGalleryFacetImpl
   @Override
   public void putContent(String id, String version, InputStream content) {
     try (StorageTx tx = openStorageTx()) {
-      final OrientVertex bucket = tx.getBucket();
-      OrientVertex component = findComponent(tx, id, version);
+      final Bucket bucket = tx.getBucket();
+      Component component = findComponent(tx, id, version);
       checkState(component != null, "Component metadata does not exist yet");
       createOrUpdateAsset(tx, bucket, component, content);
       tx.commit();
@@ -241,8 +238,8 @@ public class NugetGalleryFacetImpl
 
     final StringBuilder xml = new StringBuilder();
     try (StorageTx tx = openStorageTx()) {
-      final OrientVertex component = findComponent(tx, id, version);
-      final Map<String, ?> entryData = toData(nugetAttribs(tx, component), extra);
+      final Component component = findComponent(tx, id, version);
+      final Map<String, ?> entryData = toData(component.formatAttributes(), extra);
 
       final String nugetEntry = ODataTemplates.NUGET_ENTRY;
       xml.append(interpolateTemplate(nugetEntry, entryData));
@@ -254,11 +251,6 @@ public class NugetGalleryFacetImpl
   String interpolateTemplate(final String template, final Map<String, ?> entryData) {
     return ODataTemplates
         .interpolate(template, entryData);
-  }
-
-  @VisibleForTesting
-  NestedAttributesMap nugetAttribs(final StorageTx tx, final OrientVertex component) {
-    return tx.getAttributes(component).child(NUGET);
   }
 
   private Map<String, String> extraTemplateVars(final String base, final String operation) {
@@ -287,7 +279,7 @@ public class NugetGalleryFacetImpl
       recordMetadata.put(CREATED, creationTime);
       recordMetadata.put(LAST_UPDATED, creationTime);
       recordMetadata.put(PUBLISHED, creationTime);
-      OrientVertex component;
+      Component component;
       try (InputStream in = tempStream.get()) {
         component = createOrUpdatePackage(storageTx, recordMetadata, in);
       }
@@ -295,7 +287,7 @@ public class NugetGalleryFacetImpl
       String id = recordMetadata.get(ID);
       maintainAggregateInfo(storageTx, id);
 
-      boolean isNew = component.getIdentity().isNew();  // must check before commit
+      boolean isNew = component.isNew();  // must check before commit
       storageTx.commit();
 
       if (isNew) {
@@ -314,21 +306,14 @@ public class NugetGalleryFacetImpl
     checkNotNull(version);
 
     try (StorageTx tx = openStorageTx()) {
-      OrientVertex component = findComponent(tx, id, version);
+      Component component = findComponent(tx, id, version);
       if (component == null) {
         return null;
       }
-      OrientVertex asset = firstAsset(component);
-      if (asset == null) {
-        return null;
-      }
+      Asset asset = component.firstAsset();
 
-      String blobRefString = asset.getProperty(P_BLOB_REF);
-      checkState(blobRefString != null);
-
-      Blob blob = requireBlob(tx, blobRefString);
-
-      String contentType = asset.getProperty(P_CONTENT_TYPE);
+      Blob blob = tx.requireBlob(asset.requireBlobRef());
+      String contentType = asset.contentType();
 
       return new StreamPayload(blob.getInputStream(), blob.getMetrics().getContentSize(), contentType);
     }
@@ -340,12 +325,12 @@ public class NugetGalleryFacetImpl
     checkNotNull(version);
 
     try (StorageTx tx = openStorageTx()) {
-      OrientVertex component = findComponent(tx, id, version);
+      Component component = findComponent(tx, id, version);
       if (component == null) {
         return null;
       }
 
-      final NestedAttributesMap nugetAttributes = nugetAttribs(tx, component);
+      final NestedAttributesMap nugetAttributes = component.formatAttributes();
       Date date = nugetAttributes.get(P_LAST_UPDATED, Date.class);
       return new DateTime(checkNotNull(date));
     }
@@ -357,44 +342,16 @@ public class NugetGalleryFacetImpl
     checkNotNull(version);
 
     try (StorageTx tx = openStorageTx()) {
-      OrientVertex component = findComponent(tx, id, version);
+      Component component = findComponent(tx, id, version);
       if (component == null) {
         return false;
       }
-
-      deleteAsset(tx, component);
-      tx.deleteVertex(component);
+      tx.deleteComponent(component);
       tx.commit();
 
       getEventBus().post(new ComponentDeletedEvent(component, getRepository()));
       return true;
     }
-  }
-
-  /**
-   * Deletes the asset associated with the component, if it exists, and the associated blob, if it exists.
-   */
-  private void deleteAsset(final StorageTx tx, final OrientVertex component) {
-    OrientVertex asset = Iterables.getFirst(tx.findAssets(component), null);
-    if (asset != null) {
-      // Delete blob
-      String blobRefString = asset.getProperty(P_BLOB_REF);
-      if (blobRefString != null) {
-        tx.deleteBlob(BlobRef.parse(blobRefString));
-      }
-      tx.deleteVertex(asset);
-    }
-  }
-
-  private Blob requireBlob(final StorageTx tx, final String blobRefString) {
-    Blob blob = tx.getBlob(BlobRef.parse(blobRefString));
-    checkState(blob != null);
-    return blob;
-  }
-
-  @VisibleForTesting
-  OrientVertex firstAsset(final OrientVertex component) {
-    return Iterables.getFirst(openStorageTx().findAssets(component), null);
   }
 
   @VisibleForTesting
@@ -403,17 +360,17 @@ public class NugetGalleryFacetImpl
   }
 
   @VisibleForTesting
-  OrientVertex createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata,
+  Component createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata,
                                      final InputStream packageStream)
   {
-    final OrientVertex bucket = storageTx.getBucket();
-    final OrientVertex component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
+    final Bucket bucket = storageTx.getBucket();
+    final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
     createOrUpdateAsset(storageTx, bucket, component, packageStream);
     return component;
   }
 
-  private String blobName(OrientVertex component) {
-    return component.getProperty(P_NAME) + " " + component.getProperty(P_VERSION) + "@" + getRepository().getName();
+  private String blobName(Component component) {
+    return component.get(P_NAME) + " " + component.require(P_VERSION) + "@" + getRepository().getName();
   }
 
   /**
@@ -427,30 +384,30 @@ public class NugetGalleryFacetImpl
   }
 
   @VisibleForTesting
-  void maintainAggregateInfo(final StorageTx storageTx, final Iterable<OrientVertex> versions) {
+  void maintainAggregateInfo(final StorageTx storageTx, final Iterable<Component> versions) {
     long totalDownloadCount = 0;
 
-    SortedSet<OrientVertex> releases = Sets.newTreeSet(new ComponentVersionComparator());
-    SortedSet<OrientVertex> allReleases = Sets.newTreeSet(new ComponentVersionComparator());
+    SortedSet<Component> releases = Sets.newTreeSet(new ComponentVersionComparator());
+    SortedSet<Component> allReleases = Sets.newTreeSet(new ComponentVersionComparator());
 
-    for (OrientVertex version : versions) {
-      final NestedAttributesMap nugetAttributes = nugetAttribs(storageTx, version);
+    for (Component version : versions) {
+      final NestedAttributesMap nugetAttributes = version.formatAttributes();
 
-      final boolean isPrerelease = checkNotNull(nugetAttributes.get(P_IS_PRERELEASE, Boolean.class));
+      final boolean isPrerelease = nugetAttributes.require(P_IS_PRERELEASE, Boolean.class);
       if (!isPrerelease) {
         releases.add(version);
       }
       allReleases.add(version);
 
-      final int versionDownloadCount = checkNotNull(nugetAttributes.get(P_VERSION_DOWNLOAD_COUNT, Integer.class));
+      final int versionDownloadCount = nugetAttributes.require(P_VERSION_DOWNLOAD_COUNT, Integer.class);
       totalDownloadCount += versionDownloadCount;
     }
 
-    OrientVertex latestVersion = releases.isEmpty() ? null : releases.last();
-    OrientVertex absoluteLatestVersion = allReleases.isEmpty() ? null : allReleases.last();
+    Component latestVersion = releases.isEmpty() ? null : releases.last();
+    Component absoluteLatestVersion = allReleases.isEmpty() ? null : allReleases.last();
 
-    for (OrientVertex component : allReleases) {
-      final NestedAttributesMap nugetAttributes = nugetAttribs(storageTx, component);
+    for (Component component : allReleases) {
+      final NestedAttributesMap nugetAttributes = component.formatAttributes();
 
       nugetAttributes.set(P_IS_LATEST_VERSION, component.equals(latestVersion));
       nugetAttributes.set(P_IS_ABSOLUTE_LATEST_VERSION, component.equals(absoluteLatestVersion));
@@ -461,21 +418,20 @@ public class NugetGalleryFacetImpl
     }
   }
 
-  private Iterable<OrientVertex> findComponentsById(final StorageTx storageTx, final Object id) {
+  private Iterable<Component> findComponentsById(final StorageTx storageTx, final Object id) {
     final String whereClause = "name = :name";
     Map<String, Object> parameters = ImmutableMap.of(P_NAME, id);
     return storageTx.findComponents(whereClause, parameters, getRepositories(), null);
   }
 
-  private OrientVertex createOrUpdateAsset(final StorageTx storageTx, final OrientVertex bucket,
-                                           final OrientVertex component, final InputStream in)
+  private Asset createOrUpdateAsset(final StorageTx storageTx, final Bucket bucket,
+                                    final Component component, final InputStream in)
   {
-    OrientVertex asset = null;
+    Asset asset = null;
 
-    final List<OrientVertex> assets = storageTx.findAssets(component);
+    final List<Asset> assets = component.assets();
     if (assets.isEmpty()) {
-      asset = storageTx.createAsset(bucket);
-      asset.addEdge(StorageFacet.E_PART_OF_COMPONENT, component);
+      asset = storageTx.createAsset(bucket, component);
     }
     else {
       asset = assets.get(0);
@@ -499,18 +455,17 @@ public class NugetGalleryFacetImpl
     }
   }
 
-  private OrientVertex createOrUpdateComponent(final StorageTx storageTx, final OrientVertex bucket,
-                                               final Map<String, String> data)
+  private Component createOrUpdateComponent(final StorageTx storageTx, final Bucket bucket,
+                                            final Map<String, String> data)
   {
     final String id = checkNotNull(data.get(ID));
     final String version = checkVersion(data.get(VERSION));
 
-    final OrientVertex component = findOrCreateComponent(storageTx, bucket, id, version);
+    final Component component = findOrCreateComponent(storageTx, bucket, id, version);
 
-    final boolean republishing = !component.getIdentity().isNew();
+    final boolean republishing = !component.isNew();
 
-    final NestedAttributesMap attributes = storageTx.getAttributes(component);
-    final NestedAttributesMap nugetAttr = attributes.child(NUGET);
+    final NestedAttributesMap nugetAttr = component.formatAttributes();
 
     setDerivedAttributes(data, nugetAttr, republishing);
 
@@ -587,10 +542,10 @@ public class NugetGalleryFacetImpl
         (nullToEmpty(incomingMetadata.get(TITLE)) + nullToEmpty(incomingMetadata.get(ID))).toLowerCase());
   }
 
-  private OrientVertex findOrCreateComponent(final StorageTx storageTx, final OrientVertex bucket, final String name,
-                                             final String version)
+  private Component findOrCreateComponent(final StorageTx storageTx, final Bucket bucket, final String name,
+                                          final String version)
   {
-    final OrientVertex found = findComponent(storageTx, name, version);
+    final Component found = findComponent(storageTx, name, version);
     if (found != null) {
       return found;
     }
@@ -599,27 +554,24 @@ public class NugetGalleryFacetImpl
   }
 
   @VisibleForTesting
-  OrientVertex findComponent(final StorageTx storageTx, final String name, final Object version) {
+  Component findComponent(final StorageTx storageTx, final String name, final Object version) {
     Builder builder = new Builder().where("name = ").param(name).where(" and version = ").param(version);
 
     return Iterables.getFirst(findComponents(storageTx, builder.build()), null);
   }
 
-  private Iterable<OrientVertex> findComponents(final StorageTx storageTx, final ComponentQuery query) {
+  private Iterable<Component> findComponents(final StorageTx storageTx, final ComponentQuery query) {
     return storageTx.findComponents(query.getWhere(), query.getParameters(),
         getRepositories(), query.getQuerySuffix());
   }
 
-  private OrientVertex createComponent(final StorageTx storageTx, final OrientVertex bucket, final String name,
-                                       final String version)
+  private Component createComponent(final StorageTx storageTx, final Bucket bucket, final String name,
+                                    final String version)
   {
     log.debug("Creating NuGet component {} v. {}", name, version);
-    OrientVertex component = storageTx.createComponent(storageTx.getBucket());
-    component.setProperty(P_FORMAT, NugetFormat.NAME);
-    component.setProperty(P_NAME, name);
-    // Nuget components don't have a group
-    component.setProperty(P_VERSION, version);
-    return component;
+    return storageTx.createComponent(bucket, getRepository().getFormat())
+        .name(name)
+        .version(version); // Nuget components don't have a group
   }
 
   private boolean inlineCountRequested(Map<String, String> query) {
@@ -646,13 +598,13 @@ public class NugetGalleryFacetImpl
 
   @VisibleForTesting
   static class ComponentVersionComparator
-      implements Comparator<OrientVertex>
+      implements Comparator<Component>
   {
     @Override
-    public int compare(final OrientVertex o1, final OrientVertex o2) {
+    public int compare(final Component o1, final Component o2) {
       try {
-        Version v1 = SCHEME.parseVersion((String) o1.getProperty(P_VERSION));
-        Version v2 = SCHEME.parseVersion((String) o2.getProperty(P_VERSION));
+        Version v1 = SCHEME.parseVersion(o1.requireVersion());
+        Version v2 = SCHEME.parseVersion(o2.requireVersion());
         return v1.compareTo(v2);
       }
       catch (InvalidVersionSpecificationException e) {
