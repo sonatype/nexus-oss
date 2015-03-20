@@ -17,14 +17,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
+import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.nexus.repository.view.payloads.DecoratedPayload;
@@ -50,7 +53,7 @@ public class DefaultHttpResponseSender
     implements HttpResponseSender
 {
   @Override
-  public void send(final Response response, final HttpServletResponse httpResponse)
+  public void send(final @Nullable Request request, final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
     log.trace("Sending response: {}", response);
@@ -107,9 +110,10 @@ public class DefaultHttpResponseSender
           }
         }
 
-        // TODO: Do not do this below is verb is HEAD
-        try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
-          ByteStreams.copy(input, output);
+        if (request != null && !HttpMethods.HEAD.equals(request.getAction())) {
+          try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
+            ByteStreams.copy(input, output);
+          }
         }
       }
     }

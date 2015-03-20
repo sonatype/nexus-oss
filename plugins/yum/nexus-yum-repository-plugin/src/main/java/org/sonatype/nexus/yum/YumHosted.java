@@ -98,7 +98,7 @@ public interface YumHosted
    */
   String getVersion(String alias);
 
-  TaskInfo<YumRepository> regenerate();
+  TaskInfo regenerate();
 
   /**
    * Adds RPM and regenerate.
@@ -106,7 +106,7 @@ public interface YumHosted
    * @param path to be added
    * @return regenerate future (never null)
    */
-  TaskInfo<YumRepository> addRpmAndRegenerate(String path);
+  TaskInfo addRpmAndRegenerate(String path);
 
   YumRepository getYumRepository(String version)
       throws Exception;

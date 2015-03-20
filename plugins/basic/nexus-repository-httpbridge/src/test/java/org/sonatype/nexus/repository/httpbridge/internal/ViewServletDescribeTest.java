@@ -75,7 +75,7 @@ public class ViewServletDescribeTest
     viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
 
     verify(viewServlet, never()).describe(any(Request.class), any(Response.class), any(Exception.class));
-    verify(defaultResponseSender).send(facetResponse, servletResponse);
+    verify(defaultResponseSender).send(request, facetResponse, servletResponse);
   }
 
   @Test
@@ -86,7 +86,7 @@ public class ViewServletDescribeTest
     viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
 
     verify(viewServlet).describe(request, facetResponse, null);
-    verify(viewServlet).send(descriptionResponse, servletResponse);
+    verify(viewServlet).send(request, descriptionResponse, servletResponse);
   }
 
   @Test(expected = RuntimeException.class)
@@ -106,7 +106,7 @@ public class ViewServletDescribeTest
 
     // The exception got described
     verify(viewServlet).describe(request, null, facetException);
-    verify(viewServlet).send(descriptionResponse, servletResponse);
+    verify(viewServlet).send(request, descriptionResponse, servletResponse);
   }
 
   private void facetThrowsException(final boolean facetThrowsException) throws Exception {

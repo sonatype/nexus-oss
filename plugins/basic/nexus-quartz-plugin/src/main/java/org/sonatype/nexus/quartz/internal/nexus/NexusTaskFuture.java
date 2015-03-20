@@ -36,9 +36,9 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 3.0
  */
-public class NexusTaskFuture<T>
+public class NexusTaskFuture
     extends ComponentSupport
-    implements Future<T>
+    implements Future<Object>
 {
   /**
    * Key used in job execution context to stick future in.
@@ -63,7 +63,7 @@ public class NexusTaskFuture<T>
 
   private Exception exception;
 
-  private T result;
+  private Object result;
 
   public NexusTaskFuture(final QuartzTaskExecutorSPI quartzSupport,
                          final JobKey jobKey,
@@ -84,7 +84,7 @@ public class NexusTaskFuture<T>
     this.jobExecutingThread = checkNotNull(jobExecutingThread);
   }
 
-  public void setResult(final T result, final Exception exception) {
+  public void setResult(final Object result, final Exception exception) {
     this.result = result;
     this.exception = exception;
     this.jobExecutingThread = null;
@@ -154,7 +154,7 @@ public class NexusTaskFuture<T>
   }
 
   @Override
-  public T get() throws InterruptedException, ExecutionException {
+  public Object get() throws InterruptedException, ExecutionException {
     countDownLatch.await();
     if (exception != null) {
       Throwables.propagateIfPossible(exception);
@@ -166,7 +166,7 @@ public class NexusTaskFuture<T>
   }
 
   @Override
-  public T get(final long timeout, final TimeUnit unit)
+  public Object get(final long timeout, final TimeUnit unit)
       throws InterruptedException, ExecutionException, TimeoutException
   {
     countDownLatch.await(timeout, unit);

@@ -30,7 +30,7 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
  *
  * @since 3.0
  */
-public interface TaskInfo<T>
+public interface TaskInfo
 {
   /**
    * Returns a unique ID of the task instance. Shorthand method for {@link #getConfiguration()#getId()}
@@ -94,7 +94,7 @@ public interface TaskInfo<T>
     STARTING, BLOCKED, RUNNING, CANCELED
   }
 
-  interface CurrentState<T>
+  interface CurrentState
   {
     /**
      * Returns the state of task, never {@code null}.
@@ -124,7 +124,7 @@ public interface TaskInfo<T>
      * In case of {@link State#DONE} the future is done too.
      */
     @Nullable
-    Future<T> getFuture();
+    Future<?> getFuture();
   }
 
   enum EndState
@@ -157,7 +157,7 @@ public interface TaskInfo<T>
    * manually started with {@link #runNow()} method, the invocation of this method will block until underlying
    * scheduler actually starts the task, hence, caller might get the task result.
    */
-  CurrentState<T> getCurrentState();
+  CurrentState getCurrentState();
 
   /**
    * Returns the task last run state, if there was any, otherwise {@code null}.
@@ -183,5 +183,5 @@ public interface TaskInfo<T>
    * @throws TaskRemovedException  if task with this ID has been removed from scheduler.
    * @throws IllegalStateException if task is already running.
    */
-  TaskInfo<T> runNow() throws TaskRemovedException;
+  TaskInfo runNow() throws TaskRemovedException;
 }

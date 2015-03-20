@@ -25,6 +25,7 @@ import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
 
 /**
  * A format-neutral proxy handler which delegates to an instance of {@link ProxyFacet} for content.
@@ -40,8 +41,8 @@ public class ProxyHandler
   public Response handle(@Nonnull final Context context) throws Exception {
 
     final String action = context.getRequest().getAction();
-    if (!HttpMethods.GET.equals(action)) {
-      return HttpResponses.methodNotAllowed(action, GET);
+    if (!GET.equals(action) && !HEAD.equals(action)) {
+      return HttpResponses.methodNotAllowed(action, GET, HEAD);
     }
 
     try {

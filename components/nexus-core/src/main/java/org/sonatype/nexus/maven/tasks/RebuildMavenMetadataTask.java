@@ -28,7 +28,7 @@ import org.codehaus.plexus.util.StringUtils;
  */
 @Named
 public class RebuildMavenMetadataTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
 {
   @Override
   public Void execute()

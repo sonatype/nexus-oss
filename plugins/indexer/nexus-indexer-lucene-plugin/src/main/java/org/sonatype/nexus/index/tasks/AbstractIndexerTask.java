@@ -24,7 +24,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
  * Base class for indexer related tasks.
  */
 public abstract class AbstractIndexerTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
     implements Cancelable
 {
   private List<ReindexTaskHandler> handlers;

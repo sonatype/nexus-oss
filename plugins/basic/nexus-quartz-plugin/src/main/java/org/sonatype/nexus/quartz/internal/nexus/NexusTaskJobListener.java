@@ -60,20 +60,20 @@ public class NexusTaskJobListener<T>
 
   private final NexusScheduleConverter nexusScheduleConverter;
 
-  private final NexusTaskInfo<T> nexusTaskInfo;
+  private final NexusTaskInfo nexusTaskInfo;
 
   public NexusTaskJobListener(final EventBus eventBus,
                               final QuartzTaskExecutorSPI quartzSupport,
                               final JobKey jobKey,
                               final NexusScheduleConverter nexusScheduleConverter,
                               final NexusTaskState initialState,
-                              final @Nullable NexusTaskFuture<T> nexusTaskFuture)
+                              final @Nullable NexusTaskFuture nexusTaskFuture)
   {
     this.eventBus = checkNotNull(eventBus);
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
     this.nexusScheduleConverter = checkNotNull(nexusScheduleConverter);
-    this.nexusTaskInfo = new NexusTaskInfo<>(
+    this.nexusTaskInfo = new NexusTaskInfo(
         quartzSupport,
         jobKey,
         initialState,
@@ -81,7 +81,7 @@ public class NexusTaskJobListener<T>
     );
   }
 
-  public NexusTaskInfo<T> getNexusTaskInfo() {
+  public NexusTaskInfo getNexusTaskInfo() {
     return nexusTaskInfo;
   }
 
@@ -124,11 +124,11 @@ public class NexusTaskJobListener<T>
     // we do want to "follow" it's lifecycle here.
     final Trigger currentTrigger = getCurrentTrigger(context);
 
-    NexusTaskFuture<T> future = nexusTaskInfo.getNexusTaskFuture();
+    NexusTaskFuture future = nexusTaskInfo.getNexusTaskFuture();
     if (future == null) {
       log.trace("Job {} : {} has no future, creating it", jobKey.getName(),
           nexusTaskInfo.getConfiguration().getTaskLogName());
-      future = new NexusTaskFuture<>(quartzSupport, jobKey, nexusTaskInfo.getConfiguration().getTaskLogName(),
+      future = new NexusTaskFuture(quartzSupport, jobKey, nexusTaskInfo.getConfiguration().getTaskLogName(),
           context.getFireTime(),
           nexusScheduleConverter.toSchedule(context.getTrigger()));
       // set the future on taskinfo
@@ -144,16 +144,16 @@ public class NexusTaskJobListener<T>
     }
     context.put(NexusTaskFuture.FUTURE_KEY, future);
     context.put(NexusTaskInfo.TASK_INFO_KEY, nexusTaskInfo);
-    eventBus.post(new TaskEventStarted<>(nexusTaskInfo));
+    eventBus.post(new TaskEventStarted(nexusTaskInfo));
   }
 
   @Override
   public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
     log.trace("Job {} : {} jobWasExecuted", jobKey.getName(), nexusTaskInfo.getConfiguration().getTaskLogName());
-    final NexusTaskFuture<T> future = (NexusTaskFuture<T>) context.get(NexusTaskFuture.FUTURE_KEY);
+    final NexusTaskFuture future = (NexusTaskFuture) context.get(NexusTaskFuture.FUTURE_KEY);
     // on Executed, the taskInfo might be removed or even replaced, so use the one we started with
     // DO NOT TOUCH the listener's instance
-    final NexusTaskInfo<T> nexusTaskInfo = (NexusTaskInfo<T>) context.get(NexusTaskInfo.TASK_INFO_KEY);
+    final NexusTaskInfo nexusTaskInfo = (NexusTaskInfo) context.get(NexusTaskInfo.TASK_INFO_KEY);
     final EndState endState;
     if (future.isCancelled()) {
       endState = EndState.CANCELED;
@@ -207,13 +207,13 @@ public class NexusTaskJobListener<T>
     // fire events
     switch (endState) {
       case OK:
-        eventBus.post(new TaskEventStoppedDone<>(nexusTaskInfo));
+        eventBus.post(new TaskEventStoppedDone(nexusTaskInfo));
         break;
       case FAILED:
-        eventBus.post(new TaskEventStoppedFailed<>(nexusTaskInfo, failure));
+        eventBus.post(new TaskEventStoppedFailed(nexusTaskInfo, failure));
         break;
       case CANCELED:
-        eventBus.post(new TaskEventStoppedCanceled<>(nexusTaskInfo));
+        eventBus.post(new TaskEventStoppedCanceled(nexusTaskInfo));
         break;
     }
   }
