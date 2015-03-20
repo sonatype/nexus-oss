@@ -76,7 +76,7 @@ import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
  */
 @Named
 public class GenerateMetadataTask
-    extends RepositoryTaskSupport<YumRepository>
+    extends RepositoryTaskSupport
     implements Cancelable
 {
   // TODO: is defined in DefaultFSPeer. Do we want to expose it over there?
@@ -119,16 +119,16 @@ public class GenerateMetadataTask
    * overlap with this tasks' processed repositories, and have same version (including null!).
    */
   @Override
-  public List<TaskInfo<?>> isBlockedBy(List<TaskInfo<?>> runningTasks) {
-    final List<TaskInfo<?>> blockedBy = super.isBlockedBy(runningTasks);
+  public List<TaskInfo> isBlockedBy(List<TaskInfo> runningTasks) {
+    final List<TaskInfo> blockedBy = super.isBlockedBy(runningTasks);
     if (blockedBy.isEmpty()) {
       return blockedBy;
     }
     else {
-      return Lists.newArrayList(Iterables.filter(blockedBy, new Predicate<TaskInfo<?>>()
+      return Lists.newArrayList(Iterables.filter(blockedBy, new Predicate<TaskInfo>()
       {
         @Override
-        public boolean apply(final TaskInfo<?> taskInfo) {
+        public boolean apply(final TaskInfo taskInfo) {
           return Objects.equals(getConfiguration().getString(GenerateMetadataTask.PARAM_VERSION),
               taskInfo.getConfiguration().getString(GenerateMetadataTask.PARAM_VERSION));
         }

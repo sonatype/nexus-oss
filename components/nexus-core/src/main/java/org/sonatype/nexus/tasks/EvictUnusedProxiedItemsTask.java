@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 @Named
 public class EvictUnusedProxiedItemsTask
-    extends RepositoryTaskSupport<Collection<String>>
+    extends RepositoryTaskSupport
 {
   @Override
   protected Collection<String> execute()

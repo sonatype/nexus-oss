@@ -48,14 +48,14 @@ public class NexusTaskSchedulerIT
 
     String id;
     {
-      List<TaskInfo<?>> taskInfos = taskScheduler.listsTasks();
+      List<TaskInfo> taskInfos = taskScheduler.listsTasks();
       assertThat(taskInfos, hasSize(1));
       assertThat(taskInfos.get(0).getConfiguration().getTypeId(), equalTo(configuration.getTypeId()));
       id = taskInfos.get(0).getId();
     }
 
     {
-      TaskInfo<?> taskInfo = taskScheduler.getTaskById("foo-bar-not-exists");
+      TaskInfo taskInfo = taskScheduler.getTaskById("foo-bar-not-exists");
       assertThat(taskInfo, nullValue());
 
       taskInfo = taskScheduler.getTaskById(id);
@@ -69,7 +69,7 @@ public class NexusTaskSchedulerIT
     }
 
     {
-      TaskInfo<?> taskInfo = taskScheduler.getTaskById(id);
+      TaskInfo taskInfo = taskScheduler.getTaskById(id);
       assertThat(taskInfo, notNullValue());
       assertThat(taskInfo.getSchedule(), instanceOf(Weekly.class));
       assertThat(taskInfo.getCurrentState().getState(), is(State.WAITING));
@@ -79,10 +79,10 @@ public class NexusTaskSchedulerIT
     }
 
     {
-      TaskInfo<?> taskInfo = taskScheduler.getTaskById(id);
+      TaskInfo taskInfo = taskScheduler.getTaskById(id);
       assertThat(taskInfo, nullValue());
 
-      List<TaskInfo<?>> taskInfos = taskScheduler.listsTasks();
+      List<TaskInfo> taskInfos = taskScheduler.listsTasks();
       assertThat(taskInfos, hasSize(0));
     }
   }

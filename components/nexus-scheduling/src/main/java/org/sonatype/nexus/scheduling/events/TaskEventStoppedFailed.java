@@ -19,15 +19,15 @@ import org.sonatype.nexus.scheduling.TaskInfo;
  *
  * @since 2.0
  */
-public class TaskEventStoppedFailed<T>
-    extends TaskEventStopped<T>
+public class TaskEventStoppedFailed
+    extends TaskEventStopped
 {
   /**
    * Failure cause.
    */
   private final Throwable throwable;
 
-  public TaskEventStoppedFailed(final TaskInfo<T> taskInfo,
+  public TaskEventStoppedFailed(final TaskInfo taskInfo,
                                 final Throwable throwable)
   {
     super(taskInfo);

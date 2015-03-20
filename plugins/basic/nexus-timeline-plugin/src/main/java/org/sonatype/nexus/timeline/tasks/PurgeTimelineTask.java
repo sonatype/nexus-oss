@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class PurgeTimelineTask
-    extends TaskSupport<Void>
+    extends TaskSupport
 {
   private final Timeline timeline;
 

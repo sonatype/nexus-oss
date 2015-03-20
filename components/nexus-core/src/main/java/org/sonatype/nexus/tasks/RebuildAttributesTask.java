@@ -25,7 +25,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
  */
 @Named
 public class RebuildAttributesTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
 {
   @Override
   public Void execute()

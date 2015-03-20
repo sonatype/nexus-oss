@@ -103,23 +103,23 @@ public class DefaultTaskScheduler
   }
 
   @Override
-  public <T> TaskInfo<T> submit(final TaskConfiguration taskConfiguration) {
+  public TaskInfo submit(final TaskConfiguration taskConfiguration) {
     return scheduleTask(taskConfiguration, new Now());
   }
 
   @Override
-  public <T> TaskInfo<T> getTaskById(final String id) {
+  public TaskInfo getTaskById(final String id) {
     checkNotNull(id);
     return getScheduler().getTaskById(id);
   }
 
   @Override
-  public List<TaskInfo<?>> listsTasks() {
+  public List<TaskInfo> listsTasks() {
     return getScheduler().listsTasks();
   }
 
   @Override
-  public <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
+  public TaskInfo scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
     checkNotNull(taskConfiguration);
     taskConfiguration.validate();
     checkNotNull(schedule);
@@ -128,16 +128,16 @@ public class DefaultTaskScheduler
       taskConfiguration.setCreated(now);
     }
     taskConfiguration.setUpdated(now);
-    final TaskInfo<T> taskInfo = getScheduler().scheduleTask(taskConfiguration, schedule);
+    final TaskInfo taskInfo = getScheduler().scheduleTask(taskConfiguration, schedule);
     log.info("Task {} scheduled: {}", taskInfo.getConfiguration().getTaskLogName(), taskInfo.getSchedule().getType());
     return taskInfo;
   }
 
   @Override
-  public <T> TaskInfo<T> rescheduleTask(final String id, final Schedule schedule) {
+  public TaskInfo rescheduleTask(final String id, final Schedule schedule) {
     checkNotNull(id);
     checkNotNull(schedule);
-    final TaskInfo<T> taskInfo =  getScheduler().rescheduleTask(id, schedule);
+    final TaskInfo taskInfo =  getScheduler().rescheduleTask(id, schedule);
     if (taskInfo != null) {
       log.info("Task {} rescheduled: {}", taskInfo.getConfiguration().getTaskLogName(),
           taskInfo.getSchedule().getType());

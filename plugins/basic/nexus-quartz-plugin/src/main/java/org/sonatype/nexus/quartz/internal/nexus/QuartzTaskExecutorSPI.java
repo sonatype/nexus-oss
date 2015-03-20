@@ -87,9 +87,9 @@ public class QuartzTaskExecutorSPI
   }
 
   @Override
-  public <T> TaskInfo<T> getTaskById(final String id) {
+  public TaskInfo getTaskById(final String id) {
     try {
-      final NexusTaskInfo<T> task = taskByNxTaskId(id);
+      final NexusTaskInfo task = taskByNxTaskId(id);
       if (task != null && !task.isRemovedOrDone()) {
         return task;
       }
@@ -104,11 +104,11 @@ public class QuartzTaskExecutorSPI
   }
 
   @Override
-  public List<TaskInfo<?>> listsTasks() {
+  public List<TaskInfo> listsTasks() {
     try {
-      final List<TaskInfo<?>> result = Lists.newArrayList();
-      final Map<JobKey, NexusTaskInfo<?>> allTasks = allTasks();
-      for (NexusTaskInfo<?> nexusTaskInfo : allTasks.values()) {
+      final List<TaskInfo> result = Lists.newArrayList();
+      final Map<JobKey, NexusTaskInfo> allTasks = allTasks();
+      for (NexusTaskInfo nexusTaskInfo : allTasks.values()) {
         if (!nexusTaskInfo.isRemovedOrDone()) {
           result.add(nexusTaskInfo);
         }
@@ -122,8 +122,8 @@ public class QuartzTaskExecutorSPI
 
 
   @Override
-  public <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration,
-                                      final Schedule schedule)
+  public TaskInfo scheduleTask(final TaskConfiguration taskConfiguration,
+                               final Schedule schedule)
   {
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
@@ -135,7 +135,7 @@ public class QuartzTaskExecutorSPI
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(jobKey.getName(), jobKey.getGroup()).build();
 
-      final NexusTaskInfo<T> old = taskByNxTaskId(taskConfiguration.getId());
+      final NexusTaskInfo old = taskByNxTaskId(taskConfiguration.getId());
       if (old != null && !old.remove()) {
         // this is update but old task could not be removed: ie. running a non-cancelable task
         throw new IllegalArgumentException("Task could not be updated: running and not cancelable?");
@@ -147,7 +147,7 @@ public class QuartzTaskExecutorSPI
           .withDescription(taskConfiguration.getName()).usingJobData(jobDataMap).build();
 
       // register job specific listener with initial state
-      final NexusTaskInfo<T> nexusTaskInfo = (NexusTaskInfo<T>) initializeTaskState(jobDetail, trigger);
+      final NexusTaskInfo nexusTaskInfo = initializeTaskState(jobDetail, trigger);
       // schedule the job
       quartzSupport.getScheduler().scheduleJob(jobDetail, trigger);
       // enabled
@@ -165,11 +165,11 @@ public class QuartzTaskExecutorSPI
   }
 
   @Override
-  public <T> TaskInfo<T> rescheduleTask(final String id, final Schedule schedule) {
+  public TaskInfo rescheduleTask(final String id, final Schedule schedule) {
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
-      final NexusTaskInfo<T> task = taskByNxTaskId(id);
+      final NexusTaskInfo task = taskByNxTaskId(id);
       if (task == null) {
         return null;
       }
@@ -222,7 +222,7 @@ public class QuartzTaskExecutorSPI
    * Creates and registers a {@link NexusTaskJobListener} for given task with initial state and returns it's {@link
    * NexusTaskInfo}.
    */
-  <T> TaskInfo<T> initializeTaskState(final JobDetail jobDetail, final Trigger trigger) throws SchedulerException {
+  NexusTaskInfo initializeTaskState(final JobDetail jobDetail, final Trigger trigger) throws SchedulerException {
     final Date now = new Date();
     final TaskConfiguration taskConfiguration = toTaskConfiguration(jobDetail.getJobDataMap());
     final Schedule schedule = nexusScheduleConverter.toSchedule(trigger);
@@ -232,9 +232,9 @@ public class QuartzTaskExecutorSPI
         trigger.getFireTimeAfter(now)
     );
 
-    NexusTaskFuture<T> future = null;
+    NexusTaskFuture future = null;
     if (schedule instanceof Now) {
-      future = new NexusTaskFuture<>(
+      future = new NexusTaskFuture(
           this,
           jobDetail.getKey(),
           taskConfiguration.getTaskLogName(),
@@ -243,7 +243,7 @@ public class QuartzTaskExecutorSPI
       );
     }
 
-    final NexusTaskJobListener<T> nexusTaskJobListener = new NexusTaskJobListener<>(
+    final NexusTaskJobListener nexusTaskJobListener = new NexusTaskJobListener<>(
         eventBus,
         this,
         jobDetail.getKey(),
@@ -257,8 +257,8 @@ public class QuartzTaskExecutorSPI
     return nexusTaskJobListener.getNexusTaskInfo();
   }
 
-  Map<JobKey, NexusTaskInfo<?>> allTasks() throws SchedulerException {
-    final Map<JobKey, NexusTaskInfo<?>> result = Maps.newHashMap();
+  Map<JobKey, NexusTaskInfo> allTasks() throws SchedulerException {
+    final Map<JobKey, NexusTaskInfo> result = Maps.newHashMap();
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
@@ -277,14 +277,14 @@ public class QuartzTaskExecutorSPI
     }
   }
 
-  <T> NexusTaskInfo<T> taskByNxTaskId(final String id) throws SchedulerException {
+  NexusTaskInfo taskByNxTaskId(final String id) throws SchedulerException {
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
-      final Map<JobKey, NexusTaskInfo<?>> allTasks = allTasks();
-      for (NexusTaskInfo<?> task : allTasks.values()) {
+      final Map<JobKey, NexusTaskInfo> allTasks = allTasks();
+      for (NexusTaskInfo task : allTasks.values()) {
         if (task.getId().equals(id)) {
-          return (NexusTaskInfo<T>) task;
+          return task;
         }
       }
     }

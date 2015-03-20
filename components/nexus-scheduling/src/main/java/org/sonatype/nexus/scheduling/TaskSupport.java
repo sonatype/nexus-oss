@@ -33,9 +33,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public abstract class TaskSupport<T>
+public abstract class TaskSupport
     extends ComponentSupport
-    implements Task<T>
+    implements Task
 {
   private final TaskConfiguration configuration;
 
@@ -83,11 +83,11 @@ public abstract class TaskSupport<T>
    * Returns running tasks having same type as this task.
    */
   @Override
-  public List<TaskInfo<?>> isBlockedBy(final List<TaskInfo<?>> runningTasks) {
-    return Lists.newArrayList(Iterables.filter(runningTasks, new Predicate<TaskInfo<?>>()
+  public List<TaskInfo> isBlockedBy(final List<TaskInfo> runningTasks) {
+    return Lists.newArrayList(Iterables.filter(runningTasks, new Predicate<TaskInfo>()
     {
       @Override
-      public boolean apply(final TaskInfo<?> taskInfo) {
+      public boolean apply(final TaskInfo taskInfo) {
         // blockedBy: running tasks of same type as me
         return State.RUNNING == taskInfo.getCurrentState().getState()
             && getConfiguration().getTypeId().equals(taskInfo.getConfiguration().getTypeId());
@@ -96,7 +96,7 @@ public abstract class TaskSupport<T>
   }
 
   @Override
-  public final T call() throws Exception {
+  public final Object call() throws Exception {
     MDC.put(TaskSupport.class.getSimpleName(), getClass().getSimpleName());
     CancelableSupport.setCurrent(cancelableFlagHolder);
     try {
@@ -123,7 +123,7 @@ public abstract class TaskSupport<T>
   /**
    * Where the job is done.
    */
-  protected abstract T execute() throws Exception;
+  protected abstract Object execute() throws Exception;
 
   // ==
 

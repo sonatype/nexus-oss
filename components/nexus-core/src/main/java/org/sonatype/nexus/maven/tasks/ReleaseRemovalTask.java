@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class ReleaseRemovalTask
-    extends RepositoryTaskSupport<ReleaseRemovalResult>
+    extends RepositoryTaskSupport
 {
 
   private final ReleaseRemover releaseRemover;

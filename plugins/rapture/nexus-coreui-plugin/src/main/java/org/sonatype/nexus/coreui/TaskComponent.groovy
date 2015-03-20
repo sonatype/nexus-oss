@@ -195,7 +195,7 @@ class TaskComponent
   }
 
   @PackageScope
-  String getStatusDescription(final CurrentState<?> currentState) {
+  String getStatusDescription(final CurrentState currentState) {
     switch (currentState.state) {
       case State.WAITING:
         return 'Waiting'
@@ -247,12 +247,12 @@ class TaskComponent
   }
 
   @PackageScope
-  Date getNextRun(final TaskInfo<?> task) {
+  Date getNextRun(final TaskInfo task) {
     return task.currentState.nextRun;
   }
 
   @PackageScope
-  String getLastRunResult(final TaskInfo<?> task) {
+  String getLastRunResult(final TaskInfo task) {
     String lastRunResult = null
 
     if (task.lastRunState != null) {
@@ -294,7 +294,7 @@ class TaskComponent
   }
 
   @PackageScope
-  TaskXO asTaskXO(final TaskInfo<?> task) {
+  TaskXO asTaskXO(final TaskInfo task) {
     def result = new TaskXO(
         id: task.id,
         enabled: task.configuration.enabled,
@@ -391,7 +391,7 @@ class TaskComponent
   }
 
   @PackageScope
-  void validateState(final TaskInfo<?> task) {
+  void validateState(final TaskInfo task) {
     State state = task.currentState.state;
     if (State.RUNNING == state) {
       throw new Exception('Task can\'t be edited while it is being executed or it is in line to be executed');

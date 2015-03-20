@@ -23,7 +23,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
  */
 @Named
 public class ExpireCacheTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
 {
   @Override
   public Void execute()

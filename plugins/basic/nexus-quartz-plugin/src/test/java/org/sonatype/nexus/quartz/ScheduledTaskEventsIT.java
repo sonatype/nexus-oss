@@ -76,7 +76,7 @@ public class ScheduledTaskEventsIT
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -111,7 +111,7 @@ public class ScheduledTaskEventsIT
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -148,7 +148,7 @@ public class ScheduledTaskEventsIT
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -184,7 +184,7 @@ public class ScheduledTaskEventsIT
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -224,7 +224,7 @@ public class ScheduledTaskEventsIT
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -264,7 +264,7 @@ public class ScheduledTaskEventsIT
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Now());
+    final TaskInfo taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Now());
     taskInfo.getCurrentState().getFuture().cancel(false);
 
     // do not use latches, as this task will not even start!
@@ -295,7 +295,7 @@ public class ScheduledTaskEventsIT
         .createTaskConfigurationInstance(SleeperCancelableTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -333,7 +333,7 @@ public class ScheduledTaskEventsIT
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -369,7 +369,7 @@ public class ScheduledTaskEventsIT
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();

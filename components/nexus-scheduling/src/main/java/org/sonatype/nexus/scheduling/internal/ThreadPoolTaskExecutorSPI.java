@@ -58,7 +58,7 @@ public class ThreadPoolTaskExecutorSPI
 
   private final ThreadPoolExecutor executorService;
 
-  private final ConcurrentMap<String, ThreadPoolTaskInfo<?>> tasks;
+  private final ConcurrentMap<String, ThreadPoolTaskInfo> tasks;
 
   private final ConcurrentMap<String, Future<?>> taskFutures;
 
@@ -71,10 +71,10 @@ public class ThreadPoolTaskExecutorSPI
     this.taskFutures = Maps.newConcurrentMap();
   }
 
-  private class ThreadPoolTaskInfo<T>
-      implements TaskInfo<T>, Callable<T>
+  private class ThreadPoolTaskInfo
+      implements TaskInfo, Callable<Object>
   {
-    private final Task<T> task;
+    private final Task task;
 
     private final Schedule schedule;
 
@@ -84,7 +84,7 @@ public class ThreadPoolTaskExecutorSPI
 
     private volatile EndState endState;
 
-    public ThreadPoolTaskInfo(final Task<T> task, final Schedule schedule) {
+    public ThreadPoolTaskInfo(final Task task, final Schedule schedule) {
       this.task = task;
       this.schedule = schedule;
       this.runStarted = new Date();
@@ -118,8 +118,8 @@ public class ThreadPoolTaskExecutorSPI
     }
 
     @Override
-    public CurrentState<T> getCurrentState() {
-      return new CurrentState<T>()
+    public CurrentState getCurrentState() {
+      return new CurrentState()
       {
         @Override
         public State getState() {
@@ -193,7 +193,7 @@ public class ThreadPoolTaskExecutorSPI
     }
 
     @Override
-    public TaskInfo<T> runNow() {
+    public TaskInfo runNow() {
       throw new UnsupportedOperationException("Only once executing tasks are supported");
     }
 
@@ -207,12 +207,12 @@ public class ThreadPoolTaskExecutorSPI
     }
 
     @Override
-    public T call() throws Exception {
+    public Object call() throws Exception {
       final long now = System.currentTimeMillis();
       EndState endState = null;
       log.info("Task started: {} : {}", getConfiguration().getTypeName(), getName());
       try {
-        T result = task.call();
+        Object result = task.call();
         endState = EndState.OK;
         log.info("Task ended: {} : {}", getConfiguration().getTypeName(), getName());
         return result;
@@ -232,38 +232,38 @@ public class ThreadPoolTaskExecutorSPI
   }
 
   @Override
-  public <T> TaskInfo<T> getTaskById(final String id) {
-    return (TaskInfo<T>) tasks.get(id);
+  public TaskInfo getTaskById(final String id) {
+    return tasks.get(id);
   }
 
   @Override
-  public List<TaskInfo<?>> listsTasks() {
-    return Lists.<TaskInfo<?>>newArrayList(tasks.values());
+  public List<TaskInfo> listsTasks() {
+    return Lists.<TaskInfo>newArrayList(tasks.values());
   }
 
   @Override
-  public synchronized <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
+  public synchronized TaskInfo scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
     checkNotNull(taskConfiguration);
     checkArgument(schedule instanceof Now, "Only 'now' schedule is supported");
-    final Task<T> task = taskFactory.createTaskInstance(taskConfiguration);
+    final Task task = taskFactory.createTaskInstance(taskConfiguration);
     if (tasks.containsKey(taskConfiguration.getId())) {
-      final ThreadPoolTaskInfo<T> oldTaskInfo = (ThreadPoolTaskInfo<T>) tasks.get(taskConfiguration.getId());
+      final ThreadPoolTaskInfo oldTaskInfo = tasks.get(taskConfiguration.getId());
       if (oldTaskInfo != null) {
-        final Future<T> oldTaskFuture = oldTaskInfo.getCurrentState().getFuture();
+        final Future<?> oldTaskFuture = oldTaskInfo.getCurrentState().getFuture();
         if (oldTaskFuture != null) {
           oldTaskFuture.cancel(true);
         }
       }
     }
-    final ThreadPoolTaskInfo<T> taskInfo = new ThreadPoolTaskInfo<>(task, schedule);
-    final Future<T> future = executorService.submit(taskInfo);
+    final ThreadPoolTaskInfo taskInfo = new ThreadPoolTaskInfo(task, schedule);
+    final Future<?> future = executorService.submit(taskInfo);
     tasks.put(task.getId(), taskInfo);
     taskFutures.put(task.getId(), future);
     return taskInfo;
   }
 
   @Override
-  public <T> TaskInfo<T> rescheduleTask(final String id, final Schedule schedule) {
+  public TaskInfo rescheduleTask(final String id, final Schedule schedule) {
     throw new UnsupportedOperationException("Only once executing tasks are supported");
   }
 

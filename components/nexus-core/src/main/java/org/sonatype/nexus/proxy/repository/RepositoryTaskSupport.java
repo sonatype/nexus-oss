@@ -33,8 +33,8 @@ import com.google.inject.Inject;
  *
  * @since 3.0
  */
-public abstract class RepositoryTaskSupport<T>
-    extends TaskSupport<T>
+public abstract class RepositoryTaskSupport
+    extends TaskSupport
 {
   private RepositoryRegistry repositoryRegistry;
 
@@ -52,12 +52,12 @@ public abstract class RepositoryTaskSupport<T>
    * overlap with this tasks' processed repositories.
    */
   @Override
-  public List<TaskInfo<?>> isBlockedBy(final List<TaskInfo<?>> runningTasks) {
+  public List<TaskInfo> isBlockedBy(final List<TaskInfo> runningTasks) {
     // we need to do stuff if super says is blocked (task with same type already running)
     // blocked if:
     // me: all-repository => blockedBy all of same type
     // me: X repository => blockedBy other task if runs on same repository or all repositories
-    final List<TaskInfo<?>> blockedBy = super.isBlockedBy(runningTasks);
+    final List<TaskInfo> blockedBy = super.isBlockedBy(runningTasks);
     if (blockedBy.isEmpty()) {
       return blockedBy;
     }
@@ -67,10 +67,10 @@ public abstract class RepositoryTaskSupport<T>
     }
     else {
       // am gonna work on X, so am blocked if any other running task works on all or X repositories
-      return Lists.newArrayList(Iterables.filter(blockedBy, new Predicate<TaskInfo<?>>()
+      return Lists.newArrayList(Iterables.filter(blockedBy, new Predicate<TaskInfo>()
       {
         @Override
-        public boolean apply(final TaskInfo<?> taskInfo) {
+        public boolean apply(final TaskInfo taskInfo) {
           return taskInfo.getConfiguration().getRepositoryId() == null ||
               !Collections.disjoint(
                   transitiveHull(getConfiguration().getRepositoryId()),

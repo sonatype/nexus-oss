@@ -18,7 +18,7 @@ import org.sonatype.nexus.scheduling.TaskSupport;
 
 @Named("WaitTask")
 public class WaitTask
-    extends TaskSupport<Void>
+    extends TaskSupport
 {
   @Override
   protected Void execute()

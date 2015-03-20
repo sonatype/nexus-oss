@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class PublishIndexesTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
 {
   private final IndexerManager indexerManager;
 

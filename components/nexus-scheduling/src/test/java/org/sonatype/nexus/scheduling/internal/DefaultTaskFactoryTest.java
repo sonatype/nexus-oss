@@ -74,21 +74,21 @@ public class DefaultTaskFactoryTest
     final TaskConfiguration c1 = new TaskConfiguration();
     c1.setId("id");
     c1.setTypeId(nexusTaskFactory.resolveTaskDescriptorByTypeId(TaskWithDescriptor.class.getName()).getId());
-    final TaskSupport<?> task1 = nexusTaskFactory.createTaskInstance(c1);
+    final TaskSupport task1 = nexusTaskFactory.createTaskInstance(c1);
     assertThat(task1, is(instanceOf(TaskWithDescriptor.class)));
     assertThat(task1.taskConfiguration().getTypeId(), equalTo(new TaskWithDescriptorDescriptor().getId()));
 
     final TaskConfiguration c2 = new TaskConfiguration();
     c2.setId("id");
     c2.setTypeId(nexusTaskFactory.resolveTaskDescriptorByTypeId(TaskWithoutDescriptor.class.getName()).getId());
-    final Task<?> task2 = nexusTaskFactory.createTaskInstance(c2);
+    final Task task2 = nexusTaskFactory.createTaskInstance(c2);
     assertThat(task2, is(instanceOf(TaskWithoutDescriptor.class)));
 
     final TaskConfiguration c3 = new TaskConfiguration();
     c3.setId("id");
     c2.setTypeId("foobar");
     try {
-      final Task<?> task3 = nexusTaskFactory.createTaskInstance(c2);
+      final Task task3 = nexusTaskFactory.createTaskInstance(c2);
       fail("This should not return");
     }
     catch (IllegalArgumentException e) {

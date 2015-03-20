@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 
 @Named
 public class P2MetadataGeneratorTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
 {
   private final P2MetadataGenerator p2MetadataGenerator;
 

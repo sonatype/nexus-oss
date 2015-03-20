@@ -21,7 +21,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 @Named
 public class PurgeApiKeysTask
-    extends TaskSupport<Void>
+    extends TaskSupport
 {
   private EventBus eventBus;
 

@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 public class Tasks
 {
   public static class TaskWithDescriptor
-      extends TaskSupport<Void>
+      extends TaskSupport
   {
     @Override
     protected Void execute() throws Exception {
@@ -53,7 +53,7 @@ public class Tasks
   }
 
   public static class TaskWithoutDescriptor
-      extends TaskSupport<Void>
+      extends TaskSupport
   {
     @Override
     protected Void execute() throws Exception {
@@ -99,7 +99,7 @@ public class Tasks
   // ==
 
   public static class SleeperTask
-      extends TaskSupport<String>
+      extends TaskSupport
   {
     static final String RESULT_KEY = "result";
 

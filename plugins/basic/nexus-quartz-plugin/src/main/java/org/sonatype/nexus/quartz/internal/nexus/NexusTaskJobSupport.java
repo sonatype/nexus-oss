@@ -53,21 +53,21 @@ import static com.google.common.base.Preconditions.checkState;
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
 @Named
-public class NexusTaskJobSupport<T>
+public class NexusTaskJobSupport
     extends JobSupport
     implements InterruptableJob
 {
-  private static class OtherRunningTasks<T>
-      implements Predicate<TaskInfo<?>>
+  private static class OtherRunningTasks
+      implements Predicate<TaskInfo>
   {
-    private final Task<T> me;
+    private final Task me;
 
-    public OtherRunningTasks(final Task<T> me) {
+    public OtherRunningTasks(final Task me) {
       this.me = me;
     }
 
     @Override
-    public boolean apply(final TaskInfo<?> taskInfo) {
+    public boolean apply(final TaskInfo taskInfo) {
       return !me.getId().equals(taskInfo.getId())
           && State.RUNNING == taskInfo.getCurrentState().getState();
     }
@@ -81,11 +81,11 @@ public class NexusTaskJobSupport<T>
 
   private final BaseUrlDetector baseUrlDetector;
 
-  private NexusTaskInfo<T> nexusTaskInfo;
+  private NexusTaskInfo nexusTaskInfo;
 
-  private NexusTaskFuture<T> future;
+  private NexusTaskFuture future;
 
-  private Task<T> nexusTask;
+  private Task nexusTask;
 
   @Inject
   public NexusTaskJobSupport(final EventBus eventBus,
@@ -124,7 +124,7 @@ public class NexusTaskJobSupport<T>
           if (!future.isCancelled()) {
             future.setRunState(RunState.RUNNING);
             try {
-              final T result = nexusTask.call();
+              final Object result = nexusTask.call();
               context.setResult(result);
             }
             finally {
@@ -138,7 +138,7 @@ public class NexusTaskJobSupport<T>
         log.debug("Task {} : {} canceled:", taskConfiguration.getId(), taskConfiguration.getTaskLogName(), e);
         if (!nexusTaskInfo.getNexusTaskFuture().isCancelled()) {
           nexusTaskInfo.getNexusTaskFuture().doCancel();
-          eventBus.post(new TaskEventCanceled<>(nexusTaskInfo));
+          eventBus.post(new TaskEventCanceled(nexusTaskInfo));
         }
       }
       catch (InterruptedException e) {
@@ -146,7 +146,7 @@ public class NexusTaskJobSupport<T>
         // this is non-cancelable task being interrupted, do the paperwork in this case
         // same as would be done for cancelable tasks in case of #interrupt()
         nexusTaskInfo.getNexusTaskFuture().doCancel();
-        eventBus.post(new TaskEventCanceled<>(nexusTaskInfo));
+        eventBus.post(new TaskEventCanceled(nexusTaskInfo));
       }
       catch (Exception e) {
         log.warn("Task {} : {} execution failure", taskConfiguration.getId(), taskConfiguration.getTaskLogName(), e);
@@ -167,8 +167,8 @@ public class NexusTaskJobSupport<T>
    */
   private void mayBlock() {
     // filter for running tasks, to be reused
-    final OtherRunningTasks<T> otherRunningTasks = new OtherRunningTasks<>(nexusTask);
-    List<TaskInfo<?>> blockedBy;
+    final OtherRunningTasks otherRunningTasks = new OtherRunningTasks(nexusTask);
+    List<TaskInfo> blockedBy;
     do {
       blockedBy = nexusTask.isBlockedBy(Lists.newArrayList(Iterables.filter(
           quartzNexusSchedulerSPIProvider.get().listsTasks(), otherRunningTasks)));
@@ -177,7 +177,7 @@ public class NexusTaskJobSupport<T>
         try {
           // will ISEx if canceled!
           future.setRunState(RunState.BLOCKED);
-          for (TaskInfo<?> taskInfo : blockedBy) {
+          for (TaskInfo taskInfo : blockedBy) {
             try {
               taskInfo.getCurrentState().getFuture().get();
             }
@@ -199,7 +199,7 @@ public class NexusTaskJobSupport<T>
   public void interrupt() throws UnableToInterruptJobException {
     if (nexusTask instanceof Cancelable) {
       ((Cancelable) nexusTask).cancel();
-      eventBus.post(new TaskEventCanceled<>(nexusTaskInfo));
+      eventBus.post(new TaskEventCanceled(nexusTaskInfo));
     }
     else {
       if (nexusTask == null) {

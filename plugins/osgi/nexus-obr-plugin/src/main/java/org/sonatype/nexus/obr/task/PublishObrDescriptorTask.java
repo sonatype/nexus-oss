@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named("PublishObrDescriptorTask")
 public class PublishObrDescriptorTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
 {
   private final ObrMetadataSource obrMetadataSource;
 

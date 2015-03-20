@@ -28,7 +28,7 @@ import static org.sonatype.nexus.maven.tasks.UnusedSnapshotRemoverTaskDescriptor
  */
 @Named
 public class UnusedSnapshotRemoverTask
-    extends RepositoryTaskSupport<SnapshotRemovalResult>
+    extends RepositoryTaskSupport
 {
   private final SnapshotRemover snapshotRemover;
 

@@ -194,7 +194,7 @@ public class YumHostedImpl
     return yumStore;
   }
 
-  TaskInfo<YumRepository> createYumRepository(final String version,
+  TaskInfo createYumRepository(final String version,
                                               final File yumRepoBaseDir)
   {
     try {
@@ -218,7 +218,7 @@ public class YumHostedImpl
   {
     YumRepositoryImpl yumRepository = cache.lookup(repository.getId(), version);
     if ((yumRepository == null) || yumRepository.isDirty()) {
-      final TaskInfo<YumRepository> taskInfo = createYumRepository(
+      final TaskInfo taskInfo = createYumRepository(
           version, createRepositoryTempDir(repository, version)
       );
       yumRepository = (YumRepositoryImpl) taskInfo.getCurrentState().getFuture().get();
@@ -227,10 +227,10 @@ public class YumHostedImpl
     return yumRepository;
   }
 
-  private TaskInfo<YumRepository> submitTask(final TaskConfiguration task) {
-    final List<TaskInfo<?>> taskInfos = generateMetadataTaskDescriptor.filter(nexusScheduler.listsTasks());
+  private TaskInfo submitTask(final TaskConfiguration task) {
+    final List<TaskInfo> taskInfos = generateMetadataTaskDescriptor.filter(nexusScheduler.listsTasks());
     // type + repoId + version wil conflict
-    for (TaskInfo<?> taskInfo : taskInfos) {
+    for (TaskInfo taskInfo : taskInfos) {
       if (Objects.equals(taskInfo.getConfiguration().getRepositoryId(), task.getRepositoryId()) &&
           Objects.equals(taskInfo.getConfiguration().getString(GenerateMetadataTask.PARAM_VERSION), task.getString(
               GenerateMetadataTask.PARAM_VERSION))) {
@@ -242,7 +242,7 @@ public class YumHostedImpl
   }
 
   @Override
-  public TaskInfo<YumRepository> regenerate() {
+  public TaskInfo regenerate() {
     return addRpmAndRegenerate(null);
   }
 
@@ -252,7 +252,7 @@ public class YumHostedImpl
   }
 
   @Override
-  public TaskInfo<YumRepository> addRpmAndRegenerate(@Nullable String filePath) {
+  public TaskInfo addRpmAndRegenerate(@Nullable String filePath) {
     try {
       LOG.debug("Processing added rpm {}:{}", repository.getId(), filePath);
       final File rpmBaseDir = RepositoryUtils.getBaseDir(repository);
@@ -268,7 +268,7 @@ public class YumHostedImpl
     }
   }
 
-  public TaskInfo<YumRepository> removeRpmAndRegenerate(@Nullable String filePath) {
+  public TaskInfo removeRpmAndRegenerate(@Nullable String filePath) {
     try {
       LOG.debug("Processing deleted rpm {}:{}", repository.getId(), filePath);
       final File rpmBaseDir = RepositoryUtils.getBaseDir(repository);

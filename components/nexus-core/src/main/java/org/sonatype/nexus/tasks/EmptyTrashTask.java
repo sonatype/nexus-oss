@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class EmptyTrashTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
 {
   public static final int DEFAULT_OLDER_THAN_DAYS = -1;
 

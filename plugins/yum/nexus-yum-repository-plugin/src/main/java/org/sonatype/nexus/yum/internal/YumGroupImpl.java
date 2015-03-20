@@ -80,10 +80,10 @@ public class YumGroupImpl
         lock.writeLock().lock();
         try {
           if (yumRepository == null) {
-            final Future<YumRepository> future = MergeMetadataTask.createTaskFor(nexusScheduler, repository)
+            final Future future = MergeMetadataTask.createTaskFor(nexusScheduler, repository)
                 .getCurrentState().getFuture();
             if (future != null) {
-              yumRepository = future.get();
+              yumRepository = (YumRepository) future.get();
             }
           }
         }

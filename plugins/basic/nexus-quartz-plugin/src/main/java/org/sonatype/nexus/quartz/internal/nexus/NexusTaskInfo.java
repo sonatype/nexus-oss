@@ -39,9 +39,9 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 3.0
  */
-public class NexusTaskInfo<T>
+public class NexusTaskInfo
     extends ComponentSupport
-    implements TaskInfo<T>
+    implements TaskInfo
 {
   /**
    * Key used in job execution context to stick task info in.
@@ -56,14 +56,14 @@ public class NexusTaskInfo<T>
 
   private volatile NexusTaskState nexusTaskState;
 
-  private volatile NexusTaskFuture<T> nexusTaskFuture;
+  private volatile NexusTaskFuture nexusTaskFuture;
 
   private volatile boolean removed;
 
   public NexusTaskInfo(final QuartzTaskExecutorSPI quartzSupport,
                        final JobKey jobKey,
                        final NexusTaskState nexusTaskState,
-                       final @Nullable NexusTaskFuture<T> nexusTaskFuture)
+                       final @Nullable NexusTaskFuture nexusTaskFuture)
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
@@ -77,7 +77,7 @@ public class NexusTaskInfo<T>
 
   public synchronized void setNexusTaskState(final State state,
                                              final NexusTaskState nexusTaskState,
-                                             final @Nullable NexusTaskFuture<T> nexusTaskFuture)
+                                             final @Nullable NexusTaskFuture nexusTaskFuture)
   {
     checkNotNull(state);
     checkNotNull(nexusTaskState);
@@ -122,7 +122,8 @@ public class NexusTaskInfo<T>
     if (!removed && state == State.DONE) {
       quartzSupport.removeTask(jobKey);
       removed = true;
-      log.debug("Task {} : {} is done and removed", jobKey.getName(), nexusTaskState.getConfiguration().getTaskLogName());
+      log.debug("Task {} : {} is done and removed", jobKey.getName(),
+          nexusTaskState.getConfiguration().getTaskLogName());
     }
   }
 
@@ -131,7 +132,7 @@ public class NexusTaskInfo<T>
    */
   public synchronized void setNexusTaskStateIfInState(final State state,
                                                       final NexusTaskState nexusTaskState,
-                                                      final @Nullable NexusTaskFuture<T> nexusTaskFuture)
+                                                      final @Nullable NexusTaskFuture nexusTaskFuture)
   {
     if (this.state == state) {
       setNexusTaskState(state, nexusTaskState, nexusTaskFuture);
@@ -143,7 +144,7 @@ public class NexusTaskInfo<T>
   }
 
   @Nullable
-  public NexusTaskFuture<T> getNexusTaskFuture() {
+  public NexusTaskFuture getNexusTaskFuture() {
     return nexusTaskFuture;
   }
 
@@ -173,14 +174,14 @@ public class NexusTaskInfo<T>
   }
 
   @Override
-  public synchronized CurrentState<T> getCurrentState() {
+  public synchronized CurrentState getCurrentState() {
     // TODO: why was this check here?
     // checkState(state == State.DONE || !removed, "Task already removed/updated");
     if (nexusTaskState.getSchedule() instanceof Manual) {
-      return new CS<>(state, null, nexusTaskFuture);
+      return new CS(state, null, nexusTaskFuture);
     }
     else {
-      return new CS<>(state, nexusTaskState.getNextExecutionTime(), nexusTaskFuture);
+      return new CS(state, nexusTaskState.getNextExecutionTime(), nexusTaskFuture);
     }
   }
 
@@ -221,7 +222,7 @@ public class NexusTaskInfo<T>
   }
 
   @Override
-  public synchronized TaskInfo<T> runNow() throws TaskRemovedException {
+  public synchronized TaskInfo runNow() throws TaskRemovedException {
     checkState(State.RUNNING != state, "Task already running");
     if (isRemovedOrDone()) {
       throw new TaskRemovedException("Task removed: " + jobKey);
@@ -230,7 +231,7 @@ public class NexusTaskInfo<T>
     setNexusTaskState(
         State.RUNNING,
         nexusTaskState,
-        new NexusTaskFuture<T>(
+        new NexusTaskFuture(
             quartzSupport,
             jobKey,
             getConfiguration().getTaskLogName(),
@@ -251,16 +252,16 @@ public class NexusTaskInfo<T>
 
   // ==
 
-  static class CS<T>
-      implements CurrentState<T>
+  static class CS
+      implements CurrentState
   {
     private final State state;
 
     private final Date nextRun;
 
-    private final NexusTaskFuture<T> future;
+    private final NexusTaskFuture future;
 
-    public CS(final State state, final Date nextRun, final NexusTaskFuture<T> nexusTaskFuture)
+    public CS(final State state, final Date nextRun, final NexusTaskFuture nexusTaskFuture)
     {
       this.state = state;
       this.nextRun = nextRun;
@@ -288,7 +289,7 @@ public class NexusTaskInfo<T>
     }
 
     @Override
-    public NexusTaskFuture<T> getFuture() {
+    public NexusTaskFuture getFuture() {
       return future;
     }
 

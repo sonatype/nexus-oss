@@ -22,8 +22,8 @@ import java.util.concurrent.Callable;
  *
  * @since 3.0
  */
-public interface Task<T>
-    extends Callable<T>
+public interface Task
+    extends Callable<Object>
 {
   /**
    * Returns the copy of the task configuration, modifying this map has no effect on effective configuration of the
@@ -64,5 +64,5 @@ public interface Task<T>
    * this method will not be invoked anymore.
    * // TODO: this should be not exposed via Task iface, this is internal to taskSupport?
    */
-  List<TaskInfo<?>> isBlockedBy(List<TaskInfo<?>> runningTasks);
+  List<TaskInfo> isBlockedBy(List<TaskInfo> runningTasks);
 }

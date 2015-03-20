@@ -62,7 +62,7 @@ public class TaskSchedulerTest
     final TaskConfiguration taskConfiguration = nexusTaskScheduler.createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = nexusTaskScheduler.submit(taskConfiguration);
+    final TaskInfo taskInfo = nexusTaskScheduler.submit(taskConfiguration);
 
     assertThat(taskInfo, notNullValue());
     assertThat(taskInfo.getId(), equalTo(taskConfiguration.getId()));
@@ -72,13 +72,13 @@ public class TaskSchedulerTest
     assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
     assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(1));
 
-    final CurrentState<String> currentState = taskInfo.getCurrentState();
+    final CurrentState currentState = taskInfo.getCurrentState();
     assertThat(currentState, notNullValue());
     assertThat(currentState.getState(), equalTo(State.RUNNING));
     assertThat(currentState.getRunState(), equalTo(RunState.RUNNING));
     assertThat(currentState.getRunStarted(), notNullValue());
     assertThat(currentState.getRunStarted().getTime(), lessThan(System.currentTimeMillis()));
-    final Future<String> future = currentState.getFuture();
+    final Future<?> future = currentState.getFuture();
     assertThat(future, notNullValue());
 
     // make it be done
@@ -86,7 +86,7 @@ public class TaskSchedulerTest
     Thread.yield();
 
     // and block for the result
-    final String result = future.get();
+    final String result = (String) future.get();
     assertThat(result, equalTo(RESULT));
 
     // done
