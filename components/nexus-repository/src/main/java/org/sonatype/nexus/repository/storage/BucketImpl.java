@@ -14,29 +14,24 @@ package org.sonatype.nexus.repository.storage;
 
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
-/**
- * Vertex event.
- *
- * @since 3.0
- */
-public abstract class VertexEvent
+class BucketImpl
+    extends VertexWrapperSupport
+    implements Bucket
 {
-  private final OrientVertex vertex;
-
-  public VertexEvent(final OrientVertex vertex) {
-    this.vertex = checkNotNull(vertex);
-  }
-
-  public OrientVertex getVertex() {
-    return vertex;
+  BucketImpl(OrientVertex vertex) {
+    super(vertex);
   }
 
   @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "vertexId=" + vertex +
-        '}';
+  public String repositoryName() {
+    return get(P_REPOSITORY_NAME);
+  }
+
+  @Override
+  public Bucket repositoryName(String repositoryName) {
+    set(P_REPOSITORY_NAME, repositoryName);
+    return this;
   }
 }

@@ -28,6 +28,7 @@ import org.sonatype.nexus.common.stateguard.StateGuard;
 import org.sonatype.nexus.common.stateguard.StateGuardAware;
 import org.sonatype.nexus.common.stateguard.Transitions;
 import org.sonatype.nexus.orient.graph.GraphTx;
+import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -37,6 +38,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.hash.HashCode;
+import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
@@ -46,6 +48,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageFacet.*;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.CLOSED;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.OPEN;
@@ -59,17 +62,19 @@ public class StorageTxImpl
     extends ComponentSupport
     implements StorageTx, StateGuardAware
 {
+  private static final long DELETE_BATCH_SIZE = 100L;
+
   private final BlobTx blobTx;
 
   private final GraphTx graphTx;
 
-  private final Object bucketId;
+  private final ORID bucketId;
 
   private final StateGuard stateGuard = new StateGuard.Builder().initial(CLOSED).create();
 
   public StorageTxImpl(final BlobTx blobTx,
                        final GraphTx graphTx,
-                       final Object bucketId)
+                       final ORID bucketId)
   {
     this.blobTx = checkNotNull(blobTx);
     this.graphTx = checkNotNull(graphTx);
@@ -117,81 +122,91 @@ public class StorageTxImpl
 
   @Override
   @Guarded(by = OPEN)
-  public OrientVertex getBucket() {
-    return findVertex(bucketId, null);
+  public Bucket getBucket() {
+    return new BucketImpl(findVertex(bucketId, null));
   }
 
   @Override
   @Guarded(by = OPEN)
-  public Iterable<OrientVertex> browseAssets(final Vertex bucket) {
+  public Iterable<Bucket> browseBuckets() {
+    return Iterables.transform(
+        graphTx.getVerticesOfClass(V_BUCKET),
+        new Function<Vertex, Bucket>() {
+          @Override
+          public Bucket apply(final Vertex vertex) {
+            return new BucketImpl((OrientVertex) vertex);
+          }
+        });
+  }
+
+  @Override
+  @Guarded(by = OPEN)
+  public Iterable<Asset> browseAssets(final Bucket bucket) {
     checkNotNull(bucket);
 
-    return orientVertices(bucket.getVertices(Direction.OUT, E_OWNS_ASSET));
+    return Iterables.transform(
+        bucket.vertex().getVertices(Direction.OUT, E_OWNS_ASSET),
+        new Function<Vertex, Asset>() {
+          @Override
+          public Asset apply(final Vertex vertex) {
+            return new AssetImpl((OrientVertex) vertex);
+          }
+        });
   }
 
   @Override
   @Guarded(by = OPEN)
-  public Iterable<OrientVertex> browseComponents(final Vertex bucket) {
+  public Iterable<Component> browseComponents(final Bucket bucket) {
     checkNotNull(bucket);
 
-    return orientVertices(bucket.getVertices(Direction.OUT, E_OWNS_COMPONENT));
-  }
-
-  @Override
-  @Guarded(by = OPEN)
-  public Iterable<OrientVertex> browseVertices(@Nullable final String className) {
-    if (className == null) {
-      return orientVertices(graphTx.getVertices());
-    }
-    else {
-      return orientVertices(graphTx.getVerticesOfClass(className));
-    }
+    return Iterables.transform(
+        bucket.vertex().getVertices(Direction.OUT, E_OWNS_COMPONENT),
+        new Function<Vertex, Component>() {
+          @Override
+          public Component apply(final Vertex vertex) {
+            return new ComponentImpl((OrientVertex) vertex);
+          }
+        });
   }
 
   @Nullable
   @Override
   @Guarded(by = OPEN)
-  public OrientVertex findAsset(final Object vertexId, final Vertex bucket) {
-    checkNotNull(vertexId);
+  public Asset findAsset(final ORID id, final Bucket bucket) {
+    checkNotNull(id);
     checkNotNull(bucket);
 
-    OrientVertex vertex = findVertex(vertexId, V_ASSET);
-    return bucketOwns(bucket, E_OWNS_ASSET, vertex) ? vertex : null;
+    OrientVertex vertex = findVertex(id, V_ASSET);
+    return bucketOwns(bucket, E_OWNS_ASSET, vertex) ? new AssetImpl(vertex) : null;
   }
 
-  private boolean bucketOwns(Vertex bucket, String edgeLabel, @Nullable Vertex item) {
+  private boolean bucketOwns(Bucket bucket, String edgeLabel, @Nullable Vertex item) {
     if (item == null) {
       return false;
     }
     Vertex first = Iterables.getFirst(item.getVertices(Direction.IN, edgeLabel), null);
-    return bucket.equals(first);
+    return bucket.vertex().equals(first);
   }
 
   @Nullable
   @Override
   @Guarded(by = OPEN)
-  public OrientVertex findAssetWithProperty(final String propName, final Object propValue,
-                                            final Vertex bucket)
-  {
-    return findWithPropertyOwnedBy(V_ASSET, propName, propValue, E_OWNS_ASSET, bucket);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<OrientVertex> findAssets(final Vertex component) {
-    List vertices = Lists.newArrayList(checkNotNull(component).getVertices(Direction.IN, E_PART_OF_COMPONENT));
-    return (List<OrientVertex>) vertices;
+  public Asset findAssetWithProperty(final String propName, final Object propValue, final Bucket bucket) {
+    OrientVertex vertex = findWithPropertyOwnedBy(V_ASSET, propName, propValue, E_OWNS_ASSET, bucket);
+    if (vertex == null) {
+      return null;
+    }
+    return new AssetImpl(vertex);
   }
 
   @SuppressWarnings("unchecked")
   private OrientVertex findWithPropertyOwnedBy(String className, String propName, Object propValue,
-                                               String edgeLabel, Vertex bucket)
-  {
+                                               String edgeLabel, Bucket bucket) {
     checkNotNull(propName);
     checkNotNull(propValue);
     checkNotNull(bucket);
 
-    Map<String, Object> parameters = ImmutableMap.of("propValue", propValue, "bucket", bucket);
+    Map<String, Object> parameters = ImmutableMap.of("propValue", propValue, "bucket", bucket.vertex());
     String query = String.format("select from %s where %s = :propValue and in('%s') contains :bucket",
         className, propName, edgeLabel);
     Iterable<OrientVertex> vertices = graphTx.command(new OCommandSQL(query)).execute(parameters);
@@ -200,12 +215,19 @@ public class StorageTxImpl
 
   @Override
   @Guarded(by = OPEN)
-  public Iterable<OrientVertex> findAssets(@Nullable String whereClause,
-                                           @Nullable Map<String, Object> parameters,
-                                           @Nullable Iterable<Repository> repositories,
-                                           @Nullable String querySuffix)
+  public Iterable<Asset> findAssets(@Nullable String whereClause,
+                                    @Nullable Map<String, Object> parameters,
+                                    @Nullable Iterable<Repository> repositories,
+                                    @Nullable String querySuffix)
   {
-    return findVertices(V_ASSET, whereClause, parameters, E_OWNS_ASSET, repositories, querySuffix);
+    return Iterables.transform(
+        findVertices(V_ASSET, whereClause, parameters, E_OWNS_ASSET, repositories, querySuffix),
+        new Function<OrientVertex, Asset>() {
+          @Override
+          public Asset apply(final OrientVertex vertex) {
+            return new AssetImpl(vertex);
+          }
+        });
   }
 
   @Override
@@ -293,29 +315,39 @@ public class StorageTxImpl
   @Nullable
   @Override
   @Guarded(by = OPEN)
-  public OrientVertex findComponent(final Object vertexId, final Vertex bucket) {
-    checkNotNull(vertexId);
+  public Component findComponent(final ORID id, final Bucket bucket) {
+    checkNotNull(id);
     checkNotNull(bucket);
 
-    OrientVertex vertex = findVertex(vertexId, V_COMPONENT);
-    return bucketOwns(bucket, E_OWNS_COMPONENT, vertex) ? vertex : null;
+    OrientVertex vertex = findVertex(id, V_COMPONENT);
+    return bucketOwns(bucket, E_OWNS_COMPONENT, vertex) ? new ComponentImpl(vertex) : null;
   }
 
   @Nullable
   @Override
   @Guarded(by = OPEN)
-  public OrientVertex findComponentWithProperty(final String propName, final Object propValue, final Vertex bucket) {
-    return findWithPropertyOwnedBy(V_COMPONENT, propName, propValue, E_OWNS_COMPONENT, bucket);
+  public Component findComponentWithProperty(final String propName, final Object propValue, final Bucket bucket) {
+    OrientVertex vertex = findWithPropertyOwnedBy(V_COMPONENT, propName, propValue, E_OWNS_COMPONENT, bucket);
+    if (vertex == null) {
+      return null;
+    }
+    return new ComponentImpl(vertex);
   }
 
   @Override
   @Guarded(by = OPEN)
-  public Iterable<OrientVertex> findComponents(@Nullable String whereClause,
-                                               @Nullable Map<String, Object> parameters,
-                                               @Nullable Iterable<Repository> repositories,
-                                               @Nullable String querySuffix)
-  {
-    return findVertices(V_COMPONENT, whereClause, parameters, E_OWNS_COMPONENT, repositories, querySuffix);
+  public Iterable<Component> findComponents(@Nullable String whereClause,
+                                            @Nullable Map<String, Object> parameters,
+                                            @Nullable Iterable<Repository> repositories,
+                                            @Nullable String querySuffix) {
+    return Iterables.transform(
+        findVertices(V_COMPONENT, whereClause, parameters, E_OWNS_COMPONENT, repositories, querySuffix),
+        new Function<OrientVertex, Component>() {
+          @Override
+          public Component apply(final OrientVertex vertex) {
+            return new ComponentImpl(vertex);
+          }
+        });
   }
 
   @Override
@@ -329,29 +361,10 @@ public class StorageTxImpl
   }
 
   @Nullable
-  @Override
-  @Guarded(by = OPEN)
-  public OrientVertex findVertex(final Object vertexId, @Nullable final String className) {
-    checkNotNull(vertexId);
+  private OrientVertex findVertex(final ORID id, @Nullable final String className) {
+    checkNotNull(id);
 
-    OrientVertex vertex = graphTx.getVertex(vertexId);
-    if (vertex != null && className != null && !vertex.getProperty("@class").equals(className)) {
-      return null;
-    }
-    return vertex;
-  }
-
-  @Nullable
-  @Override
-  @Guarded(by = OPEN)
-  public OrientVertex findVertexWithProperty(final String propName, final Object propValue,
-                                             @Nullable final String className)
-  {
-    checkNotNull(propName);
-    checkNotNull(propValue);
-
-    Iterable<OrientVertex> vertices = orientVertices(graphTx.getVertices(propName, propValue));
-    OrientVertex vertex = Iterables.getFirst(vertices, null);
+    OrientVertex vertex = graphTx.getVertex(id);
     if (vertex != null && className != null && !vertex.getProperty("@class").equals(className)) {
       return null;
     }
@@ -360,49 +373,104 @@ public class StorageTxImpl
 
   @Override
   @Guarded(by = OPEN)
-  public OrientVertex createAsset(final Vertex bucket) {
+  public Asset createAsset(final Bucket bucket, final Format format) {
     checkNotNull(bucket);
+    checkNotNull(format);
 
-    OrientVertex asset = createVertex(V_ASSET);
-    asset.setProperty(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
-    graphTx.addEdge(null, bucket, asset, E_OWNS_ASSET);
+    return createAsset(bucket, format.getValue());
+  }
+
+  private Asset createAsset(final Bucket bucket, final String format) {
+    OrientVertex vertex = createVertex(V_ASSET);
+    vertex.setProperty(P_FORMAT, format);
+    vertex.setProperty(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
+    graphTx.addEdge(null, bucket.vertex(), vertex, E_OWNS_ASSET);
+    return new AssetImpl(vertex);
+  }
+
+  @Override
+  @Guarded(by = OPEN)
+  public Asset createAsset(final Bucket bucket, final Component component) {
+    Asset asset = createAsset(bucket, component.format());
+    graphTx.addEdge(null, asset.vertex(), component.vertex(), E_PART_OF_COMPONENT);
     return asset;
   }
 
   @Override
   @Guarded(by = OPEN)
-  public OrientVertex createComponent(final Vertex bucket) {
+  public Component createComponent(final Bucket bucket, final Format format) {
     checkNotNull(bucket);
+    checkNotNull(format);
 
-    OrientVertex component = createVertex(V_COMPONENT);
-    component.setProperty(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
-    graphTx.addEdge(null, bucket, component, E_OWNS_COMPONENT);
-    return component;
+    OrientVertex vertex = createVertex(V_COMPONENT);
+    vertex.setProperty(P_FORMAT, format.getValue());
+    vertex.setProperty(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
+    graphTx.addEdge(null, bucket.vertex(), vertex, E_OWNS_COMPONENT);
+    return new ComponentImpl(vertex);
   }
 
-  @Override
-  @Guarded(by = OPEN)
-  public OrientVertex createVertex(final String className) {
-    checkNotNull(className);
-
+  private OrientVertex createVertex(final String className) {
     return graphTx.addVertex(className, (String) null);
   }
 
-  @Override
-  @Guarded(by = OPEN)
-  public NestedAttributesMap getAttributes(final OrientVertex vertex) {
-    checkNotNull(vertex);
-
-    Map<String, Object> backing = vertex.getProperty(P_ATTRIBUTES);
-    return new NestedAttributesMap("attributes", backing);
+  private void deleteVertex(final Vertex vertex) {
+    graphTx.removeVertex(vertex);
   }
 
   @Override
   @Guarded(by = OPEN)
-  public void deleteVertex(final Vertex vertex) {
-    checkNotNull(vertex);
+  public void deleteComponent(Component component) {
+    checkNotNull(component);
 
-    graphTx.removeVertex(vertex);
+    for (Asset asset : component.assets()) {
+      deleteAsset(asset);
+    }
+    deleteVertex(component.vertex());
+  }
+
+  @Override
+  @Guarded(by = OPEN)
+  public void deleteAsset(Asset asset) {
+    checkNotNull(asset);
+
+    BlobRef blobRef = asset.blobRef();
+    if (blobRef != null) {
+      deleteBlob(blobRef);
+    }
+    deleteVertex(asset.vertex());
+  }
+
+  @Override
+  public void deleteBucket(Bucket bucket) {
+    checkNotNull(bucket);
+
+    long count = 0;
+
+    // first delete all components and constituent assets
+    for (Component component : browseComponents(bucket)) {
+      deleteComponent(component);
+      count++;
+      if (count == DELETE_BATCH_SIZE) {
+        commit();
+        count = 0;
+      }
+    }
+    commit();
+
+    // then delete all standalone assets
+    for (Asset asset : browseAssets(bucket)) {
+      deleteAsset(asset);
+      count++;
+      if (count == DELETE_BATCH_SIZE) {
+        commit();
+        count = 0;
+      }
+    }
+    commit();
+
+    // finally, delete the bucket vertex
+    deleteVertex(bucket.vertex());
+    commit();
   }
 
   @Override
@@ -415,7 +483,7 @@ public class StorageTxImpl
   }
 
   @Override
-  public BlobRef setBlob(final InputStream inputStream, final Map<String, String> headers, final OrientVertex asset,
+  public BlobRef setBlob(final InputStream inputStream, final Map<String, String> headers, final Asset asset,
                             final Iterable<HashAlgorithm> hashAlgorithms, final String contentType)
   {
     checkNotNull(inputStream);
@@ -425,22 +493,22 @@ public class StorageTxImpl
     checkNotNull(contentType);
 
     // Delete old blob if necessary
-    String oldBlobRefString = asset.getProperty(P_BLOB_REF);
-    if (oldBlobRefString != null) {
-      deleteBlob(BlobRef.parse(oldBlobRefString));
+    BlobRef oldBlobRef = asset.blobRef();
+    if (oldBlobRef != null) {
+      deleteBlob(oldBlobRef);
     }
 
     // Store new blob while calculating hashes in one pass
     final MultiHashingInputStream hashingStream = new MultiHashingInputStream(hashAlgorithms, inputStream);
     final BlobRef newBlobRef = createBlob(hashingStream, headers);
 
-    asset.setProperty(P_BLOB_REF, newBlobRef.toString());
-    asset.setProperty(P_SIZE, hashingStream.count());
-    asset.setProperty(P_CONTENT_TYPE, contentType);
+    asset.blobRef(newBlobRef);
+    asset.size(hashingStream.count());
+    asset.contentType(contentType);
 
     // Set attributes map to contain computed checksum metadata
     Map<HashAlgorithm, HashCode> hashes = hashingStream.hashes();
-    NestedAttributesMap checksums = getAttributes(asset).child(P_CHECKSUM);
+    NestedAttributesMap checksums = asset.attributes().child(P_CHECKSUM);
     for (HashAlgorithm algorithm : hashAlgorithms) {
       checksums.set(algorithm.name(), hashes.get(algorithm).toString());
     }
@@ -459,13 +527,15 @@ public class StorageTxImpl
 
   @Override
   @Guarded(by = OPEN)
-  public void deleteBlob(final BlobRef blobRef) {
+  public Blob requireBlob(final BlobRef blobRef) {
+    Blob blob = getBlob(blobRef);
+    checkState(blob != null, "Blob not found: %s", blobRef);
+    return blob;
+  }
+
+  private void deleteBlob(final BlobRef blobRef) {
     checkNotNull(blobRef);
 
     blobTx.delete(blobRef);
-  }
-
-  private static Iterable<OrientVertex> orientVertices(Iterable<Vertex> plainVertices) {
-    return (Iterable<OrientVertex>) (Iterable) plainVertices;
   }
 }

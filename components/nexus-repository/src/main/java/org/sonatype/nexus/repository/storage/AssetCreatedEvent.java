@@ -22,7 +22,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 public class AssetCreatedEvent
   extends AssetEvent
 {
-  public AssetCreatedEvent(final OrientVertex vertex) {
-    super(vertex);
+  public AssetCreatedEvent(final Asset asset) {
+    super(asset);
   }
 }

@@ -14,7 +14,6 @@ package org.sonatype.nexus.repository.raw.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -22,7 +21,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
@@ -31,28 +29,20 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
+import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.Bucket;
+import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
-import static org.sonatype.nexus.repository.storage.StorageFacet.E_PART_OF_COMPONENT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_CONTENT_TYPE;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_LAST_UPDATED;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
 
 /**
@@ -88,15 +78,13 @@ public class RawContentFacetImpl
   @Override
   public RawContent get(final String path) {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex component = getComponent(tx, path, tx.getBucket());
+      final Component component = getComponent(tx, path, tx.getBucket());
       if (component == null) {
         return null;
       }
 
-      final OrientVertex asset = getAsset(component);
-      final BlobRef blobRef = getBlobRef(path, asset);
-      final Blob blob = tx.getBlob(blobRef);
-      checkState(blob != null, "asset of component with at path %s refers to missing blob %s", path, blobRef);
+      final Asset asset = component.firstAsset();
+      final Blob blob = tx.requireBlob(asset.requireBlobRef());
 
       return marshall(asset, blob);
     }
@@ -105,27 +93,23 @@ public class RawContentFacetImpl
   @Override
   public void put(final String path, final RawContent content) throws IOException, InvalidContentException {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex bucket = tx.getBucket();
-      OrientVertex component = getComponent(tx, path, bucket);
-      OrientVertex asset;
+      final Bucket bucket = tx.getBucket();
+      Component component = getComponent(tx, path, bucket);
+      Asset asset;
       if (component == null) {
         // CREATE
-        component = tx.createComponent(bucket);
-
-        // Set normalized properties: format, group, and name (version is undefined for "raw" components)
-        component.setProperty(P_FORMAT, RawFormat.NAME);
-        component.setProperty(P_GROUP, getGroup(path));
-        component.setProperty(P_NAME, getName(path));
+        component = tx.createComponent(bucket, getRepository().getFormat())
+            .group(getGroup(path))
+            .name(getName(path));
 
         // Set attributes map to contain "raw" format-specific metadata (in this case, path)
-        tx.getAttributes(component).child(RawFormat.NAME).set(P_PATH, path);
+        component.formatAttributes().set(P_PATH, path);
 
-        asset = tx.createAsset(bucket);
-        asset.addEdge(E_PART_OF_COMPONENT, component);
+        asset = tx.createAsset(bucket, component);
       }
       else {
         // UPDATE
-        asset = getAsset(component);
+        asset = component.firstAsset();
       }
 
       // TODO: Figure out created-by header
@@ -197,18 +181,12 @@ public class RawContentFacetImpl
   @Override
   public boolean delete(final String path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
-      final OrientVertex component = getComponent(tx, path, tx.getBucket());
+      final Component component = getComponent(tx, path, tx.getBucket());
       if (component == null) {
         return false;
       }
-      OrientVertex asset = getAsset(component);
-
-      tx.deleteBlob(getBlobRef(path, asset));
-      tx.deleteVertex(asset);
-      tx.deleteVertex(component);
-
+      tx.deleteComponent(component);
       tx.commit();
-
       return true;
     }
   }
@@ -216,20 +194,15 @@ public class RawContentFacetImpl
   @Override
   public void updateLastUpdated(final String path, final DateTime lastUpdated) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex bucket = tx.getBucket();
-      OrientVertex component = tx.findComponentWithProperty(P_PATH, path, bucket);
+      Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
 
       if (component == null) {
         log.debug("Updating lastUpdated time for nonexistant raw component {}", path);
         return;
       }
 
-      OrientVertex asset = getAsset(component);
-
-      if (lastUpdated != null) {
-        asset.setProperty(P_LAST_UPDATED, new Date(lastUpdated.getMillis()));
-      }
-
+      // last updated will be automatically set by the hook on record modification
+      component.firstAsset().vertex().getRecord().setDirty();
       tx.commit();
     }
   }
@@ -238,29 +211,15 @@ public class RawContentFacetImpl
     return getRepository().facet(StorageFacet.class);
   }
 
-  private BlobRef getBlobRef(final String path, final OrientVertex asset) {
-    String blobRefStr = asset.getProperty(P_BLOB_REF);
-    checkState(blobRefStr != null, "asset of component at path %s has missing blob reference", path);
-    return BlobRef.parse(blobRefStr);
-  }
-
-  private OrientVertex getAsset(OrientVertex component) {
-    List<Vertex> vertices = Lists.newArrayList(component.getVertices(Direction.IN, E_PART_OF_COMPONENT));
-    checkState(!vertices.isEmpty());
-    return (OrientVertex) vertices.get(0);
-  }
-
   // TODO: Consider a top-level indexed property (e.g. "locator") to make these common lookups fast
-  private OrientVertex getComponent(StorageTx tx, String path, OrientVertex bucket) {
+  private Component getComponent(StorageTx tx, String path, Bucket bucket) {
     String property = String.format("%s.%s.%s", P_ATTRIBUTES, RawFormat.NAME, P_PATH);
     return tx.findComponentWithProperty(property, path, bucket);
   }
 
-  private RawContent marshall(final OrientVertex asset, final Blob blob) {
-    final String contentType = asset.getProperty(P_CONTENT_TYPE);
-
-    final Date date = asset.getProperty(P_LAST_UPDATED);
-    final DateTime lastUpdated = date == null ? null : new DateTime(date.getTime());
+  private RawContent marshall(final Asset asset, final Blob blob) {
+    final String contentType = asset.requireContentType();
+    final DateTime lastUpdated = asset.requireLastUpdated();
 
     return new RawContent()
     {
@@ -285,5 +244,4 @@ public class RawContentFacetImpl
       }
     };
   }
-
 }

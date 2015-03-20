@@ -18,17 +18,16 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.Component;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.storage.StorageFacet.E_PART_OF_COMPONENT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
 
@@ -45,25 +44,24 @@ public class DefaultComponentMetadataProducer
 {
 
   @Override
-  public String getMetadata(final OrientVertex component) {
+  public String getMetadata(final Component component) {
     checkNotNull(component);
     Map<String, Object> metadata = Maps.newHashMap();
-    for (String key : component.getPropertyKeys()) {
-      metadata.put(key, component.getProperty(key));
+    for (String key : component.propertyNames()) {
+      metadata.put(key, component.vertex().getProperty(key));
     }
-    List<Map<String, Object>> assets = Lists.newArrayList();
-    for (Vertex vertex : component.getVertices(Direction.IN, E_PART_OF_COMPONENT)) {
-      OrientVertex asset = (OrientVertex) vertex;
+    List<Map<String, Object>> allAssetMetadata = Lists.newArrayList();
+    for (Asset asset : component.assets()) {
       Map<String, Object> assetMetadata = Maps.newHashMap();
-      for (String key : asset.getPropertyKeys()) {
+      for (String key : asset.propertyNames()) {
         if (!P_BLOB_REF.equals(key) && !P_SIZE.equals(key)) {
-          assetMetadata.put(key, asset.getProperty(key));
+          assetMetadata.put(key, asset.vertex().getProperty(key));
         }
       }
-      assets.add(assetMetadata);
+      allAssetMetadata.add(assetMetadata);
     }
-    if (!assets.isEmpty()) {
-      metadata.put("assets", assets.toArray(new Map[assets.size()]));
+    if (!allAssetMetadata.isEmpty()) {
+      metadata.put("assets", allAssetMetadata.toArray(new Map[allAssetMetadata.size()]));
     }
 
     try {

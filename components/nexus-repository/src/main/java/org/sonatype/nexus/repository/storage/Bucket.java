@@ -13,14 +13,20 @@
 package org.sonatype.nexus.repository.storage;
 
 /**
- * Asset deleted event.
+ * A logical container of components and assets.
  *
  * @since 3.0
  */
-public class AssetDeletedEvent
-  extends AssetEvent
+public interface Bucket
+    extends VertexWrapper
 {
-  public AssetDeletedEvent(final Asset asset) {
-    super(asset);
-  }
+  /**
+   * Gets the repository name.
+   */
+  String repositoryName();
+
+  /**
+   * Sets the repository name.
+   */
+  Bucket repositoryName(String repositoryName);
 }

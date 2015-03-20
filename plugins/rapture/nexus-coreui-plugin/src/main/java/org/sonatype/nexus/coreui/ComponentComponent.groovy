@@ -11,11 +11,9 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.coreui
-
 import com.orientechnologies.orient.core.id.ORecordId
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import com.tinkerpop.blueprints.impls.orient.OrientVertex
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
@@ -23,6 +21,8 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.manager.RepositoryManager
+import org.sonatype.nexus.repository.storage.AssetImpl
+import org.sonatype.nexus.repository.storage.ComponentImpl
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageTx
 import org.sonatype.nexus.repository.view.ViewFacet
@@ -32,9 +32,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 import javax.validation.constraints.NotNull
 
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_CONTENT_TYPE
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME
-
 /**
  * Component {@link DirectComponent}.
  *
@@ -66,17 +64,17 @@ extends DirectComponentSupport
     }
     StorageTx storageTx = repository.facet(StorageFacet).openTx()
     try {
-      OrientVertex component = storageTx.findComponent(new ORecordId(componentId), storageTx.getBucket())
+      ComponentImpl component = storageTx.findComponent(new ORecordId(componentId), storageTx.getBucket())
       if (component == null) {
         return null
       }
-      List<OrientVertex> assets = storageTx.findAssets(component)
+      List<AssetImpl> assets = component.assets()
       return assets.collect { asset ->
         new AssetXO(
             // TODO should asset have a name?
-            id: asset.id,
-            name: asset.getProperty(P_NAME) ?: component.getProperty(P_NAME),
-            contentType: asset.getProperty(P_CONTENT_TYPE)
+            id: asset.id(),
+            name: asset.get(P_NAME) ?: component.name(),
+            contentType: asset.contentType()
         )
       }
     }

@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Asset event.
@@ -20,9 +20,10 @@ import com.tinkerpop.blueprints.impls.orient.OrientVertex;
  * @since 3.0
  */
 public abstract class AssetEvent
-  extends VertexEvent
 {
-  public AssetEvent(final OrientVertex vertex) {
-    super(vertex);
+  private final Asset asset;
+
+  public AssetEvent(final Asset asset) {
+    this.asset = checkNotNull(asset);
   }
 }
