@@ -26,7 +26,7 @@ import org.apache.http.HttpEntity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Adapts {@link HttpEntity} to {@link Payload}.
+ * Decorates existing payload with some spice.
  *
  * @since 3.0
  */

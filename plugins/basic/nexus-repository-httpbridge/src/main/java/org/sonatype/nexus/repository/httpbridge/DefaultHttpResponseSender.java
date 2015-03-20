@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.httpbridge;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -24,6 +25,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.io.StreamSupport;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
@@ -39,7 +42,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Iterables;
 import com.google.common.hash.HashCode;
-import com.google.common.io.ByteStreams;
 import com.google.common.net.HttpHeaders;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
@@ -59,97 +61,34 @@ public class DefaultHttpResponseSender
     extends ComponentSupport
     implements HttpResponseSender
 {
+  /**
+   * Buffer size to be used when pushing content to the {@link HttpServletResponse#getOutputStream()} stream.
+   *
+   * Default is Jetty default or 8KB.
+   */
+  private static final int BUFFER_SIZE = SystemPropertiesHelper
+      .getInteger(DefaultHttpResponseSender.class.getName() + ".BUFFER_SIZE", -1);
+
   @Override
   public void send(final @Nullable Request request, final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
     log.trace("Sending response: {}", response);
 
-    // add response headers
-    for (Map.Entry<String, String> header : response.getHeaders()) {
-      httpResponse.addHeader(header.getKey(), header.getValue());
-    }
+    handleResponseHeaders(response, httpResponse);
 
     // add status followed by payload if we have one
     Status status = response.getStatus();
     if (status.isSuccessful() || response instanceof PayloadResponse) {
       httpResponse.setStatus(status.getCode());
       if (response instanceof PayloadResponse) {
-        Payload payload = ((PayloadResponse) response).getPayload();
-        log.trace("Attaching payload: {}", payload);
-
-        if (payload.getContentType() != null) {
-          httpResponse.setContentType(payload.getContentType());
-        }
-        if (payload.getSize() != Payload.UNKNOWN_SIZE) {
-          httpResponse.setContentLengthLong(payload.getSize());
-        }
-
-        if (payload instanceof DecoratedPayload) {
-          final DecoratedPayload decoratedPayload = (DecoratedPayload) payload;
-          // extra payload headers
-          final PayloadHeaders payloadHeaders = decoratedPayload.decorator(PayloadHeaders.class);
-          if (payloadHeaders != null) {
-            for (Map.Entry<String, String> header : payloadHeaders.getHeaders()) {
-              addHeaderIfNotPresent(
-                  httpResponse,
-                  header.getKey(),
-                  header.getValue()
-              );
-            }
-          }
-          // times
-          final PayloadTimes payloadTimes = decoratedPayload.decorator(PayloadTimes.class);
-          if (payloadTimes != null) {
-            addHeaderIfNotPresent(
-                httpResponse,
-                HttpHeaders.LAST_MODIFIED,
-                payloadTimes.getLastModified()
-            );
-          }
-          // ETag using hashes
-          final PayloadHashes payloadHashes = decoratedPayload.decorator(PayloadHashes.class);
-          if (payloadHashes != null) {
-            final HashAlgorithm hashAlgorithm = Iterables.getFirst(payloadHashes.getHashAlgorithms(), null);
-            if (hashAlgorithm != null) {
-              final HashCode hashCode = payloadHashes.getHashCodes().get(hashAlgorithm);
-              if (hashCode != null) {
-                addHeaderIfNotPresent(
-                    httpResponse,
-                    HttpHeaders.ETAG,
-                    hashCode
-                );
-              }
-            }
-          }
-          // Cache control
-          final PayloadCaching payloadCaching = decoratedPayload.decorator(PayloadCaching.class);
-          if (payloadCaching != null) {
-            if (!payloadCaching.isCacheable()) {
-              httpResponse.setHeader(PRAGMA, "no-cache"); // HTTP/1.0
-              httpResponse.setHeader(CACHE_CONTROL, "no-cache, no-store, max-age=0, must-revalidate"); // HTTP/1.1
-              httpResponse.addHeader(CACHE_CONTROL, "post-check=0, pre-check=0"); // MS IE
-              httpResponse.setHeader(EXPIRES, "0"); // No caching on Proxies in between client and Nexus
-            }
-            else {
-              if (payloadCaching.getValidUntil() != null) {
-                final DateTime now = DateTime.now();
-                final Seconds seconds = Seconds.secondsBetween(now, payloadCaching.getValidUntil());
-                if (seconds.getSeconds() > 0) {
-                  addHeaderIfNotPresent(
-                      httpResponse,
-                      CACHE_CONTROL,
-                      "max-age=" + seconds
-                  ); // HTTP/1.1, safest to do
-                }
-              }
-            }
-          }
-        }
+        final PayloadResponse payloadResponse = (PayloadResponse) response;
+        log.trace("Attaching payload: {}", payloadResponse.getPayload());
+        handlePayloadHeaders(payloadResponse.getPayload(), httpResponse);
 
         if (request != null && !HttpMethods.HEAD.equals(request.getAction())) {
-          try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
-            ByteStreams.copy(input, output);
+          try (InputStream input = payloadResponse.getPayload().openInputStream()) {
+            sendContent(input, httpResponse);
           }
         }
       }
@@ -159,14 +98,143 @@ public class DefaultHttpResponseSender
     }
   }
 
-  private void addHeaderIfNotPresent(final HttpServletResponse httpResponse, final String name, final Object value) {
+  /**
+   * Set HTTP response headers based on {@link Response}.
+   */
+  protected void handleResponseHeaders(final Response response,
+                                       final HttpServletResponse httpResponse)
+  {
+    // add response headers
+    for (Map.Entry<String, String> header : response.getHeaders()) {
+      httpResponse.addHeader(header.getKey(), header.getValue());
+    }
+  }
+
+  /**
+   * Set HTTP response headers based on {@link PayloadResponse}.
+   */
+  protected void handlePayloadHeaders(final Payload payload,
+                                      final HttpServletResponse httpResponse)
+  {
+    if (payload.getContentType() != null) {
+      httpResponse.setContentType(payload.getContentType());
+    }
+    if (payload.getSize() != Payload.UNKNOWN_SIZE) {
+      httpResponse.setContentLengthLong(payload.getSize());
+    }
+
+    if (payload instanceof DecoratedPayload) {
+      final DecoratedPayload decoratedPayload = (DecoratedPayload) payload;
+      handleDecoratedPayloadHeaders(decoratedPayload, httpResponse);
+    }
+  }
+
+  /**
+   * Set HTTP response headers based on {@link DecoratedPayload}.
+   */
+  protected void handleDecoratedPayloadHeaders(final DecoratedPayload decoratedPayload,
+                                               final HttpServletResponse httpResponse)
+  {
+    // extra payload headers
+    final PayloadHeaders payloadHeaders = decoratedPayload.decorator(PayloadHeaders.class);
+    if (payloadHeaders != null) {
+      for (Map.Entry<String, String> header : payloadHeaders.getHeaders()) {
+        addHeaderIfNotPresent(
+            httpResponse,
+            header.getKey(),
+            header.getValue()
+        );
+      }
+    }
+    // times
+    final PayloadTimes payloadTimes = decoratedPayload.decorator(PayloadTimes.class);
+    if (payloadTimes != null) {
+      addHeaderIfNotPresent(
+          httpResponse,
+          HttpHeaders.LAST_MODIFIED,
+          payloadTimes.getLastModified()
+      );
+    }
+    // ETag using hashes
+    final PayloadHashes payloadHashes = decoratedPayload.decorator(PayloadHashes.class);
+    if (payloadHashes != null) {
+      final HashAlgorithm hashAlgorithm = Iterables.getFirst(payloadHashes.getHashAlgorithms(), null);
+      if (hashAlgorithm != null) {
+        final HashCode hashCode = payloadHashes.getHashCodes().get(hashAlgorithm);
+        if (hashCode != null) {
+          addHeaderIfNotPresent(
+              httpResponse,
+              HttpHeaders.ETAG,
+              "\"" + hashCode + "\""
+          );
+        }
+      }
+    }
+    // Cache control
+    final PayloadCaching payloadCaching = decoratedPayload.decorator(PayloadCaching.class);
+    if (payloadCaching != null) {
+      if (!payloadCaching.isCacheable()) {
+        httpResponse.setHeader(PRAGMA, "no-cache"); // HTTP/1.0
+        httpResponse.setHeader(CACHE_CONTROL, "no-cache, no-store, max-age=0, must-revalidate"); // HTTP/1.1
+        httpResponse.addHeader(CACHE_CONTROL, "post-check=0, pre-check=0"); // MS IE
+        httpResponse.setHeader(EXPIRES, "0"); // No caching on Proxies in between client and Nexus
+      }
+      else {
+        if (payloadCaching.getValidUntil() != null) {
+          final DateTime now = DateTime.now();
+          final Seconds seconds = Seconds.secondsBetween(now, payloadCaching.getValidUntil());
+          if (seconds.getSeconds() > 0) {
+            addHeaderIfNotPresent(
+                httpResponse,
+                CACHE_CONTROL,
+                "max-age=" + seconds
+            ); // HTTP/1.1, safest to do
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Adds header to HTTP response if not already present.
+   */
+  protected void addHeaderIfNotPresent(final HttpServletResponse httpResponse, final String name, final Object value) {
     if (!httpResponse.containsHeader(name)) {
       if (value instanceof DateTime) {
         httpResponse.setDateHeader(name, ((DateTime) value).getMillis());
+      }
+      else if (value instanceof Date) {
+        httpResponse.setDateHeader(name, ((Date) value).getTime());
       }
       else {
         httpResponse.setHeader(name, String.valueOf(value));
       }
     }
   }
+
+  /**
+   * Sends content by copying all bytes from the input stream to the response setting the preferred buffer
+   * size. At the end, it flushes response buffer. Passed in {@link InputStream} is fully consumed and closed.
+   * The passed in {@link HttpServletResponse} after this call returns is committed and flushed.
+   */
+  protected void sendContent(final InputStream input, final HttpServletResponse response) throws IOException {
+    int bufferSize = BUFFER_SIZE;
+    if (bufferSize < 1) {
+      // if no user override, ask container for bufferSize
+      bufferSize = response.getBufferSize();
+      if (bufferSize < 1) {
+        bufferSize = 8192;
+        response.setBufferSize(bufferSize);
+      }
+    }
+    else {
+      // user override present, tell container what buffer size we'd like
+      response.setBufferSize(bufferSize);
+    }
+    try (final InputStream from = input; final OutputStream to = response.getOutputStream()) {
+      StreamSupport.copy(from, to, bufferSize);
+      response.flushBuffer();
+    }
+  }
+
 }
