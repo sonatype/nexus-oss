@@ -30,6 +30,7 @@ import org.joda.time.DateTime;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toContent;
 import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toPayload;
@@ -57,6 +58,7 @@ public class RawContentHandler
     RawContentFacet storage = repository.facet(RawContentFacet.class);
 
     switch (method) {
+      case HEAD:
       case GET: {
         RawContent content = storage.get(name);
         if (content == null) {
@@ -81,7 +83,7 @@ public class RawContentHandler
       }
 
       default:
-        return HttpResponses.methodNotAllowed(method, GET, PUT, DELETE);
+        return HttpResponses.methodNotAllowed(method, GET, HEAD, PUT, DELETE);
     }
   }
 

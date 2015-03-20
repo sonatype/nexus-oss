@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
 
 /**
  * Simple content proxy handler.
@@ -49,6 +50,7 @@ public class SimpleProxyHandler
     SimpleContentsFacet contents = repository.facet(SimpleContentsFacet.class);
 
     switch (method) {
+      case HEAD:
       case GET: {
         SimpleContent content = contents.get(name);
         if (content == null) {
@@ -58,7 +60,7 @@ public class SimpleProxyHandler
       }
 
       default:
-        return HttpResponses.methodNotAllowed(method, GET);
+        return HttpResponses.methodNotAllowed(method, GET, HEAD);
     }
   }
 }
