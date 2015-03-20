@@ -71,7 +71,7 @@ public abstract class NexusPaxExamSupport
 
   public static final String NEXUS_PAX_EXAM_TIMEOUT_KEY = "nexus.pax.exam.timeout";
 
-  public static final int NEXUS_PAX_EXAM_TIMEOUT_DEFAULT = 180000;
+  public static final int NEXUS_PAX_EXAM_TIMEOUT_DEFAULT = 240000;
 
   // -------------------------------------------------------------------------
 
