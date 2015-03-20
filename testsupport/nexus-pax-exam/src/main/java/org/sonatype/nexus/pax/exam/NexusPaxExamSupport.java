@@ -405,11 +405,9 @@ public abstract class NexusPaxExamSupport
       result.add(o);
     }
 
-    if (nexusFeatures.size() > 0) {
-      // combine the nexus-features values into a single request
-      result.add(editConfigurationFileExtend("etc/nexus.properties", //
-          "nexus-features", Joiner.on(',').join(nexusFeatures)));
-    }
+    // combine the nexus-features values into a single request
+    result.add(editConfigurationFileExtend("etc/nexus.properties", //
+        "nexus-features", Joiner.on(',').join(nexusFeatures)));
 
     return result.toArray(new Option[result.size()]);
   }

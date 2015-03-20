@@ -24,7 +24,6 @@ import org.ops4j.pax.exam.Option;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.ops4j.pax.exam.CoreOptions.options;
 
 /**
  * Sanity test of the OSS base template.
