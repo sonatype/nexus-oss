@@ -21,8 +21,8 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.manager.RepositoryManager
-import org.sonatype.nexus.repository.storage.AssetImpl
-import org.sonatype.nexus.repository.storage.ComponentImpl
+import org.sonatype.nexus.repository.storage.Asset
+import org.sonatype.nexus.repository.storage.Component
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageTx
 import org.sonatype.nexus.repository.view.ViewFacet
@@ -64,11 +64,11 @@ extends DirectComponentSupport
     }
     StorageTx storageTx = repository.facet(StorageFacet).openTx()
     try {
-      ComponentImpl component = storageTx.findComponent(new ORecordId(componentId), storageTx.getBucket())
+      Component component = storageTx.findComponent(new ORecordId(componentId), storageTx.getBucket())
       if (component == null) {
         return null
       }
-      List<AssetImpl> assets = component.assets()
+      List<Asset> assets = component.assets()
       return assets.collect { asset ->
         new AssetXO(
             // TODO should asset have a name?
