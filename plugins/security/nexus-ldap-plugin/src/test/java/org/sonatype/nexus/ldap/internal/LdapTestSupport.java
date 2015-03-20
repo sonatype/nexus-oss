@@ -27,8 +27,8 @@ import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
-import org.sonatype.nexus.security.SecurityModule;
 import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.TestSecurityModule;
 import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
 import org.sonatype.sisu.litmus.testsupport.port.PortRegistry;
 
@@ -60,7 +60,7 @@ public abstract class LdapTestSupport
   @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
-    modules.add(new SecurityModule());
+    modules.add(new TestSecurityModule());
     // test specific bindings
     modules.add(new Module()
     {

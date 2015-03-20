@@ -76,6 +76,10 @@ public class UserIdMdcHelper
     }
   }
 
+  public static void unknown() {
+    MDC.put(KEY, UNKNOWN);
+  }
+
   public static void unset() {
     MDC.remove(KEY);
   }

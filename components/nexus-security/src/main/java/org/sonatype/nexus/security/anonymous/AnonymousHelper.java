@@ -12,32 +12,23 @@
  */
 package org.sonatype.nexus.security.anonymous;
 
+import javax.annotation.Nullable;
+
 import org.apache.shiro.subject.Subject;
 
 /**
- * Anonymous manager.
+ * Anonymous helpers.
  *
  * @since 3.0
  */
-public interface AnonymousManager
+public class AnonymousHelper
 {
-  /**
-   * Returns copy of current anonymous configuration.
-   */
-  AnonymousConfiguration getConfiguration();
+  private AnonymousHelper() {}
 
   /**
-   * Installs new anonymous configuration.
+   * Check given given subject is anonymous.
    */
-  void setConfiguration(AnonymousConfiguration configuration);
-
-  /**
-   * Check if anonymous access is enabled.
-   */
-  boolean isEnabled();
-
-  /**
-   * Build anonymous subject.
-   */
-  Subject buildSubject();
+  public static boolean isAnonymous(final @Nullable Subject subject) {
+    return subject != null && subject.getPrincipals() instanceof AnonymousPrincipalCollection;
+  }
 }

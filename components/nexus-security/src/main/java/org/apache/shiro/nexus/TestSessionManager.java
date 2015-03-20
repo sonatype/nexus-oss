@@ -16,26 +16,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.SessionValidationScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Custom {@link DefaultSessionManager} for tests.
- *
- * Provides fixes for issue SHIRO-443. This subclass is put into package of Shiro to have
- * shiro-guice's TypeListener applied to it, and result in same behavior as for other Shiro classes.
- *
- * @author cstamas
- * @see <a href="https://issues.apache.org/jira/browse/SHIRO-443">SHIRO-443 SessionValidationScheduler created multiple
- *      times, enabling it is not thread safe</a>
- * @see <a href="https://issues.sonatype.org/browse/NEXUS-5727>NEXUS-5727 Shiro's session validating thread created
- *      multiple times</a>
+ * Custom {@link SessionManager} for tests.
  */
-public class NexusDefaultSessionManager
+public class TestSessionManager
     extends DefaultSessionManager
 {
-  private static final Logger log = LoggerFactory.getLogger(NexusDefaultSessionManager.class);
+  private static final Logger log = LoggerFactory.getLogger(TestSessionManager.class);
 
   @Inject
   public void configureProperties(
@@ -44,11 +36,14 @@ public class NexusDefaultSessionManager
     setGlobalSessionTimeout(globalSessionTimeout);
   }
 
+  /**
+   * See https://issues.sonatype.org/browse/NEXUS-5727, https://issues.apache.org/jira/browse/SHIRO-443
+   */
   @Override
   protected synchronized void enableSessionValidation() {
-    log.info("Global session timeout: {} ms", getGlobalSessionTimeout());
     final SessionValidationScheduler scheduler = getSessionValidationScheduler();
     if (scheduler == null) {
+      log.info("Global session timeout: {} ms", getGlobalSessionTimeout());
       super.enableSessionValidation();
     }
   }

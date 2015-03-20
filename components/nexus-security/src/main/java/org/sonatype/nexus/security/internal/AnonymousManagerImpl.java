@@ -141,15 +141,12 @@ public class AnonymousManagerImpl
         model.getRealmName()
     );
 
+    // FIXME: buildSubject() calls deeply into various shiro dao/save bits which are probably overhead we don't need here at all
+
     return new Subject.Builder()
         .principals(principals)
         .authenticated(false)
+        .sessionCreationEnabled(false)
         .buildSubject();
-  }
-
-  @Override
-  public boolean isAnonymous(final Subject subject) {
-    checkNotNull(subject);
-    return subject.getPrincipals() instanceof AnonymousPrincipalCollection;
   }
 }

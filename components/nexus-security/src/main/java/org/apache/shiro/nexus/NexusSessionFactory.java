@@ -10,34 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.security.anonymous;
+package org.apache.shiro.nexus;
 
-import org.apache.shiro.subject.Subject;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.SessionContext;
+import org.apache.shiro.session.mgt.SessionFactory;
+import org.apache.shiro.session.mgt.SimpleSessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Anonymous manager.
+ * Custom {@link SessionFactory}.
  *
  * @since 3.0
  */
-public interface AnonymousManager
+public class NexusSessionFactory
+  extends SimpleSessionFactory
 {
-  /**
-   * Returns copy of current anonymous configuration.
-   */
-  AnonymousConfiguration getConfiguration();
+  private static final Logger log = LoggerFactory.getLogger(NexusSessionFactory.class);
 
-  /**
-   * Installs new anonymous configuration.
-   */
-  void setConfiguration(AnonymousConfiguration configuration);
-
-  /**
-   * Check if anonymous access is enabled.
-   */
-  boolean isEnabled();
-
-  /**
-   * Build anonymous subject.
-   */
-  Subject buildSubject();
+  @Override
+  public Session createSession(final SessionContext initData) {
+    log.trace("Creating session w/init-data: {}", initData);
+    return super.createSession(initData);
+  }
 }
