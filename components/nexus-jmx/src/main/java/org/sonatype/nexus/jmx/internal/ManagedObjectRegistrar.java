@@ -169,11 +169,17 @@ public class ManagedObjectRegistrar
     // discover managed members
     builder.discover();
 
-    // expose sisu bean rank
+    // expose additinal information we have about the bean
     builder.attribute(new SuppliedMBeanAttribute.Builder()
             .name("sisu.rank")
             .description("Sisu bean rank")
             .value(entry.getRank())
+            .build()
+    );
+    builder.attribute(new SuppliedMBeanAttribute.Builder()
+            .name("sisu.source")
+            .description("Sisu bean source")
+            .value(entry.getSource())
             .build()
     );
 
