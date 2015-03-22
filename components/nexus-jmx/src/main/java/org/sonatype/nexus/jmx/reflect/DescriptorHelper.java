@@ -105,28 +105,28 @@ public class DescriptorHelper
         // convert types as described by DescriptorKey javadocs
         if (value instanceof Class) {
           // class constant
-          value = ((Class)value).getCanonicalName();
+          value = ((Class) value).getCanonicalName();
         }
         else if (value instanceof Enum) {
           // enum constant
-          value = ((Enum)value).name();
+          value = ((Enum) value).name();
         }
         else if (value.getClass().isArray()) {
           Class<?> componentType = value.getClass().getComponentType();
           if (Class.class.equals(componentType)) {
             // array of class constants, convert to string[]
-            Class[] classes = (Class[])value;
+            Class[] classes = (Class[]) value;
             String[] strings = new String[classes.length];
-            for (int i=0; i<classes.length; i++) {
+            for (int i = 0; i < classes.length; i++) {
               strings[i] = classes[i].getName();
             }
             value = strings;
           }
           else if (Enum.class.equals(componentType)) {
             // array of enum constants, convert to string[]
-            Enum[] enums = (Enum[])value;
+            Enum[] enums = (Enum[]) value;
             String[] strings = new String[enums.length];
-            for (int i=0; i<enums.length; i++) {
+            for (int i = 0; i < enums.length; i++) {
               strings[i] = enums[i].name();
             }
             value = strings;
@@ -155,7 +155,7 @@ public class DescriptorHelper
    */
   @VisibleForTesting
   static class InvalidDescriptorKeyException
-    extends RuntimeException
+      extends RuntimeException
   {
     public InvalidDescriptorKeyException(final DescriptorKey key, final Annotation annotation, final Method method) {
       super("Invalid @DescriptorKey: " + key + ", annotation=" + annotation + ", method=" + method);
@@ -177,8 +177,8 @@ public class DescriptorHelper
    * Visit all annotations, and all annotations attached to annotation type.
    */
   private static void visitAnnotations(final Set<Annotation> visited,
-                               final List<Annotation> found,
-                               final Annotation... annotations)
+                                       final List<Annotation> found,
+                                       final Annotation... annotations)
   {
     for (Annotation annotation : annotations) {
       visited.add(annotation);
