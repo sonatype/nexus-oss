@@ -20,10 +20,10 @@ import javax.inject.Named;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.sonatype.nexus.jmx.ConstantMBeanAttribute;
 import org.sonatype.nexus.jmx.MBean;
 import org.sonatype.nexus.jmx.ManagedObject;
 import org.sonatype.nexus.jmx.ObjectNameEntry;
+import org.sonatype.nexus.jmx.SuppliedMBeanAttribute;
 import org.sonatype.nexus.jmx.reflect.ReflectionMBeanBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -170,7 +170,7 @@ public class ManagedObjectRegistrar
     builder.discover();
 
     // expose sisu bean rank
-    builder.attribute(new ConstantMBeanAttribute.Builder()
+    builder.attribute(new SuppliedMBeanAttribute.Builder()
             .name("sisu.rank")
             .description("Sisu bean rank")
             .value(entry.getRank())

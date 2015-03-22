@@ -13,19 +13,23 @@
 package org.sonatype.nexus.jmx;
 
 import javax.management.AttributeNotFoundException;
+import javax.management.Descriptor;
 import javax.management.MBeanAttributeInfo;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Constant-value {@link MBeanAttribute}.
+ * Supplied-value {@link MBeanAttribute}.
  *
  * @since 3.0
  */
-public class ConstantMBeanAttribute
+public class SuppliedMBeanAttribute
   extends ComponentSupport
   implements MBeanAttribute
 {
@@ -33,14 +37,14 @@ public class ConstantMBeanAttribute
 
   private final String name;
 
-  private final Object value;
+  private final Supplier supplier;
 
-  public ConstantMBeanAttribute(final MBeanAttributeInfo info,
-                                final Object value)
+  public SuppliedMBeanAttribute(final MBeanAttributeInfo info,
+                                final Supplier supplier)
   {
     this.info = checkNotNull(info);
     this.name = info.getName();
-    this.value = value;
+    this.supplier = checkNotNull(supplier);
   }
 
   @Override
@@ -55,19 +59,19 @@ public class ConstantMBeanAttribute
 
   @Override
   public Object getValue() {
-    return value;
+    return supplier.get();
   }
 
   @Override
   public void setValue(final Object value) throws Exception {
-    throw new AttributeNotFoundException("Attribute is constant: " + name);
+    throw new AttributeNotFoundException("Attribute is read-only: " + name);
   }
 
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
         "name='" + name + '\'' +
-        ", value=" + value +
+        ", supplier=" + supplier +
         '}';
   }
 
@@ -76,7 +80,7 @@ public class ConstantMBeanAttribute
   //
 
   /**
-   * {@link ConstantMBeanAttribute} builder.
+   * {@link SuppliedMBeanAttribute} builder.
    */
   public static class Builder
     extends ComponentSupport
@@ -85,7 +89,9 @@ public class ConstantMBeanAttribute
 
     private String description;
 
-    private Object value;
+    private Supplier supplier;
+
+    private Descriptor descriptor;
 
     public Builder name(final String name) {
       this.name = name;
@@ -97,27 +103,37 @@ public class ConstantMBeanAttribute
       return this;
     }
 
-    public Builder value(final Object value) {
-      this.value = value;
+    public Builder supplier(final Supplier supplier) {
+      this.supplier = supplier;
       return this;
     }
 
-    public ConstantMBeanAttribute build() {
+    public Builder value(final Object value) {
+      this.supplier = Suppliers.ofInstance(value);
+      return this;
+    }
+
+    public Builder descriptor(final Descriptor descriptor) {
+      this.descriptor = descriptor;
+      return this;
+    }
+
+    public SuppliedMBeanAttribute build() {
       checkState(name != null);
-      checkState(value != null);
+      checkState(supplier != null);
 
       MBeanAttributeInfo info = new MBeanAttributeInfo(
           name,
-          value.getClass().getName(),
+          supplier.get().getClass().getName(),
           description,
           true, // readable
           false, // writable
           false, // is-form
-          null // descriptor
+          descriptor
       );
 
       log.trace("Building attribute with info: {}", info);
-      return new ConstantMBeanAttribute(info, value);
+      return new SuppliedMBeanAttribute(info, supplier);
     }
   }
 }
