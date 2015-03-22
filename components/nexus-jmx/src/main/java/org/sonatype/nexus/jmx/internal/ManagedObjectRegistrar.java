@@ -147,23 +147,24 @@ public class ManagedObjectRegistrar
    */
   private MBean mbean(final BeanEntry<ManagedObject, Object> entry) throws Exception {
     Class<?> type = entry.getImplementationClass();
-    ManagedObject descriptor = type.getAnnotation(ManagedObject.class);
-
-    // allow custom description, or expose what sisu tells us
-    String description = Strings.emptyToNull(descriptor.description());
-    if (description == null) {
-      description = entry.getDescription();
-    }
+    ManagedObject managedDescriptor = type.getAnnotation(ManagedObject.class);
 
     ReflectionMBeanBuilder builder = new ReflectionMBeanBuilder(type);
+
+    // attach manged target
     builder.target(new Supplier()
     {
       @Override
       public Object get() {
-        // TODO: Sort out if getProvider().get() is more appropriate here?
-        return entry.getValue();
+        return entry.getProvider().get();
       }
     });
+
+    // allow custom description, or expose what sisu tells us
+    String description = Strings.emptyToNull(managedDescriptor.description());
+    if (description == null) {
+      description = entry.getDescription();
+    }
     builder.description(description);
 
     // discover managed members
@@ -172,13 +173,13 @@ public class ManagedObjectRegistrar
     // expose additinal information we have about the bean
     builder.attribute(new SuppliedMBeanAttribute.Builder()
             .name("sisu.rank")
-            .description("Sisu bean rank")
+            .description("Sisu bean-rank")
             .value(entry.getRank())
             .build()
     );
     builder.attribute(new SuppliedMBeanAttribute.Builder()
             .name("sisu.source")
-            .description("Sisu bean source")
+            .description("Sisu bean-source")
             .value(entry.getSource())
             .build()
     );
