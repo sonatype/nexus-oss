@@ -31,12 +31,15 @@ public class ConstantMBeanAttribute
 {
   private final MBeanAttributeInfo info;
 
+  private final String name;
+
   private final Object value;
 
   public ConstantMBeanAttribute(final MBeanAttributeInfo info,
                                 final Object value)
   {
     this.info = checkNotNull(info);
+    this.name = info.getName();
     this.value = value;
   }
 
@@ -47,7 +50,7 @@ public class ConstantMBeanAttribute
 
   @Override
   public String getName() {
-    return info.getName();
+    return name;
   }
 
   @Override
@@ -57,7 +60,15 @@ public class ConstantMBeanAttribute
 
   @Override
   public void setValue(final Object value) throws Exception {
-    throw new AttributeNotFoundException("Attribute is constant: " + getName());
+    throw new AttributeNotFoundException("Attribute is constant: " + name);
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "name='" + name + '\'' +
+        ", value=" + value +
+        '}';
   }
 
   //

@@ -40,6 +40,8 @@ public class ReflectionMBeanOperation
 {
   private final MBeanOperationInfo info;
 
+  private final String name;
+
   private final Supplier target;
 
   private final Method method;
@@ -49,6 +51,7 @@ public class ReflectionMBeanOperation
                                   final Method method)
   {
     this.info = checkNotNull(info);
+    this.name = info.getName();
     this.target = checkNotNull(target);
     this.method = checkNotNull(method);
   }
@@ -60,7 +63,7 @@ public class ReflectionMBeanOperation
 
   @Override
   public String getName() {
-    return info.getName();
+    return name;
   }
 
   public Supplier getTarget() {
@@ -79,7 +82,7 @@ public class ReflectionMBeanOperation
 
   @Override
   public Object invoke(final Object[] params) throws Exception {
-    log.debug("Invoke: {} -> {}", Arrays.asList(params), method);
+    log.info("Invoke: {} -> {}", Arrays.asList(params), method);
     return method.invoke(target(), params);
   }
 
@@ -146,6 +149,7 @@ public class ReflectionMBeanOperation
           descriptor(method)
       );
 
+      log.info("Building operation with info: {}", info);
       return new ReflectionMBeanOperation(info, target, method);
     }
 

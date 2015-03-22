@@ -56,12 +56,14 @@ public class MBeanBuilder
 
   public void attribute(final MBeanAttribute attribute) {
     checkNotNull(attribute);
+    log.info("Adding attribute: {}", attribute);
     attributes.add(attribute);
   }
 
   public void operation(final MBeanOperation operation) {
     checkNotNull(operation);
     operations.add(operation);
+    log.info("Adding operation: {}", operation);
   }
 
   public MBean build() {
@@ -94,6 +96,7 @@ public class MBeanBuilder
         descriptor
     );
 
+    log.info("Building mbean with info: {}", info);
     return new MBean(info, attributes, operations);
   }
 }

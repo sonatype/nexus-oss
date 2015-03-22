@@ -38,6 +38,8 @@ public class ReflectionMBeanAttribute
 {
   private final MBeanAttributeInfo info;
 
+  private final String name;
+
   private final Supplier target;
 
   private final Method getter;
@@ -50,6 +52,7 @@ public class ReflectionMBeanAttribute
                                   final @Nullable Method setter)
   {
     this.info = checkNotNull(info);
+    this.name = info.getName();
     this.target = checkNotNull(target);
     this.getter = getter;
     this.setter = setter;
@@ -62,7 +65,7 @@ public class ReflectionMBeanAttribute
 
   @Override
   public String getName() {
-    return info.getName();
+    return name;
   }
 
   public Supplier getTarget() {
@@ -86,7 +89,7 @@ public class ReflectionMBeanAttribute
   @Override
   public Object getValue() throws Exception {
     checkState(getter != null);
-    log.debug("Get value: {}", getter);
+    log.info("Get value: {}", getter);
     //noinspection ConstantConditions
     return getter.invoke(target());
   }
@@ -94,7 +97,7 @@ public class ReflectionMBeanAttribute
   @Override
   public void setValue(final Object value) throws Exception {
     checkState(setter != null);
-    log.debug("Set value: {} -> {}", value, setter);
+    log.info("Set value: {} -> {}", value, setter);
     //noinspection ConstantConditions
     setter.invoke(target(), value);
   }
@@ -159,6 +162,7 @@ public class ReflectionMBeanAttribute
           ImmutableDescriptor.union(descriptor(getter), descriptor(setter))
       );
 
+      log.info("Building attribute with info: {}", info);
       return new ReflectionMBeanAttribute(info, target, getter, setter);
     }
 

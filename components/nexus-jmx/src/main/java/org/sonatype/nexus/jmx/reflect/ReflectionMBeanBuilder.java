@@ -28,7 +28,6 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Reflection {@link MBeanBuilder}.
@@ -59,7 +58,7 @@ public class ReflectionMBeanBuilder
   public ReflectionMBeanBuilder discover(final Class<?> type) throws Exception {
     checkNotNull(target);
 
-    log.trace("Discovering managed members of type: {}", type);
+    log.info("Discovering managed members of type: {}", type);
 
     ManagedObject descriptor = type.getAnnotation(ManagedObject.class);
     assert descriptor != null;
@@ -74,10 +73,10 @@ public class ReflectionMBeanBuilder
         continue;
       }
 
-      log.trace("Scanning for managed annotations on method: {}", method);
+      log.info("Scanning for managed annotations on method: {}", method);
 
-      ManagedAttribute attributeDescriptor = type.getAnnotation(ManagedAttribute.class);
-      ManagedOperation operationDescriptor = type.getAnnotation(ManagedOperation.class);
+      ManagedAttribute attributeDescriptor = method.getAnnotation(ManagedAttribute.class);
+      ManagedOperation operationDescriptor = method.getAnnotation(ManagedOperation.class);
 
       // skip if no configuration
       if (attributeDescriptor == null && operationDescriptor == null) {
@@ -85,9 +84,14 @@ public class ReflectionMBeanBuilder
       }
 
       // complain if method marked as both attribute and operation
-      checkState(attributeDescriptor != null && operationDescriptor != null);
+      if (attributeDescriptor != null && operationDescriptor != null) {
+        log.warn("Confusing managed annotations on method: {}", method);
+        continue;
+      }
 
       if (attributeDescriptor != null) {
+        log.info("Processing attribute descriptor: {}", attributeDescriptor);
+
         // add attribute
         String name = Strings.emptyToNull(attributeDescriptor.name());
         if (name == null) {
@@ -118,22 +122,24 @@ public class ReflectionMBeanBuilder
         }
 
         if (getter) {
-          log.trace("Found getter for attribute: {} -> {}", name, method);
+          log.info("Found attribute getter: {} -> {}", name, method);
           builder.getter(method);
         }
         else {
-          log.trace("Found setter for attribute: {} -> {}", name, method);
+          log.info("Found attribute setter: {} -> {}", name, method);
           builder.setter(method);
         }
       }
       else {
+        log.info("Processing operation descriptor: {}", operationDescriptor);
+
         // add operation
         String name = Strings.emptyToNull(operationDescriptor.name());
         if (name == null) {
           name = method.getName();
         }
 
-        log.trace("Found operation: {} -> {}", name, method);
+        log.info("Found operation: {} -> {}", name, method);
         operation(new ReflectionMBeanOperation.Builder()
             .name(name)
             .target(target)
@@ -142,6 +148,11 @@ public class ReflectionMBeanBuilder
             .method(method)
             .build());
       }
+    }
+
+    // build all discovered attributes
+    for (ReflectionMBeanAttribute.Builder builder : attributeBuilders.values()) {
+      attribute(builder.build());
     }
 
     return this;
