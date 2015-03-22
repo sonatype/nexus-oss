@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.jmx.reflect;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -19,6 +20,7 @@ import javax.management.Descriptor;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 
+import org.sonatype.nexus.jmx.DescriptorHelper;
 import org.sonatype.nexus.jmx.MBeanOperation;
 import org.sonatype.nexus.jmx.OperationKey;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -155,7 +157,7 @@ public class ReflectionMBeanOperation
           signature(method),
           method.getReturnType().getName(),
           impact,
-          descriptor(method)
+          DescriptorHelper.build(method)
       );
 
       log.info("Building operation with info: {}", info);
@@ -166,18 +168,20 @@ public class ReflectionMBeanOperation
     // Helpers
     //
 
+    /**
+     * Extract {@link MBeanParameterInfo} signature for given method.
+     */
     private MBeanParameterInfo[] signature(final Method method) {
+      // NOTE: when NX is based on Java8 we can replace Paranamer usage with JDK api
       Paranamer paranamer = new BytecodeReadingParanamer();
       String[] names = paranamer.lookupParameterNames(method);
       Class[] types = method.getParameterTypes();
+      Annotation[][] annotations = method.getParameterAnnotations();
 
       MBeanParameterInfo[] result = new MBeanParameterInfo[names.length];
       for (int i=0; i< names.length; i++) {
-        // TODO: generate descriptor
-        Descriptor descriptor = null;
-
-        // TODO: detect description
-        String description = null;
+        Descriptor descriptor = DescriptorHelper.build(annotations[i]);
+        String description = DescriptorHelper.stringValue(descriptor, "description");
 
         result[i] = new MBeanParameterInfo(
             names[i],
@@ -188,11 +192,6 @@ public class ReflectionMBeanOperation
       }
 
       return result;
-    }
-
-    private Descriptor descriptor(final Method method) {
-      // TODO: generate descriptor
-      return null;
     }
   }
 }

@@ -48,7 +48,6 @@ public class MBeanBuilder
     this.className = checkNotNull(className);
   }
 
-
   public MBeanBuilder description(final String description) {
     this.description = description;
     return this;

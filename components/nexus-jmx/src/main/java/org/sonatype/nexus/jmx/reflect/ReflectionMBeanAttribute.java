@@ -19,6 +19,7 @@ import javax.management.Descriptor;
 import javax.management.ImmutableDescriptor;
 import javax.management.MBeanAttributeInfo;
 
+import org.sonatype.nexus.jmx.DescriptorHelper;
 import org.sonatype.nexus.jmx.MBeanAttribute;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -152,6 +153,15 @@ public class ReflectionMBeanAttribute
       checkState(target != null);
       checkState(getter != null || setter != null);
 
+      Descriptor getterDescriptor = null;
+      if (getter != null) {
+        getterDescriptor = DescriptorHelper.build(getter);
+      }
+      Descriptor setterDescriptor = null;
+      if (setter != null) {
+        setterDescriptor = DescriptorHelper.build(setter);
+      }
+
       MBeanAttributeInfo info = new MBeanAttributeInfo(
           name,
           attributeType(getter, setter).getName(),
@@ -159,7 +169,7 @@ public class ReflectionMBeanAttribute
           getter != null, // readable
           setter != null, // writable
           isIs(getter),
-          ImmutableDescriptor.union(descriptor(getter), descriptor(setter))
+          ImmutableDescriptor.union(getterDescriptor, setterDescriptor)
       );
 
       log.info("Building attribute with info: {}", info);
@@ -170,7 +180,10 @@ public class ReflectionMBeanAttribute
     // Helpers
     //
 
-    private Class attributeType(final Method getter, final Method setter) {
+    /**
+     * Returns the type of attribute.
+     */
+    private Class<?> attributeType(final Method getter, final Method setter) {
       // TODO: sanity check methods
       if (getter != null) {
         return getter.getReturnType();
@@ -180,14 +193,12 @@ public class ReflectionMBeanAttribute
       }
     }
 
+    /**
+     * Check if the method is an 'is' form getter.
+     */
     private boolean isIs(final Method getter) {
       // TODO: sanity check method
       return getter != null && getter.getName().startsWith("is");
-    }
-
-    private Descriptor descriptor(final Method method) {
-      // TODO: generate descriptor
-      return null;
     }
   }
 }
