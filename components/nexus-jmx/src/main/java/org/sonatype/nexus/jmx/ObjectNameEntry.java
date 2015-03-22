@@ -22,6 +22,7 @@ import javax.management.ObjectName;
 /**
  * Key-value entry for {@link ObjectName} customization.
  *
+ * @see ManagedObject
  * @since 3.0
  */
 @Retention(RetentionPolicy.RUNTIME)

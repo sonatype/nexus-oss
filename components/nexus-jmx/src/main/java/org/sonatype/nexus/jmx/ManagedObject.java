@@ -48,7 +48,7 @@ public @interface ManagedObject
   String name() default "";
 
   /**
-   * Additional entires to customize object-name.
+   * Additional entries to customize object-name.
    */
   ObjectNameEntry[] entries() default {};
 

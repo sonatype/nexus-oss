@@ -37,6 +37,11 @@ public @interface ManagedOperation
 
   /**
    * Optional operation impact.
+   *
+   * @see MBeanOperationInfo#ACTION
+   * @see MBeanOperationInfo#ACTION_INFO
+   * @see MBeanOperationInfo#INFO
+   * @see MBeanOperationInfo#UNKNOWN
    */
   int impact() default MBeanOperationInfo.UNKNOWN;
 
