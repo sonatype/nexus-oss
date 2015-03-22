@@ -155,7 +155,7 @@ public class ManagedObjectRegistrar
       description = entry.getDescription();
     }
 
-    ReflectionMBeanBuilder builder = new ReflectionMBeanBuilder(type.getName());
+    ReflectionMBeanBuilder builder = new ReflectionMBeanBuilder(type);
     builder.target(new Supplier()
     {
       @Override
@@ -165,13 +165,18 @@ public class ManagedObjectRegistrar
       }
     });
     builder.description(description);
-    builder.discover(type);
+
+    // discover managed members
+    builder.discover();
+
+    // expose sisu bean rank
     builder.attribute(new ConstantMBeanAttribute.Builder()
             .name("sisu.rank")
-            .description("Sisu binding rank")
+            .description("Sisu bean rank")
             .value(entry.getRank())
             .build()
     );
+
     return builder.build();
   }
 }

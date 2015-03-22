@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.jmx.DescriptorHelper;
 import org.sonatype.nexus.jmx.MBeanBuilder;
 import org.sonatype.nexus.jmx.ManagedAttribute;
 import org.sonatype.nexus.jmx.ManagedObject;
@@ -63,8 +64,8 @@ public class ReflectionMBeanBuilder
 
     log.info("Discovering managed members of type: {}", type);
 
-    ManagedObject descriptor = type.getAnnotation(ManagedObject.class);
-    assert descriptor != null;
+    ManagedObject managedDescriptor = type.getAnnotation(ManagedObject.class);
+    assert managedDescriptor != null;
 
     // track attribute builders for getter/setter correlation
     Map<String,ReflectionMBeanAttribute.Builder> attributeBuilders = Maps.newHashMap();
@@ -157,6 +158,9 @@ public class ReflectionMBeanBuilder
     for (ReflectionMBeanAttribute.Builder builder : attributeBuilders.values()) {
       attribute(builder.build());
     }
+
+    // add descriptor
+    descriptor(DescriptorHelper.build(type));
 
     return this;
   }

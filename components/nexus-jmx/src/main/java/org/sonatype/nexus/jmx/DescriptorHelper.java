@@ -49,7 +49,7 @@ public class DescriptorHelper
    */
   public static Descriptor build(final Class<?> type) {
     checkNotNull(type);
-    log.info("Building descriptor for type: {}", type);
+    log.trace("Building descriptor for type: {}", type);
     return build(type.getAnnotations());
   }
 
@@ -58,7 +58,7 @@ public class DescriptorHelper
    */
   public static Descriptor build(final Method method) {
     checkNotNull(method);
-    log.info("Building descriptor for method: {}", method);
+    log.trace("Building descriptor for method: {}", method);
     return build(method.getAnnotations());
   }
 
@@ -67,7 +67,7 @@ public class DescriptorHelper
    */
   public static Descriptor build(final Annotation... annotations) {
     checkNotNull(annotations);
-    log.info("Building descriptor for annotations: {}", Arrays.asList(annotations));
+    log.trace("Building descriptor for annotations: {}", Arrays.asList(annotations));
 
     Map<String, Object> fields = Maps.newTreeMap();
 
@@ -76,16 +76,16 @@ public class DescriptorHelper
 
     // find all DescriptorKey annotations
     for (Annotation annotation : findAllAnnotations(annotations)) {
-      log.info("Scanning annotation: {}", annotation);
+      log.trace("Scanning annotation: {}", annotation);
 
       for (Method method : annotation.annotationType().getMethods()) {
-        log.info("Scanning method: {}", method);
+        log.trace("Scanning method: {}", method);
 
         DescriptorKey key = method.getAnnotation(DescriptorKey.class);
         if (key == null) {
           continue;
         }
-        log.info("Found key: {}", key);
+        log.trace("Found key: {}", key);
 
         // extract name and value for key
         String name = key.value();
@@ -158,7 +158,7 @@ public class DescriptorHelper
     extends RuntimeException
   {
     public InvalidDescriptorKeyException(final DescriptorKey key, final Annotation annotation, final Method method) {
-      super("Invalid value for @DescriptorKey: " + key + ", annotation=" + annotation + ", method=" + method);
+      super("Invalid @DescriptorKey: " + key + ", annotation=" + annotation + ", method=" + method);
     }
   }
 
