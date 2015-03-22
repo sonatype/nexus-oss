@@ -27,7 +27,6 @@ import javax.management.MBeanInfo;
 import javax.management.ReflectionException;
 import javax.management.ServiceNotFoundException;
 
-import org.sonatype.nexus.jmx.internal.OperationKey;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
@@ -66,7 +65,7 @@ public class MBean
     // build operations lookup map
     ImmutableMap.Builder<OperationKey,MBeanOperation> ops = ImmutableMap.builder();
     for (MBeanOperation operation : operations) {
-      ops.put(new OperationKey(operation.getInfo()), operation);
+      ops.put(operation.getKey(), operation);
     }
     this.operations = ops.build();
   }
@@ -111,6 +110,8 @@ public class MBean
       return attribute(name).getValue();
     }
     catch (Exception e) {
+      log.warn("Failed to get attribute: {}", name, e);
+
       // TODO: Sort out the proper exception handling/wrapping
       Throwables.propagateIfPossible(e, AttributeNotFoundException.class);
       Throwables.propagateIfPossible(e, MBeanException.class);
@@ -129,6 +130,8 @@ public class MBean
       attribute(name).setValue(value);
     }
     catch (Exception e) {
+      log.warn("Failed to set attribute: {}", attribute, e);
+
       // TODO: Sort out the proper exception handling/wrapping
       Throwables.propagateIfPossible(e, AttributeNotFoundException.class);
       Throwables.propagateIfPossible(e, InvalidAttributeValueException.class);
@@ -195,6 +198,8 @@ public class MBean
       return operation(actionName, signature).invoke(params);
     }
     catch (Exception e) {
+      log.warn("Failed to invoke operation: {}", new OperationKey(actionName, signature), e);
+
       // TODO: Sort out the proper exception handling/wrapping
       Throwables.propagateIfPossible(e, MBeanException.class);
       Throwables.propagateIfPossible(e, ReflectionException.class);

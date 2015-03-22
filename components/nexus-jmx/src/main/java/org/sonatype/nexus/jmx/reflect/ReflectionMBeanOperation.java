@@ -20,6 +20,7 @@ import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 
 import org.sonatype.nexus.jmx.MBeanOperation;
+import org.sonatype.nexus.jmx.OperationKey;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Supplier;
@@ -42,6 +43,8 @@ public class ReflectionMBeanOperation
 
   private final String name;
 
+  private final OperationKey key;
+
   private final Supplier target;
 
   private final Method method;
@@ -52,6 +55,7 @@ public class ReflectionMBeanOperation
   {
     this.info = checkNotNull(info);
     this.name = info.getName();
+    this.key = new OperationKey(info);
     this.target = checkNotNull(target);
     this.method = checkNotNull(method);
   }
@@ -64,6 +68,11 @@ public class ReflectionMBeanOperation
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public OperationKey getKey() {
+    return key;
   }
 
   public Supplier getTarget() {

@@ -21,6 +21,7 @@ import javax.management.MBeanAttributeInfo;
  * @since 3.0
  */
 public interface MBeanAttribute
+  extends MBeanFeature
 {
   MBeanAttributeInfo getInfo();
 

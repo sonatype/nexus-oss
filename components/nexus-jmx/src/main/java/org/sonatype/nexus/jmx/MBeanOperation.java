@@ -20,10 +20,13 @@ import javax.management.MBeanOperationInfo;
  * @since 3.0
  */
 public interface MBeanOperation
+  extends MBeanFeature
 {
   MBeanOperationInfo getInfo();
 
   String getName();
+
+  OperationKey getKey();
 
   Object invoke(Object[] params) throws Exception;
 }

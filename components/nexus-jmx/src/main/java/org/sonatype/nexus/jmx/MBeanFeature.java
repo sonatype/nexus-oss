@@ -10,23 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.event;
+package org.sonatype.nexus.jmx;
+
+import javax.management.MBeanFeatureInfo;
 
 /**
- * The MBean management interface for {@link DebugEventInspector} management.
+ * MBean feature.
  *
- * @author cstamas
- * @since 2.1
+ * @since 3.0
  */
-public interface DebugEventInspectorMBean
+public interface MBeanFeature
 {
-  /**
-   * Returns true if enabled.
-   */
-  boolean isEnabled();
-
-  /**
-   * Enables or disables the event inspector.
-   */
-  void setEnabled(boolean val);
+  MBeanFeatureInfo getInfo();
 }
