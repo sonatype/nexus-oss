@@ -71,13 +71,21 @@ public class DescriptorHelper
 
     Map<String, Object> fields = Maps.newTreeMap();
 
+    // TODO: consider caching which annotations actually have keys, perhaps even which methods
+    // TODO: ... to avoid rescanning the list over and over?
+
     // find all DescriptorKey annotations
     for (Annotation annotation : findAllAnnotations(annotations)) {
+      log.info("Scanning annotation: {}", annotation);
+
       for (Method method : annotation.annotationType().getMethods()) {
+        log.info("Scanning method: {}", method);
+
         DescriptorKey key = method.getAnnotation(DescriptorKey.class);
         if (key == null) {
           continue;
         }
+        log.info("Found key: {}", key);
 
         // extract name and value for key
         String name = key.value();
@@ -168,8 +176,7 @@ public class DescriptorHelper
   /**
    * Visit all annotations, and all annotations attached to annotation type.
    */
-  @VisibleForTesting
-  static void visitAnnotations(final Set<Annotation> visited,
+  private static void visitAnnotations(final Set<Annotation> visited,
                                final List<Annotation> found,
                                final Annotation... annotations)
   {

@@ -15,12 +15,6 @@ package org.sonatype.nexus.jmx
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
-import javax.management.DescriptorKey
-import java.lang.annotation.ElementType
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
-import java.lang.annotation.Target
-
 /**
  * Tests for {@link DescriptorHelper}
  */
@@ -32,7 +26,12 @@ class DescriptorHelperTest
   {
     @TestComments('foo bar baz')
     def foo() {
-      // ignore
+      // empty
+    }
+
+    @TestInvalidAnnotationValue(@TestComments('foo'))
+    def invalid1() {
+      // empty
     }
   }
 
@@ -67,24 +66,12 @@ class DescriptorHelperTest
     assert descriptor.fields.length == 1
     assert descriptor.getFieldValue('comments') == 'foo bar baz'
   }
+
+  @Test(expected = DescriptorHelper.InvalidDescriptorKeyException.class)
+  void 'build descriptor fails due to invalid'() {
+    def method = TestBean.class.getMethod('invalid1')
+    def descriptor = DescriptorHelper.build(method)
+    log descriptor
+  }
 }
 
-//
-// Annotations to help verify processing
-//
-
-@Target([ElementType.TYPE, ElementType.METHOD])
-@Retention(RetentionPolicy.RUNTIME)
-@interface TestAuthor
-{
-  @DescriptorKey('author')
-  String value()
-}
-
-@Target([ElementType.TYPE, ElementType.METHOD])
-@Retention(RetentionPolicy.RUNTIME)
-@interface TestComments
-{
-  @DescriptorKey('comments')
-  String value()
-}

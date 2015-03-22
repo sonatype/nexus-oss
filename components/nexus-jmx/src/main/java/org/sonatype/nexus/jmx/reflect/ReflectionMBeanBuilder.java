@@ -39,10 +39,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ReflectionMBeanBuilder
     extends MBeanBuilder
 {
+  private final Class<?> type;
+
   private Supplier target;
 
-  public ReflectionMBeanBuilder(final String className) {
-    super(className);
+  public ReflectionMBeanBuilder(final Class<?> type) {
+    super(type.getName());
+    this.type = type;
   }
 
   public ReflectionMBeanBuilder target(final Supplier target) {
@@ -55,7 +58,7 @@ public class ReflectionMBeanBuilder
    *
    * Target must have been previously configured.
    */
-  public ReflectionMBeanBuilder discover(final Class<?> type) throws Exception {
+  public ReflectionMBeanBuilder discover() throws Exception {
     checkNotNull(target);
 
     log.info("Discovering managed members of type: {}", type);

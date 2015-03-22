@@ -44,12 +44,19 @@ public class MBeanBuilder
 
   private String description;
 
+  private Descriptor descriptor;
+
   public MBeanBuilder(final String className) {
     this.className = checkNotNull(className);
   }
 
   public MBeanBuilder description(final String description) {
     this.description = description;
+    return this;
+  }
+
+  public MBeanBuilder descriptor(final Descriptor descriptor) {
+    this.descriptor = descriptor;
     return this;
   }
 
@@ -77,9 +84,6 @@ public class MBeanBuilder
     for (MBeanOperation operation : operations) {
       oinfos.add(operation.getInfo());
     }
-
-    // TODO: generate descriptor
-    Descriptor descriptor = null;
 
     // TODO: Sort out if we want to support ctor or notification muck
     MBeanConstructorInfo[] cinfos = {};
