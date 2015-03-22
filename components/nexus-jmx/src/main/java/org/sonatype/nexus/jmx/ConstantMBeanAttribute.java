@@ -116,7 +116,7 @@ public class ConstantMBeanAttribute
           null // descriptor
       );
 
-      log.info("Building attribute with info: {}", info);
+      log.trace("Building attribute with info: {}", info);
       return new ConstantMBeanAttribute(info, value);
     }
   }

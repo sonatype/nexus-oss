@@ -62,7 +62,7 @@ public class ReflectionMBeanBuilder
   public ReflectionMBeanBuilder discover() throws Exception {
     checkNotNull(target);
 
-    log.info("Discovering managed members of type: {}", type);
+    log.debug("Discovering managed members of type: {}", type);
 
     ManagedObject managedDescriptor = type.getAnnotation(ManagedObject.class);
     assert managedDescriptor != null;
@@ -77,7 +77,7 @@ public class ReflectionMBeanBuilder
         continue;
       }
 
-      log.info("Scanning for managed annotations on method: {}", method);
+      log.trace("Scanning for managed annotations on method: {}", method);
 
       ManagedAttribute attributeDescriptor = method.getAnnotation(ManagedAttribute.class);
       ManagedOperation operationDescriptor = method.getAnnotation(ManagedOperation.class);
@@ -94,7 +94,7 @@ public class ReflectionMBeanBuilder
       }
 
       if (attributeDescriptor != null) {
-        log.info("Processing attribute descriptor: {}", attributeDescriptor);
+        log.trace("Processing attribute descriptor: {}", attributeDescriptor);
 
         // add attribute
         String name = Strings.emptyToNull(attributeDescriptor.name());
@@ -126,16 +126,16 @@ public class ReflectionMBeanBuilder
         }
 
         if (getter) {
-          log.info("Found attribute getter: {} -> {}", name, method);
+          log.debug("Found attribute getter: {} -> {}", name, method);
           builder.getter(method);
         }
         else {
-          log.info("Found attribute setter: {} -> {}", name, method);
+          log.debug("Found attribute setter: {} -> {}", name, method);
           builder.setter(method);
         }
       }
       else {
-        log.info("Processing operation descriptor: {}", operationDescriptor);
+        log.trace("Processing operation descriptor: {}", operationDescriptor);
 
         // add operation
         String name = Strings.emptyToNull(operationDescriptor.name());
@@ -143,7 +143,7 @@ public class ReflectionMBeanBuilder
           name = method.getName();
         }
 
-        log.info("Found operation: {} -> {}", name, method);
+        log.debug("Found operation: {} -> {}", name, method);
         operation(new ReflectionMBeanOperation.Builder()
             .name(name)
             .target(target)

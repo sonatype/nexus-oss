@@ -93,8 +93,16 @@ public class ReflectionMBeanOperation
 
   @Override
   public Object invoke(final Object[] params) throws Exception {
-    log.info("Invoke: {} -> {}", Arrays.asList(params), method);
+    log.trace("Invoke: {} -> {}", Arrays.asList(params), method);
     return method.invoke(target(), params);
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "name='" + name + '\'' +
+        ", key=" + key +
+        '}';
   }
 
   //
@@ -160,7 +168,7 @@ public class ReflectionMBeanOperation
           DescriptorHelper.build(method)
       );
 
-      log.info("Building operation with info: {}", info);
+      log.trace("Building operation with info: {}", info);
       return new ReflectionMBeanOperation(info, target, method);
     }
 

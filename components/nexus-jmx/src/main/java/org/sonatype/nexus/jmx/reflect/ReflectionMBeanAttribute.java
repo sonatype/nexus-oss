@@ -90,7 +90,7 @@ public class ReflectionMBeanAttribute
   @Override
   public Object getValue() throws Exception {
     checkState(getter != null);
-    log.info("Get value: {}", getter);
+    log.trace("Get value: {}", getter);
     //noinspection ConstantConditions
     return getter.invoke(target());
   }
@@ -98,9 +98,16 @@ public class ReflectionMBeanAttribute
   @Override
   public void setValue(final Object value) throws Exception {
     checkState(setter != null);
-    log.info("Set value: {} -> {}", value, setter);
+    log.trace("Set value: {} -> {}", value, setter);
     //noinspection ConstantConditions
     setter.invoke(target(), value);
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "name='" + name + '\'' +
+        '}';
   }
 
   //
@@ -172,7 +179,7 @@ public class ReflectionMBeanAttribute
           ImmutableDescriptor.union(getterDescriptor, setterDescriptor)
       );
 
-      log.info("Building attribute with info: {}", info);
+      log.trace("Building attribute with info: {}", info);
       return new ReflectionMBeanAttribute(info, target, getter, setter);
     }
 

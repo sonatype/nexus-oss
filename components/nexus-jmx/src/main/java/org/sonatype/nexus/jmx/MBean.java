@@ -37,6 +37,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Dynamic MBean.
  *
+ * @see MBeanAttribute
+ * @see MBeanOperation
  * @since 3.0
  */
 public class MBean
@@ -79,6 +81,9 @@ public class MBean
     return attributes.values();
   }
 
+  /**
+   * Lookup attribute by name.
+   */
   private MBeanAttribute attribute(final String name) throws AttributeNotFoundException {
     checkNotNull(name);
     MBeanAttribute attribute = attributes.get(name);
@@ -92,9 +97,11 @@ public class MBean
     return operations.values();
   }
 
-  private MBeanOperation operation(final String name, final String[] types) throws ServiceNotFoundException {
-    checkNotNull(name);
-    OperationKey key = new OperationKey(name, types);
+  /**
+   * Lookup operation by key.
+   */
+  private MBeanOperation operation(final OperationKey key) throws ServiceNotFoundException {
+    checkNotNull(key);
     MBeanOperation operation = operations.get(key);
     if (operation == null) {
       throw new ServiceNotFoundException("Missing operation: " + key);
@@ -184,21 +191,22 @@ public class MBean
   private static final String[] EMPTY_SIGNATURE = new String[0];
 
   @Override
-  public Object invoke(final String actionName, @Nullable Object[] params, @Nullable String[] signature)
+  public Object invoke(final String name, @Nullable Object[] params, @Nullable String[] types)
       throws MBeanException, ReflectionException
   {
     if (params == null) {
       params = EMPTY_PARAMS;
     }
-    if (signature == null) {
-      signature = EMPTY_SIGNATURE;
+    if (types == null) {
+      types = EMPTY_SIGNATURE;
     }
 
+    OperationKey key = new OperationKey(name, types);
     try {
-      return operation(actionName, signature).invoke(params);
+      return operation(key).invoke(params);
     }
     catch (Exception e) {
-      log.warn("Failed to invoke operation: {}", new OperationKey(actionName, signature), e);
+      log.warn("Failed to invoke operation: {}", key, e);
 
       // TODO: Sort out the proper exception handling/wrapping
       Throwables.propagateIfPossible(e, MBeanException.class);
