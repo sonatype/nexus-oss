@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.jmx;
 
+import javax.annotation.Nullable;
 import javax.management.MBeanAttributeInfo;
 
 /**
@@ -23,11 +24,24 @@ import javax.management.MBeanAttributeInfo;
 public interface MBeanAttribute
   extends MBeanFeature
 {
+  /**
+   * Attribute information.
+   */
   MBeanAttributeInfo getInfo();
 
+  /**
+   * Attribute name.
+   */
   String getName();
 
+  /**
+   * Get the value of the attribute.
+   */
+  @Nullable
   Object getValue() throws Exception;
 
-  void setValue(Object value) throws Exception;
+  /**
+   * Set the value of the attribute.
+   */
+  void setValue(@Nullable Object value) throws Exception;
 }

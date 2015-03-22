@@ -72,10 +72,12 @@ public class ReflectionMBeanAttribute
     return target;
   }
 
+  @Nullable
   public Method getGetter() {
     return getter;
   }
 
+  @Nullable
   public Method getSetter() {
     return setter;
   }
@@ -87,6 +89,7 @@ public class ReflectionMBeanAttribute
   }
 
   @Override
+  @Nullable
   public Object getValue() throws Exception {
     checkState(getter != null);
     log.trace("Get value: {}", getter);
@@ -95,7 +98,7 @@ public class ReflectionMBeanAttribute
   }
 
   @Override
-  public void setValue(final Object value) throws Exception {
+  public void setValue(final @Nullable Object value) throws Exception {
     checkState(setter != null);
     log.trace("Set value: {} -> {}", value, setter);
     //noinspection ConstantConditions

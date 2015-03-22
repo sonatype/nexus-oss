@@ -21,5 +21,8 @@ import javax.management.MBeanFeatureInfo;
  */
 public interface MBeanFeature
 {
+  /**
+   * Feature information.
+   */
   MBeanFeatureInfo getInfo();
 }

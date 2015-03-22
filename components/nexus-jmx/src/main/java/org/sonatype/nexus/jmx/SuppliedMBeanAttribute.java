@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.jmx;
 
+import javax.annotation.Nullable;
 import javax.management.AttributeNotFoundException;
 import javax.management.Descriptor;
 import javax.management.MBeanAttributeInfo;
@@ -58,6 +59,7 @@ public class SuppliedMBeanAttribute
   }
 
   @Override
+  @Nullable
   public Object getValue() {
     return supplier.get();
   }

@@ -16,6 +16,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import javax.annotation.Nullable;
 import javax.management.Descriptor;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
@@ -91,6 +92,7 @@ public class ReflectionMBeanOperation
   }
 
   @Override
+  @Nullable
   public Object invoke(final Object[] params) throws Exception {
     log.trace("Invoke: {} -> {}", Arrays.asList(params), method);
     return method.invoke(target(), params);
