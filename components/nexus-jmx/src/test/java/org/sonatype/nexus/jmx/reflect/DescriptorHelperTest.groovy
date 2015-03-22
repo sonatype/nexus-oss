@@ -10,13 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.jmx
+package org.sonatype.nexus.jmx.reflect
 
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 /**
- * Tests for {@link DescriptorHelper}
+ * Tests for {@link org.sonatype.nexus.jmx.reflect.DescriptorHelper}
  */
 class DescriptorHelperTest
     extends TestSupport

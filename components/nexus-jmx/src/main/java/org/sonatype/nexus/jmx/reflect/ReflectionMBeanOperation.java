@@ -20,7 +20,6 @@ import javax.management.Descriptor;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 
-import org.sonatype.nexus.jmx.DescriptorHelper;
 import org.sonatype.nexus.jmx.MBeanOperation;
 import org.sonatype.nexus.jmx.OperationKey;
 import org.sonatype.sisu.goodies.common.ComponentSupport;

@@ -19,7 +19,6 @@ import javax.management.Descriptor;
 import javax.management.ImmutableDescriptor;
 import javax.management.MBeanAttributeInfo;
 
-import org.sonatype.nexus.jmx.DescriptorHelper;
 import org.sonatype.nexus.jmx.MBeanAttribute;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 

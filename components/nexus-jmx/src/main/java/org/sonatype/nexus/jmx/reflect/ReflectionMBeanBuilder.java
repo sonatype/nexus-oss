@@ -18,7 +18,6 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.jmx.DescriptorHelper;
 import org.sonatype.nexus.jmx.MBeanBuilder;
 import org.sonatype.nexus.jmx.ManagedAttribute;
 import org.sonatype.nexus.jmx.ManagedObject;
