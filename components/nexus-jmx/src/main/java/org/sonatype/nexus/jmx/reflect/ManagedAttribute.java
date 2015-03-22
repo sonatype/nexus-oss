@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.jmx;
+package org.sonatype.nexus.jmx.reflect;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

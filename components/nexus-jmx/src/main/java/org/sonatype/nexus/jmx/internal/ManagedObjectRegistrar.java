@@ -21,9 +21,9 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.sonatype.nexus.jmx.MBean;
-import org.sonatype.nexus.jmx.ManagedObject;
 import org.sonatype.nexus.jmx.ObjectNameEntry;
 import org.sonatype.nexus.jmx.SuppliedMBeanAttribute;
+import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.nexus.jmx.reflect.ReflectionMBeanBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 

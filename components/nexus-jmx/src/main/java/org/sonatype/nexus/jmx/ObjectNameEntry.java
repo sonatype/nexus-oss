@@ -19,6 +19,8 @@ import java.lang.annotation.Target;
 
 import javax.management.ObjectName;
 
+import org.sonatype.nexus.jmx.reflect.ManagedObject;
+
 /**
  * Key-value entry for {@link ObjectName} customization.
  *

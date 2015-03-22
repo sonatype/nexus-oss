@@ -16,8 +16,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.common.property.SystemPropertiesHelper;
-import org.sonatype.nexus.jmx.ManagedAttribute;
-import org.sonatype.nexus.jmx.ManagedObject;
+import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
+import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
