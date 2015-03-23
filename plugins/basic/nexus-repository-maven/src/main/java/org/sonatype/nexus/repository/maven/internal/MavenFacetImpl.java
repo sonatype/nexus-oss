@@ -149,7 +149,7 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
-  public BlobPayload get(final MavenPath path) throws IOException {
+  public MavenPayload get(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final Asset asset = findAsset(tx, tx.getBucket(), path);
       if (asset == null) {
@@ -166,7 +166,11 @@ public class MavenFacetImpl
         final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
         hashCodes.put(algorithm, hashCode);
       }
-      return new BlobPayload(blob, contentType, new DateTime(lastModifiedDate), hashCodes);
+      return new MavenPayload(
+          new BlobPayload(blob, contentType),
+          new DateTime(lastModifiedDate),
+          hashCodes
+      );
     }
   }
 

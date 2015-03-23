@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.view.payloads;
+package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,45 +32,69 @@ import org.joda.time.DateTime;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * {@link Blob} backed payload.
+ * Maven payload.
  *
  * @since 3.0
  */
-public class BlobPayload
+public class MavenPayload
     implements Payload
 {
-  private final Blob blob;
+  private final Payload payload;
 
-  private final String contentType;
+  private final DateTime lastModified;
 
-  public BlobPayload(final Blob blob,
-                     final @Nullable String contentType)
+  private final Map<HashAlgorithm, HashCode> hashes;
+
+  public MavenPayload(final Payload payload,
+                      final @Nullable DateTime lastModified,
+                      final @Nullable Map<HashAlgorithm, HashCode> hashes)
   {
-    this.blob = checkNotNull(blob);
-    this.contentType = contentType;
+    this.payload = checkNotNull(payload);
+    this.lastModified = lastModified;
+    final Map<HashAlgorithm, HashCode> hc = Maps.newLinkedHashMap();
+    if (hashes != null) {
+      hc.putAll(hashes);
+    }
+    this.hashes = ImmutableMap.copyOf(hc);
   }
 
   @Override
   public InputStream openInputStream() throws IOException {
-    return blob.getInputStream();
+    return payload.openInputStream();
   }
 
   @Override
   public long getSize() {
-    return blob.getMetrics().getContentSize();
+    return payload.getSize();
   }
 
   @Nullable
   @Override
   public String getContentType() {
-    return contentType;
+    return payload.getContentType();
+  }
+
+  @Nullable
+  public DateTime getLastModified() {
+    return lastModified;
+  }
+
+  @Nonnull
+  public Set<HashAlgorithm> getHashAlgorithms() {
+    return hashes.keySet();
+  }
+
+  @Nonnull
+  public Map<HashAlgorithm, HashCode> getHashCodes() {
+    return hashes;
   }
 
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "blob=" + blob +
-        ", contentType='" + contentType + '\'' +
+        "payload=" + payload +
+        ", lastModified='" + lastModified + '\'' +
+        ", hashes='" + hashes + '\'' +
         '}';
   }
 }
