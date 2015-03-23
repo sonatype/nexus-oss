@@ -19,6 +19,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 
@@ -42,12 +43,12 @@ public class MavenProxyFacet
   }
 
   @Override
-  protected Payload getCachedPayload(final Context context) throws IOException {
+  protected Content getCachedPayload(final Context context) throws IOException {
     return mavenFacet.get(mavenPath(context));
   }
 
   @Override
-  protected void store(final Context context, final Payload payload) throws IOException, InvalidContentException {
+  protected void store(final Context context, final Content payload) throws IOException, InvalidContentException {
     mavenFacet.put(mavenPath(context), payload);
   }
 

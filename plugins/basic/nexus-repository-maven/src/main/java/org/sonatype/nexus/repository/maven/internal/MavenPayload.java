@@ -12,16 +12,14 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 
 import com.google.common.collect.ImmutableMap;
@@ -29,54 +27,27 @@ import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Maven payload.
  *
  * @since 3.0
  */
 public class MavenPayload
-    implements Payload
+    extends Content
 {
-  private final Payload payload;
-
-  private final DateTime lastModified;
-
   private final Map<HashAlgorithm, HashCode> hashes;
 
   public MavenPayload(final Payload payload,
                       final @Nullable DateTime lastModified,
+                      final @Nullable String etag,
                       final @Nullable Map<HashAlgorithm, HashCode> hashes)
   {
-    this.payload = checkNotNull(payload);
-    this.lastModified = lastModified;
+    super(payload, lastModified, etag);
     final Map<HashAlgorithm, HashCode> hc = Maps.newLinkedHashMap();
     if (hashes != null) {
       hc.putAll(hashes);
     }
     this.hashes = ImmutableMap.copyOf(hc);
-  }
-
-  @Override
-  public InputStream openInputStream() throws IOException {
-    return payload.openInputStream();
-  }
-
-  @Override
-  public long getSize() {
-    return payload.getSize();
-  }
-
-  @Nullable
-  @Override
-  public String getContentType() {
-    return payload.getContentType();
-  }
-
-  @Nullable
-  public DateTime getLastModified() {
-    return lastModified;
   }
 
   @Nonnull
@@ -87,14 +58,5 @@ public class MavenPayload
   @Nonnull
   public Map<HashAlgorithm, HashCode> getHashCodes() {
     return hashes;
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "payload=" + payload +
-        ", lastModified='" + lastModified + '\'' +
-        ", hashes='" + hashes + '\'' +
-        '}';
   }
 }

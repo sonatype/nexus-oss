@@ -25,6 +25,7 @@ import com.sonatype.nexus.repository.nuget.internal.odata.ODataConsumer;
 
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
@@ -47,13 +48,18 @@ public class NugetProxyFacet
   }
 
   @Override
-  protected Payload getCachedPayload(final Context context) throws IOException {
+  protected Content getCachedPayload(final Context context) throws IOException {
     String[] coords = coords(context);
-    return gallery().get(coords[0], coords[1]);
+    Payload payload = gallery().get(coords[0], coords[1]);
+    if (payload != null) {
+      // TODO: get last-modified and etag
+      return new Content(payload, null, null);
+    }
+    return null;
   }
 
   @Override
-  protected Payload fetch(final Context context) throws IOException {
+  protected Content fetch(final Context context, final Content stale) throws IOException {
     // Here we override the default fetch behavior because we need to first fetch
     // the remote entry and cache it, then from that, determine the remote URL of
     // the actual package content, and get it.
@@ -80,11 +86,11 @@ public class NugetProxyFacet
     }
 
     // Request the remote package content and return it as a payload
-    return fetch(contentLocation.toString(), context);
+    return fetch(contentLocation.toString(), context, stale);
   }
 
   @Override
-  protected void store(final Context context, final Payload payload) throws IOException, InvalidContentException {
+  protected void store(final Context context, final Content payload) throws IOException, InvalidContentException {
     // The metadata will have been cached by this time, so we just need to set the content
     String[] coords = coords(context);
     try (InputStream in = payload.openInputStream()) {
