@@ -15,7 +15,6 @@ package org.sonatype.nexus.repository.httpbridge;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -24,25 +23,15 @@ import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
-import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Range;
-import com.google.common.hash.HashCode;
 import com.google.common.io.ByteStreams;
-import com.google.common.net.HttpHeaders;
-import org.apache.http.HttpStatus;
-import org.joda.time.DateTime;
-
-import static com.google.common.io.ByteStreams.limit;
 
 /**
  * Default {@link HttpResponseSender}.
@@ -79,27 +68,6 @@ public class DefaultHttpResponseSender
         }
         if (payload.getSize() != Payload.UNKNOWN_SIZE) {
           httpResponse.setContentLengthLong(payload.getSize());
-        }
-
-        if (payload instanceof BlobPayload) {
-          final BlobPayload decoratedPayload = (BlobPayload) payload;
-          final DateTime lastModified = decoratedPayload.getLastModified();
-          if (lastModified != null && !httpResponse.containsHeader(HttpHeaders.LAST_MODIFIED)) {
-            httpResponse.setDateHeader(
-                HttpHeaders.LAST_MODIFIED,
-                lastModified.getMillis()
-            );
-          }
-          final HashAlgorithm hashAlgorithm = Iterables.getFirst(decoratedPayload.getHashAlgorithms(), null);
-          if (hashAlgorithm != null) {
-            final HashCode hashCode = decoratedPayload.getHashCodes().get(hashAlgorithm);
-            if (hashCode != null && !httpResponse.containsHeader(HttpHeaders.ETAG)) {
-              httpResponse.setHeader(
-                  HttpHeaders.ETAG,
-                  hashCode.toString()
-              );
-            }
-          }
         }
 
         if (request != null && !HttpMethods.HEAD.equals(request.getAction())) {
