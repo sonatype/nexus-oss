@@ -18,7 +18,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import javax.inject.Named;
-import javax.inject.Qualifier;
 
 import org.sonatype.nexus.jmx.ObjectNameEntry;
 
@@ -31,7 +30,6 @@ import org.sonatype.nexus.jmx.ObjectNameEntry;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-@Qualifier
 public @interface ManagedObject
 {
   /**

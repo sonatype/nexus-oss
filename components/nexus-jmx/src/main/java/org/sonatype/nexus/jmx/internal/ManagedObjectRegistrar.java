@@ -13,8 +13,10 @@
 
 package org.sonatype.nexus.jmx.internal;
 
+import java.lang.annotation.Annotation;
 import java.util.Hashtable;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.management.MBeanServer;
@@ -56,26 +58,25 @@ public class ManagedObjectRegistrar
     checkNotNull(beanLocator);
     this.server = checkNotNull(server);
 
-    Key<Object> managedObjectKey = Key.get(Object.class, ManagedObject.class);
-    if (managedObjectKey.hasAttributes()) {
-      // workaround Guice 'feature' that upgrades annotation class with all default attributes to an instance
-      // we want the annotation class without attributes here to match against all @ManagedObject annotations
-      managedObjectKey = managedObjectKey.withoutAttributes();
-    }
-    beanLocator.watch(managedObjectKey, new ManageObjectMediator(), this);
+    beanLocator.watch(Key.get(Object.class), new ManageObjectMediator(), this);
   }
 
   private class ManageObjectMediator
-      implements Mediator<ManagedObject, Object, ManagedObjectRegistrar>
+      implements Mediator<Annotation, Object, ManagedObjectRegistrar>
   {
     @Override
-    public void add(final BeanEntry<ManagedObject, Object> entry, final ManagedObjectRegistrar watcher)
+    public void add(final BeanEntry<Annotation, Object> entry, final ManagedObjectRegistrar watcher)
         throws Exception
     {
+      ManagedObject descriptor = descriptor(entry);
+      if (descriptor == null) {
+        return;
+      }
+
       try {
-        ObjectName name = objectName(entry);
+        ObjectName name = objectName(descriptor, entry);
         log.info("Registering: {} -> {}", name, entry);
-        MBean mbean = mbean(entry);
+        MBean mbean = mbean(descriptor, entry);
         server.registerMBean(mbean, name);
       }
       catch (Exception e) {
@@ -84,11 +85,16 @@ public class ManagedObjectRegistrar
     }
 
     @Override
-    public void remove(final BeanEntry<ManagedObject, Object> entry, final ManagedObjectRegistrar watcher)
+    public void remove(final BeanEntry<Annotation, Object> entry, final ManagedObjectRegistrar watcher)
         throws Exception
     {
+      ManagedObject descriptor = descriptor(entry);
+      if (descriptor == null) {
+        return;
+      }
+
       try {
-        ObjectName name = objectName(entry);
+        ObjectName name = objectName(descriptor, entry);
         log.info("Un-registering: {} -> {}", name, entry);
         server.unregisterMBean(name);
       }
@@ -98,12 +104,17 @@ public class ManagedObjectRegistrar
     }
   }
 
+  @Nullable
+  private ManagedObject descriptor(final BeanEntry<Annotation, Object> entry) {
+    Class<?> type = entry.getImplementationClass();
+    return type.getAnnotation(ManagedObject.class);
+  }
+
   /**
    * Determine {@link ObjectName} for given {@link BeanEntry}.
    */
-  private ObjectName objectName(final BeanEntry<ManagedObject, Object> entry) throws Exception {
+  private ObjectName objectName(final ManagedObject descriptor, final BeanEntry<Annotation, Object> entry) throws Exception {
     Class<?> type = entry.getImplementationClass();
-    ManagedObject descriptor = type.getAnnotation(ManagedObject.class);
 
     // default domain to package if missing
     String domain = descriptor.domain();
@@ -145,9 +156,8 @@ public class ManagedObjectRegistrar
   /**
    * Construct mbean for given {@link BeanEntry} discovering its attributes and operations.
    */
-  private MBean mbean(final BeanEntry<ManagedObject, Object> entry) throws Exception {
+  private MBean mbean(final ManagedObject descriptor, final BeanEntry<Annotation, Object> entry) throws Exception {
     Class<?> type = entry.getImplementationClass();
-    ManagedObject managedDescriptor = type.getAnnotation(ManagedObject.class);
 
     ReflectionMBeanBuilder builder = new ReflectionMBeanBuilder(type);
 
@@ -161,7 +171,7 @@ public class ManagedObjectRegistrar
     });
 
     // allow custom description, or expose what sisu tells us
-    String description = Strings.emptyToNull(managedDescriptor.description());
+    String description = Strings.emptyToNull(descriptor.description());
     if (description == null) {
       description = entry.getDescription();
     }
