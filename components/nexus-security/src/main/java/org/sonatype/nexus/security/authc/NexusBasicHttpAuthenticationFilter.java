@@ -48,8 +48,6 @@ public class NexusBasicHttpAuthenticationFilter
     setApplicationName("Sonatype Nexus");
   }
 
-  // TODO: Should we build in browser detecting to avoid sending 401?
-
   /**
    * Always use permissive mode, which is needed for anonymous user support.
    */
@@ -99,6 +97,8 @@ public class NexusBasicHttpAuthenticationFilter
       else {
         // unauthenticated subject -> 401 inform to authenticate
         try {
+          // TODO: Should we build in browser detecting to avoid sending 401, should that be its own filter?
+
           onAccessDenied(request, response);
         }
         catch (Exception e) {
