@@ -33,7 +33,6 @@ import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 
-import com.google.common.eventbus.Subscribe;
 import com.google.common.hash.HashCode;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -61,12 +60,12 @@ public class MavenGroupFacet
     this.mavenFacet = getRepository().facet(MavenFacet.class);
   }
 
-  public BlobPayload getCachedMergedMetadata(final MavenPath mavenPath) throws IOException {
+  public MavenPayload getCachedMergedMetadata(final MavenPath mavenPath) throws IOException {
     return mavenFacet.get(mavenPath);
   }
 
-  public BlobPayload mergeAndCacheMetadata(final MavenPath mavenPath,
-                                           final LinkedHashMap<Repository, Response> responses) throws IOException
+  public MavenPayload mergeAndCacheMetadata(final MavenPath mavenPath,
+                                            final LinkedHashMap<Repository, Response> responses) throws IOException
   {
     checkArgument(!mavenPath.isHash(), "Only metadata can be merged and cached!");
     Payload mergedMetadata = null;
@@ -95,7 +94,7 @@ public class MavenGroupFacet
   private void cacheMergedMetadata(final MavenPath mavenPath, final Payload payload) throws IOException {
     // put the metadata and then put hashes
     mavenFacet.put(mavenPath, payload);
-    final BlobPayload blobPayload = mavenFacet.get(mavenPath);
+    final MavenPayload blobPayload = mavenFacet.get(mavenPath);
     final HashCode sha1HashCode = blobPayload.getHashCodes().get(HashAlgorithm.SHA1);
     mavenFacet.put(mavenPath.hash(HashType.SHA1), new StringPayload(sha1HashCode.toString(), "text/plain"));
     final HashCode md5HashCode = blobPayload.getHashCodes().get(HashAlgorithm.MD5);
