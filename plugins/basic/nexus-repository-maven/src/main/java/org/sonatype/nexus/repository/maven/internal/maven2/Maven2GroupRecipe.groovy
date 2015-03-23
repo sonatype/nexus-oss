@@ -27,6 +27,7 @@ import org.sonatype.nexus.repository.maven.internal.GroupMetadataHandler
 import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
 import org.sonatype.nexus.repository.maven.internal.MavenGroupFacet
+import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
@@ -72,6 +73,9 @@ class Maven2GroupRecipe
   Provider<MavenFacetImpl> mavenFacet
 
   @Inject
+  MavenHeadersHandler mavenHeadersHandler
+
+  @Inject
   GroupHandler groupHandler
 
   @Inject
@@ -112,6 +116,7 @@ class Maven2GroupRecipe
         .matcher(new MavenMetadataMatcher(pathParser))
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(mavenHeadersHandler)
         .handler(groupMetadataHandler)
         .create())
 
