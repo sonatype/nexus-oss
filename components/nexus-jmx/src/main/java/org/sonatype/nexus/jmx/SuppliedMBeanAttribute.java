@@ -91,6 +91,8 @@ public class SuppliedMBeanAttribute
 
     private String description;
 
+    private String type;
+
     private Supplier supplier;
 
     private Descriptor descriptor;
@@ -105,13 +107,28 @@ public class SuppliedMBeanAttribute
       return this;
     }
 
+    public Builder type(final String type) {
+      this.type = type;
+      return this;
+    }
+
+    public Builder type(final Class<?> type) {
+      this.type = type.getName();
+      return this;
+    }
+
     public Builder supplier(final Supplier supplier) {
       this.supplier = supplier;
       return this;
     }
 
-    public Builder value(final Object value) {
+    public Builder value(final @Nullable Object value) {
       this.supplier = Suppliers.ofInstance(value);
+
+      // auto-set type if we can
+      if (value != null) {
+        type(value.getClass());
+      }
       return this;
     }
 
@@ -124,9 +141,16 @@ public class SuppliedMBeanAttribute
       checkState(name != null);
       checkState(supplier != null);
 
+      // Determine type name, from configuration or resolve supplied object and use its type
+      if (type == null) {
+        Object value = supplier.get();
+        checkState(value != null, "Can not resolve type from supplier, value is null;  Configure type specifically");
+        type = value.getClass().getName();
+      }
+
       MBeanAttributeInfo info = new MBeanAttributeInfo(
           name,
-          supplier.get().getClass().getName(),
+          type,
           description,
           true, // readable
           false, // writable

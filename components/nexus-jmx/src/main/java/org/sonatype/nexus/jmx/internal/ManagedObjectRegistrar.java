@@ -49,25 +49,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ManagedObjectRegistrar
     extends ComponentSupport
 {
-  private final MBeanServer server;
-
   @Inject
   public ManagedObjectRegistrar(final BeanLocator beanLocator,
                                 final MBeanServer server)
   {
     checkNotNull(beanLocator);
-    this.server = checkNotNull(server);
+    checkNotNull(server);
 
-    beanLocator.watch(Key.get(Object.class), new ManageObjectMediator(), this);
+    beanLocator.watch(Key.get(Object.class), new ManageObjectMediator(), server);
   }
 
   private class ManageObjectMediator
-      implements Mediator<Annotation, Object, ManagedObjectRegistrar>
+      implements Mediator<Annotation, Object, MBeanServer>
   {
     @Override
-    public void add(final BeanEntry<Annotation, Object> entry, final ManagedObjectRegistrar watcher)
-        throws Exception
-    {
+    public void add(final BeanEntry<Annotation, Object> entry, final MBeanServer server) throws Exception {
       ManagedObject descriptor = descriptor(entry);
       if (descriptor == null) {
         return;
@@ -85,9 +81,7 @@ public class ManagedObjectRegistrar
     }
 
     @Override
-    public void remove(final BeanEntry<Annotation, Object> entry, final ManagedObjectRegistrar watcher)
-        throws Exception
-    {
+    public void remove(final BeanEntry<Annotation, Object> entry, final MBeanServer server) throws Exception {
       ManagedObject descriptor = descriptor(entry);
       if (descriptor == null) {
         return;
@@ -113,7 +107,9 @@ public class ManagedObjectRegistrar
   /**
    * Determine {@link ObjectName} for given {@link BeanEntry}.
    */
-  private ObjectName objectName(final ManagedObject descriptor, final BeanEntry<Annotation, Object> entry) throws Exception {
+  private ObjectName objectName(final ManagedObject descriptor, final BeanEntry<Annotation, Object> entry)
+      throws Exception
+  {
     Class<?> type = entry.getImplementationClass();
 
     // default domain to package if missing
@@ -182,6 +178,12 @@ public class ManagedObjectRegistrar
 
     // expose additional information we have about the bean
     builder.attribute(new SuppliedMBeanAttribute.Builder()
+            .name("sisu.entry")
+            .description("Sisu bean-entry")
+            .value(entry.toString())
+            .build()
+    );
+    builder.attribute(new SuppliedMBeanAttribute.Builder()
             .name("sisu.rank")
             .description("Sisu bean-rank")
             .value(entry.getRank())
@@ -190,7 +192,14 @@ public class ManagedObjectRegistrar
     builder.attribute(new SuppliedMBeanAttribute.Builder()
             .name("sisu.source")
             .description("Sisu bean-source")
-            .value(entry.getSource())
+            .value(entry.getSource().toString())
+            .build()
+    );
+    builder.attribute(new SuppliedMBeanAttribute.Builder()
+            .name("sisu.description")
+            .description("Sisu bean-description")
+            .type(String.class)
+            .value(entry.getDescription())
             .build()
     );
 
