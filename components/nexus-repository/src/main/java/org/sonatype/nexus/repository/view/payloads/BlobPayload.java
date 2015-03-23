@@ -43,27 +43,11 @@ public class BlobPayload
 
   private final String contentType;
 
-  private final DateTime lastModified;
-
-  private final Map<HashAlgorithm, HashCode> hashes;
-
-  public BlobPayload(final Blob blob, final @Nullable String contentType) {
-    this(blob, contentType, null, null);
-  }
-
   public BlobPayload(final Blob blob,
-                     final @Nullable String contentType,
-                     final @Nullable DateTime lastModified,
-                     final @Nullable Map<HashAlgorithm, HashCode> hashes)
+                     final @Nullable String contentType)
   {
     this.blob = checkNotNull(blob);
     this.contentType = contentType;
-    this.lastModified = lastModified;
-    final Map<HashAlgorithm, HashCode> hc = Maps.newLinkedHashMap();
-    if (hashes != null) {
-      hc.putAll(hashes);
-    }
-    this.hashes = ImmutableMap.copyOf(hc);
   }
 
   @Override
@@ -80,21 +64,6 @@ public class BlobPayload
   @Override
   public String getContentType() {
     return contentType;
-  }
-
-  @Nullable
-  public DateTime getLastModified() {
-    return lastModified;
-  }
-
-  @Nonnull
-  public Set<HashAlgorithm> getHashAlgorithms() {
-    return hashes.keySet();
-  }
-
-  @Nonnull
-  public Map<HashAlgorithm, HashCode> getHashCodes() {
-    return hashes;
   }
 
   @Override
