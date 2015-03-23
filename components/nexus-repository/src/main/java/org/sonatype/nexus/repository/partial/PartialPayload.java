@@ -35,6 +35,9 @@ class PartialPayload
 
   private final long partialSize;
 
+  /**
+   * The endpoints of the Range are interpreted as the first and last byte positions to send.
+   */
   public PartialPayload(final Payload payload, final Range<Long> rangeToSend) {
     this.payload = payload;
     this.rangeToSend = rangeToSend;
