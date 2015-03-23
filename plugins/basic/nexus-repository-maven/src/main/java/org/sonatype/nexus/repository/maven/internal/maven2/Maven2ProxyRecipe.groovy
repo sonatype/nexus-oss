@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.maven.internal.HostedHandler
 import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
+import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenProxyFacet
 import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
@@ -94,6 +95,9 @@ class Maven2ProxyRecipe
   VersionPolicyHandler versionPolicyHandler
 
   @Inject
+  MavenHeadersHandler mavenHeadersHandler
+
+  @Inject
   ProxyHandler proxyHandler
 
   @Inject
@@ -126,6 +130,7 @@ class Maven2ProxyRecipe
         .handler(securityHandler)
         .handler(negativeCacheHandler)
         .handler(versionPolicyHandler)
+        .handler(mavenHeadersHandler)
         .handler(proxyHandler)
         .create())
 
@@ -134,6 +139,7 @@ class Maven2ProxyRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(negativeCacheHandler)
+        .handler(mavenHeadersHandler)
         .handler(proxyHandler)
         .create())
 
