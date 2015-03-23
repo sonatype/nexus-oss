@@ -42,6 +42,8 @@ public @interface ManagedObject
    */
   String type() default "";
 
+  // TODO: add typeName or typeClass so we can get String and or Class here for convenience
+
   /**
    * Customized object-name 'name' entry.  If unset will default to {@link Named} value.
    */
