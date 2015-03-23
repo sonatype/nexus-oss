@@ -180,7 +180,7 @@ public class ManagedObjectRegistrar
     // discover managed members
     builder.discover();
 
-    // expose additinal information we have about the bean
+    // expose additional information we have about the bean
     builder.attribute(new SuppliedMBeanAttribute.Builder()
             .name("sisu.rank")
             .description("Sisu bean-rank")
