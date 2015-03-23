@@ -36,14 +36,12 @@ public abstract class AbstractSecurityTest
   @Override
   protected void customizeModules(List<Module> modules) {
     super.customizeModules(modules);
-    modules.add(new SecurityModule());
+    modules.add(new TestSecurityModule());
     modules.add(this);
   }
 
   @Override
   public void configure(final Binder binder) {
-    binder.install(new TestSecurityModule());
-
     binder.bind(SecurityConfigurationSource.class).annotatedWith(Names.named("default"))
         .toInstance(new PreconfiguredSecurityConfigurationSource(initialSecurityConfiguration()));
 
