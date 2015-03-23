@@ -71,7 +71,7 @@ public class ManagedObjectRegistrar
 
       try {
         ObjectName name = objectName(descriptor, entry);
-        log.info("Registering: {} -> {}", name, entry);
+        log.debug("Registering: {} -> {}", name, entry);
         MBean mbean = mbean(descriptor, entry);
         server.registerMBean(mbean, name);
       }
@@ -89,7 +89,7 @@ public class ManagedObjectRegistrar
 
       try {
         ObjectName name = objectName(descriptor, entry);
-        log.info("Un-registering: {} -> {}", name, entry);
+        log.debug("Un-registering: {} -> {}", name, entry);
         server.unregisterMBean(name);
       }
       catch (Exception e) {
