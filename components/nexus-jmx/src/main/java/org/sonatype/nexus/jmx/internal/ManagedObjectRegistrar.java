@@ -149,6 +149,7 @@ public class ManagedObjectRegistrar
       }
       else {
         // TODO: Consider inspecting @Typed?
+        // TODO: It would really be nice if we could infer the proper intf type of simple components, but this may be too complex?
         type = entry.getImplementationClass().getSimpleName();
       }
     }
@@ -162,10 +163,25 @@ public class ManagedObjectRegistrar
   private String name(final ManagedObject descriptor, final BeanEntry<Annotation, Object> entry) {
     String name = Strings.emptyToNull(descriptor.name());
     if (name == null) {
-      // default to binding-name if present
-      Named named = entry.getImplementationClass().getAnnotation(Named.class);
-      if (named != null) {
-        name = Strings.emptyToNull(named.value());
+      Class<?> type = entry.getImplementationClass();
+
+      // use @Named entry-key if possible, this will be filled in by sisu
+      if (entry.getKey() instanceof Named) {
+        Named named = (Named) entry.getKey();
+
+        // if named-value is NOT the same as the impl-type-name then use it
+        // ie. if org.sonatype.nexus.FooImpl == org.sonatype.nexus.FooImpl, then leave name as null
+        if (!type.getName().equals(named.value())) {
+          name = Strings.emptyToNull(named.value());
+        }
+      }
+
+      // else lookup @Named directly unable to determine from entry-key
+      if (name == null) {
+        Named named = entry.getImplementationClass().getAnnotation(Named.class);
+        if (named != null) {
+          name = Strings.emptyToNull(named.value());
+        }
       }
     }
     return name;
