@@ -49,13 +49,13 @@ import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.St
 @Singleton
 @ManagedObject(
     domain = "org.sonatype.nexus.repository.manager",
+    typeClass = RepositoryManager.class,
     description = "Repository manager"
 )
 public class RepositoryManagerImpl
     extends StateGuardLifecycleSupport
     implements RepositoryManager
 {
-
   /**
    * System property used to bypass installation of default repositories; useful for testing purposes.
    */

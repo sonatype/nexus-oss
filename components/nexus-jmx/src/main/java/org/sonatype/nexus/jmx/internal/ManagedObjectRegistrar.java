@@ -127,26 +127,48 @@ public class ManagedObjectRegistrar
     }
 
     // set object-name 'type'
-    String otype = Strings.emptyToNull(descriptor.type());
-    if (otype == null) {
-      otype = type.getSimpleName();
-    }
-    entries.put("type", otype);
+    entries.put("type", type(descriptor, entry));
 
     // optionally set object-name 'name'
-    String oname = Strings.emptyToNull(descriptor.name());
-    if (oname == null) {
-      // default to binding-name if present
-      Named name = type.getAnnotation(Named.class);
-      if (name != null) {
-        oname = Strings.emptyToNull(name.value());
-      }
-    }
-    if (oname != null) {
-      entries.put("name", oname);
+    String name = name(descriptor, entry);
+    if (name != null) {
+      entries.put("name", name);
     }
 
     return new ObjectName(domain, entries);
+  }
+
+  /**
+   * Determine object-name 'type' value.
+   */
+  private String type(final ManagedObject descriptor, final BeanEntry<Annotation, Object> entry) {
+    String type = Strings.emptyToNull(descriptor.type());
+    if (type == null) {
+      if (descriptor.typeClass() != null && descriptor.typeClass() != Void.class /*default*/) {
+        type = descriptor.typeClass().getSimpleName();
+      }
+      else {
+        // TODO: Consider inspecting @Typed?
+        type = entry.getImplementationClass().getSimpleName();
+      }
+    }
+    return type;
+  }
+
+  /**
+   * Determine object-name 'name' value.
+   */
+  @Nullable
+  private String name(final ManagedObject descriptor, final BeanEntry<Annotation, Object> entry) {
+    String name = Strings.emptyToNull(descriptor.name());
+    if (name == null) {
+      // default to binding-name if present
+      Named named = entry.getImplementationClass().getAnnotation(Named.class);
+      if (named != null) {
+        name = Strings.emptyToNull(named.value());
+      }
+    }
+    return name;
   }
 
   /**

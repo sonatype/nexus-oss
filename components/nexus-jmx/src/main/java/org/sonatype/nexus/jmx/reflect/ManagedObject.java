@@ -33,19 +33,32 @@ import org.sonatype.nexus.jmx.ObjectNameEntry;
 public @interface ManagedObject
 {
   /**
-   * Customized object-name domain.  If unset will default to the package-name of the component.
+   * Customized object-name domain.
+   *
+   * If unset will default to the package-name of the component.
    */
   String domain() default "";
 
   /**
-   * Customized object-name 'type' entry.  If unset will default to simple-name of component class.
+   * Customized object-name 'type' entry.
+   *
+   * If unset will consider {@link #typeClass} or default to simple-name of component class.
+   *
+   * @see #typeClass
    */
   String type() default "";
 
-  // TODO: add typeName or typeClass so we can get String and or Class here for convenience
+  /**
+   * Customized object-name 'type' entry, class-reference form.
+   *
+   * @see #type
+   */
+  Class<?> typeClass() default Void.class;
 
   /**
-   * Customized object-name 'name' entry.  If unset will default to {@link Named} value.
+   * Customized object-name 'name' entry.
+   *
+   * If unset will default to {@link Named} value.
    */
   String name() default "";
 
