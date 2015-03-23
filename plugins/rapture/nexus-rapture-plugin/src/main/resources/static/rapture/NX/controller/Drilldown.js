@@ -189,7 +189,12 @@ Ext.define('NX.controller.Drilldown', {
     var me = this,
       bookmark = NX.Bookmarks.getBookmark().getSegments();
 
-    me.loadStoreAtIndex(0, bookmark, cb);
+    try {
+      me.loadStoreAtIndex(0, bookmark, cb);
+    }
+    catch (e) {
+      me.logDebug('Cannot load store: ' + e.message);
+    }
   },
 
   /**
