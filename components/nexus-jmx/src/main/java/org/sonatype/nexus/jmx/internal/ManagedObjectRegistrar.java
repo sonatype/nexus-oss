@@ -200,9 +200,9 @@ public class ManagedObjectRegistrar
 
     // expose additional information we have about the bean
     builder.attribute(new SuppliedMBeanAttribute.Builder()
-            .name("sisu.entry")
-            .description("Sisu bean-entry")
-            .value(entry.toString())
+            .name("sisu.key")
+            .description("Sisu bean-key")
+            .value(entry.getKey().toString())
             .build()
     );
     builder.attribute(new SuppliedMBeanAttribute.Builder()
