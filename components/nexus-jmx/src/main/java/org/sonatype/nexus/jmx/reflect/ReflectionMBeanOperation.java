@@ -91,6 +91,8 @@ public class ReflectionMBeanOperation
     return result;
   }
 
+  // TODO: coercion for non-open types?
+
   @Override
   @Nullable
   public Object invoke(final Object[] params) throws Exception {

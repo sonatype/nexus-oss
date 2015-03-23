@@ -58,6 +58,8 @@ public class SuppliedMBeanAttribute
     return name;
   }
 
+  // TODO: coercion for non-open types?
+
   @Override
   @Nullable
   public Object getValue() {

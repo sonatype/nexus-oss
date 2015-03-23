@@ -88,6 +88,8 @@ public class ReflectionMBeanAttribute
     return result;
   }
 
+  // TODO: coercion for non-open types?
+
   @Override
   @Nullable
   public Object getValue() throws Exception {
