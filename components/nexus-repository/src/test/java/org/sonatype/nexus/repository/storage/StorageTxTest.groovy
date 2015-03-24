@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.storage
 
 import com.orientechnologies.orient.core.id.ORID
+import com.tinkerpop.blueprints.Direction
 import com.tinkerpop.blueprints.Vertex
 import com.tinkerpop.blueprints.impls.orient.OrientVertex
 import org.junit.Test
@@ -288,6 +289,86 @@ extends TestSupport
     def underTest = new StorageTxImpl(blobTx, graphTx, bucketId, WritePolicy.ALLOW)
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
     verify(asset, times(1)).blobRef(newBlobRef)
+  }
+
+  /**
+   * Given:
+   * - a bucket with components and assets
+   * - DENY write policy
+   * When:
+   * - deleting bucket
+   * Then:
+   * - no exception is thrown
+   * - blobs are deleted
+   */
+  @Test
+  void 'deleting bucket pass when DENY write policy'() {
+    deleteBucketWhenWritePolicy(WritePolicy.DENY)
+  }
+
+  /**
+   * Given:
+   * - a bucket with components and assets
+   * - ALLOW write policy
+   * When:
+   * - deleting bucket
+   * Then:
+   * - no exception is thrown
+   * - blobs are deleted
+   */
+  @Test
+  void 'deleting bucket pass when ALLOW write policy'() {
+    deleteBucketWhenWritePolicy(WritePolicy.ALLOW)
+  }
+
+  /**
+   * Given:
+   * - a bucket with components and assets
+   * - ALLOW_ONCE write policy
+   * When:
+   * - deleting bucket
+   * Then:
+   * - no exception is thrown
+   * - blobs are deleted
+   */
+  @Test
+  void 'deleting bucket pass when ALLOW_ONCE write policy'() {
+    deleteBucketWhenWritePolicy(WritePolicy.ALLOW_ONCE)
+  }
+
+  /**
+   * Given:
+   * - a bucket with components and assets
+   * - no (NULL) write policy
+   * When:
+   * - deleting bucket
+   * Then:
+   * - no exception is thrown
+   * - blobs are deleted
+   */
+  @Test
+  void 'deleting bucket pass when NULL write policy'() {
+    deleteBucketWhenWritePolicy(null)
+  }
+
+  void deleteBucketWhenWritePolicy(final WritePolicy writePolicy) {
+    Bucket bucket = mock(Bucket)
+    OrientVertex a1Vertex = mock(OrientVertex)
+    when(a1Vertex.getProperty(StorageFacet.P_ATTRIBUTES)).thenReturn([:])
+    when(a1Vertex.getProperty(StorageFacet.P_BLOB_REF)).thenReturn(new BlobRef('test', 'test', 'b1').toString())
+    OrientVertex a2Vertex = mock(OrientVertex)
+    when(a2Vertex.getProperty(StorageFacet.P_ATTRIBUTES)).thenReturn([:])
+    when(a2Vertex.getProperty(StorageFacet.P_BLOB_REF)).thenReturn(new BlobRef('test', 'test', 'b2').toString())
+    OrientVertex c1Vertex = mock(OrientVertex)
+    when(c1Vertex.getProperty(StorageFacet.P_ATTRIBUTES)).thenReturn([:])
+    when(c1Vertex.getVertices(Direction.IN, StorageFacet.E_PART_OF_COMPONENT)).thenReturn([a1Vertex])
+    OrientVertex bucketVertex = mock(OrientVertex)
+    when(bucket.vertex()).thenReturn(bucketVertex)
+    when(bucketVertex.getVertices(Direction.OUT, StorageFacet.E_OWNS_COMPONENT)).thenReturn([c1Vertex])
+    when(bucketVertex.getVertices(Direction.OUT, StorageFacet.E_OWNS_ASSET)).thenReturn([a2Vertex])
+    new StorageTxImpl(blobTx, graphTx, bucketId, writePolicy).deleteBucket(bucket)
+    verify(blobTx, times(1)).delete(new BlobRef('test', 'test', 'b1'))
+    verify(blobTx, times(1)).delete(new BlobRef('test', 'test', 'b2'))
   }
 
 }
