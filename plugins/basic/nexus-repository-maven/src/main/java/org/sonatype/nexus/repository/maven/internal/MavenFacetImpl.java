@@ -286,7 +286,7 @@ public class MavenFacetImpl
     if (payload instanceof Content) {
       Content content = (Content) payload;
       if (content.getLastModified() != null) {
-        formatAttributes.set(P_CONTENT_LAST_MODIFIED, content.getLastModified());
+        formatAttributes.set(P_CONTENT_LAST_MODIFIED, content.getLastModified().toDate());
       }
       if (content.getETag() != null) {
         formatAttributes.set(P_CONTENT_ETAG, content.getETag());
