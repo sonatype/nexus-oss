@@ -84,6 +84,8 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
 
 /**
+ * A group-aware implementation of a hosted {@link} NugetGalleryFacet.
+ *
  * @since 3.0
  */
 @Named("local")
@@ -115,16 +117,21 @@ public class NugetGalleryFacetImpl
     storage = null;
   }
 
-  //@Override
+  @Override
   @Guarded(by = STARTED)
   public int count(final String operation, final Map<String, String> query) {
     log.debug("Count: " + query);
 
+    return count(operation, query, getRepositories());
+  }
+
+  protected int count(final String operation, final Map<String, String> query,
+                      final Iterable<Repository> repositories)
+  {
     final ComponentQuery componentQuery = ODataUtils.query(query, true);
 
     try (StorageTx storageTx = openStorageTx()) {
-
-      int count = executeCount(componentQuery, storageTx);
+      int count = executeCount(componentQuery, storageTx, repositories);
 
       final Integer skip = parseSkip(query.get("$skip"));
       if (null != skip && skip >= 0) {
@@ -142,7 +149,7 @@ public class NugetGalleryFacetImpl
     }
   }
 
-  //@Override
+  @Override
   @Guarded(by = STARTED)
   public String feed(final String base, final String operation, final Map<String, String> query) {
     log.debug("Select: " + query);
@@ -167,7 +174,7 @@ public class NugetGalleryFacetImpl
 
       // NXCM-4502 add inlinecount only if requested
       if (inlineCountRequested(query)) {
-        int inlineCount = executeCount(componentCountQuery, storageTx);
+        int inlineCount = executeCount(componentCountQuery, storageTx, getRepositories());
         xml.append(interpolateTemplate(ODataTemplates.NUGET_INLINECOUNT,
             ImmutableMap.of("COUNT", String.valueOf(inlineCount))
         ));
@@ -361,7 +368,7 @@ public class NugetGalleryFacetImpl
 
   @VisibleForTesting
   Component createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata,
-                                     final InputStream packageStream)
+                                  final InputStream packageStream)
   {
     final Bucket bucket = storageTx.getBucket();
     final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
@@ -578,8 +585,10 @@ public class NugetGalleryFacetImpl
     return InlineCount.ALLPAGES.equals(parseInlineCount(query.get("$inlinecount")));
   }
 
-  private int executeCount(final ComponentQuery query, final StorageTx storageTx) {
-    return (int) storageTx.countComponents(query.getWhere(), query.getParameters(), getRepositories(),
+  private int executeCount(final ComponentQuery query, final StorageTx storageTx,
+                           final Iterable<Repository> repositories)
+  {
+    return (int) storageTx.countComponents(query.getWhere(), query.getParameters(), repositories,
         query.getQuerySuffix());
   }
 

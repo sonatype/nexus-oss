@@ -14,6 +14,7 @@ package com.sonatype.nexus.repository.nuget.internal.proxy;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacet;
 import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacetImpl;
 import com.sonatype.nexus.repository.nuget.internal.NugetWritableGallery;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataConsumer;
@@ -48,10 +50,11 @@ import org.apache.http.client.utils.URIBuilder;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Objects.equal;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Math.min;
 
 /**
- * A proxying nuget gallery facet.
+ * A group-aware proxying {@link NugetGalleryFacet}.
  *
  * @since 3.0
  */
@@ -87,6 +90,19 @@ public class NugetProxyGalleryFacet
         .expireAfterWrite(cacheItemMaxAgeSeconds, TimeUnit.SECONDS)
         .build();
   }
+
+  @Override
+  public int count(final String operation, final Map<String, String> parameters) {
+
+    final List<Integer> remoteCounts = passQueryToRemoteRepos(nugetQuery(operation, parameters),
+        getProxyRepositories(),
+        new CountFetcher(fetcher));
+
+    final int hostedCount = super.count(operation, parameters, getHostedRepositories());
+
+    return sum(remoteCounts) + hostedCount;
+  }
+
 
   @Override
   public String feed(final String base, final String operation, final Map<String, String> query) {
@@ -125,12 +141,6 @@ public class NugetProxyGalleryFacet
     // TODO: refactor the 'feed' method so that XML generation is an outer step that uses a data structure
     // then we can invoke the inner thing, tweak 'inline count' and go, instead of search/replacing
     return feedXml.replaceFirst("<m:count>\\d*</m:count>", "<m:count>" + reportedCount + "</m:count>");
-  }
-
-  @Override
-  public int count(final String operation, final Map<String, String> parameters) {
-    // Remove the leading slash
-    return passQueryToRemoteRepo(nugetQuery(operation, parameters), new CountFetcher(fetcher));
   }
 
   @Override
@@ -175,31 +185,41 @@ public class NugetProxyGalleryFacet
     }
   }
 
+  // TODO: Delete this as soon as this class is fully group-aware
+  @Deprecated
+  private int passQueryToRemoteRepo(final URI path, final RemoteCallFactory remoteCall)
+  {
+    return passQueryToRemoteRepos(path, Collections.singletonList(getRepository()), remoteCall).get(0);
+  }
+
   /**
    * Determines which of the repository IDs correspond to remote proxies, and queries (or populates) the count cache
    * using the supplied {@link RemoteCallFactory}.
    *
-   * @return the package count from the remote repo
+   * @return successfully returned counts, which might have fewer entries than repositories.size (or none at all)
    */
-  private int passQueryToRemoteRepo(final URI path, final RemoteCallFactory remoteCall)
+  private List<Integer> passQueryToRemoteRepos(final URI path, final Iterable<Repository> repositories,
+                                               final RemoteCallFactory remoteCall)
   {
-    final Repository repo = getRepository();
+    final List<Integer> counts = new ArrayList<>();
 
-    try {
-      // TODO: Determine if we should talk to the remote based on its status
+    for (Repository repo : repositories) {
+      try {
+        // TODO: Determine if we should talk to the remote based on its status
 
-      final QueryCacheKey key = new QueryCacheKey(repo.getName(), path);
-      final Integer cachedCount = cache.get(key, remoteCall.build(repo, path));
-      return cachedCount;
+        final QueryCacheKey key = new QueryCacheKey(repo.getName(), path);
+        final Integer cachedCount = cache.get(key, remoteCall.build(repo, path));
+        counts.add(cachedCount);
+      }
+      catch (ExecutionException | UncheckedExecutionException e) {
+        log.warn("{} attempting to contact proxied repository {}.", e.getCause().getClass().getSimpleName(),
+            repo.getName());
+      }
+      catch (Exception e) {
+        log.warn("{} attempting to contact proxied repository {}.", e.getClass().getSimpleName(), repo.getName());
+      }
     }
-    catch (ExecutionException | UncheckedExecutionException e) {
-      log.warn("{} attempting to contact proxied repository {}.", e.getCause().getClass().getSimpleName(),
-          repo.getName());
-    }
-    catch (Exception e) {
-      log.warn("{} attempting to contact proxied repository {}.", e.getClass().getSimpleName(), repo.getName());
-    }
-    return 0;
+    return counts;
   }
 
   @Nullable
@@ -226,6 +246,14 @@ public class NugetProxyGalleryFacet
 
     final Integer integer = asInteger(matcher.group(1));
     return integer == null ? 0 : integer;
+  }
+
+  private int sum(Iterable<Integer> values) {
+    int total = 0;
+    for (final Integer i : values) {
+      total += checkNotNull(i);
+    }
+    return total;
   }
 
 
@@ -298,7 +326,6 @@ public class NugetProxyGalleryFacet
       };
     }
   }
-
 
   private static class QueryCacheKey
   {
