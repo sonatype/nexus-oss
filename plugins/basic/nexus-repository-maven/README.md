@@ -45,6 +45,7 @@ Use this config to create Maven proxy repository, use name `maven2-proxy` (or as
       "retries" : 3
     },
     "authentication" : {
+        "type" : "username",
         "username" : "admin",
         "password" : "admin123"
     }
@@ -55,6 +56,11 @@ Use this config to create Maven proxy repository, use name `maven2-proxy` (or as
 Group "maven2-group":
 ```
 {
+  "maven" : {
+    "versionPolicy" : "MIXED",
+    "checksumPolicy" : "WARN",
+    "strictContentTypeValidation" : false
+  },
   "group" : {
     "memberNames" : ["maven2-hosted", "maven2-proxy"]
   }
