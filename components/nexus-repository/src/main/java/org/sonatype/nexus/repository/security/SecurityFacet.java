@@ -27,7 +27,7 @@ public interface SecurityFacet
   extends Facet
 {
   /**
-   * Ensure the given request is permitted on the the repository.
+   * Ensure the given request is permitted on the repository.
    *
    * @throws AuthorizationException
    */
