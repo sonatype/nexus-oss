@@ -360,13 +360,13 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-repository-raw</artifactId>
+        <artifactId>nexus-repository-maven</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-repository-simple</artifactId>
+        <artifactId>nexus-repository-raw</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 

@@ -40,9 +40,4 @@ public interface AnonymousManager
    * Build anonymous subject.
    */
   Subject buildSubject();
-
-  /**
-   * Check if given subject is anonymous.
-   */
-  boolean isAnonymous(Subject subject);
 }

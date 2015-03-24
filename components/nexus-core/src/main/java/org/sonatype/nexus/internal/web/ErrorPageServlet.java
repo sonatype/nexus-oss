@@ -31,6 +31,8 @@ import org.sonatype.nexus.web.WebUtils;
 
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -47,6 +49,8 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 public class ErrorPageServlet
     extends HttpServlet
 {
+  private static final Logger log = LoggerFactory.getLogger(ErrorPageServlet.class);
+
   /**
    * @since 3.0
    */
@@ -176,9 +180,12 @@ public class ErrorPageServlet
   }
 
   /**
+   * Attach exception details to request.
+   *
    * @since 3.0
    */
   static void attachCause(final HttpServletRequest request, final Throwable cause) {
+    log.debug("Attaching cause", cause);
     request.setAttribute(ERROR_EXCEPTION_TYPE, cause.getClass());
     request.setAttribute(ERROR_EXCEPTION, cause);
   }

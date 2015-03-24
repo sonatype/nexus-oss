@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class SnapshotRemovalTask
-    extends RepositoryTaskSupport<SnapshotRemovalResult>
+    extends RepositoryTaskSupport
 {
   public static final int DEFAULT_MIN_SNAPSHOTS_TO_KEEP = 0;
 

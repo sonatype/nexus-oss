@@ -29,7 +29,7 @@
       <table border="1" cellpadding="10">
         <thead>
         <tr>
-          <th>Key</th>
+          <th width="33%">Key</th>
           <th>Value</th>
         </tr>
         </thead>

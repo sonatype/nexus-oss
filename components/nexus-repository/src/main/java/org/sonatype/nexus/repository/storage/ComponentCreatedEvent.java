@@ -24,7 +24,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 public class ComponentCreatedEvent
   extends ComponentEvent
 {
-  public ComponentCreatedEvent(final OrientVertex vertex, final Repository repository) {
-    super(vertex, repository);
+  public ComponentCreatedEvent(final Component component, final Repository repository) {
+    super(component, repository);
   }
 }

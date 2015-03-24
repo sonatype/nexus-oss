@@ -79,16 +79,16 @@ public class MergeMetadataTaskIT
     return repoRegistry;
   }
 
-  private List<TaskInfo<?>> createRunningTaskForGroups(final String... groupIds) {
-    final List<TaskInfo<?>> taskList = Lists.newArrayList();
+  private List<TaskInfo> createRunningTaskForGroups(final String... groupIds) {
+    final List<TaskInfo> taskList = Lists.newArrayList();
     for (final String groupId : groupIds) {
       taskList.add(runningTask(groupId));
     }
     return taskList;
   }
 
-  private TaskInfo<?> runningTask(final String repoId) {
-    final TaskInfo<?> task = mock(TaskInfo.class);
+  private TaskInfo runningTask(final String repoId) {
+    final TaskInfo task = mock(TaskInfo.class);
     final TaskConfiguration taskConfiguration = new TaskConfiguration();
     taskConfiguration.setId("foo");
     taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());

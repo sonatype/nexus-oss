@@ -41,8 +41,6 @@ public class NexusBasicHttpAuthenticationFilter
     setApplicationName("Sonatype Nexus");
   }
 
-  // TODO: Should we default to permissive?  And if so, what implications does this have?
-
   // TODO: Should we build in browser detecting to avoid sending 401?
 
   @Override
@@ -55,5 +53,13 @@ public class NexusBasicHttpAuthenticationFilter
     request.setAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
 
     return super.onPreHandle(request, response, mappedValue);
+  }
+
+  /**
+   * Default to permissive mode, which is needed for anonymous user support.
+   */
+  @Override
+  protected boolean isPermissive(final Object mappedValue) {
+    return true;
   }
 }

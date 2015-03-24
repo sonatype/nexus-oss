@@ -32,9 +32,9 @@ import com.google.common.collect.Lists;
  */
 @Named
 public class UpdateSiteMirrorTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
 {
-  public static TaskInfo<Void> submit(final TaskScheduler scheduler,
+  public static TaskInfo submit(final TaskScheduler scheduler,
                                       final UpdateSiteProxyRepository updateSite,
                                       final boolean force)
   {

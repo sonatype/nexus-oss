@@ -46,7 +46,7 @@ public abstract class AbstractSecurityTest
 
   @Override
   public void configure(final Binder binder) {
-    binder.install(new SecurityModule());
+    binder.install(new TestSecurityModule());
 
     RealmConfiguration realmConfiguration = new RealmConfiguration();
     realmConfiguration.setRealmNames(Arrays.asList(

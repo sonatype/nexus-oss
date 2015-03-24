@@ -17,13 +17,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
+import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -38,17 +41,17 @@ import com.google.common.io.ByteStreams;
 @Named
 @Singleton
 public class DefaultHttpResponseSender
-  extends ComponentSupport
-  implements HttpResponseSender
+    extends ComponentSupport
+    implements HttpResponseSender
 {
   @Override
-  public void send(final Response response, final HttpServletResponse httpResponse)
+  public void send(final @Nullable Request request, final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
     log.trace("Sending response: {}", response);
 
     // add response headers
-    for (Map.Entry<String,String> header : response.getHeaders()) {
+    for (Map.Entry<String, String> header : response.getHeaders()) {
       httpResponse.addHeader(header.getKey(), header.getValue());
     }
 
@@ -57,16 +60,20 @@ public class DefaultHttpResponseSender
     if (status.isSuccessful() || response instanceof PayloadResponse) {
       httpResponse.setStatus(status.getCode());
       if (response instanceof PayloadResponse) {
-        Payload payload = ((PayloadResponse)response).getPayload();
+        Payload payload = ((PayloadResponse) response).getPayload();
         log.trace("Attaching payload: {}", payload);
 
         if (payload.getContentType() != null) {
           httpResponse.setContentType(payload.getContentType());
         }
-        httpResponse.setContentLengthLong(payload.getSize());
+        if (payload.getSize() != Payload.UNKNOWN_SIZE) {
+          httpResponse.setContentLengthLong(payload.getSize());
+        }
 
-        try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
-          ByteStreams.copy(input, output);
+        if (request != null && !HttpMethods.HEAD.equals(request.getAction())) {
+          try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
+            ByteStreams.copy(input, output);
+          }
         }
       }
     }

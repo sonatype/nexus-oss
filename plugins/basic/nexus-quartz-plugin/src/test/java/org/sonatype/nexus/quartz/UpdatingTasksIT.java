@@ -51,7 +51,7 @@ public class UpdatingTasksIT
     final TaskConfiguration taskConfiguration = taskScheduler
         .createTaskConfigurationInstance(SleeperTask.class);
     taskConfiguration.setString(SleeperTask.RESULT_KEY, "first");
-    TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Manual());
+    TaskInfo taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Manual());
 
     assertThat(taskInfo, notNullValue());
     assertThat(taskInfo.getId(), equalTo(taskConfiguration.getId()));
@@ -60,7 +60,7 @@ public class UpdatingTasksIT
     assertThat(taskInfo.getConfiguration().getCreated(), notNullValue());
     assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
 
-    final CurrentState<String> currentState = taskInfo.getCurrentState();
+    final CurrentState currentState = taskInfo.getCurrentState();
     assertThat(currentState, notNullValue());
     assertThat(currentState.getState(), equalTo(State.WAITING));
     assertThat(currentState.getRunState(), nullValue());
@@ -92,7 +92,7 @@ public class UpdatingTasksIT
     final TaskConfiguration taskConfiguration = taskScheduler
         .createTaskConfigurationInstance(SleeperTask.class);
     taskConfiguration.setString(SleeperTask.RESULT_KEY, "first");
-    TaskInfo<String> taskInfo = taskScheduler.submit(taskConfiguration);
+    TaskInfo taskInfo = taskScheduler.submit(taskConfiguration);
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -105,13 +105,13 @@ public class UpdatingTasksIT
     assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
     assertThat(taskScheduler.getRunningTaskCount(), equalTo(1));
 
-    final CurrentState<String> currentState = taskInfo.getCurrentState();
+    final CurrentState currentState = taskInfo.getCurrentState();
     assertThat(currentState, notNullValue());
     assertThat(currentState.getState(), equalTo(State.RUNNING));
     assertThat(currentState.getRunState(), equalTo(RunState.RUNNING));
     assertThat(currentState.getRunStarted(), notNullValue());
     assertThat(currentState.getRunStarted().getTime(), lessThan(System.currentTimeMillis()));
-    final Future<String> future = currentState.getFuture();
+    final Future<?> future = currentState.getFuture();
     assertThat(future, notNullValue());
 
     // update it
@@ -129,7 +129,7 @@ public class UpdatingTasksIT
     Thread.yield();
 
     // and block for the result
-    final String result = future.get();
+    final String result = (String) future.get();
     assertThat(result, equalTo("first"));
     // taskInfo for DONE task is terminal
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.DONE));

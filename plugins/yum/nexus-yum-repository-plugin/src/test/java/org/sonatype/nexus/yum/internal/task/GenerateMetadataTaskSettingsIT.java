@@ -193,11 +193,11 @@ public class GenerateMetadataTaskSettingsIT
     return repoRegistry;
   }
 
-  private List<TaskInfo<?>> asList(TaskInfo<?> task) {
-    return ImmutableList.<TaskInfo<?>>of(task);
+  private List<TaskInfo> asList(TaskInfo task) {
+    return ImmutableList.of(task);
   }
 
-  private TaskInfo<YumRepository> scheduledTask(String repo, String version) {
+  private TaskInfo scheduledTask(String repo, String version) {
     final TaskConfiguration configuration = new TaskConfiguration();
     configuration.setId("id");
     configuration.setName("name");

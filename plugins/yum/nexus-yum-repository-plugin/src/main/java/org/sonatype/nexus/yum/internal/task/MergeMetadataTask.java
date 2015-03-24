@@ -63,7 +63,7 @@ import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
  */
 @Named
 public class MergeMetadataTask
-    extends RepositoryTaskSupport<YumRepository>
+    extends RepositoryTaskSupport
     implements Cancelable
 {
   // TODO: is defined in DefaultFSPeer. Do we want to expose it over there?
@@ -187,7 +187,7 @@ public class MergeMetadataTask
     return groupRepository != null && !groupRepository.getMemberRepositories().isEmpty();
   }
 
-  public static TaskInfo<YumRepository> createTaskFor(final TaskScheduler nexusScheduler,
+  public static TaskInfo createTaskFor(final TaskScheduler nexusScheduler,
                                                       final GroupRepository groupRepository)
   {
     TaskConfiguration task = nexusScheduler.createTaskConfigurationInstance(MergeMetadataTask.class);

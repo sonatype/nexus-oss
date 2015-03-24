@@ -52,7 +52,7 @@ public class ScheduledTaskInfoLifecycleIT
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = taskScheduler.submit(taskConfiguration);
+    final TaskInfo taskInfo = taskScheduler.submit(taskConfiguration);
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -65,13 +65,13 @@ public class ScheduledTaskInfoLifecycleIT
     assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
     assertThat(taskScheduler.getRunningTaskCount(), equalTo(1));
 
-    final CurrentState<String> currentState = taskInfo.getCurrentState();
+    final CurrentState currentState = taskInfo.getCurrentState();
     assertThat(currentState, notNullValue());
     assertThat(currentState.getState(), equalTo(State.RUNNING));
     assertThat(currentState.getRunState(), equalTo(RunState.RUNNING));
     assertThat(currentState.getRunStarted(), notNullValue());
     assertThat(currentState.getRunStarted().getTime(), lessThan(System.currentTimeMillis()));
-    final Future<String> future = currentState.getFuture();
+    final Future<?> future = currentState.getFuture();
     assertThat(future, notNullValue());
 
     // make it be done
@@ -79,7 +79,7 @@ public class ScheduledTaskInfoLifecycleIT
     Thread.yield();
 
     // and block for the result
-    final String result = future.get();
+    final String result = (String) future.get();
     assertThat(result, equalTo(RESULT));
     // taskInfo for DONE task is terminal
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.DONE));
@@ -106,7 +106,7 @@ public class ScheduledTaskInfoLifecycleIT
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // task message is available after task is done (as it comes from persisted dataMap)
     assertThat(taskInfo.getMessage(), nullValue());
@@ -127,7 +127,7 @@ public class ScheduledTaskInfoLifecycleIT
 
     Date runStarted;
     {
-      final CurrentState<String> currentState = taskInfo.getCurrentState();
+      final CurrentState currentState = taskInfo.getCurrentState();
       assertThat(currentState, notNullValue());
       assertThat(currentState.getState(), equalTo(State.RUNNING));
       assertThat(currentState.getRunState(), equalTo(RunState.RUNNING));
@@ -138,7 +138,7 @@ public class ScheduledTaskInfoLifecycleIT
       // started after it was scheduled
       assertThat(currentState.getRunStarted().getTime(),
           greaterThan(taskInfo.getConfiguration().getCreated().getTime()));
-      final Future<String> future = currentState.getFuture();
+      final Future<?> future = currentState.getFuture();
       assertThat(future, notNullValue());
 
       // make it be done
@@ -146,7 +146,7 @@ public class ScheduledTaskInfoLifecycleIT
       Thread.yield();
 
       // and block for the result
-      final String result = future.get();
+      final String result = (String) future.get();
       assertThat(result, equalTo(RESULT));
       // taskInfo for DONE task is terminal
       assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
@@ -161,7 +161,7 @@ public class ScheduledTaskInfoLifecycleIT
 
     // repeating tasks when done are waiting, call for state is okay at any time
     {
-      final TaskInfo<String> ti = taskScheduler.getTaskById(taskInfo.getId());
+      final TaskInfo ti = taskScheduler.getTaskById(taskInfo.getId());
       assertThat(ti, notNullValue());
       assertThat(ti.getId(), equalTo(taskConfiguration.getId()));
       assertThat(ti.getName(), equalTo(taskConfiguration.getName()));
@@ -169,7 +169,7 @@ public class ScheduledTaskInfoLifecycleIT
       assertThat(ti.getConfiguration().getCreated(), notNullValue());
       assertThat(ti.getConfiguration().getUpdated(), notNullValue());
 
-      final CurrentState<String> currentState = ti.getCurrentState();
+      final CurrentState currentState = ti.getCurrentState();
       assertThat(currentState, notNullValue());
       assertThat(currentState.getState(), equalTo(State.WAITING));
       assertThat(currentState.getRunState(), nullValue());
@@ -180,7 +180,7 @@ public class ScheduledTaskInfoLifecycleIT
 
     // same thing from "old" handle
     {
-      final CurrentState<String> currentState = taskInfo.getCurrentState();
+      final CurrentState currentState = taskInfo.getCurrentState();
       assertThat(currentState, notNullValue());
       assertThat(currentState.getState(), equalTo(State.WAITING));
       assertThat(currentState.getRunState(), nullValue());

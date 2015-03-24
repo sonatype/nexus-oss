@@ -65,6 +65,8 @@ public class SecurityFilter
 
   /**
    * Sets MDC user-id attribute for request.
+   *
+   * This is invoked in the execute context of subject.
    */
   @Override
   protected void executeChain(final ServletRequest request,
@@ -72,6 +74,8 @@ public class SecurityFilter
                               final FilterChain origChain)
       throws IOException, ServletException
   {
+    UserIdMdcHelper.set();
+
     // HACK: Attach principal to underlying request so we can use that in the request-log
     if (request instanceof HttpServletRequest) {
       HttpServletRequest httpRequest = (HttpServletRequest)request;
@@ -82,9 +86,23 @@ public class SecurityFilter
       }
     }
 
-    UserIdMdcHelper.set();
+    super.executeChain(request, response, origChain);
+  }
+
+  /**
+   * Unset MDC after we finish filtering to restore thread state.
+   */
+  @Override
+  protected void doFilterInternal(final ServletRequest request,
+                                  final ServletResponse response,
+                                  final FilterChain chain)
+      throws ServletException, IOException
+  {
+    // FIXME: Really should find a better place to do this so its covered in all request, not just those with security-filter
+    UserIdMdcHelper.unknown();
+
     try {
-      super.executeChain(request, response, origChain);
+      super.doFilterInternal(request, response, chain);
     }
     finally {
       UserIdMdcHelper.unset();

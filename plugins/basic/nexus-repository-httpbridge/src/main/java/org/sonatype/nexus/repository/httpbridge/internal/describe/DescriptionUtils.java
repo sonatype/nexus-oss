@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
+import org.sonatype.nexus.repository.view.Status;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
@@ -62,6 +63,12 @@ public class DescriptionUtils
 
   public static void describeResponse(final Description desc, final Response response) {
     desc.topic("Response");
+
+    final Status status = response.getStatus();
+    desc.addTable("Status", ImmutableMap.of(
+        "Code", (Object) status.getCode(),
+        "Message", nullToEmpty(status.getMessage())
+    ));
 
     desc.addTable("Headers", toMap(response.getHeaders()));
     desc.addTable("Attributes", toMap(response.getAttributes()));

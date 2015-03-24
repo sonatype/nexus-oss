@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.0
  */
-public abstract class TaskEvent<T>
+public abstract class TaskEvent
 {
   private final Date eventDate;
 
@@ -37,7 +37,7 @@ public abstract class TaskEvent<T>
 
   private final LastRunState lastRunState;
 
-  public TaskEvent(final TaskInfo<T> taskInfo) {
+  public TaskEvent(final TaskInfo taskInfo) {
     this.eventDate = new Date();
     this.taskInfo = checkNotNull(taskInfo);
     this.currentState = taskInfo.getCurrentState();
@@ -55,7 +55,7 @@ public abstract class TaskEvent<T>
    * Returns the "handle" of the task. Please note that this is "live" object, so states returned by this
    * instance may change as task progresses or even finishes it's work while the event handler gets this event.
    */
-  public TaskInfo<T> getTaskInfo() {
+  public TaskInfo getTaskInfo() {
     return taskInfo;
   }
 

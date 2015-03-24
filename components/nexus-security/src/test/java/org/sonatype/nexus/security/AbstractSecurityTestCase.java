@@ -47,7 +47,7 @@ public abstract class AbstractSecurityTestCase
 
   @Override
   public void configure(final Binder binder) {
-    binder.install(new SecurityModule());
+    binder.install(new TestSecurityModule());
 
     binder.bind(SecurityConfigurationSource.class)
         .annotatedWith(Names.named("default"))
