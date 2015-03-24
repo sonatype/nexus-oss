@@ -14,6 +14,7 @@ package com.sonatype.nexus.repository.nuget.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
@@ -154,9 +155,6 @@ public class NugetGalleryFacetImpl
   public String feed(final String base, final String operation, final Map<String, String> query) {
     log.debug("Select: " + query);
 
-    final StringBuilder xml = new StringBuilder();
-    xml.append(interpolateTemplate(ODataTemplates.NUGET_FEED, extraTemplateVars(base, operation)));
-
     // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
     if (!query.containsKey("$orderby")) {
       query.put("$orderby", DOWNLOAD_COUNT + " desc");
@@ -167,19 +165,18 @@ public class NugetGalleryFacetImpl
       query.put("$orderby", orderby.replaceAll("(?i)concat\\(title,id\\)", NAME_ORDER));
     }
 
-    ComponentQuery componentQuery = ODataUtils.query(query, false);
-    ComponentQuery componentCountQuery = ODataUtils.query(query, true);
+    FeedResult result = new FeedResult(base, operation, query);
 
     try (StorageTx storageTx = openStorageTx()) {
 
       // NXCM-4502 add inlinecount only if requested
       if (inlineCountRequested(query)) {
-        int inlineCount = executeCount(componentCountQuery, storageTx, getRepositories());
-        xml.append(interpolateTemplate(ODataTemplates.NUGET_INLINECOUNT,
-            ImmutableMap.of("COUNT", String.valueOf(inlineCount))
-        ));
+        int inlineCount = executeCount(ODataUtils.query(query, true), storageTx, getRepositories());
+
+        result.setCount(inlineCount);
       }
 
+      final ComponentQuery componentQuery = ODataUtils.query(query, false);
       final Iterable<Component> components = storageTx.findComponents(componentQuery.getWhere(),
           componentQuery.getParameters(), getRepositories(), componentQuery.getQuerySuffix());
 
@@ -190,19 +187,93 @@ public class NugetGalleryFacetImpl
         final NestedAttributesMap nugetAttributes = component.formatAttributes();
         final Map<String, ?> data = toData(nugetAttributes, extraTemplateVars(base, operation));
 
-        xml.append(interpolateTemplate(ODataTemplates.NUGET_ENTRY, data));
+        result.addEntry(data);
         if (n == ODataUtils.PAGE_SIZE) {
-          xml.append("  <link rel=\"next\" href=\"").append(base).append('/').append(operation);
-          xml.append("()?").append(ODataFeedUtils.skipLink(data, query)).append("\"/>\n");
-          break;
+          result.setSkipLinkEntry(data);
         }
       }
 
       storageTx.commit();
     }
 
+    final StringBuilder xml = new StringBuilder();
+    xml.append(interpolateTemplate(ODataTemplates.NUGET_FEED,
+        extraTemplateVars(result.getBase(), result.getOperation())));
+
+    if (result.getCount() != null) {
+      xml.append(interpolateTemplate(ODataTemplates.NUGET_INLINECOUNT,
+          ImmutableMap.of("COUNT", String.valueOf(result.getCount()))
+      ));
+    }
+    for (Map<String, ?> data : result.getEntries()) {
+      xml.append(interpolateTemplate(ODataTemplates.NUGET_ENTRY, data));
+    }
+
+    if (result.getSkipLinkEntry() != null) {
+      xml.append("  <link rel=\"next\" href=\"").append(base).append('/').append(operation);
+      xml.append("()?").append(ODataFeedUtils.skipLink(result.getSkipLinkEntry(), query)).append("\"/>\n");
+    }
     return xml.append("</feed>").toString();
   }
+
+  // TODO: Move to its own class
+  static class FeedResult
+  {
+    private final String base;
+
+    private final String operation;
+
+    private final Map<String, String> query;
+
+    private Integer count;
+
+    private Map<String, ?> skipLinkEntry;
+
+    private List<Map<String, ?>> entries = new ArrayList<>();
+
+    public FeedResult(final String base, final String operation, final Map<String, String> query) {
+      this.base = base;
+      this.operation = operation;
+      this.query = query;
+    }
+
+    public void addEntry(Map<String, ?> entry) {
+      entries.add(entry);
+    }
+
+    public void setCount(final int count) {
+      this.count = count;
+    }
+
+    public String getBase() {
+      return base;
+    }
+
+    public String getOperation() {
+      return operation;
+    }
+
+    public Map<String, String> getQuery() {
+      return query;
+    }
+
+    public Integer getCount() {
+      return count;
+    }
+
+    public List<Map<String, ?>> getEntries() {
+      return entries;
+    }
+
+    public Map<String, ?> getSkipLinkEntry() {
+      return skipLinkEntry;
+    }
+
+    public void setSkipLinkEntry(final Map<String, ?> skipLinkEntry) {
+      this.skipLinkEntry = skipLinkEntry;
+    }
+  }
+
 
   @Override
   public void putMetadata(final Map<String, String> metadata) {
