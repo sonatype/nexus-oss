@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * @since 3.0
  */
-class FeedResult
+public class FeedResult
 {
   private final String base;
 

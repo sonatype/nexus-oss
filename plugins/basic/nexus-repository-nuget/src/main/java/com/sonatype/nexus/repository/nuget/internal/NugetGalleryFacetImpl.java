@@ -167,7 +167,7 @@ public class NugetGalleryFacetImpl
    * Generate a {@link FeedResult} for a given feed query.
    */
   protected FeedResult feed(final String base, final String operation, final Map<String, String> query,
-                            final List<Repository> repositories)
+                            final Iterable<Repository> repositories)
   {
     FeedResult result = new FeedResult(base, operation, query);
 
