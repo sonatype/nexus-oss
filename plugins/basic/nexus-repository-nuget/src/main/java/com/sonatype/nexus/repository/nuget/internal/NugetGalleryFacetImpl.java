@@ -210,7 +210,7 @@ public class NugetGalleryFacetImpl
     try (StorageTx tx = openStorageTx()) {
       final Bucket bucket = tx.getBucket();
       Component component = findComponent(tx, id, version);
-      checkState(component != null && component.firstAsset() != null, "Component metadata does not exist yet");
+      checkState(component != null && !component.assets().isEmpty(), "Component metadata does not exist yet");
       createOrUpdateAssetAndContents(tx, bucket, component, content, null);
       tx.commit();
     }
@@ -480,7 +480,7 @@ public class NugetGalleryFacetImpl
                                                final Map<String, String> data)
   {
     Asset asset = createOrUpdateAsset(storageTx, bucket, component, data);
-    
+
     final ImmutableMap<String, String> headers = ImmutableMap
         .of(BlobStore.BLOB_NAME_HEADER, blobName(component), BlobStore.CREATED_BY_HEADER, "unknown");
     storageTx.setBlob(in, headers, asset, Arrays.asList(HashAlgorithm.SHA512), "application/zip");
@@ -505,7 +505,7 @@ public class NugetGalleryFacetImpl
     final String version = checkVersion(data.get(VERSION));
 
     final Component component = findOrCreateComponent(storageTx, bucket, id, version);
-    
+
     NestedAttributesMap nugetAttr = component.formatAttributes();
     nugetAttr.set(P_ID, data.get(ID));
     nugetAttr.set(P_PACKAGE_HASH, data.get(PACKAGE_HASH));
