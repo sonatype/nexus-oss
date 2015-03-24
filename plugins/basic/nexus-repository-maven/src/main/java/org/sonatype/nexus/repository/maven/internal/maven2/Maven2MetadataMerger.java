@@ -153,13 +153,13 @@ public class Maven2MetadataMerger
       right.setVersion(left.getVersion());
     }
     checkArgument(
-        Objects.equals(noeFilter(left.getGroupId()), noeFilter(right.getGroupId())),
+        Objects.equals(nullOrEmptyStringFilter(left.getGroupId()), nullOrEmptyStringFilter(right.getGroupId())),
         "GroupId mismatch: %s vs %s", left.getGroupId(), right.getGroupId());
     checkArgument(
-        Objects.equals(noeFilter(left.getArtifactId()), noeFilter(right.getArtifactId())),
+        Objects.equals(nullOrEmptyStringFilter(left.getArtifactId()), nullOrEmptyStringFilter(right.getArtifactId())),
         "ArtifactId mismatch: %s vs %s", left.getArtifactId(), right.getArtifactId());
     checkArgument(
-        Objects.equals(noeFilter(left.getVersion()), noeFilter(right.getVersion())),
+        Objects.equals(nullOrEmptyStringFilter(left.getVersion()), nullOrEmptyStringFilter(right.getVersion())),
         "Version mismatch: %s vs %s", left.getVersion(), right.getVersion());
 
     mergePlugins(left, right);
@@ -171,8 +171,8 @@ public class Maven2MetadataMerger
    * Merges "right" plugins into "left", the instances are mutated.
    */
   private void mergePlugins(final Metadata left, final Metadata right) {
-    nullFilter(left.getPlugins());
-    nullFilter(right.getPlugins());
+    nullElementFilter(left.getPlugins());
+    nullElementFilter(right.getPlugins());
     for (Plugin plugin : right.getPlugins()) {
       boolean found = false;
       for (Plugin preExisting : left.getPlugins()) {
@@ -206,7 +206,7 @@ public class Maven2MetadataMerger
     final Versioning rv = right.getVersioning();
     final Versioning lv = left.getVersioning();
 
-    // lastUpdated: is now, as we just merged it... caching will do it's job later
+    // lastUpdated: if left not set, set from right, otherwise newer
     if (rv.getLastUpdated() != null) {
       if (lv.getLastUpdated() == null) {
         lv.setLastUpdated(rv.getLastUpdated());
@@ -221,17 +221,10 @@ public class Maven2MetadataMerger
     }
 
     // versions: just add strings not in list
-    nullFilter(lv.getVersions());
-    nullFilter(rv.getVersions());
+    nullElementFilter(lv.getVersions());
+    nullElementFilter(rv.getVersions());
     for (String version : rv.getVersions()) {
-      boolean found = false;
-      for (String preExisting : lv.getVersions()) {
-        if (preExisting.equals(version)) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
+      if (!lv.getVersions().contains(version)) {
         lv.getVersions().add(version);
       }
     }
@@ -251,16 +244,17 @@ public class Maven2MetadataMerger
     }
 
     // snapshotVersions: add ext+classifier combos, if not exist, or are older version
-    nullFilter(lv.getSnapshotVersions());
-    nullFilter(rv.getSnapshotVersions());
+    nullElementFilter(lv.getSnapshotVersions());
+    nullElementFilter(rv.getSnapshotVersions());
     for (SnapshotVersion snapshotVersion : rv.getSnapshotVersions()) {
       boolean found = false;
       for (SnapshotVersion preExisting : lv.getSnapshotVersions()) {
         if (Objects.equals(snapshotVersion.getExtension(), preExisting.getExtension())
-            && Objects.equals(noeFilter(snapshotVersion.getClassifier()), noeFilter(preExisting.getClassifier()))) {
+            && Objects.equals(nullOrEmptyStringFilter(snapshotVersion.getClassifier()),
+            nullOrEmptyStringFilter(preExisting.getClassifier()))) {
           found = true;
           if (version(snapshotVersion.getVersion()).compareTo(version(preExisting.getVersion())) > 0) {
-            preExisting.setClassifier(noeFilter(snapshotVersion.getClassifier()));
+            preExisting.setClassifier(nullOrEmptyStringFilter(snapshotVersion.getClassifier()));
             preExisting.setVersion(snapshotVersion.getVersion());
             preExisting.setUpdated(snapshotVersion.getUpdated());
           }
@@ -302,7 +296,7 @@ public class Maven2MetadataMerger
    * If string Null-Or-Empty returns empty string, otherwise the string.
    */
   @Nonnull
-  private String noeFilter(final String str) {
+  private String nullOrEmptyStringFilter(final String str) {
     if (Strings.isNullOrEmpty(str)) {
       return "";
     }
@@ -312,7 +306,7 @@ public class Maven2MetadataMerger
   /**
    * Filters a list for {@code null} (and "null" string) elements, removes them.
    */
-  private <T> void nullFilter(final List<T> list) {
+  private <T> void nullElementFilter(final List<T> list) {
     for (Iterator<T> i = list.iterator(); i.hasNext(); ) {
       T element = i.next();
       if (element == null || Objects.equals(element, "null")) {
