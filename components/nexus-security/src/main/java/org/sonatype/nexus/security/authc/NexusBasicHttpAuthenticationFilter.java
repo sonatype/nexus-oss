@@ -31,7 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Nexus {@link BasicHttpAuthenticationFilter}.
+ * Nexus security filter providing HTTP BASIC authentication support.
+ *
+ * Knows about special handling needed for anonymous subjects.
+ *
+ * Does not create sessions.
  *
  * @since 3.0
  */
