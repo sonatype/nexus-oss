@@ -15,6 +15,7 @@ package com.sonatype.nexus.repository.nuget.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -75,7 +77,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.base.Strings.nullToEmpty;
 import static com.sonatype.nexus.repository.nuget.internal.NugetProperties.*;
-import static java.util.Arrays.asList;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseInlineCount;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseSkip;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseTop;
@@ -623,9 +624,17 @@ public class NugetGalleryFacetImpl
         query.getQuerySuffix());
   }
 
+  /**
+   * Returns the constituent repositories - just this one, or the leaf member repositories if this is a group.
+   */
   protected List<Repository> getRepositories() {
-    // TODO: Consider groups
-    return asList(getRepository());
+    try {
+      final GroupFacet facet = getRepository().facet(GroupFacet.class);
+      return facet.leafMembers();
+    }
+    catch (MissingFacetException e) {
+      return Collections.singletonList(getRepository());
+    }
   }
 
   protected Iterable<Repository> getHostedRepositories() {

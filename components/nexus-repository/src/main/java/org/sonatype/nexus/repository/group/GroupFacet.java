@@ -37,5 +37,8 @@ public interface GroupFacet
    */
   List<Repository> members();
 
-  // TODO: Expose transitive members?
+  /**
+   * Return the full list of members, including the members of groups, but excluding groups.
+   */
+  List<Repository> leafMembers();
 }
