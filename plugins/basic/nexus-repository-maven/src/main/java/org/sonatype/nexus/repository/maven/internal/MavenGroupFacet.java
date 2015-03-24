@@ -14,10 +14,12 @@ package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -70,10 +72,19 @@ public class MavenGroupFacet
     this.mavenFacet = getRepository().facet(MavenFacet.class);
   }
 
+  /**
+   * Fetches cached metadata if exists, or {@code null}.
+   */
+  @Nullable
   public MavenPayload getCachedMergedMetadata(final MavenPath mavenPath) throws IOException {
     return mavenFacet.get(mavenPath);
   }
 
+  /**
+   * Merges and caches and returns the merged metadata. Returns {@code null} if no usable response was in passed in
+   * map.
+   */
+  @Nullable
   public MavenPayload mergeAndCacheMetadata(final MavenPath mavenPath,
                                             final LinkedHashMap<Repository, Response> responses) throws IOException
   {
@@ -89,34 +100,32 @@ public class MavenGroupFacet
       }
     }
 
+    if (metadataPayloads.isEmpty()) {
+      return null;
+    }
     final Payload mergedMetadata = mergeMetadata(metadataPayloads);
     if (mergedMetadata == null) {
       return null;
     }
-    cacheMergedMetadata(mavenPath, mergedMetadata);
-    return getCachedMergedMetadata(mavenPath);
+    return cacheMergedMetadata(mavenPath, mergedMetadata);
   }
 
   private Payload mergeMetadata(final List<MavenPayload> metadataPayloads) throws IOException {
-    if (metadataPayloads.isEmpty()) {
-      return null;
-    }
     if (metadataPayloads.size() == 1) {
       return metadataPayloads.get(0);
     }
-
+    final MetadataXpp3Reader reader = new MetadataXpp3Reader();
     List<Metadata> metadatas = Lists.newArrayList();
     for (MavenPayload metadataPayload : metadataPayloads) {
-      try {
-        final Metadata metadata = new MetadataXpp3Reader().read(metadataPayload.openInputStream());
-        metadatas.add(metadata);
-      } catch (XmlPullParserException e) {
+      try (InputStream inputStream = metadataPayload.openInputStream()) {
+        metadatas.add(reader.read(inputStream));
+      }
+      catch (XmlPullParserException e) {
         // skip it
       }
     }
 
     final Metadata mergedMetadata = metadataMerger.merge(metadatas.toArray(new Metadata[metadatas.size()]));
-
     final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     new MetadataXpp3Writer().write(byteArrayOutputStream, mergedMetadata);
     return new BytesPayload(
@@ -125,7 +134,7 @@ public class MavenGroupFacet
     );
   }
 
-  private void cacheMergedMetadata(final MavenPath mavenPath, final Payload payload) throws IOException {
+  private MavenPayload cacheMergedMetadata(final MavenPath mavenPath, final Payload payload) throws IOException {
     // put the metadata and then put hashes
     mavenFacet.put(mavenPath, payload);
     // get it and store corresponding hashes
@@ -134,6 +143,7 @@ public class MavenGroupFacet
     mavenFacet.put(mavenPath.hash(HashType.SHA1), new StringPayload(sha1HashCode.toString(), "text/plain"));
     final HashCode md5HashCode = mavenPayload.getHashCodes().get(HashAlgorithm.MD5);
     mavenFacet.put(mavenPath.hash(HashType.MD5), new StringPayload(md5HashCode.toString(), "text/plain"));
+    return mavenPayload;
   }
 
   // TODO: asset event listening and using MavenFacet.delete maybe to delete invalidated elements
