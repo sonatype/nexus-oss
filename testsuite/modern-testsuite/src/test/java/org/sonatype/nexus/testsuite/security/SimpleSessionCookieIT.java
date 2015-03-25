@@ -66,6 +66,8 @@ import static org.hamcrest.Matchers.startsWith;
 public class SimpleSessionCookieIT
     extends NexusHttpsITSupport
 {
+  private static final String PROTECTED_PATH = "internal/metrics";
+
   private static final String SESSION_PATH = "service/rapture/session";
 
   private static final String TYPICAL_BROWSER_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36";
@@ -153,8 +155,8 @@ public class SimpleSessionCookieIT
 
       HttpPost loginRequest = new HttpPost(baseUrl.toExternalForm() + SESSION_PATH);
       List<NameValuePair> params = new ArrayList<>();
-      params.add(new BasicNameValuePair("username", Strings2.encodeBase64("admin")));
-      params.add(new BasicNameValuePair("password", Strings2.encodeBase64("admin123")));
+      params.add(new BasicNameValuePair("username", Strings2.encodeBase64(credentials().getUserPrincipal().getName())));
+      params.add(new BasicNameValuePair("password", Strings2.encodeBase64(credentials().getPassword())));
       loginRequest.setEntity(new UrlEncodedFormEntity(params));
       withCommonBrowserHeaders(loginRequest);
 
@@ -225,13 +227,13 @@ public class SimpleSessionCookieIT
             headerText, not(containsString("; HttpOnly")));
       }
 
-      HttpGet loginFailedGet = new HttpGet(baseUrl.toExternalForm() + SESSION_PATH);
+      // 3. Access a protected resource again using our original login cookie, no credentials, to verify session is dead
+      HttpGet loginFailedGet = new HttpGet(baseUrl.toExternalForm() + PROTECTED_PATH);
       cookieStore.addCookie(loginCookie);
 
-      // 3. Access a protected resource again using our original login cookie, no credentials, to verify session is dead
       try (CloseableHttpResponse response = client.execute(loginFailedGet, HttpClientContext.create())) {
         assertThat("expected dead login session cookie to not authenticate", response.getStatusLine().getStatusCode(),
-            is(403)); // should this be 401?
+            is(401));
         Header[] setCookieHeaders = response.getHeaders(SET_COOKIE);
         assertThat("expecting no session cookie since login was unsuccessful",
             getSessionCookieHeader(setCookieHeaders), nullValue());
