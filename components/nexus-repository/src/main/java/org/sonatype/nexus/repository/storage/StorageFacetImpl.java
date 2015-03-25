@@ -70,6 +70,8 @@ public class StorageFacetImpl
 
   private ORID bucketId;
 
+  private WritePolicy writePolicy;
+
   @Inject
   public StorageFacetImpl(final BlobStoreManager blobStoreManager,
                           final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
@@ -85,6 +87,12 @@ public class StorageFacetImpl
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     blobStoreName = attributes.get("blobStoreName", String.class, "default");
     log.debug("BLOB-store name: {}", blobStoreName);
+    writePolicy = null;
+    String writePolicyAttr = attributes.get("writePolicy", String.class);
+    if (writePolicyAttr != null) {
+      writePolicy = WritePolicy.valueOf(writePolicyAttr);
+    }
+    log.debug("Write Policy: {}", writePolicy);
   }
 
   @Override
@@ -191,7 +199,7 @@ public class StorageFacetImpl
 
   private StorageTx openStorageTx(boolean withHooks) {
     BlobStore blobStore = blobStoreManager.get(blobStoreName);
-    return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(withHooks), bucketId);
+    return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(withHooks), bucketId, writePolicy);
   }
 
   private GraphTx openGraphTx(boolean withHooks) {
