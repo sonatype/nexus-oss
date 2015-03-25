@@ -21,8 +21,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.configuration.ApplicationDirectories;
-import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
-import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.nexus.orient.DatabaseExternalizer;
 import org.sonatype.nexus.orient.DatabaseExternalizerImpl;
 import org.sonatype.nexus.orient.DatabaseManager;
@@ -41,7 +39,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
-@ManagedObject
 public class DatabaseManagerImpl
     extends DatabaseManagerSupport
 {
@@ -60,11 +57,6 @@ public class DatabaseManagerImpl
   public DatabaseManagerImpl(final File databasesDirectory) {
     this.databasesDirectory = checkNotNull(databasesDirectory);
     log.debug("Databases directory: {}", databasesDirectory);
-  }
-
-  @ManagedAttribute
-  public File getDatabasesDirectory() {
-    return databasesDirectory;
   }
 
   /**

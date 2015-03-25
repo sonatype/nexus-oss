@@ -10,22 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.jmx.reflect;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import javax.management.DescriptorKey;
+package org.sonatype.nexus.internal.event;
 
 /**
- * Helper to test {@link DescriptorKey}.
+ * The MBean management interface for {@link DebugEventInspector} management.
+ *
+ * @author cstamas
+ * @since 2.1
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@interface TestAuthor
+public interface DebugEventInspectorMBean
 {
-  @DescriptorKey("author")
-  String value();
+  /**
+   * Returns true if enabled.
+   */
+  boolean isEnabled();
+
+  /**
+   * Enables or disables the event inspector.
+   */
+  void setEnabled(boolean val);
 }

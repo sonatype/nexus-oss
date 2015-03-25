@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.internal.blobstore;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +32,6 @@ import org.sonatype.nexus.common.validation.ValidationMessage;
 import org.sonatype.nexus.common.validation.ValidationResponse;
 import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.ApplicationDirectories;
-import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
-import org.sonatype.nexus.jmx.reflect.ManagedObject;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
@@ -52,7 +49,6 @@ import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.St
  */
 @Named
 @Singleton
-@ManagedObject
 public class BlobStoreManagerImpl
     extends StateGuardLifecycleSupport
     implements BlobStoreManager
@@ -75,11 +71,6 @@ public class BlobStoreManagerImpl
     this.basedir = directories.getWorkDirectory(BASEDIR).toPath();
     this.store = checkNotNull(store);
     this.blobstorePrototypes = checkNotNull(blobstorePrototypes);
-  }
-
-  @ManagedAttribute
-  public File getBasedir() {
-    return basedir.toFile();
   }
 
   @Override

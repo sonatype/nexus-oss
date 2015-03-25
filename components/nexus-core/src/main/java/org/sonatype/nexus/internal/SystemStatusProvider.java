@@ -20,17 +20,12 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.eclipse.sisu.Typed;
-
 /**
  * {@link SystemStatus} provider.
- *
- * This is not a singleton, as the status does change over time.
  *
  * @since 3.0
  */
 @Named
-@Typed({SystemStatus.class, Object.class}) // HACK: needed to allow @ManagedObject detection to function
 public class SystemStatusProvider
   extends ComponentSupport
   implements Provider<SystemStatus>

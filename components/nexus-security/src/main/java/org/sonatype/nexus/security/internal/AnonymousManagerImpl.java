@@ -17,8 +17,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
-import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.nexus.security.anonymous.AnonymousConfiguration;
 import org.sonatype.nexus.security.anonymous.AnonymousConfigurationStore;
 import org.sonatype.nexus.security.anonymous.AnonymousManager;
@@ -38,7 +36,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
-@ManagedObject
 public class AnonymousManagerImpl
   extends ComponentSupport
   implements AnonymousManager
@@ -128,7 +125,6 @@ public class AnonymousManagerImpl
   //
 
   @Override
-  @ManagedAttribute
   public boolean isEnabled() {
     return getConfigurationInternal().isEnabled();
   }

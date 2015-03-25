@@ -12,13 +12,9 @@
  */
 package org.sonatype.nexus;
 
-import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
-import org.sonatype.nexus.jmx.reflect.ManagedObject;
-
 /**
  * System status.
  */
-@ManagedObject
 public class SystemStatus
 {
   private String version = "unknown";
@@ -33,7 +29,6 @@ public class SystemStatus
 
   private boolean trialLicense = false;
 
-  @ManagedAttribute
   public String getVersion() {
     return version;
   }
@@ -42,7 +37,6 @@ public class SystemStatus
     this.version = version;
   }
 
-  @ManagedAttribute
   public String getEditionShort() {
     return editionShort;
   }
@@ -51,7 +45,6 @@ public class SystemStatus
     this.editionShort = editionUserAgent;
   }
 
-  @ManagedAttribute
   public SystemState getState() {
     return state;
   }
@@ -60,12 +53,10 @@ public class SystemStatus
     this.state = status;
   }
 
-  @ManagedAttribute
   public boolean isNexusStarted() {
     return SystemState.STARTED.equals(getState());
   }
 
-  @ManagedAttribute
   public boolean isLicenseInstalled() {
     return licenseInstalled;
   }
@@ -74,7 +65,6 @@ public class SystemStatus
     this.licenseInstalled = licenseInstalled;
   }
 
-  @ManagedAttribute
   public boolean isLicenseExpired() {
     return licenseExpired;
   }
@@ -83,7 +73,6 @@ public class SystemStatus
     this.licenseExpired = licenseExpired;
   }
 
-  @ManagedAttribute
   public boolean isTrialLicense() {
     return trialLicense;
   }
