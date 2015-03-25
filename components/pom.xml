@@ -41,6 +41,7 @@
     <module>nexus-elasticsearch</module>
     <module>nexus-extender</module>
     <module>nexus-httpclient-api</module>
+    <module>nexus-jmx</module>
     <module>nexus-scheduling</module>
     <module>nexus-formfields</module>
     <module>nexus-launcher</module>
