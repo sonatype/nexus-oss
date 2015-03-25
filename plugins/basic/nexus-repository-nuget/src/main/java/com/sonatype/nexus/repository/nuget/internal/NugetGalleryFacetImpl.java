@@ -173,14 +173,13 @@ public class NugetGalleryFacetImpl
         ));
       }
 
-      final Iterable<Component> components = storageTx.findComponents(componentQuery.getWhere(),
+      final Iterable<Asset> assets = storageTx.findAssets(componentQuery.getWhere(),
           componentQuery.getParameters(), getRepositories(), componentQuery.getQuerySuffix());
 
       int n = 0;
-      for (Component component : components) {
+      for (Asset asset : assets) {
         n++;
-
-        final NestedAttributesMap nugetAttributes = component.formatAttributes();
+        final NestedAttributesMap nugetAttributes = asset.formatAttributes();
         final Map<String, ?> data = toData(nugetAttributes, extraTemplateVars(base, operation));
 
         xml.append(interpolateTemplate(ODataTemplates.NUGET_ENTRY, data));
@@ -200,7 +199,7 @@ public class NugetGalleryFacetImpl
   @Override
   public void putMetadata(final Map<String, String> metadata) {
     try (StorageTx tx = openStorageTx()) {
-      final Component component = createOrUpdateComponent(tx, tx.getBucket(), metadata);
+      createOrUpdatePackage(tx, metadata);
       maintainAggregateInfo(tx, metadata.get(ID));
       tx.commit();
     }
@@ -211,8 +210,8 @@ public class NugetGalleryFacetImpl
     try (StorageTx tx = openStorageTx()) {
       final Bucket bucket = tx.getBucket();
       Component component = findComponent(tx, id, version);
-      checkState(component != null, "Component metadata does not exist yet");
-      createOrUpdateAsset(tx, bucket, component, content);
+      checkState(component != null && !component.assets().isEmpty(), "Component metadata does not exist yet");
+      createOrUpdateAssetAndContents(tx, bucket, component, content, null);
       tx.commit();
     }
   }
@@ -281,7 +280,7 @@ public class NugetGalleryFacetImpl
       recordMetadata.put(PUBLISHED, creationTime);
       Component component;
       try (InputStream in = tempStream.get()) {
-        component = createOrUpdatePackage(storageTx, recordMetadata, in);
+        component = createOrUpdatePackageAndContents(storageTx, recordMetadata, in);
       }
 
       String id = recordMetadata.get(ID);
@@ -360,13 +359,65 @@ public class NugetGalleryFacetImpl
   }
 
   @VisibleForTesting
-  Component createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata,
-                                     final InputStream packageStream)
+  Component createOrUpdatePackageAndContents(final StorageTx storageTx, final Map<String, String> recordMetadata,
+                                             final InputStream packageStream)
   {
     final Bucket bucket = storageTx.getBucket();
     final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
-    createOrUpdateAsset(storageTx, bucket, component, packageStream);
+    createOrUpdateAssetAndContents(storageTx, bucket, component, packageStream, recordMetadata);
     return component;
+  }
+
+  @VisibleForTesting
+  Component createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata)
+  {
+    final Bucket bucket = storageTx.getBucket();
+    final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
+    createOrUpdateAsset(storageTx, bucket, component, recordMetadata);
+    return component;
+  }
+
+  private Asset createOrUpdateAsset(final StorageTx storageTx, final Bucket bucket, final Component component,
+                                   final Map<String, String> data) {
+    Asset asset = null;
+
+    final List<Asset> assets = component.assets();
+    if (assets.isEmpty()) {
+      asset = storageTx.createAsset(bucket, component);
+    }
+    else {
+      asset = assets.get(0);
+    }
+
+    if (data != null) {
+      final NestedAttributesMap nugetAttr = asset.formatAttributes();
+
+      setDerivedAttributes(data, nugetAttr,  !component.isNew());
+
+      nugetAttr.set(P_AUTHORS, data.get(AUTHORS));
+      nugetAttr.set(P_COPYRIGHT, data.get(COPYRIGHT));
+      nugetAttr.set(P_DEPENDENCIES, data.get(DEPENDENCIES));
+      nugetAttr.set(P_DESCRIPTION, data.get(DESCRIPTION));
+      nugetAttr.set(P_GALLERY_DETAILS_URL, data.get(GALLERY_DETAILS_URL));
+      nugetAttr.set(P_ICON_URL, data.get(ICON_URL));
+      nugetAttr.set(P_ID, data.get(ID));
+      nugetAttr.set(P_IS_PRERELEASE, Boolean.parseBoolean(data.get(IS_PRERELEASE)));
+      nugetAttr.set(P_LANGUAGE, data.get(LANGUAGE));
+      nugetAttr.set(P_LICENSE_URL, data.get(LICENSE_URL));
+      nugetAttr.set(P_LOCATION, data.get(LOCATION));
+      nugetAttr.set(P_PACKAGE_HASH, data.get(PACKAGE_HASH));
+      nugetAttr.set(P_PACKAGE_HASH_ALGORITHM, data.get(PACKAGE_HASH_ALGORITHM));
+      nugetAttr.set(P_PACKAGE_SIZE, Integer.parseInt(data.get(PACKAGE_SIZE)));
+      nugetAttr.set(P_PROJECT_URL, data.get(PROJECT_URL));
+      nugetAttr.set(P_RELEASE_NOTES, data.get(RELEASE_NOTES));
+      nugetAttr.set(P_REPORT_ABUSE_URL, data.get(REPORT_ABUSE_URL));
+      nugetAttr.set(P_REQUIRE_LICENSE_ACCEPTANCE, Boolean.parseBoolean(data.get(REQUIRE_LICENSE_ACCEPTANCE)));
+      nugetAttr.set(P_SUMMARY, data.get(SUMMARY));
+      nugetAttr.set(P_TAGS, data.get(TAGS));
+      nugetAttr.set(P_TITLE, data.get(TITLE));
+      nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
+    }
+    return asset;
   }
 
   private String blobName(Component component) {
@@ -391,7 +442,7 @@ public class NugetGalleryFacetImpl
     SortedSet<Component> allReleases = Sets.newTreeSet(new ComponentVersionComparator());
 
     for (Component version : versions) {
-      final NestedAttributesMap nugetAttributes = version.formatAttributes();
+      final NestedAttributesMap nugetAttributes = version.firstAsset().formatAttributes();
 
       final boolean isPrerelease = nugetAttributes.require(P_IS_PRERELEASE, Boolean.class);
       if (!isPrerelease) {
@@ -407,7 +458,7 @@ public class NugetGalleryFacetImpl
     Component absoluteLatestVersion = allReleases.isEmpty() ? null : allReleases.last();
 
     for (Component component : allReleases) {
-      final NestedAttributesMap nugetAttributes = component.formatAttributes();
+      final NestedAttributesMap nugetAttributes = component.firstAsset().formatAttributes();
 
       nugetAttributes.set(P_IS_LATEST_VERSION, component.equals(latestVersion));
       nugetAttributes.set(P_IS_ABSOLUTE_LATEST_VERSION, component.equals(absoluteLatestVersion));
@@ -424,22 +475,14 @@ public class NugetGalleryFacetImpl
     return storageTx.findComponents(whereClause, parameters, getRepositories(), null);
   }
 
-  private Asset createOrUpdateAsset(final StorageTx storageTx, final Bucket bucket,
-                                    final Component component, final InputStream in)
+  private Asset createOrUpdateAssetAndContents(final StorageTx storageTx, final Bucket bucket,
+                                               final Component component, final InputStream in,
+                                               final Map<String, String> data)
   {
-    Asset asset = null;
-
-    final List<Asset> assets = component.assets();
-    if (assets.isEmpty()) {
-      asset = storageTx.createAsset(bucket, component);
-    }
-    else {
-      asset = assets.get(0);
-    }
+    Asset asset = createOrUpdateAsset(storageTx, bucket, component, data);
 
     final ImmutableMap<String, String> headers = ImmutableMap
         .of(BlobStore.BLOB_NAME_HEADER, blobName(component), BlobStore.CREATED_BY_HEADER, "unknown");
-
     storageTx.setBlob(in, headers, asset, Arrays.asList(HashAlgorithm.SHA512), "application/zip");
 
     return asset;
@@ -463,32 +506,10 @@ public class NugetGalleryFacetImpl
 
     final Component component = findOrCreateComponent(storageTx, bucket, id, version);
 
-    final boolean republishing = !component.isNew();
-
-    final NestedAttributesMap nugetAttr = component.formatAttributes();
-
-    setDerivedAttributes(data, nugetAttr, republishing);
-
-    nugetAttr.set(P_AUTHORS, data.get(AUTHORS));
-    nugetAttr.set(P_COPYRIGHT, data.get(COPYRIGHT));
-    nugetAttr.set(P_DEPENDENCIES, data.get(DEPENDENCIES));
-    nugetAttr.set(P_DESCRIPTION, data.get(DESCRIPTION));
-    nugetAttr.set(P_GALLERY_DETAILS_URL, data.get(GALLERY_DETAILS_URL));
-    nugetAttr.set(P_ICON_URL, data.get(ICON_URL));
+    NestedAttributesMap nugetAttr = component.formatAttributes();
     nugetAttr.set(P_ID, data.get(ID));
-    nugetAttr.set(P_IS_PRERELEASE, Boolean.parseBoolean(data.get(IS_PRERELEASE)));
-    nugetAttr.set(P_LANGUAGE, data.get(LANGUAGE));
-    nugetAttr.set(P_LICENSE_URL, data.get(LICENSE_URL));
-    nugetAttr.set(P_LOCATION, data.get(LOCATION));
     nugetAttr.set(P_PACKAGE_HASH, data.get(PACKAGE_HASH));
     nugetAttr.set(P_PACKAGE_HASH_ALGORITHM, data.get(PACKAGE_HASH_ALGORITHM));
-    nugetAttr.set(P_PACKAGE_SIZE, Integer.parseInt(data.get(PACKAGE_SIZE)));
-    nugetAttr.set(P_PROJECT_URL, data.get(PROJECT_URL));
-    nugetAttr.set(P_RELEASE_NOTES, data.get(RELEASE_NOTES));
-    nugetAttr.set(P_REPORT_ABUSE_URL, data.get(REPORT_ABUSE_URL));
-    nugetAttr.set(P_REQUIRE_LICENSE_ACCEPTANCE, Boolean.parseBoolean(data.get(REQUIRE_LICENSE_ACCEPTANCE)));
-    nugetAttr.set(P_SUMMARY, data.get(SUMMARY));
-    nugetAttr.set(P_TAGS, data.get(TAGS));
     nugetAttr.set(P_TITLE, data.get(TITLE));
     nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
 
