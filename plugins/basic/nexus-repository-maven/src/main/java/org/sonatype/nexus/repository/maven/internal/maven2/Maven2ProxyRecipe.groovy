@@ -23,11 +23,11 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
-import org.sonatype.nexus.repository.maven.internal.HostedHandler
 import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
 import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
+import org.sonatype.nexus.repository.maven.internal.MavenPathParser
 import org.sonatype.nexus.repository.maven.internal.MavenProxyFacet
 import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
@@ -36,7 +36,6 @@ import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
-import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Route
@@ -101,6 +100,10 @@ class Maven2ProxyRecipe
   ProxyHandler proxyHandler
 
   @Inject
+  @Named(Maven2Format.NAME)
+  MavenPathParser mavenPathParser
+
+  @Inject
   Maven2ProxyRecipe(@Named(ProxyType.NAME) final Type type,
                     @Named(Maven2Format.NAME) final Format format)
   {
@@ -122,10 +125,8 @@ class Maven2ProxyRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    Maven2MavenPathParser pathParser = new Maven2MavenPathParser();
-
     builder.route(new Route.Builder()
-        .matcher(new MavenArtifactMatcher(pathParser))
+        .matcher(new MavenArtifactMatcher(mavenPathParser))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(negativeCacheHandler)
@@ -135,7 +136,7 @@ class Maven2ProxyRecipe
         .create())
 
     builder.route(new Route.Builder()
-        .matcher(new MavenMetadataMatcher(pathParser))
+        .matcher(new MavenMetadataMatcher(mavenPathParser))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(negativeCacheHandler)

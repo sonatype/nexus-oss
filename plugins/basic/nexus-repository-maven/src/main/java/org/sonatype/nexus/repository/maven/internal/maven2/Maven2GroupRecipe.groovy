@@ -21,7 +21,6 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
-import org.sonatype.nexus.repository.group.GroupFacetImpl
 import org.sonatype.nexus.repository.group.GroupHandler
 import org.sonatype.nexus.repository.maven.internal.GroupMetadataHandler
 import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
@@ -29,6 +28,7 @@ import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
 import org.sonatype.nexus.repository.maven.internal.MavenGroupFacet
 import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
+import org.sonatype.nexus.repository.maven.internal.MavenPathParser
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.types.GroupType
@@ -82,6 +82,10 @@ class Maven2GroupRecipe
   GroupMetadataHandler groupMetadataHandler
 
   @Inject
+  @Named(Maven2Format.NAME)
+  MavenPathParser mavenPathParser
+
+  @Inject
   Maven2GroupRecipe(@Named(GroupType.NAME) Type type,
                     @Named(Maven2Format.NAME) Format format)
   {
@@ -103,17 +107,15 @@ class Maven2GroupRecipe
   private ViewFacet configure(final ConfigurableViewFacet viewFacet) {
     Router.Builder builder = new Router.Builder()
 
-    Maven2MavenPathParser pathParser = new Maven2MavenPathParser();
-
     builder.route(new Route.Builder()
-        .matcher(new MavenArtifactMatcher(pathParser))
+        .matcher(new MavenArtifactMatcher(mavenPathParser))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(groupHandler)
         .create())
 
     builder.route(new Route.Builder()
-        .matcher(new MavenMetadataMatcher(pathParser))
+        .matcher(new MavenMetadataMatcher(mavenPathParser))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(mavenHeadersHandler)

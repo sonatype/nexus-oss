@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.maven.internal.maven2;
 import java.util.Arrays;
 import java.util.List;
 
+import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.MetadataEnvelope;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Function;
@@ -132,7 +133,7 @@ public class Maven2MetadataMergerTest
     final Metadata m2 = g("foo", "bar");
     final Metadata m3 = g("baz");
 
-    final Metadata m = merger.merge(m1, m2, m3);
+    final Metadata m = merger.merge(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3));
     assertThat(m, notNullValue());
     assertThat(m.getModelVersion(), equalTo("1.1.0"));
     assertThat(m.getPlugins(), hasSize(3));
@@ -152,7 +153,7 @@ public class Maven2MetadataMergerTest
     final Metadata m2 = a("org.foo", "some-project", "20150324121700", "1.0.2", "1.0.2", "1.0.2");
     final Metadata m3 = a("org.foo", "some-project", "20150324121600", "1.1.0-SNAPSHOT", null, "1.1.0-SNAPSHOT");
 
-    final Metadata m = merger.merge(m1, m2, m3);
+    final Metadata m = merger.merge(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3));
     assertThat(m, notNullValue());
     assertThat(m.getModelVersion(), equalTo("1.1.0"));
     assertThat(m.getGroupId(), equalTo("org.foo"));
@@ -169,7 +170,7 @@ public class Maven2MetadataMergerTest
     final Metadata m2 = v("org.foo", "some-project", "1.0", "20150323.121500", 2);
     final Metadata m3 = v("org.foo", "some-project", "1.0", "20150322.121500", 3);
 
-    final Metadata m = merger.merge(m1, m2, m3);
+    final Metadata m = merger.merge(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3));
     assertThat(m, notNullValue());
     assertThat(m.getModelVersion(), equalTo("1.1.0"));
     assertThat(m.getGroupId(), equalTo("org.foo"));

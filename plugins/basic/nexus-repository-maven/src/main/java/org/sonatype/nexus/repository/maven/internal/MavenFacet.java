@@ -13,10 +13,12 @@
 package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
@@ -36,6 +38,12 @@ public interface MavenFacet
     extends Facet
 {
   @Nonnull
+  MavenPathParser getMavenPathParser();
+
+  @Nonnull
+  List<HashAlgorithm> getHashAlgorithms();
+
+  @Nonnull
   VersionPolicy getVersionPolicy();
 
   @Nonnull
@@ -46,7 +54,7 @@ public interface MavenFacet
 
   void put(MavenPath path, Payload payload) throws IOException, InvalidContentException;
 
-  boolean delete(MavenPath path) throws IOException;
+  boolean delete(MavenPath... paths) throws IOException;
 
   DateTime getLastVerified(MavenPath path) throws IOException;
 

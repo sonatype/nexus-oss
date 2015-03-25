@@ -33,6 +33,7 @@ import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Maven 2 repository metadata merge.
@@ -100,23 +101,44 @@ public class Maven2MetadataMerger
     return null;
   }
 
+  public static class MetadataEnvelope {
+    private final String origin;
+
+    private final Metadata metadata;
+
+    public MetadataEnvelope(final String origin, final Metadata metadata) {
+      this.origin = checkNotNull(origin);
+      this.metadata = checkNotNull(metadata);
+    }
+
+    @Nonnull
+    public String getOrigin() {
+      return origin;
+    }
+
+    @Nonnull
+    public Metadata getMetadata() {
+      return metadata;
+    }
+  }
+
   /**
    * Merges Maven2 repository metadata in received order. Returns {@code null} if passed in parameter array is
    * empty. The passed in instances are not mutated.
    */
-  public Metadata merge(final Metadata... metadatas) {
+  public Metadata merge(final MetadataEnvelope... metadatas) {
     Metadata result = null;
-    for (Metadata metadata : metadatas) {
+    for (MetadataEnvelope metadataEnvelope : metadatas) {
       if (result == null) {
-        result = metadata.clone();
+        result = metadataEnvelope.getMetadata().clone();
       }
       else {
         try {
-          result = merge(result, metadata.clone());
+          result = merge(result, metadataEnvelope.getMetadata().clone());
         }
         catch (IllegalArgumentException e) {
-          // leave out, but do we want to log? or have more complex result to craft some better logging?
-          log.warn("Cannot merge metadata", e);
+          // leave out, log it
+          log.warn("Bad metadata {}", metadataEnvelope.getOrigin(), e);
         }
       }
     }

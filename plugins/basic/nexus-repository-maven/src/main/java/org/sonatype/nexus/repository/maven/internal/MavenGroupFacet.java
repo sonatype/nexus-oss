@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.hash.Hashes;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.group.GroupFacetImpl;
@@ -31,19 +33,23 @@ import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger;
+import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.MetadataEnvelope;
 import org.sonatype.nexus.repository.storage.AssetEvent;
-import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
-import org.sonatype.nexus.repository.view.payloads.StringPayload;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.hash.HashCode;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -89,13 +95,12 @@ public class MavenGroupFacet
                                             final LinkedHashMap<Repository, Response> responses) throws IOException
   {
     checkArgument(!mavenPath.isHash(), "Only metadata can be merged and cached!");
-    final List<MavenPayload> metadataPayloads = Lists.newArrayList();
+    final LinkedHashMap<Repository, MavenPayload> metadataPayloads = Maps.newLinkedHashMap();
     for (Map.Entry<Repository, Response> entry : responses.entrySet()) {
       if (entry.getValue().getStatus().getCode() == HttpStatus.OK) {
         final Response response = entry.getValue();
         if (response instanceof PayloadResponse && ((PayloadResponse) response).getPayload() instanceof MavenPayload) {
-          final MavenPayload metadataPayload = (MavenPayload) ((PayloadResponse) response).getPayload();
-          metadataPayloads.add(metadataPayload);
+          metadataPayloads.put(entry.getKey(), (MavenPayload) ((PayloadResponse) response).getPayload());
         }
       }
     }
@@ -103,54 +108,72 @@ public class MavenGroupFacet
     if (metadataPayloads.isEmpty()) {
       return null;
     }
-    final Payload mergedMetadata = mergeMetadata(metadataPayloads);
+    final MavenPayload mergedMetadata = mergeMetadata(mavenPath, metadataPayloads);
     if (mergedMetadata == null) {
       return null;
     }
     return cacheMergedMetadata(mavenPath, mergedMetadata);
   }
 
-  private Payload mergeMetadata(final List<MavenPayload> metadataPayloads) throws IOException {
+  private MavenPayload mergeMetadata(final MavenPath mavenPath,
+                                     final LinkedHashMap<Repository, MavenPayload> metadataPayloads) throws IOException
+  {
     if (metadataPayloads.size() == 1) {
       return metadataPayloads.get(0);
     }
     final MetadataXpp3Reader reader = new MetadataXpp3Reader();
-    List<Metadata> metadatas = Lists.newArrayList();
-    for (MavenPayload metadataPayload : metadataPayloads) {
-      try (InputStream inputStream = metadataPayload.openInputStream()) {
-        metadatas.add(reader.read(inputStream));
+    List<MetadataEnvelope> metadatas = Lists.newArrayList();
+    for (Map.Entry<Repository, MavenPayload> entry : metadataPayloads.entrySet()) {
+      final String origin = entry.getKey().getName() + " @ " + mavenPath.getPath();
+      try (InputStream inputStream = entry.getValue().openInputStream()) {
+        final Metadata metadata = reader.read(inputStream);
+        metadatas.add(new MetadataEnvelope(origin, metadata));
       }
       catch (XmlPullParserException e) {
-        // skip it
+        // skip it, log it
+        log.info("Unparseable repository metadata: {}", origin, e);
       }
     }
 
-    final Metadata mergedMetadata = metadataMerger.merge(metadatas.toArray(new Metadata[metadatas.size()]));
+    final Metadata mergedMetadata = metadataMerger.merge(metadatas.toArray(new MetadataEnvelope[metadatas.size()]));
     final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     new MetadataXpp3Writer().write(byteArrayOutputStream, mergedMetadata);
-    return new BytesPayload(
-        byteArrayOutputStream.toByteArray(),
-        "text/xml"
+    // Metadata is rather small, so let's do it like this
+    final Map<HashAlgorithm, HashCode> hashes = Hashes.hash(mavenFacet.getHashAlgorithms(),
+        new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+    return new MavenPayload(
+        new BytesPayload(
+            byteArrayOutputStream.toByteArray(),
+            "text/xml"
+        ),
+        DateTime.now(),
+        hashes.get(HashAlgorithm.SHA1).toString(),
+        hashes
     );
   }
 
-  private MavenPayload cacheMergedMetadata(final MavenPath mavenPath, final Payload payload) throws IOException {
+  private MavenPayload cacheMergedMetadata(final MavenPath mavenPath, final MavenPayload payload) throws IOException {
     // put the metadata and then put hashes
     mavenFacet.put(mavenPath, payload);
     // get it and store corresponding hashes
-    final MavenPayload mavenPayload = mavenFacet.get(mavenPath);
-    final HashCode sha1HashCode = mavenPayload.getHashCodes().get(HashAlgorithm.SHA1);
-    mavenFacet.put(mavenPath.hash(HashType.SHA1), new StringPayload(sha1HashCode.toString(), "text/plain"));
-    final HashCode md5HashCode = mavenPayload.getHashCodes().get(HashAlgorithm.MD5);
-    mavenFacet.put(mavenPath.hash(HashType.MD5), new StringPayload(md5HashCode.toString(), "text/plain"));
-    return mavenPayload;
+    return mavenFacet.get(mavenPath);
   }
 
-  // TODO: asset event listening and using MavenFacet.delete maybe to delete invalidated elements
-  //@Subscribe
+  @Subscribe
+  @AllowConcurrentEvents
   public void onAssetEvent(final AssetEvent event) {
-    // IF event coming from a member
-    // AND event is for a metadata MavenPath
-    // THEN mavenFacet.delete
+    if (member(event.getRepository())) {
+      final String path = event.getAsset().require(StorageFacet.P_PATH);
+      final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
+      if (mavenFacet.getMavenPathParser().isRepositoryMetadata(mavenPath) && !mavenPath.isSubordinate()) {
+        try {
+          mavenFacet.delete(mavenPath, mavenPath.hash(HashType.SHA1), mavenPath.hash(HashType.MD5));
+        }
+        catch (IOException e) {
+          log.warn("Could not evict merged metadata from {} cache at {}", getRepository().getName(),
+              mavenPath.getPath(), e);
+        }
+      }
+    }
   }
 }

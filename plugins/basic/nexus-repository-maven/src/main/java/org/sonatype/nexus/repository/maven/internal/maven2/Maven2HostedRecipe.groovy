@@ -27,6 +27,7 @@ import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
+import org.sonatype.nexus.repository.maven.internal.MavenPathParser
 import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -83,6 +84,10 @@ class Maven2HostedRecipe
   HostedHandler hostedHandler
 
   @Inject
+  @Named(Maven2Format.NAME)
+  MavenPathParser mavenPathParser
+
+  @Inject
   Maven2HostedRecipe(@Named(HostedType.NAME) final Type type,
                      @Named(Maven2Format.NAME) final Format format)
   {
@@ -101,10 +106,8 @@ class Maven2HostedRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    Maven2MavenPathParser pathParser = new Maven2MavenPathParser();
-
     builder.route(new Route.Builder()
-        .matcher(new MavenArtifactMatcher(pathParser))
+        .matcher(new MavenArtifactMatcher(mavenPathParser))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(versionPolicyHandler)
@@ -113,7 +116,7 @@ class Maven2HostedRecipe
         .create())
 
     builder.route(new Route.Builder()
-        .matcher(new MavenMetadataMatcher(pathParser))
+        .matcher(new MavenMetadataMatcher(mavenPathParser))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(mavenHeadersHandler)
