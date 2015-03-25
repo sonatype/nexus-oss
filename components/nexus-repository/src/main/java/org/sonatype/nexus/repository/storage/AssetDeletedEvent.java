@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
-
 /**
  * Asset deleted event.
  *
@@ -22,7 +20,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 public class AssetDeletedEvent
   extends AssetEvent
 {
-  public AssetDeletedEvent(final OrientVertex vertex) {
-    super(vertex);
+  public AssetDeletedEvent(final Asset asset) {
+    super(asset);
   }
 }

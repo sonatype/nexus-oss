@@ -33,8 +33,7 @@ public class NexusSessionDAO
   @Override
   protected Serializable doCreate(final Session session) {
     Serializable id = super.doCreate(session);
-    // HACK: info -> debug
-    log.info("Created session-id: {} for session: {}", id, session);
+    log.trace("Created session-id: {} for session: {}", id, session);
     return id;
   }
 }

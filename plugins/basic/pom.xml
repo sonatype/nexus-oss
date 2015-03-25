@@ -36,8 +36,8 @@
     <module>nexus-quartz-plugin</module>
     <module>nexus-repository-httpbridge</module>
     <module>nexus-repository-nuget</module>
+    <module>nexus-repository-maven</module>
     <module>nexus-repository-raw</module>
-    <module>nexus-repository-simple</module>
     <module>nexus-siesta-plugin</module>
     <module>nexus-site-repository-plugin</module>
     <module>nexus-timeline-plugin</module>

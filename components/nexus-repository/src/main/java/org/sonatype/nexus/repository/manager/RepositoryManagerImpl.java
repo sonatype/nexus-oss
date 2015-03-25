@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
+import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.nexus.repository.Recipe;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -46,10 +47,20 @@ import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.St
  */
 @Named
 @Singleton
+@ManagedObject(
+    domain = "org.sonatype.nexus.repository.manager",
+    typeClass = RepositoryManager.class,
+    description = "Repository manager"
+)
 public class RepositoryManagerImpl
     extends StateGuardLifecycleSupport
     implements RepositoryManager
 {
+  /**
+   * System property used to bypass installation of default repositories; useful for testing purposes.
+   */
+  private static final String SKIP_DEFAULT_REPOSITORIES = "skipDefaultRepositories";
+
   private final EventBus eventBus;
 
   private final ConfigurationStore store;
@@ -62,6 +73,8 @@ public class RepositoryManagerImpl
 
   private final RepositoryAdminSecurityConfigurationResource securityResource;
 
+  private final List<DefaultRepositoriesContributor> defaultRepositoriesContributors;
+
   private final Map<String, Repository> repositories = Maps.newHashMap();
 
   @Inject
@@ -70,7 +83,8 @@ public class RepositoryManagerImpl
                                final RepositoryFactory factory,
                                final Provider<ConfigurationFacet> configFacet,
                                final Map<String, Recipe> recipes,
-                               final RepositoryAdminSecurityConfigurationResource securityResource)
+                               final RepositoryAdminSecurityConfigurationResource securityResource,
+                               final List<DefaultRepositoriesContributor> defaultRepositoriesContributors)
   {
     this.eventBus = checkNotNull(eventBus);
     this.store = checkNotNull(store);
@@ -78,6 +92,7 @@ public class RepositoryManagerImpl
     this.configFacet = checkNotNull(configFacet);
     this.recipes = checkNotNull(recipes);
     this.securityResource = checkNotNull(securityResource);
+    this.defaultRepositoriesContributors = checkNotNull(defaultRepositoriesContributors);
   }
 
   /**
@@ -147,7 +162,24 @@ public class RepositoryManagerImpl
     List<Configuration> configurations = store.list();
     if (configurations.isEmpty()) {
       log.debug("No repositories configured");
-      return;
+      if (Boolean.valueOf(System.getProperty(SKIP_DEFAULT_REPOSITORIES, "false"))) {
+        log.debug("Skipping provisioning of default repositories due to '{}' property", SKIP_DEFAULT_REPOSITORIES);
+        return;
+      }
+      else {
+        log.debug("Provisioning default repositories");
+        for (DefaultRepositoriesContributor configProvider : defaultRepositoriesContributors) {
+          for (Configuration configuration : configProvider.getRepositoryConfigurations()) {
+            log.debug("Provisioning default repository: {}", configuration);
+            store.create(configuration);
+          }
+        }
+        configurations = store.list();
+        if (configurations.isEmpty()) {
+          log.debug("No default repositories to provision");
+          return;
+        }
+      }
     }
 
     log.debug("Restoring {} repositories", configurations.size());

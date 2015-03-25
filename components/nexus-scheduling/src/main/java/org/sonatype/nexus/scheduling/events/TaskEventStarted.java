@@ -19,10 +19,10 @@ import org.sonatype.nexus.scheduling.TaskInfo;
  *
  * @since 2.0
  */
-public class TaskEventStarted<T>
-    extends TaskEvent<T>
+public class TaskEventStarted
+    extends TaskEvent
 {
-  public TaskEventStarted(final TaskInfo<T> taskInfo) {
+  public TaskEventStarted(final TaskInfo taskInfo) {
     super(taskInfo);
   }
 }

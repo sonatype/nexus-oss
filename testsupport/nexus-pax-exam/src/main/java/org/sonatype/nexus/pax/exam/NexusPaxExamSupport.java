@@ -34,7 +34,9 @@ import org.ops4j.pax.exam.options.MavenUrlReference;
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.propagateSystemProperty;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.systemTimeout;
 import static org.ops4j.pax.exam.CoreOptions.vmOptions;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
@@ -71,7 +73,7 @@ public abstract class NexusPaxExamSupport
 
   public static final String NEXUS_PAX_EXAM_TIMEOUT_KEY = "nexus.pax.exam.timeout";
 
-  public static final int NEXUS_PAX_EXAM_TIMEOUT_DEFAULT = 180000;
+  public static final int NEXUS_PAX_EXAM_TIMEOUT_DEFAULT = 240000;
 
   // -------------------------------------------------------------------------
 
@@ -162,6 +164,10 @@ public abstract class NexusPaxExamSupport
 
         vmOptions("-Xmx400m", "-XX:MaxPermSize=192m"), // taken from testsuite config
 
+        systemTimeout(getExamTimeout()),
+
+        propagateSystemProperty(NEXUS_PAX_EXAM_TIMEOUT_KEY),
+
         systemProperty("basedir").value(BASEDIR),
 
         karafDistributionConfiguration() //
@@ -236,6 +242,18 @@ public abstract class NexusPaxExamSupport
     }
 
     return result;
+  }
+
+  /**
+   * @return Timeout to apply when waiting for Nexus to start
+   */
+  private static int getExamTimeout() {
+    try {
+      return Integer.parseInt(System.getProperty(NEXUS_PAX_EXAM_TIMEOUT_KEY));
+    }
+    catch (final Exception e) {
+      return NEXUS_PAX_EXAM_TIMEOUT_DEFAULT;
+    }
   }
 
   // -------------------------------------------------------------------------

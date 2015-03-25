@@ -45,7 +45,7 @@ public class BlobStoreConfigurationEntityAdapter
 
   private static final String P_NAME = "name";
 
-  private static final String P_RECIPE_NAME = "recipe_name";
+  private static final String P_TYPE = "type";
 
   private static final String P_ATTRIBUTES = "attributes";
 
@@ -60,7 +60,7 @@ public class BlobStoreConfigurationEntityAdapter
     type.createProperty(P_NAME, OType.STRING)
         .setMandatory(true)
         .setNotNull(true);
-    type.createProperty(P_RECIPE_NAME, OType.STRING)
+    type.createProperty(P_TYPE, OType.STRING)
         .setMandatory(true)
         .setNotNull(true);
     type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP)
@@ -77,21 +77,21 @@ public class BlobStoreConfigurationEntityAdapter
   @Override
   protected void readFields(final ODocument document, final BlobStoreConfiguration entity) {
     String name = document.field(P_NAME, OType.STRING);
-    String recipeName = document.field(P_RECIPE_NAME, OType.STRING);
+    String type = document.field(P_TYPE, OType.STRING);
     Map<String, Map<String, Object>> attributes = document.field(P_ATTRIBUTES, OType.EMBEDDEDMAP);
 
     // deeply copy attributes to divorce from document
     attributes = FieldCopier.copyIf(attributes);
 
     entity.setName(name);
-    entity.setRecipeName(recipeName);
+    entity.setType(type);
     entity.setAttributes(attributes);
   }
 
   @Override
   protected void writeFields(final ODocument document, final BlobStoreConfiguration entity) {
     document.field(P_NAME, entity.getName());
-    document.field(P_RECIPE_NAME, entity.getRecipeName());
+    document.field(P_TYPE, entity.getType());
     document.field(P_ATTRIBUTES, entity.getAttributes());
   }
 }

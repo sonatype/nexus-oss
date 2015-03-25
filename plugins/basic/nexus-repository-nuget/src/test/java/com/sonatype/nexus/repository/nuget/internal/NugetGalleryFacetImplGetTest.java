@@ -17,12 +17,12 @@ import java.io.InputStream;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobRef;
-import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -56,16 +56,16 @@ public class NugetGalleryFacetImplGetTest
     when(blobMetrics.getContentSize()).thenReturn(size);
     final InputStream blobStream = mock(InputStream.class);
 
-    final OrientVertex asset = mock(OrientVertex.class);
-    final OrientVertex component = mock(OrientVertex.class);
+    final Asset asset = mock(Asset.class);
+    final Component component = mock(Component.class);
 
     final StorageTx tx = mock(StorageTx.class);
     doReturn(tx).when(galleryFacet).openStorageTx();
     doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
-    doReturn(asset).when(galleryFacet).firstAsset(component);
-    when(asset.getProperty(StorageFacet.P_CONTENT_TYPE)).thenReturn(contentType);
-    when(asset.getProperty(StorageFacet.P_BLOB_REF)).thenReturn(blobRef.toString());
-    when(tx.getBlob(eq(blobRef))).thenReturn(blob);
+    doReturn(asset).when(component).firstAsset();
+    when(asset.contentType()).thenReturn(contentType);
+    when(asset.requireBlobRef()).thenReturn(blobRef);
+    when(tx.requireBlob(eq(blobRef))).thenReturn(blob);
     when(blob.getInputStream()).thenReturn(blobStream);
 
     final Payload payload = galleryFacet.get(packageId, version);

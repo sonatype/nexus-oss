@@ -16,7 +16,6 @@ package org.sonatype.nexus.repository.security;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.security.SecurityHelper;
@@ -55,13 +54,13 @@ public class SecurityFacetSupport
   }
 
   @Override
-  public boolean permitted(final Request request) {
+  public void ensurePermitted(final Request request) {
     checkNotNull(request);
 
     // determine permission action from request
     String action = action(request);
 
-    return securityHelper.allPermitted(new RepositoryViewPermission(getRepository(), action));
+    securityHelper.ensurePermitted(new RepositoryViewPermission(getRepository(), action));
   }
 
   /**

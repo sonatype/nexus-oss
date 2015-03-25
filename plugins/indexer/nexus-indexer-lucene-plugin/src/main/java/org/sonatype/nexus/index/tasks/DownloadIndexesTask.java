@@ -25,7 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class DownloadIndexesTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
 {
   private final IndexerManager indexerManager;
 

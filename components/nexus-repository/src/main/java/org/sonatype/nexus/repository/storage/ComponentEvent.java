@@ -14,7 +14,7 @@ package org.sonatype.nexus.repository.storage;
 
 import org.sonatype.nexus.repository.Repository;
 
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Component event.
@@ -22,13 +22,18 @@ import com.tinkerpop.blueprints.impls.orient.OrientVertex;
  * @since 3.0
  */
 public abstract class ComponentEvent
-    extends VertexEvent
 {
+  private final Component component;
+
   private final Repository repository;
 
-  public ComponentEvent(final OrientVertex vertex, final Repository repository) {
-    super(vertex);
-    this.repository = repository;
+  public ComponentEvent(final Component component, final Repository repository) {
+    this.component = checkNotNull(component);
+    this.repository = checkNotNull(repository);
+  }
+
+  public Component getComponent() {
+    return component;
   }
 
   public Repository getRepository() {

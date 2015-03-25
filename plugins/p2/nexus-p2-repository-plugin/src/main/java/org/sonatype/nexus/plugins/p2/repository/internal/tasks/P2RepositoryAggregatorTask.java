@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 public class P2RepositoryAggregatorTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
 {
   private final P2RepositoryAggregator p2RepositoryAggregator;
 

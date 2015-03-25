@@ -30,8 +30,7 @@ public class NexusSubjectDAO
 
   @Override
   public Subject save(final Subject subject) {
-    // HACK: info -> debug/trace
-    log.info("Saving: {}", subject);
+    log.trace("Saving: {}", subject);
     return super.save(subject);
   }
 }

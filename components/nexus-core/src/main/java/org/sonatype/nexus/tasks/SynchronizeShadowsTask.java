@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
  */
 @Named
 public class SynchronizeShadowsTask
-    extends RepositoryTaskSupport<Void>
+    extends RepositoryTaskSupport
 {
   @Override
   protected Void execute()

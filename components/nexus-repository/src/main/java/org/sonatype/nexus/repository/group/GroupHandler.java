@@ -32,6 +32,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.collect.Sets;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
 
 /**
  * Group handler.
@@ -79,7 +80,8 @@ public class GroupHandler
     // FIXME: To move forward prototype, exposing HTTP semantics here
     String method = request.getAction();
     switch (method) {
-      case GET: {
+      case GET:
+      case HEAD: {
         for (Repository member : group.members()) {
           log.trace("Trying member: {}", member);
 
@@ -100,7 +102,7 @@ public class GroupHandler
       }
 
       default:
-        return HttpResponses.methodNotAllowed(method, GET);
+        return HttpResponses.methodNotAllowed(method, GET, HEAD);
     }
   }
 }

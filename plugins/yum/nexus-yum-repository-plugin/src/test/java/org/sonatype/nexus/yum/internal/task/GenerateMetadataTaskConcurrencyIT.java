@@ -102,7 +102,7 @@ public class GenerateMetadataTaskConcurrencyIT
   public void shouldExecuteSeveralThreadInParallel()
       throws Exception
   {
-    List<TaskInfo<?>> futures = Lists.newArrayList();
+    List<TaskInfo> futures = Lists.newArrayList();
 
     for (int repositoryId = 0; repositoryId < PARALLEL_THREAD_COUNT; repositoryId++) {
       futures.add(nexusScheduler.submit(createYumRepositoryTask(repositoryId).taskConfiguration()));
@@ -141,7 +141,7 @@ public class GenerateMetadataTaskConcurrencyIT
     final File rpm2 = createDummyRpm(RPM_NAME_2, "2", new File(tmpDir, "rpm2"));
 
     // given executions blocking all thread of the scheduler
-    final List<TaskInfo<?>> futures = Lists.newArrayList();
+    final List<TaskInfo> futures = Lists.newArrayList();
     for (int index = 0; index < MAX_PARALLEL_SCHEDULER_THREADS; index++) {
       futures.add(nexusScheduler.submit(nexusScheduler.createTaskConfigurationInstance(WaitTask.class)));
     }
@@ -152,8 +152,8 @@ public class GenerateMetadataTaskConcurrencyIT
     final String file1 = "rpm1/" + rpm1.getName();
     final String file2 = "rpm2/" + rpm2.getName();
 
-    final TaskInfo<YumRepository> first = yum.addRpmAndRegenerate(file1);
-    final TaskInfo<YumRepository> second = yum.addRpmAndRegenerate(file2);
+    final TaskInfo first = yum.addRpmAndRegenerate(file1);
+    final TaskInfo second = yum.addRpmAndRegenerate(file2);
     futures.add(first);
     futures.add(second);
 
@@ -169,10 +169,10 @@ public class GenerateMetadataTaskConcurrencyIT
         is(file1 + pathSeparator + file2));
   }
 
-  private void waitFor(List<TaskInfo<?>> futures)
+  private void waitFor(List<TaskInfo> futures)
       throws ExecutionException, InterruptedException
   {
-    for (TaskInfo<?> future : futures) {
+    for (TaskInfo future : futures) {
       Future<?> f = future.getCurrentState().getFuture();
       if (f != null) {
         f.get();
