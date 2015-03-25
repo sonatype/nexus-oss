@@ -54,6 +54,7 @@ public class CoreLogConfigurationCustomizer
     // Useful loggers (level will be calculated as effective level)
     configuration.setLoggerLevel("org.sonatype.nexus", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.security", LoggerLevel.DEFAULT);
+    configuration.setLoggerLevel("org.sonatype.nexus.jmx", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.internal.log", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.internal.httpclient", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.configuration", LoggerLevel.DEFAULT);
