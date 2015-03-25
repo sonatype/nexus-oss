@@ -30,6 +30,7 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.BlobHandle;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
@@ -92,6 +93,16 @@ public class RawContentFacetImpl
 
   @Override
   public void put(final String path, final RawContent content) throws IOException, InvalidContentException {
+    final BlobHandle blobHandle;
+    try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
+      // TODO: Figure out created-by header
+      final ImmutableMap<String, String> headers = ImmutableMap
+          .of(BlobStore.BLOB_NAME_HEADER, path, BlobStore.CREATED_BY_HEADER, "unknown");
+
+      try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
+        blobHandle = getStorage().createBlob(is1, headers, hashAlgorithms, determineContentType(path, is2, content.getContentType()));
+      }
+    }
     try (StorageTx tx = getStorage().openTx()) {
       final Bucket bucket = tx.getBucket();
       Component component = getComponent(tx, path, bucket);
@@ -112,16 +123,7 @@ public class RawContentFacetImpl
         asset = component.firstAsset();
       }
 
-      // TODO: Figure out created-by header
-      final ImmutableMap<String, String> headers = ImmutableMap
-          .of(BlobStore.BLOB_NAME_HEADER, path, BlobStore.CREATED_BY_HEADER, "unknown");
-
-      try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
-        try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
-          tx.setBlob(is1, headers, asset, hashAlgorithms, determineContentType(path, is2, content.getContentType()));
-        }
-      }
-
+      tx.attachBlob(asset, blobHandle);
       tx.commit();
     }
   }

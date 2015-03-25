@@ -13,20 +13,27 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import java.io.InputStream;
 import java.util.Date;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.sonatype.nexus.blobstore.api.Blob;
+import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.hash.MultiHashingInputStream;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.IllegalOperationException;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
@@ -45,6 +52,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import com.tinkerpop.blueprints.impls.orient.OrientVertexType;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
 
@@ -189,6 +197,43 @@ public class StorageFacetImpl
     try (StorageTx tx = openStorageTx(false)) {
       tx.deleteBucket(tx.getBucket());
     }
+  }
+
+  @Override
+  @Guarded(by = STARTED)
+  public BlobHandle createBlob(final InputStream inputStream, final Map<String, String> headers,
+                               final Iterable<HashAlgorithm> hashAlgorithms, final String contentType)
+  {
+    checkNotNull(inputStream);
+    checkNotNull(headers);
+    checkNotNull(hashAlgorithms);
+    checkNotNull(contentType);
+
+    if (writePolicy == WritePolicy.DENY) {
+      throw new IllegalOperationException("Repository is read only.");
+    }
+
+    final BlobStore blobStore = blobStoreManager.get(blobStoreName);
+    final MultiHashingInputStream hashingStream = new MultiHashingInputStream(hashAlgorithms, inputStream);
+    final Blob blob = blobStore.create(hashingStream, headers);
+    final BlobRef blobRef = new BlobRef("NODE", "STORE", blob.getId().asUniqueString());
+    return new BlobHandle(blobRef, hashingStream.count(), contentType, hashingStream.hashes());
+  }
+
+  @Override
+  @Guarded(by = STARTED)
+  public boolean deleteBlob(final BlobHandle blobHandle) {
+    checkNotNull(blobHandle);
+    checkArgument(!blobHandle.isAttached(), "Blob already attached to asset!");
+
+    if (writePolicy == WritePolicy.DENY) {
+      throw new IllegalOperationException("Repository is read only.");
+    }
+
+    final BlobStore blobStore = blobStoreManager.get(blobStoreName);
+    blobStore.delete(blobHandle.getBlobRef().getBlobId());
+
+    return false;
   }
 
   @Override

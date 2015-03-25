@@ -186,16 +186,10 @@ public interface StorageTx
   void deleteBucket(Bucket bucket);
 
   /**
-   * Creates a new Blob.
+   * Attaches a Blob to asset and updates the given asset with a reference to it, hash metadata, size, and content type.
+   * The asset's old blob, if any, will be deleted.
    */
-  BlobRef createBlob(InputStream inputStream, Map<String, String> headers);
-
-  /**
-   * Creates a new Blob and updates the given asset with a reference to it, hash metadata, size, and content type.
-   * The old blob, if any, will be deleted.
-   */
-  BlobRef setBlob(InputStream inputStream, Map<String, String> headers, Asset asset,
-                     Iterable<HashAlgorithm> hashAlgorithms, String contentType);
+  void attachBlob(Asset asset, BlobHandle blobHandle);
 
   /**
    * Gets a Blob, or {@code null if not found}.

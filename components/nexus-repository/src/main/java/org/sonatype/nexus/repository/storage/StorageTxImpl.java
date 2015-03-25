@@ -495,22 +495,10 @@ public class StorageTxImpl
 
   @Override
   @Guarded(by = OPEN)
-  public BlobRef createBlob(final InputStream inputStream, Map<String, String> headers) {
-    checkNotNull(inputStream);
-    checkNotNull(headers);
-
-    return blobTx.create(inputStream, headers);
-  }
-
-  @Override
-  public BlobRef setBlob(final InputStream inputStream, final Map<String, String> headers, final Asset asset,
-                         final Iterable<HashAlgorithm> hashAlgorithms, final String contentType)
+  public void attachBlob(final Asset asset, final BlobHandle blobHandle)
   {
-    checkNotNull(inputStream);
-    checkNotNull(headers);
     checkNotNull(asset);
-    checkNotNull(hashAlgorithms);
-    checkNotNull(contentType);
+    checkNotNull(blobHandle);
 
     if (writePolicy == WritePolicy.DENY) {
       throw new IllegalOperationException("Repository is read only.");
@@ -525,22 +513,17 @@ public class StorageTxImpl
       deleteBlob(oldBlobRef, true);
     }
 
-    // Store new blob while calculating hashes in one pass
-    final MultiHashingInputStream hashingStream = new MultiHashingInputStream(hashAlgorithms, inputStream);
-    final BlobRef newBlobRef = createBlob(hashingStream, headers);
-
-    asset.blobRef(newBlobRef);
-    asset.size(hashingStream.count());
-    asset.contentType(contentType);
+    asset.blobRef(blobHandle.getBlobRef());
+    asset.size(blobHandle.getSize());
+    asset.contentType(blobHandle.getContentType());
 
     // Set attributes map to contain computed checksum metadata
-    Map<HashAlgorithm, HashCode> hashes = hashingStream.hashes();
     NestedAttributesMap checksums = asset.attributes().child(P_CHECKSUM);
-    for (HashAlgorithm algorithm : hashAlgorithms) {
-      checksums.set(algorithm.name(), hashes.get(algorithm).toString());
+    for (HashAlgorithm algorithm : blobHandle.getHashes().keySet()) {
+      checksums.set(algorithm.name(), blobHandle.getHashes().get(algorithm).toString());
     }
 
-    return newBlobRef;
+    blobHandle.setAttached(true);
   }
 
   @Nullable
