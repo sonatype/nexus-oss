@@ -29,6 +29,7 @@ import org.sonatype.nexus.common.stateguard.StateGuardAware;
 import org.sonatype.nexus.common.stateguard.Transitions;
 import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.Format;
+import org.sonatype.nexus.repository.IllegalOperationException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -70,15 +71,19 @@ public class StorageTxImpl
 
   private final ORID bucketId;
 
+  private final WritePolicy writePolicy;
+
   private final StateGuard stateGuard = new StateGuard.Builder().initial(CLOSED).create();
 
   public StorageTxImpl(final BlobTx blobTx,
                        final GraphTx graphTx,
-                       final ORID bucketId)
+                       final ORID bucketId,
+                       final WritePolicy writePolicy)
   {
     this.blobTx = checkNotNull(blobTx);
     this.graphTx = checkNotNull(graphTx);
     this.bucketId = checkNotNull(bucketId);
+    this.writePolicy = writePolicy;
   }
 
   public static final class State
@@ -131,7 +136,8 @@ public class StorageTxImpl
   public Iterable<Bucket> browseBuckets() {
     return Iterables.transform(
         graphTx.getVerticesOfClass(V_BUCKET),
-        new Function<Vertex, Bucket>() {
+        new Function<Vertex, Bucket>()
+        {
           @Override
           public Bucket apply(final Vertex vertex) {
             return new BucketImpl((OrientVertex) vertex);
@@ -146,7 +152,8 @@ public class StorageTxImpl
 
     return Iterables.transform(
         bucket.vertex().getVertices(Direction.OUT, E_OWNS_ASSET),
-        new Function<Vertex, Asset>() {
+        new Function<Vertex, Asset>()
+        {
           @Override
           public Asset apply(final Vertex vertex) {
             return new AssetImpl((OrientVertex) vertex);
@@ -161,7 +168,8 @@ public class StorageTxImpl
 
     return Iterables.transform(
         bucket.vertex().getVertices(Direction.OUT, E_OWNS_COMPONENT),
-        new Function<Vertex, Component>() {
+        new Function<Vertex, Component>()
+        {
           @Override
           public Component apply(final Vertex vertex) {
             return new ComponentImpl((OrientVertex) vertex);
@@ -201,7 +209,8 @@ public class StorageTxImpl
 
   @SuppressWarnings("unchecked")
   private OrientVertex findWithPropertyOwnedBy(String className, String propName, Object propValue,
-                                               String edgeLabel, Bucket bucket) {
+                                               String edgeLabel, Bucket bucket)
+  {
     checkNotNull(propName);
     checkNotNull(propValue);
     checkNotNull(bucket);
@@ -222,7 +231,8 @@ public class StorageTxImpl
   {
     return Iterables.transform(
         findVertices(V_ASSET, whereClause, parameters, E_OWNS_ASSET, repositories, querySuffix),
-        new Function<OrientVertex, Asset>() {
+        new Function<OrientVertex, Asset>()
+        {
           @Override
           public Asset apply(final OrientVertex vertex) {
             return new AssetImpl(vertex);
@@ -339,10 +349,12 @@ public class StorageTxImpl
   public Iterable<Component> findComponents(@Nullable String whereClause,
                                             @Nullable Map<String, Object> parameters,
                                             @Nullable Iterable<Repository> repositories,
-                                            @Nullable String querySuffix) {
+                                            @Nullable String querySuffix)
+  {
     return Iterables.transform(
         findVertices(V_COMPONENT, whereClause, parameters, E_OWNS_COMPONENT, repositories, querySuffix),
-        new Function<OrientVertex, Component>() {
+        new Function<OrientVertex, Component>()
+        {
           @Override
           public Component apply(final OrientVertex vertex) {
             return new ComponentImpl(vertex);
@@ -420,10 +432,14 @@ public class StorageTxImpl
   @Override
   @Guarded(by = OPEN)
   public void deleteComponent(Component component) {
+    deleteComponent(component, true);
+  }
+
+  public void deleteComponent(final Component component, final boolean checkWritePolicy) {
     checkNotNull(component);
 
     for (Asset asset : component.assets()) {
-      deleteAsset(asset);
+      deleteAsset(asset, checkWritePolicy);
     }
     deleteVertex(component.vertex());
   }
@@ -431,11 +447,15 @@ public class StorageTxImpl
   @Override
   @Guarded(by = OPEN)
   public void deleteAsset(Asset asset) {
+    deleteAsset(asset, true);
+  }
+
+  private void deleteAsset(final Asset asset, final boolean checkWritePolicy) {
     checkNotNull(asset);
 
     BlobRef blobRef = asset.blobRef();
     if (blobRef != null) {
-      deleteBlob(blobRef);
+      deleteBlob(blobRef, checkWritePolicy);
     }
     deleteVertex(asset.vertex());
   }
@@ -448,7 +468,7 @@ public class StorageTxImpl
 
     // first delete all components and constituent assets
     for (Component component : browseComponents(bucket)) {
-      deleteComponent(component);
+      deleteComponent(component, false);
       count++;
       if (count == DELETE_BATCH_SIZE) {
         commit();
@@ -459,7 +479,7 @@ public class StorageTxImpl
 
     // then delete all standalone assets
     for (Asset asset : browseAssets(bucket)) {
-      deleteAsset(asset);
+      deleteAsset(asset, false);
       count++;
       if (count == DELETE_BATCH_SIZE) {
         commit();
@@ -484,7 +504,7 @@ public class StorageTxImpl
 
   @Override
   public BlobRef setBlob(final InputStream inputStream, final Map<String, String> headers, final Asset asset,
-                            final Iterable<HashAlgorithm> hashAlgorithms, final String contentType)
+                         final Iterable<HashAlgorithm> hashAlgorithms, final String contentType)
   {
     checkNotNull(inputStream);
     checkNotNull(headers);
@@ -492,10 +512,17 @@ public class StorageTxImpl
     checkNotNull(hashAlgorithms);
     checkNotNull(contentType);
 
+    if (writePolicy == WritePolicy.DENY) {
+      throw new IllegalOperationException("Repository is read only.");
+    }
+
     // Delete old blob if necessary
     BlobRef oldBlobRef = asset.blobRef();
     if (oldBlobRef != null) {
-      deleteBlob(oldBlobRef);
+      if (writePolicy == WritePolicy.ALLOW_ONCE) {
+        throw new IllegalOperationException("Repository does not allow updating assets.");
+      }
+      deleteBlob(oldBlobRef, true);
     }
 
     // Store new blob while calculating hashes in one pass
@@ -533,9 +560,11 @@ public class StorageTxImpl
     return blob;
   }
 
-  private void deleteBlob(final BlobRef blobRef) {
+  private void deleteBlob(final BlobRef blobRef, boolean checkWritePolicy) {
     checkNotNull(blobRef);
-
+    if (checkWritePolicy && writePolicy == WritePolicy.DENY) {
+      throw new IllegalOperationException("Repository is read only.");
+    }
     blobTx.delete(blobRef);
   }
 }
