@@ -32,7 +32,6 @@ import javax.inject.Named;
 import com.sonatype.nexus.repository.nuget.internal.FeedResult;
 import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacet;
 import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacetImpl;
-import com.sonatype.nexus.repository.nuget.internal.NugetWritableGallery;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataConsumer;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
 
@@ -106,8 +105,6 @@ public class NugetProxyGalleryFacet
 
   @Override
   public String feed(final String base, final String operation, final Map<String, String> query) {
-
-
     final Integer top = asInteger(query.get("$top"));
     final Integer skip = asInteger(query.get("$skip"));
     Map<String, String> remoteQuery = modifyQueryForRemote(operation, query, top, skip);
@@ -115,15 +112,16 @@ public class NugetProxyGalleryFacet
     // Populate local metadata with the remote metadata
     final List<Integer> remoteCounts = passQueryToRemoteRepos(nugetQuery(operation, remoteQuery),
         getProxyRepositories(),
-        new FeedLoader(fetcher, this));
+        new FeedLoader(fetcher));
 
     // Now re-run the query locally
     final FeedResult localResult = feed(base, operation, query, getRepositories());
 
     // Work out the number of results we should report to the client.
     // Note that nuget.org itself occasionally reports nonsensical results.
-    int reportedCount = CountReportingPolicy.determineReportedCount(remoteCounts, localResult.getCount(), top, skip);
-    if ("Search".equals(operation)) {
+    final int localCount = firstNonNull(localResult.getCount(), 0);
+    int reportedCount = CountReportingPolicy.determineReportedCount(remoteCounts, localCount, top, skip);
+        if ("Search".equals(operation)) {
       // If we're searching, cap results at 40 like nuget.org.
       reportedCount = min(ODataUtils.PAGE_SIZE, reportedCount);
     }
@@ -158,7 +156,7 @@ public class NugetProxyGalleryFacet
     if (entryXml == null) {
       final String remoteQuery = "Packages(Id='" + id + "',Version='" + version + "')";
 
-      passQueryToRemoteRepos(nugetQuery(remoteQuery), getProxyRepositories(),new FeedLoader(fetcher, this));
+      passQueryToRemoteRepos(nugetQuery(remoteQuery), getProxyRepositories(), new FeedLoader(fetcher));
       entryXml = super.entry(base, id, version);
     }
     return entryXml;
@@ -268,15 +266,13 @@ public class NugetProxyGalleryFacet
   private static class FeedLoader
       extends RemoteCallFactory
   {
-    private final NugetWritableGallery gallery;
-
-    private FeedLoader(final NugetFeedFetcher fetcher, final NugetWritableGallery gallery) {
+    private FeedLoader(final NugetFeedFetcher fetcher) {
       super(fetcher);
-      this.gallery = gallery;
     }
 
     public Callable<Integer> build(final Repository remote, final URI nugetQuery)
     {
+      final NugetGalleryFacet gallery = remote.facet(NugetGalleryFacet.class);
       return new Callable<Integer>()
       {
         @Override
@@ -285,7 +281,7 @@ public class NugetProxyGalleryFacet
           {
             @Override
             public void consume(final Map<String, String> data) {
-              gallery.putMetadata(data);
+             gallery.putMetadata(data);
             }
           }), 0);
         }
