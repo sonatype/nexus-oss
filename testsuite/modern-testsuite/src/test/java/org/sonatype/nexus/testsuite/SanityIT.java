@@ -16,11 +16,8 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 
 import org.junit.Test;
-import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.Option;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -31,13 +28,8 @@ import static org.hamcrest.Matchers.is;
  * @since 3.0
  */
 public class SanityIT
-    extends NexusPaxExamSupport
+    extends NexusCoreITSupport
 {
-  @Configuration
-  public static Option[] config() {
-    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"));
-  }
-
   @Inject
   private SystemStatus status;
 
