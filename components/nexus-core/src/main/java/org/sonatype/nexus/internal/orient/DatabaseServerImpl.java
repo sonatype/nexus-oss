@@ -21,6 +21,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.ApplicationDirectories;
+import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
+import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.nexus.orient.DatabaseServer;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
@@ -49,6 +51,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
+@ManagedObject
 public class DatabaseServerImpl
     extends LifecycleSupport
     implements DatabaseServer
@@ -70,6 +73,11 @@ public class DatabaseServerImpl
 
     // disable default global shutdown-hook, will shutdown manually when nexus is stopped
     Orient.instance().removeShutdownHook();
+  }
+
+  @ManagedAttribute
+  public boolean isListenerEnabled() {
+    return listenerEnabled;
   }
 
   @Override

@@ -12,14 +12,12 @@
  */
 package org.sonatype.nexus.internal.event;
 
-import java.lang.management.ManagementFactory;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import org.sonatype.nexus.common.property.SystemPropertiesHelper;
+import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
+import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -39,44 +37,29 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @EagerSingleton
+@ManagedObject
 public class DebugEventInspector
     extends ComponentSupport
 {
-  private static final String JMX_DOMAIN = DebugEventInspector.class.getPackage().getName();
-
   private final boolean ENABLED_DEFAULT = SystemPropertiesHelper.getBoolean(
       DebugEventInspector.class.getName() + ".enabled", false);
 
   private volatile boolean enabled;
-
-  private ObjectName jmxName;
 
   private final EventBus eventBus;
 
   @Inject
   public DebugEventInspector(final EventBus eventBus) {
     this.eventBus = checkNotNull(eventBus);
-
-    try {
-      jmxName = ObjectName.getInstance(JMX_DOMAIN, "name", DebugEventInspector.class.getSimpleName());
-      final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-      if (server.isRegistered(jmxName)) {
-        log.warn("MBean already registered; replacing: {}", jmxName);
-        server.unregisterMBean(jmxName);
-      }
-      server.registerMBean(new DefaultDebugEventInspectorMBean(this), jmxName);
-    }
-    catch (Exception e) {
-      jmxName = null;
-      log.warn("Problem registering MBean for: " + getClass().getName(), e);
-    }
     setEnabled(ENABLED_DEFAULT);
   }
 
+  @ManagedAttribute
   public boolean isEnabled() {
     return enabled;
   }
 
+  @ManagedAttribute
   public void setEnabled(boolean enabled) {
     try {
       if (enabled && !this.enabled) {

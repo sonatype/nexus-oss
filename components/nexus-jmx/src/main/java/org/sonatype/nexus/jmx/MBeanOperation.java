@@ -10,27 +10,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.repository;
+package org.sonatype.nexus.jmx;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.log.LogConfigurationCustomizer;
-
-import static org.sonatype.nexus.log.LoggerLevel.DEFAULT;
+import javax.annotation.Nullable;
+import javax.management.MBeanOperationInfo;
 
 /**
- * Repository {@link LogConfigurationCustomizer}.
+ * MBean operation.
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class LogConfigurationCustomizerImpl
-    implements LogConfigurationCustomizer
+public interface MBeanOperation
+  extends MBeanFeature
 {
-  @Override
-  public void customize(final Configuration config) {
-    config.setLoggerLevel("org.sonatype.nexus.repository", DEFAULT);
-  }
+  /**
+   * Operation information.
+   */
+  MBeanOperationInfo getInfo();
+
+  /**
+   * Operation name.
+   */
+  String getName();
+
+  /**
+   * Operation key.
+   */
+  OperationKey getKey();
+
+  /**
+   * Invoke operation.
+   */
+  @Nullable
+  Object invoke(Object[] params) throws Exception;
 }

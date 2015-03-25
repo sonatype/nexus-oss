@@ -10,40 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal;
+package org.sonatype.nexus.jmx.internal;
 
-import javax.inject.Inject;
+import java.lang.management.ManagementFactory;
+
 import javax.inject.Named;
 import javax.inject.Provider;
-
-import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.SystemStatus;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import org.eclipse.sisu.Typed;
+import javax.inject.Singleton;
+import javax.management.MBeanServer;
 
 /**
- * {@link SystemStatus} provider.
- *
- * This is not a singleton, as the status does change over time.
+ * Provides the platform {@link MBeanServer}.
  *
  * @since 3.0
  */
-@Named
-@Typed({SystemStatus.class, Object.class}) // HACK: needed to allow @ManagedObject detection to function
-public class SystemStatusProvider
-  extends ComponentSupport
-  implements Provider<SystemStatus>
+@Named("platform")
+@Singleton
+public class PlatformMBeanServerProvider
+  implements Provider<MBeanServer>
 {
-  private final ApplicationStatusSource statusSource;
-
-  @Inject
-  public SystemStatusProvider(final ApplicationStatusSource statusSource) {
-    this.statusSource = statusSource;
-  }
-
   @Override
-  public SystemStatus get() {
-    return statusSource.getSystemStatus();
+  public MBeanServer get() {
+    return ManagementFactory.getPlatformMBeanServer();
   }
 }

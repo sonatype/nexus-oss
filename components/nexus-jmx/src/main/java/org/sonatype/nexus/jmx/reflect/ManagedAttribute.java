@@ -10,27 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.repository;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.sonatype.nexus.jmx.reflect;
 
-import org.sonatype.nexus.log.LogConfigurationCustomizer;
-
-import static org.sonatype.nexus.log.LoggerLevel.DEFAULT;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Repository {@link LogConfigurationCustomizer}.
+ * Marks a method as a managed attribute.
  *
+ * @see ManagedObject
+ * @see ManagedOperation
  * @since 3.0
  */
-@Named
-@Singleton
-public class LogConfigurationCustomizerImpl
-    implements LogConfigurationCustomizer
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})
+public @interface ManagedAttribute
 {
-  @Override
-  public void customize(final Configuration config) {
-    config.setLoggerLevel("org.sonatype.nexus.repository", DEFAULT);
-  }
+  /**
+   * Customized attribute name.  If left unset will detect attribute-name from method.
+   */
+  String name() default "";
+
+  /**
+   * Optional attribute description.
+   */
+  String description() default "";
 }

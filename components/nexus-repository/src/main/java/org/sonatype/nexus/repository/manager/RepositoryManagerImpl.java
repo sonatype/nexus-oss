@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
+import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.nexus.repository.Recipe;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -46,11 +47,15 @@ import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.St
  */
 @Named
 @Singleton
+@ManagedObject(
+    domain = "org.sonatype.nexus.repository.manager",
+    typeClass = RepositoryManager.class,
+    description = "Repository manager"
+)
 public class RepositoryManagerImpl
     extends StateGuardLifecycleSupport
     implements RepositoryManager
 {
-
   /**
    * System property used to bypass installation of default repositories; useful for testing purposes.
    */
