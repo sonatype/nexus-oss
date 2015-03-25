@@ -57,9 +57,8 @@ public class EnvironmentFilter
     checkNotNull(statusProvider);
     this.baseUrlDetector = checkNotNull(baseUrlDetector);
 
-    SystemStatus status = statusProvider.get();
-
     // cache "Server" header value
+    SystemStatus status = statusProvider.get();
     this.serverHeader = String.format("Nexus/%s (%s)", status.getVersion(), status.getEditionShort());
   }
 
