@@ -28,19 +28,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.security.UserIdMdcHelper;
-import org.sonatype.nexus.web.ErrorStatusException;
+import org.sonatype.nexus.web.BaseUrlDetector;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.net.HttpHeaders.SERVER;
 import static com.google.common.net.HttpHeaders.X_CONTENT_TYPE_OPTIONS;
 import static com.google.common.net.HttpHeaders.X_FRAME_OPTIONS;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-
-// TODO: Find better name
 
 /**
- * ???
+ * Sets up the basic environment for web-requests.
  *
  * @since 3.0
  */
@@ -51,9 +48,15 @@ public class EnvironmentFilter
 {
   private final String serverHeader;
 
+  private final BaseUrlDetector baseUrlDetector;
+
   @Inject
-  public EnvironmentFilter(final Provider<SystemStatus> statusProvider) {
+  public EnvironmentFilter(final Provider<SystemStatus> statusProvider,
+                           final BaseUrlDetector baseUrlDetector)
+  {
     checkNotNull(statusProvider);
+    this.baseUrlDetector = checkNotNull(baseUrlDetector);
+
     SystemStatus status = statusProvider.get();
 
     // cache "Server" header value
@@ -80,8 +83,8 @@ public class EnvironmentFilter
     // start with default unknown user-id in MDC
     UserIdMdcHelper.unknown();
 
-    // TODO: detect+set base-url
-    // baseUrlDetector.set()
+    // detect base-url
+    baseUrlDetector.set();
 
     // fill in default response headers
     defaultHeaders(httpResponse);

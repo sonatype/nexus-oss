@@ -37,6 +37,8 @@ public class UserIdMdcHelper
 
   public static final String UNKNOWN = "*UNKNOWN";
 
+  public static final String SYSTEM = "*SYSTEM";
+
   public static boolean isSet() {
     String userId = MDC.get(KEY);
     return !(Strings.isNullOrEmpty(userId) || UNKNOWN.equals(userId));
@@ -78,6 +80,10 @@ public class UserIdMdcHelper
 
   public static void unknown() {
     MDC.put(KEY, UNKNOWN);
+  }
+
+  public static void system() {
+    MDC.put(KEY, SYSTEM);
   }
 
   public static void unset() {
