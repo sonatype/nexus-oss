@@ -19,7 +19,7 @@ import java.util.Map;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
-import org.sonatype.nexus.orient.DatabaseInstanceRule;
+import org.sonatype.nexus.orient.PersistentDatabaseInstanceRule;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -33,6 +33,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.inject.util.Providers;
+import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
@@ -41,6 +42,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertNotNull;
@@ -60,7 +62,7 @@ public class StorageFacetImplIT
     extends TestSupport
 {
   @Rule
-  public DatabaseInstanceRule database = new DatabaseInstanceRule("test");
+  public PersistentDatabaseInstanceRule database = new PersistentDatabaseInstanceRule("test");
 
   protected StorageFacetImpl underTest;
 
@@ -337,6 +339,92 @@ public class StorageFacetImplIT
       // NOTE: It doesn't matter for this test, but you should commit when finished with one or more writes
       //       If you don't, your changes will be automatically rolled back.
       tx.commit();
+    }
+  }
+
+  @Test
+  public void concurrentTransactionWithoutConflictTest() throws Exception {
+    doConcurrentTransactionTest(false);
+  }
+
+  @Test
+  public void concurrentTransactionWithConflictTest() throws Exception {
+    doConcurrentTransactionTest(true);
+  }
+
+  private void doConcurrentTransactionTest(boolean simulateConflict) throws Exception {
+    // setup:
+    //   main thread: create a new asset and commit it.
+    // test:
+    //   main thread: start new transaction, and if simulating a conflict, read the asset
+    //   aux thread: start new transaction, modify asset, and commit
+    //   main thread: if not simulating a conflict, read the asset. then modify the asset, then commit it
+    // expectation:
+    //   if simulating a conflict: commit on main thread fails with OConcurrentModificationException
+    //   if not simulating a conflict: modification made in main thread is persisted after the modification on aux
+
+    // setup
+    final ORID assetId;
+    int firstVersion;
+    try (StorageTx tx = underTest.openTx()) {
+      Bucket bucket = tx.getBucket();
+      Asset asset = tx.createAsset(bucket, testFormat);
+      assetId = asset.id();
+      tx.commit();
+      firstVersion = asset.get("@version", Integer.class);
+    }
+
+    // test
+    // 1. start a tx (mainTx) in the main thread
+    try (StorageTx mainTx = underTest.openTx()) {
+      Bucket bucket = mainTx.getBucket();
+      Asset asset = null;
+
+      if (simulateConflict) {
+        // cause a conflict to occur later by reading the asset before the other tx starts
+        // (this causes the MVCC version comparison at commit-time to fail)
+        asset = checkNotNull(mainTx.findAsset(assetId, bucket));
+      }
+
+      // 2. modify and commit the asset in a separate tx (auxTx) in another thread
+      Thread auxThread = new Thread() {
+        @Override
+        public void run() {
+          try (StorageTx auxTx = underTest.openTx()) {
+            Bucket bucket = auxTx.getBucket();
+            Asset asset = checkNotNull(auxTx.findAsset(assetId, bucket));
+            asset.set("foo", "firstValue");
+            auxTx.commit();
+          }
+        }
+      };
+      auxThread.start();
+      auxThread.join();
+
+      // 3. modify and commit the asset in mainTx, in the main thread
+      if (!simulateConflict) {
+        // only read the asset we propose to change *after* the other transaction completes
+        asset = checkNotNull(mainTx.findAsset(assetId, bucket));
+      }
+      asset.set("foo", "secondValue");
+      mainTx.commit(); // if we're simulating a conflict, this call should throw OConcurrentModificationException
+      assertThat(simulateConflict, is(false));
+    }
+    catch (OConcurrentModificationException e) {
+      assertThat(simulateConflict, is(true));
+      return;
+    }
+
+    // not simulating a conflict; verify the expected state
+    try (StorageTx tx = underTest.openTx()) {
+      Bucket bucket = tx.getBucket();
+      Asset asset = checkNotNull(tx.findAsset(assetId, bucket));
+
+      String fooValue = asset.require("foo");
+      int finalVersion = asset.require("@version", Integer.class);
+
+      assertThat(fooValue, is("secondValue"));
+      assertThat(finalVersion, is(firstVersion + 2));
     }
   }
 
