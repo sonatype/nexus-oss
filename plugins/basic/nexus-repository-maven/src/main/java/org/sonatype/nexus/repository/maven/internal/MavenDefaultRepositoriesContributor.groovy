@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2HostedRecipe
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy
+import org.sonatype.nexus.repository.storage.WritePolicy
 
 
 /**
@@ -36,20 +37,26 @@ class MavenDefaultRepositoriesContributor
     return [
         new Configuration(repositoryName: 'releases', recipeName: Maven2HostedRecipe.NAME, attributes:
             [
-                maven: [
+                maven  : [
                     versionPolicy              : VersionPolicy.RELEASE.toString(),
                     checksumPolicy             : ChecksumPolicy.STRICT.toString(),
                     strictContentTypeValidation: false
+                ],
+                storage: [
+                    writePolicy: WritePolicy.ALLOW_ONCE.toString()
                 ]
 
             ]
         ),
         new Configuration(repositoryName: 'snapshots', recipeName: Maven2HostedRecipe.NAME, attributes:
             [
-                maven: [
+                maven  : [
                     versionPolicy              : VersionPolicy.SNAPSHOT.toString(),
                     checksumPolicy             : ChecksumPolicy.STRICT.toString(),
                     strictContentTypeValidation: false
+                ],
+                storage: [
+                    writePolicy: WritePolicy.ALLOW.toString()
                 ]
             ]
         )
