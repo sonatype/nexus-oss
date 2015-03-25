@@ -13,8 +13,9 @@
 package org.sonatype.nexus.repository.security;
 
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.view.Request;
+
+import org.apache.shiro.authz.AuthorizationException;
 
 /**
  * Security facet.
@@ -26,7 +27,9 @@ public interface SecurityFacet
   extends Facet
 {
   /**
-   * Check if the given request is permitted on the the repository.
+   * Ensure the given request is permitted on the repository.
+   *
+   * @throws AuthorizationException
    */
-  boolean permitted(Request request);
+  void ensurePermitted(Request request);
 }

@@ -13,18 +13,29 @@
 
 package org.sonatype.nexus.security.authc;
 
+import java.io.IOException;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
+import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Nexus {@link BasicHttpAuthenticationFilter}.
+ * Nexus security filter providing HTTP BASIC authentication support.
+ *
+ * Knows about special handling needed for anonymous subjects.
+ *
+ * Does not create sessions.
  *
  * @since 3.0
  */
@@ -41,14 +52,21 @@ public class NexusBasicHttpAuthenticationFilter
     setApplicationName("Sonatype Nexus");
   }
 
-  // TODO: Should we build in browser detecting to avoid sending 401?
+  /**
+   * Always use permissive mode, which is needed for anonymous user support.
+   */
+  @Override
+  protected boolean isPermissive(final Object mappedValue) {
+    return true;
+  }
 
+  /**
+   * Disable session creation for all BASIC auth requests.
+   */
   @Override
   public boolean onPreHandle(final ServletRequest request, final ServletResponse response, final Object mappedValue)
       throws Exception
   {
-    // TODO: Sort out if this is proper, or if we should use noSessionCreation filter?
-
     // Basic auth should never create sessions
     request.setAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
 
@@ -56,10 +74,43 @@ public class NexusBasicHttpAuthenticationFilter
   }
 
   /**
-   * Default to permissive mode, which is needed for anonymous user support.
+   * Permissive {@link AuthorizationException} 401 and 403 handling.
    */
   @Override
-  protected boolean isPermissive(final Object mappedValue) {
-    return true;
+  protected void cleanup(final ServletRequest request, final ServletResponse response, Exception failure)
+      throws ServletException, IOException
+  {
+    // decode target exception
+    Throwable cause = failure;
+    if (cause instanceof ServletException) {
+      cause = cause.getCause();
+    }
+
+    // special handling for authz failures due to permissive
+    if (cause instanceof AuthorizationException) {
+      // clear the failure
+      failure = null;
+
+      Subject subject = getSubject(request, response);
+      boolean authenticated = subject.getPrincipal() != null && subject.isAuthenticated();
+
+      if (authenticated) {
+        // authenticated subject -> 403 forbidden
+        WebUtils.toHttp(response).sendError(HttpServletResponse.SC_FORBIDDEN);
+      }
+      else {
+        // unauthenticated subject -> 401 inform to authenticate
+        try {
+          // TODO: Should we build in browser detecting to avoid sending 401, should that be its own filter?
+
+          onAccessDenied(request, response);
+        }
+        catch (Exception e) {
+          failure = e;
+        }
+      }
+    }
+
+    super.cleanup(request, response, failure);
   }
 }

@@ -17,14 +17,10 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import org.apache.shiro.authz.AuthorizationException;
 
 /**
  * Security handler.
@@ -45,15 +41,8 @@ public class SecurityHandler
     // TODO: May need to check/set some authorized flag in request-context to support group security?
     // TODO: NX2 group security applies to all members, so checks on members when accessed via group are not checked
 
-    if (securityFacet.permitted(context.getRequest())) {
-      try {
-        return context.proceed();
-      }
-      catch (AuthorizationException e) {
-        log.trace("Not authorized", e);
-      }
-    }
+    securityFacet.ensurePermitted(context.getRequest());
 
-    return HttpResponses.unauthorized();
+    return context.proceed();
   }
 }
