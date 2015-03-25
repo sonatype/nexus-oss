@@ -24,6 +24,7 @@ import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.storage.BlobHandle;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
 import org.sonatype.nexus.repository.storage.ComponentEvent;
@@ -95,7 +96,7 @@ public class NugetGalleryFacetImplPutTest
     Component component = mock(Component.class);
     ORID orid = mock(ORID.class);
     doReturn(component).when(galleryFacet)
-        .createOrUpdatePackage(any(StorageTx.class), any(Map.class), any(InputStream.class));
+        .createOrUpdatePackage(any(StorageTx.class), any(Map.class), any(BlobHandle.class));
     when(component.isNew()).thenReturn(isNew);
 
     galleryFacet.put(packageStream);

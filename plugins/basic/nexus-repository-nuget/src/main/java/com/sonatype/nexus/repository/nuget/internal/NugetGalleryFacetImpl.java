@@ -44,6 +44,7 @@ import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.BlobHandle;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
@@ -208,11 +209,12 @@ public class NugetGalleryFacetImpl
 
   @Override
   public void putContent(String id, String version, InputStream content) {
+    final BlobHandle blobHandle = storeBlob(content, id, version);
     try (StorageTx tx = openStorageTx()) {
       final Bucket bucket = tx.getBucket();
       Component component = findComponent(tx, id, version);
       checkState(component != null, "Component metadata does not exist yet");
-      createOrUpdateAsset(tx, bucket, component, content);
+      createOrUpdateAsset(tx, bucket, component, blobHandle);
       tx.commit();
     }
   }
@@ -261,9 +263,7 @@ public class NugetGalleryFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void put(final InputStream inputStream) throws IOException, NugetPackageException {
-    try (StorageTx storageTx = openStorageTx();
-         TempStreamSupplier tempStream = new TempStreamSupplier(inputStream)) {
-
+    try (TempStreamSupplier tempStream = new TempStreamSupplier(inputStream)) {
       final HashMap<String, String> recordMetadata = Maps.newHashMap();
       Map<String, String> packageMetadata;
       try (InputStream in = tempStream.get()) {
@@ -271,7 +271,6 @@ public class NugetGalleryFacetImpl
       }
 
       recordMetadata.putAll(packageMetadata);
-
       // TODO: Do something cleaner with this derived data, as well as the derived stuff inside createOrUpdateComponent
       // Note: These are defaults that hold for locally-published packages,
       // but should be overridden for remotely fetched content
@@ -279,22 +278,28 @@ public class NugetGalleryFacetImpl
       recordMetadata.put(CREATED, creationTime);
       recordMetadata.put(LAST_UPDATED, creationTime);
       recordMetadata.put(PUBLISHED, creationTime);
-      Component component;
+
+      final BlobHandle blobHandle;
+      final String id = checkNotNull(recordMetadata.get(ID));
+      final String version = checkVersion(recordMetadata.get(VERSION));
       try (InputStream in = tempStream.get()) {
-        component = createOrUpdatePackage(storageTx, recordMetadata, in);
+        blobHandle = storeBlob(in, id, version);
       }
 
-      String id = recordMetadata.get(ID);
-      maintainAggregateInfo(storageTx, id);
+      try (StorageTx storageTx = openStorageTx()) {
+        Component component = createOrUpdatePackage(storageTx, recordMetadata, blobHandle);
 
-      boolean isNew = component.isNew();  // must check before commit
-      storageTx.commit();
+        maintainAggregateInfo(storageTx, id);
 
-      if (isNew) {
-        getEventBus().post(new ComponentCreatedEvent(component, getRepository()));
-      }
-      else {
-        getEventBus().post(new ComponentUpdatedEvent(component, getRepository()));
+        boolean isNew = component.isNew();  // must check before commit
+        storageTx.commit();
+
+        if (isNew) {
+          getEventBus().post(new ComponentCreatedEvent(component, getRepository()));
+        }
+        else {
+          getEventBus().post(new ComponentUpdatedEvent(component, getRepository()));
+        }
       }
     }
   }
@@ -361,16 +366,20 @@ public class NugetGalleryFacetImpl
 
   @VisibleForTesting
   Component createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata,
-                                     final InputStream packageStream)
+                                     final BlobHandle blobHandle)
   {
     final Bucket bucket = storageTx.getBucket();
     final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
-    createOrUpdateAsset(storageTx, bucket, component, packageStream);
+    createOrUpdateAsset(storageTx, bucket, component, blobHandle);
     return component;
   }
 
   private String blobName(Component component) {
-    return component.get(P_NAME) + " " + component.require(P_VERSION) + "@" + getRepository().getName();
+    return blobName(component.require(P_NAME), component.require(P_VERSION));
+  }
+
+  private String blobName(final String name, final String version) {
+    return name + " " + version + "@" + getRepository().getName();
   }
 
   /**
@@ -418,6 +427,13 @@ public class NugetGalleryFacetImpl
     }
   }
 
+  private BlobHandle storeBlob(final InputStream in, final String id, final String version) {
+    final String blobName = blobName(id, version);
+    final ImmutableMap<String, String> headers = ImmutableMap
+        .of(BlobStore.BLOB_NAME_HEADER, blobName, BlobStore.CREATED_BY_HEADER, "unknown");
+    return storage.createBlob(in, headers, Arrays.asList(HashAlgorithm.SHA512), "application/zip");
+  }
+
   private Iterable<Component> findComponentsById(final StorageTx storageTx, final Object id) {
     final String whereClause = "name = :name";
     Map<String, Object> parameters = ImmutableMap.of(P_NAME, id);
@@ -425,7 +441,7 @@ public class NugetGalleryFacetImpl
   }
 
   private Asset createOrUpdateAsset(final StorageTx storageTx, final Bucket bucket,
-                                    final Component component, final InputStream in)
+                                    final Component component, final BlobHandle blobHandle)
   {
     Asset asset = null;
 
@@ -437,10 +453,7 @@ public class NugetGalleryFacetImpl
       asset = assets.get(0);
     }
 
-    final ImmutableMap<String, String> headers = ImmutableMap
-        .of(BlobStore.BLOB_NAME_HEADER, blobName(component), BlobStore.CREATED_BY_HEADER, "unknown");
-
-    storageTx.setBlob(in, headers, asset, Arrays.asList(HashAlgorithm.SHA512), "application/zip");
+    storageTx.attachBlob(asset, blobHandle);
 
     return asset;
   }
