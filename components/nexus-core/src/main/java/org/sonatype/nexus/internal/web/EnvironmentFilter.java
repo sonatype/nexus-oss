@@ -97,6 +97,9 @@ public class EnvironmentFilter
     }
   }
 
+  /**
+   * Add default headers to servlet response.
+   */
   private void defaultHeaders(final HttpServletResponse response) {
     response.setHeader(SERVER, serverHeader);
 
