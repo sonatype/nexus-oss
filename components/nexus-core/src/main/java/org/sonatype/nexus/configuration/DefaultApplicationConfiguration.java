@@ -34,6 +34,9 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
+import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
+import org.sonatype.nexus.jmx.reflect.ManagedObject;
+import org.sonatype.nexus.jmx.reflect.ManagedOperation;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.cache.CacheManager;
@@ -74,6 +77,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 @Named
+@ManagedObject(
+    typeClass = ApplicationConfiguration.class,
+    description = "Application configuration"
+)
 public class DefaultApplicationConfiguration
     extends ComponentSupport
     implements ApplicationConfiguration
@@ -215,6 +222,7 @@ public class DefaultApplicationConfiguration
   }
 
   @Override
+  @ManagedOperation
   public synchronized void loadConfiguration(boolean force) throws IOException {
     if (force || configurationSource.getConfiguration() == null) {
       log.info("Loading Nexus Configuration...");
@@ -348,6 +356,7 @@ public class DefaultApplicationConfiguration
   }
 
   @Override
+  @ManagedOperation
   public synchronized void saveConfiguration()
       throws IOException
   {
@@ -385,6 +394,7 @@ public class DefaultApplicationConfiguration
 
   @Override
   @Deprecated
+  @ManagedAttribute
   public File getWorkingDirectory() {
     return applicationDirectories.getWorkDirectory();
   }
@@ -396,6 +406,7 @@ public class DefaultApplicationConfiguration
   }
 
   @Override
+  @ManagedAttribute
   public File getConfigurationDirectory() {
     return configurationDirectory;
   }
@@ -638,6 +649,7 @@ public class DefaultApplicationConfiguration
   }
 
   @Override
+  @ManagedOperation
   public void deleteRepository(String id)
       throws NoSuchRepositoryException, IOException, AccessDeniedException
   {
@@ -645,6 +657,7 @@ public class DefaultApplicationConfiguration
   }
 
   @Override
+  @ManagedOperation
   public synchronized void deleteRepository(String id, boolean force)
       throws NoSuchRepositoryException, IOException, AccessDeniedException
   {
