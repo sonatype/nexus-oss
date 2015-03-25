@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -56,6 +57,11 @@ public class PartialFetchHandler
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
     final Response response = context.proceed();
+
+    // Range requests only apply to GET
+    if (!HttpMethods.GET.equals(context.getRequest().getAction())) {
+      return response;
+    }
 
     if (!response.getStatus().isSuccessful()) {
       // We don't interfere with failure responses
