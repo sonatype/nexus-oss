@@ -76,12 +76,20 @@ Ext.define('NX.controller.SettingsForm', {
    * Loads the form if form's api load function is defined.
    */
   loadForm: function (form, options) {
+    var me = this;
+
     if (!form.isDestroyed && form.rendered) {
       if (form.api && form.api.load) {
+        // Load the form
         form.load(Ext.applyIf(options || {}, {
           waitMsg: form.settingsFormLoadMessage,
           success: function (basicForm, action) {
+            // Form is valid
             form.isValid();
+
+            // Set fields as not dirty
+            me.resetDirtyState(form);
+
             form.fireEvent('loaded', form, action);
           },
           failure: function (basicForm, action) {
@@ -91,6 +99,22 @@ Ext.define('NX.controller.SettingsForm', {
       }
       else {
         form.isValid();
+      }
+    }
+  },
+
+  /*
+   * @private
+   * Reset the dirty state of the form
+   */
+  resetDirtyState: function (form) {
+    var items = form.getForm().getFields().items;
+
+    for(var i = 0; i < items.length; i++) {
+      var c = items[i];
+      if(c.mixins && c.mixins.field && typeof c.mixins.field['initValue'] == 'function') {
+        c.mixins.field.initValue.apply(c);
+        c.wasDirty = false;
       }
     }
   },

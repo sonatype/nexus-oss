@@ -55,6 +55,10 @@ Ext.define('NX.controller.Menu', {
       selector: 'nx-feature-menu'
     },
     {
+      ref: 'featureContent',
+      selector: 'nx-feature-content'
+    },
+    {
       ref: 'headerPanel',
       selector: 'nx-header-panel'
     }
@@ -117,10 +121,28 @@ Ext.define('NX.controller.Menu', {
       component: {
         'nx-feature-menu': {
           select: me.onSelection,
-          afterrender: me.onAfterRender
+          afterrender: me.onAfterRender,
+          beforecellclick: function(tree, td, cellIndex, record) {
+            return me.warnBeforeMenuSelect(
+              function() {
+                me.getFeatureMenu().getSelectionModel().select(record);
+              }
+            );
+          }
         },
         'nx-header-panel button[mode]': {
-          click: me.onModeChanged
+          click: function(button, e, eOpts) {
+            var cb = function() {
+              me.getHeaderPanel().down('button[mode=' + button.mode + ']').toggle(true);
+              me.changeMode(button.mode);
+            }
+
+            if (me.warnBeforeMenuSelect(cb)) {
+              me.changeMode(button.mode);
+            } else {
+              me.getHeaderPanel().down('button[mode=' + this.mode + ']').toggle(true);
+            }
+          }
         },
         'button[mode]': {
           afterrender: me.registerModeButton,
@@ -575,16 +597,6 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
-   * @private
-   */
-  onModeChanged: function (button) {
-    var me = this,
-        mode = button.mode;
-
-    me.changeMode(mode);
-  },
-
-  /**
    * @public
    * Change mode.
    * @param {String} mode to change to
@@ -643,6 +655,85 @@ Ext.define('NX.controller.Menu', {
     me.refreshModeButtons();
     me.refreshTree();
     me.toggleMenu();
+  },
+
+  /**
+   * @private
+   * Check for unsaved changes. Warn the user, and stop or continue navigation
+   */
+  warnBeforeMenuSelect: function(callback) {
+    var me = this,
+      dirty = me.hasDirt(),
+      content = me.getFeatureContent();
+
+    // If false, we’ve already warned the user about the unsaved changes. Don’t warn again.
+    if (content.discardUnsavedChanges) {
+      // Reset the flag and continue with navigation
+      content.discardUnsavedChanges = false;
+      return true;
+    }
+
+    // Load the content, but warn first if there are unsaved changes
+    if (dirty) {
+      // Show modal and stop navigation
+      me.showUnsavedChangesModal(callback);
+      return false;
+
+    } else {
+      // Continue with navigation
+      return true;
+    }
+  },
+
+  /**
+   * @private
+   * Show warning modal about unsaved changes, and take action
+   *
+   * @param record The menu item we’re trying to navigate to
+   */
+  showUnsavedChangesModal: function(callback) {
+    var me = this,
+      content = me.getFeatureContent();
+
+    Ext.Msg.show({
+      title: 'Unsaved changes',
+      msg: 'Do you want to discard your changes?',
+      buttons: 6, // YESNO
+      buttonText: {
+        yes: 'Yes, discard changes',
+        no: 'No, go back'
+      },
+      icon: Ext.MessageBox.WARNING,
+      fn: function(buttonName) {
+        if (buttonName === 'yes') {
+
+          // Discard changes and load new content
+          content.discardUnsavedChanges = true;
+          callback();
+        }
+      }
+    });
+  },
+
+  /**
+   * @private
+   * Are any forms dirty?
+   */
+  hasDirt: function() {
+    var dirty = false,
+      forms = Ext.ComponentQuery.query('form[settingsForm=true]');
+
+    // Check for dirty content
+    if (forms) {
+      Ext.each(forms, function (form) {
+        if (form.isDirty()) {
+          dirty = true;
+          return;
+        }
+      });
+    }
+
+    return dirty;
   }
 
 });
