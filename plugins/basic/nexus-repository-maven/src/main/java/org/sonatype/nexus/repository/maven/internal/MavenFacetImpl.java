@@ -31,7 +31,6 @@ import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
@@ -42,7 +41,6 @@ import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
-import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
@@ -50,7 +48,6 @@ import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
@@ -183,11 +180,11 @@ public class MavenFacetImpl
       if (upstreamETag != null) {
         downstreamETag = upstreamETag;
       } else {
-        downstreamETag = ""; // TODO: depends on repo type, checksum policy, etc?
+        downstreamETag = null; // TODO: depends on repo type, checksum policy, etc?
       }
       final Content result = new Content(new BlobPayload(blob, contentType));
       result.getAttributes().set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
-      result.getAttributes().set(ProxyFacet.UPSTREAM_ETAG, upstreamETag);
+      result.getAttributes().set(ProxyFacet.CONTENT_UPSTREAM_ETAG, upstreamETag);
       result.getAttributes().set(Content.CONTENT_ETAG, downstreamETag);
       result.getAttributes().set(MavenHashCodes.class, new MavenHashCodes(hashCodes));
       return result;
@@ -302,7 +299,7 @@ public class MavenFacetImpl
       if (lastModified != null) {
         formatAttributes.set(P_CONTENT_LAST_MODIFIED, lastModified.toDate());
       }
-      formatAttributes.set(P_CONTENT_ETAG, content.getAttributes().get(ProxyFacet.UPSTREAM_ETAG, String.class));
+      formatAttributes.set(P_CONTENT_ETAG, content.getAttributes().get(ProxyFacet.CONTENT_UPSTREAM_ETAG, String.class));
     }
   }
 
