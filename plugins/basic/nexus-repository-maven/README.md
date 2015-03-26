@@ -65,7 +65,6 @@ Group "maven2-group":
     "memberNames" : ["maven2-hosted", "maven2-proxy"]
   }
 }
-
 ```
 
 ## Building Maven master branch and deploying it to NX3 itself
@@ -74,7 +73,7 @@ Group "maven2-group":
 * create "maven2-proxy" repository with snippet above to proxy Central
 * create "maven2-group" repository with snippet above to group the two
 * check out Apache Maven (or you can use any other prj that will have satisfied dependencies): https://github.com/apache/maven
-* prepare environment, by putting this settings.xml below in project root directory (note: license header is a MUST due to stupid RAT plugin used by all ASF builds. Same thing for localRepo location, must be OUTSIDE of checkout, otherwise RAT chokes on it)
+* prepare environment, by putting this settings.xml below in project root directory (note: license header is a MUST due to eager RAT plugin, or use '-Drat.ignoreErrors=true')
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -117,5 +116,5 @@ Group "maven2-group":
 ```
 mvn -s settings.xml clean deploy -Dtest=void -DfailIfNoTests=false -DaltDeploymentRepository=local-nexus-admin::default::http://localhost:8081/repository/maven2-hosted/ -U
 ```
-Note: the `-U` was needed in my case as currently NX Proxy HttpClient "chokes" more often that should, and autoblocks Central proxy
+Note: the `-U` is needed only to ensure Maven goes remote always (to recover from cached 404), if local repo empty as in "first run", it may be omitted.
 
