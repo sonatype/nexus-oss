@@ -23,7 +23,6 @@ import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
-import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 
 import org.joda.time.DateTime;
@@ -38,14 +37,20 @@ public interface MavenFacet
     extends Facet
 {
   /**
-   * Returns the version policy in effect for this repository.
+   * Returns the format specific {@link MavenPathParser}.
    */
   @Nonnull
   MavenPathParser getMavenPathParser();
 
+  /**
+   * List of {@link HashAlgorithm}s that are always present on {@link MavenContent} stored.
+   */
   @Nonnull
   List<HashAlgorithm> getHashAlgorithms();
 
+  /**
+   * Returns the version policy in effect for this repository.
+   */
   @Nonnull
   VersionPolicy getVersionPolicy();
 
