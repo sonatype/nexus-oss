@@ -56,7 +56,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 class Maven2ProxyRecipe
     extends RecipeSupport
 {
-  static final String NAME = "maven2-proxy"
+  static final String NAME = 'maven2-proxy'
 
   @Inject
   Provider<Maven2SecurityFacet> securityFacet
