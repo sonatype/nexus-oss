@@ -14,6 +14,7 @@ package com.sonatype.nexus.repository.nuget.internal.proxy;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -22,15 +23,15 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.sonatype.nexus.repository.nuget.internal.FeedResult;
+import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacet;
 import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacetImpl;
-import com.sonatype.nexus.repository.nuget.internal.NugetWritableGallery;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataConsumer;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
 
@@ -48,10 +49,11 @@ import org.apache.http.client.utils.URIBuilder;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Objects.equal;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Math.min;
 
 /**
- * A proxying nuget gallery facet.
+ * A group-aware proxying {@link NugetGalleryFacet}.
  *
  * @since 3.0
  */
@@ -89,14 +91,50 @@ public class NugetProxyGalleryFacet
   }
 
   @Override
+  public int count(final String operation, final Map<String, String> parameters) {
+
+    final List<Integer> remoteCounts = passQueryToRemoteRepos(nugetQuery(operation, parameters),
+        getProxyRepositories(),
+        new CountFetcher(fetcher));
+
+    final int hostedCount = super.count(operation, parameters, getHostedRepositories());
+
+    return sum(remoteCounts) + hostedCount;
+  }
+
+
+  @Override
   public String feed(final String base, final String operation, final Map<String, String> query) {
     final Integer top = asInteger(query.get("$top"));
     final Integer skip = asInteger(query.get("$skip"));
+    Map<String, String> remoteQuery = modifyQueryForRemote(operation, query, top, skip);
 
+    // Populate local metadata with the remote metadata
+    final List<Integer> remoteCounts = passQueryToRemoteRepos(nugetQuery(operation, remoteQuery),
+        getProxyRepositories(),
+        new FeedLoader(fetcher));
+
+    // Now re-run the query locally
+    final FeedResult localResult = feed(base, operation, query, getRepositories());
+
+    // Work out the number of results we should report to the client.
+    // Note that nuget.org itself occasionally reports nonsensical results.
+    final int localCount = firstNonNull(localResult.getCount(), 0);
+    int reportedCount = CountReportingPolicy.determineReportedCount(remoteCounts, localCount, top, skip);
+    if ("Search".equals(operation)) {
+      // If we're searching, cap results at 40 like nuget.org.
+      reportedCount = min(ODataUtils.PAGE_SIZE, reportedCount);
+    }
+
+    localResult.setCount(reportedCount);
+    return renderFeedResults(localResult);
+  }
+
+  private Map<String, String> modifyQueryForRemote(final String operation, final Map<String, String> query,
+                                                   final Integer top, final Integer skip)
+  {
     Map<String, String> remoteQuery = Maps.newHashMap(query);
-
-    final boolean searching = "Search".equals(operation);
-    if (searching && top != null && skip != null) {
+    if ("Search".equals(operation) && top != null && skip != null) {
       // If we're searching, then instead of passing on the request for whatever page of results the client is looking
       // for, just get the first two pages of results right away. This makes sure our metadata is sufficiently full of
       // results before we query it, which is important since we use a different search algorithm than nuget.org.
@@ -108,29 +146,7 @@ public class NugetProxyGalleryFacet
       // limit any excessive queries to twice our local page size
       remoteQuery.put("$top", "" + TWO_PAGES);
     }
-
-    final int remoteCount = passQueryToRemoteRepo(nugetQuery(operation, remoteQuery), new FeedLoader(fetcher, this));
-
-    final String feedXml = super.feed(base, operation, query);
-
-    // Work out the number of results we should report to the client.
-    // Note that nuget.org itself occasionally reports nonsensical results.
-    final int localCount = parseCount(feedXml);
-
-    int reportedCount = CountReportingPolicy.determineReportedCount(remoteCount, localCount, top, skip);
-    if (searching) {
-      // If we're searching, cap results at 40 like nuget.org.
-      reportedCount = min(ODataUtils.PAGE_SIZE, reportedCount);
-    }
-    // TODO: refactor the 'feed' method so that XML generation is an outer step that uses a data structure
-    // then we can invoke the inner thing, tweak 'inline count' and go, instead of search/replacing
-    return feedXml.replaceFirst("<m:count>\\d*</m:count>", "<m:count>" + reportedCount + "</m:count>");
-  }
-
-  @Override
-  public int count(final String operation, final Map<String, String> parameters) {
-    // Remove the leading slash
-    return passQueryToRemoteRepo(nugetQuery(operation, parameters), new CountFetcher(fetcher));
+    return remoteQuery;
   }
 
   @Override
@@ -140,7 +156,7 @@ public class NugetProxyGalleryFacet
     if (entryXml == null) {
       final String remoteQuery = "Packages(Id='" + id + "',Version='" + version + "')";
 
-      passQueryToRemoteRepo(nugetQuery(remoteQuery), new FeedLoader(fetcher, this));
+      passQueryToRemoteRepos(nugetQuery(remoteQuery), getProxyRepositories(), new FeedLoader(fetcher));
       entryXml = super.entry(base, id, version);
     }
     return entryXml;
@@ -179,27 +195,29 @@ public class NugetProxyGalleryFacet
    * Determines which of the repository IDs correspond to remote proxies, and queries (or populates) the count cache
    * using the supplied {@link RemoteCallFactory}.
    *
-   * @return the package count from the remote repo
+   * @return successfully returned counts, which might have fewer entries than repositories.size (or none at all)
    */
-  private int passQueryToRemoteRepo(final URI path, final RemoteCallFactory remoteCall)
+  private List<Integer> passQueryToRemoteRepos(final URI path, final Iterable<Repository> repositories,
+                                               final RemoteCallFactory remoteCall)
   {
-    final Repository repo = getRepository();
+    final List<Integer> counts = new ArrayList<>();
 
-    try {
-      // TODO: Determine if we should talk to the remote based on its status
+    for (Repository repo : repositories) {
+      try {
+        // TODO: Determine if we should talk to the remote based on its status
 
-      final QueryCacheKey key = new QueryCacheKey(repo.getName(), path);
-      final Integer cachedCount = cache.get(key, remoteCall.build(repo, path));
-      return cachedCount;
+        final QueryCacheKey key = new QueryCacheKey(repo.getName(), path);
+        final Integer cachedCount = cache.get(key, remoteCall.build(repo, path));
+        counts.add(cachedCount);
+      }
+      catch (ExecutionException | UncheckedExecutionException e) {
+        log.warn("Exception attempting to contact proxied repository {}.", repo.getName(), e.getCause());
+      }
+      catch (Exception e) {
+        log.warn("Exception attempting to contact proxied repository {}.", repo.getName(), e);
+      }
     }
-    catch (ExecutionException | UncheckedExecutionException e) {
-      log.warn("{} attempting to contact proxied repository {}.", e.getCause().getClass().getSimpleName(),
-          repo.getName());
-    }
-    catch (Exception e) {
-      log.warn("{} attempting to contact proxied repository {}.", e.getClass().getSimpleName(), repo.getName());
-    }
-    return 0;
+    return counts;
   }
 
   @Nullable
@@ -215,17 +233,12 @@ public class NugetProxyGalleryFacet
     }
   }
 
-  /**
-   * Return the <m:count> from an XML feed, or 0 if it's not present/fails to parse.
-   */
-  private int parseCount(final String feed) {
-    final Matcher matcher = COUNT_REGEX.matcher(feed);
-    if (!matcher.find()) {
-      return 0;
+  private int sum(Iterable<Integer> values) {
+    int total = 0;
+    for (final Integer i : values) {
+      total += checkNotNull(i);
     }
-
-    final Integer integer = asInteger(matcher.group(1));
-    return integer == null ? 0 : integer;
+    return total;
   }
 
 
@@ -252,15 +265,13 @@ public class NugetProxyGalleryFacet
   private static class FeedLoader
       extends RemoteCallFactory
   {
-    private final NugetWritableGallery gallery;
-
-    private FeedLoader(final NugetFeedFetcher fetcher, final NugetWritableGallery gallery) {
+    private FeedLoader(final NugetFeedFetcher fetcher) {
       super(fetcher);
-      this.gallery = gallery;
     }
 
     public Callable<Integer> build(final Repository remote, final URI nugetQuery)
     {
+      final NugetGalleryFacet gallery = remote.facet(NugetGalleryFacet.class);
       return new Callable<Integer>()
       {
         @Override
@@ -298,7 +309,6 @@ public class NugetProxyGalleryFacet
       };
     }
   }
-
 
   private static class QueryCacheKey
   {
