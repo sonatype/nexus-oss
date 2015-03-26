@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.fest.util.Strings;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -35,6 +36,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 
 /**
  * UT for {@link Maven2MetadataMerger}
@@ -128,7 +130,7 @@ public class Maven2MetadataMergerTest
   }
 
   @Test
-  public void smokePlugin() throws Exception {
+  public void groupLevelMd() throws Exception {
     final Metadata m1 = g("foo");
     final Metadata m2 = g("foo", "bar");
     final Metadata m3 = g("baz");
@@ -148,7 +150,7 @@ public class Maven2MetadataMergerTest
   }
 
   @Test
-  public void smokeArtifact() throws Exception {
+  public void artifactLevelMd() throws Exception {
     final Metadata m1 = a("org.foo", "some-project", "20150324121500", "1.0.1", "1.0.1", "1.0.0", "1.0.1");
     final Metadata m2 = a("org.foo", "some-project", "20150324121700", "1.0.2", "1.0.2", "1.0.2");
     final Metadata m3 = a("org.foo", "some-project", "20150324121600", "1.1.0-SNAPSHOT", null, "1.1.0-SNAPSHOT");
@@ -159,16 +161,17 @@ public class Maven2MetadataMergerTest
     assertThat(m.getGroupId(), equalTo("org.foo"));
     assertThat(m.getArtifactId(), equalTo("some-project"));
     assertThat(m.getVersioning().getLastUpdated(), equalTo("20150324121700"));
+    assertThat(m.getVersioning().getSnapshot(), nullValue());
     assertThat(m.getVersioning().getRelease(), equalTo("1.0.2"));
     assertThat(m.getVersioning().getLatest(), equalTo("1.1.0-SNAPSHOT"));
     assertThat(m.getVersioning().getVersions(), contains("1.0.0", "1.0.1", "1.0.2", "1.1.0-SNAPSHOT"));
   }
 
   @Test
-  public void smokeVersion() throws Exception {
-    final Metadata m1 = v("org.foo", "some-project", "1.0", "20150324.121500", 1);
-    final Metadata m2 = v("org.foo", "some-project", "1.0", "20150323.121500", 2);
-    final Metadata m3 = v("org.foo", "some-project", "1.0", "20150322.121500", 3);
+  public void versionLevelMd() throws Exception {
+    final Metadata m1 = v("org.foo", "some-project", "1.0.0", "20150324.121500", 3);
+    final Metadata m2 = v("org.foo", "some-project", "1.0.0", "20150323.121500", 2);
+    final Metadata m3 = v("org.foo", "some-project", "1.0.0", "20150322.121500", 1);
 
     final Metadata m = merger.merge(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3));
     assertThat(m, notNullValue());
@@ -178,6 +181,36 @@ public class Maven2MetadataMergerTest
     assertThat(m.getVersioning().getLastUpdated(), equalTo("20150324121500"));
     assertThat(m.getVersioning().getSnapshot(), notNullValue());
     assertThat(m.getVersioning().getSnapshot().getTimestamp(), equalTo("20150324.121500"));
-    assertThat(m.getVersioning().getSnapshot().getBuildNumber(), equalTo(1));
+    assertThat(m.getVersioning().getSnapshot().getBuildNumber(), equalTo(3));
+  }
+
+  @Test
+  public void mixedLevelMd() throws Exception {
+    final Metadata m1 = a("org.foo", "some-project", "20150324121500", "1.0.1", "1.0.1", "1.0.0", "1.0.1");
+    final Metadata m2 = g("foo", "bar");
+    final Metadata m3 = v("org.foo", "some-project", "1.1.0", "20150322.121500", 3);
+
+    final Metadata m = merger.merge(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3));
+    assertThat(m, notNullValue());
+    assertThat(m.getModelVersion(), equalTo("1.1.0"));
+    assertThat(m.getGroupId(), equalTo("org.foo"));
+    assertThat(m.getArtifactId(), equalTo("some-project"));
+    assertThat(m.getVersion(), equalTo("1.1.0-SNAPSHOT"));
+    assertThat(m.getVersioning().getLastUpdated(), equalTo("20150324121500"));
+    assertThat(m.getVersioning().getSnapshot(), notNullValue());
+    assertThat(m.getVersioning().getSnapshot().getTimestamp(), equalTo("20150322.121500"));
+    assertThat(m.getVersioning().getSnapshot().getBuildNumber(), equalTo(3));
+    assertThat(m.getVersioning().getRelease(), equalTo("1.0.1"));
+    assertThat(m.getVersioning().getLatest(), equalTo("1.0.1"));
+    assertThat(m.getVersioning().getVersions(), contains("1.0.0", "1.0.1"));
+    assertThat(m.getPlugins(), hasSize(2));
+    final List<String> prefixes = Lists.newArrayList(Iterables.transform(m.getPlugins(), new Function<Plugin, String>()
+    {
+      @Override
+      public String apply(final Plugin input) {
+        return input.getArtifactId();
+      }
+    }));
+    assertThat(prefixes, containsInAnyOrder("foo-maven-plugin", "bar-maven-plugin"));
   }
 }

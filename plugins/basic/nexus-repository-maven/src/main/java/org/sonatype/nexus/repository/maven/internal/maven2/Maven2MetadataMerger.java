@@ -147,8 +147,18 @@ public class Maven2MetadataMerger
     }
     if (result.getVersioning() != null && !result.getVersioning().getVersions().isEmpty()) {
       Collections.sort(result.getVersioning().getVersions(), versionStringComparator);
-      result.getVersioning().setLatest(getLatestVersion(result.getVersioning().getVersions()));
-      result.getVersioning().setRelease(getReleaseVersion(result.getVersioning().getVersions()));
+      // the last in ordered list
+      String latest = result.getVersioning().getVersions().get(result.getVersioning().getVersions().size() - 1);
+      // the last non-snapshot in ordered list, may be null
+      String release = null;
+      for (int i = result.getVersioning().getVersions().size() - 1; i >= 0; i--) {
+        if (!result.getVersioning().getVersions().get(i).endsWith("SNAPSHOT")) {
+          release = result.getVersioning().getVersions().get(i);
+          break;
+        }
+      }
+      result.getVersioning().setLatest(latest);
+      result.getVersioning().setRelease(release);
     }
     if (!result.getPlugins().isEmpty()) {
       Collections.sort(result.getPlugins(), pluginComparator);
@@ -170,6 +180,11 @@ public class Maven2MetadataMerger
     }
     if (Strings.isNullOrEmpty(right.getArtifactId())) {
       right.setArtifactId(left.getArtifactId());
+    }
+
+    // version differs: we do it "both ways" if set at all
+    if (Strings.isNullOrEmpty(left.getVersion())) {
+      left.setVersion(right.getVersion());
     }
     if (Strings.isNullOrEmpty(right.getVersion())) {
       right.setVersion(left.getVersion());
@@ -292,26 +307,6 @@ public class Maven2MetadataMerger
         lv.getSnapshotVersions().add(newSnapshotVersion);
       }
     }
-  }
-
-  /**
-   * Returns last element of sorted string version list, the "latest".
-   */
-  private String getLatestVersion(final List<String> sortedVersions) {
-    return sortedVersions.get(sortedVersions.size() - 1);
-  }
-
-  /**
-   * Returns last non-snapshot element of sorted string version list, the "release". Returns {@code null} if no such
-   * element found.
-   */
-  private String getReleaseVersion(final List<String> sortedVersions) {
-    for (int i = sortedVersions.size() - 1; i >= 0; i--) {
-      if (!sortedVersions.get(i).endsWith("SNAPSHOT")) {
-        return sortedVersions.get(i);
-      }
-    }
-    return null;
   }
 
   /**
