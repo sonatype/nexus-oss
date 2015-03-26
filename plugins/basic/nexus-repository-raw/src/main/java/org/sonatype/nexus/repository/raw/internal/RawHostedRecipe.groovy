@@ -11,11 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.repository.raw.internal
+
 import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
+import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
@@ -32,6 +34,7 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import javax.inject.Singleton
+
 /**
  * Raw hosted repository recipe.
  *
@@ -66,6 +69,9 @@ class RawHostedRecipe
   SecurityHandler securityHandler
 
   @Inject
+  PartialFetchHandler partialFetchHandler
+
+  @Inject
   RawContentHandler rawContentHandler
 
   @Inject
@@ -92,6 +98,7 @@ class RawHostedRecipe
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
+        .handler(partialFetchHandler)
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(rawContentHandler)

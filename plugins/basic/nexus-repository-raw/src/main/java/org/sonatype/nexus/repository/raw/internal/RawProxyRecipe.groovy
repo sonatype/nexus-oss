@@ -19,6 +19,7 @@ import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
 import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler
+import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -85,6 +86,9 @@ class RawProxyRecipe
   NegativeCacheHandler negativeCacheHandler
 
   @Inject
+  PartialFetchHandler partialFetchHandler
+
+  @Inject
   ProxyHandler proxyHandler
 
   @Inject
@@ -116,6 +120,7 @@ class RawProxyRecipe
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
         .handler(negativeCacheHandler)
+        .handler(partialFetchHandler)
         .handler(proxyHandler)
         .handler(notFound())
         .create())
