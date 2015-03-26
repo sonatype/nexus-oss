@@ -163,14 +163,17 @@ public class MavenFacetImpl
       final Blob blob = tx.requireBlob(asset.requireBlobRef());
       final String contentType = asset.contentType();
 
-      final NestedAttributesMap attributesMap = asset.formatAttributes();
-      final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-      final String etag = attributesMap.get(P_CONTENT_ETAG, String.class);
       final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
       final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
       for (HashAlgorithm algorithm : HASH_ALGORITHMS) {
         final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
         hashCodes.put(algorithm, hashCode);
+      }
+      final NestedAttributesMap attributesMap = asset.formatAttributes();
+      final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
+      String etag = attributesMap.get(P_CONTENT_ETAG, String.class);
+      if (etag == null && ChecksumPolicy.STRICT == checksumPolicy) {
+        etag = "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}";
       }
       return new MavenContent(
           new BlobPayload(blob, contentType),
