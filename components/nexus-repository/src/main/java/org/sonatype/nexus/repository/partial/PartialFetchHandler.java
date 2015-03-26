@@ -31,6 +31,7 @@ import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
 
 import com.google.common.collect.Range;
+import com.google.common.net.HttpHeaders;
 import org.apache.http.HttpStatus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -122,7 +123,7 @@ public class PartialFetchHandler
 
     final Headers responseHeaders = response.getHeaders();
     // ResponseSender takes care of Content-Length header, via payload.size
-    responseHeaders.set("Content-Range",
+    responseHeaders.set(HttpHeaders.CONTENT_RANGE,
         rangeToSend.lowerEndpoint() + "-" + rangeToSend.upperEndpoint() + "/" + payload.getSize());
 
     return response;
@@ -130,7 +131,7 @@ public class PartialFetchHandler
 
   private String getRangeHeader(final Context context) {
     final Request request = context.getRequest();
-    return request.getHeaders().get("Range");
+    return request.getHeaders().get(HttpHeaders.RANGE);
   }
 
 

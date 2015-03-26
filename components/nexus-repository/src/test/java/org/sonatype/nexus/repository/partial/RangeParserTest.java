@@ -14,6 +14,8 @@ package org.sonatype.nexus.repository.partial;
 
 import java.util.List;
 
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
 import com.google.common.collect.Range;
 import org.junit.Test;
 
@@ -21,7 +23,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+/**
+ * Tests {@link RangeParser}.
+ */
 public class RangeParserTest
+    extends TestSupport
 {
   private RangeParser parser = new RangeParser();
 

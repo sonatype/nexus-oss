@@ -43,7 +43,7 @@ public class Response
   private Headers headers;
 
   public Response(final Status status) {
-    this.status = checkNotNull(status);
+    setStatus(status);
   }
 
   public Status getStatus() {
@@ -51,7 +51,7 @@ public class Response
   }
 
   public void setStatus(final Status status) {
-    this.status = status;
+    this.status = checkNotNull(status);
   }
 
   public AttributesMap getAttributes() {

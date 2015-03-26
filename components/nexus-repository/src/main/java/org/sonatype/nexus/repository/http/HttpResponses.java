@@ -140,8 +140,8 @@ public class HttpResponses
 
   public static Response rangeNotSatisfiable(final long contentSize) {
     final Response response = new Response(Status.failure(REQUESTED_RANGE_NOT_SATISFIABLE));
-    response.getHeaders().set("Content-Length", "0");
-    response.getHeaders().set("Content-Range", "bytes */" + contentSize);
+    response.getHeaders().set(HttpHeaders.CONTENT_LENGTH, "0");
+    response.getHeaders().set(HttpHeaders.CONTENT_RANGE, "bytes */" + contentSize);
     return response;
   }
 }

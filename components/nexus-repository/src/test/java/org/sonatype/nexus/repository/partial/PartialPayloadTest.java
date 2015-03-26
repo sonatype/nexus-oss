@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.partial;
 import java.io.IOException;
 
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Range;
 import com.google.common.io.ByteStreams;
@@ -29,6 +30,7 @@ import static org.junit.Assert.assertThat;
  * Tests {@link PartialPayload}.
  */
 public class PartialPayloadTest
+    extends TestSupport
 {
   private final byte[] input = Bytes.toArray(asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
 

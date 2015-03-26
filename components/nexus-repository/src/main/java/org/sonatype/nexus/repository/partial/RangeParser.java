@@ -72,11 +72,11 @@ class RangeParser
             return ensureSatisfiable(Range.closed(Long.parseLong(parts[0]), Long.parseLong(parts[1])), content);
           }
           else {
-            log.info("Malformed HTTP Range value: {}, ignoring it", rangeHeader);
+            log.warn("Malformed HTTP Range value: {}, ignoring it", rangeHeader);
           }
         }
         else {
-          log.info(
+          log.warn(
               "Nexus does not support non-byte or multiple HTTP Ranges, sending complete content: Range value {}",
               rangeHeader);
         }
