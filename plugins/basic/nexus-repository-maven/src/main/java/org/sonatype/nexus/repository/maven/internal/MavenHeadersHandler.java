@@ -48,11 +48,11 @@ public class MavenHeadersHandler
       final Payload payload = ((PayloadResponse) response).getPayload();
       if (payload instanceof Content) {
         final Content content = (Content) payload;
-        final DateTime lastModified = content.getLastModified();
+        final DateTime lastModified = content.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
         if (lastModified != null) {
           response.getHeaders().set(HttpHeaders.LAST_MODIFIED, Iso8601Date.format(lastModified.toDate()));
         }
-        final String etag = content.getETag();
+        final String etag = content.getAttributes().get(Content.CONTENT_ETAG, String.class);
         if (etag != null) {
           response.getHeaders().set(HttpHeaders.ETAG, "\"" + etag + "\"");
         }
