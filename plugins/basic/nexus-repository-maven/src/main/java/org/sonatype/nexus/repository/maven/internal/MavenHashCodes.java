@@ -19,44 +19,35 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.Payload;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
-import org.joda.time.DateTime;
 
 /**
- * Maven content.
+ * Maven hash codes map, usable as attribute.
  *
  * @since 3.0
  */
-public class MavenContent
-    extends Content
+public class MavenHashCodes
 {
-  private final Map<HashAlgorithm, HashCode> hashes;
+  private final Map<HashAlgorithm, HashCode> hashcodes;
 
-  public MavenContent(final Payload payload,
-                      final @Nullable DateTime lastModified,
-                      final @Nullable String etag,
-                      final @Nullable Map<HashAlgorithm, HashCode> hashes)
-  {
-    super(payload, lastModified, etag);
+  public MavenHashCodes(final @Nullable Map<HashAlgorithm, HashCode> hashes) {
     final Map<HashAlgorithm, HashCode> hc = Maps.newLinkedHashMap();
     if (hashes != null) {
       hc.putAll(hashes);
     }
-    this.hashes = ImmutableMap.copyOf(hc);
+    this.hashcodes = ImmutableMap.copyOf(hc);
   }
 
   @Nonnull
   public Set<HashAlgorithm> getHashAlgorithms() {
-    return hashes.keySet();
+    return hashcodes.keySet();
   }
 
   @Nonnull
   public Map<HashAlgorithm, HashCode> getHashCodes() {
-    return hashes;
+    return hashcodes;
   }
 }

@@ -35,6 +35,7 @@ import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
+import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -47,7 +48,6 @@ import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
@@ -158,7 +158,7 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
-  public MavenContent get(final MavenPath path) throws IOException {
+  public Content get(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final Asset asset = findAsset(tx, tx.getBucket(), path);
       if (asset == null) {
@@ -175,13 +175,20 @@ public class MavenFacetImpl
       }
       final NestedAttributesMap attributesMap = asset.formatAttributes();
       final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-      final String etag = attributesMap.get(P_CONTENT_ETAG, String.class);
-      return new MavenContent(
-          new BlobPayload(blob, contentType),
-          lastModifiedDate == null ? null : new DateTime(lastModifiedDate),
-          etag,
-          hashCodes
-      );
+      final String upstreamETag = attributesMap.get(P_CONTENT_ETAG, String.class);
+      final String downstreamETag;
+      if (upstreamETag != null) {
+        downstreamETag = upstreamETag;
+      }
+      else {
+        downstreamETag = null; // TODO: depends on repo type, checksum policy, etc?
+      }
+      final Content result = new Content(new BlobPayload(blob, contentType));
+      result.getAttributes().set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
+      result.getAttributes().set(ProxyFacet.CONTENT_UPSTREAM_ETAG, upstreamETag);
+      result.getAttributes().set(Content.CONTENT_ETAG, downstreamETag);
+      result.getAttributes().set(MavenHashCodes.class, new MavenHashCodes(hashCodes));
+      return result;
     }
   }
 
@@ -289,10 +296,11 @@ public class MavenFacetImpl
     final NestedAttributesMap formatAttributes = asset.formatAttributes();
     if (payload instanceof Content) {
       Content content = (Content) payload;
-      if (content.getLastModified() != null) {
-        formatAttributes.set(P_CONTENT_LAST_MODIFIED, content.getLastModified().toDate());
+      final DateTime lastModified = content.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
+      if (lastModified != null) {
+        formatAttributes.set(P_CONTENT_LAST_MODIFIED, lastModified.toDate());
       }
-      formatAttributes.set(P_CONTENT_ETAG, content.getETag());
+      formatAttributes.set(P_CONTENT_ETAG, content.getAttributes().get(ProxyFacet.CONTENT_UPSTREAM_ETAG, String.class));
     }
   }
 
