@@ -288,9 +288,7 @@ public class MavenFacetImpl
       if (content.getLastModified() != null) {
         formatAttributes.set(P_CONTENT_LAST_MODIFIED, content.getLastModified().toDate());
       }
-      if (content.getETag() != null) {
-        formatAttributes.set(P_CONTENT_ETAG, content.getETag());
-      }
+      formatAttributes.set(P_CONTENT_ETAG, content.getETag());
     }
   }
 
