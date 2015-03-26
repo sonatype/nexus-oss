@@ -22,6 +22,9 @@ Use this config to create Maven2 hosted repository, use name `maven2-hosted` (or
     "versionPolicy" : "SNAPSHOT",
     "checksumPolicy" : "WARN",
     "strictContentTypeValidation" : false
+  },
+  "storage" : {
+    "writePolicy" : "ALLOW"
   }
 }
 
@@ -49,6 +52,9 @@ Use this config to create Maven proxy repository, use name `maven2-proxy` (or as
         "username" : "admin",
         "password" : "admin123"
     }
+  },
+  "storage" : {
+    "writePolicy" : "ALLOW"
   }
 }
 ```
@@ -63,6 +69,9 @@ Group "maven2-group":
   },
   "group" : {
     "memberNames" : ["maven2-hosted", "maven2-proxy"]
+  },
+  "storage" : {
+    "writePolicy" : "ALLOW"
   }
 }
 ```
