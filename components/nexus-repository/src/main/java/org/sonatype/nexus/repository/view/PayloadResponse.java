@@ -22,18 +22,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class PayloadResponse
-  extends Response
+    extends Response
 {
-  private final Payload payload;
+  private Payload payload;
 
   public PayloadResponse(final Status status, final Payload payload) {
     super(status);
-    this.payload = checkNotNull(payload);
+    setPayload(payload);
   }
 
   @Nonnull
   public Payload getPayload() {
     return payload;
+  }
+
+  public void setPayload(final Payload payload) {
+    this.payload = checkNotNull(payload);
   }
 
   @Override
@@ -43,4 +47,5 @@ public class PayloadResponse
         ", payload=" + payload +
         '}';
   }
+
 }

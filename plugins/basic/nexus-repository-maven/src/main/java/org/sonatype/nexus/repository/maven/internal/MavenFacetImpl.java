@@ -40,10 +40,12 @@ import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -102,9 +104,16 @@ public class MavenFacetImpl
 
   private static final String P_CONTENT_LAST_MODIFIED = "contentLastModified";
 
+  private static final String P_CONTENT_ETAG = "etag";
+
+  private static final String P_LAST_VERIFIED = "lastVerified";
+
   private static final String CONFIG_KEY = "maven";
 
-  private static final List<HashAlgorithm> HASH_ALGORITHMS = Lists.newArrayList(SHA1, MD5);
+  /**
+   * List of hash algorithms always applied to payloads in blob store, with first in the list being the "primary" hash.
+   */
+  private static final List<HashAlgorithm> HASH_ALGORITHMS = ImmutableList.of(SHA1, MD5);
 
   // members
 
@@ -149,7 +158,7 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
-  public MavenPayload get(final MavenPath path) throws IOException {
+  public MavenContent get(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final Asset asset = findAsset(tx, tx.getBucket(), path);
       if (asset == null) {
@@ -158,38 +167,40 @@ public class MavenFacetImpl
       final Blob blob = tx.requireBlob(asset.requireBlobRef());
       final String contentType = asset.contentType();
 
-      final NestedAttributesMap attributesMap = asset.formatAttributes();
-      final Date lastModifiedDate = attributesMap.require(P_CONTENT_LAST_MODIFIED, Date.class);
       final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
       final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
       for (HashAlgorithm algorithm : HASH_ALGORITHMS) {
         final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
         hashCodes.put(algorithm, hashCode);
       }
-      return new MavenPayload(
+      final NestedAttributesMap attributesMap = asset.formatAttributes();
+      final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
+      final String etag = attributesMap.get(P_CONTENT_ETAG, String.class);
+      return new MavenContent(
           new BlobPayload(blob, contentType),
-          new DateTime(lastModifiedDate),
+          lastModifiedDate == null ? null : new DateTime(lastModifiedDate),
+          etag,
           hashCodes
       );
     }
   }
 
   @Override
-  public void put(final MavenPath path, final Payload content)
+  public void put(final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
     try (StorageTx tx = getStorage().openTx()) {
       if (path.getCoordinates() != null) {
-        putArtifact(path, content, tx);
+        putArtifact(path, payload, tx);
       }
       else {
-        putFile(path, content, tx);
+        putFile(path, payload, tx);
       }
       tx.commit();
     }
   }
 
-  private void putArtifact(final MavenPath path, final Payload content, final StorageTx tx)
+  private void putArtifact(final MavenPath path, final Payload payload, final StorageTx tx)
       throws IOException, InvalidContentException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
@@ -234,10 +245,10 @@ public class MavenFacetImpl
       // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
     }
 
-    putAssetPayload(path, tx, asset, content);
+    putAssetPayload(path, tx, asset, payload);
   }
 
-  private void putFile(final MavenPath path, final Payload content, final StorageTx tx)
+  private void putFile(final MavenPath path, final Payload payload, final StorageTx tx)
       throws IOException, InvalidContentException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
@@ -252,13 +263,13 @@ public class MavenFacetImpl
       // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
     }
 
-    putAssetPayload(path, tx, asset, content);
+    putAssetPayload(path, tx, asset, payload);
   }
 
   private void putAssetPayload(final MavenPath path,
                                final StorageTx tx,
                                final Asset asset,
-                               final Payload content) throws IOException
+                               final Payload payload) throws IOException
   {
     // TODO: Figure out created-by header
     final ImmutableMap<String, String> headers = ImmutableMap.of(
@@ -266,16 +277,23 @@ public class MavenFacetImpl
         BlobStore.CREATED_BY_HEADER, "unknown"
     );
 
-    try (InputStream inputStream = content.openInputStream()) {
+    try (InputStream inputStream = payload.openInputStream()) {
       try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
-        final String contentType = determineContentType(path, supplier, content.getContentType());
+        final String contentType = determineContentType(path, supplier, payload.getContentType());
         try (InputStream is = supplier.get()) {
           tx.setBlob(is, headers, asset, HASH_ALGORITHMS, contentType);
         }
       }
     }
 
-    asset.formatAttributes().set(P_CONTENT_LAST_MODIFIED, new Date());
+    final NestedAttributesMap formatAttributes = asset.formatAttributes();
+    if (payload instanceof Content) {
+      Content content = (Content) payload;
+      if (content.getLastModified() != null) {
+        formatAttributes.set(P_CONTENT_LAST_MODIFIED, content.getLastModified().toDate());
+      }
+      formatAttributes.set(P_CONTENT_ETAG, content.getETag());
+    }
   }
 
   @Override
@@ -315,6 +333,36 @@ public class MavenFacetImpl
     tx.deleteAsset(asset);
     tx.commit();
     return true;
+  }
+
+  @Override
+  public DateTime getLastVerified(final MavenPath path) throws IOException {
+    try (StorageTx tx = getStorage().openTx()) {
+      final Asset asset = findAsset(tx, tx.getBucket(), path);
+      if (asset == null) {
+        return null;
+      }
+      final NestedAttributesMap attributes = asset.formatAttributes();
+      final Date date = attributes.get(P_LAST_VERIFIED, Date.class);
+      if (date == null) {
+        return null;
+      }
+      return new DateTime(date);
+    }
+  }
+
+  @Override
+  public boolean setLastVerified(final MavenPath path, final DateTime verified) throws IOException {
+    try (StorageTx tx = getStorage().openTx()) {
+      final Asset asset = findAsset(tx, tx.getBucket(), path);
+      if (asset == null) {
+        return false;
+      }
+      final NestedAttributesMap attributes = asset.formatAttributes();
+      attributes.set(P_LAST_VERIFIED, verified.toDate());
+      tx.commit();
+      return true;
+    }
   }
 
   /**

@@ -10,52 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal;
+package org.sonatype.nexus.repository.view;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.view.Payload;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Maven payload.
+ * Content, that is more than plain {@link Payload}
  *
  * @since 3.0
  */
-public class MavenPayload
+public class Content
     implements Payload
 {
   private final Payload payload;
 
   private final DateTime lastModified;
 
-  private final Map<HashAlgorithm, HashCode> hashes;
+  private final String etag;
 
-  public MavenPayload(final Payload payload,
-                      final @Nullable DateTime lastModified,
-                      final @Nullable Map<HashAlgorithm, HashCode> hashes)
+  public Content(final Payload payload,
+                 final @Nullable DateTime lastModified,
+                 final @Nullable String etag)
   {
     this.payload = checkNotNull(payload);
     this.lastModified = lastModified;
-    final Map<HashAlgorithm, HashCode> hc = Maps.newLinkedHashMap();
-    if (hashes != null) {
-      hc.putAll(hashes);
-    }
-    this.hashes = ImmutableMap.copyOf(hc);
+    this.etag = etag;
   }
 
   @Override
@@ -79,14 +68,9 @@ public class MavenPayload
     return lastModified;
   }
 
-  @Nonnull
-  public Set<HashAlgorithm> getHashAlgorithms() {
-    return hashes.keySet();
-  }
-
-  @Nonnull
-  public Map<HashAlgorithm, HashCode> getHashCodes() {
-    return hashes;
+  @Nullable
+  public String getETag() {
+    return etag;
   }
 
   @Override
@@ -94,7 +78,7 @@ public class MavenPayload
     return getClass().getSimpleName() + "{" +
         "payload=" + payload +
         ", lastModified='" + lastModified + '\'' +
-        ", hashes='" + hashes + '\'' +
+        ", etag='" + etag + '\'' +
         '}';
   }
 }

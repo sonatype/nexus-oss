@@ -23,6 +23,8 @@ import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Payload;
 
+import org.joda.time.DateTime;
+
 /**
  * Maven facet, present on all Maven repositories.
  *
@@ -32,16 +34,26 @@ import org.sonatype.nexus.repository.view.Payload;
 public interface MavenFacet
     extends Facet
 {
+  /**
+   * Returns the version policy in effect for this repository.
+   */
   @Nonnull
   VersionPolicy getVersionPolicy();
 
+  /**
+   * Returns the checksum policy in effect for this repository.
+   */
   @Nonnull
   ChecksumPolicy getChecksumPolicy();
 
   @Nullable
-  MavenPayload get(MavenPath path) throws IOException;
+  MavenContent get(MavenPath path) throws IOException;
 
-  void put(MavenPath path, Payload content) throws IOException, InvalidContentException;
+  void put(MavenPath path, Payload payload) throws IOException, InvalidContentException;
 
   boolean delete(MavenPath path) throws IOException;
+
+  DateTime getLastVerified(MavenPath path) throws IOException;
+
+  boolean setLastVerified(MavenPath path, DateTime verified) throws IOException;
 }

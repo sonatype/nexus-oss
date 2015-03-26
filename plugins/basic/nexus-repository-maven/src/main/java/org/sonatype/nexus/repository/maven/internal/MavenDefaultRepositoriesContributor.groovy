@@ -18,8 +18,10 @@ import javax.inject.Singleton
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2HostedRecipe
+import org.sonatype.nexus.repository.maven.internal.maven2.Maven2ProxyRecipe
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy
+import org.sonatype.nexus.repository.storage.WritePolicy
 
 
 /**
@@ -36,20 +38,48 @@ class MavenDefaultRepositoriesContributor
     return [
         new Configuration(repositoryName: 'releases', recipeName: Maven2HostedRecipe.NAME, attributes:
             [
-                maven: [
+                maven  : [
                     versionPolicy              : VersionPolicy.RELEASE.toString(),
                     checksumPolicy             : ChecksumPolicy.STRICT.toString(),
                     strictContentTypeValidation: false
+                ],
+                storage: [
+                    writePolicy: WritePolicy.ALLOW_ONCE.toString()
                 ]
 
             ]
         ),
         new Configuration(repositoryName: 'snapshots', recipeName: Maven2HostedRecipe.NAME, attributes:
             [
-                maven: [
+                maven  : [
                     versionPolicy              : VersionPolicy.SNAPSHOT.toString(),
                     checksumPolicy             : ChecksumPolicy.STRICT.toString(),
                     strictContentTypeValidation: false
+                ],
+                storage: [
+                    writePolicy: WritePolicy.ALLOW.toString()
+                ]
+            ]
+        ),
+        new Configuration(repositoryName: 'central', recipeName: Maven2ProxyRecipe.NAME, attributes:
+            [
+                maven  : [
+                    versionPolicy              : VersionPolicy.MIXED.toString(),
+                    checksumPolicy             : ChecksumPolicy.WARN.toString(),
+                    strictContentTypeValidation: false
+                ],
+                proxy  : [
+                    remoteUrl     : 'http://repo1.maven.org/maven2/',
+                    artifactMaxAge: 3600
+                ],
+                httpclient: [
+                    connection: [
+                        timeout: 1500,
+                        retries: 3
+                    ]    
+                ],
+                storage: [
+                    writePolicy: WritePolicy.ALLOW.toString()
                 ]
             ]
         )

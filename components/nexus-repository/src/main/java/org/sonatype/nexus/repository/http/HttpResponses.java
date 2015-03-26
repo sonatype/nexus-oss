@@ -25,15 +25,7 @@ import com.google.common.net.HttpHeaders;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.http.HttpStatus.BAD_REQUEST;
-import static org.sonatype.nexus.repository.http.HttpStatus.CREATED;
-import static org.sonatype.nexus.repository.http.HttpStatus.FORBIDDEN;
-import static org.sonatype.nexus.repository.http.HttpStatus.METHOD_NOT_ALLOWED;
-import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
-import static org.sonatype.nexus.repository.http.HttpStatus.NO_CONTENT;
-import static org.sonatype.nexus.repository.http.HttpStatus.OK;
-import static org.sonatype.nexus.repository.http.HttpStatus.SERVICE_UNAVAILABLE;
-import static org.sonatype.nexus.repository.http.HttpStatus.UNAUTHORIZED;
+import static org.sonatype.nexus.repository.http.HttpStatus.*;
 
 /**
  * Convenience methods for constructing various commonly used HTTP responses.
@@ -140,5 +132,16 @@ public class HttpResponses
 
   public static Response serviceUnavailable() {
     return serviceUnavailable(null);
+  }
+
+  public static Response notImplemented(final @Nullable String message) {
+    return new Response(Status.failure(NOT_IMPLEMENTED, message));
+  }
+
+  public static Response rangeNotSatisfiable(final long contentSize) {
+    final Response response = new Response(Status.failure(REQUESTED_RANGE_NOT_SATISFIABLE));
+    response.getHeaders().set(HttpHeaders.CONTENT_LENGTH, "0");
+    response.getHeaders().set(HttpHeaders.CONTENT_RANGE, "bytes */" + contentSize);
+    return response;
   }
 }
