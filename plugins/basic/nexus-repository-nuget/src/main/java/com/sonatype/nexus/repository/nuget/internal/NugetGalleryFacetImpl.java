@@ -224,7 +224,8 @@ public class NugetGalleryFacetImpl
   }
 
   private void setFeedQueryDefaults(final Map<String, String> query)
-  {// NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
+  {
+    // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
     if (!query.containsKey("$orderby")) {
       query.put("$orderby", DOWNLOAD_COUNT + " desc");
     }
