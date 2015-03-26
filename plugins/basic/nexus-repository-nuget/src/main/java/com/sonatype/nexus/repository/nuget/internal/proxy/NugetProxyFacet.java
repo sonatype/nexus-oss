@@ -53,7 +53,7 @@ public class NugetProxyFacet
     Payload payload = gallery().get(coords[0], coords[1]);
     if (payload != null) {
       // TODO: get last-modified and etag
-      return new Content(payload, null, null);
+      return new Content(payload);
     }
     return null;
   }

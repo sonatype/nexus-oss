@@ -18,33 +18,45 @@ import java.io.InputStream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.view.Payload;
 
+import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Content, that is more than plain {@link Payload}
+ * Content, that is wrapped {@link Payload} with {@link Attributes}.
  *
  * @since 3.0
  */
 public class Content
     implements Payload
 {
+  public static final String CONTENT_LAST_MODIFIED = "lastModified";
+
+  public static final String CONTENT_ETAG = "etag";
+
+  /**
+   * Custom attributes to configure backing and logging.
+   */
+  private static class Attributes
+      extends AttributesMap
+  {
+    public Attributes() {
+      super(Maps.<String, Object>newHashMap());
+    }
+  }
+
   private final Payload payload;
 
-  private final DateTime lastModified;
+  private final Attributes attributes;
 
-  private final String etag;
-
-  public Content(final Payload payload,
-                 final @Nullable DateTime lastModified,
-                 final @Nullable String etag)
+  public Content(final Payload payload)
   {
     this.payload = checkNotNull(payload);
-    this.lastModified = lastModified;
-    this.etag = etag;
+    this.attributes = new Attributes();
   }
 
   @Override
@@ -63,22 +75,16 @@ public class Content
     return payload.getContentType();
   }
 
-  @Nullable
-  public DateTime getLastModified() {
-    return lastModified;
-  }
-
-  @Nullable
-  public String getETag() {
-    return etag;
+  @Nonnull
+  public AttributesMap getAttributes() {
+    return attributes;
   }
 
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
         "payload=" + payload +
-        ", lastModified='" + lastModified + '\'' +
-        ", etag='" + etag + '\'' +
+        ", attributes='" + attributes + '\'' +
         '}';
   }
 }

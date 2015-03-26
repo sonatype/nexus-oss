@@ -28,6 +28,8 @@ import org.sonatype.nexus.repository.view.Context;
 public interface ProxyFacet
     extends Facet
 {
+  String CONTENT_UPSTREAM_ETAG = "upstreamEtag";
+
   /**
    * Obtain the content which the user has requested, either by retrieving cached content, or by fetching new or
    * updated content from the upstream repository.

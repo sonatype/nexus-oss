@@ -46,7 +46,7 @@ public class RawProxyFacet
       return null;
     }
 
-    return new Content(toPayload(rawContent), null, null);
+    return new Content(toPayload(rawContent));
   }
 
   @Override
