@@ -121,7 +121,7 @@ public class NugetProxyGalleryFacet
     // Note that nuget.org itself occasionally reports nonsensical results.
     final int localCount = firstNonNull(localResult.getCount(), 0);
     int reportedCount = CountReportingPolicy.determineReportedCount(remoteCounts, localCount, top, skip);
-        if ("Search".equals(operation)) {
+    if ("Search".equals(operation)) {
       // If we're searching, cap results at 40 like nuget.org.
       reportedCount = min(ODataUtils.PAGE_SIZE, reportedCount);
     }
@@ -211,11 +211,10 @@ public class NugetProxyGalleryFacet
         counts.add(cachedCount);
       }
       catch (ExecutionException | UncheckedExecutionException e) {
-        log.warn("{} attempting to contact proxied repository {}.", e.getCause().getClass().getSimpleName(),
-            repo.getName());
+        log.warn("Exception attempting to contact proxied repository {}.", repo.getName(), e.getCause());
       }
       catch (Exception e) {
-        log.warn("{} attempting to contact proxied repository {}.", e.getClass().getSimpleName(), repo.getName());
+        log.warn("Exception attempting to contact proxied repository {}.", repo.getName(), e);
       }
     }
     return counts;
@@ -281,7 +280,7 @@ public class NugetProxyGalleryFacet
           {
             @Override
             public void consume(final Map<String, String> data) {
-             gallery.putMetadata(data);
+              gallery.putMetadata(data);
             }
           }), 0);
         }
