@@ -228,7 +228,8 @@ public abstract class AbstractConfigurable<C>
   }
 
   public C getCurrentConfiguration(boolean forWrite) {
-    return getCurrentCoreConfiguration().getConfiguration(forWrite);
+    final CoreConfiguration<C> cc = getCurrentCoreConfiguration();
+    return cc != null ? cc.getConfiguration(forWrite) : null;
   }
 
   protected abstract CoreConfiguration<C> wrapConfiguration(Object configuration);
