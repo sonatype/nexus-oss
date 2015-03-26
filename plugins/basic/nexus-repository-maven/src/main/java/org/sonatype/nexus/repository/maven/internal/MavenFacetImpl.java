@@ -179,7 +179,8 @@ public class MavenFacetImpl
       final String downstreamETag;
       if (upstreamETag != null) {
         downstreamETag = upstreamETag;
-      } else {
+      }
+      else {
         downstreamETag = null; // TODO: depends on repo type, checksum policy, etc?
       }
       final Content result = new Content(new BlobPayload(blob, contentType));
