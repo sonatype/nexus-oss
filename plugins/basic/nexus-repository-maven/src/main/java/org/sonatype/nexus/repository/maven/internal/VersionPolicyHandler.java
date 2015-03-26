@@ -16,48 +16,45 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.http.HttpStatus;
-import org.sonatype.nexus.repository.view.Content;
+import org.sonatype.nexus.repository.http.HttpResponses;
+import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-import org.sonatype.sisu.goodies.common.Iso8601Date;
-
-import com.google.common.net.HttpHeaders;
-import org.joda.time.DateTime;
 
 /**
- * Maven headers handler.
+ * Maven version policy handler.
  *
  * @since 3.0
  */
 @Singleton
 @Named
-public class MavenHeadersHandler
+public class VersionPolicyHandler
     extends ComponentSupport
     implements Handler
 {
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
-    final Response response = context.proceed();
-    if (response.getStatus().getCode() == HttpStatus.OK && response instanceof PayloadResponse) {
-      final Payload payload = ((PayloadResponse) response).getPayload();
-      if (payload instanceof Content) {
-        final Content content = (Content) payload;
-        final DateTime lastModified = content.getLastModified();
-        if (lastModified != null) {
-          response.getHeaders().set(HttpHeaders.LAST_MODIFIED, Iso8601Date.format(lastModified.toDate()));
-        }
-        final String etag = content.getETag();
-        if (etag != null) {
-          response.getHeaders().set(HttpHeaders.ETAG, "\"" + etag + "\"");
-        }
-      }
+    final MavenPath path = context.getAttributes().require(MavenPath.class);
+    final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
+    final VersionPolicy versionPolicy = mavenFacet.getVersionPolicy();
+    if (path.getCoordinates() != null && !allowsArtifactRepositoryPath(versionPolicy, path.getCoordinates())) {
+      return HttpResponses.badRequest("Repository version policy: " + versionPolicy + " does not allow version: " +
+          path.getCoordinates().getVersion());
     }
-    return response;
+    return context.proceed();
+  }
+
+  private boolean allowsArtifactRepositoryPath(final VersionPolicy versionPolicy, final Coordinates coordinates) {
+    if (versionPolicy == VersionPolicy.SNAPSHOT) {
+      return coordinates.isSnapshot();
+    }
+    if (versionPolicy == VersionPolicy.RELEASE) {
+      return !coordinates.isSnapshot();
+    }
+    return true;
   }
 }

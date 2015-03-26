@@ -22,16 +22,22 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
+import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.maven.internal.HostedHandler
 import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
+import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
 import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
-import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
+import org.sonatype.nexus.repository.maven.internal.MavenProxyFacet
 import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
+import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
+import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler
+import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.types.HostedType
+import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
@@ -41,16 +47,16 @@ import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 
 /**
- * Maven 2 hosted repository recipe.
+ * Maven 2 proxy repository recipe.
  *
  * @since 3.0
  */
-@Named(Maven2HostedRecipe.NAME)
+@Named(Maven2ProxyRecipe.NAME)
 @Singleton
-class Maven2HostedRecipe
+class Maven2ProxyRecipe
     extends RecipeSupport
 {
-  static final String NAME = 'maven2-hosted'
+  static final String NAME = 'maven2-proxy'
 
   @Inject
   Provider<Maven2SecurityFacet> securityFacet
@@ -65,6 +71,12 @@ class Maven2HostedRecipe
   Provider<SearchFacet> searchFacet
 
   @Inject
+  Provider<HttpClientFacet> httpClientFacet
+
+  @Inject
+  Provider<NegativeCacheFacet> negativeCacheFacet
+
+  @Inject
   TimingHandler timingHandler
 
   @Inject
@@ -74,17 +86,23 @@ class Maven2HostedRecipe
   Provider<MavenFacetImpl> mavenFacet
 
   @Inject
+  Provider<MavenProxyFacet> mavenProxyFacet
+
+  @Inject
+  NegativeCacheHandler negativeCacheHandler
+
+  @Inject
   VersionPolicyHandler versionPolicyHandler
 
   @Inject
   MavenHeadersHandler mavenHeadersHandler
 
   @Inject
-  HostedHandler hostedHandler
+  ProxyHandler proxyHandler
 
   @Inject
-  Maven2HostedRecipe(@Named(HostedType.NAME) final Type type,
-                     @Named(Maven2Format.NAME) final Format format)
+  Maven2ProxyRecipe(@Named(ProxyType.NAME) final Type type,
+                    @Named(Maven2Format.NAME) final Format format)
   {
     super(type, format)
   }
@@ -94,7 +112,10 @@ class Maven2HostedRecipe
     repository.attach(securityFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(searchFacet.get())
+    repository.attach(httpClientFacet.get())
+    repository.attach(negativeCacheFacet.get())
     repository.attach(mavenFacet.get())
+    repository.attach(mavenProxyFacet.get())
     repository.attach(configure(viewFacet.get()))
   }
 
@@ -107,17 +128,19 @@ class Maven2HostedRecipe
         .matcher(new MavenArtifactMatcher(pathParser))
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(negativeCacheHandler)
         .handler(versionPolicyHandler)
         .handler(mavenHeadersHandler)
-        .handler(hostedHandler)
+        .handler(proxyHandler)
         .create())
 
     builder.route(new Route.Builder()
         .matcher(new MavenMetadataMatcher(pathParser))
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(negativeCacheHandler)
         .handler(mavenHeadersHandler)
-        .handler(hostedHandler)
+        .handler(proxyHandler)
         .create())
 
     builder.defaultHandlers(notFound())

@@ -20,6 +20,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.raw.RawContent;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
@@ -37,7 +38,7 @@ public class RawProxyFacet
     extends ProxyFacetSupport
 {
   @Override
-  protected Payload getCachedPayload(final Context context) throws IOException {
+  protected Content getCachedPayload(final Context context) throws IOException {
     final String path = componentPath(context);
 
     final RawContent rawContent = storage().get(path);
@@ -45,7 +46,7 @@ public class RawProxyFacet
       return null;
     }
 
-    return toPayload(rawContent);
+    return new Content(toPayload(rawContent), null, null);
   }
 
   @Override
@@ -60,8 +61,9 @@ public class RawProxyFacet
   }
 
   @Override
-  protected void store(final Context context, final Payload payload) throws IOException, InvalidContentException {
+  protected void store(final Context context, final Content payload) throws IOException, InvalidContentException {
     final String path = componentPath(context);
+    // TODO: this is NOT last-modified!
     storage().put(path, toContent(payload, new DateTime()));
   }
 

@@ -24,16 +24,21 @@ import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 
+import com.google.common.base.Strings;
+import com.google.common.net.HttpHeaders;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.DateUtils;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -107,14 +112,14 @@ public abstract class ProxyFacetSupport
   }
 
   @Override
-  public Payload get(final Context context) throws IOException {
+  public Content get(final Context context) throws IOException {
     checkNotNull(context);
 
-    Payload content = getCachedPayload(context);
+    Content content = getCachedPayload(context);
 
     if (content == null || isStale(context)) {
       try {
-        final Payload remote = fetch(context);
+        final Content remote = fetch(context, content);
         if (remote != null) {
 
           // TODO: Introduce content validation.. perhaps content's type not matching path's implied type.
@@ -135,24 +140,32 @@ public abstract class ProxyFacetSupport
   /**
    * If we have the content cached locally already, return that - otherwise {@code null}.
    */
-  protected abstract Payload getCachedPayload(final Context context) throws IOException;
+  protected abstract Content getCachedPayload(final Context context) throws IOException;
 
   /**
    * Store a new Payload, freshly fetched from the remote URL. The Context indicates which component
    * was being requested.
    */
-  protected abstract void store(final Context context, final Payload payload)
+  protected abstract void store(final Context context, final Content content)
       throws IOException, InvalidContentException;
 
   @Nullable
-  protected Payload fetch(final Context context) throws IOException {
-    return fetch(getUrl(context), context);
+  protected Content fetch(final Context context, Content stale) throws IOException {
+    return fetch(getUrl(context), context, stale);
   }
 
-  protected Payload fetch(String url, Context context) throws IOException {
+  protected Content fetch(String url, Context context, Content stale) throws IOException {
     HttpClient client = httpClient.getHttpClient();
 
     HttpGet request = new HttpGet(remoteUrl.resolve(url));
+    if (stale != null) {
+      if (stale.getLastModified() != null) {
+        request.addHeader(HttpHeaders.IF_MODIFIED_SINCE, DateUtils.formatDate(stale.getLastModified().toDate()));
+      }
+      if (stale.getETag() != null) {
+        request.addHeader(HttpHeaders.IF_NONE_MATCH, "\"" + stale.getETag() + "\"");
+      }
+    }
     log.debug("Fetching: {}", request);
 
     HttpResponse response = client.execute(request);
@@ -161,17 +174,53 @@ public abstract class ProxyFacetSupport
     StatusLine status = response.getStatusLine();
     log.debug("Status: {}", status);
 
-    Payload payload = null;
     if (status.getStatusCode() == HttpStatus.SC_OK) {
       HttpEntity entity = response.getEntity();
       log.debug("Entity: {}", entity);
-      payload = new HttpEntityPayload(response, entity);
+
+      Payload payload = new HttpEntityPayload(response, entity);
+      DateTime lastModified = extractLastModified(response.getLastHeader(HttpHeaders.LAST_MODIFIED));
+      String etag = extractETag(response.getLastHeader(HttpHeaders.ETAG));
+      return new Content(payload, lastModified, etag);
     }
-    else if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
+    if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
       indicateUpToDate(context);
     }
 
-    return payload;
+    return null;
+  }
+
+  /**
+   * Extract Last-Modified date from response if possible, or {@code null}.
+   */
+  private DateTime extractLastModified(final Header lastModifiedHeader) {
+    if (lastModifiedHeader != null) {
+      try {
+        return new DateTime(DateUtils.parseDate(lastModifiedHeader.getValue()).getTime());
+      }
+      catch (Exception ex) {
+        log.warn("Could not parse date '{}', using system current time as item creation time.", lastModifiedHeader, ex);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Extract ETag from response if possible, or {@code null}.
+   */
+  private String extractETag(final Header etagHeader) {
+    if (etagHeader != null) {
+      final String etag = etagHeader.getValue();
+      if (!Strings.isNullOrEmpty(etag)) {
+        if (etag.startsWith("\"") && etag.endsWith("\"")) {
+          return etag.substring(1, etag.length() - 1);
+        }
+        else {
+          return etag;
+        }
+      }
+    }
+    return null;
   }
 
   /**

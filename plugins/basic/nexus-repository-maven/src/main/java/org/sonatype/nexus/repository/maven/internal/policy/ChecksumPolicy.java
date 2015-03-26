@@ -13,17 +13,29 @@
 package org.sonatype.nexus.repository.maven.internal.policy;
 
 /**
- * Maven proxy checksum policy for Maven artifacts, enforcing them during transport or not.
+ * Maven checksum policy.
  *
  * @since 3.0
  */
 public enum ChecksumPolicy
 {
+  /**
+   * Completely ignore checksum files.
+   */
   IGNORE,
 
+  /**
+   * If checksums present, verify and warn in case of checksum mismatch. If not, warn also (for lack of them).
+   */
   WARN,
 
+  /**
+   * If checksums present, verify and fail artifact in case of checksum mismatch.
+   */
   STRICT_IF_EXISTS,
 
+  /**
+   * Require presence of checksums, verify and fail artifact in case of checksum mismatch.
+   */
   STRICT
 }

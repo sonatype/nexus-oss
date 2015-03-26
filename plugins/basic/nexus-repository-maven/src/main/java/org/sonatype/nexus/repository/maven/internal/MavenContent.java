@@ -12,48 +12,51 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
-import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.content.InvalidContentException;
-import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
-import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
+import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
 
 /**
- * Maven facet, present on all Maven repositories.
+ * Maven content.
  *
  * @since 3.0
  */
-@Facet.Exposed
-public interface MavenFacet
-    extends Facet
+public class MavenContent
+    extends Content
 {
-  /**
-   * Returns the version policy in effect for this repository.
-   */
+  private final Map<HashAlgorithm, HashCode> hashes;
+
+  public MavenContent(final Payload payload,
+                      final @Nullable DateTime lastModified,
+                      final @Nullable String etag,
+                      final @Nullable Map<HashAlgorithm, HashCode> hashes)
+  {
+    super(payload, lastModified, etag);
+    final Map<HashAlgorithm, HashCode> hc = Maps.newLinkedHashMap();
+    if (hashes != null) {
+      hc.putAll(hashes);
+    }
+    this.hashes = ImmutableMap.copyOf(hc);
+  }
+
   @Nonnull
-  VersionPolicy getVersionPolicy();
+  public Set<HashAlgorithm> getHashAlgorithms() {
+    return hashes.keySet();
+  }
 
-  /**
-   * Returns the checksum policy in effect for this repository.
-   */
   @Nonnull
-  ChecksumPolicy getChecksumPolicy();
-
-  @Nullable
-  MavenContent get(MavenPath path) throws IOException;
-
-  void put(MavenPath path, Payload payload) throws IOException, InvalidContentException;
-
-  boolean delete(MavenPath path) throws IOException;
-
-  DateTime getLastVerified(MavenPath path) throws IOException;
-
-  boolean setLastVerified(MavenPath path, DateTime verified) throws IOException;
+  public Map<HashAlgorithm, HashCode> getHashCodes() {
+    return hashes;
+  }
 }
