@@ -64,13 +64,14 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class MavenGroupFacet
     extends GroupFacetImpl
 {
-  private final Maven2MetadataMerger metadataMerger = new Maven2MetadataMerger();
+  private final Maven2MetadataMerger metadataMerger;
 
   private MavenFacet mavenFacet;
 
   @Inject
   public MavenGroupFacet(final RepositoryManager repositoryManager) {
     super(repositoryManager);
+    this.metadataMerger = new Maven2MetadataMerger();
   }
 
   @Override
@@ -166,9 +167,13 @@ public class MavenGroupFacet
     if (member(event.getRepository())) {
       final String path = event.getAsset().require(StorageFacet.P_PATH);
       final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
-      if (mavenFacet.getMavenPathParser().isRepositoryMetadata(mavenPath) && !mavenPath.isSubordinate()) {
+      if (mavenFacet.getMavenPathParser().isRepositoryMetadata(mavenPath)) {
         try {
-          mavenFacet.delete(mavenPath, mavenPath.hash(HashType.SHA1), mavenPath.hash(HashType.MD5));
+          mavenFacet.delete(
+              mavenPath.main(),
+              mavenPath.main().hash(HashType.SHA1),
+              mavenPath.main().hash(HashType.MD5)
+          );
         }
         catch (IOException e) {
           log.warn("Could not evict merged metadata from {} cache at {}", getRepository().getName(),
