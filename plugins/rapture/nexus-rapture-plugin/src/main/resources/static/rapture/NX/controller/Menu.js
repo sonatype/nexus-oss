@@ -130,6 +130,9 @@ Ext.define('NX.controller.Menu', {
         'nx-addwindow': {
           beforeclose: me.warnBeforeModalClose
         },
+        '#breadcrumb button': {
+          click: me.warnBeforeBreadcrumbClick
+        },
         'button[mode]': {
           afterrender: me.registerModeButton,
           destroy: me.unregisterModeButton
@@ -693,6 +696,20 @@ Ext.define('NX.controller.Menu', {
     return me.warnBeforeNavigate(
       function() {
         panel.close();
+      }
+    );
+  },
+
+  /**
+   * @private
+   * Check for unsaved changes before navigating via the breadcrumb
+   */
+  warnBeforeBreadcrumbClick: function(button, e) {
+    var me = this;
+
+    return me.warnBeforeNavigate(
+      function() {
+        button.handler.call(button.scope, button, e);
       }
     );
   },
