@@ -46,14 +46,14 @@ public class MavenHeadersHandler
   public Response handle(final @Nonnull Context context) throws Exception {
     final Response response = context.proceed();
     if (response.getStatus().getCode() == HttpStatus.OK && response instanceof PayloadResponse) {
-      final MavenPayload payload = (MavenPayload) ((PayloadResponse) response).getPayload();
-      final DateTime lastModified = payload.getLastModified();
+      final MavenContent content = (MavenContent) ((PayloadResponse) response).getPayload();
+      final DateTime lastModified = content.getLastModified();
       if (lastModified != null) {
         response.getHeaders().set(HttpHeaders.LAST_MODIFIED, Iso8601Date.format(lastModified.toDate()));
       }
       final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
       if (ChecksumPolicy.STRICT == mavenFacet.getChecksumPolicy()) {
-        final HashCode sha1HashCode = payload.getHashCodes().get(HashAlgorithm.SHA1);
+        final HashCode sha1HashCode = content.getHashCodes().get(HashAlgorithm.SHA1);
         if (sha1HashCode != null) {
           response.getHeaders().set(HttpHeaders.ETAG, "\"{SHA1{" + sha1HashCode + "}}\"");
         }

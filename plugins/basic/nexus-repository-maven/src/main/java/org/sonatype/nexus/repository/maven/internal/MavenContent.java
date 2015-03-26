@@ -28,16 +28,16 @@ import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
 
 /**
- * Maven payload.
+ * Maven content.
  *
  * @since 3.0
  */
-public class MavenPayload
+public class MavenContent
     extends Content
 {
   private final Map<HashAlgorithm, HashCode> hashes;
 
-  public MavenPayload(final Payload payload,
+  public MavenContent(final Payload payload,
                       final @Nullable DateTime lastModified,
                       final @Nullable String etag,
                       final @Nullable Map<HashAlgorithm, HashCode> hashes)

@@ -21,7 +21,6 @@ import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
-import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 
 import org.joda.time.DateTime;
@@ -42,7 +41,7 @@ public interface MavenFacet
   ChecksumPolicy getChecksumPolicy();
 
   @Nullable
-  MavenPayload get(MavenPath path) throws IOException;
+  MavenContent get(MavenPath path) throws IOException;
 
   void put(MavenPath path, Payload payload) throws IOException, InvalidContentException;
 
