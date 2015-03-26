@@ -122,27 +122,13 @@ Ext.define('NX.controller.Menu', {
         'nx-feature-menu': {
           select: me.onSelection,
           afterrender: me.onAfterRender,
-          beforecellclick: function(tree, td, cellIndex, record) {
-            return me.warnBeforeMenuSelect(
-              function() {
-                me.getFeatureMenu().getSelectionModel().select(record);
-              }
-            );
-          }
+          beforecellclick: me.warnBeforeMenuSelect
         },
         'nx-header-panel button[mode]': {
-          click: function(button, e, eOpts) {
-            var cb = function() {
-              me.getHeaderPanel().down('button[mode=' + button.mode + ']').toggle(true);
-              me.changeMode(button.mode);
-            }
-
-            if (me.warnBeforeMenuSelect(cb)) {
-              me.changeMode(button.mode);
-            } else {
-              me.getHeaderPanel().down('button[mode=' + this.mode + ']').toggle(true);
-            }
-          }
+          click: me.warnBeforeModeSelect
+        },
+        'nx-addwindow': {
+          beforeclose: me.warnBeforeModalClose
         },
         'button[mode]': {
           afterrender: me.registerModeButton,
@@ -164,6 +150,13 @@ Ext.define('NX.controller.Menu', {
          */
         'featureselected'
     );
+
+    // Warn people about refreshing or closing their browser when there are unsaved changes
+    window.onbeforeunload = function() {
+      if (me.hasDirt()) {
+        return "You will lose your unsaved changes";
+      }
+    };
   },
 
   /**
@@ -659,9 +652,56 @@ Ext.define('NX.controller.Menu', {
 
   /**
    * @private
+   * Check for unsaved changes before opening a menu item
+   */
+  warnBeforeMenuSelect: function(tree, td, cellIndex, record) {
+    var me = this;
+
+    return me.warnBeforeNavigate(
+      function () {
+        me.getFeatureMenu().getSelectionModel().select(record);
+      }
+    )
+  },
+
+  /**
+   * @private
+   * Check for unsaved changes before switching modes
+   */
+  warnBeforeModeSelect: function(button, e, eOpts) {
+    var me = this;
+
+    var cb = function() {
+      me.getHeaderPanel().down('button[mode=' + button.mode + ']').toggle(true);
+      me.changeMode(button.mode);
+    };
+
+    if (me.warnBeforeNavigate(cb)) {
+      me.changeMode(button.mode);
+    } else {
+      me.getHeaderPanel().down('button[mode=' + this.mode + ']').toggle(true);
+    }
+  },
+
+  /**
+   * @private
+   * Check for unsaved changes before closing a modal
+   */
+  warnBeforeModalClose: function(panel, eOpts) {
+    var me = this;
+
+    return me.warnBeforeNavigate(
+      function() {
+        panel.close();
+      }
+    );
+  },
+
+  /**
+   * @private
    * Check for unsaved changes. Warn the user, and stop or continue navigation
    */
-  warnBeforeMenuSelect: function(callback) {
+  warnBeforeNavigate: function(callback) {
     var me = this,
       dirty = me.hasDirt(),
       content = me.getFeatureContent();
