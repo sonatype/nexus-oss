@@ -116,6 +116,9 @@ Ext.define('NX.controller.Menu', {
         },
         '#User': {
           signout: me.onSignOut
+        },
+        '#Refresh': {
+          beforerefresh: me.warnBeforeRefresh
         }
       },
       component: {
@@ -712,6 +715,21 @@ Ext.define('NX.controller.Menu', {
         button.handler.call(button.scope, button, e);
       }
     );
+  },
+
+  /**
+   * @private
+   * Check for unsaved changes before refreshing the view
+   */
+  warnBeforeRefresh: function() {
+    var me = this,
+      button = me.getHeaderPanel().down('nx-header-refresh');
+
+    return me.warnBeforeNavigate(
+      function() {
+        button.fireEvent('click');
+      }
+    )
   },
 
   /**
