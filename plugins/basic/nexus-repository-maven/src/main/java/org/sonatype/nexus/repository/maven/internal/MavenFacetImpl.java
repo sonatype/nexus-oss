@@ -45,6 +45,7 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -109,7 +110,10 @@ public class MavenFacetImpl
 
   private static final String CONFIG_KEY = "maven";
 
-  private static final List<HashAlgorithm> HASH_ALGORITHMS = Lists.newArrayList(SHA1, MD5);
+  /**
+   * List of hash algorithms always applied to payloads in blob store, with first in the list being the "primary" hash.
+   */
+  private static final List<HashAlgorithm> HASH_ALGORITHMS = ImmutableList.of(SHA1, MD5);
 
   // members
 
@@ -171,10 +175,7 @@ public class MavenFacetImpl
       }
       final NestedAttributesMap attributesMap = asset.formatAttributes();
       final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-      String etag = attributesMap.get(P_CONTENT_ETAG, String.class);
-      if (etag == null && ChecksumPolicy.STRICT == checksumPolicy) {
-        etag = "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}";
-      }
+      final String etag = attributesMap.get(P_CONTENT_ETAG, String.class);
       return new MavenContent(
           new BlobPayload(blob, contentType),
           lastModifiedDate == null ? null : new DateTime(lastModifiedDate),

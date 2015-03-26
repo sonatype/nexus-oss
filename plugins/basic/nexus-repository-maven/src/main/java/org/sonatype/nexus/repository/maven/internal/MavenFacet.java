@@ -34,9 +34,15 @@ import org.joda.time.DateTime;
 public interface MavenFacet
     extends Facet
 {
+  /**
+   * Returns the version policy in effect for this repository.
+   */
   @Nonnull
   VersionPolicy getVersionPolicy();
 
+  /**
+   * Returns the checksum policy in effect for this repository.
+   */
   @Nonnull
   ChecksumPolicy getChecksumPolicy();
 
