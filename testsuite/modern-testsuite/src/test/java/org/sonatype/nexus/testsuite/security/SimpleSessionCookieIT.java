@@ -74,7 +74,7 @@ public class SimpleSessionCookieIT
 
   @Test
   public void authenticatedContentCRUDActionsShouldNotCreateSession() throws Exception {
-    final String target = nexusUrl + "content/repositories/releases/test.txt";
+    final String target = resolveUrl(nexusUrl, "content/repositories/releases/test.txt").toExternalForm();
 
     final HttpPut put = new HttpPut(target);
     put.setEntity(new StringEntity("text content"));
@@ -153,7 +153,7 @@ public class SimpleSessionCookieIT
       // 1. login with credentials and get session cookie
       // Set-Cookie: NXSESSIONID=98a766bc-bc33-4b3c-9d9f-d3bb85b0cf00; Path=/; Secure; HttpOnly
 
-      HttpPost loginRequest = new HttpPost(baseUrl.toExternalForm() + SESSION_PATH);
+      HttpPost loginRequest = new HttpPost(resolveUrl(baseUrl, SESSION_PATH).toURI());
       List<NameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("username", Strings2.encodeBase64(credentials().getUserPrincipal().getName())));
       params.add(new BasicNameValuePair("password", Strings2.encodeBase64(credentials().getPassword())));
@@ -192,7 +192,7 @@ public class SimpleSessionCookieIT
       HttpClientContext logoutContext = HttpClientContext.create();
       logoutContext.setCookieStore(cookieStore);
 
-      HttpDelete logoutRequest = new HttpDelete(baseUrl.toExternalForm() + SESSION_PATH);
+      HttpDelete logoutRequest = new HttpDelete(resolveUrl(baseUrl, SESSION_PATH).toURI());
       withCommonBrowserHeaders(logoutRequest);
 
       // 2. Logout, sending valid session cookie, no credentials
@@ -228,7 +228,7 @@ public class SimpleSessionCookieIT
       }
 
       // 3. Access a protected resource again using our original login cookie, no credentials, to verify session is dead
-      HttpGet loginFailedGet = new HttpGet(baseUrl.toExternalForm() + PROTECTED_PATH);
+      HttpGet loginFailedGet = new HttpGet(resolveUrl(baseUrl, PROTECTED_PATH).toURI());
       cookieStore.addCookie(loginCookie);
 
       try (CloseableHttpResponse response = client.execute(loginFailedGet, HttpClientContext.create())) {

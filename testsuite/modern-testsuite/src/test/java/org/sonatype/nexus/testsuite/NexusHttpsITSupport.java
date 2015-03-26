@@ -177,6 +177,7 @@ public abstract class NexusHttpsITSupport
    * @return the expected cookie path value of our session cookie from the given base URL
    */
   protected String cookiePath(final URL url) {
-    return url.getPath().substring(0, url.getPath().length() - 1);
+    final String path = url.getPath();
+    return path.length() > 1 && path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
   }
 }
