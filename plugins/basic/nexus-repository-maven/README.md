@@ -51,6 +51,7 @@ Use this config to create Maven proxy repository, use name `maven2-proxy` (or as
         "type" : "username",
         "username" : "admin",
         "password" : "admin123"
+    }
   },
   "storage" : {
     "writePolicy" : "ALLOW"
