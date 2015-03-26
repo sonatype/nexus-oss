@@ -36,6 +36,7 @@ import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.MetadataEnvelope;
 import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
@@ -82,7 +83,7 @@ public class MavenGroupFacet
    * Fetches cached metadata if exists, or {@code null}.
    */
   @Nullable
-  public MavenContent getCachedMergedMetadata(final MavenPath mavenPath) throws IOException {
+  public Content getCachedMergedMetadata(final MavenPath mavenPath) throws IOException {
     return mavenFacet.get(mavenPath);
   }
 
@@ -91,16 +92,16 @@ public class MavenGroupFacet
    * map.
    */
   @Nullable
-  public MavenContent mergeAndCacheMetadata(final MavenPath mavenPath,
-                                            final LinkedHashMap<Repository, Response> responses) throws IOException
+  public Content mergeAndCacheMetadata(final MavenPath mavenPath,
+                                       final LinkedHashMap<Repository, Response> responses) throws IOException
   {
     checkArgument(!mavenPath.isHash(), "Only metadata can be merged and cached!");
-    final LinkedHashMap<Repository, MavenContent> metadataPayloads = Maps.newLinkedHashMap();
+    final LinkedHashMap<Repository, Content> metadataPayloads = Maps.newLinkedHashMap();
     for (Map.Entry<Repository, Response> entry : responses.entrySet()) {
       if (entry.getValue().getStatus().getCode() == HttpStatus.OK) {
         final Response response = entry.getValue();
-        if (response instanceof PayloadResponse && ((PayloadResponse) response).getPayload() instanceof MavenContent) {
-          metadataPayloads.put(entry.getKey(), (MavenContent) ((PayloadResponse) response).getPayload());
+        if (response instanceof PayloadResponse && ((PayloadResponse) response).getPayload() instanceof Content) {
+          metadataPayloads.put(entry.getKey(), (Content) ((PayloadResponse) response).getPayload());
         }
       }
     }
@@ -108,22 +109,22 @@ public class MavenGroupFacet
     if (metadataPayloads.isEmpty()) {
       return null;
     }
-    final MavenContent mergedMetadata = mergeMetadata(mavenPath, metadataPayloads);
+    final Content mergedMetadata = mergeMetadata(mavenPath, metadataPayloads);
     if (mergedMetadata == null) {
       return null;
     }
     return cacheMergedMetadata(mavenPath, mergedMetadata);
   }
 
-  private MavenContent mergeMetadata(final MavenPath mavenPath,
-                                     final LinkedHashMap<Repository, MavenContent> metadataPayloads) throws IOException
+  private Content mergeMetadata(final MavenPath mavenPath,
+                                final LinkedHashMap<Repository, Content> metadataPayloads) throws IOException
   {
     if (metadataPayloads.size() == 1) {
       return metadataPayloads.get(0);
     }
     final MetadataXpp3Reader reader = new MetadataXpp3Reader();
     List<MetadataEnvelope> metadatas = Lists.newArrayList();
-    for (Map.Entry<Repository, MavenContent> entry : metadataPayloads.entrySet()) {
+    for (Map.Entry<Repository, Content> entry : metadataPayloads.entrySet()) {
       final String origin = entry.getKey().getName() + " @ " + mavenPath.getPath();
       try (InputStream inputStream = entry.getValue().openInputStream()) {
         final Metadata metadata = reader.read(inputStream);
@@ -141,18 +142,18 @@ public class MavenGroupFacet
     // Metadata is rather small, so let's do it like this
     final Map<HashAlgorithm, HashCode> hashes = Hashes.hash(mavenFacet.getHashAlgorithms(),
         new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
-    return new MavenContent(
+    final Content content = new Content(
         new BytesPayload(
             byteArrayOutputStream.toByteArray(),
             "text/xml"
-        ),
-        DateTime.now(),
-        hashes.get(HashAlgorithm.SHA1).toString(),
-        hashes
-    );
+        ));
+    content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
+    content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashes.get(HashAlgorithm.SHA1).toString() + "}}");
+    content.getAttributes().set(MavenHashCodes.class, new MavenHashCodes(hashes));
+    return content;
   }
 
-  private MavenContent cacheMergedMetadata(final MavenPath mavenPath, final MavenContent payload) throws IOException {
+  private Content cacheMergedMetadata(final MavenPath mavenPath, final Content payload) throws IOException {
     // put the metadata and then put hashes
     mavenFacet.put(mavenPath, payload);
     // get it and store corresponding hashes

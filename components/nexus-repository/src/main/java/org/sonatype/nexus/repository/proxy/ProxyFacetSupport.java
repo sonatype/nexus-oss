@@ -163,7 +163,7 @@ public abstract class ProxyFacetSupport
       if (lastModified != null) {
         request.addHeader(HttpHeaders.IF_MODIFIED_SINCE, DateUtils.formatDate(lastModified.toDate()));
       }
-      final String etag = stale.getAttributes().get(CONTENT_UPSTREAM_ETAG, String.class);
+      final String etag = stale.getAttributes().get(Content.CONTENT_ETAG, String.class);
       if (etag != null) {
         request.addHeader(HttpHeaders.IF_NONE_MATCH, "\"" + etag + "\"");
       }
@@ -183,7 +183,7 @@ public abstract class ProxyFacetSupport
       Payload payload = new HttpEntityPayload(response, entity);
       final Content result = new Content(payload);
       result.getAttributes().set(Content.CONTENT_LAST_MODIFIED, extractLastModified(response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
-      result.getAttributes().set(CONTENT_UPSTREAM_ETAG, extractETag(response.getLastHeader(HttpHeaders.ETAG)));
+      result.getAttributes().set(Content.CONTENT_ETAG, extractETag(response.getLastHeader(HttpHeaders.ETAG)));
       return result;
     }
     if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {

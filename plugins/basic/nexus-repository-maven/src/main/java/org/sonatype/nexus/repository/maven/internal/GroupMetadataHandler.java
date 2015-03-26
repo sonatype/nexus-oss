@@ -21,8 +21,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.group.GroupHandler;
 import org.sonatype.nexus.repository.http.HttpResponses;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Response;
 
 /**
@@ -42,9 +42,9 @@ public class GroupMetadataHandler
     final MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
     final MavenGroupFacet groupFacet = context.getRepository().facet(MavenGroupFacet.class);
     // get cached one
-    Payload payload = groupFacet.getCachedMergedMetadata(mavenPath);
-    if (payload != null) {
-      return HttpResponses.ok(payload);
+    Content content = groupFacet.getCachedMergedMetadata(mavenPath);
+    if (content != null) {
+      return HttpResponses.ok(content);
     }
 
     // not have it, let's figure out
@@ -56,9 +56,9 @@ public class GroupMetadataHandler
       // metadata, merge and cache it and get it
       final LinkedHashMap<Repository, Response> responses =
           getAll(context.getRequest(), groupFacet.members(), dispatched);
-      payload = groupFacet.mergeAndCacheMetadata(mavenPath, responses);
-      if (payload != null) {
-        return HttpResponses.ok(payload);
+      content = groupFacet.mergeAndCacheMetadata(mavenPath, responses);
+      if (content != null) {
+        return HttpResponses.ok(content);
       }
       return HttpResponses.notFound();
     }
