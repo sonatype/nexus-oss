@@ -37,6 +37,9 @@ import org.joda.time.DateTime;
 public interface MavenFacet
     extends Facet
 {
+  /**
+   * Returns the version policy in effect for this repository.
+   */
   @Nonnull
   MavenPathParser getMavenPathParser();
 
@@ -46,11 +49,14 @@ public interface MavenFacet
   @Nonnull
   VersionPolicy getVersionPolicy();
 
+  /**
+   * Returns the checksum policy in effect for this repository.
+   */
   @Nonnull
   ChecksumPolicy getChecksumPolicy();
 
   @Nullable
-  MavenPayload get(MavenPath path) throws IOException;
+  MavenContent get(MavenPath path) throws IOException;
 
   void put(MavenPath path, Payload payload) throws IOException, InvalidContentException;
 

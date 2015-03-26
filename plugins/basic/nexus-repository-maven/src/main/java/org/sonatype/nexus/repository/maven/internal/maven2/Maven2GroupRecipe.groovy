@@ -49,7 +49,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 class Maven2GroupRecipe
     extends RecipeSupport
 {
-  static final String NAME = "maven2-group"
+  static final String NAME = 'maven2-group'
 
   @Inject
   Provider<Maven2SecurityFacet> securityFacet

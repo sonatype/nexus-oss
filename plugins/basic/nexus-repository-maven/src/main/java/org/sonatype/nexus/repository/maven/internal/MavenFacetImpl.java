@@ -47,6 +47,7 @@ import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -111,7 +112,10 @@ public class MavenFacetImpl
 
   private static final String CONFIG_KEY = "maven";
 
-  private static final List<HashAlgorithm> HASH_ALGORITHMS = Lists.newArrayList(SHA1, MD5);
+  /**
+   * List of hash algorithms always applied to payloads in blob store, with first in the list being the "primary" hash.
+   */
+  private static final List<HashAlgorithm> HASH_ALGORITHMS = ImmutableList.of(SHA1, MD5);
 
   // members
 
@@ -174,7 +178,7 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
-  public MavenPayload get(final MavenPath path) throws IOException {
+  public MavenContent get(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final Asset asset = findAsset(tx, tx.getBucket(), path);
       if (asset == null) {
@@ -183,16 +187,16 @@ public class MavenFacetImpl
       final Blob blob = tx.requireBlob(asset.requireBlobRef());
       final String contentType = asset.contentType();
 
-      final NestedAttributesMap attributesMap = asset.formatAttributes();
-      final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-      final String etag = attributesMap.get(P_CONTENT_ETAG, String.class);
       final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
       final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
       for (HashAlgorithm algorithm : HASH_ALGORITHMS) {
         final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
         hashCodes.put(algorithm, hashCode);
       }
-      return new MavenPayload(
+      final NestedAttributesMap attributesMap = asset.formatAttributes();
+      final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
+      final String etag = attributesMap.get(P_CONTENT_ETAG, String.class);
+      return new MavenContent(
           new BlobPayload(blob, contentType),
           lastModifiedDate == null ? null : new DateTime(lastModifiedDate),
           etag,
@@ -208,8 +212,8 @@ public class MavenFacetImpl
     try (StorageTx tx = getStorage().openTx()) {
       if (path.getCoordinates() != null) {
         putArtifact(path, payload, tx);
-        if (payload instanceof MavenPayload) {
-          final MavenPayload mavenPayload = (MavenPayload) payload;
+        if (payload instanceof MavenContent) {
+          final MavenContent mavenPayload = (MavenContent) payload;
           for (HashType hashType : HashType.values()) {
             final HashCode hashCode = mavenPayload.getHashCodes().get(hashType.getHashAlgorithm());
             if (hashCode != null) {
@@ -220,8 +224,8 @@ public class MavenFacetImpl
       }
       else {
         putFile(path, payload, tx);
-        if (payload instanceof MavenPayload) {
-          final MavenPayload mavenPayload = (MavenPayload) payload;
+        if (payload instanceof MavenContent) {
+          final MavenContent mavenPayload = (MavenContent) payload;
           for (HashType hashType : HashType.values()) {
             final HashCode hashCode = mavenPayload.getHashCodes().get(hashType.getHashAlgorithm());
             if (hashCode != null) {
@@ -326,9 +330,7 @@ public class MavenFacetImpl
       if (content.getLastModified() != null) {
         formatAttributes.set(P_CONTENT_LAST_MODIFIED, content.getLastModified().toDate());
       }
-      if (content.getETag() != null) {
-        formatAttributes.set(P_CONTENT_ETAG, content.getETag());
-      }
+      formatAttributes.set(P_CONTENT_ETAG, content.getETag());
     }
   }
 

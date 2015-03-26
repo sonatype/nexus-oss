@@ -51,7 +51,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 class Maven2HostedRecipe
     extends RecipeSupport
 {
-  static final String NAME = "maven2-hosted"
+  static final String NAME = 'maven2-hosted'
 
   @Inject
   Provider<Maven2SecurityFacet> securityFacet
