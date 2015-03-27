@@ -33,6 +33,7 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.storage.Asset;
@@ -43,6 +44,7 @@ import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
+import org.sonatype.nexus.repository.view.payloads.StringPayload;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
@@ -119,15 +121,20 @@ public class MavenFacetImpl
 
   private final MimeSupport mimeSupport;
 
+  private final Map<String, MavenPathParser> mavenPathParsers;
+
   private boolean strictContentTypeValidation;
+
+  private MavenPathParser mavenPathParser;
 
   private VersionPolicy versionPolicy;
 
   private ChecksumPolicy checksumPolicy;
 
   @Inject
-  public MavenFacetImpl(final MimeSupport mimeSupport) {
+  public MavenFacetImpl(final MimeSupport mimeSupport, final Map<String, MavenPathParser> mavenPathParsers) {
     this.mimeSupport = checkNotNull(mimeSupport);
+    this.mavenPathParsers = checkNotNull(mavenPathParsers);
   }
 
   @Override
@@ -136,12 +143,25 @@ public class MavenFacetImpl
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     this.strictContentTypeValidation =
         attributes.get("strictContentTypeValidation", Boolean.class, Boolean.FALSE).booleanValue();
+    this.mavenPathParser = checkNotNull(mavenPathParsers.get(getRepository().getFormat().getValue()));
     this.versionPolicy = VersionPolicy.valueOf(
         attributes.require("versionPolicy", String.class)
     );
     this.checksumPolicy = ChecksumPolicy.valueOf(
         attributes.require("checksumPolicy", String.class)
     );
+  }
+
+  @Nonnull
+  @Override
+  public MavenPathParser getMavenPathParser() {
+    return mavenPathParser;
+  }
+
+  @Nonnull
+  @Override
+  public List<HashAlgorithm> getHashAlgorithms() {
+    return HASH_ALGORITHMS;
   }
 
   @Nonnull
@@ -192,9 +212,27 @@ public class MavenFacetImpl
     try (StorageTx tx = getStorage().openTx()) {
       if (path.getCoordinates() != null) {
         putArtifact(path, payload, tx);
+        if (payload instanceof MavenContent) {
+          final MavenContent mavenPayload = (MavenContent) payload;
+          for (HashType hashType : HashType.values()) {
+            final HashCode hashCode = mavenPayload.getHashCodes().get(hashType.getHashAlgorithm());
+            if (hashCode != null) {
+              putArtifact(path.hash(hashType), new StringPayload(hashCode.toString(), "text/plain"), tx);
+            }
+          }
+        }
       }
       else {
         putFile(path, payload, tx);
+        if (payload instanceof MavenContent) {
+          final MavenContent mavenPayload = (MavenContent) payload;
+          for (HashType hashType : HashType.values()) {
+            final HashCode hashCode = mavenPayload.getHashCodes().get(hashType.getHashAlgorithm());
+            if (hashCode != null) {
+              putFile(path.hash(hashType), new StringPayload(hashCode.toString(), "text/plain"), tx);
+            }
+          }
+        }
       }
       tx.commit();
     }
@@ -297,15 +335,19 @@ public class MavenFacetImpl
   }
 
   @Override
-  public boolean delete(final MavenPath path) throws IOException {
+  public boolean delete(final MavenPath... paths) throws IOException {
+    boolean result = false;
     try (StorageTx tx = getStorage().openTx()) {
-      if (path.getCoordinates() != null) {
-        return deleteArtifact(path, tx);
-      }
-      else {
-        return deleteFile(path, tx);
+      for (MavenPath path : paths) {
+        if (path.getCoordinates() != null) {
+          result = deleteArtifact(path, tx) || result;
+        }
+        else {
+          result = deleteFile(path, tx) || result;
+        }
       }
     }
+    return result;
   }
 
   private boolean deleteArtifact(final MavenPath path, final StorageTx tx) throws IOException {

@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import org.sonatype.nexus.repository.Repository;
 
 /**
  * Asset created event.
@@ -20,9 +20,9 @@ import com.tinkerpop.blueprints.impls.orient.OrientVertex;
  * @since 3.0
  */
 public class AssetCreatedEvent
-  extends AssetEvent
+    extends AssetEvent
 {
-  public AssetCreatedEvent(final Asset asset) {
-    super(asset);
+  public AssetCreatedEvent(final Asset asset, final Repository repository) {
+    super(asset, repository);
   }
 }
