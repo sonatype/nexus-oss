@@ -15,6 +15,7 @@ package com.sonatype.nexus.repository.nuget.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -75,7 +77,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.base.Strings.nullToEmpty;
 import static com.sonatype.nexus.repository.nuget.internal.NugetProperties.*;
-import static java.util.Arrays.asList;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseInlineCount;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseSkip;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseTop;
@@ -84,6 +85,8 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
 
 /**
+ * A group-aware implementation of a hosted {@link} NugetGalleryFacet.
+ *
  * @since 3.0
  */
 @Named("local")
@@ -115,16 +118,21 @@ public class NugetGalleryFacetImpl
     storage = null;
   }
 
-  //@Override
+  @Override
   @Guarded(by = STARTED)
   public int count(final String operation, final Map<String, String> query) {
     log.debug("Count: " + query);
 
+    return count(operation, query, getRepositories());
+  }
+
+  protected int count(final String operation, final Map<String, String> query,
+                      final Iterable<Repository> repositories)
+  {
     final ComponentQuery componentQuery = ODataUtils.query(query, true);
 
     try (StorageTx storageTx = openStorageTx()) {
-
-      int count = executeCount(componentQuery, storageTx);
+      int count = executeCount(componentQuery, storageTx, repositories);
 
       final Integer skip = parseSkip(query.get("$skip"));
       if (null != skip && skip >= 0) {
@@ -142,37 +150,37 @@ public class NugetGalleryFacetImpl
     }
   }
 
-  //@Override
+  @Override
   @Guarded(by = STARTED)
   public String feed(final String base, final String operation, final Map<String, String> query) {
     log.debug("Select: " + query);
+    setFeedQueryDefaults(query);
 
-    final StringBuilder xml = new StringBuilder();
-    xml.append(interpolateTemplate(ODataTemplates.NUGET_FEED, extraTemplateVars(base, operation)));
+    final List<Repository> repositories = getRepositories();
 
-    // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
-    if (!query.containsKey("$orderby")) {
-      query.put("$orderby", DOWNLOAD_COUNT + " desc");
-    }
-    else {
-      // OrientDB only supports ordering by identifiers, not by functions
-      final String orderby = query.get("$orderby");
-      query.put("$orderby", orderby.replaceAll("(?i)concat\\(title,id\\)", NAME_ORDER));
-    }
+    FeedResult result = feed(base, operation, query, repositories);
 
-    ComponentQuery componentQuery = ODataUtils.query(query, false);
-    ComponentQuery componentCountQuery = ODataUtils.query(query, true);
+    return renderFeedResults(result);
+  }
+
+  /**
+   * Generate a {@link FeedResult} for a given feed query.
+   */
+  protected FeedResult feed(final String base, final String operation, final Map<String, String> query,
+                            final Iterable<Repository> repositories)
+  {
+    FeedResult result = new FeedResult(base, operation, query);
 
     try (StorageTx storageTx = openStorageTx()) {
 
       // NXCM-4502 add inlinecount only if requested
       if (inlineCountRequested(query)) {
-        int inlineCount = executeCount(componentCountQuery, storageTx);
-        xml.append(interpolateTemplate(ODataTemplates.NUGET_INLINECOUNT,
-            ImmutableMap.of("COUNT", String.valueOf(inlineCount))
-        ));
+        int inlineCount = executeCount(ODataUtils.query(query, true), storageTx, repositories);
+
+        result.setCount(inlineCount);
       }
 
+      final ComponentQuery componentQuery = ODataUtils.query(query, false);
       final Iterable<Asset> assets = storageTx.findAssets(componentQuery.getWhere(),
           componentQuery.getParameters(), getRepositories(), componentQuery.getQuerySuffix());
 
@@ -182,18 +190,50 @@ public class NugetGalleryFacetImpl
         final NestedAttributesMap nugetAttributes = asset.formatAttributes();
         final Map<String, ?> data = toData(nugetAttributes, extraTemplateVars(base, operation));
 
-        xml.append(interpolateTemplate(ODataTemplates.NUGET_ENTRY, data));
+        result.addEntry(data);
         if (n == ODataUtils.PAGE_SIZE) {
-          xml.append("  <link rel=\"next\" href=\"").append(base).append('/').append(operation);
-          xml.append("()?").append(ODataFeedUtils.skipLink(data, query)).append("\"/>\n");
-          break;
+          result.setSkipLinkEntry(data);
         }
       }
 
       storageTx.commit();
     }
+    return result;
+  }
 
+  protected String renderFeedResults(final FeedResult result)
+  {
+    final StringBuilder xml = new StringBuilder();
+    xml.append(interpolateTemplate(ODataTemplates.NUGET_FEED,
+        extraTemplateVars(result.getBase(), result.getOperation())));
+
+    if (result.getCount() != null) {
+      xml.append(interpolateTemplate(ODataTemplates.NUGET_INLINECOUNT,
+          ImmutableMap.of("COUNT", String.valueOf(result.getCount()))
+      ));
+    }
+    for (Map<String, ?> data : result.getEntries()) {
+      xml.append(interpolateTemplate(ODataTemplates.NUGET_ENTRY, data));
+    }
+
+    if (result.getSkipLinkEntry() != null) {
+      xml.append("  <link rel=\"next\" href=\"").append(result.getBase()).append('/').append(result.getOperation());
+      xml.append("()?").append(ODataFeedUtils.skipLink(result.getSkipLinkEntry(), result.getQuery())).append("\"/>\n");
+    }
     return xml.append("</feed>").toString();
+  }
+
+  private void setFeedQueryDefaults(final Map<String, String> query)
+  {
+    // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
+    if (!query.containsKey("$orderby")) {
+      query.put("$orderby", DOWNLOAD_COUNT + " desc");
+    }
+    else {
+      // OrientDB only supports ordering by identifiers, not by functions
+      final String orderby = query.get("$orderby");
+      query.put("$orderby", orderby.replaceAll("(?i)concat\\(title,id\\)", NAME_ORDER));
+    }
   }
 
   @Override
@@ -378,7 +418,8 @@ public class NugetGalleryFacetImpl
   }
 
   private Asset createOrUpdateAsset(final StorageTx storageTx, final Bucket bucket, final Component component,
-                                   final Map<String, String> data) {
+                                    final Map<String, String> data)
+  {
     Asset asset = null;
 
     final List<Asset> assets = component.assets();
@@ -392,7 +433,7 @@ public class NugetGalleryFacetImpl
     if (data != null) {
       final NestedAttributesMap nugetAttr = asset.formatAttributes();
 
-      setDerivedAttributes(data, nugetAttr,  !component.isNew());
+      setDerivedAttributes(data, nugetAttr, !component.isNew());
 
       nugetAttr.set(P_AUTHORS, data.get(AUTHORS));
       nugetAttr.set(P_COPYRIGHT, data.get(COPYRIGHT));
@@ -599,14 +640,24 @@ public class NugetGalleryFacetImpl
     return InlineCount.ALLPAGES.equals(parseInlineCount(query.get("$inlinecount")));
   }
 
-  private int executeCount(final ComponentQuery query, final StorageTx storageTx) {
-    return (int) storageTx.countComponents(query.getWhere(), query.getParameters(), getRepositories(),
+  private int executeCount(final ComponentQuery query, final StorageTx storageTx,
+                           final Iterable<Repository> repositories)
+  {
+    return (int) storageTx.countComponents(query.getWhere(), query.getParameters(), repositories,
         query.getQuerySuffix());
   }
 
+  /**
+   * Returns the constituent repositories - just this one, or the leaf member repositories if this is a group.
+   */
   protected List<Repository> getRepositories() {
-    // TODO: Consider groups
-    return asList(getRepository());
+    try {
+      final GroupFacet facet = getRepository().facet(GroupFacet.class);
+      return facet.leafMembers();
+    }
+    catch (MissingFacetException e) {
+      return Collections.singletonList(getRepository());
+    }
   }
 
   protected Iterable<Repository> getHostedRepositories() {

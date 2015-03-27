@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.group;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -22,10 +23,10 @@ import javax.inject.Named;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -77,7 +78,7 @@ public class GroupFacetImpl
   @Override
   @Guarded(by = STARTED)
   public List<Repository> members() {
-    List<Repository> members = Lists.newArrayListWithCapacity(memberNames.size());
+    List<Repository> members = new ArrayList<>(memberNames.size());
     for (String name : memberNames) {
       Repository repository = repositoryManager.get(name);
       if (repository != null) {
@@ -88,5 +89,22 @@ public class GroupFacetImpl
       }
     }
     return members;
+  }
+
+  @Override
+  public List<Repository> leafMembers() {
+    List<Repository> leafMembers = new ArrayList<>();
+
+    for (Repository repository : members()) {
+      try {
+        final GroupFacet groupFacet = repository.facet(GroupFacet.class);
+        leafMembers.addAll(groupFacet.leafMembers());
+      }
+      catch (MissingFacetException e) {
+        leafMembers.add(repository);
+      }
+    }
+
+    return leafMembers;
   }
 }

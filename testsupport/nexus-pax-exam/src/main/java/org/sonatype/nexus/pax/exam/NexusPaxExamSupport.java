@@ -13,22 +13,39 @@
 package org.sonatype.nexus.pax.exam;
 
 import java.io.File;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.sonatype.nexus.configuration.ApplicationDirectories;
+import org.sonatype.nexus.events.EventSubscriberHost;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import org.sonatype.sisu.litmus.testsupport.port.PortRegistry;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Throwables;
+import com.google.common.util.concurrent.Uninterruptibles;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionConfigurationFileExtendOption;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 
 import static org.ops4j.pax.exam.CoreOptions.composite;
@@ -69,11 +86,11 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.useOwnKar
 @RunWith(PaxExam.class)
 public abstract class NexusPaxExamSupport
 {
-  private static final String BASEDIR = new File(System.getProperty("basedir", "")).getAbsolutePath();
+  public static final String BASEDIR = new File(System.getProperty("basedir", "")).getAbsolutePath();
 
   public static final String NEXUS_PAX_EXAM_TIMEOUT_KEY = "nexus.pax.exam.timeout";
 
-  public static final int NEXUS_PAX_EXAM_TIMEOUT_DEFAULT = 240000;
+  public static final int NEXUS_PAX_EXAM_TIMEOUT_DEFAULT = 300000;
 
   // -------------------------------------------------------------------------
 
@@ -84,10 +101,27 @@ public abstract class NexusPaxExamSupport
   public final TestIndexRule testIndex = new TestIndexRule(resolveBaseFile("target/it-reports"),
       resolveBaseFile("target/it-data"));
 
-  protected static final PortRegistry portRegistry = new PortRegistry();
+  @Rule
+  public final ExpectedException thrown = ExpectedException.none();
+
+  public static final PortRegistry portRegistry = new PortRegistry();
+
+  @Inject
+  @Named("http://127.0.0.1:${application-port}${nexus-context-path}")
+  protected URL nexusUrl;
+
+  @Inject
+  @Named("https://127.0.0.1:${application-port-ssl}${nexus-context-path}")
+  protected URL nexusSecureUrl;
 
   @Inject
   protected ApplicationDirectories applicationDirectories;
+
+  @Inject
+  protected EventSubscriberHost eventSubscriberHost;
+
+  @Inject
+  protected TaskScheduler taskScheduler;
 
   // -------------------------------------------------------------------------
 
@@ -128,6 +162,101 @@ public abstract class NexusPaxExamSupport
     return new File(applicationDirectories.getTemporaryDirectory(), path);
   }
 
+  /**
+   * Resolves path against the given URL.
+   */
+  public static URL resolveUrl(final URL url, final String path) {
+    try {
+      return URI.create(url + "/" + path).normalize().toURL();
+    }
+    catch (final Exception e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  // -------------------------------------------------------------------------
+
+  /**
+   * Periodically polls function until it returns {@code true} or 30 seconds have elapsed.
+   * 
+   * @throws InterruptedException if the thread is interrupted or the timeout exceeded
+   */
+  public static void waitFor(final Callable<Boolean> function) throws InterruptedException {
+    waitFor(function, 30000);
+  }
+
+  /**
+   * Periodically polls function until it returns {@code true} or the timeout has elapsed.
+   * 
+   * @throws InterruptedException if the thread is interrupted or the timeout exceeded
+   */
+  public static void waitFor(final Callable<Boolean> function, final long millis) throws InterruptedException {
+    Thread.yield();
+    for (int i = 0; i < millis / 100; i++) {
+      try {
+        if (Boolean.TRUE.equals(function.call())) {
+          return; // success
+        }
+        Thread.sleep(100);
+      }
+      catch (final InterruptedException e) {
+        throw e; // cancelled
+      }
+      catch (final Exception e) {
+        Thread.sleep(100);
+      }
+    }
+    throw new InterruptedException();
+  }
+
+  /**
+   * @return Function that returns {@code true} when there's a response from the URL; otherwise {@code false}
+   */
+  public static Callable<Boolean> responseFrom(final URL url) {
+    return new Callable<Boolean>()
+    {
+      public Boolean call() throws Exception {
+        HttpURLConnection conn = null;
+        try {
+          conn = (HttpURLConnection) url.openConnection();
+          conn.setRequestMethod("HEAD");
+          conn.connect();
+          return true;
+        }
+        finally {
+          if (conn != null) {
+            conn.disconnect();
+          }
+        }
+      }
+    };
+  }
+
+  /**
+   * @return Function that returns {@code true} when the event system is calm; otherwise {@code false}
+   */
+  protected Callable<Boolean> calmPeriod() {
+    return new Callable<Boolean>()
+    {
+      public Boolean call() throws Exception {
+        return eventSubscriberHost.isCalmPeriod();
+      }
+    };
+  }
+
+  /**
+   * @return Function that returns {@code true} when all tasks have stopped; otherwise {@code false}
+   */
+  protected Callable<Boolean> tasksDone() {
+    Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS);
+    return new Callable<Boolean>()
+    {
+      public Boolean call() throws Exception {
+        return taskScheduler.getRunningTaskCount() == 0;
+      }
+    };
+  }
+
   // -------------------------------------------------------------------------
 
   /**
@@ -160,6 +289,20 @@ public abstract class NexusPaxExamSupport
       localRepo = "${maven.repo.local}";
     }
 
+    // allow overriding the distribution under test from the command-line
+    if (System.getProperty("it.nexus.bundle.groupId") != null) {
+      frameworkZip.groupId(System.getProperty("it.nexus.bundle.groupId"));
+    }
+    if (System.getProperty("it.nexus.bundle.artifactId") != null) {
+      frameworkZip.artifactId(System.getProperty("it.nexus.bundle.artifactId"));
+    }
+    if (System.getProperty("it.nexus.bundle.version") != null) {
+      frameworkZip.version(System.getProperty("it.nexus.bundle.version"));
+    }
+    if (System.getProperty("it.nexus.bundle.classifier") != null) {
+      frameworkZip.classifier(System.getProperty("it.nexus.bundle.classifier"));
+    }
+
     return composite(
 
         vmOptions("-Xmx400m", "-XX:MaxPermSize=192m"), // taken from testsuite config
@@ -176,7 +319,7 @@ public abstract class NexusPaxExamSupport
             .unpackDirectory(resolveBaseFile("target/it-data")) //
             .useDeployFolder(false), //
 
-        configureConsole().ignoreLocalConsole(), // no need for console
+        configureConsole().ignoreLocalConsole().ignoreRemoteShell(), // no need for console
 
         doNotModifyLogConfiguration(), // don't mess with our logging
 
@@ -214,6 +357,22 @@ public abstract class NexusPaxExamSupport
   }
 
   /**
+   * @return Pax-Exam option to change the context path for the Nexus distribution
+   */
+  public static Option withContextPath(final String contextPath) {
+    return editConfigurationFilePut("etc/nexus.properties", "nexus-context-path", contextPath);
+  }
+
+  /**
+   * @return Pax-Exam option to enable HTTPS support in the Nexus distribution
+   */
+  public static Option withHttps() {
+    return composite(
+        editConfigurationFileExtend("etc/custom.properties", "nexus-args", "${karaf.base}/etc/jetty-https.xml"),
+        replaceConfigurationFile("etc/ssl/keystore.jks", resolveBaseFile("src/test/it-resources/ssl/nexus.jks")));
+  }
+
+  /**
    * @return Pax-Exam option to install a Nexus plugin based on groupId and artifactId
    */
   public static Option nexusPlugin(final String groupId, final String artifactId) {
@@ -226,6 +385,59 @@ public abstract class NexusPaxExamSupport
   public static Option nexusPlugin(final MavenUrlReference featureXml, final String name) {
     return composite(features(featureXml), editConfigurationFileExtend("etc/nexus.properties", "nexus-features", name));
   }
+
+  /**
+   * Replacement for {@link CoreOptions#options(Option...)} to workaround Pax-Exam 'feature'
+   * where only the last 'editConfigurationFileExtend' for a given property key is honoured.
+   */
+  public static Option[] options(final Option... options) {
+    final List<Option> result = new ArrayList<>();
+
+    // filter out the individual nexus-features values
+    final List<String> nexusFeatures = new ArrayList<>();
+    for (final Option o : OptionUtils.expand(options)) {
+      if (o instanceof KarafDistributionConfigurationFileExtendOption) {
+        if ("nexus-features".equals(((KarafDistributionConfigurationFileExtendOption) o).getKey())) {
+          nexusFeatures.add(((KarafDistributionConfigurationFileExtendOption) o).getValue());
+          continue;
+        }
+      }
+      result.add(o);
+    }
+
+    if (nexusFeatures.size() > 0) {
+      // combine the nexus-features values into a single request
+      result.add(editConfigurationFileExtend("etc/nexus.properties", //
+          "nexus-features", Joiner.on(',').join(nexusFeatures)));
+    }
+
+    return result.toArray(new Option[result.size()]);
+  }
+
+  // -------------------------------------------------------------------------
+
+  @Before
+  public void startTestRecording() {
+    // Pax-Exam guarantees unique test location, use that with index
+    testIndex.setDirectory(applicationDirectories.getAppDirectory());
+  }
+
+  @After
+  public void stopTestRecording() {
+    testIndex.recordAndCopyLink("karaf.log", resolveAppFile("data/log/karaf.log"));
+    testIndex.recordAndCopyLink("nexus.log", resolveWorkFile("logs/nexus.log"));
+    testIndex.recordAndCopyLink("request.log", resolveWorkFile("logs/request.log"));
+
+    final String surefirePrefix = "target/surefire-reports/" + getClass().getName();
+    testIndex.recordLink("surefire result", resolveBaseFile(surefirePrefix + ".txt"));
+    testIndex.recordLink("surefire output", resolveBaseFile(surefirePrefix + "-output.txt"));
+
+    final String failsafePrefix = "target/failsafe-reports/" + getClass().getName();
+    testIndex.recordLink("failsafe result", resolveBaseFile(failsafePrefix + ".txt"));
+    testIndex.recordLink("failsafe output", resolveBaseFile(failsafePrefix + "-output.txt"));
+  }
+
+  // -------------------------------------------------------------------------
 
   /**
    * @return Pax-Exam option to install custom invoker factory that waits for Nexus to start
@@ -254,28 +466,5 @@ public abstract class NexusPaxExamSupport
     catch (final Exception e) {
       return NEXUS_PAX_EXAM_TIMEOUT_DEFAULT;
     }
-  }
-
-  // -------------------------------------------------------------------------
-
-  @Before
-  public void startTestRecording() {
-    // Pax-Exam guarantees unique test location, use that with index
-    testIndex.setDirectory(applicationDirectories.getAppDirectory());
-  }
-
-  @After
-  public void stopTestRecording() {
-    testIndex.recordAndCopyLink("karaf.log", resolveAppFile("data/log/karaf.log"));
-    testIndex.recordAndCopyLink("nexus.log", resolveWorkFile("logs/nexus.log"));
-    testIndex.recordAndCopyLink("request.log", resolveWorkFile("logs/request.log"));
-
-    final String surefirePrefix = "target/surefire-reports/" + getClass().getName();
-    testIndex.recordLink("surefire result", resolveBaseFile(surefirePrefix + ".txt"));
-    testIndex.recordLink("surefire output", resolveBaseFile(surefirePrefix + "-output.txt"));
-
-    final String failsafePrefix = "target/failsafe-reports/" + getClass().getName();
-    testIndex.recordLink("failsafe result", resolveBaseFile(failsafePrefix + ".txt"));
-    testIndex.recordLink("failsafe output", resolveBaseFile(failsafePrefix + "-output.txt"));
   }
 }
