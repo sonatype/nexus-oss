@@ -38,6 +38,8 @@ public class Content
 
   public static final String CONTENT_ETAG = "etag";
 
+  public static final String CONTENT_HASH_CODES_MAP = "hashCodesMap";
+
   /**
    * Custom attributes to configure backing and logging.
    */

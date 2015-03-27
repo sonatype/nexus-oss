@@ -198,7 +198,7 @@ public class MavenFacetImpl
       result.getAttributes()
           .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
       result.getAttributes().set(Content.CONTENT_ETAG, eTag);
-      result.getAttributes().set(MavenHashCodes.class, new MavenHashCodes(hashCodes));
+      result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
       return result;
     }
   }

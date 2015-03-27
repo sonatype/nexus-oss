@@ -141,7 +141,7 @@ public class MavenGroupFacet
     final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     new MetadataXpp3Writer().write(byteArrayOutputStream, mergedMetadata);
     // Metadata is rather small, so let's do it like this
-    final Map<HashAlgorithm, HashCode> hashes = Hashes.hash(mavenFacet.getHashAlgorithms(),
+    final Map<HashAlgorithm, HashCode> hashCodes = Hashes.hash(mavenFacet.getHashAlgorithms(),
         new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
     final Content content = new Content(
         new BytesPayload(
@@ -149,8 +149,8 @@ public class MavenGroupFacet
             "text/xml"
         ));
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
-    content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashes.get(HashAlgorithm.SHA1).toString() + "}}");
-    content.getAttributes().set(MavenHashCodes.class, new MavenHashCodes(hashes));
+    content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}");
+    content.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
     return content;
   }
 
