@@ -14,14 +14,16 @@ package org.sonatype.nexus.repository.view;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
-import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.common.hash.HashAlgorithm;
 
 import com.google.common.collect.Maps;
+import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -34,10 +36,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Content
     implements Payload
 {
+  /**
+   * Key of the "last modified" attribute of type {@link DateTime}.
+   */
   public static final String CONTENT_LAST_MODIFIED = "lastModified";
 
+  /**
+   * Key of the "etag" attribute of type {@link String}.
+   */
   public static final String CONTENT_ETAG = "etag";
 
+  /**
+   * Key of the "hashCodes" attribute of type {@link Map}, with keys {@link HashAlgorithm} and values of {@link
+   * HashCode>}.
+   */
   public static final String CONTENT_HASH_CODES_MAP = "hashCodesMap";
 
   /**
