@@ -21,7 +21,7 @@ Ext.define('NX.view.UnsavedChanges', {
   extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-unsaved-changes',
 
-  title: 'Unsaved changes',
+  title: NX.I18n.get('GLOBAL_UNSAVED_TITLE'),
   defaultFocus: 'nx-discard',
 
   /**
@@ -46,11 +46,11 @@ Ext.define('NX.view.UnsavedChanges', {
       items: {
         xtype: 'panel',
         ui: 'nx-inset',
-        html: '<p>Do you want to discard your changes?</p>',
+        html: NX.I18n.get('GLOBAL_UNSAVED_MESSAGE'),
         buttonAlign: 'left',
         buttons: [
           {
-            text: 'Discard changes',
+            text: NX.I18n.get('GLOBAL_UNSAVED_DISCARD_BUTTON'),
             ui: 'nx-primary',
             itemId: 'nx-discard',
             handler: function () {
@@ -60,7 +60,7 @@ Ext.define('NX.view.UnsavedChanges', {
               me.close();
             }
           },
-          { text: 'Go back', handler: me.close, scope: me }
+          { text: NX.I18n.get('GLOBAL_UNSAVED_BACK_BUTTON'), handler: me.close, scope: me }
         ]
       }
     });
