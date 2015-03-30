@@ -26,7 +26,7 @@ Sonatype Nexus - Open Source Edition
 
 ## Running
 
-The run Nexus, after building, unzip the assembly and start the server:
+To run Nexus, after building, unzip the assembly and start the server:
 
     unzip -d target assemblies/nexus-base-template/target/nexus-base-template-*.zip
     ./target/nexus-base-template-*/bin/nexus console

@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.authz.AuthorizationManager;
 import org.sonatype.nexus.security.config.CPrivilege;
@@ -31,17 +31,19 @@ import org.sonatype.nexus.security.user.UserSearchCriteria;
 import org.sonatype.nexus.security.user.UserStatus;
 
 import com.google.common.collect.ImmutableList;
-import junit.framework.Assert;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests adding, updating, searching, authc, and authz a user that has an empty role (a role that does not contain any
  * other role or permission).
  */
 public class EmptyRoleTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
+  @Test
   public void testCreateEmptyRole() throws Exception {
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
     AuthorizationManager authManager = securitySystem.getAuthorizationManager("default");
@@ -71,6 +73,7 @@ public class EmptyRoleTest
    * Note: this test is kinda useless, as Security system (as underlying Shiro) is not "reloadable": once created,
    * you need to toss it away and ask another instance from Guice, we cannot reload security currently.
    */
+  @Test
   public void testReloadSecurityWithEmptyRole() throws Exception {
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
     AuthorizationManager authManager = securitySystem.getAuthorizationManager("default");
@@ -84,6 +87,7 @@ public class EmptyRoleTest
     Assert.assertNotNull(authManager.getRole(emptyRole.getRoleId()));
   }
 
+  @Test
   public void testAuthorizeUserWithEmptyRole() throws Exception {
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
 
@@ -120,6 +124,7 @@ public class EmptyRoleTest
     subject.checkPermission("app:config:read");
   }
 
+  @Test
   public void testSearchForUserWithEmptyRole() throws Exception {
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
     AuthorizationManager authManager = securitySystem.getAuthorizationManager("default");

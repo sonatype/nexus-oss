@@ -15,8 +15,12 @@ package org.sonatype.nexus.kenai;
 import java.io.IOException;
 import java.util.List;
 
-import org.sonatype.nexus.NexusAppTestSupport;
+import org.sonatype.nexus.AbstractApplicationStatusSource;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.kenai.internal.KenaiMockAuthcServlet;
+import org.sonatype.nexus.security.TestSecurityModule;
+import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.tests.http.runner.junit.ServerResource;
 import org.sonatype.tests.http.server.fluent.Server;
 
@@ -31,7 +35,7 @@ import static org.mockito.Mockito.when;
  * Kenai test super class. Note: NexusAppTestSupport needed as these tests boot whole security up.
  */
 public abstract class AbstractKenaiRealmTest
-    extends NexusAppTestSupport
+    extends NexusTestSupport
 {
 
   protected final String username = "test-user";
@@ -49,10 +53,15 @@ public abstract class AbstractKenaiRealmTest
   @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
+    modules.add(new TestSecurityModule());
     modules.add(new Module()
     {
       @Override
       public void configure(final Binder binder) {
+        ApplicationStatusSource statusSource = mock(AbstractApplicationStatusSource.class);
+        when(statusSource.getSystemStatus()).thenReturn(new SystemStatus());
+        binder.bind(ApplicationStatusSource.class).toInstance(statusSource);
+
         binder.bind(Kenai.class).toInstance(mockKenai());
       }
     });

@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -26,6 +25,7 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.templates.TemplateProvider;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -33,7 +33,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class P2ProxyMirrorsTest
-    extends NexusAppTestSupport
+    extends NexusTestSupport
 {
 
   private P2ProxyRepository repository;
@@ -48,8 +48,6 @@ public class P2ProxyMirrorsTest
 
     // next line will force initialization of P2 repository types
     lookup(TemplateProvider.class, "p2-repository");
-
-    startNx();
 
     lookup(ApplicationConfiguration.class);
 

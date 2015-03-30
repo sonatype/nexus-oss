@@ -15,18 +15,22 @@ package org.sonatype.nexus.security.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 
 import com.google.inject.Binder;
 import com.google.inject.name.Names;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ResourceMergingSecurityConfigurationManagerTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
   private SecurityConfigurationManager manager;
 
   @Override
-  protected MemorySecurityConfiguration getSecurityModelConfig() {
+  protected MemorySecurityConfiguration initialSecurityConfiguration() {
     return ResourceMergingConfigurationManagerTestSecurity.securityModel();
   }
 
@@ -44,6 +48,7 @@ public class ResourceMergingSecurityConfigurationManagerTest
     manager = lookup(SecurityConfigurationManager.class);
   }
 
+  @Test
   public void testRoleMerging() throws Exception {
     List<CRole> roles = manager.listRoles();
 
@@ -75,6 +80,7 @@ public class ResourceMergingSecurityConfigurationManagerTest
 
   }
 
+  @Test
   public void testPrivsMerging() throws Exception {
     List<CPrivilege> privs = manager.listPrivileges();
 

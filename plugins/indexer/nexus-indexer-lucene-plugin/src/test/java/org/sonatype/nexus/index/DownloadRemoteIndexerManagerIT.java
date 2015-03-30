@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -32,8 +31,6 @@ import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Get;
 import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Head;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.treeview.DefaultTreeNodeFactory;
@@ -74,7 +71,7 @@ public class DownloadRemoteIndexerManagerIT
 
     Thread.sleep(100);
 
-    wairForAsyncEventsToCalmDown();
+    waitForAsyncEventsToCalmDown();
     waitForTasksToStop();
   }
 

@@ -16,16 +16,17 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 
 import com.google.inject.Binder;
 import com.google.inject.name.Names;
 import edu.umd.cs.mtc.MultithreadedTestCase;
 import edu.umd.cs.mtc.TestFramework;
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ResourceMergingManagerThreadedTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
   private SecurityConfigurationManager manager;
 
@@ -38,7 +39,7 @@ public class ResourceMergingManagerThreadedTest
   private List<DynamicSecurityConfigurationResource> injectedDynamicResources;
 
   @Override
-  protected MemorySecurityConfiguration getSecurityModelConfig() {
+  protected MemorySecurityConfiguration initialSecurityConfiguration() {
     return ResourceMergingConfigurationManagerTestSecurity.securityModel();
   }
 
@@ -84,6 +85,7 @@ public class ResourceMergingManagerThreadedTest
     }
   }
 
+  @Test
   public void testThreading() throws Throwable {
     TestFramework.runOnce(new MultithreadedTestCase()
     {

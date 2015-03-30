@@ -135,16 +135,6 @@
 
       <!-- INTERNAL -->
 
-      <!--
-      DM entry here is used to allow the _bundle-launcher-style_ integration-tests to locate the appropriate Nexus bundle to test with.
-      -->
-      <dependency>
-        <groupId>${it.nexus.bundle.groupId}</groupId>
-        <artifactId>${it.nexus.bundle.artifactId}</artifactId>
-        <version>${it.nexus.bundle.version}</version>
-        <type>zip</type>
-      </dependency>
-
       <dependency>
         <groupId>org.sonatype.nexus.assemblies</groupId>
         <artifactId>karaf-nexus-branding</artifactId>
@@ -203,13 +193,6 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-core</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-        <classifier>tests</classifier>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-orient</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
@@ -253,12 +236,6 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-formfields</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-launcher</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -338,25 +315,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-it-helper-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-testsupport</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-common</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-testsuite-support</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -537,15 +496,6 @@
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>modello-plugin-upgrade</artifactId>
           <version>1.1</version>
-        </plugin>
-
-        <!--
-        Support for bridging maven configuration to test-suite executions; see 'it' profile.
-        -->
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
-          <version>3.1</version>
         </plugin>
 
         <!--
@@ -1003,17 +953,6 @@
       </activation>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>export</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>

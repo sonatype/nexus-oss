@@ -1,3 +1,0 @@
-[
-    [ "org.sonatype.nexus.assemblies:nexus-base-template:zip:${project.version}" ]
-]

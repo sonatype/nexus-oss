@@ -12,57 +12,49 @@
  */
 package org.sonatype.nexus.security;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.Properties;
+import java.util.List;
 
-import org.sonatype.nexus.common.io.DirSupport;
+import org.sonatype.nexus.security.config.PreconfiguredSecurityConfigurationSource;
+import org.sonatype.nexus.security.config.SecurityConfiguration;
+import org.sonatype.nexus.security.config.SecurityConfigurationSource;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
-import org.sonatype.sisu.litmus.testsupport.TestUtil;
+import org.sonatype.nexus.security.user.UserManager;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 import com.google.inject.Binder;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.name.Names;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.util.ThreadContext;
-import org.eclipse.sisu.launch.InjectedTestCase;
-import org.eclipse.sisu.space.BeanScanning;
 
 public abstract class AbstractSecurityTest
-    extends InjectedTestCase
+    extends NexusTestSupport
+    implements Module
 {
-  // FIXME: Convert to junit4
-
-  protected final TestUtil util = new TestUtil(this);
-
-  private File PLEXUS_HOME = util.resolveFile("target/plexus-home/");
-
-  private File APP_CONF = new File(PLEXUS_HOME, "etc");
-
   @Override
-  public void configure(Properties properties) {
-    properties.put("application-conf", APP_CONF.getAbsolutePath());
-    super.configure(properties);
+  protected void customizeModules(List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new TestSecurityModule());
+    modules.add(this);
   }
 
   @Override
   public void configure(final Binder binder) {
-    binder.install(new TestSecurityModule());
+    binder.bind(SecurityConfigurationSource.class).annotatedWith(Names.named("default"))
+        .toInstance(new PreconfiguredSecurityConfigurationSource(initialSecurityConfiguration()));
 
     RealmConfiguration realmConfiguration = new RealmConfiguration();
-    realmConfiguration.setRealmNames(Arrays.asList(
-        "MockRealmA",
-        "MockRealmB"
-    ));
-    binder.bind(RealmConfiguration.class)
-        .annotatedWith(Names.named("initial"))
-        .toInstance(realmConfiguration);
+    realmConfiguration.setRealmNames(Arrays.asList("MockRealmA", "MockRealmB"));
+    binder.bind(RealmConfiguration.class).annotatedWith(Names.named("initial")).toInstance(realmConfiguration);
   }
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
 
-    DirSupport.deleteIfExists(PLEXUS_HOME.toPath());
+    lookup(Injector.class).injectMembers(this);
 
     getSecuritySystem().start();
   }
@@ -87,12 +79,19 @@ public abstract class AbstractSecurityTest
     super.tearDown();
   }
 
-  @Override
-  public BeanScanning scanning() {
-    return BeanScanning.INDEX;
+  protected SecuritySystem getSecuritySystem() {
+    return lookup(SecuritySystem.class);
   }
 
-  protected SecuritySystem getSecuritySystem() throws Exception {
-    return this.lookup(SecuritySystem.class);
+  protected UserManager getUserManager() {
+    return lookup(UserManager.class);
+  }
+
+  protected SecurityConfiguration initialSecurityConfiguration() {
+    return BaseSecurityConfig.get();
+  }
+
+  protected final SecurityConfiguration getSecurityConfiguration() {
+    return lookup(SecurityConfigurationSource.class, "default").getConfiguration();
   }
 }

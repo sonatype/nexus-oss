@@ -12,35 +12,33 @@
  */
 package org.sonatype.nexus.testsuite;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 
-import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
-import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
-
-import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
+import org.junit.Before;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.Option;
 
 /**
- * Support for Core integration tests.
+ * Support for Nexus integration tests.
  *
- * @since 2.4
+ * @since 2.11.1
  */
-@NexusStartAndStopStrategy(EACH_TEST)
 public abstract class NexusCoreITSupport
-    extends NexusRunningParametrizedITSupport
+    extends NexusPaxExamSupport
 {
-
-  protected NexusCoreITSupport(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
+  /**
+   * Configure Nexus with out-of-the box settings (no HTTPS).
+   */
+  @Configuration
+  public static Option[] configureNexus() {
+    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"));
   }
 
   /**
-   * Creates unique name with given prefix.
-   *
-   * @return a unique name.
+   * Make sure Nexus is responding on the standard base URL before continuing
    */
-  public static String uniqueName(final String prefix) {
-    return prefix + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date());
+  @Before
+  public void waitForNexus() throws Exception {
+    waitFor(responseFrom(nexusUrl));
   }
-
 }

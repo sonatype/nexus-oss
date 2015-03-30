@@ -158,7 +158,7 @@ public class Nexus5249IndexerManagerIT
     }
 
     // as things above will trigger some bg tasks (failingRepository will be reindexed with a task)
-    wairForAsyncEventsToCalmDown();
+    waitForAsyncEventsToCalmDown();
     waitForTasksToStop();
 
     // reset counters
