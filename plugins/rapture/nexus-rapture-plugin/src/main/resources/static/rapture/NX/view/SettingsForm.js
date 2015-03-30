@@ -25,6 +25,16 @@ Ext.define('NX.view.SettingsForm', {
   ],
 
   /**
+   * @private
+   * Set trackResetOnLoad by default
+   */
+  constructor : function(config) {
+    config = config || {};
+    config.trackResetOnLoad = true;
+    this.callParent([config]);
+  },
+
+  /**
    * @cfg {boolean} [settingsForm=true] Marker that we have a settings form
    * ({NX.controller.SettingsForm} controller kicks in)
    */

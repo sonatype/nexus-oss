@@ -108,15 +108,8 @@ Ext.define('NX.controller.SettingsForm', {
    * Reset the dirty state of the form
    */
   resetDirtyState: function (form) {
-    var items = form.getForm().getFields().items;
-
-    for(var i = 0; i < items.length; i++) {
-      var c = items[i];
-      if(c.mixins && c.mixins.field && typeof c.mixins.field['initValue'] == 'function') {
-        c.mixins.field.initValue.apply(c);
-        c.wasDirty = false;
-      }
-    }
+    var realform = form.getForm();
+    realform.setValues(realform.getValues());
   },
 
   /**
