@@ -18,19 +18,10 @@
  * @since 3.0
  */
 Ext.define('NX.view.ExpireSession', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-expire-session',
-  requires: [
-    'NX.I18n'
-  ],
 
   title: NX.I18n.get('GLOBAL_EXPIRE_TITLE'),
-
-  layout: 'fit',
-  autoShow: true,
-  modal: true,
-  constrain: true,
-  width: 400,
   closable: false,
 
   /**

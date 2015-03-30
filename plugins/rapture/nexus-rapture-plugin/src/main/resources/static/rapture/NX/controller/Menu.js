@@ -37,7 +37,8 @@ Ext.define('NX.controller.Menu', {
     'feature.NotVisible',
     'header.BrowseMode',
     'header.AdminMode',
-    'header.Mode'
+    'header.Mode',
+    'UnsavedChanges'
   ],
 
   models: [
@@ -770,23 +771,9 @@ Ext.define('NX.controller.Menu', {
     var me = this,
       content = me.getFeatureContent();
 
-    Ext.Msg.show({
-      title: 'Unsaved changes',
-      msg: 'Do you want to discard your changes?',
-      buttons: 6, // YESNO
-      buttonText: {
-        yes: 'Yes, discard changes',
-        no: 'No, go back'
-      },
-      icon: Ext.MessageBox.WARNING,
-      fn: function(buttonName) {
-        if (buttonName === 'yes') {
-
-          // Discard changes and load new content
-          content.discardUnsavedChanges = true;
-          callback();
-        }
-      }
+    Ext.create('NX.view.UnsavedChanges', {
+      content: content,
+      callback: callback
     });
   },
 
