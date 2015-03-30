@@ -46,11 +46,17 @@ Ext.define('NX.controller.Refresh', {
     });
 
     me.addEvents(
-        /**
-         * @event refresh
-         * Fires when refresh should be performed.
-         */
-        'refresh'
+      /**
+       * @event beforerefresh
+       * Fires before the refresh is performed
+       */
+      'beforerefresh',
+
+      /**
+       * @event refresh
+       * Fires when refresh should be performed.
+       */
+      'refresh'
     );
   },
 
@@ -61,11 +67,13 @@ Ext.define('NX.controller.Refresh', {
   refresh: function () {
     var me = this;
 
-    me.fireEvent('refresh');
+    if (me.fireEvent('beforerefresh')) {
+      me.fireEvent('refresh');
 
-    // Show a message here, so that if the current view doesn't actually support
-    // request that users don't think the feature is broken and spam-click the refresh button
-    NX.Messages.add({ text: NX.I18n.get('GLOBAL_HEADER_REFRESH_DEFAULT'), type: 'default' });
+      // Show a message here, so that if the current view doesn't actually support
+      // request that users don't think the feature is broken and spam-click the refresh button
+      NX.Messages.add({ text: NX.I18n.get('GLOBAL_HEADER_REFRESH_DEFAULT'), type: 'default' });
+    }
   }
 
 });

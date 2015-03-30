@@ -26,6 +26,12 @@ Ext.define('NX.view.feature.Content', {
   cls: 'nx-feature-content',
   layout: 'fit',
 
+  /**
+   * @private
+   * If false, show a warning modal when you’re about to discard unsaved changes by navigating away
+   */
+  discardUnsavedChanges: false,
+
   header: {
     items: [
       {
