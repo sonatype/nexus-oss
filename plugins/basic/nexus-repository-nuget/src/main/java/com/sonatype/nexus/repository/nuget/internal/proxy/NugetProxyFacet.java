@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacet;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataConsumer;
 
+import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Content;
@@ -30,6 +31,7 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
+import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
 
 /**
@@ -113,6 +115,12 @@ public class NugetProxyFacet
   protected String getUrl(final @Nonnull Context context) {
     // Unnecessary to implement this, as we override fetch in a way that doesn't use it
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  protected Map<HashAlgorithm, HashCode> getExpectedHashes(final Context context) {
+    String[] coords = coords(context);
+    return gallery().getExpectedHashes(coords[0], coords[1]);
   }
 
   private NugetGalleryFacet gallery() {

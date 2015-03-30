@@ -34,6 +34,7 @@ import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
 
 import org.sonatype.nexus.blobstore.api.Blob;
+import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
@@ -65,6 +66,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.hash.HashCode;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -346,16 +348,18 @@ public class NugetGalleryFacetImpl
 
     try (StorageTx tx = openStorageTx()) {
       Component component = findComponent(tx, id, version);
-      if (component == null) {
-        return null;
+      if (component != null) {
+        Asset asset = component.firstAsset();
+        BlobRef blobRef = asset.blobRef();
+        if (blobRef != null) {
+          Blob blob = tx.requireBlob(blobRef);
+          String contentType = asset.contentType();
+
+          return new StreamPayload(blob.getInputStream(), blob.getMetrics().getContentSize(), contentType);
+        }
       }
-      Asset asset = component.firstAsset();
-
-      Blob blob = tx.requireBlob(asset.requireBlobRef());
-      String contentType = asset.contentType();
-
-      return new StreamPayload(blob.getInputStream(), blob.getMetrics().getContentSize(), contentType);
     }
+    return null;
   }
 
   @Override
@@ -373,6 +377,28 @@ public class NugetGalleryFacetImpl
       Date date = nugetAttributes.get(P_LAST_UPDATED, Date.class);
       return new DateTime(checkNotNull(date));
     }
+  }
+
+  @Override
+  public Map<HashAlgorithm, HashCode> getExpectedHashes(final String id, final String version) {
+    Map<HashAlgorithm, HashCode> hashes = new HashMap<>();
+    try (StorageTx tx = openStorageTx()) {
+      Component component = findComponent(tx, id, version);
+      if (component != null) {
+        NestedAttributesMap nugetAttr = component.formatAttributes();
+        String algorithm = nugetAttr.get(P_PACKAGE_HASH_ALGORITHM, String.class);
+        if ("sha512".equalsIgnoreCase(algorithm)) {
+          String hash = nugetAttr.get(P_PACKAGE_HASH, String.class);
+          if (hash != null) {
+            hashes.put(HashAlgorithm.SHA512, HashCode.fromString(hash));
+          }
+        }
+        else {
+          log.warn("NuGet component {} v. {} contains an unsupported hash algorithm {}", id, version, algorithm);
+        }
+      }
+    }
+    return hashes;
   }
 
   @Override
