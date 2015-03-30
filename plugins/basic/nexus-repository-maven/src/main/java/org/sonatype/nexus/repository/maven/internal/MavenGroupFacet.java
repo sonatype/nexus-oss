@@ -147,16 +147,8 @@ public class MavenGroupFacet
     final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     new MetadataXpp3Writer().write(byteArrayOutputStream, mergedMetadata);
     // Metadata is rather small, so let's do it like this
-    final Iterable<HashAlgorithm> hashAlgorithms = Iterables.transform(Arrays.asList(HashType.values()),
-        new Function<HashType, HashAlgorithm>()
-        {
-          @Override
-          public HashAlgorithm apply(final HashType input) {
-            return input.getHashAlgorithm();
-          }
-        });
     final byte[] byteArray = byteArrayOutputStream.toByteArray();
-    final Map<HashAlgorithm, HashCode> hashCodes = Hashes.hash(hashAlgorithms,
+    final Map<HashAlgorithm, HashCode> hashCodes = Hashes.hash(mavenFacet.getHashAlgorithms(),
         new ByteArrayInputStream(byteArray));
     final Content content = new Content(
         new BytesPayload(

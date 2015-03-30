@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.content.InvalidContentException;
+import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Content;
@@ -42,6 +43,14 @@ public interface MavenFacet
    */
   @Nonnull
   MavenPathParser getMavenPathParser();
+
+  /**
+   * Returns the list of {@link HashAlgorithm} used by Maven {@link Content}. These are derived from {@link HashType}.
+   *
+   * @see HashType
+   */
+  @Nonnull
+  List<HashAlgorithm> getHashAlgorithms();
 
   /**
    * Returns the version policy in effect for this repository.

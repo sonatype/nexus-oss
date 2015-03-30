@@ -171,6 +171,12 @@ public class MavenFacetImpl
 
   @Nonnull
   @Override
+  public List<HashAlgorithm> getHashAlgorithms() {
+    return HASH_ALGORITHMS;
+  }
+
+  @Nonnull
+  @Override
   public VersionPolicy getVersionPolicy() {
     return versionPolicy;
   }
