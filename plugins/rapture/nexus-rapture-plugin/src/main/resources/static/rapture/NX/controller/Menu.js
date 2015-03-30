@@ -158,12 +158,11 @@ Ext.define('NX.controller.Menu', {
         'featureselected'
     );
 
+    // Disable backspace as a means for navigating back
+    me.disableBackspaceNav();
+
     // Warn people about refreshing or closing their browser when there are unsaved changes
-    window.onbeforeunload = function() {
-      if (me.hasDirt()) {
-        return "You will lose your unsaved changes";
-      }
-    };
+    me.warnBeforeUnload();
   },
 
   /**
@@ -796,6 +795,33 @@ Ext.define('NX.controller.Menu', {
     }
 
     return dirty;
-  }
+  },
 
+
+  /**
+   * @private
+   * Disable backspace as a means for navigating back
+   */
+  disableBackspaceNav: function() {
+    var parent = Ext.isIE ? document : window;
+    Ext.EventManager.on(parent, 'keydown', function (e, focused) {
+      if (e.getKey() == e.BACKSPACE && (!/^input$/i.test(focused.tagName) && !/^textarea$/i.test(focused.tagName)) || focused.disabled || focused.readOnly) {
+        e.stopEvent();
+      }
+    });
+  },
+
+  /*
+   * @private
+   * Warn people about refreshing or closing their browser when there are unsaved changes
+   */
+  warnBeforeUnload: function() {
+    var me = this;
+
+    window.onbeforeunload = function() {
+      if (me.hasDirt()) {
+        return "You will lose your unsaved changes";
+      }
+    };
+  }
 });
