@@ -155,11 +155,12 @@ public class MavenGroupFacet
             return input.getHashAlgorithm();
           }
         });
+    final byte[] byteArray = byteArrayOutputStream.toByteArray();
     final Map<HashAlgorithm, HashCode> hashCodes = Hashes.hash(hashAlgorithms,
-        new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+        new ByteArrayInputStream(byteArray));
     final Content content = new Content(
         new BytesPayload(
-            byteArrayOutputStream.toByteArray(),
+            byteArray,
             ContentTypes.TEXT_XML
         ));
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
