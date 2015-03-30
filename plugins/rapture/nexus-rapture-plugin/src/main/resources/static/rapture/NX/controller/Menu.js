@@ -131,9 +131,6 @@ Ext.define('NX.controller.Menu', {
         'nx-header-panel button[mode]': {
           click: me.warnBeforeModeSelect
         },
-        'nx-addwindow': {
-          beforeclose: me.warnBeforeModalClose
-        },
         '#breadcrumb button': {
           click: me.warnBeforeBreadcrumbClick
         },
@@ -687,20 +684,6 @@ Ext.define('NX.controller.Menu', {
     } else {
       me.getHeaderPanel().down('button[mode=' + this.mode + ']').toggle(true);
     }
-  },
-
-  /**
-   * @private
-   * Check for unsaved changes before closing a modal
-   */
-  warnBeforeModalClose: function(panel, eOpts) {
-    var me = this;
-
-    return me.warnBeforeNavigate(
-      function() {
-        panel.close();
-      }
-    );
   },
 
   /**
