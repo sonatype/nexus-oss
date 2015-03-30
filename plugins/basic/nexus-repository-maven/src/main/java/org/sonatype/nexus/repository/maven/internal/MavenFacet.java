@@ -44,12 +44,6 @@ public interface MavenFacet
   MavenPathParser getMavenPathParser();
 
   /**
-   * List of {@link HashAlgorithm}s that are always present on {@link MavenContent} stored.
-   */
-  @Nonnull
-  List<HashAlgorithm> getHashAlgorithms();
-
-  /**
    * Returns the version policy in effect for this repository.
    */
   @Nonnull

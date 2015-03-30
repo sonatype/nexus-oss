@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -126,6 +127,7 @@ public class Maven2MetadataMerger
    * Merges Maven2 repository metadata in received order. Returns {@code null} if passed in parameter array is
    * empty. The passed in instances are not mutated.
    */
+  @Nullable
   public Metadata merge(final MetadataEnvelope... metadatas) {
     Metadata result = null;
     for (MetadataEnvelope metadataEnvelope : metadatas) {

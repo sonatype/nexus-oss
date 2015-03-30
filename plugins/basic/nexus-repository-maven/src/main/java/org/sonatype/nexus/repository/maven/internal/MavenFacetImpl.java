@@ -33,9 +33,9 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
-import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -45,9 +45,12 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
+import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
@@ -55,8 +58,6 @@ import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
-import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 
 /**
  * A {@link MavenFacet} that persists Maven artifacts and metadata to a {@link StorageFacet}.
@@ -112,8 +113,20 @@ public class MavenFacetImpl
 
   /**
    * List of hash algorithms always applied to payloads in blob store, with first in the list being the "primary" hash.
+   * In case of Maven, this list is driven by {@link HashType}.
+   *
+   * @see HashType
    */
-  private static final List<HashAlgorithm> HASH_ALGORITHMS = ImmutableList.of(SHA1, MD5);
+  private static final List<HashAlgorithm> HASH_ALGORITHMS = ImmutableList.copyOf(
+      Iterables.transform(
+          Lists.newArrayList(HashType.values()),
+          new Function<HashType, HashAlgorithm>()
+          {
+            @Override
+            public HashAlgorithm apply(final HashType input) {
+              return input.getHashAlgorithm();
+            }
+          }));
 
   // members
 
@@ -154,12 +167,6 @@ public class MavenFacetImpl
   @Override
   public MavenPathParser getMavenPathParser() {
     return mavenPathParser;
-  }
-
-  @Nonnull
-  @Override
-  public List<HashAlgorithm> getHashAlgorithms() {
-    return HASH_ALGORITHMS;
   }
 
   @Nonnull
@@ -312,7 +319,8 @@ public class MavenFacetImpl
         formatAttributes.set(P_CONTENT_LAST_MODIFIED, lastModified.toDate());
       }
       formatAttributes.set(P_CONTENT_ETAG, content.getAttributes().get(Content.CONTENT_ETAG, String.class));
-    } else {
+    }
+    else {
       formatAttributes.set(P_CONTENT_LAST_MODIFIED, DateTime.now());
     }
   }
