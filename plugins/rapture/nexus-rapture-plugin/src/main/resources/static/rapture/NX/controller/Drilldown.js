@@ -202,20 +202,26 @@ Ext.define('NX.controller.Drilldown', {
     var me = this,
       lists = me.getLists();
 
-    if (lists[index]) {
-      lists[index].getStore().clearFilter();
-      if (index < lists.length - 1 && bookmark.length) {
-        lists[index].getStore().load(function(records, operation, success) {
-          me.loadStoreAtIndex(index + 1, bookmark, cb);
-        });
-      } else {
-        lists[index].getStore().load(function(records, operation, success) {
-          if (cb) {
-            cb(records, operation, success);
-          }
-          me.onStoreLoad();
-        });
+    try {
+      if (lists[index]) {
+        lists[index].getStore().clearFilter();
+        if (index < lists.length - 1 && bookmark.length) {
+          lists[index].getStore().load(function(records, operation, success) {
+            me.loadStoreAtIndex(index + 1, bookmark, cb);
+          });
+        } else {
+          lists[index].getStore().load(function(records, operation, success) {
+            if (cb) {
+              cb(records, operation, success);
+            }
+            me.onStoreLoad();
+          });
+        }
       }
+    }
+    catch (e) {
+      // Ext.data.Store.load() returned an exception, log it here
+      me.logDebug(e);
     }
   },
 
