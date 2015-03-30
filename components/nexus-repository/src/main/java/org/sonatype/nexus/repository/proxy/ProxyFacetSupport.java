@@ -13,12 +13,18 @@
 package org.sonatype.nexus.repository.proxy;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.hash.Hashes;
+import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.content.InvalidContentException;
@@ -28,8 +34,11 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
+import org.sonatype.nexus.repository.view.payloads.StreamPayload;
+import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 import com.google.common.base.Strings;
+import com.google.common.hash.HashCode;
 import com.google.common.net.HttpHeaders;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -58,6 +67,8 @@ public abstract class ProxyFacetSupport
 
   private int artifactMaxAgeMinutes;
 
+  private ChecksumPolicy checksumPolicy;
+
   private HttpClientFacet httpClient;
 
   private boolean remoteUrlChanged;
@@ -80,6 +91,11 @@ public abstract class ProxyFacetSupport
 
     artifactMaxAgeMinutes = attributes.require("artifactMaxAge", Integer.class);
     log.debug("Artifact max age: {}", artifactMaxAgeMinutes);
+
+    checksumPolicy = ChecksumPolicy.valueOf(
+        attributes.get("checksumPolicy", String.class, ChecksumPolicy.IGNORE.name())
+    );
+    log.debug("Checksum policy: {}", checksumPolicy);
   }
 
 
@@ -124,7 +140,7 @@ public abstract class ProxyFacetSupport
 
           // TODO: Introduce content validation.. perhaps content's type not matching path's implied type.
 
-          store(context, remote);
+          verifyAndStore(context, remote);
 
           content = getCachedPayload(context);
         }
@@ -135,6 +151,63 @@ public abstract class ProxyFacetSupport
       }
     }
     return content;
+  }
+
+  private void verifyAndStore(final Context context, final Content content) throws IOException {
+    Map<HashAlgorithm, HashCode> expected;
+
+    if (checksumPolicy == ChecksumPolicy.IGNORE || (expected = getExpectedHashes(context)) == null) {
+      store(context, content);
+      return;
+    }
+
+    String message = null;
+    boolean stored = false;
+
+    if (expected.isEmpty()) {
+      message = SimpleFormat.format(
+          "No remote checksum available in repository %s for %s",
+          getRepository().getName(), getUrl(context)
+      );
+      if (checksumPolicy != ChecksumPolicy.STRICT) {
+        store(context, content);
+        stored = true;
+      }
+    }
+    else {
+      try (InputStream inputStream = content.openInputStream()) {
+        try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
+          Map<HashAlgorithm, HashCode> actual;
+          try (InputStream is = supplier.get()) {
+            actual = Hashes.hash(expected.keySet(), is);
+          }
+          boolean hashesEquals = expected.equals(actual);
+          if (hashesEquals || checksumPolicy == ChecksumPolicy.WARN) {
+            StreamPayload payload = new StreamPayload(supplier.get(), content.getSize(), content.getContentType());
+            store(context, new Content(payload, content.getLastModified(), content.getETag()));
+            stored = true;
+          }
+          if (!hashesEquals) {
+            message = SimpleFormat.format(
+                "Remote checksum of %s does not match in repository %s",
+                getUrl(context), getRepository().getName()
+            );
+          }
+        }
+      }
+    }
+    if (message != null) {
+      if (stored) {
+        log.warn(message);
+      }
+      else {
+        throw new InvalidContentException(message);
+      }
+    }
+  }
+
+  protected Map<HashAlgorithm, HashCode> getExpectedHashes(final Context context) {
+    return null;
   }
 
   /**

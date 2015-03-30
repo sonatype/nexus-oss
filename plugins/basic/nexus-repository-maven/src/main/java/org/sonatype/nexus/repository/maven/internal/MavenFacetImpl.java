@@ -33,7 +33,7 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
-import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
+import org.sonatype.nexus.repository.proxy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -47,7 +47,6 @@ import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
@@ -123,8 +122,6 @@ public class MavenFacetImpl
 
   private VersionPolicy versionPolicy;
 
-  private ChecksumPolicy checksumPolicy;
-
   @Inject
   public MavenFacetImpl(final MimeSupport mimeSupport) {
     this.mimeSupport = checkNotNull(mimeSupport);
@@ -139,21 +136,12 @@ public class MavenFacetImpl
     this.versionPolicy = VersionPolicy.valueOf(
         attributes.require("versionPolicy", String.class)
     );
-    this.checksumPolicy = ChecksumPolicy.valueOf(
-        attributes.require("checksumPolicy", String.class)
-    );
   }
 
   @Nonnull
   @Override
   public VersionPolicy getVersionPolicy() {
     return versionPolicy;
-  }
-
-  @Nonnull
-  @Override
-  public ChecksumPolicy getChecksumPolicy() {
-    return checksumPolicy;
   }
 
   @Nullable

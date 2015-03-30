@@ -19,7 +19,7 @@ import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2HostedRecipe
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2ProxyRecipe
-import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy
+import org.sonatype.nexus.repository.proxy.ChecksumPolicy
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy
 import org.sonatype.nexus.repository.storage.WritePolicy
 
@@ -40,7 +40,6 @@ class MavenDefaultRepositoriesContributor
             [
                 maven  : [
                     versionPolicy              : VersionPolicy.RELEASE.toString(),
-                    checksumPolicy             : ChecksumPolicy.STRICT.toString(),
                     strictContentTypeValidation: false
                 ],
                 storage: [
@@ -53,7 +52,6 @@ class MavenDefaultRepositoriesContributor
             [
                 maven  : [
                     versionPolicy              : VersionPolicy.SNAPSHOT.toString(),
-                    checksumPolicy             : ChecksumPolicy.STRICT.toString(),
                     strictContentTypeValidation: false
                 ],
                 storage: [
@@ -65,12 +63,12 @@ class MavenDefaultRepositoriesContributor
             [
                 maven  : [
                     versionPolicy              : VersionPolicy.MIXED.toString(),
-                    checksumPolicy             : ChecksumPolicy.WARN.toString(),
                     strictContentTypeValidation: false
                 ],
                 proxy  : [
                     remoteUrl     : 'http://repo1.maven.org/maven2/',
-                    artifactMaxAge: 3600
+                    artifactMaxAge: 3600,
+                    checksumPolicy: ChecksumPolicy.WARN.toString(),
                 ],
                 httpclient: [
                     connection: [
