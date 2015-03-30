@@ -682,7 +682,7 @@ Ext.define('NX.controller.Menu', {
     if (me.warnBeforeNavigate(cb)) {
       me.changeMode(button.mode);
     } else {
-      me.getHeaderPanel().down('button[mode=' + this.mode + ']').toggle(true);
+      me.getHeaderPanel().down('button[mode=' + me.mode + ']').toggle(true);
     }
   },
 
