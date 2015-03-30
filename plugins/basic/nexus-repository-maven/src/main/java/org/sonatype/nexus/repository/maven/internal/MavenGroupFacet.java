@@ -103,31 +103,31 @@ public class MavenGroupFacet
     checkArgument(mavenFacet.getMavenPathParser().isRepositoryMetadata(mavenPath),
         "Only metadata can be merged and cached: %s", mavenPath);
     checkArgument(!mavenPath.isSubordinate(), "Only metadata XML can be merged and cached: %s", mavenPath);
-    final LinkedHashMap<Repository, Content> metadataPayloads = Maps.newLinkedHashMap();
+    final LinkedHashMap<Repository, Content> metadataContents = Maps.newLinkedHashMap();
     for (Map.Entry<Repository, Response> entry : responses.entrySet()) {
       if (entry.getValue().getStatus().getCode() == HttpStatus.OK) {
         final Response response = entry.getValue();
         if (response instanceof PayloadResponse && ((PayloadResponse) response).getPayload() instanceof Content) {
-          metadataPayloads.put(entry.getKey(), (Content) ((PayloadResponse) response).getPayload());
+          metadataContents.put(entry.getKey(), (Content) ((PayloadResponse) response).getPayload());
         }
       }
     }
 
-    if (metadataPayloads.isEmpty()) {
+    if (metadataContents.isEmpty()) {
       return null;
     }
-    return doMergeAndCacheMetadata(mavenPath, metadataPayloads);
+    return doMergeAndCacheMetadata(mavenPath, metadataContents);
   }
 
   private Content doMergeAndCacheMetadata(final MavenPath mavenPath,
-                                          final LinkedHashMap<Repository, Content> metadataPayloads) throws IOException
+                                          final LinkedHashMap<Repository, Content> metadataContents) throws IOException
   {
-    if (metadataPayloads.size() == 1) {
-      return metadataPayloads.get(0);
+    if (metadataContents.size() == 1) {
+      return metadataContents.get(0);
     }
     final MetadataXpp3Reader reader = new MetadataXpp3Reader();
     List<MetadataEnvelope> metadatas = Lists.newArrayList();
-    for (Map.Entry<Repository, Content> entry : metadataPayloads.entrySet()) {
+    for (Map.Entry<Repository, Content> entry : metadataContents.entrySet()) {
       final String origin = entry.getKey().getName() + " @ " + mavenPath.getPath();
       try (InputStream inputStream = entry.getValue().openInputStream()) {
         final Metadata metadata = reader.read(inputStream);
