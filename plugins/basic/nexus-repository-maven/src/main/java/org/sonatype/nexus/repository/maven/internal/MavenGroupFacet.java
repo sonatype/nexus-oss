@@ -38,6 +38,7 @@ import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.
 import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.view.Content;
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
@@ -159,7 +160,7 @@ public class MavenGroupFacet
     final Content content = new Content(
         new BytesPayload(
             byteArrayOutputStream.toByteArray(),
-            "text/xml"
+            ContentTypes.TEXT_XML
         ));
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
     content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}");
@@ -170,7 +171,7 @@ public class MavenGroupFacet
     for (HashType hashType : HashType.values()) {
       final HashCode hashCode = hashCodes.get(hashType.getHashAlgorithm());
       if (hashCode != null) {
-        mavenFacet.put(mavenPath.hash(hashType), new StringPayload(hashCode.toString(), "text/plain"));
+        mavenFacet.put(mavenPath.hash(hashType), new StringPayload(hashCode.toString(), ContentTypes.TEXT_PLAIN));
       }
     }
     // reload it from cache
