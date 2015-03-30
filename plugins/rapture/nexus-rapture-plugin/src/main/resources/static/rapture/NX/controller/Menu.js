@@ -803,7 +803,7 @@ Ext.define('NX.controller.Menu', {
 
     window.onbeforeunload = function() {
       if (me.hasDirt()) {
-        return "You will lose your unsaved changes";
+        return NX.I18n.get('GLOBAL_UNSAVED_BROWSER_TITLE');
       }
     };
   }

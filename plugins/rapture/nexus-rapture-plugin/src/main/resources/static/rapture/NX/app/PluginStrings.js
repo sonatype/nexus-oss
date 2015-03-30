@@ -141,6 +141,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_UNSAVED_MESSAGE: '<p>Do you want to discard your changes?</p>',
     GLOBAL_UNSAVED_DISCARD_BUTTON: 'Discard changes',
     GLOBAL_UNSAVED_BACK_BUTTON: 'Go back',
+    GLOBAL_UNSAVED_BROWSER_TITLE: 'You will lose your unsaved changes',
 
     // Unsupported browser
     GLOBAL_UNSUPPORTED_TITLE: 'The browser you are using is not supported',
