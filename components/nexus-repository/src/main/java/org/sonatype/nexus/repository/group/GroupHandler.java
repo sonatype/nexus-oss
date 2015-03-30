@@ -125,8 +125,7 @@ public class GroupHandler
   }
 
   /**
-   * Returns all responses from all members as a linked map, where order is processing order (actually group member
-   * order).
+   * Returns all responses from all members as a linked map, where order is group member order.
    */
   protected LinkedHashMap<Repository, Response> getAll(final @Nonnull Request request,
                                                        final @Nonnull List<Repository> members,
