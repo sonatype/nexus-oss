@@ -80,4 +80,22 @@ public class GlobalComponentLookupHelper
   }
 
   // TODO: Consider adding lookup(Class) and lookup(Key) helpers?
+
+ /**
+   * Lookup a type by class-name.
+   *
+   * @return Type reference, or {@code null} if the type was not found.
+   */
+  @Nullable
+  public Class<?> type(final String className) {
+    checkNotNull(className);
+    try {
+      log.trace("Looking up type: {}", className);
+      return classLoader.loadClass(className);
+    }
+    catch (Exception e) {
+      log.trace("Unable to lookup type: {}; ignoring", className, e);
+    }
+    return null;
+  }
 }

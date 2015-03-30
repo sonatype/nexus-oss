@@ -19,11 +19,7 @@ import java.security.KeyStore;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
 
-import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
-
 import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -34,8 +30,8 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.cookie.CookieOrigin;
@@ -44,14 +40,10 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.jetbrains.annotations.NotNull;
-
-import static com.google.common.net.HttpHeaders.SET_COOKIE;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.sonatype.sisu.bl.BundleConfiguration.RANDOM_PORT;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.Option;
 
 /**
  * Support for Nexus-serving-HTTPS integration tests.
@@ -59,20 +51,21 @@ import static org.sonatype.sisu.bl.BundleConfiguration.RANDOM_PORT;
  * @since 2.11.1
  */
 public abstract class NexusHttpsITSupport
-    extends NexusRunningParametrizedITSupport
+    extends NexusCoreITSupport
 {
-
   protected static final String DEFAULT_SESSION_COOKIE_NAME = "NXSESSIONID";
 
-  public NexusHttpsITSupport(final String nexusBundleCoordinates) {
-    super(nexusBundleCoordinates);
+  /**
+   * Configure Nexus with HTTPS support enabled.
+   */
+  @Configuration
+  public static Option[] configureNexus() {
+    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"), withHttps());
   }
 
-  @Override
-  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration config) {
-    return super.configureNexus(config).enableHttps(RANDOM_PORT, testData().resolveFile("keystore.jks"), "changeit");
-  }
-
+  /**
+   * @return Client that can use preemptive auth and self-signed certificates
+   */
   protected HttpClientBuilder clientBuilder() throws Exception {
     HttpClientBuilder builder = HttpClients.custom();
     builder.setDefaultRequestConfig(requestConfig());
@@ -81,53 +74,75 @@ public abstract class NexusHttpsITSupport
     return builder;
   }
 
+  /**
+   * @return Policy for handling cookies on client side
+   */
   protected RequestConfig requestConfig() {
-    return RequestConfig.custom()
-        .setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
-        .build();
+    return RequestConfig.custom().setCookieSpec(CookieSpecs.DEFAULT).build();
   }
 
+  /**
+   * @return Provider of credentials for preemptive auth
+   */
   protected CredentialsProvider credentialsProvider() {
-    String hostname = nexus().getConfiguration().getHostName();
+    String hostname = nexusUrl.getHost();
     AuthScope scope = new AuthScope(hostname, -1);
     CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
     credentialsProvider.setCredentials(scope, credentials());
     return credentialsProvider;
   }
 
+  /**
+   * @return Credentials to be used in preemptive auth
+   */
   protected Credentials credentials() {
     return new UsernamePasswordCredentials("admin", "admin123");
   }
 
+  /**
+   * @return SSL socket factory that accepts self-signed certificates from any host
+   */
   protected SSLConnectionSocketFactory sslSocketFactory() throws Exception {
     SSLContext context = SSLContexts.custom().loadTrustMaterial(trustStore(), new TrustSelfSignedStrategy()).build();
-    return new SSLConnectionSocketFactory(context, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+    return new SSLConnectionSocketFactory(context, NoopHostnameVerifier.INSTANCE);
   }
 
+  /**
+   * @return Client trust store containing exported Nexus certificate
+   */
   protected KeyStore trustStore() throws Exception {
     KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-    try (FileInputStream instream = new FileInputStream(testData().resolveFile("truststore.jks"))) {
-      trustStore.load(instream, "changeit".toCharArray());
+    try (FileInputStream instream = new FileInputStream(resolveBaseFile("src/test/it-resources/ssl/client.jks"))) {
+      trustStore.load(instream, "password".toCharArray());
     }
     return trustStore;
   }
 
+  /**
+   * @return Context with preemptive auth enabled for Nexus
+   */
   protected HttpClientContext clientContext() {
     HttpClientContext context = HttpClientContext.create();
     context.setAuthCache(basicAuthCache());
     return context;
   }
 
+  /**
+   * @return Cache with preemptive auth enabled for Nexus
+   */
   protected AuthCache basicAuthCache() {
-    String hostname = nexus().getConfiguration().getHostName();
+    String hostname = nexusUrl.getHost();
     AuthCache authCache = new BasicAuthCache();
-    HttpHost hostHttp = new HttpHost(hostname, nexus().getPort(), "http");
-    HttpHost hostHttps = new HttpHost(hostname, nexus().getSslPort(), "https");
+    HttpHost hostHttp = new HttpHost(hostname, nexusUrl.getPort(), "http");
+    HttpHost hostHttps = new HttpHost(hostname, nexusSecureUrl.getPort(), "https");
     authCache.put(hostHttp, new BasicScheme());
     authCache.put(hostHttps, new BasicScheme());
     return authCache;
   }
 
+  /**
+   * @return our session cookie; {@code null} if it doesn't exist
+   */
   @Nullable
   protected Cookie getSessionCookie(CookieStore cookieStore) {
     for (Cookie cookie : cookieStore.getCookies()) {
@@ -138,6 +153,9 @@ public abstract class NexusHttpsITSupport
     return null;
   }
 
+  /**
+   * @return the header containing our session cookie; {@code null} if it doesn't exist
+   */
   @Nullable
   protected Header getSessionCookieHeader(@NotNull Header[] headers) {
     for (Header header : headers) {
@@ -149,19 +167,17 @@ public abstract class NexusHttpsITSupport
   }
 
   /**
-   * @return CookieOrigin suitable for validating cookies from the Nexus URL
+   * @return CookieOrigin suitable for validating session cookies from the given base URL
    */
-  public static CookieOrigin cookieOrigin(final URL nexusUrl) {
-    return new CookieOrigin(nexusUrl.getHost(), nexusUrl.getPort(),
-        expectedCookiePath(nexusUrl), nexusUrl.getProtocol().equals("https"));
+  protected CookieOrigin cookieOrigin(final URL url) {
+    return new CookieOrigin(url.getHost(), url.getPort(), cookiePath(url), url.getProtocol().equals("https"));
   }
 
   /**
-   * @return the expected cookie path value of our session cookie from the provided Nexus origin base URL
+   * @return the expected cookie path value of our session cookie from the given base URL
    */
-  public static String expectedCookiePath(final URL nexusUrl) {
-    return nexusUrl.getPath().substring(0, nexusUrl.getPath().length() - 1);
+  protected String cookiePath(final URL url) {
+    final String path = url.getPath();
+    return path.length() > 1 && path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
   }
-
-
 }

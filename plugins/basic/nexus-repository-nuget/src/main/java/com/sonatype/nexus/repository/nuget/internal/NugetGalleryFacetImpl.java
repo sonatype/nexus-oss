@@ -15,6 +15,7 @@ package com.sonatype.nexus.repository.nuget.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -75,7 +77,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.base.Strings.nullToEmpty;
 import static com.sonatype.nexus.repository.nuget.internal.NugetProperties.*;
-import static java.util.Arrays.asList;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseInlineCount;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseSkip;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseTop;
@@ -84,6 +85,8 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
 
 /**
+ * A group-aware implementation of a hosted {@link} NugetGalleryFacet.
+ *
  * @since 3.0
  */
 @Named("local")
@@ -115,16 +118,21 @@ public class NugetGalleryFacetImpl
     storage = null;
   }
 
-  //@Override
+  @Override
   @Guarded(by = STARTED)
   public int count(final String operation, final Map<String, String> query) {
     log.debug("Count: " + query);
 
+    return count(operation, query, getRepositories());
+  }
+
+  protected int count(final String operation, final Map<String, String> query,
+                      final Iterable<Repository> repositories)
+  {
     final ComponentQuery componentQuery = ODataUtils.query(query, true);
 
     try (StorageTx storageTx = openStorageTx()) {
-
-      int count = executeCount(componentQuery, storageTx);
+      int count = executeCount(componentQuery, storageTx, repositories);
 
       final Integer skip = parseSkip(query.get("$skip"));
       if (null != skip && skip >= 0) {
@@ -142,14 +150,81 @@ public class NugetGalleryFacetImpl
     }
   }
 
-  //@Override
+  @Override
   @Guarded(by = STARTED)
   public String feed(final String base, final String operation, final Map<String, String> query) {
     log.debug("Select: " + query);
+    setFeedQueryDefaults(query);
 
+    final List<Repository> repositories = getRepositories();
+
+    FeedResult result = feed(base, operation, query, repositories);
+
+    return renderFeedResults(result);
+  }
+
+  /**
+   * Generate a {@link FeedResult} for a given feed query.
+   */
+  protected FeedResult feed(final String base, final String operation, final Map<String, String> query,
+                            final Iterable<Repository> repositories)
+  {
+    FeedResult result = new FeedResult(base, operation, query);
+
+    try (StorageTx storageTx = openStorageTx()) {
+
+      // NXCM-4502 add inlinecount only if requested
+      if (inlineCountRequested(query)) {
+        int inlineCount = executeCount(ODataUtils.query(query, true), storageTx, repositories);
+
+        result.setCount(inlineCount);
+      }
+
+      final ComponentQuery componentQuery = ODataUtils.query(query, false);
+      final Iterable<Asset> assets = storageTx.findAssets(componentQuery.getWhere(),
+          componentQuery.getParameters(), getRepositories(), componentQuery.getQuerySuffix());
+
+      int n = 0;
+      for (Asset asset : assets) {
+        n++;
+        final NestedAttributesMap nugetAttributes = asset.formatAttributes();
+        final Map<String, ?> data = toData(nugetAttributes, extraTemplateVars(base, operation));
+
+        result.addEntry(data);
+        if (n == ODataUtils.PAGE_SIZE) {
+          result.setSkipLinkEntry(data);
+        }
+      }
+
+      storageTx.commit();
+    }
+    return result;
+  }
+
+  protected String renderFeedResults(final FeedResult result)
+  {
     final StringBuilder xml = new StringBuilder();
-    xml.append(interpolateTemplate(ODataTemplates.NUGET_FEED, extraTemplateVars(base, operation)));
+    xml.append(interpolateTemplate(ODataTemplates.NUGET_FEED,
+        extraTemplateVars(result.getBase(), result.getOperation())));
 
+    if (result.getCount() != null) {
+      xml.append(interpolateTemplate(ODataTemplates.NUGET_INLINECOUNT,
+          ImmutableMap.of("COUNT", String.valueOf(result.getCount()))
+      ));
+    }
+    for (Map<String, ?> data : result.getEntries()) {
+      xml.append(interpolateTemplate(ODataTemplates.NUGET_ENTRY, data));
+    }
+
+    if (result.getSkipLinkEntry() != null) {
+      xml.append("  <link rel=\"next\" href=\"").append(result.getBase()).append('/').append(result.getOperation());
+      xml.append("()?").append(ODataFeedUtils.skipLink(result.getSkipLinkEntry(), result.getQuery())).append("\"/>\n");
+    }
+    return xml.append("</feed>").toString();
+  }
+
+  private void setFeedQueryDefaults(final Map<String, String> query)
+  {
     // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
     if (!query.containsKey("$orderby")) {
       query.put("$orderby", DOWNLOAD_COUNT + " desc");
@@ -159,48 +234,12 @@ public class NugetGalleryFacetImpl
       final String orderby = query.get("$orderby");
       query.put("$orderby", orderby.replaceAll("(?i)concat\\(title,id\\)", NAME_ORDER));
     }
-
-    ComponentQuery componentQuery = ODataUtils.query(query, false);
-    ComponentQuery componentCountQuery = ODataUtils.query(query, true);
-
-    try (StorageTx storageTx = openStorageTx()) {
-
-      // NXCM-4502 add inlinecount only if requested
-      if (inlineCountRequested(query)) {
-        int inlineCount = executeCount(componentCountQuery, storageTx);
-        xml.append(interpolateTemplate(ODataTemplates.NUGET_INLINECOUNT,
-            ImmutableMap.of("COUNT", String.valueOf(inlineCount))
-        ));
-      }
-
-      final Iterable<Component> components = storageTx.findComponents(componentQuery.getWhere(),
-          componentQuery.getParameters(), getRepositories(), componentQuery.getQuerySuffix());
-
-      int n = 0;
-      for (Component component : components) {
-        n++;
-
-        final NestedAttributesMap nugetAttributes = component.formatAttributes();
-        final Map<String, ?> data = toData(nugetAttributes, extraTemplateVars(base, operation));
-
-        xml.append(interpolateTemplate(ODataTemplates.NUGET_ENTRY, data));
-        if (n == ODataUtils.PAGE_SIZE) {
-          xml.append("  <link rel=\"next\" href=\"").append(base).append('/').append(operation);
-          xml.append("()?").append(ODataFeedUtils.skipLink(data, query)).append("\"/>\n");
-          break;
-        }
-      }
-
-      storageTx.commit();
-    }
-
-    return xml.append("</feed>").toString();
   }
 
   @Override
   public void putMetadata(final Map<String, String> metadata) {
     try (StorageTx tx = openStorageTx()) {
-      final Component component = createOrUpdateComponent(tx, tx.getBucket(), metadata);
+      createOrUpdatePackage(tx, metadata);
       maintainAggregateInfo(tx, metadata.get(ID));
       tx.commit();
     }
@@ -211,8 +250,8 @@ public class NugetGalleryFacetImpl
     try (StorageTx tx = openStorageTx()) {
       final Bucket bucket = tx.getBucket();
       Component component = findComponent(tx, id, version);
-      checkState(component != null, "Component metadata does not exist yet");
-      createOrUpdateAsset(tx, bucket, component, content);
+      checkState(component != null && !component.assets().isEmpty(), "Component metadata does not exist yet");
+      createOrUpdateAssetAndContents(tx, bucket, component, content, null);
       tx.commit();
     }
   }
@@ -281,7 +320,7 @@ public class NugetGalleryFacetImpl
       recordMetadata.put(PUBLISHED, creationTime);
       Component component;
       try (InputStream in = tempStream.get()) {
-        component = createOrUpdatePackage(storageTx, recordMetadata, in);
+        component = createOrUpdatePackageAndContents(storageTx, recordMetadata, in);
       }
 
       String id = recordMetadata.get(ID);
@@ -360,13 +399,66 @@ public class NugetGalleryFacetImpl
   }
 
   @VisibleForTesting
-  Component createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata,
-                                     final InputStream packageStream)
+  Component createOrUpdatePackageAndContents(final StorageTx storageTx, final Map<String, String> recordMetadata,
+                                             final InputStream packageStream)
   {
     final Bucket bucket = storageTx.getBucket();
     final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
-    createOrUpdateAsset(storageTx, bucket, component, packageStream);
+    createOrUpdateAssetAndContents(storageTx, bucket, component, packageStream, recordMetadata);
     return component;
+  }
+
+  @VisibleForTesting
+  Component createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata)
+  {
+    final Bucket bucket = storageTx.getBucket();
+    final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
+    createOrUpdateAsset(storageTx, bucket, component, recordMetadata);
+    return component;
+  }
+
+  private Asset createOrUpdateAsset(final StorageTx storageTx, final Bucket bucket, final Component component,
+                                    final Map<String, String> data)
+  {
+    Asset asset = null;
+
+    final List<Asset> assets = component.assets();
+    if (assets.isEmpty()) {
+      asset = storageTx.createAsset(bucket, component);
+    }
+    else {
+      asset = assets.get(0);
+    }
+
+    if (data != null) {
+      final NestedAttributesMap nugetAttr = asset.formatAttributes();
+
+      setDerivedAttributes(data, nugetAttr, !component.isNew());
+
+      nugetAttr.set(P_AUTHORS, data.get(AUTHORS));
+      nugetAttr.set(P_COPYRIGHT, data.get(COPYRIGHT));
+      nugetAttr.set(P_DEPENDENCIES, data.get(DEPENDENCIES));
+      nugetAttr.set(P_DESCRIPTION, data.get(DESCRIPTION));
+      nugetAttr.set(P_GALLERY_DETAILS_URL, data.get(GALLERY_DETAILS_URL));
+      nugetAttr.set(P_ICON_URL, data.get(ICON_URL));
+      nugetAttr.set(P_ID, data.get(ID));
+      nugetAttr.set(P_IS_PRERELEASE, Boolean.parseBoolean(data.get(IS_PRERELEASE)));
+      nugetAttr.set(P_LANGUAGE, data.get(LANGUAGE));
+      nugetAttr.set(P_LICENSE_URL, data.get(LICENSE_URL));
+      nugetAttr.set(P_LOCATION, data.get(LOCATION));
+      nugetAttr.set(P_PACKAGE_HASH, data.get(PACKAGE_HASH));
+      nugetAttr.set(P_PACKAGE_HASH_ALGORITHM, data.get(PACKAGE_HASH_ALGORITHM));
+      nugetAttr.set(P_PACKAGE_SIZE, Integer.parseInt(data.get(PACKAGE_SIZE)));
+      nugetAttr.set(P_PROJECT_URL, data.get(PROJECT_URL));
+      nugetAttr.set(P_RELEASE_NOTES, data.get(RELEASE_NOTES));
+      nugetAttr.set(P_REPORT_ABUSE_URL, data.get(REPORT_ABUSE_URL));
+      nugetAttr.set(P_REQUIRE_LICENSE_ACCEPTANCE, Boolean.parseBoolean(data.get(REQUIRE_LICENSE_ACCEPTANCE)));
+      nugetAttr.set(P_SUMMARY, data.get(SUMMARY));
+      nugetAttr.set(P_TAGS, data.get(TAGS));
+      nugetAttr.set(P_TITLE, data.get(TITLE));
+      nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
+    }
+    return asset;
   }
 
   private String blobName(Component component) {
@@ -391,7 +483,7 @@ public class NugetGalleryFacetImpl
     SortedSet<Component> allReleases = Sets.newTreeSet(new ComponentVersionComparator());
 
     for (Component version : versions) {
-      final NestedAttributesMap nugetAttributes = version.formatAttributes();
+      final NestedAttributesMap nugetAttributes = version.firstAsset().formatAttributes();
 
       final boolean isPrerelease = nugetAttributes.require(P_IS_PRERELEASE, Boolean.class);
       if (!isPrerelease) {
@@ -407,7 +499,7 @@ public class NugetGalleryFacetImpl
     Component absoluteLatestVersion = allReleases.isEmpty() ? null : allReleases.last();
 
     for (Component component : allReleases) {
-      final NestedAttributesMap nugetAttributes = component.formatAttributes();
+      final NestedAttributesMap nugetAttributes = component.firstAsset().formatAttributes();
 
       nugetAttributes.set(P_IS_LATEST_VERSION, component.equals(latestVersion));
       nugetAttributes.set(P_IS_ABSOLUTE_LATEST_VERSION, component.equals(absoluteLatestVersion));
@@ -424,22 +516,14 @@ public class NugetGalleryFacetImpl
     return storageTx.findComponents(whereClause, parameters, getRepositories(), null);
   }
 
-  private Asset createOrUpdateAsset(final StorageTx storageTx, final Bucket bucket,
-                                    final Component component, final InputStream in)
+  private Asset createOrUpdateAssetAndContents(final StorageTx storageTx, final Bucket bucket,
+                                               final Component component, final InputStream in,
+                                               final Map<String, String> data)
   {
-    Asset asset = null;
-
-    final List<Asset> assets = component.assets();
-    if (assets.isEmpty()) {
-      asset = storageTx.createAsset(bucket, component);
-    }
-    else {
-      asset = assets.get(0);
-    }
+    Asset asset = createOrUpdateAsset(storageTx, bucket, component, data);
 
     final ImmutableMap<String, String> headers = ImmutableMap
         .of(BlobStore.BLOB_NAME_HEADER, blobName(component), BlobStore.CREATED_BY_HEADER, "unknown");
-
     storageTx.setBlob(in, headers, asset, Arrays.asList(HashAlgorithm.SHA512), "application/zip");
 
     return asset;
@@ -463,32 +547,10 @@ public class NugetGalleryFacetImpl
 
     final Component component = findOrCreateComponent(storageTx, bucket, id, version);
 
-    final boolean republishing = !component.isNew();
-
-    final NestedAttributesMap nugetAttr = component.formatAttributes();
-
-    setDerivedAttributes(data, nugetAttr, republishing);
-
-    nugetAttr.set(P_AUTHORS, data.get(AUTHORS));
-    nugetAttr.set(P_COPYRIGHT, data.get(COPYRIGHT));
-    nugetAttr.set(P_DEPENDENCIES, data.get(DEPENDENCIES));
-    nugetAttr.set(P_DESCRIPTION, data.get(DESCRIPTION));
-    nugetAttr.set(P_GALLERY_DETAILS_URL, data.get(GALLERY_DETAILS_URL));
-    nugetAttr.set(P_ICON_URL, data.get(ICON_URL));
+    NestedAttributesMap nugetAttr = component.formatAttributes();
     nugetAttr.set(P_ID, data.get(ID));
-    nugetAttr.set(P_IS_PRERELEASE, Boolean.parseBoolean(data.get(IS_PRERELEASE)));
-    nugetAttr.set(P_LANGUAGE, data.get(LANGUAGE));
-    nugetAttr.set(P_LICENSE_URL, data.get(LICENSE_URL));
-    nugetAttr.set(P_LOCATION, data.get(LOCATION));
     nugetAttr.set(P_PACKAGE_HASH, data.get(PACKAGE_HASH));
     nugetAttr.set(P_PACKAGE_HASH_ALGORITHM, data.get(PACKAGE_HASH_ALGORITHM));
-    nugetAttr.set(P_PACKAGE_SIZE, Integer.parseInt(data.get(PACKAGE_SIZE)));
-    nugetAttr.set(P_PROJECT_URL, data.get(PROJECT_URL));
-    nugetAttr.set(P_RELEASE_NOTES, data.get(RELEASE_NOTES));
-    nugetAttr.set(P_REPORT_ABUSE_URL, data.get(REPORT_ABUSE_URL));
-    nugetAttr.set(P_REQUIRE_LICENSE_ACCEPTANCE, Boolean.parseBoolean(data.get(REQUIRE_LICENSE_ACCEPTANCE)));
-    nugetAttr.set(P_SUMMARY, data.get(SUMMARY));
-    nugetAttr.set(P_TAGS, data.get(TAGS));
     nugetAttr.set(P_TITLE, data.get(TITLE));
     nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
 
@@ -578,14 +640,24 @@ public class NugetGalleryFacetImpl
     return InlineCount.ALLPAGES.equals(parseInlineCount(query.get("$inlinecount")));
   }
 
-  private int executeCount(final ComponentQuery query, final StorageTx storageTx) {
-    return (int) storageTx.countComponents(query.getWhere(), query.getParameters(), getRepositories(),
+  private int executeCount(final ComponentQuery query, final StorageTx storageTx,
+                           final Iterable<Repository> repositories)
+  {
+    return (int) storageTx.countComponents(query.getWhere(), query.getParameters(), repositories,
         query.getQuerySuffix());
   }
 
+  /**
+   * Returns the constituent repositories - just this one, or the leaf member repositories if this is a group.
+   */
   protected List<Repository> getRepositories() {
-    // TODO: Consider groups
-    return asList(getRepository());
+    try {
+      final GroupFacet facet = getRepository().facet(GroupFacet.class);
+      return facet.leafMembers();
+    }
+    catch (MissingFacetException e) {
+      return Collections.singletonList(getRepository());
+    }
   }
 
   protected Iterable<Repository> getHostedRepositories() {

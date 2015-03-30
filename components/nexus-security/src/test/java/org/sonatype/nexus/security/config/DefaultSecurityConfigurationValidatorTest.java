@@ -13,27 +13,41 @@
 package org.sonatype.nexus.security.config;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.security.internal.ConfigurationIdGeneratorImpl;
+import org.sonatype.nexus.security.internal.SecurityConfigurationValidatorImpl;
+import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
+import org.sonatype.nexus.security.privilege.PrivilegeDescriptor;
 
-import org.eclipse.sisu.launch.InjectedTestCase;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class DefaultSecurityConfigurationValidatorTest
-    extends InjectedTestCase
 {
-  // FIXME: Convert to junit4
-
   protected SecurityConfigurationValidator configurationValidator;
 
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
-    this.configurationValidator = lookup(SecurityConfigurationValidator.class);
+    ConfigurationIdGenerator idGenerator = new ConfigurationIdGeneratorImpl();
+
+    List<PrivilegeDescriptor> privilegeDescriptors = new ArrayList<>();
+    MethodPrivilegeDescriptor methodPrivilegeDescriptor = new MethodPrivilegeDescriptor();
+    methodPrivilegeDescriptor.installDependencies(idGenerator);
+    privilegeDescriptors.add(methodPrivilegeDescriptor);
+
+    configurationValidator = new SecurityConfigurationValidatorImpl(privilegeDescriptors, idGenerator);
   }
 
+  @Test
   public void testBad1() throws Exception {
-    ValidationResponse response = configurationValidator.validateModel(
-        DefaultSecurityConfigurationValidatorTestSecurity.securityModel1()
-    );
+    ValidationResponse response = configurationValidator
+        .validateModel(DefaultSecurityConfigurationValidatorTestSecurity.securityModel1());
 
     assertFalse(response.isValid());
 
@@ -45,10 +59,10 @@ public class DefaultSecurityConfigurationValidatorTest
     assertEquals(0, response.getWarnings().size());
   }
 
+  @Test
   public void testBad2() throws Exception {
-    ValidationResponse response = configurationValidator.validateModel(
-        DefaultSecurityConfigurationValidatorTestSecurity.securityModel2()
-    );
+    ValidationResponse response = configurationValidator
+        .validateModel(DefaultSecurityConfigurationValidatorTestSecurity.securityModel2());
 
     assertFalse(response.isValid());
 
@@ -59,10 +73,10 @@ public class DefaultSecurityConfigurationValidatorTest
     assertEquals(10, response.getErrors().size());
   }
 
+  @Test
   public void testBad3() throws Exception {
-    ValidationResponse response = configurationValidator.validateModel(
-        DefaultSecurityConfigurationValidatorTestSecurity.securityModel3()
-    );
+    ValidationResponse response = configurationValidator
+        .validateModel(DefaultSecurityConfigurationValidatorTestSecurity.securityModel3());
 
     assertFalse(response.isValid());
 
@@ -73,6 +87,7 @@ public class DefaultSecurityConfigurationValidatorTest
     assertEquals(2, response.getErrors().size());
   }
 
+  @Test
   public void testRoles() throws Exception {
     SecurityConfigurationValidationContext context = new SecurityConfigurationValidationContext();
 
@@ -129,6 +144,7 @@ public class DefaultSecurityConfigurationValidatorTest
   /**
    * NEXUS-5040: Creating a role with an unknown privilege should not result in a validation error, just a warning.
    */
+  @Test
   public void testValidationOfRoleWithUnknownPrivilege() {
     SecurityConfigurationValidationContext context = new SecurityConfigurationValidationContext();
 
@@ -154,9 +170,6 @@ public class DefaultSecurityConfigurationValidatorTest
     assertTrue(vr.isValid());
     assertEquals(vr.getErrors().size(), 0);
     assertEquals(vr.getWarnings().size(), 1);
-    assertEquals(
-        vr.getWarnings().get(0).getMessage(),
-        "Role ID 'role1' Invalid privilege id 'foo' found."
-    );
+    assertEquals(vr.getWarnings().get(0).getMessage(), "Role ID 'role1' Invalid privilege id 'foo' found.");
   }
 }

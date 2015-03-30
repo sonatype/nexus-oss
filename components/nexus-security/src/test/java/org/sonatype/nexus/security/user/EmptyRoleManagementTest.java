@@ -14,23 +14,28 @@ package org.sonatype.nexus.security.user;
 
 import java.util.Set;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.config.CUser;
 import org.sonatype.nexus.security.config.CUserRoleMapping;
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration;
 import org.sonatype.nexus.security.config.SecurityConfiguration;
 import org.sonatype.nexus.security.role.RoleIdentifier;
 
-import junit.framework.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class EmptyRoleManagementTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
   @Override
-  protected MemorySecurityConfiguration getSecurityModelConfig() {
+  protected MemorySecurityConfiguration initialSecurityConfiguration() {
     return EmptyRoleManagementTestSecurity.securityModel();
   }
 
+  @Test
   public void testDeleteUserWithEmptyRole()
       throws Exception
   {
@@ -43,17 +48,18 @@ public class EmptyRoleManagementTest
 
     for (CUser tmpUser : securityModel.getUsers()) {
       if (userId.equals(tmpUser.getId())) {
-        Assert.fail("User " + userId + " was not removed.");
+        fail("User " + userId + " was not removed.");
       }
     }
 
     for (CUserRoleMapping userRoleMapping : securityModel.getUserRoleMappings()) {
       if (userId.equals(userRoleMapping.getUserId()) && "default".equals(userRoleMapping.getSource())) {
-        Assert.fail("User Role Mapping was not deleted when user: " + userId + " was removed.");
+        fail("User Role Mapping was not deleted when user: " + userId + " was removed.");
       }
     }
   }
 
+  @Test
   public void testDeleteEmptyRoleFromUser() throws Exception {
     String userId = "test-user-with-empty-role";
     String roleId = "empty-role";
@@ -83,6 +89,7 @@ public class EmptyRoleManagementTest
     }
   }
 
+  @Test
   public void testUpdateUser() throws Exception {
     String userId = "test-user-with-empty-role";
 
@@ -120,6 +127,7 @@ public class EmptyRoleManagementTest
     assertTrue("userRoleMapping not found", found);
   }
 
+  @Test
   public void testDeleteOtherRoleFromUser() throws Exception {
     String userId = "test-user-with-empty-role";
     String roleId = "role1";

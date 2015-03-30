@@ -16,8 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.nexus.repository.view.payloads.StreamPayload;
-import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
@@ -69,7 +67,7 @@ public class DigestExtractorTest
       String test = validDigests[i][0];
       String expected = validDigests[i][1];
 
-      String digest = DigestExtractor.extract(new StreamPayload(stream(test), -1, "unimportant"));
+      String digest = DigestExtractor.extract(stream(test));
 
       assertThat("DigestExtractor did not accept " + test, digest, notNullValue());
       assertThat("DigestExtractor did not accept " + test, digest, equalTo(expected));
@@ -77,19 +75,10 @@ public class DigestExtractorTest
   }
 
   @Test
-  public void zeroLengthDigest() throws Exception
-  {
-    final String digest = DigestExtractor.extract(new StringPayload("", "unimportant"));
-    assertThat("Zero bytes checksum file", digest, is(nullValue()));
-  }
-
-  /**
-   * Invalid digests
-   */
-  @Test
-  public void invalidShortDigest() {
-    assertThat(DigestExtractor.extract("123456"), is(nullValue()));
-    assertThat(DigestExtractor.extract(""), is(nullValue()));
-    assertThat(DigestExtractor.extract("   "), is(nullValue()));
+  public void rejectedDigests() {
+    assertThat(DigestExtractor.extract("123456"), is(nullValue())); // too short
+    assertThat(DigestExtractor.extract(""), is(nullValue())); // empty
+    assertThat(DigestExtractor.extract("   "), is(nullValue())); // blank
+    assertThat(DigestExtractor.extract("902a360Xcad98a34b59863c1e65bcf71"), is(nullValue())); // invalid, there is an non-hex X in there
   }
 }

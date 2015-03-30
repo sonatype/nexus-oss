@@ -24,6 +24,7 @@ import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
 import org.sonatype.nexus.repository.storage.ComponentEvent;
@@ -95,7 +96,7 @@ public class NugetGalleryFacetImplPutTest
     Component component = mock(Component.class);
     ORID orid = mock(ORID.class);
     doReturn(component).when(galleryFacet)
-        .createOrUpdatePackage(any(StorageTx.class), any(Map.class), any(InputStream.class));
+        .createOrUpdatePackageAndContents(any(StorageTx.class), any(Map.class), any(InputStream.class));
     when(component.isNew()).thenReturn(isNew);
 
     galleryFacet.put(packageStream);
@@ -164,7 +165,7 @@ public class NugetGalleryFacetImplPutTest
 
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(preRelease));
 
-    verifyVersionFlags(preRelease.formatAttributes(), false, true);
+    verifyVersionFlags(preRelease.firstAsset().formatAttributes(), false, true);
   }
 
   @Test
@@ -176,7 +177,7 @@ public class NugetGalleryFacetImplPutTest
     final NugetGalleryFacetImpl galleryFacet = buildSpy();
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release));
 
-    verifyVersionFlags(release.formatAttributes(), true, true);
+    verifyVersionFlags(release.firstAsset().formatAttributes(), true, true);
   }
 
   @Test
@@ -190,8 +191,8 @@ public class NugetGalleryFacetImplPutTest
     final NugetGalleryFacetImpl galleryFacet = buildSpy();
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release, preRelease));
 
-    verifyVersionFlags(release.formatAttributes(), true, true);
-    verifyVersionFlags(preRelease.formatAttributes(), false, false);
+    verifyVersionFlags(release.firstAsset().formatAttributes(), true, true);
+    verifyVersionFlags(preRelease.firstAsset().formatAttributes(), false, false);
   }
 
   @Test
@@ -204,8 +205,8 @@ public class NugetGalleryFacetImplPutTest
     final NugetGalleryFacetImpl galleryFacet = buildSpy();
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release, preRelease));
 
-    verifyVersionFlags(preRelease.formatAttributes(), false, true);
-    verifyVersionFlags(release.formatAttributes(), true, false);
+    verifyVersionFlags(preRelease.firstAsset().formatAttributes(), false, true);
+    verifyVersionFlags(release.firstAsset().formatAttributes(), true, false);
   }
 
   private NugetGalleryFacetImpl buildSpy() {
@@ -223,9 +224,11 @@ public class NugetGalleryFacetImplPutTest
 
   private Component buildVersionMock(final StorageTx tx, final String version, final boolean isPrerelease) {
     final Component component = mock(Component.class);
+    final Asset asset = mock(Asset.class);
     final NestedAttributesMap nugetAttributes = mock(NestedAttributesMap.class);
 
-    when(component.formatAttributes()).thenReturn(nugetAttributes);
+    when(component.firstAsset()).thenReturn(asset);
+    when(asset.formatAttributes()).thenReturn(nugetAttributes);
 
     when(component.requireVersion()).thenReturn(version);
     when(nugetAttributes.require(eq(P_VERSION))).thenReturn(version);

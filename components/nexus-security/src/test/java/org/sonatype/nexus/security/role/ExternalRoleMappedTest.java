@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.internal.AuthorizingRealmImpl;
 import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
@@ -31,14 +31,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
-import junit.framework.Assert;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ExternalRoleMappedTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
   @Override
   public void configure(final Binder binder) {
@@ -55,6 +56,7 @@ public class ExternalRoleMappedTest
         .in(Singleton.class);
   }
 
+  @Test
   public void testUserHasPermissionFromExternalRole() throws Exception {
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
 

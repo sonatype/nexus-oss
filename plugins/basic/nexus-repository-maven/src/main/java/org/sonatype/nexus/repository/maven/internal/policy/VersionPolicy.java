@@ -19,9 +19,18 @@ package org.sonatype.nexus.repository.maven.internal.policy;
  */
 public enum VersionPolicy
 {
+  /**
+   * Only release coordinates allowed.
+   */
   RELEASE,
 
+  /**
+   * Only snapshot coordinate allowed.
+   */
   SNAPSHOT,
 
-  MIXED // TODO: do we want this one? ie. allow mixed proxy and/or for groups?
+  /**
+   * Both kind of coordinates allowed.
+   */
+  MIXED
 }

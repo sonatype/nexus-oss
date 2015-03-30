@@ -35,7 +35,17 @@ public class UserIdMdcHelper
 
   public static final String KEY = "userId";
 
+  /**
+   * Value for {@link #KEY} when subject principal is not known.
+   */
   public static final String UNKNOWN = "*UNKNOWN";
+
+  /**
+   * Value for {@link #KEY} for privileged system execution.
+   *
+   * @since 3.0
+   */
+  public static final String SYSTEM = "*SYSTEM";
 
   public static boolean isSet() {
     String userId = MDC.get(KEY);
@@ -76,8 +86,18 @@ public class UserIdMdcHelper
     }
   }
 
+  /**
+   * @since 3.0
+   */
   public static void unknown() {
     MDC.put(KEY, UNKNOWN);
+  }
+
+  /**
+   * @since 3.0
+   */
+  public static void system() {
+    MDC.put(KEY, SYSTEM);
   }
 
   public static void unset() {

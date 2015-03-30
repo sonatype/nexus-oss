@@ -27,6 +27,7 @@ import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
+import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
@@ -49,7 +50,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 class Maven2HostedRecipe
     extends RecipeSupport
 {
-  static final String NAME = "maven2-hosted"
+  static final String NAME = 'maven2-hosted'
 
   @Inject
   Provider<Maven2SecurityFacet> securityFacet
@@ -71,6 +72,9 @@ class Maven2HostedRecipe
 
   @Inject
   Provider<MavenFacetImpl> mavenFacet
+
+  @Inject
+  VersionPolicyHandler versionPolicyHandler
 
   @Inject
   MavenHeadersHandler mavenHeadersHandler
@@ -103,6 +107,7 @@ class Maven2HostedRecipe
         .matcher(new MavenArtifactMatcher(pathParser))
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(versionPolicyHandler)
         .handler(mavenHeadersHandler)
         .handler(hostedHandler)
         .create())

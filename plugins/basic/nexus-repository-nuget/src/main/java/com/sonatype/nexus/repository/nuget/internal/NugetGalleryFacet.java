@@ -30,12 +30,22 @@ import org.joda.time.DateTime;
  */
 @Facet.Exposed
 public interface NugetGalleryFacet
-    extends Facet, NugetWritableGallery
+    extends Facet
 {
   /**
    * Add or update a package to the nuget gallery.
    */
   void put(InputStream inputStream) throws IOException, NugetPackageException;
+
+  /**
+   * Insert metadata a package into the gallery.
+   */
+  void putMetadata(final Map<String, String> metadata);
+
+  /**
+   * Attach content to pre-existing metadata.
+   */
+  void putContent(String id, String version, InputStream content);
 
   /**
    * Get a package, or {@code null} if not found.
@@ -75,7 +85,7 @@ public interface NugetGalleryFacet
   /**
    * Returns the number of matching packages
    *
-   * @param operation       typically a feed name followed by "/$count"
+   * @param operation  typically a feed name followed by "/$count"
    * @param parameters OData query parameters
    */
   public int count(final String operation, final Map<String, String> parameters);

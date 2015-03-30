@@ -25,7 +25,7 @@ import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.io.IOUtils;
+import com.google.common.io.ByteStreams;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -116,7 +116,7 @@ public class FileBlobStoreIT
 
   private byte[] extractContent(final Blob blob) throws IOException {
     try (InputStream inputStream = blob.getInputStream()) {
-      return IOUtils.toByteArray(inputStream);
+      return ByteStreams.toByteArray(inputStream);
     }
   }
 

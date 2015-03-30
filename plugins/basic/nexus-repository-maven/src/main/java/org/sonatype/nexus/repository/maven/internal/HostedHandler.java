@@ -18,8 +18,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
-import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Payload;
@@ -47,11 +45,6 @@ public class HostedHandler
   public Response handle(final @Nonnull Context context) throws Exception {
     final MavenPath path = context.getAttributes().require(MavenPath.class);
     final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
-    final VersionPolicy versionPolicy = mavenFacet.getVersionPolicy();
-    if (path.getCoordinates() != null && !allowsArtifactRepositoryPath(versionPolicy, path.getCoordinates())) {
-      return HttpResponses.badRequest("Repository version policy: " + versionPolicy + " does not allow version: " +
-          path.getCoordinates().getVersion());
-    }
     final String action = context.getRequest().getAction();
     switch (action) {
       case GET:
@@ -84,15 +77,5 @@ public class HostedHandler
       default:
         return HttpResponses.methodNotAllowed(context.getRequest().getAction(), GET, HEAD, PUT, DELETE);
     }
-  }
-
-  private boolean allowsArtifactRepositoryPath(final VersionPolicy versionPolicy, final Coordinates coordinates) {
-    if (versionPolicy == VersionPolicy.SNAPSHOT) {
-      return coordinates.isSnapshot();
-    }
-    if (versionPolicy == VersionPolicy.RELEASE) {
-      return !coordinates.isSnapshot();
-    }
-    return true;
   }
 }

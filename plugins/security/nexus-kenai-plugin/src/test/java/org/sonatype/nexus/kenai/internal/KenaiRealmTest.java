@@ -27,11 +27,6 @@ import org.mockito.Mockito;
 public class KenaiRealmTest
     extends AbstractKenaiRealmTest
 {
-  @Override
-  protected boolean runWithSecurityDisabled() {
-    return false;
-  }
-
   private KenaiRealm getRealm()
       throws Exception
   {

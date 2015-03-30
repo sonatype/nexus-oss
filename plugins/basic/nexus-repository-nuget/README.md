@@ -17,6 +17,7 @@
     orient:connect plocal:../sonatype-work/nexus/db/config admin admin
     orient:insert 'into repository_configuration SET repository_name="nugethosted1", recipe_name="nuget-hosted"'
     orient:insert 'into repository_configuration SET repository_name="nugetproxy", recipe_name="nuget-proxy", attributes={"proxy": { "remoteUrl": "http://www.nuget.org/api/v2/", "artifactMaxAge" : 5 }, "httpclient":{"connection":{"timeout":20000, "retries":2}}}'
+    orient:insert 'into repository_configuration SET repository_name="nugetgroup", recipe_name="nuget-group", attributes={"group": { "memberNames": ["nugethosted1", "nugetproxy"] }}'
     system:shutdown --force --reboot
 
 # Interact

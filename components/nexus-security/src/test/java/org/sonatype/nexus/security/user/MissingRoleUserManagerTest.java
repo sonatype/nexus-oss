@@ -15,21 +15,23 @@ package org.sonatype.nexus.security.user;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.nexus.security.AbstractSecurityTestCase;
+import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration;
 import org.sonatype.nexus.security.role.RoleIdentifier;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class MissingRoleUserManagerTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityTest
 {
   @Override
-  protected MemorySecurityConfiguration getSecurityModelConfig() {
+  protected MemorySecurityConfiguration initialSecurityConfiguration() {
     return MissingRoleUserManagerTestSecurity.securityModel();
   }
 
+  @Test
   public void testInvalidRoleMapping() throws Exception {
     SecuritySystem userManager = getSecuritySystem();
 

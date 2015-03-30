@@ -16,7 +16,10 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.AbstractApplicationStatusSource;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.NxApplication;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.plugins.mavenbridge.internal.FileItemModelSource;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -25,26 +28,53 @@ import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.security.subject.FakeAlmightySubject;
+import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import junit.framework.Assert;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelSource;
+import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.util.ThreadContext;
 import org.eclipse.sisu.plexus.PlexusSpaceModule;
 import org.eclipse.sisu.space.BeanScanning;
 import org.eclipse.sisu.space.URLClassSpace;
 import org.junit.Test;
 
-public class MavenBridgeIT
-    extends AbstractMavenRepoContentTests
-{
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+public class MavenBridgeIT
+    extends NexusTestSupport
+{
   protected NexusMavenBridge mavenBridge;
+
+  protected RepositoryRegistry repositoryRegistry;
 
   private Server server;
 
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        ThreadContext.bind(FakeAlmightySubject.forUserId("disabled-security"));
+        bind(RealmSecurityManager.class).toInstance(mock(RealmSecurityManager.class));
+
+        ApplicationStatusSource statusSource = mock(AbstractApplicationStatusSource.class);
+        when(statusSource.getSystemStatus()).thenReturn(new SystemStatus());
+        bind(ApplicationStatusSource.class).toInstance(statusSource);
+      }
+    });
+  }
+
+  @Override
   protected void setUp()
       throws Exception
   {
@@ -53,6 +83,8 @@ public class MavenBridgeIT
     mavenBridge = lookup(NexusMavenBridge.class);
 
     repositoryRegistry = lookup(RepositoryRegistry.class);
+
+    lookup(NxApplication.class).start();
 
     server = Server.withPort(0).serve("/*").withBehaviours(Behaviours.get(
         new File(getBasedir(), "src/test/resources/test-repo"))).start();
@@ -64,14 +96,11 @@ public class MavenBridgeIT
   }
 
   @Override
-  protected boolean runWithSecurityDisabled() {
-    return true;
-  }
-
-  @Override
   protected void tearDown()
       throws Exception
   {
+    lookup(NxApplication.class).stop();
+
     super.tearDown();
 
     if (server != null) {
