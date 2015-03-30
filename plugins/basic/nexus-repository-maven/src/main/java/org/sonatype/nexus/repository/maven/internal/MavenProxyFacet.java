@@ -101,6 +101,7 @@ public class MavenProxyFacet
 
   private HashCode getHash(final MavenPath mavenPath, final HashType hashType) {
     MavenPath hashMavenPath = mavenPath.hash(hashType);
+    // TODO use a request builder
     Request request = new Request(hashMavenPath.getPath())
     {
       {
