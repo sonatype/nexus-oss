@@ -373,10 +373,18 @@ Ext.define('NX.view.drilldown.Drilldown', {
    */
   showChild: function (index, animate) {
     var me = this,
-      item = me.query('nx-drilldown-item')[index];
+      items = me.query('nx-drilldown-item'),
+      item = items[index],
+      createContainer;
 
     // Show the proper card
     item.setCardIndex(me.BROWSE_INDEX);
+
+    // Destroy any create wizard panels
+    for (var i = 0; i < items.length; ++i) {
+      createContainer = items[i].down('#create' + i);
+      createContainer.removeAll();
+    }
 
     me.slidePanels(index, animate);
   },

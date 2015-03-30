@@ -87,9 +87,6 @@ Ext.define('NX.controller.SettingsForm', {
             // Form is valid
             form.isValid();
 
-            // Set fields as not dirty
-            me.resetDirtyState(form);
-
             form.fireEvent('loaded', form, action);
           },
           failure: function (basicForm, action) {
@@ -101,15 +98,6 @@ Ext.define('NX.controller.SettingsForm', {
         form.isValid();
       }
     }
-  },
-
-  /*
-   * @private
-   * Reset the dirty state of the form
-   */
-  resetDirtyState: function (form) {
-    var realform = form.getForm();
-    realform.setValues(realform.getValues());
   },
 
   /**
