@@ -16,7 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +43,6 @@ import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -148,7 +145,7 @@ public class MavenGroupFacet
     new MetadataXpp3Writer().write(byteArrayOutputStream, mergedMetadata);
     // Metadata is rather small, so let's do it like this
     final byte[] byteArray = byteArrayOutputStream.toByteArray();
-    final Map<HashAlgorithm, HashCode> hashCodes = Hashes.hash(mavenFacet.getHashAlgorithms(),
+    final Map<HashAlgorithm, HashCode> hashCodes = Hashes.hash(HashType.ALGORITHMS,
         new ByteArrayInputStream(byteArray));
     final Content content = new Content(
         new BytesPayload(

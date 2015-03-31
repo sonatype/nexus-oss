@@ -45,12 +45,8 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
-import com.google.common.base.Function;
 import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
@@ -111,23 +107,6 @@ public class MavenFacetImpl
 
   private static final String CONFIG_KEY = "maven";
 
-  /**
-   * List of hash algorithms always applied to payloads in blob store, with first in the list being the "primary" hash.
-   * In case of Maven, this list is driven by {@link HashType}.
-   *
-   * @see HashType
-   */
-  private static final List<HashAlgorithm> HASH_ALGORITHMS = ImmutableList.copyOf(
-      Iterables.transform(
-          Lists.newArrayList(HashType.values()),
-          new Function<HashType, HashAlgorithm>()
-          {
-            @Override
-            public HashAlgorithm apply(final HashType input) {
-              return input.getHashAlgorithm();
-            }
-          }));
-
   // members
 
   private final MimeSupport mimeSupport;
@@ -171,12 +150,6 @@ public class MavenFacetImpl
 
   @Nonnull
   @Override
-  public List<HashAlgorithm> getHashAlgorithms() {
-    return HASH_ALGORITHMS;
-  }
-
-  @Nonnull
-  @Override
   public VersionPolicy getVersionPolicy() {
     return versionPolicy;
   }
@@ -200,7 +173,7 @@ public class MavenFacetImpl
 
       final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
       final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
-      for (HashAlgorithm algorithm : HASH_ALGORITHMS) {
+      for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
         final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
         hashCodes.put(algorithm, hashCode);
       }
@@ -312,7 +285,7 @@ public class MavenFacetImpl
       try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
         final String contentType = determineContentType(path, supplier, payload.getContentType());
         try (InputStream is = supplier.get()) {
-          tx.setBlob(is, headers, asset, HASH_ALGORITHMS, contentType);
+          tx.setBlob(is, headers, asset, HashType.ALGORITHMS, contentType);
         }
       }
     }
