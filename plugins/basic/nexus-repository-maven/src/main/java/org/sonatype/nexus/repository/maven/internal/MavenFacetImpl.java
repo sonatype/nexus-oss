@@ -33,7 +33,7 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
-import org.sonatype.nexus.repository.proxy.ChecksumPolicy;
+import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -45,7 +45,6 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
@@ -54,8 +53,6 @@ import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
-import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 
 /**
  * A {@link MavenFacet} that persists Maven artifacts and metadata to a {@link StorageFacet}.
@@ -109,22 +106,22 @@ public class MavenFacetImpl
 
   private static final String CONFIG_KEY = "maven";
 
-  /**
-   * List of hash algorithms always applied to payloads in blob store, with first in the list being the "primary" hash.
-   */
-  private static final List<HashAlgorithm> HASH_ALGORITHMS = ImmutableList.of(SHA1, MD5);
-
   // members
 
   private final MimeSupport mimeSupport;
 
+  private final Map<String, MavenPathParser> mavenPathParsers;
+
   private boolean strictContentTypeValidation;
+
+  private MavenPathParser mavenPathParser;
 
   private VersionPolicy versionPolicy;
 
   @Inject
-  public MavenFacetImpl(final MimeSupport mimeSupport) {
+  public MavenFacetImpl(final MimeSupport mimeSupport, final Map<String, MavenPathParser> mavenPathParsers) {
     this.mimeSupport = checkNotNull(mimeSupport);
+    this.mavenPathParsers = checkNotNull(mavenPathParsers);
   }
 
   @Override
@@ -133,9 +130,16 @@ public class MavenFacetImpl
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     this.strictContentTypeValidation =
         attributes.get("strictContentTypeValidation", Boolean.class, Boolean.FALSE).booleanValue();
+    this.mavenPathParser = checkNotNull(mavenPathParsers.get(getRepository().getFormat().getValue()));
     this.versionPolicy = VersionPolicy.valueOf(
         attributes.require("versionPolicy", String.class)
     );
+  }
+
+  @Nonnull
+  @Override
+  public MavenPathParser getMavenPathParser() {
+    return mavenPathParser;
   }
 
   @Nonnull
@@ -146,7 +150,7 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
-  public MavenContent get(final MavenPath path) throws IOException {
+  public Content get(final MavenPath path) throws IOException {
     try (StorageTx tx = getStorage().openTx()) {
       final Asset asset = findAsset(tx, tx.getBucket(), path);
       if (asset == null) {
@@ -157,19 +161,19 @@ public class MavenFacetImpl
 
       final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
       final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
-      for (HashAlgorithm algorithm : HASH_ALGORITHMS) {
+      for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
         final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
         hashCodes.put(algorithm, hashCode);
       }
       final NestedAttributesMap attributesMap = asset.formatAttributes();
       final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-      final String etag = attributesMap.get(P_CONTENT_ETAG, String.class);
-      return new MavenContent(
-          new BlobPayload(blob, contentType),
-          lastModifiedDate == null ? null : new DateTime(lastModifiedDate),
-          etag,
-          hashCodes
-      );
+      final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
+      final Content result = new Content(new BlobPayload(blob, contentType));
+      result.getAttributes()
+          .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
+      result.getAttributes().set(Content.CONTENT_ETAG, eTag);
+      result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
+      return result;
     }
   }
 
@@ -269,7 +273,7 @@ public class MavenFacetImpl
       try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
         final String contentType = determineContentType(path, supplier, payload.getContentType());
         try (InputStream is = supplier.get()) {
-          tx.setBlob(is, headers, asset, HASH_ALGORITHMS, contentType);
+          tx.setBlob(is, headers, asset, HashType.ALGORITHMS, contentType);
         }
       }
     }
@@ -277,23 +281,31 @@ public class MavenFacetImpl
     final NestedAttributesMap formatAttributes = asset.formatAttributes();
     if (payload instanceof Content) {
       Content content = (Content) payload;
-      if (content.getLastModified() != null) {
-        formatAttributes.set(P_CONTENT_LAST_MODIFIED, content.getLastModified().toDate());
+      final DateTime lastModified = content.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
+      if (lastModified != null) {
+        formatAttributes.set(P_CONTENT_LAST_MODIFIED, lastModified.toDate());
       }
-      formatAttributes.set(P_CONTENT_ETAG, content.getETag());
+      formatAttributes.set(P_CONTENT_ETAG, content.getAttributes().get(Content.CONTENT_ETAG, String.class));
+    }
+    else {
+      formatAttributes.set(P_CONTENT_LAST_MODIFIED, DateTime.now());
     }
   }
 
   @Override
-  public boolean delete(final MavenPath path) throws IOException {
+  public boolean delete(final MavenPath... paths) throws IOException {
+    boolean result = false;
     try (StorageTx tx = getStorage().openTx()) {
-      if (path.getCoordinates() != null) {
-        return deleteArtifact(path, tx);
-      }
-      else {
-        return deleteFile(path, tx);
+      for (MavenPath path : paths) {
+        if (path.getCoordinates() != null) {
+          result = deleteArtifact(path, tx) || result;
+        }
+        else {
+          result = deleteFile(path, tx) || result;
+        }
       }
     }
+    return result;
   }
 
   private boolean deleteArtifact(final MavenPath path, final StorageTx tx) throws IOException {

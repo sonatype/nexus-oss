@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import org.sonatype.nexus.repository.Repository;
+
 /**
  * Asset updated event.
  *
@@ -20,7 +22,7 @@ package org.sonatype.nexus.repository.storage;
 public class AssetUpdatedEvent
   extends AssetEvent
 {
-  public AssetUpdatedEvent(final Asset asset) {
-    super(asset);
+  public AssetUpdatedEvent(final Asset asset, final Repository repository) {
+    super(asset, repository);
   }
 }

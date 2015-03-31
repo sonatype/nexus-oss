@@ -13,6 +13,8 @@
 package org.sonatype.nexus.repository.maven.internal.maven2;
 
 import javax.annotation.Nullable;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.maven.internal.MavenPath;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
@@ -25,6 +27,8 @@ import org.sonatype.nexus.repository.maven.internal.MavenPathParser;
  *
  * @since 3.0
  */
+@Singleton
+@Named(Maven2Format.NAME)
 public class Maven2MavenPathParser
     implements MavenPathParser
 {

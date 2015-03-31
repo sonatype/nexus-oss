@@ -31,35 +31,33 @@ Ext.define('NX.coreui.view.analytics.AnalyticsSettings', {
   initComponent: function() {
     var me = this;
 
-    me.items = [
-      {
-        xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_SUCCESS'),
-        api: {
-          load: 'NX.direct.analytics_Settings.read',
-          submit: 'NX.direct.analytics_Settings.update'
-        },
-        editableCondition: NX.Conditions.isPermitted('nexus:analytics', 'update'),
-        editableMarker: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_ERROR'),
+    me.items = {
+      xtype: 'nx-settingsform',
+      settingsFormSuccessMessage: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_SUCCESS'),
+      api: {
+        load: 'NX.direct.analytics_Settings.read',
+        submit: 'NX.direct.analytics_Settings.update'
+      },
+      editableCondition: NX.Conditions.isPermitted('nexus:analytics', 'update'),
+      editableMarker: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_ERROR'),
 
-        items: [
-          {
-            xtype: 'container',
-            html: NX.I18n.get('ADMIN_ANALYTICS_HELP')
-          },
-          {
-            xtype: 'checkbox',
-            name: 'collection',
-            boxLabel: NX.I18n.get('ADMIN_ANALYTICS_COLLECTION')
-          },
-          {
-            xtype: 'checkbox',
-            name: 'autosubmit',
-            boxLabel: NX.I18n.get('ADMIN_ANALYTICS_SUBMISSION')
-          }
-        ]
-      }
-    ];
+      items: [
+        {
+          xtype: 'container',
+          html: NX.I18n.get('ADMIN_ANALYTICS_HELP')
+        },
+        {
+          xtype: 'checkbox',
+          name: 'collection',
+          boxLabel: NX.I18n.get('ADMIN_ANALYTICS_COLLECTION')
+        },
+        {
+          xtype: 'checkbox',
+          name: 'autosubmit',
+          boxLabel: NX.I18n.get('ADMIN_ANALYTICS_SUBMISSION')
+        }
+      ]
+    };
 
     me.callParent();
   }

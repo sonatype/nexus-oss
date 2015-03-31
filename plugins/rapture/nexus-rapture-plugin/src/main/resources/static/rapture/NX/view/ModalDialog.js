@@ -10,18 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.view;
+/*global Ext*/
 
 /**
- * Common content-type values.
+ * Custom modal dialog window.
  *
  * @since 3.0
  */
-public class ContentTypes
-{
-  public static final String TEXT_PLAIN = "text/plain";
+Ext.define('NX.view.ModalDialog', {
+  extend: 'Ext.window.Window',
+  alias: 'widget.nx-modal-dialog',
+  requires: [
+    'NX.I18n'
+  ],
 
-  public static final String TEXT_HTML = "text/html";
+  layout: 'fit',
+  autoShow: true,
+  modal: true,
+  constrain: true,
+  width: 400
 
-  public static final String TEXT_XML = "text/xml";
-}
+});

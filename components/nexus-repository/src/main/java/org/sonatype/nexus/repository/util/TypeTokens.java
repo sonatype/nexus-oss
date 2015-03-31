@@ -14,7 +14,11 @@ package org.sonatype.nexus.repository.util;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import org.sonatype.nexus.common.hash.HashAlgorithm;
+
+import com.google.common.hash.HashCode;
 import com.google.common.reflect.TypeToken;
 
 /**
@@ -29,4 +33,6 @@ public class TypeTokens
   public static final TypeToken<Collection<String>> COLLECTION_STRING = new TypeToken<Collection<String>>() {};
 
   public static final TypeToken<List<String>> LIST_STRING = new TypeToken<List<String>>() {};
+
+  public static final TypeToken<Map<HashAlgorithm, HashCode>> HASH_CODES_MAP = new TypeToken<Map<HashAlgorithm, HashCode>>() {};
 }

@@ -76,12 +76,17 @@ Ext.define('NX.controller.SettingsForm', {
    * Loads the form if form's api load function is defined.
    */
   loadForm: function (form, options) {
+    var me = this;
+
     if (!form.isDestroyed && form.rendered) {
       if (form.api && form.api.load) {
+        // Load the form
         form.load(Ext.applyIf(options || {}, {
           waitMsg: form.settingsFormLoadMessage,
           success: function (basicForm, action) {
+            // Form is valid
             form.isValid();
+
             form.fireEvent('loaded', form, action);
           },
           failure: function (basicForm, action) {

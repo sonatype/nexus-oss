@@ -17,12 +17,24 @@
  *
  * @since 3.0
  */
-Ext.define('NX.view.ExpireSession', {
+Ext.define('NX.view.UnsavedChanges', {
   extend: 'NX.view.ModalDialog',
-  alias: 'widget.nx-expire-session',
+  alias: 'widget.nx-unsaved-changes',
 
-  title: NX.I18n.get('GLOBAL_EXPIRE_TITLE'),
-  closable: false,
+  title: NX.I18n.get('GLOBAL_UNSAVED_TITLE'),
+  defaultFocus: 'nx-discard',
+
+  /**
+   * @public
+   * Panel with content to be saved
+   */
+  content: null,
+
+  /**
+   * @public
+   * Function to call if content is to be discarded
+   */
+  callback: Ext.emptyFn,
 
   /**
    * @protected
@@ -31,39 +43,26 @@ Ext.define('NX.view.ExpireSession', {
     var me = this;
 
     Ext.apply(this, {
-      items: [
-        {
-          xtype: 'label',
-          id: 'expire',
-          text: NX.I18n.get('GLOBAL_EXPIRE_HELP'),
-          style: {
-            'color': 'red',
-            'font-size': '20px',
-            'margin': '12px'
-          }
-        }
-      ],
-      buttonAlign: 'left',
-      buttons: [
-        { text: NX.I18n.get('GLOBAL_EXPIRE_CANCEL_BUTTON'), action: 'cancel' },
-        {
-          text: NX.I18n.get('GLOBAL_EXPIRE_SIGN_IN_BUTTON'),
-          action: 'signin',
-          hidden: true,
-          ui: 'nx-primary',
-          handler: function() {
-            this.up('nx-expire-session').close();
-          }
-        },
-        {
-          text: NX.I18n.get('GLOBAL_EXPIRE_CLOSE_BUTTON'),
-          action: 'close',
-          hidden: true,
-          handler: function() {
-            this.up('nx-expire-session').close();
-          }
-        }
-      ]
+      items: {
+        xtype: 'panel',
+        ui: 'nx-inset',
+        html: NX.I18n.get('GLOBAL_UNSAVED_MESSAGE'),
+        buttonAlign: 'left',
+        buttons: [
+          {
+            text: NX.I18n.get('GLOBAL_UNSAVED_DISCARD_BUTTON'),
+            ui: 'nx-primary',
+            itemId: 'nx-discard',
+            handler: function () {
+              // Discard changes and load new content
+              me.content.discardUnsavedChanges = true;
+              me.callback();
+              me.close();
+            }
+          },
+          { text: NX.I18n.get('GLOBAL_UNSAVED_BACK_BUTTON'), handler: me.close, scope: me }
+        ]
+      }
     });
 
     me.callParent();

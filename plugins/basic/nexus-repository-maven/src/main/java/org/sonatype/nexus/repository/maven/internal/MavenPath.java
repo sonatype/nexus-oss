@@ -12,11 +12,15 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+
+import com.google.common.collect.ImmutableList;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,6 +39,12 @@ public class MavenPath
     SHA1("sha1", HashAlgorithm.SHA1),
 
     MD5("md5", HashAlgorithm.MD5);
+
+    /**
+     * {@link HashAlgorithm}s corresponding to {@link HashType}s.
+     */
+    public static final List<HashAlgorithm> ALGORITHMS = ImmutableList
+        .of(SHA1.getHashAlgorithm(), MD5.getHashAlgorithm());
 
     private final String ext;
 

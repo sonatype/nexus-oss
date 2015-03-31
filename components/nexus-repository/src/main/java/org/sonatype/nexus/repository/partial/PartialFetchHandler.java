@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.http.HttpResponses;
+import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Headers;
@@ -32,7 +33,6 @@ import org.sonatype.nexus.repository.view.Status;
 
 import com.google.common.collect.Range;
 import com.google.common.net.HttpHeaders;
-import org.apache.http.HttpStatus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -64,8 +64,8 @@ public class PartialFetchHandler
       return response;
     }
 
-    if (!response.getStatus().isSuccessful()) {
-      // We don't interfere with failure responses
+    if (response.getStatus().getCode() != HttpStatus.OK) {
+      // We don't interfere with any non-200 responses
       return response;
     }
 
@@ -114,7 +114,7 @@ public class PartialFetchHandler
   private PayloadResponse partialResponse(final PayloadResponse response, final Payload payload,
                                           final Range requestedRange)
   {
-    response.setStatus(Status.success(HttpStatus.SC_PARTIAL_CONTENT));
+    response.setStatus(Status.success(HttpStatus.PARTIAL_CONTENT));
     final Range<Long> rangeToSend = requestedRange;
 
     Payload partialPayload = new PartialPayload(payload, rangeToSend);
