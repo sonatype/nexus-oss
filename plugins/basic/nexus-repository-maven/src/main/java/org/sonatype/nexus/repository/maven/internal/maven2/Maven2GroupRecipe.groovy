@@ -16,6 +16,7 @@ import javax.annotation.Nonnull
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
+import javax.inject.Singleton
 
 import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
@@ -47,6 +48,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
  * @since 3.0
  */
 @Named(Maven2GroupRecipe.NAME)
+@Singleton
 class Maven2GroupRecipe
     extends RecipeSupport
 {
