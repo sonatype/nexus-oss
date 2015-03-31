@@ -123,5 +123,19 @@ Ext.define('NX.view.feature.Content', {
    *
    * @private
    */
-  currentIconCls: undefined
+  currentIconCls: undefined,
+
+  /**
+   * @public
+   * Reset the discardUnsavedChanges flag (false by default)
+   */
+  resetUnsavedChangesFlag: function(enable) {
+    var me = this;
+
+    if (enable) {
+      me.discardUnsavedChanges = true;
+    } else {
+      me.discardUnsavedChanges = false;
+    }
+  }
 });
