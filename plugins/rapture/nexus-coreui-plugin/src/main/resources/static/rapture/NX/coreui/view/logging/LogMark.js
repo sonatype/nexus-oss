@@ -60,9 +60,11 @@ Ext.define('NX.coreui.view.logging.LogMark', {
 
     me.items.buttons = [
       { text: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary', bindToEnter: me.items.settingsFormSubmitOnEnter },
-      { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
-        this.up('window').close();
-      }}
+      { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler:
+        function() {
+          me.close();
+        }
+      }
     ];
 
     me.callParent();

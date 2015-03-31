@@ -15,6 +15,7 @@ package com.sonatype.nexus.repository.nuget.internal
 import javax.inject.Named
 import javax.inject.Singleton
 
+import com.sonatype.nexus.repository.nuget.internal.proxy.NugetGroupRecipe
 import com.sonatype.nexus.repository.nuget.internal.proxy.NugetProxyRecipe
 
 import org.sonatype.nexus.repository.config.Configuration
@@ -30,11 +31,19 @@ class NugetDefaultRepositoriesContributor
     implements DefaultRepositoriesContributor
 
 {
+
+  static final String DEFAULT_HOSTED_NAME = 'nuget-hosted'
+
+  static final String DEFAULT_PROXIED_NAME = 'nuget.org-proxy'
+
+  static final String DEFAULT_GROUP_NAME = 'nuget-group'
+
+
   @Override
   List<Configuration> getRepositoryConfigurations() {
     return [
-        new Configuration(repositoryName: 'nuget-hosted', recipeName: NugetHostedRecipe.NAME, attributes: [:]),
-        new Configuration(repositoryName: 'nuget.org-proxy', recipeName: NugetProxyRecipe.NAME, attributes:
+        new Configuration(repositoryName: DEFAULT_HOSTED_NAME, recipeName: NugetHostedRecipe.NAME, attributes: [:]),
+        new Configuration(repositoryName: DEFAULT_PROXIED_NAME, recipeName: NugetProxyRecipe.NAME, attributes:
             [
                 proxy     : [
                     remoteUrl     : 'http://www.nuget.org/api/v2/',
@@ -45,6 +54,13 @@ class NugetDefaultRepositoriesContributor
                         timeout: 20000,
                         retries: 2
                     ]
+                ]
+            ]
+        ),
+        new Configuration(repositoryName: DEFAULT_GROUP_NAME, recipeName: NugetGroupRecipe.NAME, attributes:
+            [
+                group: [
+                    memberNames: [DEFAULT_HOSTED_NAME, DEFAULT_PROXIED_NAME]
                 ]
             ]
         )

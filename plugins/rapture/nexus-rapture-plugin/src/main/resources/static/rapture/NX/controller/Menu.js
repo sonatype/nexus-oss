@@ -37,7 +37,8 @@ Ext.define('NX.controller.Menu', {
     'feature.NotVisible',
     'header.BrowseMode',
     'header.AdminMode',
-    'header.Mode'
+    'header.Mode',
+    'UnsavedChanges'
   ],
 
   models: [
@@ -53,6 +54,10 @@ Ext.define('NX.controller.Menu', {
     {
       ref: 'featureMenu',
       selector: 'nx-feature-menu'
+    },
+    {
+      ref: 'featureContent',
+      selector: 'nx-feature-content'
     },
     {
       ref: 'headerPanel',
@@ -112,15 +117,22 @@ Ext.define('NX.controller.Menu', {
         },
         '#User': {
           signout: me.onSignOut
+        },
+        '#Refresh': {
+          beforerefresh: me.warnBeforeRefresh
         }
       },
       component: {
         'nx-feature-menu': {
           select: me.onSelection,
-          afterrender: me.onAfterRender
+          afterrender: me.onAfterRender,
+          beforecellclick: me.warnBeforeMenuSelect
         },
         'nx-header-panel button[mode]': {
-          click: me.onModeChanged
+          click: me.warnBeforeModeSelect
+        },
+        '#breadcrumb button': {
+          click: me.warnBeforeBreadcrumbClick
         },
         'button[mode]': {
           afterrender: me.registerModeButton,
@@ -142,6 +154,12 @@ Ext.define('NX.controller.Menu', {
          */
         'featureselected'
     );
+
+    // Disable backspace as a means for navigating back
+    me.disableBackspaceNav();
+
+    // Warn people about refreshing or closing their browser when there are unsaved changes
+    me.warnBeforeUnload();
   },
 
   /**
@@ -575,16 +593,6 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
-   * @private
-   */
-  onModeChanged: function (button) {
-    var me = this,
-        mode = button.mode;
-
-    me.changeMode(mode);
-  },
-
-  /**
    * @public
    * Change mode.
    * @param {String} mode to change to
@@ -643,6 +651,160 @@ Ext.define('NX.controller.Menu', {
     me.refreshModeButtons();
     me.refreshTree();
     me.toggleMenu();
-  }
+  },
 
+  /**
+   * @private
+   * Check for unsaved changes before opening a menu item
+   */
+  warnBeforeMenuSelect: function(tree, td, cellIndex, record) {
+    var me = this;
+
+    return me.warnBeforeNavigate(
+      function () {
+        me.getFeatureMenu().getSelectionModel().select(record);
+      }
+    )
+  },
+
+  /**
+   * @private
+   * Check for unsaved changes before switching modes
+   */
+  warnBeforeModeSelect: function(button, e, eOpts) {
+    var me = this;
+
+    var cb = function() {
+      me.getHeaderPanel().down('button[mode=' + button.mode + ']').toggle(true);
+      me.changeMode(button.mode);
+    };
+
+    if (me.warnBeforeNavigate(cb)) {
+      me.changeMode(button.mode);
+    } else {
+      me.getHeaderPanel().down('button[mode=' + me.mode + ']').toggle(true);
+    }
+  },
+
+  /**
+   * @private
+   * Check for unsaved changes before navigating via the breadcrumb
+   */
+  warnBeforeBreadcrumbClick: function(button, e) {
+    var me = this;
+
+    return me.warnBeforeNavigate(
+      function() {
+        button.handler.call(button.scope, button, e);
+      }
+    );
+  },
+
+  /**
+   * @private
+   * Check for unsaved changes before refreshing the view
+   */
+  warnBeforeRefresh: function() {
+    var me = this,
+      button = me.getHeaderPanel().down('nx-header-refresh');
+
+    return me.warnBeforeNavigate(
+      function() {
+        button.fireEvent('click');
+      }
+    )
+  },
+
+  /**
+   * @private
+   * Check for unsaved changes. Warn the user, and stop or continue navigation
+   */
+  warnBeforeNavigate: function(callback) {
+    var me = this,
+      dirty = me.hasDirt(),
+      content = me.getFeatureContent();
+
+    // If false, we’ve already warned the user about the unsaved changes. Don’t warn again.
+    if (content.discardUnsavedChanges) {
+      // Reset the flag and continue with navigation
+      content.discardUnsavedChanges = false;
+      return true;
+    }
+
+    // Load the content, but warn first if there are unsaved changes
+    if (dirty) {
+      // Show modal and stop navigation
+      me.showUnsavedChangesModal(callback);
+      return false;
+
+    } else {
+      // Continue with navigation
+      return true;
+    }
+  },
+
+  /**
+   * @private
+   * Show warning modal about unsaved changes, and take action
+   *
+   * @param record The menu item we’re trying to navigate to
+   */
+  showUnsavedChangesModal: function(callback) {
+    var me = this,
+      content = me.getFeatureContent();
+
+    Ext.create('NX.view.UnsavedChanges', {
+      content: content,
+      callback: callback
+    });
+  },
+
+  /**
+   * @private
+   * Are any forms dirty?
+   */
+  hasDirt: function() {
+    var dirty = false,
+      forms = Ext.ComponentQuery.query('form[settingsForm=true]');
+
+    // Check for dirty content
+    if (forms) {
+      Ext.each(forms, function (form) {
+        if (form.isDirty()) {
+          dirty = true;
+          return;
+        }
+      });
+    }
+
+    return dirty;
+  },
+
+
+  /**
+   * @private
+   * Disable backspace as a means for navigating back
+   */
+  disableBackspaceNav: function() {
+    var parent = Ext.isIE ? document : window;
+    Ext.EventManager.on(parent, 'keydown', function (e, focused) {
+      if (e.getKey() == e.BACKSPACE && (!/^input$/i.test(focused.tagName) && !/^textarea$/i.test(focused.tagName)) || focused.disabled || focused.readOnly) {
+        e.stopEvent();
+      }
+    });
+  },
+
+  /*
+   * @private
+   * Warn people about refreshing or closing their browser when there are unsaved changes
+   */
+  warnBeforeUnload: function() {
+    var me = this;
+
+    window.onbeforeunload = function() {
+      if (me.hasDirt()) {
+        return NX.I18n.get('GLOBAL_UNSAVED_BROWSER_TITLE');
+      }
+    };
+  }
 });

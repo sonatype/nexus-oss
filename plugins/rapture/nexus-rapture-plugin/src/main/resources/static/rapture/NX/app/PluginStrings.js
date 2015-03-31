@@ -136,6 +136,13 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_EXPIRE_SIGN_IN_BUTTON: 'Sign in',
     GLOBAL_EXPIRE_CLOSE_BUTTON: 'Close',
 
+    // Unsaved changes modal
+    GLOBAL_UNSAVED_TITLE: 'Unsaved changes',
+    GLOBAL_UNSAVED_MESSAGE: '<p>Do you want to discard your changes?</p>',
+    GLOBAL_UNSAVED_DISCARD_BUTTON: 'Discard changes',
+    GLOBAL_UNSAVED_BACK_BUTTON: 'Go back',
+    GLOBAL_UNSAVED_BROWSER_TITLE: 'You will lose your unsaved changes',
+
     // Unsupported browser
     GLOBAL_UNSUPPORTED_TITLE: 'The browser you are using is not supported',
     GLOBAL_UNSUPPORTED_ALTERNATIVES: 'Below is a list of alternatives that are supported by this web application',

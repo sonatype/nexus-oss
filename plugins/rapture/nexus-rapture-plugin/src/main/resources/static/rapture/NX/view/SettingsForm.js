@@ -25,6 +25,16 @@ Ext.define('NX.view.SettingsForm', {
   ],
 
   /**
+   * @private
+   * Set trackResetOnLoad by default
+   */
+  constructor : function(config) {
+    config = config || {};
+    config.trackResetOnLoad = true;
+    this.callParent([config]);
+  },
+
+  /**
    * @cfg {boolean} [settingsForm=true] Marker that we have a settings form
    * ({NX.controller.SettingsForm} controller kicks in)
    */
@@ -110,6 +120,10 @@ Ext.define('NX.view.SettingsForm', {
       me.buttons[0].bindToEnter = me.settingsFormSubmitOnEnter;
     }
 
+    me.on('recordloaded', me.resetDirtyState);
+    me.on('loaded', me.resetDirtyState);
+    me.on('submitted', me.resetDirtyState);
+
     me.callParent(arguments);
 
     me.addEvents(
@@ -146,6 +160,15 @@ Ext.define('NX.view.SettingsForm', {
 
     me.callParent(arguments);
     me.fireEvent('recordloaded', me, record);
+  },
+
+  /*
+   * @private
+   * Reset the dirty state of the form
+   */
+  resetDirtyState: function (form) {
+    var realform = form.getForm();
+    realform.setValues(realform.getValues());
   },
 
   /**
