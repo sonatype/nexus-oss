@@ -22,18 +22,18 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
-import org.sonatype.nexus.repository.maven.internal.HostedHandler
+import org.sonatype.nexus.repository.group.GroupHandler
+import org.sonatype.nexus.repository.maven.internal.GroupMetadataHandler
 import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
+import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
+import org.sonatype.nexus.repository.maven.internal.MavenGroupFacet
 import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
-import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
 import org.sonatype.nexus.repository.maven.internal.MavenPathParser
-import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
 import org.sonatype.nexus.repository.partial.PartialFetchHandler
-import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
-import org.sonatype.nexus.repository.types.HostedType
+import org.sonatype.nexus.repository.types.GroupType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
@@ -43,16 +43,16 @@ import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 
 /**
- * Maven 2 hosted repository recipe.
+ * Raw group repository recipe.
  *
  * @since 3.0
  */
-@Named(Maven2HostedRecipe.NAME)
+@Named(Maven2GroupRecipe.NAME)
 @Singleton
-class Maven2HostedRecipe
+class Maven2GroupRecipe
     extends RecipeSupport
 {
-  static final String NAME = 'maven2-hosted'
+  static final String NAME = 'maven2-group'
 
   @Inject
   Provider<Maven2SecurityFacet> securityFacet
@@ -64,7 +64,7 @@ class Maven2HostedRecipe
   Provider<StorageFacetImpl> storageFacet
 
   @Inject
-  Provider<SearchFacet> searchFacet
+  Provider<MavenGroupFacet> mavenGroupFacet
 
   @Inject
   TimingHandler timingHandler
@@ -79,21 +79,21 @@ class Maven2HostedRecipe
   Provider<MavenFacetImpl> mavenFacet
 
   @Inject
-  VersionPolicyHandler versionPolicyHandler
-
-  @Inject
   MavenHeadersHandler mavenHeadersHandler
 
   @Inject
-  HostedHandler hostedHandler
+  GroupHandler groupHandler
+
+  @Inject
+  GroupMetadataHandler groupMetadataHandler
 
   @Inject
   @Named(Maven2Format.NAME)
   MavenPathParser mavenPathParser
 
   @Inject
-  Maven2HostedRecipe(@Named(HostedType.NAME) final Type type,
-                     @Named(Maven2Format.NAME) final Format format)
+  Maven2GroupRecipe(@Named(GroupType.NAME) Type type,
+                    @Named(Maven2Format.NAME) Format format)
   {
     super(type, format)
   }
@@ -102,12 +102,15 @@ class Maven2HostedRecipe
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
     repository.attach(storageFacet.get())
-    repository.attach(searchFacet.get())
     repository.attach(mavenFacet.get())
+    repository.attach(mavenGroupFacet.get())
     repository.attach(configure(viewFacet.get()))
   }
 
-  private ViewFacet configure(final ConfigurableViewFacet facet) {
+  /**
+   * Configure {@link ViewFacet}.
+   */
+  private ViewFacet configure(final ConfigurableViewFacet viewFacet) {
     Router.Builder builder = new Router.Builder()
 
     builder.route(new Route.Builder()
@@ -115,9 +118,7 @@ class Maven2HostedRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(partialFetchHandler)
-        .handler(versionPolicyHandler)
-        .handler(mavenHeadersHandler)
-        .handler(hostedHandler)
+        .handler(groupHandler)
         .create())
 
     // Note: partialFetchHandler NOT added for Maven metadata
@@ -126,13 +127,13 @@ class Maven2HostedRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(mavenHeadersHandler)
-        .handler(hostedHandler)
+        .handler(groupMetadataHandler)
         .create())
 
     builder.defaultHandlers(notFound())
 
-    facet.configure(builder.create())
+    viewFacet.configure(builder.create())
 
-    return facet
+    return viewFacet
   }
 }

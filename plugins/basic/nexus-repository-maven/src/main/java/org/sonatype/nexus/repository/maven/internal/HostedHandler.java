@@ -18,9 +18,9 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpResponses;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -49,7 +49,7 @@ public class HostedHandler
     switch (action) {
       case GET:
       case HEAD: {
-        final Payload content = mavenFacet.get(path);
+        final Content content = mavenFacet.get(path);
         if (content == null) {
           return HttpResponses.notFound(path.getPath());
         }

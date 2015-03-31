@@ -159,11 +159,13 @@ public abstract class ProxyFacetSupport
 
     HttpGet request = new HttpGet(remoteUrl.resolve(url));
     if (stale != null) {
-      if (stale.getLastModified() != null) {
-        request.addHeader(HttpHeaders.IF_MODIFIED_SINCE, DateUtils.formatDate(stale.getLastModified().toDate()));
+      final DateTime lastModified = stale.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
+      if (lastModified != null) {
+        request.addHeader(HttpHeaders.IF_MODIFIED_SINCE, DateUtils.formatDate(lastModified.toDate()));
       }
-      if (stale.getETag() != null) {
-        request.addHeader(HttpHeaders.IF_NONE_MATCH, "\"" + stale.getETag() + "\"");
+      final String etag = stale.getAttributes().get(Content.CONTENT_ETAG, String.class);
+      if (etag != null) {
+        request.addHeader(HttpHeaders.IF_NONE_MATCH, "\"" + etag + "\"");
       }
     }
     log.debug("Fetching: {}", request);
@@ -179,9 +181,10 @@ public abstract class ProxyFacetSupport
       log.debug("Entity: {}", entity);
 
       Payload payload = new HttpEntityPayload(response, entity);
-      DateTime lastModified = extractLastModified(response.getLastHeader(HttpHeaders.LAST_MODIFIED));
-      String etag = extractETag(response.getLastHeader(HttpHeaders.ETAG));
-      return new Content(payload, lastModified, etag);
+      final Content result = new Content(payload);
+      result.getAttributes().set(Content.CONTENT_LAST_MODIFIED, extractLastModified(response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
+      result.getAttributes().set(Content.CONTENT_ETAG, extractETag(response.getLastHeader(HttpHeaders.ETAG)));
+      return result;
     }
     if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
       indicateUpToDate(context);
@@ -193,6 +196,7 @@ public abstract class ProxyFacetSupport
   /**
    * Extract Last-Modified date from response if possible, or {@code null}.
    */
+  @Nullable
   private DateTime extractLastModified(final Header lastModifiedHeader) {
     if (lastModifiedHeader != null) {
       try {
@@ -208,6 +212,7 @@ public abstract class ProxyFacetSupport
   /**
    * Extract ETag from response if possible, or {@code null}.
    */
+  @Nullable
   private String extractETag(final Header etagHeader) {
     if (etagHeader != null) {
       final String etag = etagHeader.getValue();
@@ -227,6 +232,7 @@ public abstract class ProxyFacetSupport
    * For whatever component/asset is implied by the Context, return the date it was last deemed up to date, or {@code
    * null} if it isn't present.
    */
+  @Nullable
   protected abstract DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException;
 
   /**

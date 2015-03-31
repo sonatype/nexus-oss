@@ -60,8 +60,10 @@ public class MavenHeadersHandlerTest
 
   @Test
   public void okResponse() throws Exception {
-    when(context.proceed())
-        .thenReturn(HttpResponses.ok(new Content(new StringPayload(payloadString, "text/plain"), now, "etag")));
+    final Content content = new Content(new StringPayload(payloadString, "text/plain"));
+    content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, now);
+    content.getAttributes().set(Content.CONTENT_ETAG, "etag");
+    when(context.proceed()).thenReturn(HttpResponses.ok(content));
     final Response r = subject.handle(context);
     assertThat(r.getStatus().isSuccessful(), is(true));
     assertThat(r.getHeaders().get(HttpHeaders.LAST_MODIFIED), equalTo(Iso8601Date.format(now.toDate())));
@@ -71,7 +73,7 @@ public class MavenHeadersHandlerTest
   @Test
   public void okResponseNoExtraData() throws Exception {
     when(context.proceed()).thenReturn(
-        HttpResponses.ok(new Content(new StringPayload(payloadString, "text/plain"), null, null)));
+        HttpResponses.ok(new Content(new StringPayload(payloadString, "text/plain"))));
     final Response r = subject.handle(context);
     assertThat(r.getStatus().isSuccessful(), is(true));
     assertThat(r.getHeaders().get(HttpHeaders.LAST_MODIFIED), nullValue());

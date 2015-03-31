@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.repository.group;
 
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -29,6 +31,7 @@ import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
@@ -48,7 +51,7 @@ public class GroupHandler
   /**
    * Request-context state container for set of repositories already dispatched to.
    */
-  private static class DispatchedRepositories
+  protected static class DispatchedRepositories
   {
     private final Set<String> dispatched = Sets.newHashSet();
 
@@ -69,40 +72,81 @@ public class GroupHandler
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
-    Request request = context.getRequest();
-
-    // Lookup/create dispatched repositories in request-context
-    DispatchedRepositories dispatched = request.getAttributes().getOrCreate(DispatchedRepositories.class);
-
-    Repository repository = context.getRepository();
-    GroupFacet group = repository.facet(GroupFacet.class);
-
-    // FIXME: To move forward prototype, exposing HTTP semantics here
-    String method = request.getAction();
+    final String method = context.getRequest().getAction();
     switch (method) {
       case GET:
       case HEAD: {
-        for (Repository member : group.members()) {
-          log.trace("Trying member: {}", member);
-
-          // track repositories we have dispatched to, prevent circular dispatch for nested groups
-          if (dispatched.contains(member)) {
-            log.trace("Skipping already dispatched member: {}", member);
-            continue;
-          }
-          dispatched.add(member);
-
-          ViewFacet view = member.facet(ViewFacet.class);
-          Response response = view.dispatch(request);
-          if (response.getStatus().getCode() == HttpStatus.OK) {
-            return response;
-          }
-        }
-        return HttpResponses.notFound();
+        final DispatchedRepositories dispatched = context.getRequest().getAttributes()
+            .getOrCreate(DispatchedRepositories.class);
+        return doGet(context, dispatched);
       }
 
       default:
         return HttpResponses.methodNotAllowed(method, GET, HEAD);
     }
+  }
+
+  /**
+   * Method that actually performs group GET. Override if needed.
+   */
+  protected Response doGet(final @Nonnull Context context,
+                           final @Nonnull DispatchedRepositories dispatched)
+      throws Exception
+  {
+    final GroupFacet groupFacet = context.getRepository().facet(GroupFacet.class);
+    return getFirst(context.getRequest(), groupFacet.members(), dispatched);
+  }
+
+  /**
+   * Returns the first OK response from member repositories or {@link HttpResponses#notFound()} if none of the members
+   * responded with OK.
+   */
+  protected Response getFirst(final @Nonnull Request request,
+                              final @Nonnull List<Repository> members,
+                              final @Nonnull DispatchedRepositories dispatched)
+      throws Exception
+  {
+    for (Repository member : members) {
+      log.trace("Trying member: {}", member);
+      // track repositories we have dispatched to, prevent circular dispatch for nested groups
+      if (dispatched.contains(member)) {
+        log.trace("Skipping already dispatched member: {}", member);
+        continue;
+      }
+      dispatched.add(member);
+
+      final ViewFacet view = member.facet(ViewFacet.class);
+      final Response response = view.dispatch(request);
+      if (response.getStatus().isSuccessful()) {
+        return response;
+      }
+    }
+    return HttpResponses.notFound();
+  }
+
+  /**
+   * Returns all responses from all members as a linked map, where order is group member order.
+   */
+  protected LinkedHashMap<Repository, Response> getAll(final @Nonnull Request request,
+                                                       final @Nonnull List<Repository> members,
+                                                       final @Nonnull DispatchedRepositories dispatched)
+      throws Exception
+  {
+    final LinkedHashMap<Repository, Response> responses = Maps.newLinkedHashMap();
+    for (Repository member : members) {
+      log.trace("Trying member: {}", member);
+      // track repositories we have dispatched to, prevent circular dispatch for nested groups
+      if (dispatched.contains(member)) {
+        log.trace("Skipping already dispatched member: {}", member);
+        continue;
+      }
+      dispatched.add(member);
+
+      final ViewFacet view = member.facet(ViewFacet.class);
+      final Response response = view.dispatch(request);
+
+      responses.put(member, response);
+    }
+    return responses;
   }
 }

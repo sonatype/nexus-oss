@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import org.sonatype.nexus.repository.Repository;
+
 /**
  * Asset deleted event.
  *
@@ -20,7 +22,7 @@ package org.sonatype.nexus.repository.storage;
 public class AssetDeletedEvent
   extends AssetEvent
 {
-  public AssetDeletedEvent(final Asset asset) {
-    super(asset);
+  public AssetDeletedEvent(final Asset asset, final Repository repository) {
+    super(asset, repository);
   }
 }
