@@ -15,12 +15,12 @@ package org.sonatype.nexus.repository.proxy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Collections;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.hash.Hashes;
@@ -186,8 +186,13 @@ public abstract class ProxyFacetSupport
           }
           boolean hashesEquals = expected.equals(actual);
           if (hashesEquals || checksumPolicy == ChecksumPolicy.WARN) {
-            StreamPayload payload = new StreamPayload(supplier.get(), content.getSize(), content.getContentType());
-            store(context, new Content(payload, content.getLastModified(), content.getETag()));
+            store(context, new Content(new StreamPayload(supplier.get(), content.getSize(), content.getContentType()))
+            {
+              @Override
+              public AttributesMap getAttributes() {
+                return content.getAttributes();
+              }
+            });
             stored = true;
           }
           if (!hashesEquals) {
@@ -268,7 +273,8 @@ public abstract class ProxyFacetSupport
 
       Payload payload = new HttpEntityPayload(response, entity);
       final Content result = new Content(payload);
-      result.getAttributes().set(Content.CONTENT_LAST_MODIFIED, extractLastModified(response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
+      result.getAttributes()
+          .set(Content.CONTENT_LAST_MODIFIED, extractLastModified(response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
       result.getAttributes().set(Content.CONTENT_ETAG, extractETag(response.getLastHeader(HttpHeaders.ETAG)));
       return result;
     }
