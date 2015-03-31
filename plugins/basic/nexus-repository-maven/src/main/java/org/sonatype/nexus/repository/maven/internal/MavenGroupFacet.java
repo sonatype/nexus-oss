@@ -123,10 +123,10 @@ public class MavenGroupFacet
   }
 
   private Content mergeMetadata(final MavenPath mavenPath,
-                                          final LinkedHashMap<Repository, Content> metadataContents) throws IOException
+                                final LinkedHashMap<Repository, Content> metadataContents) throws IOException
   {
     if (metadataContents.size() == 1) {
-      return metadataContents.get(0);
+      return metadataContents.get(metadataContents.keySet().iterator().next());
     }
     final MetadataXpp3Reader reader = new MetadataXpp3Reader();
     List<MetadataEnvelope> metadatas = Lists.newArrayList();
@@ -163,15 +163,18 @@ public class MavenGroupFacet
     return content;
   }
 
-  private Content cacheMetadata(final MavenPath mavenPath, final Content content) throws IOException{
+  private Content cacheMetadata(final MavenPath mavenPath, final Content content) throws IOException {
     final Map<HashAlgorithm, HashCode> hashCodes = content.getAttributes().require(
         Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
+    final DateTime now = content.getAttributes().require(Content.CONTENT_LAST_MODIFIED, DateTime.class);
     // cache the metadata and the hashes
     mavenFacet.put(mavenPath, content);
     for (HashType hashType : HashType.values()) {
       final HashCode hashCode = hashCodes.get(hashType.getHashAlgorithm());
       if (hashCode != null) {
-        mavenFacet.put(mavenPath.hash(hashType), new StringPayload(hashCode.toString(), ContentTypes.TEXT_PLAIN));
+        final Content hashContent = new Content(new StringPayload(hashCode.toString(), ContentTypes.TEXT_PLAIN));
+        hashContent.getAttributes().set(Content.CONTENT_LAST_MODIFIED, now);
+        mavenFacet.put(mavenPath.hash(hashType), hashContent);
       }
     }
     // reload it from cache
