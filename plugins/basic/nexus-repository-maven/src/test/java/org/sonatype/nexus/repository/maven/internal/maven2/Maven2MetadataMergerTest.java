@@ -19,6 +19,7 @@ import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -135,7 +136,9 @@ public class Maven2MetadataMergerTest
     final Metadata m2 = g("foo", "bar");
     final Metadata m3 = g("baz");
 
-    final Metadata m = merger.merge(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3));
+    final Metadata m = merger.merge(
+        ImmutableList.of(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3))
+    );
     assertThat(m, notNullValue());
     assertThat(m.getModelVersion(), equalTo("1.1.0"));
     assertThat(m.getPlugins(), hasSize(3));
@@ -155,7 +158,9 @@ public class Maven2MetadataMergerTest
     final Metadata m2 = a("org.foo", "some-project", "20150324121700", "1.0.2", "1.0.2", "1.0.2");
     final Metadata m3 = a("org.foo", "some-project", "20150324121600", "1.1.0-SNAPSHOT", null, "1.1.0-SNAPSHOT");
 
-    final Metadata m = merger.merge(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3));
+    final Metadata m = merger.merge(
+        ImmutableList.of(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3))
+    );
     assertThat(m, notNullValue());
     assertThat(m.getModelVersion(), equalTo("1.1.0"));
     assertThat(m.getGroupId(), equalTo("org.foo"));
@@ -173,7 +178,9 @@ public class Maven2MetadataMergerTest
     final Metadata m2 = v("org.foo", "some-project", "1.0.0", "20150323.121500", 2);
     final Metadata m3 = v("org.foo", "some-project", "1.0.0", "20150322.121500", 1);
 
-    final Metadata m = merger.merge(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3));
+    final Metadata m = merger.merge(
+        ImmutableList.of(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3))
+    );
     assertThat(m, notNullValue());
     assertThat(m.getModelVersion(), equalTo("1.1.0"));
     assertThat(m.getGroupId(), equalTo("org.foo"));
@@ -190,7 +197,9 @@ public class Maven2MetadataMergerTest
     final Metadata m2 = g("foo", "bar");
     final Metadata m3 = v("org.foo", "some-project", "1.1.0", "20150322.121500", 3);
 
-    final Metadata m = merger.merge(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3));
+    final Metadata m = merger.merge(
+        ImmutableList.of(new MetadataEnvelope("1", m1), new MetadataEnvelope("2", m2), new MetadataEnvelope("3", m3))
+    );
     assertThat(m, notNullValue());
     assertThat(m.getModelVersion(), equalTo("1.1.0"));
     assertThat(m.getGroupId(), equalTo("org.foo"));

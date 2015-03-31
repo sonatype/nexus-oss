@@ -137,7 +137,7 @@ public class MavenGroupFacet
       }
     }
 
-    final Metadata mergedMetadata = metadataMerger.merge(metadatas.toArray(new MetadataEnvelope[metadatas.size()]));
+    final Metadata mergedMetadata = metadataMerger.merge(metadatas);
     if (mergedMetadata == null) {
       return null;
     }

@@ -124,11 +124,12 @@ public class Maven2MetadataMerger
   }
 
   /**
-   * Merges Maven2 repository metadata in received order. Returns {@code null} if passed in parameter array is
+   * Merges Maven2 repository metadata in received order. Returns {@code null} if passed in iterable is
    * empty. The passed in instances are not mutated.
    */
   @Nullable
-  public Metadata merge(final MetadataEnvelope... metadatas) {
+  public Metadata merge(final Iterable<MetadataEnvelope> metadatas) {
+    checkNotNull(metadatas);
     Metadata result = null;
     for (MetadataEnvelope metadataEnvelope : metadatas) {
       if (result == null) {
