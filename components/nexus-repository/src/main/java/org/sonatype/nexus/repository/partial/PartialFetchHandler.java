@@ -64,8 +64,8 @@ public class PartialFetchHandler
       return response;
     }
 
-    if (!response.getStatus().isSuccessful() || response.getStatus().getCode() == HttpStatus.PARTIAL_CONTENT) {
-      // We don't interfere with failure responses or already partial responses
+    if (response.getStatus().getCode() != HttpStatus.OK) {
+      // We don't interfere with any non-200 responses
       return response;
     }
 
