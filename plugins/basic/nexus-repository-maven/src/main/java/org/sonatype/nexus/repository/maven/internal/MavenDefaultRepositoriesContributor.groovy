@@ -93,7 +93,6 @@ class MavenDefaultRepositoriesContributor
             [
                 maven  : [
                     versionPolicy              : VersionPolicy.MIXED.toString(),
-                    checksumPolicy             : ChecksumPolicy.WARN.toString(),
                     strictContentTypeValidation: false
                 ],
                 storage: [
