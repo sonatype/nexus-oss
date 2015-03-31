@@ -12,6 +12,8 @@
  */
 package com.sonatype.nexus.repository.nuget.internal
 
+import org.sonatype.nexus.repository.proxy.ChecksumPolicy
+
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -38,7 +40,8 @@ class NugetDefaultRepositoriesContributor
             [
                 proxy     : [
                     remoteUrl     : 'http://www.nuget.org/api/v2/',
-                    artifactMaxAge: 5
+                    artifactMaxAge: 5,
+                    checksumPolicy: ChecksumPolicy.WARN.toString()
                 ],
                 httpclient: [
                     connection: [
