@@ -22,7 +22,6 @@ Ext.define('NX.view.ExpireSession', {
   alias: 'widget.nx-expire-session',
 
   title: NX.I18n.get('GLOBAL_EXPIRE_TITLE'),
-  closable: false,
 
   /**
    * @protected
