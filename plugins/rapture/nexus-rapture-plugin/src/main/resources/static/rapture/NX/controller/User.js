@@ -88,7 +88,7 @@ Ext.define('NX.controller.User', {
           click: me.showSignInWindow
         },
         'nx-header-signout': {
-          click: me.signOut
+          click: me.onClickSignOut
         },
         'nx-signin button[action=signin]': {
           click: me.signIn
@@ -106,6 +106,12 @@ Ext.define('NX.controller.User', {
          * @param {Object} user
          */
         'signin',
+
+        /**
+         * @event beforesignout
+         * Fires before a user is signed out
+         */
+        'beforesignout',
 
         /**
          * @event signout
@@ -326,6 +332,17 @@ Ext.define('NX.controller.User', {
         }
       }
     });
+  },
+
+  /**
+   * @private
+   */
+  onClickSignOut: function() {
+    var me = this;
+
+    if (me.fireEvent('beforesignout')) {
+      me.signOut();
+    }
   },
 
   /**

@@ -116,6 +116,7 @@ Ext.define('NX.controller.Menu', {
           navigate: me.navigateTo
         },
         '#User': {
+          beforesignout: me.warnBeforeSignOut,
           signout: me.onSignOut
         },
         '#Refresh': {
@@ -130,6 +131,9 @@ Ext.define('NX.controller.Menu', {
         },
         'nx-header-panel button[mode]': {
           click: me.warnBeforeModeSelect
+        },
+        'nx-main #quicksearch': {
+          beforesearch: me.warnBeforeSearch
         },
         '#breadcrumb button': {
           click: me.warnBeforeBreadcrumbClick
@@ -688,6 +692,21 @@ Ext.define('NX.controller.Menu', {
 
   /**
    * @private
+   * Check for unsaved changes before doing a search
+   */
+  warnBeforeSearch: function() {
+    var me = this,
+      button = me.getHeaderPanel().down('nx-header-quicksearch');
+
+    return me.warnBeforeNavigate(
+      function() {
+        button.fireEvent('search', button, button.getValue());
+      }
+    )
+  },
+
+  /**
+   * @private
    * Check for unsaved changes before navigating via the breadcrumb
    */
   warnBeforeBreadcrumbClick: function(button, e) {
@@ -711,6 +730,20 @@ Ext.define('NX.controller.Menu', {
     return me.warnBeforeNavigate(
       function() {
         button.fireEvent('click');
+      }
+    )
+  },
+
+  /**
+   * @private
+   * Check for unsaved changes before signing out
+   */
+  warnBeforeSignOut: function() {
+    var me = this;
+
+    return me.warnBeforeNavigate(
+      function() {
+        NX.getApplication().getController('User').signOut();
       }
     )
   },
