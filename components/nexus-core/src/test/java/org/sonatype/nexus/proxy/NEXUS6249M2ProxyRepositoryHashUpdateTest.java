@@ -27,7 +27,6 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.maven.ChecksumContentValidator;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
@@ -176,34 +175,5 @@ public class NEXUS6249M2ProxyRepositoryHashUpdateTest
         false, false);
     request.setRequestRemoteOnly(true);
     return getRepository().retrieveItem(request);
-  }
-
-  @Test
-  public void testItemUpdateUpdatesRemoteHash()
-      throws Exception
-  {
-    StorageItem item;
-    final HashSet<String> hashes = Sets.newHashSet();
-
-    mavenContent.setContent("First version of content");
-
-    item = retrieveItem();
-    hashes.add(item.getRepositoryItemAttributes().get(ChecksumContentValidator.ATTR_REMOTE_SHA1));
-
-    mavenContent.setContent("Second version of content");
-
-    item = retrieveItem();
-    hashes.add(item.getRepositoryItemAttributes().get(ChecksumContentValidator.ATTR_REMOTE_SHA1));
-
-    mavenContent.setContent("Third version of content");
-
-    item = retrieveItem();
-    hashes.add(item.getRepositoryItemAttributes().get(ChecksumContentValidator.ATTR_REMOTE_SHA1));
-
-    // we expect three different hashes, NEXUS-6249 caused one same hash to be served always,
-    // but as this UT sets up a proxy repo with ChecksumPolicy.STRICT_IF_EXISTS due to same bug
-    // 2nd retrieval attempt would end up in validation failure, as Nx Core would use stale hashes
-    // to validate
-    assertThat(hashes, hasSize(3));
   }
 }

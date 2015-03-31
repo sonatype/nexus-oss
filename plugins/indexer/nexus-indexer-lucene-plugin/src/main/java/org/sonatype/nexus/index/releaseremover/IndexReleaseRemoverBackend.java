@@ -208,7 +208,7 @@ public class IndexReleaseRemoverBackend
         // delete each item one by one
         for (StorageItem item : mustBeDeleted) {
           try {
-            repository.deleteItemWithChecksums(new ResourceStoreRequest(item.getResourceStoreRequest()));
+            repository.deleteItem(new ResourceStoreRequest(item.getResourceStoreRequest()));
             deleted = deleted + 1;
           }
           catch (ItemNotFoundException e) {

@@ -348,7 +348,7 @@ public class MavenRepositoryMetadataLocator
         new DefaultStorageFileItem(uid.getRepository(), new ResourceStoreRequest(uid.getPath()), true, true,
             new StringContentLocator(mdString));
 
-    ((MavenRepository) uid.getRepository()).storeItemWithChecksums(false, file);
+    ((MavenRepository) uid.getRepository()).storeItem(false, file);
   }
 
   protected Metadata readOrCreateGAVMetadata(ArtifactStoreRequest request, Gav gav)

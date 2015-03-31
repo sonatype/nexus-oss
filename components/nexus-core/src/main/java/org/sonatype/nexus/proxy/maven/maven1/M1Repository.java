@@ -109,11 +109,6 @@ public class M1Repository
     return M1ArtifactRecognizer.isMetadata(path);
   }
 
-  @Override
-  public boolean isMavenArtifactChecksumPath(String path) {
-    return M1ArtifactRecognizer.isChecksum(path);
-  }
-
   /**
    * Should serve by policies.
    *

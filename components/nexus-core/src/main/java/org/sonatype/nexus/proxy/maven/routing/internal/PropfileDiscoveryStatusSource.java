@@ -195,7 +195,7 @@ public class PropfileDiscoveryStatusSource
     request.setRequestLocalOnly(true);
     request.setRequestGroupLocalOnly(true);
     try {
-      getMavenProxyRepository().deleteItemWithChecksums(true, request);
+      getMavenProxyRepository().deleteItem(true, request);
     }
     catch (ItemNotFoundException e) {
       // ignore

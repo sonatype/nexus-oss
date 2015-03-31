@@ -141,35 +141,4 @@ public abstract class AbstractMavenGroupRepository
 
   @Override
   public abstract boolean isMavenMetadataPath(String path);
-
-  @Override
-  public void storeItemWithChecksums(ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes)
-      throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
-             StorageException, AccessDeniedException
-  {
-    getArtifactStoreHelper().storeItemWithChecksums(request, is, userAttributes);
-  }
-
-  @Override
-  public void storeItemWithChecksums(boolean fromTask, AbstractStorageItem item)
-      throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
-  {
-    getArtifactStoreHelper().storeItemWithChecksums(fromTask, item);
-  }
-
-  @Override
-  public void deleteItemWithChecksums(ResourceStoreRequest request)
-      throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
-             StorageException, AccessDeniedException
-  {
-    getArtifactStoreHelper().deleteItemWithChecksums(request);
-  }
-
-  @Override
-  public void deleteItemWithChecksums(boolean fromTask, ResourceStoreRequest request)
-      throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
-  {
-    getArtifactStoreHelper().deleteItemWithChecksums(fromTask, request);
-  }
-
 }

@@ -60,196 +60,6 @@ public class ArtifactStoreHelper
     return repository;
   }
 
-  public void storeItemWithChecksums(ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes)
-      throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
-  {
-    String originalPath = request.getRequestPath();
-
-    try {
-      try {
-        getMavenRepository().storeItem(request, is, userAttributes);
-      }
-      catch (IOException e) {
-        throw new LocalStorageException(String.format("Could not store item to repository %s, path %s",
-            RepositoryStringUtils.getHumanizedNameString(getMavenRepository()), request), e);
-      }
-
-      // NXCM-4861: Doing "local only" lookup, same code should be used as in
-      // org.sonatype.nexus.proxy.repository.AbstractProxyRepository#doCacheItem
-      // Note: ResourceStoreRequest( ResourceStoreRequest ) creates a "subordinate" request from passed with same
-      // path but localOnly=true
-      StorageFileItem storedFile =
-          (StorageFileItem) getMavenRepository().retrieveItem(false, new ResourceStoreRequest(request));
-
-      String sha1Hash = storedFile.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_SHA1_KEY);
-
-      String md5Hash = storedFile.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_MD5_KEY);
-
-      if (!StringUtils.isEmpty(sha1Hash)) {
-        request.setRequestPath(storedFile.getPath() + ".sha1");
-
-        getMavenRepository().storeItem(
-            false,
-            new DefaultStorageFileItem(getMavenRepository(), request, true, true, new StringContentLocator(
-                sha1Hash)));
-      }
-
-      if (!StringUtils.isEmpty(md5Hash)) {
-        request.setRequestPath(storedFile.getPath() + ".md5");
-
-        getMavenRepository().storeItem(
-            false,
-            new DefaultStorageFileItem(getMavenRepository(), request, true, true, new StringContentLocator(
-                md5Hash)));
-      }
-    }
-    catch (ItemNotFoundException e) {
-      throw new LocalStorageException("Storage inconsistency!", e);
-    }
-    finally {
-      request.setRequestPath(originalPath);
-    }
-  }
-
-  public void deleteItemWithChecksums(ResourceStoreRequest request)
-      throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
-             StorageException, AccessDeniedException
-  {
-    try {
-      getMavenRepository().deleteItem(request);
-    }
-    catch (ItemNotFoundException e) {
-      if (request.getRequestPath().endsWith(".asc")) {
-        // Do nothing no guarantee that the .asc files will exist
-      }
-      else {
-        throw e;
-      }
-    }
-
-    String originalPath = request.getRequestPath();
-
-    request.setRequestPath(originalPath + ".sha1");
-
-    try {
-      getMavenRepository().deleteItem(request);
-    }
-    catch (ItemNotFoundException e) {
-      // ignore not found
-    }
-
-    request.setRequestPath(originalPath + ".md5");
-
-    try {
-      getMavenRepository().deleteItem(request);
-    }
-    catch (ItemNotFoundException e) {
-      // ignore not found
-    }
-
-    // Now remove the .asc files, and the checksums stored with them as well
-    // Note this is a recursive call, hence the check for .asc
-    if (!originalPath.endsWith(".asc")) {
-      request.setRequestPath(originalPath + ".asc");
-
-      deleteItemWithChecksums(request);
-    }
-  }
-
-  public void storeItemWithChecksums(boolean fromTask, AbstractStorageItem item)
-      throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
-  {
-    try {
-      try {
-        getMavenRepository().storeItem(false, item);
-      }
-      catch (IOException e) {
-        throw new LocalStorageException("Could not get the content from the ContentLocator!", e);
-      }
-
-      StorageFileItem storedFile =
-          (StorageFileItem) getMavenRepository().retrieveItem(false, new ResourceStoreRequest(item));
-
-      ResourceStoreRequest req = new ResourceStoreRequest(storedFile);
-
-      String sha1Hash = storedFile.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_SHA1_KEY);
-
-      String md5Hash = storedFile.getRepositoryItemAttributes().get(DigestCalculatingInspector.DIGEST_MD5_KEY);
-
-      if (!StringUtils.isEmpty(sha1Hash)) {
-        req.setRequestPath(item.getPath() + ".sha1");
-
-        getMavenRepository().storeItem(
-            false,
-            new DefaultStorageFileItem(getMavenRepository(), req, true, true, new StringContentLocator(
-                sha1Hash)));
-      }
-
-      if (!StringUtils.isEmpty(md5Hash)) {
-        req.setRequestPath(item.getPath() + ".md5");
-
-        getMavenRepository().storeItem(
-            false,
-            new DefaultStorageFileItem(getMavenRepository(), req, true, true, new StringContentLocator(
-                md5Hash)));
-      }
-    }
-    catch (ItemNotFoundException e) {
-      throw new LocalStorageException("Storage inconsistency!", e);
-    }
-  }
-
-  public void deleteItemWithChecksums(boolean fromTask, ResourceStoreRequest request)
-      throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
-  {
-    try {
-      getMavenRepository().deleteItem(fromTask, request);
-    }
-    catch (ItemNotFoundException e) {
-      if (request.getRequestPath().endsWith(".asc")) {
-        // Do nothing no guarantee that the .asc files will exist
-      }
-      else {
-        throw e;
-      }
-    }
-
-    request.pushRequestPath(request.getRequestPath() + ".sha1");
-    try {
-      getMavenRepository().deleteItem(fromTask, request);
-
-    }
-    catch (ItemNotFoundException e) {
-      // ignore not found
-    }
-    finally {
-      request.popRequestPath();
-    }
-
-    request.pushRequestPath(request.getRequestPath() + ".md5");
-    try {
-      getMavenRepository().deleteItem(fromTask, request);
-    }
-    catch (ItemNotFoundException e) {
-      // ignore not found
-    }
-    finally {
-      request.popRequestPath();
-    }
-
-    // Now remove the .asc files, and the checksums stored with them as well
-    // Note this is a recursive call, hence the check for .asc
-    if (!request.getRequestPath().endsWith(".asc")) {
-      request.pushRequestPath(request.getRequestPath() + ".asc");
-      try {
-        deleteItemWithChecksums(fromTask, request);
-      }
-      finally {
-        request.popRequestPath();
-      }
-    }
-  }
-
   public StorageFileItem retrieveArtifactPom(ArtifactStoreRequest gavRequest)
       throws IllegalOperationException, ItemNotFoundException, StorageException, AccessDeniedException
   {
@@ -324,7 +134,7 @@ public class ArtifactStoreHelper
 
     gavRequest.setRequestPath(repository.getGavCalculator().gavToPath(gav));
 
-    repository.storeItemWithChecksums(gavRequest, is, attributes);
+    repository.storeItem(gavRequest, is, attributes);
 
     try {
       repository.getMetadataManager().deployArtifact(gavRequest);
@@ -346,7 +156,7 @@ public class ArtifactStoreHelper
 
     gavRequest.setRequestPath(repository.getGavCalculator().gavToPath(gav));
 
-    repository.storeItemWithChecksums(gavRequest, is, attributes);
+    repository.storeItem(gavRequest, is, attributes);
   }
 
   public void storeArtifactWithGeneratedPom(ArtifactStoreRequest gavRequest, String packaging, InputStream is,
@@ -394,8 +204,7 @@ public class ArtifactStoreHelper
         // writing to string, not to happen
       }
 
-      repository.storeItemWithChecksums(pomRequest, new ByteArrayInputStream(sw.toString().getBytes()),
-          attributes);
+      repository.storeItem(pomRequest, new ByteArrayInputStream(sw.toString().getBytes()), attributes);
 
       try {
         repository.getMetadataManager().deployArtifact(pomRequest);
@@ -408,7 +217,7 @@ public class ArtifactStoreHelper
 
     // reset path if anything changed it
     gavRequest.setRequestPath(repository.getGavCalculator().gavToPath(gavRequest.getGav()));
-    repository.storeItemWithChecksums(gavRequest, is, attributes);
+    repository.storeItem(gavRequest, is, attributes);
   }
 
   // =======================================================================================

@@ -51,7 +51,7 @@ public class EvictUnusedMavenItemsWalkerProcessor
     final MavenRepository repository = (MavenRepository) getRepository(ctx);
     final ResourceStoreRequest rsr = new ResourceStoreRequest(item);
     rsr.getRequestContext().put(DeleteOperation.DELETE_OPERATION_CTX_KEY,DeleteOperation.DELETE_PERMANENTLY);
-    repository.deleteItemWithChecksums(false, rsr);
+    repository.deleteItem(false, rsr);
   }
 
   // on maven repositories, we must use another delete method
@@ -62,7 +62,7 @@ public class EvictUnusedMavenItemsWalkerProcessor
       if (getRepository(ctx).list(false, coll).size() == 0) {
         final ResourceStoreRequest rsr = new ResourceStoreRequest(coll);
         rsr.getRequestContext().put(DeleteOperation.DELETE_OPERATION_CTX_KEY,DeleteOperation.DELETE_PERMANENTLY);
-        ((MavenRepository) getRepository(ctx)).deleteItemWithChecksums(false, rsr);
+        ((MavenRepository) getRepository(ctx)).deleteItem(false, rsr);
       }
     }
     catch (UnsupportedStorageOperationException e) {

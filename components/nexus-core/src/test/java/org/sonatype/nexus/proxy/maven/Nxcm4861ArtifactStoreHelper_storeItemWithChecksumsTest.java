@@ -108,7 +108,7 @@ public class Nxcm4861ArtifactStoreHelper_storeItemWithChecksumsTest
     // invoke storeWithChecksums
     final String PATH = "/group/artifact/1.0/artifact-1.0.jar";
     final ResourceStoreRequest request = new ResourceStoreRequest(PATH);
-    mavenRepository.storeItemWithChecksums(request, new ByteArrayInputStream("some fluke content".getBytes()),
+    mavenRepository.storeItem(request, new ByteArrayInputStream("some fluke content".getBytes()),
         null);
 
     // verify side effects (storage changes)

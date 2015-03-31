@@ -116,7 +116,7 @@ public class LocalContentDiscovererImplTest
   {
     for (String path : paths) {
       final ResourceStoreRequest request = new ResourceStoreRequest(path);
-      mavenRepository.storeItemWithChecksums(request,
+      mavenRepository.storeItem(request,
           new ByteArrayInputStream("some fluke content".getBytes()), null);
     }
   }
@@ -126,7 +126,7 @@ public class LocalContentDiscovererImplTest
   {
     for (String path : paths) {
       final ResourceStoreRequest request = new ResourceStoreRequest(path);
-      mavenRepository.deleteItemWithChecksums(request);
+      mavenRepository.deleteItem(request);
     }
   }
 

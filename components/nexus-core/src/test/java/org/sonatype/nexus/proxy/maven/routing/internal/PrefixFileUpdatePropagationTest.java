@@ -204,7 +204,7 @@ public class PrefixFileUpdatePropagationTest
     {
       final MavenRepository mavenRepository =
           getRepositoryRegistry().getRepositoryWithFacet(HOSTED_REPO_ID, MavenRepository.class);
-      mavenRepository.storeItemWithChecksums(new ResourceStoreRequest("/com/sonatype/test/1.0/test-1.0.txt"),
+      mavenRepository.storeItem(new ResourceStoreRequest("/com/sonatype/test/1.0/test-1.0.txt"),
           new ByteArrayInputStream("Some fluke content".getBytes()), null);
     }
 

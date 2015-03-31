@@ -1563,14 +1563,8 @@ public class DefaultIndexerManager
         fItem.setCreated(context.getTimestamp().getTime());
       }
 
-      if (repository instanceof MavenRepository) {
-        // this is maven repo, so use the checksumming facility
-        ((MavenRepository) repository).storeItemWithChecksums(false, fItem);
-      }
-      else {
-        // simply store it
-        repository.storeItem(false, fItem);
-      }
+      // simply store it
+      repository.storeItem(false, fItem);
     }
     catch (Exception e) {
       log.error("Cannot store index file " + path, e);

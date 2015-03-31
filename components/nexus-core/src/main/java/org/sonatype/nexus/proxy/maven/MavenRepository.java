@@ -59,22 +59,4 @@ public interface MavenRepository
   boolean isMavenMetadata(StorageItem item);
 
   boolean isMavenMetadataPath(String path);
-
-  // == "Public API" (JSec protected)
-
-  void storeItemWithChecksums(ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes)
-      throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
-             StorageException, AccessDeniedException;
-
-  void deleteItemWithChecksums(ResourceStoreRequest request)
-      throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,
-             StorageException, AccessDeniedException;
-
-  // == "Insider API" (unprotected)
-
-  void storeItemWithChecksums(boolean fromTask, AbstractStorageItem item)
-      throws UnsupportedStorageOperationException, IllegalOperationException, StorageException;
-
-  void deleteItemWithChecksums(boolean fromTask, ResourceStoreRequest request)
-      throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException;
 }
