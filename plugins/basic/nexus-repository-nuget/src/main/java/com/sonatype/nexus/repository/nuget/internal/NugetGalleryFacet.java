@@ -60,7 +60,14 @@ public interface NugetGalleryFacet
    */
   DateTime getLastUpdatedDate(String id, String version);
 
-  Map<HashAlgorithm,HashCode> getExpectedHashes(String id, String version);
+  /**
+   * Extracts the expected hashes of the package binary from package metadata.
+   *
+   * @param id      package id
+   * @param version package version
+   * @return expected hashes
+   */
+  Map<HashAlgorithm, HashCode> getExpectedHashes(String id, String version);
 
   /**
    * Delete a package and return whether it existed.

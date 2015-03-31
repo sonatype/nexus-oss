@@ -153,6 +153,9 @@ public abstract class ProxyFacetSupport
     return content;
   }
 
+  /**
+   * Verify (based on checksum policy) the fetched content against expected hashes and store it if verification passes.
+   */
   private void verifyAndStore(final Context context, final Content content) throws IOException {
     Map<HashAlgorithm, HashCode> expected;
 
@@ -206,6 +209,16 @@ public abstract class ProxyFacetSupport
     }
   }
 
+  /**
+   * Get the expected hashes to be checked against the remotely retrieved asset (blob), check done based on configured
+   * checksum policy. If returned map is null, the check is skipped (as in repository format and/or asset does not
+   * support hashes). If returned map is empty, repository format and/or asset does support hashes but they are
+   * present,
+   * e.g. maven .sha1/.md5 are not present on remote)
+   *
+   * @param context request context
+   * @return expected hashes
+   */
   protected Map<HashAlgorithm, HashCode> getExpectedHashes(final Context context) {
     return null;
   }
