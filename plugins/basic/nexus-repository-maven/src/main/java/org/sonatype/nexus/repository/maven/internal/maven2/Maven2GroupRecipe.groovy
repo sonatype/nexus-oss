@@ -119,11 +119,11 @@ class Maven2GroupRecipe
         .handler(groupHandler)
         .create())
 
+    // Note: partialFetchHandler NOT added for Maven metadata
     builder.route(new Route.Builder()
         .matcher(new MavenMetadataMatcher(mavenPathParser))
         .handler(timingHandler)
         .handler(securityHandler)
-        .handler(partialFetchHandler)
         .handler(mavenHeadersHandler)
         .handler(groupMetadataHandler)
         .create())
