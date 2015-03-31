@@ -114,7 +114,7 @@ public class PartialFetchHandler
   private PayloadResponse partialResponse(final PayloadResponse response, final Payload payload,
                                           final Range requestedRange)
   {
-    response.setStatus(Status.success(HttpStatus.SC_PARTIAL_CONTENT));
+    response.setStatus(Status.success(HttpStatus.PARTIAL_CONTENT));
     final Range<Long> rangeToSend = requestedRange;
 
     Payload partialPayload = new PartialPayload(payload, rangeToSend);
