@@ -32,6 +32,7 @@ import org.sonatype.nexus.repository.maven.internal.MavenProxyFacet
 import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
 import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler
+import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -82,6 +83,9 @@ class Maven2ProxyRecipe
   SecurityHandler securityHandler
 
   @Inject
+  PartialFetchHandler partialFetchHandler
+
+  @Inject
   Provider<MavenFacetImpl> mavenFacet
 
   @Inject
@@ -130,6 +134,7 @@ class Maven2ProxyRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(negativeCacheHandler)
+        .handler(partialFetchHandler)
         .handler(versionPolicyHandler)
         .handler(mavenHeadersHandler)
         .handler(proxyHandler)
@@ -140,6 +145,7 @@ class Maven2ProxyRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(negativeCacheHandler)
+        .handler(partialFetchHandler)
         .handler(mavenHeadersHandler)
         .handler(proxyHandler)
         .create())
