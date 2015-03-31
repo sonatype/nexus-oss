@@ -67,6 +67,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.hash.HashCode;
+import org.apache.commons.codec.binary.Base64;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -390,7 +391,7 @@ public class NugetGalleryFacetImpl
         if ("sha512".equalsIgnoreCase(algorithm)) {
           String hash = nugetAttr.get(P_PACKAGE_HASH, String.class);
           if (hash != null) {
-            hashes.put(HashAlgorithm.SHA512, HashCode.fromString(hash));
+            hashes.put(HashAlgorithm.SHA512, HashCode.fromBytes(Base64.decodeBase64(hash)));
           }
         }
         else {
