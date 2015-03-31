@@ -36,6 +36,7 @@ import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.MetadataEnvelope;
 import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.PayloadResponse;
@@ -114,10 +115,14 @@ public class MavenGroupFacet
     if (metadataContents.isEmpty()) {
       return null;
     }
-    return doMergeAndCacheMetadata(mavenPath, metadataContents);
+    final Content content = mergeMetadata(mavenPath, metadataContents);
+    if (content == null) {
+      return null;
+    }
+    return cacheMetadata(mavenPath, content);
   }
 
-  private Content doMergeAndCacheMetadata(final MavenPath mavenPath,
+  private Content mergeMetadata(final MavenPath mavenPath,
                                           final LinkedHashMap<Repository, Content> metadataContents) throws IOException
   {
     if (metadataContents.size() == 1) {
@@ -155,7 +160,12 @@ public class MavenGroupFacet
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
     content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}");
     content.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
+    return content;
+  }
 
+  private Content cacheMetadata(final MavenPath mavenPath, final Content content) throws IOException{
+    final Map<HashAlgorithm, HashCode> hashCodes = content.getAttributes().require(
+        Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
     // cache the metadata and the hashes
     mavenFacet.put(mavenPath, content);
     for (HashType hashType : HashType.values()) {
