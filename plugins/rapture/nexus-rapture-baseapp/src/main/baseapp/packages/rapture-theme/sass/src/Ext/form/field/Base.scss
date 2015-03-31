@@ -8,9 +8,10 @@
  * cls: 'x-form-readonly'
  */
 
-.x-form-field[readonly="readonly"].x-form-field:not([role="combobox"]) {
+.x-form-field[readonly].x-form-field:not([role="combobox"]) {
   color: $color-dark-gray;
   background-color: $color-smoke;
+  opacity: 1;
 }
 
 .nx-log-viewer-field textarea {
