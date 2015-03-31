@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.http.HttpResponses;
+import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Headers;
@@ -32,7 +33,6 @@ import org.sonatype.nexus.repository.view.Status;
 
 import com.google.common.collect.Range;
 import com.google.common.net.HttpHeaders;
-import org.apache.http.HttpStatus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -64,8 +64,7 @@ public class PartialFetchHandler
       return response;
     }
 
-    if (!response.getStatus().isSuccessful() || response.getStatus().getCode() ==
-        org.sonatype.nexus.repository.http.HttpStatus.PARTIAL_CONTENT) {
+    if (!response.getStatus().isSuccessful() || response.getStatus().getCode() == HttpStatus.PARTIAL_CONTENT) {
       // We don't interfere with failure responses or already partial responses
       return response;
     }
