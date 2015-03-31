@@ -106,7 +106,7 @@ public class MavenGroupFacet
     checkArgument(!mavenPath.isSubordinate(), "Only metadata XML can be merged and cached: %s", mavenPath);
     final LinkedHashMap<Repository, Content> metadataContents = Maps.newLinkedHashMap();
     for (Map.Entry<Repository, Response> entry : responses.entrySet()) {
-      if (entry.getValue().getStatus().getCode() == HttpStatus.OK) { // this MUST be 200 OK and no other 2xx code
+      if (entry.getValue().getStatus().getCode() == HttpStatus.OK) {
         final Response response = entry.getValue();
         if (response instanceof PayloadResponse && ((PayloadResponse) response).getPayload() instanceof Content) {
           metadataContents.put(entry.getKey(), (Content) ((PayloadResponse) response).getPayload());
