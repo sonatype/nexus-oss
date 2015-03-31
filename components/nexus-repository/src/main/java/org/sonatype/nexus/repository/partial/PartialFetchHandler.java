@@ -64,8 +64,9 @@ public class PartialFetchHandler
       return response;
     }
 
-    if (!response.getStatus().isSuccessful()) {
-      // We don't interfere with failure responses
+    if (!response.getStatus().isSuccessful() || response.getStatus().getCode() ==
+        org.sonatype.nexus.repository.http.HttpStatus.PARTIAL_CONTENT) {
+      // We don't interfere with failure responses or already partial responses
       return response;
     }
 

@@ -117,7 +117,7 @@ public class GroupHandler
 
       final ViewFacet view = member.facet(ViewFacet.class);
       final Response response = view.dispatch(request);
-      if (response.getStatus().getCode() == HttpStatus.OK) {
+      if (response.getStatus().isSuccessful()) {
         return response;
       }
     }
