@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateMavenMetadata;
@@ -50,11 +51,13 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
+import org.sonatype.nexus.proxy.walker.WalkerFilter;
 
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_HASH_EXPIRED;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_MD5;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.ATTR_REMOTE_SHA1;
 import static org.sonatype.nexus.proxy.maven.ChecksumContentValidator.SUFFIX_MD5;
@@ -483,6 +486,44 @@ public abstract class AbstractMavenRepository
     result.getRepositoryItemAttributes().remove(ATTR_REMOTE_SHA1);
     result.getRepositoryItemAttributes().remove(ATTR_REMOTE_MD5);
     return result;
+  }
+
+  @Override
+  protected boolean doExpireProxyCaches(ResourceStoreRequest request, WalkerFilter filter) {
+
+    // special handling if this is a remote checksum request
+    if (getRepositoryKind().isFacetAvailable(ProxyRepository.class)
+        && request.getRequestPath() != null && !request.getRequestPath().startsWith("/.")) {
+
+      if (request.getRequestPath().endsWith(SUFFIX_SHA1)) {
+        expireRemoteHash(request, SUFFIX_SHA1);
+      }
+      else if (request.getRequestPath().endsWith(SUFFIX_MD5)) {
+        expireRemoteHash(request, SUFFIX_MD5);
+      }
+    }
+
+    return super.doExpireProxyCaches(request, filter);
+  }
+
+  private void expireRemoteHash(ResourceStoreRequest hashRequest, String suffix) {
+    final String hashPath = hashRequest.getRequestPath();
+    final String itemPath = hashPath.substring(0, hashPath.length() - suffix.length());
+    hashRequest.pushRequestPath(itemPath);
+    try {
+      StorageItem artifact = getLocalStorage().retrieveItem(this, hashRequest);
+      Attributes attributes = artifact.getRepositoryItemAttributes();
+      if (attributes.containsKey(ATTR_REMOTE_SHA1) || attributes.containsKey(ATTR_REMOTE_MD5)) {
+        attributes.put(ATTR_REMOTE_HASH_EXPIRED, "true");
+        getAttributesHandler().storeAttributes(artifact);
+      }
+    }
+    catch (Exception e) {
+      log.debug("Skip expiring remote hash in repository {} because it does not contain path='{}'.", this, itemPath);
+    }
+    finally {
+      hashRequest.popRequestPath();
+    }
   }
 
   @Override
