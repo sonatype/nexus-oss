@@ -55,7 +55,7 @@ Ext.define('NX.view.UnsavedChanges', {
             itemId: 'nx-discard',
             handler: function () {
               // Discard changes and load new content
-              me.content.discardUnsavedChanges = true;
+              me.content.resetUnsavedChangesFlag(true);
               me.callback();
               me.close();
             }

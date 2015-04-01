@@ -87,6 +87,9 @@ Ext.define('NX.controller.Content', {
     content.setTitle(text);
     content.setIconCls(NX.Icons.cls(iconName, 'x32'));
 
+    // Reset unsaved changes flag
+    content.resetUnsavedChangesFlag();
+
     // set browser title
     NX.global.document.title = text + ' - ' + NX.State.getValue('uiSettings').title;
 

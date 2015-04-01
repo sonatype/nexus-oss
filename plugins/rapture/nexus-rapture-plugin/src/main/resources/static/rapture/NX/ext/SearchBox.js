@@ -51,6 +51,12 @@ Ext.define('NX.ext.SearchBox', {
 
     me.addEvents(
         /**
+         * @event beforesearch
+         * Fires before a search is performed
+         */
+        'beforesearch',
+
+        /**
          * @event search
          * Fires when a search values was typed. Fires with a delay of **{@link #searchDelay}**.
          * @param {NX.view.header.SearchBox} this search box
@@ -138,7 +144,9 @@ Ext.define('NX.ext.SearchBox', {
       me.setValue(value);
     }
     else {
-      me.fireEvent('search', me, value);
+      if (me.fireEvent('beforesearch', me)) {
+        me.fireEvent('search', me, value);
+      }
     }
   },
 

@@ -28,6 +28,7 @@ Ext.define('NX.view.ModalDialog', {
   autoShow: true,
   modal: true,
   constrain: true,
-  width: 400
+  width: 400,
+  closable: false
 
 });

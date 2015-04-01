@@ -14477,17 +14477,18 @@
  * cls: 'x-form-readonly'
  */
 /* line 11, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
-.x-form-field[readonly="readonly"].x-form-field:not([role="combobox"]) {
+.x-form-field[readonly].x-form-field:not([role="combobox"]) {
   color: #777777;
   background-color: #ebebeb;
+  opacity: 1;
 }
 
-/* line 16, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 17, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-log-viewer-field textarea {
   background-color: white !important;
 }
 
-/* line 20, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 21, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .x-form-fieldcontainer .x-mask {
   background-color: #dddddd;
   opacity: 0.6;
@@ -14496,20 +14497,20 @@
 /**
  * Styles which allow for horizontal alignment of form fields
  */
-/* line 29, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 30, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-float-left {
   position: relative;
   float: left !important;
   margin-right: 5px;
 }
 
-/* line 35, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 36, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-interstitial-label {
   font-size: 13px;
   padding-top: 5px;
 }
 
-/* line 40, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 41, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-clear-both {
   clear: both;
 }
@@ -14517,7 +14518,7 @@
 /**
  * IE10 adds a second 'x' icon to text fields. Hide this.
  */
-/* line 47, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 48, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 ::-ms-clear {
   width: 0;
   height: 0;
