@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import javax.annotation.Nullable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -25,16 +27,24 @@ public class ReleaseRemovalRequest
 
   private final int numberOfVersionsToKeep;
 
+  private final boolean useIndex;
+
   private final String targetId;
 
   /**
    * @param repositoryId           the repository to target
    * @param numberOfVersionsToKeep the number of released versions to keep for Group/Artifact in the repository
+   * @param useIndex               use index instead of walker
    * @param targetId               (optional) Repository Target id to be applied
    */
-  public ReleaseRemovalRequest(final String repositoryId, final int numberOfVersionsToKeep, final String targetId) {
+  public ReleaseRemovalRequest(final String repositoryId,
+                               final int numberOfVersionsToKeep,
+                               final boolean useIndex,
+                               final @Nullable String targetId)
+  {
     this.repositoryId = checkNotNull(repositoryId);
     this.numberOfVersionsToKeep = checkNotNull(numberOfVersionsToKeep);
+    this.useIndex = useIndex;
     this.targetId = targetId;
   }
 
@@ -46,6 +56,11 @@ public class ReleaseRemovalRequest
     return numberOfVersionsToKeep;
   }
 
+  public boolean isUseIndex() {
+    return useIndex;
+  }
+
+  @Nullable
   public String getTargetId() {
     return targetId;
   }

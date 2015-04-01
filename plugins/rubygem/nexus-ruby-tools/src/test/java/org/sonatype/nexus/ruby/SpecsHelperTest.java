@@ -252,11 +252,11 @@ public class SpecsHelperTest
 
     // adding to latest
     is = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.LATEST);
-    dumpStream(is, target);
+    assertThat("no change", is, nullValue());
 
     size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
-    assertThat("specsfile size", size, equalTo(1));
+    assertThat("specsfile size", size, equalTo(0));
   }
 
   private void dumpStream(final InputStream is, File target)

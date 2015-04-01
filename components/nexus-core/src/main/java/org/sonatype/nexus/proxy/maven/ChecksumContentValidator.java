@@ -61,24 +61,10 @@ public class ChecksumContentValidator
   public static final String ATTR_REMOTE_SHA1 = "remote.sha1";
 
   /**
-   * Key of item attribute that is set to <code>true</code> if and only if the item does not have corresponding
-   * remote
-   * .sha1 file.
-   */
-  public static final String ATTR_NO_REMOTE_SHA1 = "remote.no-sha1";
-
-  /**
    * Key of item attribute that holds contents of remote .md5 file. The attribute is not present if the item does not
    * have corresponding .md5 file
    */
   public static final String ATTR_REMOTE_MD5 = "remote.md5";
-
-  /**
-   * Key of item attribute that is set to <code>true</code> if and only if the item does not have corresponding
-   * remote
-   * .md5 file.
-   */
-  public static final String ATTR_NO_REMOTE_MD5 = "remote.no-md5";
 
   @Override
   protected void cleanup(ProxyRepository proxy, RemoteHashResponse remoteHash, boolean contentValid)
@@ -169,7 +155,7 @@ public class ChecksumContentValidator
       throws LocalStorageException, ItemNotFoundException
   {
     return doRetrieveChecksumItem(proxy, hashRequest, artifact, DigestCalculatingInspector.DIGEST_SHA1_KEY,
-        ATTR_REMOTE_SHA1, ATTR_NO_REMOTE_SHA1);
+        ATTR_REMOTE_SHA1);
   }
 
   public static RemoteHashResponse doRetrieveMD5(ProxyRepository proxy, ResourceStoreRequest hashRequest,
@@ -177,12 +163,11 @@ public class ChecksumContentValidator
       throws LocalStorageException, ItemNotFoundException
   {
     return doRetrieveChecksumItem(proxy, hashRequest, artifact, DigestCalculatingInspector.DIGEST_MD5_KEY,
-        ATTR_REMOTE_MD5, ATTR_NO_REMOTE_MD5);
+        ATTR_REMOTE_MD5);
   }
 
   private static RemoteHashResponse doRetrieveChecksumItem(ProxyRepository proxy, ResourceStoreRequest request,
-                                                           StorageItem artifact, String inspector, String attrname,
-                                                           String noattrname)
+                                                           StorageItem artifact, String inspector, String attrname)
       throws ItemNotFoundException, LocalStorageException
   {
     final RepositoryItemUid itemUid = artifact.getRepositoryItemUid();
@@ -194,12 +179,8 @@ public class ChecksumContentValidator
         throw new LocalStorageException("Null item repository attributes");
       }
 
-      if (Boolean.parseBoolean(attributes.get(noattrname)) && !request.isRequestAsExpired()) {
-        throw new ItemNotFoundException(request);
-      }
-
       String hash = attributes.get(attrname);
-      if (hash == null || request.isRequestAsExpired()) {
+      if (hash == null || request.isRequestAsExpired() || !hash.equals(attributes.get(inspector))) {
         try {
           final StorageFileItem remoteItem =
               (StorageFileItem) proxy.getRemoteStorage().retrieveItem(proxy, request, proxy.getRemoteUrl());
@@ -217,7 +198,7 @@ public class ChecksumContentValidator
           // either expire the artifact or request the hash asExpired to retry
         }
 
-        doStoreChechsumItem(proxy, artifact, attrname, noattrname, hash);
+        doStoreChechsumItem(proxy, artifact, attrname, hash);
       }
 
       if (hash != null) {
@@ -239,8 +220,7 @@ public class ChecksumContentValidator
       throws LocalStorageException
   {
     try {
-      doStoreChechsumItem(proxy, artifact, ATTR_REMOTE_SHA1, ATTR_NO_REMOTE_SHA1,
-          MUtils.readDigestFromFileItem(hash));
+      doStoreChechsumItem(proxy, artifact, ATTR_REMOTE_SHA1, MUtils.readDigestFromFileItem(hash));
     }
     catch (IOException e) {
       throw new LocalStorageException(e);
@@ -251,16 +231,14 @@ public class ChecksumContentValidator
       throws LocalStorageException
   {
     try {
-      doStoreChechsumItem(proxy, artifact, ATTR_REMOTE_MD5, ATTR_NO_REMOTE_MD5,
-          MUtils.readDigestFromFileItem(hash));
+      doStoreChechsumItem(proxy, artifact, ATTR_REMOTE_MD5, MUtils.readDigestFromFileItem(hash));
     }
     catch (IOException e) {
       throw new LocalStorageException(e);
     }
   }
 
-  private static void doStoreChechsumItem(ProxyRepository proxy, StorageItem artifact, String attrname,
-                                          String noattrname, String hash)
+  private static void doStoreChechsumItem(ProxyRepository proxy, StorageItem artifact, String attrname, String hash)
       throws IOException
   {
     final RepositoryItemUid itemUid = artifact.getRepositoryItemUid();
@@ -269,9 +247,6 @@ public class ChecksumContentValidator
     try {
       if (hash != null) {
         attributes.put(attrname, hash);
-      }
-      else {
-        attributes.put(noattrname, Boolean.toString(true));
       }
       proxy.getAttributesHandler().storeAttributes(artifact);
     }

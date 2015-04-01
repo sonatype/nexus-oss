@@ -17,6 +17,7 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoComboFormField;
@@ -40,6 +41,8 @@ public class ReleaseRemovalTaskDescriptor
 
   public static final String NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID = "numberOfVersionsToKeep";
 
+  public static final String INDEX_BACKEND = "indexBackend";
+
   public static final String REPOSITORY_TARGET_FIELD_ID = "repositoryTarget";
 
   private final List<FormField> formFields = ImmutableList.<FormField>of(
@@ -48,7 +51,9 @@ public class ReleaseRemovalTaskDescriptor
           NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID, "Number to keep", "The number of versions for each GA to keep",
           FormField.MANDATORY),
       new RepoTargetComboFormField(REPOSITORY_TARGET_FIELD_ID, "Repository Target",
-          "Select a repository target to apply", FormField.OPTIONAL)
+          "Select a repository target to apply", FormField.OPTIONAL),
+      new CheckboxFormField(INDEX_BACKEND, "Use index",
+          "Use Maven Index to walk the repository? Defaults to crawling if unchecked", FormField.MANDATORY)
   );
 
   public String getId() {

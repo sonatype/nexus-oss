@@ -43,7 +43,7 @@ public class PurgeBrokenRubygemsMetadataTaskDescriptor
   }
 
   public String getName() {
-    return "Purge Broken Proxied Rubygems Metadata";
+    return "Rubygems: Purge Broken Files on Proxy";
   }
 
   @SuppressWarnings("rawtypes")

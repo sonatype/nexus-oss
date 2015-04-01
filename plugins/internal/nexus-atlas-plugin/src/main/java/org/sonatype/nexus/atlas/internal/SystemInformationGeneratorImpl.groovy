@@ -109,14 +109,23 @@ class SystemInformationGeneratorImpl
     def reportFileStores = {
       def data = [:]
       def fs = FileSystems.default
+      def ignoreEx = { def defaultValue, Closure callMe ->
+        try {
+          return callMe.call()
+        }
+        catch (e) {
+          log.debug "FileStore exception, defaulting to {}", defaultValue, e
+          return defaultValue
+        }
+      }
       fs.fileStores.each { store ->
         data[store.name()] = [
             'description': store.toString(), // seems to be the only place where mount-point is exposed
-            'type': store.type(),
-            'totalSpace': store.totalSpace,
-            'usableSpace': store.usableSpace,
-            'unallocatedSpace': store.unallocatedSpace,
-            'readOnly': store.readOnly
+            'type': ignoreEx('n/a') {store.type()},
+            'totalSpace': ignoreEx(-1) {store.totalSpace},
+            'usableSpace': ignoreEx(-1) {store.usableSpace},
+            'unallocatedSpace': ignoreEx(-1) {store.unallocatedSpace},
+            'readOnly': ignoreEx(false) {store.readOnly}
         ]
       }
 

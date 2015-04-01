@@ -165,27 +165,26 @@ public class GenerateMetadataTask
         LOG.warn("Yum metadata generation failed", e);
         throw new IOException("Yum metadata generation failed", e);
       }
-      // TODO dubious
-      Thread.sleep(100);
-
-      if (repository != null) {
-        final MavenRepository mavenRepository = repository.adaptToFacet(MavenRepository.class);
-        if (mavenRepository != null) {
-          try {
-            routingManager.forceUpdatePrefixFile(mavenRepository);
-          }
-          catch (Exception e) {
-            logger.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
-          }
-        }
-      }
-
-      regenerateMetadataForGroups();
-      return new YumRepositoryImpl(getRepoDir(), repositoryId, getVersion());
     }
     finally {
       mdUid.getLock().unlock();
     }
+
+    // TODO dubious
+    Thread.sleep(100);
+
+    final MavenRepository mavenRepository = repository.adaptToFacet(MavenRepository.class);
+    if (mavenRepository != null) {
+      try {
+        routingManager.forceUpdatePrefixFile(mavenRepository);
+      }
+      catch (Exception e) {
+        logger.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
+      }
+    }
+
+    regenerateMetadataForGroups();
+    return new YumRepositoryImpl(getRepoDir(), repositoryId, getVersion());
   }
 
   protected void setDefaults()

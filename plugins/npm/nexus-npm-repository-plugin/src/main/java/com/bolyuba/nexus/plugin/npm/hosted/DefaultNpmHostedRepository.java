@@ -31,6 +31,7 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -55,6 +56,8 @@ import com.bolyuba.nexus.plugin.npm.service.NpmBlob;
 import com.bolyuba.nexus.plugin.npm.service.PackageRequest;
 import com.bolyuba.nexus.plugin.npm.service.PackageRoot;
 import com.bolyuba.nexus.plugin.npm.service.PackageVersion;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.sisu.Description;
 
@@ -109,6 +112,14 @@ public class DefaultNpmHostedRepository
     return processor.getPackageRoots() > 0;
   }
 
+  @AllowConcurrentEvents
+  @Subscribe
+  public void onEvent(final RepositoryRegistryEventRemove event) {
+    if (event.getRepository() == this) {
+      getMetadataService().deleteAllMetadata();
+    }
+  }
+
   @Override
   public HostedMetadataService getMetadataService() { return hostedMetadataService; }
 
@@ -143,6 +154,7 @@ public class DefaultNpmHostedRepository
     };
   }
 
+  // TODO: npm hosted and proxy repositories have similar retrieve code, factor it out or keep in sync
   @Override
   protected AbstractStorageItem doRetrieveLocalItem(ResourceStoreRequest storeRequest)
       throws ItemNotFoundException, LocalStorageException
@@ -152,38 +164,47 @@ public class DefaultNpmHostedRepository
         // shut down NPM MD+tarball service completely
         return delegateDoRetrieveLocalItem(storeRequest);
       }
-      PackageRequest packageRequest = new PackageRequest(storeRequest);
-      if (packageRequest.isMetadata()) {
-        ContentLocator contentLocator;
-        if (packageRequest.isRegistryRoot()) {
-          contentLocator = hostedMetadataService.produceRegistryRoot(packageRequest);
-        }
-        else if (packageRequest.isPackageRoot()) {
-          contentLocator = hostedMetadataService.producePackageRoot(packageRequest);
+      PackageRequest packageRequest = null;
+      try {
+        packageRequest = new PackageRequest(storeRequest);
+      }
+      catch (IllegalArgumentException e) {
+        // something completely different
+        return delegateDoRetrieveLocalItem(storeRequest);
+      }
+      if (packageRequest != null) {
+        if (packageRequest.isMetadata()) {
+          ContentLocator contentLocator;
+          if (packageRequest.isRegistryRoot()) {
+            log.debug("Serving registry root...");
+            contentLocator = hostedMetadataService.produceRegistryRoot(packageRequest);
+          }
+          else if (packageRequest.isPackageRoot()) {
+            log.debug("Serving package {} root...", packageRequest.getName());
+            contentLocator = hostedMetadataService.producePackageRoot(packageRequest);
+          }
+          else {
+            log.debug("Serving package {} version {}...", packageRequest.getName(), packageRequest.getVersion());
+            contentLocator = hostedMetadataService.producePackageVersion(packageRequest);
+          }
+          if (contentLocator != null) {
+            return new DefaultStorageFileItem(this, storeRequest, true, true, contentLocator);
+          }
         }
         else {
-          contentLocator = hostedMetadataService.producePackageVersion(packageRequest);
+          // registry special
+          if (packageRequest.isRegistrySpecial() && packageRequest.getPath().startsWith("/-/all")) {
+            log.debug("Serving registry root from /-/all...");
+            return new DefaultStorageFileItem(this, storeRequest, true, true,
+                hostedMetadataService.produceRegistryRoot(
+                    packageRequest));
+          }
+          log.debug("Unknown registry special {}", packageRequest.getPath());
         }
-        if (contentLocator == null) {
-          throw new ItemNotFoundException(
-              reasonFor(storeRequest, this, "No content for path %s", storeRequest.getRequestPath()));
-        }
-        return new DefaultStorageFileItem(this, storeRequest, true, true, contentLocator);
       }
-      else {
-        // registry special
-        if (packageRequest.isRegistrySpecial() && packageRequest.getPath().startsWith("/-/all")) {
-          return new DefaultStorageFileItem(this, storeRequest, true, true,
-              hostedMetadataService.produceRegistryRoot(
-                  packageRequest));
-        }
-        throw new ItemNotFoundException(
-            reasonFor(storeRequest, this, "No content for path %s", storeRequest.getRequestPath()));
-      }
-    }
-    catch (IllegalArgumentException ignore) {
-      // something completely different
-      return delegateDoRetrieveLocalItem(storeRequest);
+      log.debug("No NPM metadata for path {}", storeRequest.getRequestPath());
+      throw new ItemNotFoundException(
+          reasonFor(storeRequest, this, "No content for path %s", storeRequest.getRequestPath()));
     }
     catch (IOException e) {
       throw new LocalStorageException("Metadata service error", e);
@@ -247,58 +268,98 @@ public class DefaultNpmHostedRepository
       throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
   {
     try {
-      PackageRequest packageRequest = new PackageRequest(request);
-
-      if (!packageRequest.isPackageRoot()) {
-        throw new UnsupportedStorageOperationException(
-            "Store operations are only valid for package roots, path: " + packageRequest.getPath());
+      PackageRequest packageRequest = null;
+      try {
+        packageRequest = new PackageRequest(request);
+      } catch (IllegalArgumentException e) {
+        // TODO: This might be our tarball, but it also might be something stupid uploaded. Need to validate further
+        // for now just store it
+        super.storeItem(request, is, userAttributes);
       }
 
-      // serialize all publish request for the same
-      final RepositoryItemUid publisherUid = createUid(packageRequest.getPath() + ".publish()");
-      RepositoryItemUidLock publisherLock = publisherUid.getLock();
+      if (packageRequest != null) {
+        if (!packageRequest.isPackageRoot()) {
+          throw new UnsupportedStorageOperationException(
+              "Store operations are only valid for package roots, path: " + packageRequest.getPath());
+        }
 
-      publisherLock.lock(Action.create);
-      try {
-        PackageRoot packageRoot = hostedMetadataService.parsePackageRoot(packageRequest,
-            new PreparedContentLocator(is, NpmRepository.JSON_MIME_TYPE, ContentLocator.UNKNOWN_LENGTH));
+        // serialize all publish request for the same
+        final RepositoryItemUid publisherUid = createUid(packageRequest.getPath() + ".publish()");
+        RepositoryItemUidLock publisherLock = publisherUid.getLock();
 
+        publisherLock.lock(Action.create);
         try {
-          checkConditions(request, getResultingActionOnWrite(request, packageRoot));
-        }
-        catch (ItemNotFoundException e) {
-          throw new AccessDeniedException(request, e.getMessage());
-        }
+          PackageRoot packageRoot = hostedMetadataService.parsePackageRoot(packageRequest,
+              new PreparedContentLocator(is, NpmRepository.JSON_MIME_TYPE, ContentLocator.UNKNOWN_LENGTH));
 
-        packageRoot = hostedMetadataService.consumePackageRoot(packageRoot);
+          try {
+            checkConditions(request, getResultingActionOnWrite(request, packageRoot));
+          }
+          catch (ItemNotFoundException e) {
+            throw new AccessDeniedException(request, e.getMessage());
+          }
 
-        if (!packageRoot.getAttachments().isEmpty()) {
-          for (NpmBlob attachment : packageRoot.getAttachments().values()) {
-            try {
-              final ResourceStoreRequest attachmentRequest = new ResourceStoreRequest(request);
-              attachmentRequest.setRequestPath(
-                  packageRequest.getPath() + RepositoryItemUid.PATH_SEPARATOR + NPM_REGISTRY_SPECIAL +
-                      RepositoryItemUid.PATH_SEPARATOR + attachment.getName());
-              super.storeItem(attachmentRequest, attachment.getContent(), userAttributes);
-            }
-            finally {
-              // delete temporary files backing attachment
-              attachment.delete();
+          packageRoot = hostedMetadataService.consumePackageRoot(packageRoot);
+
+          if (!packageRoot.getAttachments().isEmpty()) {
+            for (NpmBlob attachment : packageRoot.getAttachments().values()) {
+              try {
+                final ResourceStoreRequest attachmentRequest = new ResourceStoreRequest(request);
+                attachmentRequest.setRequestPath(
+                    packageRequest.getPath() + RepositoryItemUid.PATH_SEPARATOR + NPM_REGISTRY_SPECIAL +
+                        RepositoryItemUid.PATH_SEPARATOR + attachment.getName());
+                super.storeItem(attachmentRequest, attachment.getContent(), userAttributes);
+              }
+              finally {
+                // delete temporary files backing attachment
+                attachment.delete();
+              }
             }
           }
         }
+        finally {
+          publisherLock.unlock();
+        }
       }
-      finally {
-        publisherLock.unlock();
-      }
-    }
-    catch (IllegalArgumentException e) {
-      // TODO: This might be our tarball, but it also might be something stupid uploaded. Need to validate further
-      // for now just store it
-      super.storeItem(request, is, userAttributes);
     }
     catch (IOException e) {
       throw new LocalStorageException("Upload problem", e);
+    }
+  }
+
+  // TODO: npm hosted and proxy repositories have same deleteItem code, factor it out or keep in sync
+  @Override
+  public void deleteItem(boolean fromTask, ResourceStoreRequest storeRequest)
+      throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
+  {
+    PackageRequest packageRequest = null;
+    try {
+      packageRequest = new PackageRequest(storeRequest);
+    }
+    catch (IllegalArgumentException e) {
+      // something completely different
+    }
+    boolean supressItemNotFound = false;
+    if (packageRequest != null) {
+      if (packageRequest.isMetadata()) {
+        if (packageRequest.isRegistryRoot()) {
+          log.debug("Deleting registry root...");
+          getMetadataService().deleteAllMetadata();
+        }
+        else if (packageRequest.isPackageRoot()) {
+          log.debug("Deleting package {} root...", packageRequest.getName());
+          supressItemNotFound = getMetadataService().deletePackage(packageRequest.getName());
+        }
+      }
+    }
+    try {
+      super.deleteItem(fromTask, storeRequest);
+    }
+    catch (ItemNotFoundException e) {
+      // this allows to delete package metadata only, where no tarballs were cached/deployed for some reason
+      if (!supressItemNotFound) {
+        throw e;
+      }
     }
   }
 }
