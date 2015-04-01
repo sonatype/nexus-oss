@@ -79,6 +79,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.any;
@@ -91,7 +92,9 @@ public class MetadataServiceIT
 {
   private File tmpDir;
 
-  private NpmHostedRepository npmHostedRepository;
+  private NpmHostedRepository npmHostedRepository1;
+
+  private NpmHostedRepository npmHostedRepository2;
 
   private NpmProxyRepository npmProxyRepository;
 
@@ -153,12 +156,23 @@ public class MetadataServiceIT
     when(uid.getLock()).thenReturn(mock(RepositoryItemUidLock.class));
 
     // not using mock as it would OOM when it tracks invocations, as we work with large files here
-    npmHostedRepository = new DefaultNpmHostedRepository(mock(ContentClass.class), mock(
+    npmHostedRepository1 = new DefaultNpmHostedRepository(mock(ContentClass.class), mock(
         NpmHostedRepositoryConfigurator.class), metadataService)
     {
       @Override
       public String getId() {
-        return "hosted";
+        return "hosted1";
+      }
+
+      @Override
+      public RepositoryItemUid createUid(String path) { return uid; }
+    };
+    npmHostedRepository2 = new DefaultNpmHostedRepository(mock(ContentClass.class), mock(
+        NpmHostedRepositoryConfigurator.class), metadataService)
+    {
+      @Override
+      public String getId() {
+        return "hosted2";
       }
 
       @Override
@@ -202,7 +216,8 @@ public class MetadataServiceIT
       @Override
       public List<Repository> getMemberRepositories() {
         final List<Repository> result = Lists.newArrayList();
-        result.add(npmHostedRepository);
+        result.add(npmHostedRepository1);
+        result.add(npmHostedRepository2);
         result.add(npmProxyRepository);
         return result;
       }
@@ -279,22 +294,22 @@ public class MetadataServiceIT
 
     // this is "illegal" case using internal stuff, but is for testing only
     metadataStore
-        .updatePackages(npmHostedRepository, metadataParser.parseRegistryRoot(npmHostedRepository.getId(), input));
+        .updatePackages(npmHostedRepository1, metadataParser.parseRegistryRoot(npmHostedRepository1.getId(), input));
 
     log("Splice done");
     // we pushed all into DB, now query
-    assertThat(metadataStore.listPackageNames(npmHostedRepository), hasSize(4));
-    assertThat(metadataStore.getPackageByName(npmHostedRepository, "ansi-font"), notNullValue());
-    assertThat(metadataStore.getPackageByName(npmHostedRepository, "commonjs"), notNullValue());
+    assertThat(metadataStore.listPackageNames(npmHostedRepository1), hasSize(4));
+    assertThat(metadataStore.getPackageByName(npmHostedRepository1, "ansi-font"), notNullValue());
+    assertThat(metadataStore.getPackageByName(npmHostedRepository1, "commonjs"), notNullValue());
 
-    npmHostedRepository.getMetadataService().deletePackage("commonjs");
+    npmHostedRepository1.getMetadataService().deletePackage("commonjs");
 
-    assertThat(metadataStore.listPackageNames(npmHostedRepository), hasSize(3));
-    assertThat(metadataStore.getPackageByName(npmHostedRepository, "ansi-font"), notNullValue());
-    assertThat(metadataStore.getPackageByName(npmHostedRepository, "commonjs"), nullValue());
+    assertThat(metadataStore.listPackageNames(npmHostedRepository1), hasSize(3));
+    assertThat(metadataStore.getPackageByName(npmHostedRepository1, "ansi-font"), notNullValue());
+    assertThat(metadataStore.getPackageByName(npmHostedRepository1, "commonjs"), nullValue());
 
-    npmHostedRepository.getMetadataService().deleteAllMetadata();
-    assertThat(metadataStore.listPackageNames(npmHostedRepository), hasSize(0));
+    npmHostedRepository1.getMetadataService().deleteAllMetadata();
+    assertThat(metadataStore.listPackageNames(npmHostedRepository1), hasSize(0));
   }
 
   @Test
@@ -328,13 +343,13 @@ public class MetadataServiceIT
         new FileInputStream(jsonFile),
         NpmRepository.JSON_MIME_TYPE, -1);
     final PackageRequest request = new PackageRequest(new ResourceStoreRequest("/commonjs"));
-    npmHostedRepository.getMetadataService()
-        .consumePackageRoot(npmHostedRepository.getMetadataService().parsePackageRoot(
+    npmHostedRepository1.getMetadataService()
+        .consumePackageRoot(npmHostedRepository1.getMetadataService().parsePackageRoot(
             request, input));
 
-    assertThat(metadataStore.listPackageNames(npmHostedRepository), hasSize(1));
+    assertThat(metadataStore.listPackageNames(npmHostedRepository1), hasSize(1));
 
-    final PackageRoot commonjs = metadataStore.getPackageByName(npmHostedRepository, "commonjs");
+    final PackageRoot commonjs = metadataStore.getPackageByName(npmHostedRepository1, "commonjs");
     assertThat(commonjs.getName(), equalTo("commonjs"));
     assertThat(commonjs.isUnpublished(), is(false));
     assertThat(commonjs.isIncomplete(), is(false));
@@ -354,8 +369,8 @@ public class MetadataServiceIT
     onDisk.getJSONObject("versions").getJSONObject("0.0.1")
         .remove("_rev"); // TODO: See MetadataGenerator#filterPackageVersion
     onDisk.getJSONObject("versions").getJSONObject("0.0.1").getJSONObject("dist")
-        .put("tarball", "http://localhost:8081/nexus/content/repositories/hosted/commonjs/-/commonjs-0.0.1.tgz");
-    final StringContentLocator contentLocator = (StringContentLocator) npmHostedRepository.getMetadataService()
+        .put("tarball", "http://localhost:8081/nexus/content/repositories/hosted1/commonjs/-/commonjs-0.0.1.tgz");
+    final StringContentLocator contentLocator = (StringContentLocator) npmHostedRepository1.getMetadataService()
         .producePackageRoot(new PackageRequest(new ResourceStoreRequest("/commonjs")));
     JSONObject onStore = new JSONObject(
         ByteSource.wrap(contentLocator.getByteArray()).asCharSource(Charsets.UTF_8).read());
@@ -377,8 +392,8 @@ public class MetadataServiceIT
           NpmRepository.JSON_MIME_TYPE, -1);
       final PackageRequest request = new PackageRequest(new ResourceStoreRequest("/commonjs"));
 
-      npmHostedRepository.getMetadataService()
-          .consumePackageRoot(npmHostedRepository.getMetadataService().parsePackageRoot(
+      npmHostedRepository1.getMetadataService()
+          .consumePackageRoot(npmHostedRepository1.getMetadataService().parsePackageRoot(
               request, input));
     }
 
@@ -386,7 +401,7 @@ public class MetadataServiceIT
 
     // grab deployed one and check
     {
-      final PackageRoot commonjs = metadataStore.getPackageByName(npmHostedRepository, "commonjs");
+      final PackageRoot commonjs = metadataStore.getPackageByName(npmHostedRepository1, "commonjs");
       assertThat(commonjs.getRaw(), hasKey("time"));
       final Map<String, String> time = (Map<String, String>) commonjs.getRaw().get("time");
       assertThat(time.entrySet(), hasSize(3));
@@ -405,8 +420,8 @@ public class MetadataServiceIT
           NpmRepository.JSON_MIME_TYPE, -1);
       final PackageRequest request = new PackageRequest(new ResourceStoreRequest("/commonjs"));
 
-      npmHostedRepository.getMetadataService()
-          .consumePackageRoot(npmHostedRepository.getMetadataService().parsePackageRoot(
+      npmHostedRepository1.getMetadataService()
+          .consumePackageRoot(npmHostedRepository1.getMetadataService().parsePackageRoot(
               request, input));
     }
 
@@ -414,7 +429,7 @@ public class MetadataServiceIT
 
     // grab deployed one and check
     {
-      final PackageRoot commonjs = metadataStore.getPackageByName(npmHostedRepository, "commonjs");
+      final PackageRoot commonjs = metadataStore.getPackageByName(npmHostedRepository1, "commonjs");
       assertThat(commonjs.getRaw(), hasKey("time"));
       final Map<String, String> time = (Map<String, String>) commonjs.getRaw().get("time");
       assertThat(time.entrySet(), hasSize(4));
@@ -428,21 +443,36 @@ public class MetadataServiceIT
   }
 
   /**
-   * Simple smoke test that checks group functionality, it should aggregate members.
+   * Simple smoke test that checks group functionality, it should aggregate members. Not using merge, so
+   * first member "shades" the package in next member.
    */
   @Test
-  public void groupPackageRootRoundtrip() throws Exception {
-    // deploy private project to hosted repo
+  public void groupPackageRootRoundtripWithoutMerge() throws Exception {
+    // deploy private project to hosted1 repo
     {
       final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject.json");
       final ContentLocator input = new PreparedContentLocator(
           new FileInputStream(jsonFile),
           NpmRepository.JSON_MIME_TYPE, -1);
       final PackageRequest request = new PackageRequest(new ResourceStoreRequest("/testproject"));
-      npmHostedRepository.getMetadataService()
-          .consumePackageRoot(npmHostedRepository.getMetadataService().parsePackageRoot(
+      npmHostedRepository1.getMetadataService()
+          .consumePackageRoot(npmHostedRepository1.getMetadataService().parsePackageRoot(
               request, input));
     }
+    // deploy private patched project to hosted2 repo
+    {
+      final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject_patched.json");
+      final ContentLocator input = new PreparedContentLocator(
+          new FileInputStream(jsonFile),
+          NpmRepository.JSON_MIME_TYPE, -1);
+      final PackageRequest request = new PackageRequest(new ResourceStoreRequest("/testproject"));
+      npmHostedRepository2.getMetadataService()
+          .consumePackageRoot(npmHostedRepository2.getMetadataService().parsePackageRoot(
+              request, input));
+    }
+
+    // disable merging
+    npmGroupRepository.getMetadataService().setMergeMetadata(false);
 
     // proxy is set up against registry.npmjs.org, so no need to seed it
 
@@ -454,6 +484,70 @@ public class MetadataServiceIT
     final PackageRoot testproject = npmGroupRepository.getMetadataService()
         .generatePackageRoot(new PackageRequest(new ResourceStoreRequest("/testproject")));
     assertThat(testproject, notNullValue());
+
+    assertThat(testproject.getVersions(), hasKey("0.0.0"));
+    assertThat(testproject.getVersions(), not(hasKey("0.0.0-patched"))); // is shaded
+
+    final PackageRootIterator iterator = npmGroupRepository.getMetadataService().generateRegistryRoot(
+        new PackageRequest(new ResourceStoreRequest("/", true, false)));
+    boolean found = false;
+    int count = 0;
+    while (iterator.hasNext()) {
+      PackageRoot root = iterator.next();
+      if ("testproject".equals(root.getName())) {
+        found = true;
+      }
+      count++;
+    }
+    assertThat(count, greaterThan(1)); // we have ALL from registry.npmjs.org + testproject
+    assertThat(found, is(true)); // we need to have testproject in there
+  }
+
+  /**
+   * Simple smoke test that checks group functionality, it should aggregate members. Using merge, so member
+   * metadata should not shade each other.
+   */
+  @Test
+  public void groupPackageRootRoundtripWithMerge() throws Exception {
+    // deploy private project to hosted1 repo
+    {
+      final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject.json");
+      final ContentLocator input = new PreparedContentLocator(
+          new FileInputStream(jsonFile),
+          NpmRepository.JSON_MIME_TYPE, -1);
+      final PackageRequest request = new PackageRequest(new ResourceStoreRequest("/testproject"));
+      npmHostedRepository1.getMetadataService()
+          .consumePackageRoot(npmHostedRepository1.getMetadataService().parsePackageRoot(
+              request, input));
+    }
+    // deploy private patched project to hosted2 repo
+    {
+      final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject_patched.json");
+      final ContentLocator input = new PreparedContentLocator(
+          new FileInputStream(jsonFile),
+          NpmRepository.JSON_MIME_TYPE, -1);
+      final PackageRequest request = new PackageRequest(new ResourceStoreRequest("/testproject"));
+      npmHostedRepository2.getMetadataService()
+          .consumePackageRoot(npmHostedRepository2.getMetadataService().parsePackageRoot(
+              request, input));
+    }
+
+    // enable merging
+    npmGroupRepository.getMetadataService().setMergeMetadata(true);
+
+    // proxy is set up against registry.npmjs.org, so no need to seed it
+
+    // verify we have all what registry.mpmjs.org has + testproject
+    final PackageRoot commonjs = npmGroupRepository.getMetadataService()
+        .generatePackageRoot(new PackageRequest(new ResourceStoreRequest("/commonjs")));
+    assertThat(commonjs, notNullValue());
+
+    final PackageRoot testproject = npmGroupRepository.getMetadataService()
+        .generatePackageRoot(new PackageRequest(new ResourceStoreRequest("/testproject")));
+    assertThat(testproject, notNullValue());
+
+    assertThat(testproject.getVersions(), hasKey("0.0.0"));
+    assertThat(testproject.getVersions(), hasKey("0.0.0-patched"));
 
     final PackageRootIterator iterator = npmGroupRepository.getMetadataService().generateRegistryRoot(
         new PackageRequest(new ResourceStoreRequest("/", true, false)));

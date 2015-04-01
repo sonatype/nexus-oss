@@ -42,11 +42,23 @@ public class GroupMetadataServiceImpl
 {
   private final NpmGroupRepository npmGroupRepository;
 
+  private boolean mergeMetadata = false; // explicit we retain old behaviour
+
   public GroupMetadataServiceImpl(final NpmGroupRepository npmGroupRepository,
                                   final MetadataParser metadataParser)
   {
     super(npmGroupRepository, metadataParser);
     this.npmGroupRepository = checkNotNull(npmGroupRepository);
+  }
+
+  @Override
+  public boolean isMergeMetadata() {
+    return mergeMetadata;
+  }
+
+  @Override
+  public void setMergeMetadata(final boolean mergeMetadata) {
+    this.mergeMetadata = mergeMetadata;
   }
 
   @Override
@@ -64,13 +76,31 @@ public class GroupMetadataServiceImpl
   protected PackageRoot doGeneratePackageRoot(final PackageRequest request) throws IOException {
     final List<NpmRepository> members = (request.isScoped() &&
         !npmGroupRepository.getId().equals(request.getScope())) ? getScopeMembers(request.getScope()) : getMembers();
-    for (NpmRepository member : members) {
-      final PackageRoot root = member.getMetadataService().generatePackageRoot(request);
-      if (root != null) {
-        return root;
+    if (mergeMetadata) {
+      PackageRoot root = null;
+      // apply in reverse order to have "first wins", as package overlay makes overlaid prevail
+      for (NpmRepository member : Lists.reverse(members)) {
+        final PackageRoot memberRoot = member.getMetadataService().generatePackageRoot(request);
+        if (memberRoot != null) {
+          if (root == null) {
+            root = new PackageRoot(npmGroupRepository.getId(), memberRoot.getRaw());
+          }
+          else {
+            root.overlayIgnoringOrigin(memberRoot);
+          }
+        }
       }
+      return root;
     }
-    return null;
+    else {
+      for (NpmRepository member : members) {
+        final PackageRoot root = member.getMetadataService().generatePackageRoot(request);
+        if (root != null) {
+          return root;
+        }
+      }
+      return null;
+    }
   }
 
   @Nullable
