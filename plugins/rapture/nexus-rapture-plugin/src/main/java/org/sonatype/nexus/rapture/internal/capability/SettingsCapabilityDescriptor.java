@@ -66,7 +66,7 @@ public class SettingsCapabilityDescriptor
     @DefaultMessage("Authenticated user status interval")
     String statusIntervalAuthenticatedLabel();
 
-    @DefaultMessage("Interval between status requests for authenticated users(seconds)")
+    @DefaultMessage("Interval between status requests for authenticated users (seconds)")
     String statusIntervalAuthenticatedHelp();
 
     @DefaultMessage("Anonymous user status interval")
