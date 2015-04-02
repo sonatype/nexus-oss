@@ -31,6 +31,7 @@ import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
 import org.sonatype.nexus.repository.view.ViewFacet
+import org.sonatype.nexus.web.BaseUrlHolder
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
@@ -112,13 +113,15 @@ extends DirectComponentSupport
     catch (MissingFacetException e) {
       // no proxy, no remote status
     }
+    
     return new RepositoryXO(
         name: input.name,
         type: input.type,
         format: input.format,
         online: input.facet(ViewFacet).online,
         status: status,
-        attributes: attributeConverter.asAttributes(input.configuration.attributes)
+        attributes: attributeConverter.asAttributes(input.configuration.attributes),
+        url: "${BaseUrlHolder.get()}/repository/${input.name}"
     )
   }
 
