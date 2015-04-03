@@ -93,20 +93,23 @@ public class ConfigurationFacetImpl
     // render log warning and throw exception if any constraints were violated
     if (!violations.isEmpty()) {
       String message = String.format("Validation failed; %d constraints violated", violations.size());
-      StringBuilder buff = new StringBuilder();
-      int c = 0;
-      for (ConstraintViolation<Object> violation : violations) {
-        buff.append("  ").append(++c).append(") ")
-            .append(violation.getMessage())
-            .append(", type: ")
-            .append(violation.getRootBeanClass())
-            .append(", property: ")
-            .append(violation.getPropertyPath())
-            .append(", value: ")
-            .append(violation.getInvalidValue())
-            .append(System.lineSeparator());
+
+      if (log.isWarnEnabled()) {
+        StringBuilder buff = new StringBuilder();
+        int c = 0;
+        for (ConstraintViolation<Object> violation : violations) {
+          buff.append("  ").append(++c).append(") ")
+              .append(violation.getMessage())
+              .append(", type: ")
+              .append(violation.getRootBeanClass())
+              .append(", property: ")
+              .append(violation.getPropertyPath())
+              .append(", value: ")
+              .append(violation.getInvalidValue())
+              .append(System.lineSeparator());
+        }
+        log.warn("{}:{}{}", message, System.lineSeparator(), buff);
       }
-      log.warn("{}:{}{}", message, System.lineSeparator(), buff);
 
       throw new ConstraintViolationException(message, violations);
     }
