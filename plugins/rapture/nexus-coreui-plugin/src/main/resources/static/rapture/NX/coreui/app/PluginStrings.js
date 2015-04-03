@@ -857,6 +857,11 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_PLUGINS_SUMMARY_SITE: 'Site',
     ADMIN_PLUGINS_SUMMARY_DOCUMENTATION: 'Documentation',
 
+    // Admin -> System -> Bundles
+    ADMIN_BUNDLES_TITLE: 'Bundles',
+    ADMIN_BUNDLES_SUBTITLE: 'View OSGI bundles',
+    ADMIN_BUNDLES_LIST_FILTER_ERROR: 'No bundles matched "$filter"',
+
     // Admin -> System -> Tasks
     ADMIN_TASKS_TITLE: 'Tasks',
     ADMIN_TASKS_SUBTITLE: 'Manage scheduled tasks',
