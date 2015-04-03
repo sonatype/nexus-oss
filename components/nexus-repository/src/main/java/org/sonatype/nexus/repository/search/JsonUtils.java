@@ -49,7 +49,7 @@ class JsonUtils
   /**
    * Merges json objects.
    */
-  public static JsonNode merge(JsonNode mainNode, JsonNode updateNode) {
+  public static JsonNode merge(final JsonNode mainNode, final JsonNode updateNode) {
     Iterator<String> fieldNames = updateNode.fieldNames();
     while (fieldNames.hasNext()) {
       String fieldName = fieldNames.next();
