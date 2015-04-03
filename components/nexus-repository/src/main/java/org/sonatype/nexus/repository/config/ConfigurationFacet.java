@@ -31,8 +31,14 @@ public interface ConfigurationFacet
    */
   void save() throws Exception;
 
+  /**
+   * Read object of given type from attributes.
+   */
   <T> T readObject(AttributesMap attributes, Class<T> type);
 
+  /**
+   * Read object of given type from named configuration section.
+   */
   <T> T readObject(String section, Class<T> type);
 
   /**
