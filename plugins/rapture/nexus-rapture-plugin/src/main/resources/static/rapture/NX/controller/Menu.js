@@ -763,7 +763,7 @@ Ext.define('NX.controller.Menu', {
       dirty = me.hasDirt(),
       content = me.getFeatureContent();
 
-    // If false, we’ve already warned the user about the unsaved changes. Don’t warn again.
+    // If true, we’ve already warned the user about the unsaved changes. Don’t warn again.
     if (content.discardUnsavedChanges) {
       // Reset the flag and continue with navigation
       content.resetUnsavedChangesFlag();
@@ -794,7 +794,13 @@ Ext.define('NX.controller.Menu', {
 
     Ext.create('NX.view.UnsavedChanges', {
       content: content,
-      callback: callback
+      callback: function() {
+        // Run the callback
+        callback();
+
+        // Reset the unsaved changes flag
+        content.resetUnsavedChangesFlag();
+      }
     });
   },
 
