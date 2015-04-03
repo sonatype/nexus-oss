@@ -19,7 +19,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.validation.constraints.NotNull;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
@@ -73,7 +72,7 @@ public class StorageFacetImpl
     @NotEmpty
     public String blobStoreName = "default";
 
-    @NotNull
+    //@NotNull
     public WritePolicy writePolicy;
 
     @Override

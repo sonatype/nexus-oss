@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.config;
 
 import java.util.Arrays;
@@ -36,8 +37,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class ConfigurationFacetImpl
-  extends FacetSupport
-  implements ConfigurationFacet
+    extends FacetSupport
+    implements ConfigurationFacet
 {
   private final ConfigurationStore store;
 
@@ -81,15 +82,33 @@ public class ConfigurationFacetImpl
   public void validate(final Object value, final Class<?>... groups) {
     checkNotNull(value);
     checkNotNull(groups);
-    Validator validator = validatorFactory.getValidator();
 
     if (log.isTraceEnabled()) {
       log.trace("Validating: {} in groups: {}", value, Arrays.asList(groups));
     }
+
+    Validator validator = validatorFactory.getValidator();
     Set<ConstraintViolation<Object>> violations = validator.validate(value, groups);
 
+    // render log warning and throw exception if any constraints were violated
     if (!violations.isEmpty()) {
-      throw new ConstraintViolationException(violations);
+      String message = String.format("Validation failed; %d constraints violated", violations.size());
+      StringBuilder buff = new StringBuilder();
+      int c = 0;
+      for (ConstraintViolation<Object> violation : violations) {
+        buff.append("  ").append(++c).append(") ")
+            .append(violation.getMessage())
+            .append(", type: ")
+            .append(violation.getRootBeanClass())
+            .append(", property: ")
+            .append(violation.getPropertyPath())
+            .append(", value: ")
+            .append(violation.getInvalidValue())
+            .append(System.lineSeparator());
+      }
+      log.warn("{}:{}{}", message, System.lineSeparator(), buff.toString());
+
+      throw new ConstraintViolationException(message, violations);
     }
   }
 }
