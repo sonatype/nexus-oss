@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.config;
 
+import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.Facet;
 
 /**
@@ -27,4 +28,8 @@ public interface ConfigurationFacet
    * Persist configuration.
    */
   void save() throws Exception;
+
+  <T> T readObject(AttributesMap attributes, Class<T> type);
+
+  <T> T readObject(String section, Class<T> type);
 }

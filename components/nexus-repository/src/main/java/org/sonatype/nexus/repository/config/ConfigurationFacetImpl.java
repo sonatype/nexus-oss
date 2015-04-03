@@ -15,7 +15,10 @@ package org.sonatype.nexus.repository.config;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.FacetSupport;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,14 +34,33 @@ public class ConfigurationFacetImpl
 {
   private final ConfigurationStore store;
 
+  private final ObjectMapper objectMapper;
+
   @Inject
-  public ConfigurationFacetImpl(final ConfigurationStore store) {
+  public ConfigurationFacetImpl(final ConfigurationStore store,
+                                final @Named(ConfigurationObjectMapperProvider.NAME) ObjectMapper objectMapper)
+  {
     this.store = checkNotNull(store);
+    this.objectMapper = checkNotNull(objectMapper);
   }
 
   @Override
   public void save() throws Exception {
     store.update(getRepository().getConfiguration());
     log.debug("Saved");
+  }
+
+  @Override
+  public <T> T readObject(final AttributesMap attributes, final Class<T> type) {
+    checkNotNull(attributes);
+    checkNotNull(type);
+    return objectMapper.convertValue(attributes.backing(), type);
+  }
+
+  @Override
+  public <T> T readObject(final String section, final Class<T> type) {
+    checkNotNull(section);
+    AttributesMap attributes = getRepository().getConfiguration().attributes(section);
+    return readObject(attributes, type);
   }
 }
