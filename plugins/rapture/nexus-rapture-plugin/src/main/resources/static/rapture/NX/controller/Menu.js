@@ -136,12 +136,12 @@ Ext.define('NX.controller.Menu', {
           beforesearch: me.warnBeforeSearch
         },
         '#breadcrumb button': {
-          click: me.warnBeforeBreadcrumbNav
-        },
-        'nx-drilldown-actions button:not([action=delete]):not([menu])': {
           click: me.warnBeforeButtonClick
         },
-        'nx-drilldown-actions menuitem': {
+        'nx-drilldown-actions button[handler]': {
+          click: me.warnBeforeButtonClick
+        },
+        'nx-drilldown-actions menuitem[handler]': {
           click: me.warnBeforeButtonClick
         },
         'button[mode]': {
@@ -713,20 +713,6 @@ Ext.define('NX.controller.Menu', {
 
   /**
    * @private
-   * Check for unsaved changes before navigating via the breadcrumb
-   */
-  warnBeforeBreadcrumbNav: function(button, e) {
-    var me = this;
-
-    return me.warnBeforeNavigate(
-      function() {
-        button.handler.call(button.scope, button, e);
-      }
-    );
-  },
-
-  /**
-   * @private
    * Check for unsaved changes before clicking a button
    */
   warnBeforeButtonClick: function(button, e) {
@@ -734,7 +720,7 @@ Ext.define('NX.controller.Menu', {
 
     return me.warnBeforeNavigate(
       function() {
-        button.fireEvent('click', button, e);
+        button.handler.call(button.scope, button, e);
       }
     );
   },

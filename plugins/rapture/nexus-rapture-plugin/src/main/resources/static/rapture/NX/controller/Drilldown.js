@@ -143,16 +143,6 @@ Ext.define('NX.controller.Drilldown', {
     if (me.features) {
       me.getApplication().getFeaturesController().registerFeature(me.features, me);
     }
-
-    me.addEvents(
-      /**
-       * @event beforeaction
-       * Fires before an action is performed
-       *
-       * @param button The button to click
-       */
-      'beforeaction'
-    );
   },
 
   /**
