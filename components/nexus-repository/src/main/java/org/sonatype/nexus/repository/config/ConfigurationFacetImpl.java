@@ -106,7 +106,7 @@ public class ConfigurationFacetImpl
             .append(violation.getInvalidValue())
             .append(System.lineSeparator());
       }
-      log.warn("{}:{}{}", message, System.lineSeparator(), buff.toString());
+      log.warn("{}:{}{}", message, System.lineSeparator(), buff);
 
       throw new ConstraintViolationException(message, violations);
     }
