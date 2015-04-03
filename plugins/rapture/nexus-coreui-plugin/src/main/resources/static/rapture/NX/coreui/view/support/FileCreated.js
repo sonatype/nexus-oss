@@ -53,7 +53,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
       items: [
         {
           xtype: 'form',
-          bodyPadding: 10,
+          ui: 'nx-inset',
           defaults: {
             anchor: '100%'
           },

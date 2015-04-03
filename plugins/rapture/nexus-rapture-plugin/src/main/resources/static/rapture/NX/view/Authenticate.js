@@ -52,7 +52,7 @@ Ext.define('NX.view.Authenticate', {
     Ext.apply(this, {
       items: {
         xtype: 'form',
-        bodyPadding: 10,
+        ui: 'nx-inset',
         defaultType: 'textfield',
         defaults: {
           anchor: '100%'
