@@ -265,7 +265,9 @@ Ext.define('NX.view.drilldown.Drilldown', {
       if (i != index) {
         items[i].getLayout().setActiveItem(me.BLANK_INDEX);
         Ext.each(items[i].query('nx-settingsform'), function(panel) {
-          panel.getForm().reset();
+          if (panel.getForm().isDirty()) {
+            panel.getForm().reset();
+          }
         });
       }
     }
