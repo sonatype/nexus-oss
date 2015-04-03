@@ -12,8 +12,15 @@
  */
 package org.sonatype.nexus.repository.config;
 
+import java.util.Arrays;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.FacetSupport;
@@ -36,12 +43,16 @@ public class ConfigurationFacetImpl
 
   private final ObjectMapper objectMapper;
 
+  private final ValidatorFactory validatorFactory;
+
   @Inject
   public ConfigurationFacetImpl(final ConfigurationStore store,
-                                final @Named(ConfigurationObjectMapperProvider.NAME) ObjectMapper objectMapper)
+                                final @Named(ConfigurationObjectMapperProvider.NAME) ObjectMapper objectMapper,
+                                final ValidatorFactory validatorFactory)
   {
     this.store = checkNotNull(store);
     this.objectMapper = checkNotNull(objectMapper);
+    this.validatorFactory = checkNotNull(validatorFactory);
   }
 
   @Override
@@ -54,13 +65,31 @@ public class ConfigurationFacetImpl
   public <T> T readObject(final AttributesMap attributes, final Class<T> type) {
     checkNotNull(attributes);
     checkNotNull(type);
+    log.trace("Reading object type: {}", type);
     return objectMapper.convertValue(attributes.backing(), type);
   }
 
   @Override
   public <T> T readObject(final String section, final Class<T> type) {
     checkNotNull(section);
+    log.trace("Reading section: {}", section);
     AttributesMap attributes = getRepository().getConfiguration().attributes(section);
     return readObject(attributes, type);
+  }
+
+  @Override
+  public void validate(final Object value, final Class<?>... groups) {
+    checkNotNull(value);
+    checkNotNull(groups);
+    Validator validator = validatorFactory.getValidator();
+
+    if (log.isTraceEnabled()) {
+      log.trace("Validating: {} in groups: {}", value, Arrays.asList(groups));
+    }
+    Set<ConstraintViolation<Object>> violations = validator.validate(value, groups);
+
+    if (!violations.isEmpty()) {
+      throw new ConstraintViolationException(violations);
+    }
   }
 }

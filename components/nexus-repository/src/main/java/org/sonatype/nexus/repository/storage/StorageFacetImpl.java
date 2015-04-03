@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.validation.constraints.NotNull;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
@@ -44,6 +45,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import com.tinkerpop.blueprints.impls.orient.OrientVertexType;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
@@ -68,8 +70,10 @@ public class StorageFacetImpl
 
   private static class Config
   {
+    @NotEmpty
     public String blobStoreName = "default";
 
+    @NotNull
     public WritePolicy writePolicy;
 
     @Override
@@ -97,8 +101,10 @@ public class StorageFacetImpl
 
   @Override
   protected void doConfigure() throws Exception {
-    config = facet(ConfigurationFacet.class).readObject(CONFIG_KEY, Config.class);
+    ConfigurationFacet configuration = facet(ConfigurationFacet.class);
+    config = configuration.readObject(CONFIG_KEY, Config.class);
     log.debug("Config: {}", config);
+    configuration.validate(config);
   }
 
   @Override
