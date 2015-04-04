@@ -29,8 +29,12 @@ Ext.define('NX.coreui.view.support.Metrics', {
   ui: 'nx-inset',
 
   autoScroll: true,
-  layout: {
-    type: 'vbox'
+  layout: 'column',
+
+  defaults: {
+    style: {
+      margin: '0px 20px 20px 0px'
+    }
   },
 
   tbar: [
@@ -51,115 +55,96 @@ Ext.define('NX.coreui.view.support.Metrics', {
     }
   ],
 
-  defaults: {
-    style: {
-      margin: '20px 0px 0px 0px'
-    }
-  },
-
   items: [
     {
       xtype: 'panel',
-      layout: {
-        type: 'hbox'
-      },
-      defaults: {
-        style: {
-          margin: '0px 20px 0px 0px'
-        }
-      },
+      title: NX.I18n.get('ADMIN_METRICS_USAGE_SECTION'),
+      frame: true,
+      ui: 'nx-subsection',
+      height: 240,
+      width: 300,
+      layout: 'fit',
+
       items: [
         {
-          xtype: 'panel',
-          title: NX.I18n.get('ADMIN_METRICS_USAGE_SECTION'),
-          frame: true,
-          ui: 'nx-subsection',
-          height: 240,
-          width: 300,
-          layout: 'fit',
+          xtype: 'chart',
+          itemId: 'memoryUsage',
 
-          items: [
+          animate: false,
+          insetPadding: 40,
+
+          store: Ext.create('Ext.data.ArrayStore', {
+            fields: ['value']
+          }),
+
+          axes: [
             {
-              xtype: 'chart',
-              itemId: 'memoryUsage',
-
-              animate: false,
-              insetPadding: 40,
-
-              store: Ext.create('Ext.data.ArrayStore', {
-                fields: ['value']
-              }),
-
-              axes: [
-                {
-                  type: 'gauge',
-                  position: 'gauge',
-                  minimum: 0,
-                  maximum: 100,
-                  steps: 10
-                }
-              ],
-
-              series: [
-                {
-                  type: 'gauge',
-                  field: 'value',
-                  donut: 30,
-                  colorSet: ['#F49D10', '#ddd'],
-
-                  tips: {
-                    trackMouse: true,
-                    renderer: function (storeItem, item) {
-                      this.setTitle('Memory used: ' + storeItem.get('value') + '%');
-                    }
-                  }
-                }
-              ]
+              type: 'gauge',
+              position: 'gauge',
+              minimum: 0,
+              maximum: 100,
+              steps: 10
             }
-          ]
-        },
-        {
-          xtype: 'panel',
-          title: NX.I18n.get('ADMIN_METRICS_DISTRIBUTION_SECTION'),
-          frame: true,
-          ui: 'nx-subsection',
-          height: 240,
-          width: 300,
-          layout: 'fit',
+          ],
 
-          items: [
+          series: [
             {
-              xtype: 'chart',
-              itemId: 'memoryDist',
-              animate: false,
-              insetPadding: 20,
-              theme: 'Green',
+              type: 'gauge',
+              field: 'value',
+              donut: 30,
+              colorSet: ['#F49D10', '#ddd'],
 
-              store: Ext.create('Ext.data.ArrayStore', {
-                fields: ['name', 'data']
-              }),
-
-              series: [
-                {
-                  type: 'pie',
-                  angleField: 'data',
-                  showInLegend: true,
-
-                  tips: {
-                    trackMouse: true,
-                    renderer: function (storeItem, item) {
-                      this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data') + ' bytes');
-                    }
-                  }
+              tips: {
+                trackMouse: true,
+                renderer: function (storeItem, item) {
+                  this.setTitle('Memory used: ' + storeItem.get('value') + '%');
                 }
-              ],
-
-              legend: {
-                position: 'right',
-                boxStrokeWidth: 0
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      xtype: 'panel',
+      title: NX.I18n.get('ADMIN_METRICS_DISTRIBUTION_SECTION'),
+      frame: true,
+      ui: 'nx-subsection',
+      height: 240,
+      width: 300,
+      layout: 'fit',
+
+      items: [
+        {
+          xtype: 'chart',
+          itemId: 'memoryDist',
+          animate: false,
+          insetPadding: 20,
+          theme: 'Green',
+
+          store: Ext.create('Ext.data.ArrayStore', {
+            fields: ['name', 'data']
+          }),
+
+          series: [
+            {
+              type: 'pie',
+              angleField: 'data',
+              showInLegend: true,
+
+              tips: {
+                trackMouse: true,
+                renderer: function (storeItem, item) {
+                  this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data') + ' bytes');
+                }
+              }
+            }
+          ],
+
+          legend: {
+            position: 'right',
+            boxStrokeWidth: 0
+          }
         }
       ]
     },
