@@ -851,6 +851,11 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_BUNDLES_LIST_VERSION_COLUMN: 'Version',
     ADMIN_BUNDLES_LIST_STATE_COLUMN: 'State',
     ADMIN_BUNDLES_LIST_LOCATION_COLUMN: 'Location',
+    ADMIN_BUNDLES_SUMMARY_ID: 'ID',
+    ADMIN_BUNDLES_SUMMARY_NAME: 'Name',
+    ADMIN_BUNDLES_SUMMARY_VERSION: 'Version',
+    ADMIN_BUNDLES_SUMMARY_STATE: 'State',
+    ADMIN_BUNDLES_SUMMARY_LOCATION: 'Location',
 
     // Admin -> System -> Tasks
     ADMIN_TASKS_TITLE: 'Tasks',

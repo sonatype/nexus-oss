@@ -74,24 +74,14 @@ Ext.define('NX.coreui.controller.Bundles', {
     var me = this,
         info;
 
-    //if (Ext.isDefined(model)) {
-    //  info = {};
-    //  info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_NAME')] = model.get('name');
-    //  info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_VERSION')] = model.get('version');
-    //  info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_STATUS')] = model.get('status');
-    //  //info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_DESCRIPTION') = model.get('description');
-    //  //info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_SCM_VERSION') = model.get('scmVersion');
-    //  //info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_SCM_TIMESTAMP') = model.get('scmTimestamp');
-    //  //info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_SITE') = NX.util.Url.asLink(model.get('site'));
-    //  if (Ext.isDefined(model.get('documentation'))) {
-    //    Ext.each(model.get('documentation'), function (doc) {
-    //      if (!Ext.isEmpty(doc.url)) {
-    //        info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_DOCUMENTATION')] = NX.util.Url.asLink(doc.url, doc.label);
-    //      }
-    //    });
-    //  }
-    //  me.getInfo().showInfo(info);
-    //}
+    if (Ext.isDefined(model)) {
+      info = {};
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_ID')] = model.get('id');
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_NAME')] = model.get('symbolicName');
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_VERSION')] = model.get('version');
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_STATE')] = model.get('state');
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_LOCATION')] = model.get('location');
+      me.getInfo().showInfo(info);
+    }
   }
-
 });
