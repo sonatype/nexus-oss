@@ -18,9 +18,11 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.view.Payload;
 
+import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
 
 /**
@@ -59,6 +61,15 @@ public interface NugetGalleryFacet
   DateTime getLastUpdatedDate(String id, String version);
 
   /**
+   * Extracts the expected hashes of the package binary from package metadata.
+   *
+   * @param id      package id
+   * @param version package version
+   * @return expected hashes
+   */
+  Map<HashAlgorithm, HashCode> getExpectedHashes(String id, String version);
+
+  /**
    * Delete a package and return whether it existed.
    */
   boolean delete(String id, String version) throws IOException;
@@ -89,4 +100,5 @@ public interface NugetGalleryFacet
    * @param parameters OData query parameters
    */
   public int count(final String operation, final Map<String, String> parameters);
+
 }

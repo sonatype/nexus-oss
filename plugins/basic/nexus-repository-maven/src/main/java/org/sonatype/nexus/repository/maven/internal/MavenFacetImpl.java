@@ -34,7 +34,6 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
-import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -119,8 +118,6 @@ public class MavenFacetImpl
 
   private VersionPolicy versionPolicy;
 
-  private ChecksumPolicy checksumPolicy;
-
   @Inject
   public MavenFacetImpl(final MimeSupport mimeSupport, final Map<String, MavenPathParser> mavenPathParsers) {
     this.mimeSupport = checkNotNull(mimeSupport);
@@ -137,9 +134,6 @@ public class MavenFacetImpl
     this.versionPolicy = VersionPolicy.valueOf(
         attributes.require("versionPolicy", String.class)
     );
-    this.checksumPolicy = ChecksumPolicy.valueOf(
-        attributes.require("checksumPolicy", String.class)
-    );
   }
 
   @Nonnull
@@ -152,12 +146,6 @@ public class MavenFacetImpl
   @Override
   public VersionPolicy getVersionPolicy() {
     return versionPolicy;
-  }
-
-  @Nonnull
-  @Override
-  public ChecksumPolicy getChecksumPolicy() {
-    return checksumPolicy;
   }
 
   @Nullable
