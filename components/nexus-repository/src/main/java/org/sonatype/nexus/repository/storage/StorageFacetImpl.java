@@ -31,6 +31,7 @@ import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -65,9 +66,11 @@ public class StorageFacetImpl
 
   private final ComponentMetadataFactory componentMetadataFactory;
 
-  public static final String CONFIG_KEY = "storage";
+  @VisibleForTesting
+  static final String CONFIG_KEY = "storage";
 
-  private static class Config
+  @VisibleForTesting
+  static class Config
   {
     @NotEmpty
     public String blobStoreName = "default";

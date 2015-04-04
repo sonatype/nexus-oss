@@ -22,7 +22,7 @@ import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.orient.PersistentDatabaseInstanceRule;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -89,17 +89,18 @@ public class StorageFacetImplIT
     );
     underTest.installDependencies(mock(EventBus.class));
 
-    NestedAttributesMap storageAttributes = new NestedAttributesMap(
-        "storage", ImmutableMap.of("blobStoreName", (Object) "default"));
-    Configuration testConfiguration = mock(Configuration.class);
-    when(testConfiguration.attributes(anyString())).thenReturn(storageAttributes);
+    StorageFacetImpl.Config config = new StorageFacetImpl.Config();
+    ConfigurationFacet configurationFacet = mock(ConfigurationFacet.class);
+    when(configurationFacet.readObject(StorageFacetImpl.CONFIG_KEY, StorageFacetImpl.Config.class)).thenReturn(config);
 
     when(testRepository1.getName()).thenReturn("test-repository-1");
-    when(testRepository1.getConfiguration()).thenReturn(testConfiguration);
+    when(testRepository1.facet(ConfigurationFacet.class)).thenReturn(configurationFacet);
     when(testRepository1.facet(SearchFacet.class)).thenReturn(mock(SearchFacet.class));
+
     when(testRepository2.getName()).thenReturn("test-repository-2");
-    when(testRepository2.getConfiguration()).thenReturn(testConfiguration);
+    when(testRepository2.facet(ConfigurationFacet.class)).thenReturn(configurationFacet);
     when(testRepository2.facet(SearchFacet.class)).thenReturn(mock(SearchFacet.class));
+
     underTest.init(testRepository1);
     underTest.start();
   }
