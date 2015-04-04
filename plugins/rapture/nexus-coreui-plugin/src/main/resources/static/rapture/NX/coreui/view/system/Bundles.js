@@ -21,7 +21,7 @@ Ext.define('NX.coreui.view.system.Bundles', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-system-bundles',
 
-  iconName: 'plugin-default',
+  iconName: 'bundle-default',
 
   masters: { xtype: 'nx-coreui-system-bundlelist' }
 });

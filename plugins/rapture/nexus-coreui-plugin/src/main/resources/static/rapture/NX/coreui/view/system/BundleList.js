@@ -32,18 +32,17 @@ Ext.define('NX.coreui.view.system.BundleList', {
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
-        return 'plugin-default';
+        return 'bundle-default';
       }
     },
-    {header: 'ID', dataIndex: 'id'},
-    {header: 'Name', dataIndex: 'symbolicName', flex: 2},
-    {header: 'Version', dataIndex: 'version', flex: 1},
-    {header: 'State', dataIndex: 'state'},
-    {header: 'Location', dataIndex: 'location', flex: 1, hidden: true}
+    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_ID_COLUMN'), dataIndex: 'id'},
+    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_NAME_COLUMN'), dataIndex: 'symbolicName', flex: 2},
+    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_VERSION_COLUMN'), dataIndex: 'version', flex: 1},
+    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_STATE_COLUMN'), dataIndex: 'state'},
+    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_LOCATION_COLUMN'), dataIndex: 'location', flex: 1, hidden: true}
   ],
 
   plugins: [
     { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_BUNDLES_LIST_FILTER_ERROR') }
   ]
-
 });

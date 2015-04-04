@@ -128,12 +128,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
-      id: 'NX.coreui.controller.PluginConsole',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-plugin-console-plugin');
-      }
-    },
-    {
       id: 'NX.coreui.controller.Bundles',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');

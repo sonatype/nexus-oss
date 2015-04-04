@@ -51,12 +51,13 @@ Ext.define('NX.coreui.controller.Bundles', {
       variants: ['x16', 'x32']
     },
     visible: function () {
+      // FIXME: Update permission
       return NX.Permissions.check('nexus:pluginconsoleplugininfos', 'read');
     }
   },
 
   icons: {
-    'plugin-default': {
+    'bundle-default': {
       file: 'plugin.png',
       variants: ['x16', 'x32']
     }
@@ -66,8 +67,7 @@ Ext.define('NX.coreui.controller.Bundles', {
    * @override
    */
   getDescription: function (model) {
-    //return model.get('name');
-    return 'TEST'
+    return model.get('symbolicName');
   },
 
   onSelection: function (list, model) {

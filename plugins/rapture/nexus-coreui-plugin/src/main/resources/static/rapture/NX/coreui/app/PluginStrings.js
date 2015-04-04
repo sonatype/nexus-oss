@@ -842,25 +842,15 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_HTTPS_PROXY_PORT: 'HTTPS proxy port',
     ADMIN_HTTPS_PROXY_AUTHENTICATION: 'Authentication',
 
-    // Admin -> System -> Plugins
-    ADMIN_PLUGINS_TITLE: 'Plugins',
-    ADMIN_PLUGINS_SUBTITLE: 'View installed plugins',
-    ADMIN_PLUGINS_LIST_NAME_COLUMN: 'Name',
-    ADMIN_PLUGINS_LIST_VERSION_COLUMN: 'Version',
-    ADMIN_PLUGINS_LIST_FILTER_ERROR: 'No plugins matched "$filter"',
-    ADMIN_PLUGINS_SUMMARY_NAME: 'Name',
-    ADMIN_PLUGINS_SUMMARY_VERSION: 'Version',
-    ADMIN_PLUGINS_SUMMARY_STATUS: 'Status',
-    ADMIN_PLUGINS_SUMMARY_DESCRIPTION: 'Description',
-    ADMIN_PLUGINS_SUMMARY_SCM_VERSION: 'SCM version',
-    ADMIN_PLUGINS_SUMMARY_SCM_TIMESTAMP: 'SCM timestamp',
-    ADMIN_PLUGINS_SUMMARY_SITE: 'Site',
-    ADMIN_PLUGINS_SUMMARY_DOCUMENTATION: 'Documentation',
-
     // Admin -> System -> Bundles
     ADMIN_BUNDLES_TITLE: 'Bundles',
     ADMIN_BUNDLES_SUBTITLE: 'View OSGI bundles',
     ADMIN_BUNDLES_LIST_FILTER_ERROR: 'No bundles matched "$filter"',
+    ADMIN_BUNDLES_LIST_ID_COLUMN: 'ID',
+    ADMIN_BUNDLES_LIST_NAME_COLUMN: 'Name',
+    ADMIN_BUNDLES_LIST_VERSION_COLUMN: 'Version',
+    ADMIN_BUNDLES_LIST_STATE_COLUMN: 'State',
+    ADMIN_BUNDLES_LIST_LOCATION_COLUMN: 'Location',
 
     // Admin -> System -> Tasks
     ADMIN_TASKS_TITLE: 'Tasks',
