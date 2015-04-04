@@ -8,7 +8,7 @@
 @include extjs-panel-ui(
   $ui: 'nx-feature-content',
 
-  $ui-header-padding: 10px 8px 12px 10px,
+  $ui-header-padding: 10px 8px 10px 10px,
   $ui-header-background-color: $color-white,
   $ui-body-background-color: $color-light-smoke,
   $ui-header-icon-height: 32,
@@ -18,10 +18,17 @@
   $ui-tool-background-image: $panel-light-tool-background-image
 );
 
-.nx-feature-content > .x-panel-body > div {
-  border-width: 1px 0 0 0;
-  border-color: $color-gainsboro;
-  border-style: solid;
+.nx-feature-content {
+  .nx-actions {
+    background-color: $color-white;
+    border-width: 0 0 1px 0 !important;
+    border-color: $color-gainsboro;
+    border-style: solid;
+
+    &.nx-borderless {
+      border-style: none !important;
+    }
+  }
 }
 
 /**
@@ -77,6 +84,15 @@
   .x-panel-body {
     .x-toolbar {
       padding: 6px 0 6px 0;
+    }
+  }
+}
+
+.x-panel-body {
+  .x-toolbar {
+    padding: 0 8px 0 0;
+    .x-toolbar-item {
+      margin: 6px 0 6px 8px;
     }
   }
 }

@@ -181,7 +181,7 @@ Ext.define('NX.coreui_legacy.controller.Repositories', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-drilldown-actions' },
+        { xtype: 'nx-actions' },
         {
           xtype: 'nx-coreui_legacy-repository-selecttemplate',
           flex: 1

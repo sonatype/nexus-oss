@@ -263,7 +263,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-drilldown-actions' },
+        { xtype: 'nx-actions' },
         {
           xtype: 'nx-coreui-capability-selecttype',
           flex: 1

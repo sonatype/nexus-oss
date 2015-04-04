@@ -74,7 +74,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
           xtype: 'nx-coreui-search-result-details'
         },
         {
-          xtype: 'nx-drilldown-actions'
+          xtype: 'nx-actions'
         },
         {
           xtype: 'nx-coreui-search-result-asset-list',
@@ -95,7 +95,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
     items: [
       {
-        xtype: 'nx-drilldown-actions'
+        xtype: 'nx-actions'
       },
       {
         xtype: 'nx-coreui-component-assetcontainer',

@@ -20,7 +20,12 @@
 Ext.define('NX.view.SettingsPanel', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-settingsPanel',
-  ui: 'nx-inset',
+
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions'
+  }],
 
   layout: {
     type: 'vbox',

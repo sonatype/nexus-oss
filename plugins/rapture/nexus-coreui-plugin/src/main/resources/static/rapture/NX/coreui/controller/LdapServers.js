@@ -200,7 +200,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-drilldown-actions' },
+        { xtype: 'nx-actions' },
         {
           xtype: 'nx-coreui-ldapserver-connection-add',
           flex: 1
@@ -226,7 +226,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-drilldown-actions' },
+        { xtype: 'nx-actions' },
         {
           xtype: 'nx-coreui-ldapserver-userandgroup-add',
           flex: 1
