@@ -52,7 +52,7 @@ Ext.define('NX.coreui.controller.Bundles', {
     },
     visible: function () {
       // FIXME: Update permission
-      return NX.Permissions.check('nexus:pluginconsoleplugininfos', 'read');
+      return NX.Permissions.check('nexus:*', 'read');
     }
   },
 
