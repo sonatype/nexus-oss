@@ -67,20 +67,37 @@ Ext.define('NX.coreui.controller.Bundles', {
    * @override
    */
   getDescription: function (model) {
-    return model.get('symbolicName');
+    return model.get('name');
   },
 
   onSelection: function (list, model) {
     var me = this,
-        info;
+        info,
+        headers;
+
+    // TODO: Resolve better presentation
 
     if (Ext.isDefined(model)) {
       info = {};
       info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_ID')] = model.get('id');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_NAME')] = model.get('symbolicName');
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_NAME')] = model.get('name');
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_SYMBOLIC_NAME')] = model.get('symbolicName');
       info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_VERSION')] = model.get('version');
       info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_STATE')] = model.get('state');
       info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_LOCATION')] = model.get('location');
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_START_LEVEL')] = model.get('startLevel');
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_LAST_MODIFIED')] = model.get('lastModified');
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_FRAGMENT')] = model.get('fragment');
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_FRAGMENTS')] = model.get('fragments');
+      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_FRAGMENT_HOSTS')] = model.get('fragmentHosts');
+
+      headers = model.get('headers');
+      if (headers) {
+        Ext.iterate(headers, function (key, value) {
+          info[NX.I18n.format('ADMIN_BUNDLES_SUMMARY_HEADER', key)] = value;
+        });
+      }
+
       me.getInfo().showInfo(info);
     }
   }
