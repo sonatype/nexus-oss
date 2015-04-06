@@ -25,18 +25,40 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
   ],
 
   store: 'NX.coreui.store.Repository',
-
+  
   columns: [
     {
       xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
-      iconName: function() {
-        return 'repository-default';
+      iconName: function(value, meta, record) {
+        switch((record.get('type'))) {
+          case 'proxy':
+            return 'repository-proxy';
+          case 'group':
+            return 'repository-group';
+          default :
+            return 'repository-hosted';
+        }
       }
     },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_TYPE_COLUMN'), dataIndex: 'type' },
+    //{
+    //  xtype: 'nx-iconcolumn',
+    //  width: 36,
+    //  iconVariant: 'x16',
+    //  iconName: function(value, meta, record) {
+    //    switch((record.get('format'))) {
+    //      case 'maven2':
+    //        return 'repository-maven';
+    //      case 'nuget':
+    //        return 'repository-nuget';
+    //      default :
+    //        return 'repository-hosted';
+    //    }
+    //  }
+    //},
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_FORMAT_COLUMN'), dataIndex: 'format' },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_STATUS_COLUMN'), dataIndex: 'status', flex: 1 }
   ],
