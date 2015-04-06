@@ -24,11 +24,17 @@ Ext.define('NX.view.dashboard.Welcome', {
     'NX.util.Url'
   ],
 
-  layout: {
-    type: 'vbox',
-    align: 'stretch',
-    pack: 'start'
+  layout: 'fit',
+
+  style: {
+    'margin-bottom': '12px'
   },
+
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions'
+  }],
 
   /**
    * @override
@@ -36,28 +42,48 @@ Ext.define('NX.view.dashboard.Welcome', {
   initComponent: function () {
     var me = this;
 
-    me.items = [
-      //NOTE: Using custom welcome icon for milestones
-      //{
-      //  xtype: 'image',
-      //  cls: 'nx-icon-nexus-x100',
-      //  style: {
-      //    margin: '100px 0 0 0'
-      //  }
-      //},
-      {
-        xtype: 'image',
-        src: NX.util.Url.urlOf('/static/rapture/resources/images/nexus-milestone.png'), // 160x130
-        height: 130,
-        width: 160,
-        autoEl: 'div',
-        style: {
-          'text-align': 'center',
-          'vertical-align': 'middle',
-          margin: '100px 0 0 0'
-        }
+    me.items = {
+      xtype: 'panel',
+      ui: 'nx-inset',
+
+      layout: 'fit',
+
+      items: {
+        xtype: 'panel',
+        itemId: 'nx-dashboard-div',
+        ui: 'nx-subsection',
+        frame: true,
+
+        layout: {
+          type: 'vbox',
+          align: 'stretch',
+          pack: 'start'
+        },
+
+        items: [
+          //NOTE: Using custom welcome icon for milestones
+          //{
+          //  xtype: 'image',
+          //  cls: 'nx-icon-nexus-x100',
+          //  style: {
+          //    margin: '100px 0 0 0'
+          //  }
+          //},
+          {
+            xtype: 'image',
+            src: NX.util.Url.urlOf('/static/rapture/resources/images/nexus-milestone.png'), // 160x130
+            height: 130,
+            width: 160,
+            autoEl: 'div',
+            style: {
+              'text-align': 'center',
+              'vertical-align': 'middle',
+              margin: '50px 0 0 0'
+            }
+          }
+        ]
       }
-    ];
+    };
 
     me.callParent();
   }

@@ -171,7 +171,8 @@
       background-color: $color-light-gray;
     }
     .x-grid-row-selected .x-grid-td {
-      background-color: $color-white;
+      color: $color-white;
+      background-color: $color-cerulean-blue;
     }
   }
 }
