@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-coreui-role-settings-form',
       api: {
         submit: 'NX.direct.coreui_Role.create'

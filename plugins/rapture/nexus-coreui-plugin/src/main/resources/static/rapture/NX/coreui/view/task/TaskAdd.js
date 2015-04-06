@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
   initComponent: function () {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-coreui-task-settings-form',
 
       buttons: [

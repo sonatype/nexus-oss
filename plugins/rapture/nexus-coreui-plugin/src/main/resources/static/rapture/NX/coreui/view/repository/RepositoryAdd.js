@@ -34,7 +34,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-coreui-repository-settings-form',
       api: {
         submit: 'NX.direct.coreui_Repository.create'

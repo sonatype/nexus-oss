@@ -53,7 +53,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
     me.repositoryStore = Ext.create('NX.coreui_legacy.store.RepositoryReference');
     me.repositoryStore.load();
 
-    me.items = [
+    me.settingsForm = [
       {
         xtype: 'hiddenfield',
         name: 'id'

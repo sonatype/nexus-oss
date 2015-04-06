@@ -33,7 +33,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
   initComponent: function () {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-settingsform',
       api: {
         submit: 'NX.direct.ldap_LdapServer.create'

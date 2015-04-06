@@ -27,7 +27,7 @@ Ext.define('NX.coreui.view.logging.LoggerAdd', {
 
   defaultFocus: 'name',
 
-  items: {
+  settingsForm: {
     xtype: 'nx-settingsform',
     items: [
       {

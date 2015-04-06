@@ -27,7 +27,7 @@ Ext.define('NX.coreui_legacy.view.repository.RepositoryAddProxy', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-repository-settings-proxy-form',
       template: me.template,
       api: {

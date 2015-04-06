@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionAdd', {
   initComponent: function () {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-coreui-ldapserver-connection-form',
 
       buttons: [

@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
   initComponent: function () {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-coreui-capability-settings-form',
 
       buttons: [

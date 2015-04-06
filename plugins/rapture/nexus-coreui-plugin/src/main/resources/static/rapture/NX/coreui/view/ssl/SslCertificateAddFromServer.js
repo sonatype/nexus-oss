@@ -34,7 +34,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
   initComponent: function () {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-settingsform',
       settingsFormSubmitOnEnter: true,
 

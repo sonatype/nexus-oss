@@ -27,7 +27,7 @@ Ext.define('NX.coreui.view.search.SaveSearchFilter', {
   title: NX.I18n.get('BROWSE_SEARCH_SAVE_TITLE'),
   defaultFocus: 'name',
 
-  items: {
+  settingsForm: {
     xtype: 'nx-settingsform',
     items: [
       {

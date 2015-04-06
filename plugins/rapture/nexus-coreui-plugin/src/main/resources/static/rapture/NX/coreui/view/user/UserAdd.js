@@ -34,7 +34,7 @@ Ext.define('NX.coreui.view.user.UserAdd', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-coreui-user-settings-form',
       api: {
         submit: 'NX.direct.coreui_User.create'
