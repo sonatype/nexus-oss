@@ -23,15 +23,6 @@ import org.sonatype.nexus.repository.Facet;
 public interface StorageFacet
   extends Facet
 {
-  static String E_CONTAINS_COMPONENTS_WITH_LABEL = "contains_components_with_label";
-
-  static String E_HAS_LABEL = "has_label";
-
-  static String E_OWNS_ASSET = "owns_asset";
-
-  static String E_OWNS_COMPONENT = "owns_component";
-
-  static String E_PART_OF_COMPONENT = "part_of_component";
 
   static String P_ATTRIBUTES = "attributes";
 
