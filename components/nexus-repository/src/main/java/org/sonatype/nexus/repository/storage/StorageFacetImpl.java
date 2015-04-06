@@ -14,8 +14,8 @@
 package org.sonatype.nexus.repository.storage;
 
 import java.util.Date;
+import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -25,25 +25,19 @@ import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.orient.DatabaseInstance;
-import org.sonatype.nexus.orient.graph.GraphTx;
+import org.sonatype.nexus.orient.ODatabaseListenerSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.orientechnologies.orient.core.db.ODatabase;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.hook.ODocumentHookAbstract;
+import com.orientechnologies.orient.core.hook.ORecordHook;
 import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.Parameter;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
-import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
-import com.tinkerpop.blueprints.impls.orient.OrientVertexType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
@@ -66,6 +60,12 @@ public class StorageFacetImpl
 
   private final ComponentMetadataFactory componentMetadataFactory;
 
+  private final BucketEntityAdapter bucketEntityAdapter;
+
+  private final ComponentEntityAdapter componentEntityAdapter;
+
+  private final AssetEntityAdapter assetEntityAdapter;
+
   private String blobStoreName;
 
   private ORID bucketId;
@@ -80,6 +80,11 @@ public class StorageFacetImpl
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
     this.componentMetadataFactory = checkNotNull(componentMetadataFactory);
+
+
+    bucketEntityAdapter = new BucketEntityAdapter();
+    componentEntityAdapter = new ComponentEntityAdapter(bucketEntityAdapter);
+    assetEntityAdapter = new AssetEntityAdapter(bucketEntityAdapter, componentEntityAdapter);
   }
 
   @Override
@@ -103,83 +108,25 @@ public class StorageFacetImpl
   }
 
   private void initSchema() {
-    // initialize the graph schema if needed
-    final CheckedGraphNoTx graph = new CheckedGraphNoTx(databaseInstanceProvider.get().acquire());
-    graph.setUseLightweightEdges(true);
-    try {
-      initVertexType(graph, V_ASSET, new Predicate<OrientVertexType>()
-      {
-        @SuppressWarnings("unchecked")
-        @Override
-        public boolean apply(final OrientVertexType type) {
-          type.createProperty(P_PATH, OType.STRING);
-          graph.createKeyIndex(P_PATH, Vertex.class, new Parameter("class", V_ASSET));
-          return true;
-        }
-      });
-      initVertexType(graph, V_BUCKET, new Predicate<OrientVertexType>()
-      {
-        @SuppressWarnings("unchecked")
-        @Override
-        public boolean apply(final OrientVertexType type) {
-          type.createProperty(P_REPOSITORY_NAME, OType.STRING);
-          graph.createKeyIndex(P_REPOSITORY_NAME, Vertex.class, new Parameter("type", "UNIQUE"),
-              new Parameter("class", V_BUCKET));
-          return true;
-        }
-      });
-      initVertexType(graph, V_COMPONENT, null);
-      initVertexType(graph, V_LABEL, null);
-
-      initEdgeType(graph, E_CONTAINS_COMPONENTS_WITH_LABEL, null);
-      initEdgeType(graph, E_HAS_LABEL, null);
-      initEdgeType(graph, E_OWNS_ASSET, null);
-      initEdgeType(graph, E_OWNS_COMPONENT, null);
-      initEdgeType(graph, E_PART_OF_COMPONENT, null);
-    }
-    finally {
-      graph.shutdown();
-    }
-  }
-
-  private static class CheckedGraphNoTx
-      extends OrientGraphNoTx
-  {
-    public CheckedGraphNoTx(ODatabaseDocumentTx db) {
-      super(db);
-      checkForGraphSchema(db);
-    }
-  }
-
-  private void initVertexType(CheckedGraphNoTx graph, String name, @Nullable Predicate<OrientVertexType> predicate) {
-    if (graph.getVertexType(name) == null) {
-      OrientVertexType type = graph.createVertexType(name);
-      if (predicate != null) {
-        predicate.apply(type);
-      }
-    }
-  }
-
-  private void initEdgeType(CheckedGraphNoTx graph, String name, @Nullable Predicate<OrientEdgeType> predicate) {
-    if (graph.getEdgeType(name) == null) {
-      OrientEdgeType type = graph.createEdgeType(name);
-      if (predicate != null) {
-        predicate.apply(type);
-      }
+    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().connect()) {
+      bucketEntityAdapter.register(db);
+      componentEntityAdapter.register(db);
+      assetEntityAdapter.register(db);
     }
   }
 
   private void initBucket() {
     // get or create the bucket for the repository and set bucketId for fast lookup later
-    try (GraphTx graphTx = openGraphTx(false)) {
+    try (ODatabaseDocumentTx db = openDb(false)) {
       String repositoryName = getRepository().getName();
-      Vertex bucketVertex = Iterables.getFirst(graphTx.getVertices(P_REPOSITORY_NAME, repositoryName), null);
-      if (bucketVertex == null) {
-        bucketVertex = graphTx.addVertex(V_BUCKET, (String) null);
-        bucketVertex.setProperty(P_REPOSITORY_NAME, repositoryName);
-        graphTx.commit();
+      ODocument doc = bucketEntityAdapter.getByRepositoryName(db, repositoryName);
+      if (doc == null) {
+        doc = db.newInstance(V_BUCKET);
+        doc.field(P_REPOSITORY_NAME, repositoryName);
+        doc.save();
+        db.commit();
       }
-      bucketId = (ORID) bucketVertex.getId();
+      bucketId = doc.getIdentity();
     }
   }
 
@@ -199,26 +146,45 @@ public class StorageFacetImpl
 
   private StorageTx openStorageTx(boolean withHooks) {
     BlobStore blobStore = blobStoreManager.get(blobStoreName);
-    return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(withHooks), bucketId, writePolicy);
+    return new StorageTxImpl(new BlobTx(blobStore), openDb(withHooks), bucketId, writePolicy);
   }
 
-  private GraphTx openGraphTx(boolean withHooks) {
+  private ODatabaseDocumentTx openDb(boolean withHooks) {
     ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire();
-    GraphTx graphTx = new GraphTx(db);
-
     if (withHooks) {
-      graphTx.registerHook(new LastUpdatedHook());
+      HooksListener hooksListener = new HooksListener();
+      db.registerListener(hooksListener);
+      hooksListener.registerHook(db, new LastUpdatedHook());
       try {
         SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
-        graphTx.registerHook(new IndexingHook(graphTx, searchFacet));
+        hooksListener.registerHook(db, new IndexingHook(searchFacet));
       }
       catch (MissingFacetException e) {
         // no search facet, no indexing
       }
     }
-
-    return graphTx;
+    return db;
   }
+
+  private class HooksListener
+      extends ODatabaseListenerSupport
+  {
+    private final List<ORecordHook> hooks = Lists.newArrayList();
+
+    public void registerHook(final ODatabase db, final ORecordHook hook) {
+      hooks.add(hook);
+      db.registerHook(hook);
+    }
+
+    @Override
+    public void onClose(final ODatabase db) {
+      for (ORecordHook hook : hooks) {
+        db.unregisterHook(hook);
+      }
+      db.registerListener(this);
+    }
+  }
+
 
   private class LastUpdatedHook
       extends ODocumentHookAbstract
@@ -250,12 +216,9 @@ public class StorageFacetImpl
   private class IndexingHook
       extends ODocumentHookAbstract
   {
-    private final GraphTx graphTx;
-
     private final SearchFacet searchFacet;
 
-    public IndexingHook(final GraphTx graphTx, final SearchFacet searchFacet) {
-      this.graphTx = graphTx;
+    public IndexingHook(final SearchFacet searchFacet) {
       this.searchFacet = searchFacet;
       setIncludeClasses(V_COMPONENT);
     }
@@ -268,9 +231,9 @@ public class StorageFacetImpl
     @Override
     public void onRecordAfterCreate(final ODocument doc) {
       // TODO should indexing failures affect storage? (catch and log?)
-      if (doc.getIdentity().isPersistent()) {
-        searchFacet.put(componentMetadataFactory.from(new ComponentImpl(new OrientVertex(graphTx, doc))));
-      }
+      //if (doc.getIdentity().isPersistent()) {
+      //  searchFacet.put(componentMetadataFactory.from(new ComponentImpl(doc)));
+      //}
     }
 
     @Override
@@ -281,7 +244,7 @@ public class StorageFacetImpl
     @Override
     public void onRecordAfterDelete(final ODocument doc) {
       // TODO should indexing failures affect storage? (catch and log?)
-      searchFacet.delete(new OrientVertex(graphTx, doc).getId().toString());
+      searchFacet.delete(doc.getIdentity().toString());
     }
   }
 }

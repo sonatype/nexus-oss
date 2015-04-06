@@ -458,6 +458,7 @@ public class NugetGalleryFacetImpl
       nugetAttr.set(P_TITLE, data.get(TITLE));
       nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
     }
+    asset.save();
     return asset;
   }
 
@@ -554,6 +555,7 @@ public class NugetGalleryFacetImpl
     nugetAttr.set(P_TITLE, data.get(TITLE));
     nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
 
+    component.save();
     return component;
   }
 

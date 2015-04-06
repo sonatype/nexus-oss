@@ -18,7 +18,7 @@ package org.sonatype.nexus.repository.storage;
  * @since 3.0
  */
 public interface Bucket
-    extends VertexWrapper
+    extends DocumentWrapper
 {
   /**
    * Gets the repository name.

@@ -17,25 +17,27 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import com.orientechnologies.orient.core.id.ORID;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
- * Wraps an {@code OrientVertex} to provide a simpler API for working with nodes in the component metadata graph.
+ * Wraps an {@code ODocument} to provide a simpler API.
  *
  * @since 3.0
  */
-interface VertexWrapper
+interface DocumentWrapper
 {
   /**
-   * Gets the underlying vertex.
+   * Gets the underlying document.
    */
-  OrientVertex vertex();
+  ODocument document();
 
   /**
    * Gets the identity of the underlying record. Note that this will be a temporary id until the underlying
    * record is saved for the first time. After the first save, the id will remain permanent.
    */
   ORID id();
+
+  void save();
 
   /**
    * Tells whether the underlying record is new.

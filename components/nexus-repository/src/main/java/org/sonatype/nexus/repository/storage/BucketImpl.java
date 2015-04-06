@@ -12,16 +12,16 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
 class BucketImpl
-    extends VertexWrapperSupport
+    extends DocumentWrapperSupport
     implements Bucket
 {
-  BucketImpl(OrientVertex vertex) {
-    super(vertex);
+  BucketImpl(ODocument document) {
+    super(document);
   }
 
   @Override

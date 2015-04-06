@@ -48,14 +48,14 @@ public class DefaultComponentMetadataProducer
     checkNotNull(component);
     Map<String, Object> metadata = Maps.newHashMap();
     for (String key : component.propertyNames()) {
-      metadata.put(key, component.vertex().getProperty(key));
+      metadata.put(key, component.document().field(key));
     }
     List<Map<String, Object>> allAssetMetadata = Lists.newArrayList();
     for (Asset asset : component.assets()) {
       Map<String, Object> assetMetadata = Maps.newHashMap();
       for (String key : asset.propertyNames()) {
         if (!P_BLOB_REF.equals(key) && !P_SIZE.equals(key)) {
-          assetMetadata.put(key, asset.vertex().getProperty(key));
+          assetMetadata.put(key, asset.document().field(key));
         }
       }
       allAssetMetadata.add(assetMetadata);

@@ -13,20 +13,21 @@
 package org.sonatype.nexus.repository.storage;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.OCommandSQL;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.sonatype.nexus.repository.storage.StorageFacet.E_PART_OF_COMPONENT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
+import static org.sonatype.nexus.repository.storage.StorageFacet.V_ASSET;
 
 /**
  * Stored metadata about a component.
@@ -37,8 +38,8 @@ class ComponentImpl
     extends MetadataNodeSupport
     implements Component
 {
-  ComponentImpl(OrientVertex vertex) {
-    super(vertex);
+  ComponentImpl(ODocument document) {
+    super(document);
   }
 
   @Override
@@ -90,8 +91,13 @@ class ComponentImpl
   @Override
   public List<Asset> assets() {
     List<Asset> assets = Lists.newArrayList();
-    for (Vertex assetVertex : vertex.getVertices(Direction.IN, E_PART_OF_COMPONENT)) {
-      assets.add(new AssetImpl((OrientVertex) assetVertex, this));
+
+    Map<String, Object> parameters = ImmutableMap.<String, Object>of("component", document());
+    String query = String.format("select from %s where component = :component", V_ASSET);
+    Iterable<ODocument> docs = document.getDatabase().command(new OCommandSQL(query)).execute(parameters);
+
+    for (ODocument doc : docs) {
+      assets.add(new AssetImpl(doc, this));
     }
     return assets;
   }

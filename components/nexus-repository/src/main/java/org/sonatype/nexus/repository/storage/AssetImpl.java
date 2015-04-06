@@ -16,13 +16,10 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.BlobRef;
 
-import com.google.common.collect.Iterables;
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 
-import static org.sonatype.nexus.repository.storage.StorageFacet.E_PART_OF_COMPONENT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_COMPONENT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_CONTENT_TYPE;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
 
@@ -39,12 +36,12 @@ class AssetImpl
 
   private boolean componentKnown;
 
-  AssetImpl(OrientVertex vertex) {
-    super(vertex);
+  AssetImpl(ODocument document) {
+    super(document);
   }
 
-  AssetImpl(OrientVertex vertex, @Nullable Component component) {
-    this(vertex);
+  AssetImpl(ODocument document, @Nullable Component component) {
+    this(document);
     this.component = component;
     this.componentKnown = true;
   }
@@ -53,10 +50,9 @@ class AssetImpl
   @Nullable
   public Component component() {
     if (!componentKnown) {
-      Vertex componentVertex = Iterables.getFirst(
-          vertex.getVertices(Direction.OUT, E_PART_OF_COMPONENT), null);
-      if (componentVertex != null) {
-        component = new ComponentImpl((OrientVertex) componentVertex);
+      ODocument componentDoc = document().field(P_COMPONENT, ODocument.class);
+      if (componentDoc != null) {
+        component = new ComponentImpl(componentDoc);
       }
       componentKnown = true;
     }

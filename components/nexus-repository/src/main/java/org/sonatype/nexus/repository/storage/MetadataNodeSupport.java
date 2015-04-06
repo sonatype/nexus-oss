@@ -17,9 +17,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
-import org.sonatype.nexus.repository.Format;
 
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.joda.time.DateTime;
 
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
@@ -32,14 +31,14 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_LAST_UPDATED;
  * @since 3.0
  */
 abstract class MetadataNodeSupport
-    extends VertexWrapperSupport
+    extends DocumentWrapperSupport
     implements MetadataNode
 {
   protected final NestedAttributesMap attributes;
 
-  MetadataNodeSupport(OrientVertex vertex) {
-    super(vertex);
-    Map<String, Object> backing = vertex.getProperty(P_ATTRIBUTES);
+  MetadataNodeSupport(ODocument document) {
+    super(document);
+    Map<String, Object> backing = document.field(P_ATTRIBUTES);
     this.attributes = new NestedAttributesMap(P_ATTRIBUTES, backing);
   }
 

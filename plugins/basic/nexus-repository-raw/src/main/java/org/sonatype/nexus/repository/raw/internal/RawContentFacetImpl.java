@@ -104,6 +104,7 @@ public class RawContentFacetImpl
 
         // Set attributes map to contain "raw" format-specific metadata (in this case, path)
         component.formatAttributes().set(P_PATH, path);
+        component.save();
 
         asset = tx.createAsset(bucket, component);
       }
@@ -121,6 +122,8 @@ public class RawContentFacetImpl
           tx.setBlob(is1, headers, asset, hashAlgorithms, determineContentType(path, is2, content.getContentType()));
         }
       }
+
+      asset.save();
 
       tx.commit();
     }
@@ -202,7 +205,7 @@ public class RawContentFacetImpl
       }
 
       // last updated will be automatically set by the hook on record modification
-      component.firstAsset().vertex().getRecord().setDirty();
+      component.firstAsset().document().getRecord().setDirty();
       tx.commit();
     }
   }

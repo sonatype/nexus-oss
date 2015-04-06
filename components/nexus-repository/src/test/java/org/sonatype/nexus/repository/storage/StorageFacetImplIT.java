@@ -34,8 +34,8 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.inject.util.Providers;
 import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -121,11 +121,11 @@ public class StorageFacetImplIT
       Asset asset = tx.createAsset(tx.getBucket(), testFormat);
       Component component = tx.createComponent(tx.getBucket(), testFormat);
 
-      Map<String, Object> assetAttributes = component.vertex().getProperty(P_ATTRIBUTES);
+      Map<String, Object> assetAttributes = asset.document().field(P_ATTRIBUTES);
       assertThat(assetAttributes, is(notNullValue()));
       assertThat(assetAttributes.isEmpty(), is(true));
 
-      Map<String, Object> componentAttributes = component.vertex().getProperty(P_ATTRIBUTES);
+      Map<String, Object> componentAttributes = component.document().field(P_ATTRIBUTES);
       assertThat(componentAttributes, is(notNullValue()));
       assertThat(componentAttributes.isEmpty(), is(true));
     }
@@ -133,7 +133,7 @@ public class StorageFacetImplIT
 
   @Test
   public void getAndSetAttributes() {
-    ORID vertexId;
+    ORID docId;
     try (StorageTx tx = underTest.openTx()) {
       Asset asset = tx.createAsset(tx.getBucket(), testFormat);
       NestedAttributesMap map = asset.attributes();
@@ -145,12 +145,14 @@ public class StorageFacetImplIT
 
       assertThat(map.isEmpty(), is(false));
 
+      asset.save();
+
       tx.commit();
-      vertexId = asset.id();
+      docId = asset.id();
     }
 
     try (StorageTx tx = underTest.openTx()) {
-      NestedAttributesMap map = tx.findAsset(vertexId, tx.getBucket()).attributes();
+      NestedAttributesMap map = tx.findAsset(docId, tx.getBucket()).attributes();
 
       assertThat(map.size(), is(2));
       assertThat(map.child("bag1").size(), is(1));
@@ -167,6 +169,7 @@ public class StorageFacetImplIT
       Asset asset1 = tx.createAsset(tx.getBucket(), testFormat);
       asset1.set("name", "asset1");
       asset1.set("number", 42);
+      asset1.save();
       tx.commit();
     }
 
@@ -175,6 +178,7 @@ public class StorageFacetImplIT
       Asset asset2 = tx.createAsset(tx.getBucket(), testFormat);
       asset2.set("name", "asset2");
       asset2.set("number", 42);
+      asset2.save();
       tx.commit();
     }
 
@@ -251,23 +255,23 @@ public class StorageFacetImplIT
 
     // Transaction 1:
     // Create a new asset with property "attributes" that's a map of maps (stored as an embeddedmap)
-    Object vertexId;
+    Object docId;
     try (StorageTx tx = underTest.openTx()) {
       Bucket bucket = tx.getBucket();
       Asset asset = tx.createAsset(bucket, testFormat);
       asset.set("attributes", inputMap);
       tx.commit();
-      vertexId = asset.vertex().getIdentity();
+      docId = asset.document().getIdentity();
     }
 
     // Transaction 2:
     // Get the asset and make sure it contains what we expect
     try (StorageTx tx = underTest.openTx()) {
       Bucket bucket = tx.getBucket();
-      Asset asset = tx.findAsset((ORID) vertexId, bucket);
+      Asset asset = tx.findAsset((ORID) docId, bucket);
       assert asset != null;
 
-      Map<String, Map<String, String>> outputMap = asset.vertex().getProperty("attributes");
+      Map<String, Map<String, String>> outputMap = asset.document().field("attributes");
 
       assertThat(outputMap.keySet().size(), is(2));
 
@@ -288,11 +292,11 @@ public class StorageFacetImplIT
       Map<String, String> parameters = ImmutableMap.of("fooValue", "bar");
       String query = String.format("select from %s where attributes.bag1.foo = :fooValue", V_ASSET);
 
-      Iterable<OrientVertex> vertices = tx.getGraphTx().command(new OCommandSQL(query)).execute(parameters);
-      List<OrientVertex> list = Lists.newArrayList(vertices);
+      Iterable<ODocument> vertices = tx.getDb().command(new OCommandSQL(query)).execute(parameters);
+      List<ODocument> list = Lists.newArrayList(vertices);
 
       assertThat(list.size(), is(1));
-      assertThat(list.get(0).getId(), is(vertexId));
+      assertThat(list.get(0).getIdentity(), is(docId));
     }
   }
 
@@ -307,17 +311,23 @@ public class StorageFacetImplIT
       checkSize(tx.browseComponents(bucket), 0);
 
       // Create an asset and component and verify state with browse and find
-      Asset asset = tx.createAsset(bucket, testFormat);
-      asset.set(P_PATH, "path");
+      Asset asset1 = tx.createAsset(bucket, testFormat);
+      asset1.set(P_PATH, "path");
       Component component = tx.createComponent(bucket, testFormat);
       component.set("foo", "bar");
+      Asset asset2 = tx.createAsset(bucket, component);
       tx.commit();
 
-      checkSize(tx.browseAssets(bucket), 1);
+      checkSize(tx.browseAssets(bucket), 2);
       checkSize(tx.browseComponents(bucket), 1);
 
-      assertNotNull(tx.findAsset(asset.id(), bucket));
+      assertNotNull(tx.findAsset(asset1.id(), bucket));
       assertNotNull(tx.findComponent(component.id(), bucket));
+
+      checkSize(tx.findComponent(component.id(), bucket).assets(), 1);
+      assertNotNull(tx.findComponent(component.id(), bucket).firstAsset());
+      assertNull(tx.findAsset(asset1.id(), bucket).component());
+      assertNotNull(tx.findAsset(asset2.id(), bucket).component());
 
       assertNull(tx.findAssetWithProperty(P_PATH, "nomatch", bucket));
       assertNotNull(tx.findAssetWithProperty(P_PATH, "path", bucket));
@@ -326,12 +336,12 @@ public class StorageFacetImplIT
       assertNotNull(tx.findComponentWithProperty("foo", "bar", bucket));
 
       // Delete both and make sure browse and find behave as expected
-      tx.deleteAsset(asset);
+      tx.deleteAsset(asset1);
       tx.deleteComponent(component);
 
       checkSize(tx.browseAssets(bucket), 0);
       checkSize(tx.browseComponents(bucket), 0);
-      assertNull(tx.findAsset(asset.id(), bucket));
+      assertNull(tx.findAsset(asset1.id(), bucket));
       assertNull(tx.findComponent(component.id(), bucket));
 
       // NOTE: It doesn't matter for this test, but you should commit when finished with one or more writes

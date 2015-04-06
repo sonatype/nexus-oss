@@ -23,6 +23,7 @@ import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
 
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
@@ -40,7 +41,7 @@ public interface StorageTx
    * Note: The caller may use this to directly query or manipulate the OrientDB graph, if needed, but should not
    * directly commit, rollback, or close the underlying transaction.
    */
-  OrientGraph getGraphTx();
+  ODatabaseDocumentTx getDb();
 
   /**
    * Commits the transaction.

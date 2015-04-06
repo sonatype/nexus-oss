@@ -16,35 +16,43 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.entity.Entity;
+
+import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.id.ORID;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Supporting base class for {@link VertexWrapper} implementations.
+ * Supporting base class for {@link DocumentWrapper} implementations.
  *
  * @since 3.0
  */
-abstract class VertexWrapperSupport
-    implements VertexWrapper
+abstract class DocumentWrapperSupport
+    implements DocumentWrapper
 {
-  protected final OrientVertex vertex;
+  protected final ODocument document;
 
-  VertexWrapperSupport(OrientVertex vertex) {
-    this.vertex = checkNotNull(vertex);
+  DocumentWrapperSupport(final ODocument document) {
+    this.document = checkNotNull(document.save());
   }
 
   @Override
-  public OrientVertex vertex() {
-    return vertex;
+  public ODocument document() {
+    return document;
   }
 
   @Override
   public ORID id() {
-    return vertex.getRecord().getIdentity();
+    return document.getRecord().getIdentity();
+  }
+
+  @Override
+  public void save() {
+    document.save();
   }
 
   @Override
@@ -54,7 +62,7 @@ abstract class VertexWrapperSupport
 
   @Override
   public Set<String> propertyNames() {
-    return vertex.getPropertyKeys();
+    return Sets.newHashSet(document.fieldNames());
   }
 
   @Override
@@ -69,7 +77,7 @@ abstract class VertexWrapperSupport
     checkNotNull(name);
     checkNotNull(type);
 
-    Object value = vertex.getProperty(name);
+    Object value = document.field(name);
     if (value != null) {
       // TODO: PropertyEditor coercion? (see also, AttributesMap#coerce())
       if (type == DateTime.class) {
@@ -96,26 +104,27 @@ abstract class VertexWrapperSupport
   public void set(final String name, final @Nullable Object value) {
     checkNotNull(name);
     if (value == null) {
-      vertex.removeProperty(name);
+      document.removeField(name);
     }
     else if (value instanceof DateTime) {
-      vertex.setProperty(name, ((DateTime) value).toDate());
+      document.field(name, ((DateTime) value).toDate());
     }
     else {
-      vertex.setProperty(name, value);
+      document.field(name, value);
     }
+    save();
   }
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || !(o instanceof VertexWrapperSupport)) {
+    if (o == null || !(o instanceof DocumentWrapperSupport)) {
       return false;
     }
-    return vertex.equals(((VertexWrapper) o).vertex());
+    return document.equals(((DocumentWrapper) o).document());
   }
 
   @Override
   public int hashCode() {
-    return vertex().hashCode();
+    return document().hashCode();
   }
 }
