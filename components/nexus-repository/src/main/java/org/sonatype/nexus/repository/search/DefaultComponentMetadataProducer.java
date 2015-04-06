@@ -26,10 +26,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
 
 /**
  * Default {@link ComponentMetadataProducer} implementation that uses all properties of a component & its assets as
@@ -43,19 +42,25 @@ public class DefaultComponentMetadataProducer
     implements ComponentMetadataProducer
 {
 
+  private static final ObjectMapper objectMapper = new ObjectMapper();
+
   @Override
   public String getMetadata(final Component component) {
     checkNotNull(component);
     Map<String, Object> metadata = Maps.newHashMap();
     for (String key : component.propertyNames()) {
-      metadata.put(key, component.document().field(key));
+      Object field = component.document().field(key);
+      if (!(field instanceof ODocument)) { // skip links
+        metadata.put(key, field);
+      }
     }
     List<Map<String, Object>> allAssetMetadata = Lists.newArrayList();
     for (Asset asset : component.assets()) {
       Map<String, Object> assetMetadata = Maps.newHashMap();
       for (String key : asset.propertyNames()) {
-        if (!P_BLOB_REF.equals(key) && !P_SIZE.equals(key)) {
-          assetMetadata.put(key, asset.document().field(key));
+        Object field = asset.document().field(key);
+        if (!(field instanceof ODocument)) { // skip links
+          assetMetadata.put(key, field);
         }
       }
       allAssetMetadata.add(assetMetadata);
@@ -65,7 +70,7 @@ public class DefaultComponentMetadataProducer
     }
 
     try {
-      return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(metadata);
+      return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(metadata);
     }
     catch (JsonProcessingException e) {
       throw Throwables.propagate(e);

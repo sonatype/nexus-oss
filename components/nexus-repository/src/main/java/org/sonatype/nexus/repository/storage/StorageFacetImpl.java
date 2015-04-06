@@ -231,9 +231,9 @@ public class StorageFacetImpl
     @Override
     public void onRecordAfterCreate(final ODocument doc) {
       // TODO should indexing failures affect storage? (catch and log?)
-      //if (doc.getIdentity().isPersistent()) {
-      //  searchFacet.put(componentMetadataFactory.from(new ComponentImpl(doc)));
-      //}
+      if (doc.getIdentity().isPersistent()) {
+        searchFacet.put(componentMetadataFactory.from(new ComponentImpl(doc)));
+      }
     }
 
     @Override
