@@ -60,6 +60,8 @@ Ext.define('NX.util.Url', {
     }
     if (id) {
       id = ' id="' + id + '"';
+    } else {
+      id = '';
     }
     return '<a href="' + url + '" target="' + target + '"' + id + '>' + text + '</a>';
   }
