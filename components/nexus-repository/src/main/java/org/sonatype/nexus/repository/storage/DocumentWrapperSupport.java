@@ -16,9 +16,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.common.entity.Entity;
-
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.joda.time.DateTime;
@@ -62,7 +60,7 @@ abstract class DocumentWrapperSupport
 
   @Override
   public Set<String> propertyNames() {
-    return Sets.newHashSet(document.fieldNames());
+    return ImmutableSet.copyOf(document.fieldNames());
   }
 
   @Override
