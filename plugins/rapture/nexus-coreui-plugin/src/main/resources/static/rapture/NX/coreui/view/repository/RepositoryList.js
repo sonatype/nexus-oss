@@ -41,13 +41,6 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_STATUS_COLUMN'), dataIndex: 'status', flex: 1 },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_URL_COLUMN'), dataIndex: 'url', xtype: 'nx-linkcolumn', flex: 1 }
   ],
-  listeners: {
-    cellclick: function(grid, td, cellIndex, record, tr, rowIndex, e) {
-      if(e.getTarget('a')) {
-        return false; //prevents grid selection if we click a link that will do its own thing anyhow
-      }
-    }
-  },
 
   viewConfig: {
     emptyText: NX.I18n.get('ADMIN_REPOSITORIES_LIST_EMPTY_STATE'),
