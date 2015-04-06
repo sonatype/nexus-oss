@@ -24,7 +24,6 @@ Ext.define('NX.coreui.view.user.UserAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
   defaultFocus: 'userId',
 

@@ -49,7 +49,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerList', {
     xtype: 'toolbar',
     dock: 'top',
     cls: 'nx-actions nx-borderless',
-    tbar: [
+    items: [
       {
         xtype: 'button',
         text: NX.I18n.get('ADMIN_LDAP_LIST_NEW_BUTTON'),

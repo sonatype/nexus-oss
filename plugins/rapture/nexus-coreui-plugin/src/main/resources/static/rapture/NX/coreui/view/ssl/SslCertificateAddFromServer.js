@@ -24,7 +24,6 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
     'NX.Icons',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
   defaultFocus: 'server',
 

@@ -24,7 +24,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
+
+  dockedItems: null,
 
   /**
    * @override
