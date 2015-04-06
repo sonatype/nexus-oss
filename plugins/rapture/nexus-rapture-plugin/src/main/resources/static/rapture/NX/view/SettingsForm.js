@@ -20,7 +20,8 @@
 Ext.define('NX.view.SettingsForm', {
   extend: 'Ext.form.Panel',
   alias: 'widget.nx-settingsform',
-  ui: 'nx-inset',
+  ui: 'nx-subsection',
+  frame: true,
   requires: [
     'NX.I18n'
   ],

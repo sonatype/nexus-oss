@@ -61,30 +61,35 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     deferEmptyText: false
   },
 
-  tbar: [
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_LOGGING_NEW_BUTTON'),
-      glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
-      action: 'new',
-      disabled: true
-    },
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_LOGGING_DELETE_BUTTON'),
-      glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
-      action: 'delete',
-      disabled: true
-    },
-    '-',
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_LOGGING_RESET_BUTTON'),
-      glyph: 'xf0e2@FontAwesome' /* fa-undo */,
-      action: 'reset',
-      disabled: true
-    }
-  ],
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless',
+    items: [
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_LOGGING_NEW_BUTTON'),
+        glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
+        action: 'new',
+        disabled: true
+      },
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_LOGGING_DELETE_BUTTON'),
+        glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
+        action: 'delete',
+        disabled: true
+      },
+      '-',
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_LOGGING_RESET_BUTTON'),
+        glyph: 'xf0e2@FontAwesome' /* fa-undo */,
+        action: 'reset',
+        disabled: true
+      }
+    ]
+  }],
 
   plugins: [
     { pluginId: 'editor', ptype: 'rowediting', clicksToEdit: 1, errorSummary: false },

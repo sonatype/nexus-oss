@@ -20,29 +20,28 @@
 Ext.define('NX.view.feature.Group', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-feature-group',
+  cls: 'nx-feature-group',
+  layout: 'fit',
 
   autoScroll: true,
 
-  items: [
-    {
-      xtype: 'dataview',
-      cls: 'nx-feature-group',
+  items: {
+    xtype: 'dataview',
 
-      store: 'FeatureGroup',
-      tpl: [
-        '<tpl for=".">',
-        '<div class="item-wrap">',
-        '{[ NX.Icons.img(values.iconName, "x32") ]}',
-        '<span>{text}</span>',
-        '</div>',
-        '</tpl>'
-      ],
+    store: 'FeatureGroup',
+    tpl: [
+      '<tpl for=".">',
+      '<div class="item-wrap">',
+      '{[ NX.Icons.img(values.iconName, "x32") ]}',
+      '<span>{text}</span>',
+      '</div>',
+      '</tpl>'
+    ],
 
-      itemSelector: 'div.item-wrap',
-      trackOver: true,
-      overItemCls: 'x-item-over',
-      selectedItemCls: 'x-item-selected'
-    }
-  ]
+    itemSelector: 'div.item-wrap',
+    trackOver: true,
+    overItemCls: 'x-item-over',
+    selectedItemCls: 'x-item-selected'
+  }
 
 });

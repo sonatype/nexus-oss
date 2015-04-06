@@ -20,6 +20,7 @@
 Ext.define('NX.view.SettingsPanel', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-settingsPanel',
+  autoScroll: true,
 
   dockedItems: [{
     xtype: 'toolbar',
@@ -33,14 +34,33 @@ Ext.define('NX.view.SettingsPanel', {
     pack: 'start'
   },
 
-  autoScroll: true,
-
   // TODO maxWidth: 1024,
 
   defaults: {
     style: {
       margin: '0px 0px 20px 0px'
     }
+  },
+
+  /**
+   * @override
+   */
+  initComponent: function() {
+    var me = this;
+
+    me.items = {
+      xtype: 'panel',
+      ui: 'nx-inset',
+      defaults: {
+        style: {
+          margin: '0 0 20px 0'
+        }
+      },
+
+      items: me.settingsForm
+    };
+
+    me.callParent(arguments);
   },
 
   /**
