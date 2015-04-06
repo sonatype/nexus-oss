@@ -67,12 +67,6 @@
       <artifactId>nexus-core</artifactId>
     </dependency>
 
-    <!-- TODO: Establish what indirect dependency is making this necessary -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
