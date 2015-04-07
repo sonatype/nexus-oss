@@ -27,7 +27,7 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NA
  *
  * @since 3.0
  */
-public class BucketEntityAdapter
+public class BucketEntityType
     extends EntityType
 {
   public static final String DB_CLASS = new OClassNameBuilder()
@@ -36,7 +36,7 @@ public class BucketEntityAdapter
 
   private static final String I_REPOSITORY_NAME = "bucket_repository_name_idx";
 
-  public BucketEntityAdapter() {
+  public BucketEntityType() {
     super(DB_CLASS);
   }
 

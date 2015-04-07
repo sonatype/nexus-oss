@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.repository.storage;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.nexus.orient.entity.EntityType;
 
@@ -24,47 +21,55 @@ import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_BUCKET;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_COMPONENT;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_CONTENT_TYPE;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_LAST_UPDATED;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
 
 /**
- * {@link Component} entity-adapter.
+ * {@link Asset} entity-adapter.
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class ComponentEntityAdapter
+public class AssetEntityType
     extends EntityType
 {
   public static final String DB_CLASS = new OClassNameBuilder()
-      .type(Component.class)
+      .type(Asset.class)
       .build();
 
-  private static final String I_BUCKET = "component_bucket_idx";
+  private static final String I_BUCKET = "asset_bucket_idx";
 
-  private BucketEntityAdapter bucketEntityAdapter;
+  private static final String I_COMPONENT = "asset_component_idx";
 
-  public ComponentEntityAdapter(final BucketEntityAdapter bucketEntityAdapter) {
+  private BucketEntityType bucketEntityType;
+
+  private ComponentEntityType componentEntityType;
+
+  public AssetEntityType(final BucketEntityType bucketEntityType,
+                         final ComponentEntityType componentEntityType)
+  {
     super(DB_CLASS);
-    this.bucketEntityAdapter = bucketEntityAdapter;
+    this.bucketEntityType = bucketEntityType;
+    this.componentEntityType = componentEntityType;
   }
 
   @Override
   protected void defineType(final OClass type) {
-    type.createProperty(P_BUCKET, OType.LINK, bucketEntityAdapter.getType());
-    type.createProperty(P_GROUP, OType.STRING);
-    type.createProperty(P_NAME, OType.STRING);
-    type.createProperty(P_VERSION, OType.STRING);
+    type.createProperty(P_BUCKET, OType.LINK, bucketEntityType.getType());
+    type.createProperty(P_COMPONENT, OType.LINK, componentEntityType.getType());
     type.createProperty(P_FORMAT, OType.STRING);
     type.createProperty(P_LAST_UPDATED, OType.DATETIME);
+    type.createProperty(P_SIZE, OType.INTEGER);
+    type.createProperty(P_CONTENT_TYPE, OType.STRING);
+    type.createProperty(P_BLOB_REF, OType.STRING);
     type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
 
     type.createIndex(I_BUCKET, INDEX_TYPE.NOTUNIQUE, P_BUCKET);
+    type.createIndex(I_COMPONENT, INDEX_TYPE.NOTUNIQUE, P_COMPONENT);
   }
 
 }

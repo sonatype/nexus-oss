@@ -51,11 +51,11 @@ public class StorageFacetImpl
 
   private final Provider<DatabaseInstance> databaseInstanceProvider;
 
-  private final BucketEntityAdapter bucketEntityAdapter;
+  private final BucketEntityType bucketEntityType;
 
-  private final ComponentEntityAdapter componentEntityAdapter;
+  private final ComponentEntityType componentEntityType;
 
-  private final AssetEntityAdapter assetEntityAdapter;
+  private final AssetEntityType assetEntityType;
 
   private String blobStoreName;
 
@@ -70,9 +70,9 @@ public class StorageFacetImpl
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
 
-    bucketEntityAdapter = new BucketEntityAdapter();
-    componentEntityAdapter = new ComponentEntityAdapter(bucketEntityAdapter);
-    assetEntityAdapter = new AssetEntityAdapter(bucketEntityAdapter, componentEntityAdapter);
+    bucketEntityType = new BucketEntityType();
+    componentEntityType = new ComponentEntityType(bucketEntityType);
+    assetEntityType = new AssetEntityType(bucketEntityType, componentEntityType);
   }
 
   @Override
@@ -97,9 +97,9 @@ public class StorageFacetImpl
 
   private void initSchema() {
     try (ODatabaseDocumentTx db = databaseInstanceProvider.get().connect()) {
-      bucketEntityAdapter.register(db);
-      componentEntityAdapter.register(db);
-      assetEntityAdapter.register(db);
+      bucketEntityType.register(db);
+      componentEntityType.register(db);
+      assetEntityType.register(db);
     }
   }
 

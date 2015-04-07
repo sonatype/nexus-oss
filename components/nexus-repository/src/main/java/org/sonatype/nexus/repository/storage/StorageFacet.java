@@ -28,7 +28,11 @@ public interface StorageFacet
 
   static String P_BLOB_REF = "blob_ref";
 
+  static String P_BUCKET = "bucket";
+
   static String P_CHECKSUM = "checksum";
+
+  static String P_COMPONENT = "component";
 
   static String P_CONTENT_TYPE = "content_type";
 
@@ -48,15 +52,11 @@ public interface StorageFacet
 
   static String P_VERSION = "version";
 
-  static String V_ASSET = AssetEntityAdapter.DB_CLASS;
+  static String V_ASSET = AssetEntityType.DB_CLASS;
 
-  static String V_COMPONENT = ComponentEntityAdapter.DB_CLASS;
+  static String V_COMPONENT = ComponentEntityType.DB_CLASS;
 
-  static String P_COMPONENT = "component";
-
-  static String V_BUCKET = BucketEntityAdapter.DB_CLASS;
-
-  static String P_BUCKET = "bucket";
+  static String V_BUCKET = BucketEntityType.DB_CLASS;
 
   /**
    * Opens a transaction.
