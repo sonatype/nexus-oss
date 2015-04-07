@@ -32,6 +32,8 @@ import org.osgi.framework.BundleContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.inject.name.Names.named;
+import static org.eclipse.sisu.osgi.ServiceBindings.defaultAllow;
+import static org.eclipse.sisu.osgi.ServiceBindings.defaultIgnore;
 
 /**
  * Binds the initial {@link ServletContext} and configures shiro.
@@ -41,6 +43,10 @@ import static com.google.inject.name.Names.named;
 public class NexusContextModule
     extends AbstractModule
 {
+  private static final String ALLOW_SERVICES = "org.apache.karaf.*," + defaultAllow();
+
+  private static final String IGNORE_SERVICES = defaultIgnore();
+
   private final BundleContext bundleContext;
 
   private final ServletContext servletContext;
@@ -70,9 +76,9 @@ public class NexusContextModule
 
     install(new WebSecurityModule(servletContext));
 
-    // enable OSGi service lookup of components
+    // enable OSGi service lookup of Karaf components
     MutableBeanLocator locator = new DefaultBeanLocator();
-    locator.add(new ServiceBindings(bundleContext));
+    locator.add(new ServiceBindings(bundleContext, ALLOW_SERVICES, IGNORE_SERVICES, Integer.MIN_VALUE));
     bind(MutableBeanLocator.class).toInstance(locator);
   }
 }
