@@ -20,16 +20,13 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Provider;
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.sonatype.nexus.NxApplication;
 import org.sonatype.nexus.log.LogManager;
-import org.sonatype.nexus.web.NexusGuiceFilter;
-import org.sonatype.nexus.web.NexusServletModule;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 import com.codahale.metrics.SharedMetricRegistries;
 import com.google.common.base.Splitter;
@@ -38,7 +35,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.servlet.GuiceServletContextListener;
+import com.google.inject.Provider;
+import com.google.inject.name.Names;
+import com.google.inject.servlet.GuiceFilter;
 import org.apache.karaf.features.Feature;
 import org.apache.karaf.features.FeaturesService;
 import org.apache.karaf.features.FeaturesService.Option;
@@ -66,8 +65,7 @@ import static org.apache.karaf.features.FeaturesService.Option.NoCleanIfFailure;
  * @since 3.0
  */
 public class NexusContextListener
-    extends GuiceServletContextListener
-    implements FrameworkListener
+    implements ServletContextListener, FrameworkListener
 {
   static {
     boolean hasPaxExam;
@@ -99,7 +97,7 @@ public class NexusContextListener
 
   private LogManager logManager;
 
-  private NxApplication application;
+  private Lifecycle application;
 
   private ServiceRegistration<Filter> registration;
 
@@ -121,19 +119,17 @@ public class NexusContextListener
 
     featuresService = bundleContext.getService(bundleContext.getServiceReference(FeaturesService.class));
 
-    injector = Guice.createInjector(new WireModule(new NexusServletModule(servletContext, variables)));
+    injector = Guice.createInjector(new WireModule(new NexusContextModule(servletContext, variables)));
     log.debug("Injector: {}", injector);
-
-    super.contextInitialized(event);
 
     extender.doStart(); // start tracking nexus bundles
 
     try {
-      logManager = lookup(LogManager.class);
+      logManager = injector.getInstance(LogManager.class);
       log.debug("Log manager: {}", logManager);
       logManager.configure();
 
-      application = lookup(NxApplication.class);
+      application = injector.getInstance(Key.get(Lifecycle.class, Names.named("NxApplication")));
       log.debug("Application: {}", application);
 
       FrameworkStartLevel fsl = bundleContext.getBundle(0).adapt(FrameworkStartLevel.class);
@@ -169,7 +165,7 @@ public class NexusContextListener
       }
 
       // register our dynamic filter with the surrounding bootstrap code
-      final Filter filter = injector.getInstance(NexusGuiceFilter.class);
+      final Filter filter = injector.getInstance(GuiceFilter.class);
       final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));
       registration = bundleContext.registerService(Filter.class, filter, properties);
 
@@ -206,7 +202,6 @@ public class NexusContextListener
     extender.doStop(); // stop tracking bundles
 
     if (servletContext != null) {
-      super.contextDestroyed(new ServletContextEvent(servletContext));
       servletContext = null;
     }
 
@@ -215,14 +210,9 @@ public class NexusContextListener
     SharedMetricRegistries.remove("nexus");
   }
 
-  @Override
-  protected Injector getInjector() {
+  public Injector getInjector() {
     checkState(injector != null, "Missing injector reference");
     return injector;
-  }
-
-  private <T> T lookup(final Class<T> clazz) {
-    return injector.getInstance(BeanLocator.class).locate(Key.get(clazz)).iterator().next().getValue();
   }
 
   private Set<Feature> getFeatures(final String featureNames) throws Exception {
