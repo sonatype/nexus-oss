@@ -25,15 +25,14 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
   ],
 
   store: 'NX.coreui.store.Repository',
-
+  
   columns: [
     {
       xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
-      iconName: function() {
-        return 'repository-default';
-      }
+      iconNamePrefix: 'repository-',
+      dataIndex: 'type'
     },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_TYPE_COLUMN'), dataIndex: 'type' },

@@ -48,8 +48,16 @@ Ext.define('NX.coreui.controller.Repositories', {
     { ref: 'settings', selector: 'nx-coreui-repository-feature nx-coreui-repository-settings' }
   ],
   icons: {
-    'repository-default': {
+    'repository-hosted': {
       file: 'database_green.png',
+      variants: ['x16', 'x32']
+    },
+    'repository-proxy': {
+      file: 'database_link.png',
+      variants: ['x16', 'x32']  
+    },
+    'repository-group': {
+      file: 'folder_database.png',
       variants: ['x16', 'x32']
     }
   },
