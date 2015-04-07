@@ -511,11 +511,11 @@ public abstract class AbstractMavenRepository
     final String itemPath = hashPath.substring(0, hashPath.length() - suffix.length());
     hashRequest.pushRequestPath(itemPath);
     try {
-      // TODO: do we need to persist this? or will remote hash be refetched before attributes are re-loaded?
       StorageItem artifact = getLocalStorage().retrieveItem(this, hashRequest);
       Attributes attributes = artifact.getRepositoryItemAttributes();
       if (attributes.containsKey(ATTR_REMOTE_SHA1) || attributes.containsKey(ATTR_REMOTE_MD5)) {
         attributes.put(ATTR_REMOTE_HASH_EXPIRED, "true");
+        getAttributesHandler().storeAttributes(artifact);
       }
     }
     catch (Exception e) {
