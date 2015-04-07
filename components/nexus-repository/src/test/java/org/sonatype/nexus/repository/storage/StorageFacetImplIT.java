@@ -316,8 +316,10 @@ public class StorageFacetImplIT
       // Create an asset and component and verify state with browse and find
       Asset asset1 = tx.createAsset(bucket, testFormat);
       asset1.set(P_PATH, "path");
+      tx.updateAsset(asset1);
       Component component = tx.createComponent(bucket, testFormat);
       component.set("foo", "bar");
+      tx.updateComponent(component);
       Asset asset2 = tx.createAsset(bucket, component);
       tx.commit();
 
@@ -405,6 +407,7 @@ public class StorageFacetImplIT
             Bucket bucket = auxTx.getBucket();
             Asset asset = checkNotNull(auxTx.findAsset(assetId, bucket));
             asset.set("foo", "firstValue");
+            auxTx.updateAsset(asset);
             auxTx.commit();
           }
         }
@@ -418,6 +421,7 @@ public class StorageFacetImplIT
         asset = checkNotNull(mainTx.findAsset(assetId, bucket));
       }
       asset.set("foo", "secondValue");
+      mainTx.updateAsset(asset);
       mainTx.commit(); // if we're simulating a conflict, this call should throw OConcurrentModificationException
       assertThat(simulateConflict, is(false));
     }

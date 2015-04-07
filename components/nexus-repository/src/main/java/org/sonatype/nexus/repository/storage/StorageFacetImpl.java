@@ -138,11 +138,11 @@ public class StorageFacetImpl
   }
 
   @Nullable
-  public ODocument getByRepositoryName(final ODatabaseDocumentTx db, final String id) {
+  private ODocument getByRepositoryName(final ODatabaseDocumentTx db, final String repositoryName) {
     OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
         "SELECT FROM " + V_BUCKET + " WHERE " + P_REPOSITORY_NAME + " = ?"
     );
-    List<ODocument> results = db.command(query).execute(id);
+    List<ODocument> results = db.command(query).execute(repositoryName);
     if (results.isEmpty()) {
       return null;
     }
