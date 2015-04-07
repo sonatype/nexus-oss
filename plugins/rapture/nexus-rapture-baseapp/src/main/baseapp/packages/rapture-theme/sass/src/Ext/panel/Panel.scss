@@ -130,14 +130,14 @@
   $ui-body-background-color: $color-white
 );
 
-/*.x-panel-nx-subsection {
+.x-panel-nx-subsection {
   .x-panel-header {
-    padding: 0 !important;
-  }
-  .x-panel-header-text-container {
     padding: 10px 0 10px 0 !important;
   }
-}*/
+  //.x-panel-header-text-container {
+  //  padding: 10px 0 10px 0 !important;
+  //}
+}
 
 .x-panel-nx-subsection-framed {
   border: $color-gainsboro 1px solid;
