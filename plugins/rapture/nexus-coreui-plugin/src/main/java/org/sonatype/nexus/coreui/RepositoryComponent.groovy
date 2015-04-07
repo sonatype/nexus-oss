@@ -120,9 +120,8 @@ extends DirectComponentSupport
   }
 
   RepositoryStatusXO buildStatus(Repository input) {
-    def statusXO = new RepositoryStatusXO()
-    statusXO.repositoryName = input.name
-    statusXO.online = input.facet(ViewFacet).online
+    RepositoryStatusXO statusXO = new RepositoryStatusXO(repositoryName: input.name,
+        online: input.facet(ViewFacet).online)
 
     try {
       if (input.facet(GroupFacet)) {
@@ -145,14 +144,6 @@ extends DirectComponentSupport
       // no proxy, no remote status
     }
     return statusXO
-  }
-
-  public class RepositoryStatusXO {
-    @NotEmpty
-    String repositoryName
-    boolean online
-    String description
-    String reason
   }
   
 }

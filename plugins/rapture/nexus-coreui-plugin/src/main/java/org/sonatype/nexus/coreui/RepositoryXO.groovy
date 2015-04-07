@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.coreui
 
-import org.sonatype.nexus.coreui.RepositoryComponent.RepositoryStatusXO
-
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.common.validation.Create
