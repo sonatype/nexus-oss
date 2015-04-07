@@ -29,7 +29,7 @@ Ext.define('NX.coreui.controller.Outreach', {
   },
 
   refs: [
-    { ref: 'welcomePage', selector: '#nx-dashboard-div' }
+    { ref: 'welcomePage', selector: 'nx-dashboard-welcome' }
   ],
 
   /**
