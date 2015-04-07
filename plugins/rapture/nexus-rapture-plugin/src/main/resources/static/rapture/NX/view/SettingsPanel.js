@@ -51,10 +51,30 @@ Ext.define('NX.view.SettingsPanel', {
         }
       },
 
-      items: me.settingsForm
+      items: me.settingsForm || []
     };
 
     me.callParent(arguments);
+  },
+
+  /**
+   * @override
+   * @param form The form to add to this settings panel
+   */
+  addSettingsForm: function(form) {
+    var me = this;
+
+    me.down('panel').add(form);
+  },
+
+  /**
+   * @override
+   * Remove all settings forms from this settings panel
+   */
+  removeAllSettingsForms: function() {
+    var me = this;
+
+    me.down('panel').removeAll();
   },
 
   /**
