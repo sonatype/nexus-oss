@@ -39,7 +39,8 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
           header: false,
 
           style: {
-            'border-bottom': '1px solid #000000'
+            'border-bottom': '1px solid #DDDDDD',
+            'background-color': '#FFFFFF'
           },
 
           layout: {
