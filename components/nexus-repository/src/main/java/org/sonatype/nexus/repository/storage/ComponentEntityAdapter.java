@@ -20,6 +20,7 @@ import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.nexus.orient.entity.EntityType;
 
 import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
@@ -44,6 +45,8 @@ public class ComponentEntityAdapter
       .type(Component.class)
       .build();
 
+  private static final String I_BUCKET = "component_bucket_idx";
+
   private BucketEntityAdapter bucketEntityAdapter;
 
   public ComponentEntityAdapter(final BucketEntityAdapter bucketEntityAdapter) {
@@ -60,7 +63,8 @@ public class ComponentEntityAdapter
     type.createProperty(P_FORMAT, OType.STRING);
     type.createProperty(P_LAST_UPDATED, OType.DATETIME);
     type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
-    // TODO create indexes
+
+    type.createIndex(I_BUCKET, INDEX_TYPE.NOTUNIQUE, P_BUCKET);
   }
 
 }

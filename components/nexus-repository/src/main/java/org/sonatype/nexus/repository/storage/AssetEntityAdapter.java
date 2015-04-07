@@ -17,6 +17,7 @@ import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.nexus.orient.entity.EntityType;
 
 import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
@@ -27,7 +28,6 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_CONTENT_TYPE;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_LAST_UPDATED;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
 
 /**
  * {@link Asset} entity-adapter.
@@ -41,12 +41,17 @@ public class AssetEntityAdapter
       .type(Asset.class)
       .build();
 
+  private static final String I_BUCKET = "asset_bucket_idx";
+
+  private static final String I_COMPONENT = "asset_component_idx";
+
   private BucketEntityAdapter bucketEntityAdapter;
 
   private ComponentEntityAdapter componentEntityAdapter;
 
   public AssetEntityAdapter(final BucketEntityAdapter bucketEntityAdapter,
-                            final ComponentEntityAdapter componentEntityAdapter) {
+                            final ComponentEntityAdapter componentEntityAdapter)
+  {
     super(DB_CLASS);
     this.bucketEntityAdapter = bucketEntityAdapter;
     this.componentEntityAdapter = componentEntityAdapter;
@@ -62,7 +67,9 @@ public class AssetEntityAdapter
     type.createProperty(P_CONTENT_TYPE, OType.STRING);
     type.createProperty(P_BLOB_REF, OType.STRING);
     type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
-    // TODO create indexes
+
+    type.createIndex(I_BUCKET, INDEX_TYPE.NOTUNIQUE, P_BUCKET);
+    type.createIndex(I_COMPONENT, INDEX_TYPE.NOTUNIQUE, P_COMPONENT);
   }
 
 }

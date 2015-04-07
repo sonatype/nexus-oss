@@ -13,18 +13,12 @@
 
 package org.sonatype.nexus.repository.storage;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.nexus.orient.entity.EntityType;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
@@ -40,6 +34,8 @@ public class BucketEntityAdapter
       .type(Bucket.class)
       .build();
 
+  private static final String I_REPOSITORY_NAME = "bucket_repository_name_idx";
+
   public BucketEntityAdapter() {
     super(DB_CLASS);
   }
@@ -47,6 +43,7 @@ public class BucketEntityAdapter
   @Override
   protected void defineType(final OClass type) {
     type.createProperty(P_REPOSITORY_NAME, OType.STRING);
-    // TODO create indexes
+
+    type.createIndex(I_REPOSITORY_NAME, INDEX_TYPE.UNIQUE, P_REPOSITORY_NAME);
   }
 }
