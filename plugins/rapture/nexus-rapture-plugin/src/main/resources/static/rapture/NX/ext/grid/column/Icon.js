@@ -68,7 +68,8 @@ Ext.define('NX.ext.grid.column.Icon', {
       tag: 'img',
       // NOTE: Chrome is displaying borders around <img> w/o src
       src: Ext.BLANK_IMAGE_URL,
-      cls: cls
+      cls: cls,
+      alt: me.iconName(value, meta, record)
     };
     if (height) {
       spec.height = height;
