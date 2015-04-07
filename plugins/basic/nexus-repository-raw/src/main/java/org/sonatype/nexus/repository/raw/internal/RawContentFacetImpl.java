@@ -200,12 +200,12 @@ public class RawContentFacetImpl
       Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
 
       if (component == null) {
-        log.debug("Updating lastUpdated time for nonexistant raw component {}", path);
+        log.debug("Updating lastUpdated time for non-existent raw component {}", path);
         return;
       }
 
-      // last updated will be automatically set by the hook on record modification
-      component.firstAsset().document().getRecord().setDirty();
+      // last updated will be automatically set on update
+      tx.updateAsset(component.firstAsset());
       tx.commit();
     }
   }
