@@ -38,7 +38,8 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_TYPE_COLUMN'), dataIndex: 'type' },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_FORMAT_COLUMN'), dataIndex: 'format' },
-    { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_STATUS_COLUMN'), dataIndex: 'status', flex: 1 }
+    { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_STATUS_COLUMN'), dataIndex: 'status', flex: 1 },
+    { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_URL_COLUMN'), dataIndex: 'url', xtype: 'nx-linkcolumn', flex: 1 }
   ],
 
   viewConfig: {

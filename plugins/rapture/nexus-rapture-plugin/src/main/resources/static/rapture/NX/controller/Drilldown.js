@@ -302,9 +302,13 @@ Ext.define('NX.controller.Drilldown', {
    * @private
    * When a list item is clicked, display the new view and update the bookmark
    */
-  onCellClick: function(list, td, cellIndex, model) {
+  onCellClick: function(list, td, cellIndex, model, tr, rowIndex, e) {
     var me = this;
 
+    //if the cell target is a link, let it do it's thing
+    if(e.getTarget('a')) {
+      return false;
+    }
     me.loadView(list, model, true);
   },
 
