@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * {@link Bundle} tracker that tracks and binds bundles with Nexus components.
- * 
+ *
  * @since 3.0
  */
 public class NexusBundleTracker
@@ -67,7 +67,7 @@ public class NexusBundleTracker
         log.info("ACTIVATED {}", bundle);
         return publisher;
       }
-      catch (Exception e) {
+      catch (final Exception e) {
         log.warn("BROKEN {}", bundle);
         throw e;
       }
@@ -80,7 +80,7 @@ public class NexusBundleTracker
   }
 
   @Override
-  protected boolean evictBundle(Bundle bundle) {
+  protected boolean evictBundle(final Bundle bundle) {
     // when system is shutting down we disable eviction of bundles to keep things stable
     return super.evictBundle(bundle) && (systemBundle.getState() & Bundle.STOPPING) == 0;
   }
@@ -89,7 +89,7 @@ public class NexusBundleTracker
     final BundleWiring wiring = bundle.adapt(BundleWiring.class);
     final List<BundleWire> wires = wiring.getRequiredWires(BundleRevision.PACKAGE_NAMESPACE);
     if (wires != null) {
-      for (BundleWire wire : wires) {
+      for (final BundleWire wire : wires) {
         try {
           final Bundle dependency = wire.getProviderWiring().getBundle();
           if (visited.add(dependency.getSymbolicName()) && hasComponents(dependency)) {
@@ -102,14 +102,14 @@ public class NexusBundleTracker
             }
           }
         }
-        catch (Exception e) {
+        catch (final Exception e) {
           log.warn("MISSING {}", wire, e);
         }
       }
     }
   }
 
-  private static boolean hasComponents(Bundle bundle) {
+  private static boolean hasComponents(final Bundle bundle) {
     return bundle.getResource("META-INF/sisu/javax.inject.Named") != null
         || bundle.getResource("META-INF/plexus/components.xml") != null;
   }

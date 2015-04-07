@@ -59,16 +59,15 @@ class SystemInformationGeneratorImpl
                                  final ApplicationDirectories applicationDirectories,
                                  final Provider<SystemStatus> systemStatusProvider,
                                  final @Parameters Map<String, String> parameters,
-                                 final BundleContext bundleContext)
+                                 final BundleContext bundleContext,
+                                 final BundleService bundleService)
   {
     this.componentLookupHelper = checkNotNull(componentLookupHelper)
     this.applicationDirectories = checkNotNull(applicationDirectories)
     this.systemStatusProvider = checkNotNull(systemStatusProvider)
     this.parameters = checkNotNull(parameters)
     this.bundleContext = checkNotNull(bundleContext)
-
-    // TODO: Sort out why BundleService can not be injected normally
-    this.bundleService = bundleContext.getService(bundleContext.getServiceReference(BundleService.class))
+    this.bundleService = checkNotNull(bundleService)
   }
 
   @Override

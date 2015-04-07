@@ -41,11 +41,9 @@ class BundleComponent
   final BundleService bundleService
 
   @Inject
-  BundleComponent(BundleContext bundleContext) {
+  BundleComponent(BundleContext bundleContext, BundleService bundleService) {
     this.bundleContext = checkNotNull(bundleContext)
-
-    // TODO: Sort out why BundleService can not be injected normally
-    this.bundleService = bundleContext.getService(bundleContext.getServiceReference(BundleService.class))
+    this.bundleService = checkNotNull(bundleService)
   }
 
   // TODO: Sort out permission

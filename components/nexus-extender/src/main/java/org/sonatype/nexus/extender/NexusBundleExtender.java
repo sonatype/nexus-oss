@@ -27,7 +27,7 @@ import static java.util.Collections.singletonMap;
 
 /**
  * {@link Bundle} extender that manages bundles with Nexus components.
- * 
+ *
  * @since 3.0
  */
 public class NexusBundleExtender
@@ -46,8 +46,8 @@ public class NexusBundleExtender
     listener = new NexusContextListener(this);
 
     // register our listener; the bootstrap code will call us back with the servlet context
-    final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));
-    ctx.registerService(ServletContextListener.class, listener, properties);
+    final Dictionary<String, ?> listenerProperties = new Hashtable<>(singletonMap("name", "nexus"));
+    ctx.registerService(ServletContextListener.class, listener, listenerProperties);
   }
 
   @Override

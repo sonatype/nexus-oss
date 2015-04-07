@@ -12,13 +12,17 @@
  */
 package org.sonatype.nexus.web;
 
-import org.sonatype.nexus.internal.web.DynamicFilterPipeline;
 import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.internal.web.DynamicFilterPipeline;
+
 import com.google.inject.servlet.GuiceFilter;
 
 /**
  * {@link GuiceFilter} that supports a dynamic ordered pipeline of filters and servlets.
  */
+@Singleton
 public final class NexusGuiceFilter
     extends GuiceFilter
 {

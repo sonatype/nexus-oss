@@ -268,12 +268,6 @@
     <dependency>
       <groupId>com.palominolabs.metrics</groupId>
       <artifactId>metrics-guice</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.inject</groupId>
-          <artifactId>guice</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>

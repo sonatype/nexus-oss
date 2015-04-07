@@ -12,24 +12,26 @@
  */
 package org.sonatype.nexus.extender.modules;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import javax.servlet.ServletContext;
 
 import com.google.inject.AbstractModule;
-import org.eclipse.sisu.inject.DefaultRankingFunction;
-import org.eclipse.sisu.inject.RankingFunction;
 
 /**
- * Provides ranking policy that gives more recent plugins priority over older plugins.
+ * Override guice-servlet's legacy {@link ServletContext} binding as it doesn't work well with multiple injectors.
  * 
  * @since 3.0
  */
-public class RankingModule
+public class ServletContextModule
     extends AbstractModule
 {
-  private final AtomicInteger rank = new AtomicInteger(1);
+  private final ServletContext servletContext;
+
+  public ServletContextModule(final ServletContext servletContext) {
+    this.servletContext = servletContext;
+  }
 
   @Override
   protected void configure() {
-    bind(RankingFunction.class).toInstance(new DefaultRankingFunction(rank.incrementAndGet()));
+    bind(ServletContext.class).toInstance(servletContext);
   }
 }
