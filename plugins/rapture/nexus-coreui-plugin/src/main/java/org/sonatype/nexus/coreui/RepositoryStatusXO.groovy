@@ -14,31 +14,32 @@ package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Create
 
 /**
- * Repository exchange object.
- *
+ * Repository status exchange object.
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-class RepositoryXO
+class RepositoryStatusXO
 {
+  /**
+   * Name of associated Repository.
+   */
   @NotEmpty
-  String name
+  String repositoryName
 
-  String type
+  /**
+   * Whether or not the repository is online.
+   */
+  boolean online
 
-  String format
+  /**
+   * A description of the status.
+   */
+  String description
 
-  @NotEmpty(groups = Create)
-  String recipe
-
-  Boolean online
-
-  String attributes
-  
-  String url
-  
-  RepositoryStatusXO status
+  /**
+   * A reason for the status.
+   */
+  String reason
 }
