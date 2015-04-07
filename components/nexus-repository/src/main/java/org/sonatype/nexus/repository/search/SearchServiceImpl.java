@@ -35,6 +35,7 @@ import org.sonatype.nexus.repository.security.RepositoryViewPermission;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.security.SecurityHelper;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -62,6 +63,7 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NA
 @Named
 @Singleton
 public class SearchServiceImpl
+    extends ComponentSupport
     implements SearchService
 {
 
@@ -105,6 +107,7 @@ public class SearchServiceImpl
             source = JsonUtils.merge(source, contributed);
           }
         }
+        log.debug("Creating index for {}", repository);
         client.get().admin().indices().prepareCreate(repository.getName())
             .setSource(source)
             .execute()
@@ -120,6 +123,7 @@ public class SearchServiceImpl
   public void deleteIndex(final Repository repository) {
     checkNotNull(repository);
     if (client.get().admin().indices().prepareExists(repository.getName()).execute().actionGet().isExists()) {
+      log.debug("Removing index of {}", repository);
       client.get().admin().indices().prepareDelete(repository.getName()).execute().actionGet();
     }
   }
@@ -128,10 +132,11 @@ public class SearchServiceImpl
   public void put(final Repository repository, final Component component) {
     checkNotNull(repository);
     checkNotNull(component);
+    log.debug("Indexing metadata of {} from {}", component, repository);
     try {
       Map<String, Object> additional = Maps.newHashMap();
       additional.put(P_REPOSITORY_NAME, repository.getName());
-      String json = JsonUtils.merge(from(component), JsonUtils.from(additional));
+      String json = JsonUtils.merge(componentMetadata(component), JsonUtils.from(additional));
       client.get().prepareIndex(repository.getName(), TYPE, component.id().toString()).setSource(json).execute();
     }
     catch (IOException e) {
@@ -143,6 +148,7 @@ public class SearchServiceImpl
   public void delete(final Repository repository, final Component component) {
     checkNotNull(repository);
     checkNotNull(component);
+    log.debug("Removing indexed metadata of {} from {}", component, repository);
     client.get().prepareDelete(repository.getName(), TYPE, component.id().toString()).execute();
   }
 
@@ -269,10 +275,11 @@ public class SearchServiceImpl
   }
 
   /**
-   * Creates a component metadata out of a component using {@link ComponentMetadataProducer} specific to component
-   * {@link Format}. If one is not available will use a default one ({@link DefaultComponentMetadataProducer}).
+   * Creates component metadata to be indexed out of a component using {@link ComponentMetadataProducer} specific to
+   * component {@link Format}.
+   * If one is not available will use a default one ({@link DefaultComponentMetadataProducer}).
    */
-  public String from(final Component component) {
+  private String componentMetadata(final Component component) {
     checkNotNull(component);
     String format = component.format();
     ComponentMetadataProducer producer = componentMetadataProducers.get(format);
