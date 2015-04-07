@@ -31,16 +31,8 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
       xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
-      iconName: function(value, meta, record) {
-        switch((record.get('type'))) {
-          case 'proxy':
-            return 'repository-proxy';
-          case 'group':
-            return 'repository-group';
-          default :
-            return 'repository-hosted';
-        }
-      }
+      iconNamePrefix: 'repository-',
+      dataIndex: 'type'
     },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_TYPE_COLUMN'), dataIndex: 'type' },
