@@ -45,6 +45,7 @@ import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
+import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -386,6 +387,7 @@ public class NugetGalleryFacetImpl
         return false;
       }
       tx.deleteComponent(component);
+      getRepository().facet(SearchFacet.class).delete(component);
       tx.commit();
 
       getEventBus().post(new ComponentDeletedEvent(component, getRepository()));
@@ -405,6 +407,7 @@ public class NugetGalleryFacetImpl
     final Bucket bucket = storageTx.getBucket();
     final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
     createOrUpdateAssetAndContents(storageTx, bucket, component, packageStream, recordMetadata);
+    getRepository().facet(SearchFacet.class).put(component);
     return component;
   }
 
@@ -414,6 +417,7 @@ public class NugetGalleryFacetImpl
     final Bucket bucket = storageTx.getBucket();
     final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
     createOrUpdateAsset(storageTx, bucket, component, recordMetadata);
+    getRepository().facet(SearchFacet.class).put(component);
     return component;
   }
 

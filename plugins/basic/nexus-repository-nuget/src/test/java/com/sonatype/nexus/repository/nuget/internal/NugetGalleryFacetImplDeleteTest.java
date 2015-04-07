@@ -14,6 +14,7 @@ package com.sonatype.nexus.repository.nuget.internal;
 
 import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentDeletedEvent;
@@ -50,7 +51,7 @@ public class NugetGalleryFacetImplDeleteTest
 
     final EventBus eventBus = mock(EventBus.class);
     final Repository repository = mock(Repository.class);
-
+    when(repository.facet(SearchFacet.class)).thenReturn(mock(SearchFacet.class));
     final NugetGalleryFacetImpl galleryFacet = Mockito.spy(new NugetGalleryFacetImpl()
     {
       @Override

@@ -26,7 +26,6 @@ import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
@@ -52,8 +51,6 @@ public class StorageFacetImpl
 
   private final Provider<DatabaseInstance> databaseInstanceProvider;
 
-  private final ComponentMetadataFactory componentMetadataFactory;
-
   private final BucketEntityAdapter bucketEntityAdapter;
 
   private final ComponentEntityAdapter componentEntityAdapter;
@@ -68,13 +65,10 @@ public class StorageFacetImpl
 
   @Inject
   public StorageFacetImpl(final BlobStoreManager blobStoreManager,
-                          final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
-                          final ComponentMetadataFactory componentMetadataFactory)
+                          final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider)
   {
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
-    this.componentMetadataFactory = checkNotNull(componentMetadataFactory);
-
 
     bucketEntityAdapter = new BucketEntityAdapter();
     componentEntityAdapter = new ComponentEntityAdapter(bucketEntityAdapter);

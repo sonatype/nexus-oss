@@ -36,6 +36,7 @@ import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
+import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -252,6 +253,7 @@ public class MavenFacetImpl
 
     putAssetPayload(path, tx, asset, payload);
     tx.updateAsset(asset);
+    getRepository().facet(SearchFacet.class).put(component);
   }
 
   private void putFile(final MavenPath path, final Payload payload, final StorageTx tx)
@@ -335,6 +337,10 @@ public class MavenFacetImpl
     tx.deleteAsset(asset);
     if (component.assets().isEmpty()) {
       tx.deleteComponent(component);
+      getRepository().facet(SearchFacet.class).delete(component);
+    }
+    else {
+      getRepository().facet(SearchFacet.class).put(component);
     }
     tx.commit();
     return true;
@@ -375,6 +381,7 @@ public class MavenFacetImpl
       }
       final NestedAttributesMap attributes = asset.formatAttributes();
       attributes.set(P_LAST_VERIFIED, verified.toDate());
+      tx.updateAsset(asset);
       tx.commit();
       return true;
     }
@@ -483,10 +490,4 @@ public class MavenFacetImpl
     return getRepository().facet(StorageFacet.class);
   }
 
-  private BlobRef getBlobRef(final MavenPath mavenPath, final OrientVertex asset) {
-    String blobRefStr = asset.getProperty(StorageFacet.P_BLOB_REF);
-    checkState(blobRefStr != null, "asset of component at path %s has missing blob reference",
-        mavenPath.getPath());
-    return BlobRef.parse(blobRefStr);
-  }
 }

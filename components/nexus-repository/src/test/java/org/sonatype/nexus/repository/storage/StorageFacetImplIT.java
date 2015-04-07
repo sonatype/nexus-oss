@@ -23,7 +23,6 @@ import org.sonatype.nexus.orient.DatabaseInstanceRule;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -70,7 +69,9 @@ public class StorageFacetImplIT
 
   protected TestFormat testFormat = new TestFormat();
 
-  private class TestFormat extends Format {
+  private class TestFormat
+      extends Format
+  {
     public TestFormat() {
       super("test");
     }
@@ -82,8 +83,7 @@ public class StorageFacetImplIT
     when(mockBlobStoreManager.get(anyString())).thenReturn(mock(BlobStore.class));
     underTest = new StorageFacetImpl(
         mockBlobStoreManager,
-        Providers.of(database.getInstance()),
-        mock(ComponentMetadataFactory.class)
+        Providers.of(database.getInstance())
     );
     underTest.installDependencies(mock(EventBus.class));
 

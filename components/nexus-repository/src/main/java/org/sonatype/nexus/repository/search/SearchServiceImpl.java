@@ -26,11 +26,13 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.security.BreadActions;
 import org.sonatype.nexus.repository.security.RepositoryViewPermission;
+import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.security.SecurityHelper;
 
@@ -49,6 +51,7 @@ import org.elasticsearch.search.internal.InternalSearchResponse;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
 /**
@@ -72,16 +75,20 @@ public class SearchServiceImpl
 
   private final List<IndexSettingsContributor> indexSettingsContributors;
 
+  private final Map<String, ComponentMetadataProducer> componentMetadataProducers;
+
   @Inject
   public SearchServiceImpl(final Provider<Client> client,
                            final RepositoryManager repositoryManager,
                            final SecurityHelper securityHelper,
-                           final List<IndexSettingsContributor> indexSettingsContributors)
+                           final List<IndexSettingsContributor> indexSettingsContributors,
+                           final Map<String, ComponentMetadataProducer> componentMetadataProducers)
   {
     this.client = checkNotNull(client);
     this.repositoryManager = checkNotNull(repositoryManager);
     this.securityHelper = checkNotNull(securityHelper);
     this.indexSettingsContributors = checkNotNull(indexSettingsContributors);
+    this.componentMetadataProducers = checkNotNull(componentMetadataProducers);
   }
 
   @Override
@@ -118,14 +125,14 @@ public class SearchServiceImpl
   }
 
   @Override
-  public void put(final Repository repository, final ComponentMetadata componentMetadata) {
+  public void put(final Repository repository, final Component component) {
     checkNotNull(repository);
-    checkNotNull(componentMetadata);
+    checkNotNull(component);
     try {
       Map<String, Object> additional = Maps.newHashMap();
       additional.put(P_REPOSITORY_NAME, repository.getName());
-      String json = JsonUtils.merge(componentMetadata.toJson(), JsonUtils.from(additional));
-      client.get().prepareIndex(repository.getName(), TYPE, componentMetadata.getId()).setSource(json).execute();
+      String json = JsonUtils.merge(from(component), JsonUtils.from(additional));
+      client.get().prepareIndex(repository.getName(), TYPE, component.id().toString()).setSource(json).execute();
     }
     catch (IOException e) {
       throw Throwables.propagate(e);
@@ -133,10 +140,10 @@ public class SearchServiceImpl
   }
 
   @Override
-  public void delete(final Repository repository, final String id) {
+  public void delete(final Repository repository, final Component component) {
     checkNotNull(repository);
-    checkNotNull(id);
-    client.get().prepareDelete(repository.getName(), TYPE, id).execute();
+    checkNotNull(component);
+    client.get().prepareDelete(repository.getName(), TYPE, component.id().toString()).execute();
   }
 
   @Override
@@ -259,6 +266,21 @@ public class SearchServiceImpl
       }
     }
     return indexes.toArray(new String[indexes.size()]);
+  }
+
+  /**
+   * Creates a component metadata out of a component using {@link ComponentMetadataProducer} specific to component
+   * {@link Format}. If one is not available will use a default one ({@link DefaultComponentMetadataProducer}).
+   */
+  public String from(final Component component) {
+    checkNotNull(component);
+    String format = component.format();
+    ComponentMetadataProducer producer = componentMetadataProducers.get(format);
+    if (producer == null) {
+      producer = componentMetadataProducers.get("default");
+    }
+    checkState(producer != null, "Could not find a component metadata producer for format: {}", format);
+    return producer.getMetadata(component);
   }
 
 }

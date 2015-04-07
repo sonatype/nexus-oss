@@ -29,6 +29,7 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
+import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -124,6 +125,7 @@ public class RawContentFacetImpl
       }
 
       tx.updateAsset(asset);
+      getRepository().facet(SearchFacet.class).put(component);
 
       tx.commit();
     }
@@ -189,6 +191,7 @@ public class RawContentFacetImpl
         return false;
       }
       tx.deleteComponent(component);
+      getRepository().facet(SearchFacet.class).delete(component);
       tx.commit();
       return true;
     }
