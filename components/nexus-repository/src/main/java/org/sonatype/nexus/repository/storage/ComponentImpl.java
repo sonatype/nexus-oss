@@ -108,4 +108,14 @@ class ComponentImpl
     checkState(!assets.isEmpty(), "No assets found for component");
     return assets.get(0);
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "RID=" + id() +
+        ", name=" + name() +
+        ", version=" + version() +
+        ", group=" + group() +
+        '}';
+  }
 }
