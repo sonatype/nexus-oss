@@ -1,3 +1,9 @@
+.x-tab-nx-light-top-disabled .x-frame-mc,
+.x-tab-nx-light-left-disabled .x-frame-mc,
+.x-tab-nx-light-right-disabled .x-frame-mc {
+  background-color: white;
+}
+
 /* line 826, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-nx-light-bottom-disabled .x-frame-tl,
 .x-tab-nx-light-bottom-disabled .x-frame-bl,
