@@ -23,7 +23,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.UserIdMdcHelper;
 
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
@@ -50,13 +49,12 @@ public class SecurityFilter
   public static final String ATTR_USER_ID = "nexus.user.id";
 
   @Inject
-  public SecurityFilter(final SecuritySystem securitySystem,
+  public SecurityFilter(final WebSecurityManager webSecurityManager,
                         final FilterChainResolver filterChainResolver)
   {
-    checkNotNull(securitySystem);
-    WebSecurityManager sm = (WebSecurityManager)securitySystem.getRealmSecurityManager();
-    log.trace("Security manager: {}", sm);
-    setSecurityManager(sm);
+    checkNotNull(webSecurityManager);
+    log.trace("Security manager: {}", webSecurityManager);
+    setSecurityManager(webSecurityManager);
 
     checkNotNull(filterChainResolver);
     log.trace("Filter chain resolver: {}", filterChainResolver);
