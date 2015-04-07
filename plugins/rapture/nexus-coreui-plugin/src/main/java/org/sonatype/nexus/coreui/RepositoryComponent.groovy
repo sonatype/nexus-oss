@@ -32,6 +32,7 @@ import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
 import org.sonatype.nexus.repository.view.ViewFacet
+import org.sonatype.nexus.web.BaseUrlHolder
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
@@ -109,7 +110,8 @@ extends DirectComponentSupport
         format: input.format,
         online: input.facet(ViewFacet).online,
         status: buildStatus(input),
-        attributes: attributeConverter.asAttributes(input.configuration.attributes)
+        attributes: attributeConverter.asAttributes(input.configuration.attributes),
+        url: "${BaseUrlHolder.get()}/repository/${input.name}"
     )
   }
 

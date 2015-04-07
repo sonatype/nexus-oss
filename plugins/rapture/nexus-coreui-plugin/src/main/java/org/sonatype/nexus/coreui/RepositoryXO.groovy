@@ -38,5 +38,7 @@ class RepositoryXO
 
   String attributes
   
+  String url
+  
   RepositoryStatusXO status
 }
