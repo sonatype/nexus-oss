@@ -119,7 +119,7 @@ public class NexusContextListener
 
     featuresService = bundleContext.getService(bundleContext.getServiceReference(FeaturesService.class));
 
-    injector = Guice.createInjector(new WireModule(new NexusContextModule(servletContext, variables)));
+    injector = Guice.createInjector(new WireModule(new NexusContextModule(bundleContext, servletContext, variables)));
     log.debug("Injector: {}", injector);
 
     extender.doStart(); // start tracking nexus bundles

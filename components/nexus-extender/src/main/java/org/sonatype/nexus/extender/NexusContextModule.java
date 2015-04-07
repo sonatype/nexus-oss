@@ -24,7 +24,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.GuiceFilter;
+import org.eclipse.sisu.inject.DefaultBeanLocator;
+import org.eclipse.sisu.inject.MutableBeanLocator;
+import org.eclipse.sisu.osgi.ServiceBindings;
 import org.eclipse.sisu.wire.ParameterKeys;
+import org.osgi.framework.BundleContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.inject.name.Names.named;
@@ -37,11 +41,16 @@ import static com.google.inject.name.Names.named;
 public class NexusContextModule
     extends AbstractModule
 {
+  private final BundleContext bundleContext;
+
   private final ServletContext servletContext;
 
   private final Map<?, ?> properties;
 
-  public NexusContextModule(final ServletContext servletContext, final Map<?, ?> properties) {
+  public NexusContextModule(final BundleContext bundleContext, final ServletContext servletContext,
+      final Map<?, ?> properties)
+  {
+    this.bundleContext = checkNotNull(bundleContext);
     this.servletContext = checkNotNull(servletContext);
     this.properties = checkNotNull(properties);
   }
@@ -60,5 +69,10 @@ public class NexusContextModule
     bind(ParameterKeys.PROPERTIES).toInstance(properties);
 
     install(new WebSecurityModule(servletContext));
+
+    // enable OSGi service lookup of components
+    MutableBeanLocator locator = new DefaultBeanLocator();
+    locator.add(new ServiceBindings(bundleContext));
+    bind(MutableBeanLocator.class).toInstance(locator);
   }
 }
