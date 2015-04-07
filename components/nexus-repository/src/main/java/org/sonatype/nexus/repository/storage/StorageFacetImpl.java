@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.storage;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -24,19 +25,13 @@ import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.orient.DatabaseInstance;
-import org.sonatype.nexus.orient.ODatabaseListenerSupport;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
-import org.sonatype.nexus.repository.search.SearchFacet;
 
-import com.google.common.collect.Lists;
-import com.orientechnologies.orient.core.db.ODatabase;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.hook.ODocumentHookAbstract;
-import com.orientechnologies.orient.core.hook.ORecordHook;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
@@ -116,9 +111,9 @@ public class StorageFacetImpl
 
   private void initBucket() {
     // get or create the bucket for the repository and set bucketId for fast lookup later
-    try (ODatabaseDocumentTx db = openDb(false)) {
+    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
       String repositoryName = getRepository().getName();
-      ODocument doc = bucketEntityAdapter.getByRepositoryName(db, repositoryName);
+      ODocument doc = getByRepositoryName(db, repositoryName);
       if (doc == null) {
         doc = db.newInstance(V_BUCKET);
         doc.field(P_REPOSITORY_NAME, repositoryName);
@@ -132,7 +127,7 @@ public class StorageFacetImpl
   @Override
   protected void doDelete() throws Exception {
     // TODO: Make this a soft delete and cleanup later so it doesn't block for large repos.
-    try (StorageTx tx = openStorageTx(false)) {
+    try (StorageTx tx = openStorageTx()) {
       tx.deleteBucket(tx.getBucket());
     }
   }
@@ -140,81 +135,24 @@ public class StorageFacetImpl
   @Override
   @Guarded(by = STARTED)
   public StorageTx openTx() {
-    return openStorageTx(true);
+    return openStorageTx();
   }
 
-  private StorageTx openStorageTx(boolean withHooks) {
+  private StorageTx openStorageTx() {
     BlobStore blobStore = blobStoreManager.get(blobStoreName);
-    return new StorageTxImpl(new BlobTx(blobStore), openDb(withHooks), bucketId, writePolicy);
+    return new StorageTxImpl(new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucketId, writePolicy);
   }
 
-  private ODatabaseDocumentTx openDb(boolean withHooks) {
-    ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire();
-    if (withHooks) {
-      HooksListener hooksListener = new HooksListener();
-      db.registerListener(hooksListener);
-      try {
-        SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
-        hooksListener.registerHook(db, new IndexingHook(searchFacet));
-      }
-      catch (MissingFacetException e) {
-        // no search facet, no indexing
-      }
+  @Nullable
+  public ODocument getByRepositoryName(final ODatabaseDocumentTx db, final String id) {
+    OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
+        "SELECT FROM " + V_BUCKET + " WHERE " + P_REPOSITORY_NAME + " = ?"
+    );
+    List<ODocument> results = db.command(query).execute(id);
+    if (results.isEmpty()) {
+      return null;
     }
-    return db;
+    return results.get(0);
   }
 
-  private class HooksListener
-      extends ODatabaseListenerSupport
-  {
-    private final List<ORecordHook> hooks = Lists.newArrayList();
-
-    public void registerHook(final ODatabase db, final ORecordHook hook) {
-      hooks.add(hook);
-      db.registerHook(hook);
-    }
-
-    @Override
-    public void onClose(final ODatabase db) {
-      for (ORecordHook hook : hooks) {
-        db.unregisterHook(hook);
-      }
-      db.registerListener(this);
-    }
-  }
-
-  private class IndexingHook
-      extends ODocumentHookAbstract
-  {
-    private final SearchFacet searchFacet;
-
-    public IndexingHook(final SearchFacet searchFacet) {
-      this.searchFacet = searchFacet;
-      setIncludeClasses(V_COMPONENT);
-    }
-
-    @Override
-    public DISTRIBUTED_EXECUTION_MODE getDistributedExecutionMode() {
-      return DISTRIBUTED_EXECUTION_MODE.TARGET_NODE;
-    }
-
-    @Override
-    public void onRecordAfterCreate(final ODocument doc) {
-      // TODO should indexing failures affect storage? (catch and log?)
-      if (doc.getIdentity().isPersistent()) {
-        searchFacet.put(componentMetadataFactory.from(new ComponentImpl(doc)));
-      }
-    }
-
-    @Override
-    public void onRecordAfterUpdate(final ODocument doc) {
-      onRecordAfterCreate(doc);
-    }
-
-    @Override
-    public void onRecordAfterDelete(final ODocument doc) {
-      // TODO should indexing failures affect storage? (catch and log?)
-      searchFacet.delete(doc.getIdentity().toString());
-    }
-  }
 }

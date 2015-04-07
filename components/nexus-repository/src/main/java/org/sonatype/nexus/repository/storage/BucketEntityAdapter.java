@@ -49,17 +49,4 @@ public class BucketEntityAdapter
     type.createProperty(P_REPOSITORY_NAME, OType.STRING);
     // TODO create indexes
   }
-
-  @Nullable
-  public ODocument getByRepositoryName(final ODatabaseDocumentTx db, final String id) {
-    OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
-        "SELECT FROM " + DB_CLASS + " WHERE " + P_REPOSITORY_NAME + " = ?"
-    );
-    List<ODocument> results = db.command(query).execute(id);
-    if (results.isEmpty()) {
-      return null;
-    }
-    return results.get(0);
-  }
-
 }
