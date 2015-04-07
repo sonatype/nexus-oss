@@ -45,7 +45,7 @@ public class NexusContextModule
 {
   private static final String ALLOW_SERVICES = "org.apache.karaf.*," + defaultAllow();
 
-  private static final String IGNORE_SERVICES = defaultIgnore();
+  private static final String IGNORE_SERVICES = "org.apache.karaf.shell.*," + defaultIgnore();
 
   private final BundleContext bundleContext;
 
