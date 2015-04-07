@@ -226,7 +226,7 @@ public class MavenFacetImpl
       if (coordinates.isSnapshot()) {
         componentAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
       }
-      component.save();
+      tx.updateComponent(component);
     }
 
     Asset asset = selectComponentAsset(tx, component, path);
@@ -251,7 +251,7 @@ public class MavenFacetImpl
     }
 
     putAssetPayload(path, tx, asset, payload);
-    asset.save();
+    tx.updateAsset(asset);
   }
 
   private void putFile(final MavenPath path, final Payload payload, final StorageTx tx)
@@ -270,7 +270,7 @@ public class MavenFacetImpl
     }
 
     putAssetPayload(path, tx, asset, payload);
-    asset.save();
+    tx.updateAsset(asset);
   }
 
   private void putAssetPayload(final MavenPath path,

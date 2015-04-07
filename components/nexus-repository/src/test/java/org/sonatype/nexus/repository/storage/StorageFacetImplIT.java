@@ -145,7 +145,7 @@ public class StorageFacetImplIT
 
       assertThat(map.isEmpty(), is(false));
 
-      asset.save();
+      tx.updateAsset(asset);
 
       tx.commit();
       docId = asset.id();
@@ -169,7 +169,7 @@ public class StorageFacetImplIT
       Asset asset1 = tx.createAsset(tx.getBucket(), testFormat);
       asset1.set("name", "asset1");
       asset1.set("number", 42);
-      asset1.save();
+      tx.updateAsset(asset1);
       tx.commit();
     }
 
@@ -178,7 +178,7 @@ public class StorageFacetImplIT
       Asset asset2 = tx.createAsset(tx.getBucket(), testFormat);
       asset2.set("name", "asset2");
       asset2.set("number", 42);
-      asset2.save();
+      tx.updateAsset(asset2);
       tx.commit();
     }
 
@@ -260,6 +260,7 @@ public class StorageFacetImplIT
       Bucket bucket = tx.getBucket();
       Asset asset = tx.createAsset(bucket, testFormat);
       asset.set("attributes", inputMap);
+      tx.updateAsset(asset);
       tx.commit();
       docId = asset.document().getIdentity();
     }

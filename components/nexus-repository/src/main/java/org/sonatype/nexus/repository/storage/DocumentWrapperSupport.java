@@ -110,7 +110,6 @@ abstract class DocumentWrapperSupport
     else {
       document.field(name, value);
     }
-    save();
   }
 
   @Override

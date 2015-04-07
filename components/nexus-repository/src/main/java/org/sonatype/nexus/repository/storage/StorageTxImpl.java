@@ -391,24 +391,23 @@ public class StorageTxImpl
   public Asset createAsset(final Bucket bucket, final Format format) {
     checkNotNull(bucket);
     checkNotNull(format);
-
-    return createAsset(bucket, format.getValue());
+    return new AssetImpl(createAsset(bucket, format.getValue()));
   }
 
-  private Asset createAsset(final Bucket bucket, final String format) {
-    ODocument assetDoc = db.newInstance(V_ASSET);
-    assetDoc.field(P_BUCKET, bucket.document());
-    assetDoc.field(P_FORMAT, format);
-    assetDoc.field(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
-    return new AssetImpl(assetDoc);
+  private ODocument createAsset(final Bucket bucket, final String format) {
+    ODocument doc = db.newInstance(V_ASSET);
+    doc.field(P_BUCKET, bucket.document());
+    doc.field(P_FORMAT, format);
+    doc.field(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
+    return doc;
   }
 
   @Override
   @Guarded(by = OPEN)
   public Asset createAsset(final Bucket bucket, final Component component) {
-    Asset asset = createAsset(bucket, component.format());
-    asset.document().field(P_COMPONENT, component.document());
-    return asset;
+    ODocument doc = createAsset(bucket, component.format());
+    doc.field(P_COMPONENT, component.document());
+    return new AssetImpl(doc);
   }
 
   @Override
@@ -422,6 +421,16 @@ public class StorageTxImpl
     doc.field(P_FORMAT, format.getValue());
     doc.field(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
     return new ComponentImpl(doc);
+  }
+
+  @Override
+  public void updateComponent(final Component component) {
+    db.save(component.document());
+  }
+
+  @Override
+  public void updateAsset(final Asset asset) {
+    db.save(asset.document());
   }
 
   @Override
@@ -534,8 +543,6 @@ public class StorageTxImpl
     for (HashAlgorithm algorithm : hashAlgorithms) {
       checksums.set(algorithm.name(), hashes.get(algorithm).toString());
     }
-
-    asset.save();
 
     return newBlobRef;
   }

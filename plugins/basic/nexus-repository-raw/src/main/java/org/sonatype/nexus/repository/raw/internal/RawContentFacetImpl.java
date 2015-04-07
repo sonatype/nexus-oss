@@ -104,7 +104,7 @@ public class RawContentFacetImpl
 
         // Set attributes map to contain "raw" format-specific metadata (in this case, path)
         component.formatAttributes().set(P_PATH, path);
-        component.save();
+        tx.updateComponent(component);
 
         asset = tx.createAsset(bucket, component);
       }
@@ -123,7 +123,7 @@ public class RawContentFacetImpl
         }
       }
 
-      asset.save();
+      tx.updateAsset(asset);
 
       tx.commit();
     }

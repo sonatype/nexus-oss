@@ -168,6 +168,16 @@ public interface StorageTx
   Component createComponent(Bucket bucket, Format format);
 
   /**
+   * Updates an existing component.
+   */
+  void updateComponent(Component component);
+
+  /**
+   * Updates an existing asset.
+   */
+  void updateAsset(Asset asset);
+
+  /**
    * Deletes an existing component and all constituent assets.
    */
   void deleteComponent(Component component);
