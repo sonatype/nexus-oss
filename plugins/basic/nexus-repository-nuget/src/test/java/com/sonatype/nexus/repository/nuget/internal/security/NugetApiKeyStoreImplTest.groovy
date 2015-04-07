@@ -96,8 +96,6 @@ class NugetApiKeyStoreImplTest
 
     PrincipalCollection principals = underTest.getPrincipals(key)
 
-    System.err.println(principals)
-    //    assertThat(principals, isNotNull())
     assertThat(principals.primaryPrincipal, equalTo("alpha"))
   }
 
