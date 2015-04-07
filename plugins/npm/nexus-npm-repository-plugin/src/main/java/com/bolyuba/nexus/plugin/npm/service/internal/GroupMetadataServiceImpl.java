@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import com.bolyuba.nexus.plugin.npm.NpmRepository;
 import com.bolyuba.nexus.plugin.npm.group.NpmGroupRepository;
@@ -42,7 +43,10 @@ public class GroupMetadataServiceImpl
 {
   private final NpmGroupRepository npmGroupRepository;
 
-  private boolean mergeMetadata = false; // explicit we retain old behaviour
+  private boolean mergeMetadata = SystemPropertiesHelper.getBoolean(
+    "com.bolyuba.nexus.plugin.npm.service.internal.GroupMetadataServiceImpl.mergeMetadata",
+    true
+  );
 
   public GroupMetadataServiceImpl(final NpmGroupRepository npmGroupRepository,
                                   final MetadataParser metadataParser)
@@ -76,7 +80,7 @@ public class GroupMetadataServiceImpl
   protected PackageRoot doGeneratePackageRoot(final PackageRequest request) throws IOException {
     final List<NpmRepository> members = (request.isScoped() &&
         !npmGroupRepository.getId().equals(request.getScope())) ? getScopeMembers(request.getScope()) : getMembers();
-    if (mergeMetadata) {
+    if (isMergeMetadata()) {
       PackageRoot root = null;
       // apply in reverse order to have "first wins", as package overlay makes overlaid prevail
       for (NpmRepository member : Lists.reverse(members)) {
