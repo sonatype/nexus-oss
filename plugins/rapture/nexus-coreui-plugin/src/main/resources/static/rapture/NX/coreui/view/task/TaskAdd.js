@@ -24,7 +24,6 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
   /**
    * @override
