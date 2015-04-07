@@ -71,7 +71,7 @@ public class NugetGalleryFacetImplDeleteTest
     final Asset asset = mock(Asset.class);
     final BlobRef blobRef = mock(BlobRef.class); //new BlobRef("local", "default", "a34af31");
 
-    // Wire the mock vertices together: component has asset, asset has blobRef
+    // Wire the mocks together: component has asset, asset has blobRef
     doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
     when(component.assets()).thenReturn(asList(asset));
     when(asset.blobRef()).thenReturn(blobRef);

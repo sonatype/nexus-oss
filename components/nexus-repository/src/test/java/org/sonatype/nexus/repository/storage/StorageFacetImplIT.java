@@ -295,8 +295,8 @@ public class StorageFacetImplIT
       Map<String, String> parameters = ImmutableMap.of("fooValue", "bar");
       String query = String.format("select from %s where attributes.bag1.foo = :fooValue", V_ASSET);
 
-      Iterable<ODocument> vertices = tx.getDb().command(new OCommandSQL(query)).execute(parameters);
-      List<ODocument> list = Lists.newArrayList(vertices);
+      Iterable<ODocument> docs = tx.getDb().command(new OCommandSQL(query)).execute(parameters);
+      List<ODocument> list = Lists.newArrayList(docs);
 
       assertThat(list.size(), is(1));
       assertThat(list.get(0).getIdentity(), is(docId));

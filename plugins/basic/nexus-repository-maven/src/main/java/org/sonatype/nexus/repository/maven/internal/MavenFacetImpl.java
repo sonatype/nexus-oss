@@ -50,11 +50,9 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A {@link MavenFacet} that persists Maven artifacts and metadata to a {@link StorageFacet}.
