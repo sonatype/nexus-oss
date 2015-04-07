@@ -37,8 +37,6 @@ interface DocumentWrapper
    */
   ORID id();
 
-  void save();
-
   /**
    * Tells whether the underlying record is new.
    */

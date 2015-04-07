@@ -49,11 +49,6 @@ abstract class DocumentWrapperSupport
   }
 
   @Override
-  public void save() {
-    document.save();
-  }
-
-  @Override
   public boolean isNew() {
     return id().isNew();
   }
