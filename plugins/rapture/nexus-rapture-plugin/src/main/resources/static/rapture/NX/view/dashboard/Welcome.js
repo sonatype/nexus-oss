@@ -50,9 +50,6 @@ Ext.define('NX.view.dashboard.Welcome', {
       //  }
       //},
       {
-        xtype: 'nx-actions'
-      },
-      {
         xtype: 'image',
         src: NX.util.Url.urlOf('/static/rapture/resources/images/nexus-milestone.png'), // 160x130
         height: 130,
