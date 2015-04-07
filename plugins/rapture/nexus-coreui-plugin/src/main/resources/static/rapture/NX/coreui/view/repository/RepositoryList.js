@@ -38,12 +38,25 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_TYPE_COLUMN'), dataIndex: 'type' },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_FORMAT_COLUMN'), dataIndex: 'format' },
-    { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_STATUS_COLUMN'), dataIndex: 'status', flex: 1 }
+    {
+      header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_STATUS_COLUMN'), dataIndex: 'status', flex: 1,
+      renderer: function(value) {
+        var status = value.online ? 'Online' : 'Offline';
+        if (value.description) {
+          status += ' - ' + value.description;
+        }
+        if (value.reason) {
+          status += '<br/><i>' + value.reason + '</i>'
+        }
+        return status;
+      }
+    }
   ],
 
   viewConfig: {
     emptyText: NX.I18n.get('ADMIN_REPOSITORIES_LIST_EMPTY_STATE'),
-    deferEmptyText: false
+    deferEmptyText: false,
+    markDirty:false
   },
 
   tbar: [

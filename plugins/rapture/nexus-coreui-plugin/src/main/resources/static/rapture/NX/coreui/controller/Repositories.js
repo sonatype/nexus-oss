@@ -81,11 +81,16 @@ Ext.define('NX.coreui.controller.Repositories', {
       controller: {
         '#Refresh': {
           refresh: me.loadRecipe
+        },
+        '#State': {
+          receivingchanged: me.onStateReceivingChanged
         }
       },
       component: {
         'nx-coreui-repository-list': {
-          beforerender: me.loadRecipe
+          beforerender: me.loadRecipe,
+          afterrender: me.startStatusPolling,
+          beforedestroy: me.stopStatusPolling
         },
         'nx-coreui-repository-list button[action=new]': {
           click: me.showAddWindow
@@ -167,6 +172,79 @@ Ext.define('NX.coreui.controller.Repositories', {
         NX.Messages.add({ text: 'Repository deleted: ' + description, type: 'success' });
       }
     });
+  },
+
+  /**
+   * @private
+   * Start polling for repository statuses.
+   */
+  startStatusPolling: function() {
+    var me = this;
+
+    if (me.statusProvider) {
+      me.statusProvider.disconnect();
+    }
+    me.statusProvider = Ext.direct.Manager.addProvider({
+      type: 'polling',
+      url: NX.direct.api.POLLING_URLS.coreui_Repository_readStatus,
+      interval: 5000,
+      baseParams: {
+      },
+      listeners: {
+        data: function(provider, event) {
+          if (event.data && event.data.success && event.data.data) {
+            me.updateRepositoryModels(event.data.data);
+          }
+        },
+        scope: me
+      }
+    });
+    me.logDebug('Repository status pooling started');
+  },
+
+  /**
+   * @private
+   * Stop polling for repository statuses.
+   */
+  stopStatusPolling: function() {
+    var me = this;
+
+    if (me.statusProvider) {
+      me.statusProvider.disconnect();
+    }
+    me.logDebug('Repository status pooling stopped');
+  },
+
+  /**
+   * @private
+   * Updates Repository store records with values returned by status polling.
+   * @param {Array} repositoryStatuses array of status objects
+   */
+  updateRepositoryModels: function(repositoryStatuses) {
+    var me = this;
+
+    Ext.Array.each(repositoryStatuses, function(repositoryStatus) {
+      var repositoryModel = me.getNXCoreuiStoreRepositoryStore().findRecord('name', repositoryStatus.repositoryName);
+      if (repositoryModel) {
+        repositoryModel.set('status', repositoryStatus);
+        repositoryModel.commit(true);
+      }
+    });
+  },
+
+  /**
+   * Start / Stop status pooling when server is disconnected/connected.
+   * @param receiving if we are receiving or not status from server (server connected/disconnected)
+   */
+  onStateReceivingChanged: function(receiving) {
+    var me = this;
+
+    if (me.getList() && receiving) {
+      me.startStatusPolling();
+    }
+    else {
+      me.stopStatusPolling();
+    }
   }
 
 });

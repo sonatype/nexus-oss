@@ -28,12 +28,14 @@ import org.sonatype.nexus.repository.MissingFacetException
 import org.sonatype.nexus.repository.Recipe
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
+import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
 import org.sonatype.nexus.repository.view.ViewFacet
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.hibernate.validator.constraints.NotEmpty
 
@@ -101,25 +103,56 @@ extends DirectComponentSupport
   }
 
   RepositoryXO asRepository(Repository input) {
-    def status = input.facet(ViewFacet).online ? 'Online' : 'Offline'
-    try {
-      def remoteStatus = input.facet(HttpClientFacet).status
-      status += " - ${remoteStatus.description}"
-      if (remoteStatus.reason) {
-        status += "<br/><i>${remoteStatus.reason}</i>"
-      }
-    }
-    catch (MissingFacetException e) {
-      // no proxy, no remote status
-    }
     return new RepositoryXO(
         name: input.name,
         type: input.type,
         format: input.format,
         online: input.facet(ViewFacet).online,
-        status: status,
+        status: buildStatus(input),
         attributes: attributeConverter.asAttributes(input.configuration.attributes)
     )
   }
 
+  @DirectPollMethod(event = "coreui_Repository_readStatus")
+  @RequiresAuthentication
+  List<RepositoryStatusXO> readStatus(final Map<String, String> params) {
+    repositoryManager.browse().collect { Repository repository -> buildStatus(repository) }
+  }
+
+  RepositoryStatusXO buildStatus(Repository input) {
+    def statusXO = new RepositoryStatusXO()
+    statusXO.repositoryName = input.name
+    statusXO.online = input.facet(ViewFacet).online
+
+    try {
+      if (input.facet(GroupFacet)) {
+        //TODO - should we try to aggregate status from group members?
+        return statusXO
+      }
+    }
+    catch (MissingFacetException e) {
+      // no group, can refine status
+    }
+    
+    try {
+      def remoteStatus = input.facet(HttpClientFacet).status
+      statusXO.description = remoteStatus.description
+      if (remoteStatus.reason) {
+        statusXO.reason = remoteStatus.reason
+      }
+    }
+    catch (MissingFacetException e) {
+      // no proxy, no remote status
+    }
+    return statusXO
+  }
+
+  public class RepositoryStatusXO {
+    @NotEmpty
+    String repositoryName
+    boolean online
+    String description
+    String reason
+  }
+  
 }
