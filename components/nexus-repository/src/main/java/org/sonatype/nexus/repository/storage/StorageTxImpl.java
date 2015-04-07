@@ -13,7 +13,6 @@
 package org.sonatype.nexus.repository.storage;
 
 import java.io.InputStream;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +52,6 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_BUCKET;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_CHECKSUM;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_COMPONENT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_LAST_UPDATED;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.V_ASSET;
 import static org.sonatype.nexus.repository.storage.StorageFacet.V_BUCKET;
@@ -427,15 +425,11 @@ public class StorageTxImpl
 
   @Override
   public void updateComponent(final Component component) {
-    checkNotNull(component);
-    component.set(P_LAST_UPDATED, new Date());
     db.save(component.document());
   }
 
   @Override
   public void updateAsset(final Asset asset) {
-    checkNotNull(asset);
-    asset.set(P_LAST_UPDATED, new Date());
     db.save(asset.document());
   }
 

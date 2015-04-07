@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -153,6 +154,7 @@ public class StorageFacetImpl
     if (withHooks) {
       HooksListener hooksListener = new HooksListener();
       db.registerListener(hooksListener);
+      hooksListener.registerHook(db, new LastUpdatedHook());
       try {
         SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
         hooksListener.registerHook(db, new IndexingHook(searchFacet));
@@ -180,6 +182,34 @@ public class StorageFacetImpl
         db.unregisterHook(hook);
       }
       db.registerListener(this);
+    }
+  }
+
+
+  private class LastUpdatedHook
+      extends ODocumentHookAbstract
+  {
+    public LastUpdatedHook() {
+      setIncludeClasses(V_COMPONENT, V_ASSET);
+    }
+
+    @Override
+    public DISTRIBUTED_EXECUTION_MODE getDistributedExecutionMode() {
+      return DISTRIBUTED_EXECUTION_MODE.TARGET_NODE;
+    }
+
+    public RESULT onRecordBeforeCreate(final ODocument doc) {
+      setLastUpdatedToNow(doc);
+      return RESULT.RECORD_CHANGED;
+    }
+
+    public RESULT onRecordBeforeUpdate(final ODocument doc) {
+      setLastUpdatedToNow(doc);
+      return RESULT.RECORD_CHANGED;
+    }
+
+    private void setLastUpdatedToNow(ODocument doc) {
+      doc.field(P_LAST_UPDATED, new Date());
     }
   }
 
