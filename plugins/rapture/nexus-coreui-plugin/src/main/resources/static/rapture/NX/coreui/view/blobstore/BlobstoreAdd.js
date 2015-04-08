@@ -24,7 +24,6 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
   defaultFocus: 'type',
 
@@ -34,7 +33,7 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreAdd', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-coreui-blobstore-settings-form',
       api: {
         submit: 'NX.direct.coreui_Blobstore.create'

@@ -23,11 +23,10 @@ Ext.define('NX.coreui.view.logging.LoggerAdd', {
   requires: [
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
   defaultFocus: 'name',
 
-  items: {
+  settingsForm: {
     xtype: 'nx-settingsform',
     items: [
       {

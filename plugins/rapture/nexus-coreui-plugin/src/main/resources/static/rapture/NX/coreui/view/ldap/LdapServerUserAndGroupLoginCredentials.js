@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
     'NX.Icons',
     'NX.I18n'
   ],
+  ui: 'nx-inset',
 
   title: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_TITLE'),
 
@@ -31,7 +32,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
   autoShow: true,
   modal: true,
   constrain: true,
-  width: 320,
+  width: 360,
   defaultFocus: 'username',
 
   /**
@@ -47,11 +48,10 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
     Ext.apply(this, {
       items: {
         xtype: 'form',
-        bodyPadding: 10,
         defaultType: 'textfield',
         defaults: {
           labelAlign: 'left',
-          labelWidth: 100,
+          labelWidth: 140,
           anchor: '100%'
         },
         items: [

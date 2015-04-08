@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
     'NX.Icons',
     'NX.I18n'
   ],
+  ui: 'nx-inset',
 
   title: NX.I18n.get('ADMIN_SMTP_VERIFY_TITLE'),
   defaultFocus: 'email',
@@ -45,7 +46,6 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
     me.items = [
       {
         xtype: 'form',
-        bodyPadding: 10,
         defaults: {
           labelSeparator: '',
           labelWidth: 40,

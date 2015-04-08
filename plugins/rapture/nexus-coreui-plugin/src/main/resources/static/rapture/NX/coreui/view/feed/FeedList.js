@@ -54,6 +54,12 @@ Ext.define('NX.coreui.view.feed.FeedList', {
     deferEmptyText: false
   },
 
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless'
+  }],
+
   plugins: [
     { ptype: 'gridfilterbox', emptyText: NX.I18n.get('BROWSE_FEEDS_LIST_FILTER_ERROR') }
   ]

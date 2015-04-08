@@ -27,7 +27,7 @@ Ext.define('NX.coreui_legacy.view.repository.RepositoryAddHostedMaven', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-repository-settings-hosted-maven2-form',
       template: me.template,
       api: {

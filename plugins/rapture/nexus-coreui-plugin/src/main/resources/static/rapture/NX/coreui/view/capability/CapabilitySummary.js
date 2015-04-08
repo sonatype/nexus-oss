@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.capability.CapabilitySummary', {
-  extend: 'NX.ext.panel.SubsectionPanel',
+  extend: 'Ext.Panel',
   alias: 'widget.nx-coreui-capability-summary',
   requires: [
     'NX.Conditions',
@@ -28,66 +28,82 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
   title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SUMMARY_TAB'),
   autoScroll: true,
 
+  layout: {
+    type: 'vbox',
+    align: 'stretch'
+  },
+
   /**
    * @override
    */
   initComponent: function () {
     var me = this;
 
-    me.items = [
-      {
-        layout: 'column',
-        title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SUMMARY_SECTION'),
-        weight: 10,
-        items: [
-          {
-            xtype: 'nx-info',
-            columnWidth: 1
-          }
-        ]
-      },
-      {
-        xtype: 'nx-coreui-capability-status',
-        title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_STATUS_SECTION'),
-        weight: 20
-      },
-      {
-        xtype: 'nx-coreui-capability-about',
-        title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_ABOUT_SECTION'),
-        weight: 30
-      },
-      {
-        xtype: 'nx-settingsform',
-        title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_NOTES_SECTION'),
-        weight: 40,
-        api: {
-          submit: 'NX.direct.capability_Capability.updateNotes'
+    me.items = {
+      xtype: 'panel',
+      ui: 'nx-inset',
+      items: [
+        {
+          xtype: 'panel',
+          ui: 'nx-subsection',
+          frame: true,
+          title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SUMMARY_SECTION'),
+          layout: 'column',
+          weight: 10,
+          items: [
+            {
+              xtype: 'nx-info',
+              columnWidth: 1
+            }
+          ]
         },
-        settingsFormSuccessMessage: function (data) {
-          var description = NX.I18n.format('ADMIN_CAPABILITIES_UPDATE_SUCCESS', data['typeName']);
-          if (data['description']) {
-            description += ' - ' + data['description'];
-          }
-          return description;
+        {
+          xtype: 'nx-coreui-capability-status',
+          ui: 'nx-subsection',
+          frame: true,
+          title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_STATUS_SECTION'),
+          weight: 20
         },
-        editableCondition: NX.Conditions.isPermitted('nexus:capabilities', 'update'),
-        editableMarker: NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_ERROR'),
-        items: [
-          {
-            xtype: 'hiddenfield',
-            name: 'id'
+        {
+          xtype: 'nx-coreui-capability-about',
+          ui: 'nx-subsection',
+          frame: true,
+          title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_ABOUT_SECTION'),
+          weight: 30
+        },
+        {
+          xtype: 'nx-settingsform',
+          title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_NOTES_SECTION'),
+          weight: 40,
+          api: {
+            submit: 'NX.direct.capability_Capability.updateNotes'
           },
-          {
-            xtype: 'textarea',
-            fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_NOTES'),
-            helpText: NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_NOTES_HELP'),
-            name: 'notes',
-            allowBlank: true,
-            anchor: '100%'
-          }
-        ]
-      }
-    ];
+          settingsFormSuccessMessage: function (data) {
+            var description = NX.I18n.format('ADMIN_CAPABILITIES_UPDATE_SUCCESS', data['typeName']);
+            if (data['description']) {
+              description += ' - ' + data['description'];
+            }
+            return description;
+          },
+          editableCondition: NX.Conditions.isPermitted('nexus:capabilities', 'update'),
+          editableMarker: NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_ERROR'),
+          items: [
+            {
+              xtype: 'hiddenfield',
+              name: 'id'
+            },
+            {
+              xtype: 'textarea',
+              fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_NOTES'),
+              helpText: NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_NOTES_HELP'),
+              name: 'notes',
+              allowBlank: true,
+              anchor: '100%'
+            }
+          ]
+        }
+      ]
+    };
 
     me.callParent();
   },

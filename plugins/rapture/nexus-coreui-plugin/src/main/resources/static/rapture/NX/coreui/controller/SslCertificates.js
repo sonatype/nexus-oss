@@ -37,6 +37,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     'ssl.SslCertificateAddFromPem',
     'ssl.SslCertificateAddFromServer',
     'ssl.SslCertificateDetails',
+    'ssl.SslCertificateDetailsForm',
     'ssl.SslCertificateDetailsWindow',
     'ssl.SslCertificateFeature',
     'ssl.SslCertificateList'
@@ -44,7 +45,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
   refs: [
     { ref: 'feature', selector: 'nx-coreui-sslcertificate-feature' },
     { ref: 'list', selector: 'nx-coreui-sslcertificate-list' },
-    { ref: 'details', selector: 'nx-coreui-sslcertificate-feature nx-coreui-sslcertificate-details' }
+    { ref: 'details', selector: 'nx-coreui-sslcertificate-feature nx-coreui-sslcertificate-details-form' }
   ],
   icons: {
     'sslcertificate-default': {

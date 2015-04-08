@@ -21,6 +21,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnection', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-ldapserver-connection',
 
-  items: { xtype: 'nx-coreui-ldapserver-connection-form' }
+  settingsForm: { xtype: 'nx-coreui-ldapserver-connection-form' }
 
 });

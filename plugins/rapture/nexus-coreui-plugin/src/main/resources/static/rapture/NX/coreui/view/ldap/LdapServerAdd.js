@@ -33,7 +33,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
   initComponent: function () {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-settingsform',
       api: {
         submit: 'NX.direct.ldap_LdapServer.create'
@@ -75,7 +75,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
 
     me.callParent(arguments);
 
-    me.items.get(0).getDockedItems('toolbar[dock="bottom"]')[0].add(
+    me.down('nx-settingsform').getDockedItems('toolbar[dock="bottom"]')[0].add(
         { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_CONNECTION_VERIFY_BUTTON'), groupBind: 'connection', action: 'verifyconnection' },
         { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_MAPPING_BUTTON'), formBind: true, action: 'verifyusermapping' },
         { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_LOGIN_BUTTON'), formBind: true, action: 'verifylogin' }

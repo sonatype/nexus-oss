@@ -30,6 +30,10 @@ Ext.define('NX.view.dashboard.Welcome', {
     pack: 'start'
   },
 
+  style: {
+    "background-color": "white"
+  },
+
   /**
    * @override
    */

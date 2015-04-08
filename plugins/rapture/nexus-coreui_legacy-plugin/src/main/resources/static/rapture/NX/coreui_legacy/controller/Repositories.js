@@ -155,8 +155,8 @@ Ext.define('NX.coreui_legacy.controller.Repositories', {
       };
       settingsFormClass = me.findComponent('settings', template, true);
       if (!settingsForm || settingsFormClass.xtype !== settingsForm.xtype) {
-        settingsPanel.removeAll();
-        settingsPanel.add({ xtype: settingsFormClass.xtype, template: template });
+        settingsPanel.removeAllSettingsForms();
+        settingsPanel.addSettingsForm({ xtype: settingsFormClass.xtype, template: template });
       }
       settingsPanel.loadRecord(model);
 
@@ -181,7 +181,7 @@ Ext.define('NX.coreui_legacy.controller.Repositories', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-drilldown-actions' },
+        { xtype: 'nx-actions' },
         {
           xtype: 'nx-coreui_legacy-repository-selecttemplate',
           flex: 1

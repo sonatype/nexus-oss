@@ -24,7 +24,6 @@ Ext.define('NX.coreui_legacy.view.repository.RepositoryAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
   editableMarker: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_CREATE_ERROR'),
 
@@ -35,7 +34,7 @@ Ext.define('NX.coreui_legacy.view.repository.RepositoryAdd', {
 
     me.editableCondition = NX.Conditions.isPermitted('nexus:repositories', 'create');
 
-    me.items.buttons = [
+    me.settingsForm.buttons = [
       { text: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
       { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
         this.up('nx-drilldown').showChild(0, true);

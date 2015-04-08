@@ -23,6 +23,10 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryFeature', {
 
   layout: 'border',
 
+  bodyStyle: {
+    'background-color': 'white'
+  },
+
   initComponent: function() {
     var me = this;
 

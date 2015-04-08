@@ -45,11 +45,34 @@ Ext.define('NX.coreui.view.ldap.LdapServerList', {
     deferEmptyText: false
   },
 
-  tbar: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
-    { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_LIST_ORDER_BUTTON'), glyph: 'xf162@FontAwesome' /* fa-sort-numeric-asc */, action: 'changeorder', disabled: true },
-    { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_LIST_CACHE_BUTTON'), glyph: 'xf014@FontAwesome' /* fa-trash-o */, action: 'clearcache', disabled: true }
-  ],
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless',
+    items: [
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_LDAP_LIST_NEW_BUTTON'),
+        glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
+        action: 'new',
+        disabled: true
+      },
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_LDAP_LIST_ORDER_BUTTON'),
+        glyph: 'xf162@FontAwesome' /* fa-sort-numeric-asc */,
+        action: 'changeorder',
+        disabled: true
+      },
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_LDAP_LIST_CACHE_BUTTON'),
+        glyph: 'xf014@FontAwesome' /* fa-trash-o */,
+        action: 'clearcache',
+        disabled: true
+      }
+    ]
+  }],
 
   plugins: [
     { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_LDAP_LIST_FILTER_ERROR') }

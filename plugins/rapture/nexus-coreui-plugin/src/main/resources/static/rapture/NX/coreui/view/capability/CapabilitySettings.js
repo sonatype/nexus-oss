@@ -21,6 +21,6 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-capability-settings',
 
-  items: { xtype: 'nx-coreui-capability-settings-form' }
+  settingsForm: { xtype: 'nx-coreui-capability-settings-form' }
 
 });

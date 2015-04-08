@@ -26,5 +26,5 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreSettings', {
 
   title: NX.I18n.get('ADMIN_BLOBSTORES_DETAILS_SETTINGS_TAB'),
 
-  items: { xtype: 'nx-coreui-blobstore-settings-form' }
+  settingsForm: { xtype: 'nx-coreui-blobstore-settings-form' }
 });

@@ -30,7 +30,7 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
     repository: undefined
   },
 
-  items: [
+  settingsForm: [
     {
       xtype: 'nx-settingsform',
       paramOrder: ['repositoryId'],

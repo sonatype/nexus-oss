@@ -53,7 +53,7 @@ Ext.define('NX.view.dev.styles.Modals', {
 
         items: {
           xtype: 'form',
-          bodyPadding: 10,
+          ui: 'nx-inset',
           defaultType: 'textfield',
           defaults: {
             anchor: '100%'

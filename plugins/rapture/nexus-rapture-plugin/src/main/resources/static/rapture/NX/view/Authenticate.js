@@ -23,6 +23,7 @@ Ext.define('NX.view.Authenticate', {
   requires: [
     'NX.I18n'
   ],
+  ui: 'nx-inset',
 
   title: NX.I18n.get('GLOBAL_AUTHENTICATE_TITLE'),
 
@@ -52,7 +53,6 @@ Ext.define('NX.view.Authenticate', {
     Ext.apply(this, {
       items: {
         xtype: 'form',
-        bodyPadding: 10,
         defaultType: 'textfield',
         defaults: {
           anchor: '100%'

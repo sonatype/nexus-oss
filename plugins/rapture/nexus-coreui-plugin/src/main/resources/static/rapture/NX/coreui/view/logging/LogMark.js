@@ -24,13 +24,14 @@ Ext.define('NX.coreui.view.logging.LogMark', {
     'NX.Conditions',
     'NX.I18n'
   ],
+  ui: 'nx-inset',
 
   title: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_TITLE'),
   defaultFocus: 'message',
 
   items: {
     xtype: 'nx-settingsform',
-    ui: 'nx-inset',
+    frame: false,
     defaults: {
       anchor: '100%'
     },
@@ -67,6 +68,6 @@ Ext.define('NX.coreui.view.logging.LogMark', {
       }
     ];
 
-    me.callParent();
+    me.callParent(arguments);
   }
 });

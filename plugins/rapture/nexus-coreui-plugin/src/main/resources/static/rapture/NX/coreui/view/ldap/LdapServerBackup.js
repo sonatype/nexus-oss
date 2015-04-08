@@ -21,6 +21,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackup', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-ldapserver-backup',
 
-  items: { xtype: 'nx-coreui-ldapserver-backup-form' }
+  settingsForm: { xtype: 'nx-coreui-ldapserver-backup-form' }
 
 });

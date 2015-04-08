@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.maven.MavenUpload', {
     'NX.I18n'
   ],
 
-  items: {
+  settingsForm: {
     xtype: 'nx-coreui-upload-artifact',
     api: {
       submit: 'NX.direct.coreui_MavenUpload.uploadArtifacts'

@@ -20,6 +20,6 @@
 
 Ext.define('NX.view.drilldown.Actions', {
   extend: 'Ext.toolbar.Toolbar',
-  alias: 'widget.nx-drilldown-actions',
-  cls: 'nx-drilldown-actions'
+  alias: 'widget.nx-actions',
+  cls: 'nx-actions'
 });

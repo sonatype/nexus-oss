@@ -138,10 +138,10 @@ Ext.define('NX.controller.Menu', {
         '#breadcrumb button': {
           click: me.warnBeforeButtonClick
         },
-        'nx-drilldown-actions button[handler]': {
+        'nx-actions button[handler]': {
           click: me.warnBeforeButtonClick
         },
-        'nx-drilldown-actions menuitem[handler]': {
+        'nx-actions menuitem[handler]': {
           click: me.warnBeforeButtonClick
         },
         'button[mode]': {

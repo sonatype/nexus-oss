@@ -26,190 +26,182 @@ Ext.define('NX.coreui.view.support.Metrics', {
     'Ext.data.ArrayStore',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
-
   autoScroll: true,
-  layout: {
-    type: 'vbox'
-  },
 
-  tbar: [
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_METRICS_DOWNLOAD_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_METRICS_DOWNLOAD_TOOLTIP'),
-      glyph: 'xf019@FontAwesome' /* fa-download */,
-      action: 'download'
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions',
+    items: [
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_METRICS_DOWNLOAD_BUTTON'),
+        tooltip: NX.I18n.get('ADMIN_METRICS_DOWNLOAD_TOOLTIP'),
+        glyph: 'xf019@FontAwesome' /* fa-download */,
+        action: 'download'
+      },
+      '-',
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_METRICS_DUMP_BUTTON'),
+        tooltip: NX.I18n.get('ADMIN_METRICS_DUMP_TOOLTIP'),
+        glyph: 'xf019@FontAwesome' /* fa-download */,
+        action: 'threads'
+      }
+    ]
+  }],
+
+  items: {
+    xtype: 'panel',
+    ui: 'nx-inset',
+    layout: 'column',
+    defaults: {
+      style: {
+        margin: '0px 20px 20px 0px'
+      }
     },
-    '-',
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_METRICS_DUMP_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_METRICS_DUMP_TOOLTIP'),
-      glyph: 'xf019@FontAwesome' /* fa-download */,
-      action: 'threads'
-    }
-  ],
 
-  defaults: {
-    style: {
-      margin: '20px 0px 0px 0px'
-    }
-  },
+    items: [
+      {
+        xtype: 'panel',
+        title: NX.I18n.get('ADMIN_METRICS_USAGE_SECTION'),
+        frame: true,
+        ui: 'nx-subsection',
+        height: 240,
+        width: 300,
+        layout: 'fit',
 
-  items: [
-    {
-      xtype: 'panel',
-      layout: {
-        type: 'hbox'
-      },
-      defaults: {
-        style: {
-          margin: '0px 20px 0px 0px'
-        }
-      },
-      items: [
-        {
-          xtype: 'panel',
-          title: NX.I18n.get('ADMIN_METRICS_USAGE_SECTION'),
-          frame: true,
-          ui: 'nx-subsection',
-          height: 240,
-          width: 300,
-          layout: 'fit',
+        items: [
+          {
+            xtype: 'chart',
+            itemId: 'memoryUsage',
 
-          items: [
-            {
-              xtype: 'chart',
-              itemId: 'memoryUsage',
+            animate: false,
+            insetPadding: 40,
 
-              animate: false,
-              insetPadding: 40,
+            store: Ext.create('Ext.data.ArrayStore', {
+              fields: ['value']
+            }),
 
-              store: Ext.create('Ext.data.ArrayStore', {
-                fields: ['value']
-              }),
+            axes: [
+              {
+                type: 'gauge',
+                position: 'gauge',
+                minimum: 0,
+                maximum: 100,
+                steps: 10
+              }
+            ],
 
-              axes: [
-                {
-                  type: 'gauge',
-                  position: 'gauge',
-                  minimum: 0,
-                  maximum: 100,
-                  steps: 10
-                }
-              ],
+            series: [
+              {
+                type: 'gauge',
+                field: 'value',
+                donut: 30,
+                colorSet: ['#F49D10', '#ddd'],
 
-              series: [
-                {
-                  type: 'gauge',
-                  field: 'value',
-                  donut: 30,
-                  colorSet: ['#F49D10', '#ddd'],
-
-                  tips: {
-                    trackMouse: true,
-                    renderer: function (storeItem, item) {
-                      this.setTitle('Memory used: ' + storeItem.get('value') + '%');
-                    }
+                tips: {
+                  trackMouse: true,
+                  renderer: function (storeItem, item) {
+                    this.setTitle('Memory used: ' + storeItem.get('value') + '%');
                   }
                 }
-              ]
-            }
-          ]
-        },
-        {
-          xtype: 'panel',
-          title: NX.I18n.get('ADMIN_METRICS_DISTRIBUTION_SECTION'),
-          frame: true,
-          ui: 'nx-subsection',
-          height: 240,
-          width: 300,
-          layout: 'fit',
-
-          items: [
-            {
-              xtype: 'chart',
-              itemId: 'memoryDist',
-              animate: false,
-              insetPadding: 20,
-              theme: 'Green',
-
-              store: Ext.create('Ext.data.ArrayStore', {
-                fields: ['name', 'data']
-              }),
-
-              series: [
-                {
-                  type: 'pie',
-                  angleField: 'data',
-                  showInLegend: true,
-
-                  tips: {
-                    trackMouse: true,
-                    renderer: function (storeItem, item) {
-                      this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data') + ' bytes');
-                    }
-                  }
-                }
-              ],
-
-              legend: {
-                position: 'right',
-                boxStrokeWidth: 0
               }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      xtype: 'panel',
-      title: NX.I18n.get('ADMIN_METRICS_STATES_SECTION'),
-      frame: true,
-      ui: 'nx-subsection',
-      height: 240,
-      width: 300,
-
-      layout: 'fit',
-      colspan: 2,
-
-      items: [
-        {
-          xtype: 'chart',
-          itemId: 'threadStates',
-          animate: false,
-          insetPadding: 20,
-          theme: 'Base',
-
-          store: Ext.create('Ext.data.ArrayStore', {
-            fields: ['name', 'data']
-          }),
-
-          series: [
-            {
-              type: 'pie',
-              angleField: 'data',
-              showInLegend: true,
-
-              tips: {
-                trackMouse: true,
-                renderer: function (storeItem, item) {
-                  // name: count
-                  this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data'));
-                }
-              }
-            }
-          ],
-
-          legend: {
-            position: 'right',
-            boxStrokeWidth: 0
+            ]
           }
-        }
-      ]
-    }
-  ],
+        ]
+      },
+      {
+        xtype: 'panel',
+        title: NX.I18n.get('ADMIN_METRICS_DISTRIBUTION_SECTION'),
+        frame: true,
+        ui: 'nx-subsection',
+        height: 240,
+        width: 300,
+        layout: 'fit',
+
+        items: [
+          {
+            xtype: 'chart',
+            itemId: 'memoryDist',
+            animate: false,
+            insetPadding: 20,
+            theme: 'Green',
+
+            store: Ext.create('Ext.data.ArrayStore', {
+              fields: ['name', 'data']
+            }),
+
+            series: [
+              {
+                type: 'pie',
+                angleField: 'data',
+                showInLegend: true,
+
+                tips: {
+                  trackMouse: true,
+                  renderer: function (storeItem, item) {
+                    this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data') + ' bytes');
+                  }
+                }
+              }
+            ],
+
+            legend: {
+              position: 'right',
+              boxStrokeWidth: 0
+            }
+          }
+        ]
+      },
+      {
+        xtype: 'panel',
+        title: NX.I18n.get('ADMIN_METRICS_STATES_SECTION'),
+        frame: true,
+        ui: 'nx-subsection',
+        height: 240,
+        width: 300,
+
+        layout: 'fit',
+        colspan: 2,
+
+        items: [
+          {
+            xtype: 'chart',
+            itemId: 'threadStates',
+            animate: false,
+            insetPadding: 20,
+            theme: 'Base',
+
+            store: Ext.create('Ext.data.ArrayStore', {
+              fields: ['name', 'data']
+            }),
+
+            series: [
+              {
+                type: 'pie',
+                angleField: 'data',
+                showInLegend: true,
+
+                tips: {
+                  trackMouse: true,
+                  renderer: function (storeItem, item) {
+                    // name: count
+                    this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data'));
+                  }
+                }
+              }
+            ],
+
+            legend: {
+              position: 'right',
+              boxStrokeWidth: 0
+            }
+          }
+        ]
+      }
+    ]
+  },
 
   /**
    * @public

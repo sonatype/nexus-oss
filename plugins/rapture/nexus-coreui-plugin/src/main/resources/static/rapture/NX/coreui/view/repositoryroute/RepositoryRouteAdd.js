@@ -24,7 +24,6 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
   defaultFocus: 'pattern',
 
@@ -34,7 +33,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-coreui-repositoryroute-settings-form',
       api: {
         submit: 'NX.direct.coreui_RepositoryRoute.create'

@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
     'NX.Conditions',
     'NX.I18n'
   ],
+  ui: 'nx-inset',
 
   title: NX.I18n.get('ADMIN_USERS_PASSWORD_TITLE'),
   defaultFocus: 'password',
@@ -46,10 +47,9 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
     var me = this;
 
     me.items = {
-      xtype: 'nx-settingsform',
+      xtype: 'form',
       editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'create'),
       editableMarker: NX.I18n.get('ADMIN_USERS_PASSWORD_ERROR'),
-      ui: 'nx-inset',
       defaults: {
         anchor: '100%'
       },
@@ -73,6 +73,7 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
         }
       ],
 
+      buttonAlign: 'left',
       buttons: [
         { text: NX.I18n.get('ADMIN_USERS_PASSWORD_SUBMIT_BUTTON'), action: 'changepassword', formBind: true, ui: 'nx-primary' },
         { text: NX.I18n.get('ADMIN_USERS_PASSWORD_CANCEL_BUTTON'), handler: function () {

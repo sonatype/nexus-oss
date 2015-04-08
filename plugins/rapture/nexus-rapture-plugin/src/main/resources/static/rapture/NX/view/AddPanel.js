@@ -26,9 +26,14 @@ Ext.define('NX.view.AddPanel', {
 
   layout: {
     type: 'vbox',
-    align: 'stretch',
-    pack: 'start'
+    align: 'stretch'
   },
+
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions'
+  }],
 
   autoScroll: true,
 
@@ -38,9 +43,10 @@ Ext.define('NX.view.AddPanel', {
   initComponent: function () {
     var me = this;
 
-    if (Ext.isDefined(me.items) && !Ext.isArray(me.items)) {
-      if (!me.items.buttons) {
-        me.items.buttons = [
+    // Create default buttons if they do not exist
+    if (Ext.isDefined(me.settingsForm) && !Ext.isArray(me.settingsForm)) {
+      if (!me.settingsForm.buttons) {
+        me.settingsForm.buttons = [
           { text: NX.I18n.get('GLOBAL_DIALOG_ADD_SUBMIT_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary', bindToEnter:  me.items.settingsFormSubmitOnEnter },
           { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
             this.up('nx-drilldown').showChild(0, true);
@@ -48,6 +54,14 @@ Ext.define('NX.view.AddPanel', {
         ];
       }
     }
+
+    // Add settings form to the panel
+    me.items = {
+      xtype: 'panel',
+      ui: 'nx-inset',
+
+      items: me.settingsForm
+    };
 
     me.callParent(arguments);
   }

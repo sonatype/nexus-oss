@@ -23,6 +23,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
   requires: [
     'NX.I18n'
   ],
+  ui: 'nx-inset',
 
   /**
    * @cfg Icon to show (img)
@@ -53,7 +54,6 @@ Ext.define('NX.coreui.view.support.FileCreated', {
       items: [
         {
           xtype: 'form',
-          bodyPadding: 10,
           defaults: {
             anchor: '100%'
           },

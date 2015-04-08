@@ -56,13 +56,18 @@ Ext.define('NX.coreui.view.role.RoleList', {
   initComponent: function () {
     var me = this;
 
-    me.tbar = [
-      { xtype: 'button', text: NX.I18n.get('ADMIN_ROLES_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
-        menu: [
-          { text: NX.I18n.get('ADMIN_ROLES_LIST_NEXUS_ROLE_ITEM'), action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
-        ]
-      }
-    ];
+    me.dockedItems = [{
+      xtype: 'toolbar',
+      dock: 'top',
+      cls: 'nx-actions nx-borderless',
+      items: [
+        { xtype: 'button', text: NX.I18n.get('ADMIN_ROLES_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
+          menu: [
+            { text: NX.I18n.get('ADMIN_ROLES_LIST_NEXUS_ROLE_ITEM'), action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
+          ]
+        }
+      ]
+    }];
 
     me.callParent();
   }

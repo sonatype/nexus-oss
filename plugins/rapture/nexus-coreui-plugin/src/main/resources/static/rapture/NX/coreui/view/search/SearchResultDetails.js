@@ -30,6 +30,10 @@ Ext.define('NX.coreui.view.search.SearchResultDetails', {
     align: 'stretch'
   },
 
+  style: {
+    'background-color': '#FFFFFF'
+  },
+
   /**
    * @override
    */

@@ -26,6 +26,10 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
 
   store: 'SearchResult',
 
+  style: {
+    'background-color': '#F4F4F4'
+  },
+
   viewConfig: {
     emptyText: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_EMPTY_STATE'),
     deferEmptyText: false

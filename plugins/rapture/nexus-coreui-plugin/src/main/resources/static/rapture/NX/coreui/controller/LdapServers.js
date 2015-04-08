@@ -111,7 +111,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         'nx-coreui-ldapserver-connection-add button[action=next]': {
           click: me.showUserAndGroupPanel
         },
-        'nx-coreui-ldapserver-userandgroup-add button[action=add]': {
+        'nx-coreui-ldapserver-userandgroup-form button[action=add]': {
           click: me.createServer
         },
         'nx-coreui-ldapserver-connection-form button[action=save]': {
@@ -200,7 +200,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-drilldown-actions' },
+        { xtype: 'nx-actions' },
         {
           xtype: 'nx-coreui-ldapserver-connection-add',
           flex: 1
@@ -226,7 +226,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-drilldown-actions' },
+        { xtype: 'nx-actions' },
         {
           xtype: 'nx-coreui-ldapserver-userandgroup-add',
           flex: 1

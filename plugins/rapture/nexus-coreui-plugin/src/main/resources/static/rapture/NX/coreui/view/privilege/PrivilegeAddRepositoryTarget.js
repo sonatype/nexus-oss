@@ -27,7 +27,6 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
     'NX.coreui.model.Reference',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
   defaultFocus: 'name',
 
@@ -43,7 +42,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
     me.targetStore = Ext.create('NX.coreui.store.RepositoryTarget');
     me.targetStore.load();
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-settingsform',
       api: {
         submit: 'NX.direct.coreui_Privilege.createForRepositoryTarget'

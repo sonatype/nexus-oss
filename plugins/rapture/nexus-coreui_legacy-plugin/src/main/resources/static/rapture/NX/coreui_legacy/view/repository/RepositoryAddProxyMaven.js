@@ -27,7 +27,7 @@ Ext.define('NX.coreui_legacy.view.repository.RepositoryAddProxyMaven', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-repository-settings-proxy-maven2-form',
       template: me.template,
       api: {

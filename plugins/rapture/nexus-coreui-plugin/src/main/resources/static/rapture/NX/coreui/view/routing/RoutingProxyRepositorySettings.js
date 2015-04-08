@@ -37,7 +37,7 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
   initComponent: function () {
     var me = this;
 
-    me.items = [
+    me.settingsForm = [
       {
         xtype: 'nx-settingsform',
         paramOrder: ['repositoryId'],
@@ -204,7 +204,7 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
       }
     });
 
-    me.items.get(0).getDockedItems('toolbar[dock="bottom"]')[0].add({
+    me.down('nx-settingsform').getDockedItems('toolbar[dock="bottom"]')[0].add({
       xtype: 'button', text: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_ROUTING_UPDATE_BUTTON'), formBind: true, action: 'update', hidden: true
     });
   },

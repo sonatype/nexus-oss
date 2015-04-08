@@ -25,5 +25,4 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileInfo', {
   ],
 
   title: NX.I18n.get('BROWSE_SEARCH_DETAILS_INFO_TAB')
-
 });

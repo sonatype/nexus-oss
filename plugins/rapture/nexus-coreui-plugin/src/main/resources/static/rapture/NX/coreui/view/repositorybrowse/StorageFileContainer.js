@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
-  extend: 'NX.ext.panel.SubsectionPanel',
+  extend: 'Ext.Panel',
   alias: 'widget.nx-coreui-repositorybrowse-storagefilecontainer',
   requires: [
     'NX.Icons'

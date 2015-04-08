@@ -21,6 +21,6 @@ Ext.define('NX.coreui.view.user.UserSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-user-settings',
 
-  items: { xtype: 'nx-coreui-user-settings-form' }
+  settingsForm: { xtype: 'nx-coreui-user-settings-form' }
 
 });

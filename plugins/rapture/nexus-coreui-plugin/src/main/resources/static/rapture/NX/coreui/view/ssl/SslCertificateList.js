@@ -57,27 +57,32 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
   initComponent: function () {
     var me = this;
 
-    me.tbar = [
-      {
-        xtype: 'button',
-        text: NX.I18n.get('ADMIN_SSL_LIST_NEW_BUTTON'),
-        glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
-        action: 'new',
-        disabled: true,
-        menu: [
-          {
-            text: NX.I18n.get('ADMIN_SSL_LIST_LOAD_BUTTON'),
-            action: 'newfromserver',
-            iconCls: NX.Icons.cls('sslcertificate-add-by-server', 'x16')
-          },
-          {
-            text: NX.I18n.get('ADMIN_SSL_LIST_PASTE_BUTTON'),
-            action: 'newfrompem',
-            iconCls: NX.Icons.cls('sslcertificate-add-by-pem', 'x16')
-          }
-        ]
-      }
-    ];
+    me.dockedItems = [{
+      xtype: 'toolbar',
+      dock: 'top',
+      cls: 'nx-actions nx-borderless',
+      items: [
+        {
+          xtype: 'button',
+          text: NX.I18n.get('ADMIN_SSL_LIST_NEW_BUTTON'),
+          glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
+          action: 'new',
+          disabled: true,
+          menu: [
+            {
+              text: NX.I18n.get('ADMIN_SSL_LIST_LOAD_BUTTON'),
+              action: 'newfromserver',
+              iconCls: NX.Icons.cls('sslcertificate-add-by-server', 'x16')
+            },
+            {
+              text: NX.I18n.get('ADMIN_SSL_LIST_PASTE_BUTTON'),
+              action: 'newfrompem',
+              iconCls: NX.Icons.cls('sslcertificate-add-by-pem', 'x16')
+            }
+          ]
+        }
+      ]
+    }];
 
     me.callParent();
   }

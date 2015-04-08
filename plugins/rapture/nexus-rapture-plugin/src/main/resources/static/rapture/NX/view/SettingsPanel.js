@@ -20,22 +20,55 @@
 Ext.define('NX.view.SettingsPanel', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-settingsPanel',
-  ui: 'nx-inset',
+  autoScroll: true,
+
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions'
+  }],
 
   layout: {
     type: 'vbox',
-    align: 'stretch',
-    pack: 'start'
+    align: 'stretch'
   },
-
-  autoScroll: true,
 
   // TODO maxWidth: 1024,
 
-  defaults: {
-    style: {
-      margin: '0px 0px 20px 0px'
-    }
+  /**
+   * @override
+   */
+  initComponent: function() {
+    var me = this;
+
+    me.items = {
+      xtype: 'panel',
+      ui: 'nx-inset',
+
+      items: me.settingsForm || []
+    };
+
+    me.callParent(arguments);
+  },
+
+  /**
+   * @override
+   * @param form The form to add to this settings panel
+   */
+  addSettingsForm: function(form) {
+    var me = this;
+
+    me.down('panel').add(form);
+  },
+
+  /**
+   * @override
+   * Remove all settings forms from this settings panel
+   */
+  removeAllSettingsForms: function() {
+    var me = this;
+
+    me.down('panel').removeAll();
   },
 
   /**

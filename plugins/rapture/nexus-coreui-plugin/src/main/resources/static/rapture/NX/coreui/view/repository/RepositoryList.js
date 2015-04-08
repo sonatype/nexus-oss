@@ -61,9 +61,20 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     markDirty:false
   },
 
-  tbar: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true }
-  ],
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless',
+    items: [
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NEW_BUTTON'),
+        glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
+        action: 'new',
+        disabled: true
+      }
+    ]
+  }],
 
   plugins: [
     { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_REPOSITORIES_LIST_FILTER_ERROR') }

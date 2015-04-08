@@ -120,6 +120,9 @@ p {
  * @class Ext.toolbar.Toolbar
  */
 /**
+ * @class Ext.panel.Panel
+ */
+/**
  * @class Ext.tip.QuickTip
  */
 /**
@@ -10816,7 +10819,7 @@ a.x-tab .x-tab-inner-right {
 
 /* line 301, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-body-default {
-  background: white;
+  background: transparent;
   border-color: #444444;
   color: black;
   font-size: 13px;
@@ -16385,7 +16388,7 @@ a.x-color-picker-item:hover {
 
 /* line 1, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Table.scss */
 .x-grid-body {
-  background: white;
+  background: transparent;
   border-width: 1px;
   border-style: solid;
   border-color: silver;
@@ -16395,7 +16398,7 @@ a.x-color-picker-item:hover {
 .x-grid-empty {
   padding: 10px;
   color: gray;
-  background-color: white;
+  background-color: transparent;
   font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
@@ -16804,7 +16807,7 @@ a.x-color-picker-item:hover {
 
 /* line 1, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/grid/feature/Summary.scss */
 .x-docked-summary {
-  background: white !important;
+  background: transparent !important;
 }
 /* line 2, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/grid/feature/Summary.scss */
 .x-docked-summary .x-grid-table {
@@ -21712,7 +21715,7 @@ a.x-color-picker-item:hover {
 
 /* line 301, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-body-light {
-  background: white;
+  background: transparent;
   border-color: #e4e4e4;
   color: black;
   font-size: 13px;
