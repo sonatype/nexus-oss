@@ -24,6 +24,7 @@ Ext.define('NX.view.ChangeOrderWindow', {
     'NX.ext.form.field.ItemOrderer',
     'NX.I18n'
   ],
+  ui: 'nx-inset',
 
   layout: 'fit',
   autoShow: true,
@@ -42,7 +43,6 @@ Ext.define('NX.view.ChangeOrderWindow', {
 
     me.items = {
       xtype: 'form',
-      ui: 'nx-inset',
       items: {
         xtype: 'nx-itemorderer',
         store: me.store,

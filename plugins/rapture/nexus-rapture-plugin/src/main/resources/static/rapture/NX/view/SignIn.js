@@ -23,6 +23,7 @@ Ext.define('NX.view.SignIn', {
   requires: [
     'NX.I18n'
   ],
+  ui: 'nx-inset',
 
   title: NX.I18n.get('GLOBAL_SIGN_IN_TITLE'),
 
@@ -44,7 +45,6 @@ Ext.define('NX.view.SignIn', {
       items: {
         xtype: 'form',
         defaultType: 'textfield',
-        ui: 'nx-inset',
         defaults: {
           anchor: '100%'
         },
