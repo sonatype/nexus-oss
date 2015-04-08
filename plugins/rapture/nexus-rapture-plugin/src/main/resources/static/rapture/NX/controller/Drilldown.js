@@ -72,7 +72,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
-   * @private
+   * @override
    */
   init: function () {
     var me = this,
@@ -168,12 +168,7 @@ Ext.define('NX.controller.Drilldown', {
    * Whenever the first list loads, trigger a navigation event
    */
   onAfterRender: function () {
-    var me = this;/*,
-      lists = me.getLists(),
-      last = lists[lists.length - 1];*/
-
-    // Trigger navigation when the last list loads
-    //last.mon(last.getStore(), 'load', me.onStoreLoad, me);
+    var me = this;
 
     // Start loading the lists
     me.loadStore(Ext.emptyFn);
@@ -302,9 +297,13 @@ Ext.define('NX.controller.Drilldown', {
    * @private
    * When a list item is clicked, display the new view and update the bookmark
    */
-  onCellClick: function(list, td, cellIndex, model) {
+  onCellClick: function(list, td, cellIndex, model, tr, rowIndex, e) {
     var me = this;
 
+    //if the cell target is a link, let it do it's thing
+    if(e.getTarget('a')) {
+      return false;
+    }
     me.loadView(list, model, true);
   },
 

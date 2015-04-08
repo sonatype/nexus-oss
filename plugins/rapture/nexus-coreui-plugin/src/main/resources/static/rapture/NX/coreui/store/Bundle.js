@@ -13,15 +13,30 @@
 /*global Ext, NX*/
 
 /**
- * Plugin feature panel.
+ * Bundle store.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.system.Plugins', {
-  extend: 'NX.view.drilldown.Drilldown',
-  alias: 'widget.nx-coreui-system-plugins',
+Ext.define('NX.coreui.store.Bundle', {
+  extend: 'Ext.data.Store',
+  model: 'NX.coreui.model.Bundle',
 
-  iconName: 'plugin-default',
+  proxy: {
+    type: 'direct',
+    paramsAsHash: false,
+    api: {
+      read: 'NX.direct.coreui_Bundle.read'
+    },
 
-  masters: { xtype: 'nx-coreui-system-pluginlist' }
+    reader: {
+      type: 'json',
+      root: 'data',
+      idProperty: 'id',
+      successProperty: 'success'
+    }
+  },
+
+  sortOnLoad: true,
+  sorters: { property: 'id', direction: 'ASC' }
+
 });

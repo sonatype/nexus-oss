@@ -12,26 +12,26 @@
  */
 package org.sonatype.nexus.repository.search;
 
-import java.io.IOException;
+import java.net.URL;
 
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Repository;
 
 /**
- * Contributor to ES index settings. Index settings from all contributors are merged before index is created.
+ * Contributor to ES index settings.
+ *
+ * Index settings from all contributors are merged before index is created.
  *
  * @since 3.0
  */
 public interface IndexSettingsContributor
 {
-
   /**
    * Retrieves index settings for specific repository.
    *
    * @return ES index settings in json format or null if this contributor has no settings for repository
    */
   @Nullable
-  String getIndexSettings(Repository repository) throws IOException;
-
+  URL getIndexSettings(Repository repository);
 }

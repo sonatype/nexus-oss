@@ -10,16 +10,43 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.plugin.console;
-
-import java.util.List;
-
-import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
+package org.sonatype.nexus.coreui
 
 /**
- * @author juven
+ * OSGI bundle.
+ *
+ * @since 3.0
  */
-public interface PluginConsoleManager
+class BundleXO
 {
-  List<PluginInfo> listPluginInfo();
+  long id
+
+  String state
+
+  String name
+
+  String symbolicName
+
+  String location
+
+  String version
+
+  int startLevel
+
+  boolean fragment
+
+  // TODO: expose as DateTime?
+  long lastModified
+
+  /**
+   * Fragment bundle ids.
+   */
+  List<Long> fragments
+
+  /**
+   * Fragment-host bundle ids.
+   */
+  List<Long> fragmentHosts
+
+  Map<String,String> headers
 }

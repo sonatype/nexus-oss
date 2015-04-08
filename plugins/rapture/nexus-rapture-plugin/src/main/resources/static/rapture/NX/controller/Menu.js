@@ -136,7 +136,13 @@ Ext.define('NX.controller.Menu', {
           beforesearch: me.warnBeforeSearch
         },
         '#breadcrumb button': {
-          click: me.warnBeforeBreadcrumbClick
+          click: me.warnBeforeButtonClick
+        },
+        'nx-drilldown-actions button[handler]': {
+          click: me.warnBeforeButtonClick
+        },
+        'nx-drilldown-actions menuitem[handler]': {
+          click: me.warnBeforeButtonClick
         },
         'button[mode]': {
           afterrender: me.registerModeButton,
@@ -707,9 +713,9 @@ Ext.define('NX.controller.Menu', {
 
   /**
    * @private
-   * Check for unsaved changes before navigating via the breadcrumb
+   * Check for unsaved changes before clicking a button
    */
-  warnBeforeBreadcrumbClick: function(button, e) {
+  warnBeforeButtonClick: function(button, e) {
     var me = this;
 
     return me.warnBeforeNavigate(
@@ -757,7 +763,7 @@ Ext.define('NX.controller.Menu', {
       dirty = me.hasDirt(),
       content = me.getFeatureContent();
 
-    // If false, we’ve already warned the user about the unsaved changes. Don’t warn again.
+    // If true, we’ve already warned the user about the unsaved changes. Don’t warn again.
     if (content.discardUnsavedChanges) {
       // Reset the flag and continue with navigation
       content.resetUnsavedChangesFlag();
@@ -788,7 +794,13 @@ Ext.define('NX.controller.Menu', {
 
     Ext.create('NX.view.UnsavedChanges', {
       content: content,
-      callback: callback
+      callback: function() {
+        // Run the callback
+        callback();
+
+        // Reset the unsaved changes flag
+        content.resetUnsavedChangesFlag();
+      }
     });
   },
 
