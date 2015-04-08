@@ -34,7 +34,7 @@ public class BucketEntityType
       .type(Bucket.class)
       .build();
 
-  private static final String I_REPOSITORY_NAME = "bucket_repository_name_idx";
+  private static final String I_REPOSITORY_NAME = DB_CLASS + ".repository_name_idx";
 
   public BucketEntityType() {
     super(DB_CLASS);
@@ -42,7 +42,7 @@ public class BucketEntityType
 
   @Override
   protected void defineType(final OClass type) {
-    type.createProperty(P_REPOSITORY_NAME, OType.STRING);
+    type.createProperty(P_REPOSITORY_NAME, OType.STRING).setMandatory(true).setNotNull(true);
 
     type.createIndex(I_REPOSITORY_NAME, INDEX_TYPE.UNIQUE, P_REPOSITORY_NAME);
   }

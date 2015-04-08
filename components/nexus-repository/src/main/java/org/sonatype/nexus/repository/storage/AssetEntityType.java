@@ -41,9 +41,9 @@ public class AssetEntityType
       .type(Asset.class)
       .build();
 
-  private static final String I_BUCKET = "asset_bucket_idx";
+  private static final String I_BUCKET = DB_CLASS + ".bucket_idx";
 
-  private static final String I_COMPONENT = "asset_component_idx";
+  private static final String I_COMPONENT = DB_CLASS + ".component_idx";
 
   private BucketEntityType bucketEntityType;
 
@@ -59,9 +59,9 @@ public class AssetEntityType
 
   @Override
   protected void defineType(final OClass type) {
-    type.createProperty(P_BUCKET, OType.LINK, bucketEntityType.getType());
+    type.createProperty(P_BUCKET, OType.LINK, bucketEntityType.getType()).setMandatory(true).setNotNull(true);
     type.createProperty(P_COMPONENT, OType.LINK, componentEntityType.getType());
-    type.createProperty(P_FORMAT, OType.STRING);
+    type.createProperty(P_FORMAT, OType.STRING).setMandatory(true).setNotNull(true);
     type.createProperty(P_LAST_UPDATED, OType.DATETIME);
     type.createProperty(P_SIZE, OType.INTEGER);
     type.createProperty(P_CONTENT_TYPE, OType.STRING);

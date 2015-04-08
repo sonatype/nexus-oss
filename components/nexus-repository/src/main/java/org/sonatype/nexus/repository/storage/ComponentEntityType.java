@@ -45,7 +45,7 @@ public class ComponentEntityType
       .type(Component.class)
       .build();
 
-  private static final String I_BUCKET = "component_bucket_idx";
+  private static final String I_BUCKET = DB_CLASS + ".bucket_idx";
 
   private BucketEntityType bucketEntityType;
 
@@ -56,11 +56,11 @@ public class ComponentEntityType
 
   @Override
   protected void defineType(final OClass type) {
-    type.createProperty(P_BUCKET, OType.LINK, bucketEntityType.getType());
+    type.createProperty(P_BUCKET, OType.LINK, bucketEntityType.getType()).setMandatory(true).setNotNull(true);
+    type.createProperty(P_FORMAT, OType.STRING).setMandatory(true).setNotNull(true);
     type.createProperty(P_GROUP, OType.STRING);
     type.createProperty(P_NAME, OType.STRING);
     type.createProperty(P_VERSION, OType.STRING);
-    type.createProperty(P_FORMAT, OType.STRING);
     type.createProperty(P_LAST_UPDATED, OType.DATETIME);
     type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
 
