@@ -31,5 +31,9 @@
     -->
     <bundle>wrap:${mvn:shiro-guice}$overwrite=merge&amp;Import-Package=*</bundle>
     <bundle>wrap:${mvn:xstream}$overwrite=merge&amp;-exportcontents=*&amp;DynamicImport-Package=*</bundle>
+    <!--
+    Give our extender bundle its own start level (distinct from the boot start-level)
+    -->
+    <bundle start-level="100">${mvn:nexus-extender}</bundle>
   </feature>
 </features>
