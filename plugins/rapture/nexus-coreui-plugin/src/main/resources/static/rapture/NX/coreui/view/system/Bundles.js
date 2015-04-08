@@ -13,30 +13,15 @@
 /*global Ext, NX*/
 
 /**
- * Plugin info store.
+ * Bundles feature panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.store.PluginInfo', {
-  extend: 'Ext.data.Store',
-  model: 'NX.coreui.model.PluginInfo',
+Ext.define('NX.coreui.view.system.Bundles', {
+  extend: 'NX.view.drilldown.Drilldown',
+  alias: 'widget.nx-coreui-system-bundles',
 
-  proxy: {
-    type: 'direct',
-    paramsAsHash: false,
-    api: {
-      read: 'NX.direct.pluginconsole_PluginConsole.read'
-    },
+  iconName: 'bundle-default',
 
-    reader: {
-      type: 'json',
-      root: 'data',
-      idProperty: 'id',
-      successProperty: 'success'
-    }
-  },
-
-  sortOnLoad: true,
-  sorters: { property: 'name', direction: 'ASC' }
-
+  masters: { xtype: 'nx-coreui-system-bundlelist' }
 });

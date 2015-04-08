@@ -32,7 +32,6 @@
     <module>nexus-content-plugin</module>
     <module>nexus-groovy-plugin</module>
     <module>nexus-logging-plugin</module>
-    <module>nexus-plugin-console-plugin</module>
     <module>nexus-quartz-plugin</module>
     <module>nexus-repository-httpbridge</module>
     <module>nexus-repository-nuget</module>

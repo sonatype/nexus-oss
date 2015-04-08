@@ -12,13 +12,14 @@
  */
 package org.sonatype.nexus.atlas.internal
 
+import org.apache.karaf.bundle.core.BundleService
 import org.eclipse.sisu.Parameters
+import org.osgi.framework.BundleContext
 import org.sonatype.nexus.SystemStatus
 import org.sonatype.nexus.atlas.SystemInformationGenerator
 import org.sonatype.nexus.common.guice.GlobalComponentLookupHelper
 import org.sonatype.nexus.common.text.Strings2
 import org.sonatype.nexus.configuration.ApplicationDirectories
-import org.sonatype.nexus.plugin.PluginIdentity
 import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.sisu.goodies.common.Iso8601Date
 
@@ -47,22 +48,27 @@ class SystemInformationGeneratorImpl
 
   private final Provider<SystemStatus> systemStatusProvider
 
-  private final Map<String, String> parameters;
+  private final Map<String, String> parameters
 
-  private final List<PluginIdentity> pluginIdentities
+  private final BundleContext bundleContext
+
+  private final BundleService bundleService
 
   @Inject
   SystemInformationGeneratorImpl(final GlobalComponentLookupHelper componentLookupHelper,
                                  final ApplicationDirectories applicationDirectories,
                                  final Provider<SystemStatus> systemStatusProvider,
                                  final @Parameters Map<String, String> parameters,
-                                 final List<PluginIdentity> pluginIdentities)
+                                 final BundleContext bundleContext)
   {
     this.componentLookupHelper = checkNotNull(componentLookupHelper)
     this.applicationDirectories = checkNotNull(applicationDirectories)
     this.systemStatusProvider = checkNotNull(systemStatusProvider)
-    this.parameters = checkNotNull(parameters);
-    this.pluginIdentities = checkNotNull(pluginIdentities)
+    this.parameters = checkNotNull(parameters)
+    this.bundleContext = checkNotNull(bundleContext)
+
+    // TODO: Sort out why BundleService can not be injected normally
+    this.bundleService = bundleContext.getService(bundleContext.getServiceReference(BundleService.class))
   }
 
   @Override
@@ -74,7 +80,8 @@ class SystemInformationGeneratorImpl
     def applicationDirectories = this.applicationDirectories
     def systemStatus = this.systemStatusProvider.get()
     def parameters = this.parameters
-    def pluginIdentities = this.pluginIdentities
+    def bundleContext = this.bundleContext
+    def bundleService = this.bundleService
 
     def fileref = { File file ->
       if (file) {
@@ -199,14 +206,19 @@ class SystemInformationGeneratorImpl
       ]
     }
 
-    def reportNexusPlugins = {
+    def reportNexusBundles = {
       def data = [:]
-      pluginIdentities.each {
-        def coordinates = it.coordinates
-        def item = data[coordinates.artifactId] = [
-            'groupId': coordinates.groupId,
-            'artifactId': coordinates.artifactId,
-            'version': coordinates.version
+      bundleContext.bundles.each { bundle ->
+        def info = bundleService.getInfo(bundle)
+        data[info.bundleId] = [
+            'bundleId': info.bundleId,
+            'name': info.name,
+            'symbolicName': info.symbolicName,
+            'location': info.updateLocation,
+            'version': info.version,
+            'state': info.state.name(),
+            'startLevel': info.startLevel,
+            'fragment': info.fragment
         ]
       }
       return data
@@ -233,7 +245,7 @@ class SystemInformationGeneratorImpl
         'nexus-license': reportNexusLicense(),
         'nexus-properties': reportObfuscatedProperties(parameters),
         'nexus-configuration': reportNexusConfiguration(),
-        'nexus-plugins': reportNexusPlugins()
+        'nexus-bundles': reportNexusBundles()
     ]
 
     return sections

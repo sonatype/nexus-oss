@@ -10,16 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.plugin.console;
-
-import java.util.List;
-
-import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
+/*global Ext, NX*/
 
 /**
- * @author juven
+ * Bundle model.
+ *
+ * @since 3.0
  */
-public interface PluginConsoleManager
-{
-  List<PluginInfo> listPluginInfo();
-}
+Ext.define('NX.coreui.model.Bundle', {
+  extend: 'Ext.data.Model',
+  idProperty: 'id',
+  fields: [
+    { name: 'id', type: 'int' },
+    { name: 'state', type: 'string' },
+    { name: 'name', type: 'string' },
+    { name: 'symbolicName', type: 'string' },
+    { name: 'version', type: 'string' },
+    { name: 'location', type: 'string' },
+    { name: 'startLevel', type: 'int' },
+    { name: 'lastModified', type: 'int'},
+    { name: 'fragment', type: 'bool' },
+    { name: 'fragments', type: 'auto' /*array*/ },
+    { name: 'fragmentHosts', type: 'auto' /*array*/ },
+    { name: 'headers', type: 'auto' /*object*/}
+  ]
+});

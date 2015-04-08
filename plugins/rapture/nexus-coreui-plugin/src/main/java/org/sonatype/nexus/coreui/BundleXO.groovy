@@ -10,37 +10,43 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, NX*/
+package org.sonatype.nexus.coreui
 
 /**
- * Plugin grid.
+ * OSGI bundle.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.system.PluginList', {
-  extend: 'NX.view.drilldown.Master',
-  alias: 'widget.nx-coreui-system-pluginlist',
-  requires: [
-    'NX.I18n'
-  ],
+class BundleXO
+{
+  long id
 
-  store: 'PluginInfo',
+  String state
 
-  columns: [
-    {
-      xtype: 'nx-iconcolumn',
-      width: 36,
-      iconVariant: 'x16',
-      iconName: function () {
-        return 'plugin-default';
-      }
-    },
-    {header: NX.I18n.get('ADMIN_PLUGINS_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1},
-    {header: NX.I18n.get('ADMIN_PLUGINS_LIST_VERSION_COLUMN'), dataIndex: 'version', flex: 1}
-  ],
+  String name
 
-  plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_PLUGINS_LIST_FILTER_ERROR') }
-  ]
+  String symbolicName
 
-});
+  String location
+
+  String version
+
+  int startLevel
+
+  boolean fragment
+
+  // TODO: expose as DateTime?
+  long lastModified
+
+  /**
+   * Fragment bundle ids.
+   */
+  List<Long> fragments
+
+  /**
+   * Fragment-host bundle ids.
+   */
+  List<Long> fragmentHosts
+
+  Map<String,String> headers
+}

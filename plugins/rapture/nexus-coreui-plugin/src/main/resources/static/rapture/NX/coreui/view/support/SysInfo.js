@@ -115,7 +115,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
         '{[ this.section("nexus-configuration", values) ]}',
         '{[ this.section("nexus-properties", values) ]}',
         '{[ this.section("nexus-license", values) ]}',
-        '{[ this.nestedSection("nexus-plugins", values) ]}',
+        '{[ this.nestedSection("nexus-bundles", values) ]}',
         // system details
         '{[ this.section("system-time", values) ]}',
         '{[ this.section("system-properties", values) ]}',
