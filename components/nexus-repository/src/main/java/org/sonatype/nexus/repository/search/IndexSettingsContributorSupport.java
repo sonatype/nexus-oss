@@ -16,22 +16,39 @@ import java.net.URL;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.io.Resources;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.search.SearchServiceImpl.MAPPING_JSON;
+
+// TODO: Can probably simplify and avoid intf/impl here for such simple configurator
 
 /**
- * Contributor to ES index settings.
- *
- * Index settings from all contributors are merged before index is created.
+ * Support for {@link IndexSettingsContributor} implementations.
  *
  * @since 3.0
  */
-public interface IndexSettingsContributor
+public class IndexSettingsContributorSupport
+  extends ComponentSupport
+  implements IndexSettingsContributor
 {
-  /**
-   * Retrieves index settings for specific repository.
-   *
-   * @return ES index settings in json format or null if this contributor has no settings for repository
-   */
+  private final Format format;
+
+  public IndexSettingsContributorSupport(final Format format) {
+    this.format = checkNotNull(format);
+  }
+
+  @Override
   @Nullable
-  URL getIndexSettings(Repository repository);
+  public URL getIndexSettings(final Repository repository) {
+    checkNotNull(repository);
+    if (format.equals(repository.getFormat())) {
+      return Resources.getResource(getClass(), MAPPING_JSON);
+    }
+    return null;
+  }
 }

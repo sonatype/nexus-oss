@@ -12,17 +12,12 @@
  */
 package com.sonatype.nexus.repository.nuget.internal;
 
-import java.io.IOException;
-
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.search.IndexSettingsContributor;
-
-import com.google.common.io.Resources;
-
-import static com.google.common.base.Charsets.UTF_8;
+import org.sonatype.nexus.repository.Format;
+import org.sonatype.nexus.repository.search.IndexSettingsContributorSupport;
 
 /**
  * Contributor to ES NuGet index settings.
@@ -32,17 +27,10 @@ import static com.google.common.base.Charsets.UTF_8;
 @Named
 @Singleton
 public class NugetIndexSettingsContributor
-    implements IndexSettingsContributor
+    extends IndexSettingsContributorSupport
 {
-
-  @Override
-  public String getIndexSettings(final Repository repository) throws IOException {
-    if (NugetFormat.NAME.equals(repository.getFormat().getValue())) {
-      return Resources.toString(
-          Resources.getResource(NugetIndexSettingsContributor.class, "es-mapping-nuget.json"), UTF_8
-      );
-    }
-    return null;
+  @Inject
+  public NugetIndexSettingsContributor(final @Named(NugetFormat.NAME) Format format) {
+    super(format);
   }
-
 }
