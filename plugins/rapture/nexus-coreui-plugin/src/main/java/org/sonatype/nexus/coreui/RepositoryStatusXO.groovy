@@ -10,37 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, NX*/
+package org.sonatype.nexus.coreui
+
+import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
- * Plugin grid.
- *
+ * Repository status exchange object.
  * @since 3.0
  */
-Ext.define('NX.coreui.view.system.PluginList', {
-  extend: 'NX.view.drilldown.Master',
-  alias: 'widget.nx-coreui-system-pluginlist',
-  requires: [
-    'NX.I18n'
-  ],
+@ToString(includePackage = false, includeNames = true)
+class RepositoryStatusXO
+{
+  /**
+   * Name of associated Repository.
+   */
+  @NotEmpty
+  String repositoryName
 
-  store: 'PluginInfo',
+  /**
+   * Whether or not the repository is online.
+   */
+  boolean online
 
-  columns: [
-    {
-      xtype: 'nx-iconcolumn',
-      width: 36,
-      iconVariant: 'x16',
-      iconName: function () {
-        return 'plugin-default';
-      }
-    },
-    {header: NX.I18n.get('ADMIN_PLUGINS_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1},
-    {header: NX.I18n.get('ADMIN_PLUGINS_LIST_VERSION_COLUMN'), dataIndex: 'version', flex: 1}
-  ],
+  /**
+   * A description of the status.
+   */
+  String description
 
-  plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_PLUGINS_LIST_FILTER_ERROR') }
-  ]
-
-});
+  /**
+   * A reason for the status.
+   */
+  String reason
+}

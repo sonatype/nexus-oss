@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.search;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -37,6 +39,7 @@ import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.security.SecurityHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -50,7 +53,6 @@ import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.internal.InternalSearchResponse;
 
-import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
@@ -66,8 +68,12 @@ public class SearchServiceImpl
     extends ComponentSupport
     implements SearchService
 {
-
   public static final String TYPE = "component";
+
+  /**
+   * Resource name of ElasticSearch mapping configuration.
+   */
+  public static final String MAPPING_JSON = "elasticsearch-mapping.json";
 
   private final Provider<Client> client;
 
@@ -99,14 +105,27 @@ public class SearchServiceImpl
     // TODO we should calculate the checksum of index settings and compare it with a value stored in index _meta tags
     // in case that they not match (settings changed) we should drop the index, recreate it and re-index all components
     if (!client.get().admin().indices().prepareExists(repository.getName()).execute().actionGet().isExists()) {
-      try {
-        String source = Resources.toString(Resources.getResource(getClass(), "es-mapping.json"), UTF_8);
-        for (IndexSettingsContributor contributor : indexSettingsContributors) {
-          String contributed = contributor.getIndexSettings(repository);
-          if (contributed != null) {
-            source = JsonUtils.merge(source, contributed);
-          }
+      // determine list of mapping configuration urls
+      List<URL> urls = Lists.newArrayListWithExpectedSize(indexSettingsContributors.size() + 1);
+      urls.add(Resources.getResource(getClass(), MAPPING_JSON)); // core mapping
+      for (IndexSettingsContributor contributor : indexSettingsContributors) {
+        URL url = contributor.getIndexSettings(repository);
+        if (url != null) {
+          urls.add(url);
         }
+      }
+
+      try {
+        // merge all mapping configuration
+        String source = "{}";
+        for (URL url : urls) {
+          log.debug("Merging ElasticSearch mapping: {}", url);
+          String contributed = Resources.toString(url, Charsets.UTF_8);
+          log.trace("Contributed ElasticSearch mapping: {}", contributed);
+          source = JsonUtils.merge(source, contributed);
+        }
+        // update runtime configuration
+        log.trace("ElasticSearch mapping: {}", source);
         log.debug("Creating index for {}", repository);
         client.get().admin().indices().prepareCreate(repository.getName())
             .setSource(source)
@@ -174,7 +193,6 @@ public class SearchServiceImpl
       public Iterator<SearchHit> iterator() {
         return new Iterator<SearchHit>()
         {
-
           private SearchResponse response;
 
           private Iterator<SearchHit> iterator;

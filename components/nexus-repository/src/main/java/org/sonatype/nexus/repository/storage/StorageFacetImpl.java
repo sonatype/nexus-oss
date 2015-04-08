@@ -22,15 +22,17 @@ import javax.inject.Provider;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
@@ -45,8 +47,6 @@ public class StorageFacetImpl
     extends FacetSupport
     implements StorageFacet
 {
-  public static final String CONFIG_KEY = "storage";
-
   private final BlobStoreManager blobStoreManager;
 
   private final Provider<DatabaseInstance> databaseInstanceProvider;
@@ -57,11 +57,30 @@ public class StorageFacetImpl
 
   private final AssetEntityType assetEntityType;
 
-  private String blobStoreName;
+  @VisibleForTesting
+  static final String CONFIG_KEY = "storage";
+
+  @VisibleForTesting
+  static class Config
+  {
+    @NotEmpty
+    public String blobStoreName = "default";
+
+    //@NotNull
+    public WritePolicy writePolicy;
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "blobStoreName='" + blobStoreName + '\'' +
+          ", writePolicy=" + writePolicy +
+          '}';
+    }
+  }
+
+  private Config config;
 
   private ORID bucketId;
-
-  private WritePolicy writePolicy;
 
   @Inject
   public StorageFacetImpl(final BlobStoreManager blobStoreManager,
@@ -77,15 +96,10 @@ public class StorageFacetImpl
 
   @Override
   protected void doConfigure() throws Exception {
-    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
-    blobStoreName = attributes.get("blobStoreName", String.class, "default");
-    log.debug("BLOB-store name: {}", blobStoreName);
-    writePolicy = null;
-    String writePolicyAttr = attributes.get("writePolicy", String.class);
-    if (writePolicyAttr != null) {
-      writePolicy = WritePolicy.valueOf(writePolicyAttr);
-    }
-    log.debug("Write Policy: {}", writePolicy);
+    ConfigurationFacet configuration = facet(ConfigurationFacet.class);
+    config = configuration.readObject(CONFIG_KEY, Config.class);
+    log.debug("Config: {}", config);
+    configuration.validate(config);
   }
 
   @Override
@@ -133,8 +147,9 @@ public class StorageFacetImpl
   }
 
   private StorageTx openStorageTx() {
-    BlobStore blobStore = blobStoreManager.get(blobStoreName);
-    return new StorageTxImpl(new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucketId, writePolicy);
+    BlobStore blobStore = blobStoreManager.get(config.blobStoreName);
+    return new StorageTxImpl(new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucketId,
+        config.writePolicy);
   }
 
   @Nullable

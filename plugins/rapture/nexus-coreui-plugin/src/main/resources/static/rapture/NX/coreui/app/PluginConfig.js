@@ -128,9 +128,9 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
-      id: 'NX.coreui.controller.PluginConsole',
+      id: 'NX.coreui.controller.Bundles',
       active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-plugin-console-plugin');
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
       }
     },
     {

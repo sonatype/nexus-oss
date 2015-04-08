@@ -10,19 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.maven.internal.maven2;
 
-import java.io.IOException;
-
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.search.IndexSettingsContributor;
-
-import com.google.common.io.Resources;
-
-import static com.google.common.base.Charsets.UTF_8;
+import org.sonatype.nexus.repository.Format;
+import org.sonatype.nexus.repository.search.IndexSettingsContributorSupport;
 
 /**
  * Contributor to ES index settings for Maven 2 repositories.
@@ -32,16 +28,11 @@ import static com.google.common.base.Charsets.UTF_8;
 @Named
 @Singleton
 public class Maven2IndexSettingsContributor
-    implements IndexSettingsContributor
+    extends IndexSettingsContributorSupport
 {
-
-  @Override
-  public String getIndexSettings(final Repository repository) throws IOException {
-    if (Maven2Format.NAME.equals(repository.getFormat().getValue())) {
-      return Resources
-          .toString(Resources.getResource(Maven2IndexSettingsContributor.class, "es-mapping-maven.json"), UTF_8);
-    }
-    return null;
+  @Inject
+  public Maven2IndexSettingsContributor(final @Named(Maven2Format.NAME) Format format) {
+    super(format);
   }
-
 }
+

@@ -10,46 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.plugin.console;
+package org.sonatype.nexus.repository.config;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
-import org.sonatype.nexus.plugin.PluginIdentity;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.eclipse.sisu.EagerSingleton;
-import org.jetbrains.annotations.NonNls;
+// TODO: This probably should live in nexus-core, or goodies-validation?
 
 /**
- * Plugin-console plugin.
+ * Provides the default {@link ValidatorFactory}.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
-@EagerSingleton
-public class PluginConsolePlugin
-    extends PluginIdentity
+@Singleton
+public class DefaultValidatorFactoryProvider
+  extends ComponentSupport
+  implements Provider<ValidatorFactory>
 {
-  /**
-   * Prefix for ID-like things.
-   */
-  @NonNls
-  public static final String ID_PREFIX = "plugin-console";
-
-  /**
-   * Expected groupId for plugin artifact.
-   */
-  @NonNls
-  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
-
-  /**
-   * Expected artifactId for plugin artifact.
-   */
-  @NonNls
-  public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
-
-  @Inject
-  public PluginConsolePlugin() throws Exception {
-    super(GROUP_ID, ARTIFACT_ID);
+  @Override
+  public ValidatorFactory get() {
+    return Validation.buildDefaultValidatorFactory();
   }
 }

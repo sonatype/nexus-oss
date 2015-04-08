@@ -10,16 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.plugin.console;
+package org.sonatype.nexus.internal.validation;
 
-import java.util.List;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
-import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
- * @author juven
+ * Provides the default {@link ValidatorFactory}.
+ *
+ * @since 3.0
  */
-public interface PluginConsoleManager
+@Named
+@Singleton
+public class DefaultValidatorFactoryProvider
+  extends ComponentSupport
+  implements Provider<ValidatorFactory>
 {
-  List<PluginInfo> listPluginInfo();
+  @Override
+  public ValidatorFactory get() {
+    return Validation.buildDefaultValidatorFactory();
+  }
 }
