@@ -25,8 +25,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
     'NX.I18n'
   ],
 
-  items: {
-    xtype: 'nx-coreui-sslcertificate-details',
+  settingsForm: {
+    xtype: 'nx-coreui-sslcertificate-details-form',
     buttons: [
       { text: NX.I18n.get('ADMIN_SSL_DETAILS_CANCEL_BUTTON'),
         handler: function () {

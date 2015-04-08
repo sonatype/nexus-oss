@@ -103,11 +103,11 @@ Ext.define('NX.coreui.controller.Tasks', {
           click: me.showSelectTypePanel
         },
         'nx-coreui-task-feature button[action=run]': {
-          click: me.runTask,
+          runaction: me.runTask,
           afterrender: me.bindRunButton
         },
         'nx-coreui-task-feature button[action=stop]': {
-          click: me.stopTask,
+          runaction: me.stopTask,
           afterrender: me.bindStopButton
         },
         'nx-coreui-task-settings button[action=save]': {
@@ -235,7 +235,7 @@ Ext.define('NX.coreui.controller.Tasks', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-drilldown-actions' },
+        { xtype: 'nx-actions' },
         {
           xtype: 'nx-coreui-task-add',
           flex: 1
@@ -400,6 +400,9 @@ Ext.define('NX.coreui.controller.Tasks', {
         bookmark = NX.Bookmarks.getBookmark(),
         model, modelId, description;
 
+    // Reload the form
+    me.loadStore();
+
     modelId = decodeURIComponent(bookmark.getSegment(1));
     model = me.getList().getStore().getById(modelId);
     description = me.getDescription(model);
@@ -428,6 +431,9 @@ Ext.define('NX.coreui.controller.Tasks', {
     var me = this,
       bookmark = NX.Bookmarks.getBookmark(),
       model, modelId, description;
+
+    // Reload the form
+    me.loadStore();
 
     modelId = decodeURIComponent(bookmark.getSegment(1));
     model = me.getList().getStore().getById(modelId);

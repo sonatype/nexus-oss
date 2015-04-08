@@ -273,6 +273,18 @@
   $background-gradient-disabled: $color-elf-green $color-dark-pigment-green
 );
 
+// Fix glyph font size so the top of the icon isn’t cropped
+.x-btn-default-small,
+.x-btn-plain-small,
+.x-btn-primary-small,
+.x-btn-danger-small,
+.x-btn-warning-small,
+.x-btn-success-small {
+  .x-btn-glyph {
+    font-size: $font-size-body;
+  }
+}
+
 /**
  * ui: 'nx-header'
  */

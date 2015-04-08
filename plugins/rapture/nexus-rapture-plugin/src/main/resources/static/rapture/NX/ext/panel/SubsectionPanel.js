@@ -26,8 +26,6 @@ Ext.define('NX.ext.panel.SubsectionPanel', {
     align: 'stretch'
   },
 
-  padding: '12px',
-
   autoScroll: true,
 
   /**

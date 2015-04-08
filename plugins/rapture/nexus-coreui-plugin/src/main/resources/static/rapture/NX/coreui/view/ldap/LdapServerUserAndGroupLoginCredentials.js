@@ -47,7 +47,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
     Ext.apply(this, {
       items: {
         xtype: 'form',
-        bodyPadding: 10,
+        ui: 'nx-inset',
         defaultType: 'textfield',
         defaults: {
           labelAlign: 'left',

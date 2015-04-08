@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.analytics.AnalyticsSettings', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-settingsform',
       settingsFormSuccessMessage: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_SUCCESS'),
       api: {

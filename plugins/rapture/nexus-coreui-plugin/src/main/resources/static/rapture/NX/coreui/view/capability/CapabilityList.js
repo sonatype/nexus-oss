@@ -50,15 +50,20 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
     }
   },
 
-  tbar: [
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NEW_BUTTON'),
-      action: 'new',
-      disabled: true,
-      glyph: 'xf055@FontAwesome' /* fa-plus-circle */
-    }
-  ],
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless',
+    items: [
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NEW_BUTTON'),
+        action: 'new',
+        disabled: true,
+        glyph: 'xf055@FontAwesome' /* fa-plus-circle */
+      }
+    ]
+  }],
 
   features: [
     {

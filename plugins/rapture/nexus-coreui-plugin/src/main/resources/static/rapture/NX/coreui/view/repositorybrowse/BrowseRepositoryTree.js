@@ -30,6 +30,10 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
     markDirty: false
   },
 
+  style: {
+    'background-color': 'transparent'
+  },
+
   rootVisible: false,
 
   columns: [
@@ -68,11 +72,21 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
     }
   ],
 
-  tbar: [
-    { xtype: 'button', text: NX.I18n.get('BROWSE_REPOSITORY_MORE_BUTTON'), glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more', disabled: true,
+
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions',
+
+    items: {
+      xtype: 'button',
+      text: NX.I18n.get('BROWSE_REPOSITORY_MORE_BUTTON'),
+      glyph: 'xf0ae@FontAwesome' /* fa-tasks */,
+      action: 'more',
+      disabled: true,
       menu: []
     }
-  ],
+  }],
 
   /**
    * @override

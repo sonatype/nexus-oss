@@ -35,54 +35,59 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
     inputAttrTpl: 'wrap="off"'
   },
 
-  tbar: [
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_LOG_VIEWER_DOWNLOAD_BUTTON'),
-      glyph: 'xf019@FontAwesome' /* fa-download */,
-      action: 'download'
-    },
-    '-',
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_BUTTON'),
-      glyph: 'xf11e@FontAwesome' /* fa-flag-checkered */,
-      action: 'mark',
-      disabled: true
-    },
-    '->',
-    {
-      xtype: 'label',
-      text: NX.I18n.get('ADMIN_LOG_VIEWER_REFRESH_INTERVAL')
-    },
-    {
-      xtype: 'combo',
-      itemId: 'refreshPeriod',
-      width: 140,
-      editable: false,
-      value: 0,
-      store: [
-        [0, NX.I18n.get('ADMIN_LOG_VIEWER_MANUAL_ITEM')],
-        [20, NX.I18n.get('ADMIN_LOG_VIEWER_20_SECONDS_ITEM')],
-        [60, NX.I18n.get('ADMIN_LOG_VIEWER_MINUTE_ITEM')],
-        [120, NX.I18n.get('ADMIN_LOG_VIEWER_2_MINUTES_ITEM')],
-        [300, NX.I18n.get('ADMIN_LOG_VIEWER_5_MINUTES_ITEM')]
-      ],
-      queryMode: 'local'
-    },
-    {
-      xtype: 'combo',
-      itemId: 'refreshSize',
-      width: 120,
-      editable: false,
-      value: 25,
-      store: [
-        [25, NX.I18n.get('ADMIN_LOG_VIEWER_25KB_ITEM')],
-        [50, NX.I18n.get('ADMIN_LOG_VIEWER_50KB_ITEM')],
-        [100, NX.I18n.get('ADMIN_LOG_VIEWER_100KB_ITEM')]
-      ],
-      queryMode: 'local'
-    }
-  ]
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless',
+    items: [
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_LOG_VIEWER_DOWNLOAD_BUTTON'),
+        glyph: 'xf019@FontAwesome' /* fa-download */,
+        action: 'download'
+      },
+      '-',
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_BUTTON'),
+        glyph: 'xf11e@FontAwesome' /* fa-flag-checkered */,
+        action: 'mark',
+        disabled: true
+      },
+      '->',
+      {
+        xtype: 'label',
+        text: NX.I18n.get('ADMIN_LOG_VIEWER_REFRESH_INTERVAL')
+      },
+      {
+        xtype: 'combo',
+        itemId: 'refreshPeriod',
+        width: 140,
+        editable: false,
+        value: 0,
+        store: [
+          [0, NX.I18n.get('ADMIN_LOG_VIEWER_MANUAL_ITEM')],
+          [20, NX.I18n.get('ADMIN_LOG_VIEWER_20_SECONDS_ITEM')],
+          [60, NX.I18n.get('ADMIN_LOG_VIEWER_MINUTE_ITEM')],
+          [120, NX.I18n.get('ADMIN_LOG_VIEWER_2_MINUTES_ITEM')],
+          [300, NX.I18n.get('ADMIN_LOG_VIEWER_5_MINUTES_ITEM')]
+        ],
+        queryMode: 'local'
+      },
+      {
+        xtype: 'combo',
+        itemId: 'refreshSize',
+        width: 120,
+        editable: false,
+        value: 25,
+        store: [
+          [25, NX.I18n.get('ADMIN_LOG_VIEWER_25KB_ITEM')],
+          [50, NX.I18n.get('ADMIN_LOG_VIEWER_50KB_ITEM')],
+          [100, NX.I18n.get('ADMIN_LOG_VIEWER_100KB_ITEM')]
+        ],
+        queryMode: 'local'
+      }
+    ]
+  }]
 
 });

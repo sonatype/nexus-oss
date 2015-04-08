@@ -21,6 +21,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroup', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-ldapserver-userandgroup',
 
-  items: { xtype: 'nx-coreui-ldapserver-userandgroup-form' }
+  settingsForm: { xtype: 'nx-coreui-ldapserver-userandgroup-form' }
 
 });

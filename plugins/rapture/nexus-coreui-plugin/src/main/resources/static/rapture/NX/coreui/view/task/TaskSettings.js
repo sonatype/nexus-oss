@@ -21,6 +21,6 @@ Ext.define('NX.coreui.view.task.TaskSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-task-settings',
 
-  items: { xtype: 'nx-coreui-task-settings-form' }
+  settingsForm: { xtype: 'nx-coreui-task-settings-form' }
 
 });

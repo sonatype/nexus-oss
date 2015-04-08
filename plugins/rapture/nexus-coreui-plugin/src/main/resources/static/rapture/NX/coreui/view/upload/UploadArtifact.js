@@ -24,8 +24,6 @@ Ext.define('NX.coreui.view.upload.UploadArtifact', {
     'NX.I18n'
   ],
 
-  bodyPadding: 10,
-
   defaults: {
     xtype: 'textfield',
     allowBlank: false

@@ -45,7 +45,7 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
     me.items = [
       {
         xtype: 'form',
-        bodyPadding: 10,
+        ui: 'nx-inset',
         defaults: {
           labelSeparator: '',
           labelWidth: 40,

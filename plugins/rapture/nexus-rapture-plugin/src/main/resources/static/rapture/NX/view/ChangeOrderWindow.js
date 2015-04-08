@@ -42,7 +42,7 @@ Ext.define('NX.view.ChangeOrderWindow', {
 
     me.items = {
       xtype: 'form',
-      bodyPadding: 10,
+      ui: 'nx-inset',
       items: {
         xtype: 'nx-itemorderer',
         store: me.store,

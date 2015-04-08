@@ -35,9 +35,15 @@ Ext.define('NX.coreui.view.system.PluginList', {
         return 'plugin-default';
       }
     },
-    {header: NX.I18n.get('ADMIN_PLUGINS_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1},
-    {header: NX.I18n.get('ADMIN_PLUGINS_LIST_VERSION_COLUMN'), dataIndex: 'version', flex: 1}
+    { header: NX.I18n.get('ADMIN_PLUGINS_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
+    { header: NX.I18n.get('ADMIN_PLUGINS_LIST_VERSION_COLUMN'), dataIndex: 'version', flex: 1 }
   ],
+
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless'
+  }],
 
   plugins: [
     { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_PLUGINS_LIST_FILTER_ERROR') }

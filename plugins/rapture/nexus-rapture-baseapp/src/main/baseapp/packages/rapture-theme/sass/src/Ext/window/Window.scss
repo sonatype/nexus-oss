@@ -2,6 +2,15 @@
  * @class Ext.window.Window
  */
 
+/**
+ * ui: 'nx-inset'
+ */
+@include extjs-window-ui(
+  $ui: 'nx-inset',
+
+  $ui-padding: 12px 12px 0 12px
+);
+
 @include extjs-window-ui(
   $ui: 'nx-message-default',
 
