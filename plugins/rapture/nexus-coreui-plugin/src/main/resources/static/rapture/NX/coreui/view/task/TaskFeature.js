@@ -33,8 +33,27 @@ Ext.define('NX.coreui.view.task.TaskFeature', {
   ],
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_TASKS_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
-    { xtype: 'button', text: NX.I18n.get('ADMIN_TASKS_DETAILS_RUN_BUTTON'), glyph: 'xf04b@FontAwesome' /* fa-play */, action: 'run', disabled: true },
-    { xtype: 'button', text: NX.I18n.get('ADMIN_TASKS_DETAILS_STOP_BUTTON'), glyph: 'xf04d@FontAwesome' /* fa-stop */, action: 'stop', disabled: true }
+    {
+      xtype: 'button',
+      text: NX.I18n.get('ADMIN_TASKS_DETAILS_DELETE_BUTTON'),
+      glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
+      action: 'delete',disabled: true
+    },
+    {
+      xtype: 'button',
+      text: NX.I18n.get('ADMIN_TASKS_DETAILS_RUN_BUTTON'),
+      glyph: 'xf04b@FontAwesome' /* fa-play */,
+      action: 'run',
+      handler: function(button) { button.fireEvent('runaction') },
+      disabled: true
+    },
+    {
+      xtype: 'button',
+      text: NX.I18n.get('ADMIN_TASKS_DETAILS_STOP_BUTTON'),
+      glyph: 'xf04d@FontAwesome' /* fa-stop */,
+      action: 'stop',
+      handler: function(button) { button.fireEvent('runaction') },
+      disabled: true
+    }
   ]
 });
