@@ -15,7 +15,7 @@ package com.sonatype.nexus.repository.nuget.internal.security;
 import org.sonatype.nexus.security.authc.HttpHeaderAuthenticationToken;
 
 /**
- * Rut Auth specific {@link HttpHeaderAuthenticationToken}.
+ * Nuget-specific {@link HttpHeaderAuthenticationToken}.
  *
  * @since 3.0
  */
