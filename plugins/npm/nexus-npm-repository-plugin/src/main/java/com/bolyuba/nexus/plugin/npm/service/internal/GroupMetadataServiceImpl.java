@@ -16,11 +16,15 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import com.bolyuba.nexus.plugin.npm.NpmRepository;
@@ -30,6 +34,7 @@ import com.bolyuba.nexus.plugin.npm.service.PackageRequest;
 import com.bolyuba.nexus.plugin.npm.service.PackageRoot;
 import com.bolyuba.nexus.plugin.npm.service.PackageVersion;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -43,9 +48,11 @@ public class GroupMetadataServiceImpl
 {
   private final NpmGroupRepository npmGroupRepository;
 
+  private final AlphanumComparator comparator;
+
   private boolean mergeMetadata = SystemPropertiesHelper.getBoolean(
-    "com.bolyuba.nexus.plugin.npm.service.internal.GroupMetadataServiceImpl.mergeMetadata",
-    true
+      "com.bolyuba.nexus.plugin.npm.service.internal.GroupMetadataServiceImpl.mergeMetadata",
+      true
   );
 
   public GroupMetadataServiceImpl(final NpmGroupRepository npmGroupRepository,
@@ -53,6 +60,7 @@ public class GroupMetadataServiceImpl
   {
     super(npmGroupRepository, metadataParser);
     this.npmGroupRepository = checkNotNull(npmGroupRepository);
+    this.comparator = new AlphanumComparator();
   }
 
   @Override
@@ -82,17 +90,28 @@ public class GroupMetadataServiceImpl
         !npmGroupRepository.getId().equals(request.getScope())) ? getScopeMembers(request.getScope()) : getMembers();
     if (isMergeMetadata()) {
       PackageRoot root = null;
+      String latestVersion = null;
       // apply in reverse order to have "first wins", as package overlay makes overlaid prevail
       for (NpmRepository member : Lists.reverse(members)) {
         final PackageRoot memberRoot = member.getMetadataService().generatePackageRoot(request);
         if (memberRoot != null) {
           if (root == null) {
             root = new PackageRoot(npmGroupRepository.getId(), memberRoot.getRaw());
+            latestVersion = getDistTagsLatest(root);
           }
           else {
+            String memberLatestVersion = getDistTagsLatest(memberRoot);
             root.overlayIgnoringOrigin(memberRoot);
+            if (latestVersion != null && memberLatestVersion != null &&
+                comparator.compare(memberLatestVersion, latestVersion) > 0) {
+              latestVersion = memberLatestVersion;
+            }
           }
         }
+      }
+      // fix up latest: is biggest of all latest versions we met
+      if (latestVersion != null) {
+        setDistTagsLatest(root, latestVersion);
       }
       return root;
     }
@@ -105,6 +124,24 @@ public class GroupMetadataServiceImpl
       }
       return null;
     }
+  }
+
+  @Nullable
+  private String getDistTagsLatest(final PackageRoot root) {
+    final Map<String, String> distTags = (Map<String, String>) root.getRaw().get("dist-tags");
+    if (distTags == null) {
+      return null;
+    }
+    return distTags.get("latest");
+  }
+
+  private void setDistTagsLatest(final PackageRoot root, final String version) {
+    Map<String, String> distTags = (Map<String, String>) root.getRaw().get("dist-tags");
+    if (distTags == null) {
+      distTags = Maps.newHashMap();
+      root.getRaw().put("dist-tags", distTags);
+    }
+    distTags.put("latest", version);
   }
 
   @Nullable

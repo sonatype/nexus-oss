@@ -450,7 +450,7 @@ public class MetadataServiceIT
   public void groupPackageRootRoundtripWithoutMerge() throws Exception {
     // deploy private project to hosted1 repo
     {
-      final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject.json");
+      final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject_patched.json");
       final ContentLocator input = new PreparedContentLocator(
           new FileInputStream(jsonFile),
           NpmRepository.JSON_MIME_TYPE, -1);
@@ -461,7 +461,7 @@ public class MetadataServiceIT
     }
     // deploy private patched project to hosted2 repo
     {
-      final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject_patched.json");
+      final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject.json");
       final ContentLocator input = new PreparedContentLocator(
           new FileInputStream(jsonFile),
           NpmRepository.JSON_MIME_TYPE, -1);
@@ -485,8 +485,9 @@ public class MetadataServiceIT
         .generatePackageRoot(new PackageRequest(new ResourceStoreRequest("/testproject")));
     assertThat(testproject, notNullValue());
 
-    assertThat(testproject.getVersions(), hasKey("0.0.0"));
-    assertThat(testproject.getVersions(), not(hasKey("0.0.0-patched"))); // is shaded
+    assertThat(testproject.getVersions(), not(hasKey("0.0.0"))); // is shaded
+    assertThat(testproject.getVersions(), hasKey("0.0.0-patched"));
+    assertThat((Map<String, String>) testproject.getRaw().get("dist-tags"), hasEntry("latest", "0.0.0-patched"));
 
     final PackageRootIterator iterator = npmGroupRepository.getMetadataService().generateRegistryRoot(
         new PackageRequest(new ResourceStoreRequest("/", true, false)));
@@ -511,7 +512,7 @@ public class MetadataServiceIT
   public void groupPackageRootRoundtripWithMerge() throws Exception {
     // deploy private project to hosted1 repo
     {
-      final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject.json");
+      final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject_patched.json");
       final ContentLocator input = new PreparedContentLocator(
           new FileInputStream(jsonFile),
           NpmRepository.JSON_MIME_TYPE, -1);
@@ -522,7 +523,7 @@ public class MetadataServiceIT
     }
     // deploy private patched project to hosted2 repo
     {
-      final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject_patched.json");
+      final File jsonFile = util.resolveFile("src/test/npm/ROOT_testproject.json");
       final ContentLocator input = new PreparedContentLocator(
           new FileInputStream(jsonFile),
           NpmRepository.JSON_MIME_TYPE, -1);
@@ -548,6 +549,10 @@ public class MetadataServiceIT
 
     assertThat(testproject.getVersions(), hasKey("0.0.0"));
     assertThat(testproject.getVersions(), hasKey("0.0.0-patched"));
+    // TODO: none of these are latest, as proxied registry ALSO has this package
+    // TODO: this IT might break if package gets removed from registry (unlikely but possible), in which case the patched should become latest version
+    assertThat((Map<String, String>) testproject.getRaw().get("dist-tags"), not(hasEntry("latest", "0.0.0")));
+    assertThat((Map<String, String>) testproject.getRaw().get("dist-tags"), not(hasEntry("latest", "0.0.0-patched")));
 
     final PackageRootIterator iterator = npmGroupRepository.getMetadataService().generateRegistryRoot(
         new PackageRequest(new ResourceStoreRequest("/", true, false)));
