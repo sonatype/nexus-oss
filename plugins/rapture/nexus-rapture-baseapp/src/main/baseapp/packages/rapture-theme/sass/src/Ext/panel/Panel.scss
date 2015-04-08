@@ -91,7 +91,7 @@
   }
 
   .x-panel-nx-subsection-framed {
-    margin: 0 0 20px 0;
+    margin: 0 0 10px 0;
   }
 }
 
@@ -136,16 +136,20 @@
 
 .x-panel-nx-subsection {
   .x-panel-header {
-    padding: 10px 0 10px 0 !important;
+    padding: 10px 0 5px 0 !important;
   }
 }
 
 .x-panel-nx-subsection-framed {
   border: $color-gainsboro 1px solid;
-}
 
-.x-panel-nx-subsection-framed > .x-panel-body {
-  padding: 12px;
+  .x-panel-header {
+    padding: 10px 9px 5px 9px !important;
+  }
+
+  .x-panel-body {
+    padding: 9px 9px 10px 9px !important;
+  }
 }
 
 /**
