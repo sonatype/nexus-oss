@@ -38,6 +38,12 @@ Ext.define('NX.coreui_legacy.view.repository.RepositoryFeature', {
       menu: []
     },
     '-',
-    { xtype: 'button', text: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_DETAILS_BROWSE_BUTTON'), glyph: 'xf0e8@FontAwesome' /* fa-sitemap */, action: 'browse' }
+    {
+      xtype: 'button',
+      text: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_DETAILS_BROWSE_BUTTON'),
+      glyph: 'xf0e8@FontAwesome' /* fa-sitemap */,
+      action: 'browse',
+      handler: function(button) { button.fireEvent('runaction') }
+    }
   ]
 });

@@ -121,11 +121,11 @@ Ext.define('NX.coreui.controller.Capabilities', {
           click: me.showSelectTypePanel
         },
         'nx-coreui-capability-feature button[action=enable]': {
-          click: me.enableCapability,
+          runaction: me.enableCapability,
           afterrender: me.bindEnableButton
         },
         'nx-coreui-capability-feature button[action=disable]': {
-          click: me.disableCapability,
+          runaction: me.disableCapability,
           afterrender: me.bindDisableButton
         },
         'nx-coreui-capability-summary nx-settingsform': {

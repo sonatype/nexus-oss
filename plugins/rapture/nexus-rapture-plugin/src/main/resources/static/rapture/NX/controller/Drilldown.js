@@ -72,7 +72,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
-   * @private
+   * @override
    */
   init: function () {
     var me = this,
@@ -168,12 +168,7 @@ Ext.define('NX.controller.Drilldown', {
    * Whenever the first list loads, trigger a navigation event
    */
   onAfterRender: function () {
-    var me = this;/*,
-      lists = me.getLists(),
-      last = lists[lists.length - 1];*/
-
-    // Trigger navigation when the last list loads
-    //last.mon(last.getStore(), 'load', me.onStoreLoad, me);
+    var me = this;
 
     // Start loading the lists
     me.loadStore(Ext.emptyFn);

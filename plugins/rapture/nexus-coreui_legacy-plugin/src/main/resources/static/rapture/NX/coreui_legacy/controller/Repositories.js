@@ -112,7 +112,7 @@ Ext.define('NX.coreui_legacy.controller.Repositories', {
           beforedestroy: me.stopStatusPolling
         },
         'nx-coreui_legacy-repository-feature button[action=browse]': {
-          click: me.navigateToBrowseMode
+          runaction: me.navigateToBrowseMode
         },
         'nx-coreui_legacy-repository-list button[action=new]': {
           click: me.showSelectTemplatePanel

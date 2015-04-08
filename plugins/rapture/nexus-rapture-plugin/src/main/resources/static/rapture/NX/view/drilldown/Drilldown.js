@@ -260,10 +260,15 @@ Ext.define('NX.view.drilldown.Drilldown', {
       items = me.query('nx-drilldown-item'),
       form;
 
-    // Hide everything that’s not the specified panel
+    // Hide everything that’s not the specified panel, reset forms, etc…
     for (var i = 0; i < items.length; ++i) {
       if (i != index) {
         items[i].getLayout().setActiveItem(me.BLANK_INDEX);
+        Ext.each(items[i].query('nx-settingsform'), function(panel) {
+          if (panel.getForm().isDirty()) {
+            panel.getForm().reset();
+          }
+        });
       }
     }
 
