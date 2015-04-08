@@ -28,6 +28,7 @@ import com.bolyuba.nexus.plugin.npm.client.NpmProxyRepository;
 import com.google.common.collect.Lists;
 import org.junit.BeforeClass;
 import org.junit.Rule;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 
@@ -42,6 +43,7 @@ import static org.sonatype.sisu.goodies.common.Varargs.$;
 /**
  * Support for NPM integration tests.
  */
+@Category(NpmCategory.class)
 @NexusStartAndStopStrategy(EACH_TEST)
 public abstract class NpmITSupport
     extends NexusRunningParametrizedITSupport
