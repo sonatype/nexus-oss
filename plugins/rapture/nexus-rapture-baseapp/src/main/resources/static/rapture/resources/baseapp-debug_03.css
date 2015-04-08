@@ -1,3 +1,12 @@
+.x-tab-nx-light-top-disabled .x-frame-ml,
+.x-tab-nx-light-top-disabled .x-frame-mr,
+.x-tab-nx-light-left-disabled .x-frame-ml,
+.x-tab-nx-light-left-disabled .x-frame-mr,
+.x-tab-nx-light-right-disabled .x-frame-ml,
+.x-tab-nx-light-right-disabled .x-frame-mr {
+  background-image: url(images/tab/tab-nx-light-top-disabled-sides.gif);
+}
+/* line 811, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-nx-light-top-disabled .x-frame-mc,
 .x-tab-nx-light-left-disabled .x-frame-mc,
 .x-tab-nx-light-right-disabled .x-frame-mc {

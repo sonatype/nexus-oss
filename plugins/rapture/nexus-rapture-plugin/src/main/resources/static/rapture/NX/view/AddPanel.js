@@ -59,11 +59,6 @@ Ext.define('NX.view.AddPanel', {
     me.items = {
       xtype: 'panel',
       ui: 'nx-inset',
-      defaults: {
-        style: {
-          margin: '0 0 20px 0'
-        }
-      },
 
       items: me.settingsForm
     };

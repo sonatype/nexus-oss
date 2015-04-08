@@ -42,11 +42,6 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
     me.items = {
       xtype: 'panel',
       ui: 'nx-inset',
-      defaults: {
-        style: {
-          margin: '0 0 20px 0'
-        }
-      },
       items: [
         {
           xtype: 'panel',
