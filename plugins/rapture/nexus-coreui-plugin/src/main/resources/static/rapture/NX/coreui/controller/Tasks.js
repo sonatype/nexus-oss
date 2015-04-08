@@ -235,7 +235,6 @@ Ext.define('NX.coreui.controller.Tasks', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-actions' },
         {
           xtype: 'nx-coreui-task-add',
           flex: 1
