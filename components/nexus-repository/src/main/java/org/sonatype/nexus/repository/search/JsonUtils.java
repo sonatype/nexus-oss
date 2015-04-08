@@ -15,9 +15,6 @@ package org.sonatype.nexus.repository.search;
 import java.io.IOException;
 import java.util.Iterator;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,34 +24,32 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class JsonUtils
+class JsonUtils
 {
+  private static final ObjectMapper objectMapper = new ObjectMapper();
 
   /**
    * Converts any object to JSON.
    */
   public static String from(final Object value) throws IOException {
-    return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(value);
+    return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
   }
 
   /**
    * Merges json objects.
    */
   public static String merge(final String... jsons) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode merged = mapper.readTree("{}");
+    JsonNode merged = objectMapper.readTree("{}");
     for (String json : jsons) {
-      merged = merge(merged, mapper.readTree(json));
+      merged = merge(merged, objectMapper.readTree(json));
     }
-    return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(merged);
+    return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(merged);
   }
 
   /**
    * Merges json objects.
    */
-  public static JsonNode merge(JsonNode mainNode, JsonNode updateNode) {
+  public static JsonNode merge(final JsonNode mainNode, final JsonNode updateNode) {
     Iterator<String> fieldNames = updateNode.fieldNames();
     while (fieldNames.hasNext()) {
       String fieldName = fieldNames.next();
@@ -73,5 +68,4 @@ public class JsonUtils
     }
     return mainNode;
   }
-
 }

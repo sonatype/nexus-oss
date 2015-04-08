@@ -110,6 +110,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
       // so override these methods to prevent them from including
       // any of their values
       submitValue: false,
+      isDirty: Ext.emptyFn,
       getSubmitData: function () {
         return null;
       },

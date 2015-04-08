@@ -13,40 +13,30 @@
 /*global Ext, NX*/
 
 /**
- * NuGet upload panel.
+ * Bundle store.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.nuget.NuGetUpload', {
-  extend: 'NX.view.SettingsPanel',
-  alias: 'widget.nx-coreui-nuget-upload',
+Ext.define('NX.coreui.store.Bundle', {
+  extend: 'Ext.data.Store',
+  model: 'NX.coreui.model.Bundle',
 
-  items: {
-    xtype: 'nx-coreui-upload-file',
+  proxy: {
+    type: 'direct',
+    paramsAsHash: false,
     api: {
-      submit: 'NX.direct.nuget_Upload.uploadPackages'
+      read: 'NX.direct.coreui_Bundle.read'
     },
-    entryName: 'package'
+
+    reader: {
+      type: 'json',
+      root: 'data',
+      idProperty: 'id',
+      successProperty: 'success'
+    }
   },
 
-  initComponent: function() {
-    var me = this;
+  sortOnLoad: true,
+  sorters: { property: 'id', direction: 'ASC' }
 
-    me.callParent(arguments);
-
-    me.down('form').insert(0, [
-      {
-        xtype: 'combo',
-        name: 'repositoryId',
-        fieldLabel: 'Repository',
-        helpText: 'Select the repository where packages will be uploaded.',
-        emptyText: 'select repository',
-        queryMode: 'local',
-        displayField: 'name',
-        valueField: 'id',
-        store: 'NuGetUploadRepositoryHosted',
-        editable: false
-      }
-    ]);
-  }
 });

@@ -25,25 +25,40 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
   ],
 
   store: 'NX.coreui.store.Repository',
-
+  
   columns: [
     {
       xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
-      iconName: function() {
-        return 'repository-default';
-      }
+      iconNamePrefix: 'repository-',
+      dataIndex: 'type'
     },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_TYPE_COLUMN'), dataIndex: 'type' },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_FORMAT_COLUMN'), dataIndex: 'format' },
-    { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_STATUS_COLUMN'), dataIndex: 'status', flex: 1 }
+    { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_STATUS_COLUMN'), dataIndex: 'status', flex: 1, 
+      xtype: 'templatecolumn', 
+      tpl: new Ext.XTemplate(
+          '<tpl if="status.online">',
+          'Online',
+          '<tpl else>',
+          'Offline',
+          '</tpl>',
+          '<tpl if="status.description">',
+          ' - {status.description}',
+          '</tpl>',
+          '<tpl if="status.reason">',
+          '<br/><i>{status.reason}</i>',
+          '</tpl>')
+    },
+    { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_URL_COLUMN'), dataIndex: 'url', xtype: 'nx-linkcolumn', flex: 1 }
   ],
 
   viewConfig: {
     emptyText: NX.I18n.get('ADMIN_REPOSITORIES_LIST_EMPTY_STATE'),
-    deferEmptyText: false
+    deferEmptyText: false,
+    markDirty:false
   },
 
   tbar: [

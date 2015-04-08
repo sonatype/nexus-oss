@@ -121,16 +121,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
       }
     },
-    { id: 'NX.coreui.controller.NuGetRepositorySettings',
-      active: function () {
-        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-nuget-plugin');
-      }
-    },
-    { id: 'NX.coreui.controller.NuGetUpload',
-      active: function () {
-        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-nuget-plugin');
-      }
-    },
     {
       id: 'NX.coreui.controller.Outreach',
       active: function () {
@@ -138,9 +128,9 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
-      id: 'NX.coreui.controller.PluginConsole',
+      id: 'NX.coreui.controller.Bundles',
       active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-plugin-console-plugin');
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
       }
     },
     {

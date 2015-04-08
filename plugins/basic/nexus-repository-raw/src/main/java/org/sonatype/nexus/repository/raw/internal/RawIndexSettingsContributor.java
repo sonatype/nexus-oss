@@ -12,17 +12,12 @@
  */
 package org.sonatype.nexus.repository.raw.internal;
 
-import java.io.IOException;
-
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.search.IndexSettingsContributor;
-
-import com.google.common.io.Resources;
-
-import static com.google.common.base.Charsets.UTF_8;
+import org.sonatype.nexus.repository.Format;
+import org.sonatype.nexus.repository.search.IndexSettingsContributorSupport;
 
 /**
  * Contributor to ES index settings.
@@ -32,15 +27,10 @@ import static com.google.common.base.Charsets.UTF_8;
 @Named
 @Singleton
 public class RawIndexSettingsContributor
-    implements IndexSettingsContributor
+    extends IndexSettingsContributorSupport
 {
-
-  @Override
-  public String getIndexSettings(final Repository repository) throws IOException {
-    if (RawFormat.NAME.equals(repository.getFormat().getValue())) {
-      return Resources.toString(Resources.getResource(RawIndexSettingsContributor.class, "es-mapping-raw.json"), UTF_8);
-    }
-    return null;
+  @Inject
+  public RawIndexSettingsContributor(final @Named(RawFormat.NAME) Format format) {
+    super(format);
   }
-
 }

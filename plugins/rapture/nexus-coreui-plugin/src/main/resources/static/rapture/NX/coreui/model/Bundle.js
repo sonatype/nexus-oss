@@ -13,17 +13,25 @@
 /*global Ext, NX*/
 
 /**
- * NuGet Upload Hosted Repository store.
+ * Bundle model.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.store.NuGetUploadRepositoryHosted', {
-  extend: 'NX.coreui_legacy.store.RepositoryReference',
-
-  remoteFilter: true,
-  filters: [
-    { property: 'type', value: 'hosted' },
-    { property: 'format', value: 'nuget' }
+Ext.define('NX.coreui.model.Bundle', {
+  extend: 'Ext.data.Model',
+  idProperty: 'id',
+  fields: [
+    { name: 'id', type: 'int' },
+    { name: 'state', type: 'string' },
+    { name: 'name', type: 'string' },
+    { name: 'symbolicName', type: 'string' },
+    { name: 'version', type: 'string' },
+    { name: 'location', type: 'string' },
+    { name: 'startLevel', type: 'int' },
+    { name: 'lastModified', type: 'int'},
+    { name: 'fragment', type: 'bool' },
+    { name: 'fragments', type: 'auto' /*array*/ },
+    { name: 'fragmentHosts', type: 'auto' /*array*/ },
+    { name: 'headers', type: 'auto' /*object*/}
   ]
-
 });

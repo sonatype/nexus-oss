@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.repository.config;
 
+import javax.validation.ValidationException;
+
+import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.Facet;
 
 /**
@@ -27,4 +30,21 @@ public interface ConfigurationFacet
    * Persist configuration.
    */
   void save() throws Exception;
+
+  /**
+   * Read object of given type from attributes.
+   */
+  <T> T readObject(AttributesMap attributes, Class<T> type);
+
+  /**
+   * Read object of given type from named configuration section.
+   */
+  <T> T readObject(String section, Class<T> type);
+
+  /**
+   * Validate given object.
+   *
+   * @throws ValidationException
+   */
+  void validate(Object value, final Class<?>... groups);
 }

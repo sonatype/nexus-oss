@@ -22,15 +22,16 @@ import javax.inject.Provider;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -44,6 +45,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import com.tinkerpop.blueprints.impls.orient.OrientVertexType;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
@@ -58,19 +60,36 @@ public class StorageFacetImpl
     extends FacetSupport
     implements StorageFacet
 {
-  public static final String CONFIG_KEY = "storage";
-
   private final BlobStoreManager blobStoreManager;
 
   private final Provider<DatabaseInstance> databaseInstanceProvider;
 
   private final ComponentMetadataFactory componentMetadataFactory;
 
-  private String blobStoreName;
+  @VisibleForTesting
+  static final String CONFIG_KEY = "storage";
+
+  @VisibleForTesting
+  static class Config
+  {
+    @NotEmpty
+    public String blobStoreName = "default";
+
+    //@NotNull
+    public WritePolicy writePolicy;
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "blobStoreName='" + blobStoreName + '\'' +
+          ", writePolicy=" + writePolicy +
+          '}';
+    }
+  }
+
+  private Config config;
 
   private ORID bucketId;
-
-  private WritePolicy writePolicy;
 
   @Inject
   public StorageFacetImpl(final BlobStoreManager blobStoreManager,
@@ -84,15 +103,10 @@ public class StorageFacetImpl
 
   @Override
   protected void doConfigure() throws Exception {
-    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
-    blobStoreName = attributes.get("blobStoreName", String.class, "default");
-    log.debug("BLOB-store name: {}", blobStoreName);
-    writePolicy = null;
-    String writePolicyAttr = attributes.get("writePolicy", String.class);
-    if (writePolicyAttr != null) {
-      writePolicy = WritePolicy.valueOf(writePolicyAttr);
-    }
-    log.debug("Write Policy: {}", writePolicy);
+    ConfigurationFacet configuration = facet(ConfigurationFacet.class);
+    config = configuration.readObject(CONFIG_KEY, Config.class);
+    log.debug("Config: {}", config);
+    configuration.validate(config);
   }
 
   @Override
@@ -198,8 +212,8 @@ public class StorageFacetImpl
   }
 
   private StorageTx openStorageTx(boolean withHooks) {
-    BlobStore blobStore = blobStoreManager.get(blobStoreName);
-    return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(withHooks), bucketId, writePolicy);
+    BlobStore blobStore = blobStoreManager.get(config.blobStoreName);
+    return new StorageTxImpl(new BlobTx(blobStore), openGraphTx(withHooks), bucketId, config.writePolicy);
   }
 
   private GraphTx openGraphTx(boolean withHooks) {
@@ -209,7 +223,7 @@ public class StorageFacetImpl
     if (withHooks) {
       graphTx.registerHook(new LastUpdatedHook());
       try {
-        SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
+        SearchFacet searchFacet = facet(SearchFacet.class);
         graphTx.registerHook(new IndexingHook(graphTx, searchFacet));
       }
       catch (MissingFacetException e) {

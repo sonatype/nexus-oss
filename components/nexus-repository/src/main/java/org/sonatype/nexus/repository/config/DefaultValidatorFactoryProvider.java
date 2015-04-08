@@ -10,18 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, NX*/
+package org.sonatype.nexus.repository.config;
+
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
+
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+// TODO: This probably should live in nexus-core, or goodies-validation?
 
 /**
- * Plugin feature panel.
+ * Provides the default {@link ValidatorFactory}.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.system.Plugins', {
-  extend: 'NX.view.drilldown.Drilldown',
-  alias: 'widget.nx-coreui-system-plugins',
-
-  iconName: 'plugin-default',
-
-  masters: { xtype: 'nx-coreui-system-pluginlist' }
-});
+@Named
+@Singleton
+public class DefaultValidatorFactoryProvider
+  extends ComponentSupport
+  implements Provider<ValidatorFactory>
+{
+  @Override
+  public ValidatorFactory get() {
+    return Validation.buildDefaultValidatorFactory();
+  }
+}
