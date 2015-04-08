@@ -10,41 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.config;
+package org.sonatype.nexus.internal.validation;
 
-import javax.validation.ValidationException;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
-import org.sonatype.nexus.common.collect.AttributesMap;
-import org.sonatype.nexus.repository.Facet;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
- * Configuration {@link Facet}.
+ * Provides the default {@link ValidatorFactory}.
  *
  * @since 3.0
  */
-@Facet.Exposed
-public interface ConfigurationFacet
-  extends Facet
+@Named
+@Singleton
+public class DefaultValidatorFactoryProvider
+  extends ComponentSupport
+  implements Provider<ValidatorFactory>
 {
-  /**
-   * Persist configuration.
-   */
-  void save() throws Exception;
-
-  /**
-   * Read object of given type from attributes.
-   */
-  <T> T readObject(AttributesMap attributes, Class<T> type);
-
-  /**
-   * Read object of given type from named configuration section.
-   */
-  <T> T readObject(String section, Class<T> type);
-
-  /**
-   * Validate given object.
-   *
-   * @throws ValidationException
-   */
-  void validate(Object value, final Class<?>... groups);
+  @Override
+  public ValidatorFactory get() {
+    return Validation.buildDefaultValidatorFactory();
+  }
 }

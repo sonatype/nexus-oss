@@ -12,39 +12,34 @@
  */
 package org.sonatype.nexus.repository.config;
 
-import javax.validation.ValidationException;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.collect.AttributesMap;
-import org.sonatype.nexus.repository.Facet;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Configuration {@link Facet}.
+ * Provides {@link ObjectMapper} for repository configuration.
  *
  * @since 3.0
  */
-@Facet.Exposed
-public interface ConfigurationFacet
-  extends Facet
+@Named(ConfigurationObjectMapperProvider.NAME)
+@Singleton
+public class ConfigurationObjectMapperProvider
+    extends ComponentSupport
+    implements Provider<ObjectMapper>
 {
-  /**
-   * Persist configuration.
-   */
-  void save() throws Exception;
+  public static final String NAME = "repository-configuration";
 
-  /**
-   * Read object of given type from attributes.
-   */
-  <T> T readObject(AttributesMap attributes, Class<T> type);
-
-  /**
-   * Read object of given type from named configuration section.
-   */
-  <T> T readObject(String section, Class<T> type);
-
-  /**
-   * Validate given object.
-   *
-   * @throws ValidationException
-   */
-  void validate(Object value, final Class<?>... groups);
+  @Override
+  public ObjectMapper get() {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    // TODO: ISO-8601, joda
+    // TODO: null handling
+    return mapper;
+  }
 }

@@ -172,4 +172,20 @@ public abstract class FacetSupport
   protected void doDestroy() throws Exception {
     // nop
   }
+
+  //
+  // Helpers
+  //
+
+  /**
+   * Lookup a facet on attached repository.
+   *
+   * Reduce some verbosity for commonly used repository operation.
+   *
+   * @see Repository#facet(Class)
+   */
+  @Nonnull
+  protected <T extends Facet> T facet(final Class<T> type) throws MissingFacetException {
+    return getRepository().facet(type);
+  }
 }

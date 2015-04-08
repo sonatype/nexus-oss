@@ -49,6 +49,13 @@ public class AttributesMap
   }
 
   /**
+   * Expose the underlying backing for attributes.
+   */
+  public Map<String, Object> backing() {
+    return backing;
+  }
+
+  /**
    * Coerce value to type.
    */
   @SuppressWarnings("unchecked")
