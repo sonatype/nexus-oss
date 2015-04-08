@@ -15,18 +15,27 @@ package org.sonatype.nexus.repository.group;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.ValidationException;
+import javax.validation.constraints.NotNull;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.MissingFacetException;
+import org.sonatype.nexus.repository.Recipe;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
+import org.sonatype.nexus.repository.config.ConfigurationStore;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -47,39 +56,93 @@ public class GroupFacetImpl
 
   private final RepositoryManager repositoryManager;
 
-  private final Set<String> memberNames = Sets.newLinkedHashSet();
+  private final ConfigurationStore configurationStore;
+
+  private final Map<String, Recipe> recipes;
+
+  private Config config;
+  private static class Config
+  {
+    @NotNull
+    public List<String> memberNames;
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "memberNames='" + memberNames +
+          '}';
+    }
+  }
 
   @Inject
-  public GroupFacetImpl(final RepositoryManager repositoryManager) {
+  public GroupFacetImpl(final RepositoryManager repositoryManager,
+                        final ConfigurationStore configurationStore, final Map<String, Recipe> recipes)
+  {
     this.repositoryManager = checkNotNull(repositoryManager);
+    this.configurationStore = checkNotNull(configurationStore);
+    this.recipes = checkNotNull(recipes);
   }
 
   // TODO: Check for compatibility and cyclic-references
 
   @Override
   protected void doConfigure() throws Exception {
-    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
-    memberNames.addAll(attributes.require("memberNames", COLLECTION_STRING));
-    log.debug("Members names: {}", memberNames);
+    config = facet(ConfigurationFacet.class).readObject(CONFIG_KEY, Config.class);
+
+    Map<String, Configuration> memberConfigs = memberConfigs();
+    for (String memberName : config.memberNames) {
+      ensureMemberExists(memberConfigs, memberName);
+      ensureFormatMatches(memberName, getRepository().getFormat(), memberConfigs);
+    }
+  }
+
+  private void ensureMemberExists(final Map<String, Configuration> memberConfigs, final String memberName) {
+    if (!memberConfigs.containsKey(memberName)) {
+      throw new ValidationException("Group refers to nonexistent member repository " + memberName);
+    }
+  }
+
+  private void ensureFormatMatches(final String memberName, final Format requiredFormat,
+                                   final Map<String, Configuration> memberConfigs)
+  {
+    final Configuration memberConfig = memberConfigs.get(memberName);
+    final String recipeName = memberConfig.getRecipeName();
+    final Format memberFormat = recipes.get(recipeName).getFormat();
+
+    if (!requiredFormat.equals(memberFormat)) {
+      throw new ValidationException(String.format("%s-format %s cannot contain %s-format member %s",
+          requiredFormat, getRepository().getName(), memberFormat, memberName));
+    }
+  }
+
+  private Map<String, Configuration> memberConfigs() {
+    Map<String, Configuration> memberConfigs = Maps.newHashMap();
+
+    for (Configuration repoConfig : configurationStore.list()) {
+      if (config.memberNames.contains(repoConfig.getRepositoryName())) {
+        memberConfigs.put(repoConfig.getRepositoryName(), repoConfig);
+      }
+    }
+    return memberConfigs;
   }
 
   @Override
   protected void doDestroy() throws Exception {
-    memberNames.clear();
+    config.memberNames.clear();
   }
 
   @Override
   @Guarded(by = STARTED)
   public boolean member(final Repository repository) {
     checkNotNull(repository);
-    return memberNames.contains(repository.getName());
+    return config.memberNames.contains(repository.getName());
   }
 
   @Override
   @Guarded(by = STARTED)
   public List<Repository> members() {
-    List<Repository> members = new ArrayList<>(memberNames.size());
-    for (String name : memberNames) {
+    List<Repository> members = new ArrayList<>(config.memberNames.size());
+    for (String name : config.memberNames) {
       Repository repository = repositoryManager.get(name);
       if (repository != null) {
         members.add(repository);

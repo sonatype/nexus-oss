@@ -27,7 +27,9 @@ import javax.inject.Named;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.hash.Hashes;
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.Recipe;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.ConfigurationStore;
 import org.sonatype.nexus.repository.group.GroupFacetImpl;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
@@ -72,8 +74,11 @@ public class MavenGroupFacet
   private MavenFacet mavenFacet;
 
   @Inject
-  public MavenGroupFacet(final RepositoryManager repositoryManager) {
-    super(repositoryManager);
+  public MavenGroupFacet(final RepositoryManager repositoryManager,
+                         final ConfigurationStore configurationStore,
+                         final Map<String, Recipe> recipes)
+  {
+    super(repositoryManager, configurationStore, recipes);
     this.metadataMerger = new Maven2MetadataMerger();
   }
 
