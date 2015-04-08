@@ -30,8 +30,7 @@ Ext.define('NX.view.SettingsPanel', {
 
   layout: {
     type: 'vbox',
-    align: 'stretch',
-    pack: 'start'
+    align: 'stretch'
   },
 
   // TODO maxWidth: 1024,

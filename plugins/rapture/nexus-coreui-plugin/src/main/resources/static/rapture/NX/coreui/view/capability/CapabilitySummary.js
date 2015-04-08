@@ -30,8 +30,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
 
   layout: {
     type: 'vbox',
-    align: 'stretch',
-    pack: 'start'
+    align: 'stretch'
   },
 
   /**

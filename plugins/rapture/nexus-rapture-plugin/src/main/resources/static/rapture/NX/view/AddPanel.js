@@ -26,8 +26,7 @@ Ext.define('NX.view.AddPanel', {
 
   layout: {
     type: 'vbox',
-    align: 'stretch',
-    pack: 'start'
+    align: 'stretch'
   },
 
   dockedItems: [{
