@@ -24,6 +24,15 @@ Ext.define('NX.coreui.view.component.AssetInfo', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('BROWSE_SEARCH_DETAILS_INFO_TAB')
+  /**
+   * @override
+   */
+  initComponent: function() {
+    var me = this;
+
+    me.callParent(arguments);
+
+    me.setTitle(NX.I18n.get('BROWSE_SEARCH_DETAILS_INFO_TAB'));
+  }
 
 });

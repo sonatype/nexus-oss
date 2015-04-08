@@ -18,11 +18,19 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.component.AssetContainer', {
-  extend: 'NX.ext.panel.SubsectionPanel',
+  extend: 'Ext.Panel',
   alias: 'widget.nx-coreui-component-assetcontainer',
   requires: [
     'NX.Icons'
   ],
+
+  autoscroll: true,
+
+  layout: {
+    type: 'vbox',
+    align: 'stretch',
+    pack: 'start'
+  },
 
   /**
    * Currently shown component model.

@@ -23,6 +23,7 @@ Ext.define('NX.view.info.Panel', {
 
   title: 'Summary',
   autoScroll: true,
+  header: false,
 
   items: {
     xtype: 'panel',
@@ -39,6 +40,10 @@ Ext.define('NX.view.info.Panel', {
       frame: true,
       items: { xtype: 'nx-info' }
     }
+  },
+
+  setTitle: function(info) {
+    this.down('panel').down('panel').setTitle(info);
   },
 
   showInfo: function (info) {
