@@ -31,7 +31,7 @@ Ext.define('NX.ext.grid.column.Link', {
     var me = this;
     if (value) {
       value = value.replace(/\$baseUrl/, NX.util.Url.baseUrl);
-      return NX.util.Url.asLink(value, me.label(value), me.target(value));
+      return NX.util.Url.asLink(value, me.label(value), me.target('_blank'));
     }
     return undefined;
   },

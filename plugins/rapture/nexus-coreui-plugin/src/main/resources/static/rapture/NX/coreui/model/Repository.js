@@ -27,6 +27,7 @@ Ext.define('NX.coreui.model.Repository', {
     'recipe',
     'online',
     'status',
-    'attributes'
+    'attributes',
+    'url'
   ]
 });
