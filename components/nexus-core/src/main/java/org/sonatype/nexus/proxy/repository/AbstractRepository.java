@@ -31,7 +31,6 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -1098,22 +1097,23 @@ public abstract class AbstractRepository
     // NEXUS-6177: skip NFC if request is "asExpired"
     // On outcome, if remotely found, will invalidate NFC by caching it
     if (isNotFoundCacheActive() && !request.isRequestAsExpired()) {
-      if (getNotFoundCache().contains(request.getRequestPath())) {
-        if (getNotFoundCache().isExpired(request.getRequestPath())) {
-          if (log.isDebugEnabled()) {
-            log.debug("The path " + request.getRequestPath() + " is in NFC but expired.");
-          }
+      final PathCache nfc = getNotFoundCache();
+      final String requestPath = request.getRequestPath();
 
-          removeFromNotFoundCache(request);
+      if (nfc.contains(requestPath)) {
+        if (nfc.isExpired(requestPath)) {
+          log.debug("Removing expired path from NFC: {}", requestPath);
+          nfc.removeWithParents(requestPath);
         }
         else {
-          StringBuilder sb = new StringBuilder("The path ").append(request.getRequestPath()).append(" is cached ");
-          long expirationTime = getNotFoundCache().getExpirationTime(request.getRequestPath());
-          if (expirationTime > 0) {
-            sb.append("until ").append(new DateTime(expirationTime)).append(" ");
-          }
-          final String message = sb.append("as not found in repository ").append(this).toString();
+          StringBuilder buff = new StringBuilder("The path ").append(requestPath).append(" is cached ");
 
+          long expirationTime = nfc.getExpirationTime(requestPath);
+          if (expirationTime > 0) {
+            buff.append("until ").append(new DateTime(expirationTime)).append(" ");
+          }
+
+          String message = buff.append("as not found in repository ").append(this).toString();
           log.debug(message);
           throw new ItemNotFoundException(reasonFor(request, this, message));
         }
@@ -1127,10 +1127,7 @@ public abstract class AbstractRepository
   @Override
   public void addToNotFoundCache(ResourceStoreRequest request) {
     if (isNotFoundCacheActive()) {
-      if (log.isDebugEnabled()) {
-        log.debug("Adding path " + request.getRequestPath() + " to NFC.");
-      }
-
+      log.debug("Adding path to NFC: {}", request.getRequestPath());
       getNotFoundCache().put(request.getRequestPath(), Boolean.TRUE, getNotFoundCacheTimeToLive() * 60);
     }
   }
@@ -1141,10 +1138,7 @@ public abstract class AbstractRepository
   @Override
   public void removeFromNotFoundCache(ResourceStoreRequest request) {
     if (isNotFoundCacheActive()) {
-      if (log.isDebugEnabled()) {
-        log.debug("Removing path " + request.getRequestPath() + " from NFC.");
-      }
-
+      log.debug("Removing path from NFC: {}", request.getRequestPath());
       getNotFoundCache().removeWithParents(request.getRequestPath());
     }
   }
