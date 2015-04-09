@@ -57,6 +57,11 @@ public interface SupportZipGenerator
     private boolean log;
 
     /**
+     * Include JMX information.
+     */
+    private boolean jmx;
+
+    /**
      * Limit the size of files included in the ZIP.
      */
     private boolean limitFileSizes;
@@ -114,6 +119,14 @@ public interface SupportZipGenerator
       this.log = log;
     }
 
+    public boolean isJmx() {
+      return jmx;
+    }
+
+    public void setJmx(final boolean jmx) {
+      this.jmx = jmx;
+    }
+
     public boolean isLimitFileSizes() {
       return limitFileSizes;
     }
@@ -139,6 +152,7 @@ public interface SupportZipGenerator
           ", configuration=" + configuration +
           ", security=" + security +
           ", log=" + log +
+          ", jmx=" + jmx +
           ", limitFileSizes=" + limitFileSizes +
           ", limitZipSize=" + limitZipSize +
           '}';

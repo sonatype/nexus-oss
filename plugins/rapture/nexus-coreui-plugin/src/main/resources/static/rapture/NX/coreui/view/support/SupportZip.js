@@ -86,6 +86,12 @@ Ext.define('NX.coreui.view.support.SupportZip', {
               name: 'metrics',
               boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_METRICS'),
               checked: true
+            },
+            {
+              xtype: 'checkbox',
+              name: 'jmx',
+              boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_JMX'),
+              checked: true
             }
           ]
         },
