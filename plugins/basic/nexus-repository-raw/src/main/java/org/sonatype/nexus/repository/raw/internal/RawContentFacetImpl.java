@@ -30,6 +30,7 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.BlobHandle;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
@@ -118,7 +119,8 @@ public class RawContentFacetImpl
 
       try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
         try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
-          tx.setBlob(is1, headers, asset, hashAlgorithms, determineContentType(path, is2, content.getContentType()));
+          BlobHandle blobHandle = tx.createBlob(is1, headers, hashAlgorithms, determineContentType(path, is2, content.getContentType()));
+          tx.attachBlob(asset, blobHandle);
         }
       }
 
