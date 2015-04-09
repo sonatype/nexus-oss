@@ -21,28 +21,60 @@ Ext.define('NX.view.info.Panel', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-info-panel',
 
-  title: 'Summary',
+  titled: null,
+  framed: true,
   autoScroll: true,
   header: false,
 
-  items: {
-    xtype: 'panel',
-    ui: 'nx-inset',
+  /**
+   * @private
+   */
+  initComponent: function() {
+    var me = this,
+      inset,
+      subsection;
 
-    items: {
+    subsection = {
       xtype: 'panel',
       ui: 'nx-subsection',
-      frame: true,
+      title: me.titled,
+      frame: me.framed,
       items: { xtype: 'nx-info' }
+    };
+
+    inset = {
+      xtype: 'panel',
+      ui: 'nx-inset',
+
+      items: subsection
+    };
+
+    if (me.framed) {
+      me.items = inset;
+    } else {
+      me.items = subsection;
     }
+
+    me.callParent(arguments);
   },
 
-  setTitle: function(info) {
-    this.down('panel').down('panel').setTitle(info);
+  /**
+   * @public
+   */
+  setTitle: function(title) {
+    var me = this;
+
+    me.titled = title;
+    me.down('panel').down('panel').setTitle(title);
   },
 
+  /**
+   * @public
+   */
   showInfo: function (info) {
-    this.down('nx-info').showInfo(info);
+    var me = this;
+
+    me.down('nx-info').showInfo(info);
   }
 
 });

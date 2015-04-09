@@ -16775,6 +16775,14 @@
 }
 
 /**
+ * @class Ext.form.CheckboxGroup
+ */
+/* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/CheckboxGroup.scss */
+.x-form-checkboxgroup-body {
+  padding: 0;
+}
+
+/**
  * @class Ext.form.Fieldset
  */
 /* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
