@@ -23,7 +23,6 @@ import javax.inject.Named;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
@@ -77,9 +76,7 @@ public class GroupFacetImpl
   @Override
   @Guarded(by = STARTED)
   public List<Repository> members() {
-    final Repository repo = getRepository();
-
-    final Format myFormat = repo.getFormat();
+    final Repository repository = getRepository();
 
     List<Repository> members = new ArrayList<>(memberNames.size());
     for (String name : memberNames) {
@@ -87,9 +84,9 @@ public class GroupFacetImpl
       if (member == null) {
         log.warn("Ignoring missing member repository: {}", name);
       }
-      else if (!myFormat.equals(member.getFormat())) {
+      else if (!repository.getFormat().equals(member.getFormat())) {
         log.warn("Group {} includes an incompatible-format member: {} with format {}",
-            repo.getName(), name, member.getFormat());
+            repository.getName(), name, member.getFormat());
       }
       else {
         members.add(member);
