@@ -18,7 +18,8 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.security.AbstractSecurityTest;
 
-import com.google.inject.Binder;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import com.google.inject.name.Names;
 import edu.umd.cs.mtc.MultithreadedTestCase;
 import edu.umd.cs.mtc.TestFramework;
@@ -44,25 +45,30 @@ public class ResourceMergingManagerThreadedTest
   }
 
   @Override
-  public void configure(Binder binder) {
-    super.configure(binder);
+  protected void customizeModules(List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        bind(StaticSecurityConfigurationResource.class).annotatedWith(Names.named("default"))
+            .toInstance(new StaticSecurityConfigurationResource2());
+        bind(DynamicSecurityConfigurationResource.class).annotatedWith(Names.named("default"))
+            .toInstance(new UnitTestDynamicSecurityConfigurationResource());
 
-    binder.bind(StaticSecurityConfigurationResource.class).annotatedWith(Names.named("default"))
-        .toInstance(new StaticSecurityConfigurationResource2());
-    binder.bind(DynamicSecurityConfigurationResource.class).annotatedWith(Names.named("default"))
-        .toInstance(new UnitTestDynamicSecurityConfigurationResource());
+        int staticResourceCount = 100;
+        for (int ii = 0; ii < staticResourceCount - 1; ii++) {
+          bind(StaticSecurityConfigurationResource.class).annotatedWith(Names.named("test-" + ii))
+              .toInstance(new StaticSecurityConfigurationResource3());
+        }
 
-    int staticResourceCount = 100;
-    for (int ii = 0; ii < staticResourceCount - 1; ii++) {
-      binder.bind(StaticSecurityConfigurationResource.class).annotatedWith(Names.named("test-" + ii))
-          .toInstance(new StaticSecurityConfigurationResource3());
-    }
-
-    int dynamicResourceCount = 100;
-    for (int ii = 0; ii < dynamicResourceCount - 1; ii++) {
-      binder.bind(DynamicSecurityConfigurationResource.class).annotatedWith(Names.named("test-" + ii))
-          .toInstance(new UnitTestDynamicSecurityConfigurationResource());
-    }
+        int dynamicResourceCount = 100;
+        for (int ii = 0; ii < dynamicResourceCount - 1; ii++) {
+          bind(DynamicSecurityConfigurationResource.class).annotatedWith(Names.named("test-" + ii))
+              .toInstance(new UnitTestDynamicSecurityConfigurationResource());
+        }
+      }
+    });
   }
 
   @Override

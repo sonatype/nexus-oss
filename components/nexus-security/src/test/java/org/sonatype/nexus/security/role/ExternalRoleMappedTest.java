@@ -14,6 +14,7 @@ package org.sonatype.nexus.security.role;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.security.AbstractSecurityTest;
@@ -28,7 +29,8 @@ import org.sonatype.nexus.security.user.MockUserManager;
 import org.sonatype.nexus.security.user.UserManager;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Binder;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import org.apache.shiro.authz.AuthorizationException;
@@ -42,18 +44,23 @@ public class ExternalRoleMappedTest
     extends AbstractSecurityTest
 {
   @Override
-  public void configure(final Binder binder) {
-    super.configure(binder);
+  protected void customizeModules(List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        bind(UserManager.class)
+            .annotatedWith(Names.named("Mock"))
+            .to(MockUserManager.class)
+            .in(Singleton.class);
 
-    binder.bind(UserManager.class)
-        .annotatedWith(Names.named("Mock"))
-        .to(MockUserManager.class)
-        .in(Singleton.class);
-
-    binder.bind(Realm.class)
-        .annotatedWith(Names.named("Mock"))
-        .to(MockRealm.class)
-        .in(Singleton.class);
+        bind(Realm.class)
+            .annotatedWith(Names.named("Mock"))
+            .to(MockRealm.class)
+            .in(Singleton.class);
+      }
+    });
   }
 
   @Test

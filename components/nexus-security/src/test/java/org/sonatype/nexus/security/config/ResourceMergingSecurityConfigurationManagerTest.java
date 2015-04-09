@@ -17,10 +17,12 @@ import java.util.List;
 
 import org.sonatype.nexus.security.AbstractSecurityTest;
 
-import com.google.inject.Binder;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import com.google.inject.name.Names;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -35,10 +37,16 @@ public class ResourceMergingSecurityConfigurationManagerTest
   }
 
   @Override
-  public void configure(Binder binder) {
-    super.configure(binder);
-    binder.bind(StaticSecurityConfigurationResource.class).annotatedWith(Names.named("s2")).to(StaticSecurityConfigurationResource2.class);
-    binder.bind(StaticSecurityConfigurationResource.class).annotatedWith(Names.named("s1")).to(StaticSecurityConfigurationResource1.class);
+  protected void customizeModules(List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        bind(StaticSecurityConfigurationResource.class).annotatedWith(Names.named("s2")).to(StaticSecurityConfigurationResource2.class);
+        bind(StaticSecurityConfigurationResource.class).annotatedWith(Names.named("s1")).to(StaticSecurityConfigurationResource1.class);
+      }
+    });
   }
 
   @Override

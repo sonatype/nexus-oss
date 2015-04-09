@@ -17,11 +17,10 @@ import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.realm.MockRealmB;
 import org.sonatype.nexus.security.user.User;
 
-import org.junit.Test;
-
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.junit.Assert;
+import org.junit.Test;
 
 public class CachingTest
     extends AbstractSecurityTest

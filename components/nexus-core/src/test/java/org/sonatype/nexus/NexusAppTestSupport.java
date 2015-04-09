@@ -17,13 +17,15 @@ import java.net.ServerSocket;
 import java.util.List;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
+
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.events.EventSubscriberHost;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.scheduling.TaskScheduler;
-import org.sonatype.nexus.security.TestSecurityModule;
+import org.sonatype.nexus.security.WebSecurityModule;
 import org.sonatype.nexus.security.subject.FakeAlmightySubject;
 import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.TemplateSet;
@@ -37,6 +39,7 @@ import org.apache.shiro.util.ThreadContext;
 import org.junit.After;
 
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 public abstract class NexusAppTestSupport
     extends NexusTestSupport
@@ -107,7 +110,7 @@ public abstract class NexusAppTestSupport
   @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
-    modules.add(new TestSecurityModule());
+    modules.add(new WebSecurityModule(mock(ServletContext.class)));
     modules.add(new Module()
     {
       @Override
