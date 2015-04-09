@@ -148,7 +148,10 @@ public class StorageTxImpl
       try {
         graphTx.begin();
         for (Link link : links) {
-          graphTx.addEdge(link.id, link.v1, link.v2, link.label);
+          // force reload the vertexes being linked
+          final OrientVertex v1 = graphTx.getVertex(link.v1.getIdentity());
+          final OrientVertex v2 = graphTx.getVertex(link.v2.getIdentity());
+          graphTx.addEdge(link.id, v1, v2, link.label);
         }
         graphTx.commit();
         break;
