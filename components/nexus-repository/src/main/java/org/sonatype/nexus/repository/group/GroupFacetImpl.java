@@ -23,6 +23,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
@@ -54,8 +55,6 @@ public class GroupFacetImpl
     this.repositoryManager = checkNotNull(repositoryManager);
   }
 
-  // TODO: Check for compatibility and cyclic-references
-
   @Override
   protected void doConfigure() throws Exception {
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
@@ -78,14 +77,22 @@ public class GroupFacetImpl
   @Override
   @Guarded(by = STARTED)
   public List<Repository> members() {
+    final Repository repo = getRepository();
+
+    final Format myFormat = repo.getFormat();
+
     List<Repository> members = new ArrayList<>(memberNames.size());
     for (String name : memberNames) {
-      Repository repository = repositoryManager.get(name);
-      if (repository != null) {
-        members.add(repository);
+      Repository member = repositoryManager.get(name);
+      if (member == null) {
+        log.warn("Ignoring missing member repository: {}", name);
+      }
+      else if (!myFormat.equals(member.getFormat())) {
+        log.warn("Group {} includes an incompatible-format member: {} with format {}",
+            repo.getName(), name, member.getFormat());
       }
       else {
-        log.warn("Ignoring missing member repository: {}", name);
+        members.add(member);
       }
     }
     return members;
