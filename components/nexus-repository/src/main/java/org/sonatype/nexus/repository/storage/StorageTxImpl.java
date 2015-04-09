@@ -70,13 +70,13 @@ public class StorageTxImpl
   {
     private final Object id;
 
-    private final ORID v1;
+    private final OrientVertex v1;
 
-    private final ORID v2;
+    private final OrientVertex v2;
 
     private final String label;
 
-    public Link(final @Nullable Object id, final ORID v1, final ORID v2, final String label) {
+    public Link(final @Nullable Object id, final OrientVertex v1, final OrientVertex v2, final String label) {
       this.id = id;
       this.v1 = checkNotNull(v1);
       this.v2 = checkNotNull(v2);
@@ -447,7 +447,7 @@ public class StorageTxImpl
     OrientVertex vertex = createVertex(V_ASSET);
     vertex.setProperty(P_FORMAT, format);
     vertex.setProperty(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
-    links.add(new Link(null, bucket.vertex().getIdentity(), vertex.getIdentity(), E_OWNS_ASSET));
+    links.add(new Link(null, bucket.vertex(), vertex, E_OWNS_ASSET));
     return new AssetImpl(vertex);
   }
 
@@ -455,7 +455,7 @@ public class StorageTxImpl
   @Guarded(by = OPEN)
   public Asset createAsset(final Bucket bucket, final Component component) {
     Asset asset = createAsset(bucket, component.format());
-    links.add(new Link(null, asset.vertex().getIdentity(), component.vertex().getIdentity(), E_PART_OF_COMPONENT));
+    links.add(new Link(null, asset.vertex(), component.vertex(), E_PART_OF_COMPONENT));
     return asset;
   }
 
@@ -468,7 +468,7 @@ public class StorageTxImpl
     OrientVertex vertex = createVertex(V_COMPONENT);
     vertex.setProperty(P_FORMAT, format.getValue());
     vertex.setProperty(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
-    links.add(new Link(null, bucket.vertex().getIdentity(), vertex.getIdentity(), E_OWNS_COMPONENT));
+    links.add(new Link(null, bucket.vertex(), vertex, E_OWNS_COMPONENT));
     return new ComponentImpl(vertex);
   }
 
