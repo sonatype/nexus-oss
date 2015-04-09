@@ -15,11 +15,13 @@ package org.sonatype.nexus.kenai;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.sonatype.nexus.AbstractApplicationStatusSource;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.kenai.internal.KenaiMockAuthcServlet;
-import org.sonatype.nexus.security.TestSecurityModule;
+import org.sonatype.nexus.security.WebSecurityModule;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.tests.http.runner.junit.ServerResource;
 import org.sonatype.tests.http.server.fluent.Server;
@@ -53,7 +55,7 @@ public abstract class AbstractKenaiRealmTest
   @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
-    modules.add(new TestSecurityModule());
+    modules.add(new WebSecurityModule(mock(ServletContext.class)));
     modules.add(new Module()
     {
       @Override

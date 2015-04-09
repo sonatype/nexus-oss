@@ -15,6 +15,8 @@ package org.sonatype.nexus.security;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.sonatype.nexus.security.config.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.nexus.security.config.SecurityConfiguration;
 import org.sonatype.nexus.security.config.SecurityConfigurationSource;
@@ -29,6 +31,8 @@ import com.google.inject.name.Names;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.util.ThreadContext;
 
+import static org.mockito.Mockito.mock;
+
 public abstract class AbstractSecurityTest
     extends NexusTestSupport
     implements Module
@@ -36,7 +40,7 @@ public abstract class AbstractSecurityTest
   @Override
   protected void customizeModules(List<Module> modules) {
     super.customizeModules(modules);
-    modules.add(new TestSecurityModule());
+    modules.add(new WebSecurityModule(mock(ServletContext.class)));
     modules.add(this);
   }
 
