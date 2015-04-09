@@ -27,7 +27,7 @@ Ext.define('NX.coreui_legacy.view.repository.RepositoryAddGroup', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-repository-settings-group-form',
       template: me.template,
       api: {

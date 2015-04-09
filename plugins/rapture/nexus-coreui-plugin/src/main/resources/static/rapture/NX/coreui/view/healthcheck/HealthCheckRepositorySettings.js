@@ -35,7 +35,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
   initComponent: function() {
     var me = this;
 
-    me.items = [
+    me.settingsForm = [
       {
         xtype: 'nx-settingsform',
         paramOrder: ['repositoryId'],

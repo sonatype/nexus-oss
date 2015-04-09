@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
   initComponent: function () {
     var me = this;
 
-    me.items = [
+    me.settingsForm = [
       {
         xtype: 'nx-settingsform',
         settingsFormSuccessMessage: NX.I18n.get('ADMIN_SMTP_UPDATE_SUCCESS'),
@@ -113,7 +113,7 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
 
     me.callParent(arguments);
 
-    me.items.get(0).getDockedItems('toolbar[dock="bottom"]')[0].add({
+    me.down('nx-settingsform').getDockedItems('toolbar[dock="bottom"]')[0].add({
       xtype: 'button', text: NX.I18n.get('ADMIN_SMTP_VERIFY_BUTTON'), formBind: true, action: 'verify', glyph: 'xf003@FontAwesome' /* fa-envelope-o */
     });
   }

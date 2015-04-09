@@ -20,11 +20,11 @@
 Ext.define('NX.coreui.view.upload.UploadArtifact', {
   extend: 'Ext.form.Panel',
   alias: 'widget.nx-coreui-upload-artifact',
+  ui: 'nx-subsection',
+  frame: true,
   requires: [
     'NX.I18n'
   ],
-
-  bodyPadding: 10,
 
   defaults: {
     xtype: 'textfield',

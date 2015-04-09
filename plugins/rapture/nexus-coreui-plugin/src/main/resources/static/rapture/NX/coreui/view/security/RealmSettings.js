@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
   initComponent: function () {
     var me = this;
 
-    me.items = [
+    me.settingsForm = [
       // basic settings
       {
         xtype: 'nx-settingsform',
@@ -48,6 +48,7 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
           {
             xtype: 'nx-itemselector',
             name: 'realms',
+            fieldLabel: 'Active realms',
             buttons: ['up', 'add', 'remove', 'down'],
             fromTitle: NX.I18n.get('ADMIN_REALMS_AVAILABLE'),
             toTitle: NX.I18n.get('ADMIN_REALMS_ACTIVE'),

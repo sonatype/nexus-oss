@@ -42,7 +42,8 @@ public class SupportBundle
       METRICS,
       CONFIG,
       SECURITY,
-      LOG
+      LOG,
+      JMX
     }
 
     /**

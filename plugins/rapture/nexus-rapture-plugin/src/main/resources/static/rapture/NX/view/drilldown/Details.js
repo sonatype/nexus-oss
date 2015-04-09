@@ -56,7 +56,7 @@ Ext.define('NX.view.drilldown.Details', {
         hidden: true
       },
       {
-        xtype: 'nx-drilldown-actions',
+        xtype: 'nx-actions',
         items: me.actions
       },
       {

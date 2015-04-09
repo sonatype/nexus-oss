@@ -732,6 +732,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_SUPPORT_ZIP_SECURITY: 'Security configuration files',
     ADMIN_SUPPORT_ZIP_LOGS: 'Log files',
     ADMIN_SUPPORT_ZIP_METRICS: 'System and component metrics',
+    ADMIN_SUPPORT_ZIP_JMX: 'JMX information',
     ADMIN_SUPPORT_ZIP_OPTIONS: 'Options',
     ADMIN_SUPPORT_ZIP_INCLUDED: 'Limit files in the ZIP archive to 30 MB apiece',
     ADMIN_SUPPORT_ZIP_MAX: 'Limit the ZIP archive to 20 MB',

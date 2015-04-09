@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.support.SupportZip', {
   initComponent: function () {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-settingsform',
       settingsFormSubmitMessage: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATING'),
       settingsFormSuccessMessage: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED'),
@@ -85,6 +85,12 @@ Ext.define('NX.coreui.view.support.SupportZip', {
               xtype: 'checkbox',
               name: 'metrics',
               boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_METRICS'),
+              checked: true
+            },
+            {
+              xtype: 'checkbox',
+              name: 'jmx',
+              boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_JMX'),
               checked: true
             }
           ]

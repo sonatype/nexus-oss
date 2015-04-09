@@ -43,6 +43,7 @@
 }
 
 .nx-info-entry-name {
+  padding-left: 0;
   font-weight: bold;
 }
 

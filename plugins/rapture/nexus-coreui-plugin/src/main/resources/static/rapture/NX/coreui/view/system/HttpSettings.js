@@ -33,7 +33,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
   initComponent: function () {
     var me = this;
 
-    me.items = [
+    me.settingsForm = [
       {
         xtype: 'nx-settingsform',
         settingsFormSuccessMessage: NX.I18n.get('ADMIN_HTTP_UPDATE_SUCCESS'),

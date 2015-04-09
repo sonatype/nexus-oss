@@ -48,12 +48,23 @@ Ext.define('NX.coreui.view.user.UserList', {
     deferEmptyText: false
   },
 
-  tbar: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
-    '-',
-    { xtype: 'label', text: NX.I18n.get('ADMIN_USERS_LIST_SOURCE') },
-    { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_LIST_DEFAULT_BUTTON'), action: 'filter', menu: [] },
-    { xtype: 'nx-coreui-user-searchbox' }
-  ]
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless',
+    items: [
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_USERS_LIST_NEW_BUTTON'),
+        glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
+        action: 'new',
+        disabled: true
+      },
+      '-',
+      { xtype: 'label', text: NX.I18n.get('ADMIN_USERS_LIST_SOURCE') },
+      { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_LIST_DEFAULT_BUTTON'), action: 'filter', menu: [] },
+      { xtype: 'nx-coreui-user-searchbox' }
+    ]
+  }]
 
 });

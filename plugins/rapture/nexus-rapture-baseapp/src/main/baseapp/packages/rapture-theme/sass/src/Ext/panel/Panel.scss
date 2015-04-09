@@ -8,8 +8,9 @@
 @include extjs-panel-ui(
   $ui: 'nx-feature-content',
 
-  $ui-header-padding: 10px 8px 6px 10px,
+  $ui-header-padding: 10px 8px 10px 10px,
   $ui-header-background-color: $color-white,
+  $ui-body-background-color: $color-light-smoke,
   $ui-header-icon-height: 32,
   $ui-header-icon-width: 32,
   $ui-wrap-border-width: 0,
@@ -17,10 +18,19 @@
   $ui-tool-background-image: $panel-light-tool-background-image
 );
 
-.x-panel-nx-feature-content {
-  background-color: $color-white;
-  .x-toolbar {
+.nx-feature-content {
+  .nx-actions {
     background-color: $color-white;
+    border-bottom: 1px $color-gainsboro solid !important;
+
+    &.nx-borderless {
+      border-style: none !important;
+    }
+  }
+
+  .nx-feature-group {
+    border-top: 1px $color-gainsboro solid !important;
+    margin: 0 !important;
   }
 }
 
@@ -79,6 +89,67 @@
       padding: 6px 0 6px 0;
     }
   }
+
+  .x-panel-nx-subsection-framed {
+    margin: 0 0 10px 0;
+  }
+}
+
+.nx-feature-content {
+  .x-panel-body {
+    .x-toolbar {
+      padding: 0 8px 0 0;
+      .x-toolbar-item {
+        margin: 6px 0 6px 8px;
+      }
+      &.x-toolbar-footer {
+        background-color: $color-white;
+      }
+    }
+  }
+}
+
+/**
+* Style for the "transparent" inter-page panels
+*
+* ui: 'subsection'
+*/
+
+@include extjs-panel-ui(
+  $ui: 'nx-subsection',
+
+  $ui-header-color: $color-night-rider,
+  $ui-header-font-size: $font-size-h4,
+  $ui-header-background-color: $color-white,
+  $ui-header-line-height: 22px
+);
+
+@include extjs-panel-ui(
+  $ui: 'nx-subsection-framed',
+
+  $ui-header-color: $color-night-rider,
+  $ui-header-font-size: $font-size-h4,
+  $ui-header-background-color: $color-white,
+  $ui-header-line-height: 22px,
+  $ui-body-background-color: $color-white
+);
+
+.x-panel-nx-subsection {
+  .x-panel-header {
+    padding: 10px 0 5px 0 !important;
+  }
+}
+
+.x-panel-nx-subsection-framed {
+  border: $color-gainsboro 1px solid;
+
+  .x-panel-header {
+    padding: 10px 9px 5px 9px !important;
+  }
+
+  .x-panel-body {
+    padding: 9px 9px 10px 9px !important;
+  }
 }
 
 /**
@@ -88,7 +159,7 @@
   $ui: 'nx-feature-menu',
 
   $ui-header-padding: 4px,
-  $ui-body-background-color: $color-light-smoke
+  $ui-body-background-color: $color-gainsboro
 );
 
 .x-panel-nx-feature-menu {
@@ -98,13 +169,14 @@
 
   .x-panel-body-nx-feature-menu {
     .x-grid-cell {
-      background-color: $color-light-smoke;
-    }
-    .x-grid-row-over .x-grid-td {
       background-color: $color-gainsboro;
     }
+    .x-grid-row-over .x-grid-td {
+      background-color: $color-smoke;
+    }
     .x-grid-row-selected .x-grid-td {
-      background-color: $color-light-gray;
+      color: $color-white;
+      background-color: $color-cerulean-blue;
     }
   }
 }

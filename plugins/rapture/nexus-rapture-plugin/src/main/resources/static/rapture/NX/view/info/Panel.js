@@ -20,13 +20,25 @@
 Ext.define('NX.view.info.Panel', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-info-panel',
-  ui: 'nx-inset',
 
   title: 'Summary',
   autoScroll: true,
+  header: false,
 
   items: {
-    xtype: 'nx-info'
+    xtype: 'panel',
+    ui: 'nx-inset',
+
+    items: {
+      xtype: 'panel',
+      ui: 'nx-subsection',
+      frame: true,
+      items: { xtype: 'nx-info' }
+    }
+  },
+
+  setTitle: function(info) {
+    this.down('panel').down('panel').setTitle(info);
   },
 
   showInfo: function (info) {

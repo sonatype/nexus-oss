@@ -28,7 +28,7 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
   initComponent: function () {
     var me = this;
 
-    me.items = [
+    me.settingsForm = [
       {
         xtype: 'nx-settingsform',
         settingsFormSuccessMessage: NX.I18n.get('ADMIN_ANONYMOUS_UPDATE_SUCCESS'),

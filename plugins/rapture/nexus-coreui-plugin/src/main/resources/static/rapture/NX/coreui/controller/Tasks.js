@@ -205,15 +205,12 @@ Ext.define('NX.coreui.controller.Tasks', {
       xtype: 'panel',
       layout: {
         type: 'vbox',
-        align: 'stretch',
-        pack: 'start'
+        align: 'stretch'
       },
-      items: [
-        {
-          xtype: 'nx-coreui-task-selecttype',
-          flex: 1
-        }
-      ]
+      items: {
+        xtype: 'nx-coreui-task-selecttype',
+        flex: 1
+      }
     }));
   },
 
@@ -235,7 +232,6 @@ Ext.define('NX.coreui.controller.Tasks', {
         pack: 'start'
       },
       items: [
-        { xtype: 'nx-drilldown-actions' },
         {
           xtype: 'nx-coreui-task-add',
           flex: 1
