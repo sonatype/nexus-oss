@@ -24,7 +24,6 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
     'NX.Icons',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
   defaultFocus: 'pem',
 
@@ -34,7 +33,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
   initComponent: function () {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-settingsform',
 
       items: [

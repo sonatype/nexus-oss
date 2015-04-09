@@ -24,7 +24,6 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
   defaultFocus: 'name',
 
@@ -34,7 +33,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetAdd', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-coreui-repositorytarget-settings-form',
       api: {
         submit: 'NX.direct.coreui_RepositoryTarget.create'

@@ -24,7 +24,6 @@ Ext.define('NX.coreui.view.user.UserAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
   defaultFocus: 'userId',
 
@@ -34,7 +33,7 @@ Ext.define('NX.coreui.view.user.UserAdd', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-coreui-user-settings-form',
       api: {
         submit: 'NX.direct.coreui_User.create'

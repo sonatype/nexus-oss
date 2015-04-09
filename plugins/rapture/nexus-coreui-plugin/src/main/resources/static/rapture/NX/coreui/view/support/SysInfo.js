@@ -24,26 +24,29 @@ Ext.define('NX.coreui.view.support.SysInfo', {
     'Ext.XTemplate',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
-
   layout: 'fit',
   autoScroll: true,
 
-  tbar: [
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_DOWNLOAD_BUTTON'),
-      glyph: 'xf019@FontAwesome' /* fa-download */,
-      action: 'download'
-    },
-    '-',
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_PRINT_BUTTON'),
-      glyph: 'xf02f@FontAwesome' /* fa-print */,
-      action: 'print'
-    }
-  ],
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions',
+    items: [
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_DOWNLOAD_BUTTON'),
+        glyph: 'xf019@FontAwesome' /* fa-download */,
+        action: 'download'
+      },
+      '-',
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_PRINT_BUTTON'),
+        glyph: 'xf02f@FontAwesome' /* fa-print */,
+        action: 'print'
+      }
+    ]
+  }],
 
   /**
    * @override
@@ -53,45 +56,49 @@ Ext.define('NX.coreui.view.support.SysInfo', {
 
     // simple named section with list of key-value properties
     me.sectionTpl = Ext.create('Ext.XTemplate',
-        '<tr>',
-        '<td colspan="2">',
-        '<h2>{name}</h2>',
-        '</td>',
-        '</tr>',
-        '<tpl for="props">',
-        '<tr>',
-        '<td class="property-name">{name}</td>',
-        '<td class="property-value">{value}</td>',
-        '</tr>',
-        '</tpl>',
-        {
-          compiled: true
-        }
+      '<div class="x-panel x-panel-nx-subsection-framed" style="margin: 0 0 20px 0">',
+      '<div class="x-panel-header-nx-subsection-framed x-panel-header-nx-subsection-framed-horizontal" style="border: none !important">',
+      '<span class="x-panel-header-text-container-nx-subsection-framed">{name}</span>',
+      '</div>',
+      '<div class="x-panel-body x-panel-body-nx-subsection-framed" style="border: none !important">',
+      '<table>',
+      '<tpl for="props">',
+      '<tr>',
+      '<td>{name}</td>',
+      '<td>{value}</td>',
+      '</tr>',
+      '</tpl>',
+      '</table>',
+      '</div>',
+      '</div>',
+      {
+        compiled: true
+      }
     );
 
     // nested named section with list of child named sections
     me.nestedSectionTpl = Ext.create('Ext.XTemplate',
-        '<tr>',
-        '<td colspan="2">',
-        '<h2>{name}</h2>',
-        '</td>',
-        '</tr>',
-        '<tpl for="nested">',
-        '<tr>',
-        '<td colspan="2">',
-        '<h3>{name}</h3>',
-        '</td>',
-        '</tr>',
-        '<tpl for="props">',
-        '<tr>',
-        '<td class="property-name">{name}</td>',
-        '<td class="property-value">{value}</td>',
-        '</tr>',
-        '</tpl>',
-        '</tpl>',
-        {
-          compiled: true
-        }
+      '<div class="x-panel x-panel-nx-subsection-framed" style="margin: 0 0 20px 0">',
+      '<div class="x-panel-header-nx-subsection-framed x-panel-header-nx-subsection-framed-horizontal" style="border: none !important">',
+      '<span class="x-panel-header-text-container-nx-subsection-framed">{name}</span>',
+      '</div>',
+      '<div class="x-panel-body x-panel-body-nx-subsection-framed" style="border: none !important">',
+      '<tpl for="nested">',
+      '<h3>{name}</h3>',
+      '<table>',
+      '<tpl for="props">',
+      '<tr>',
+      '<td class="property-name">{name}</td>',
+      '<td class="property-value">{value}</td>',
+      '</tr>',
+      '</tpl>',
+      '</table>',
+      '</tpl>',
+      '</div>',
+      '</div>',
+      {
+        compiled: true
+      }
     );
 
     // Helper to convert an object into an array of {name,value} properties
@@ -109,7 +116,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
     // Main template renders all sections
     me.mainTpl = Ext.create('Ext.XTemplate',
         '<div class="nx-atlas-view-sysinfo-body">',
-        '<table>',
+        '<div class="x-panel x-panel-nx-inset">',
         // nexus details
         '{[ this.section("nexus-status", values) ]}',
         '{[ this.section("nexus-configuration", values) ]}',
@@ -123,7 +130,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
         '{[ this.section("system-runtime", values) ]}',
         '{[ this.nestedSection("system-network", values) ]}',
         '{[ this.nestedSection("system-filestores", values) ]}',
-        '</table>',
+        '</div>',
         '</div>',
         {
           compiled: true,
@@ -171,6 +178,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
    * @public
    */
   setInfo: function(info) {
+    console.log(this.down('panel'));
     this.mainTpl.overwrite(this.body, info);
   }
 

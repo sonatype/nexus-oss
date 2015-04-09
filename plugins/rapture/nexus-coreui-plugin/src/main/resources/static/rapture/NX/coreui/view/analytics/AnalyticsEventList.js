@@ -90,35 +90,41 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
     }
   ],
 
-  tbar: [
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_EVENTS_CLEAR_BUTTON'),
-      glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
-      action: 'clear',
-      disabled: true
-    },
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_EVENTS_EXPORT_BUTTON'),
-      glyph: 'xf019@FontAwesome' /* fa-download */,
-      action: 'export'
-    },
-    '-',
-    {
-      xtype: 'button',
-      text: NX.I18n.get('ADMIN_EVENTS_SUBMIT_BUTTON'),
-      glyph: 'xf0ee@FontAwesome' /* fa-cloud-upload */,
-      action: 'submit',
-      disabled: true
-    },
-    '-',
-    {
-      xtype: 'pagingtoolbar',
-      store: 'AnalyticsEvent',
-      border: false
-    }
-  ],
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless',
+
+    items: [
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_EVENTS_CLEAR_BUTTON'),
+        glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
+        action: 'clear',
+        disabled: true
+      },
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_EVENTS_EXPORT_BUTTON'),
+        glyph: 'xf019@FontAwesome' /* fa-download */,
+        action: 'export'
+      },
+      '-',
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_EVENTS_SUBMIT_BUTTON'),
+        glyph: 'xf0ee@FontAwesome' /* fa-cloud-upload */,
+        action: 'submit',
+        disabled: true
+      },
+      '-',
+      {
+        xtype: 'pagingtoolbar',
+        store: 'AnalyticsEvent',
+        border: false
+      }
+    ]
+  }],
 
   plugins: [
     {

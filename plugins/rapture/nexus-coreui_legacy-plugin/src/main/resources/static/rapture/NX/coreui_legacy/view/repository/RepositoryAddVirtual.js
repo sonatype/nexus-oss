@@ -27,7 +27,7 @@ Ext.define('NX.coreui_legacy.view.repository.RepositoryAddVirtual', {
   initComponent: function() {
     var me = this;
 
-    me.items = {
+    me.settingsForm = {
       xtype: 'nx-repository-settings-virtual-form',
       template: me.template,
       api: {

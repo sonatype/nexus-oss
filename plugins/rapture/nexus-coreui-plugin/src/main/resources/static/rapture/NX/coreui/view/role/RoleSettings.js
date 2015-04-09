@@ -21,6 +21,6 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-role-settings',
 
-  items: { xtype: 'nx-coreui-role-settings-form' }
+  settingsForm: { xtype: 'nx-coreui-role-settings-form' }
 
 });
