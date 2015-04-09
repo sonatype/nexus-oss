@@ -45,6 +45,8 @@ public class NexusBundleModule
 
   private static final SecurityFilterModule securityFilterModule = new SecurityFilterModule();
 
+  private static final ServletContextModule servletContextModule = new ServletContextModule();
+
   private static final MetricsRegistryModule metricsRegistryModule = new MetricsRegistryModule();
 
   private static final InstrumentationModule instrumentationModule = new InstrumentationModule();
@@ -79,6 +81,7 @@ public class NexusBundleModule
 
     maybeAddShiroAOP(modules);
     maybeAddSecurityFilter(modules);
+    maybeAddServletContext(modules);
     maybeAddMetricsRegistry(modules);
     maybeAddInstrumentation(modules);
     maybeAddValidation(modules);
@@ -113,6 +116,12 @@ public class NexusBundleModule
   private void maybeAddSecurityFilter(List<Module> modules) {
     if (imports.contains("org.sonatype.nexus.web")) {
       modules.add(securityFilterModule);
+    }
+  }
+
+  private void maybeAddServletContext(List<Module> modules) {
+    if (imports.contains("com.google.inject.servlet")) {
+      modules.add(servletContextModule);
     }
   }
 

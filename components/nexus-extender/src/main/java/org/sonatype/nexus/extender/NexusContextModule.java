@@ -31,7 +31,6 @@ import org.eclipse.sisu.wire.ParameterKeys;
 import org.osgi.framework.BundleContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.inject.name.Names.named;
 import static org.eclipse.sisu.osgi.ServiceBindings.defaultAllow;
 import static org.eclipse.sisu.osgi.ServiceBindings.defaultIgnore;
 
@@ -70,8 +69,7 @@ public class NexusContextModule
     requireBinding(GuiceFilter.class);
     requireBinding(LogManager.class);
 
-    // re-bind context with name to avoid backwards-compat warnings from guice-servlet
-    bind(ServletContext.class).annotatedWith(named("nexus")).toInstance(servletContext);
+    bind(ServletContext.class).toInstance(servletContext);
     bind(ParameterKeys.PROPERTIES).toInstance(properties);
 
     install(new WebSecurityModule(servletContext));
