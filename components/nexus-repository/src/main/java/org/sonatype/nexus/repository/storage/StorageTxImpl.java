@@ -156,8 +156,13 @@ public class StorageTxImpl
         graphTx.commit();
         break;
       } catch (OConcurrentModificationException e ) {
+        graphTx.rollback();
         attempts = attempts - 1;
-        if (attempts == 0) throw e;
+        if (attempts == 0) {
+          // re-throw, as the whole Tx should be retried (same as concurrent update of component or asset would cause)
+          // orphan (bucket-less) assets and components created in this failed TX should be GCed just like Blobs are
+          throw e;
+        }
       }
     }
   }
