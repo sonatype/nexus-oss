@@ -36,7 +36,7 @@ import static org.eclipse.sisu.osgi.ServiceBindings.defaultIgnore;
 
 /**
  * Binds the initial {@link ServletContext} and configures shiro.
- * 
+ *
  * @since 3.0
  */
 public class NexusContextModule
@@ -50,14 +50,14 @@ public class NexusContextModule
 
   private final ServletContext servletContext;
 
-  private final Map<?, ?> properties;
+  private final Map<?, ?> nexusProperties;
 
   public NexusContextModule(final BundleContext bundleContext, final ServletContext servletContext,
-      final Map<?, ?> properties)
+      final Map<?, ?> nexusProperties)
   {
     this.bundleContext = checkNotNull(bundleContext);
     this.servletContext = checkNotNull(servletContext);
-    this.properties = checkNotNull(properties);
+    this.nexusProperties = checkNotNull(nexusProperties);
   }
 
   @Override
@@ -70,12 +70,12 @@ public class NexusContextModule
     requireBinding(LogManager.class);
 
     bind(ServletContext.class).toInstance(servletContext);
-    bind(ParameterKeys.PROPERTIES).toInstance(properties);
+    bind(ParameterKeys.PROPERTIES).toInstance(nexusProperties);
 
     install(new WebSecurityModule(servletContext));
 
     // enable OSGi service lookup of Karaf components
-    MutableBeanLocator locator = new DefaultBeanLocator();
+    final MutableBeanLocator locator = new DefaultBeanLocator();
     locator.add(new ServiceBindings(bundleContext, ALLOW_SERVICES, IGNORE_SERVICES, Integer.MIN_VALUE));
     bind(MutableBeanLocator.class).toInstance(locator);
   }

@@ -61,7 +61,7 @@ import static org.apache.karaf.features.FeaturesService.Option.NoCleanIfFailure;
 
 /**
  * {@link ServletContextListener} that bootstraps the core Nexus application.
- * 
+ *
  * @since 3.0
  */
 public class NexusContextListener
@@ -112,14 +112,16 @@ public class NexusContextListener
     bundleContext = extender.getBundleContext();
 
     servletContext = event.getServletContext();
-    Map<?, ?> variables = (Map<?, ?>) servletContext.getAttribute("nexus.properties");
-    if (variables == null) {
-      variables = System.getProperties();
+    Map<?, ?> nexusProperties = (Map<?, ?>) servletContext.getAttribute("nexus.properties");
+    if (nexusProperties == null) {
+      nexusProperties = System.getProperties();
     }
 
     featuresService = bundleContext.getService(bundleContext.getServiceReference(FeaturesService.class));
 
-    injector = Guice.createInjector(new WireModule(new NexusContextModule(bundleContext, servletContext, variables)));
+    injector = Guice.createInjector(new WireModule( //
+        new NexusContextModule(bundleContext, servletContext, nexusProperties)));
+
     log.debug("Injector: {}", injector);
 
     extender.doStart(); // start tracking nexus bundles
@@ -132,15 +134,15 @@ public class NexusContextListener
       application = injector.getInstance(Key.get(Lifecycle.class, Names.named("NxApplication")));
       log.debug("Application: {}", application);
 
-      FrameworkStartLevel fsl = bundleContext.getBundle(0).adapt(FrameworkStartLevel.class);
+      final FrameworkStartLevel fsl = bundleContext.getBundle(0).adapt(FrameworkStartLevel.class);
 
       // assign higher start level to hold back plugin activation
       fsl.setInitialBundleStartLevel(NEXUS_PLUGIN_START_LEVEL);
 
-      installFeatures(getFeatures((String) variables.get("nexus-features")));
+      installFeatures(getFeatures((String) nexusProperties.get("nexus-features")));
 
-      if (variables.containsKey("nexus-test-features")) {
-        installFeatures(getFeatures((String) variables.get("nexus-test-features")));
+      if (nexusProperties.containsKey("nexus-test-features")) {
+        installFeatures(getFeatures((String) nexusProperties.get("nexus-test-features")));
       }
 
       // raise framework start level to activate plugins
@@ -166,8 +168,8 @@ public class NexusContextListener
 
       // register our dynamic filter with the surrounding bootstrap code
       final Filter filter = injector.getInstance(GuiceFilter.class);
-      final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));
-      registration = bundleContext.registerService(Filter.class, filter, properties);
+      final Dictionary<String, ?> filterProperties = new Hashtable<>(singletonMap("name", "nexus"));
+      registration = bundleContext.registerService(Filter.class, filter, filterProperties);
 
       if (HAS_PAX_EXAM) {
         registerLocatorWithPaxExam(injector.getProvider(BeanLocator.class));
@@ -216,12 +218,12 @@ public class NexusContextListener
   }
 
   private Set<Feature> getFeatures(final String featureNames) throws Exception {
-    Set<Feature> features = new LinkedHashSet<>();
+    final Set<Feature> features = new LinkedHashSet<>();
     if (featureNames != null) {
       log.info("Selecting features by name...");
 
-      for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(featureNames)) {
-        Feature feature = featuresService.getFeature(name);
+      for (final String name : Splitter.on(',').trimResults().omitEmptyStrings().split(featureNames)) {
+        final Feature feature = featuresService.getFeature(name);
         if (feature != null) {
           log.info("Adding {}", name);
           features.add(feature);
@@ -240,7 +242,7 @@ public class NexusContextListener
     // install features using batch mode; skip features already in the cache
     features.removeAll(Arrays.asList(featuresService.listInstalledFeatures()));
     if (features.size() > 0) {
-      EnumSet<Option> options = EnumSet.of(ContinueBatchOnFailure, NoCleanIfFailure, NoAutoRefreshBundles);
+      final EnumSet<Option> options = EnumSet.of(ContinueBatchOnFailure, NoCleanIfFailure, NoAutoRefreshBundles);
       featuresService.installFeatures(features, options);
     }
 
@@ -253,9 +255,9 @@ public class NexusContextListener
   private void registerLocatorWithPaxExam(final Provider<BeanLocator> locatorProvider) {
 
     // ensure this service is ranked higher than the Pax-Exam one
-    final Dictionary<String, Object> properties = new Hashtable<>();
-    properties.put(Constants.SERVICE_RANKING, Integer.MAX_VALUE);
-    properties.put("name", "nexus");
+    final Dictionary<String, Object> examProperties = new Hashtable<>();
+    examProperties.put(Constants.SERVICE_RANKING, Integer.MAX_VALUE);
+    examProperties.put("name", "nexus");
 
     bundleContext.registerService(org.ops4j.pax.exam.util.Injector.class, new org.ops4j.pax.exam.util.Injector()
     {
@@ -277,6 +279,6 @@ public class NexusContextListener
           }
         }));
       }
-    }, properties);
+    }, examProperties);
   }
 }

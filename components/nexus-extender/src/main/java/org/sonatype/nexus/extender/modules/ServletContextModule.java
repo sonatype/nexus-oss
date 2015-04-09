@@ -12,35 +12,26 @@
  */
 package org.sonatype.nexus.extender.modules;
 
-import javax.inject.Named;
 import javax.servlet.ServletContext;
 
-import org.sonatype.nexus.extender.NexusContextModule;
-
 import com.google.inject.AbstractModule;
-import com.google.inject.Key;
-import org.eclipse.sisu.inject.BeanLocator;
-import org.eclipse.sisu.inject.Sources;
 
 /**
- * Override guice-servlet's legacy {@link ServletContext} binding as it doesn't work well with multiple injectors.<br>
- * <br>
- * The replacement binding redirects to any @Named ServletContext key, which the {@link BeanLocator} will implicitly
- * match to the servlet context bound in {@link NexusContextModule}. This redirect is deliberately hidden from the
- * BeanLocator to avoid any chance of an endless lookup cycle.
+ * Override guice-servlet's legacy {@link ServletContext} binding as it doesn't work well with multiple injectors.
  * 
  * @since 3.0
  */
 public class ServletContextModule
     extends AbstractModule
 {
-  private static final Key<ServletContext> NAMED_SERVLET_CONTEXT = Key.get(ServletContext.class, Named.class);
+  private final ServletContext servletContext;
+
+  public ServletContextModule(final ServletContext servletContext) {
+    this.servletContext = servletContext;
+  }
 
   @Override
   protected void configure() {
-    requireBinding(NAMED_SERVLET_CONTEXT); // tell the BeanLocator it should supply this
-
-    // override the original binding with hidden redirect to the one supplied by the locator
-    binder().withSource(Sources.hide()).bind(ServletContext.class).to(NAMED_SERVLET_CONTEXT);
+    bind(ServletContext.class).toInstance(servletContext);
   }
 }
