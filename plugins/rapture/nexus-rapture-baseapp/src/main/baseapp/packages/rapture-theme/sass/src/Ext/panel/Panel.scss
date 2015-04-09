@@ -167,6 +167,10 @@
   border-color: $color-light-gray;
   border-style: solid;
 
+  .x-grid-header-ct {
+    border: none;
+  }
+
   .x-panel-body-nx-feature-menu {
     .x-grid-cell {
       background-color: $color-gainsboro;
