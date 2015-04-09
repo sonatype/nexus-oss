@@ -39,6 +39,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.hash.HashCode;
+import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -63,6 +64,26 @@ public class StorageTxImpl
     extends ComponentSupport
     implements StorageTx, StateGuardAware
 {
+  private static final int MAX_LINK_CREATION_ATTEMPTS = 3;
+
+  private static class Link
+  {
+    private final Object id;
+
+    private final OrientVertex v1;
+
+    private final OrientVertex v2;
+
+    private final String label;
+
+    public Link(final @Nullable Object id, final OrientVertex v1, final OrientVertex v2, final String label) {
+      this.id = id;
+      this.v1 = checkNotNull(v1);
+      this.v2 = checkNotNull(v2);
+      this.label = checkNotNull(label);
+    }
+  }
+
   private static final long DELETE_BATCH_SIZE = 100L;
 
   private final BlobTx blobTx;
@@ -72,6 +93,8 @@ public class StorageTxImpl
   private final ORID bucketId;
 
   private final WritePolicy writePolicy;
+
+  private final List<Link> links;
 
   private final StateGuard stateGuard = new StateGuard.Builder().initial(CLOSED).create();
 
@@ -84,6 +107,7 @@ public class StorageTxImpl
     this.graphTx = checkNotNull(graphTx);
     this.bucketId = checkNotNull(bucketId);
     this.writePolicy = writePolicy;
+    this.links = Lists.newArrayList();
   }
 
   public static final class State
@@ -108,13 +132,46 @@ public class StorageTxImpl
   @Guarded(by = OPEN)
   public void commit() {
     graphTx.commit();
+    commitLinks();
+    links.clear();
     blobTx.commit();
+  }
+
+  /**
+   * Creates graph edges in separate Graph TX with retries in case of {@link OConcurrentModificationException} as
+   * recommended by Orient folks. At this moment, all the vertexes touched are just created or updated, and the
+   * change is committed.
+   */
+  private void commitLinks() {
+    int attempts = MAX_LINK_CREATION_ATTEMPTS;
+    while (true) {
+      try {
+        graphTx.begin();
+        for (Link link : links) {
+          // force reload the vertexes being linked
+          final OrientVertex v1 = graphTx.getVertex(link.v1.getIdentity());
+          final OrientVertex v2 = graphTx.getVertex(link.v2.getIdentity());
+          graphTx.addEdge(link.id, v1, v2, link.label);
+        }
+        graphTx.commit();
+        break;
+      } catch (OConcurrentModificationException e ) {
+        graphTx.rollback();
+        attempts = attempts - 1;
+        if (attempts == 0) {
+          // re-throw, as the whole Tx should be retried (same as concurrent update of component or asset would cause)
+          // orphan (bucket-less) assets and components created in this failed TX should be GCed just like Blobs are
+          throw e;
+        }
+      }
+    }
   }
 
   @Override
   @Guarded(by = OPEN)
   public void rollback() {
     graphTx.rollback();
+    links.clear();
     blobTx.rollback();
   }
 
@@ -396,7 +453,7 @@ public class StorageTxImpl
     OrientVertex vertex = createVertex(V_ASSET);
     vertex.setProperty(P_FORMAT, format);
     vertex.setProperty(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
-    graphTx.addEdge(null, bucket.vertex(), vertex, E_OWNS_ASSET);
+    links.add(new Link(null, bucket.vertex(), vertex, E_OWNS_ASSET));
     return new AssetImpl(vertex);
   }
 
@@ -404,7 +461,7 @@ public class StorageTxImpl
   @Guarded(by = OPEN)
   public Asset createAsset(final Bucket bucket, final Component component) {
     Asset asset = createAsset(bucket, component.format());
-    graphTx.addEdge(null, asset.vertex(), component.vertex(), E_PART_OF_COMPONENT);
+    links.add(new Link(null, asset.vertex(), component.vertex(), E_PART_OF_COMPONENT));
     return asset;
   }
 
@@ -417,7 +474,7 @@ public class StorageTxImpl
     OrientVertex vertex = createVertex(V_COMPONENT);
     vertex.setProperty(P_FORMAT, format.getValue());
     vertex.setProperty(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
-    graphTx.addEdge(null, bucket.vertex(), vertex, E_OWNS_COMPONENT);
+    links.add(new Link(null, bucket.vertex(), vertex, E_OWNS_COMPONENT));
     return new ComponentImpl(vertex);
   }
 
@@ -494,23 +551,30 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
-  public BlobRef createBlob(final InputStream inputStream, Map<String, String> headers) {
-    checkNotNull(inputStream);
-    checkNotNull(headers);
-
-    return blobTx.create(inputStream, headers);
-  }
-
-  @Override
-  public BlobRef setBlob(final InputStream inputStream, final Map<String, String> headers, final Asset asset,
-                         final Iterable<HashAlgorithm> hashAlgorithms, final String contentType)
+  public BlobHandle createBlob(final InputStream inputStream,
+                               final Map<String, String> headers,
+                               final Iterable<HashAlgorithm> hashAlgorithms,
+                               final String contentType)
   {
     checkNotNull(inputStream);
     checkNotNull(headers);
-    checkNotNull(asset);
     checkNotNull(hashAlgorithms);
     checkNotNull(contentType);
+
+    if (writePolicy == WritePolicy.DENY) {
+      throw new IllegalOperationException("Repository is read only.");
+    }
+
+    final MultiHashingInputStream hashingStream = new MultiHashingInputStream(hashAlgorithms, inputStream);
+    final BlobRef blobRef = blobTx.create(hashingStream, headers);
+    return new BlobHandle(blobRef, hashingStream.count(), contentType, hashingStream.hashes());
+  }
+
+  @Override
+  public void attachBlob(final Asset asset, final BlobHandle blobHandle)
+  {
+    checkNotNull(asset);
+    checkNotNull(blobHandle);
 
     if (writePolicy == WritePolicy.DENY) {
       throw new IllegalOperationException("Repository is read only.");
@@ -525,22 +589,17 @@ public class StorageTxImpl
       deleteBlob(oldBlobRef, true);
     }
 
-    // Store new blob while calculating hashes in one pass
-    final MultiHashingInputStream hashingStream = new MultiHashingInputStream(hashAlgorithms, inputStream);
-    final BlobRef newBlobRef = createBlob(hashingStream, headers);
-
-    asset.blobRef(newBlobRef);
-    asset.size(hashingStream.count());
-    asset.contentType(contentType);
+    asset.blobRef(blobHandle.getBlobRef());
+    asset.size(blobHandle.getSize());
+    asset.contentType(blobHandle.getContentType());
 
     // Set attributes map to contain computed checksum metadata
-    Map<HashAlgorithm, HashCode> hashes = hashingStream.hashes();
     NestedAttributesMap checksums = asset.attributes().child(P_CHECKSUM);
-    for (HashAlgorithm algorithm : hashAlgorithms) {
-      checksums.set(algorithm.name(), hashes.get(algorithm).toString());
+    for (HashAlgorithm algorithm : blobHandle.getHashes().keySet()) {
+      checksums.set(algorithm.name(), blobHandle.getHashes().get(algorithm).toString());
     }
 
-    return newBlobRef;
+    blobHandle.setAttached(true);
   }
 
   @Nullable

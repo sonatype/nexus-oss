@@ -37,6 +37,7 @@ import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.BlobHandle;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
@@ -194,17 +195,32 @@ public class MavenFacetImpl
       throws IOException, InvalidContentException
   {
     try (StorageTx tx = getStorage().openTx()) {
+      // TODO: Figure out created-by header
+      final ImmutableMap<String, String> headers = ImmutableMap.of(
+          BlobStore.BLOB_NAME_HEADER, path.getPath(),
+          BlobStore.CREATED_BY_HEADER, "unknown"
+      );
+      final BlobHandle blobHandle;
+      try (InputStream inputStream = payload.openInputStream()) {
+        try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
+          final String contentType = determineContentType(path, supplier, payload.getContentType());
+          try (InputStream is = supplier.get()) {
+            blobHandle = tx.createBlob(is, headers, HashType.ALGORITHMS, contentType);
+          }
+        }
+      }
+
       if (path.getCoordinates() != null) {
-        putArtifact(path, payload, tx);
+        putArtifact(path, blobHandle, payload, tx);
       }
       else {
-        putFile(path, payload, tx);
+        putFile(path, blobHandle, payload, tx);
       }
       tx.commit();
     }
   }
 
-  private void putArtifact(final MavenPath path, final Payload payload, final StorageTx tx)
+  private void putArtifact(final MavenPath path, final BlobHandle blobHandle, final Payload payload, final StorageTx tx)
       throws IOException, InvalidContentException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
@@ -249,10 +265,10 @@ public class MavenFacetImpl
       // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
     }
 
-    putAssetPayload(path, tx, asset, payload);
+    putAssetPayload(tx, asset, blobHandle, payload);
   }
 
-  private void putFile(final MavenPath path, final Payload payload, final StorageTx tx)
+  private void putFile(final MavenPath path, final BlobHandle blobHandle, final Payload payload, final StorageTx tx)
       throws IOException, InvalidContentException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
@@ -267,29 +283,15 @@ public class MavenFacetImpl
       // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
     }
 
-    putAssetPayload(path, tx, asset, payload);
+    putAssetPayload(tx, asset, blobHandle, payload);
   }
 
-  private void putAssetPayload(final MavenPath path,
-                               final StorageTx tx,
+  private void putAssetPayload(final StorageTx tx,
                                final Asset asset,
+                               final BlobHandle blobHandle,
                                final Payload payload) throws IOException
   {
-    // TODO: Figure out created-by header
-    final ImmutableMap<String, String> headers = ImmutableMap.of(
-        BlobStore.BLOB_NAME_HEADER, path.getPath(),
-        BlobStore.CREATED_BY_HEADER, "unknown"
-    );
-
-    try (InputStream inputStream = payload.openInputStream()) {
-      try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
-        final String contentType = determineContentType(path, supplier, payload.getContentType());
-        try (InputStream is = supplier.get()) {
-          tx.setBlob(is, headers, asset, HashType.ALGORITHMS, contentType);
-        }
-      }
-    }
-
+    tx.attachBlob(asset, blobHandle);
     final NestedAttributesMap formatAttributes = asset.formatAttributes();
     if (payload instanceof Content) {
       Content content = (Content) payload;

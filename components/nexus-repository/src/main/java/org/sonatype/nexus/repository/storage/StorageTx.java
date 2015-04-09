@@ -186,16 +186,19 @@ public interface StorageTx
   void deleteBucket(Bucket bucket);
 
   /**
-   * Creates a new Blob.
+   * Creates a new Blob and returns handle to it. Blobs created but not attached to any asset are "orphans", and they
+   * will be deleted from blob store at the end of a TX..
    */
-  BlobRef createBlob(InputStream inputStream, Map<String, String> headers);
+  BlobHandle createBlob(InputStream inputStream,
+                        Map<String, String> headers,
+                        Iterable<HashAlgorithm> hashAlgorithms,
+                        String contentType);
 
   /**
-   * Creates a new Blob and updates the given asset with a reference to it, hash metadata, size, and content type.
-   * The old blob, if any, will be deleted.
+   * Attaches a Blob to asset and updates the given asset with a reference to it, hash metadata, size, and content
+   * type. The asset's old blob, if any, will be deleted.
    */
-  BlobRef setBlob(InputStream inputStream, Map<String, String> headers, Asset asset,
-                     Iterable<HashAlgorithm> hashAlgorithms, String contentType);
+  void attachBlob(Asset asset, BlobHandle blobHandle);
 
   /**
    * Gets a Blob, or {@code null if not found}.

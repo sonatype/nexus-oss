@@ -46,6 +46,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.BlobHandle;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
@@ -524,7 +525,8 @@ public class NugetGalleryFacetImpl
 
     final ImmutableMap<String, String> headers = ImmutableMap
         .of(BlobStore.BLOB_NAME_HEADER, blobName(component), BlobStore.CREATED_BY_HEADER, "unknown");
-    storageTx.setBlob(in, headers, asset, Arrays.asList(HashAlgorithm.SHA512), "application/zip");
+    BlobHandle blobHandle = storageTx.createBlob(in, headers, Arrays.asList(HashAlgorithm.SHA512), "application/zip");
+    storageTx.attachBlob(asset, blobHandle);
 
     return asset;
   }
