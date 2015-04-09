@@ -13,6 +13,7 @@
 package org.sonatype.nexus.security.internal;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +26,8 @@ import org.sonatype.nexus.security.role.RoleIdentifier;
 import org.sonatype.nexus.security.user.User;
 import org.sonatype.nexus.security.user.UserStatus;
 
-import com.google.inject.Binder;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import org.apache.shiro.authc.AuthenticationException;
@@ -44,13 +46,18 @@ public class DefaultSecuritySystemTest
     extends AbstractSecurityTest
 {
   @Override
-  public void configure(final Binder binder) {
-    super.configure(binder);
-
-    binder.bind(AuthorizationManager.class)
-        .annotatedWith(Names.named("sourceB"))
-        .to(MockAuthorizationManagerB.class)
-        .in(Singleton.class);
+  protected void customizeModules(List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        bind(AuthorizationManager.class)
+            .annotatedWith(Names.named("sourceB"))
+            .to(MockAuthorizationManagerB.class)
+            .in(Singleton.class);
+      }
+    });
   }
 
   @Override
