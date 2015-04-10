@@ -19,9 +19,12 @@ import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.entity.EntityMetadata;
 import org.sonatype.nexus.common.entity.EntityVersion;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.version.ORecordVersion;
 import com.orientechnologies.orient.core.version.OSimpleVersion;
@@ -35,12 +38,20 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public abstract class EntityAdapter<T extends Entity>
-    extends EntityType
+    extends ComponentSupport
 {
+  private final String typeName;
+
   private RecordIdObfuscator recordIdObfuscator;
 
+  private OClass type;
+
   public EntityAdapter(final String typeName) {
-    super(typeName);
+    this.typeName = checkNotNull(typeName);
+  }
+
+  protected String getTypeName() {
+    return typeName;
   }
 
   @Inject
@@ -51,6 +62,42 @@ public abstract class EntityAdapter<T extends Entity>
   protected RecordIdObfuscator getRecordIdObfuscator() {
     checkState(recordIdObfuscator != null);
     return recordIdObfuscator;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "typeName='" + typeName + '\'' +
+        '}';
+  }
+
+  //
+  // Schema
+  //
+
+  public void register(final ODatabaseDocumentTx db) {
+    checkNotNull(db);
+
+    OSchema schema = db.getMetadata().getSchema();
+    OClass type = schema.getClass(typeName);
+    if (type == null) {
+      type = schema.createClass(typeName);
+      defineType(type);
+
+      log.info("Created schema type '{}': properties={}, indexes={}",
+          type,
+          type.properties(),
+          type.getIndexes()
+      );
+    }
+    this.type = type;
+  }
+
+  protected abstract void defineType(final OClass type);
+
+  public OClass getType() {
+    checkState(type != null, "Not registered");
+    return type;
   }
 
   //
@@ -68,7 +115,7 @@ public abstract class EntityAdapter<T extends Entity>
    */
   protected Iterable<ODocument> browseDocuments(final ODatabaseDocumentTx db) {
     checkNotNull(db);
-    return db.browseClass(getTypeName());
+    return db.browseClass(typeName);
   }
 
   /**
@@ -123,7 +170,7 @@ public abstract class EntityAdapter<T extends Entity>
     // new entity must not already have metadata
     checkState(entity.getEntityMetadata() == null);
 
-    ODocument doc = db.newInstance(getTypeName());
+    ODocument doc = db.newInstance(typeName);
     return writeEntity(doc, entity);
   }
 

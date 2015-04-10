@@ -13,21 +13,17 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
-import org.sonatype.nexus.orient.entity.EntityType;
 
 import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_BUCKET;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_LAST_UPDATED;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
 
@@ -38,33 +34,51 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
  */
 @Named
 @Singleton
-public class ComponentEntityType
-    extends EntityType
+public class ComponentEntityAdapter
+    extends MetadataNodeEntityAdapter<Component>
 {
   public static final String DB_CLASS = new OClassNameBuilder()
       .type(Component.class)
       .build();
 
-  private static final String I_BUCKET = DB_CLASS + ".bucket_idx";
-
-  private BucketEntityType bucketEntityType;
-
-  public ComponentEntityType(final BucketEntityType bucketEntityType) {
-    super(DB_CLASS);
-    this.bucketEntityType = bucketEntityType;
+  @Inject
+  public ComponentEntityAdapter(final BucketEntityAdapter bucketEntityAdapter) {
+    super(DB_CLASS, bucketEntityAdapter);
   }
 
   @Override
   protected void defineType(final OClass type) {
-    type.createProperty(P_BUCKET, OType.LINK, bucketEntityType.getType()).setMandatory(true).setNotNull(true);
-    type.createProperty(P_FORMAT, OType.STRING).setMandatory(true).setNotNull(true);
+    super.defineType(type);
     type.createProperty(P_GROUP, OType.STRING);
     type.createProperty(P_NAME, OType.STRING);
     type.createProperty(P_VERSION, OType.STRING);
-    type.createProperty(P_LAST_UPDATED, OType.DATETIME);
-    type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
+  }
 
-    type.createIndex(I_BUCKET, INDEX_TYPE.NOTUNIQUE, P_BUCKET);
+  @Override
+  protected Component newEntity() {
+    return new Component();
+  }
+
+  @Override
+  protected void readFields(final ODocument document, final Component entity) {
+    super.readFields(document, entity);
+
+    String group = document.field(P_GROUP, OType.STRING);
+    String name = document.field(P_NAME, OType.STRING);
+    String version = document.field(P_VERSION, OType.STRING);
+
+    entity.group(group);
+    entity.name(name);
+    entity.version(version);
+  }
+
+  @Override
+  protected void writeFields(final ODocument document, final Component entity) {
+    super.writeFields(document, entity);
+
+    document.field(P_GROUP, entity.group());
+    document.field(P_NAME, entity.name());
+    document.field(P_VERSION, entity.version());
   }
 
 }

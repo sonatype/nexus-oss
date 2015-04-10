@@ -73,7 +73,7 @@ public class NugetGalleryFacetImplDeleteTest
 
     // Wire the mocks together: component has asset, asset has blobRef
     doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
-    when(component.assets()).thenReturn(asList(asset));
+    when(tx.browseAssets(component)).thenReturn(asList(asset));
     when(asset.blobRef()).thenReturn(blobRef);
 
     galleryFacet.delete(packageId, version);

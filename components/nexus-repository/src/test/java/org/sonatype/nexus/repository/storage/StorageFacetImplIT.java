@@ -19,6 +19,9 @@ import java.util.Map;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.common.entity.EntityId;
+import org.sonatype.nexus.common.entity.EntityVersion;
+import org.sonatype.nexus.orient.HexRecordIdObfuscator;
 import org.sonatype.nexus.orient.PersistentDatabaseInstanceRule;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
@@ -33,7 +36,6 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.inject.util.Providers;
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
-import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import org.junit.After;
@@ -50,9 +52,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
-import static org.sonatype.nexus.repository.storage.StorageFacet.V_ASSET;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 
 /**
  * Integration tests for {@link StorageFacetImpl}.
@@ -71,6 +71,8 @@ public class StorageFacetImplIT
 
   protected TestFormat testFormat = new TestFormat();
 
+  private AssetEntityAdapter assetEntityAdapter;
+
   private class TestFormat
       extends Format
   {
@@ -83,9 +85,17 @@ public class StorageFacetImplIT
   public void setUp() throws Exception {
     BlobStoreManager mockBlobStoreManager = mock(BlobStoreManager.class);
     when(mockBlobStoreManager.get(anyString())).thenReturn(mock(BlobStore.class));
+    BucketEntityAdapter bucketEntityAdapter = new BucketEntityAdapter();
+    HexRecordIdObfuscator recordIdObfuscator = new HexRecordIdObfuscator();
+    bucketEntityAdapter.installDependencies(recordIdObfuscator);
+    ComponentEntityAdapter componentEntityAdapter = new ComponentEntityAdapter(bucketEntityAdapter);
+    componentEntityAdapter.installDependencies(recordIdObfuscator);
+    assetEntityAdapter = new AssetEntityAdapter(bucketEntityAdapter, componentEntityAdapter);
+    assetEntityAdapter.installDependencies(recordIdObfuscator);
     underTest = new StorageFacetImpl(
         mockBlobStoreManager,
-        Providers.of(database.getInstance())
+        Providers.of(database.getInstance()),
+        bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter
     );
     underTest.installDependencies(mock(EventBus.class));
 
@@ -124,11 +134,11 @@ public class StorageFacetImplIT
       Asset asset = tx.createAsset(tx.getBucket(), testFormat);
       Component component = tx.createComponent(tx.getBucket(), testFormat);
 
-      Map<String, Object> assetAttributes = asset.document().field(P_ATTRIBUTES);
+      NestedAttributesMap assetAttributes = asset.attributes();
       assertThat(assetAttributes, is(notNullValue()));
       assertThat(assetAttributes.isEmpty(), is(true));
 
-      Map<String, Object> componentAttributes = component.document().field(P_ATTRIBUTES);
+      NestedAttributesMap componentAttributes = component.attributes();
       assertThat(componentAttributes, is(notNullValue()));
       assertThat(componentAttributes.isEmpty(), is(true));
     }
@@ -136,7 +146,7 @@ public class StorageFacetImplIT
 
   @Test
   public void getAndSetAttributes() {
-    ORID docId;
+    EntityId docId;
     try (StorageTx tx = underTest.openTx()) {
       Asset asset = tx.createAsset(tx.getBucket(), testFormat);
       NestedAttributesMap map = asset.attributes();
@@ -148,7 +158,7 @@ public class StorageFacetImplIT
 
       assertThat(map.isEmpty(), is(false));
 
-      tx.updateAsset(asset);
+      tx.saveAsset(asset);
 
       tx.commit();
       docId = asset.id();
@@ -170,18 +180,18 @@ public class StorageFacetImplIT
     // Setup: add an asset in both repositories
     try (StorageTx tx = underTest.openTx()) {
       Asset asset1 = tx.createAsset(tx.getBucket(), testFormat);
-      asset1.set("name", "asset1");
-      asset1.set("number", 42);
-      tx.updateAsset(asset1);
+      asset1.name("asset1");
+      asset1.size(42L);
+      tx.saveAsset(asset1);
       tx.commit();
     }
 
     underTest.init(testRepository2);
     try (StorageTx tx = underTest.openTx()) {
       Asset asset2 = tx.createAsset(tx.getBucket(), testFormat);
-      asset2.set("name", "asset2");
-      asset2.set("number", 42);
-      tx.updateAsset(asset2);
+      asset2.name("asset2");
+      asset2.size(42L);
+      tx.saveAsset(asset2);
       tx.commit();
     }
 
@@ -212,79 +222,78 @@ public class StorageFacetImplIT
       // Find assets with number = 42
 
       // ..in testRepository1, should yield 1 match
-      checkSize(tx.findAssets("number = :number", ImmutableMap.of("number", (Object) 42),
+      checkSize(tx.findAssets("size = :number", ImmutableMap.of("number", (Object) 42),
           ImmutableSet.of(testRepository1), null), 1);
-      assertThat(tx.countAssets("number = :number", ImmutableMap.of("number", (Object) 42),
+      assertThat(tx.countAssets("size = :number", ImmutableMap.of("number", (Object) 42),
           ImmutableSet.of(testRepository1), null), is(1L));
       // ..in testRepository2, should yield 1 match
-      checkSize(tx.findAssets("number = :number", ImmutableMap.of("number", (Object) 42),
+      checkSize(tx.findAssets("size = :number", ImmutableMap.of("number", (Object) 42),
           ImmutableSet.of(testRepository2), null), 1);
-      assertThat(tx.countAssets("number = :number", ImmutableMap.of("number", (Object) 42),
+      assertThat(tx.countAssets("size = :number", ImmutableMap.of("number", (Object) 42),
           ImmutableSet.of(testRepository2), null), is(1L));
       // ..in testRepository1 or testRepository2, should yield 2 matches
-      checkSize(tx.findAssets("number = :number", ImmutableMap.of("number", (Object) 42),
+      checkSize(tx.findAssets("size = :number", ImmutableMap.of("number", (Object) 42),
           ImmutableSet.of(testRepository1, testRepository2), null), 2);
-      assertThat(tx.countAssets("number = :number", ImmutableMap.of("number", (Object) 42),
+      assertThat(tx.countAssets("size = :number", ImmutableMap.of("number", (Object) 42),
           ImmutableSet.of(testRepository1, testRepository2), null), is(2L));
       // ..in any repository, should yield 2 matches
-      checkSize(tx.findAssets("number = :number", ImmutableMap.of("number", (Object) 42),
+      checkSize(tx.findAssets("size = :number", ImmutableMap.of("number", (Object) 42),
           ImmutableSet.of(testRepository1, testRepository2), null), 2);
-      assertThat(tx.countAssets("number = :number", ImmutableMap.of("number", (Object) 42),
+      assertThat(tx.countAssets("size = :number", ImmutableMap.of("number", (Object) 42),
           ImmutableSet.of(testRepository1, testRepository2), null), is(2L));
 
       // Find assets in any repository with name = "foo" or number = 42
-      String whereClause = "name = :name or number = :number";
+      String whereClause = "name = :name or size = :number";
       Map<String, Object> parameters = ImmutableMap.of("name", (Object) "foo", "number", 42);
 
       // ..in ascending order by name with limit 1, should return asset1
       String suffix = "order by name limit 1";
       List<Asset> results = Lists.newArrayList(tx.findAssets(whereClause, parameters, null, suffix));
       checkSize(results, 1);
-      assertThat((String) results.get(0).get("name"), is("asset1"));
+      assertThat((String) results.get(0).name(), is("asset1"));
 
       // ..in descending order by name with limit 1, should return asset2
       suffix = "order by name desc limit 1";
       results = Lists.newArrayList(tx.findAssets(whereClause, parameters, null, suffix));
       checkSize(results, 1);
-      assertThat((String) results.get(0).get("name"), is("asset2"));
+      assertThat((String) results.get(0).name(), is("asset2"));
     }
   }
 
   @Test
   public void mapOfMaps() {
-    Map<String, String> bag1 = ImmutableMap.of("foo", "bar");
-    Map<String, String> bag2 = ImmutableMap.of("baz", "qux");
-    Map<String, Map<String, String>> inputMap = ImmutableMap.of("bag1", bag1, "bag2", bag2);
+    Map<String, String> bag2 = ImmutableMap.of();
 
     // Transaction 1:
     // Create a new asset with property "attributes" that's a map of maps (stored as an embeddedmap)
-    Object docId;
+    EntityId docId;
     try (StorageTx tx = underTest.openTx()) {
       Bucket bucket = tx.getBucket();
       Asset asset = tx.createAsset(bucket, testFormat);
-      asset.set("attributes", inputMap);
-      tx.updateAsset(asset);
+      asset.attributes().child("bag1").set("foo", "bar");
+      asset.attributes().child("bag2").set("baz", "qux");
+      tx.saveAsset(asset);
       tx.commit();
-      docId = asset.document().getIdentity();
+      docId = asset.id();
     }
 
     // Transaction 2:
     // Get the asset and make sure it contains what we expect
     try (StorageTx tx = underTest.openTx()) {
       Bucket bucket = tx.getBucket();
-      Asset asset = tx.findAsset((ORID) docId, bucket);
+      Asset asset = tx.findAsset(docId, bucket);
       assert asset != null;
 
-      Map<String, Map<String, String>> outputMap = asset.document().field("attributes");
+      NestedAttributesMap outputMap = asset.attributes();
 
-      assertThat(outputMap.keySet().size(), is(2));
+      assertThat(outputMap.size(), is(2));
 
-      Map<String, String> outputBag1 = outputMap.get("bag1");
+      Map<String, String> outputBag1 = (Map<String, String>) outputMap.get("bag1");
       assertNotNull(outputBag1);
       assertThat(outputBag1.keySet().size(), is(1));
       assertThat(outputBag1.get("foo"), is("bar"));
 
-      Map<String, String> outputBag2 = outputMap.get("bag2");
+      Map<String, String> outputBag2 = (Map<String, String>) outputMap.get("bag2");
       assertNotNull(outputBag2);
       assertThat(outputBag2.keySet().size(), is(1));
       assertThat(outputBag2.get("baz"), is("qux"));
@@ -294,13 +303,13 @@ public class StorageFacetImplIT
     // Make sure we can use dot notation to query for the asset by some aspect of the attributes
     try (StorageTx tx = underTest.openTx()) {
       Map<String, String> parameters = ImmutableMap.of("fooValue", "bar");
-      String query = String.format("select from %s where attributes.bag1.foo = :fooValue", V_ASSET);
+      String query = String.format("select from %s where attributes.bag1.foo = :fooValue", AssetEntityAdapter.DB_CLASS);
 
       Iterable<ODocument> docs = tx.getDb().command(new OCommandSQL(query)).execute(parameters);
       List<ODocument> list = Lists.newArrayList(docs);
 
       assertThat(list.size(), is(1));
-      assertThat(list.get(0).getIdentity(), is(docId));
+      assertThat(assetEntityAdapter.encode(list.get(0).getIdentity()), is(docId));
     }
   }
 
@@ -316,12 +325,15 @@ public class StorageFacetImplIT
 
       // Create an asset and component and verify state with browse and find
       Asset asset1 = tx.createAsset(bucket, testFormat);
-      asset1.set(P_PATH, "path");
-      tx.updateAsset(asset1);
+      asset1.name("foo");
+      tx.saveAsset(asset1);
+
       Component component = tx.createComponent(bucket, testFormat);
-      component.set("foo", "bar");
-      tx.updateComponent(component);
+      component.name("bar");
+      tx.saveComponent(component);
+
       Asset asset2 = tx.createAsset(bucket, component);
+      tx.saveAsset(asset2);
       tx.commit();
 
       checkSize(tx.browseAssets(bucket), 2);
@@ -330,25 +342,28 @@ public class StorageFacetImplIT
       assertNotNull(tx.findAsset(asset1.id(), bucket));
       assertNotNull(tx.findComponent(component.id(), bucket));
 
-      checkSize(tx.findComponent(component.id(), bucket).assets(), 1);
-      assertNotNull(tx.findComponent(component.id(), bucket).firstAsset());
-      assertNull(tx.findAsset(asset1.id(), bucket).component());
-      assertNotNull(tx.findAsset(asset2.id(), bucket).component());
+      checkSize(tx.browseAssets(tx.findComponent(component.id(), bucket)), 1);
+      assertNotNull(tx.firstAsset(tx.findComponent(component.id(), bucket)));
+      assertNull(tx.findAsset(asset1.id(), bucket).componentId());
+      assertNotNull(tx.findAsset(asset2.id(), bucket).componentId());
 
-      assertNull(tx.findAssetWithProperty(P_PATH, "nomatch", bucket));
-      assertNotNull(tx.findAssetWithProperty(P_PATH, "path", bucket));
+      assertNull(tx.findAssetWithProperty(P_NAME, "nomatch", bucket));
+      assertNotNull(tx.findAssetWithProperty(P_NAME, "foo", bucket));
 
-      assertNull(tx.findComponentWithProperty("foo", "nomatch", bucket));
-      assertNotNull(tx.findComponentWithProperty("foo", "bar", bucket));
+      assertNull(tx.findComponentWithProperty(P_NAME, "nomatch", bucket));
+      assertNotNull(tx.findComponentWithProperty(P_NAME, "bar", bucket));
 
+      // store ids as they are cleaned up after delete
+      EntityId asset1Id = asset1.id();
+      EntityId componentId = component.id();
       // Delete both and make sure browse and find behave as expected
       tx.deleteAsset(asset1);
       tx.deleteComponent(component);
 
       checkSize(tx.browseAssets(bucket), 0);
       checkSize(tx.browseComponents(bucket), 0);
-      assertNull(tx.findAsset(asset1.id(), bucket));
-      assertNull(tx.findComponent(component.id(), bucket));
+      assertNull(tx.findAsset(asset1Id, bucket));
+      assertNull(tx.findComponent(componentId, bucket));
 
       // NOTE: It doesn't matter for this test, but you should commit when finished with one or more writes
       //       If you don't, your changes will be automatically rolled back.
@@ -378,14 +393,15 @@ public class StorageFacetImplIT
     //   if not simulating a conflict: modification made in main thread is persisted after the modification on aux
 
     // setup
-    final ORID assetId;
-    int firstVersion;
+    final EntityId assetId;
+    EntityVersion firstVersion;
     try (StorageTx tx = underTest.openTx()) {
       Bucket bucket = tx.getBucket();
       Asset asset = tx.createAsset(bucket, testFormat);
+      tx.saveAsset(asset);
       assetId = asset.id();
       tx.commit();
-      firstVersion = asset.get("@version", Integer.class);
+      firstVersion = asset.getEntityMetadata().getVersion();
     }
 
     // test
@@ -408,8 +424,8 @@ public class StorageFacetImplIT
           try (StorageTx auxTx = underTest.openTx()) {
             Bucket bucket = auxTx.getBucket();
             Asset asset = checkNotNull(auxTx.findAsset(assetId, bucket));
-            asset.set("foo", "firstValue");
-            auxTx.updateAsset(asset);
+            asset.name("firstValue");
+            auxTx.saveAsset(asset);
             auxTx.commit();
           }
         }
@@ -422,8 +438,8 @@ public class StorageFacetImplIT
         // only read the asset we propose to change *after* the other transaction completes
         asset = checkNotNull(mainTx.findAsset(assetId, bucket));
       }
-      asset.set("foo", "secondValue");
-      mainTx.updateAsset(asset);
+      asset.name("secondValue");
+      mainTx.saveAsset(asset);
       mainTx.commit(); // if we're simulating a conflict, this call should throw OConcurrentModificationException
       assertThat(simulateConflict, is(false));
     }
@@ -437,11 +453,11 @@ public class StorageFacetImplIT
       Bucket bucket = tx.getBucket();
       Asset asset = checkNotNull(tx.findAsset(assetId, bucket));
 
-      String fooValue = asset.require("foo");
-      int finalVersion = asset.require("@version", Integer.class);
+      String name = asset.name();
+      EntityVersion finalVersion = asset.getEntityMetadata().getVersion();
 
-      assertThat(fooValue, is("secondValue"));
-      assertThat(finalVersion, is(firstVersion + 2));
+      assertThat(name, is("secondValue"));
+      assertThat(finalVersion, is(new EntityVersion(String.valueOf(Integer.valueOf(firstVersion.toString()) + 2))));
     }
   }
 

@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.repository.storage;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -29,9 +26,6 @@ import org.sonatype.nexus.repository.config.ConfigurationFacet;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -51,11 +45,11 @@ public class StorageFacetImpl
 
   private final Provider<DatabaseInstance> databaseInstanceProvider;
 
-  private final BucketEntityType bucketEntityType;
+  private final BucketEntityAdapter bucketEntityAdapter;
 
-  private final ComponentEntityType componentEntityType;
+  private final ComponentEntityAdapter componentEntityAdapter;
 
-  private final AssetEntityType assetEntityType;
+  private final AssetEntityAdapter assetEntityAdapter;
 
   @VisibleForTesting
   static final String CONFIG_KEY = "storage";
@@ -80,18 +74,21 @@ public class StorageFacetImpl
 
   private Config config;
 
-  private ORID bucketId;
+  private Bucket bucket;
 
   @Inject
   public StorageFacetImpl(final BlobStoreManager blobStoreManager,
-                          final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider)
+                          final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
+                          final BucketEntityAdapter bucketEntityAdapter,
+                          final ComponentEntityAdapter componentEntityAdapter,
+                          final AssetEntityAdapter assetEntityAdapter)
   {
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
 
-    bucketEntityType = new BucketEntityType();
-    componentEntityType = new ComponentEntityType(bucketEntityType);
-    assetEntityType = new AssetEntityType(bucketEntityType, componentEntityType);
+    this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
+    this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
+    this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
   }
 
   @Override
@@ -111,9 +108,9 @@ public class StorageFacetImpl
 
   private void initSchema() {
     try (ODatabaseDocumentTx db = databaseInstanceProvider.get().connect()) {
-      bucketEntityType.register(db);
-      componentEntityType.register(db);
-      assetEntityType.register(db);
+      bucketEntityAdapter.register(db);
+      componentEntityAdapter.register(db);
+      assetEntityAdapter.register(db);
     }
   }
 
@@ -121,14 +118,11 @@ public class StorageFacetImpl
     // get or create the bucket for the repository and set bucketId for fast lookup later
     try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
       String repositoryName = getRepository().getName();
-      ODocument doc = getByRepositoryName(db, repositoryName);
-      if (doc == null) {
-        doc = db.newInstance(V_BUCKET);
-        doc.field(P_REPOSITORY_NAME, repositoryName);
-        doc.save();
+      bucket = bucketEntityAdapter.getByRepositoryName(db, repositoryName);
+      if (bucket == null) {
+        bucketEntityAdapter.add(db, bucket = new Bucket().repositoryName(repositoryName));
         db.commit();
       }
-      bucketId = doc.getIdentity();
     }
   }
 
@@ -148,20 +142,10 @@ public class StorageFacetImpl
 
   private StorageTx openStorageTx() {
     BlobStore blobStore = blobStoreManager.get(config.blobStoreName);
-    return new StorageTxImpl(new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucketId,
-        config.writePolicy);
-  }
-
-  @Nullable
-  private ODocument getByRepositoryName(final ODatabaseDocumentTx db, final String repositoryName) {
-    OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
-        "SELECT FROM " + V_BUCKET + " WHERE " + P_REPOSITORY_NAME + " = ?"
+    return new StorageTxImpl(
+        new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucket, config.writePolicy,
+        bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter
     );
-    List<ODocument> results = db.command(query).execute(repositoryName);
-    if (results.isEmpty()) {
-      return null;
-    }
-    return results.get(0);
   }
 
 }

@@ -13,8 +13,7 @@
 package org.sonatype.nexus.repository.storage;
 
 import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -23,6 +22,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.hash.MultiHashingInputStream;
 import org.sonatype.nexus.common.stateguard.Guarded;
@@ -34,30 +34,14 @@ import org.sonatype.nexus.repository.IllegalOperationException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.hash.HashCode;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.OCommandSQL;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_BUCKET;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_CHECKSUM;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_COMPONENT;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_LAST_UPDATED;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
-import static org.sonatype.nexus.repository.storage.StorageFacet.V_ASSET;
-import static org.sonatype.nexus.repository.storage.StorageFacet.V_BUCKET;
-import static org.sonatype.nexus.repository.storage.StorageFacet.V_COMPONENT;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.CLOSED;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.OPEN;
 
@@ -76,21 +60,33 @@ public class StorageTxImpl
 
   private final ODatabaseDocumentTx db;
 
-  private final ORID bucketId;
+  private final Bucket bucket;
 
   private final WritePolicy writePolicy;
 
   private final StateGuard stateGuard = new StateGuard.Builder().initial(CLOSED).create();
 
+  private final BucketEntityAdapter bucketEntityAdapter;
+
+  private final ComponentEntityAdapter componentEntityAdapter;
+
+  private final AssetEntityAdapter assetEntityAdapter;
+
   public StorageTxImpl(final BlobTx blobTx,
                        final ODatabaseDocumentTx db,
-                       final ORID bucketId,
-                       final WritePolicy writePolicy)
+                       final Bucket bucket,
+                       final WritePolicy writePolicy,
+                       final BucketEntityAdapter bucketEntityAdapter,
+                       final ComponentEntityAdapter componentEntityAdapter,
+                       final AssetEntityAdapter assetEntityAdapter)
   {
     this.blobTx = checkNotNull(blobTx);
     this.db = checkNotNull(db);
-    this.bucketId = checkNotNull(bucketId);
+    this.bucket = checkNotNull(bucket);
     this.writePolicy = writePolicy;
+    this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
+    this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
+    this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
   }
 
   public static final class State
@@ -136,101 +132,59 @@ public class StorageTxImpl
   @Override
   @Guarded(by = OPEN)
   public Bucket getBucket() {
-    return new BucketImpl(findDocument(bucketId, null));
+    return bucket;
   }
 
   @Override
   @Guarded(by = OPEN)
   public Iterable<Bucket> browseBuckets() {
-    return Iterables.transform(
-        db.browseClass(V_BUCKET),
-        new Function<ODocument, Bucket>()
-        {
-          @Override
-          public Bucket apply(final ODocument doc) {
-            return new BucketImpl(doc);
-          }
-        });
+    return bucketEntityAdapter.browse(db);
   }
 
   @Override
   @Guarded(by = OPEN)
   public Iterable<Asset> browseAssets(final Bucket bucket) {
-    checkNotNull(bucket);
+    return assetEntityAdapter.browseByBucket(db, bucket);
+  }
 
-    return Iterables.transform(
-        browseDocuments(V_ASSET, bucket),
-        new Function<ODocument, Asset>()
-        {
-          @Override
-          public Asset apply(final ODocument doc) {
-            return new AssetImpl(doc);
-          }
-        });
+  @Override
+  @Guarded(by = OPEN)
+  public Iterable<Asset> browseAssets(final Component component) {
+    return assetEntityAdapter.browseByComponent(db, component);
+  }
+
+  @Override
+  public Asset firstAsset(final Component component) {
+    return Iterables.getFirst(browseAssets(component), null);
   }
 
   @Override
   @Guarded(by = OPEN)
   public Iterable<Component> browseComponents(final Bucket bucket) {
-    checkNotNull(bucket);
-
-    return Iterables.transform(
-        browseDocuments(V_COMPONENT, bucket),
-        new Function<ODocument, Component>()
-        {
-          @Override
-          public Component apply(final ODocument doc) {
-            return new ComponentImpl(doc);
-          }
-        });
-  }
-
-  private Iterable<ODocument> browseDocuments(final String className, final Bucket bucket) {
-    checkNotNull(bucket);
-
-    Map<String, Object> parameters = ImmutableMap.<String, Object>of("bucket", bucket.document());
-    String query = String.format("select from %s where bucket = :bucket", className);
-    return db.command(new OCommandSQL(query)).execute(parameters);
+    return componentEntityAdapter.browseByBucket(db, bucket);
   }
 
   @Nullable
   @Override
   @Guarded(by = OPEN)
-  public Asset findAsset(final ORID id, final Bucket bucket) {
+  public Asset findAsset(final EntityId id, final Bucket bucket) {
     checkNotNull(id);
     checkNotNull(bucket);
-    ODocument doc = findDocument(id, V_ASSET);
-    return bucketOwns(bucket, doc) ? new AssetImpl(doc) : null;
+    Asset asset = assetEntityAdapter.get(db, id);
+    return bucketOwns(bucket, asset) ? asset : null;
   }
 
-  private boolean bucketOwns(Bucket bucket, @Nullable ODocument item) {
-    return item != null && bucket.document().equals(item.field(P_BUCKET, ODocument.class));
+  private boolean bucketOwns(final Bucket bucket, final @Nullable MetadataNode item) {
+    return item != null && bucket.id().equals(item.bucketId());
   }
 
   @Nullable
   @Override
   @Guarded(by = OPEN)
   public Asset findAssetWithProperty(final String propName, final Object propValue, final Bucket bucket) {
-    ODocument doc = findWithPropertyOwnedBy(V_ASSET, propName, propValue, bucket);
-    if (doc == null) {
-      return null;
-    }
-    return new AssetImpl(doc);
+    return assetEntityAdapter.findByProperty(db, propName, propValue, bucket);
   }
 
-  @SuppressWarnings("unchecked")
-  private ODocument findWithPropertyOwnedBy(String className, String propName, Object propValue,
-                                            Bucket bucket)
-  {
-    checkNotNull(propName);
-    checkNotNull(propValue);
-    checkNotNull(bucket);
-
-    Map<String, Object> parameters = ImmutableMap.of("propValue", propValue, "bucket", bucket.document());
-    String query = String.format("select from %s where %s = :propValue and bucket = :bucket", className, propName);
-    Iterable<ODocument> docs = db.command(new OCommandSQL(query)).execute(parameters);
-    return Iterables.getFirst(docs, null);
-  }
 
   @Override
   @Guarded(by = OPEN)
@@ -239,15 +193,7 @@ public class StorageTxImpl
                                     @Nullable Iterable<Repository> repositories,
                                     @Nullable String querySuffix)
   {
-    return Iterables.transform(
-        findDocuments(V_ASSET, whereClause, parameters, repositories, querySuffix),
-        new Function<ODocument, Asset>()
-        {
-          @Override
-          public Asset apply(final ODocument doc) {
-            return new AssetImpl(doc);
-          }
-        });
+    return assetEntityAdapter.browseByQuery(db, whereClause, parameters, repositories, querySuffix);
   }
 
   @Override
@@ -257,96 +203,24 @@ public class StorageTxImpl
                           @Nullable Iterable<Repository> repositories,
                           @Nullable String querySuffix)
   {
-    return countDocuments(V_ASSET, whereClause, parameters, repositories, querySuffix);
-  }
-
-  private Iterable<ODocument> findDocuments(String className,
-                                            @Nullable String whereClause,
-                                            @Nullable Map<String, Object> parameters,
-                                            @Nullable Iterable<Repository> repositories,
-                                            @Nullable String querySuffix)
-  {
-    String query = buildQuery(className, false, whereClause, repositories, querySuffix);
-    log.debug("Finding documents with query: {}, parameters: {}", query, parameters);
-    return db.command(new OCommandSQL(query)).execute(parameters);
-  }
-
-  private long countDocuments(String className,
-                              @Nullable String whereClause,
-                              @Nullable Map<String, Object> parameters,
-                              @Nullable Iterable<Repository> repositories,
-                              @Nullable String querySuffix)
-  {
-    String query = buildQuery(className, true, whereClause, repositories, querySuffix);
-    log.debug("Counting documents with query: {}, parameters: {}", query, parameters);
-    List<ODocument> results = db.command(new OCommandSQL(query)).execute(parameters);
-    return results.get(0).field("count");
-  }
-
-  private String buildQuery(String className,
-                            boolean isCount,
-                            @Nullable String whereClause,
-                            @Nullable Iterable<Repository> repositories,
-                            @Nullable String querySuffix)
-  {
-    StringBuilder query = new StringBuilder();
-    query.append("select");
-    if (isCount) {
-      query.append(" count(*)");
-    }
-    query.append(" from ").append(className);
-    if (whereClause != null) {
-      query.append(" where ").append(whereClause);
-    }
-
-    if (repositories != null) {
-      List<String> bucketConstraints = Lists.newArrayList(
-          Iterables.transform(repositories, new Function<Repository, String>()
-          {
-            @Override
-            public String apply(final Repository repository) {
-              return String.format("%s.%s = '%s'", P_BUCKET, P_REPOSITORY_NAME, repository.getName());
-            }
-          }).iterator());
-      if (bucketConstraints.size() > 0) {
-        if (whereClause == null) {
-          query.append(" where");
-        }
-        else {
-          query.append(" and");
-        }
-        query.append(" (");
-        query.append(Joiner.on(" or ").join(bucketConstraints));
-        query.append(")");
-      }
-    }
-
-    if (querySuffix != null) {
-      query.append(" ").append(querySuffix);
-    }
-
-    return query.toString();
+    return assetEntityAdapter.countByQuery(db, whereClause, parameters, repositories, querySuffix);
   }
 
   @Nullable
   @Override
   @Guarded(by = OPEN)
-  public Component findComponent(final ORID id, final Bucket bucket) {
+  public Component findComponent(final EntityId id, final Bucket bucket) {
     checkNotNull(id);
     checkNotNull(bucket);
-    ODocument doc = findDocument(id, V_COMPONENT);
-    return bucketOwns(bucket, doc) ? new ComponentImpl(doc) : null;
+    Component component = componentEntityAdapter.get(db, id);
+    return bucketOwns(bucket, component) ? component : null;
   }
 
   @Nullable
   @Override
   @Guarded(by = OPEN)
   public Component findComponentWithProperty(final String propName, final Object propValue, final Bucket bucket) {
-    ODocument doc = findWithPropertyOwnedBy(V_COMPONENT, propName, propValue, bucket);
-    if (doc == null) {
-      return null;
-    }
-    return new ComponentImpl(doc);
+    return componentEntityAdapter.findByProperty(db, propName, propValue, bucket);
   }
 
   @Override
@@ -356,15 +230,7 @@ public class StorageTxImpl
                                             @Nullable Iterable<Repository> repositories,
                                             @Nullable String querySuffix)
   {
-    return Iterables.transform(
-        findDocuments(V_COMPONENT, whereClause, parameters, repositories, querySuffix),
-        new Function<ODocument, Component>()
-        {
-          @Override
-          public Component apply(final ODocument doc) {
-            return new ComponentImpl(doc);
-          }
-        });
+    return componentEntityAdapter.browseByQuery(db, whereClause, parameters, repositories, querySuffix);
   }
 
   @Override
@@ -374,42 +240,33 @@ public class StorageTxImpl
                               @Nullable Iterable<Repository> repositories,
                               @Nullable String querySuffix)
   {
-    return countDocuments(V_COMPONENT, whereClause, parameters, repositories, querySuffix);
-  }
-
-  @Nullable
-  private ODocument findDocument(final ORID id, @Nullable final String className) {
-    checkNotNull(id);
-
-    ODocument doc = db.getRecord(id);
-    if (doc != null && className != null && !doc.field("@class").equals(className)) {
-      return null;
-    }
-    return doc;
+    return componentEntityAdapter.countByQuery(db, whereClause, parameters, repositories, querySuffix);
   }
 
   @Override
   @Guarded(by = OPEN)
   public Asset createAsset(final Bucket bucket, final Format format) {
-    checkNotNull(bucket);
     checkNotNull(format);
-    return new AssetImpl(createAsset(bucket, format.getValue()));
+    Asset asset = createAsset(bucket, format.toString());
+    return asset;
   }
 
-  private ODocument createAsset(final Bucket bucket, final String format) {
-    ODocument doc = db.newInstance(V_ASSET);
-    doc.field(P_BUCKET, bucket.document());
-    doc.field(P_FORMAT, format);
-    doc.field(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
-    return doc;
+  private Asset createAsset(final Bucket bucket, final String format) {
+    checkNotNull(bucket);
+    Asset asset = new Asset();
+    asset.bucketId(bucket.id());
+    asset.format(format);
+    asset.attributes(new NestedAttributesMap(P_ATTRIBUTES, new HashMap<String, Object>()));
+    return asset;
   }
 
   @Override
   @Guarded(by = OPEN)
   public Asset createAsset(final Bucket bucket, final Component component) {
-    ODocument doc = createAsset(bucket, component.format());
-    doc.field(P_COMPONENT, component.document());
-    return new AssetImpl(doc);
+    checkNotNull(component);
+    Asset asset = createAsset(bucket, component.format());
+    asset.componentId(component.id());
+    return asset;
   }
 
   @Override
@@ -418,25 +275,31 @@ public class StorageTxImpl
     checkNotNull(bucket);
     checkNotNull(format);
 
-    ODocument doc = db.newInstance(V_COMPONENT);
-    doc.field(P_BUCKET, bucket.document());
-    doc.field(P_FORMAT, format.getValue());
-    doc.field(P_ATTRIBUTES, ImmutableMap.of(), OType.EMBEDDEDMAP);
-    return new ComponentImpl(doc);
+    Component component = new Component();
+    component.bucketId(bucket.id());
+    component.format(format.toString());
+    component.attributes(new NestedAttributesMap(P_ATTRIBUTES, new HashMap<String, Object>()));
+    return component;
   }
 
   @Override
-  public void updateComponent(final Component component) {
-    checkNotNull(component);
-    component.set(P_LAST_UPDATED, new Date());
-    db.save(component.document());
+  public void saveComponent(final Component component) {
+    if (component.isNew()) {
+      componentEntityAdapter.add(db, component);
+    }
+    else {
+      componentEntityAdapter.edit(db, component);
+    }
   }
 
   @Override
-  public void updateAsset(final Asset asset) {
-    checkNotNull(asset);
-    asset.set(P_LAST_UPDATED, new Date());
-    db.save(asset.document());
+  public void saveAsset(final Asset asset) {
+    if (asset.isNew()) {
+      assetEntityAdapter.add(db, asset);
+    }
+    else {
+      assetEntityAdapter.edit(db, asset);
+    }
   }
 
   @Override
@@ -448,10 +311,10 @@ public class StorageTxImpl
   public void deleteComponent(final Component component, final boolean checkWritePolicy) {
     checkNotNull(component);
 
-    for (Asset asset : component.assets()) {
+    for (Asset asset : browseAssets(component)) {
       deleteAsset(asset, checkWritePolicy);
     }
-    db.delete(component.document());
+    componentEntityAdapter.delete(db, component);
   }
 
   @Override
@@ -467,7 +330,7 @@ public class StorageTxImpl
     if (blobRef != null) {
       deleteBlob(blobRef, checkWritePolicy);
     }
-    db.delete(asset.document());
+    assetEntityAdapter.delete(db, asset);
   }
 
   @Override
@@ -499,7 +362,7 @@ public class StorageTxImpl
     commit();
 
     // finally, delete the bucket document
-    db.delete(bucket.document());
+    bucketEntityAdapter.delete(db, bucket);
     commit();
   }
 

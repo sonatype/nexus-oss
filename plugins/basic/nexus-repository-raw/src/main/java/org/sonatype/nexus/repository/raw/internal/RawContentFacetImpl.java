@@ -84,7 +84,7 @@ public class RawContentFacetImpl
         return null;
       }
 
-      final Asset asset = component.firstAsset();
+      final Asset asset = tx.firstAsset(component);
       final Blob blob = tx.requireBlob(asset.requireBlobRef());
 
       return marshall(asset, blob);
@@ -105,13 +105,13 @@ public class RawContentFacetImpl
 
         // Set attributes map to contain "raw" format-specific metadata (in this case, path)
         component.formatAttributes().set(P_PATH, path);
-        tx.updateComponent(component);
+        tx.saveComponent(component);
 
         asset = tx.createAsset(bucket, component);
       }
       else {
         // UPDATE
-        asset = component.firstAsset();
+        asset = tx.firstAsset(component);
       }
 
       // TODO: Figure out created-by header
@@ -124,7 +124,7 @@ public class RawContentFacetImpl
         }
       }
 
-      tx.updateAsset(asset);
+      tx.saveAsset(asset);
       getRepository().facet(SearchFacet.class).put(component);
 
       tx.commit();
@@ -208,7 +208,7 @@ public class RawContentFacetImpl
       }
 
       // last updated will be automatically set on update
-      tx.updateAsset(component.firstAsset());
+      tx.saveAsset(tx.firstAsset(component));
       tx.commit();
     }
   }

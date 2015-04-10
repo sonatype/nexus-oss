@@ -165,7 +165,7 @@ public class NugetGalleryFacetImplPutTest
 
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(preRelease));
 
-    verifyVersionFlags(preRelease.firstAsset().formatAttributes(), false, true);
+    verifyVersionFlags(tx.firstAsset(preRelease).formatAttributes(), false, true);
   }
 
   @Test
@@ -177,7 +177,7 @@ public class NugetGalleryFacetImplPutTest
     final NugetGalleryFacetImpl galleryFacet = buildSpy();
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release));
 
-    verifyVersionFlags(release.firstAsset().formatAttributes(), true, true);
+    verifyVersionFlags(tx.firstAsset(release).formatAttributes(), true, true);
   }
 
   @Test
@@ -191,8 +191,8 @@ public class NugetGalleryFacetImplPutTest
     final NugetGalleryFacetImpl galleryFacet = buildSpy();
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release, preRelease));
 
-    verifyVersionFlags(release.firstAsset().formatAttributes(), true, true);
-    verifyVersionFlags(preRelease.firstAsset().formatAttributes(), false, false);
+    verifyVersionFlags(tx.firstAsset(release).formatAttributes(), true, true);
+    verifyVersionFlags(tx.firstAsset(preRelease).formatAttributes(), false, false);
   }
 
   @Test
@@ -205,8 +205,8 @@ public class NugetGalleryFacetImplPutTest
     final NugetGalleryFacetImpl galleryFacet = buildSpy();
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release, preRelease));
 
-    verifyVersionFlags(preRelease.firstAsset().formatAttributes(), false, true);
-    verifyVersionFlags(release.firstAsset().formatAttributes(), true, false);
+    verifyVersionFlags(tx.firstAsset(preRelease).formatAttributes(), false, true);
+    verifyVersionFlags(tx.firstAsset(release).formatAttributes(), true, false);
   }
 
   private NugetGalleryFacetImpl buildSpy() {
@@ -227,7 +227,7 @@ public class NugetGalleryFacetImplPutTest
     final Asset asset = mock(Asset.class);
     final NestedAttributesMap nugetAttributes = mock(NestedAttributesMap.class);
 
-    when(component.firstAsset()).thenReturn(asset);
+    when(tx.firstAsset(component)).thenReturn(asset);
     when(asset.formatAttributes()).thenReturn(nugetAttributes);
 
     when(component.requireVersion()).thenReturn(version);

@@ -21,7 +21,7 @@ import org.sonatype.nexus.repository.Facet;
  */
 @Facet.Exposed
 public interface StorageFacet
-  extends Facet
+    extends Facet
 {
 
   static String P_ATTRIBUTES = "attributes";
@@ -51,12 +51,6 @@ public interface StorageFacet
   static String P_SIZE = "size";
 
   static String P_VERSION = "version";
-
-  static String V_ASSET = AssetEntityType.DB_CLASS;
-
-  static String V_COMPONENT = ComponentEntityType.DB_CLASS;
-
-  static String V_BUCKET = BucketEntityType.DB_CLASS;
 
   /**
    * Opens a transaction.

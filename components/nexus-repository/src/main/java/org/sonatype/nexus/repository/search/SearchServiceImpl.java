@@ -34,7 +34,10 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.security.BreadActions;
 import org.sonatype.nexus.repository.security.RepositoryViewPermission;
+import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.security.SecurityHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -155,7 +158,11 @@ public class SearchServiceImpl
     try {
       Map<String, Object> additional = Maps.newHashMap();
       additional.put(P_REPOSITORY_NAME, repository.getName());
-      String json = JsonUtils.merge(componentMetadata(component), JsonUtils.from(additional));
+      List<Asset> assets;
+      try (StorageTx tx = repository.facet(StorageFacet.class).openTx()) {
+        assets = Lists.newArrayList(tx.browseAssets(component));
+      }
+      String json = JsonUtils.merge(componentMetadata(component, assets), JsonUtils.from(additional));
       client.get().prepareIndex(repository.getName(), TYPE, component.id().toString()).setSource(json).execute();
     }
     catch (IOException e) {
@@ -297,7 +304,7 @@ public class SearchServiceImpl
    * component {@link Format}.
    * If one is not available will use a default one ({@link DefaultComponentMetadataProducer}).
    */
-  private String componentMetadata(final Component component) {
+  private String componentMetadata(final Component component, final Iterable<Asset> assets) {
     checkNotNull(component);
     String format = component.format();
     ComponentMetadataProducer producer = componentMetadataProducers.get(format);
@@ -305,7 +312,7 @@ public class SearchServiceImpl
       producer = componentMetadataProducers.get("default");
     }
     checkState(producer != null, "Could not find a component metadata producer for format: {}", format);
-    return producer.getMetadata(component);
+    return producer.getMetadata(component, assets);
   }
 
 }

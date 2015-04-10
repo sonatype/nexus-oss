@@ -26,9 +26,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_CONTENT_TYPE;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
 
 /**
  * Default {@link ComponentMetadataProducer} implementation that uses all properties of a component & its assets as
@@ -45,24 +49,22 @@ public class DefaultComponentMetadataProducer
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
-  public String getMetadata(final Component component) {
+  public String getMetadata(final Component component, final Iterable<Asset> assets) {
     checkNotNull(component);
+
     Map<String, Object> metadata = Maps.newHashMap();
-    for (String key : component.propertyNames()) {
-      Object field = component.document().field(key);
-      if (!(field instanceof ODocument)) { // skip links
-        metadata.put(key, field);
-      }
-    }
+    metadata.put(P_GROUP, component.group());
+    metadata.put(P_NAME, component.name());
+    metadata.put(P_VERSION, component.version());
+    metadata.put(P_ATTRIBUTES, component.attributes().backing());
+
     List<Map<String, Object>> allAssetMetadata = Lists.newArrayList();
-    for (Asset asset : component.assets()) {
+    for (Asset asset : assets) {
       Map<String, Object> assetMetadata = Maps.newHashMap();
-      for (String key : asset.propertyNames()) {
-        Object field = asset.document().field(key);
-        if (!(field instanceof ODocument)) { // skip links
-          assetMetadata.put(key, field);
-        }
-      }
+      assetMetadata.put(P_NAME, asset.name());
+      assetMetadata.put(P_CONTENT_TYPE, asset.contentType());
+      assetMetadata.put(P_ATTRIBUTES, asset.attributes().backing());
+
       allAssetMetadata.add(assetMetadata);
     }
     if (!allAssetMetadata.isEmpty()) {
