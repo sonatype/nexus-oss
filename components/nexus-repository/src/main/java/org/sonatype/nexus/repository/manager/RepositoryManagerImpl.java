@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.jmx.reflect.ManagedObject;
@@ -58,10 +59,8 @@ public class RepositoryManagerImpl
 {
   // FIXME: Use prefixed property
 
-  /**
-   * System property used to bypass installation of default repositories; useful for testing purposes.
-   */
-  private static final String SKIP_DEFAULT_REPOSITORIES = "skipDefaultRepositories";
+  private static final boolean skipDefaultRepositories =
+      SystemPropertiesHelper.getBoolean(RepositoryManagerImpl.class + ".skipDefaultRepositories", false);
 
   private final EventBus eventBus;
 
@@ -167,25 +166,28 @@ public class RepositoryManagerImpl
   @Override
   protected void doStart() throws Exception {
     List<Configuration> configurations = store.list();
+
+    // attempt to provision default repositories if allowed
     if (configurations.isEmpty()) {
-      log.debug("No repositories configured");
-      if (Boolean.valueOf(System.getProperty(SKIP_DEFAULT_REPOSITORIES, "false"))) {
-        log.debug("Skipping provisioning of default repositories due to '{}' property", SKIP_DEFAULT_REPOSITORIES);
+      if (skipDefaultRepositories) {
+        log.debug("No repositories configured; skipping provisioning of default repositories");
         return;
       }
-      else {
-        log.debug("Provisioning default repositories");
-        for (DefaultRepositoriesContributor contributor : defaultRepositoriesContributors) {
-          for (Configuration configuration : contributor.getRepositoryConfigurations()) {
-            log.debug("Provisioning default repository: {}", configuration);
-            store.create(configuration);
-          }
+
+      // attempt to discover default repository configurations
+      log.debug("No repositories configured; provisioning default repositories");
+      for (DefaultRepositoriesContributor contributor : defaultRepositoriesContributors) {
+        for (Configuration configuration : contributor.getRepositoryConfigurations()) {
+          log.debug("Provisioning default repository: {}", configuration);
+          store.create(configuration);
         }
-        configurations = store.list();
-        if (configurations.isEmpty()) {
-          log.debug("No default repositories to provision");
-          return;
-        }
+      }
+      configurations = store.list();
+
+      // if we still have no repository configurations, complain and stop
+      if (configurations.isEmpty()) {
+        log.debug("No default repositories to provision");
+        return;
       }
     }
 
