@@ -101,7 +101,8 @@ public class StorageFacetImplIT
     when(testRepository2.facet(ConfigurationFacet.class)).thenReturn(configurationFacet);
     when(testRepository2.facet(SearchFacet.class)).thenReturn(mock(SearchFacet.class));
 
-    underTest.init(testRepository1);
+    underTest.attach(testRepository1);
+    underTest.init();
     underTest.start();
   }
 
@@ -173,7 +174,8 @@ public class StorageFacetImplIT
       tx.commit();
     }
 
-    underTest.init(testRepository2);
+    underTest.attach(testRepository2);
+    underTest.init();
     try (StorageTx tx = underTest.openTx()) {
       Asset asset2 = tx.createAsset(tx.getBucket(), testFormat);
       asset2.set("name", "asset2");

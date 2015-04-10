@@ -27,6 +27,7 @@ import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
@@ -102,11 +103,17 @@ public class StorageFacetImpl
   }
 
   @Override
+  protected void doValidate(final Configuration configuration) throws Exception {
+    ConfigurationFacet cfacet = facet(ConfigurationFacet.class);
+    Config config = cfacet.readObject(configuration, CONFIG_KEY, Config.class);
+    cfacet.validate(config);
+  }
+
+  @Override
   protected void doConfigure() throws Exception {
-    ConfigurationFacet configuration = facet(ConfigurationFacet.class);
-    config = configuration.readObject(CONFIG_KEY, Config.class);
+    ConfigurationFacet cfacet = facet(ConfigurationFacet.class);
+    config = cfacet.readObject(CONFIG_KEY, Config.class);
     log.debug("Config: {}", config);
-    configuration.validate(config);
   }
 
   @Override

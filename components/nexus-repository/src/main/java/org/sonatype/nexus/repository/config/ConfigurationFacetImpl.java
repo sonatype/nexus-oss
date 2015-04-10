@@ -71,11 +71,17 @@ public class ConfigurationFacetImpl
   }
 
   @Override
-  public <T> T readObject(final String section, final Class<T> type) {
+  public <T> T readObject(final Configuration configuration, final String section, final Class<T> type) {
+    checkNotNull(configuration);
     checkNotNull(section);
     log.trace("Reading section: {}", section);
-    AttributesMap attributes = getRepository().getConfiguration().attributes(section);
+    AttributesMap attributes = configuration.attributes(section);
     return readObject(attributes, type);
+  }
+
+  @Override
+  public <T> T readObject(final String section, final Class<T> type) {
+    return readObject(getRepository().getConfiguration(), section, type);
   }
 
   @Override

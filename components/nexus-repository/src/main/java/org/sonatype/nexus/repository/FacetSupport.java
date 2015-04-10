@@ -25,6 +25,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.FacetSupport.State.ATTACHED;
 import static org.sonatype.nexus.repository.FacetSupport.State.DELETED;
 import static org.sonatype.nexus.repository.FacetSupport.State.DESTROYED;
 import static org.sonatype.nexus.repository.FacetSupport.State.FAILED;
@@ -67,6 +68,8 @@ public abstract class FacetSupport
   {
     public static final String NEW = "NEW";
 
+    public static final String ATTACHED = "ATTACHED";
+
     public static final String INITIALISED = "INITIALISED";
 
     public static final String STARTED = "STARTED";
@@ -96,9 +99,18 @@ public abstract class FacetSupport
   // Lifecycle
   //
 
+  @Override
+  @Transitions(from = NEW, to = ATTACHED)
+  public void attach(final Repository repository) throws Exception {
+    this.repository = checkNotNull(repository);
+  }
 
   @Override
   public void validate(final Configuration configuration) throws Exception {
+    doValidate(configuration);
+  }
+
+  protected void doValidate(final Configuration configuration) throws Exception {
     // nop
   }
 
@@ -113,9 +125,8 @@ public abstract class FacetSupport
   }
 
   @Override
-  @Transitions(from = NEW, to = INITIALISED)
-  public void init(final Repository repository) throws Exception {
-    this.repository = checkNotNull(repository);
+  @Transitions(from = ATTACHED, to = INITIALISED)
+  public void init() throws Exception {
     doInit();
   }
 

@@ -184,7 +184,7 @@ public class RepositoryImpl
     for (Facet facet : facets) {
       try {
         log.debug("Initializing facet: {}", facet);
-        facet.init(this);
+        facet.init();
       }
       catch (Throwable t) {
         log.error("Failed to initialize facet: {}", facet, t);
@@ -309,6 +309,7 @@ public class RepositoryImpl
   public void attach(final Facet facet) throws Exception {
     checkNotNull(facet);
     log.debug("Attaching facet: {}", facet);
+    facet.attach(this);
     facets.add(facet);
   }
 

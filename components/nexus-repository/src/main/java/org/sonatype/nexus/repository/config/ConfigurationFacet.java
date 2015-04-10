@@ -39,6 +39,11 @@ public interface ConfigurationFacet
   /**
    * Read object of given type from named configuration section.
    */
+  <T> T readObject(Configuration configuration, String section, Class<T> type);
+
+  /**
+   * Read object of given type from named configuration section.
+   */
   <T> T readObject(String section, Class<T> type);
 
   /**
