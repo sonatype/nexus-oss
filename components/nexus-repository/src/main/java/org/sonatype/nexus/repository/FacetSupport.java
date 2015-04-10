@@ -20,6 +20,7 @@ import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuard;
 import org.sonatype.nexus.common.stateguard.StateGuardAware;
 import org.sonatype.nexus.common.stateguard.Transitions;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -94,6 +95,12 @@ public abstract class FacetSupport
   //
   // Lifecycle
   //
+
+
+  @Override
+  public void validate(final Configuration configuration) throws Exception {
+    // nop
+  }
 
   /**
    * Common init/update configuration extension-point.

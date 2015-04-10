@@ -17,6 +17,8 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.sonatype.nexus.repository.config.Configuration;
+
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -33,6 +35,11 @@ public interface Facet
    * Called when facet is attached to a repository.
    */
   void init(Repository repository) throws Exception;
+
+  /**
+   * Validate configuration.
+   */
+  void validate(Configuration configuration) throws Exception;
 
   /**
    * Update facet.
