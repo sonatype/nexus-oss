@@ -17219,6 +17219,19 @@
 }
 
 /**
+ * cls: 'nx-rowexpander'
+ */
+/* line 18, ../../../baseapp/packages/rapture-theme/sass/src/Ext/grid/Panel.scss */
+.nx-rowexpander {
+  padding: 5px;
+}
+/* line 22, ../../../baseapp/packages/rapture-theme/sass/src/Ext/grid/Panel.scss */
+.nx-rowexpander tbody td:first-child {
+  padding-right: 5px;
+  font-weight: bold;
+}
+
+/**
  * @class Ext.grid.column.Column
  */
 /* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/grid/column/Column.scss */
