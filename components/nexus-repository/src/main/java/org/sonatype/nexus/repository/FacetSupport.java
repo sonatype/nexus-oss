@@ -106,6 +106,7 @@ public abstract class FacetSupport
   }
 
   @Override
+  @Guarded(by = {ATTACHED, STARTED, STOPPED})
   public void validate(final Configuration configuration) throws Exception {
     doValidate(configuration);
   }
