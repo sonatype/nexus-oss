@@ -22,6 +22,7 @@ import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.orient.PersistentDatabaseInstanceRule;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
@@ -41,6 +42,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.Matchers.is;
@@ -91,7 +93,11 @@ public class StorageFacetImplIT
 
     StorageFacetImpl.Config config = new StorageFacetImpl.Config();
     ConfigurationFacet configurationFacet = mock(ConfigurationFacet.class);
-    when(configurationFacet.readObject(StorageFacetImpl.CONFIG_KEY, StorageFacetImpl.Config.class)).thenReturn(config);
+    when(configurationFacet.readSection(
+        Mockito.any(Configuration.class),
+        StorageFacetImpl.CONFIG_KEY,
+        StorageFacetImpl.Config.class))
+        .thenReturn(config);
 
     when(testRepository1.getName()).thenReturn("test-repository-1");
     when(testRepository1.facet(ConfigurationFacet.class)).thenReturn(configurationFacet);

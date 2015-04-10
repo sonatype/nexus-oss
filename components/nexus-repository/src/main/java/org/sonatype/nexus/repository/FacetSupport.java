@@ -111,6 +111,9 @@ public abstract class FacetSupport
     doValidate(configuration);
   }
 
+  /**
+   * Sub-class should override to provide configuration validation logic.
+   */
   protected void doValidate(final Configuration configuration) throws Exception {
     // nop
   }
@@ -121,28 +124,28 @@ public abstract class FacetSupport
    * By default this is called on {@link #init} and {@link #update}
    * unless sub-class overrides {@link #doInit} or {@link #doUpdate}.
    */
-  protected void doConfigure() throws Exception {
+  protected void doConfigure(final Configuration configuration) throws Exception {
     // nop
   }
 
   @Override
   @Transitions(from = ATTACHED, to = INITIALISED)
   public void init() throws Exception {
-    doInit();
+    doInit(getRepository().getConfiguration());
   }
 
-  protected void doInit() throws Exception {
-    doConfigure();
+  protected void doInit(final Configuration configuration) throws Exception {
+    doConfigure(configuration);
   }
 
   @Override
   @Guarded(by = STOPPED)
   public void update() throws Exception {
-    doUpdate();
+    doUpdate(getRepository().getConfiguration());
   }
 
-  protected void doUpdate() throws Exception {
-    doConfigure();
+  protected void doUpdate(final Configuration configuration) throws Exception {
+    doConfigure(configuration);
   }
 
   @Override

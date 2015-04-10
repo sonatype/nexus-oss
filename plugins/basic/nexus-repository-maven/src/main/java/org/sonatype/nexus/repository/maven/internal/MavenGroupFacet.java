@@ -28,6 +28,7 @@ import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.hash.Hashes;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacetImpl;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
@@ -78,8 +79,8 @@ public class MavenGroupFacet
   }
 
   @Override
-  protected void doConfigure() throws Exception {
-    super.doConfigure();
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    super.doConfigure(configuration);
     this.mavenFacet = getRepository().facet(MavenFacet.class);
   }
 

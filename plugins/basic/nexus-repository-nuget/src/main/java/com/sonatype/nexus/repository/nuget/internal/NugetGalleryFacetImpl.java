@@ -43,6 +43,7 @@ import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
@@ -109,7 +110,7 @@ public class NugetGalleryFacetImpl
   private static final VersionScheme SCHEME = new GenericVersionScheme();
 
   @Override
-  protected void doConfigure() throws Exception {
+  protected void doConfigure(final Configuration configuration) throws Exception {
     storage = getRepository().facet(StorageFacet.class);
   }
 

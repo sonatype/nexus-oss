@@ -89,7 +89,8 @@ extends TestSupport
    */
   @Test
   void 'no configuration present no cache'() {
-    underTest.init(repository)
+    underTest.attach(repository)
+    underTest.init()
     underTest.start()
     verify(cacheManager, never()).addCache(any(Cache))
     assert underTest.get(key) == null
@@ -114,7 +115,8 @@ extends TestSupport
   @Test
   void 'not enabled no cache'() {
     attributes.put('enabled', false)
-    underTest.init(repository)
+    underTest.attach(repository)
+    underTest.init()
     underTest.start()
     verify(cacheManager, never()).addCache(any(Cache))
     assert underTest.get(key) == null
@@ -137,7 +139,8 @@ extends TestSupport
   @Test
   void 'cache is created and removed'() {
     attributes.put("enabled", true)
-    underTest.init(repository)
+    underTest.attach(repository)
+    underTest.init()
     underTest.start()
     verify(cacheManager).addCache(cache)
     underTest.stop()
@@ -156,7 +159,8 @@ extends TestSupport
   @Test
   void 'cache is not removed when manager is not active'() {
     attributes.put("enabled", true)
-    underTest.init(repository)
+    underTest.attach(repository)
+    underTest.init()
     underTest.start()
     when(cacheManager.status).thenReturn(STATUS_SHUTDOWN)
     underTest.stop()
@@ -174,7 +178,8 @@ extends TestSupport
   @Test
   void 'put caches element'() {
     attributes.put("enabled", true)
-    underTest.init(repository)
+    underTest.attach(repository)
+    underTest.init()
     underTest.start()
     underTest.put(key, status)
     ArgumentCaptor<Element> elementCaptor = ArgumentCaptor.forClass(Element);
@@ -194,7 +199,8 @@ extends TestSupport
   @Test
   void 'get returns status'() {
     attributes.put("enabled", true)
-    underTest.init(repository)
+    underTest.attach(repository)
+    underTest.init()
     underTest.start()
     when(cache.get(key)).thenReturn(new Element(key, status))
     Status actualStatus = underTest.get(key)
@@ -212,7 +218,8 @@ extends TestSupport
   @Test
   void 'get returns null when cache returns null'() {
     attributes.put("enabled", true)
-    underTest.init(repository)
+    underTest.attach(repository)
+    underTest.init()
     underTest.start()
     when(cache.get(key)).thenReturn(null)
     Status actualStatus = underTest.get(key)
@@ -229,7 +236,8 @@ extends TestSupport
   @Test
   void 'invalidate removes element'() {
     attributes.put("enabled", true)
-    underTest.init(repository)
+    underTest.attach(repository)
+    underTest.init()
     underTest.start()
     underTest.invalidate(key)
     verify(cache).remove(key)
@@ -245,7 +253,8 @@ extends TestSupport
   @Test
   void 'invalidate removes all elements'() {
     attributes.put("enabled", true)
-    underTest.init(repository)
+    underTest.attach(repository)
+    underTest.init()
     underTest.start()
     underTest.invalidate()
     verify(cache).removeAll()
@@ -267,7 +276,8 @@ extends TestSupport
     when(key.isParentOf(key1)).thenReturn(false)
     when(key.isParentOf(key2)).thenReturn(true)
     attributes.put("enabled", true)
-    underTest.init(repository)
+    underTest.attach(repository)
+    underTest.init()
     underTest.start()
     underTest.invalidateSubset(key)
     verify(cache).remove(key)

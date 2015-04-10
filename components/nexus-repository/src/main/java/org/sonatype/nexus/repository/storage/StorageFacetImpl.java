@@ -104,23 +104,20 @@ public class StorageFacetImpl
 
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
-    ConfigurationFacet cfacet = facet(ConfigurationFacet.class);
-    Config config = cfacet.readObject(configuration, CONFIG_KEY, Config.class);
-    cfacet.validate(config);
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
   }
 
   @Override
-  protected void doConfigure() throws Exception {
-    ConfigurationFacet cfacet = facet(ConfigurationFacet.class);
-    config = cfacet.readObject(CONFIG_KEY, Config.class);
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
     log.debug("Config: {}", config);
   }
 
   @Override
-  protected void doInit() throws Exception {
+  protected void doInit(final Configuration configuration) throws Exception {
     initSchema();
     initBucket();
-    super.doInit();
+    super.doInit(configuration);
   }
 
   private void initSchema() {
