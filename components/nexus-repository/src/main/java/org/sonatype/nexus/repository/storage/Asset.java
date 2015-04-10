@@ -45,6 +45,9 @@ public class Asset
     return componentId;
   }
 
+  /**
+   * Sets the component id.
+   */
   Asset componentId(final EntityId componentId) {
     this.componentId = componentId;
     return this;

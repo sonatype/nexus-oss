@@ -53,7 +53,7 @@ public abstract class MetadataNode<T>
 
   T newEntity(final boolean newEntity) {
     this.newEntity = newEntity;
-    return (T) this;
+    return self();
   }
 
   /**
@@ -66,7 +66,7 @@ public abstract class MetadataNode<T>
 
   T bucketId(final EntityId bucketId) {
     this.bucketId = bucketId;
-    return (T) this;
+    return self();
   }
 
   /**
@@ -88,7 +88,7 @@ public abstract class MetadataNode<T>
    */
   public T name(final String name) {
     this.name = name;
-    return (T) this;
+    return self();
   }
 
   /**
@@ -106,9 +106,12 @@ public abstract class MetadataNode<T>
     return require(lastUpdated, P_LAST_UPDATED);
   }
 
+  /**
+   * Sets the last updated date.
+   */
   T lastUpdated(final DateTime lastUpdated) {
     this.lastUpdated = lastUpdated;
-    return (T) this;
+    return self();
   }
 
   /**
@@ -118,9 +121,12 @@ public abstract class MetadataNode<T>
     return require(format, P_FORMAT);
   }
 
+  /**
+   * Sets the format.
+   */
   T format(final String format) {
     this.format = format;
-    return (T) this;
+    return self();
   }
 
   /**
@@ -130,9 +136,12 @@ public abstract class MetadataNode<T>
     return require(attributes, P_ATTRIBUTES);
   }
 
+  /**
+   * Sets the attributes.
+   */
   T attributes(final NestedAttributesMap attributes) {
     this.attributes = attributes;
-    return (T) this;
+    return self();
   }
 
   /**
@@ -145,6 +154,10 @@ public abstract class MetadataNode<T>
   protected <T> T require(final T value, final String name) {
     checkState(value != null, "Missing property: %s", name);
     return value;
+  }
+
+  private T self() {
+    return (T) this;
   }
 
 }
