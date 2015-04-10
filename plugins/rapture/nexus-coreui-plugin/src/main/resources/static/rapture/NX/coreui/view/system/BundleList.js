@@ -45,6 +45,12 @@ Ext.define('NX.coreui.view.system.BundleList', {
     {header: NX.I18n.get('ADMIN_BUNDLES_LIST_FRAGMENT_COLUMN'), dataIndex: 'fragment', hidden: true}
   ],
 
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless'
+  }],
+
   plugins: [
     {ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_BUNDLES_LIST_FILTER_ERROR')}
   ]
