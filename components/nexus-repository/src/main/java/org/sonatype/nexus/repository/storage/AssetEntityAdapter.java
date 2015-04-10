@@ -68,6 +68,7 @@ public class AssetEntityAdapter
 
   @Override
   protected void defineType(final OClass type) {
+    super.defineType(type);
     type.createProperty(P_COMPONENT, OType.LINK, componentEntityAdapter.getType());
     type.createProperty(P_NAME, OType.STRING);
     type.createProperty(P_SIZE, OType.LONG);
