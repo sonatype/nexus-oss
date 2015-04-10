@@ -160,10 +160,10 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode>
     return results.get(0).field("count");
   }
 
-  String buildQuery(final boolean isCount,
-                    final @Nullable String whereClause,
-                    final @Nullable Iterable<Repository> repositories,
-                    final @Nullable String querySuffix)
+  private String buildQuery(final boolean isCount,
+                            final @Nullable String whereClause,
+                            final @Nullable Iterable<Repository> repositories,
+                            final @Nullable String querySuffix)
   {
     StringBuilder query = new StringBuilder();
     query.append("select");
