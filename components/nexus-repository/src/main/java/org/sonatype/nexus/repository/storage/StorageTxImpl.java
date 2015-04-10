@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.storage;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -175,7 +176,7 @@ public class StorageTxImpl
   }
 
   private boolean bucketOwns(final Bucket bucket, final @Nullable MetadataNode item) {
-    return item != null && bucket.id().equals(item.bucketId());
+    return item != null && Objects.equals(bucket.id(), item.bucketId());
   }
 
   @Nullable
@@ -247,8 +248,7 @@ public class StorageTxImpl
   @Guarded(by = OPEN)
   public Asset createAsset(final Bucket bucket, final Format format) {
     checkNotNull(format);
-    Asset asset = createAsset(bucket, format.toString());
-    return asset;
+    return createAsset(bucket, format.toString());
   }
 
   private Asset createAsset(final Bucket bucket, final String format) {
