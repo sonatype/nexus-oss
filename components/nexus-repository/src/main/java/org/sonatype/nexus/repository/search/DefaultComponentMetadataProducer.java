@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.storage.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -30,6 +31,7 @@ import com.google.common.collect.Maps;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_CONTENT_TYPE;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
@@ -46,36 +48,43 @@ public class DefaultComponentMetadataProducer
     implements ComponentMetadataProducer
 {
 
-  private static final ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectWriter objectWriter = new ObjectMapper().writerWithDefaultPrettyPrinter();
 
   @Override
   public String getMetadata(final Component component, final Iterable<Asset> assets) {
     checkNotNull(component);
 
     Map<String, Object> metadata = Maps.newHashMap();
-    metadata.put(P_GROUP, component.group());
-    metadata.put(P_NAME, component.name());
-    metadata.put(P_VERSION, component.version());
-    metadata.put(P_ATTRIBUTES, component.attributes().backing());
+    put(metadata, P_FORMAT, component.format());
+    put(metadata, P_GROUP, component.group());
+    put(metadata, P_NAME, component.name());
+    put(metadata, P_VERSION, component.version());
+    put(metadata, P_ATTRIBUTES, component.attributes().backing());
 
     List<Map<String, Object>> allAssetMetadata = Lists.newArrayList();
     for (Asset asset : assets) {
       Map<String, Object> assetMetadata = Maps.newHashMap();
-      assetMetadata.put(P_NAME, asset.name());
-      assetMetadata.put(P_CONTENT_TYPE, asset.contentType());
-      assetMetadata.put(P_ATTRIBUTES, asset.attributes().backing());
+      put(assetMetadata, P_NAME, asset.name());
+      put(assetMetadata, P_CONTENT_TYPE, asset.contentType());
+      put(assetMetadata, P_ATTRIBUTES, asset.attributes().backing());
 
       allAssetMetadata.add(assetMetadata);
     }
     if (!allAssetMetadata.isEmpty()) {
-      metadata.put("assets", allAssetMetadata.toArray(new Map[allAssetMetadata.size()]));
+      put(metadata, "assets", allAssetMetadata.toArray(new Map[allAssetMetadata.size()]));
     }
 
     try {
-      return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(metadata);
+      return objectWriter.writeValueAsString(metadata);
     }
     catch (JsonProcessingException e) {
       throw Throwables.propagate(e);
+    }
+  }
+
+  private void put(final Map<String, Object> metadata, final String key, final Object value) {
+    if (value != null) {
+      metadata.put(key, value);
     }
   }
 
