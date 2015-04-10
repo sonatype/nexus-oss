@@ -54,8 +54,6 @@ public class GroupFacetImpl
     this.repositoryManager = checkNotNull(repositoryManager);
   }
 
-  // TODO: Check for compatibility and cyclic-references
-
   @Override
   protected void doConfigure() throws Exception {
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
@@ -78,14 +76,20 @@ public class GroupFacetImpl
   @Override
   @Guarded(by = STARTED)
   public List<Repository> members() {
+    final Repository repository = getRepository();
+
     List<Repository> members = new ArrayList<>(memberNames.size());
     for (String name : memberNames) {
-      Repository repository = repositoryManager.get(name);
-      if (repository != null) {
-        members.add(repository);
+      Repository member = repositoryManager.get(name);
+      if (member == null) {
+        log.warn("Ignoring missing member repository: {}", name);
+      }
+      else if (!repository.getFormat().equals(member.getFormat())) {
+        log.warn("Group {} includes an incompatible-format member: {} with format {}",
+            repository.getName(), name, member.getFormat());
       }
       else {
-        log.warn("Ignoring missing member repository: {}", name);
+        members.add(member);
       }
     }
     return members;

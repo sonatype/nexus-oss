@@ -13,6 +13,7 @@
 package org.sonatype.nexus.security.user;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,7 +23,8 @@ import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmManager;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Binder;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import org.junit.Assert;
@@ -46,13 +48,18 @@ public class UserManagementTest
   }
 
   @Override
-  public void configure(final Binder binder) {
-    super.configure(binder);
-
-    binder.bind(UserManager.class)
-        .annotatedWith(Names.named("Mock"))
-        .to(MockUserManager.class)
-        .in(Singleton.class);
+  protected void customizeModules(List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        bind(UserManager.class)
+            .annotatedWith(Names.named("Mock"))
+            .to(MockUserManager.class)
+            .in(Singleton.class);
+      }
+    });
   }
 
   @Test
