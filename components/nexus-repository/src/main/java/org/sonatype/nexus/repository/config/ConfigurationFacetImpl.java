@@ -14,11 +14,14 @@
 package org.sonatype.nexus.repository.config;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
@@ -93,6 +96,19 @@ public class ConfigurationFacetImpl
     ConstraintViolations.maybePropagate(violations, log);
   }
 
+  /**
+   * Wrap attribute section value to allow configuration hierarchy to be encoded into property path.
+   */
+  private static class SectionWrapper
+  {
+    @Valid
+    private Map<String,Object> attributes = new HashMap<>(1);
+
+    public SectionWrapper(final String name, final Object value) {
+      this.attributes.put(name, value);
+    }
+  }
+
   @Override
   public <T> T validateSection(final Configuration configuration,
                                final String section,
@@ -100,7 +116,8 @@ public class ConfigurationFacetImpl
                                final Class<?>... groups)
   {
     T value = readSection(configuration, section, type);
-    validate(value, groups);
+    SectionWrapper wrapper = new SectionWrapper(section, value);
+    validate(wrapper, groups);
     return value;
   }
 }
