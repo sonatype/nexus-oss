@@ -95,7 +95,7 @@ public class Component
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "id=" + getEntityMetadata() +
+        "metadata=" + getEntityMetadata() +
         ", name=" + name() +
         ", version=" + version() +
         ", group=" + group() +

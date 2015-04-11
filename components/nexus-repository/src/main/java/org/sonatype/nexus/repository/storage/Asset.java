@@ -125,7 +125,7 @@ public class Asset
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "id=" + getEntityMetadata() +
+        "metadata=" + getEntityMetadata() +
         ", name=" + name() +
         '}';
   }
