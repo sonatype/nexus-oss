@@ -42,7 +42,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.Matchers.is;
@@ -51,6 +50,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
@@ -94,9 +95,9 @@ public class StorageFacetImplIT
     StorageFacetImpl.Config config = new StorageFacetImpl.Config();
     ConfigurationFacet configurationFacet = mock(ConfigurationFacet.class);
     when(configurationFacet.readSection(
-        Mockito.any(Configuration.class),
-        StorageFacetImpl.CONFIG_KEY,
-        StorageFacetImpl.Config.class))
+        any(Configuration.class),
+        eq(StorageFacetImpl.CONFIG_KEY),
+        eq(StorageFacetImpl.Config.class)))
         .thenReturn(config);
 
     when(testRepository1.getName()).thenReturn("test-repository-1");
