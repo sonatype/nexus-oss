@@ -58,7 +58,6 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode>
 
   private final BucketEntityAdapter bucketEntityAdapter;
 
-  @Inject
   public MetadataNodeEntityAdapter(final String typeName, final BucketEntityAdapter bucketEntityAdapter) {
     super(typeName);
     this.bucketEntityAdapter = bucketEntityAdapter;
