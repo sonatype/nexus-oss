@@ -45,6 +45,7 @@ public abstract class CollectionEntityAdapter<T extends Entity>
 
   @Nullable
   public T get(final ODatabaseDocumentTx db, final String id) {
+    checkNotNull(db);
     checkNotNull(id);
     ODocument doc = db.getRecord(getRecordIdObfuscator().decode(getType(), id));
     if (doc == null) {
