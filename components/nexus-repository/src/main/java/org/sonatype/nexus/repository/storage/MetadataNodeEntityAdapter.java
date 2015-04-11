@@ -109,7 +109,7 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode>
     checkState(bucket.getEntityMetadata() != null);
 
     Map<String, Object> parameters = ImmutableMap.<String, Object>of(
-        "bucket", bucketEntityAdapter.decode(bucket.id())
+        "bucket", bucketEntityAdapter.decode(bucket.getEntityMetadata().getId())
     );
     String query = String.format("select from %s where bucket = :bucket", getTypeName());
     Iterable<ODocument> docs = db.command(new OCommandSQL(query)).execute(parameters);
@@ -127,7 +127,7 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode>
 
     Map<String, Object> parameters = ImmutableMap.of(
         "propValue", propValue,
-        "bucket", bucketEntityAdapter.decode(bucket.id())
+        "bucket", bucketEntityAdapter.decode(bucket.getEntityMetadata().getId())
     );
     String query = String.format("select from %s where %s = :propValue and bucket = :bucket", getTypeName(), propName);
     Iterable<ODocument> docs = db.command(new OCommandSQL(query)).execute(parameters);

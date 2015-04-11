@@ -24,11 +24,6 @@ public abstract class Entity
   private EntityMetadata metadata;
 
   @Nullable
-  public EntityId id() {
-    return getEntityMetadata() != null ? getEntityMetadata().getId() : null;
-  }
-
-  @Nullable
   public EntityMetadata getEntityMetadata() {
     return metadata;
   }

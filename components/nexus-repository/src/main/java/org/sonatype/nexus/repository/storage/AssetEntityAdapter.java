@@ -122,7 +122,7 @@ public class AssetEntityAdapter
     checkState(component.getEntityMetadata() != null);
 
     Map<String, Object> parameters = ImmutableMap.<String, Object>of(
-        "component", componentEntityAdapter.decode(component.id())
+        "component", componentEntityAdapter.decode(component.getEntityMetadata().getId())
     );
     String query = String.format("select from %s where component = :component", DB_CLASS);
     Iterable<ODocument> docs = db.command(new OCommandSQL(query)).execute(parameters);

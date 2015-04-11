@@ -163,7 +163,8 @@ public class SearchServiceImpl
         assets = Lists.newArrayList(tx.browseAssets(component));
       }
       String json = JsonUtils.merge(componentMetadata(component, assets), JsonUtils.from(additional));
-      client.get().prepareIndex(repository.getName(), TYPE, component.id().toString()).setSource(json).execute();
+      client.get().prepareIndex(repository.getName(), TYPE, component.getEntityMetadata().getId().toString())
+          .setSource(json).execute();
     }
     catch (IOException e) {
       throw Throwables.propagate(e);
@@ -175,7 +176,7 @@ public class SearchServiceImpl
     checkNotNull(repository);
     checkNotNull(component);
     log.debug("Removing indexed metadata of {} from {}", component, repository);
-    client.get().prepareDelete(repository.getName(), TYPE, component.id().toString()).execute();
+    client.get().prepareDelete(repository.getName(), TYPE, component.getEntityMetadata().getId().toString()).execute();
   }
 
   @Override

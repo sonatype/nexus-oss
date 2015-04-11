@@ -161,7 +161,7 @@ public class StorageFacetImplIT
       tx.saveAsset(asset);
 
       tx.commit();
-      docId = asset.id();
+      docId = asset.getEntityMetadata().getId();
     }
 
     try (StorageTx tx = underTest.openTx()) {
@@ -274,7 +274,7 @@ public class StorageFacetImplIT
       asset.attributes().child("bag2").set("baz", "qux");
       tx.saveAsset(asset);
       tx.commit();
-      docId = asset.id();
+      docId = asset.getEntityMetadata().getId();
     }
 
     // Transaction 2:
@@ -339,13 +339,13 @@ public class StorageFacetImplIT
       checkSize(tx.browseAssets(bucket), 2);
       checkSize(tx.browseComponents(bucket), 1);
 
-      assertNotNull(tx.findAsset(asset1.id(), bucket));
-      assertNotNull(tx.findComponent(component.id(), bucket));
+      assertNotNull(tx.findAsset(asset1.getEntityMetadata().getId(), bucket));
+      assertNotNull(tx.findComponent(component.getEntityMetadata().getId(), bucket));
 
-      checkSize(tx.browseAssets(tx.findComponent(component.id(), bucket)), 1);
-      assertNotNull(tx.firstAsset(tx.findComponent(component.id(), bucket)));
-      assertNull(tx.findAsset(asset1.id(), bucket).componentId());
-      assertNotNull(tx.findAsset(asset2.id(), bucket).componentId());
+      checkSize(tx.browseAssets(tx.findComponent(component.getEntityMetadata().getId(), bucket)), 1);
+      assertNotNull(tx.firstAsset(tx.findComponent(component.getEntityMetadata().getId(), bucket)));
+      assertNull(tx.findAsset(asset1.getEntityMetadata().getId(), bucket).componentId());
+      assertNotNull(tx.findAsset(asset2.getEntityMetadata().getId(), bucket).componentId());
 
       assertNull(tx.findAssetWithProperty(P_NAME, "nomatch", bucket));
       assertNotNull(tx.findAssetWithProperty(P_NAME, "foo", bucket));
@@ -354,8 +354,8 @@ public class StorageFacetImplIT
       assertNotNull(tx.findComponentWithProperty(P_NAME, "bar", bucket));
 
       // store ids as they are cleaned up after delete
-      EntityId asset1Id = asset1.id();
-      EntityId componentId = component.id();
+      EntityId asset1Id = asset1.getEntityMetadata().getId();
+      EntityId componentId = component.getEntityMetadata().getId();
       // Delete both and make sure browse and find behave as expected
       tx.deleteAsset(asset1);
       tx.deleteComponent(component);
@@ -399,7 +399,7 @@ public class StorageFacetImplIT
       Bucket bucket = tx.getBucket();
       Asset asset = tx.createAsset(bucket, testFormat);
       tx.saveAsset(asset);
-      assetId = asset.id();
+      assetId = asset.getEntityMetadata().getId();
       tx.commit();
       firstVersion = asset.getEntityMetadata().getVersion();
     }

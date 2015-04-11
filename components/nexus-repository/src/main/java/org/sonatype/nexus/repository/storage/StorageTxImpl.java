@@ -176,7 +176,7 @@ public class StorageTxImpl
   }
 
   private boolean bucketOwns(final Bucket bucket, final @Nullable MetadataNode item) {
-    return item != null && Objects.equals(bucket.id(), item.bucketId());
+    return item != null && Objects.equals(bucket.getEntityMetadata().getId(), item.bucketId());
   }
 
   @Nullable
@@ -254,7 +254,7 @@ public class StorageTxImpl
   private Asset createAsset(final Bucket bucket, final String format) {
     checkNotNull(bucket);
     Asset asset = new Asset();
-    asset.bucketId(bucket.id());
+    asset.bucketId(bucket.getEntityMetadata().getId());
     asset.format(format);
     asset.attributes(new NestedAttributesMap(P_ATTRIBUTES, new HashMap<String, Object>()));
     return asset;
@@ -265,7 +265,7 @@ public class StorageTxImpl
   public Asset createAsset(final Bucket bucket, final Component component) {
     checkNotNull(component);
     Asset asset = createAsset(bucket, component.format());
-    asset.componentId(component.id());
+    asset.componentId(component.getEntityMetadata().getId());
     return asset;
   }
 
@@ -276,7 +276,7 @@ public class StorageTxImpl
     checkNotNull(format);
 
     Component component = new Component();
-    component.bucketId(bucket.id());
+    component.bucketId(bucket.getEntityMetadata().getId());
     component.format(format.toString());
     component.attributes(new NestedAttributesMap(P_ATTRIBUTES, new HashMap<String, Object>()));
     return component;

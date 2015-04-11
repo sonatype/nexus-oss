@@ -72,8 +72,7 @@ extends DirectComponentSupport
 
       return storageTx.browseAssets(component).collect { asset ->
         new AssetXO(
-            // TODO should asset have a name?
-            id: asset.id(),
+            id: asset.entityMetadata.id,
             name: asset.name() ?: component.name(),
             contentType: asset.contentType()
         )
