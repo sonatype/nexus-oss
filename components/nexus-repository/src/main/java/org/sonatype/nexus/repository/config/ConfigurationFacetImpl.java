@@ -14,7 +14,7 @@
 package org.sonatype.nexus.repository.config;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -102,10 +102,10 @@ public class ConfigurationFacetImpl
   private static class SectionWrapper
   {
     @Valid
-    private Map<String,Object> attributes = new HashMap<>(1);
+    private Map<String,Object> attributes;
 
     public SectionWrapper(final String name, final Object value) {
-      this.attributes.put(name, value);
+      this.attributes = Collections.singletonMap(name, value);
     }
   }
 
