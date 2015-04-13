@@ -39,6 +39,11 @@ public interface Repository
   String getName();
 
   /**
+   * Validate repository configuration.
+   */
+  void validate(Configuration configuration) throws Exception;
+
+  /**
    * Initialize the repository.
    *
    * Called when a new repository is created or a repository is restored from persistent storage on startup.

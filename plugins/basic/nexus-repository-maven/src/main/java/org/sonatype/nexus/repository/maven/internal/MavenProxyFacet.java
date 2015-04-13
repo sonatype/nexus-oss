@@ -17,11 +17,11 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Payload;
 
 import org.joda.time.DateTime;
 
@@ -37,8 +37,8 @@ public class MavenProxyFacet
   private MavenFacet mavenFacet;
 
   @Override
-  protected void doConfigure() throws Exception {
-    super.doConfigure();
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    super.doConfigure(configuration);
     this.mavenFacet = getRepository().facet(MavenFacet.class);
   }
 

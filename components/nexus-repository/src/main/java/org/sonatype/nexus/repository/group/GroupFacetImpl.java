@@ -25,6 +25,7 @@ import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 
 import com.google.common.collect.Sets;
@@ -55,8 +56,8 @@ public class GroupFacetImpl
   }
 
   @Override
-  protected void doConfigure() throws Exception {
-    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
     memberNames.addAll(attributes.require("memberNames", COLLECTION_STRING));
     log.debug("Members names: {}", memberNames);
   }

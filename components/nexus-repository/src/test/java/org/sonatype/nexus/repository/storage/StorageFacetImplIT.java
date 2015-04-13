@@ -22,6 +22,7 @@ import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.orient.PersistentDatabaseInstanceRule;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.search.ComponentMetadataFactory;
 import org.sonatype.nexus.repository.search.SearchFacet;
@@ -49,6 +50,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
@@ -91,7 +94,11 @@ public class StorageFacetImplIT
 
     StorageFacetImpl.Config config = new StorageFacetImpl.Config();
     ConfigurationFacet configurationFacet = mock(ConfigurationFacet.class);
-    when(configurationFacet.readObject(StorageFacetImpl.CONFIG_KEY, StorageFacetImpl.Config.class)).thenReturn(config);
+    when(configurationFacet.readSection(
+        any(Configuration.class),
+        eq(StorageFacetImpl.CONFIG_KEY),
+        eq(StorageFacetImpl.Config.class)))
+        .thenReturn(config);
 
     when(testRepository1.getName()).thenReturn("test-repository-1");
     when(testRepository1.facet(ConfigurationFacet.class)).thenReturn(configurationFacet);
@@ -101,7 +108,8 @@ public class StorageFacetImplIT
     when(testRepository2.facet(ConfigurationFacet.class)).thenReturn(configurationFacet);
     when(testRepository2.facet(SearchFacet.class)).thenReturn(mock(SearchFacet.class));
 
-    underTest.init(testRepository1);
+    underTest.attach(testRepository1);
+    underTest.init();
     underTest.start();
   }
 
@@ -173,7 +181,8 @@ public class StorageFacetImplIT
       tx.commit();
     }
 
-    underTest.init(testRepository2);
+    underTest.attach(testRepository2);
+    underTest.init();
     try (StorageTx tx = underTest.openTx()) {
       Asset asset2 = tx.createAsset(tx.getBucket(), testFormat);
       asset2.set("name", "asset2");

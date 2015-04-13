@@ -37,6 +37,7 @@ import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.Configuration;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
@@ -78,8 +79,9 @@ public class NugetProxyGalleryFacet
   }
 
   @Override
-  protected void doConfigure() throws Exception {
-    super.doConfigure();
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    super.doConfigure(configuration);
+
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     final int queryCacheSize = attributes.get("queryCacheSize", Integer.class, 300);
     final int cacheItemMaxAgeSeconds = attributes.get("queryCacheItemMaxAgeSeconds", Integer.class, 3600);

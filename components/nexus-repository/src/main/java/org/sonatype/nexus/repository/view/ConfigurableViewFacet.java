@@ -16,6 +16,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.config.Configuration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -43,8 +44,8 @@ public class ConfigurableViewFacet
   }
 
   @Override
-  protected void doConfigure() throws Exception {
-    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
     online = attributes.get("online", Boolean.class, true);
     log.debug("Online: {}", online);
   }

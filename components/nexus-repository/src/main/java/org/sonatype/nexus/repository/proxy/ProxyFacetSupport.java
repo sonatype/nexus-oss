@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
@@ -63,8 +64,8 @@ public abstract class ProxyFacetSupport
   private boolean remoteUrlChanged;
 
   @Override
-  protected void doConfigure() throws Exception {
-    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
     String url = attributes.require("remoteUrl", String.class);
     if (!url.endsWith("/")) {
       url = url + "/";

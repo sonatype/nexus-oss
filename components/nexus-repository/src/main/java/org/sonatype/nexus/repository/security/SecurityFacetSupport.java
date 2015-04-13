@@ -16,6 +16,7 @@ package org.sonatype.nexus.repository.security;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.security.SecurityHelper;
@@ -44,7 +45,7 @@ public class SecurityFacetSupport
   }
 
   @Override
-  protected void doInit() throws Exception {
+  protected void doInit(final Configuration configuration) throws Exception {
     securityResource.add(getRepository());
   }
 

@@ -14,16 +14,19 @@
 package org.sonatype.nexus.repository.config;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
+import org.sonatype.nexus.common.validation.ConstraintViolations;
 import org.sonatype.nexus.repository.FacetSupport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,19 +66,20 @@ public class ConfigurationFacetImpl
   }
 
   @Override
-  public <T> T readObject(final AttributesMap attributes, final Class<T> type) {
-    checkNotNull(attributes);
+  public <T> T convert(final Object value, final Class<T> type) {
+    checkNotNull(value);
     checkNotNull(type);
-    log.trace("Reading object type: {}", type);
-    return objectMapper.convertValue(attributes.backing(), type);
+    log.trace("Converting value: {} to type: {}", value, type);
+    return objectMapper.convertValue(value, type);
   }
 
   @Override
-  public <T> T readObject(final String section, final Class<T> type) {
+  public <T> T readSection(final Configuration configuration, final String section, final Class<T> type) {
+    checkNotNull(configuration);
     checkNotNull(section);
     log.trace("Reading section: {}", section);
-    AttributesMap attributes = getRepository().getConfiguration().attributes(section);
-    return readObject(attributes, type);
+    AttributesMap attributes = configuration.attributes(section);
+    return convert(attributes.backing(), type);
   }
 
   @Override
@@ -89,29 +93,31 @@ public class ConfigurationFacetImpl
 
     Validator validator = validatorFactory.getValidator();
     Set<ConstraintViolation<Object>> violations = validator.validate(value, groups);
+    ConstraintViolations.maybePropagate(violations, log);
+  }
 
-    // render log warning and throw exception if any constraints were violated
-    if (!violations.isEmpty()) {
-      String message = String.format("Validation failed; %d constraints violated", violations.size());
+  /**
+   * Wrap attribute section value to allow configuration hierarchy to be encoded into property path.
+   */
+  private static class SectionWrapper
+  {
+    @Valid
+    private Map<String,Object> attributes;
 
-      if (log.isWarnEnabled()) {
-        StringBuilder buff = new StringBuilder();
-        int c = 0;
-        for (ConstraintViolation<Object> violation : violations) {
-          buff.append("  ").append(++c).append(") ")
-              .append(violation.getMessage())
-              .append(", type: ")
-              .append(violation.getRootBeanClass())
-              .append(", property: ")
-              .append(violation.getPropertyPath())
-              .append(", value: ")
-              .append(violation.getInvalidValue())
-              .append(System.lineSeparator());
-        }
-        log.warn("{}:{}{}", message, System.lineSeparator(), buff);
-      }
-
-      throw new ConstraintViolationException(message, violations);
+    public SectionWrapper(final String name, final Object value) {
+      this.attributes = Collections.singletonMap(name, value);
     }
+  }
+
+  @Override
+  public <T> T validateSection(final Configuration configuration,
+                               final String section,
+                               final Class<T> type,
+                               final Class<?>... groups)
+  {
+    T value = readSection(configuration, section, type);
+    SectionWrapper wrapper = new SectionWrapper(section, value);
+    validate(wrapper, groups);
+    return value;
   }
 }
