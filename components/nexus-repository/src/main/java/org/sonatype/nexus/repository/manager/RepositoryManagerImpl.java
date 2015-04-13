@@ -57,9 +57,7 @@ public class RepositoryManagerImpl
     extends StateGuardLifecycleSupport
     implements RepositoryManager
 {
-  // FIXME: Use prefixed property
-
-  private static final boolean skipDefaultRepositories =
+  private static final boolean SKIP_DEFAULT_REPOSITORIES =
       SystemPropertiesHelper.getBoolean(RepositoryManagerImpl.class + ".skipDefaultRepositories", false);
 
   private final EventBus eventBus;
@@ -169,7 +167,7 @@ public class RepositoryManagerImpl
 
     // attempt to provision default repositories if allowed
     if (configurations.isEmpty()) {
-      if (skipDefaultRepositories) {
+      if (SKIP_DEFAULT_REPOSITORIES) {
         log.debug("No repositories configured; skipping provisioning of default repositories");
         return;
       }
