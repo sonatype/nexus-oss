@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.common.guice.AbstractInterceptorModule;
+import org.sonatype.sisu.goodies.inject.converter.TypeConverterSupport;
 
 import com.google.common.base.Strings;
 import com.google.inject.Module;
@@ -58,6 +59,8 @@ public class NexusBundleModule
 
   private final List<AbstractInterceptorModule> interceptorModules;
 
+  private final List<TypeConverterSupport> converterModules;
+
   private final LifecycleModule lifecycleModule;
 
   private final String imports;
@@ -66,13 +69,14 @@ public class NexusBundleModule
 
   public NexusBundleModule(final Bundle bundle, final MutableBeanLocator locator, final Map<?, ?> nexusProperties,
       final ServletContextModule servletContextModule, final List<AbstractInterceptorModule> interceptorModules,
-      final LifecycleModule lifecycleModule)
+      final List<TypeConverterSupport> converterModules, final LifecycleModule lifecycleModule)
   {
     super(bundle, locator);
 
     this.nexusProperties = nexusProperties;
     this.servletContextModule = servletContextModule;
     this.interceptorModules = interceptorModules;
+    this.converterModules = converterModules;
     this.lifecycleModule = lifecycleModule;
 
     imports = Strings.nullToEmpty(bundle.getHeaders().get(Constants.IMPORT_PACKAGE));
@@ -93,6 +97,7 @@ public class NexusBundleModule
     maybeAddInterceptors(modules);
     maybeAddLifecycle(modules);
     modules.addAll(super.modules());
+    modules.addAll(converterModules);
     modules.add(rankingModule);
 
     return modules;
