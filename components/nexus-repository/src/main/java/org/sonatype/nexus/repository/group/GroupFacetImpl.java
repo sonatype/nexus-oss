@@ -48,7 +48,7 @@ public class GroupFacetImpl
 
   private final RepositoryManager repositoryManager;
 
-  private final Set<String> memberNames = Sets.newLinkedHashSet();
+  private Set<String> memberNames = Sets.newLinkedHashSet();
 
   @Inject
   public GroupFacetImpl(final RepositoryManager repositoryManager) {
@@ -58,7 +58,7 @@ public class GroupFacetImpl
   @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
     NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
-    memberNames.addAll(attributes.require("memberNames", COLLECTION_STRING));
+    memberNames = Sets.newLinkedHashSet(attributes.require("memberNames", COLLECTION_STRING));
     log.debug("Members names: {}", memberNames);
   }
 
