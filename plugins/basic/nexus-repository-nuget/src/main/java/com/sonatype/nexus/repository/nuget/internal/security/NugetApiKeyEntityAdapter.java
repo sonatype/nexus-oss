@@ -82,8 +82,8 @@ public class NugetApiKeyEntityAdapter
     type.createProperty(P_PRINCIPALS, OType.BINARY)
         .setMandatory(true)
         .setNotNull(true);
-    type.createIndex(I_APIKEY, INDEX_TYPE.UNIQUE, P_APIKEY);
-    type.createIndex(I_PRIMARY_PRINCIPAL, INDEX_TYPE.UNIQUE, P_PRIMARY_PRINCIPAL);
+    type.createIndex(type.getName() + "." + P_APIKEY, INDEX_TYPE.UNIQUE, P_APIKEY);
+    type.createIndex(type.getName() + "." + P_PRIMARY_PRINCIPAL, INDEX_TYPE.UNIQUE, P_PRIMARY_PRINCIPAL);
   }
 
   @Override
