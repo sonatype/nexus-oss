@@ -37,6 +37,10 @@
  * @namespace NX.view.info
  */
 
+.nx-info {
+  overflow: auto;
+}
+
 .nx-info-entry td {
   padding-bottom: 4px;
   vertical-align: top;
@@ -45,6 +49,7 @@
 .nx-info-entry-name {
   padding-left: 0;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .nx-info-entry-value {

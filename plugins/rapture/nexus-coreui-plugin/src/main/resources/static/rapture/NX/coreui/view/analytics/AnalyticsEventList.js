@@ -130,10 +130,10 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
     {
       ptype: 'rowexpander',
       rowBodyTpl: Ext.create('Ext.XTemplate',
-          '<table style="padding: 5px;">',
+          '<table class="nx-rowexpander">',
           '<tpl for="this.attributes(values)">',
           '<tr>',
-          '<td class="x-selectable" style="padding-right: 5px;"><b>{name}</b></td>',
+          '<td class="x-selectable">{name}</td>',
           '<td class="x-selectable">{value}</td>',
           '</tr>',
           '</tpl>',
