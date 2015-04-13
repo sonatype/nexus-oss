@@ -78,6 +78,11 @@
       <artifactId>nexus-security</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-inject</artifactId>
+    </dependency>
+
     <!--
     Optional support for Pax-Exam if/when deployed alongside Nexus
     -->

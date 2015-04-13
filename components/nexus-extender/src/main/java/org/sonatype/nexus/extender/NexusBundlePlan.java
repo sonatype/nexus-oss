@@ -20,6 +20,7 @@ import javax.servlet.ServletContext;
 import org.sonatype.nexus.common.guice.AbstractInterceptorModule;
 import org.sonatype.nexus.extender.modules.NexusBundleModule;
 import org.sonatype.nexus.extender.modules.ServletContextModule;
+import org.sonatype.sisu.goodies.inject.converter.TypeConverterSupport;
 
 import com.google.inject.Key;
 import com.google.inject.Module;
@@ -45,6 +46,8 @@ public class NexusBundlePlan
 
   private final List<AbstractInterceptorModule> interceptorModules;
 
+  private final List<TypeConverterSupport> converterModules;
+
   private final LifecycleModule lifecycleModule;
 
   public NexusBundlePlan(final MutableBeanLocator locator) {
@@ -54,6 +57,7 @@ public class NexusBundlePlan
     nexusProperties = getFirstValue(locator.locate(ParameterKeys.PROPERTIES));
     servletContextModule = new ServletContextModule(getFirstValue(locator.locate(Key.get(ServletContext.class))));
     interceptorModules = new EntryListAdapter<>(locator.locate(Key.get(AbstractInterceptorModule.class)));
+    converterModules = new EntryListAdapter<>(locator.locate(Key.get(TypeConverterSupport.class)));
     lifecycleModule = new LifecycleModule();
   }
 
@@ -65,7 +69,7 @@ public class NexusBundlePlan
   @Override
   protected Module compose(final Bundle bundle) {
     return new NexusBundleModule(bundle, locator, nexusProperties, //
-        servletContextModule, interceptorModules, lifecycleModule);
+        servletContextModule, interceptorModules, converterModules, lifecycleModule);
   }
 
   private static <T> T getFirstValue(final Iterable<? extends BeanEntry<?, T>> entries) {
