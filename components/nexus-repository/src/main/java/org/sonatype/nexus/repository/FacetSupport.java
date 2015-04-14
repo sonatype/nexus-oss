@@ -20,10 +20,12 @@ import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuard;
 import org.sonatype.nexus.common.stateguard.StateGuardAware;
 import org.sonatype.nexus.common.stateguard.Transitions;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.FacetSupport.State.ATTACHED;
 import static org.sonatype.nexus.repository.FacetSupport.State.DELETED;
 import static org.sonatype.nexus.repository.FacetSupport.State.DESTROYED;
 import static org.sonatype.nexus.repository.FacetSupport.State.FAILED;
@@ -66,6 +68,8 @@ public abstract class FacetSupport
   {
     public static final String NEW = "NEW";
 
+    public static final String ATTACHED = "ATTACHED";
+
     public static final String INITIALISED = "INITIALISED";
 
     public static final String STARTED = "STARTED";
@@ -95,35 +99,53 @@ public abstract class FacetSupport
   // Lifecycle
   //
 
+  @Override
+  @Transitions(from = NEW, to = ATTACHED)
+  public void attach(final Repository repository) throws Exception {
+    this.repository = checkNotNull(repository);
+  }
+
+  @Override
+  @Guarded(by = {ATTACHED, STARTED, STOPPED})
+  public void validate(final Configuration configuration) throws Exception {
+    doValidate(configuration);
+  }
+
+  /**
+   * Sub-class should override to provide configuration validation logic.
+   */
+  protected void doValidate(final Configuration configuration) throws Exception {
+    // nop
+  }
+
   /**
    * Common init/update configuration extension-point.
    *
    * By default this is called on {@link #init} and {@link #update}
    * unless sub-class overrides {@link #doInit} or {@link #doUpdate}.
    */
-  protected void doConfigure() throws Exception {
+  protected void doConfigure(final Configuration configuration) throws Exception {
     // nop
   }
 
   @Override
-  @Transitions(from = NEW, to = INITIALISED)
-  public void init(final Repository repository) throws Exception {
-    this.repository = checkNotNull(repository);
-    doInit();
+  @Transitions(from = ATTACHED, to = INITIALISED)
+  public void init() throws Exception {
+    doInit(getRepository().getConfiguration());
   }
 
-  protected void doInit() throws Exception {
-    doConfigure();
+  protected void doInit(final Configuration configuration) throws Exception {
+    doConfigure(configuration);
   }
 
   @Override
   @Guarded(by = STOPPED)
   public void update() throws Exception {
-    doUpdate();
+    doUpdate(getRepository().getConfiguration());
   }
 
-  protected void doUpdate() throws Exception {
-    doConfigure();
+  protected void doUpdate(final Configuration configuration) throws Exception {
+    doConfigure(configuration);
   }
 
   @Override

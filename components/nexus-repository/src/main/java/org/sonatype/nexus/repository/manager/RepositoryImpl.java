@@ -13,8 +13,13 @@
 
 package org.sonatype.nexus.repository.manager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuard;
@@ -142,16 +147,61 @@ public class RepositoryImpl
   //
 
   @Override
+  public void validate(final Configuration configuration) throws Exception {
+    checkNotNull(configuration);
+
+    Set<ConstraintViolation<?>> violations = new HashSet<>();
+    MultipleFailures failures = new MultipleFailures();
+
+    for (Facet facet : facets) {
+      log.debug("Validating facet: {}", facet);
+      try {
+        facet.validate(configuration);
+      }
+      catch (ConstraintViolationException e) {
+        log.debug("Facet validation produced violations: {}", facet, e);
+        violations.addAll(e.getConstraintViolations());
+      }
+      catch (Throwable t) {
+        log.error("Failed to validate facet: {}", facet, t);
+        failures.add(t);
+      }
+    }
+    failures.maybePropagate("Failed to validate facets");
+
+    if (!violations.isEmpty()) {
+      throw new ConstraintViolationException(violations);
+    }
+  }
+
+  @Override
   @Transitions(from = NEW, to = INITIALISED)
   public void init(final Configuration configuration) throws Exception {
     this.configuration = checkNotNull(configuration);
     this.name = configuration.getRepositoryName();
+
+    MultipleFailures failures = new MultipleFailures();
+    for (Facet facet : facets) {
+      try {
+        log.debug("Initializing facet: {}", facet);
+        facet.init();
+      }
+      catch (Throwable t) {
+        log.error("Failed to initialize facet: {}", facet, t);
+        failures.add(t);
+      }
+    }
+    failures.maybePropagate("Failed to initialize facets");
   }
 
   @Override
   @Guarded(by = STOPPED)
   public void update(final Configuration configuration) throws Exception {
-    this.configuration = checkNotNull(configuration);
+    checkNotNull(configuration);
+
+    // Ensure configuration sanity
+    validate(configuration);
+    this.configuration = configuration;
 
     MultipleFailures failures = new MultipleFailures();
     for (Facet facet : facets) {
@@ -255,11 +305,11 @@ public class RepositoryImpl
   //
 
   @Override
-  @Guarded(by = INITIALISED)
+  @Guarded(by = NEW)
   public void attach(final Facet facet) throws Exception {
     checkNotNull(facet);
     log.debug("Attaching facet: {}", facet);
-    facet.init(this);
+    facet.attach(this);
     facets.add(facet);
   }
 

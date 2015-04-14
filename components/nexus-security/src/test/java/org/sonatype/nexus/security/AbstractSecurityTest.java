@@ -12,54 +12,91 @@
  */
 package org.sonatype.nexus.security;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.security.config.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.nexus.security.config.SecurityConfiguration;
 import org.sonatype.nexus.security.config.SecurityConfigurationSource;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.user.UserManager;
-import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
-import com.google.inject.Binder;
-import com.google.inject.Injector;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.util.ThreadContext;
+import org.eclipse.sisu.inject.BeanLocator;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.SpaceModule;
+import org.eclipse.sisu.space.URLClassSpace;
+import org.eclipse.sisu.wire.WireModule;
+import org.junit.After;
+import org.junit.Before;
+
+import static org.mockito.Mockito.mock;
 
 public abstract class AbstractSecurityTest
-    extends NexusTestSupport
-    implements Module
 {
-  @Override
+  protected final TestUtil util = new TestUtil(this);
+
+  @Inject
+  private BeanLocator beanLocator;
+
+  @Before
+  public final void doSetUp() throws Exception {
+    List<Module> modules = new ArrayList<>();
+
+    customizeModules(modules);
+    modules.add(new SpaceModule(new URLClassSpace(getClass().getClassLoader()), BeanScanning.INDEX));
+    Guice.createInjector(new WireModule(modules));
+
+    setUp();
+  }
+
+  @After
+  public final void doTearDown() throws Exception {
+    tearDown();
+  }
+
   protected void customizeModules(List<Module> modules) {
-    super.customizeModules(modules);
-    modules.add(new TestSecurityModule());
-    modules.add(this);
+    modules.add(new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        install(new WebSecurityModule(mock(ServletContext.class)));
+
+        bind(SecurityConfigurationSource.class).annotatedWith(Names.named("default")).toInstance(
+            new PreconfiguredSecurityConfigurationSource(initialSecurityConfiguration()));
+
+        RealmConfiguration realmConfiguration = new RealmConfiguration();
+        realmConfiguration.setRealmNames(Arrays.asList("MockRealmA", "MockRealmB"));
+        bind(RealmConfiguration.class).annotatedWith(Names.named("initial")).toInstance(realmConfiguration);
+
+        requestInjection(AbstractSecurityTest.this);
+      }
+    });
   }
 
-  @Override
-  public void configure(final Binder binder) {
-    binder.bind(SecurityConfigurationSource.class).annotatedWith(Names.named("default"))
-        .toInstance(new PreconfiguredSecurityConfigurationSource(initialSecurityConfiguration()));
-
-    RealmConfiguration realmConfiguration = new RealmConfiguration();
-    realmConfiguration.setRealmNames(Arrays.asList("MockRealmA", "MockRealmB"));
-    binder.bind(RealmConfiguration.class).annotatedWith(Names.named("initial")).toInstance(realmConfiguration);
+  protected <T> T lookup(Class<T> role) {
+    return beanLocator.locate(Key.get(role)).iterator().next().getValue();
   }
 
-  @Override
+  protected <T> T lookup(Class<T> role, String hint) {
+    return beanLocator.locate(Key.get(role, Names.named(hint))).iterator().next().getValue();
+  }
+
   protected void setUp() throws Exception {
-    super.setUp();
-
-    lookup(Injector.class).injectMembers(this);
-
     getSecuritySystem().start();
   }
 
-  @Override
   protected void tearDown() throws Exception {
     try {
       getSecuritySystem().stop();
@@ -76,7 +113,6 @@ public abstract class AbstractSecurityTest
     }
 
     ThreadContext.remove();
-    super.tearDown();
   }
 
   protected SecuritySystem getSecuritySystem() {

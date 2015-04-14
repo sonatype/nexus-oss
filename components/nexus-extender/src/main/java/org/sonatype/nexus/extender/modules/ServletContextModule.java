@@ -10,24 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.wonderland.internal;
+package org.sonatype.nexus.extender.modules;
 
-import javax.inject.Named;
+import javax.servlet.ServletContext;
 
-import org.sonatype.sisu.goodies.common.Time;
-import org.sonatype.sisu.goodies.inject.converter.TypeConverterSupport;
-
-import com.google.inject.TypeLiteral;
-import com.google.inject.spi.TypeConverter;
+import com.google.inject.AbstractModule;
 
 /**
- * Guice {@link TypeConverter} for {@link Time} instances.
- *
- * @since 2.7
+ * Override guice-servlet's legacy {@link ServletContext} binding as it doesn't work well with multiple injectors.
+ * 
+ * @since 3.0
  */
-@Named
-public class TimeTypeConverter
-    extends org.sonatype.sisu.goodies.inject.converter.TimeTypeConverter
+public class ServletContextModule
+    extends AbstractModule
 {
-  // HACK: Work-around for type-converters not getting picked up by the container
+  private final ServletContext servletContext;
+
+  public ServletContextModule(final ServletContext servletContext) {
+    this.servletContext = servletContext;
+  }
+
+  @Override
+  protected void configure() {
+    bind(ServletContext.class).toInstance(servletContext);
+  }
 }

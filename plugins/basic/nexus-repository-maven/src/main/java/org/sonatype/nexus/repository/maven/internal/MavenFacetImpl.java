@@ -30,6 +30,7 @@ import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
@@ -126,8 +127,9 @@ public class MavenFacetImpl
   }
 
   @Override
-  protected void doConfigure() throws Exception {
-    super.doConfigure();
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    super.doConfigure(configuration);
+
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     this.strictContentTypeValidation =
         attributes.get("strictContentTypeValidation", Boolean.class, Boolean.FALSE).booleanValue();

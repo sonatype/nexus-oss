@@ -22,6 +22,7 @@ import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -92,18 +93,21 @@ public class StorageFacetImpl
   }
 
   @Override
-  protected void doConfigure() throws Exception {
-    ConfigurationFacet configuration = facet(ConfigurationFacet.class);
-    config = configuration.readObject(CONFIG_KEY, Config.class);
-    log.debug("Config: {}", config);
-    configuration.validate(config);
+  protected void doValidate(final Configuration configuration) throws Exception {
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
   }
 
   @Override
-  protected void doInit() throws Exception {
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+    log.debug("Config: {}", config);
+  }
+
+  @Override
+  protected void doInit(final Configuration configuration) throws Exception {
     initSchema();
     initBucket();
-    super.doInit();
+    super.doInit(configuration);
   }
 
   private void initSchema() {

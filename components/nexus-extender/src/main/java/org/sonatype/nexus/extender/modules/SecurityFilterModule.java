@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.extender.modules;
 
-import org.sonatype.nexus.web.SecurityFilter;
-
 import com.google.inject.AbstractModule;
+import org.apache.shiro.web.filter.mgt.FilterChainResolver;
+import org.apache.shiro.web.mgt.WebSecurityManager;
 
 /**
  * SecurityFilter support bindings.
@@ -29,6 +29,7 @@ public class SecurityFilterModule
 
   @Override
   protected void configure() {
-    bind(SecurityFilter.class);
+    requireBinding(WebSecurityManager.class);
+    requireBinding(FilterChainResolver.class);
   }
 }

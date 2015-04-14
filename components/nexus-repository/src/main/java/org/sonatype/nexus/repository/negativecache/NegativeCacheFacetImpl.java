@@ -20,6 +20,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.sisu.goodies.common.Time;
@@ -60,8 +61,8 @@ public class NegativeCacheFacetImpl
   }
 
   @Override
-  protected void doConfigure() throws Exception {
-    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
     Boolean enabled = attributes.get("enabled", Boolean.class, false);
     log.debug("Enabled: {}", enabled);
     Time timeToLive = Time.minutes(attributes.get("timeToLive", Integer.class, 1440));

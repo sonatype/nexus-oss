@@ -22,7 +22,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.ServletContext;
 
@@ -55,7 +54,7 @@ public class WebResourceServiceImpl
 
   private final List<WebResource> resources;
 
-  private final Provider<ServletContext> servletContextProvider;
+  private final ServletContext servletContext;
 
   private final MimeSupport mimeSupport;
 
@@ -64,12 +63,12 @@ public class WebResourceServiceImpl
   @Inject
   public WebResourceServiceImpl(final List<WebResourceBundle> bundles,
                                 final List<WebResource> resources,
-                                final @Named("nexus") Provider<ServletContext> servletContextProvider,
+                                final ServletContext servletContext,
                                 final MimeSupport mimeSupport)
   {
     this.bundles = checkNotNull(bundles);
     this.resources = checkNotNull(resources);
-    this.servletContextProvider = checkNotNull(servletContextProvider);
+    this.servletContext = checkNotNull(servletContext);
     this.mimeSupport = checkNotNull(mimeSupport);
     this.resourcePaths = Maps.newHashMap();
 
@@ -157,7 +156,7 @@ public class WebResourceServiceImpl
     if (resource == null) {
       URL url;
       try {
-        url = servletContextProvider.get().getResource(path);
+        url = servletContext.getResource(path);
         if (url != null) {
           resource = new UrlWebResource(url, path, mimeSupport.guessMimeTypeFromPath(path));
           log.trace("Found servlet-context resource: {}", resource);

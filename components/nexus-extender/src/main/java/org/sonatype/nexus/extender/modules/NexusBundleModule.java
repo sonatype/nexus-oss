@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.common.guice.AbstractInterceptorModule;
+import org.sonatype.sisu.goodies.inject.converter.TypeConverterSupport;
 
 import com.google.common.base.Strings;
-import com.google.inject.Key;
 import com.google.inject.Module;
 import org.apache.shiro.guice.aop.ShiroAopModule;
 import org.eclipse.sisu.bean.LifecycleModule;
@@ -28,8 +28,6 @@ import org.eclipse.sisu.launch.BundleModule;
 import org.eclipse.sisu.plexus.PlexusSpaceModule;
 import org.eclipse.sisu.space.BeanScanning;
 import org.eclipse.sisu.space.SpaceModule;
-import org.eclipse.sisu.wire.EntryListAdapter;
-import org.eclipse.sisu.wire.ParameterKeys;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 
@@ -55,7 +53,13 @@ public class NexusBundleModule
 
   private static final RankingModule rankingModule = new RankingModule();
 
+  private final Map<?, ?> nexusProperties;
+
+  private final ServletContextModule servletContextModule;
+
   private final List<AbstractInterceptorModule> interceptorModules;
+
+  private final List<TypeConverterSupport> converterModules;
 
   private final LifecycleModule lifecycleModule;
 
@@ -63,12 +67,18 @@ public class NexusBundleModule
 
   private final boolean hasPlexus;
 
-  public NexusBundleModule(final Bundle bundle, final MutableBeanLocator locator, final LifecycleModule lifecycleModule) {
+  public NexusBundleModule(final Bundle bundle, final MutableBeanLocator locator, final Map<?, ?> nexusProperties,
+      final ServletContextModule servletContextModule, final List<AbstractInterceptorModule> interceptorModules,
+      final List<TypeConverterSupport> converterModules, final LifecycleModule lifecycleModule)
+  {
     super(bundle, locator);
 
+    this.nexusProperties = nexusProperties;
+    this.servletContextModule = servletContextModule;
+    this.interceptorModules = interceptorModules;
+    this.converterModules = converterModules;
     this.lifecycleModule = lifecycleModule;
 
-    interceptorModules = new EntryListAdapter<>(locator.locate(Key.get(AbstractInterceptorModule.class)));
     imports = Strings.nullToEmpty(bundle.getHeaders().get(Constants.IMPORT_PACKAGE));
     hasPlexus = bundle.getResource("META-INF/plexus/components.xml") != null;
   }
@@ -79,6 +89,7 @@ public class NexusBundleModule
 
     maybeAddShiroAOP(modules);
     maybeAddSecurityFilter(modules);
+    maybeAddServletContext(modules);
     maybeAddMetricsRegistry(modules);
     maybeAddInstrumentation(modules);
     maybeAddValidation(modules);
@@ -86,6 +97,7 @@ public class NexusBundleModule
     maybeAddInterceptors(modules);
     maybeAddLifecycle(modules);
     modules.addAll(super.modules());
+    modules.addAll(converterModules);
     modules.add(rankingModule);
 
     return modules;
@@ -93,7 +105,7 @@ public class NexusBundleModule
 
   @Override
   protected Map<?, ?> getProperties() {
-    return locator.locate(ParameterKeys.PROPERTIES).iterator().next().getValue();
+    return nexusProperties;
   }
 
   @Override
@@ -113,6 +125,12 @@ public class NexusBundleModule
   private void maybeAddSecurityFilter(List<Module> modules) {
     if (imports.contains("org.sonatype.nexus.web")) {
       modules.add(securityFilterModule);
+    }
+  }
+
+  private void maybeAddServletContext(List<Module> modules) {
+    if (imports.contains("com.google.inject.servlet")) {
+      modules.add(servletContextModule);
     }
   }
 

@@ -63,8 +63,6 @@ import org.eclipse.sisu.inject.BeanLocator;
  * Shiro security configuration Guice module for the runtime server.
  *
  * @since 2.6.1
- *
- * @see TestSecurityModule
  */
 public class WebSecurityModule
     extends ShiroWebModule

@@ -51,7 +51,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.7.0
  */
 @Singleton
-@Named
+@Named("NxApplication")
 public class NxApplication
     extends LifecycleSupport
 {

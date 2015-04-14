@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.jmx.reflect.ManagedObject;
@@ -56,10 +57,8 @@ public class RepositoryManagerImpl
     extends StateGuardLifecycleSupport
     implements RepositoryManager
 {
-  /**
-   * System property used to bypass installation of default repositories; useful for testing purposes.
-   */
-  private static final String SKIP_DEFAULT_REPOSITORIES = "skipDefaultRepositories";
+  private static final boolean SKIP_DEFAULT_REPOSITORIES =
+      SystemPropertiesHelper.getBoolean(RepositoryManagerImpl.class + ".skipDefaultRepositories", false);
 
   private final EventBus eventBus;
 
@@ -122,7 +121,6 @@ public class RepositoryManagerImpl
     log.debug("Using recipe: [{}] {}", recipeName, recipe);
 
     Repository repository = factory.create(recipe.getType(), recipe.getFormat());
-    repository.init(configuration);
 
     // attach mandatory facets
     repository.attach(configFacet.get());
@@ -132,6 +130,12 @@ public class RepositoryManagerImpl
 
     // verify required facets
     repository.facet(ViewFacet.class);
+
+    // ensure configuration sanity, once all facets are attached
+    repository.validate(configuration);
+
+    // initialize repository
+    repository.init(configuration);
 
     // configure security
     securityResource.add(repository);
@@ -160,25 +164,28 @@ public class RepositoryManagerImpl
   @Override
   protected void doStart() throws Exception {
     List<Configuration> configurations = store.list();
+
+    // attempt to provision default repositories if allowed
     if (configurations.isEmpty()) {
-      log.debug("No repositories configured");
-      if (Boolean.valueOf(System.getProperty(SKIP_DEFAULT_REPOSITORIES, "false"))) {
-        log.debug("Skipping provisioning of default repositories due to '{}' property", SKIP_DEFAULT_REPOSITORIES);
+      if (SKIP_DEFAULT_REPOSITORIES) {
+        log.debug("No repositories configured; skipping provisioning of default repositories");
         return;
       }
-      else {
-        log.debug("Provisioning default repositories");
-        for (DefaultRepositoriesContributor configProvider : defaultRepositoriesContributors) {
-          for (Configuration configuration : configProvider.getRepositoryConfigurations()) {
-            log.debug("Provisioning default repository: {}", configuration);
-            store.create(configuration);
-          }
+
+      // attempt to discover default repository configurations
+      log.debug("No repositories configured; provisioning default repositories");
+      for (DefaultRepositoriesContributor contributor : defaultRepositoriesContributors) {
+        for (Configuration configuration : contributor.getRepositoryConfigurations()) {
+          log.debug("Provisioning default repository: {}", configuration);
+          store.create(configuration);
         }
-        configurations = store.list();
-        if (configurations.isEmpty()) {
-          log.debug("No default repositories to provision");
-          return;
-        }
+      }
+      configurations = store.list();
+
+      // if we still have no repository configurations, complain and stop
+      if (configurations.isEmpty()) {
+        log.debug("No default repositories to provision");
+        return;
       }
     }
 
@@ -245,9 +252,8 @@ public class RepositoryManagerImpl
 
     log.debug("Creating repository: {} -> {}", repositoryName, configuration);
 
-    // FIXME: This can leave storage/tracked inconsistent if new repository/init fails
-    store.create(configuration);
     Repository repository = newRepository(configuration);
+    store.create(configuration);
     track(repository);
 
     repository.start();
@@ -267,8 +273,10 @@ public class RepositoryManagerImpl
 
     Repository repository = repository(repositoryName);
 
-    // TODO: Ensure configuration sanity, before we apply to repository
+    // ensure configuration sanity
+    repository.validate(configuration);
     store.update(configuration);
+
     repository.stop();
     repository.update(configuration);
     repository.start();

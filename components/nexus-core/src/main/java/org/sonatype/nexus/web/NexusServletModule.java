@@ -12,52 +12,33 @@
  */
 package org.sonatype.nexus.web;
 
-import java.util.Map;
-
-import javax.servlet.ServletContext;
+import javax.inject.Named;
 
 import org.sonatype.nexus.internal.metrics.MetricsModule;
 import org.sonatype.nexus.internal.orient.OrientModule;
 import org.sonatype.nexus.internal.web.EnvironmentFilter;
 import org.sonatype.nexus.internal.web.ErrorPageFilter;
 import org.sonatype.nexus.internal.web.ErrorPageServlet;
-import org.sonatype.nexus.security.WebSecurityModule;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.ServletModule;
 import org.eclipse.sisu.inject.DefaultRankingFunction;
 import org.eclipse.sisu.inject.RankingFunction;
-import org.eclipse.sisu.wire.ParameterKeys;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.inject.name.Names.named;
 
 /**
  * Core Nexus servlet bindings.
  * 
  * @since 3.0
  */
+@Named
 public class NexusServletModule
     extends AbstractModule
 {
-  private final ServletContext servletContext;
-
-  private final Map<?, ?> properties;
-
-  public NexusServletModule(final ServletContext servletContext, final Map<?, ?> properties) {
-    this.servletContext = checkNotNull(servletContext);
-    this.properties = checkNotNull(properties);
-  }
-
   @Override
   protected void configure() {
-    binder().requireExplicitBindings();
 
-    bind(NexusGuiceFilter.class);
-
-    // re-bind context with name to avoid backwards-compat warnings from guice-servlet
-    bind(ServletContext.class).annotatedWith(named("nexus")).toInstance(servletContext);
-    bind(ParameterKeys.PROPERTIES).toInstance(properties);
+    bind(GuiceFilter.class).to(NexusGuiceFilter.class);
 
     install(new ServletModule()
     {
@@ -79,9 +60,6 @@ public class NexusServletModule
     });
 
     install(new MetricsModule());
-
-    install(new WebSecurityModule(servletContext));
-
     install(new OrientModule());
   }
 }

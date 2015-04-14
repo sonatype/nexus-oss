@@ -19,6 +19,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.servlet.ServletContext;
+
 import org.sonatype.nexus.ldap.internal.persist.LdapConfigurationSource;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Host;
@@ -28,7 +30,7 @@ import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.security.SecuritySystem;
-import org.sonatype.nexus.security.TestSecurityModule;
+import org.sonatype.nexus.security.WebSecurityModule;
 import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
 import org.sonatype.sisu.litmus.testsupport.port.PortRegistry;
 
@@ -60,7 +62,7 @@ public abstract class LdapTestSupport
   @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
-    modules.add(new TestSecurityModule());
+    modules.add(new WebSecurityModule(mock(ServletContext.class)));
     // test specific bindings
     modules.add(new Module()
     {
