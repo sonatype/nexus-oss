@@ -506,7 +506,8 @@ public class NugetGalleryFacetImpl
     Component absoluteLatestVersion = allReleases.isEmpty() ? null : allReleases.last();
 
     for (Component component : allReleases) {
-      final NestedAttributesMap nugetAttributes = storageTx.firstAsset(component).formatAttributes();
+      final Asset asset = storageTx.firstAsset(component);
+      final NestedAttributesMap nugetAttributes = asset.formatAttributes();
 
       nugetAttributes.set(P_IS_LATEST_VERSION, component.equals(latestVersion));
       nugetAttributes.set(P_IS_ABSOLUTE_LATEST_VERSION, component.equals(absoluteLatestVersion));
@@ -514,6 +515,7 @@ public class NugetGalleryFacetImpl
       if (isRepoAuthoritative()) {
         nugetAttributes.set(P_DOWNLOAD_COUNT, totalDownloadCount);
       }
+      storageTx.saveAsset(asset);
     }
   }
 
