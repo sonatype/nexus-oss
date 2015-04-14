@@ -18,4 +18,7 @@ package com.bolyuba.nexus.plugin.npm.service;
 public interface GroupMetadataService
     extends Generator
 {
+    boolean isMergeMetadata();
+
+    void setMergeMetadata(boolean mergeMetadata);
 }

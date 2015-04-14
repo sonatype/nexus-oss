@@ -136,10 +136,21 @@ public class PackageRoot
 
   /**
    * Overlays given package root onto this package root, probably changing the mappings, or merging some maps. It also
-   * maintains inner state of this document (wrappedVersions and attachments).
+   * maintains inner state of this document (wrappedVersions and attachments). This method also enforces that only
+   * same origin roots may be overlaid by {@link #getComponentId()} equality check.
+   *
+   * @see #overlayIgnoringOrigin(PackageRoot)
    */
   public void overlay(final PackageRoot packageRoot) {
     checkArgument(getComponentId().equals(packageRoot.getComponentId()), "Cannot overlay different package roots!");
+    overlayIgnoringOrigin(packageRoot);
+  }
+
+  /**
+   * Overlays given package root onto this package root, probably changing the mappings, or merging some maps. It also
+   * maintains inner state of this document (wrappedVersions and attachments). This method ignores package origin.
+   */
+  public void overlayIgnoringOrigin(final PackageRoot packageRoot) {
     overlay(getRaw(), packageRoot.getRaw()); // this changes underlying raw map directly
     getProperties().putAll(packageRoot.getProperties()); // this is "shallow" string-string map
     this.wrappedVersions.clear();
