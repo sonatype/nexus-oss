@@ -17,6 +17,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -42,14 +43,14 @@ public class SearchFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public void put(final ComponentMetadata componentMetadata) {
-    searchService.put(getRepository(), componentMetadata);
+  public void put(final Component component) {
+    searchService.put(getRepository(), component);
   }
 
   @Override
   @Guarded(by = STARTED)
-  public void delete(final String id) {
-    searchService.delete(getRepository(), id);
+  public void delete(final Component component) {
+    searchService.delete(getRepository(), component);
   }
 
   @Override

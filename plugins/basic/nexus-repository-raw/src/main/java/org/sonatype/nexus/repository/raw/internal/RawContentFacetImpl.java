@@ -30,6 +30,7 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
+import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -84,7 +85,7 @@ public class RawContentFacetImpl
         return null;
       }
 
-      final Asset asset = component.firstAsset();
+      final Asset asset = tx.firstAsset(component);
       final Blob blob = tx.requireBlob(asset.requireBlobRef());
 
       return marshall(asset, blob);
@@ -105,12 +106,13 @@ public class RawContentFacetImpl
 
         // Set attributes map to contain "raw" format-specific metadata (in this case, path)
         component.formatAttributes().set(P_PATH, path);
+        tx.saveComponent(component);
 
         asset = tx.createAsset(bucket, component);
       }
       else {
         // UPDATE
-        asset = component.firstAsset();
+        asset = tx.firstAsset(component);
       }
 
       // TODO: Figure out created-by header
@@ -122,6 +124,9 @@ public class RawContentFacetImpl
           tx.setBlob(is1, headers, asset, hashAlgorithms, determineContentType(path, is2, content.getContentType()));
         }
       }
+
+      tx.saveAsset(asset);
+      getRepository().facet(SearchFacet.class).put(component);
 
       tx.commit();
     }
@@ -187,6 +192,7 @@ public class RawContentFacetImpl
         return false;
       }
       tx.deleteComponent(component);
+      getRepository().facet(SearchFacet.class).delete(component);
       tx.commit();
       return true;
     }
@@ -198,12 +204,12 @@ public class RawContentFacetImpl
       Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
 
       if (component == null) {
-        log.debug("Updating lastUpdated time for nonexistant raw component {}", path);
+        log.debug("Updating lastUpdated time for non-existent raw component {}", path);
         return;
       }
 
-      // last updated will be automatically set by the hook on record modification
-      component.firstAsset().vertex().getRecord().setDirty();
+      // last updated will be automatically set on update
+      tx.saveAsset(tx.firstAsset(component));
       tx.commit();
     }
   }

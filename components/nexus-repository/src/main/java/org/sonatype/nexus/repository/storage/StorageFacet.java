@@ -21,23 +21,18 @@ import org.sonatype.nexus.repository.Facet;
  */
 @Facet.Exposed
 public interface StorageFacet
-  extends Facet
+    extends Facet
 {
-  static String E_CONTAINS_COMPONENTS_WITH_LABEL = "contains_components_with_label";
-
-  static String E_HAS_LABEL = "has_label";
-
-  static String E_OWNS_ASSET = "owns_asset";
-
-  static String E_OWNS_COMPONENT = "owns_component";
-
-  static String E_PART_OF_COMPONENT = "part_of_component";
 
   static String P_ATTRIBUTES = "attributes";
 
   static String P_BLOB_REF = "blob_ref";
 
+  static String P_BUCKET = "bucket";
+
   static String P_CHECKSUM = "checksum";
+
+  static String P_COMPONENT = "component";
 
   static String P_CONTENT_TYPE = "content_type";
 
@@ -56,14 +51,6 @@ public interface StorageFacet
   static String P_SIZE = "size";
 
   static String P_VERSION = "version";
-
-  static String V_ASSET = "asset";
-
-  static String V_COMPONENT = "component";
-
-  static String V_LABEL = "label";
-
-  static String V_BUCKET = "bucket";
 
   /**
    * Opens a transaction.

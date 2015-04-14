@@ -14,15 +14,13 @@ package org.sonatype.nexus.repository.storage;
 
 import org.sonatype.nexus.repository.Repository;
 
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
-
 /**
  * Component created event.
  *
  * @since 3.0
  */
 public class ComponentCreatedEvent
-  extends ComponentEvent
+    extends ComponentEvent
 {
   public ComponentCreatedEvent(final Component component, final Repository repository) {
     super(component, repository);

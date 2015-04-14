@@ -59,34 +59,6 @@
 
       <dependency>
         <groupId>com.orientechnologies</groupId>
-        <artifactId>orientdb-graphdb</artifactId>
-        <version>${orientdb.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>stax</groupId>
-            <artifactId>stax-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils-core</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.tinkerpop.gremlin</groupId>
-            <artifactId>gremlin-java</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.tinkerpop.gremlin</groupId>
-            <artifactId>gremlin-groovy</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-enterprise</artifactId>
         <version>${orientdb.version}</version>
       </dependency>

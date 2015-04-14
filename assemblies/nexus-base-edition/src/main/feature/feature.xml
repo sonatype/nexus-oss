@@ -23,7 +23,6 @@
     <bundle>wrap:${mvn:httpclient}$Bundle-SymbolicName=httpclient&amp;Fragment-Host=httpcore</bundle>
     <bundle>wrap:${mvn:maven-model}$Bundle-SymbolicName=maven-model</bundle>
     <bundle>wrap:${mvn:maven-model-builder}$Bundle-SymbolicName=maven-model-builder&amp;Fragment-Host=maven-model</bundle>
-    <bundle>wrap:${mvn:orientdb-graphdb}$overwrite=merge&amp;Fragment-Host=com.orientechnologies.orientdb-core</bundle>
     <bundle>wrap:${mvn:xmlpull}$Bundle-SymbolicName=xmlpull</bundle>
     <bundle>wrap:${mvn:xpp3_min}$Bundle-SymbolicName=xpp3_min&amp;Fragment-Host=xmlpull</bundle>
     <!--

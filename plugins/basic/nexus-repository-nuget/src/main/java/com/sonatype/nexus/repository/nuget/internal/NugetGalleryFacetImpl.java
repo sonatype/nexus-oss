@@ -46,6 +46,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
+import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -83,7 +84,6 @@ import static org.odata4j.producer.resources.OptionsQueryParser.parseSkip;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseTop;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
 
 /**
  * A group-aware implementation of a hosted {@link} NugetGalleryFacet.
@@ -251,7 +251,10 @@ public class NugetGalleryFacetImpl
     try (StorageTx tx = openStorageTx()) {
       final Bucket bucket = tx.getBucket();
       Component component = findComponent(tx, id, version);
-      checkState(component != null && !component.assets().isEmpty(), "Component metadata does not exist yet");
+      checkState(
+          component != null && tx.browseAssets(component).iterator().hasNext(),
+          "Component metadata does not exist yet"
+      );
       createOrUpdateAssetAndContents(tx, bucket, component, content, null);
       tx.commit();
     }
@@ -350,7 +353,7 @@ public class NugetGalleryFacetImpl
       if (component == null) {
         return null;
       }
-      Asset asset = component.firstAsset();
+      Asset asset = tx.firstAsset(component);
 
       Blob blob = tx.requireBlob(asset.requireBlobRef());
       String contentType = asset.contentType();
@@ -387,6 +390,7 @@ public class NugetGalleryFacetImpl
         return false;
       }
       tx.deleteComponent(component);
+      getRepository().facet(SearchFacet.class).delete(component);
       tx.commit();
 
       getEventBus().post(new ComponentDeletedEvent(component, getRepository()));
@@ -406,6 +410,7 @@ public class NugetGalleryFacetImpl
     final Bucket bucket = storageTx.getBucket();
     final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
     createOrUpdateAssetAndContents(storageTx, bucket, component, packageStream, recordMetadata);
+    getRepository().facet(SearchFacet.class).put(component);
     return component;
   }
 
@@ -415,6 +420,7 @@ public class NugetGalleryFacetImpl
     final Bucket bucket = storageTx.getBucket();
     final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
     createOrUpdateAsset(storageTx, bucket, component, recordMetadata);
+    getRepository().facet(SearchFacet.class).put(component);
     return component;
   }
 
@@ -423,12 +429,12 @@ public class NugetGalleryFacetImpl
   {
     Asset asset = null;
 
-    final List<Asset> assets = component.assets();
-    if (assets.isEmpty()) {
+    final Iterable<Asset> assets = storageTx.browseAssets(component);
+    if (!assets.iterator().hasNext()) {
       asset = storageTx.createAsset(bucket, component);
     }
     else {
-      asset = assets.get(0);
+      asset = assets.iterator().next();
     }
 
     if (data != null) {
@@ -459,11 +465,12 @@ public class NugetGalleryFacetImpl
       nugetAttr.set(P_TITLE, data.get(TITLE));
       nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
     }
+    storageTx.saveAsset(asset);
     return asset;
   }
 
   private String blobName(Component component) {
-    return component.get(P_NAME) + " " + component.require(P_VERSION) + "@" + getRepository().getName();
+    return component.name() + " " + component.requireVersion() + "@" + getRepository().getName();
   }
 
   /**
@@ -484,7 +491,7 @@ public class NugetGalleryFacetImpl
     SortedSet<Component> allReleases = Sets.newTreeSet(new ComponentVersionComparator());
 
     for (Component version : versions) {
-      final NestedAttributesMap nugetAttributes = version.firstAsset().formatAttributes();
+      final NestedAttributesMap nugetAttributes = storageTx.firstAsset(version).formatAttributes();
 
       final boolean isPrerelease = nugetAttributes.require(P_IS_PRERELEASE, Boolean.class);
       if (!isPrerelease) {
@@ -500,7 +507,8 @@ public class NugetGalleryFacetImpl
     Component absoluteLatestVersion = allReleases.isEmpty() ? null : allReleases.last();
 
     for (Component component : allReleases) {
-      final NestedAttributesMap nugetAttributes = component.firstAsset().formatAttributes();
+      final Asset asset = storageTx.firstAsset(component);
+      final NestedAttributesMap nugetAttributes = asset.formatAttributes();
 
       nugetAttributes.set(P_IS_LATEST_VERSION, component.equals(latestVersion));
       nugetAttributes.set(P_IS_ABSOLUTE_LATEST_VERSION, component.equals(absoluteLatestVersion));
@@ -508,6 +516,7 @@ public class NugetGalleryFacetImpl
       if (isRepoAuthoritative()) {
         nugetAttributes.set(P_DOWNLOAD_COUNT, totalDownloadCount);
       }
+      storageTx.saveAsset(asset);
     }
   }
 
@@ -555,6 +564,7 @@ public class NugetGalleryFacetImpl
     nugetAttr.set(P_TITLE, data.get(TITLE));
     nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
 
+    storageTx.saveComponent(component);
     return component;
   }
 

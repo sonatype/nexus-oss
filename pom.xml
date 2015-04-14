@@ -574,7 +574,6 @@
               <id>httpclient</id>
               <id>maven-model</id>
               <id>maven-model-builder</id>
-              <id>orientdb-graphdb</id>
               <id>xmlpull</id>
               <id>xpp3_min</id>
               <id>shiro-guice</id>
