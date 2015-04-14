@@ -51,7 +51,7 @@ public class GroupMetadataServiceImpl
   private final AlphanumComparator comparator;
 
   private boolean mergeMetadata = SystemPropertiesHelper.getBoolean(
-      "com.bolyuba.nexus.plugin.npm.service.internal.GroupMetadataServiceImpl.mergeMetadata",
+      "nexus.npm.mergeGroupMetadata",
       true
   );
 
