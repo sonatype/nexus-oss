@@ -14,25 +14,27 @@
 package org.sonatype.nexus.repository.group;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 
-import com.google.common.collect.Sets;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.annotations.VisibleForTesting;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
-import static org.sonatype.nexus.repository.util.TypeTokens.COLLECTION_STRING;
 
 /**
  * Default {@link GroupFacet} implementation.
@@ -44,11 +46,27 @@ public class GroupFacetImpl
     extends FacetSupport
     implements GroupFacet
 {
-  public static final String CONFIG_KEY = "group";
-
   private final RepositoryManager repositoryManager;
 
-  private final Set<String> memberNames = Sets.newLinkedHashSet();
+  @VisibleForTesting
+  static final String CONFIG_KEY = "group";
+
+  @VisibleForTesting
+  static class Config
+  {
+    @NotEmpty
+    @JsonDeserialize(as = LinkedHashSet.class) // retain order
+    public Set<String> memberNames;
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "memberNames=" + memberNames +
+          '}';
+    }
+  }
+
+  private Config config;
 
   @Inject
   public GroupFacetImpl(final RepositoryManager repositoryManager) {
@@ -56,22 +74,26 @@ public class GroupFacetImpl
   }
 
   @Override
+  protected void doValidate(final Configuration configuration) throws Exception {
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
+  }
+
+  @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
-    NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
-    memberNames.addAll(attributes.require("memberNames", COLLECTION_STRING));
-    log.debug("Members names: {}", memberNames);
+    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+    log.debug("Config: {}", config);
   }
 
   @Override
   protected void doDestroy() throws Exception {
-    memberNames.clear();
+    config = null;
   }
 
   @Override
   @Guarded(by = STARTED)
   public boolean member(final Repository repository) {
     checkNotNull(repository);
-    return memberNames.contains(repository.getName());
+    return config.memberNames.contains(repository.getName());
   }
 
   @Override
@@ -79,8 +101,8 @@ public class GroupFacetImpl
   public List<Repository> members() {
     final Repository repository = getRepository();
 
-    List<Repository> members = new ArrayList<>(memberNames.size());
-    for (String name : memberNames) {
+    List<Repository> members = new ArrayList<>(config.memberNames.size());
+    for (String name : config.memberNames) {
       Repository member = repositoryManager.get(name);
       if (member == null) {
         log.warn("Ignoring missing member repository: {}", name);
