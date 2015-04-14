@@ -48,6 +48,9 @@ Ext.define('NX.coreui.view.formfield.factory.FormfieldTextFieldFactory', {
     if (formField.initialValue) {
       item.value = formField.initialValue;
     }
+    if(formField.vtype) {
+      item.vtype = formField.vtype;
+    }
     return item;
   }
 

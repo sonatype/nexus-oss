@@ -54,7 +54,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     },
     'repository-proxy': {
       file: 'database_link.png',
-      variants: ['x16', 'x32']  
+      variants: ['x16', 'x32']
     },
     'repository-group': {
       file: 'folder_database.png',
@@ -105,6 +105,12 @@ Ext.define('NX.coreui.controller.Repositories', {
         },
         'nx-coreui-repository-settings-form': {
           submitted: me.onSettingsSubmitted
+        },
+        'nx-coreui-repository-settings button[action=save]': {
+          click: me.updateRepository
+        },
+        'nx-coreui-repository-add button[action=add]': {
+          click: me.createRepository
         }
       }
     });
@@ -253,6 +259,47 @@ Ext.define('NX.coreui.controller.Repositories', {
     else {
       me.stopStatusPolling();
     }
+  },
+
+  updateRepository: function(button) {
+    var me = this,
+        form = button.up('form'),
+        values = form.getValues();
+
+    NX.direct.coreui_Repository.update(values, function(response) {
+      if (Ext.isObject(response)) {
+        if (response.success) {
+          NX.Messages.add({
+            text: NX.I18n.format('ADMIN_REPOSITORIES_UPDATE_SUCCESS', response.data.name),
+            type: 'success'
+          });
+          me.loadStoreAndSelect(response.data.id, false);
+        }
+        else if (Ext.isDefined(response.errors)) {
+          form.markInvalid(response.errors);
+        }
+      }
+    });
+  },
+
+  createRepository: function(button) {
+    var me = this,
+        form = button.up('form'),
+        values = form.getValues();
+    NX.direct.coreui_Repository.create(values, function(response) {
+      if (Ext.isObject(response)) {
+        if (response.success) {
+          NX.Messages.add({
+            text: NX.I18n.format('ADMIN_REPOSITORIES_CREATE_SUCCESS', response.data.name),
+            type: 'success'
+          });
+          me.loadStoreAndSelect(response.data.id, false);
+        }
+        else if (Ext.isDefined(response.errors)) {
+          form.markInvalid(response.errors);
+        }
+      }
+    });
   }
 
 });

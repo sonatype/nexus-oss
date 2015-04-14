@@ -31,6 +31,7 @@ import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
+import org.sonatype.nexus.repository.storage.WritePolicy
 import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.web.BaseUrlHolder
 
@@ -38,6 +39,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
 
 /**
@@ -75,6 +77,46 @@ extends DirectComponentSupport
     }
   }
 
+  @DirectMethod
+  List<ReferenceXO> readWritePolicies() {
+    WritePolicy.values().collect{ WritePolicy writePolicy ->
+      new ReferenceXO(
+          id: writePolicy.name(),
+          name: writePolicy.name()
+      )
+    }
+  }
+
+  @DirectMethod
+  List<ReferenceXO> readVersionPolicies() {
+    ['RELEASE', 'SNAPSHOT', 'MIXED'].collect{  it
+      new ReferenceXO(id: it, name: it)
+    }
+  }
+
+  @DirectMethod
+  List<ReferenceXO> readChecksumPolicies() {
+    ['IGNORE', 'WARN', 'STRICT_IF_EXISTS', 'STRICT'].collect{  it
+      new ReferenceXO(id: it, name: it)
+    }
+  }
+
+  /**
+   * Retrieve a list of available repositories references.
+   */
+  @DirectMethod
+  @RequiresPermissions('nexus:repositories:read')
+  List<RepositoryReferenceXO> readReferences() {
+    return repositoryManager.browse().collect { Repository repository ->
+      new RepositoryReferenceXO(
+          id: repository.name,
+          name: repository.name,
+          type: repository.type.toString(),
+          format: repository.format.toString()
+      )
+    }
+  }
+  
   @DirectMethod
   @RequiresAuthentication
   @Validate(groups = [Create.class, Default.class])

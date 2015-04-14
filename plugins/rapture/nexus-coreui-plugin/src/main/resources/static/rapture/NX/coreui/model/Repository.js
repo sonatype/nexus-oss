@@ -24,10 +24,22 @@ Ext.define('NX.coreui.model.Repository', {
     'name',
     'type',
     'format',
-    'recipe',
+    {
+      //TODO - KR is this actually necessary?
+      name:'recipe',
+      convert: function(val, row) {
+        return val || row.get('type') + '-' + row.get('format');
+      }
+    },
     'online',
     'status',
     'attributes',
-    'url'
+    'url',
+    {
+      name: 'attributesMap',
+      convert: function(val, row) {
+        return Ext.decode(row.get('attributes'));
+      }
+    }
   ]
 });

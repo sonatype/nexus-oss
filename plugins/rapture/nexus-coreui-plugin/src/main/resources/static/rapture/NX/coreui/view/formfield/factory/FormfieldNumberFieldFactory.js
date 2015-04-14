@@ -40,6 +40,12 @@ Ext.define('NX.coreui.view.formfield.factory.FormfieldNumberFieldFactory', {
       allowBlank: !formField.required,
       regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null
     };
+    if(formField.maxValue) {
+      item.maxValue = formField.maxValue;  
+    }
+    if(formField.minValue) {
+      item.minValue = formField.minValue;  
+    }
     if (formField.initialValue) {
       item.value = Number(formField.initialValue);
     }

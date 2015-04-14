@@ -22,41 +22,77 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
   alias: 'widget.nx-coreui-repository-settings-form',
   requires: [
     'NX.Conditions',
-    'NX.I18n'
+    'NX.I18n',
+    'NX.coreui.service.RepositoryFormService'
   ],
 
-  api: {
-    submit: 'NX.direct.coreui_Repository.update'
-  },
   settingsFormSuccessMessage: function(data) {
     return NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_SUCCESS') + data['name'];
   },
 
   editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_ERROR'),
 
-  initComponent: function() {
-    var me = this;
+  items: [
+    {
+      xtype: 'textfield',
+      name: 'name',
+      itemId: 'name',
+      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME'),
+      readOnly: true
+    },
+    {
+      xtype: 'textfield',
+      name: 'format',
+      itemId: 'format',
+      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FORMAT'),
+      allowBlank: true,
+      readOnly: true
+    },
+    {
+      xtype: 'textfield',
+      name: 'type',
+      itemId: 'type',
+      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_TYPE'),
+      allowBlank: true,
+      readOnly: true
+    },
+    {
+      xtype: 'hiddenfield',
+      name: 'attributes'
+    },
+    {xtype: 'nx-coreui-formfield-settingsfieldset'}
+  ],
 
-    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:repositories', 'update');
-
-    me.items = [
-      {
-        xtype: 'textfield',
-        name: 'name',
-        itemId: 'name',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME'),
-        readOnly: true
-      },
-      {
-        xtype: 'textarea',
-        name: 'attributes',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ATTRIBUTES'),
-        height: 300,
-        allowBlank: true,
-        cls: 'nx-log-viewer-field'
-      }
-    ];
-
+  /**
+   * @override
+   * Imports repository into settings field set.
+   * @param {NX.model.Repository} model repository model
+   */
+  loadRecord: function(model) {
+    var me = this,
+        settingsFieldSet = me.down('nx-coreui-formfield-settingsfieldset');
     me.callParent(arguments);
+
+    settingsFieldSet.importProperties(NX.coreui.service.RepositoryFormService.propertiesForModel(model),
+        NX.coreui.service.RepositoryFormService.fieldsForModel(model));
+  },
+
+  /**
+   * @override
+   * Exports repository from settings field set.
+   * @returns {Object} form values
+   */
+  getValues: function() {
+    var me = this,
+        values = me.getForm().getFieldValues(),
+        record = me.getForm().getRecord(),
+        repository = {
+          name: values.name,
+          recipe: record ? record.get('format') + '-' + record.get('type') : values.recipe,
+          attributes: null
+        };
+    var properties = me.down('nx-coreui-formfield-settingsfieldset').exportProperties(values);
+    repository.attributes =  NX.coreui.service.RepositoryFormService.mapAttributes(repository.recipe, properties);
+    return repository;
   }
 });
