@@ -54,8 +54,8 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
           file: 'key.png',
           variants: ['x16', 'x32']
         },
-        visible: function () {
-          return true;
+        visible: function() {
+          return NX.Security.hasUser();
         }
       }
     ], me);
