@@ -12,67 +12,94 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
 
 /**
  * Metadata about a software component.
  *
  * @since 3.0
  */
-public interface Component
-    extends MetadataNode
+public class Component
+    extends MetadataNode<Component>
 {
+  private String group;
+
+  private String version;
+
   /**
    * Gets the group or {@code null} if undefined.
    */
   @Nullable
-  String group();
+  public String group() {
+    return group;
+  }
 
   /**
    * Gets the group or throws a runtime exception if undefined.
    */
-  String requireGroup();
+  public String requireGroup() {
+    return require(group, P_GROUP);
+  }
 
   /**
    * Sets the group to the given value, or {@code null} to un-define it.
    */
-  Component group(@Nullable String group);
+  public Component group(final @Nullable String group) {
+    this.group = group;
+    return this;
+  }
 
   /**
    * Gets the (required) name or throws a runtime exception if undefined.
    */
-  String name();
+  @Override
+  public String name() {
+    return requireName();
+  }
 
   /**
    * Sets the (required) name.
    */
-  Component name(String name);
+  public Component name(final String name) {
+    checkNotNull(name);
+    return super.name(name);
+  }
 
   /**
    * Gets the version or {@code null} if undefined.
    */
   @Nullable
-  String version();
+  public String version() {
+    return version;
+  }
 
   /**
    * Gets the version or throws a runtime exception if undefined.
    */
-  String requireVersion();
+  public String requireVersion() {
+    return require(version, P_VERSION);
+  }
 
   /**
    * Sets the version to the given value, or {@code null} to un-define it.
    */
-  Component version(@Nullable String version);
+  public Component version(final @Nullable String version) {
+    this.version = version;
+    return this;
+  }
 
-  /**
-   * Gets the assets that belong to this component, possibly empty, never {@code null}.
-   */
-  List<Asset> assets();
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "metadata=" + getEntityMetadata() +
+        ", name=" + name() +
+        ", version=" + version() +
+        ", group=" + group() +
+        '}';
+  }
 
-  /**
-   * Gets the first asset that belongs to this component or throws a runtime exception if undefined.
-   */
-  Asset firstAsset();
 }

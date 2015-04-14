@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.search;
 
+import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 
 /**
@@ -27,6 +28,6 @@ public interface ComponentMetadataProducer
    *
    * @return data to be indexed in json format
    */
-  String getMetadata(Component component);
+  String getMetadata(Component component, Iterable<Asset> assets);
 
 }

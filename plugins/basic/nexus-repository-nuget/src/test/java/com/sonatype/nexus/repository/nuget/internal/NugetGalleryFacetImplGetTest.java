@@ -62,7 +62,7 @@ public class NugetGalleryFacetImplGetTest
     final StorageTx tx = mock(StorageTx.class);
     doReturn(tx).when(galleryFacet).openStorageTx();
     doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
-    doReturn(asset).when(component).firstAsset();
+    when(tx.firstAsset(component)).thenReturn(asset);
     when(asset.contentType()).thenReturn(contentType);
     when(asset.requireBlobRef()).thenReturn(blobRef);
     when(tx.requireBlob(eq(blobRef))).thenReturn(blob);

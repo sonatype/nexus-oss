@@ -24,7 +24,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
@@ -37,6 +36,7 @@ import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
+import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -50,11 +50,9 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A {@link MavenFacet} that persists Maven artifacts and metadata to a {@link StorageFacet}.
@@ -217,7 +215,7 @@ public class MavenFacetImpl
           .group(coordinates.getGroupId())
           .name(coordinates.getArtifactId())
           .version(coordinates.getVersion());
-      component.set(StorageFacet.P_PATH, path.getPath());
+      component.formatAttributes().set(StorageFacet.P_PATH, path.getPath());
 
       // Set format specific attributes
       final NestedAttributesMap componentAttributes = component.formatAttributes();
@@ -228,14 +226,15 @@ public class MavenFacetImpl
       if (coordinates.isSnapshot()) {
         componentAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
       }
+      tx.saveComponent(component);
     }
 
     Asset asset = selectComponentAsset(tx, component, path);
     if (asset == null) {
       asset = tx.createAsset(tx.getBucket(), component);
 
-      asset.set(StorageFacet.P_NAME, path.getFileName());
-      asset.set(StorageFacet.P_PATH, path.getPath());
+      asset.name(path.getFileName());
+      asset.formatAttributes().set(StorageFacet.P_PATH, path.getPath());
 
       final NestedAttributesMap assetAttributes = asset.formatAttributes();
       assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
@@ -252,6 +251,8 @@ public class MavenFacetImpl
     }
 
     putAssetPayload(path, tx, asset, payload);
+    tx.saveAsset(asset);
+    getRepository().facet(SearchFacet.class).put(component);
   }
 
   private void putFile(final MavenPath path, final Payload payload, final StorageTx tx)
@@ -260,8 +261,8 @@ public class MavenFacetImpl
     Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
       asset = tx.createAsset(tx.getBucket(), getRepository().getFormat());
-      asset.set(StorageFacet.P_NAME, path.getFileName());
-      asset.set(StorageFacet.P_PATH, path.getPath());
+      asset.name(path.getFileName());
+      asset.formatAttributes().set(StorageFacet.P_PATH, path.getPath());
 
       final NestedAttributesMap assetAttributes = asset.formatAttributes();
       assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
@@ -270,6 +271,7 @@ public class MavenFacetImpl
     }
 
     putAssetPayload(path, tx, asset, payload);
+    tx.saveAsset(asset);
   }
 
   private void putAssetPayload(final MavenPath path,
@@ -332,8 +334,12 @@ public class MavenFacetImpl
       return false;
     }
     tx.deleteAsset(asset);
-    if (component.assets().isEmpty()) {
+    if (!tx.browseAssets(component).iterator().hasNext()) {
       tx.deleteComponent(component);
+      getRepository().facet(SearchFacet.class).delete(component);
+    }
+    else {
+      getRepository().facet(SearchFacet.class).put(component);
     }
     tx.commit();
     return true;
@@ -374,6 +380,7 @@ public class MavenFacetImpl
       }
       final NestedAttributesMap attributes = asset.formatAttributes();
       attributes.set(P_LAST_VERIFIED, verified.toDate());
+      tx.saveAsset(asset);
       tx.commit();
       return true;
     }
@@ -419,7 +426,7 @@ public class MavenFacetImpl
                                      final MavenPath mavenPath)
   {
     final String assetKey = getAssetKey(mavenPath);
-    for (Asset asset : component.assets()) {
+    for (Asset asset : tx.browseAssets(component)) {
       final NestedAttributesMap attributesMap = asset.formatAttributes();
       if (assetKey.equals(attributesMap.get(P_ASSET_KEY, String.class))) {
         return asset;
@@ -482,10 +489,4 @@ public class MavenFacetImpl
     return getRepository().facet(StorageFacet.class);
   }
 
-  private BlobRef getBlobRef(final MavenPath mavenPath, final OrientVertex asset) {
-    String blobRefStr = asset.getProperty(StorageFacet.P_BLOB_REF);
-    checkState(blobRefStr != null, "asset of component at path %s has missing blob reference",
-        mavenPath.getPath());
-    return BlobRef.parse(blobRefStr);
-  }
 }

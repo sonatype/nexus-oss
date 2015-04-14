@@ -16,6 +16,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.security.FilterChainModule;
 import org.sonatype.nexus.security.anonymous.AnonymousFilter;
+import org.sonatype.nexus.security.authc.NexusApiKeyAuthenticationFilter;
 import org.sonatype.nexus.security.authc.NexusBasicHttpAuthenticationFilter;
 import org.sonatype.nexus.web.SecurityFilter;
 
@@ -49,7 +50,10 @@ public class HttpBridgeModule
     {
       @Override
       protected void configure() {
-        addFilterChain(MOUNT_POINT + "/**", NexusBasicHttpAuthenticationFilter.NAME, AnonymousFilter.NAME);
+        addFilterChain(MOUNT_POINT + "/**",
+            NexusBasicHttpAuthenticationFilter.NAME,
+            NexusApiKeyAuthenticationFilter.NAME,
+            AnonymousFilter.NAME);
       }
     });
   }

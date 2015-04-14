@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.search;
 
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.storage.Component;
 
 /**
  * Search {@link Facet}, providing means to index/de-index component metadata.
@@ -27,15 +28,15 @@ public interface SearchFacet
   /**
    * Index component metadata.
    *
-   * @param componentMetadata metadata to be indexed
+   * @param component to be indexed
    */
-  void put(ComponentMetadata componentMetadata);
+  void put(Component component);
 
   /**
    * Deletes component metadata from index.
    *
-   * @param id id of component metadata to be deleted
+   * @param component to be deleted from index
    */
-  void delete(String id);
+  void delete(Component component);
 
 }

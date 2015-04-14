@@ -180,7 +180,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // Browse -> Upload -> Nuget
     BROWSE_NUGET_TITLE: 'NuGet',
     BROWSE_NUGET_SUBTITLE: 'Upload packages to Nuget Hosted Repositories',
-    BROWSE_NUGET_TIMEOUT_SUCCESS: 'Automatically closing NuGet API Key details due to timeout',
 
     // Browse -> Upload -> Maven
     BROWSE_MAVEN_TITLE: 'Maven',
@@ -951,7 +950,22 @@ Ext.define('NX.coreui.app.PluginStrings', {
     USER_ACCOUNT_FIRST: 'First name',
     USER_ACCOUNT_LAST: 'Last Name',
     USER_ACCOUNT_EMAIL: 'Email',
-    USER_ACCOUNT_PASSWORD_BUTTON: 'Change password'
+    USER_ACCOUNT_PASSWORD_BUTTON: 'Change password',
+    
+    // User -> NuGet Api Key
+    NUGET_APIKEY_TITLE:'NuGet API Key',
+    NUGET_APIKEY_SUB_TITLE: 'Configure credentials for NuGet repositories',
+    NUGET_APIKEY_DETAIL_DESCRIPTION: 'You NuGet API Key enables pushing packages using NuGet.exe. ' +
+    '<span style="font-weight: bold;">Keep this key secret!</span>',
+    NUGET_APIKEY_DETAIL_APIKEY_LABEL: 'Your NuGet API Key is:',
+    NUGET_APIKEY_DETAIL_REGISTER_LABEL: 'You can register this key for a given repository with the following command:',
+    NUGET_APIKEY_DETAIL_REGISTER_EXAMPLE: 'nuget setapikey {0} -source {1}',
+    NUGET_APIKEY_DETAIL_AUTOCLOSE_LABEL: 'This window will automatically close after one minute.',
+    NUGET_APIKEY_DETAIL_AUTOCLOSE_MESSAGE: 'Automatically closing NuGet API Key details due to timeout',
+    NUGET_APIKEY_INSTRUCTIONS : 'A new API Key will be created the first time it is accessed. Resetting your API Key will invalidate the current key.',
+    NUGET_APIKEY_ACCESS_BUTTON: 'Access API Key',
+    NUGET_APIKEY_RESET_BUTTON: 'Reset API Key'
+
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);

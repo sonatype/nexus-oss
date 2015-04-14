@@ -85,6 +85,7 @@ class NugetProxyRecipe
     router.route(new Route.Builder()
         .matcher(new TokenMatcher("/{id}/{version}"))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(proxyHandler)
         .handler(notFound())
         .create())

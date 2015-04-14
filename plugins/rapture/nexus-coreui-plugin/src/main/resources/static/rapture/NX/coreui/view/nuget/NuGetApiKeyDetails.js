@@ -1,0 +1,126 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-2015 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+/*global Ext, NX*/
+
+/**
+ * Dialog to display a NuGet API Key details.
+ *
+ * @since 3.0
+ */
+Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
+  extend: 'Ext.window.Window',
+  alias: 'widget.nx-coreui-nuget-apikeydetails',
+  requires: [
+    'NX.Icons',
+    'NX.Messages',
+    'NX.I18n',
+    'NX.util.Url'
+  ],
+
+  title: 'NuGet API Key',
+  autoShow: true,
+  modal: true,
+  constrain: true,
+  width: 640,
+  resizable: false,
+
+  /**
+   * @cfg {String} NuGet API Key
+   */
+  apiKey: undefined,
+
+  /**
+   * @override
+   */
+  initComponent: function() {
+    var me = this;
+
+    me.items = {
+      xtype: 'form',
+      bodyPadding: 10,
+      items: [
+        {
+          xtype: 'panel',
+          layout: 'hbox',
+          items: [
+            { xtype: 'component', html: NX.Icons.img('nuget-default', 'x32') },
+            { xtype: 'label', margin: '0 0 0 5',
+              html: NX.I18n.get('NUGET_APIKEY_DETAIL_DESCRIPTION')
+            }
+          ]
+        },
+
+        {
+          xtype: 'panel',
+          layout: 'vbox',
+          margin: '0 0 10 0',
+          items: [
+            {
+              xtype: 'label',
+              margin: '5 0 0 0',
+              text: NX.I18n.get('NUGET_APIKEY_DETAIL_APIKEY_LABEL')
+            },
+            {
+              xtype: 'textfield',
+              value: me.apiKey,
+              readOnly: true,
+              selectOnFocus: true,
+              fieldStyle: {
+                padding: '2px',
+                'font-family': 'monospace'
+              }
+            },
+            {
+              xtype: 'label',
+              margin: '5 0 0 0',
+              text: NX.I18n.get('NUGET_APIKEY_DETAIL_REGISTER_LABEL')
+            },
+            {
+              xtype: 'textfield',
+              value: NX.I18n.format('NUGET_APIKEY_DETAIL_REGISTER_EXAMPLE', me.apiKey,
+                  NX.util.Url.urlOf('repository/{repository name}/')),
+              readOnly: true,
+              selectOnFocus: true,
+              fieldStyle: {
+                padding: '2px',
+                'font-family': 'monospace'
+              }
+            },
+          ]
+        },
+        {
+          xtype: 'label',
+          style: 'font-style: italic;',
+          html: NX.I18n.get('NUGET_APIKEY_DETAIL_AUTOCLOSE_LABEL')
+        }
+      ],
+      buttonAlign: 'left',
+      buttons: [
+        { text: 'Cancel', handler: function() {
+          this.up('window').close();
+        }}
+      ]
+    };
+
+    me.callParent(arguments);
+
+    // Automatically close the window
+    Ext.defer(function() {
+      if (me.isVisible()) { // ignore if already closed
+        NX.Messages.add({ text: NX.I18n.get('NUGET_APIKEY_DETAIL_AUTOCLOSE_MESSAGE') });
+        me.close();
+      }
+    }, 1 * 60 * 1000); // 1 minute
+  }
+
+});
