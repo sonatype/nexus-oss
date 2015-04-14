@@ -88,7 +88,7 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
             {
               xtype: 'textfield',
               value: NX.I18n.format('NUGET_APIKEY_DETAIL_REGISTER_EXAMPLE', me.apiKey,
-                  NX.util.Url.urlOf('repository/{repository name}')),
+                  NX.util.Url.urlOf('repository/{repository name}/')),
               readOnly: true,
               selectOnFocus: true,
               fieldStyle: {
