@@ -20,9 +20,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 import org.sonatype.nexus.orient.entity.FieldCopier;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OType;
@@ -49,7 +51,11 @@ public class BlobStoreConfigurationEntityAdapter
 
   private static final String P_ATTRIBUTES = "attributes";
 
-  private static final String I_NAME = "name_idx";
+  @VisibleForTesting
+  static final String I_NAME = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_NAME)
+      .build();
 
   public BlobStoreConfigurationEntityAdapter() {
     super(DB_CLASS);

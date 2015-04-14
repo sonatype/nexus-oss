@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline.internal;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.DatabasePool;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.timeline.Entry;
@@ -56,7 +58,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Implementation of {@link Timeline} backed by OrientDB.
- * 
+ *
  * @since 3.0
  */
 @Named
@@ -81,9 +83,15 @@ public class DefaultTimeline
 
   private static final String P_DATA = "data";
 
-  private static final String I_TYPE = DB_CLASS + "." + P_TYPE;
+  private static final String I_TYPE = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_TYPE)
+      .build();
 
-  private static final String I_SUBTYPE = DB_CLASS + "." + P_SUBTYPE;
+  private static final String I_SUBTYPE = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_SUBTYPE)
+      .build();
 
   private final DatabaseManager databaseManager;
 
@@ -220,7 +228,8 @@ public class DefaultTimeline
   /**
    * Calculates the expected cluster name where given timestamp should be located. It adds new cluster if cluster with
    * calculated name not exists, hence, after the return from this method it is guaranteed that the cluster with name
-   * returned does exists. Clusters have common prefixes (see {@link #DB_CLUSTER_PREFIX}) and suffix is timestamp's date
+   * returned does exists. Clusters have common prefixes (see {@link #DB_CLUSTER_PREFIX}) and suffix is timestamp's
+   * date
    * (rounded to midnight) as string with pattern {@code YYYYMMDD}. As OrientDB DDL is not atomic, this method must be
    * mutually exclusive with method {@link #purgeOlderThan(int)}, hence both should be synchronized (or called from
    * synchronized block like this method). This method must be called outside of a TX as it performs DDL.
@@ -244,7 +253,7 @@ public class DefaultTimeline
 
   @Override
   public void retrieve(final int fromItem, final int count, final Set<String> types, final Set<String> subTypes,
-      final Predicate<Entry> filter, final TimelineCallback callback)
+                       final Predicate<Entry> filter, final TimelineCallback callback)
   {
     if (!isStarted() || count == 0) {
       return;
@@ -297,7 +306,8 @@ public class DefaultTimeline
 
   /**
    * Purges old clusters based on {@code days} ("older than days") parameters. If input is {@code 0}, all clusters will
-   * be removed, meaning all the timeline is purged. As Orient DDL is not atomic, this method must be mutually exclusive
+   * be removed, meaning all the timeline is purged. As Orient DDL is not atomic, this method must be mutually
+   * exclusive
    * with {@link #maybeAddNewCluster(ODatabaseDocumentTx, long)}, hence both are synchronized.
    */
   @Override
