@@ -179,6 +179,8 @@ public class DefaultProxyRubyRepository
       return item;
     }
     else {
+      // use the storage path for cache - i.e. the request path is used as well
+      item.getResourceStoreRequest().setRequestPath(item.getRepositoryItemUid().getPath());
       return super.doCacheItem(item);
     }
   }

@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.ruby.layout;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -111,13 +112,17 @@ public class HostedPOSTLayout
     for (SpecsIndexType type : SpecsIndexType.values()) {
       SpecsIndexZippedFile specsIndex = ensureSpecsIndexZippedFile(type);
 
+      ByteArrayInputStream gzippedResult = null;
       try (InputStream in = new GZIPInputStream(store.getInputStream(specsIndex))) {
         try (InputStream result = specs.addSpec(spec, in, type)) {
           // if nothing was added the content is NULL
           if (result != null) {
-            store.update(IOUtil.toGzipped(result), specsIndex);
+            gzippedResult = IOUtil.toGzipped(result);
           }
         }
+      }
+      if (gzippedResult != null) {
+        store.update(gzippedResult, specsIndex);
       }
     }
   }
