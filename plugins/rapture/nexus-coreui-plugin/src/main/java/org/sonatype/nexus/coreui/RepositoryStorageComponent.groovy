@@ -15,14 +15,12 @@ package org.sonatype.nexus.coreui
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.commons.io.FilenameUtils
-import org.apache.maven.index.IteratorSearchResponse
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.index.IndexerManager
 import org.sonatype.nexus.proxy.AccessDeniedException
 import org.sonatype.nexus.proxy.ItemNotFoundException
 import org.sonatype.nexus.proxy.NoSuchRepositoryException
@@ -61,9 +59,6 @@ extends DirectComponentSupport
 
   @Inject
   RepositoryRouter repositoryRouter
-
-  @Inject
-  IndexerManager indexerManager
 
   /**
    * Retrieves children of specified path.
@@ -208,25 +203,25 @@ extends DirectComponentSupport
 
   Set<Repository> findContainingRepositories(final StorageItem item) {
     Set<Repository> repositories = [item.repositoryItemUid.repository]
-    // search item by checksum
-    String sha1 = item.repositoryItemAttributes.get(StorageFileItem.DIGEST_SHA1_KEY)
-    if (sha1) {
-      IteratorSearchResponse searchResponse = null
-      try {
-        searchResponse = indexerManager.searchArtifactSha1ChecksumIterator(sha1, null, null, null, null, null)
-        searchResponse.each {
-          try {
-            repositories << protectedRepositoryRegistry.getRepository(it.repository)
-          }
-          catch (NoSuchRepositoryException e) {
-            log.trace 'Repository not found even if present in search results; ignoring', e
-          }
-        }
-      }
-      finally {
-        searchResponse?.close()
-      }
-    }
+    // ******** search item by checksum temporarily disabled ********
+//    String sha1 = item.repositoryItemAttributes.get(StorageFileItem.DIGEST_SHA1_KEY)
+//    if (sha1) {
+//      IteratorSearchResponse searchResponse = null
+//      try {
+//        searchResponse = indexerManager.searchArtifactSha1ChecksumIterator(sha1, null, null, null, null, null)
+//        searchResponse.each {
+//          try {
+//            repositories << protectedRepositoryRegistry.getRepository(it.repository)
+//          }
+//          catch (NoSuchRepositoryException e) {
+//            log.trace 'Repository not found even if present in search results; ignoring', e
+//          }
+//        }
+//      }
+//      finally {
+//        searchResponse?.close()
+//      }
+//    }
     // search repositories
     protectedRepositoryRegistry.repositories.each { repository ->
       if (!repositories.contains(repository)) {

@@ -25,7 +25,6 @@ import org.apache.shiro.guice.aop.ShiroAopModule;
 import org.eclipse.sisu.bean.LifecycleModule;
 import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.eclipse.sisu.launch.BundleModule;
-import org.eclipse.sisu.plexus.PlexusSpaceModule;
 import org.eclipse.sisu.space.BeanScanning;
 import org.eclipse.sisu.space.SpaceModule;
 import org.osgi.framework.Bundle;
@@ -65,8 +64,6 @@ public class NexusBundleModule
 
   private final String imports;
 
-  private final boolean hasPlexus;
-
   public NexusBundleModule(final Bundle bundle, final MutableBeanLocator locator, final Map<?, ?> nexusProperties,
       final ServletContextModule servletContextModule, final List<AbstractInterceptorModule> interceptorModules,
       final List<TypeConverterSupport> converterModules, final LifecycleModule lifecycleModule)
@@ -80,7 +77,6 @@ public class NexusBundleModule
     this.lifecycleModule = lifecycleModule;
 
     imports = Strings.nullToEmpty(bundle.getHeaders().get(Constants.IMPORT_PACKAGE));
-    hasPlexus = bundle.getResource("META-INF/plexus/components.xml") != null;
   }
 
   @Override
@@ -110,9 +106,6 @@ public class NexusBundleModule
 
   @Override
   protected Module spaceModule() {
-    if (hasPlexus) {
-      return new PlexusSpaceModule(space, BeanScanning.GLOBAL_INDEX);
-    }
     return new SpaceModule(space, BeanScanning.GLOBAL_INDEX);
   }
 
