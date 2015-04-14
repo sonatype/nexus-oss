@@ -34,10 +34,9 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKey', {
   initComponent: function() {
     var me = this;
 
-    me.items = [
+    me.settingsForm = [
       {
-        xtype: 'form',
-        ui: 'nx-subsection',
+        xtype: 'nx-settingsform',
 
         items: [
           {
