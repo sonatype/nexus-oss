@@ -33,6 +33,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class NexusApiKeyAuthenticationFilter
     extends NexusBasicHttpAuthenticationFilter
 {
+  public static final String NAME = "nx-apikey-authc";
+
   private final Map<String, NexusApiKey> apiKeys;
 
   @Inject

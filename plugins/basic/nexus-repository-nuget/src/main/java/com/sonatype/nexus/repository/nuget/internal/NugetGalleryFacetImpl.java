@@ -580,14 +580,17 @@ public class NugetGalleryFacetImpl
   void setDerivedAttributes(final Map<String, String> incomingMetadata,
                             final NestedAttributesMap storedMetadata, final boolean republishing)
   {
-    // Force the version download count to zero if it wasn't provided nor previously set
-    if (!republishing && isRepoAuthoritative()) {
-      storedMetadata.set(P_DOWNLOAD_COUNT, 0);
-      storedMetadata.set(P_VERSION_DOWNLOAD_COUNT, 0);
-    }
-    else {
-      storedMetadata.set(P_DOWNLOAD_COUNT, Integer.parseInt(incomingMetadata.get(DOWNLOAD_COUNT)));
-      storedMetadata.set(P_VERSION_DOWNLOAD_COUNT, Integer.parseInt(incomingMetadata.get(VERSION_DOWNLOAD_COUNT)));
+    if (!republishing) {
+      if (isRepoAuthoritative()) {
+        // If we're the authoritative repo for this content, set the download counts to zero
+        storedMetadata.set(P_DOWNLOAD_COUNT, 0);
+        storedMetadata.set(P_VERSION_DOWNLOAD_COUNT, 0);
+      }
+      else {
+        // Otherwise, use what's in the feed (if anything)
+        storedMetadata.set(P_DOWNLOAD_COUNT, parseIntOrZero(incomingMetadata.get(DOWNLOAD_COUNT)));
+        storedMetadata.set(P_VERSION_DOWNLOAD_COUNT, parseIntOrZero(incomingMetadata.get(VERSION_DOWNLOAD_COUNT)));
+      }
     }
 
     final Date now = new Date(clock.millis());
@@ -613,6 +616,15 @@ public class NugetGalleryFacetImpl
     // Orient doesn't support anything other than identifiers in ORDER BY
     storedMetadata.set(P_NAME_ORDER,
         (nullToEmpty(incomingMetadata.get(TITLE)) + nullToEmpty(incomingMetadata.get(ID))).toLowerCase());
+  }
+
+  private int parseIntOrZero(final String s) {
+    try {
+      return Integer.parseInt(s);
+    }
+    catch (NumberFormatException e) {
+      return 0;
+    }
   }
 
   private Component findOrCreateComponent(final StorageTx storageTx, final Bucket bucket, final String name,

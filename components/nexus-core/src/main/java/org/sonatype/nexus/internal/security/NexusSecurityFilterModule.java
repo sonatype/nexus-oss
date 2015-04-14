@@ -42,6 +42,7 @@ public class NexusSecurityFilterModule
   protected void configure() {
     bind(filterKey(AnonymousFilter.NAME)).to(AnonymousFilter.class);
     bind(filterKey(NexusBasicHttpAuthenticationFilter.NAME)).to(NexusBasicHttpAuthenticationFilter.class);
+    bind(filterKey(NexusApiKeyAuthenticationFilter.NAME)).to(NexusApiKeyAuthenticationFilter.class);
     bind(filterKey(PermissionsFilter.NAME)).to(PermissionsFilter.class);
 
     // FIXME: Sort out, and deal with naming the "authcBasic" are presently auth-token bits

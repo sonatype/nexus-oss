@@ -72,7 +72,7 @@ class NugetHostedRecipe
     router.route(new Route.Builder()
         .matcher(new AlwaysMatcher())
         .handler(timingHandler)
-    //            .handler(securityHandler)
+        .handler(securityHandler)
         .handler(pushHandler)
         .create())
 

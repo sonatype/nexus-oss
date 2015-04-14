@@ -64,9 +64,9 @@ import static org.mockito.Mockito.when;
 public class NugetGalleryFacetImplPutTest
     extends TestSupport
 {
-  @Mock 
+  @Mock
   private EventBus eventBus;
-  
+
   @Mock
   private Repository repository;
 
@@ -82,8 +82,9 @@ public class NugetGalleryFacetImplPutTest
 
   @SuppressWarnings("unchecked")
   private void putPackageMetadataAndBlob(final boolean isNew,
-                                         final Class eventClass) throws Exception {
-    final NugetGalleryFacetImpl galleryFacet = buildSpy();
+                                         final Class eventClass) throws Exception
+  {
+    final NugetGalleryFacetImpl galleryFacet = buildSpy(true);
 
     final StorageTx tx = mock(StorageTx.class);
 
@@ -112,7 +113,7 @@ public class NugetGalleryFacetImplPutTest
 
   @Test
   public void derivedAttributesSetForNewComponents() {
-    final NugetGalleryFacetImpl galleryFacet = buildSpy();
+    final NugetGalleryFacetImpl galleryFacet = buildSpy(true);
     final Clock clock = new TestableClock();
     galleryFacet.clock = clock;
 
@@ -127,8 +128,8 @@ public class NugetGalleryFacetImplPutTest
   }
 
   @Test
-  public void derivedAttributesSetForRepublishedComponents() {
-    final NugetGalleryFacetImpl galleryFacet = buildSpy();
+  public void derivedAttributesSetForHostedRepublishedComponents() {
+    final NugetGalleryFacetImpl galleryFacet = buildSpy(true);
     final Clock clock = new TestableClock();
     galleryFacet.clock = clock;
 
@@ -141,6 +142,46 @@ public class NugetGalleryFacetImplPutTest
 
     final NestedAttributesMap storedAttributes = mock(NestedAttributesMap.class);
     galleryFacet.setDerivedAttributes(incomingMap, storedAttributes, true);
+
+    verify(storedAttributes).set(eq(P_CREATED), eq(clock.dateTime().toDate()));
+    verify(storedAttributes).set(eq(P_PUBLISHED), eq(clock.dateTime().toDate()));
+  }
+
+  @Test
+  public void derivedAttributesSetForProxyRepublishedComponents() {
+    final NugetGalleryFacetImpl galleryFacet = buildSpy(false);
+    final Clock clock = new TestableClock();
+    galleryFacet.clock = clock;
+
+    final Map<String, String> incomingMap = Maps.newHashMap();
+    incomingMap.put(DOWNLOAD_COUNT, "20");
+    incomingMap.put(VERSION_DOWNLOAD_COUNT, "12");
+    final String feedDate = ODataFeedUtils.datetime(clock.millis());
+    incomingMap.put(CREATED, feedDate);
+    incomingMap.put(PUBLISHED, feedDate);
+
+    final NestedAttributesMap storedAttributes = mock(NestedAttributesMap.class);
+    galleryFacet.setDerivedAttributes(incomingMap, storedAttributes, true);
+
+    verify(storedAttributes).set(eq(P_CREATED), eq(clock.dateTime().toDate()));
+    verify(storedAttributes).set(eq(P_PUBLISHED), eq(clock.dateTime().toDate()));
+  }
+  
+  @Test
+  public void derivedAttributesSetForProxyNewComponents(){
+    final NugetGalleryFacetImpl galleryFacet = buildSpy(false);
+    final Clock clock = new TestableClock();
+    galleryFacet.clock = clock;
+
+    final Map<String, String> incomingMap = Maps.newHashMap();
+    incomingMap.put(DOWNLOAD_COUNT, "20");
+    incomingMap.put(VERSION_DOWNLOAD_COUNT, "12");
+    final String feedDate = ODataFeedUtils.datetime(clock.millis());
+    incomingMap.put(CREATED, feedDate);
+    incomingMap.put(PUBLISHED, feedDate);
+
+    final NestedAttributesMap storedAttributes = mock(NestedAttributesMap.class);
+    galleryFacet.setDerivedAttributes(incomingMap, storedAttributes, false);
 
     verify(storedAttributes).set(eq(P_CREATED), eq(clock.dateTime().toDate()));
     verify(storedAttributes).set(eq(P_PUBLISHED), eq(clock.dateTime().toDate()));
@@ -160,7 +201,7 @@ public class NugetGalleryFacetImplPutTest
 
     final Component preRelease = buildVersionMock(tx, "2.1.8-greenbell", true);
 
-    final NugetGalleryFacetImpl galleryFacet = buildSpy();
+    final NugetGalleryFacetImpl galleryFacet = buildSpy(true);
 
 
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(preRelease));
@@ -174,7 +215,7 @@ public class NugetGalleryFacetImplPutTest
 
     final Component release = buildVersionMock(tx, "2.1.8", false);
 
-    final NugetGalleryFacetImpl galleryFacet = buildSpy();
+    final NugetGalleryFacetImpl galleryFacet = buildSpy(true);
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release));
 
     verifyVersionFlags(tx.firstAsset(release).formatAttributes(), true, true);
@@ -188,7 +229,7 @@ public class NugetGalleryFacetImplPutTest
     // TODO: Aether doesn't correctly order 2.1.7-greenbell and 2.1.7
     final Component preRelease = buildVersionMock(tx, "2.1.7-greenbell", true);
 
-    final NugetGalleryFacetImpl galleryFacet = buildSpy();
+    final NugetGalleryFacetImpl galleryFacet = buildSpy(true);
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release, preRelease));
 
     verifyVersionFlags(tx.firstAsset(release).formatAttributes(), true, true);
@@ -202,14 +243,14 @@ public class NugetGalleryFacetImplPutTest
     final Component preRelease = buildVersionMock(tx, "2.1.9-greenbell", true);
     final Component release = buildVersionMock(tx, "2.1.8", false);
 
-    final NugetGalleryFacetImpl galleryFacet = buildSpy();
+    final NugetGalleryFacetImpl galleryFacet = buildSpy(true);
     galleryFacet.maintainAggregateInfo(tx, Arrays.asList(release, preRelease));
 
     verifyVersionFlags(tx.firstAsset(preRelease).formatAttributes(), false, true);
     verifyVersionFlags(tx.firstAsset(release).formatAttributes(), true, false);
   }
 
-  private NugetGalleryFacetImpl buildSpy() {
+  private NugetGalleryFacetImpl buildSpy(final boolean hosted) {
     final NugetGalleryFacetImpl galleryFacet = Mockito.spy(new NugetGalleryFacetImpl()
     {
       @Override
@@ -218,7 +259,7 @@ public class NugetGalleryFacetImplPutTest
       }
     });
     galleryFacet.installDependencies(eventBus);
-    doReturn(true).when(galleryFacet).isRepoAuthoritative();
+    doReturn(hosted).when(galleryFacet).isRepoAuthoritative();
     return galleryFacet;
   }
 

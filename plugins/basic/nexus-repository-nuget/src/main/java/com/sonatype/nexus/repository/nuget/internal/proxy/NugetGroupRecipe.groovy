@@ -23,7 +23,6 @@ import org.sonatype.nexus.repository.group.GroupHandler
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.types.GroupType
-import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
@@ -91,6 +90,7 @@ class NugetGroupRecipe
     router.route(new Route.Builder()
         .matcher(new TokenMatcher("/{id}/{version}"))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(groupHandler)
         .handler(notFound())
         .create())

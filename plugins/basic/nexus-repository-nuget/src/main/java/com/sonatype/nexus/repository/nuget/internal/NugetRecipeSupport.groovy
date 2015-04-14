@@ -99,6 +99,7 @@ abstract class NugetRecipeSupport
     // Services root and /$metadata static content
     router.route(new Route.Builder()
         .matcher(LogicMatchers.or(new LiteralMatcher("/"), new LiteralMatcher("/\$metadata")))
+        .handler(securityHandler)
         .handler(staticFeedHandler)
         .create());
 
@@ -110,7 +111,7 @@ abstract class NugetRecipeSupport
         .matcher(LogicMatchers.or(new TokenMatcher(FEED_COUNT_PATTERN), new TokenMatcher(FEED_PATTERN),
         new TokenMatcher(PACKAGE_ENTRY_PATTERN)))
         .handler(timingHandler)
-    //        .handler(securityHandler)
+        .handler(securityHandler)
         .handler(feedHandler)
         .handler(notFound())
         .create())
@@ -120,7 +121,7 @@ abstract class NugetRecipeSupport
     router.route(new Route.Builder()
         .matcher(new TokenMatcher("/{id}/{version}"))
         .handler(timingHandler)
-    //        .handler(securityHandler)
+        .handler(securityHandler)
         .handler(itemHandler)
         .handler(notFound())
         .create())
