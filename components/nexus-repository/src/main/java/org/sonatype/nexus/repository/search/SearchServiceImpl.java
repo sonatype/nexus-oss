@@ -28,11 +28,16 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.security.BreadActions;
 import org.sonatype.nexus.repository.security.RepositoryViewPermission;
+import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.security.SecurityHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -52,6 +57,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.internal.InternalSearchResponse;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
 /**
@@ -80,16 +86,20 @@ public class SearchServiceImpl
 
   private final List<IndexSettingsContributor> indexSettingsContributors;
 
+  private final Map<String, ComponentMetadataProducer> componentMetadataProducers;
+
   @Inject
   public SearchServiceImpl(final Provider<Client> client,
                            final RepositoryManager repositoryManager,
                            final SecurityHelper securityHelper,
-                           final List<IndexSettingsContributor> indexSettingsContributors)
+                           final List<IndexSettingsContributor> indexSettingsContributors,
+                           final Map<String, ComponentMetadataProducer> componentMetadataProducers)
   {
     this.client = checkNotNull(client);
     this.repositoryManager = checkNotNull(repositoryManager);
     this.securityHelper = checkNotNull(securityHelper);
     this.indexSettingsContributors = checkNotNull(indexSettingsContributors);
+    this.componentMetadataProducers = checkNotNull(componentMetadataProducers);
   }
 
   @Override
@@ -117,9 +127,9 @@ public class SearchServiceImpl
           log.trace("Contributed ElasticSearch mapping: {}", contributed);
           source = JsonUtils.merge(source, contributed);
         }
-
         // update runtime configuration
         log.trace("ElasticSearch mapping: {}", source);
+        log.debug("Creating index for {}", repository);
         client.get().admin().indices().prepareCreate(repository.getName())
             .setSource(source)
             .execute()
@@ -135,19 +145,26 @@ public class SearchServiceImpl
   public void deleteIndex(final Repository repository) {
     checkNotNull(repository);
     if (client.get().admin().indices().prepareExists(repository.getName()).execute().actionGet().isExists()) {
+      log.debug("Removing index of {}", repository);
       client.get().admin().indices().prepareDelete(repository.getName()).execute().actionGet();
     }
   }
 
   @Override
-  public void put(final Repository repository, final ComponentMetadata componentMetadata) {
+  public void put(final Repository repository, final Component component) {
     checkNotNull(repository);
-    checkNotNull(componentMetadata);
+    checkNotNull(component);
+    log.debug("Indexing metadata of {} from {}", component, repository);
     try {
       Map<String, Object> additional = Maps.newHashMap();
       additional.put(P_REPOSITORY_NAME, repository.getName());
-      String json = JsonUtils.merge(componentMetadata.toJson(), JsonUtils.from(additional));
-      client.get().prepareIndex(repository.getName(), TYPE, componentMetadata.getId()).setSource(json).execute();
+      List<Asset> assets;
+      try (StorageTx tx = repository.facet(StorageFacet.class).openTx()) {
+        assets = Lists.newArrayList(tx.browseAssets(component));
+      }
+      String json = JsonUtils.merge(componentMetadata(component, assets), JsonUtils.from(additional));
+      client.get().prepareIndex(repository.getName(), TYPE, component.getEntityMetadata().getId().toString())
+          .setSource(json).execute();
     }
     catch (IOException e) {
       throw Throwables.propagate(e);
@@ -155,10 +172,11 @@ public class SearchServiceImpl
   }
 
   @Override
-  public void delete(final Repository repository, final String id) {
+  public void delete(final Repository repository, final Component component) {
     checkNotNull(repository);
-    checkNotNull(id);
-    client.get().prepareDelete(repository.getName(), TYPE, id).execute();
+    checkNotNull(component);
+    log.debug("Removing indexed metadata of {} from {}", component, repository);
+    client.get().prepareDelete(repository.getName(), TYPE, component.getEntityMetadata().getId().toString()).execute();
   }
 
   @Override
@@ -281,4 +299,21 @@ public class SearchServiceImpl
     }
     return indexes.toArray(new String[indexes.size()]);
   }
+
+  /**
+   * Creates component metadata to be indexed out of a component using {@link ComponentMetadataProducer} specific to
+   * component {@link Format}.
+   * If one is not available will use a default one ({@link DefaultComponentMetadataProducer}).
+   */
+  private String componentMetadata(final Component component, final Iterable<Asset> assets) {
+    checkNotNull(component);
+    String format = component.format();
+    ComponentMetadataProducer producer = componentMetadataProducers.get(format);
+    if (producer == null) {
+      producer = componentMetadataProducers.get("default");
+    }
+    checkState(producer != null, "Could not find a component metadata producer for format: {}", format);
+    return producer.getMetadata(component, assets);
+  }
+
 }

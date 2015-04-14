@@ -12,21 +12,30 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import org.sonatype.nexus.common.entity.Entity;
+
 /**
  * A logical container of components and assets.
  *
  * @since 3.0
  */
-public interface Bucket
-    extends VertexWrapper
+public class Bucket
+    extends Entity
 {
+  private String repositoryName;
+
   /**
    * Gets the repository name.
    */
-  String repositoryName();
+  public String repositoryName() {
+    return repositoryName;
+  }
 
   /**
    * Sets the repository name.
    */
-  Bucket repositoryName(String repositoryName);
+  public Bucket repositoryName(String repositoryName) {
+    this.repositoryName = repositoryName;
+    return this;
+  }
 }

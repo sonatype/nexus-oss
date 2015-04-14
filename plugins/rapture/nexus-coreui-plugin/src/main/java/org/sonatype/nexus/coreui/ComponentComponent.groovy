@@ -15,6 +15,7 @@ import com.orientechnologies.orient.core.id.ORecordId
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.sonatype.nexus.common.entity.EntityId
 import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
@@ -64,16 +65,15 @@ extends DirectComponentSupport
     }
     StorageTx storageTx = repository.facet(StorageFacet).openTx()
     try {
-      Component component = storageTx.findComponent(new ORecordId(componentId), storageTx.getBucket())
+      Component component = storageTx.findComponent(new EntityId(componentId), storageTx.getBucket())
       if (component == null) {
         return null
       }
-      List<Asset> assets = component.assets()
-      return assets.collect { asset ->
+
+      return storageTx.browseAssets(component).collect { asset ->
         new AssetXO(
-            // TODO should asset have a name?
-            id: asset.id(),
-            name: asset.get(P_NAME) ?: component.name(),
+            id: asset.entityMetadata.id,
+            name: asset.name() ?: component.name(),
             contentType: asset.contentType()
         )
       }

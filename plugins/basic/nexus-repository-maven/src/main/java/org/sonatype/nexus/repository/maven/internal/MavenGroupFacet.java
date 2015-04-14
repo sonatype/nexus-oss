@@ -186,7 +186,7 @@ public class MavenGroupFacet
   @AllowConcurrentEvents
   public void onAssetEvent(final AssetEvent event) {
     if (member(event.getRepository())) {
-      final String path = event.getAsset().require(StorageFacet.P_PATH);
+      final String path = event.getAsset().formatAttributes().require(StorageFacet.P_PATH, String.class);
       final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
       if (mavenFacet.getMavenPathParser().isRepositoryMetadata(mavenPath)) {
         try {

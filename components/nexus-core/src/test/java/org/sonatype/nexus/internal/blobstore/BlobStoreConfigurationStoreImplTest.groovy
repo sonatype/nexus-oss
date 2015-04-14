@@ -84,7 +84,7 @@ class BlobStoreConfigurationStoreImplTest
     }
     catch (ORecordDuplicatedException e) {
       // FIXME: This is fragile for refactoring
-      assert e.toString().contains('name_idx')
+      assert e.toString().contains(BlobStoreConfigurationEntityAdapter.I_NAME)
     }
   }
 

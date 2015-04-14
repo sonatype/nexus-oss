@@ -12,16 +12,12 @@
  */
 package org.sonatype.nexus.repository.storage
 
-import com.orientechnologies.orient.core.id.ORID
-import com.tinkerpop.blueprints.Direction
-import com.tinkerpop.blueprints.Vertex
-import com.tinkerpop.blueprints.impls.orient.OrientVertex
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx
 import org.junit.Test
 import org.mockito.Mock
 import org.sonatype.nexus.blobstore.api.BlobRef
 import org.sonatype.nexus.common.collect.NestedAttributesMap
 import org.sonatype.nexus.common.hash.HashAlgorithm
-import org.sonatype.nexus.orient.graph.GraphTx
 import org.sonatype.nexus.repository.IllegalOperationException
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
@@ -37,15 +33,21 @@ import static org.mockito.Mockito.when
 /**
  * Tests for {@link StorageTxImpl}.
  */
-class StorageTxTest
+class StorageTxImplTest
 extends TestSupport
 {
   @Mock
   private BlobTx blobTx
   @Mock
-  private GraphTx graphTx
+  private ODatabaseDocumentTx db
   @Mock
-  private ORID bucketId
+  private Bucket bucket
+  @Mock
+  private BucketEntityAdapter bucketEntityAdapter
+  @Mock
+  private ComponentEntityAdapter componentEntityAdapter
+  @Mock
+  private AssetEntityAdapter assetEntityAdapter
   @Mock
   private Asset asset
   @Mock
@@ -67,14 +69,14 @@ extends TestSupport
   @Test
   void 'deleting assets fails when DENY write policy'() {
     when(asset.blobRef()).thenReturn(mock(BlobRef))
-    def underTest = new StorageTxImpl(blobTx, graphTx, bucketId, WritePolicy.DENY)
+    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.DENY, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     try {
       underTest.deleteAsset(asset)
       assertThat 'Expected IllegalOperationException', false
     }
     catch (IllegalOperationException e) {}
     verify(blobTx, never()).delete(any(BlobRef))
-    verify(graphTx, never()).removeVertex(any(Vertex))
+    verify(assetEntityAdapter, never()).delete(db, asset)
   }
 
   /**
@@ -88,10 +90,8 @@ extends TestSupport
    */
   @Test
   void 'deleting assets pass when DENY write policy without blob'() {
-    def vertex = mock(OrientVertex)
-    when(asset.vertex()).thenReturn(vertex)
-    new StorageTxImpl(blobTx, graphTx, bucketId, WritePolicy.DENY).deleteAsset(asset)
-    verify(graphTx, times(1)).removeVertex(vertex)
+    new StorageTxImpl(blobTx, db, bucket, WritePolicy.DENY, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter).deleteAsset(asset)
+    verify(assetEntityAdapter, times(1)).delete(db, asset)
   }
 
   /**
@@ -142,11 +142,9 @@ extends TestSupport
   void deleteAssetWhenWritePolicy(final WritePolicy writePolicy) {
     def blobRef = mock(BlobRef)
     when(asset.blobRef()).thenReturn(blobRef)
-    def vertex = mock(OrientVertex)
-    when(asset.vertex()).thenReturn(vertex)
-    new StorageTxImpl(blobTx, graphTx, bucketId, writePolicy).deleteAsset(asset)
+    new StorageTxImpl(blobTx, db, bucket, writePolicy, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter).deleteAsset(asset)
     verify(blobTx, times(1)).delete(blobRef)
-    verify(graphTx, times(1)).removeVertex(vertex)
+    verify(assetEntityAdapter, times(1)).delete(db, asset)
   }
 
   /**
@@ -165,7 +163,7 @@ extends TestSupport
   void 'setting blob fails on asset with blob when DENY write policy'() {
     def blobRef = mock(BlobRef)
     when(asset.blobRef()).thenReturn(blobRef)
-    def underTest = new StorageTxImpl(blobTx, graphTx, bucketId, WritePolicy.DENY)
+    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.DENY, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     try {
       underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
       assertThat 'Expected IllegalOperationException', false
@@ -189,7 +187,7 @@ extends TestSupport
    */
   @Test
   void 'setting blob fails on asset without blob when DENY write policy'() {
-    def underTest = new StorageTxImpl(blobTx, graphTx, bucketId, WritePolicy.DENY)
+    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.DENY, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     try {
       underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
       assertThat 'Expected IllegalOperationException', false
@@ -216,7 +214,7 @@ extends TestSupport
   void 'setting blob fails on asset with blob when ALLOW_ONCE write policy'() {
     def blobRef = mock(BlobRef)
     when(asset.blobRef()).thenReturn(blobRef)
-    def underTest = new StorageTxImpl(blobTx, graphTx, bucketId, WritePolicy.ALLOW_ONCE)
+    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW_ONCE, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     try {
       underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
       assertThat 'Expected IllegalOperationException', false
@@ -242,7 +240,7 @@ extends TestSupport
     when(asset.attributes()).thenReturn(mock(NestedAttributesMap))
     def newBlobRef = mock(BlobRef)
     when(blobTx.create(any(InputStream), eq(headers))).thenReturn(newBlobRef)
-    def underTest = new StorageTxImpl(blobTx, graphTx, bucketId, WritePolicy.ALLOW_ONCE)
+    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW_ONCE, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
     verify(asset, times(1)).blobRef(newBlobRef)
   }
@@ -265,7 +263,7 @@ extends TestSupport
     when(asset.attributes()).thenReturn(mock(NestedAttributesMap))
     def newBlobRef = mock(BlobRef)
     when(blobTx.create(any(InputStream), eq(headers))).thenReturn(newBlobRef)
-    def underTest = new StorageTxImpl(blobTx, graphTx, bucketId, WritePolicy.ALLOW)
+    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
     verify(blobTx, times(1)).delete(blobRef)
     verify(asset, times(1)).blobRef(newBlobRef)
@@ -286,89 +284,9 @@ extends TestSupport
     when(asset.attributes()).thenReturn(mock(NestedAttributesMap))
     def newBlobRef = mock(BlobRef)
     when(blobTx.create(any(InputStream), eq(headers))).thenReturn(newBlobRef)
-    def underTest = new StorageTxImpl(blobTx, graphTx, bucketId, WritePolicy.ALLOW)
+    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
     verify(asset, times(1)).blobRef(newBlobRef)
-  }
-
-  /**
-   * Given:
-   * - a bucket with components and assets
-   * - DENY write policy
-   * When:
-   * - deleting bucket
-   * Then:
-   * - no exception is thrown
-   * - blobs are deleted
-   */
-  @Test
-  void 'deleting bucket pass when DENY write policy'() {
-    deleteBucketWhenWritePolicy(WritePolicy.DENY)
-  }
-
-  /**
-   * Given:
-   * - a bucket with components and assets
-   * - ALLOW write policy
-   * When:
-   * - deleting bucket
-   * Then:
-   * - no exception is thrown
-   * - blobs are deleted
-   */
-  @Test
-  void 'deleting bucket pass when ALLOW write policy'() {
-    deleteBucketWhenWritePolicy(WritePolicy.ALLOW)
-  }
-
-  /**
-   * Given:
-   * - a bucket with components and assets
-   * - ALLOW_ONCE write policy
-   * When:
-   * - deleting bucket
-   * Then:
-   * - no exception is thrown
-   * - blobs are deleted
-   */
-  @Test
-  void 'deleting bucket pass when ALLOW_ONCE write policy'() {
-    deleteBucketWhenWritePolicy(WritePolicy.ALLOW_ONCE)
-  }
-
-  /**
-   * Given:
-   * - a bucket with components and assets
-   * - no (NULL) write policy
-   * When:
-   * - deleting bucket
-   * Then:
-   * - no exception is thrown
-   * - blobs are deleted
-   */
-  @Test
-  void 'deleting bucket pass when NULL write policy'() {
-    deleteBucketWhenWritePolicy(null)
-  }
-
-  void deleteBucketWhenWritePolicy(final WritePolicy writePolicy) {
-    Bucket bucket = mock(Bucket)
-    OrientVertex a1Vertex = mock(OrientVertex)
-    when(a1Vertex.getProperty(StorageFacet.P_ATTRIBUTES)).thenReturn([:])
-    when(a1Vertex.getProperty(StorageFacet.P_BLOB_REF)).thenReturn(new BlobRef('test', 'test', 'b1').toString())
-    OrientVertex a2Vertex = mock(OrientVertex)
-    when(a2Vertex.getProperty(StorageFacet.P_ATTRIBUTES)).thenReturn([:])
-    when(a2Vertex.getProperty(StorageFacet.P_BLOB_REF)).thenReturn(new BlobRef('test', 'test', 'b2').toString())
-    OrientVertex c1Vertex = mock(OrientVertex)
-    when(c1Vertex.getProperty(StorageFacet.P_ATTRIBUTES)).thenReturn([:])
-    when(c1Vertex.getVertices(Direction.IN, StorageFacet.E_PART_OF_COMPONENT)).thenReturn([a1Vertex])
-    OrientVertex bucketVertex = mock(OrientVertex)
-    when(bucket.vertex()).thenReturn(bucketVertex)
-    when(bucketVertex.getVertices(Direction.OUT, StorageFacet.E_OWNS_COMPONENT)).thenReturn([c1Vertex])
-    when(bucketVertex.getVertices(Direction.OUT, StorageFacet.E_OWNS_ASSET)).thenReturn([a2Vertex])
-    new StorageTxImpl(blobTx, graphTx, bucketId, writePolicy).deleteBucket(bucket)
-    verify(blobTx, times(1)).delete(new BlobRef('test', 'test', 'b1'))
-    verify(blobTx, times(1)).delete(new BlobRef('test', 'test', 'b2'))
   }
 
 }

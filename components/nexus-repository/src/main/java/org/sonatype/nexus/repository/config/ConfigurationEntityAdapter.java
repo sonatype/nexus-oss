@@ -19,6 +19,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 import org.sonatype.nexus.orient.entity.FieldCopier;
 
@@ -48,7 +49,10 @@ public class ConfigurationEntityAdapter
 
   private static final String P_ATTRIBUTES = "attributes";
 
-  private static final String I_REPOSITORY_NAME = "repository_name_idx";
+  private static final String I_REPOSITORY_NAME = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_REPOSITORY_NAME)
+      .build();
 
   public ConfigurationEntityAdapter() {
     super(DB_CLASS);

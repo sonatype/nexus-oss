@@ -15,66 +15,118 @@ package org.sonatype.nexus.repository.storage;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.BlobRef;
+import org.sonatype.nexus.common.entity.EntityId;
+
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_CONTENT_TYPE;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
 
 /**
  * Metadata about a file, which may or may not belong to a component.
  *
  * @since 3.0
  */
-public interface Asset
-    extends MetadataNode
+public class Asset
+    extends MetadataNode<Asset>
 {
+  private EntityId componentId;
+
+  private Long size;
+
+  private String contentType;
+
+  private BlobRef blobRef;
+
   /**
    * Gets the component this asset is part of, or {@code null} if it's standalone.
    */
   @Nullable
-  Component component();
+  public EntityId componentId() {
+    return componentId;
+  }
+
+  /**
+   * Sets the component id.
+   */
+  Asset componentId(final EntityId componentId) {
+    this.componentId = componentId;
+    return this;
+  }
 
   /**
    * Gets the size of the file in bytes or {@code null} if undefined.
    */
   @Nullable
-  Long size();
+  public Long size() {
+    return size;
+  }
 
   /**
    * Gets the size of the file in bytes or throws a runtime exception if undefined.
    */
-  Long requireSize();
+  public Long requireSize() {
+    return require(size, P_SIZE);
+  }
 
   /**
    * Sets the size to the given value, or {@code null} to un-define it.
    */
-  Asset size(@Nullable Long size);
+  public Asset size(final @Nullable Long size) {
+    this.size = size;
+    return this;
+  }
 
   /**
    * Gets the content type or {@code null} if undefined.
    */
   @Nullable
-  String contentType();
+  public String contentType() {
+    return contentType;
+  }
 
   /**
    * Gets the content type or throws a runtime exception if undefined.
    */
-  String requireContentType();
+  public String requireContentType() {
+    return require(contentType, P_CONTENT_TYPE);
+  }
 
   /**
    * Sets the content type to the given value, or {@code null} to un-define it.
    */
-  Asset contentType(@Nullable String contentType);
+  public Asset contentType(final @Nullable String contentType) {
+    this.contentType = contentType;
+    return this;
+  }
 
   /**
    * Gets the blobRef or {@code null} if undefined.
    */
   @Nullable
-  BlobRef blobRef();
+  public BlobRef blobRef() {
+    return blobRef;
+  }
 
   /**
    * Gets the blobRef or throws a runtime exception if undefined.
    */
-  BlobRef requireBlobRef();
+  public BlobRef requireBlobRef() {
+    return require(blobRef, P_BLOB_REF);
+  }
 
   /**
    * Sets the blobRef to the given value, or {@code null} to un-define it.
    */
-  Asset blobRef(@Nullable BlobRef blobRef);
+  Asset blobRef(final @Nullable BlobRef blobRef) {
+    this.blobRef = blobRef;
+    return this;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "metadata=" + getEntityMetadata() +
+        ", name=" + name() +
+        '}';
+  }
 }

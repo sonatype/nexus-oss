@@ -14,7 +14,10 @@ package org.sonatype.nexus.orient.entity;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.common.entity.Entity;
+import org.sonatype.nexus.common.entity.EntityId;
 
 import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -34,7 +37,22 @@ public abstract class CollectionEntityAdapter<T extends Entity>
     super(typeName);
   }
 
-  // TODO: Consider adding direct lookup helpers based on EntityId?
+  @Nullable
+  public T get(final ODatabaseDocumentTx db, final EntityId id) {
+    checkNotNull(id);
+    return get(db, id.toString());
+  }
+
+  @Nullable
+  public T get(final ODatabaseDocumentTx db, final String id) {
+    checkNotNull(db);
+    checkNotNull(id);
+    ODocument doc = db.getRecord(getRecordIdObfuscator().decode(getType(), id));
+    if (doc == null) {
+      return null;
+    }
+    return readEntity(doc);
+  }
 
   // TODO: Add (closable) iterator/iterable-based "browse" to avoid needing full memory copies for large collections?
 

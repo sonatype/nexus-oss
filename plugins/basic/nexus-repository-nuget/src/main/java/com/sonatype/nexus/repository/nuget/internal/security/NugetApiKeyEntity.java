@@ -10,28 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.storage;
+package com.sonatype.nexus.repository.nuget.internal.security;
 
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+import org.sonatype.nexus.common.entity.Entity;
 
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
+import org.apache.shiro.subject.PrincipalCollection;
 
-class BucketImpl
-    extends VertexWrapperSupport
-    implements Bucket
+/**
+ * An Orient-stored object representing the association between a {@link PrincipalCollection} and a nuget api key
+ * (char[]).
+ *
+ * @since 3.0
+ */
+public class NugetApiKeyEntity
+    extends Entity
 {
-  BucketImpl(OrientVertex vertex) {
-    super(vertex);
+  private PrincipalCollection principals;
+
+  private char[] apiKey;
+
+  public void setPrincipals(final PrincipalCollection principals) {
+    this.principals = principals;
   }
 
-  @Override
-  public String repositoryName() {
-    return get(P_REPOSITORY_NAME);
+  public void setApiKey(final char[] apiKey) {
+    this.apiKey = apiKey;
   }
 
-  @Override
-  public Bucket repositoryName(String repositoryName) {
-    set(P_REPOSITORY_NAME, repositoryName);
-    return this;
+  public PrincipalCollection getPrincipals() {
+    return principals;
+  }
+
+  public char[] getApiKey() {
+    return apiKey;
   }
 }

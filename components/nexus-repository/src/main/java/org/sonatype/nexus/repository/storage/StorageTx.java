@@ -19,12 +19,12 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
+import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
 
-import com.orientechnologies.orient.core.id.ORID;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
  * A storage transaction.
@@ -40,7 +40,7 @@ public interface StorageTx
    * Note: The caller may use this to directly query or manipulate the OrientDB graph, if needed, but should not
    * directly commit, rollback, or close the underlying transaction.
    */
-  OrientGraph getGraphTx();
+  ODatabaseDocumentTx getDb();
 
   /**
    * Commits the transaction.
@@ -73,6 +73,16 @@ public interface StorageTx
   Iterable<Asset> browseAssets(Bucket bucket);
 
   /**
+   * Gets all assets owned by the specified component.
+   */
+  Iterable<Asset> browseAssets(Component component);
+
+  /**
+   * Gets first asset owned by the specified component.
+   */
+  Asset firstAsset(Component component);
+
+  /**
    * Gets all components owned by the specified bucket.
    */
   Iterable<Component> browseComponents(Bucket bucket);
@@ -81,7 +91,7 @@ public interface StorageTx
    * Gets an asset by id, owned by the specified bucket, or {@code null} if not found.
    */
   @Nullable
-  Asset findAsset(ORID id, Bucket bucket);
+  Asset findAsset(EntityId id, Bucket bucket);
 
   /**
    * Gets an asset by some identifying property, owned by the specified bucket, or {@code null} if not found.
@@ -92,14 +102,16 @@ public interface StorageTx
   /**
    * Gets all assets in the specified repositories that match the given where clause.
    *
-   * @param whereClause an OrientDB select query, minus the "select from X where " prefix. Rather than passing values
-   *                    in directly, they should be specified as :labeled portions of the where clause (e.g. a = :aVal).
-   * @param parameters the name-value pairs specifying the values for any :labeled portions of the where clause.
+   * @param whereClause  an OrientDB select query, minus the "select from X where " prefix. Rather than passing values
+   *                     in directly, they should be specified as :labeled portions of the where clause (e.g. a =
+   *                     :aVal).
+   * @param parameters   the name-value pairs specifying the values for any :labeled portions of the where clause.
    * @param repositories the repositories to limit the results to. If null or empty, results won't be limited
    *                     by repository.
-   * @param querySuffix the part of the query after the where clause, which may by used for ordering and paging
-   *                    as per the OrientDB select query syntax.
-   * @see <a href="https://github.com/orientechnologies/orientdb/wiki/SQL-Query">OrientDB SELECT Query Documentation</a>
+   * @param querySuffix  the part of the query after the where clause, which may by used for ordering and paging
+   *                     as per the OrientDB select query syntax.
+   * @see <a href="https://github.com/orientechnologies/orientdb/wiki/SQL-Query">OrientDB SELECT Query
+   *      Documentation</a>
    */
   Iterable<Asset> findAssets(@Nullable String whereClause,
                              @Nullable Map<String, Object> parameters,
@@ -118,7 +130,7 @@ public interface StorageTx
    * Gets a component by id, owned by the specified bucket, or {@code null} if not found.
    */
   @Nullable
-  Component findComponent(ORID id, Bucket bucket);
+  Component findComponent(EntityId id, Bucket bucket);
 
   /**
    * Gets a component by some identifying property, or {@code null} if not found.
@@ -129,14 +141,16 @@ public interface StorageTx
   /**
    * Gets all component in the specified repositories that match the given where clause.
    *
-   * @param whereClause an OrientDB query, minus the "select from X where " prefix. Rather than passing values
-   *                    in directly, they should be specified as :labeled portions of the where clause (e.g. a = :aVal).
-   * @param parameters the name-value pairs specifying the values for any :labeled portions of the where clause.
+   * @param whereClause  an OrientDB query, minus the "select from X where " prefix. Rather than passing values
+   *                     in directly, they should be specified as :labeled portions of the where clause (e.g. a =
+   *                     :aVal).
+   * @param parameters   the name-value pairs specifying the values for any :labeled portions of the where clause.
    * @param repositories the repositories to limit the results to. If null or empty, results won't be limited
    *                     by repository.
-   * @param querySuffix the part of the query after the where clause, which may by used for ordering and paging
-   *                    as per the OrientDB select query syntax.
-   * @see <a href="https://github.com/orientechnologies/orientdb/wiki/SQL-Query">OrientDB SELECT Query Documentation</a>
+   * @param querySuffix  the part of the query after the where clause, which may by used for ordering and paging
+   *                     as per the OrientDB select query syntax.
+   * @see <a href="https://github.com/orientechnologies/orientdb/wiki/SQL-Query">OrientDB SELECT Query
+   *      Documentation</a>
    */
   Iterable<Component> findComponents(@Nullable String whereClause,
                                      @Nullable Map<String, Object> parameters,
@@ -167,6 +181,16 @@ public interface StorageTx
   Component createComponent(Bucket bucket, Format format);
 
   /**
+   * Updates an existing component.
+   */
+  void saveComponent(Component component);
+
+  /**
+   * Updates an existing asset.
+   */
+  void saveAsset(Asset asset);
+
+  /**
    * Deletes an existing component and all constituent assets.
    */
   void deleteComponent(Component component);
@@ -195,7 +219,7 @@ public interface StorageTx
    * The old blob, if any, will be deleted.
    */
   BlobRef setBlob(InputStream inputStream, Map<String, String> headers, Asset asset,
-                     Iterable<HashAlgorithm> hashAlgorithms, String contentType);
+                  Iterable<HashAlgorithm> hashAlgorithms, String contentType);
 
   /**
    * Gets a Blob, or {@code null if not found}.
