@@ -102,9 +102,11 @@ public class GroupMetadataServiceImpl
           else {
             String memberLatestVersion = getDistTagsLatest(memberRoot);
             root.overlayIgnoringOrigin(memberRoot);
-            if (latestVersion != null && memberLatestVersion != null &&
-                comparator.compare(memberLatestVersion, latestVersion) > 0) {
-              latestVersion = memberLatestVersion;
+            if (memberLatestVersion != null) {
+              if (latestVersion == null ||
+                  comparator.compare(memberLatestVersion, latestVersion) > 0) {
+                latestVersion = memberLatestVersion;
+              }
             }
           }
         }
