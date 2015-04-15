@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.repository.maven.internal
 
+import javax.inject.Named
+import javax.inject.Singleton
+
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2GroupRecipe
@@ -21,9 +24,6 @@ import org.sonatype.nexus.repository.maven.internal.maven2.Maven2ProxyRecipe
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy
 import org.sonatype.nexus.repository.storage.WritePolicy
-
-import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * Provide default hosted and proxy repositories for Maven.
