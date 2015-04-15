@@ -34,10 +34,10 @@ public class ActionMatcher
 {
   private final List<String> allowedActions;
 
-  public ActionMatcher(final String... allowedMethods) {
-    checkNotNull(allowedMethods);
-    checkArgument(allowedMethods.length > 0, "at least one allowed method must be specified");
-    this.allowedActions = asList(allowedMethods);
+  public ActionMatcher(final String... allowedActions) {
+    checkNotNull(allowedActions);
+    checkArgument(allowedActions.length > 0, "at least one allowed action must be specified");
+    this.allowedActions = asList(allowedActions);
   }
 
   @Override
