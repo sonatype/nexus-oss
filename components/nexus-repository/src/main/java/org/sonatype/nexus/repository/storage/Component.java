@@ -54,22 +54,6 @@ public class Component
   }
 
   /**
-   * Gets the (required) name or throws a runtime exception if undefined.
-   */
-  @Override
-  public String name() {
-    return requireName();
-  }
-
-  /**
-   * Sets the (required) name.
-   */
-  public Component name(final String name) {
-    checkNotNull(name);
-    return super.name(name);
-  }
-
-  /**
    * Gets the version or {@code null} if undefined.
    */
   @Nullable

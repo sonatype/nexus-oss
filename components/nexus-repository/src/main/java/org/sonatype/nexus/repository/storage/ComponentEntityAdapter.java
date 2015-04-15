@@ -18,11 +18,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_BUCKET;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
@@ -41,17 +45,31 @@ public class ComponentEntityAdapter
       .type(Component.class)
       .build();
 
+  private static final String I_BUCKET_GROUP_NAME_VERSION = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_BUCKET)
+      .property(P_GROUP)
+      .property(P_NAME)
+      .property(P_VERSION)
+      .build();
+
   @Inject
   public ComponentEntityAdapter(final BucketEntityAdapter bucketEntityAdapter) {
     super(DB_CLASS, bucketEntityAdapter);
   }
 
   @Override
-  protected void defineType(final OClass type) {
+  protected void defineType(final ODatabaseDocumentTx db, final OClass type) {
     super.defineType(type);
     type.createProperty(P_GROUP, OType.STRING);
-    type.createProperty(P_NAME, OType.STRING);
+    type.createProperty(P_NAME, OType.STRING).setMandatory(true).setNotNull(true);
     type.createProperty(P_VERSION, OType.STRING);
+
+    ODocument metadata = db.newInstance()
+        .field("ignoreNullValues", false)
+        .field("mergeKeys", false);
+    type.createIndex(I_BUCKET_GROUP_NAME_VERSION, INDEX_TYPE.UNIQUE.name(), null, metadata,
+        new String[]{P_BUCKET, P_GROUP, P_NAME, P_VERSION});
   }
 
   @Override

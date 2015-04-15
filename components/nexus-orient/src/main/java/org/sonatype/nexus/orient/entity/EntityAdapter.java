@@ -82,7 +82,7 @@ public abstract class EntityAdapter<T extends Entity>
     OClass type = schema.getClass(typeName);
     if (type == null) {
       type = schema.createClass(typeName);
-      defineType(type);
+      defineType(db, type);
 
       log.info("Created schema type '{}': properties={}, indexes={}",
           type,
@@ -91,6 +91,10 @@ public abstract class EntityAdapter<T extends Entity>
       );
     }
     this.type = type;
+  }
+
+  protected void defineType(final ODatabaseDocumentTx db, final OClass type){
+    defineType(type);
   }
 
   protected abstract void defineType(final OClass type);

@@ -39,6 +39,7 @@ import com.google.inject.util.Providers;
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -157,6 +158,7 @@ public class StorageFacetImplIT
     EntityId docId;
     try (StorageTx tx = underTest.openTx()) {
       Asset asset = tx.createAsset(tx.getBucket(), testFormat);
+      asset.name("asset");
       NestedAttributesMap map = asset.attributes();
 
       assertThat(map.isEmpty(), is(true));
@@ -279,6 +281,7 @@ public class StorageFacetImplIT
     try (StorageTx tx = underTest.openTx()) {
       Bucket bucket = tx.getBucket();
       Asset asset = tx.createAsset(bucket, testFormat);
+      asset.name("asset");
       asset.attributes().child("bag1").set("foo", "bar");
       asset.attributes().child("bag2").set("baz", "qux");
       tx.saveAsset(asset);
@@ -342,6 +345,7 @@ public class StorageFacetImplIT
       tx.saveComponent(component);
 
       Asset asset2 = tx.createAsset(bucket, component);
+      asset2.name("asset2");
       tx.saveAsset(asset2);
       tx.commit();
 
@@ -407,6 +411,7 @@ public class StorageFacetImplIT
     try (StorageTx tx = underTest.openTx()) {
       Bucket bucket = tx.getBucket();
       Asset asset = tx.createAsset(bucket, testFormat);
+      asset.name("asset");
       tx.saveAsset(asset);
       assetId = asset.getEntityMetadata().getId();
       tx.commit();
@@ -468,6 +473,89 @@ public class StorageFacetImplIT
       assertThat(name, is("secondValue"));
       assertThat(finalVersion, is(new EntityVersion(String.valueOf(Integer.valueOf(firstVersion.toString()) + 2))));
     }
+  }
+
+  @Test
+  public void noDuplicateComponent() throws Exception {
+    createComponent(null, "name", null);
+    createComponent("group", "name", null);
+    createComponent(null, "name", "1");
+    createComponent("group", "name", "1");
+  }
+
+  @Test(expected = ORecordDuplicatedException.class)
+  public void duplicateComponentName() throws Exception {
+    createComponent(null, "name", null);
+    createComponent(null, "name", null);
+  }
+
+  @Test(expected = ORecordDuplicatedException.class)
+  public void duplicateComponentGroupName() throws Exception {
+    createComponent("group", "name", null);
+    createComponent("group", "name", null);
+  }
+
+  @Test(expected = ORecordDuplicatedException.class)
+  public void duplicateComponentNameVersion() throws Exception {
+    createComponent(null, "name", "1");
+    createComponent(null, "name", "1");
+  }
+
+  @Test(expected = ORecordDuplicatedException.class)
+  public void duplicateComponentGroupNameVersion() throws Exception {
+    createComponent("group", "name", "1");
+    createComponent("group", "name", "1");
+  }
+
+  private Component createComponent(final String group, final String name, final String version) throws Exception {
+    try (StorageTx tx = underTest.openTx()) {
+      Bucket bucket = tx.getBucket();
+      Component component = tx.createComponent(bucket, testFormat)
+          .group(group)
+          .name(name)
+          .version(version);
+      tx.saveComponent(component);
+      tx.commit();
+      return component;
+    }
+  }
+
+  private Asset createAsset(final Component component, final String name) throws Exception {
+    try (StorageTx tx = underTest.openTx()) {
+      Bucket bucket = tx.getBucket();
+      Asset asset;
+      if (component != null) {
+        asset = tx.createAsset(bucket, component);
+      }
+      else {
+        asset = tx.createAsset(bucket, testFormat);
+      }
+      asset.name(name);
+      tx.saveAsset(asset);
+      tx.commit();
+      return asset;
+    }
+  }
+
+  @Test
+  public void noDuplicateAsset() throws Exception {
+    Component component = createComponent("group", "name", "1");
+    createAsset(component, "name");
+    createAsset(null, "name");
+  }
+
+
+  @Test(expected = ORecordDuplicatedException.class)
+  public void duplicateAssetComponentName() throws Exception {
+    Component component = createComponent("group", "name", "1");
+    createAsset(component, "name");
+    createAsset(component, "name");
+  }
+
+  @Test(expected = ORecordDuplicatedException.class)
+  public void duplicateAssetName() throws Exception {
+    createAsset(null, "name");
+    createAsset(null, "name");
   }
 
   private void checkSize(Iterable iterable, int expectedSize) {

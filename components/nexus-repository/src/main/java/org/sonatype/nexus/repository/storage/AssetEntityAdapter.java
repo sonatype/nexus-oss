@@ -22,6 +22,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 
 import com.google.common.collect.ImmutableMap;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -35,6 +36,7 @@ import com.orientechnologies.orient.core.sql.OCommandSQL;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_BUCKET;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_COMPONENT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_CONTENT_TYPE;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
@@ -54,7 +56,17 @@ public class AssetEntityAdapter
       .type(Asset.class)
       .build();
 
-  private static final String I_COMPONENT = DB_CLASS + ".component_idx";
+  private static final String I_BUCKET_COMPONENT_NAME = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_BUCKET)
+      .property(P_COMPONENT)
+      .property(P_NAME)
+      .build();
+
+  private static final String I_COMPONENT = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_COMPONENT)
+      .build();
 
   private final ComponentEntityAdapter componentEntityAdapter;
 
@@ -67,14 +79,20 @@ public class AssetEntityAdapter
   }
 
   @Override
-  protected void defineType(final OClass type) {
+  protected void defineType(final ODatabaseDocumentTx db, final OClass type) {
     super.defineType(type);
     type.createProperty(P_COMPONENT, OType.LINK, componentEntityAdapter.getType());
-    type.createProperty(P_NAME, OType.STRING);
+    type.createProperty(P_NAME, OType.STRING).setMandatory(true).setNotNull(true);
     type.createProperty(P_SIZE, OType.LONG);
     type.createProperty(P_CONTENT_TYPE, OType.STRING);
     type.createProperty(P_BLOB_REF, OType.STRING);
 
+    ODocument metadata = db.newInstance()
+        .field("ignoreNullValues", false)
+        .field("mergeKeys", false);
+    type.createIndex(I_BUCKET_COMPONENT_NAME, INDEX_TYPE.UNIQUE.name(), null, metadata,
+        new String[]{P_BUCKET, P_COMPONENT, P_NAME}
+    );
     type.createIndex(I_COMPONENT, INDEX_TYPE.NOTUNIQUE, P_COMPONENT);
   }
 
