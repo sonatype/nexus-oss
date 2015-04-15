@@ -12,13 +12,14 @@
  */
 package org.sonatype.nexus.coreui_legacy
 
+import javax.validation.constraints.NotNull
+
+import org.sonatype.nexus.proxy.repository.LocalStatus
+import org.sonatype.nexus.validation.group.Create
+import org.sonatype.nexus.validation.group.Update
+
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Create
-import org.sonatype.nexus.common.validation.Update
-import org.sonatype.nexus.proxy.repository.LocalStatus
-
-import javax.validation.constraints.NotNull
 
 /**
  * Repository exchange object.

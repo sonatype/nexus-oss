@@ -39,11 +39,11 @@ import javax.validation.ValidationException;
 
 import org.sonatype.nexus.analytics.EventDataBuilder;
 import org.sonatype.nexus.analytics.EventRecorder;
-import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.extdirect.model.Response;
+import org.sonatype.nexus.validation.ValidationResponseException;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;

@@ -19,9 +19,6 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
 
-import org.sonatype.nexus.common.validation.Create
-import org.sonatype.nexus.common.validation.Update
-import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.repository.MissingFacetException
@@ -32,6 +29,9 @@ import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
 import org.sonatype.nexus.repository.view.ViewFacet
+import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.validation.group.Create
+import org.sonatype.nexus.validation.group.Update
 import org.sonatype.nexus.web.BaseUrlHolder
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction

@@ -12,24 +12,16 @@
  */
 package org.sonatype.nexus.coreui
 
-import com.google.inject.Key
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import groovy.transform.PackageScope
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.apache.shiro.authz.annotation.RequiresUser
-import org.apache.shiro.subject.Subject
-import org.eclipse.sisu.inject.BeanLocator
-import org.hibernate.validator.constraints.NotEmpty
+import javax.annotation.Nullable
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+import javax.validation.groups.Default
+
 import org.sonatype.micromailer.Address
 import org.sonatype.nexus.common.text.Strings2
-import org.sonatype.nexus.common.validation.Create
-import org.sonatype.nexus.common.validation.Update
-import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.common.validation.ValidationMessage
-import org.sonatype.nexus.common.validation.ValidationResponse
-import org.sonatype.nexus.common.validation.ValidationResponseException
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
@@ -40,15 +32,24 @@ import org.sonatype.nexus.security.role.RoleIdentifier
 import org.sonatype.nexus.security.user.User
 import org.sonatype.nexus.security.user.UserManager
 import org.sonatype.nexus.security.user.UserSearchCriteria
+import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.validation.ValidationMessage
+import org.sonatype.nexus.validation.ValidationResponse
+import org.sonatype.nexus.validation.ValidationResponseException
+import org.sonatype.nexus.validation.group.Create
+import org.sonatype.nexus.validation.group.Update
 import org.sonatype.nexus.wonderland.AuthTicketService
 
-import javax.annotation.Nullable
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
-import javax.validation.groups.Default
+import com.google.inject.Key
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.apache.shiro.authz.annotation.RequiresUser
+import org.apache.shiro.subject.Subject
+import org.eclipse.sisu.inject.BeanLocator
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * User {@link DirectComponent}.

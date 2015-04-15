@@ -17,12 +17,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.common.text.Strings2;
-import org.sonatype.nexus.common.validation.ValidationMessage;
-import org.sonatype.nexus.common.validation.ValidationResponse;
 import org.sonatype.nexus.security.authz.WildcardPermission2;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.ConfigurationIdGenerator;
 import org.sonatype.nexus.security.config.SecurityConfigurationValidationContext;
+import org.sonatype.nexus.validation.ValidationMessage;
+import org.sonatype.nexus.validation.ValidationResponse;
 
 import org.apache.shiro.authz.Permission;
 

@@ -29,12 +29,12 @@ import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.blobstore.file.FileBlobStore;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
-import org.sonatype.nexus.common.validation.ValidationMessage;
-import org.sonatype.nexus.common.validation.ValidationResponse;
-import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
 import org.sonatype.nexus.jmx.reflect.ManagedObject;
+import org.sonatype.nexus.validation.ValidationMessage;
+import org.sonatype.nexus.validation.ValidationResponse;
+import org.sonatype.nexus.validation.ValidationResponseException;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;

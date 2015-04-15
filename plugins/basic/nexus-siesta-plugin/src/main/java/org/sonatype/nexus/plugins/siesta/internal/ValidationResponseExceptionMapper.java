@@ -18,9 +18,9 @@ import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.validation.ValidationMessage;
-import org.sonatype.nexus.common.validation.ValidationResponse;
-import org.sonatype.nexus.common.validation.ValidationResponseException;
+import org.sonatype.nexus.validation.ValidationMessage;
+import org.sonatype.nexus.validation.ValidationResponse;
+import org.sonatype.nexus.validation.ValidationResponseException;
 import org.sonatype.siesta.ValidationErrorXO;
 import org.sonatype.siesta.server.validation.ValidationExceptionMapperSupport;
 

@@ -17,9 +17,9 @@ import javax.inject.Named
 import javax.inject.Provider
 import javax.inject.Singleton
 
-import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.security.SecurityHelper
+import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.wonderland.AuthTicketService
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction

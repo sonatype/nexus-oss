@@ -12,14 +12,13 @@
  */
 package org.sonatype.nexus.capability.internal.ui
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import groovy.transform.PackageScope
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.hibernate.validator.constraints.NotEmpty
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+import javax.validation.groups.Default
+
 import org.sonatype.nexus.capability.Capability
 import org.sonatype.nexus.capability.CapabilityDescriptor
 import org.sonatype.nexus.capability.CapabilityDescriptorRegistry
@@ -28,19 +27,21 @@ import org.sonatype.nexus.capability.CapabilityRegistry
 import org.sonatype.nexus.capability.Tag
 import org.sonatype.nexus.capability.Taggable
 import org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder
-import org.sonatype.nexus.common.validation.Create
-import org.sonatype.nexus.common.validation.Update
-import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable
+import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.validation.group.Create
+import org.sonatype.nexus.validation.group.Update
 
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
-import javax.validation.groups.Default
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import static org.sonatype.nexus.capability.CapabilityIdentity.capabilityIdentity
 import static org.sonatype.nexus.capability.CapabilityType.capabilityType

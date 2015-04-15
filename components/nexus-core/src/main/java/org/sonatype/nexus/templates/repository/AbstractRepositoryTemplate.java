@@ -15,12 +15,12 @@ package org.sonatype.nexus.templates.repository;
 import java.io.IOException;
 
 import org.sonatype.nexus.common.throwables.ConfigurationException;
-import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.templates.AbstractConfigurableTemplate;
+import org.sonatype.nexus.validation.ValidationResponseException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

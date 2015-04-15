@@ -15,7 +15,7 @@ package org.sonatype.nexus.configuration.validator;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.common.validation.ValidationResponse;
+import org.sonatype.nexus.validation.ValidationResponse;
 
 /**
  * Application {@link ValidationResponse} which sets {@link ApplicationValidationContext}.

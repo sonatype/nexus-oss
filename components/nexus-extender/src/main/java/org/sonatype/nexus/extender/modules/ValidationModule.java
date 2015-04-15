@@ -23,7 +23,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.executable.ExecutableValidator;
 
-import org.sonatype.nexus.common.validation.Validate;
+import org.sonatype.nexus.validation.Validate;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;

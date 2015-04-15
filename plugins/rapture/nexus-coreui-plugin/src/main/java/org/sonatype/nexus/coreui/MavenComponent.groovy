@@ -12,12 +12,10 @@
  */
 package org.sonatype.nexus.coreui
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Validate
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask
@@ -27,10 +25,13 @@ import org.sonatype.nexus.proxy.maven.gav.GavCalculator
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.scheduling.TaskConfiguration
 import org.sonatype.nexus.scheduling.TaskScheduler
+import org.sonatype.nexus.validation.Validate
 
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Maven {@link DirectComponent}.

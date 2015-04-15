@@ -12,14 +12,17 @@
  */
 package org.sonatype.nexus.coreui
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import groovy.transform.PackageScope
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.hibernate.validator.constraints.Email
+import java.security.cert.CertPathBuilderException
+
+import javax.annotation.Nullable
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import javax.net.ssl.SSLPeerUnverifiedException
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+
 import org.sonatype.micromailer.Address
-import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.configuration.ApplicationConfiguration
 import org.sonatype.nexus.email.EmailerException
 import org.sonatype.nexus.email.NexusEmailer
@@ -29,15 +32,14 @@ import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.rapture.TrustStoreKeys
+import org.sonatype.nexus.validation.Validate
 
-import javax.annotation.Nullable
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import javax.net.ssl.SSLPeerUnverifiedException
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
-import java.security.cert.CertPathBuilderException
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.Email
 
 /**
  * SMTP System Settings {@link DirectComponent}.

@@ -12,14 +12,10 @@
  */
 package org.sonatype.nexus.coreui
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.commons.io.FilenameUtils
-import org.apache.maven.index.IteratorSearchResponse
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Validate
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.index.IndexerManager
@@ -37,10 +33,15 @@ import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.repository.Repository
 import org.sonatype.nexus.proxy.router.RepositoryRouter
+import org.sonatype.nexus.validation.Validate
 
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.commons.io.FilenameUtils
+import org.apache.maven.index.IteratorSearchResponse
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Repository Storage {@link DirectComponent}.

@@ -47,11 +47,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-validator</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-odata4j</artifactId>
       <version>0.0.7</version>

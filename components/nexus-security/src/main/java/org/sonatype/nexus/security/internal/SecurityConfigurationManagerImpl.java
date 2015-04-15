@@ -25,9 +25,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.text.Strings2;
-import org.sonatype.nexus.common.validation.ValidationMessage;
-import org.sonatype.nexus.common.validation.ValidationResponse;
-import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.security.authz.AuthorizationConfigurationChanged;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CRole;
@@ -48,6 +45,9 @@ import org.sonatype.nexus.security.role.NoSuchRoleException;
 import org.sonatype.nexus.security.user.NoSuchRoleMappingException;
 import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.nexus.security.user.UserNotFoundException;
+import org.sonatype.nexus.validation.ValidationMessage;
+import org.sonatype.nexus.validation.ValidationResponse;
+import org.sonatype.nexus.validation.ValidationResponseException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

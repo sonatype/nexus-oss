@@ -16,13 +16,13 @@ package org.sonatype.nexus.proxy.targets;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.validation.ValidationMessage;
-import org.sonatype.nexus.common.validation.ValidationResponse;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.SecurityConfigurationValidationContext;
 import org.sonatype.nexus.security.privilege.AbstractPrivilegeDescriptor;
 import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
 import org.sonatype.nexus.security.privilege.PrivilegeDescriptor;
+import org.sonatype.nexus.validation.ValidationMessage;
+import org.sonatype.nexus.validation.ValidationResponse;
 
 import org.codehaus.plexus.util.StringUtils;
 

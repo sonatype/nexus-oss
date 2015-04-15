@@ -10,42 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.common.validation
+package org.sonatype.nexus.validation
 
-import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
+import org.junit.Test
+
 /**
- * Tests for {@link ValidationResponse}
+ * Trials of {@link ValidationMessage}
  */
-class ValidationResponseTest
+class ValidationMessageTrial
     extends TestSupport
 {
   @Test
-  void 'empty'() {
-    def response = new ValidationResponse()
-    assert response.empty
+  void 'string representation'() {
+    log new ValidationMessage('key', 'message')
   }
 
   @Test
-  void 'not empty with warnings'() {
-    def response = new ValidationResponse()
-    response.addWarning(new ValidationMessage('foo', 'bar'))
-    assert !response.empty
-  }
-
-  @Test
-  void 'not empty with errors'() {
-    def response = new ValidationResponse()
-    response.addError(new ValidationMessage('foo', 'bar'))
-    assert !response.empty
-  }
-
-  @Test
-  void 'not empty with warnings and errors'() {
-    def response = new ValidationResponse()
-    response.addWarning(new ValidationMessage('foo', 'bar'))
-    response.addError(new ValidationMessage('foo', 'bar'))
-    assert !response.empty
+  void 'string representation with exception'() {
+    log new ValidationMessage('key', 'message', new Throwable('TEST'))
   }
 }

@@ -21,7 +21,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.executable.ExecutableValidator;
 
-import org.sonatype.nexus.common.validation.Validate;
+import org.sonatype.nexus.validation.Validate;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;

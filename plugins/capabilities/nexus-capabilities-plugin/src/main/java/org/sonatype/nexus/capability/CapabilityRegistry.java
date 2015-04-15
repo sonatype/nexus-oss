@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.sonatype.nexus.common.validation.ValidationResponseException;
+import org.sonatype.nexus.validation.ValidationResponseException;
 
 import com.google.common.base.Predicate;
 

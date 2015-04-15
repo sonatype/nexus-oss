@@ -24,13 +24,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.text.Strings2;
-import org.sonatype.nexus.common.validation.Validate;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.rapture.StateContributor;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.anonymous.AnonymousConfiguration;
 import org.sonatype.nexus.security.anonymous.AnonymousManager;
 import org.sonatype.nexus.security.privilege.Privilege;
+import org.sonatype.nexus.validation.Validate;
 import org.sonatype.nexus.wonderland.AuthTicketService;
 
 import com.google.common.collect.Lists;

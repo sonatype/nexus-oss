@@ -13,6 +13,18 @@
 
 package org.sonatype.nexus.coreui
 
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+
+import org.sonatype.nexus.extdirect.DirectComponent
+import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.security.realm.RealmConfiguration
+import org.sonatype.nexus.security.realm.RealmManager
+import org.sonatype.nexus.validation.Validate
+
 import com.google.inject.Key
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
@@ -20,17 +32,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.realm.Realm
 import org.eclipse.sisu.inject.BeanLocator
-import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.extdirect.DirectComponent
-import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.security.realm.RealmConfiguration
-import org.sonatype.nexus.security.realm.RealmManager
-
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
 
 /**
  * Realm Security Settings {@link DirectComponent}.

@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.common.validation.ValidationResponseException;
+import org.sonatype.nexus.validation.ValidationResponseException;
 
 /**
  * Kenai facade.

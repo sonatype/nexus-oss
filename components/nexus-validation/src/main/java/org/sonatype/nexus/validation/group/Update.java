@@ -27,11 +27,11 @@
 * limitations under the License.
 */
 
-package org.sonatype.nexus.common.validation;
+package org.sonatype.nexus.validation.group;
 
 /**
- * Bean Validation group that should be used on create.
+ * Bean Validation group that should be used on update.
  */
-public interface Create
+public interface Update
 {
 }

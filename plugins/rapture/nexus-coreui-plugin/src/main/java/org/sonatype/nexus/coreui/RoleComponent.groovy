@@ -12,28 +12,29 @@
  */
 package org.sonatype.nexus.coreui
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import groovy.transform.PackageScope
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Create
-import org.sonatype.nexus.common.validation.Update
-import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.extdirect.DirectComponent
-import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.security.SecuritySystem
-import org.sonatype.nexus.security.authz.AuthorizationManager
-import org.sonatype.nexus.security.role.Role
-import org.sonatype.nexus.security.user.UserManager
-
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
+
+import org.sonatype.nexus.extdirect.DirectComponent
+import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.security.SecuritySystem
+import org.sonatype.nexus.security.authz.AuthorizationManager
+import org.sonatype.nexus.security.role.Role
+import org.sonatype.nexus.security.user.UserManager
+import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.validation.group.Create
+import org.sonatype.nexus.validation.group.Update
+
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Role {@link DirectComponent}.

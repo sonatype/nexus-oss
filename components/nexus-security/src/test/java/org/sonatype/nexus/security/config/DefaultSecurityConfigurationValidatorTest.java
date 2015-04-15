@@ -15,11 +15,11 @@ package org.sonatype.nexus.security.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.common.validation.ValidationResponse;
 import org.sonatype.nexus.security.internal.ConfigurationIdGeneratorImpl;
 import org.sonatype.nexus.security.internal.SecurityConfigurationValidatorImpl;
 import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
 import org.sonatype.nexus.security.privilege.PrivilegeDescriptor;
+import org.sonatype.nexus.validation.ValidationResponse;
 
 import org.junit.Before;
 import org.junit.Test;

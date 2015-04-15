@@ -12,13 +12,12 @@
  */
 package org.sonatype.nexus.coreui
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import groovy.transform.PackageScope
-import org.apache.commons.lang.StringUtils
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.sonatype.nexus.common.validation.Validate
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+
 import org.sonatype.nexus.configuration.ApplicationConfiguration
 import org.sonatype.nexus.configuration.GlobalRemoteConnectionSettings
 import org.sonatype.nexus.configuration.GlobalRemoteProxySettings
@@ -30,12 +29,14 @@ import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings
 import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings
+import org.sonatype.nexus.validation.Validate
 
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
+import org.apache.commons.lang.StringUtils
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
 
 /**
  * HTTP System Settings {@link DirectComponent}.

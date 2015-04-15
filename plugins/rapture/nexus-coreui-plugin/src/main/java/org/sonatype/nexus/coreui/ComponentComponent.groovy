@@ -11,29 +11,28 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.coreui
-import com.orientechnologies.orient.core.id.ORecordId
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.sonatype.nexus.common.entity.EntityId
-import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.extdirect.DirectComponent
-import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.extdirect.model.StoreLoadParameters
-import org.sonatype.nexus.repository.Repository
-import org.sonatype.nexus.repository.manager.RepositoryManager
-import org.sonatype.nexus.repository.storage.Asset
-import org.sonatype.nexus.repository.storage.Component
-import org.sonatype.nexus.repository.storage.StorageFacet
-import org.sonatype.nexus.repository.storage.StorageTx
-import org.sonatype.nexus.repository.view.ViewFacet
 
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 import javax.validation.constraints.NotNull
 
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME
+import org.sonatype.nexus.common.entity.EntityId
+import org.sonatype.nexus.extdirect.DirectComponent
+import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.extdirect.model.StoreLoadParameters
+import org.sonatype.nexus.repository.Repository
+import org.sonatype.nexus.repository.manager.RepositoryManager
+import org.sonatype.nexus.repository.storage.Component
+import org.sonatype.nexus.repository.storage.StorageFacet
+import org.sonatype.nexus.repository.storage.StorageTx
+import org.sonatype.nexus.repository.view.ViewFacet
+import org.sonatype.nexus.validation.Validate
+
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.shiro.authz.annotation.RequiresPermissions
+
 /**
  * Component {@link DirectComponent}.
  *
