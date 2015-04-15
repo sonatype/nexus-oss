@@ -20,6 +20,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -62,6 +63,11 @@ public class CPrivilegeEntityAdapter
 
   public static final String P_PROPERTIES = "properties";
 
+  private static final String I_ID = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_ID)
+      .build();
+
   /**
    * Register schema.
    */
@@ -79,7 +85,7 @@ public class CPrivilegeEntityAdapter
       type.createProperty(P_TYPE, OType.STRING).setNotNull(true);
       type.createProperty(P_PROPERTIES, OType.EMBEDDEDMAP).setNotNull(true);
 
-      type.createIndex(DB_CLASS + "_" + P_ID + "idx", INDEX_TYPE.UNIQUE, P_ID);
+      type.createIndex(I_ID, INDEX_TYPE.UNIQUE, P_ID);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
 
