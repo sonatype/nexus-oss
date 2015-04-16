@@ -52,7 +52,8 @@ extends TestSupport
   private Asset asset
   @Mock
   private InputStream inputStream
-  private Map<String, String> headers = [(Bucket.REPO_NAME_HEADER) : 'testRepo']
+  private Map<String, String> headers = [:]
+  private Map<String, String> expectedHeaders = [(Bucket.REPO_NAME_HEADER) : 'testRepo']
   private Iterable<HashAlgorithm> hashAlgorithms = []
 
   /**
@@ -169,8 +170,8 @@ extends TestSupport
       assertThat 'Expected IllegalOperationException', false
     }
     catch (IllegalOperationException e) {}
-    verify(blobTx, never()).delete(blobRef)
-    verify(blobTx, never()).create(inputStream, headers)
+    verify(blobTx, never()).delete(any(BlobRef))
+    verify(blobTx, never()).create(any(InputStream), any(Map))
     verify(asset, never()).blobRef(any(BlobRef))
   }
 
@@ -194,7 +195,7 @@ extends TestSupport
     }
     catch (IllegalOperationException e) {}
     verify(blobTx, never()).delete(any(BlobRef))
-    verify(blobTx, never()).create(inputStream, headers)
+    verify(blobTx, never()).create(any(InputStream), any(Map))
     verify(asset, never()).blobRef(any(BlobRef))
   }
 
@@ -220,8 +221,8 @@ extends TestSupport
       assertThat 'Expected IllegalOperationException', false
     }
     catch (IllegalOperationException e) {}
-    verify(blobTx, never()).delete(blobRef)
-    verify(blobTx, never()).create(inputStream, headers)
+    verify(blobTx, never()).delete(any(BlobRef))
+    verify(blobTx, never()).create(any(InputStream), any(Map))
     verify(asset, never()).blobRef(any(BlobRef))
   }
 
@@ -240,9 +241,10 @@ extends TestSupport
     when(asset.attributes()).thenReturn(mock(NestedAttributesMap))
     def newBlobRef = mock(BlobRef)
     when(bucket.repositoryName()).thenReturn('testRepo')
-    when(blobTx.create(any(InputStream), eq(headers))).thenReturn(newBlobRef)
+    when(blobTx.create(any(InputStream), any(Map))).thenReturn(newBlobRef)
     def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW_ONCE, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
+    verify(blobTx, times(1)).create(any(InputStream), eq(expectedHeaders))
     verify(asset, times(1)).blobRef(newBlobRef)
   }
 
@@ -264,10 +266,11 @@ extends TestSupport
     when(asset.attributes()).thenReturn(mock(NestedAttributesMap))
     def newBlobRef = mock(BlobRef)
     when(bucket.repositoryName()).thenReturn('testRepo')
-    when(blobTx.create(any(InputStream), eq(headers))).thenReturn(newBlobRef)
+    when(blobTx.create(any(InputStream), any(Map))).thenReturn(newBlobRef)
     def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
     verify(blobTx, times(1)).delete(blobRef)
+    verify(blobTx, times(1)).create(any(InputStream), eq(expectedHeaders))
     verify(asset, times(1)).blobRef(newBlobRef)
   }
 
@@ -286,9 +289,10 @@ extends TestSupport
     when(asset.attributes()).thenReturn(mock(NestedAttributesMap))
     def newBlobRef = mock(BlobRef)
     when(bucket.repositoryName()).thenReturn('testRepo')
-    when(blobTx.create(any(InputStream), eq(headers))).thenReturn(newBlobRef)
+    when(blobTx.create(any(InputStream), any(Map))).thenReturn(newBlobRef)
     def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
+    verify(blobTx, times(1)).create(any(InputStream), eq(expectedHeaders))
     verify(asset, times(1)).blobRef(newBlobRef)
   }
 
