@@ -740,6 +740,16 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
+                id: 'search', // 17
+                type: 'method',
+                name: 'Search Repositories',
+                description: 'Give permission to perform searches of repository content.',
+                properties: [
+                    'method': 'read',
+                    'permission': 'nexus:index'
+                ]
+            ),
+            new CPrivilege(
                 id: 'apikey-access', // 83
                 type: 'method',
                 name: 'API-Key Access',
@@ -969,7 +979,7 @@ class StaticSecurityConfigurationResourceImpl
                 name: 'Nexus Anonymous Role',
                 description: 'Anonymous role for Nexus',
                 privileges: ['status', 'artifact-read', 'usersforgotpw', 'usersforgotid', 'contentclasses-read', 'repotypes-read'],
-                roles: ['ui-repo-browser']
+                roles: ['ui-repo-browser', 'ui-search']
             ),
             new CRole(
                 id: 'nx-developer',
@@ -1074,6 +1084,12 @@ class StaticSecurityConfigurationResourceImpl
                 name: 'UI: Base UI Privileges',
                 description: 'Generic privileges for users in the Nexus UI',
                 privileges: ['status', 'signin', 'userschangepw']
+            ),
+            new CRole(
+                id: 'ui-search',
+                name: 'UI: Search',
+                description: 'Gives access to the Search screen in Nexus UI',
+                privileges: ['search', 'artifact-read']
             ),
             new CRole(
                 id: 'nx-apikey-access',
