@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 
 import com.google.common.base.Throwables;
@@ -63,9 +64,15 @@ public class NugetApiKeyEntityAdapter
 
   private static final String P_PRINCIPALS = "principals";
 
-  private static final String I_APIKEY = "api_key_idx";
+  private static final String I_APIKEY = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_APIKEY)
+      .build();
 
-  private static final String I_PRIMARY_PRINCIPAL = "principal_idx";
+  private static final String I_PRIMARY_PRINCIPAL = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_PRIMARY_PRINCIPAL)
+      .build();
 
   public NugetApiKeyEntityAdapter() {
     super(DB_CLASS);
@@ -82,8 +89,8 @@ public class NugetApiKeyEntityAdapter
     type.createProperty(P_PRINCIPALS, OType.BINARY)
         .setMandatory(true)
         .setNotNull(true);
-    type.createIndex(type.getName() + "." + P_APIKEY, INDEX_TYPE.UNIQUE, P_APIKEY);
-    type.createIndex(type.getName() + "." + P_PRIMARY_PRINCIPAL, INDEX_TYPE.UNIQUE, P_PRIMARY_PRINCIPAL);
+    type.createIndex(I_APIKEY, INDEX_TYPE.UNIQUE, P_APIKEY);
+    type.createIndex(I_PRIMARY_PRINCIPAL, INDEX_TYPE.UNIQUE, P_PRIMARY_PRINCIPAL);
   }
 
   @Override
