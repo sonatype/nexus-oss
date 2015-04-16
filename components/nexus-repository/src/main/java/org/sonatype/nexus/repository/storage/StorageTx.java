@@ -110,8 +110,7 @@ public interface StorageTx
    *                     by repository.
    * @param querySuffix  the part of the query after the where clause, which may by used for ordering and paging
    *                     as per the OrientDB select query syntax.
-   * @see <a href="https://github.com/orientechnologies/orientdb/wiki/SQL-Query">OrientDB SELECT Query
-   *      Documentation</a>
+   * @see <a href="http://orientdb.com/docs/last/SQL-Query.html">OrientDB SELECT Query Documentation</a>
    */
   Iterable<Asset> findAssets(@Nullable String whereClause,
                              @Nullable Map<String, Object> parameters,
@@ -149,8 +148,7 @@ public interface StorageTx
    *                     by repository.
    * @param querySuffix  the part of the query after the where clause, which may by used for ordering and paging
    *                     as per the OrientDB select query syntax.
-   * @see <a href="https://github.com/orientechnologies/orientdb/wiki/SQL-Query">OrientDB SELECT Query
-   *      Documentation</a>
+   * @see <a href="http://orientdb.com/docs/last/SQL-Query.html">OrientDB SELECT Query Documentation</a>
    */
   Iterable<Component> findComponents(@Nullable String whereClause,
                                      @Nullable Map<String, Object> parameters,
