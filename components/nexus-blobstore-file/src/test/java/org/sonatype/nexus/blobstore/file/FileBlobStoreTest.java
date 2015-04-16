@@ -23,6 +23,7 @@ import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration;
 import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
+import org.sonatype.nexus.common.collect.AutoClosableIterable;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;
@@ -150,5 +151,11 @@ public class FileBlobStoreTest
 
     final boolean deleted = underTest.delete(fakeId);
     assertThat(deleted, is(equalTo(false)));
+  }
+
+  @Test
+  public void iteratorIsOnlyForAliveBlobs() {
+    final AutoClosableIterable<BlobId> iterator = underTest.iterator();
+    verify(metadataStore).findWithState(BlobState.ALIVE);
   }
 }

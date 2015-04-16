@@ -60,9 +60,9 @@ public class FileBlobStore
   public static final String TYPE = "File";
 
   public static final String BLOB_CONTENT_SUFFIX = ".blob";
-  
+
   private static final String CONFIG_KEY = "file";
-  
+
   private static final String PATH_KEY = "path";
 
   private Path root;
@@ -305,6 +305,11 @@ public class FileBlobStore
     DirSupport.mkdir(metadataFile);
     this.root = content;
     this.metadataStore = MapdbBlobMetadataStore.create(metadataFile);
+  }
+
+  @Override
+  public AutoClosableIterable<BlobId> iterator() {
+    return metadataStore.findWithState(BlobState.ALIVE);
   }
 
   private void checkExists(final Path path, final BlobId blobId) throws IOException {
