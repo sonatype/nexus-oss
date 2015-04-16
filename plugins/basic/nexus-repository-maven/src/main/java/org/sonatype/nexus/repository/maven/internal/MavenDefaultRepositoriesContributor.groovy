@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.maven.internal
 
 import javax.inject.Named
@@ -24,9 +25,9 @@ import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy
 import org.sonatype.nexus.repository.storage.WritePolicy
 
-
 /**
  * Provide default hosted and proxy repositories for Maven.
+ *
  * @since 3.0
  */
 @Named
@@ -34,12 +35,13 @@ import org.sonatype.nexus.repository.storage.WritePolicy
 class MavenDefaultRepositoriesContributor
     implements DefaultRepositoriesContributor
 {
+  static final String DEFAULT_RELEASE_REPO = 'maven-releases'
 
-  static final String DEFAULT_RELEASE_REPO = 'releases'
+  static final String DEFAULT_SNAPSHOT_REPO = 'maven-snapshots'
 
-  static final String DEFAULT_SNAPSHOT_REPO = 'snapshots'
+  static final String DEFAULT_CENTRAL_REPO = 'maven-central'
 
-  static final String DEFAULT_CENTRAL_REPO = 'central'
+  static final String DEFAULT_PUBLIC_REPO = 'maven-public'
 
   @Override
   List<Configuration> getRepositoryConfigurations() {
@@ -77,7 +79,7 @@ class MavenDefaultRepositoriesContributor
                     strictContentTypeValidation: false
                 ],
                 proxy     : [
-                    remoteUrl     : 'http://repo1.maven.org/maven2/',
+                    remoteUrl     : 'https://repo1.maven.org/maven2/',
                     artifactMaxAge: 3600
                 ],
                 httpclient: [
@@ -91,7 +93,7 @@ class MavenDefaultRepositoriesContributor
                 ]
             ]
         ),
-        new Configuration(repositoryName: 'public', recipeName: Maven2GroupRecipe.NAME, attributes:
+        new Configuration(repositoryName: DEFAULT_PUBLIC_REPO, recipeName: Maven2GroupRecipe.NAME, attributes:
             [
                 maven  : [
                     versionPolicy              : VersionPolicy.MIXED.toString(),
