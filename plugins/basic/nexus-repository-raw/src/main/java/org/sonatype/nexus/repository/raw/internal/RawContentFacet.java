@@ -17,7 +17,7 @@ import java.io.IOException;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.content.InvalidContentException;
+import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
 
 import org.joda.time.DateTime;

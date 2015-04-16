@@ -17,12 +17,11 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 
-import org.sonatype.nexus.repository.content.InvalidContentException;
+import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
 import org.joda.time.DateTime;
