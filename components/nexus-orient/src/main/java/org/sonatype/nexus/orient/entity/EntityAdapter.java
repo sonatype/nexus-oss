@@ -186,7 +186,7 @@ public abstract class EntityAdapter<T extends Entity>
     ORID rid = recordIdentity(entity);
     db.delete(rid);
 
-    entity.setEntityMetadata(null);
+    //entity.setEntityMetadata(null);
   }
 
   //
