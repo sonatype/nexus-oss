@@ -52,7 +52,7 @@ extends TestSupport
   private Asset asset
   @Mock
   private InputStream inputStream
-  private Map<String, String> headers = [:]
+  private Map<String, String> headers = [(Bucket.REPO_NAME_HEADER) : 'testRepo']
   private Iterable<HashAlgorithm> hashAlgorithms = []
 
   /**
@@ -239,6 +239,7 @@ extends TestSupport
   void 'setting blob pass on asset without blob when ALLOW_ONCE write policy'() {
     when(asset.attributes()).thenReturn(mock(NestedAttributesMap))
     def newBlobRef = mock(BlobRef)
+    when(bucket.repositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), eq(headers))).thenReturn(newBlobRef)
     def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW_ONCE, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
@@ -262,6 +263,7 @@ extends TestSupport
     when(asset.blobRef()).thenReturn(blobRef)
     when(asset.attributes()).thenReturn(mock(NestedAttributesMap))
     def newBlobRef = mock(BlobRef)
+    when(bucket.repositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), eq(headers))).thenReturn(newBlobRef)
     def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
@@ -283,6 +285,7 @@ extends TestSupport
   void 'setting blob pass on asset without blob when ALLOW write policy'() {
     when(asset.attributes()).thenReturn(mock(NestedAttributesMap))
     def newBlobRef = mock(BlobRef)
+    when(bucket.repositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), eq(headers))).thenReturn(newBlobRef)
     def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter)
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")

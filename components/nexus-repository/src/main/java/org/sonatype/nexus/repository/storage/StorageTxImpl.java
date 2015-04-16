@@ -372,7 +372,10 @@ public class StorageTxImpl
     checkNotNull(inputStream);
     checkNotNull(headers);
 
-    return blobTx.create(inputStream, headers);
+    Map<String, String> storageHeaders = new HashMap<>(headers);
+    storageHeaders.put(Bucket.REPO_NAME_HEADER, bucket.repositoryName());
+
+    return blobTx.create(inputStream, storageHeaders);
   }
 
   @Override
