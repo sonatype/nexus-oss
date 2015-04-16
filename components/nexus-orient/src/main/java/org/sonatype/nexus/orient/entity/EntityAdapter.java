@@ -247,8 +247,7 @@ public abstract class EntityAdapter<T extends Entity>
    * Set metadata on entity.
    */
   protected void setMetadata(final T entity, final ODocument doc) {
-    checkNotNull(entity != null);
-    assert entity != null;
+    checkNotNull(entity);
     entity.setEntityMetadata(new AttachedEntityMetadata(this, doc));
   }
 
@@ -256,8 +255,7 @@ public abstract class EntityAdapter<T extends Entity>
    * Get metadata from entity.
    */
   protected EntityMetadata getMetadata(final T entity) {
-    checkNotNull(entity != null);
-    assert entity != null;
+    checkNotNull(entity);
     EntityMetadata metadata = entity.getEntityMetadata();
     checkState(metadata != null);
     return metadata;
