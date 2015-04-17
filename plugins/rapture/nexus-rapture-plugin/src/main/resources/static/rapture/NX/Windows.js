@@ -36,6 +36,11 @@ Ext.define('NX.Windows', {
   open: function(url, name, specs, replace) {
     var me = this, win;
 
+    // apply default window specs if omitted, helps keep windows user-controllable on most browsers
+    if (specs === undefined) {
+      specs = 'menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes'
+    }
+
     me.logDebug('Opening window: url=' + url + ', name=' + name + ', specs=' + specs + ', replace=' + replace);
 
     win = NX.global.open(url, name, specs, replace);
