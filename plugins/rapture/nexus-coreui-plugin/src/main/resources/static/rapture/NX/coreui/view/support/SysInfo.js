@@ -171,7 +171,6 @@ Ext.define('NX.coreui.view.support.SysInfo', {
    * @public
    */
   setInfo: function(info) {
-    console.log(this.down('panel'));
     this.mainTpl.overwrite(this.body, info);
   }
 
