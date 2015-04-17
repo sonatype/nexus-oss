@@ -43,6 +43,8 @@ public class ConfigurableViewFacet
     this.router = router;
   }
 
+  // FIXME: Move 'online' to core repository property
+
   @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
     NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);

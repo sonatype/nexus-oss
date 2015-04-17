@@ -22,12 +22,12 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.search.SearchFacet;
@@ -37,6 +37,7 @@ import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
@@ -56,13 +57,27 @@ public class RawContentFacetImpl
     extends FacetSupport
     implements RawContentFacet
 {
-  public static final String CONFIG_KEY = "rawContent";
-
   private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(MD5, SHA1);
 
   private final MimeSupport mimeSupport;
 
-  private boolean strictContentTypeValidation = false;
+  @VisibleForTesting
+  static final String CONFIG_KEY = "rawContent";
+
+  @VisibleForTesting
+  static class Config
+  {
+    public boolean strictContentTypeValidation = false;
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "strictContentTypeValidation=" + strictContentTypeValidation +
+          '}';
+    }
+  }
+
+  private Config config;
 
   @Inject
   public RawContentFacetImpl(final MimeSupport mimeSupport)
@@ -71,9 +86,19 @@ public class RawContentFacetImpl
   }
 
   @Override
+  protected void doValidate(final Configuration configuration) throws Exception {
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
+  }
+
+  @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
-    NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
-    this.strictContentTypeValidation = checkNotNull(attributes.require("strictContentTypeValidation", Boolean.class));
+    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+    log.debug("Config: {}", config);
+  }
+
+  @Override
+  protected void doDestroy() throws Exception {
+    config = null;
   }
 
   @Nullable
@@ -141,11 +166,11 @@ public class RawContentFacetImpl
     String contentType = declaredContentType;
 
     if (contentType == null) {
-      log.trace("Content PUT to {} has no content type.", path);
+      log.trace("Content PUT to {} has no content type", path);
       contentType = mimeSupport.detectMimeType(is, path);
       log.trace("Mime support implies content type {}", contentType);
 
-      if (contentType == null && strictContentTypeValidation) {
+      if (contentType == null && config.strictContentTypeValidation) {
         throw new InvalidContentException("Content type could not be determined.");
       }
     }
@@ -153,7 +178,7 @@ public class RawContentFacetImpl
       final List<String> types = mimeSupport.detectMimeTypes(is, path);
       if (!types.isEmpty() && !types.contains(contentType)) {
         log.debug("Discovered content type {} ", types.get(0));
-        if (strictContentTypeValidation) {
+        if (config.strictContentTypeValidation) {
           throw new InvalidContentException(
               String.format("Declared content type %s, but declared %s.", contentType, types.get(0)));
         }

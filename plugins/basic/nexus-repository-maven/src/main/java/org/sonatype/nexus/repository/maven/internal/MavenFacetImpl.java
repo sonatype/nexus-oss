@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.constraints.NotNull;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
@@ -31,6 +32,7 @@ import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
@@ -46,6 +48,7 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -104,21 +107,37 @@ public class MavenFacetImpl
 
   private static final String P_LAST_VERIFIED = "lastVerified";
 
-  private static final String CONFIG_KEY = "maven";
-
-  // members
-
   private final MimeSupport mimeSupport;
 
   private final Map<String, MavenPathParser> mavenPathParsers;
 
-  private boolean strictContentTypeValidation;
+  @VisibleForTesting
+  static final String CONFIG_KEY = "maven";
+
+  @VisibleForTesting
+  static class Config
+  {
+    public boolean strictContentTypeValidation = false;
+
+    @NotNull
+    public VersionPolicy versionPolicy;
+
+    @NotNull
+    public ChecksumPolicy checksumPolicy;
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "strictContentTypeValidation=" + strictContentTypeValidation +
+          ", versionPolicy=" + versionPolicy +
+          ", checksumPolicy=" + checksumPolicy +
+          '}';
+    }
+  }
+
+  private Config config;
 
   private MavenPathParser mavenPathParser;
-
-  private VersionPolicy versionPolicy;
-
-  private ChecksumPolicy checksumPolicy;
 
   @Inject
   public MavenFacetImpl(final MimeSupport mimeSupport, final Map<String, MavenPathParser> mavenPathParsers) {
@@ -127,19 +146,25 @@ public class MavenFacetImpl
   }
 
   @Override
-  protected void doConfigure(final Configuration configuration) throws Exception {
-    super.doConfigure(configuration);
+  protected void doValidate(final Configuration configuration) throws Exception {
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
+  }
 
-    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
-    this.strictContentTypeValidation =
-        attributes.get("strictContentTypeValidation", Boolean.class, Boolean.FALSE).booleanValue();
-    this.mavenPathParser = checkNotNull(mavenPathParsers.get(getRepository().getFormat().getValue()));
-    this.versionPolicy = VersionPolicy.valueOf(
-        attributes.require("versionPolicy", String.class)
-    );
-    this.checksumPolicy = ChecksumPolicy.valueOf(
-        attributes.require("checksumPolicy", String.class)
-    );
+  @Override
+  protected void doInit(final Configuration configuration) throws Exception {
+    super.doInit(configuration);
+    mavenPathParser = checkNotNull(mavenPathParsers.get(getRepository().getFormat().getValue()));
+  }
+
+  @Override
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+    log.debug("Config: {}", config);
+  }
+
+  @Override
+  protected void doDestroy() throws Exception {
+    config = null;
   }
 
   @Nonnull
@@ -151,13 +176,13 @@ public class MavenFacetImpl
   @Nonnull
   @Override
   public VersionPolicy getVersionPolicy() {
-    return versionPolicy;
+    return config.versionPolicy;
   }
 
   @Nonnull
   @Override
   public ChecksumPolicy getChecksumPolicy() {
-    return checksumPolicy;
+    return config.checksumPolicy;
   }
 
   @Nullable
@@ -466,7 +491,7 @@ public class MavenFacetImpl
       }
       log.trace("Mime support implies content type {}", contentType);
 
-      if (contentType == null && strictContentTypeValidation) {
+      if (contentType == null && config.strictContentTypeValidation) {
         throw new InvalidContentException("Content type could not be determined.");
       }
     }
@@ -475,7 +500,7 @@ public class MavenFacetImpl
         final List<String> types = mimeSupport.detectMimeTypes(is, mavenPath.getPath());
         if (!types.isEmpty() && !types.contains(contentType)) {
           log.debug("Discovered content type {} ", types.get(0));
-          if (strictContentTypeValidation) {
+          if (config.strictContentTypeValidation) {
             throw new InvalidContentException(
                 String.format("Declared content type %s, but declared %s.", contentType, types.get(0)));
           }
@@ -488,5 +513,4 @@ public class MavenFacetImpl
   private StorageFacet getStorage() {
     return getRepository().facet(StorageFacet.class);
   }
-
 }

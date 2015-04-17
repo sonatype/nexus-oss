@@ -110,8 +110,9 @@ public class NugetGalleryFacetImpl
   private static final VersionScheme SCHEME = new GenericVersionScheme();
 
   @Override
-  protected void doConfigure(final Configuration configuration) throws Exception {
-    storage = getRepository().facet(StorageFacet.class);
+  protected void doInit(final Configuration configuration) throws Exception {
+    super.doInit(configuration);
+    storage = facet(StorageFacet.class);
   }
 
   @Override
@@ -122,7 +123,7 @@ public class NugetGalleryFacetImpl
   @Override
   @Guarded(by = STARTED)
   public int count(final String operation, final Map<String, String> query) {
-    log.debug("Count: " + query);
+    log.debug("Count: {}", query);
 
     return count(operation, query, getRepositories());
   }
@@ -154,7 +155,7 @@ public class NugetGalleryFacetImpl
   @Override
   @Guarded(by = STARTED)
   public String feed(final String base, final String operation, final Map<String, String> query) {
-    log.debug("Select: " + query);
+    log.debug("Select: {}", query);
     setFeedQueryDefaults(query);
 
     final List<Repository> repositories = getRepositories();

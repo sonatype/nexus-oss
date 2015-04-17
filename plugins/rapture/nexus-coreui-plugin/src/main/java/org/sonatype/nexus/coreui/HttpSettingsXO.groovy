@@ -12,11 +12,12 @@
  */
 package org.sonatype.nexus.coreui
 
-import groovy.transform.ToString
-import org.sonatype.nexus.extdirect.model.Password
-
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
+
+import org.sonatype.nexus.extdirect.model.Password
+
+import groovy.transform.ToString
 
 /**
  * HTTP System Settings exchange object.
@@ -29,8 +30,11 @@ class HttpSettingsXO
   String userAgentCustomisation
   String urlParameters
 
+  /**
+   * Timeout seconds.
+   */
   @Min(0L)
-  @Max(3600L)
+  @Max(3600L) // 1 hour
   Integer timeout
 
   @Min(0L)
@@ -64,5 +68,4 @@ class HttpSettingsXO
   String httpsAuthNtlmDomain
 
   Set<String> nonProxyHosts
-
 }
