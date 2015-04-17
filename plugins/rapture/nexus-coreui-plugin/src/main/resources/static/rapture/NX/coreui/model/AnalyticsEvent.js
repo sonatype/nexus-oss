@@ -25,6 +25,6 @@ Ext.define('NX.coreui.model.AnalyticsEvent', {
     {name: 'sequence', type: 'int'},
     {name: 'duration', type: 'int'},
     {name: 'userId', type: 'string', sortType: 'asUCText'},
-    {name: 'attributes', type: 'auto'}
+    {name: 'attributes', type: 'auto' /*object*/}
   ]
 });
