@@ -20,9 +20,9 @@
 Ext.define('NX.coreui.model.LdapSchemaTemplate', {
   extend: 'Ext.data.Model',
   fields: [
-    {name: 'name', type: 'string'},
+    {name: 'name', type: 'string', sortType: 'asUCText'},
 
-    {name: 'userBaseDn', type: 'string', sortType: 'asUCText'},
+    {name: 'userBaseDn', type: 'string'},
     {name: 'userSubtree', type: 'boolean'},
     {name: 'userObjectClass', type: 'string'},
     {name: 'userLdapFilter', type: 'string'},
