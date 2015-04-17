@@ -21,15 +21,15 @@ Ext.define('NX.coreui.model.User', {
   extend: 'Ext.data.Model',
   idProperty: 'userId',
   fields: [
-    'userId',
-    'version',
-    'realm',
-    'firstName',
-    'lastName',
-    'email',
-    'status',
-    'roles',
-    'external',
-    'externalRoles'
+    {name: 'userId', type: 'string', sortType: 'asUCText'},
+    {name: 'version', type: 'string', sortType: 'asUCText'},
+    {name: 'realm', type: 'string', sortType: 'asUCText'},
+    {name: 'firstName', type: 'string', sortType: 'asUCText'},
+    {name: 'lastName', type: 'string', sortType: 'asUCText'},
+    {name: 'email', type: 'string', sortType: 'asUCText'},
+    {name: 'status', type: 'string', sortType: 'asUCText'},
+    {name: 'roles', type: 'auto' /*array*/},
+    {name: 'external', type: 'boolean'},
+    {name: 'externalRoles', type: 'auto' /*array*/}
   ]
 });
