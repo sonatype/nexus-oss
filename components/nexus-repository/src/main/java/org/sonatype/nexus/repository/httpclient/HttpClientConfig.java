@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.repository.httpclient;
 
+import javax.validation.Valid;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /**
  * HTTP client configuration.
  *
@@ -19,33 +23,46 @@ package org.sonatype.nexus.repository.httpclient;
  */
 public class HttpClientConfig
 {
-  private ConnectionConfig connectionConfig;
+  @Valid
+  private ConnectionConfig connection;
 
-  private AuthenticationConfig authenticationConfig;
+  @Valid
+  @JsonDeserialize(using=AuthenticationConfigDeserializer.class)
+  private AuthenticationConfig authentication;
 
-  private ProxyConfig proxyConfig;
+  @Valid
+  private ProxyConfig proxy;
 
-  public ConnectionConfig getConnectionConfig() {
-    return connectionConfig;
+  public ConnectionConfig getConnection() {
+    return connection;
   }
 
-  public void setConnectionConfig(final ConnectionConfig connectionConfig) {
-    this.connectionConfig = connectionConfig;
+  public void setConnection(final ConnectionConfig connectionConfig) {
+    this.connection = connectionConfig;
   }
 
-  public AuthenticationConfig getAuthenticationConfig() {
-    return authenticationConfig;
+  public AuthenticationConfig getAuthentication() {
+    return authentication;
   }
 
-  public void setAuthenticationConfig(final AuthenticationConfig authenticationConfig) {
-    this.authenticationConfig = authenticationConfig;
+  public void setAuthentication(final AuthenticationConfig authentication) {
+    this.authentication = authentication;
   }
 
-  public ProxyConfig getProxyConfig() {
-    return proxyConfig;
+  public ProxyConfig getProxy() {
+    return proxy;
   }
 
-  public void setProxyConfig(final ProxyConfig proxyConfig) {
-    this.proxyConfig = proxyConfig;
+  public void setProxy(final ProxyConfig proxy) {
+    this.proxy = proxy;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "connection=" + connection +
+        ", authentication=" + authentication +
+        ", proxy=" + proxy +
+        '}';
   }
 }

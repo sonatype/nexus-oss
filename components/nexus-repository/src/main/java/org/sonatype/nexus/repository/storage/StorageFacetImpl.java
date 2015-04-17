@@ -61,6 +61,7 @@ public class StorageFacetImpl
     @NotEmpty
     public String blobStoreName = "default";
 
+    // FIXME: This should be not-null, but pending property default
     //@NotNull
     public WritePolicy writePolicy;
 

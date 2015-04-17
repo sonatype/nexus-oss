@@ -89,8 +89,8 @@ public class HttpClientFactoryImpl
   private void applyConfiguration(final Builder builder, final HttpClientConfig config) {
     // connection/socket timeouts
     int timeout = 1000;
-    if (config.getConnectionConfig() != null && config.getConnectionConfig().getTimeout() != null) {
-      timeout = config.getConnectionConfig().getTimeout();
+    if (config.getConnection() != null && config.getConnection().getTimeout() != null) {
+      timeout = config.getConnection().getTimeout();
     }
     builder.getSocketConfigBuilder().setSoTimeout(timeout);
     builder.getRequestConfigBuilder().setConnectTimeout(timeout);
@@ -98,29 +98,29 @@ public class HttpClientFactoryImpl
 
     // obey the given retries count and apply it to client.
     int retries = 0;
-    if (config.getConnectionConfig() != null && config.getConnectionConfig().getRetries() != null) {
-      retries = config.getConnectionConfig().getRetries();
+    if (config.getConnection() != null && config.getConnection().getRetries() != null) {
+      retries = config.getConnection().getRetries();
     }
     builder.getHttpClientBuilder().setRetryHandler(new StandardHttpRequestRetryHandler(retries, false));
 
-    applyAuthenticationConfig(builder, config.getAuthenticationConfig(), null);
+    applyAuthenticationConfig(builder, config.getAuthentication(), null);
     applyProxyConfig(builder, config);
 
     // Apply optional context-specific user-agent suffix
-    if (config.getConnectionConfig() != null) {
-      String userAgentSuffix = config.getConnectionConfig().getUserAgentCustomisation();
+    if (config.getConnection() != null) {
+      String userAgentSuffix = config.getConnection().getUserAgentCustomisation();
       String customizedUserAgent = null;
       if (!Strings.nullToEmpty(userAgentSuffix).isEmpty()) {
         customizedUserAgent = builder.getUserAgent() + " " + userAgentSuffix;
         builder.setUserAgent(customizedUserAgent);
       }
-      String urlParameters = config.getConnectionConfig().getUrlParameters();
+      String urlParameters = config.getConnection().getUrlParameters();
       if (Strings.nullToEmpty(urlParameters).isEmpty()) {
         urlParameters = null;
       }
       applyRequestExecutor(builder, customizedUserAgent, urlParameters);
     }
-    if (config.getConnectionConfig() != null && Boolean.TRUE.equals(config.getConnectionConfig().getUseTrustStore())) {
+    if (config.getConnection() != null && Boolean.TRUE.equals(config.getConnection().getUseTrustStore())) {
       builder.getHttpClientBuilder().addInterceptorFirst(new HttpRequestInterceptor()
       {
         @Override
@@ -159,28 +159,28 @@ public class HttpClientFactoryImpl
 
   @VisibleForTesting
   public void applyProxyConfig(final Builder builder, final HttpClientConfig config) {
-    if (config.getProxyConfig() != null && config.getProxyConfig().getHttpProxyConfig() != null) {
+    if (config.getProxy() != null && config.getProxy().getHttp() != null) {
       Map<String, HttpHost> proxies = Maps.newHashMap();
 
-      HttpProxyConfig httpProxyConfig = config.getProxyConfig().getHttpProxyConfig();
+      HttpProxyConfig httpProxyConfig = config.getProxy().getHttp();
       HttpHost httpProxy = new HttpHost(httpProxyConfig.getHostname(), httpProxyConfig.getPort());
-      applyAuthenticationConfig(builder, httpProxyConfig.getAuthenticationConfig(), httpProxy);
+      applyAuthenticationConfig(builder, httpProxyConfig.getAuthentication(), httpProxy);
 
       log.debug("http proxy setup with host '{}'", httpProxyConfig.getHostname());
       proxies.put("http", httpProxy);
       proxies.put("https", httpProxy);
 
-      if (config.getProxyConfig().getHttpsProxyConfig() != null) {
-        HttpProxyConfig httpsProxyConfig = config.getProxyConfig().getHttpsProxyConfig();
+      if (config.getProxy().getHttps() != null) {
+        HttpProxyConfig httpsProxyConfig = config.getProxy().getHttps();
         HttpHost httpsProxy = new HttpHost(httpsProxyConfig.getHostname(), httpsProxyConfig.getPort());
-        applyAuthenticationConfig(builder, httpsProxyConfig.getAuthenticationConfig(), httpsProxy);
+        applyAuthenticationConfig(builder, httpsProxyConfig.getAuthentication(), httpsProxy);
         log.debug("https proxy setup with host '{}'", httpsProxy.getHostName());
         proxies.put("https", httpsProxy);
       }
 
       final Set<Pattern> nonProxyHostPatterns = Sets.newHashSet();
-      if (config.getProxyConfig().getNonProxyHosts() != null) {
-        for (String nonProxyHostRegex : config.getProxyConfig().getNonProxyHosts()) {
+      if (config.getProxy().getNonProxyHosts() != null) {
+        for (String nonProxyHostRegex : config.getProxy().getNonProxyHosts()) {
           try {
             nonProxyHostPatterns.add(Pattern.compile(nonProxyHostRegex, Pattern.CASE_INSENSITIVE));
           }

@@ -89,13 +89,15 @@ public interface Repository
 
   /**
    * Returns the configuration entity for the repository.
+   *
+   * Only available after {@link #init(Configuration)} lifecycle-operation.
    */
   Configuration getConfiguration();
 
   /**
    * Attach a facet to the repository.
    *
-   * Facet must be initialized.
+   * Only allowed before repository {@link #init(Configuration)} lifecycle-operation.
    */
   void attach(Facet facet) throws Exception;
 

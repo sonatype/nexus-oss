@@ -35,10 +35,12 @@ import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacetImpl;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataConsumer;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
 
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
+import org.sonatype.sisu.goodies.common.Time;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.cache.Cache;
@@ -62,39 +64,67 @@ import static java.lang.Math.min;
 public class NugetProxyGalleryFacet
     extends NugetGalleryFacetImpl
 {
-  public static final String CONFIG_KEY = "nugetProxy";
-
   private static final int TWO_PAGES = 2 * ODataUtils.PAGE_SIZE;
 
   private static final Pattern COUNT_REGEX = Pattern.compile("<m:count>(\\d*)</m:count>");
 
   private final NugetFeedFetcher fetcher;
 
+  @VisibleForTesting
+  static final String CONFIG_KEY = "nugetProxy";
+
+  @VisibleForTesting
+  static class Config
+  {
+    public int queryCacheSize = 300;
+
+    /**
+     * Query cache item-max-age seconds.
+     */
+    public int queryCacheItemMaxAge = Time.minutes(60).toSecondsI();
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "queryCacheSize=" + queryCacheSize +
+          ", queryCacheItemMaxAge=" + queryCacheItemMaxAge +
+          '}';
+    }
+  }
+
+  private Config config;
+
   private Cache<QueryCacheKey, Integer> cache;
 
   @Inject
-  public NugetProxyGalleryFacet(final NugetFeedFetcher fetcher)
-  {
-    this.fetcher = fetcher;
+  public NugetProxyGalleryFacet(final NugetFeedFetcher fetcher) {
+    this.fetcher = checkNotNull(fetcher);
+  }
+
+  @Override
+  protected void doValidate(final Configuration configuration) throws Exception {
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
   }
 
   @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
-    super.doConfigure(configuration);
-
-    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
-    final int queryCacheSize = attributes.get("queryCacheSize", Integer.class, 300);
-    final int cacheItemMaxAgeSeconds = attributes.get("queryCacheItemMaxAgeSeconds", Integer.class, 3600);
+    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+    log.debug("Config: {}", config);
 
     cache = CacheBuilder.newBuilder()
-        .maximumSize(queryCacheSize)
-        .expireAfterWrite(cacheItemMaxAgeSeconds, TimeUnit.SECONDS)
+        .maximumSize(config.queryCacheSize)
+        .expireAfterWrite(config.queryCacheItemMaxAge, TimeUnit.SECONDS)
         .build();
   }
 
   @Override
-  public int count(final String operation, final Map<String, String> parameters) {
+  protected void doDestroy() throws Exception {
+    cache = null;
+    config = null;
+  }
 
+  @Override
+  public int count(final String operation, final Map<String, String> parameters) {
     final List<Integer> remoteCounts = passQueryToRemoteRepos(nugetQuery(operation, parameters),
         getProxyRepositories(),
         new CountFetcher(fetcher));
@@ -103,7 +133,6 @@ public class NugetProxyGalleryFacet
 
     return sum(remoteCounts) + hostedCount;
   }
-
 
   @Override
   public String feed(final String base, final String operation, final Map<String, String> query) {
@@ -132,8 +161,10 @@ public class NugetProxyGalleryFacet
     return renderFeedResults(localResult);
   }
 
-  private Map<String, String> modifyQueryForRemote(final String operation, final Map<String, String> query,
-                                                   final Integer top, final Integer skip)
+  private Map<String, String> modifyQueryForRemote(final String operation,
+                                                   final Map<String, String> query,
+                                                   final Integer top,
+                                                   final Integer skip)
   {
     Map<String, String> remoteQuery = Maps.newHashMap(query);
     if ("Search".equals(operation) && top != null && skip != null) {
@@ -242,7 +273,6 @@ public class NugetProxyGalleryFacet
     }
     return total;
   }
-
 
   /**
    * A factory to create {@link Callable}s to populate the count cache.

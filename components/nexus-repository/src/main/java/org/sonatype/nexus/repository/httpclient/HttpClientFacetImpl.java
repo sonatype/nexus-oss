@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.httpclient;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.http.client.HttpClient;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,20 +37,37 @@ public class HttpClientFacetImpl
     extends FacetSupport
     implements HttpClientFacet
 {
-  public static final String CONFIG_KEY = "httpclient";
-
   private final HttpClientFactory factory;
 
-  private final HttpClientConfigMarshaller marshaller;
+  @VisibleForTesting
+  static final String CONFIG_KEY = "httpclient";
+
+  private HttpClientConfig config;
 
   private FilteredHttpClient httpClient;
 
   @Inject
-  public HttpClientFacetImpl(final HttpClientFactory factory,
-                             final HttpClientConfigMarshaller marshaller)
-  {
+  public HttpClientFacetImpl(final HttpClientFactory factory) {
     this.factory = checkNotNull(factory);
-    this.marshaller = checkNotNull(marshaller);
+  }
+
+  @Override
+  protected void doValidate(final Configuration configuration) throws Exception {
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, HttpClientConfig.class);
+  }
+
+  @Override
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, HttpClientConfig.class);
+    log.debug("Config: {}", config);
+
+    httpClient = new FilteredHttpClient(factory.create(config), config);
+    log.debug("Created HTTP client: {}", httpClient);
+  }
+
+  @Override
+  protected void doDestroy() throws Exception {
+    config = null;
   }
 
   @Override
@@ -61,14 +80,6 @@ public class HttpClientFacetImpl
   @Guarded(by = STARTED)
   public RemoteConnectionStatus getStatus() {
     return httpClient.getStatus();
-  }
-
-  @Override
-  protected void doConfigure(final Configuration configuration) throws Exception {
-    NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
-    HttpClientConfig config = marshaller.unmarshall(attributes);
-    httpClient = new FilteredHttpClient(factory.create(config), config);
-    log.debug("Created HTTP client: {}", httpClient);
   }
 
   @Override

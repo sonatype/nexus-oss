@@ -79,9 +79,9 @@ public class MavenGroupFacet
   }
 
   @Override
-  protected void doConfigure(final Configuration configuration) throws Exception {
-    super.doConfigure(configuration);
-    this.mavenFacet = getRepository().facet(MavenFacet.class);
+  protected void doInit(final Configuration configuration) throws Exception {
+    super.doInit(configuration);
+    this.mavenFacet = facet(MavenFacet.class);
   }
 
   /**

@@ -20,10 +20,10 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.FacetSupport;
@@ -47,16 +47,16 @@ public class ConfigurationFacetImpl
 
   private final ObjectMapper objectMapper;
 
-  private final ValidatorFactory validatorFactory;
+  private final Provider<Validator> validatorProvider;
 
   @Inject
   public ConfigurationFacetImpl(final ConfigurationStore store,
                                 final @Named(ConfigurationObjectMapperProvider.NAME) ObjectMapper objectMapper,
-                                final ValidatorFactory validatorFactory)
+                                final Provider<Validator> validatorProvider)
   {
     this.store = checkNotNull(store);
     this.objectMapper = checkNotNull(objectMapper);
-    this.validatorFactory = checkNotNull(validatorFactory);
+    this.validatorProvider = checkNotNull(validatorProvider);
   }
 
   @Override
@@ -91,7 +91,7 @@ public class ConfigurationFacetImpl
       log.trace("Validating: {} in groups: {}", value, Arrays.asList(groups));
     }
 
-    Validator validator = validatorFactory.getValidator();
+    Validator validator = validatorProvider.get();
     Set<ConstraintViolation<Object>> violations = validator.validate(value, groups);
     ConstraintViolations.maybePropagate(violations, log);
   }
@@ -101,6 +101,7 @@ public class ConfigurationFacetImpl
    */
   private static class SectionWrapper
   {
+    @SuppressWarnings("unused")
     @Valid
     private Map<String,Object> attributes;
 

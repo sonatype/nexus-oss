@@ -17,11 +17,12 @@ import java.net.URI;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
@@ -30,6 +31,7 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.net.HttpHeaders;
 import org.apache.http.Header;
@@ -53,44 +55,75 @@ public abstract class ProxyFacetSupport
     extends FacetSupport
     implements ProxyFacet
 {
-  public static final String CONFIG_KEY = "proxy";
+  @VisibleForTesting
+  static final String CONFIG_KEY = "proxy";
 
-  private URI remoteUrl;
+  @VisibleForTesting
+  static class Config
+  {
+    @NotNull
+    public URI remoteUrl;
 
-  private int artifactMaxAgeMinutes;
+    /**
+     * Artifact max-age minutes.
+     */
+    @NotNull
+    public int artifactMaxAge;
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "remoteUrl=" + remoteUrl +
+          ", artifactMaxAge=" + artifactMaxAge +
+          '}';
+    }
+  }
+
+  private Config config;
 
   private HttpClientFacet httpClient;
 
   private boolean remoteUrlChanged;
 
   @Override
-  protected void doConfigure(final Configuration configuration) throws Exception {
-    NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
-    String url = attributes.require("remoteUrl", String.class);
-    if (!url.endsWith("/")) {
-      url = url + "/";
-    }
-
-    final URI newRemoteURI = new URI(url);
-    if (remoteUrl != null && !remoteUrl.equals(newRemoteURI)) {
-      remoteUrlChanged = true;
-    }
-
-    this.remoteUrl = newRemoteURI;
-    log.debug("Remote URL: {}", remoteUrl);
-
-    artifactMaxAgeMinutes = attributes.require("artifactMaxAge", Integer.class);
-    log.debug("Artifact max age: {}", artifactMaxAgeMinutes);
+  protected void doValidate(final Configuration configuration) throws Exception {
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
   }
 
+  @Override
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+
+    // normalize URL path to contain trailing slash
+    if (!config.remoteUrl.getPath().endsWith("/")) {
+      config.remoteUrl = config.remoteUrl.resolve(config.remoteUrl.getPath() + "/");
+    }
+
+    log.debug("Config: {}", config);
+  }
+
+  @Override
+  protected void doUpdate(final Configuration configuration) throws Exception {
+    // detect URL changes
+    URI previousUrl = config.remoteUrl;
+    super.doUpdate(configuration);
+    remoteUrlChanged = !config.remoteUrl.equals(previousUrl);
+  }
+
+  @Override
+  protected void doDestroy() throws Exception {
+    config = null;
+  }
 
   @Override
   protected void doStart() throws Exception {
-    httpClient = getRepository().facet(HttpClientFacet.class);
+    httpClient = facet(HttpClientFacet.class);
+
     if (remoteUrlChanged) {
       remoteUrlChanged = false;
+
       try {
-        getRepository().facet(NegativeCacheFacet.class).invalidate();
+        facet(NegativeCacheFacet.class).invalidate();
       }
       catch (MissingFacetException e) {
         // NCF is optional
@@ -103,13 +136,8 @@ public abstract class ProxyFacetSupport
     httpClient = null;
   }
 
-  @Override
-  protected void doDestroy() throws Exception {
-    remoteUrl = null;
-  }
-
   public URI getRemoteUrl() {
-    return remoteUrl;
+    return config.remoteUrl;
   }
 
   @Override
@@ -158,7 +186,7 @@ public abstract class ProxyFacetSupport
   protected Content fetch(String url, Context context, Content stale) throws IOException {
     HttpClient client = httpClient.getHttpClient();
 
-    HttpGet request = new HttpGet(remoteUrl.resolve(url));
+    HttpGet request = new HttpGet(config.remoteUrl.resolve(url));
     if (stale != null) {
       final DateTime lastModified = stale.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
       if (lastModified != null) {
@@ -204,7 +232,7 @@ public abstract class ProxyFacetSupport
         return new DateTime(DateUtils.parseDate(lastModifiedHeader.getValue()).getTime());
       }
       catch (Exception ex) {
-        log.warn("Could not parse date '{}', using system current time as item creation time.", lastModifiedHeader, ex);
+        log.warn("Could not parse date '{}'; using system current time as item creation time", lastModifiedHeader, ex);
       }
     }
     return null;
@@ -247,19 +275,19 @@ public abstract class ProxyFacetSupport
   protected abstract String getUrl(final @Nonnull Context context);
 
   private boolean isStale(final Context context) throws IOException {
-    if (artifactMaxAgeMinutes < 0) {
-      log.trace("Artifact max age checking disabled.");
+    if (config.artifactMaxAge < 0) {
+      log.trace("Artifact max age checking disabled");
       return false;
     }
 
     final DateTime lastUpdated = getCachedPayloadLastUpdatedDate(context);
 
     if (lastUpdated == null) {
-      log.debug("Artifact last modified date unknown.");
+      log.debug("Artifact last modified date unknown");
       return true;
     }
 
-    final DateTime earliestFreshDate = new DateTime().minusMinutes(artifactMaxAgeMinutes);
+    final DateTime earliestFreshDate = new DateTime().minusMinutes(config.artifactMaxAge);
     return lastUpdated.isBefore(earliestFreshDate);
   }
 }

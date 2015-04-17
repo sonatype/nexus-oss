@@ -12,9 +12,13 @@
  */
 package org.sonatype.nexus.repository.httpclient;
 
+import javax.annotation.Nullable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * Remote connection status.
+ *
  * @since 3.0
  */
 public class RemoteConnectionStatus
@@ -27,7 +31,7 @@ public class RemoteConnectionStatus
     this(description, null);
   }
 
-  public RemoteConnectionStatus(final String description, final String reason) {
+  public RemoteConnectionStatus(final String description, final @Nullable String reason) {
     this.description = checkNotNull(description);
     this.reason = reason;
   }
@@ -36,6 +40,7 @@ public class RemoteConnectionStatus
     return description;
   }
 
+  @Nullable
   public String getReason() {
     return reason;
   }
@@ -48,5 +53,4 @@ public class RemoteConnectionStatus
     }
     return sb.toString();
   }
-
 }
