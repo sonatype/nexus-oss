@@ -31,7 +31,7 @@ class PrivilegeXO
   @NotBlank
   String id
 
-  @NotEmpty(groups = Update)
+  @NotBlank(groups = Update)
   String version
 
   @NotBlank
