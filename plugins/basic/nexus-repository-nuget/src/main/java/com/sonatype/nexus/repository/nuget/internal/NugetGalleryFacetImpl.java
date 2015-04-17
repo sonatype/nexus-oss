@@ -536,6 +536,7 @@ public class NugetGalleryFacetImpl
     final ImmutableMap<String, String> headers = ImmutableMap
         .of(BlobStore.BLOB_NAME_HEADER, blobName(component), BlobStore.CREATED_BY_HEADER, "unknown");
     storageTx.setBlob(in, headers, asset, Arrays.asList(HashAlgorithm.SHA512), "application/zip");
+    storageTx.saveAsset(asset);
 
     return asset;
   }
