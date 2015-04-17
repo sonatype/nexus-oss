@@ -13,6 +13,7 @@
 package org.sonatype.nexus.capability.internal.ui
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Capability Type exchange object.
@@ -22,8 +23,13 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class CapabilityTypeXO
 {
+  @NotEmpty
   String id
+
+  @NotEmpty
   String name
+  
   String about
+  
   List<FormFieldXO> formFields
 }
