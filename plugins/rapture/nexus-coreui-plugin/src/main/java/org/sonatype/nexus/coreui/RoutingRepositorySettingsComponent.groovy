@@ -12,13 +12,14 @@
  */
 package org.sonatype.nexus.coreui
 
-import com.google.common.primitives.Ints
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Validate
+import java.util.concurrent.TimeUnit
+
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository
@@ -30,13 +31,14 @@ import org.sonatype.nexus.proxy.maven.routing.PublishingStatus
 import org.sonatype.nexus.proxy.maven.routing.RoutingStatus
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.repository.Repository
+import org.sonatype.nexus.validation.Validate
 
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
-import java.util.concurrent.TimeUnit
+import com.google.common.primitives.Ints
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Routing Repository Settings {@link DirectComponent}.

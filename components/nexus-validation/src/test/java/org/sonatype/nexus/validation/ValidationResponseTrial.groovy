@@ -10,10 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.common.validation
+package org.sonatype.nexus.validation
+
+import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import org.junit.Test
-import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 /**
  * Trials of {@link ValidationResponse}

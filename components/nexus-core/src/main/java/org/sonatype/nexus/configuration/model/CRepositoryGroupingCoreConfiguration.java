@@ -17,10 +17,10 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.sonatype.nexus.common.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
+import org.sonatype.nexus.validation.ValidationResponse;
 
 import org.codehaus.plexus.util.StringUtils;
 

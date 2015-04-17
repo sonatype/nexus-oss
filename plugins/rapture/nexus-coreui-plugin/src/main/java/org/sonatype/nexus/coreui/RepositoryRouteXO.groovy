@@ -12,11 +12,12 @@
  */
 package org.sonatype.nexus.coreui
 
+import javax.validation.constraints.NotNull
+
+import org.sonatype.nexus.validation.group.Update
+
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Update
-
-import javax.validation.constraints.NotNull
 
 import static org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType
 

@@ -12,9 +12,10 @@
  */
 package org.sonatype.nexus.capability.internal.ui
 
+import org.sonatype.nexus.validation.group.Update
+
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Update
 
 /**
  * Capability notes exchange object.

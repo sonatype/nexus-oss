@@ -12,25 +12,8 @@
  */
 package org.sonatype.nexus.coreui
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import groovy.transform.PackageScope
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Create
-import org.sonatype.nexus.common.validation.Update
-import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.common.validation.ValidationMessage
-import org.sonatype.nexus.common.validation.ValidationResponse
-import org.sonatype.nexus.common.validation.ValidationResponseException
-import org.sonatype.nexus.configuration.ApplicationConfiguration
-import org.sonatype.nexus.extdirect.DirectComponent
-import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.extdirect.model.StoreLoadParameters
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
-import org.sonatype.nexus.proxy.targets.Target
-import org.sonatype.nexus.proxy.targets.TargetRegistry
+import java.util.regex.Pattern
+import java.util.regex.PatternSyntaxException
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -39,8 +22,27 @@ import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
-import java.util.regex.Pattern
-import java.util.regex.PatternSyntaxException
+
+import org.sonatype.nexus.configuration.ApplicationConfiguration
+import org.sonatype.nexus.extdirect.DirectComponent
+import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.extdirect.model.StoreLoadParameters
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
+import org.sonatype.nexus.proxy.targets.Target
+import org.sonatype.nexus.proxy.targets.TargetRegistry
+import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.validation.ValidationMessage
+import org.sonatype.nexus.validation.ValidationResponse
+import org.sonatype.nexus.validation.ValidationResponseException
+import org.sonatype.nexus.validation.group.Create
+import org.sonatype.nexus.validation.group.Update
+
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Repository Target {@link DirectComponent}.

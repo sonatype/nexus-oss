@@ -12,14 +12,15 @@
  */
 package org.sonatype.nexus.coreui
 
-import groovy.transform.ToString
-import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Create
-import org.sonatype.nexus.common.validation.Update
+import javax.validation.constraints.NotNull
+
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.security.user.UserStatus
+import org.sonatype.nexus.validation.group.Create
+import org.sonatype.nexus.validation.group.Update
 
-import javax.validation.constraints.NotNull
+import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * User exchange object.

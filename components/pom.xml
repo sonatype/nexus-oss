@@ -53,6 +53,7 @@
     <module>nexus-repository</module>
     <module>nexus-security</module>
     <module>nexus-supportzip-api</module>
+    <module>nexus-validation</module>
     <module>nexus-webresources-api</module>
     <module>pax-logging-metrics</module>
     <module>pax-logging-access</module>

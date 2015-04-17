@@ -12,23 +12,18 @@
  */
 package org.sonatype.nexus.coreui_legacy
 
-import com.google.common.base.Predicate
-import com.google.common.base.Predicates
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod
-import groovy.transform.PackageScope
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.codehaus.plexus.util.StringUtils
-import org.codehaus.plexus.util.xml.Xpp3Dom
-import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Create
-import org.sonatype.nexus.common.validation.Update
-import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.common.validation.ValidationMessage
-import org.sonatype.nexus.common.validation.ValidationResponse
-import org.sonatype.nexus.common.validation.ValidationResponseException
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+import javax.annotation.Nullable
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.Validator
+import javax.validation.constraints.NotNull
+import javax.validation.groups.Default
+
 import org.sonatype.nexus.configuration.ApplicationConfiguration
 import org.sonatype.nexus.configuration.model.CLocalStorage
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication
@@ -73,17 +68,24 @@ import org.sonatype.nexus.templates.TemplateManager
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
 import org.sonatype.nexus.templates.repository.RepositoryTemplate
 import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemplate
+import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.validation.ValidationMessage
+import org.sonatype.nexus.validation.ValidationResponse
+import org.sonatype.nexus.validation.ValidationResponseException
+import org.sonatype.nexus.validation.group.Create
+import org.sonatype.nexus.validation.group.Update
 
-import javax.annotation.Nullable
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import javax.validation.Valid
-import javax.validation.Validator
-import javax.validation.constraints.NotNull
-import javax.validation.groups.Default
-import java.util.regex.Matcher
-import java.util.regex.Pattern
+import com.google.common.base.Predicate
+import com.google.common.base.Predicates
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod
+import groovy.transform.PackageScope
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.codehaus.plexus.util.StringUtils
+import org.codehaus.plexus.util.xml.Xpp3Dom
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Repository {@link DirectComponent}.

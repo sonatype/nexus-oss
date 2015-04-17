@@ -16,8 +16,8 @@ import java.util.List;
 
 import javax.validation.ConstraintViolationException;
 
-import org.sonatype.nexus.common.validation.ValidationMessage;
-import org.sonatype.nexus.common.validation.ValidationResponseException;
+import org.sonatype.nexus.validation.ValidationMessage;
+import org.sonatype.nexus.validation.ValidationResponseException;
 
 /**
  * Ext.Direct response builder.

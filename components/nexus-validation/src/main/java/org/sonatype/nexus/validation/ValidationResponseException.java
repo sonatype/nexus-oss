@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.common.validation;
+package org.sonatype.nexus.validation;
 
 import java.util.List;
 

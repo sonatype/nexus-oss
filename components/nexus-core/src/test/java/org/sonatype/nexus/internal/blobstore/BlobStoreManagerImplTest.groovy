@@ -17,7 +17,6 @@ import javax.inject.Provider
 import org.sonatype.nexus.blobstore.api.BlobStore
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
 import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore
-import org.sonatype.nexus.common.validation.ValidationResponseException
 import org.sonatype.nexus.configuration.ApplicationDirectories
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 

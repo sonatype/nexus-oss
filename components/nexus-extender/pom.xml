@@ -49,8 +49,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-validator</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-validation</artifactId>
     </dependency>
 
     <dependency>
