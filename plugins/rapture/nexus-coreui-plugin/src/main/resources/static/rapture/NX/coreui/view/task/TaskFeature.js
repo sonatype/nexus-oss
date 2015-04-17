@@ -29,7 +29,11 @@ Ext.define('NX.coreui.view.task.TaskFeature', {
   masters: { xtype: 'nx-coreui-task-list' },
 
   tabs: [
-    { xtype: 'nx-info-panel', weight: 10 }
+    {
+      xtype: 'nx-info-panel',
+      title: NX.I18n.get('ADMIN_TASKS_DETAILS_SUMMARY_TAB'),
+      weight: 10
+    }
   ],
 
   actions: [
