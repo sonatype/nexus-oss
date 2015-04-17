@@ -20,6 +20,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.security.config.CRole;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -62,6 +63,11 @@ public class CRoleEntityAdapter
 
   public static final String P_ROLES = "roles";
 
+  private static final String I_ID = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_ID)
+      .build();
+
   /**
    * Register schema.
    */
@@ -79,7 +85,7 @@ public class CRoleEntityAdapter
       type.createProperty(P_PRIVILEGES, OType.EMBEDDEDSET);
       type.createProperty(P_ROLES, OType.EMBEDDEDSET);
 
-      type.createIndex(DB_CLASS + "_" + P_ID + "idx", INDEX_TYPE.UNIQUE, P_ID);
+      type.createIndex(I_ID, INDEX_TYPE.UNIQUE, P_ID);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
 

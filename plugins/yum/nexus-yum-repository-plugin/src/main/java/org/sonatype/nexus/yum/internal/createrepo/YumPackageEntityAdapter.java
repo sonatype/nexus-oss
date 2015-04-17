@@ -15,6 +15,7 @@ package org.sonatype.nexus.yum.internal.createrepo;
 import java.util.List;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.yum.internal.createrepo.YumPackage.Entry;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -112,6 +113,12 @@ public class YumPackageEntityAdapter
 
   private static final String P_CHANGES = "changes";
 
+  private static final String I_REPOSITORY_ID_LOCATION = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_REPOSITORY_ID)
+      .property(P_LOCATION)
+      .build();
+
   private final YumPackageEntryEntityAdapter entryEntityAdapter = new YumPackageEntryEntityAdapter();
 
   private final YumPackageFileEntityAdapter fileEntityAdapter = new YumPackageFileEntityAdapter();
@@ -165,11 +172,7 @@ public class YumPackageEntityAdapter
       type.createProperty(P_FILES, OType.EMBEDDEDLIST, fileType);
       type.createProperty(P_CHANGES, OType.EMBEDDEDLIST, changeLogType);
 
-      type.createIndex(
-          DB_CLASS + "_" + P_REPOSITORY_ID + "_" + P_LOCATION + "idx",
-          INDEX_TYPE.UNIQUE,
-          P_REPOSITORY_ID, P_LOCATION
-      );
+      type.createIndex(I_REPOSITORY_ID_LOCATION, INDEX_TYPE.UNIQUE, P_REPOSITORY_ID, P_LOCATION);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }

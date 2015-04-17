@@ -23,6 +23,7 @@ import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Protocol;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -75,6 +76,16 @@ public class LdapConfigurationEntityAdapter
 
   private static final String P_MAPPING = "mapping";
 
+  private static final String I_ID = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_ID)
+      .build();
+
+  private static final String I_NAME = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_NAME)
+      .build();
+
   public OClass register(final ODatabaseDocumentTx db) {
     checkNotNull(db);
     OSchema schema = db.getMetadata().getSchema();
@@ -124,8 +135,8 @@ public class LdapConfigurationEntityAdapter
       type.createProperty(P_CONNECTION, OType.EMBEDDED, connectionType).setNotNull(true);
       type.createProperty(P_MAPPING, OType.EMBEDDED, mappingType).setNotNull(true);
 
-      type.createIndex(DB_CLASS + "_" + P_ID + "idx", INDEX_TYPE.UNIQUE, P_ID);
-      type.createIndex(DB_CLASS + "_" + P_NAME + "idx", INDEX_TYPE.UNIQUE, P_NAME);
+      type.createIndex(I_ID, INDEX_TYPE.UNIQUE, P_ID);
+      type.createIndex(I_NAME, INDEX_TYPE.UNIQUE, P_NAME);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }

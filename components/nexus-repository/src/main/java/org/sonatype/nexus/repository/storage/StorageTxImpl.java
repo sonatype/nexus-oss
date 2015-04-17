@@ -35,6 +35,7 @@ import org.sonatype.nexus.repository.IllegalOperationException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.hash.HashCode;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -372,7 +373,11 @@ public class StorageTxImpl
     checkNotNull(inputStream);
     checkNotNull(headers);
 
-    return blobTx.create(inputStream, headers);
+    ImmutableMap.Builder<String, String> storageHeaders = ImmutableMap.builder();
+    storageHeaders.put(Bucket.REPO_NAME_HEADER, bucket.repositoryName());
+    storageHeaders.putAll(headers);
+
+    return blobTx.create(inputStream, storageHeaders.build());
   }
 
   @Override

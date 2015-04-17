@@ -31,7 +31,7 @@ import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.content.InvalidContentException;
+import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
@@ -467,7 +467,7 @@ public class MavenFacetImpl
       log.trace("Mime support implies content type {}", contentType);
 
       if (contentType == null && strictContentTypeValidation) {
-        throw new InvalidContentException(String.format("Content type could not be determined."));
+        throw new InvalidContentException("Content type could not be determined.");
       }
     }
     else {

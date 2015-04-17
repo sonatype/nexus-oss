@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.EntityId;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 import org.sonatype.nexus.repository.Repository;
 
@@ -70,7 +71,8 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode>
     type.createProperty(P_LAST_UPDATED, OType.DATETIME);
     type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
 
-    type.createIndex(getTypeName() + ".bucket_idx", INDEX_TYPE.NOTUNIQUE, P_BUCKET);
+    String indexName = new OIndexNameBuilder().type(getTypeName()).property(P_BUCKET).build();
+    type.createIndex(indexName, INDEX_TYPE.NOTUNIQUE, P_BUCKET);
   }
 
   @Override

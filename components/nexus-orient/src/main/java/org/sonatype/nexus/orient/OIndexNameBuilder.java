@@ -12,8 +12,11 @@
  */
 package org.sonatype.nexus.orient;
 
+import java.util.List;
 import java.util.Locale;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.index.OIndex;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -25,13 +28,15 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class OIndexNameBuilder
 {
-  public static final String TYPE_SEPARATOR = ".";
+  public static final String TYPE_SEPARATOR = "_";
+
+  public static final String PROPERTY_SEPARATOR = "_";
 
   public static final String SUFFIX = "_idx";
 
   private String type;
 
-  private String property;
+  private List<String> properties = Lists.newArrayList();
 
   public OIndexNameBuilder type(final String type) {
     this.type = type;
@@ -39,20 +44,20 @@ public class OIndexNameBuilder
   }
 
   public OIndexNameBuilder property(final String property) {
-    this.property = property;
+    properties.add(property);
     return this;
   }
 
   public String build() {
     // type is optional
-    checkState(property != null, "Property required");
+    checkState(!properties.isEmpty(), "At least one property required");
 
     StringBuilder buff = new StringBuilder();
     if (type != null) {
       buff.append(type);
       buff.append(TYPE_SEPARATOR);
     }
-    buff.append(property);
+    Joiner.on(PROPERTY_SEPARATOR).appendTo(buff, properties);
     buff.append(SUFFIX);
 
     // OIndex names are always lower-case

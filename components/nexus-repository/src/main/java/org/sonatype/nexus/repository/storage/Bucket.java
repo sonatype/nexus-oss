@@ -22,6 +22,11 @@ import org.sonatype.nexus.common.entity.Entity;
 public class Bucket
     extends Entity
 {
+  /**
+   * An identifying name for disaster recovery purposes (which isn't required to be strictly unique)
+   */
+  public static final String REPO_NAME_HEADER = "Bucket.repo-name";
+
   private String repositoryName;
 
   /**
