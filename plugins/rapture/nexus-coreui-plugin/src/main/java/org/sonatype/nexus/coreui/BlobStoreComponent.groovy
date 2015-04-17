@@ -23,9 +23,9 @@ import javax.validation.groups.Default
 import org.sonatype.nexus.blobstore.api.BlobStore
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
 import org.sonatype.nexus.blobstore.api.BlobStoreManager
-import org.sonatype.nexus.common.validation.Create
-import org.sonatype.nexus.common.validation.Validate
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.validation.group.Create
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod

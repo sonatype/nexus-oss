@@ -289,6 +289,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-validation</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webresources-api</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
@@ -572,8 +578,6 @@
               <id>validation-api</id>
               <id>httpcore</id>
               <id>httpclient</id>
-              <id>maven-model</id>
-              <id>maven-model-builder</id>
               <id>xmlpull</id>
               <id>xpp3_min</id>
               <id>shiro-guice</id>

@@ -101,12 +101,6 @@
         <artifactId>org.eclipse.sisu.inject</artifactId>
         <version>${eclipse-sisu.version}</version>
       </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>org.eclipse.sisu.plexus</artifactId>
-        <version>${eclipse-sisu.version}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 

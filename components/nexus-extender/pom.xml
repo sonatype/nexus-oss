@@ -49,8 +49,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-validator</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-validation</artifactId>
     </dependency>
 
     <dependency>
@@ -91,14 +91,6 @@
       <artifactId>pax-exam</artifactId>
       <optional>true</optional>
       <scope>provided</scope>
-    </dependency>
-
-    <!--
-    To be removed once all plugins are migrated off the Plexus API
-    -->
-    <dependency>
-      <groupId>org.eclipse.sisu</groupId>
-      <artifactId>org.eclipse.sisu.plexus</artifactId>
     </dependency>
   </dependencies>
 

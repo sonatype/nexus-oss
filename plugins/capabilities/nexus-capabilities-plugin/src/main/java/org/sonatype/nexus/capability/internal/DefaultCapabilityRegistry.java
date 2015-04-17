@@ -42,12 +42,12 @@ import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.ValidatorRegistry;
 import org.sonatype.nexus.capability.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.capability.internal.storage.CapabilityStorageItem;
-import org.sonatype.nexus.common.validation.ValidationMessage;
-import org.sonatype.nexus.common.validation.ValidationResponse;
-import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.PasswordHelper;
 import org.sonatype.nexus.formfields.Encrypted;
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.validation.ValidationMessage;
+import org.sonatype.nexus.validation.ValidationResponse;
+import org.sonatype.nexus.validation.ValidationResponseException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

@@ -30,8 +30,6 @@
   <properties>
     <apache-maven.version>3.2.3</apache-maven.version>
     <aether.version>1.0.0.v20140518</aether.version>
-    <wagon.version>2.7</wagon.version>
-    <maven-indexer.version>5.1.2-bf3d48b</maven-indexer.version>
   </properties>
 
   <dependencyManagement>
@@ -39,12 +37,6 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-aether-provider</artifactId>
-        <version>${apache-maven.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-model-builder</artifactId>
         <version>${apache-maven.version}</version>
       </dependency>
 
@@ -103,30 +95,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.apache.maven.archetype</groupId>
-        <artifactId>archetype-catalog</artifactId>
-        <version>2.2</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-provider-api</artifactId>
-        <version>${wagon.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-file</artifactId>
-        <version>${wagon.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-http-lightweight</artifactId>
-        <version>${wagon.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-verifier</artifactId>
         <version>1.4</version>
@@ -164,42 +132,6 @@
         <groupId>org.eclipse.aether</groupId>
         <artifactId>aether-impl</artifactId>
         <version>${aether.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.aether</groupId>
-        <artifactId>aether-connector-basic</artifactId>
-        <version>${aether.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.aether</groupId>
-        <artifactId>aether-transport-wagon</artifactId>
-        <version>${aether.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.indexer</groupId>
-        <artifactId>indexer-artifact</artifactId>
-        <version>${maven-indexer.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.indexer</groupId>
-        <artifactId>indexer-core</artifactId>
-        <version>${maven-indexer.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-maven-bridge</artifactId>
-        <version>3.2.0</version>
       </dependency>
 
     </dependencies>

@@ -26,7 +26,7 @@ Note: curl commands have been escaped for bash
 
 ## Hosted
 
-    curl -u admin:admin123 -X PUT -v -include -F package=@src/test/resources/SONATYPE.TEST.1.0.nupkg http://localhost:8081/repository/nugethosted1/upload
+    curl -u admin:admin123 -X PUT -v -include -F package=@src/test/resources/SONATYPE.TEST.1.0.nupkg http://localhost:8081/repository/nugethosted1/
     curl -u admin:admin123 -X GET -v http://localhost:8081/repository/nugethosted1/SONATYPE.TEST/1.0
     curl -u admin:admin123 -X DELETE -v http://localhost:8081/repository/nugethosted1/SONATYPE.TEST/1.0
 

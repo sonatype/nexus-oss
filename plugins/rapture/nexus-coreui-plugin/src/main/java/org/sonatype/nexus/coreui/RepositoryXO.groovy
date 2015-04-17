@@ -12,9 +12,10 @@
  */
 package org.sonatype.nexus.coreui
 
+import org.sonatype.nexus.validation.group.Create
+
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Create
 
 /**
  * Repository exchange object.

@@ -26,8 +26,8 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
-import org.sonatype.nexus.common.validation.ConstraintViolations;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.validation.ConstraintViolations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

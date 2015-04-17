@@ -17,10 +17,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.sonatype.nexus.common.validation.ValidationResponse;
-import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.validation.ValidationResponse;
+import org.sonatype.nexus.validation.ValidationResponseException;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.reflection.Reflector;

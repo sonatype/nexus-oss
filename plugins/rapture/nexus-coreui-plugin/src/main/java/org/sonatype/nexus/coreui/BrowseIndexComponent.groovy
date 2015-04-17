@@ -12,22 +12,19 @@
  */
 package org.sonatype.nexus.coreui
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.commons.io.FilenameUtils
-import org.apache.maven.index.treeview.TreeNode
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.extdirect.DirectComponent
-import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.index.IndexerManager
-import org.sonatype.nexus.plugin.lucene.IndexBrowserTreeNodeFactory
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry
-
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+
+import org.sonatype.nexus.extdirect.DirectComponent
+import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry
+import org.sonatype.nexus.validation.Validate
+
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Browse Index {@link DirectComponent}.
@@ -45,9 +42,6 @@ extends DirectComponentSupport
   @Inject
   RepositoryRegistry protectedRepositoryRegistry
 
-  @Inject
-  IndexerManager indexerManager
-
   /**
    * Retrieves children of specified path.
    *
@@ -61,22 +55,24 @@ extends DirectComponentSupport
   List<RepositoryStorageItemXO> readChildren(final @NotEmpty(message = '[repositoryId] may not be empty') String repositoryId,
                                              final @NotEmpty(message = '[path] may not be empty') String path)
   {
-    def repository = protectedRepositoryRegistry.getRepository(repositoryId)
-    TreeNode node = indexerManager.listNodes(new IndexBrowserTreeNodeFactory(repository, ''), path, repositoryId)
-
-    Closure asChild
-    asChild = { TreeNode child ->
-      new RepositoryStorageItemXO(
-          repositoryId: repositoryId,
-          path: child.path,
-          text: child.nodeName,
-          leaf: child.leaf,
-          processed: child.leaf || !child.children?.isEmpty(),
-          children: child.children?.collect(asChild),
-          type: child.leaf ? FilenameUtils.getExtension(child.nodeName) : null
-      )
-    }
-    return node?.children?.collect(asChild)
+    // ******** browse index temporarily disabled ********
+    return null;
+//    def repository = protectedRepositoryRegistry.getRepository(repositoryId)
+//    TreeNode node = indexerManager.listNodes(new IndexBrowserTreeNodeFactory(repository, ''), path, repositoryId)
+//
+//    Closure asChild
+//    asChild = { TreeNode child ->
+//      new RepositoryStorageItemXO(
+//          repositoryId: repositoryId,
+//          path: child.path,
+//          text: child.nodeName,
+//          leaf: child.leaf,
+//          processed: child.leaf || !child.children?.isEmpty(),
+//          children: child.children?.collect(asChild),
+//          type: child.leaf ? FilenameUtils.getExtension(child.nodeName) : null
+//      )
+//    }
+//    return node?.children?.collect(asChild)
   }
 
 }

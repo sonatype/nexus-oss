@@ -12,6 +12,30 @@
  */
 package org.sonatype.nexus.coreui
 
+import java.security.cert.X509Certificate
+
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import javax.servlet.http.HttpServletRequest
+import javax.validation.constraints.NotNull
+
+import org.sonatype.nexus.extdirect.DirectComponent
+import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.proxy.access.AccessManager
+import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository
+import org.sonatype.nexus.proxy.maven.MavenRepository
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy
+import org.sonatype.nexus.proxy.maven.gav.Gav
+import org.sonatype.nexus.proxy.maven.gav.GavCalculator
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry
+import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.validation.ValidationMessage
+import org.sonatype.nexus.validation.ValidationResponse
+import org.sonatype.nexus.validation.ValidationResponseException
+import org.sonatype.nexus.web.RemoteIPFinder
+
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectFormPostMethod
 import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager
@@ -23,28 +47,6 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.sonatype.nexus.common.validation.Validate
-import org.sonatype.nexus.common.validation.ValidationMessage
-import org.sonatype.nexus.common.validation.ValidationResponse
-import org.sonatype.nexus.common.validation.ValidationResponseException
-import org.sonatype.nexus.extdirect.DirectComponent
-import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.proxy.access.AccessManager
-import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository
-import org.sonatype.nexus.proxy.maven.MavenRepository
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy
-import org.sonatype.nexus.proxy.maven.gav.Gav
-import org.sonatype.nexus.proxy.maven.gav.GavCalculator
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry
-import org.sonatype.nexus.web.RemoteIPFinder
-
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import javax.servlet.http.HttpServletRequest
-import javax.validation.constraints.NotNull
-import java.security.cert.X509Certificate
 
 /**
  * Maven {@link DirectComponent}.

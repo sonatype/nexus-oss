@@ -16,10 +16,12 @@ import org.sonatype.nexus.repository.Facet
 import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
+import org.sonatype.nexus.repository.http.HttpMethods
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
+import org.sonatype.nexus.repository.view.matchers.ActionMatcher
 import org.sonatype.nexus.repository.view.matchers.AlwaysMatcher
 
 import javax.annotation.Nonnull
@@ -64,17 +66,17 @@ class NugetHostedRecipe
   protected Facet configure(final ConfigurableViewFacet facet) {
     Router.Builder router = new Router.Builder()
 
-    addFeedRoutes(router)
-
-    addPackageRoute(router)
-
     // Uploading packages
     router.route(new Route.Builder()
-        .matcher(new AlwaysMatcher())
+        .matcher(new ActionMatcher(HttpMethods.PUT))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(pushHandler)
         .create())
+
+    addFeedRoutes(router)
+
+    addPackageRoute(router)
 
     // By default, return a 404
     router.defaultHandlers(notFound())

@@ -20,6 +20,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.security.config.CUserRoleMapping;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -58,6 +59,12 @@ public class CUserRoleMappingEntityAdapter
 
   public static final String P_ROLES = "roles";
 
+  private static final String I_USER_ID_SOURCE = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_USER_ID)
+      .property(P_SOURCE)
+      .build();
+
   /**
    * Register schema.
    */
@@ -73,7 +80,7 @@ public class CUserRoleMappingEntityAdapter
       type.createProperty(P_SOURCE, OType.STRING).setNotNull(true);
       type.createProperty(P_ROLES, OType.EMBEDDEDSET);
 
-      type.createIndex(DB_CLASS + "_" + P_USER_ID + "_" + P_SOURCE + "idx", INDEX_TYPE.UNIQUE, P_USER_ID, P_SOURCE);
+      type.createIndex(I_USER_ID_SOURCE, INDEX_TYPE.UNIQUE, P_USER_ID, P_SOURCE);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
 

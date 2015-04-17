@@ -267,19 +267,6 @@ Ext.define('NX.coreui_legacy.controller.Repositories', {
         text: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_DETAILS_PRIS_ITEM'), action: 'putinservice', handler: Ext.bind(me.putInService, me, [model])
       });
     }
-
-    me.removeMenuItem(button, 'repairindex');
-    me.removeMenuItem(button, 'updateindex');
-    if (NX.Conditions.isPermitted("nexus:index", "delete")
-        && (provider === 'maven2' || provider === 'maven1')
-        && type !== 'virtual') {
-      button.menu.add({
-        text: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_DETAILS_REPAIR_ITEM'), action: 'repairindex', handler: Ext.bind(me.repairIndex, me, [model])
-      });
-      button.menu.add({
-        text: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_DETAILS_UPDATE_ITEM'), action: 'updateindex', handler: Ext.bind(me.updateIndex, me, [model])
-      });
-    }
   },
 
   /**
@@ -554,36 +541,6 @@ Ext.define('NX.coreui_legacy.controller.Repositories', {
         me.loadStore();
         NX.Messages.add({
           text: NX.I18n.format('LEGACY_ADMIN_REPOSITORIES_DETAILS_PRIS_SUCCESS', model.get('name')),
-          type: 'success'
-        });
-      }
-    });
-  },
-
-  /**
-   * Repair index for selected repository.
-   * @param {NX.coreui_legacy.model.Repository} model repository model
-   */
-  repairIndex: function(model) {
-    NX.direct.indexerLucene_Index.repair(model.getId(), '/', function(response) {
-      if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({
-          text: NX.I18n.format('LEGACY_ADMIN_REPOSITORIES_DETAILS_REPAIR_SUCCESS', model.get('name')),
-          type: 'success'
-        });
-      }
-    });
-  },
-
-  /**
-   * Update index for selected repository.
-   * @param {NX.coreui_legacy.model.Repository} model repository model
-   */
-  updateIndex: function(model) {
-    NX.direct.indexerLucene_Index.update(model.getId(), '/', function(response) {
-      if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({
-          text: NX.I18n.format('LEGACY_ADMIN_REPOSITORIES_DETAILS_UPDATE_SUCCESS', model.get('name')),
           type: 'success'
         });
       }

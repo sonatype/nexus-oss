@@ -13,11 +13,11 @@
 package org.sonatype.nexus.repositories;
 
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.common.validation.ValidationResponseException;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.templates.repository.maven.Maven2GroupRepositoryTemplate;
+import org.sonatype.nexus.validation.ValidationResponseException;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
