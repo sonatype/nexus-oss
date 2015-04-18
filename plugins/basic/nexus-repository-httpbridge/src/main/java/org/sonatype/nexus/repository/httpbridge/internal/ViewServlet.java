@@ -29,6 +29,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
+import org.sonatype.nexus.repository.httpbridge.internal.describe.DescribeType;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.Description;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionRenderer;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionUtils;
@@ -168,8 +169,10 @@ public class ViewServlet
       failure = e;
     }
 
-    if (request.getParameters().contains("describe")) {
-      send(request, describe(request, response, failure), httpResponse);
+    String describeFlags = request.getParameters().get("describe");
+    log.trace("Describe flags: {}", describeFlags);
+    if (describeFlags != null) {
+      send(request, describe(request, response, failure, describeFlags), httpResponse);
     }
     else {
       if (failure != null) {
@@ -181,7 +184,7 @@ public class ViewServlet
   }
 
   @VisibleForTesting
-  Response describe(final Request request, final Response response, final Exception exception) {
+  Response describe(final Request request, final Response response, final Exception exception, final String flags) {
     final Description description = new Description(ImmutableMap.<String, Object>of(
         "path", request.getPath(),
         "nexusUrl", BaseUrlHolder.get()
@@ -193,7 +196,21 @@ public class ViewServlet
     if (response != null) {
       DescriptionUtils.describeResponse(description, response);
     }
-    return toHtmlResponse(description);
+
+    DescribeType type = DescribeType.parse(flags);
+    log.trace("Describe type: {}", type);
+    switch (type) {
+      case HTML: {
+        String html = descriptionRenderer.renderHtml(description);
+        return HttpResponses.ok(new StringPayload(html, Charsets.UTF_8, "text/html"));
+      }
+      case JSON: {
+        String json = descriptionRenderer.renderJson(description);
+        return HttpResponses.ok(new StringPayload(json, Charsets.UTF_8, "application/json"));
+      }
+      default:
+        throw new RuntimeException("Invalid describe-type: " + type);
+    }
   }
 
   /**
@@ -243,10 +260,5 @@ public class ViewServlet
       return defaultHttpResponseSender;
     }
     return sender;
-  }
-
-  private Response toHtmlResponse(final Description description) {
-    final String html = descriptionRenderer.renderHtml(description);
-    return HttpResponses.ok(new StringPayload(html, Charsets.UTF_8, "text/html"));
   }
 }

@@ -74,7 +74,7 @@ public class ViewServletDescribeTest
 
     viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
 
-    verify(viewServlet, never()).describe(any(Request.class), any(Response.class), any(Exception.class));
+    verify(viewServlet, never()).describe(any(Request.class), any(Response.class), any(Exception.class), any(String.class));
     verify(defaultResponseSender).send(request, facetResponse, servletResponse);
   }
 
@@ -85,7 +85,7 @@ public class ViewServletDescribeTest
 
     viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
 
-    verify(viewServlet).describe(request, facetResponse, null);
+    verify(viewServlet).describe(request, facetResponse, null, "HTML");
     verify(viewServlet).send(request, descriptionResponse, servletResponse);
   }
 
@@ -105,7 +105,7 @@ public class ViewServletDescribeTest
     viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
 
     // The exception got described
-    verify(viewServlet).describe(request, null, facetException);
+    verify(viewServlet).describe(request, null, facetException, "HTML");
     verify(viewServlet).send(request, descriptionResponse, servletResponse);
   }
 
@@ -126,8 +126,8 @@ public class ViewServletDescribeTest
             defaultResponseSender,
             mock(DescriptionRenderer.class))
     );
-    doReturn(descriptionResponse)
-        .when(viewServlet).describe(any(Request.class), any(Response.class), any(Exception.class));
+    doReturn(descriptionResponse).when(viewServlet)
+        .describe(any(Request.class), any(Response.class), any(Exception.class), any(String.class));
 
     when(request.getParameters()).thenReturn(parameters);
 
@@ -135,6 +135,10 @@ public class ViewServletDescribeTest
   }
 
   private void descriptionRequested(final boolean describe) {
-    when(parameters.contains("describe")).thenReturn(describe);
+    String flags = null;
+    if (describe) {
+      flags = "HTML";
+    }
+    when(parameters.get("describe")).thenReturn(flags);
   }
 }

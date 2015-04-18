@@ -25,6 +25,7 @@ import org.sonatype.nexus.repository.view.Status;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Primitives;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
@@ -80,7 +81,7 @@ public class DescriptionUtils
     }
   }
 
-  public static ImmutableMap<String, Object> toMap(final Payload payload) {
+  private static ImmutableMap<String, Object> toMap(final Payload payload) {
     return ImmutableMap.<String, Object>of(
         "Content-Type", nullToEmpty(payload.getContentType()),
         "Size", payload.getSize()
@@ -99,7 +100,7 @@ public class DescriptionUtils
   private static Map<String, Object> toMap(final Iterable<Entry<String, Object>> entries) {
     Map<String, Object> table = Maps.newHashMap();
     for (Entry<String, Object> entry : entries) {
-      table.put(entry.getKey(), entry.getValue());
+      table.put(entry.getKey(), convert(entry.getValue()));
     }
     return table;
   }
@@ -111,5 +112,23 @@ public class DescriptionUtils
       table.put(e.getKey(), e.getValue());
     }
     return table;
+  }
+
+  /**
+   * Helper to convert value to string unless its a char-sequence or primitive/boxed-type.
+   *
+   * This is to help keep rendering JSON simple, and avoid side-effect with getter invocations when rendering.
+   */
+  private static Object convert(final Object value) {
+    if (value == null) {
+      return null;
+    }
+    if (value instanceof CharSequence) {
+      return value.toString();
+    }
+    if (value.getClass().isPrimitive() || Primitives.isWrapperType(value.getClass())) {
+      return value;
+    }
+    return String.valueOf(value);
   }
 }
