@@ -52,11 +52,9 @@
     <Set name="sendDateHeader"><Property name="jetty.send.date.header" default="true"/></Set>
     <Set name="headerCacheSize">512</Set>
     <Set name="delayDispatchUntilContent"><Property name="jetty.delayDispatchUntilContent" default="false"/></Set>
-    <!-- Uncomment to enable handling of X-Forwarded- style headers
     <Call name="addCustomizer">
       <Arg><New class="org.eclipse.jetty.server.ForwardedRequestCustomizer"/></Arg>
     </Call>
-    -->
   </New>
 
   <Call name="addConnector">
@@ -68,7 +66,7 @@
         <Arg name="factories">
           <Array type="org.eclipse.jetty.server.ConnectionFactory">
             <!-- uncomment to support proxy protocol
-	    <Item>
+            <Item>
               <New class="org.eclipse.jetty.server.ProxyConnectionFactory"/>
             </Item>-->
             <Item>
