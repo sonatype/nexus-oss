@@ -47,6 +47,10 @@ public class DescriptionUtils
             .put("path", request.getPath()).build()
     );
 
+    desc.addTable("Parameters", toMap(request.getParameters()));
+    desc.addTable("Headers", toMap(request.getHeaders()));
+    desc.addTable("Attributes", toMap(request.getAttributes()));
+
     if (request.isMultipart()) {
       for (Payload payload : request.getMultiparts()) {
         desc.addTable("Payload", toMap(payload));
@@ -57,9 +61,6 @@ public class DescriptionUtils
         desc.addTable("Payload", toMap(request.getPayload()));
       }
     }
-
-    desc.addTable("Headers", toMap(request.getHeaders()));
-    desc.addTable("Attributes", toMap(request.getAttributes()));
   }
 
   public static void describeResponse(final Description desc, final Response response) {
