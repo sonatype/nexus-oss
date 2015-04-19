@@ -264,6 +264,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL_HELP: 'How long to cache the fact that a file was not found in the repository (in minutes)',    
     ADMIN_REPOSITORIES_SETTINGS_VIEW_ONLINE: 'Online',
     ADMIN_REPOSITORIES_SETTINGS_VIEW_ONLINE_HELP: 'Whether or not the repository should accept incoming requests',
+    ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_SIZE: 'Query cache size',
+    ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_SIZE_HELP: 'Maximum number of cached query results',
+    ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_ITEM_MAX_AGE: 'Query cache age',
+    ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_ITEM_MAX_AGE_HELP: 'How long to cache query results (in seconds)',
 
     // Admin -> Repository -> Blobstores
     ADMIN_BLOBSTORES_TITLE: 'Blobstores',

@@ -27,7 +27,8 @@ Ext.define('NX.coreui.view.repository.recipe.NugetProxy', {
     'NX.coreui.view.repository.facet.StorageFacet',
     'NX.coreui.view.repository.facet.ViewFacet',
     'NX.coreui.view.repository.facet.HttpFacet',
-    'NX.coreui.view.repository.facet.NegativeCacheFacet'
+    'NX.coreui.view.repository.facet.NegativeCacheFacet',
+    'NX.coreui.view.repository.facet.NugetProxyFacet'
   ],
 
   initComponent: function() {
@@ -38,7 +39,8 @@ Ext.define('NX.coreui.view.repository.recipe.NugetProxy', {
       { xtype: 'nx-coreui-repository-proxy-facet'},
       { xtype: 'nx-coreui-repository-storage-facet'},
       { xtype: 'nx-coreui-repository-http-facet'} ,
-      { xtype: 'nx-coreui-repository-negativecache-facet'}
+      { xtype: 'nx-coreui-repository-negativecache-facet'},
+      { xtype: 'nx-coreui-repository-nugetproxy-facet'}
     ];
 
     me.callParent(arguments);
