@@ -13,7 +13,7 @@
 /*global Ext, NX*/
 
 /**
- * Select repository recipe window.
+ * Select repository recipe panel.
  *
  * @since 3.0
  */
