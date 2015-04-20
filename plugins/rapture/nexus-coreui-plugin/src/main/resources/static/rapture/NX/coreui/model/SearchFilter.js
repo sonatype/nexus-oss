@@ -20,11 +20,11 @@
 Ext.define('NX.coreui.model.SearchFilter', {
   extend: 'Ext.data.Model',
   fields: [
-    'id',
-    'name',
-    'text',
-    'description',
-    'criterias',
-    'readOnly'
+    {name: 'id', type: 'string'},
+    {name: 'name', type: 'string'},
+    {name: 'text', type: 'string'},
+    {name: 'description', type: 'string'},
+    {name: 'criterias', type: 'auto' /*array*/},
+    {name: 'readOnly', type: 'boolean'}
   ]
 });

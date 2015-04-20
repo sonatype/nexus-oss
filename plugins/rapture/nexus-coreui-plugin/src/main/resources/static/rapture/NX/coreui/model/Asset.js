@@ -20,8 +20,8 @@
 Ext.define('NX.coreui.model.Asset', {
   extend: 'Ext.data.Model',
   fields: [
-    'id',
-    'name',
-    'contentType'
+    {name: 'id', type: 'string', sortType: 'asUCText'},
+    {name: 'name', type: 'string', sortType: 'asUCText'},
+    {name: 'contentType', type: 'string', sortType: 'asUCText'}
   ]
 });

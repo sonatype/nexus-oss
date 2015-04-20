@@ -36,7 +36,7 @@ public class RecentCachedFileFeedSource
   public RecentCachedFileFeedSource(final FeedRecorder feedRecorder) {
     super(feedRecorder,
         CHANNEL_KEY,
-        "New remote files",
+        "Cached files",
         "New remote files (cached).");
   }
 

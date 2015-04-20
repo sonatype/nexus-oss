@@ -35,7 +35,7 @@ public class RecentChangedFileFeedSource
   public RecentChangedFileFeedSource(final FeedRecorder feedRecorder) {
     super(feedRecorder,
         CHANNEL_KEY,
-        "New files",
+        "Changed files",
         "New files (cached, deployed or deleted).");
   }
 

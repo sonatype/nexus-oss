@@ -20,16 +20,16 @@
 Ext.define('NX.coreui.model.HealthCheckRepositoryStatus', {
   extend: 'Ext.data.Model',
   fields: [
-    'repositoryId',
-    'enabled',
-    'eulaAccepted',
-    'analyzing',
-    'detailedReportSupported',
-    'iframeHeight',
-    'iframeWidth',
-    'securityIssueCount',
-    'licenseIssueCount',
-    'summaryUrl',
-    'detailUrl'
+    {name:'repositoryId', type: 'string', sortType: 'asUCText'},
+    {name:'enabled', type: 'boolean'},
+    {name:'eulaAccepted', type: 'boolean'},
+    {name:'analyzing', type: 'boolean'},
+    {name:'detailedReportSupported', type: 'boolean'},
+    {name:'iframeHeight', type: 'int'},
+    {name:'iframeWidth', type: 'int'},
+    {name:'securityIssueCount', type: 'int'},
+    {name:'licenseIssueCount', type: 'int'},
+    {name:'summaryUrl', type: 'string', sortType: 'asUCText'},
+    {name:'detailUrl', type: 'string', sortType: 'asUCText'}
   ]
 });

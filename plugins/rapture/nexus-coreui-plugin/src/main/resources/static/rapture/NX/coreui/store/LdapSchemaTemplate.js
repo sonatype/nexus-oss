@@ -36,6 +36,5 @@ Ext.define('NX.coreui.store.LdapSchemaTemplate', {
     }
   },
 
-  sortOnLoad: true,
   sorters: { property: 'name', direction: 'ASC' }
 });
