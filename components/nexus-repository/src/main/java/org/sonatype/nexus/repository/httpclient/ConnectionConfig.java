@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.repository.httpclient;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 /**
  * HTTP client connection configuration.
  *
@@ -19,12 +23,21 @@ package org.sonatype.nexus.repository.httpclient;
  */
 public class ConnectionConfig
 {
+  @Nullable
   private String userAgentCustomisation;
 
+  @Nullable
   private String urlParameters;
 
+  /**
+   * Timeout milliseconds.
+   */
+  @Min(0L)
+  @Max(3600000L) // 1 hour
   private Integer timeout;
 
+  @Min(0L)
+  @Max(10L)
   private Integer retries;
 
   private Boolean blocked;
@@ -33,19 +46,21 @@ public class ConnectionConfig
 
   private Boolean useTrustStore;
 
+  @Nullable
   public String getUserAgentCustomisation() {
     return userAgentCustomisation;
   }
 
-  public void setUserAgentCustomisation(final String userAgentCustomisation) {
+  public void setUserAgentCustomisation(final @Nullable String userAgentCustomisation) {
     this.userAgentCustomisation = userAgentCustomisation;
   }
 
+  @Nullable
   public String getUrlParameters() {
     return urlParameters;
   }
 
-  public void setUrlParameters(final String urlParameters) {
+  public void setUrlParameters(final @Nullable String urlParameters) {
     this.urlParameters = urlParameters;
   }
 
@@ -87,5 +102,18 @@ public class ConnectionConfig
 
   public void setUseTrustStore(final Boolean useTrustStore) {
     this.useTrustStore = useTrustStore;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "userAgentCustomisation='" + userAgentCustomisation + '\'' +
+        ", urlParameters='" + urlParameters + '\'' +
+        ", timeout=" + timeout +
+        ", retries=" + retries +
+        ", blocked=" + blocked +
+        ", autoBlock=" + autoBlock +
+        ", useTrustStore=" + useTrustStore +
+        '}';
   }
 }

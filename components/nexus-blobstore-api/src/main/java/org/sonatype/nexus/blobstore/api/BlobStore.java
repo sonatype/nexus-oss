@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.collect.AutoClosableIterable;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
@@ -107,4 +108,11 @@ public interface BlobStore
    * Initialize the BlobStore.
    */
   void init(BlobStoreConfiguration configuration) throws Exception;
+
+  /**
+   * Returns an Iterable of BlobIds.
+   *
+   * @return Iterable handle must be closed when finished using it.
+   */
+  AutoClosableIterable<BlobId> iterator();
 }

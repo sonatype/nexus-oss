@@ -10,18 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.httpclient;
+package org.sonatype.nexus.validation.constraint;
 
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
- * {@link HttpClientConfig} marshaller.
+ * {@link PortNumber} validator.
  *
  * @since 3.0
  */
-public interface HttpClientConfigMarshaller
+public class PortNumberValidator
+  implements ConstraintValidator<PortNumber,Integer>
 {
-  void marshall(HttpClientConfig config, NestedAttributesMap attributes);
+  private int min;
 
-  HttpClientConfig unmarshall(NestedAttributesMap attributes);
+  private int max;
+
+  @Override
+  public void initialize(final PortNumber annotation) {
+    min = annotation.min();
+    max = annotation.max();
+  }
+
+  @Override
+  public boolean isValid(final Integer value, final ConstraintValidatorContext context) {
+    if (value == null) {
+      return true;
+    }
+
+    return value >= min && value <= max;
+  }
 }

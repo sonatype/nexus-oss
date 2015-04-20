@@ -10,10 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.negativecache
 
+import org.sonatype.nexus.repository.Repository
+import org.sonatype.nexus.repository.config.Configuration
+import org.sonatype.nexus.repository.config.ConfigurationFacet
+import org.sonatype.nexus.repository.http.HttpStatus
+import org.sonatype.nexus.repository.view.Status
+import org.sonatype.sisu.goodies.common.Time
+import org.sonatype.sisu.goodies.eventbus.EventBus
+import org.sonatype.sisu.litmus.testsupport.TestSupport
+
 import com.google.common.collect.Lists
-import com.google.common.collect.Maps
 import net.sf.ehcache.Cache
 import net.sf.ehcache.CacheManager
 import net.sf.ehcache.Ehcache
@@ -21,18 +30,11 @@ import net.sf.ehcache.Element
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentCaptor
-import org.sonatype.nexus.common.collect.NestedAttributesMap
-import org.sonatype.nexus.repository.Repository
-import org.sonatype.nexus.repository.config.Configuration
-import org.sonatype.nexus.repository.http.HttpStatus
-import org.sonatype.nexus.repository.view.Status
-import org.sonatype.sisu.goodies.common.Time
-import org.sonatype.sisu.goodies.eventbus.EventBus
-import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static net.sf.ehcache.Status.STATUS_ALIVE
 import static net.sf.ehcache.Status.STATUS_SHUTDOWN
 import static org.mockito.Matchers.any
+import static org.mockito.Mockito.eq
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.never
 import static org.mockito.Mockito.verify
@@ -42,15 +44,21 @@ import static org.mockito.Mockito.when
  * Tests for {@link NegativeCacheHandler}.
  */
 class NegativeCacheFacetImplTest
-extends TestSupport
+    extends TestSupport
 {
   private NegativeCacheFacetImpl underTest
+
   private NegativeCacheKey key
+
   private Status status
+
   private CacheManager cacheManager
+
   private Ehcache cache
+
   private Repository repository
-  private Map attributes
+
+  private NegativeCacheFacetImpl.Config config
 
   @Before
   void setUp() {
@@ -59,9 +67,9 @@ extends TestSupport
     cache = mock(Ehcache)
     underTest = new NegativeCacheFacetImpl(cacheManager) {
       @Override
-      Ehcache createCache(final String name, final Time timeToLive) {
+      Ehcache newCache(final String name, final int timeToLiveSeconds) {
         assert name == 'negative-cache-test'
-        assert timeToLive.equals(Time.minutes(1440))
+        assert timeToLiveSeconds.equals(Time.hours(24).toSecondsI())
         when(cache.name).thenReturn(name)
         return cache
       }
@@ -71,11 +79,15 @@ extends TestSupport
     status = Status.failure(HttpStatus.NOT_FOUND, '404')
     repository = mock(Repository)
     when(repository.name).thenReturn('test')
-    Configuration config = mock(Configuration)
-    when(repository.configuration).thenReturn(config)
-    when(config.attributes(NegativeCacheFacetImpl.CONFIG_KEY)).thenReturn(
-        new NestedAttributesMap(NegativeCacheFacetImpl.CONFIG_KEY, attributes = Maps.newHashMap())
-    )
+
+    config = new NegativeCacheFacetImpl.Config()
+    def configurationFacet = mock(ConfigurationFacet.class)
+    when(configurationFacet.readSection(
+        any(Configuration.class),
+        eq(NegativeCacheFacetImpl.CONFIG_KEY),
+        eq(NegativeCacheFacetImpl.Config.class)))
+        .thenReturn(config)
+    when(repository.facet(ConfigurationFacet.class)).thenReturn(configurationFacet)
   }
 
   /**
@@ -114,7 +126,7 @@ extends TestSupport
    */
   @Test
   void 'not enabled no cache'() {
-    attributes.put('enabled', false)
+    config.enabled = false
     underTest.attach(repository)
     underTest.init()
     underTest.start()
@@ -138,7 +150,7 @@ extends TestSupport
    */
   @Test
   void 'cache is created and removed'() {
-    attributes.put("enabled", true)
+    config.enabled = true
     underTest.attach(repository)
     underTest.init()
     underTest.start()
@@ -158,7 +170,7 @@ extends TestSupport
    */
   @Test
   void 'cache is not removed when manager is not active'() {
-    attributes.put("enabled", true)
+    config.enabled = true
     underTest.attach(repository)
     underTest.init()
     underTest.start()
@@ -177,7 +189,7 @@ extends TestSupport
    */
   @Test
   void 'put caches element'() {
-    attributes.put("enabled", true)
+    config.enabled = true
     underTest.attach(repository)
     underTest.init()
     underTest.start()
@@ -198,7 +210,7 @@ extends TestSupport
    */
   @Test
   void 'get returns status'() {
-    attributes.put("enabled", true)
+    config.enabled = true
     underTest.attach(repository)
     underTest.init()
     underTest.start()
@@ -217,7 +229,7 @@ extends TestSupport
    */
   @Test
   void 'get returns null when cache returns null'() {
-    attributes.put("enabled", true)
+    config.enabled = true
     underTest.attach(repository)
     underTest.init()
     underTest.start()
@@ -235,7 +247,7 @@ extends TestSupport
    */
   @Test
   void 'invalidate removes element'() {
-    attributes.put("enabled", true)
+    config.enabled = true
     underTest.attach(repository)
     underTest.init()
     underTest.start()
@@ -252,7 +264,7 @@ extends TestSupport
    */
   @Test
   void 'invalidate removes all elements'() {
-    attributes.put("enabled", true)
+    config.enabled = true
     underTest.attach(repository)
     underTest.init()
     underTest.start()
@@ -275,7 +287,7 @@ extends TestSupport
     when(cache.getKeys()).thenReturn(Lists.newArrayList(key1, key2))
     when(key.isParentOf(key1)).thenReturn(false)
     when(key.isParentOf(key2)).thenReturn(true)
-    attributes.put("enabled", true)
+    config.enabled = true
     underTest.attach(repository)
     underTest.init()
     underTest.start()
@@ -284,5 +296,4 @@ extends TestSupport
     verify(cache, never()).remove(key1)
     verify(cache).remove(key2)
   }
-
 }
