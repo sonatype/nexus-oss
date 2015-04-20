@@ -37,13 +37,6 @@ Ext.define('NX.coreui.view.support.SysInfo', {
         text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_DOWNLOAD_BUTTON'),
         glyph: 'xf019@FontAwesome' /* fa-download */,
         action: 'download'
-      },
-      '-',
-      {
-        xtype: 'button',
-        text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_PRINT_BUTTON'),
-        glyph: 'xf02f@FontAwesome' /* fa-print */,
-        action: 'print'
       }
     ]
   }],
@@ -178,7 +171,6 @@ Ext.define('NX.coreui.view.support.SysInfo', {
    * @public
    */
   setInfo: function(info) {
-    console.log(this.down('panel'));
     this.mainTpl.overwrite(this.body, info);
   }
 

@@ -70,7 +70,7 @@ public class FilteredHttpClient
   {
     this.delegate = checkNotNull(delegate);
     checkNotNull(config);
-    ConnectionConfig conConfig = config.getConnectionConfig();
+    ConnectionConfig conConfig = config.getConnection();
     blocked = conConfig != null && conConfig.isBlocked() != null && conConfig.isBlocked();
     autoBlock = conConfig == null || conConfig.shouldAutoBlock() == null || conConfig.shouldAutoBlock();
     status = new RemoteConnectionStatus(blocked ? "Remote Manually Blocked" : "Remote Connection Pending...");

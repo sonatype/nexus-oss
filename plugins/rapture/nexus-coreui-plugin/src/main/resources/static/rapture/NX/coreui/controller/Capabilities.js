@@ -283,7 +283,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(2, NX.I18n.format('ADMIN_CAPABILITIES_CREATE_TITLE', model.get('name')));
     me.loadCreateWizard(2, true, panel = Ext.create('widget.nx-coreui-capability-add'));
-    var m = me.getCapabilityModel().create({ typeId: model.getId() });
+    var m = me.getCapabilityModel().create({ typeId: model.getId(), enabled: true });
     panel.down('nx-settingsform').loadRecord(m);
   },
 

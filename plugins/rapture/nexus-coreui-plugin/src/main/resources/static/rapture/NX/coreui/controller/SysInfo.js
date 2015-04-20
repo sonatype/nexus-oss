@@ -24,7 +24,6 @@ Ext.define('NX.coreui.controller.SysInfo', {
     'NX.util.Url',
     'NX.util.DownloadHelper',
     'NX.Messages',
-    'NX.Windows',
     'NX.I18n'
   ],
   mixins: {
@@ -74,9 +73,6 @@ Ext.define('NX.coreui.controller.SysInfo', {
         },
         'nx-coreui-support-sysinfo button[action=download]': {
           'click': me.download
-        },
-        'nx-coreui-support-sysinfo button[action=print]': {
-          'click': me.print
         }
       }
     });
@@ -110,30 +106,5 @@ Ext.define('NX.coreui.controller.SysInfo', {
    */
   download: function () {
     NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf('service/siesta/atlas/system-information'));
-  },
-
-  /**
-   * @private
-   * Print system information panel contents.
-   */
-  print: function () {
-    var me = this,
-        panel = me.getSysInfo(),
-        win;
-
-    win = NX.Windows.open('', '', 'width=640,height=480');
-    if (win !== null) {
-      win.document.write('<html><head>');
-      win.document.write('<title>' + NX.I18n.get('ADMIN_SYSTEM_INFORMATION_TITLE') + '</title>');
-
-      // FIXME: Ideally want some of the style in here
-      // FIXME: ... but unsure how to resolve that URL (since it could change for debug, etc)
-      // FIXME: See for more details http://stackoverflow.com/questions/5939456/how-to-print-extjs-component
-
-      win.document.write('</head><body>');
-      win.document.write(panel.body.dom.innerHTML);
-      win.document.write('</body></html>');
-      win.print();
-    }
   }
 });

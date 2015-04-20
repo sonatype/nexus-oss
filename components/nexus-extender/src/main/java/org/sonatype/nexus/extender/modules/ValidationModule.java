@@ -21,6 +21,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 
 import org.sonatype.nexus.validation.Validate;
@@ -53,9 +54,19 @@ public class ValidationModule
     try {
       Thread.currentThread().setContextClassLoader(HibernateValidator.class.getClassLoader());
 
-      return Validation.byDefaultProvider().configure() // start with default configuration
+      ValidatorFactory factory = Validation.byDefaultProvider().configure()
           .traversableResolver(new AlwaysTraversableResolver()) // disable JPA reachability
           .buildValidatorFactory();
+
+      // exercise interpolator to preload elements (avoids issues later when TCCL might be different)
+      factory.getValidator().validate(new Object()
+      {
+        // minimal token message
+        @NotNull(message = "${0}")
+        String empty;
+      });
+
+      return factory;
     }
     finally {
       Thread.currentThread().setContextClassLoader(tccl);

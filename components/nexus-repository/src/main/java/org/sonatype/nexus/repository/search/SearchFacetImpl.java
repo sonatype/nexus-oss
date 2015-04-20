@@ -33,7 +33,6 @@ public class SearchFacetImpl
     extends FacetSupport
     implements SearchFacet
 {
-
   private final SearchService searchService;
 
   @Inject
@@ -62,5 +61,4 @@ public class SearchFacetImpl
   protected void doDelete() {
     searchService.deleteIndex(getRepository());
   }
-
 }
