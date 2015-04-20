@@ -134,6 +134,7 @@ public class RawContentFacetImpl
         tx.saveComponent(component);
 
         asset = tx.createAsset(bucket, component);
+        asset.name(component.name());
       }
       else {
         // UPDATE
