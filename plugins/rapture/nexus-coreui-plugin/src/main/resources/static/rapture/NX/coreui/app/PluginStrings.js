@@ -759,6 +759,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // Admin -> System -> Capabilities
     ADMIN_CAPABILITIES_TITLE: 'Capabilities',
     ADMIN_CAPABILITIES_SUBTITLE: 'Manage capabilities',
+    ADMIN_CAPABILITIES_UPDATE_MASK: 'Updating capability',
+    ADMIN_CAPABILITIES_ENABLE_MASK: 'Enabling capability',
+    ADMIN_CAPABILITIES_DISABLE_MASK: 'Disabling capability',
     ADMIN_CAPABILITIES_UPDATE_ERROR: 'You do not have permission to update capabilities',
     ADMIN_CAPABILITIES_UPDATE_SUCCESS: 'Capability updated: {0}',
     ADMIN_CAPABILITIES_CREATE_TITLE: 'Create {0} Capability',
