@@ -44,7 +44,7 @@ public class RecentCachedOrDeployedArtifactFeedSource
   {
     super(feedRecorder,
         CHANNEL_KEY,
-        "New artifacts",
+        "Cached or deployed artifacts",
         "New artifacts (cached or deployed).");
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }

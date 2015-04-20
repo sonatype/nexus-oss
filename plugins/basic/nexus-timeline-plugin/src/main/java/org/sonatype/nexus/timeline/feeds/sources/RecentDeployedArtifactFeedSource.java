@@ -43,7 +43,7 @@ public class RecentDeployedArtifactFeedSource
   {
     super(feedRecorder,
         CHANNEL_KEY,
-        "New deployed artifacts",
+        "Deployed artifacts",
         "New deployed artifacts in all Nexus repositories (deployed).");
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }

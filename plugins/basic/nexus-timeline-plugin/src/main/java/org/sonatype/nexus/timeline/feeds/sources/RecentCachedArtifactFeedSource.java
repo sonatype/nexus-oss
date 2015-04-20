@@ -41,7 +41,7 @@ public class RecentCachedArtifactFeedSource
   public RecentCachedArtifactFeedSource(final FeedRecorder feedRecorder, final RepositoryRegistry repositoryRegistry) {
     super(feedRecorder,
         CHANNEL_KEY,
-        "New remote artifacts",
+        "Cached artifacts",
         "New remote artifacts (cached).");
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
