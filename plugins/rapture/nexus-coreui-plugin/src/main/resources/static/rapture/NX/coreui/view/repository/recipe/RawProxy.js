@@ -41,8 +41,8 @@ Ext.define('NX.coreui.view.repository.recipe.RawProxy', {
       { xtype: 'nx-coreui-repository-view-facet'},
       { xtype: 'nx-coreui-repository-proxy-facet'},
       { xtype: 'nx-coreui-repository-storage-facet'},
-      { xtype: 'nx-coreui-repository-http-facet'},
       { xtype: 'nx-coreui-repository-negativecache-facet'},
+      { xtype: 'nx-coreui-repository-http-facet'},
       { xtype: 'nx-coreui-repository-content-rawcontent-facet' }
     ];
 

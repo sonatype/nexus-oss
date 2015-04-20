@@ -268,6 +268,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_SIZE_HELP: 'Maximum number of cached query results',
     ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_ITEM_MAX_AGE: 'Query cache age',
     ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_ITEM_MAX_AGE_HELP: 'How long to cache query results (in seconds)',
+    ADMIN_REPOSITORIES_AUTHENTICATION_TYPE: 'Authentication type',
+    ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_USERNAME: 'Username',
+    ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_NTLM: 'Windows NTLM',
+    ADMIN_REPOSITORIES_SETTINGS_AUTHENTICATION: 'Authentication',
 
     // Admin -> Repository -> Blobstores
     ADMIN_BLOBSTORES_TITLE: 'Blobstores',
