@@ -128,7 +128,6 @@ extends DirectComponentSupport
         type: input.type,
         format: input.format,
         recipe: input.configuration.recipeName,
-        online: input.facet(ViewFacet).online,
         status: buildStatus(input),
         attributes: input.configuration.attributes,
         url: "${BaseUrlHolder.get()}/repository/${input.name}"
