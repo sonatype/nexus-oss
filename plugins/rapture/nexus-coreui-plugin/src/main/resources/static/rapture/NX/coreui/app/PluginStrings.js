@@ -414,8 +414,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_USERS_DETAILS_DELETE_BUTTON: 'Delete user',
     ADMIN_USERS_DETAILS_DELETE_SUCCESS: 'User deleted: {0}',
     ADMIN_USERS_DETAILS_MORE_BUTTON: 'More',
-    ADMIN_USERS_DETAILS_RESET_ITEM: 'Reset password',
-    ADMIN_USERS_DETAILS_RESET_SUCCESS: 'Password reset',
     ADMIN_USERS_DETAILS_CHANGE_ITEM: 'Change password',
     ADMIN_USERS_DETAILS_CHANGE_SUCCESS: 'Password changed',
     ADMIN_USERS_DETAILS_SETTINGS_TAB: 'Settings',

@@ -13,13 +13,13 @@
 
 package org.sonatype.nexus.internal.security
 
+import javax.inject.Named
+import javax.inject.Singleton
+
 import org.sonatype.nexus.security.config.CPrivilege
 import org.sonatype.nexus.security.config.CRole
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
-
-import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * Default nexus static security resource.
@@ -909,16 +909,19 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'security:usersforgotid'
                 ]
             ),
-            new CPrivilege(
-                id: 'usersresetpw', // 59
-                type: 'method',
-                name: 'User Reset Password - (delete,read)',
-                description: 'Give permission to reset any user\'s password.',
-                properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'security:usersreset'
-                ]
-            ),
+
+            // NOTE: This privilege is no longer used by anything
+//            new CPrivilege(
+//                id: 'usersresetpw', // 59
+//                type: 'method',
+//                name: 'User Reset Password - (delete,read)',
+//                description: 'Give permission to reset any user\'s password.',
+//                properties: [
+//                    'method'    : 'delete,read',
+//                    'permission': 'security:usersreset'
+//                ]
+//            ),
+
             new CPrivilege(
                 id: 'userschangepw', // 64
                 type: 'method',
