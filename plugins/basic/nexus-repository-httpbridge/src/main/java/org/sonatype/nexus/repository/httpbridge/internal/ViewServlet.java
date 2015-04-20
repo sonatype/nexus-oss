@@ -140,11 +140,12 @@ public class ViewServlet
     }
     log.debug("Repository: {}", repo);
 
-    ViewFacet facet = repo.facet(ViewFacet.class);
-    if (!facet.isOnline()) {
+    if (!repo.getConfiguration().isOnline()) {
       send(null, HttpResponses.serviceUnavailable("Repository offline"), httpResponse);
       return;
     }
+
+    ViewFacet facet = repo.facet(ViewFacet.class);
     log.debug("Dispatching to view facet: {}", facet);
 
     // Dispatch the request

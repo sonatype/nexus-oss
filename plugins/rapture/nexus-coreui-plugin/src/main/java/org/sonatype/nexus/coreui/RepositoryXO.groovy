@@ -17,6 +17,8 @@ import org.sonatype.nexus.validation.group.Create
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
 
+import javax.validation.constraints.NotNull
+
 /**
  * Repository exchange object.
  *
@@ -35,6 +37,7 @@ class RepositoryXO
   @NotEmpty(groups = Create)
   String recipe
 
+  @NotNull
   Boolean online
 
   String attributes
