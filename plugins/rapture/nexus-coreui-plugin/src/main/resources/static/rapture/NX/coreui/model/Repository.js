@@ -27,7 +27,7 @@ Ext.define('NX.coreui.model.Repository', {
     {name: 'recipe', type: 'string', sortType: 'asUCText'},
     {name: 'online', type: 'boolean'},
     {name: 'status', type: 'auto' /*object*/},
-    {name: 'attributes', type: 'string'},
+    {name: 'attributes', type: 'auto' /*object*/},
     {name: 'url', type: 'string', sortType: 'asUCText'}
   ]
 });
