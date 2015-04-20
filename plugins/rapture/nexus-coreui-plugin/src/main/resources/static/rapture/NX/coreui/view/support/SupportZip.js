@@ -35,6 +35,7 @@ Ext.define('NX.coreui.view.support.SupportZip', {
       xtype: 'nx-settingsform',
       settingsFormSubmitMessage: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATING'),
       settingsFormSuccessMessage: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED'),
+      timeout: 60 * 3, // 3 minutes
       api: {
         submit: 'NX.direct.atlas_SupportZip.create'
       },

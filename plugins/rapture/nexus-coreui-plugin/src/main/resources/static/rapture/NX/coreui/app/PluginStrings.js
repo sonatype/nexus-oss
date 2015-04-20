@@ -764,7 +764,8 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // Admin -> Support -> Support ZIP
     ADMIN_SUPPORT_ZIP_TITLE: 'Support ZIP',
     ADMIN_SUPPORT_ZIP_SUBTITLE: 'Creates a ZIP file containing useful support information about your server',
-    ADMIN_SUPPORT_ZIP_HELP: '<p>No information will be sent to Sonatype when creating the support ZIP file.</p>',
+    ADMIN_SUPPORT_ZIP_HELP: '<p>No information will be sent to Sonatype when creating the support ZIP file.</p>' +
+      '<p>Support ZIP creation may take a few minutes to complete.</p>',
     ADMIN_SUPPORT_ZIP_CONTENTS: 'Contents',
     ADMIN_SUPPORT_ZIP_REPORT: 'System information report',
     ADMIN_SUPPORT_ZIP_DUMP: 'JVM thread-dump',
@@ -777,7 +778,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_SUPPORT_ZIP_INCLUDED: 'Limit files in the ZIP archive to 30 MB apiece',
     ADMIN_SUPPORT_ZIP_MAX: 'Limit the ZIP archive to 20 MB',
     ADMIN_SUPPORT_ZIP_CREATE_BUTTON: 'Create support ZIP',
-    ADMIN_SUPPORT_ZIP_CREATING: 'Creating support ZIP',
+    ADMIN_SUPPORT_ZIP_CREATING: '<div align="center">Creating support ZIP <br/>(may take a few minutes)</div>',
     ADMIN_SUPPORT_ZIP_TRUNCATED: 'Contents have been truncated due to exceeded size limits.',
     ADMIN_SUPPORT_ZIP_CREATED: 'Support ZIP created',
     ADMIN_SUPPORT_ZIP_CREATED_NAME: 'Name',
