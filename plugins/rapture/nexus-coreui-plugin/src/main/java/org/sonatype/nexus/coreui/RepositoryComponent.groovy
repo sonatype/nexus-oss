@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
+import javax.annotation.Nullable
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -21,6 +22,7 @@ import javax.validation.groups.Default
 
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.repository.MissingFacetException
 import org.sonatype.nexus.repository.Recipe
 import org.sonatype.nexus.repository.Repository
@@ -37,7 +39,9 @@ import org.sonatype.nexus.web.BaseUrlHolder
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod
+import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
 
 /**
@@ -57,9 +61,6 @@ extends DirectComponentSupport
   @Inject
   Map<String, Recipe> recipes
   
-  @Inject
-  AttributeConverter attributeConverter
-
   @DirectMethod
   List<RepositoryXO> read() {
     repositoryManager.browse().collect { asRepository(it) }
@@ -75,14 +76,31 @@ extends DirectComponentSupport
     }
   }
 
+  /**
+   * Retrieve a list of available repositories references.
+   */
+  @DirectMethod
+  @RequiresPermissions('nexus:repositories:read')
+  List<RepositoryReferenceXO> readReferences(final @Nullable StoreLoadParameters parameters) {
+    return filter(parameters).collect { Repository repository ->
+      new RepositoryReferenceXO(
+          id: repository.name,
+          name: repository.name,
+          type: repository.type.toString(),
+          format: repository.format.toString()
+      )
+    }
+  }
+
   @DirectMethod
   @RequiresAuthentication
   @Validate(groups = [Create.class, Default.class])
   RepositoryXO create(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repository) {
+    convertDoublesToInts(repository.attributes)
     return asRepository(repositoryManager.create(new Configuration(
         repositoryName: repository.name,
         recipeName: repository.recipe,
-        attributes: attributeConverter.asAttributes(repository.attributes)
+        attributes: repository.attributes
     )))
   }
 
@@ -90,8 +108,9 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @Validate(groups = [Update.class, Default.class])
   RepositoryXO update(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repository) {
+    convertDoublesToInts(repository.attributes)
     return asRepository(repositoryManager.update(repositoryManager.get(repository.name).configuration.with {
-      attributes = attributeConverter.asAttributes(repository.attributes)
+      attributes = repository.attributes
       return it
     }))
   }
@@ -108,11 +127,27 @@ extends DirectComponentSupport
         name: input.name,
         type: input.type,
         format: input.format,
-        online: input.facet(ViewFacet).online,
+        recipe: input.configuration.recipeName,
         status: buildStatus(input),
-        attributes: attributeConverter.asAttributes(input.configuration.attributes),
+        attributes: input.configuration.attributes,
         url: "${BaseUrlHolder.get()}/repository/${input.name}"
     )
+  }
+
+  /**
+   * Gson inconveniently transforms all numbers in our Map<String, Object> to Double type.
+   * This mutates the passed in map to change all Double types to Integer.
+   */
+  @PackageScope
+  def convertDoublesToInts(final map) {
+    map.each { key, value ->
+      if (value instanceof Map) {
+        convertDoublesToInts(value)
+      }
+      else if (value instanceof Double) {
+        map[key] = (value as int)
+      }
+    }
   }
 
   @DirectPollMethod(event = "coreui_Repository_readStatus")
@@ -147,5 +182,18 @@ extends DirectComponentSupport
     }
     return statusXO
   }
-  
+
+  @PackageScope
+  List<Repository> filter(final @Nullable StoreLoadParameters parameters) {
+    def repositories = repositoryManager.browse()
+    if (parameters) {
+      String format = parameters.getFilter('format')
+      if (format) {
+        return repositories.findResults { Repository repository ->
+          repository.format == format
+        }
+      }
+    }
+    return repositories
+  }
 }

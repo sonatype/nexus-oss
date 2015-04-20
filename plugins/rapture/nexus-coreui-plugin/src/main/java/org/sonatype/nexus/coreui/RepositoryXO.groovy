@@ -31,22 +31,17 @@ class RepositoryXO
   @NotBlank
   String name
 
-  @NotBlank
   String type
 
-  @NotBlank
   String format
 
   @NotBlank(groups = Create)
   String recipe
 
-  @NotNull
-  Boolean online
+  @NotEmpty
+  Map<String, Map<String, Object>> attributes
 
-  String attributes
-
-  @NotBlank
   String url
-  
+
   RepositoryStatusXO status
 }
