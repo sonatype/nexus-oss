@@ -36,7 +36,7 @@ Ext.define('NX.coreui.view.repository.facet.GroupFacet', {
   },
   
   /**
-   * @param
+   * @cfg String 
    * Set the format to narrow the format of groups available to choose from.
    */
   format: undefined,
