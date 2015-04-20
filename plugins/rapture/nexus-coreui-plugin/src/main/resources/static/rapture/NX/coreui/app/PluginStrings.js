@@ -490,8 +490,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // Admin -> Security -> LDAP
     ADMIN_LDAP_TITLE: 'LDAP',
     ADMIN_LDAP_SUBTITLE: 'Manage LDAP server configuration',
+    ADMIN_LDAP_UPDATE_MASK: 'Updating LDAP connection',
     ADMIN_LDAP_UPDATE_SUCCESS: 'LDAP server updated: {0}',
     ADMIN_LDAP_UPDATE_ERROR: 'You do not have permission to update LDAP servers',
+    ADMIN_LDAP_CREATE_MASK: 'Creating LDAP connection',
     ADMIN_LDAP_CREATE_CONNECTION: 'Create LDAP Connection',
     ADMIN_LDAP_CREATE_GROUP: 'Choose Users and Groups',
     ADMIN_LDAP_CREATE_SUCCESS: 'LDAP server created: {0}',

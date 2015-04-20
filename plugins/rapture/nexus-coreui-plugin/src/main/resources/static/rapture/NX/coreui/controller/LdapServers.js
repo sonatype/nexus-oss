@@ -36,7 +36,6 @@ Ext.define('NX.coreui.controller.LdapServers', {
     'LdapSchemaTemplate'
   ],
   views: [
-    'ldap.LdapServerAdd',
     'ldap.LdapServerChangeOrder',
     'ldap.LdapServerFeature',
     'ldap.LdapServerList',
@@ -266,7 +265,26 @@ Ext.define('NX.coreui.controller.LdapServers', {
     });
     Ext.apply(modelData, values);
 
+    // Apply masks
+    if (connectionForm.getEl()) {
+      connectionForm.getEl().mask(NX.I18n.get('ADMIN_LDAP_UPDATE_MASK'));
+    }
+    if (userGroupForm.getEl()) {
+      userGroupForm.getEl().mask(NX.I18n.get('ADMIN_LDAP_UPDATE_MASK'));
+    }
+    if (backupForm.getEl()) {
+      backupForm.getEl().mask(NX.I18n.get('ADMIN_LDAP_UPDATE_MASK'));
+    }
     NX.direct.ldap_LdapServer.update(modelData, function(response) {
+      if (connectionForm.getEl()) {
+        connectionForm.getEl().unmask();
+      }
+      if (userGroupForm.getEl()) {
+        userGroupForm.getEl().unmask();
+      }
+      if (backupForm.getEl()) {
+        backupForm.getEl().unmask();
+      }
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
@@ -295,7 +313,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
     Ext.apply(values, connectionForm.getForm().getFieldValues());
     Ext.apply(values, userGroupForm.getForm().getFieldValues());
 
+    userGroupForm.getEl().mask(NX.I18n.get('ADMIN_LDAP_CREATE_MASK'));
     NX.direct.ldap_LdapServer.create(values, function(response) {
+      userGroupForm.getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
