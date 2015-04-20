@@ -265,7 +265,9 @@ Ext.define('NX.coreui.controller.Tasks', {
       form = button.up('form'),
       values = form.getValues();
 
+    me.maskTask(NX.I18n.get('ADMIN_TASKS_UPDATE_MASK'));
     NX.direct.coreui_Task.update(values, function(response) {
+      me.unmaskTask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
@@ -407,8 +409,10 @@ Ext.define('NX.coreui.controller.Tasks', {
       description = me.getDescription(model);
       NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_TASKS_DETAILS_RUN_CONFIRM'),
         NX.I18n.format('ADMIN_TASKS_DETAILS_RUN_CONFIRM_HELP', description), function() {
+        me.maskTask(NX.I18n.get('ADMIN_TASKS_RUN_MASK'));
         NX.direct.coreui_Task.run(model.getId(), function(response) {
           me.loadStore();
+          me.unmaskTask();
           if (Ext.isObject(response) && response.success) {
             NX.Messages.add({
               text: NX.I18n.format('ADMIN_TASKS_DETAILS_RUN_SUCCESS', description), type: 'success'
@@ -439,8 +443,10 @@ Ext.define('NX.coreui.controller.Tasks', {
       description = me.getDescription(model);
       NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_TASKS_DETAILS_STOP_CONFIRM'),
         NX.I18n.format('ADMIN_TASKS_DETAILS_STOP_CONFIRM_HELP', description), function() {
+        me.maskTask(NX.I18n.get('ADMIN_TASKS_STOP_MASK'));
         NX.direct.coreui_Task.stop(model.getId(), function(response) {
           me.loadStore();
+          me.unmaskTask();
           if (Ext.isObject(response) && response.success) {
             NX.Messages.add({
               text: NX.I18n.format('ADMIN_TASKS_DETAILS_STOP_SUCCESS', description), type: 'success'
@@ -449,6 +455,39 @@ Ext.define('NX.coreui.controller.Tasks', {
         });
       }, { scope: me });
     }
-  }
+  },
 
+  /**
+   * @private
+   * Mask capability
+   */
+  maskTask: function(str) {
+    var me = this,
+      infoPanel = me.getInfo().down('panel').down('panel').getEl(),
+      settingsPanel = me.getSettings().down('nx-settingsform').getEl();
+
+    if (infoPanel) {
+      infoPanel.mask(str);
+    }
+    if (settingsPanel) {
+      settingsPanel.mask(str);
+    }
+  },
+
+  /**
+   * @private
+   * Unmask capability
+   */
+  unmaskTask: function() {
+    var me = this,
+      infoPanel = me.getInfo().down('panel').down('panel').getEl(),
+      settingsPanel = me.getSettings().down('nx-settingsform').getEl();
+
+    if (infoPanel) {
+      infoPanel.unmask();
+    }
+    if (settingsPanel) {
+      settingsPanel.unmask();
+    }
+  }
 });
