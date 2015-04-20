@@ -36,9 +36,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 @Singleton
 @DirectAction(action = 'atlas_SupportZip')
 class SupportZipComponent
-extends DirectComponentSupport
+    extends DirectComponentSupport
 {
-
   @Inject
   SupportZipGenerator supportZipGenerator
 
@@ -59,5 +58,4 @@ extends DirectComponentSupport
         truncated: result.truncated
     )
   }
-
 }
