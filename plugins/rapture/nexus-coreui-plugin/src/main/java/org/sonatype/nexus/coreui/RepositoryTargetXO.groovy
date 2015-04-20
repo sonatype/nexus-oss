@@ -15,6 +15,7 @@ package org.sonatype.nexus.coreui
 import org.sonatype.nexus.validation.group.Update
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
 
 /**
@@ -25,13 +26,13 @@ import org.hibernate.validator.constraints.NotEmpty
 @ToString(includePackage = false, includeNames = true)
 class RepositoryTargetXO
 {
-  @NotEmpty(groups = Update.class)
+  @NotBlank(groups = Update.class)
   String id
 
-  @NotEmpty
+  @NotBlank
   String name
 
-  @NotEmpty
+  @NotBlank
   String format
 
   @NotEmpty

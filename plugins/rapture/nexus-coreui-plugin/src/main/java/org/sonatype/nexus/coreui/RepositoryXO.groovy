@@ -12,9 +12,12 @@
  */
 package org.sonatype.nexus.coreui
 
+import javax.validation.constraints.NotNull
+
 import org.sonatype.nexus.validation.group.Create
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
 
 import javax.validation.constraints.NotNull
@@ -27,22 +30,23 @@ import javax.validation.constraints.NotNull
 @ToString(includePackage = false, includeNames = true)
 class RepositoryXO
 {
-  @NotEmpty
+  @NotBlank
   String name
 
   String type
 
   String format
 
-  @NotEmpty(groups = Create)
+  @NotBlank(groups = Create)
   String recipe
 
   @NotNull
   Boolean online
 
-  String attributes
-  
+  @NotEmpty
+  Map<String, Map<String, Object>> attributes
+
   String url
-  
+
   RepositoryStatusXO status
 }

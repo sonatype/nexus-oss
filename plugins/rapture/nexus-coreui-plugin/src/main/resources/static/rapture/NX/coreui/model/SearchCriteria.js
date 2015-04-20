@@ -20,8 +20,8 @@
 Ext.define('NX.coreui.model.SearchCriteria', {
   extend: 'Ext.data.Model',
   fields: [
-    'id',
-    'group',
-    'config'
+    {name: 'id', type: 'string', sortType: 'asUCText'},
+    {name: 'group', type: 'string', sortType: 'asUCText'},
+    {name: 'config', type: 'auto' /*object*/}
   ]
 });

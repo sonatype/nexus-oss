@@ -13,6 +13,7 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 
 /**
  * Reference exchange object.
@@ -22,6 +23,9 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class ReferenceXO
 {
+  @NotBlank
   String id
+
+  @NotBlank
   String name
 }

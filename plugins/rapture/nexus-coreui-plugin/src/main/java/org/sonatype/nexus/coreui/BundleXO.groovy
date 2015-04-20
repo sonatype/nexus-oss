@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.coreui
 
+import org.hibernate.validator.constraints.NotBlank
+import org.hibernate.validator.constraints.Range
+
 /**
  * OSGI bundle.
  *
@@ -19,18 +22,25 @@ package org.sonatype.nexus.coreui
  */
 class BundleXO
 {
+  @Range
   long id
 
+  @NotBlank
   String state
 
+  @NotBlank
   String name
 
+  @NotBlank
   String symbolicName
 
+  @NotBlank
   String location
 
+  @NotBlank
   String version
 
+  @Range
   int startLevel
 
   boolean fragment

@@ -20,8 +20,8 @@
 Ext.define('NX.coreui.model.TaskType', {
   extend: 'Ext.data.Model',
   fields: [
-    'id',
-    'name',
-    'formFields'
+    {name: 'id', type: 'string', sortType: 'asUCText'},
+    {name: 'name', type: 'string', sortType: 'asUCText'},
+    {name: 'formFields', type: 'auto' /*array*/}
   ]
 });

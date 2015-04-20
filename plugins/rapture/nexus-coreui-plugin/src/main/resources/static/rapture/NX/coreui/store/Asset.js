@@ -36,7 +36,6 @@ Ext.define('NX.coreui.store.Asset', {
   },
 
   remoteFilter: true,
-  sortOnLoad: true,
   sorters: { property: 'name', direction: 'ASC' }
 
 });

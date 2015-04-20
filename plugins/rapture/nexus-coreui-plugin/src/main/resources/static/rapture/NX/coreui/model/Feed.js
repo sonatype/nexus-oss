@@ -20,8 +20,8 @@
 Ext.define('NX.coreui.model.Feed', {
   extend: 'Ext.data.Model',
   fields: [
-    'key',
-    'name',
-    'url'
+    {name: 'key', type: 'string', sortType: 'asUCText'},
+    {name: 'name', type: 'string', sortType: 'asUCText'},
+    {name: 'url', type: 'string', sortType: 'asUCText'}
   ]
 });

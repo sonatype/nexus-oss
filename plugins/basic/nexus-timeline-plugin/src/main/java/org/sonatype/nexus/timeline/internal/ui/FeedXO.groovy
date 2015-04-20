@@ -13,6 +13,7 @@
 package org.sonatype.nexus.timeline.internal.ui
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 
 /**
  * Feed exchange object.
@@ -22,8 +23,15 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class FeedXO
 {
+  @NotBlank
   String key
+
+  @NotBlank
   String name
+
+  @NotBlank
   String description
+
+  @NotBlank
   String url
 }

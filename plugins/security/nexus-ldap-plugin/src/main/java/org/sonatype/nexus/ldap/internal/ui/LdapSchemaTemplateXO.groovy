@@ -13,6 +13,7 @@
 package org.sonatype.nexus.ldap.internal.ui
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 
 /**
  * LDAP Schema Template exchange object.
@@ -22,6 +23,7 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class LdapSchemaTemplateXO
 {
+  @NotBlank
   String name
   String userBaseDn
   Boolean userSubtree

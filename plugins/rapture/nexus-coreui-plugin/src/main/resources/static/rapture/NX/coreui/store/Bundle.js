@@ -36,7 +36,6 @@ Ext.define('NX.coreui.store.Bundle', {
     }
   },
 
-  sortOnLoad: true,
   sorters: { property: 'id', direction: 'ASC' }
 
 });

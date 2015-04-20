@@ -20,7 +20,7 @@
 Ext.define('NX.coreui.model.Reference', {
   extend: 'Ext.data.Model',
   fields: [
-    'id',
-    'name'
+    {name: 'id', type: 'string', sortType: 'asUCText'},
+    {name: 'name', type: 'string', sortType: 'asUCText'}
   ]
 });
