@@ -37,6 +37,5 @@ Ext.define('NX.coreui.store.AnalyticsEvent', {
     }
   },
 
-  sortOnLoad: true,
   sorters: { property: 'timestamp', direction: 'ASC' }
 });

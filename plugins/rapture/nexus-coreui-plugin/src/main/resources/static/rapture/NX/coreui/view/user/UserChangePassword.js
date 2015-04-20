@@ -51,7 +51,8 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
       editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'create'),
       editableMarker: NX.I18n.get('ADMIN_USERS_PASSWORD_ERROR'),
       defaults: {
-        anchor: '100%'
+        anchor: '100%',
+        validateOnBlur: false // allow cancel to be clicked w/o validating field to be non-blank
       },
       items: [
         {

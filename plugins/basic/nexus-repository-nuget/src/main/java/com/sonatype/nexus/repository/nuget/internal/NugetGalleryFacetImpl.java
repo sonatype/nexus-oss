@@ -433,6 +433,7 @@ public class NugetGalleryFacetImpl
     final Iterable<Asset> assets = storageTx.browseAssets(component);
     if (!assets.iterator().hasNext()) {
       asset = storageTx.createAsset(bucket, component);
+      asset.name(component.name());
     }
     else {
       asset = assets.iterator().next();

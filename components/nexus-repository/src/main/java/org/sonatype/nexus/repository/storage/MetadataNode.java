@@ -20,6 +20,7 @@ import org.sonatype.nexus.common.entity.EntityId;
 
 import org.joda.time.DateTime;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_BUCKET;
@@ -65,7 +66,7 @@ public abstract class MetadataNode<T>
   }
 
   T bucketId(final EntityId bucketId) {
-    this.bucketId = bucketId;
+    this.bucketId = checkNotNull(bucketId);
     return self();
   }
 
@@ -73,13 +74,6 @@ public abstract class MetadataNode<T>
    * Gets the name.
    */
   public String name() {
-    return name;
-  }
-
-  /**
-   * Gets the name or throws a runtime exception if undefined.
-   */
-  public String requireName() {
     return require(name, P_NAME);
   }
 
@@ -87,7 +81,7 @@ public abstract class MetadataNode<T>
    * Sets the name.
    */
   public T name(final String name) {
-    this.name = name;
+    this.name = checkNotNull(name);
     return self();
   }
 

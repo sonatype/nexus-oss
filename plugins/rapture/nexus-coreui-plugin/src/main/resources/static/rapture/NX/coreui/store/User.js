@@ -35,6 +35,5 @@ Ext.define('NX.coreui.store.User', {
     }
   },
 
-  sortOnLoad: true,
   sorters: { property: 'userId', direction: 'ASC' }
 });

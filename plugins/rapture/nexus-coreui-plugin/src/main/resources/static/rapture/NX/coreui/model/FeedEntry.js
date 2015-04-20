@@ -20,8 +20,8 @@
 Ext.define('NX.coreui.model.FeedEntry', {
   extend: 'Ext.data.Model',
   fields: [
-    'title',
+    { name: 'title', type: 'string', sortType: 'asUCText' }, 
     { name: 'published', type: 'date', dateFormat: 'c' },
-    'content'
+    { name: 'content', type: 'string', sortType: 'asUCText' }
   ]
 });
