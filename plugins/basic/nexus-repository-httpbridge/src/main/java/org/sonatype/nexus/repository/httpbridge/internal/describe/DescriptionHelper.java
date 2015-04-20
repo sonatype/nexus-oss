@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Primitives;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.nullToEmpty;
 
 /**
@@ -55,7 +56,9 @@ public class DescriptionHelper
     desc.addTable("Attributes", toMap(request.getAttributes()));
 
     if (request.isMultipart()) {
-      for (Payload payload : request.getMultiparts()) {
+      Iterable<Payload> parts = request.getMultiparts();
+      checkState(parts != null);
+      for (Payload payload : parts) {
         desc.addTable("Payload", toMap(payload));
       }
     }
