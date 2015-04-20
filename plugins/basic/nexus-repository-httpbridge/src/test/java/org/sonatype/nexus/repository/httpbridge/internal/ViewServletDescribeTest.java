@@ -42,7 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for describe functionalify of {@link ViewServlet}.
+ * Tests for describe functionality of {@link ViewServlet}.
  */
 public class ViewServletDescribeTest
     extends TestSupport
