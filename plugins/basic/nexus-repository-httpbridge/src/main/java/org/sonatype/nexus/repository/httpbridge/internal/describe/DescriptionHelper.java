@@ -15,6 +15,9 @@ package org.sonatype.nexus.repository.httpbridge.internal.describe;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.repository.util.StringMultimap;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
@@ -34,11 +37,11 @@ import static com.google.common.base.Strings.nullToEmpty;
  *
  * @since 3.0
  */
-public class DescriptionUtils
+@Named
+@Singleton
+public class DescriptionHelper
 {
-  private DescriptionUtils() {}
-
-  public static void describeRequest(final Description desc, final Request request) {
+  public void describeRequest(final Description desc, final Request request) {
     desc.topic("Request");
 
     desc.addTable("Details", ImmutableMap.<String, Object>builder()
@@ -63,7 +66,7 @@ public class DescriptionUtils
     }
   }
 
-  public static void describeResponse(final Description desc, final Response response) {
+  public void describeResponse(final Description desc, final Response response) {
     desc.topic("Response");
 
     final Status status = response.getStatus();
@@ -82,14 +85,14 @@ public class DescriptionUtils
     }
   }
 
-  private static ImmutableMap<String, Object> toMap(final Payload payload) {
+  private ImmutableMap<String, Object> toMap(final Payload payload) {
     return ImmutableMap.<String, Object>of(
         "Content-Type", nullToEmpty(payload.getContentType()),
         "Size", payload.getSize()
     );
   }
 
-  public static void describeException(final Description d, final Exception e) {
+  public void describeException(final Description d, final Exception e) {
     d.topic("Exception during handler processing");
 
     for (Throwable cause : Throwables.getCausalChain(e)) {
@@ -98,7 +101,7 @@ public class DescriptionUtils
     }
   }
 
-  private static Map<String, Object> toMap(final Iterable<Entry<String, Object>> entries) {
+  private Map<String, Object> toMap(final Iterable<Entry<String, Object>> entries) {
     Map<String, Object> table = Maps.newHashMap();
     for (Entry<String, Object> entry : entries) {
       table.put(entry.getKey(), convert(entry.getValue()));
@@ -106,7 +109,7 @@ public class DescriptionUtils
     return table;
   }
 
-  private static Map<String, Object> toMap(final StringMultimap headers) {
+  private Map<String, Object> toMap(final StringMultimap headers) {
     Map<String, Object> table = Maps.newHashMap();
     final Iterable<Entry<String, String>> entries = headers.entries();
     for (Entry<String, String> e : entries) {
@@ -120,7 +123,7 @@ public class DescriptionUtils
    *
    * This is to help keep rendering JSON simple, and avoid side-effect with getter invocations when rendering.
    */
-  private static Object convert(final Object value) {
+  private Object convert(final Object value) {
     if (value == null) {
       return null;
     }

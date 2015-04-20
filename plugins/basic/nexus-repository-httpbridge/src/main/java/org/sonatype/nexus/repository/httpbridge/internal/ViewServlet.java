@@ -31,8 +31,8 @@ import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescribeType;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.Description;
+import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionHelper;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionRenderer;
-import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionUtils;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
@@ -62,9 +62,14 @@ public class ViewServlet
 {
   private static final Logger log = LoggerFactory.getLogger(ViewServlet.class);
 
+  @VisibleForTesting
+  static final String P_DESCRIBE = "describe";
+
   private final RepositoryManager repositoryManager;
 
   private final Map<String, HttpResponseSender> responseSenders;
+
+  private final DescriptionHelper descriptionHelper;
 
   private final DescriptionRenderer descriptionRenderer;
 
@@ -74,11 +79,13 @@ public class ViewServlet
   public ViewServlet(final RepositoryManager repositoryManager,
                      final Map<String, HttpResponseSender> responseSenders,
                      final DefaultHttpResponseSender defaultHttpResponseSender,
+                     final DescriptionHelper descriptionHelper,
                      final DescriptionRenderer descriptionRenderer)
   {
 
     this.repositoryManager = checkNotNull(repositoryManager);
     this.responseSenders = checkNotNull(responseSenders);
+    this.descriptionHelper = checkNotNull(descriptionHelper);
     this.descriptionRenderer = checkNotNull(descriptionRenderer);
     this.defaultHttpResponseSender = checkNotNull(defaultHttpResponseSender);
   }
@@ -169,7 +176,7 @@ public class ViewServlet
       failure = e;
     }
 
-    String describeFlags = request.getParameters().get("describe");
+    String describeFlags = request.getParameters().get(P_DESCRIBE);
     log.trace("Describe flags: {}", describeFlags);
     if (describeFlags != null) {
       send(request, describe(request, response, failure, describeFlags), httpResponse);
@@ -190,11 +197,11 @@ public class ViewServlet
         "nexusUrl", BaseUrlHolder.get()
     ));
     if (exception != null) {
-      DescriptionUtils.describeException(description, exception);
+      descriptionHelper.describeException(description, exception);
     }
-    DescriptionUtils.describeRequest(description, request);
+    descriptionHelper.describeRequest(description, request);
     if (response != null) {
-      DescriptionUtils.describeResponse(description, response);
+      descriptionHelper.describeResponse(description, response);
     }
 
     DescribeType type = DescribeType.parse(flags);
