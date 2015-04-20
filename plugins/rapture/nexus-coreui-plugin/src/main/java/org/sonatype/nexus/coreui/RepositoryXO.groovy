@@ -43,10 +43,10 @@ class RepositoryXO
   @NotNull
   Boolean online
 
-  String attributes
+  Map<String, Map<String, Object>> attributes
 
   @NotBlank
   String url
-  
+
   RepositoryStatusXO status
 }

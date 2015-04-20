@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
     'NX.I18n'
   ],
 
-  defaultFocus: 'recipe',
+  recipe: undefined,
 
   /**
    * @override
@@ -34,7 +34,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
     var me = this;
 
     me.settingsForm = {
-      xtype: 'nx-coreui-repository-settings-form',
+      xtype: 'nx-coreui-repository-' + me.recipe.getId(),
       api: {
         submit: 'NX.direct.coreui_Repository.create'
       },
@@ -55,17 +55,12 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
     me.callParent();
 
     me.down('#name').setReadOnly(false);
-    me.down('nx-settingsform').add(0, {
-      xtype: 'combo',
+    me.down('#format').setVisible(false);
+    me.down('#type').setVisible(false);
+    me.down('form').add({
+      xtype: 'hiddenfield',
       name: 'recipe',
-      itemId: 'recipe',
-      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_RECIPE'),
-      emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_RECIPE_PLACEHOLDER'),
-      editable: false,
-      store: 'RepositoryRecipe',
-      queryMode: 'local',
-      displayField: 'name',
-      valueField: 'id'
+      value: me.recipe.getId()
     });
   }
 });
