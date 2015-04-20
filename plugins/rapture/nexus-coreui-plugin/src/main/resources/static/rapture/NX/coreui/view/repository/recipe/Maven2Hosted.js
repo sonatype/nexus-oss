@@ -24,8 +24,7 @@ Ext.define('NX.coreui.view.repository.recipe.Maven2Hosted', {
     'NX.Conditions',
     'NX.I18n',
     'NX.coreui.view.repository.facet.Maven2Facet',
-    'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.ViewFacet'
+    'NX.coreui.view.repository.facet.StorageFacet'
   ],
 
   /**
@@ -35,7 +34,6 @@ Ext.define('NX.coreui.view.repository.recipe.Maven2Hosted', {
     var me = this;
 
     me.items = [
-      { xtype: 'nx-coreui-repository-view-facet'},
       { xtype: 'nx-coreui-repository-storage-facet'},
       { xtype: 'nx-coreui-repository-maven2-facet'}
     ];
