@@ -40,12 +40,11 @@ class RepositoryXO
   @NotBlank(groups = Create)
   String recipe
 
-  @NotNull
   Boolean online
 
+  @NotEmpty
   Map<String, Map<String, Object>> attributes
 
-  @NotBlank
   String url
 
   RepositoryStatusXO status
