@@ -68,7 +68,7 @@ public class ConfigurationEntityAdapter
     type.createProperty(P_RECIPE_NAME, OType.STRING)
         .setMandatory(true)
         .setNotNull(true);
-    type.createProperty(P_RECIPE_NAME, OType.BOOLEAN)
+    type.createProperty(P_ONLINE, OType.BOOLEAN)
         .setMandatory(true)
         .setNotNull(true);
     type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
