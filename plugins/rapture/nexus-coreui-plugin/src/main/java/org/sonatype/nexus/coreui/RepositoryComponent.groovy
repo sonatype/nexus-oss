@@ -110,7 +110,7 @@ extends DirectComponentSupport
   RepositoryXO update(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repository) {
     convertDoublesToInts(repository.attributes)
     return asRepository(repositoryManager.update(repositoryManager.get(repository.name).configuration.with {
-      online: repository.online
+      online = repository.online
       attributes = repository.attributes
       return it
     }))
