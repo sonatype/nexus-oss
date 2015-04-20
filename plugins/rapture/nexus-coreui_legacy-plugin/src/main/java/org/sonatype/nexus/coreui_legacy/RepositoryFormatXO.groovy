@@ -13,6 +13,7 @@
 package org.sonatype.nexus.coreui_legacy
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 
 /**
  * Content Class exchange object.
@@ -22,7 +23,9 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class RepositoryFormatXO
 {
+  @NotBlank
   String id
 
+  @NotBlank
   String name
 }

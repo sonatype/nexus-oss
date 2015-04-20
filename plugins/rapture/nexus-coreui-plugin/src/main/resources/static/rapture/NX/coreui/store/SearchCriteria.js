@@ -93,7 +93,6 @@ Ext.define('NX.coreui.store.SearchCriteria', {
     }
   ],
 
-  sortOnLoad: true,
   sorters: { property: 'id', direction: 'ASC' }
 
 });

@@ -20,11 +20,11 @@
 Ext.define('NX.coreui.model.AnalyticsEvent', {
   extend: 'Ext.data.Model',
   fields: [
-    'type',
-    'timestamp',
-    'sequence',
-    'duration',
-    'userId',
-    'attributes'
+    {name: 'type', type: 'string', sortType: 'asUCText'},
+    {name: 'timestamp', type: 'int'},
+    {name: 'sequence', type: 'int'},
+    {name: 'duration', type: 'int'},
+    {name: 'userId', type: 'string', sortType: 'asUCText'},
+    {name: 'attributes', type: 'auto' /*object*/}
   ]
 });

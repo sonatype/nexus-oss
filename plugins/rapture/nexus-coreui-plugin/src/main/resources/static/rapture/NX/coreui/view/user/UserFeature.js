@@ -38,7 +38,6 @@ Ext.define('NX.coreui.view.user.UserFeature', {
     { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
     { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_DETAILS_MORE_BUTTON'), glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more', disabled: true,
       menu: [
-        { text: NX.I18n.get('ADMIN_USERS_DETAILS_RESET_ITEM'), glyph: 'xf084@FontAwesome' /* fa-key */, action: 'resetpassword' },
         { text: NX.I18n.get('ADMIN_USERS_DETAILS_CHANGE_ITEM'), glyph: 'xf084@FontAwesome' /* fa-key */, action: 'setpassword' }
       ]
     }

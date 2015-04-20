@@ -35,7 +35,7 @@ public class RecentDeployedFileFeedSource
   public RecentDeployedFileFeedSource(final FeedRecorder feedRecorder) {
     super(feedRecorder,
         CHANNEL_KEY,
-        "New deployed files",
+        "Deployed files",
         "New deployed files in all Nexus repositories (deployed).");
   }
 

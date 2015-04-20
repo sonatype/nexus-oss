@@ -37,6 +37,5 @@ Ext.define('NX.coreui.store.Role', {
     }
   },
 
-  sortOnLoad: true,
   sorters: { property: 'name', direction: 'ASC' }
 });

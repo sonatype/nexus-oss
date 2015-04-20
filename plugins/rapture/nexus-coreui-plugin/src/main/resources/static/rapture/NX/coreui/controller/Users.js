@@ -146,9 +146,6 @@ Ext.define('NX.coreui.controller.Users', {
         'nx-coreui-user-feature button[action=more]': {
           afterrender: me.bindMoreButton
         },
-        'nx-coreui-user-feature menuitem[action=resetpassword]': {
-          click: me.resetPassword
-        },
         'nx-coreui-user-feature menuitem[action=setpassword]': {
           click: me.showChangePasswordWindowForSelection
         },
@@ -508,20 +505,15 @@ Ext.define('NX.coreui.controller.Users', {
 
   /**
    * @protected
-   * Enable 'More' when user is not the anonymous user and it has 'security:userschangepw:create' or
-   * 'security:usersreset:delete' permission.
+   * Enable 'More' actions as appropriate for user's permissions.
    */
   bindMoreButton: function(button) {
     var me = this,
-        resetMenuItem = button.down('menuitem[action=resetpassword]'),
         setMenuItem = button.down('menuitem[action=setpassword]');
 
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.or(
-                NX.Conditions.isPermitted('security:userschangepw', 'create'),
-                NX.Conditions.isPermitted('security:usersreset', 'delete')
-            ),
+            NX.Conditions.isPermitted('security:userschangepw', 'create'),
             NX.Conditions.gridHasSelection(me.masters[0], function(model) {
               return !model.get('external') && model.getId() !== NX.State.getValue('anonymousUsername');
             })
@@ -530,15 +522,6 @@ Ext.define('NX.coreui.controller.Users', {
           satisfied: button.enable,
           unsatisfied: button.disable,
           scope: button
-        }
-    );
-
-    resetMenuItem.mon(
-        NX.Conditions.isPermitted('security:usersreset', 'delete'),
-        {
-          satisfied: resetMenuItem.enable,
-          unsatisfied: resetMenuItem.disable,
-          scope: resetMenuItem
         }
     );
 
@@ -583,32 +566,6 @@ Ext.define('NX.coreui.controller.Users', {
         NX.Messages.add({ text: NX.I18n.get('ADMIN_USERS_DETAILS_CHANGE_SUCCESS'), type: 'success' });
       }
     });
-  },
-
-  /**
-   * @private
-   * Resets password for currently selected user.
-   */
-  resetPassword: function() {
-    var me = this,
-        list = me.getList(),
-        userModel = list.getSelectionModel().getSelection()[0],
-        userId = userModel.getId();
-
-    NX.Security.doWithAuthenticationToken(
-        'Resetting password requires validation of your credentials.',
-        {
-          success: function(authToken) {
-            NX.Dialogs.askConfirmation('Reset user password', 'Reset the ' + userId + ' user password?', function() {
-              NX.direct.coreui_User.resetPassword(authToken, userId, function(response) {
-                if (Ext.isObject(response) && response.success) {
-                  NX.Messages.add({ text: NX.I18n.format('ADMIN_USERS_DETAILS_RESET_SUCCESS'), type: 'success' });
-                }
-              });
-            });
-          }
-        }
-    );
   }
 
 });

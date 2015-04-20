@@ -35,7 +35,7 @@ public class RecentCachedOrDeployedFileFeedSource
   public RecentCachedOrDeployedFileFeedSource(final FeedRecorder feedRecorder) {
     super(feedRecorder,
         CHANNEL_KEY,
-        "New files",
+        "Cached or deployed files",
         "New files (cached or deployed).");
   }
 
