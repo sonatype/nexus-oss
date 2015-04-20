@@ -36,7 +36,6 @@ Ext.define('NX.coreui.store.Capability', {
     }
   },
 
-  sortOnLoad: true,
   sorters: { property: 'typeName', direction: 'ASC' }
 
 });

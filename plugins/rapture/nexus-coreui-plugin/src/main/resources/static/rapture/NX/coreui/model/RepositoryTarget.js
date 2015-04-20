@@ -20,9 +20,9 @@
 Ext.define('NX.coreui.model.RepositoryTarget', {
   extend: 'Ext.data.Model',
   fields: [
-    'id',
-    'name',
-    'format',
-    'patterns'
+    {name: 'id', type: 'string', sortType: 'asUCText'},
+    {name: 'name', type: 'string', sortType: 'asUCText'},
+    {name: 'format', type: 'string', sortType: 'asUCText'},
+    {name: 'patterns', type: 'auto' /*array*/}
   ]
 });

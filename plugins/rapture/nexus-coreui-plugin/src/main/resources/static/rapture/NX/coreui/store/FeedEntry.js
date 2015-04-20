@@ -36,6 +36,5 @@ Ext.define('NX.coreui.store.FeedEntry', {
   },
 
   remoteFilter: true,
-  sortOnLoad: true,
   sorters: { property: 'timestamp', direction: 'ASC' }
 });

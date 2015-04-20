@@ -20,12 +20,12 @@
 Ext.define('NX.coreui.model.RepositoryRoute', {
   extend: 'Ext.data.Model',
   fields: [
-    'id',
-    'pattern',
-    'mappingType',
-    'groupId',
-    'groupName',
-    'mappedRepositoriesIds',
-    'mappedRepositoriesNames'
+    {name: 'id', type: 'string', sortType: 'asUCText'},
+    {name: 'pattern', type: 'string', sortType: 'asUCText'},
+    {name: 'mappingType', type: 'string', sortType: 'asUCText'},
+    {name: 'groupId', type: 'string', sortType: 'asUCText'},
+    {name: 'groupName', type: 'string', sortType: 'asUCText'},
+    {name: 'mappedRepositoriesIds', type: 'auto' /*array*/},
+    {name: 'mappedRepositoriesNames', type: 'auto' /*array*/}
   ]
 });
