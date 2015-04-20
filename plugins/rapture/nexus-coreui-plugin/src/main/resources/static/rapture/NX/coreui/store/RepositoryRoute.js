@@ -37,6 +37,5 @@ Ext.define('NX.coreui.store.RepositoryRoute', {
     }
   },
 
-  sortOnLoad: true,
   sorters: { property: 'pattern', direction: 'ASC' }
 });

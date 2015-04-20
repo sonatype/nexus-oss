@@ -12,10 +12,13 @@
  */
 package org.sonatype.nexus.coreui
 
+import javax.validation.constraints.NotNull
+
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
 
 /**
@@ -26,15 +29,16 @@ import org.hibernate.validator.constraints.NotEmpty
 @ToString(includePackage = false, includeNames = true)
 class TaskXO
 {
-  @NotEmpty(groups = [Update, Schedule])
+  @NotBlank(groups = [Update, Schedule])
   String id
 
+  @NotNull
   Boolean enabled
 
-  @NotEmpty(groups = [Create, Update])
+  @NotBlank(groups = [Create, Update])
   String name
 
-  @NotEmpty(groups = Create)
+  @NotBlank(groups = Create)
   String typeId
 
   String typeName
@@ -51,7 +55,7 @@ class TaskXO
 
   Map<String, String> properties
 
-  @NotEmpty(groups = Create)
+  @NotBlank(groups = Create)
   String schedule
 
   Date startDate

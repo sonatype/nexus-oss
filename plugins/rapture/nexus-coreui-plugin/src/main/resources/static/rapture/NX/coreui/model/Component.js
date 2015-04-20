@@ -20,11 +20,11 @@
 Ext.define('NX.coreui.model.Component', {
   extend: 'Ext.data.Model',
   fields: [
-    'id',
-    'repositoryName',
-    'group',
-    'name',
-    'version',
-    'format'
+    {name: 'id', type: 'string', sortType: 'asUCText'},
+    {name: 'repositoryName', type: 'string', sortType: 'asUCText'},
+    {name: 'group', type: 'string', sortType: 'asUCText'},
+    {name: 'name', type: 'string', sortType: 'asUCText'},
+    {name: 'version', type: 'string', sortType: 'asUCText'},
+    {name: 'format', type: 'string', sortType: 'asUCText'}
   ]
 });

@@ -12,7 +12,10 @@
  */
 package org.sonatype.nexus.timeline.internal.ui
 
+import javax.validation.constraints.NotNull
+
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 
 /**
  * Feed exchange object.
@@ -22,7 +25,12 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class FeedEntryXO
 {
+  @NotBlank
   String title
+  
+  @NotNull
   Date published
+  
+  @NotBlank
   String content
 }

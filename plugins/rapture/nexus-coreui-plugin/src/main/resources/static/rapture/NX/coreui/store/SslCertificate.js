@@ -37,6 +37,5 @@ Ext.define('NX.coreui.store.SslCertificate', {
     }
   },
 
-  sortOnLoad: true,
   sorters: { property: 'subjectCommonName', direction: 'ASC' }
 });

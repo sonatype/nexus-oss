@@ -13,6 +13,7 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 
 /**
  * Task type exchange object.
@@ -22,7 +23,11 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class TaskTypeXO
 {
+  @NotBlank
   String id
+
+  @NotBlank
   String name
+  
   List<FormFieldXO> formFields
 }

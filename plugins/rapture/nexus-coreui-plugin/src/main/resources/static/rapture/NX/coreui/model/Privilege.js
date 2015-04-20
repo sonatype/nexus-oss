@@ -20,13 +20,13 @@
 Ext.define('NX.coreui.model.Privilege', {
   extend: 'Ext.data.Model',
   fields: [
-    'id',
-    'version',
-    'name',
-    'description',
-    'type',
-    'readOnly',
-    'properties',
-    'permission'
+    {name: 'id', type: 'string'},
+    {name: 'version', type: 'string'},
+    {name: 'name', type: 'string', sortType: 'asUCText'},
+    {name: 'description', type: 'string', sortType: 'asUCText'},
+    {name: 'type', type: 'string', sortType: 'asUCText'},
+    {name: 'readOnly', type: 'boolean'},
+    {name: 'properties', type: 'auto' /*object*/},
+    {name: 'permission', type: 'string', sortType: 'asUCText'}
   ]
 });

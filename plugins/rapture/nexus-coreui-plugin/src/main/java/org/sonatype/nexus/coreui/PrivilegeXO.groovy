@@ -12,9 +12,12 @@
  */
 package org.sonatype.nexus.coreui
 
+import javax.validation.constraints.NotNull
+
 import org.sonatype.nexus.validation.group.Update
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
 
 /**
@@ -25,20 +28,26 @@ import org.hibernate.validator.constraints.NotEmpty
 @ToString(includePackage = false, includeNames = true)
 class PrivilegeXO
 {
+  @NotBlank
   String id
 
-  @NotEmpty(groups = Update)
+  @NotBlank(groups = Update)
   String version
 
+  @NotBlank
   String name
 
+  @NotBlank
   String description
 
+  @NotBlank
   String type
 
+  @NotNull
   Boolean readOnly
 
   Map<String,String> properties
 
+  @NotBlank
   String permission
 }
