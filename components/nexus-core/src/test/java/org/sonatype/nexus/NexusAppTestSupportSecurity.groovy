@@ -29,7 +29,7 @@ class NexusAppTestSupportSecurity
                 password: 'f865b53623b121fd34ee5426c792e5c33af8c227',
                 firstName: 'Administrator',
                 status: 'active',
-                email: 'changeme@yourcompany.com'
+                email: 'admin@example.org'
             ),
             new CUser(
                 id: 'deployment',
@@ -37,7 +37,7 @@ class NexusAppTestSupportSecurity
                 firstName: 'Deployment',
                 lastName: 'User',
                 status: 'active',
-                email: 'changeme1@yourcompany.com'
+                email: 'deployment@example.org'
             ),
             new CUser(
                 id: 'anonymous',
@@ -45,7 +45,7 @@ class NexusAppTestSupportSecurity
                 firstName: 'Nexus',
                 lastName: 'Anonynmous User',
                 status: 'active',
-                email: 'changeme2@yourcompany.com'
+                email: 'anonymous@example.org'
             )
         ],
         userRoleMappings: [

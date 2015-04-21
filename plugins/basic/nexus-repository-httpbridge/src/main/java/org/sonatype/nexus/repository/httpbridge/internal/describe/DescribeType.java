@@ -10,37 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, NX*/
+package org.sonatype.nexus.repository.httpbridge.internal.describe;
+
+import org.sonatype.nexus.common.text.Strings2;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Online status of the repository.
+ * Describe type.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.facet.ViewFacet', {
-  extend: 'Ext.form.FieldContainer',
-  alias: 'widget.nx-coreui-repository-view-facet',
-  requires: [
-    'NX.I18n'
-  ],
+public enum DescribeType
+{
+  HTML,
+  JSON;
 
   /**
-   * @override
+   * Parse type from flags.  Either explicit HTML or JSON, or anything else will default to HTML.
    */
-  initComponent: function() {
-    var me = this;
-
-    me.items = [
-      {
-        xtype: 'checkbox',
-        name: 'view.online',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VIEW_ONLINE'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VIEW_ONLINE_HELP'),
-        value: true
-      }
-    ];
-
-    me.callParent(arguments);
+  public static DescribeType parse(String flags) {
+    checkNotNull(flags);
+    flags = Strings2.upper(flags).trim();
+    if (flags.isEmpty()) {
+      return HTML;
+    }
+    try {
+      return valueOf(flags);
+    }
+    catch (IllegalArgumentException e) {
+      return HTML;
+    }
   }
-
-});
+}
