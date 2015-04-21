@@ -46,7 +46,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
         name: 'name',
         itemId: 'name',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME'),
-        readOnly: true
+        readOnly: true,
+        vtype: 'nx-name'
       },
       {
         xtype: 'textfield',

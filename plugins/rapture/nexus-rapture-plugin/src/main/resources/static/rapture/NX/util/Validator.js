@@ -19,8 +19,9 @@
  */
 Ext.define('NX.util.Validator', {
   singleton: true,
-
-  // isURL validation based on: https://github.com/chriso/validator.js (MIT license)
+  requires: [
+      'Ext.form.field.VTypes'
+  ],
 
   /**
    * @private
@@ -33,8 +34,42 @@ Ext.define('NX.util.Validator', {
   },
 
   /**
+   * @private
+   */
+  nxNameRegex : /^[^(_)#A-Z\\\/"'\*\?<>|\s,.][^#A-Z\\\/"'\*\?<>|\s,.]*$/,
+  
+  /**
+   * @private
+   */
+  vtypes : [
+    {
+      'nx-name': function(val) {
+        return NX.util.Validator.nxNameRegex.test(val);
+      },
+      'nx-nameText': 'Must be lowercase and cannot contain commas, whitespace or the following characters: \\, /, *, ?, ", \',<, >, |'
+    }    
+  ],
+
+  /**
+   * @public
+   * @param vtype {object}
+   */
+  registerVtype: function(vtype) {
+    Ext.apply(Ext.form.field.VTypes, vtype);
+  },
+  
+  constructor: function () {
+    var me = this;
+
+    Ext.each(me.vtypes, function(vtype) {
+      me.registerVtype(vtype);
+    });
+  },
+
+  /**
    * Validate if given string is a URL.
-   *
+   * Based on: https://github.com/chriso/validator.js (MIT license)
+   * 
    * @public
    * @param {String} str
    * @param {Object} options (optional)
