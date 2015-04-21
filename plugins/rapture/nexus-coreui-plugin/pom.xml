@@ -67,10 +67,10 @@
       <artifactId>goodies-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.spockframework</groupId>
       <artifactId>spock-core</artifactId>
-      <version>1.0-groovy-2.3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
