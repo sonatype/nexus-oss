@@ -690,7 +690,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // Admin -> Support -> Logging
     ADMIN_LOGGING_TITLE: 'Logging',
     ADMIN_LOGGING_SUBTITLE: 'Control logging verbosity levels',
-    ADMIN_LOGGING_CREATE_TITLE: 'Save search filter',
+    ADMIN_LOGGING_CREATE_TITLE: 'Create logger',
     ADMIN_LOGGING_CREATE_NAME: 'Logger name',
     ADMIN_LOGGING_CREATE_LEVEL: 'Logging level',
     ADMIN_LOGGING_WRITE_SUCCESS: 'Logger {0}d: {1}',
