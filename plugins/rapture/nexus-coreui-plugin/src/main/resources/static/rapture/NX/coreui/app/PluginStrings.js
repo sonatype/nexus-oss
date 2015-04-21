@@ -272,6 +272,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_USERNAME: 'Username',
     ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_NTLM: 'Windows NTLM',
     ADMIN_REPOSITORIES_SETTINGS_AUTHENTICATION: 'Authentication',
+    ADMIN_REPOSITORIES_SETTINGS_HTTP: 'HTTP request settings',
 
     // Admin -> Repository -> Blobstores
     ADMIN_BLOBSTORES_TITLE: 'Blobstores',

@@ -92,7 +92,7 @@ Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
       },
       {
         xtype: 'nx-optionalfieldset',
-        title: NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_SETTINGS_HTTP'),
+        title: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_HTTP'),
         checkboxToggle: true,
         checkboxName: 'httpRequestSettings',
         collapsed: true,
