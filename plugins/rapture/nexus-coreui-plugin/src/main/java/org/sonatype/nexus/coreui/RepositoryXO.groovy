@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
-import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
 
 import org.sonatype.nexus.validation.group.Create
 
@@ -30,7 +30,11 @@ import javax.validation.constraints.NotNull
 @ToString(includePackage = false, includeNames = true)
 class RepositoryXO
 {
-  @NotBlank
+  @Pattern(
+      regexp = "^[^_#A-Z\\\\/\"'\\*\\?<>|\\s,.][^#A-Z\\\\/\"'\\*\\?<>|\\s,.]*\$",
+      message = /Name must be lowercase and must not contain the following characters [\, \/, *, ?, ", <, >, |,  , ,]/
+  )
+  @NotEmpty
   String name
 
   String type
