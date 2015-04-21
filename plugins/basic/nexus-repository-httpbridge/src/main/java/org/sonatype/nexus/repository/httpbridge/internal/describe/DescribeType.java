@@ -12,14 +12,34 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal.describe;
 
+import org.sonatype.nexus.common.text.Strings2;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Renders {@link Description} into HTML or JSON.
+ * Describe type.
  *
  * @since 3.0
  */
-public interface DescriptionRenderer
+public enum DescribeType
 {
-  String renderHtml(Description description);
+  HTML,
+  JSON;
 
-  String renderJson(Description description);
+  /**
+   * Parse type from flags.  Either explicit HTML or JSON, or anything else will default to HTML.
+   */
+  public static DescribeType parse(String flags) {
+    checkNotNull(flags);
+    flags = Strings2.upper(flags).trim();
+    if (flags.isEmpty()) {
+      return HTML;
+    }
+    try {
+      return valueOf(flags);
+    }
+    catch (IllegalArgumentException e) {
+      return HTML;
+    }
+  }
 }

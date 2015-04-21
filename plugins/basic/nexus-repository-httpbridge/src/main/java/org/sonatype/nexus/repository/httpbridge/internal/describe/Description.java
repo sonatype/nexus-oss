@@ -12,11 +12,9 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal.describe;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * Accumulates a renderable description of request-processing activity.
@@ -25,9 +23,9 @@ import com.google.common.collect.Maps;
  */
 public class Description
 {
-  final private Map<String, Object> parameters;
+  private final Map<String, Object> parameters;
 
-  final private List<DescriptionItem> items = Lists.newArrayList();
+  private final List<DescriptionItem> items = new ArrayList<>();
 
   public Description(final Map<String, Object> parameters) {
     this.parameters = parameters;
@@ -38,23 +36,9 @@ public class Description
     return this;
   }
 
-  public Description add(final String name, final Object value) {
-    items.add(new DescriptionItem(name, "string", String.valueOf(value)));
-    return this;
-  }
-
   public Description addTable(final String name, final Map<String, Object> values) {
     items.add(new DescriptionItem(name, "table", values));
     return this;
-  }
-
-  public Description addAll(final String name, final Iterable values) {
-    int row = 0;
-    Map<String, Object> table = Maps.newHashMap();
-    for (Object value : values) {
-      table.put("" + row++, value);
-    }
-    return addTable(name, table);
   }
 
   public Map<String, Object> getParameters() {

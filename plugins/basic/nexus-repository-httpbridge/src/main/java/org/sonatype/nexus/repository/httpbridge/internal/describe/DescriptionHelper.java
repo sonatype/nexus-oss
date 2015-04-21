@@ -15,6 +15,9 @@ package org.sonatype.nexus.repository.httpbridge.internal.describe;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.repository.util.StringMultimap;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
@@ -25,7 +28,9 @@ import org.sonatype.nexus.repository.view.Status;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Primitives;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.nullToEmpty;
 
 /**
@@ -33,11 +38,11 @@ import static com.google.common.base.Strings.nullToEmpty;
  *
  * @since 3.0
  */
-public class DescriptionUtils
+@Named
+@Singleton
+public class DescriptionHelper
 {
-  private DescriptionUtils() {}
-
-  public static void describeRequest(final Description desc, final Request request) {
+  public void describeRequest(final Description desc, final Request request) {
     desc.topic("Request");
 
     desc.addTable("Details", ImmutableMap.<String, Object>builder()
@@ -46,8 +51,14 @@ public class DescriptionUtils
             .put("path", request.getPath()).build()
     );
 
+    desc.addTable("Parameters", toMap(request.getParameters()));
+    desc.addTable("Headers", toMap(request.getHeaders()));
+    desc.addTable("Attributes", toMap(request.getAttributes()));
+
     if (request.isMultipart()) {
-      for (Payload payload : request.getMultiparts()) {
+      Iterable<Payload> parts = request.getMultiparts();
+      checkState(parts != null);
+      for (Payload payload : parts) {
         desc.addTable("Payload", toMap(payload));
       }
     }
@@ -56,12 +67,9 @@ public class DescriptionUtils
         desc.addTable("Payload", toMap(request.getPayload()));
       }
     }
-
-    desc.addTable("Headers", toMap(request.getHeaders()));
-    desc.addTable("Attributes", toMap(request.getAttributes()));
   }
 
-  public static void describeResponse(final Description desc, final Response response) {
+  public void describeResponse(final Description desc, final Response response) {
     desc.topic("Response");
 
     final Status status = response.getStatus();
@@ -80,14 +88,14 @@ public class DescriptionUtils
     }
   }
 
-  public static ImmutableMap<String, Object> toMap(final Payload payload) {
+  private ImmutableMap<String, Object> toMap(final Payload payload) {
     return ImmutableMap.<String, Object>of(
         "Content-Type", nullToEmpty(payload.getContentType()),
         "Size", payload.getSize()
     );
   }
 
-  public static void describeException(final Description d, final Exception e) {
+  public void describeException(final Description d, final Exception e) {
     d.topic("Exception during handler processing");
 
     for (Throwable cause : Throwables.getCausalChain(e)) {
@@ -96,20 +104,38 @@ public class DescriptionUtils
     }
   }
 
-  private static Map<String, Object> toMap(final Iterable<Entry<String, Object>> entries) {
+  private Map<String, Object> toMap(final Iterable<Entry<String, Object>> entries) {
     Map<String, Object> table = Maps.newHashMap();
     for (Entry<String, Object> entry : entries) {
-      table.put(entry.getKey(), entry.getValue());
+      table.put(entry.getKey(), convert(entry.getValue()));
     }
     return table;
   }
 
-  private static Map<String, Object> toMap(final StringMultimap headers) {
+  private Map<String, Object> toMap(final StringMultimap headers) {
     Map<String, Object> table = Maps.newHashMap();
     final Iterable<Entry<String, String>> entries = headers.entries();
     for (Entry<String, String> e : entries) {
       table.put(e.getKey(), e.getValue());
     }
     return table;
+  }
+
+  /**
+   * Helper to convert value to string unless its a char-sequence or primitive/boxed-type.
+   *
+   * This is to help keep rendering JSON simple, and avoid side-effect with getter invocations when rendering.
+   */
+  private Object convert(final Object value) {
+    if (value == null) {
+      return null;
+    }
+    if (value instanceof CharSequence) {
+      return value.toString();
+    }
+    if (value.getClass().isPrimitive() || Primitives.isWrapperType(value.getClass())) {
+      return value;
+    }
+    return String.valueOf(value);
   }
 }

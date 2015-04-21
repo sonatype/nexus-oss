@@ -44,8 +44,6 @@
       </table>
     #end
   #end
-
-
 </head>
 <body>
 
@@ -55,7 +53,6 @@
 </div>
 
 <div class="nexus-describe-detail">
-
   <p>
     This page describes the processing of a request made by external client,
     using information from the request, retrieved item (or exception if not item was retrieved)
@@ -63,21 +60,15 @@
   </p>
 
   #foreach ($item in $items)
-
     #if($item.type == "topic")
       <h2>$item.name</h2>
-
     #elseif($item.type == "string")
       <h3>$item.name</h3>
       <p>$item.value</p>
-
     #elseif($item.type == "table")
       <h3>$item.name</h3>
       #table($item.value)
-
     #end
-
   #end
-
 </body>
 </html>

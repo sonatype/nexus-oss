@@ -21,16 +21,21 @@ import javax.inject.Singleton;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.base.Throwables;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Renders an HTML description of a {@link Description} with a Velocity template.
+ * Default {@link DescriptionRenderer}.
  *
  * @since 3.0
  */
 @Named
 @Singleton
-public class TemplateDescriptionRenderer
+public class DescriptionRendererImpl
     implements DescriptionRenderer
 {
   private static final String TEMPLATE_RESOURCE = "describe.vm";
@@ -39,18 +44,32 @@ public class TemplateDescriptionRenderer
 
   private final URL template;
 
+  private final ObjectMapper objectMapper;
+
   @Inject
-  public TemplateDescriptionRenderer(final @Named("shared") TemplateEngine templateEngine) {
+  public DescriptionRendererImpl(final @Named("shared") TemplateEngine templateEngine) {
     this.templateEngine = checkNotNull(templateEngine);
     template = getClass().getResource(TEMPLATE_RESOURCE);
+    objectMapper = new ObjectMapper();
+    objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
   }
 
   @Override
   public String renderHtml(final Description description) {
-    final TemplateParameters params = new TemplateParameters();
+    TemplateParameters params = new TemplateParameters();
     params.setAll(description.getParameters());
     params.set("items", description.getItems());
 
     return templateEngine.render(this, template, params);
+  }
+
+  @Override
+  public String renderJson(final Description description) {
+    try {
+      return objectMapper.writeValueAsString(description);
+    }
+    catch (JsonProcessingException e) {
+      throw Throwables.propagate(e);
+    }
   }
 }

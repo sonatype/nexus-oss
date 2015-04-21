@@ -10,16 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.httpbridge.internal.describe;
+package org.sonatype.nexus.repository.httpbridge.internal.describe
+
+import org.sonatype.sisu.litmus.testsupport.TestSupport
+
+import org.junit.Test
 
 /**
- * Renders {@link Description} into HTML or JSON.
- *
- * @since 3.0
+ * Tests for {@link DescribeType}.
  */
-public interface DescriptionRenderer
+class DescribeTypeTest
+    extends TestSupport
 {
-  String renderHtml(Description description);
+  @Test
+  void 'parse html'() {
+    assert DescribeType.parse('html') == DescribeType.HTML
+  }
 
-  String renderJson(Description description);
+  @Test
+  void 'parse json'() {
+    assert DescribeType.parse('json') == DescribeType.JSON
+  }
+
+  @Test
+  void 'parse blank as html'() {
+    assert DescribeType.parse('') == DescribeType.HTML
+  }
+
+  @Test
+  void 'parse true as html'() {
+    assert DescribeType.parse('true') == DescribeType.HTML
+  }
 }
