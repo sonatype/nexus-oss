@@ -16813,8 +16813,8 @@
   font-size: 13px;
 }
 
-/* line 11, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Label.scss */
-.nx-log-viewer-field textarea {
+/* line 12, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Label.scss */
+.nx-monospace-field textarea, .nx-monospace-field input {
   font-family: "Courier New", Courier, monospace;
   font-size: 13px;
 }

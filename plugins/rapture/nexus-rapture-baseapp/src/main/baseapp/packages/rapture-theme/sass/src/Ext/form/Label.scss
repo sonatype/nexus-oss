@@ -8,7 +8,9 @@
   font-size: $font-size-code;
 }
 
-.nx-log-viewer-field textarea {
-  font-family: $font-monospace;
-  font-size: $font-size-code;
+.nx-monospace-field {
+  textarea, input {
+    font-family: $font-monospace;
+    font-size: $font-size-code;
+  }
 }
