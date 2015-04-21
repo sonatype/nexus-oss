@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -106,7 +108,7 @@ public class LogbackLogManager
 
   private final Map<String, LoggerLevel> customisations;
 
-  private final CustomizationContextListener customizationContextListener;
+  private final CustomizationContextListener contextListener;
 
   private final File configDir;
 
@@ -126,7 +128,7 @@ public class LogbackLogManager
     this.eventBus = checkNotNull(eventBus);
     this.overrides = new HashMap<>();
     this.customisations = new HashMap<>();
-    this.customizationContextListener = new CustomizationContextListener();
+    this.contextListener = new CustomizationContextListener();
 
     this.configDir = applicationDirectories.getWorkDirectory("etc");
     log.debug("Config dir: {}", configDir);
@@ -147,39 +149,48 @@ public class LogbackLogManager
 
   @Override
   protected void doStart() throws Exception {
+    // setup default configuration files if needed
     maybeCreateDefaultConfigurationFiles();
 
+    // apply customizations
     readCustomisations();
 
+    // rebuild overrides
     overrides.clear();
     if (overridesFile.exists()) {
       overrides.putAll(LogbackOverrides.read(overridesFile));
     }
 
-    maybeInstallCustomizationContextListener();
+    // ensure customizations apply on logback restart events
+    maybeInstallContextListener();
 
+    // read main logback configuration
     File file = new File(configDir, F_LOGBACK_XML);
     log.debug("Configuring from: {}", file);
 
-    LoggerContext context = getLoggerContext();
-    Object bundleContext = context.getObject(PAX_BUNDLE_CONTEXT_KEY);
+    LoggerContext ctx = loggerContext();
+    Object bundleContext = ctx.getObject(PAX_BUNDLE_CONTEXT_KEY);
     NOPAppender nopAppender = new NOPAppender();
-    nopAppender.setContext(context);
+    nopAppender.setContext(ctx);
     nopAppender.start();
 
     try {
       JoranConfigurator configurator = new JoranConfigurator();
-      configurator.setContext(context);
-      context.reset();
+      configurator.setContext(ctx);
+      ctx.reset();
 
       // placeholder to avoid 'No appenders present' while reconfiguring
-      context.getLogger(Logger.ROOT_LOGGER_NAME).addAppender(nopAppender);
+      ctx.getLogger(Logger.ROOT_LOGGER_NAME).addAppender(nopAppender);
 
       // restore persisted setting so pax-logging can reload
-      context.putObject(PAX_BUNDLE_CONTEXT_KEY, bundleContext);
+      ctx.putObject(PAX_BUNDLE_CONTEXT_KEY, bundleContext);
 
-      context.getStatusManager().clear();
+      // flush any previous logback status messages
+      ctx.getStatusManager().clear();
+
+      // ensure JUL is in sync
       installLevelChangePropagator();
+
       configurator.doConfigure(file);
     }
     catch (JoranException e) {
@@ -190,7 +201,10 @@ public class LogbackLogManager
       }
     }
 
-    StatusPrinter.printInCaseOfErrorsOrWarnings(context);
+    // Expose any status messages
+    StatusPrinter.printInCaseOfErrorsOrWarnings(ctx);
+
+    // injection any appenders which need it
     injectAppenders();
   }
 
@@ -204,17 +218,10 @@ public class LogbackLogManager
   public Set<File> getLogFiles() {
     HashSet<File> files = new HashSet<>();
 
-    LoggerContext ctx = getLoggerContext();
-    for (Logger l : ctx.getLoggerList()) {
-      ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) l;
-
-      Iterator<Appender<ILoggingEvent>> iter = log.iteratorForAppenders();
-      while (iter.hasNext()) {
-        Appender<ILoggingEvent> appender = iter.next();
-        if (appender instanceof FileAppender) {
-          String path = ((FileAppender) appender).getFile();
-          files.add(new File(path));
-        }
+    for (Appender appender : appenders()) {
+      if (appender instanceof FileAppender) {
+        String path = ((FileAppender) appender).getFile();
+        files.add(new File(path));
       }
     }
 
@@ -268,7 +275,7 @@ public class LogbackLogManager
   public Map<String, LoggerLevel> getLoggers() {
     Map<String, LoggerLevel> loggers = new HashMap<>();
 
-    LoggerContext ctx = getLoggerContext();
+    LoggerContext ctx = loggerContext();
     for (ch.qos.logback.classic.Logger logger : ctx.getLoggerList()) {
       String name = logger.getName();
       Level level = logger.getLevel();
@@ -407,23 +414,16 @@ public class LogbackLogManager
    * @since 2.8
    */
   private void installLevelChangePropagator() {
-    LoggerContext context = getLoggerContext();
+    LoggerContext ctx = loggerContext();
     final LevelChangePropagator propagator = new LevelChangePropagator();
     propagator.setResetJUL(true);
-    propagator.setContext(context);
-    context.addListener(propagator);
+    propagator.setContext(ctx);
+    ctx.addListener(propagator);
   }
 
   private void injectAppenders() {
-    LoggerContext ctx = getLoggerContext();
-
-    for (Logger l : ctx.getLoggerList()) {
-      ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) l;
-      Iterator<Appender<ILoggingEvent>> iter = log.iteratorForAppenders();
-      while (iter.hasNext()) {
-        Appender<ILoggingEvent> appender = iter.next();
-        injector.injectMembers(appender);
-      }
+    for (Appender appender : appenders()) {
+      injector.injectMembers(appender);
     }
   }
 
@@ -534,7 +534,7 @@ public class LogbackLogManager
   @Nullable
   @Guarded(by = STARTED)
   public LoggerLevel getLoggerLevel(final String name) {
-    Level level = getLoggerContext().getLogger(name).getLevel();
+    Level level = loggerContext().getLogger(name).getLevel();
     if (level != null) {
       return convert(level);
     }
@@ -544,11 +544,11 @@ public class LogbackLogManager
   @Override
   @Guarded(by = STARTED)
   public LoggerLevel getLoggerEffectiveLevel(final String name) {
-    return convert(getLoggerContext().getLogger(name).getEffectiveLevel());
+    return convert(loggerContext().getLogger(name).getEffectiveLevel());
   }
 
   private void setLogbackLoggerLevel(final String name, final Level level) {
-    getLoggerContext().getLogger(name).setLevel(level);
+    loggerContext().getLogger(name).setLevel(level);
   }
 
   //
@@ -558,10 +558,10 @@ public class LogbackLogManager
   /**
    * Installs {@link CustomizationContextListener} if not already present in context.
    */
-  private void maybeInstallCustomizationContextListener() {
-    LoggerContext context = getLoggerContext();
-    if (!context.getCopyOfListenerList().contains(customizationContextListener)) {
-      context.addListener(customizationContextListener);
+  private void maybeInstallContextListener() {
+    LoggerContext ctx = loggerContext();
+    if (!ctx.getCopyOfListenerList().contains(contextListener)) {
+      ctx.addListener(contextListener);
       log.debug("Nexus logger context listener installed");
     }
   }
@@ -625,12 +625,30 @@ public class LogbackLogManager
   // Helpers
   //
 
-  private static LoggerContext getLoggerContext() {
+  /**
+   * Returns the current logger-context.
+   */
+  private static LoggerContext loggerContext() {
     ILoggerFactory factory = LoggerFactory.getILoggerFactory();
     if (factory instanceof LoggerContext) {
       return (LoggerContext) factory;
     }
     // temporary workaround for situations where SLF4j is not backed by logback
     return (LoggerContext) StaticLoggerBinder.getSingleton().getLoggerFactory();
+  }
+
+  /**
+   * Returns all configured appenders.
+   */
+  private static Collection<Appender> appenders() {
+    List<Appender> result = new ArrayList<>();
+    for (Logger l : loggerContext().getLoggerList()) {
+      ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) l;
+      Iterator<Appender<ILoggingEvent>> iter = log.iteratorForAppenders();
+      while (iter.hasNext()) {
+        result.add(iter.next());
+      }
+    }
+    return result;
   }
 }
