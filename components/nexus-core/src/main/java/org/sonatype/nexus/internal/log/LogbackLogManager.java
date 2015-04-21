@@ -46,10 +46,8 @@ import org.sonatype.nexus.log.LogConfigurationCustomizer.Configuration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -63,7 +61,6 @@ import ch.qos.logback.core.helpers.NOPAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.google.common.base.Throwables;
-import com.google.common.eventbus.Subscribe;
 import com.google.inject.Injector;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
@@ -101,8 +98,6 @@ public class LogbackLogManager
 
   private final List<LogConfigurationCustomizer> customizers;
 
-  private final EventBus eventBus;
-
   private final Map<String, LoggerLevel> overrides;
 
   private final Map<String, LoggerLevel> customisations;
@@ -117,14 +112,12 @@ public class LogbackLogManager
   public LogbackLogManager(final Injector injector,
                            final ApplicationDirectories applicationDirectories,
                            final List<LogConfigurationParticipant> participants,
-                           final List<LogConfigurationCustomizer> customizers,
-                           final EventBus eventBus)
+                           final List<LogConfigurationCustomizer> customizers)
   {
     this.injector = checkNotNull(injector);
     checkNotNull(applicationDirectories);
     this.participants = checkNotNull(participants);
     this.customizers = checkNotNull(customizers);
-    this.eventBus = checkNotNull(eventBus);
     this.overrides = new HashMap<>();
     this.customisations = new HashMap<>();
     this.contextListener = new CustomizationContextListener();
@@ -137,13 +130,6 @@ public class LogbackLogManager
 
     this.overridesFile = new File(configDir, "logback-overrides.xml");
     log.debug("Overrides file: {}", overridesFile);
-
-    eventBus.register(this);
-  }
-
-  @Subscribe
-  public void on(final NexusInitializedEvent event) throws Exception {
-    start();
   }
 
   @Override
@@ -212,7 +198,7 @@ public class LogbackLogManager
 
   @Override
   protected void doStop() throws Exception {
-    eventBus.unregister(this);
+    loggerContext().stop();
   }
 
   @Override
