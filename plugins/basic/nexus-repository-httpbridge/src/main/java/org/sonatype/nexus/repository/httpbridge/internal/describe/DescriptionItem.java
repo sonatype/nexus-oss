@@ -24,7 +24,7 @@ public class DescriptionItem
   private final String type;
 
   /**
-   * Value should be a primitive/char-sequence or collection/map of primative/char-sequence
+   * Value should be a primitive/char-sequence or collection/map of primitive/char-sequence
    * to support html + json rendering w/o overcomplex mapping configurations.
    *
    * @see DescriptionHelper#convert(Object)
