@@ -19,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,8 +32,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import org.sonatype.nexus.common.io.FileSupport;
 import org.sonatype.nexus.common.io.LimitedInputStream;
@@ -119,8 +116,6 @@ public class LogbackLogManager
 
   private final Map<String, LoggerLevel> customisations;
 
-  private ObjectName jmxName;
-
   @Inject
   public LogbackLogManager(final Injector injector,
                            final ApplicationConfiguration applicationConfiguration,
@@ -136,15 +131,6 @@ public class LogbackLogManager
     this.eventBus = checkNotNull(eventBus);
     this.overrides = Maps.newHashMap();
     this.customisations = Maps.newHashMap();
-    try {
-      jmxName = ObjectName.getInstance(JMX_DOMAIN, "name", LogManager.class.getSimpleName());
-      final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-      server.registerMBean(new DefaultLogManagerMBean(this), jmxName);
-    }
-    catch (Exception e) {
-      jmxName = null;
-      logger.warn("Problem registering MBean for: " + getClass().getName(), e);
-    }
     eventBus.register(this);
   }
 
@@ -178,14 +164,6 @@ public class LogbackLogManager
 
   @Override
   public synchronized void shutdown() {
-    if (null != jmxName) {
-      try {
-        ManagementFactory.getPlatformMBeanServer().unregisterMBean(jmxName);
-      }
-      catch (final Exception e) {
-        logger.warn("Problem unregistering MBean for: " + getClass().getName(), e);
-      }
-    }
     eventBus.unregister(this);
   }
 
