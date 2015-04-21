@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal.describe;
 
+import org.sonatype.nexus.common.text.Strings2;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -29,7 +31,7 @@ public enum DescribeType
    */
   public static DescribeType parse(String flags) {
     checkNotNull(flags);
-    flags = flags.toUpperCase().trim();
+    flags = Strings2.upper(flags).trim();
     if (flags.isEmpty()) {
       return HTML;
     }

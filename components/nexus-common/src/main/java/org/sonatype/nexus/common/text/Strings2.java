@@ -12,11 +12,15 @@
  */
 package org.sonatype.nexus.common.text;
 
+import java.util.Locale;
+
 import javax.annotation.Nullable;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.BaseEncoding;
 import org.jetbrains.annotations.NonNls;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * String helpers.
@@ -64,6 +68,22 @@ public final class Strings2
       return MASK;
     }
     return null;
+  }
+
+  /**
+   * Returns lower-case {@link Locale#ENGLISH} string.
+   */
+  public static String lower(final String value) {
+    checkNotNull(value);
+    return value.toLowerCase(Locale.ENGLISH);
+  }
+
+  /**
+   * Returns upper-case {@link Locale#ENGLISH} string.
+   */
+  public static String upper(final String value) {
+    checkNotNull(value);
+    return value.toUpperCase(Locale.ENGLISH);
   }
 
   /**
