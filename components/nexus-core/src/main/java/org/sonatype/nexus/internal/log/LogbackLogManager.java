@@ -204,7 +204,8 @@ public class LogbackLogManager
     // Expose any status messages
     StatusPrinter.printInCaseOfErrorsOrWarnings(ctx);
 
-    // injection any appenders which need it
+    // TODO: This is questionable to do post-configuration
+    // inject any appenders which need it
     injectAppenders();
   }
 
