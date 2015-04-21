@@ -72,7 +72,7 @@ public class UserManager2Test
 
     Assert.assertEquals("Test User", testUser.getName());
     Assert.assertEquals("test-user", testUser.getUserId());
-    Assert.assertEquals("changeme1@yourcompany.com", testUser.getEmailAddress());
+    Assert.assertEquals("test-user@example.org", testUser.getEmailAddress());
 
     // test roles
     Map<String, RoleIdentifier> roleMap = this.toRoleMap(testUser.getRoles());
@@ -88,7 +88,7 @@ public class UserManager2Test
 
     Assert.assertEquals("Test User With Empty Role", testUser.getName());
     Assert.assertEquals("test-user-with-empty-role", testUser.getUserId());
-    Assert.assertEquals("empty-role@yourcompany.com", testUser.getEmailAddress());
+    Assert.assertEquals("test-user-with-empty-role@example.org", testUser.getEmailAddress());
 
     // test roles
     Map<String, RoleIdentifier> roleMap = this.toRoleMap(testUser.getRoles());
