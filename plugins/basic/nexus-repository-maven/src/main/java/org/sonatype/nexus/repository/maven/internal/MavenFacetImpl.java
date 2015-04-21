@@ -258,7 +258,7 @@ public class MavenFacetImpl
     if (asset == null) {
       asset = tx.createAsset(tx.getBucket(), component);
 
-      asset.name(path.getFileName());
+      asset.name(path.getPath());
       asset.formatAttributes().set(StorageFacet.P_PATH, path.getPath());
 
       final NestedAttributesMap assetAttributes = asset.formatAttributes();
@@ -286,7 +286,7 @@ public class MavenFacetImpl
     Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
       asset = tx.createAsset(tx.getBucket(), getRepository().getFormat());
-      asset.name(path.getFileName());
+      asset.name(path.getPath());
       asset.formatAttributes().set(StorageFacet.P_PATH, path.getPath());
 
       final NestedAttributesMap assetAttributes = asset.formatAttributes();

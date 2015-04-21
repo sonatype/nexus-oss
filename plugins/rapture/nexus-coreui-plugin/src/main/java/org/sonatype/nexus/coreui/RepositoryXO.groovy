@@ -20,6 +20,8 @@ import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
 
+import javax.validation.constraints.NotNull
+
 /**
  * Repository exchange object.
  *
@@ -37,6 +39,9 @@ class RepositoryXO
 
   @NotBlank(groups = Create)
   String recipe
+
+  @NotNull
+  Boolean online
 
   @NotEmpty
   Map<String, Map<String, Object>> attributes

@@ -302,6 +302,6 @@
     <port>25</port>
     <username>smtp-username</username>
     <password>smtp-password</password>
-    <systemEmailAddress>system@nexus.org</systemEmailAddress>
+    <systemEmailAddress>nexus@example.org</systemEmailAddress>
   </smtpConfiguration>
 </nexusConfiguration>

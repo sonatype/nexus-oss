@@ -229,9 +229,16 @@ Ext.define('NX.app.Application', {
    * Initialize Ex.Direct remote providers.
    */
   initDirect: function () {
-    var me = this;
+    var me = this,
+        remotingProvider;
 
-    Ext.direct.Manager.addProvider(NX.direct.api.REMOTING_API);
+    remotingProvider = Ext.direct.Manager.addProvider(NX.direct.api.REMOTING_API);
+
+    // disable retry
+    remotingProvider.maxRetries = 0;
+
+    // default request timeout to 60 seconds
+    remotingProvider.timeout = 60 * 1000;
 
     //<if debug>
     me.logDebug('Configured Ext.Direct');
