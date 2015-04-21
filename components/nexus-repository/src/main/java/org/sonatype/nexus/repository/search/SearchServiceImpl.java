@@ -38,7 +38,6 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
-import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.security.SecurityHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -288,7 +287,7 @@ public class SearchServiceImpl
       try {
         // check if search facet is available so avoid searching repositories without an index
         repository.facet(SearchFacet.class);
-        if (repository.facet(ViewFacet.class).isOnline()
+        if (repository.getConfiguration().isOnline()
             && securityHelper.allPermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))) {
           indexes.add(repository.getName());
         }

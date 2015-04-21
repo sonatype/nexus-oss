@@ -14,9 +14,7 @@ package org.sonatype.nexus.repository.view;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.config.Configuration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -35,31 +33,15 @@ public class ConfigurableViewFacet
 
   private Router router;
 
-  private Boolean online;
-
   public void configure(final Router router) {
     checkNotNull(router);
     checkState(this.router == null, "Router already configured");
     this.router = router;
   }
 
-  // FIXME: Move 'online' to core repository property
-
-  @Override
-  protected void doConfigure(final Configuration configuration) throws Exception {
-    NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
-    online = attributes.get("online", Boolean.class, true);
-    log.debug("Online: {}", online);
-  }
-
   @Override
   public Response dispatch(final Request request) throws Exception {
     checkState(router != null, "Router not configured");
     return router.dispatch(getRepository(), request);
-  }
-
-  @Override
-  public boolean isOnline() {
-    return online;
   }
 }

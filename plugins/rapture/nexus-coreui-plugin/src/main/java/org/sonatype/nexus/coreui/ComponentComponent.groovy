@@ -26,7 +26,6 @@ import org.sonatype.nexus.repository.manager.RepositoryManager
 import org.sonatype.nexus.repository.storage.Component
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageTx
-import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.validation.Validate
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -59,7 +58,7 @@ extends DirectComponentSupport
                            final @NotNull(message = '[componentId] may not be null') String componentId)
   {
     Repository repository = repositoryManager.get(repositoryName)
-    if (!repository.facet(ViewFacet).online) {
+    if (!repository.configuration.online) {
       return null
     }
     StorageTx storageTx = repository.facet(StorageFacet).openTx()

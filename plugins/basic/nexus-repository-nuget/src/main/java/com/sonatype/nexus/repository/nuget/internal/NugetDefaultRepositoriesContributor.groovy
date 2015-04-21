@@ -42,8 +42,8 @@ class NugetDefaultRepositoriesContributor
   @Override
   List<Configuration> getRepositoryConfigurations() {
     return [
-        new Configuration(repositoryName: DEFAULT_HOSTED_NAME, recipeName: NugetHostedRecipe.NAME, attributes: [:]),
-        new Configuration(repositoryName: DEFAULT_PROXIED_NAME, recipeName: NugetProxyRecipe.NAME, attributes:
+        new Configuration(repositoryName: DEFAULT_HOSTED_NAME, recipeName: NugetHostedRecipe.NAME, online: true, attributes: [:]),
+        new Configuration(repositoryName: DEFAULT_PROXIED_NAME, recipeName: NugetProxyRecipe.NAME, online: true, attributes:
             [
                 proxy     : [
                     remoteUrl     : 'http://www.nuget.org/api/v2/',
@@ -57,7 +57,7 @@ class NugetDefaultRepositoriesContributor
                 ]
             ]
         ),
-        new Configuration(repositoryName: DEFAULT_GROUP_NAME, recipeName: NugetGroupRecipe.NAME, attributes:
+        new Configuration(repositoryName: DEFAULT_GROUP_NAME, recipeName: NugetGroupRecipe.NAME, online: true, attributes:
             [
                 group: [
                     memberNames: [DEFAULT_HOSTED_NAME, DEFAULT_PROXIED_NAME]

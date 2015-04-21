@@ -35,6 +35,8 @@ public class Configuration
 
   private String recipeName;
 
+  private boolean online;
+
   private Map<String, Map<String, Object>> attributes;
 
   public String getRepositoryName() {
@@ -51,6 +53,20 @@ public class Configuration
 
   public void setRecipeName(final String recipeName) {
     this.recipeName = checkNotNull(recipeName);
+  }
+
+  /**
+   * @return true, if repository should serve inbound requests
+   */
+  public boolean isOnline() {
+    return online;
+  }
+
+  /**
+   * @param online true, if repository should serve inbound requests
+   */
+  public void setOnline(final boolean online) {
+    this.online = online;
   }
 
   @Nullable
