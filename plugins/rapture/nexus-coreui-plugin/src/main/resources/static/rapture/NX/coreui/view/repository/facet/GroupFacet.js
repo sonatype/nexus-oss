@@ -70,7 +70,7 @@ Ext.define('NX.coreui.view.repository.facet.GroupFacet', {
     me.items = [
       {
         xtype: 'nx-itemselector',
-        name: 'group.memberNames',
+        name: 'attributes.group.memberNames',
         itemId: 'groupMemberNames',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS'),
         helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_HELP'),

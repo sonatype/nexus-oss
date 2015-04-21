@@ -33,7 +33,7 @@ Ext.define('NX.coreui.view.repository.facet.ViewFacet', {
     me.items = [
       {
         xtype: 'checkbox',
-        name: 'view.online',
+        name: 'attributes.view.online',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VIEW_ONLINE'),
         helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VIEW_ONLINE_HELP'),
         value: true

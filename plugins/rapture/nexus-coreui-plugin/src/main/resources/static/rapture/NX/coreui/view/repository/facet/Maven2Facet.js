@@ -39,7 +39,7 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
     me.items = [
       {
         xtype: 'combo',
-        name: 'maven.versionPolicy',
+        name: 'attributes.maven.versionPolicy',
         itemId: 'versionPolicy',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY'),
         helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_HELP'),
@@ -54,7 +54,7 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
       },
       {
         xtype: 'combo',
-        name: 'maven.checksumPolicy',
+        name: 'attributes.maven.checksumPolicy',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM'),
         emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_PLACEHOLDER'),
         editable: false,
@@ -68,7 +68,7 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
       },
       {
         xtype: 'checkbox',
-        name: 'maven.strictContentTypeValidation',
+        name: 'attributes.maven.strictContentTypeValidation',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION'),
         value: true
       }

@@ -37,7 +37,7 @@ Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
     me.items = [
       {
         xtype: 'numberfield',
-        name: 'httpclient.connection.retries',
+        name: 'attributes.httpclient.connection.retries',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES'),
         helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES_HELP'),
         minValue: 0,
@@ -45,7 +45,7 @@ Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
       },
       {
         xtype: 'numberfield',
-        name: 'httpclient.connection.timeout',
+        name: 'attributes.httpclient.connection.timeout',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT'),
         helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT_HELP'),
         minValue: 0,
