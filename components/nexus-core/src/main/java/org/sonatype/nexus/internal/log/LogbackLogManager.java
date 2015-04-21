@@ -328,7 +328,7 @@ public class LogbackLogManager
         }
       }
       catch (IOException e) {
-        throw new IllegalStateException("Could not create logback.properties:" + propertiesFile.getAbsolutePath());
+        throw new IllegalStateException("Could not create: " + propertiesFile.getAbsolutePath(), e);
       }
       log.info("Created: {}", propertiesFile);
     }
@@ -355,8 +355,7 @@ public class LogbackLogManager
             log.info("Created: {}", participantFile);
           }
           catch (IOException e) {
-            throw new IllegalStateException(
-                String.format("Could not create %s as %s", name, participantFile.getAbsolutePath()), e);
+            throw new IllegalStateException("Could not create: " + participantFile.getAbsolutePath(), e);
           }
         }
       }
@@ -404,7 +403,7 @@ public class LogbackLogManager
       log.info("Created: {}", logbackFile);
     }
     catch (IOException e) {
-      throw new IllegalStateException("Could not create logback.xml as " + logbackFile.getAbsolutePath());
+      throw new IllegalStateException("Could not create:" + logbackFile.getAbsolutePath(), e);
     }
   }
 
