@@ -246,7 +246,7 @@ public class LogbackLogManager
   @Override
   @Nullable
   @Guarded(by = STARTED)
-  public InputStream getLogFileStream(String fileName, long from, long count) throws IOException {
+  public InputStream getLogFileStream(final String fileName, final long from, final long count) throws IOException {
     log.debug("Retrieving log file: {}", fileName);
 
     if (fileName.contains(File.pathSeparator)) {
