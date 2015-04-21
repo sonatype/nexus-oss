@@ -31,8 +31,8 @@ import javax.validation.constraints.NotNull
 class RepositoryXO
 {
   @Pattern(
-      regexp = "^[^_#A-Z\\\\/\"'\\*\\?<>|\\s,.][^#A-Z\\\\/\"'\\*\\?<>|\\s,.]*\$",
-      message = /Name must be lowercase and must not contain the following characters [\, \/, *, ?, ", <, >, |,  , ,]/
+      regexp = '^[^_#A-Z\\\\/"\'\\*\\?<>|\\s,.][^#A-Z\\\\/"\'\\*\\?<>|\\s,.]*$',
+      message = 'Must be lowercase and cannot contain commas, whitespace or the following characters: \\, /, *, ?, ", \',<, >, |, ., #'
   )
   @NotEmpty
   String name

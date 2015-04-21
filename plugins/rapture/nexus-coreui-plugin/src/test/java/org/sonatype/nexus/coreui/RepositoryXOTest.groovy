@@ -16,8 +16,10 @@ class RepositoryXOTest
   @Shared
   Validator validator = Validation.buildDefaultValidatorFactory().validator
 
-  static List INVALID_CHARACTERS = ['_', '#', ',', 'A', '*', ' ', '#', '\'', '\\', '/', '?', '<', '>', '|', ' ', '\r',
-                                    '\n', '\t', ',', '.'].asImmutable()
+  static List INVALID_NAMES = ['_', '#', ',', 'A', '*', ' ', '#', '\'', '\\', '/', '?', '<', '>', '|', ' ', '\r',
+                               '\n', '\t', ',', '.'].asImmutable()
+
+  static final List VALID_NAMES = ['foo123!@$%^&()-+=[];:~`', 'a_'].asImmutable()
 
   def "Name is always required"() {
     when:
@@ -29,9 +31,13 @@ class RepositoryXOTest
       validations[0].message == 'may not be empty'
   }
 
-  def "Attributes are always required, and cannot be empty"() {
+  def "Attributes are always required, and cannot be empty"(Map attributes) {
     when:
-      def validations = validator.validate(new RepositoryXO([name: 'foo'] + init))
+      Map properties = [
+          name      : 'foo',
+          attributes: attributes
+      ]
+      def validations = validator.validate(new RepositoryXO(properties))
 
     then:
       validations.size() == 1
@@ -39,44 +45,40 @@ class RepositoryXOTest
       validations[0].message == 'may not be empty'
 
     where:
-      init << [null, [:]].collect { [attributes: it] }
+      attributes << [null, [:]]
   }
 
   @Unroll
-  def "The name: #init.name should not validate"() {
-    setup:
-      Map validConfiguration = [
-          name      : 'foo',
+  def "The name: #name should not validate"(String name) {
+    when:
+      Map properties = [
+          name      : name,
           attributes: [any: 'any']
       ]
-
-    when:
-      def validations = validator.validate(new RepositoryXO(validConfiguration + init))
+      def validations = validator.validate(new RepositoryXO(properties))
 
     then:
       validations.size() == 1
       validations[0].propertyPath.toString() == 'name'
 
     where:
-      init << INVALID_CHARACTERS.collect { [name: it] }
+      name << INVALID_NAMES
   }
 
   @Unroll
-  def "The name: #init.name should be valid"() {
-    setup:
-      Map validConfiguration = [
-          name      : 'foo',
+  def "The name: #name should be valid"(String name) {
+    when:
+      Map properties = [
+          name      : name,
           attributes: [any: 'any']
       ]
-
-    when:
-      def validations = validator.validate(new RepositoryXO(validConfiguration + init))
+      def validations = validator.validate(new RepositoryXO(properties))
 
     then:
       validations.isEmpty()
 
     where:
-      init << ['foo123!@$%^&()-+=[];:~`', 'a_'].collect { [name: it] }
+      name << VALID_NAMES
   }
 
   def "The recipe field is only required on creation"() {
