@@ -25,7 +25,6 @@ Ext.define('NX.coreui.view.repository.recipe.NugetProxy', {
     'NX.I18n',
     'NX.coreui.view.repository.facet.ProxyFacet',
     'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.ViewFacet',
     'NX.coreui.view.repository.facet.HttpFacet',
     'NX.coreui.view.repository.facet.NegativeCacheFacet',
     'NX.coreui.view.repository.facet.NugetProxyFacet'
@@ -35,7 +34,6 @@ Ext.define('NX.coreui.view.repository.recipe.NugetProxy', {
     var me = this;
 
     me.items = [
-      { xtype: 'nx-coreui-repository-view-facet'},
       { xtype: 'nx-coreui-repository-proxy-facet'},
       { xtype: 'nx-coreui-repository-storage-facet'},
       { xtype: 'nx-coreui-repository-http-facet'} ,
