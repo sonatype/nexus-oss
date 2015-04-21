@@ -82,7 +82,6 @@ public class LogbackLogManager
     extends StateGuardLifecycleSupport
     implements LogManager
 {
-
   private static final String F_LOGBACK_XML = "logback.xml";
 
   private static final String F_LOGBACK_PROPERTIES = "logback.properties";
