@@ -46,7 +46,7 @@ Ext.define('NX.util.Validator', {
       'nx-name': function(val) {
         return NX.util.Validator.nxNameRegex.test(val);
       },
-      'nx-nameText': 'Must be lowercase and cannot contain commas, whitespace or the following characters: \\, /, *, ?, ", \',<, >, |'
+      'nx-nameText': 'Must be lowercase and cannot contain commas, whitespace or the following characters: \\, /, *, ?, ", \',<, >, |, ., #'
     }    
   ],
 
