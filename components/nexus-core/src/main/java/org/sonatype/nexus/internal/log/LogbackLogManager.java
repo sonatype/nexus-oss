@@ -331,7 +331,7 @@ public class LogbackLogManager
   private void maybeCreateConfigurationFiles() {
     log.debug("Preparing configuration files");
 
-    // generate default properties
+    // install default properties
     File propertiesFile = new File(configDir, F_LOGBACK_PROPERTIES);
     if (!propertiesFile.exists()) {
       try {
