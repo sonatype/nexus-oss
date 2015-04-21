@@ -129,7 +129,7 @@ public class NexusContextListener
     try {
       logManager = injector.getInstance(LogManager.class);
       log.debug("Log manager: {}", logManager);
-      logManager.configure();
+      logManager.start();
 
       application = injector.getInstance(Key.get(Lifecycle.class, Names.named("NxApplication")));
       log.debug("Application: {}", application);
@@ -179,7 +179,6 @@ public class NexusContextListener
 
   @Override
   public void contextDestroyed(final ServletContextEvent event) {
-
     // remove our dynamic filter
     if (registration != null) {
       registration.unregister();
@@ -197,7 +196,12 @@ public class NexusContextListener
     }
 
     if (logManager != null) {
-      logManager.shutdown();
+      try {
+        logManager.stop();
+      }
+      catch (final Exception e) {
+        log.error("Failed to stop log-manager", e);
+      }
       logManager = null;
     }
 

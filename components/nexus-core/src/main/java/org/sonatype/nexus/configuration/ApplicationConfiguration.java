@@ -46,7 +46,7 @@ public interface ApplicationConfiguration
   File getWorkingDirectory(String key);
 
   /**
-   * Returns the configuration directory. It defaults to $NEXUS_WORK/conf.
+   * Returns the configuration directory. It defaults to $NEXUS_WORK/etc.
    */
   File getConfigurationDirectory();
 

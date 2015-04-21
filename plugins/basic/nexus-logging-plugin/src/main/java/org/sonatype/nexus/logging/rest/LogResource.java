@@ -80,7 +80,7 @@ public class LogResource
     if (count == null) {
       count = Long.MAX_VALUE;
     }
-    InputStream log = logManager.getApplicationLogAsStream("nexus.log", from, count);
+    InputStream log = logManager.getLogFileStream("nexus.log", from, count);
     if (log == null) {
       throw new NotFoundException("nexus.log not found");
     }

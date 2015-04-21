@@ -38,10 +38,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class LogbackOverrides
 {
-
-  private LogbackOverrides() {
-    // utility class
-  }
+  private LogbackOverrides() {}
 
   /**
    * Reads loggers/levels from logback-overrides.xml.
@@ -79,9 +76,7 @@ public class LogbackOverrides
   /**
    * Writes loggers/levels to logback-overrides.xml.
    */
-  static void write(final File overridesXml,
-                    final Map<String, LoggerLevel> overrides)
-  {
+  static void write(final File overridesXml, final Map<String, LoggerLevel> overrides) {
     try {
       final FileReplacer fileReplacer = new FileReplacer(overridesXml);
       fileReplacer.setDeleteBackupFile(true);
@@ -100,9 +95,9 @@ public class LogbackOverrides
             out.println();
             out.println("<included>");
             for (Entry<String, LoggerLevel> entry : overrides.entrySet()) {
-              out.println(String.format(
-                  "  <logger name=\"%s\" level=\"%s\"/>", entry.getKey(), entry.getValue().toString()
-              ));
+              out.format(
+                  "  <logger name=\"%s\" level=\"%s\"/>%n", entry.getKey(), entry.getValue().toString()
+              );
             }
             out.write("</included>");
           }
