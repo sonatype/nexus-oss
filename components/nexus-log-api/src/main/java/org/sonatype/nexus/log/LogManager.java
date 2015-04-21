@@ -21,28 +21,20 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 /**
- * LogManager.
- *
- * @author cstamas
- * @author juven
- * @author adreghiciu@gmail.com
+ * Log manager.
  */
 public interface LogManager
 {
-  Set<File> getLogFiles();
-
-  File getLogFile(String filename);
-
-  @Nullable
-  InputStream getApplicationLogAsStream(String logFile, long fromByte, long bytesCount) throws IOException;
-
-  LogConfiguration getConfiguration() throws IOException;
-
-  void setConfiguration(LogConfiguration configuration) throws IOException;
-
   void configure();
 
   void shutdown();
+
+  Set<File> getLogFiles();
+
+  File getLogFile(String fileName);
+
+  @Nullable
+  InputStream getApplicationLogAsStream(String fileName, long fromByte, long bytesCount) throws IOException;
 
   /**
    * Return mapping of existing loggers which have explicit levels configured (never null).
