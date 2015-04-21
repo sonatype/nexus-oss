@@ -445,6 +445,8 @@ public class LogbackLogManager
 
     log.debug("Set logger level: {}={}", name, level);
     LoggerLevel calculated = null;
+
+    // if logger is root logger we have to customize the appender ref container via properties
     if (Logger.ROOT_LOGGER_NAME.equals(name)) {
       try {
         calculated = LoggerLevel.DEFAULT.equals(level) ? LoggerLevel.INFO : level;
@@ -460,6 +462,7 @@ public class LogbackLogManager
       }
     }
     else {
+      // else we customize the logger overrides configuration
       if (LoggerLevel.DEFAULT.equals(level)) {
         boolean customizedByUser = overrides.containsKey(name) && !customisations.containsKey(name);
         unsetLoggerLevel(name);
