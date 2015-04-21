@@ -162,7 +162,7 @@ public class LogbackLogManager
     maybeCreateConfigurationFiles();
 
     // apply customizations
-    readCustomisations();
+    applyCustomizers();
 
     // rebuild overrides
     overrides.clear();
@@ -517,9 +517,13 @@ public class LogbackLogManager
   @Override
   @Guarded(by = STARTED)
   public LoggerLevel getLoggerEffectiveLevel(final String name) {
-    return LogbackLevels.convert(loggerContext().getLogger(name).getEffectiveLevel());
+    Level level = loggerContext().getLogger(name).getEffectiveLevel();
+    return LogbackLevels.convert(level);
   }
 
+  /**
+   * Set named logback logger level.
+   */
   private void setLogbackLoggerLevel(final String name, final Level level) {
     loggerContext().getLogger(name).setLevel(level);
   }
@@ -539,7 +543,10 @@ public class LogbackLogManager
     }
   }
 
-  private void readCustomisations() {
+  /**
+   * Ask all configured {@link LogConfigurationCustomizer customiers} to register customisations.
+   */
+  private void applyCustomizers() {
     Configuration config = new Configuration()
     {
       @Override
@@ -555,6 +562,9 @@ public class LogbackLogManager
     }
   }
 
+  /**
+   * Apply all registered customizations.
+   */
   private void applyCustomisations() {
     for (Entry<String, LoggerLevel> entry : customisations.entrySet()) {
       if (!LoggerLevel.DEFAULT.equals(entry.getValue())) {
