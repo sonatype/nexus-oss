@@ -1,3 +1,15 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-2015 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
 package org.sonatype.nexus.coreui
 
 import javax.validation.Validation
@@ -16,26 +28,26 @@ class RepositoryXOTest
   @Shared
   Validator validator = Validation.buildDefaultValidatorFactory().validator
 
-  static List INVALID_NAMES = ['_', '#', ',', 'A', '*', ' ', '#', '\'', '\\', '/', '?', '<', '>', '|', ' ', '\r',
-                               '\n', '\t', ',', '.'].asImmutable()
+  // semi-random sample of invalid characters from Latin and other character sets
+  static List INVALID_NAMES = ('#,* #\'\\/?<>| \r\n\t,.+@&å©不βخ'.collect{it} + '_leadingUnderscore').asImmutable()
 
-  static final List VALID_NAMES = ['foo123!@$%^&()-+=[];:~`', 'a_'].asImmutable()
+  static final List VALID_NAMES = ['Foo_1.2-3', '.foo', 'foo.', '-0.'].asImmutable()
 
   def "Name is always required"() {
     when:
-      def validations = validator.validate(new RepositoryXO([attributes: [any: 'any']]))
+      def validations = validator.validate(new RepositoryXO([attributes: [any: 'any'], online: true]))
 
     then:
       validations.size() == 1
       validations[0].propertyPath.toString() == 'name'
-      validations[0].message == 'may not be empty'
   }
 
   def "Attributes are always required, and cannot be empty"(Map attributes) {
     when:
       Map properties = [
           name      : 'foo',
-          attributes: attributes
+          attributes: attributes,
+          online: true
       ]
       def validations = validator.validate(new RepositoryXO(properties))
 
@@ -53,7 +65,8 @@ class RepositoryXOTest
     when:
       Map properties = [
           name      : name,
-          attributes: [any: 'any']
+          attributes: [any: 'any'] ,
+          online: true
       ]
       def validations = validator.validate(new RepositoryXO(properties))
 
@@ -70,7 +83,8 @@ class RepositoryXOTest
     when:
       Map properties = [
           name      : name,
-          attributes: [any: 'any']
+          attributes: [any: 'any'],
+          online: true
       ]
       def validations = validator.validate(new RepositoryXO(properties))
 

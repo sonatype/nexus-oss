@@ -20,7 +20,8 @@
 Ext.define('NX.util.Validator', {
   singleton: true,
   requires: [
-      'Ext.form.field.VTypes'
+      'Ext.form.field.VTypes',
+      'NX.I18n'
   ],
 
   /**
@@ -36,8 +37,8 @@ Ext.define('NX.util.Validator', {
   /**
    * @private
    */
-  nxNameRegex : /^[^_#A-Z\\\/"'\*\?<>|\s,.][^#A-Z\\\/"'\*\?<>|\s,.]*$/,
-  
+  nxNameRegex : /^[^_][a-zA-Z0-9_\-\.]+$/,
+
   /**
    * @private
    */
@@ -46,8 +47,8 @@ Ext.define('NX.util.Validator', {
       'nx-name': function(val) {
         return NX.util.Validator.nxNameRegex.test(val);
       },
-      'nx-nameText': 'Must be lowercase and cannot contain commas, whitespace or the following characters: \\, /, *, ?, ", \',<, >, |, ., #'
-    }    
+      'nx-nameText': NX.I18n.get('NAME_VALIDATION_MESSAGE')
+    }
   ],
 
   /**
@@ -57,7 +58,7 @@ Ext.define('NX.util.Validator', {
   registerVtype: function(vtype) {
     Ext.apply(Ext.form.field.VTypes, vtype);
   },
-  
+
   constructor: function () {
     var me = this;
 
@@ -69,7 +70,7 @@ Ext.define('NX.util.Validator', {
   /**
    * Validate if given string is a URL.
    * Based on: https://github.com/chriso/validator.js (MIT license)
-   * 
+   *
    * @public
    * @param {String} str
    * @param {Object} options (optional)

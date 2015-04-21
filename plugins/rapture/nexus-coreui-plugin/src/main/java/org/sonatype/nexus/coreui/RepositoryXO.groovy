@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
+import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 
 import org.sonatype.nexus.validation.group.Create
@@ -19,8 +20,6 @@ import org.sonatype.nexus.validation.group.Create
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
-
-import javax.validation.constraints.NotNull
 
 /**
  * Repository exchange object.
@@ -31,8 +30,8 @@ import javax.validation.constraints.NotNull
 class RepositoryXO
 {
   @Pattern(
-      regexp = '^[^_#A-Z\\\\/"\'\\*\\?<>|\\s,.][^#A-Z\\\\/"\'\\*\\?<>|\\s,.]*$',
-      message = 'Must be lowercase and cannot contain commas, whitespace or the following characters: \\, /, *, ?, ", \',<, >, |, ., #'
+      regexp = /^[^_][a-zA-Z0-9_\-\.]+$/,
+      message = 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed'
   )
   @NotEmpty
   String name
