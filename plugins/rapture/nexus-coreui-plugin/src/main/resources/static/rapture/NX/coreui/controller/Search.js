@@ -308,7 +308,7 @@ Ext.define('NX.coreui.controller.Search', {
         if (!cmpClass) {
           cmpClass = Ext.ClassManager.getByAlias('widget.nx-coreui-searchcriteria-text');
         }
-        searchCriteria = searchCriteriaPanel.add(cmpClass.create(Ext.apply(criteriaModel.get('config'), {
+        searchCriteria = searchCriteriaPanel.add(cmpClass.create(Ext.apply(Ext.clone(criteriaModel.get('config')), {
           criteriaId: criteriaModel.getId(),
           value: criteria['value'],
           hidden: criteria['hidden'],
@@ -385,7 +385,7 @@ Ext.define('NX.coreui.controller.Search', {
     }
     searchCriteriaPanel.remove(addButton, false);
     cmp = cmpClass.create(
-        Ext.apply(criteria.get('config'), { criteriaId: criteria.getId(), value: undefined, removable: true })
+        Ext.apply(Ext.clone(criteria.get('config')), { criteriaId: criteria.getId(), value: undefined, removable: true })
     );
     searchCriteriaPanel.add(cmp);
     cmp.focus();
