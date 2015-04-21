@@ -141,15 +141,25 @@ public class LogbackLogManager
     eventBus.register(this);
   }
 
-  @Subscribe
-  public void on(final NexusInitializedEvent event) throws Exception {
-    start();
-  }
-
   @Override
   protected void doStart() throws Exception {
+    configure();
+  }
+
+  /**
+   * Re-configure after start to pick up customizations provided by plugins.
+   */
+  @Subscribe
+  @Guarded(by=STARTED)
+  public void on(final NexusInitializedEvent event) throws Exception {
+    configure();
+  }
+
+  private void configure() {
+    log.info("Configuring");
+
     // setup default configuration files if needed
-    maybeCreateDefaultConfigurationFiles();
+    maybeCreateConfigurationFiles();
 
     // apply customizations
     readCustomisations();
@@ -163,7 +173,8 @@ public class LogbackLogManager
     // ensure customizations apply on logback restart events
     maybeInstallContextListener();
 
-    // read main logback configuration
+    // apply configuration
+
     File file = new File(configDir, F_LOGBACK_XML);
     log.debug("Configuring from: {}", file);
 
@@ -315,9 +326,9 @@ public class LogbackLogManager
   }
 
   /**
-   * Create default configuration files if needed.
+   * Create configuration files as needed.
    */
-  private void maybeCreateDefaultConfigurationFiles() {
+  private void maybeCreateConfigurationFiles() {
     log.debug("Preparing configuration files");
 
     // generate default properties
@@ -572,6 +583,7 @@ public class LogbackLogManager
 
     customisations.clear();
     for (LogConfigurationCustomizer customizer : customizers) {
+      log.debug("Applying customizer: {}", customizer);
       customizer.customize(config);
     }
   }
