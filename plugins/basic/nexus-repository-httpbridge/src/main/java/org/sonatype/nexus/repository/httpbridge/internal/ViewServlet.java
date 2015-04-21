@@ -29,9 +29,10 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
+import org.sonatype.nexus.repository.httpbridge.internal.describe.DescribeType;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.Description;
+import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionHelper;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionRenderer;
-import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionUtils;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
@@ -61,9 +62,14 @@ public class ViewServlet
 {
   private static final Logger log = LoggerFactory.getLogger(ViewServlet.class);
 
+  @VisibleForTesting
+  static final String P_DESCRIBE = "describe";
+
   private final RepositoryManager repositoryManager;
 
   private final Map<String, HttpResponseSender> responseSenders;
+
+  private final DescriptionHelper descriptionHelper;
 
   private final DescriptionRenderer descriptionRenderer;
 
@@ -73,11 +79,13 @@ public class ViewServlet
   public ViewServlet(final RepositoryManager repositoryManager,
                      final Map<String, HttpResponseSender> responseSenders,
                      final DefaultHttpResponseSender defaultHttpResponseSender,
+                     final DescriptionHelper descriptionHelper,
                      final DescriptionRenderer descriptionRenderer)
   {
 
     this.repositoryManager = checkNotNull(repositoryManager);
     this.responseSenders = checkNotNull(responseSenders);
+    this.descriptionHelper = checkNotNull(descriptionHelper);
     this.descriptionRenderer = checkNotNull(descriptionRenderer);
     this.defaultHttpResponseSender = checkNotNull(defaultHttpResponseSender);
   }
@@ -140,11 +148,12 @@ public class ViewServlet
     }
     log.debug("Repository: {}", repo);
 
-    ViewFacet facet = repo.facet(ViewFacet.class);
-    if (!facet.isOnline()) {
+    if (!repo.getConfiguration().isOnline()) {
       send(null, HttpResponses.serviceUnavailable("Repository offline"), httpResponse);
       return;
     }
+
+    ViewFacet facet = repo.facet(ViewFacet.class);
     log.debug("Dispatching to view facet: {}", facet);
 
     // Dispatch the request
@@ -168,8 +177,10 @@ public class ViewServlet
       failure = e;
     }
 
-    if (request.getParameters().contains("describe")) {
-      send(request, describe(request, response, failure), httpResponse);
+    String describeFlags = request.getParameters().get(P_DESCRIBE);
+    log.trace("Describe flags: {}", describeFlags);
+    if (describeFlags != null) {
+      send(request, describe(request, response, failure, describeFlags), httpResponse);
     }
     else {
       if (failure != null) {
@@ -181,19 +192,33 @@ public class ViewServlet
   }
 
   @VisibleForTesting
-  Response describe(final Request request, final Response response, final Exception exception) {
+  Response describe(final Request request, final Response response, final Exception exception, final String flags) {
     final Description description = new Description(ImmutableMap.<String, Object>of(
         "path", request.getPath(),
         "nexusUrl", BaseUrlHolder.get()
     ));
     if (exception != null) {
-      DescriptionUtils.describeException(description, exception);
+      descriptionHelper.describeException(description, exception);
     }
-    DescriptionUtils.describeRequest(description, request);
+    descriptionHelper.describeRequest(description, request);
     if (response != null) {
-      DescriptionUtils.describeResponse(description, response);
+      descriptionHelper.describeResponse(description, response);
     }
-    return toHtmlResponse(description);
+
+    DescribeType type = DescribeType.parse(flags);
+    log.trace("Describe type: {}", type);
+    switch (type) {
+      case HTML: {
+        String html = descriptionRenderer.renderHtml(description);
+        return HttpResponses.ok(new StringPayload(html, Charsets.UTF_8, "text/html"));
+      }
+      case JSON: {
+        String json = descriptionRenderer.renderJson(description);
+        return HttpResponses.ok(new StringPayload(json, Charsets.UTF_8, "application/json"));
+      }
+      default:
+        throw new RuntimeException("Invalid describe-type: " + type);
+    }
   }
 
   /**
@@ -243,10 +268,5 @@ public class ViewServlet
       return defaultHttpResponseSender;
     }
     return sender;
-  }
-
-  private Response toHtmlResponse(final Description description) {
-    final String html = descriptionRenderer.renderHtml(description);
-    return HttpResponses.ok(new StringPayload(html, Charsets.UTF_8, "text/html"));
   }
 }

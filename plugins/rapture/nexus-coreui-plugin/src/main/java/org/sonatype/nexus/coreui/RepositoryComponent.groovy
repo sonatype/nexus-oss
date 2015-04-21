@@ -30,7 +30,6 @@ import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
-import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
@@ -100,6 +99,7 @@ extends DirectComponentSupport
     return asRepository(repositoryManager.create(new Configuration(
         repositoryName: repository.name,
         recipeName: repository.recipe,
+        online: repository.online,
         attributes: repository.attributes
     )))
   }
@@ -110,6 +110,7 @@ extends DirectComponentSupport
   RepositoryXO update(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repository) {
     convertDoublesToInts(repository.attributes)
     return asRepository(repositoryManager.update(repositoryManager.get(repository.name).configuration.with {
+      online = repository.online
       attributes = repository.attributes
       return it
     }))
@@ -127,10 +128,11 @@ extends DirectComponentSupport
         name: input.name,
         type: input.type,
         format: input.format,
+        online: input.configuration.online,
         recipe: input.configuration.recipeName,
         status: buildStatus(input),
         attributes: input.configuration.attributes,
-        url: "${BaseUrlHolder.get()}/repository/${input.name}"
+        url: "${BaseUrlHolder.get()}/repository/${input.name}/" // trailing slash is important
     )
   }
 
@@ -158,7 +160,7 @@ extends DirectComponentSupport
 
   RepositoryStatusXO buildStatus(Repository input) {
     RepositoryStatusXO statusXO = new RepositoryStatusXO(repositoryName: input.name,
-        online: input.facet(ViewFacet).online)
+        online: input.configuration.online)
 
     try {
       if (input.facet(GroupFacet)) {

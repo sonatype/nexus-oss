@@ -24,7 +24,6 @@ Ext.define('NX.coreui.view.repository.recipe.NugetGroup', {
     'NX.Conditions',
     'NX.I18n',
     'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.ViewFacet',
     'NX.coreui.view.repository.facet.GroupFacet'
   ],
 
@@ -35,7 +34,6 @@ Ext.define('NX.coreui.view.repository.recipe.NugetGroup', {
     var me = this;
 
     me.items = [
-      { xtype: 'nx-coreui-repository-view-facet'},
       { xtype: 'nx-coreui-repository-storage-facet'},
       { xtype: 'nx-coreui-repository-group-facet', format: 'nuget' }
     ];

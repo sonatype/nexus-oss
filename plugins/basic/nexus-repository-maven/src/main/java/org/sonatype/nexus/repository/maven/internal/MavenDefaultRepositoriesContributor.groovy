@@ -46,7 +46,7 @@ class MavenDefaultRepositoriesContributor
   @Override
   List<Configuration> getRepositoryConfigurations() {
     return [
-        new Configuration(repositoryName: DEFAULT_RELEASE_REPO, recipeName: Maven2HostedRecipe.NAME, attributes:
+        new Configuration(repositoryName: DEFAULT_RELEASE_REPO, recipeName: Maven2HostedRecipe.NAME, online: true, attributes:
             [
                 maven  : [
                     versionPolicy              : VersionPolicy.RELEASE.toString(),
@@ -59,7 +59,7 @@ class MavenDefaultRepositoriesContributor
 
             ]
         ),
-        new Configuration(repositoryName: DEFAULT_SNAPSHOT_REPO, recipeName: Maven2HostedRecipe.NAME, attributes:
+        new Configuration(repositoryName: DEFAULT_SNAPSHOT_REPO, recipeName: Maven2HostedRecipe.NAME, online: true, attributes:
             [
                 maven  : [
                     versionPolicy              : VersionPolicy.SNAPSHOT.toString(),
@@ -71,7 +71,7 @@ class MavenDefaultRepositoriesContributor
                 ]
             ]
         ),
-        new Configuration(repositoryName: DEFAULT_CENTRAL_REPO, recipeName: Maven2ProxyRecipe.NAME, attributes:
+        new Configuration(repositoryName: DEFAULT_CENTRAL_REPO, recipeName: Maven2ProxyRecipe.NAME, online: true, attributes:
             [
                 maven     : [
                     versionPolicy              : VersionPolicy.MIXED.toString(),
@@ -93,7 +93,7 @@ class MavenDefaultRepositoriesContributor
                 ]
             ]
         ),
-        new Configuration(repositoryName: DEFAULT_PUBLIC_REPO, recipeName: Maven2GroupRecipe.NAME, attributes:
+        new Configuration(repositoryName: DEFAULT_PUBLIC_REPO, recipeName: Maven2GroupRecipe.NAME, online: true, attributes:
             [
                 maven  : [
                     versionPolicy              : VersionPolicy.MIXED.toString(),
