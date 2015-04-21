@@ -483,6 +483,7 @@ public class LogbackLogManager
       case Level.OFF_INT:
         return LoggerLevel.OFF;
 
+      case Level.TRACE_INT:
       default:
         return LoggerLevel.TRACE;
     }
