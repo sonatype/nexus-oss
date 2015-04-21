@@ -32,7 +32,7 @@ class UserRoleMappingTestSecurity
                 password: 'f865b53623b121fd34ee5426c792e5c33af8c227',
                 firstName: 'Administrator',
                 status: 'active',
-                email: 'changeme@yourcompany.com'
+                email: 'admin@example.org'
             ),
             new CUser(
                 id: 'test-user',
@@ -40,7 +40,7 @@ class UserRoleMappingTestSecurity
                 firstName: 'Test',
                 lastName: 'User',
                 status: 'active',
-                email: 'changeme1@yourcompany.com'
+                email: 'test-user@example.org'
             ),
             new CUser(
                 id: 'test-user-with-empty-role',
@@ -48,7 +48,7 @@ class UserRoleMappingTestSecurity
                 firstName: 'Test',
                 lastName: 'User With Empty Role',
                 status: 'active',
-                email: 'empty-role@yourcompany.com'
+                email: 'test-user-with-empty-role@example.org'
             ),
             new CUser(
                 id: 'anonymous',
@@ -56,7 +56,7 @@ class UserRoleMappingTestSecurity
                 firstName: 'Anonynmous',
                 lastName: 'User',
                 status: 'active',
-                email: 'changeme2@yourcompany.com'
+                email: 'anonymous@example.org'
             )
         ],
         userRoleMappings: [

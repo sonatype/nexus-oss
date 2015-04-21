@@ -43,7 +43,7 @@ public class UserRoleMappingTest
 
     CUser user = config.readUser("test-user");
     Assert.assertEquals(user.getId(), "test-user");
-    Assert.assertEquals(user.getEmail(), "changeme1@yourcompany.com");
+    Assert.assertEquals(user.getEmail(), "test-user@example.org");
     Assert.assertEquals(user.getFirstName(), "Test");
     Assert.assertEquals(user.getLastName(), "User");
     Assert.assertEquals(user.getPassword(), "b2a0e378437817cebdf753d7dff3dd75483af9e0");
@@ -62,7 +62,7 @@ public class UserRoleMappingTest
 
     CUser user = config.readUser("test-user-with-empty-role");
     Assert.assertEquals(user.getId(), "test-user-with-empty-role");
-    Assert.assertEquals(user.getEmail(), "empty-role@yourcompany.com");
+    Assert.assertEquals(user.getEmail(), "test-user-with-empty-role@example.org");
     Assert.assertEquals(user.getFirstName(), "Test");
     Assert.assertEquals(user.getLastName(), "User With Empty Role");
     Assert.assertEquals(user.getPassword(), "b2a0e378437817cebdf753d7dff3dd75483af9e0");

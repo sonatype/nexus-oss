@@ -36,7 +36,7 @@ class StaticSecurityConfigurationSource
                 firstName: 'Administrator',
                 lastName: 'User',
                 status: 'active',
-                email: 'changeme@yourcompany.com'
+                email: 'admin@example.org'
             ),
             new CUser(
                 id: 'deployment',
@@ -44,7 +44,7 @@ class StaticSecurityConfigurationSource
                 firstName: 'Deployment',
                 lastName: 'User',
                 status: 'active',
-                email: 'changeme1@yourcompany.com'
+                email: 'deployment@example.org'
             ),
             new CUser(
                 id: 'anonymous',
@@ -52,7 +52,7 @@ class StaticSecurityConfigurationSource
                 firstName: 'Nexus',
                 lastName: 'Anonymous User',
                 status: 'active',
-                email: 'changeme2@yourcompany.com'
+                email: 'anonymous@example.org'
             )
         ],
         userRoleMappings: [
