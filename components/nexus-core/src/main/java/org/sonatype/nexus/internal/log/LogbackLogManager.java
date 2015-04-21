@@ -232,13 +232,6 @@ public class LogbackLogManager
     return null;
   }
 
-  /**
-   * Retrieves a stream to the requested log file. This method ensures that the file is rooted in the log folder to
-   * prevent browsing of the file system.
-   *
-   * @param fileName path of the file to retrieve
-   * @return InputStream to the file or null if the file is not allowed or doesn't exist.
-   */
   @Override
   @Nullable
   @Guarded(by = STARTED)

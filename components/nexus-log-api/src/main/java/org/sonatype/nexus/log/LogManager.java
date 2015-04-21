@@ -33,6 +33,12 @@ public interface LogManager
   @Nullable
   File getLogFile(String fileName);
 
+  /**
+   * Provides access to named log-file streams.
+   *
+   * @param fileName name of log file to fetch
+   * @return Stream to log file or {@code null} if non-existent.
+   */
   @Nullable
   InputStream getLogFileStream(String fileName, long fromByte, long bytesCount) throws IOException;
 
