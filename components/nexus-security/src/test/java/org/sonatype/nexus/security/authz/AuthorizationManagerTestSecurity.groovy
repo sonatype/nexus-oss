@@ -32,21 +32,21 @@ class AuthorizationManagerTestSecurity
                 password: 'f865b53623b121fd34ee5426c792e5c33af8c227',
                 firstName: 'Administrator',
                 status: 'active',
-                email: 'changeme@yourcompany.com'
+                email: 'admin@example.org'
             ),
             new CUser(
                 id: 'test-user',
                 password: 'b2a0e378437817cebdf753d7dff3dd75483af9e0',
                 firstName: 'Test User',
                 status: 'active',
-                email: 'changeme1@yourcompany.com'
+                email: 'test-user@example.org'
             ),
             new CUser(
                 id: 'anonymous',
                 password: '0a92fab3230134cca6eadd9898325b9b2ae67998',
                 firstName: 'Anonynmous User',
                 status: 'active',
-                email: 'changeme2@yourcompany.com'
+                email: 'anonymous@example.org'
             )
         ],
         userRoleMappings: [

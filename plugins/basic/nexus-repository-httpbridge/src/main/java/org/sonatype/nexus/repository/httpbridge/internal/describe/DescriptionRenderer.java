@@ -13,11 +13,13 @@
 package org.sonatype.nexus.repository.httpbridge.internal.describe;
 
 /**
- * Turns a {@link Description} into HTML to be returned to the client.
+ * Renders {@link Description} into HTML or JSON.
  *
  * @since 3.0
  */
 public interface DescriptionRenderer
 {
   String renderHtml(Description description);
+
+  String renderJson(Description description);
 }

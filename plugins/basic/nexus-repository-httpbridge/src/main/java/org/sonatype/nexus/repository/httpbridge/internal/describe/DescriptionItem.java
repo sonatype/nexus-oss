@@ -23,9 +23,15 @@ public class DescriptionItem
 
   private final String type;
 
+  /**
+   * Value should be a primitive/char-sequence or collection/map of primitive/char-sequence
+   * to support html + json rendering w/o overly complex mapping configurations.
+   *
+   * @see DescriptionHelper#convert(Object)
+   */
   private final Object value;
 
-  public DescriptionItem(final String name, final String type, final Object value) {
+  DescriptionItem(final String name, final String type, final Object value) {
     this.name = name;
     this.type = type;
     this.value = value;

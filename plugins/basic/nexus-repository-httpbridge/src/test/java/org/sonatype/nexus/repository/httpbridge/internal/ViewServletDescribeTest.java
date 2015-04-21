@@ -17,6 +17,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
+import org.sonatype.nexus.repository.httpbridge.internal.describe.Description;
+import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionHelper;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionRenderer;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.view.Parameters;
@@ -30,14 +32,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for describe functionality of {@link ViewServlet}.
+ */
 public class ViewServletDescribeTest
     extends TestSupport
 {
@@ -45,68 +51,115 @@ public class ViewServletDescribeTest
   private Request request;
 
   @Mock
-  private Parameters parameters;
-
-  @Mock
   private ViewFacet facet;
 
-  @Mock
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private HttpServletResponse servletResponse;
 
   @Mock
-  private DefaultHttpResponseSender defaultResponseSender;
+  private DescriptionRenderer descriptionRenderer;
 
-  @Mock(name = "facet response")
+  @Mock(name = "facet-response", answer = RETURNS_DEEP_STUBS)
   private Response facetResponse;
 
-  @Mock(name = "description response")
-  private Response descriptionResponse;
-
-  @Mock(name = "facet exception")
+  @Mock(name = "facet-exception", answer = RETURNS_DEEP_STUBS)
   private RuntimeException facetException;
 
-  private ViewServlet viewServlet;
+  private Parameters parameters;
 
-  @Test
-  public void normalRequestReturnsFacetResponse() throws Exception {
-    descriptionRequested(false);
-    facetThrowsException(false);
+  private DefaultHttpResponseSender defaultResponseSender;
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
+  private ViewServlet underTest;
 
-    verify(viewServlet, never()).describe(any(Request.class), any(Response.class), any(Exception.class));
-    verify(defaultResponseSender).send(request, facetResponse, servletResponse);
+  @Before
+  public void setUp() throws Exception {
+    defaultResponseSender = spy(new DefaultHttpResponseSender());
+
+    when(descriptionRenderer.renderHtml(any(Description.class))).thenReturn("HTML");
+    when(descriptionRenderer.renderJson(any(Description.class))).thenReturn("JSON");
+
+    underTest = spy(new ViewServlet(mock(RepositoryManager.class),
+        mock(Map.class),
+        defaultResponseSender,
+        mock(DescriptionHelper.class),
+        descriptionRenderer
+    ));
+
+    when(request.getPath()).thenReturn("/test");
+
+    parameters = new Parameters();
+    when(request.getParameters()).thenReturn(parameters);
+
+    BaseUrlHolder.set("http://placebo");
+  }
+
+  private void descriptionRequested(final String describe) {
+    if (describe == null) {
+      parameters.remove(ViewServlet.P_DESCRIBE);
+    }
+    else {
+      parameters.set(ViewServlet.P_DESCRIBE, describe);
+    }
   }
 
   @Test
-  public void describeRequestReturnsDescriptionResponse() throws Exception {
-    descriptionRequested(true);
+  public void normalRequestReturnsFacetResponse() throws Exception {
+    descriptionRequested(null);
     facetThrowsException(false);
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
+    underTest.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
 
-    verify(viewServlet).describe(request, facetResponse, null);
-    verify(viewServlet).send(request, descriptionResponse, servletResponse);
+    verify(underTest, never()).describe(
+        any(Request.class),
+        any(Response.class),
+        any(Exception.class),
+        any(String.class)
+    );
+    verify(defaultResponseSender).send(eq(request), any(Response.class), eq(servletResponse));
+  }
+
+  @Test
+  public void describeRequestReturnsDescriptionResponse_HTML() throws Exception {
+    descriptionRequested("HTML");
+    facetThrowsException(false);
+
+    underTest.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
+
+    verify(underTest).describe(request, facetResponse, null, "HTML");
+    verify(underTest).send(eq(request), any(Response.class), eq(servletResponse));
+    verify(servletResponse).setContentType("text/html");
+  }
+
+  @Test
+  public void describeRequestReturnsDescriptionResponse_JSON() throws Exception {
+    descriptionRequested("JSON");
+    facetThrowsException(false);
+
+    underTest.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
+
+    verify(underTest).describe(request, facetResponse, null, "JSON");
+    verify(underTest).send(eq(request), any(Response.class), eq(servletResponse));
+    verify(servletResponse).setContentType("application/json");
   }
 
   @Test(expected = RuntimeException.class)
   public void facetExceptionsReturnedNormally() throws Exception {
-    descriptionRequested(false);
+    descriptionRequested(null);
     facetThrowsException(true);
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
+    underTest.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
   }
 
   @Test
   public void facetExceptionsAreDescribed() throws Exception {
-    descriptionRequested(true);
+    descriptionRequested("HTML");
     facetThrowsException(true);
 
-    viewServlet.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
+    underTest.dispatchAndSend(request, facet, defaultResponseSender, servletResponse);
 
     // The exception got described
-    verify(viewServlet).describe(request, null, facetException);
-    verify(viewServlet).send(request, descriptionResponse, servletResponse);
+    verify(underTest).describe(request, null, facetException, "HTML");
+    verify(underTest).send(eq(request), any(Response.class), eq(servletResponse));
   }
 
   private void facetThrowsException(final boolean facetThrowsException) throws Exception {
@@ -116,25 +169,5 @@ public class ViewServletDescribeTest
     else {
       when(facet.dispatch(request)).thenReturn(facetResponse);
     }
-  }
-
-  @Before
-  public void prepareMocks() {
-    viewServlet = spy(
-        new ViewServlet(mock(RepositoryManager.class),
-            mock(Map.class),
-            defaultResponseSender,
-            mock(DescriptionRenderer.class))
-    );
-    doReturn(descriptionResponse)
-        .when(viewServlet).describe(any(Request.class), any(Response.class), any(Exception.class));
-
-    when(request.getParameters()).thenReturn(parameters);
-
-    BaseUrlHolder.set("http://placebo");
-  }
-
-  private void descriptionRequested(final boolean describe) {
-    when(parameters.contains("describe")).thenReturn(describe);
   }
 }
