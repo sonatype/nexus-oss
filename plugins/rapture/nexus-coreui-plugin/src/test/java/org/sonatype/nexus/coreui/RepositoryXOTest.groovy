@@ -21,6 +21,9 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+/**
+ * Test bean validation for {@link RepositoryXO}
+ */
 class RepositoryXOTest
     extends Specification
 {
