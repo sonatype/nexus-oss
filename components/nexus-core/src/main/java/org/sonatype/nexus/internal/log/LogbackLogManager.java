@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -81,11 +80,14 @@ public class LogbackLogManager
     extends StateGuardLifecycleSupport
     implements LogManager
 {
+
   private static final String F_LOGBACK_XML = "logback.xml";
 
   private static final String F_LOGBACK_PROPERTIES = "logback.properties";
 
   private static final String PAX_BUNDLE_CONTEXT_KEY = "org.ops4j.pax.logging.logback.bundlecontext";
+
+  private static final String ROOT_LEVEL = "root.level";
 
   /**
    * System variable, dynamically set to config dir, used for rooting include files.
@@ -303,32 +305,6 @@ public class LogbackLogManager
     log.debug("Loggers reset to their default levels");
   }
 
-  private Properties loadConfigurationProperties() throws IOException {
-    maybeCreateDefaultConfigurationFiles();
-
-    File file = new File(configDir, F_LOGBACK_PROPERTIES);
-    try (InputStream in = new BufferedInputStream(new FileInputStream(file))) {
-      Properties properties = new Properties();
-      properties.load(in);
-      return properties;
-    }
-  }
-
-  private void saveConfigurationProperties(final Properties properties) throws IOException {
-    final File file = new File(configDir, F_LOGBACK_PROPERTIES);
-    log.debug("Saving configuration: {}", file);
-    final FileReplacer fileReplacer = new FileReplacer(file);
-    // we save this file many times, don't litter backups
-    fileReplacer.setDeleteBackupFile(true);
-    fileReplacer.replace(new ContentWriter()
-    {
-      @Override
-      public void write(final BufferedOutputStream output) throws IOException {
-        properties.store(output, "Saved by Nexus");
-      }
-    });
-  }
-
   /**
    * Create default configuration files if needed.
    */
@@ -502,9 +478,12 @@ public class LogbackLogManager
     if (Logger.ROOT_LOGGER_NAME.equals(name)) {
       try {
         calculated = LoggerLevel.DEFAULT.equals(level) ? LoggerLevel.INFO : level;
-        Properties props = loadConfigurationProperties();
-        props.setProperty("root.level", calculated.name());
-        saveConfigurationProperties(props);
+
+        // Re-write root property in properties
+        PropertiesFile props = new PropertiesFile(new File(configDir, F_LOGBACK_PROPERTIES));
+        props.load();
+        props.setProperty(ROOT_LEVEL, calculated.name());
+        props.store();
       }
       catch (IOException e) {
         throw Throwables.propagate(e);
