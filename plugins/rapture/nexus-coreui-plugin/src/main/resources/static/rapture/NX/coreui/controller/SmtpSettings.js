@@ -100,10 +100,10 @@ Ext.define('NX.coreui.controller.SmtpSettings', {
         smtpSettings = panel.down('form').getForm().getFieldValues();
 
     win.close();
-    panel.mask(NX.I18n.format('ADMIN_SMTP_VERIFY_MASK', smtpSettings.host));
+    panel.up('nx-feature-content').mask(NX.I18n.format('ADMIN_SMTP_VERIFY_MASK', smtpSettings.host));
 
     NX.direct.coreui_SmtpSettings.verifyConnection(smtpSettings, email, function (response) {
-      panel.unmask();
+      panel.up('nx-feature-content').unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: NX.I18n.get('ADMIN_SMTP_VERIFY_SUCCESS'), type: 'success' });
       }

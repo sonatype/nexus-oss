@@ -242,7 +242,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
     if (node.get('inIndex') && !node.get('indexLoaded')) {
       node.set('indexLoaded', true);
-      tree.getEl().mask(NX.I18n.get('BROWSE_REPOSITORY_LOAD_CHILDREN_MASK'));
+      tree.up('nx-feature-content').getEl().mask(NX.I18n.get('BROWSE_REPOSITORY_LOAD_CHILDREN_MASK'));
       NX.direct.coreui_BrowseIndex.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
         if (Ext.isObject(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();
@@ -257,7 +257,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           });
           Ext.resumeLayouts(true);
         }
-        tree.getEl().unmask();
+        tree.up('nx-feature-content').getEl().unmask();
         me.loadChildrenFromStorage(node);
       });
     }
@@ -276,7 +276,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
     if (node.get('inStorage') && !node.get('storageLoaded')) {
       node.set('storageLoaded', true);
-      tree.getEl().mask(NX.I18n.get('BROWSE_REPOSITORY_LOAD_CHILDREN_MASK'));
+      tree.up('nx-feature-content').getEl().mask(NX.I18n.get('BROWSE_REPOSITORY_LOAD_CHILDREN_MASK'));
       NX.direct.coreui_RepositoryStorage.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
         if (Ext.isObject(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();
@@ -294,7 +294,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           node.expandFn(node);
           delete node.expandFn;
         }
-        tree.getEl().unmask();
+        tree.up('nx-feature-content').getEl().unmask();
       });
     }
     else {

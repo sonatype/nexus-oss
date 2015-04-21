@@ -185,7 +185,7 @@ Ext.define('NX.coreui.controller.Log', {
     if (logPanel) {
       size = logPanel.down('#refreshSize').getValue();
 
-      logPanel.getEl().mask(NX.I18n.get('ADMIN_LOG_VIEWER_LOAD_MASK'));
+      logPanel.up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_LOG_VIEWER_LOAD_MASK'));
 
       me.logDebug('Retrieving last ' + size + 'kb from log');
 
@@ -201,11 +201,11 @@ Ext.define('NX.coreui.controller.Log', {
         scope: me,
         suppressStatus: true,
         success: function (response) {
-          logPanel.getEl().unmask();
+          logPanel.up('nx-feature-content').getEl().unmask();
           me.showLog(response.responseText);
         },
         failure: function (response) {
-          logPanel.getEl().unmask();
+          logPanel.up('nx-feature-content').getEl().unmask();
           me.showLog(NX.I18n.format('ADMIN_LOG_VIEWER_LOAD_FAILURE', response.statusText));
         }
       });

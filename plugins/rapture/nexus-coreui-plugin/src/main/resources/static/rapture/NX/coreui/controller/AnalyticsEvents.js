@@ -133,9 +133,9 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
     var me = this;
 
     NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_EVENTS_CLEAR_TITLE'), NX.I18n.get('ADMIN_EVENTS_CLEAR_BODY'), function () {
-      me.getList().getEl().mask(NX.I18n.get('ADMIN_EVENTS_CLEAR_MASK'));
+      me.getList().up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_EVENTS_CLEAR_MASK'));
       NX.direct.analytics_Events.clear(function (response) {
-        me.getList().getEl().unmask();
+        me.getList().up('nx-feature-content').getEl().unmask();
         me.load();
         if (Ext.isObject(response) && response.success) {
           NX.Messages.add({ text: NX.I18n.get('ADMIN_EVENTS_CLEAR_SUCCESS'), type: 'success' });
@@ -152,9 +152,9 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
     var me = this;
 
     NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_EVENTS_EXPORT_TITLE'), NX.I18n.get('ADMIN_EVENTS_EXPORT_BODY'), function () {
-          me.getList().getEl().mask(NX.I18n.get('ADMIN_EVENTS_EXPORT_MASK'));
+          me.getList().up('nx-main').getEl().mask(NX.I18n.get('ADMIN_EVENTS_EXPORT_MASK'));
           NX.direct.analytics_Events.exportAll(function (response) {
-            me.getList().getEl().unmask();
+            me.getList().up('nx-main').getEl().unmask();
             if (Ext.isObject(response) && response.success) {
               Ext.widget('nx-coreui-analytics-eventszipcreated').setValues(response.data);
             }

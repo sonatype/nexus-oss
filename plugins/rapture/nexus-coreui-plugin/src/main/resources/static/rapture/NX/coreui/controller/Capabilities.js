@@ -451,9 +451,9 @@ Ext.define('NX.coreui.controller.Capabilities', {
         form = button.up('form'),
         values = form.getValues();
 
-    me.maskCapability(NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_MASK'));
+    form.up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_MASK'));
     NX.direct.capability_Capability.update(values, function(response) {
-      me.unmaskCapability();
+      form.up('nx-feature-content').getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
@@ -503,10 +503,10 @@ Ext.define('NX.coreui.controller.Capabilities', {
     model = me.getList().getStore().getById(modelId);
     description = me.getDescription(model);
 
-    me.maskCapability(NX.I18n.get('ADMIN_CAPABILITIES_ENABLE_MASK'));
+    me.getList().up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_ENABLE_MASK'));
     NX.direct.capability_Capability.enable(model.getId(), function(response) {
       me.loadStore();
-      me.unmaskCapability();
+      me.getList().up('nx-feature-content').getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('ADMIN_CAPABILITIES_DETAILS_ENABLE_SUCCESS', description),
@@ -529,10 +529,10 @@ Ext.define('NX.coreui.controller.Capabilities', {
     model = me.getList().getStore().getById(modelId);
     description = me.getDescription(model);
 
-    me.maskCapability(NX.I18n.get('ADMIN_CAPABILITIES_DISABLE_MASK'));
+    me.getList().up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_DISABLE_MASK'));
     NX.direct.capability_Capability.disable(model.getId(), function(response) {
       me.loadStore();
-      me.unmaskCapability();
+      me.getList().up('nx-feature-content').getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('ADMIN_CAPABILITIES_DETAILS_DISABLE_SUCCESS', description),
@@ -540,63 +540,5 @@ Ext.define('NX.coreui.controller.Capabilities', {
         });
       }
     });
-  },
-
-  /**
-   * @private
-   * Mask capability
-   */
-  maskCapability: function(str) {
-    var me = this,
-      settingsPanel = me.getSettingsPanel().getEl(),
-      summaryPanel = me.getSummaryPanel().getEl(),
-      statusPanel = me.getStatusPanel().getEl(),
-      aboutPanel = me.getAboutPanel().getEl(),
-      notesPanel = me.getNotesPanel().getEl();
-
-    if (settingsPanel) {
-      settingsPanel.mask(str);
-    }
-    if (summaryPanel) {
-      summaryPanel.mask(str);
-    }
-    if (statusPanel) {
-      statusPanel.mask(str);
-    }
-    if (aboutPanel) {
-      aboutPanel.mask(str);
-    }
-    if (notesPanel) {
-      notesPanel.mask(str);
-    }
-  },
-
-  /**
-   * @private
-   * Unmask capability
-   */
-  unmaskCapability: function() {
-    var me = this,
-      settingsPanel = me.getSettingsPanel().getEl(),
-      summaryPanel = me.getSummaryPanel().getEl(),
-      statusPanel = me.getStatusPanel().getEl(),
-      aboutPanel = me.getAboutPanel().getEl(),
-      notesPanel = me.getNotesPanel().getEl();
-
-    if (settingsPanel) {
-      settingsPanel.unmask();
-    }
-    if (summaryPanel) {
-      summaryPanel.unmask();
-    }
-    if (statusPanel) {
-      statusPanel.unmask();
-    }
-    if (aboutPanel) {
-      aboutPanel.unmask();
-    }
-    if (notesPanel) {
-      notesPanel.unmask();
-    }
   }
 });

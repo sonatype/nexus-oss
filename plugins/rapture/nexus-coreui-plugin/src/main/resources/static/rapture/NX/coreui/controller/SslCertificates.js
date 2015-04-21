@@ -179,9 +179,9 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         win = button.up('nx-coreui-sslcertificate-add-from-pem'),
         pem = button.up('form').getForm().getFieldValues().pem;
 
-    win.getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
+    win.up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
     NX.direct.ssl_Certificate.details({ value: pem }, function (response) {
-      win.getEl().unmask();
+      win.up('nx-feature-content').getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         me.showCertificateDetails(response.data);
       }
@@ -199,9 +199,9 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         parsed = me.parseHostAndPort(server),
         protocolHint = server && Ext.String.startsWith(server, "https://") ? 'https' : undefined;
 
-    win.getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
+    win.up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
     NX.direct.ssl_Certificate.retrieveFromHost(parsed[0], parsed[1], protocolHint, function (response) {
-      win.getEl().unmask();
+      win.up('nx-feature-content').getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         me.showCertificateDetails(response.data);
       }

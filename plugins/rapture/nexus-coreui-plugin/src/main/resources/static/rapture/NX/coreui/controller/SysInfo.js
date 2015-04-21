@@ -90,9 +90,9 @@ Ext.define('NX.coreui.controller.SysInfo', {
     if (panel) {
       me.logDebug('Refreshing sysinfo');
 
-      panel.getEl().mask(NX.I18n.get('ADMIN_SYSTEM_INFORMATION_LOAD_MASK'));
+      panel.up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_SYSTEM_INFORMATION_LOAD_MASK'));
       NX.direct.atlas_SystemInformation.read(function (response) {
-        panel.getEl().unmask();
+        panel.up('nx-feature-content').getEl().unmask();
         if (Ext.isObject(response) && response.success) {
           panel.setInfo(response.data);
         }
