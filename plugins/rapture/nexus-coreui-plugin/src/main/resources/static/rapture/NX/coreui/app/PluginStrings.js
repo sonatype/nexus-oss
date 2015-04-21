@@ -225,7 +225,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_RECIPE: 'Recipe',
     ADMIN_REPOSITORIES_SETTINGS_RECIPE_PLACEHOLDER: 'Select a recipe',
     ADMIN_REPOSITORIES_SETTINGS_NAME: 'Name',
-    ADMIN_REPOSITORIES_SETTINGS_ATTRIBUTES: 'Attributes',
+    ADMIN_REPOSITORIES_SETTINGS_URL: 'URL',
     ADMIN_REPOSITORIES_SETTINGS_MEMBERS: 'Member repositories',
     ADMIN_REPOSITORIES_SETTINGS_MEMBERS_HELP: 'Select and order the repositories that are part of this group',
     ADMIN_REPOSITORIES_SETTINGS_MEMBERS_FROM: 'Available',
@@ -263,7 +263,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION: 'Strict Content Type Validation',
     ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_ENABLED: 'Not found cache enabled',
     ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL: 'Not found cache TTL',
-    ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL_HELP: 'How long to cache the fact that a file was not found in the repository (in minutes)',    
+    ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL_HELP: 'How long to cache the fact that a file was not found in the repository (in minutes)',
     ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_SIZE: 'Query cache size',
     ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_SIZE_HELP: 'Maximum number of cached query results',
     ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_ITEM_MAX_AGE: 'Query cache age',
@@ -999,7 +999,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     USER_ACCOUNT_LAST: 'Last Name',
     USER_ACCOUNT_EMAIL: 'Email',
     USER_ACCOUNT_PASSWORD_BUTTON: 'Change password',
-    
+
     // User -> NuGet Api Key
     NUGET_APIKEY_TITLE:'NuGet API Key',
     NUGET_APIKEY_SUB_TITLE: 'Configure credentials for NuGet repositories',

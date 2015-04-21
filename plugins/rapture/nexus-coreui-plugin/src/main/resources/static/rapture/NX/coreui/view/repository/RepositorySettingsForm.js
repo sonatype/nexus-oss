@@ -64,6 +64,15 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
         allowBlank: true,
         readOnly: true
       },
+
+      {
+        xtype: 'textfield',
+        name: 'url',
+        itemId: 'url',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_URL'),
+        allowBlank: true,
+        readOnly: true
+      },
       {
         xtype: 'checkbox',
         name: 'online',
