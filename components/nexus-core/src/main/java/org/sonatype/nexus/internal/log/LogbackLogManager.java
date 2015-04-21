@@ -214,9 +214,10 @@ public class LogbackLogManager
     // Expose any status messages
     StatusPrinter.printInCaseOfErrorsOrWarnings(ctx);
 
-    // TODO: This is questionable to do post-configuration
+    // TODO: This is questionable to do post-configuration, and apparently no longer needed; consider removing
     // inject any appenders which need it
     for (Appender appender : appenders()) {
+      log.debug("Injecting appender: {}", appender);
       injector.injectMembers(appender);
     }
   }
@@ -224,6 +225,9 @@ public class LogbackLogManager
   @Override
   protected void doStop() throws Exception {
     eventBus.unregister(this);
+
+    // inform logback to shutdown
+    loggerContext().stop();
   }
 
   @Override
@@ -280,9 +284,6 @@ public class LogbackLogManager
     }
   }
 
-  /**
-   * @since 2.7
-   */
   @Override
   @Guarded(by = STARTED)
   public Map<String, LoggerLevel> getLoggers() {
@@ -294,7 +295,7 @@ public class LogbackLogManager
       Level level = logger.getLevel();
       // only include loggers which explicit levels configured
       if (level != null) {
-        loggers.put(name, convert(level));
+        loggers.put(name, LogbackLevels.convert(level));
       }
     }
 
@@ -422,8 +423,6 @@ public class LogbackLogManager
 
   /**
    * Installs JUL {@link LevelChangePropagator} in context.
-   *
-   * @since 2.8
    */
   private void installLevelChangePropagator() {
     LoggerContext ctx = loggerContext();
@@ -436,40 +435,6 @@ public class LogbackLogManager
   //
   // Logger levels
   //
-
-  /**
-   * Convert a Logback {@link Level} into a {@link LoggerLevel}.
-   */
-  private static LoggerLevel convert(final Level level) {
-    switch (level.toInt()) {
-
-      case Level.ERROR_INT:
-        return LoggerLevel.ERROR;
-
-      case Level.WARN_INT:
-        return LoggerLevel.WARN;
-
-      case Level.INFO_INT:
-        return LoggerLevel.INFO;
-
-      case Level.DEBUG_INT:
-        return LoggerLevel.DEBUG;
-
-      case Level.OFF_INT:
-        return LoggerLevel.OFF;
-
-      case Level.TRACE_INT:
-      default:
-        return LoggerLevel.TRACE;
-    }
-  }
-
-  /**
-   * Convert a {@link LoggerLevel} into a Logback {@link Level}.
-   */
-  private Level convert(final LoggerLevel level) {
-    return Level.valueOf(level.name());
-  }
 
   @Override
   @Guarded(by = STARTED)
@@ -516,7 +481,7 @@ public class LogbackLogManager
       }
     }
     if (calculated != null) {
-      setLogbackLoggerLevel(name, convert(calculated));
+      setLogbackLoggerLevel(name, LogbackLevels.convert(calculated));
     }
   }
 
@@ -542,7 +507,7 @@ public class LogbackLogManager
   public LoggerLevel getLoggerLevel(final String name) {
     Level level = loggerContext().getLogger(name).getLevel();
     if (level != null) {
-      return convert(level);
+      return LogbackLevels.convert(level);
     }
     return null;
   }
@@ -550,7 +515,7 @@ public class LogbackLogManager
   @Override
   @Guarded(by = STARTED)
   public LoggerLevel getLoggerEffectiveLevel(final String name) {
-    return convert(loggerContext().getLogger(name).getEffectiveLevel());
+    return LogbackLevels.convert(loggerContext().getLogger(name).getEffectiveLevel());
   }
 
   private void setLogbackLoggerLevel(final String name, final Level level) {
@@ -568,7 +533,7 @@ public class LogbackLogManager
     LoggerContext ctx = loggerContext();
     if (!ctx.getCopyOfListenerList().contains(contextListener)) {
       ctx.addListener(contextListener);
-      log.debug("Nexus logger context listener installed");
+      log.debug("Context-listener installed");
     }
   }
 
@@ -591,7 +556,7 @@ public class LogbackLogManager
   private void applyCustomisations() {
     for (Entry<String, LoggerLevel> entry : customisations.entrySet()) {
       if (!LoggerLevel.DEFAULT.equals(entry.getValue())) {
-        setLogbackLoggerLevel(entry.getKey(), convert(entry.getValue()));
+        setLogbackLoggerLevel(entry.getKey(), LogbackLevels.convert(entry.getValue()));
       }
     }
   }
