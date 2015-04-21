@@ -205,7 +205,9 @@ public class LogbackLogManager
 
     // TODO: This is questionable to do post-configuration
     // inject any appenders which need it
-    injectAppenders();
+    for (Appender appender : appenders()) {
+      injector.injectMembers(appender);
+    }
   }
 
   @Override
@@ -418,12 +420,6 @@ public class LogbackLogManager
     propagator.setResetJUL(true);
     propagator.setContext(ctx);
     ctx.addListener(propagator);
-  }
-
-  private void injectAppenders() {
-    for (Appender appender : appenders()) {
-      injector.injectMembers(appender);
-    }
   }
 
   //
