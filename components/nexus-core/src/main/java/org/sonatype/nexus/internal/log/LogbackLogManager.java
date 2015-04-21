@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +37,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.common.io.FileSupport;
 import org.sonatype.nexus.common.io.LimitedInputStream;
 import org.sonatype.nexus.common.io.StreamSupport;
+import org.sonatype.nexus.common.stateguard.Guarded;
+import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.log.LogConfigurationCustomizer;
 import org.sonatype.nexus.log.LogConfigurationCustomizer.Configuration;
@@ -43,7 +46,6 @@ import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -60,7 +62,6 @@ import ch.qos.logback.core.helpers.NOPAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Injector;
 import org.slf4j.ILoggerFactory;
@@ -69,8 +70,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.impl.StaticLoggerBinder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-//TODO configuration operations should be locking
+import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
 
 /**
  * Logback {@link LogManager}.
@@ -78,7 +78,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class LogbackLogManager
-    extends ComponentSupport
+    extends StateGuardLifecycleSupport
     implements LogManager
 {
   private static final String F_LOGBACK_XML = "logback.xml";
@@ -122,8 +122,8 @@ public class LogbackLogManager
     this.participants = checkNotNull(participants);
     this.customizers = checkNotNull(customizers);
     this.eventBus = checkNotNull(eventBus);
-    this.overrides = Maps.newHashMap();
-    this.customisations = Maps.newHashMap();
+    this.overrides = new HashMap<>();
+    this.customisations = new HashMap<>();
     this.customizationContextListener = new CustomizationContextListener();
 
     this.configDir = applicationDirectories.getWorkDirectory("etc");
@@ -139,16 +139,13 @@ public class LogbackLogManager
   }
 
   @Subscribe
-  public void on(final NexusInitializedEvent event) {
-    configure();
+  public void on(final NexusInitializedEvent event) throws Exception {
+    start();
   }
 
   @Override
-  public synchronized void configure() {
-    log.info("Configuring");
-
-    // TODO maybe do some optimization that if participants does not change, do not reconfigure
-    prepareConfigurationFiles();
+  protected void doStart() throws Exception {
+    maybeCreateDefaultConfigurationFiles();
 
     readCustomisations();
 
@@ -196,11 +193,12 @@ public class LogbackLogManager
   }
 
   @Override
-  public synchronized void shutdown() {
+  protected void doStop() throws Exception {
     eventBus.unregister(this);
   }
 
   @Override
+  @Guarded(by = STARTED)
   public Set<File> getLogFiles() {
     HashSet<File> files = new HashSet<>();
 
@@ -212,7 +210,7 @@ public class LogbackLogManager
       while (iter.hasNext()) {
         Appender<ILoggingEvent> appender = iter.next();
         if (appender instanceof FileAppender) {
-          String path = ((FileAppender)appender).getFile();
+          String path = ((FileAppender) appender).getFile();
           files.add(new File(path));
         }
       }
@@ -222,15 +220,15 @@ public class LogbackLogManager
   }
 
   @Override
-  public File getLogFile(String fileName) {
-    Set<File> logFiles = getLogFiles();
-
-    for (File logFile : logFiles) {
-      if (logFile.getName().equals(fileName)) {
-        return logFile;
+  @Nullable
+  @Guarded(by = STARTED)
+  public File getLogFile(final String fileName) {
+    Set<File> files = getLogFiles();
+    for (File file : files) {
+      if (file.getName().equals(fileName)) {
+        return file;
       }
     }
-
     return null;
   }
 
@@ -243,7 +241,8 @@ public class LogbackLogManager
    */
   @Override
   @Nullable
-  public InputStream getApplicationLogAsStream(String fileName, long from, long count) throws IOException {
+  @Guarded(by = STARTED)
+  public InputStream getLogFileStream(String fileName, long from, long count) throws IOException {
     log.debug("Retrieving log file: {}", fileName);
 
     if (fileName.contains(File.pathSeparator)) {
@@ -270,8 +269,9 @@ public class LogbackLogManager
    * @since 2.7
    */
   @Override
+  @Guarded(by = STARTED)
   public Map<String, LoggerLevel> getLoggers() {
-    Map<String, LoggerLevel> loggers = Maps.newHashMap();
+    Map<String, LoggerLevel> loggers = new HashMap<>();
 
     LoggerContext ctx = getLoggerContext();
     for (ch.qos.logback.classic.Logger logger : ctx.getLoggerList()) {
@@ -293,6 +293,7 @@ public class LogbackLogManager
   }
 
   @Override
+  @Guarded(by = STARTED)
   public void resetLoggers() {
     log.debug("Resetting loggers");
 
@@ -310,7 +311,7 @@ public class LogbackLogManager
   }
 
   private Properties loadConfigurationProperties() throws IOException {
-    prepareConfigurationFiles();
+    maybeCreateDefaultConfigurationFiles();
 
     File file = new File(configDir, F_LOGBACK_PROPERTIES);
     try (InputStream in = new BufferedInputStream(new FileInputStream(file))) {
@@ -338,7 +339,7 @@ public class LogbackLogManager
   /**
    * Create default configuration files if needed.
    */
-  private void prepareConfigurationFiles() {
+  private void maybeCreateDefaultConfigurationFiles() {
     log.debug("Preparing configuration files");
 
     // generate default properties
@@ -378,7 +379,8 @@ public class LogbackLogManager
             log.info("Created: {}", participantFile);
           }
           catch (IOException e) {
-            throw new IllegalStateException(String.format("Could not create %s as %s", name, participantFile.getAbsolutePath()), e);
+            throw new IllegalStateException(
+                String.format("Could not create %s as %s", name, participantFile.getAbsolutePath()), e);
           }
         }
       }
@@ -494,6 +496,7 @@ public class LogbackLogManager
   }
 
   @Override
+  @Guarded(by = STARTED)
   public void setLoggerLevel(final String name, final @Nullable LoggerLevel level) {
     if (level == null) {
       unsetLoggerLevel(name);
@@ -539,6 +542,7 @@ public class LogbackLogManager
   }
 
   @Override
+  @Guarded(by = STARTED)
   public void unsetLoggerLevel(final String name) {
     log.debug("Unset logger level: {}", name);
 
@@ -555,6 +559,7 @@ public class LogbackLogManager
 
   @Override
   @Nullable
+  @Guarded(by = STARTED)
   public LoggerLevel getLoggerLevel(final String name) {
     Level level = getLoggerContext().getLogger(name).getLevel();
     if (level != null) {
@@ -564,6 +569,7 @@ public class LogbackLogManager
   }
 
   @Override
+  @Guarded(by = STARTED)
   public LoggerLevel getLoggerEffectiveLevel(final String name) {
     return convert(getLoggerContext().getLogger(name).getEffectiveLevel());
   }

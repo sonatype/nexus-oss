@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.atlas.internal.customizers
 
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+
 import org.sonatype.nexus.configuration.ApplicationDirectories
 import org.sonatype.nexus.log.LogManager
 import org.sonatype.nexus.supportzip.FileContentSourceSupport
@@ -19,10 +23,6 @@ import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport
 import org.sonatype.nexus.supportzip.SupportBundle
 import org.sonatype.nexus.supportzip.SupportBundleCustomizer
 import org.sonatype.sisu.goodies.common.ComponentSupport
-
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
 import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority
@@ -59,7 +59,7 @@ class LogCustomizer
     supportBundle << new GeneratedContentSourceSupport(LOG, 'log/nexus.log', LOW) {
       @Override
       protected void generate(final File file) {
-        def log = logManager.getApplicationLogAsStream('nexus.log', 0, Long.MAX_VALUE)
+        def log = logManager.getLogFileStream('nexus.log', 0, Long.MAX_VALUE)
         log.withStream { input ->
           file.withOutputStream { output ->
             output << input
