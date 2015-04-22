@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.common.guice.AbstractInterceptorModule;
+import org.sonatype.nexus.validation.ValidationModule;
 import org.sonatype.sisu.goodies.inject.converter.TypeConverterSupport;
 
 import com.google.common.base.Strings;
