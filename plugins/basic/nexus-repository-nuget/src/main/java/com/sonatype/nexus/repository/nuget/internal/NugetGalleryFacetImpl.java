@@ -46,6 +46,7 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.search.SearchFacet;
+import org.sonatype.nexus.repository.search.SearchItemId;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -389,9 +390,12 @@ public class NugetGalleryFacetImpl
       if (component == null) {
         return false;
       }
+      final SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
+      final SearchItemId searchId = searchFacet.identifier(component);
       tx.deleteComponent(component);
-      getRepository().facet(SearchFacet.class).delete(component);
       tx.commit();
+
+      searchFacet.delete(searchId);
 
       getEventBus().post(new ComponentDeletedEvent(component, getRepository()));
       return true;
