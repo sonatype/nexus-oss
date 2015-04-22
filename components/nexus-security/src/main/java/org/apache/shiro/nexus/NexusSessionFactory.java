@@ -51,7 +51,7 @@ public class NexusSessionFactory
   }
 
   /**
-   * Customized session impl to apply sychronized-treatment to attributes map.
+   * Customized session impl to apply synchronized-treatment to attributes map.
    */
   private static class SimpleSessionImpl
     extends SimpleSession
@@ -65,7 +65,7 @@ public class NexusSessionFactory
     }
 
     /**
-     * Work around bug in Shiro which uses a non-sychronized map to back attributes.
+     * Work around bug in Shiro which uses a non-synchronized map to back attributes.
      *
      * This appears to only be called by {@link SimpleSession#getAttributesLazy()}.
      */
