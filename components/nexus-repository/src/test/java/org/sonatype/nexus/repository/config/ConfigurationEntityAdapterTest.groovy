@@ -46,38 +46,26 @@ class ConfigurationEntityAdapterTest
 
   @Test
   void 'register schema'() {
-    def db = database.instance.connect()
-    try {
+    database.instance.connect().withCloseable { db ->
       underTest.register(db)
-    }
-    finally {
-      db.close()
     }
   }
 
   @Test
   void 'add simple entity'() {
-    def db = database.instance.connect()
-    try {
+    database.instance.connect().withCloseable { db ->
       underTest.register(db)
 
-      def config = new Configuration()
-      config.recipeName = 'foo'
-      config.repositoryName = 'bar'
-      def attr = config.attributes('baz')
-      attr.set('a', 'b')
+      def config = new Configuration(repositoryName: 'bar', recipeName: 'foo')
+      config.attributes('baz').set('a', 'b')
 
       underTest.add(db, config)
-    }
-    finally {
-      db.close()
     }
   }
 
   @Test(expected = ORecordDuplicatedException)
   void 'index on name is case-insensitive'() {
-    def db = database.instance.connect()
-    try {
+    database.instance.connect().withCloseable { db ->
       underTest.register(db)
 
       def config = new Configuration(repositoryName: 'bar', recipeName: 'foo', attributes: [:])
@@ -85,9 +73,6 @@ class ConfigurationEntityAdapterTest
       def conflictingConfig = new Configuration(repositoryName: config.repositoryName.capitalize(),
           recipeName: config.recipeName, attributes: config.attributes)
       underTest.add(db, conflictingConfig)
-    }
-    finally {
-      db.close()
     }
   }
 
