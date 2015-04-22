@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.coreui
 
-import javax.validation.Validation
 import javax.validation.Validator
 
 import org.sonatype.nexus.extender.modules.ValidationModule
@@ -27,7 +26,7 @@ import spock.lang.Unroll
 /**
  * Test bean validation for {@link RepositoryXO}
  */
-@UseModules([ValidationModule, RepositoryManagerModule])
+@UseModules([ValidationModule, TestRepositoryManagerModule])
 class RepositoryXOTest
     extends Specification
 {
@@ -105,7 +104,7 @@ class RepositoryXOTest
   def "The recipe field is only required on creation"() {
     setup:
       Map baseConfiguration = [
-          name      : 'foo',
+          name      : 'bob',
           attributes: [any: 'any']
       ]
     when:
@@ -121,5 +120,24 @@ class RepositoryXOTest
 
     then:
       validations.isEmpty()
+  }
+
+  def "On creation the name should be validated as case-insensitively unique"() {
+    when:
+      Map properties = [
+          name      : name,
+          attributes: [any: 'any'],
+          online    : true,
+          recipe    : 'any'
+      ]
+      def validations = validator.validate(new RepositoryXO(properties), Create)
+
+    then:
+      validations.size() == 1
+      validations[0].propertyPath.toString() == 'name'
+      validations[0].message == 'Name must be case-insensitively unique'
+
+    where:
+      name << ['Foo', 'bAr', 'baZ']
   }
 }

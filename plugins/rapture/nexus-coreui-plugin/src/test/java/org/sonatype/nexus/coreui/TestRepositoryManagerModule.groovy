@@ -13,9 +13,7 @@
 package org.sonatype.nexus.coreui
 
 import org.sonatype.nexus.repository.Repository
-import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.RepositoryManager
-import org.sonatype.sisu.goodies.lifecycle.Lifecycle
 
 import com.google.inject.AbstractModule
 
@@ -24,10 +22,13 @@ import com.google.inject.AbstractModule
  * 
  * @since 3.0
  */
-class RepositoryManagerModule extends AbstractModule
+class TestRepositoryManagerModule
+    extends AbstractModule
 {
+  public static final NAMES = ['foo', 'bar', 'baz'].asImmutable()
+  
   @Override
   protected void configure() {
-    bind(RepositoryManager).toInstance({-> []} as RepositoryManager);
+    bind(RepositoryManager).toInstance({ -> NAMES.collect { { -> it } as Repository } } as RepositoryManager);
   }
 }
