@@ -118,28 +118,6 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- groovy -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-groovy-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <!-- internal -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-groovyremote-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-groovyremote-client</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
       <!-- kenai -->
 
       <dependency>

@@ -44,6 +44,7 @@
     <module>nexus-jmx</module>
     <module>nexus-scheduling</module>
     <module>nexus-formfields</module>
+    <module>nexus-groovy</module>
     <module>nexus-locks</module>
     <module>nexus-log-api</module>
     <module>nexus-mime</module>

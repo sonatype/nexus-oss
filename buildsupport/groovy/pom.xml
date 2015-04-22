@@ -30,7 +30,13 @@
   <properties>
     <groovy.version>2.3.7</groovy.version>
   </properties>
-  
+
+  <!--
+  The groovy-eclipse-compiler and groovy-eclipse-batch dependencies which are configured on
+  the maven-compiler-plugin must have versions defined in the plugin execution (in project root pom).
+  The groovy-all version and the groovy-eclipse-batch version need to be kept in-sync with compatible versions.
+  -->
+
   <dependencyManagement>
     <dependencies>
 
@@ -44,30 +50,6 @@
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy</artifactId>
         <version>${groovy.version}</version>
-      </dependency>
-
-      <!--
-      The groovy-eclipse-compiler and groovy-eclipse-batch dependencies which are configured on
-      the maven-compiler-plugin must have versions defined in the plugin execution (in project root pom).
-      The groovy-all version and the groovy-eclipse-batch version need to be kept in-sync with compatible versions.
-      -->
-
-      <dependency>
-        <groupId>org.codehaus.groovy.modules.remote</groupId>
-        <artifactId>remote-core</artifactId>
-        <version>0.5</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.codehaus.groovy.modules.remote</groupId>
-        <artifactId>remote-transport-http</artifactId>
-        <version>0.5</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
     </dependencies>
