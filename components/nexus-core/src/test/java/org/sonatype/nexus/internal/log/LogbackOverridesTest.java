@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.sonatype.nexus.internal.log.LogbackOverrides;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.DiffMatchers;
