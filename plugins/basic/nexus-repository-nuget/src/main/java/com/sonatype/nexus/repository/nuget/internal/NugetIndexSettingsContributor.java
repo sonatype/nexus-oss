@@ -30,7 +30,7 @@ public class NugetIndexSettingsContributor
     extends IndexSettingsContributorSupport
 {
   @Inject
-  public NugetIndexSettingsContributor(final @Named(NugetFormat.NAME) Format format) {
+  public NugetIndexSettingsContributor(@Named(NugetFormat.NAME) final Format format) {
     super(format);
   }
 }
