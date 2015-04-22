@@ -70,7 +70,8 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
             xtype: 'nx-email',
             name: 'email',
             itemId: 'email',
-            fieldLabel: 'E-mail'
+            fieldLabel: 'E-mail',
+            allowBlank: false
           }
         ],
 
