@@ -10,30 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.log;
+package org.sonatype.nexus.repository.httpbridge.internal.describe;
 
-import java.io.InputStream;
+import org.sonatype.nexus.common.text.Strings2;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.log.LogConfigurationParticipant;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Contributes {@code logback-nexus.xml} configuration.
+ * Describe type.
+ *
+ * @since 3.0
  */
-@Singleton
-@Named
-public class LogbackNexusLogConfigurationParticipant
-    implements LogConfigurationParticipant
+public enum DescribeType
 {
-  @Override
-  public String getName() {
-    return "logback-nexus.xml";
-  }
+  HTML,
+  JSON;
 
-  @Override
-  public InputStream getConfiguration() {
-    return getClass().getResourceAsStream(getName());
+  /**
+   * Parse type from flags.  Either explicit HTML or JSON, or anything else will default to HTML.
+   */
+  public static DescribeType parse(String flags) {
+    checkNotNull(flags);
+    flags = Strings2.upper(flags).trim();
+    if (flags.isEmpty()) {
+      return HTML;
+    }
+    try {
+      return valueOf(flags);
+    }
+    catch (IllegalArgumentException e) {
+      return HTML;
+    }
   }
 }

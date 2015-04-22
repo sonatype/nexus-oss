@@ -132,7 +132,7 @@ extends DirectComponentSupport
         recipe: input.configuration.recipeName,
         status: buildStatus(input),
         attributes: input.configuration.attributes,
-        url: "${BaseUrlHolder.get()}/repository/${input.name}"
+        url: "${BaseUrlHolder.get()}/repository/${input.name}/" // trailing slash is important
     )
   }
 

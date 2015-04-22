@@ -20,29 +20,27 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
+
 /**
- * LogManager.
- *
- * @author cstamas
- * @author juven
- * @author adreghiciu@gmail.com
+ * Log manager.
  */
 public interface LogManager
+  extends Lifecycle
 {
   Set<File> getLogFiles();
 
-  File getLogFile(String filename);
-
   @Nullable
-  InputStream getApplicationLogAsStream(String logFile, long fromByte, long bytesCount) throws IOException;
+  File getLogFile(String fileName);
 
-  LogConfiguration getConfiguration() throws IOException;
-
-  void setConfiguration(LogConfiguration configuration) throws IOException;
-
-  void configure();
-
-  void shutdown();
+  /**
+   * Provides access to named log-file streams.
+   *
+   * @param fileName name of log file to fetch
+   * @return Stream to log file or {@code null} if non-existent.
+   */
+  @Nullable
+  InputStream getLogFileStream(String fileName, long fromByte, long bytesCount) throws IOException;
 
   /**
    * Return mapping of existing loggers which have explicit levels configured (never null).
@@ -54,17 +52,17 @@ public interface LogManager
   /**
    * @since 2.7
    */
+  void resetLoggers();
+
+  /**
+   * @since 2.7
+   */
   void setLoggerLevel(String name, @Nullable LoggerLevel level);
 
   /**
    * @since 2.7
    */
   void unsetLoggerLevel(String name);
-
-  /**
-   * @since 2.7
-   */
-  void resetLoggers();
 
   /**
    * @since 2.7

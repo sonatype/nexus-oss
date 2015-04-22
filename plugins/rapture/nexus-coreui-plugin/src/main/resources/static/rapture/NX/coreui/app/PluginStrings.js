@@ -225,7 +225,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_RECIPE: 'Recipe',
     ADMIN_REPOSITORIES_SETTINGS_RECIPE_PLACEHOLDER: 'Select a recipe',
     ADMIN_REPOSITORIES_SETTINGS_NAME: 'Name',
-    ADMIN_REPOSITORIES_SETTINGS_ATTRIBUTES: 'Attributes',
+    ADMIN_REPOSITORIES_SETTINGS_URL: 'URL',
     ADMIN_REPOSITORIES_SETTINGS_MEMBERS: 'Member repositories',
     ADMIN_REPOSITORIES_SETTINGS_MEMBERS_HELP: 'Select and order the repositories that are part of this group',
     ADMIN_REPOSITORIES_SETTINGS_MEMBERS_FROM: 'Available',
@@ -263,11 +263,16 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION: 'Strict Content Type Validation',
     ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_ENABLED: 'Not found cache enabled',
     ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL: 'Not found cache TTL',
-    ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL_HELP: 'How long to cache the fact that a file was not found in the repository (in minutes)',    
+    ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL_HELP: 'How long to cache the fact that a file was not found in the repository (in minutes)',
     ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_SIZE: 'Query cache size',
     ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_SIZE_HELP: 'Maximum number of cached query results',
     ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_ITEM_MAX_AGE: 'Query cache age',
     ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_ITEM_MAX_AGE_HELP: 'How long to cache query results (in seconds)',
+    ADMIN_REPOSITORIES_AUTHENTICATION_TYPE: 'Authentication type',
+    ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_USERNAME: 'Username',
+    ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_NTLM: 'Windows NTLM',
+    ADMIN_REPOSITORIES_SETTINGS_AUTHENTICATION: 'Authentication',
+    ADMIN_REPOSITORIES_SETTINGS_HTTP: 'HTTP request settings',
 
     // Admin -> Repository -> Blobstores
     ADMIN_BLOBSTORES_TITLE: 'Blobstores',
@@ -685,7 +690,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // Admin -> Support -> Logging
     ADMIN_LOGGING_TITLE: 'Logging',
     ADMIN_LOGGING_SUBTITLE: 'Control logging verbosity levels',
-    ADMIN_LOGGING_CREATE_TITLE: 'Save search filter',
+    ADMIN_LOGGING_CREATE_TITLE: 'Create logger',
     ADMIN_LOGGING_CREATE_NAME: 'Logger name',
     ADMIN_LOGGING_CREATE_LEVEL: 'Logging level',
     ADMIN_LOGGING_WRITE_SUCCESS: 'Logger {0}d: {1}',
@@ -994,7 +999,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     USER_ACCOUNT_LAST: 'Last Name',
     USER_ACCOUNT_EMAIL: 'Email',
     USER_ACCOUNT_PASSWORD_BUTTON: 'Change password',
-    
+
     // User -> NuGet Api Key
     NUGET_APIKEY_TITLE:'NuGet API Key',
     NUGET_APIKEY_SUB_TITLE: 'Configure credentials for NuGet repositories',

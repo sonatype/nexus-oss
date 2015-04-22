@@ -63,7 +63,7 @@ public class UserManagerTest
     User user = userManager.getUser("test-user");
 
     Assert.assertEquals(user.getUserId(), "test-user");
-    Assert.assertEquals(user.getEmailAddress(), "changeme1@yourcompany.com");
+    Assert.assertEquals(user.getEmailAddress(), "test-user@example.org");
     Assert.assertEquals(user.getName(), "Test User");
     // not exposed anymore
     // Assert.assertEquals( user.getPassword(), "b2a0e378437817cebdf753d7dff3dd75483af9e0" );

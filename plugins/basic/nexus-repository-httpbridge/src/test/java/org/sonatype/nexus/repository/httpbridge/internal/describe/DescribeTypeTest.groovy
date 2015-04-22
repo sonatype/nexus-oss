@@ -10,37 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.log;
+package org.sonatype.nexus.repository.httpbridge.internal.describe
 
-import java.io.IOException;
+import org.sonatype.sisu.litmus.testsupport.TestSupport
+
+import org.junit.Test
 
 /**
- * LogManager MBean interface (intentionally narrowed to same as UI supports, as this is the only thing proven useful
- * and used).
- *
- * @since 2.1
+ * Tests for {@link DescribeType}.
  */
-public interface LogManagerMBean
+class DescribeTypeTest
+    extends TestSupport
 {
-  String getRootLoggerLevel() throws IOException;
+  @Test
+  void 'parse html'() {
+    assert DescribeType.parse('html') == DescribeType.HTML
+  }
 
-  /**
-   * @since 2.7
-   */
-  void makeRootLoggerLevelOff() throws IOException;
+  @Test
+  void 'parse json'() {
+    assert DescribeType.parse('json') == DescribeType.JSON
+  }
 
-  void makeRootLoggerLevelTrace() throws IOException;
+  @Test
+  void 'parse blank as html'() {
+    assert DescribeType.parse('') == DescribeType.HTML
+  }
 
-  void makeRootLoggerLevelDebug() throws IOException;
-
-  void makeRootLoggerLevelInfo() throws IOException;
-
-  void makeRootLoggerLevelWarn() throws IOException;
-
-  /**
-   * @since 2.7
-   */
-  void makeRootLoggerLevelError() throws IOException;
-
-  void makeRootLoggerLevelDefault() throws IOException;
+  @Test
+  void 'parse true as html'() {
+    assert DescribeType.parse('true') == DescribeType.HTML
+  }
 }
