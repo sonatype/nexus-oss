@@ -21,6 +21,7 @@ import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.entity.EntityVersion;
+import org.sonatype.nexus.common.stateguard.StateGuardModule;
 import org.sonatype.nexus.orient.HexRecordIdObfuscator;
 import org.sonatype.nexus.orient.PersistentDatabaseInstanceRule;
 import org.sonatype.nexus.repository.Format;
@@ -35,6 +36,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.inject.Guice;
 import com.google.inject.util.Providers;
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -51,9 +53,9 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
@@ -96,10 +98,15 @@ public class StorageFacetImplIT
     componentEntityAdapter.installDependencies(recordIdObfuscator);
     assetEntityAdapter = new AssetEntityAdapter(bucketEntityAdapter, componentEntityAdapter);
     assetEntityAdapter.installDependencies(recordIdObfuscator);
+    StorageTxFactory storageTxFactory = Guice.createInjector(
+        new StorageTxModule(), new StateGuardModule()).getInstance(StorageTxFactory.class);
     underTest = new StorageFacetImpl(
         mockBlobStoreManager,
         Providers.of(database.getInstance()),
-        bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter
+        bucketEntityAdapter,
+        componentEntityAdapter,
+        assetEntityAdapter,
+        storageTxFactory
     );
     underTest.installDependencies(mock(EventBus.class));
 
