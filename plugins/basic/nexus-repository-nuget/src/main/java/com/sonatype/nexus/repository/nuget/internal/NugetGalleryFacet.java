@@ -71,7 +71,7 @@ public interface NugetGalleryFacet
    * @param parameters OData query parameters
    * @return NuGet feed XML
    */
-  public String feed(final String base, final String operation, final Map<String, String> parameters);
+  String feed(final String base, final String operation, final Map<String, String> parameters);
 
   /**
    * Returns entry XML for a given package ID and version.
@@ -80,7 +80,7 @@ public interface NugetGalleryFacet
    * @param id      package id
    * @param version package version
    */
-  public String entry(final String base, final String id, final String version);
+  String entry(final String base, final String id, final String version);
 
   /**
    * Returns the number of matching packages
@@ -88,5 +88,5 @@ public interface NugetGalleryFacet
    * @param operation  typically a feed name followed by "/$count"
    * @param parameters OData query parameters
    */
-  public int count(final String operation, final Map<String, String> parameters);
+  int count(final String operation, final Map<String, String> parameters);
 }
