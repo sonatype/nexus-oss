@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.search;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.storage.Component;
@@ -42,14 +43,22 @@ public class SearchFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public void put(final Component component) {
-    searchService.put(getRepository(), component);
+  public SearchItemId identifier(final Component component) {
+    return new SearchItemId(EntityHelper.id(component).toString());
   }
 
   @Override
   @Guarded(by = STARTED)
-  public void delete(final Component component) {
-    searchService.delete(getRepository(), component);
+  public SearchItemId put(final Component component) {
+    final SearchItemId searchId = identifier(component);
+    searchService.put(getRepository(), component, searchId.getValue());
+    return searchId;
+  }
+
+  @Override
+  @Guarded(by = STARTED)
+  public void delete(final SearchItemId identifier) {
+    searchService.delete(getRepository(), identifier.getValue());
   }
 
   @Override
