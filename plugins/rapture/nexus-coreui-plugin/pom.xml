@@ -73,6 +73,18 @@
       <artifactId>spock-core</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.spockframework</groupId>
+      <artifactId>spock-guice</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-extender</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

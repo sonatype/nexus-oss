@@ -15,8 +15,11 @@ package org.sonatype.nexus.coreui
 import javax.validation.Validation
 import javax.validation.Validator
 
+import org.sonatype.nexus.extender.modules.ValidationModule
 import org.sonatype.nexus.validation.group.Create
 
+import com.google.inject.Inject
+import spock.guice.UseModules
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -24,12 +27,13 @@ import spock.lang.Unroll
 /**
  * Test bean validation for {@link RepositoryXO}
  */
+@UseModules([ValidationModule, RepositoryManagerModule])
 class RepositoryXOTest
     extends Specification
 {
-
+  @Inject
   @Shared
-  Validator validator = Validation.buildDefaultValidatorFactory().validator
+  Validator validator
 
   // semi-random sample of invalid characters from Latin and other character sets
   static List INVALID_NAMES = ('#,* #\'\\/?<>| \r\n\t,.+@&å©不βخ'.collect{it} + '_leadingUnderscore').asImmutable()
@@ -118,5 +122,4 @@ class RepositoryXOTest
     then:
       validations.isEmpty()
   }
-
 }
