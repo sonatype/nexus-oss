@@ -94,7 +94,6 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
             },
             {
               xtype: 'textarea',
-              fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_NOTES'),
               helpText: NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_NOTES_HELP'),
               name: 'notes',
               allowBlank: true,

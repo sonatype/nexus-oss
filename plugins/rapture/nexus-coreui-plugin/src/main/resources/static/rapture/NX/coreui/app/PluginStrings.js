@@ -837,7 +837,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_CAPABILITIES_SUMMARY_TYPE: 'Type',
     ADMIN_CAPABILITIES_SUMMARY_DESCRIPTION: 'Description',
     ADMIN_CAPABILITIES_SUMMARY_STATE: 'State',
-    ADMIN_CAPABILITIES_SUMMARY_NOTES: 'Notes',
     ADMIN_CAPABILITIES_SUMMARY_NOTES_HELP: 'Optional notes about configured capability',
     ADMIN_CAPABILITIES_STATUS_EMPTY_STATE: 'This capability does not provide any status',
 
