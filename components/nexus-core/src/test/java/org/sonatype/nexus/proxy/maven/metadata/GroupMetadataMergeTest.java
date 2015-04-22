@@ -26,9 +26,9 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.codehaus.plexus.digest.Md5Digester;
-import org.codehaus.plexus.digest.Sha1Digester;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNull;
@@ -224,10 +224,9 @@ public class GroupMetadataMergeTest
       String md5Hash = contentAsString(md5Item);
       String sha1Hash = contentAsString(sha1Item);
 
-      Md5Digester md5Digester = new Md5Digester();
-      md5Digester.verify(mdFile, md5Hash);
-      Sha1Digester sha1Digester = new Sha1Digester();
-      sha1Digester.verify(mdFile, sha1Hash);
+      byte[] buf = FileUtils.readFileToByteArray(mdFile);
+      assertEquals(DigestUtils.md5Hex(buf), md5Hash.trim());
+      assertEquals(DigestUtils.sha1Hex(buf), sha1Hash.trim());
     }
     finally {
       mdFile.delete();
