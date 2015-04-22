@@ -15,6 +15,7 @@ package org.sonatype.nexus.coreui
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 
+import org.sonatype.nexus.repository.config.UniqueRepositoryName
 import org.sonatype.nexus.validation.group.Create
 
 import groovy.transform.ToString
@@ -34,6 +35,7 @@ class RepositoryXO
       message = 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed'
   )
   @NotEmpty
+  @UniqueRepositoryName(groups = Create)
   String name
 
   String type
