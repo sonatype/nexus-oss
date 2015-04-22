@@ -55,6 +55,7 @@ Ext.define('NX.coreui.controller.Tasks', {
   ],
   refs: [
     { ref: 'feature', selector: 'nx-coreui-task-feature' },
+    { ref: 'content', selector: 'nx-feature-content' },
     { ref: 'list', selector: 'nx-coreui-task-list' },
     { ref: 'info', selector: 'nx-coreui-task-feature nx-info-panel' },
     { ref: 'settings', selector: 'nx-coreui-task-settings' }
@@ -265,9 +266,9 @@ Ext.define('NX.coreui.controller.Tasks', {
       form = button.up('form'),
       values = form.getValues();
 
-    form.up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_TASKS_UPDATE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('ADMIN_TASKS_UPDATE_MASK'));
     NX.direct.coreui_Task.update(values, function(response) {
-      form.up('nx-feature-content').getEl().unmask();
+      me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
@@ -409,10 +410,10 @@ Ext.define('NX.coreui.controller.Tasks', {
       description = me.getDescription(model);
       NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_TASKS_DETAILS_RUN_CONFIRM'),
         NX.I18n.format('ADMIN_TASKS_DETAILS_RUN_CONFIRM_HELP', description), function() {
-        me.getList().up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_TASKS_RUN_MASK'));
+        me.getContent().getEl().mask(NX.I18n.get('ADMIN_TASKS_RUN_MASK'));
         NX.direct.coreui_Task.run(model.getId(), function(response) {
           me.loadStore();
-          me.getList().up('nx-feature-content').getEl().unmask();
+          me.getContent().getEl().unmask();
           if (Ext.isObject(response) && response.success) {
             NX.Messages.add({
               text: NX.I18n.format('ADMIN_TASKS_DETAILS_RUN_SUCCESS', description), type: 'success'
@@ -443,10 +444,10 @@ Ext.define('NX.coreui.controller.Tasks', {
       description = me.getDescription(model);
       NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_TASKS_DETAILS_STOP_CONFIRM'),
         NX.I18n.format('ADMIN_TASKS_DETAILS_STOP_CONFIRM_HELP', description), function() {
-        me.getList().up('nx-fetaure-content').getEl().mask(NX.I18n.get('ADMIN_TASKS_STOP_MASK'));
+        me.getContent().getEl().mask(NX.I18n.get('ADMIN_TASKS_STOP_MASK'));
         NX.direct.coreui_Task.stop(model.getId(), function(response) {
           me.loadStore();
-          me.getList().up('nx-feature-content').getEl().unmask();
+          me.getContent().getEl().unmask();
           if (Ext.isObject(response) && response.success) {
             NX.Messages.add({
               text: NX.I18n.format('ADMIN_TASKS_DETAILS_STOP_SUCCESS', description), type: 'success'

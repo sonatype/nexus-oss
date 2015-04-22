@@ -50,6 +50,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
   ],
   refs: [
     { ref: 'feature', selector: 'nx-coreui-capability-feature' },
+    { ref: 'content', selector: 'nx-feature-content' },
     { ref: 'list', selector: 'nx-coreui-capability-list' },
     { ref: 'summaryTab', selector: 'nx-coreui-capability-summary' },
     { ref: 'settingsTab', selector: 'nx-coreui-capability-settings' },
@@ -451,9 +452,9 @@ Ext.define('NX.coreui.controller.Capabilities', {
         form = button.up('form'),
         values = form.getValues();
 
-    form.up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_MASK'));
     NX.direct.capability_Capability.update(values, function(response) {
-      form.up('nx-feature-content').getEl().unmask();
+      me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
@@ -503,10 +504,10 @@ Ext.define('NX.coreui.controller.Capabilities', {
     model = me.getList().getStore().getById(modelId);
     description = me.getDescription(model);
 
-    me.getList().up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_ENABLE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_ENABLE_MASK'));
     NX.direct.capability_Capability.enable(model.getId(), function(response) {
       me.loadStore();
-      me.getList().up('nx-feature-content').getEl().unmask();
+      me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('ADMIN_CAPABILITIES_DETAILS_ENABLE_SUCCESS', description),
@@ -529,10 +530,10 @@ Ext.define('NX.coreui.controller.Capabilities', {
     model = me.getList().getStore().getById(modelId);
     description = me.getDescription(model);
 
-    me.getList().up('nx-feature-content').getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_DISABLE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_DISABLE_MASK'));
     NX.direct.capability_Capability.disable(model.getId(), function(response) {
       me.loadStore();
-      me.getList().up('nx-feature-content').getEl().unmask();
+      me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('ADMIN_CAPABILITIES_DETAILS_DISABLE_SUCCESS', description),
