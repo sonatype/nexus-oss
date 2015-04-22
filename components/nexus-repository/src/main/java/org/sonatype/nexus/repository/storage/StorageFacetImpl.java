@@ -52,6 +52,8 @@ public class StorageFacetImpl
 
   private final AssetEntityAdapter assetEntityAdapter;
 
+  private final StorageTxFactory storageTxFactory;
+
   @VisibleForTesting
   static final String CONFIG_KEY = "storage";
 
@@ -83,7 +85,8 @@ public class StorageFacetImpl
                           final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
                           final BucketEntityAdapter bucketEntityAdapter,
                           final ComponentEntityAdapter componentEntityAdapter,
-                          final AssetEntityAdapter assetEntityAdapter)
+                          final AssetEntityAdapter assetEntityAdapter,
+                          final StorageTxFactory storageTxFactory)
   {
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
@@ -91,6 +94,8 @@ public class StorageFacetImpl
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
+
+    this.storageTxFactory = checkNotNull(storageTxFactory);
   }
 
   @Override
@@ -152,10 +157,9 @@ public class StorageFacetImpl
 
   private StorageTx openStorageTx() {
     BlobStore blobStore = blobStoreManager.get(config.blobStoreName);
-    return new StorageTxImpl(
+    return storageTxFactory.create(
         new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucket, config.writePolicy,
         bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter
     );
   }
-
 }

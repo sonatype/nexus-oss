@@ -19,6 +19,7 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
@@ -38,6 +39,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.hash.HashCode;
+import com.google.inject.assistedinject.Assisted;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -66,7 +68,7 @@ public class StorageTxImpl
 
   private final WritePolicy writePolicy;
 
-  private final StateGuard stateGuard = new StateGuard.Builder().initial(CLOSED).create();
+  private final StateGuard stateGuard = new StateGuard.Builder().initial(OPEN).create();
 
   private final BucketEntityAdapter bucketEntityAdapter;
 
@@ -74,13 +76,14 @@ public class StorageTxImpl
 
   private final AssetEntityAdapter assetEntityAdapter;
 
-  public StorageTxImpl(final BlobTx blobTx,
-                       final ODatabaseDocumentTx db,
-                       final Bucket bucket,
-                       final WritePolicy writePolicy,
-                       final BucketEntityAdapter bucketEntityAdapter,
-                       final ComponentEntityAdapter componentEntityAdapter,
-                       final AssetEntityAdapter assetEntityAdapter)
+  @Inject
+  public StorageTxImpl(@Assisted final BlobTx blobTx,
+                       @Assisted final ODatabaseDocumentTx db,
+                       @Assisted final Bucket bucket,
+                       @Assisted @Nullable final WritePolicy writePolicy,
+                       @Assisted final BucketEntityAdapter bucketEntityAdapter,
+                       @Assisted final ComponentEntityAdapter componentEntityAdapter,
+                       @Assisted final AssetEntityAdapter assetEntityAdapter)
   {
     this.blobTx = checkNotNull(blobTx);
     this.db = checkNotNull(db);
@@ -445,4 +448,5 @@ public class StorageTxImpl
     }
     blobTx.delete(blobRef);
   }
+
 }
