@@ -20,9 +20,9 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.codehaus.plexus.digest.Md5Digester;
-import org.codehaus.plexus.digest.Sha1Digester;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -205,10 +205,9 @@ public class GroupingBehaviourTest
       // save it
       String sha1hash = contentAsString(item);
 
-      Md5Digester md5Digester = new Md5Digester();
-      md5Digester.verify(mdmFile, md5hash);
-      Sha1Digester sha1Digester = new Sha1Digester();
-      sha1Digester.verify(mdmFile, sha1hash);
+      byte[] buf = FileUtils.readFileToByteArray(mdmFile);
+      assertEquals(DigestUtils.md5Hex(buf), md5hash.trim());
+      assertEquals(DigestUtils.sha1Hex(buf), sha1hash.trim());
     }
     finally {
       mdmFile.delete();
@@ -261,10 +260,9 @@ public class GroupingBehaviourTest
       // save it
       String sha1hash = contentAsString(item);
 
-      Md5Digester md5Digester = new Md5Digester();
-      md5Digester.verify(mdmFile, md5hash);
-      Sha1Digester sha1Digester = new Sha1Digester();
-      sha1Digester.verify(mdmFile, sha1hash);
+      byte[] buf = FileUtils.readFileToByteArray(mdmFile);
+      assertEquals(DigestUtils.md5Hex(buf), md5hash.trim());
+      assertEquals(DigestUtils.sha1Hex(buf), sha1hash.trim());
     }
     finally {
       mdmFile.delete();
