@@ -53,7 +53,7 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreSettingsForm', {
         fieldLabel: NX.I18n.get('ADMIN_BLOBSTORES_SETTINGS_ATTRIBUTES'),
         height: 300,
         allowBlank: false,
-        cls: 'nx-log-viewer-field'
+        cls: 'nx-monospace-field'
       }
     ];
 

@@ -23,33 +23,113 @@ Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
   requires: [
     'NX.I18n'
   ],
-
-  defaults: {
-    itemCls: 'required-field'
-  },
-
   /**
    * @override
    */
   initComponent: function() {
     var me = this;
 
+    me.updateAuthenticationFields = function(combo, record) {
+      var me = this, ntlmFields = me.up('form').down('#ntlmFields');
+      if(combo.getValue() === 'ntlm') {
+        ntlmFields.show();  
+      }
+      else {
+        ntlmFields.hide();
+      }
+    };
     me.items = [
       {
-        xtype: 'numberfield',
-        name: 'httpclient.connection.retries',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES_HELP'),
-        minValue: 0,
-        value: 0
+        xtype: 'nx-optionalfieldset',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_AUTHENTICATION'),
+        checkboxToggle: true,
+        checkboxName: 'authEnabled',
+        collapsed: true,
+        items: [
+          {
+            xtype: 'combo',
+            name: 'httpclient.authentication.type',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_AUTHENTICATION_TYPE'),
+            store: [
+              ['username', NX.I18n.get('ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_USERNAME')],
+              ['ntlm', NX.I18n.get('ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_NTLM')]
+            ],
+            value: 'username' ,
+            listeners: {
+              'select': me.updateAuthenticationFields,
+              'beforerender': me.updateAuthenticationFields
+              }
+          },
+          {
+            xtype:'textfield',
+            name: 'httpclient.authentication.username',
+            fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_USERNAME'),
+            allowBlank: false
+          },
+          {
+            xtype: 'nx-password',
+            name: 'httpclient.authentication.password',
+            fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_PASSWORD')
+          },
+          {
+            xtype: 'fieldcontainer',
+            itemId: 'ntlmFields',
+            hidden: true,
+            items:[
+              {
+                xtype:'textfield',
+                name: 'httpclient.authentication.ntlmHost',
+                fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_HOST')
+              },
+              {
+                xtype:'textfield',
+                name: 'httpclient.authentication.ntlmDomain',
+                fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_DOMAIN')
+              }
+            ]
+          }
+        ]
       },
       {
-        xtype: 'numberfield',
-        name: 'httpclient.connection.timeout',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT_HELP'),
-        minValue: 0,
-        value: 0
+        xtype: 'nx-optionalfieldset',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_HTTP'),
+        checkboxToggle: true,
+        checkboxName: 'httpRequestSettings',
+        collapsed: true,
+        items: [
+          {
+            xtype: 'textfield',
+            name: 'httpclient.connection.userAgentCustomisation',
+            fieldLabel: NX.I18n.get('ADMIN_HTTP_CUSTOMIZATION'),
+            helpText: NX.I18n.get('ADMIN_HTTP_CUSTOMIZATION_HELP')
+          },
+          {
+            xtype: 'textfield',
+            name: 'httpclient.connection.urlParameters',
+            fieldLabel: NX.I18n.get('ADMIN_HTTP_PARAMETERS'),
+            helpText: NX.I18n.get('ADMIN_HTTP_PARAMETERS_HELP')
+          },
+          {
+            xtype: 'numberfield',
+            name: 'httpclient.connection.retries',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES'),
+            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES_HELP'),
+            allowDecimals: false,
+            allowExponential: false,
+            minValue: 0,
+            maxValue: 10
+          },
+          {
+            xtype: 'numberfield',
+            name: 'httpclient.connection.timeout',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT'),
+            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT_HELP'),
+            allowDecimals: false,
+            allowExponential: false,
+            minValue: 0,
+            maxValue: 3600
+          }
+        ]
       }
     ];
 
