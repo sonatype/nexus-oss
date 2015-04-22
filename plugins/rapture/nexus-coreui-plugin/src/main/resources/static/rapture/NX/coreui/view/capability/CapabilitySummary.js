@@ -46,6 +46,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
         {
           xtype: 'panel',
           ui: 'nx-subsection',
+          itemId: 'nx-coreui-capability-summary-subsection',
           frame: true,
           title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SUMMARY_SECTION'),
           layout: 'column',
@@ -73,6 +74,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
         },
         {
           xtype: 'nx-settingsform',
+          itemId: 'nx-coreui-capability-notes-subsection',
           title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_NOTES_SECTION'),
           weight: 40,
           api: {

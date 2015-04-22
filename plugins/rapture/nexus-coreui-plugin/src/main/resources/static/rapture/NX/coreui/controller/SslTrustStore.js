@@ -32,6 +32,13 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
     'ssl.SslUseTrustStore'
   ],
 
+  refs: [
+    {
+      ref: 'main',
+      selector: 'nx-main'
+    }
+  ],
+
   /**
    * @override
    */
@@ -108,9 +115,9 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
         hostAndPort = me.getHostAndPort(button.up('nx-coreui-sslusetruststore').useTrustStoreConfig),
         sslCertificates = me.getController('NX.coreui.controller.SslCertificates');
 
-    panel.getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
+    me.getMain().getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
     NX.direct.ssl_Certificate.retrieveFromHost(hostAndPort.host, hostAndPort.port, undefined, function(response) {
-      panel.getEl().unmask();
+      me.getMain().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         sslCertificates.showCertificateDetails(response.data);
       }
