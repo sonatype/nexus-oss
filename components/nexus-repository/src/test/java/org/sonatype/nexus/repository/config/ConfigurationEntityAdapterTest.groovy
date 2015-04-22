@@ -12,13 +12,15 @@
  */
 package org.sonatype.nexus.repository.config
 
+import org.sonatype.nexus.orient.DatabaseInstanceRule
+import org.sonatype.nexus.orient.HexRecordIdObfuscator
+import org.sonatype.sisu.litmus.testsupport.TestSupport
+
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.sonatype.nexus.orient.DatabaseInstanceRule
-import org.sonatype.nexus.orient.HexRecordIdObfuscator
-import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 /**
  * Tests for {@link ConfigurationEntityAdapter}.
@@ -66,6 +68,23 @@ class ConfigurationEntityAdapterTest
       attr.set('a', 'b')
 
       underTest.add(db, config)
+    }
+    finally {
+      db.close()
+    }
+  }
+
+  @Test(expected = ORecordDuplicatedException)
+  void 'index on name is case-insensitive'() {
+    def db = database.instance.connect()
+    try {
+      underTest.register(db)
+
+      def config = new Configuration(repositoryName: 'bar', recipeName: 'foo', attributes: [:])
+      underTest.add(db, config)
+      def conflictingConfig = new Configuration(repositoryName: config.repositoryName.capitalize(),
+          recipeName: config.recipeName, attributes: config.attributes)
+      underTest.add(db, conflictingConfig)
     }
     finally {
       db.close()
