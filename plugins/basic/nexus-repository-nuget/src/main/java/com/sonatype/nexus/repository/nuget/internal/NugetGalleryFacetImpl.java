@@ -403,7 +403,6 @@ public class NugetGalleryFacetImpl
       final SearchItemId searchId = searchFacet.identifier(component);
       tx.deleteComponent(component);
       tx.commit();
-      searchFacet.delete(searchId);
 
       searchFacet.delete(searchId);
 
@@ -481,7 +480,8 @@ public class NugetGalleryFacetImpl
   }
 
   @Nullable
-  private Asset findAsset(final StorageTx storageTx, final Component component) {
+  @VisibleForTesting
+  protected Asset findAsset(final StorageTx storageTx, final Component component) {
     final Iterable<Asset> assets = storageTx.browseAssets(component);
     if (assets.iterator().hasNext()) {
       return assets.iterator().next();
