@@ -33,7 +33,7 @@ class UniqueRepositoryNameValidatorTest
       def valid = validator.isValid(name, null)
 
     then:
-      repositoryManager.browse() >> repositoryNames.collect{ String repoName -> { -> repoName } as Repository}
+      1 * repositoryManager.browse() >> repositoryNames.collect{ String repoName -> { -> repoName } as Repository}
       valid == isValid
 
     where:
