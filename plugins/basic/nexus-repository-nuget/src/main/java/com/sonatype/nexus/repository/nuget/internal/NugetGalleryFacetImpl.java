@@ -714,7 +714,9 @@ public class NugetGalleryFacetImpl
   {
     private final Class<ProxyFacet> facetClass;
 
-    public HasFacet(final Class<ProxyFacet> facetClass) {this.facetClass = facetClass;}
+    public HasFacet(final Class<ProxyFacet> facetClass) {
+      this.facetClass = facetClass;
+    }
 
     @Override
     public boolean apply(final Repository input) {
