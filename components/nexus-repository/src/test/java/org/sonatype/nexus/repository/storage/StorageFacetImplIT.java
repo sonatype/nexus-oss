@@ -657,7 +657,7 @@ public class StorageFacetImplIT
     }
   }
 
-  static class MidTransactionException
+  private static class MidTransactionException
       extends Exception
   {}
 }
