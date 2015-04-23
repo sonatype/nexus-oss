@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.ElementKind;
 import javax.validation.Path.Node;
 
 import org.sonatype.nexus.validation.ValidationMessage;
@@ -68,10 +69,12 @@ public class ValidationResponse
         List<String> entries = new ArrayList<>();
         // iterate path to get the full path
         for (Node node : violation.getPropertyPath()) {
-          if (node.getKey() != null) {
-            entries.add(node.getKey().toString());
+          if (ElementKind.PROPERTY == node.getKind()) {
+            if (node.getKey() != null) {
+              entries.add(node.getKey().toString());
+            }
+            entries.add(node.getName());
           }
-          entries.add(node.getName());
         }
         if (entries.isEmpty()) {
           if (messages == null) {
