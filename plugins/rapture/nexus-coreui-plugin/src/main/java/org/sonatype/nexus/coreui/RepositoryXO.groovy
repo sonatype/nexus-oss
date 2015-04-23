@@ -31,7 +31,7 @@ import org.hibernate.validator.constraints.NotEmpty
 class RepositoryXO
 {
   @Pattern(
-      regexp = /^[^_][a-zA-Z0-9_\-\.]+$/,
+      regexp = /^[a-zA-Z0-9\-\.]{1}[a-zA-Z0-9_\-\.]*$/,
       message = 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed'
   )
   @NotEmpty

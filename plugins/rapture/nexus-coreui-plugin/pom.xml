@@ -80,11 +80,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-extender</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>

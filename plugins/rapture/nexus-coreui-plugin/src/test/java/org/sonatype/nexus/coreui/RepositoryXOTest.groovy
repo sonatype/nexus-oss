@@ -14,7 +14,7 @@ package org.sonatype.nexus.coreui
 
 import javax.validation.Validator
 
-import org.sonatype.nexus.extender.modules.ValidationModule
+import org.sonatype.nexus.validation.ValidationModule
 import org.sonatype.nexus.validation.group.Create
 
 import com.google.inject.Inject
@@ -35,9 +35,9 @@ class RepositoryXOTest
   Validator validator
 
   // semi-random sample of invalid characters from Latin and other character sets
-  static List INVALID_NAMES = ('#,* #\'\\/?<>| \r\n\t,.+@&å©不βخ'.collect{it} + '_leadingUnderscore').asImmutable()
+  static List INVALID_NAMES = ('#,* #\'\\/?<>| \r\n\t,+@&å©不βخ'.collect{it} + '_leadingUnderscore').asImmutable()
 
-  static final List VALID_NAMES = ['Foo_1.2-3', '.foo', 'foo.', '-0.'].asImmutable()
+  static final List VALID_NAMES = ['Foo_1.2-3', '.foo', 'foo.', '-0.', 'a', '1', '.'].asImmutable()
 
   def "Name is always required"() {
     when:
