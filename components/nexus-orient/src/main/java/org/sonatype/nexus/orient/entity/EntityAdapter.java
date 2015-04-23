@@ -205,6 +205,8 @@ public abstract class EntityAdapter<T extends Entity>
   {
     private final EntityAdapter owner;
 
+    private ODocument document;
+
     private final ORID rid;
 
     private final ORecordVersion rversion;
@@ -215,6 +217,7 @@ public abstract class EntityAdapter<T extends Entity>
 
     public AttachedEntityMetadata(final EntityAdapter owner, final ODocument document) {
       this.owner = checkNotNull(owner);
+      this.document = checkNotNull(document);
       checkNotNull(document);
       this.rid = document.getIdentity();
       this.rversion = document.getRecordVersion();

@@ -43,10 +43,12 @@ import com.orientechnologies.orient.core.tx.OTransaction.TXTYPE;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sonatype.nexus.common.entity.EntityHelper.id;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_CHECKSUM;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.CLOSED;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.OPEN;
+import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.RESOLVED;
 
 /**
  * Default {@link StorageTx} implementation.
@@ -98,6 +100,8 @@ public class StorageTxImpl
   {
     public static final String OPEN = "OPEN";
 
+    public static final String RESOLVED = "RESOLVED";
+
     public static final String CLOSED = "CLOSED";
   }
 
@@ -114,22 +118,28 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Transitions(from = OPEN, to = RESOLVED)
   public void commit() {
     db.commit();
     blobTx.commit();
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Transitions(from = OPEN, to = RESOLVED)
   public void rollback() {
     db.rollback();
     blobTx.rollback();
   }
 
   @Override
-  @Transitions(from = OPEN, to = CLOSED)
+  @Transitions(from = {OPEN, RESOLVED}, to = CLOSED)
   public void close() {
+
+    // If the transaction has not been committed, then we roll back.
+    if (OPEN.equals(stateGuard.getCurrent())) {
+      rollback();
+    }
+
     db.close(); // rolls back and releases ODatabaseDocumentTx to pool
     blobTx.rollback(); // no-op if no changes have occurred since last commit
   }
@@ -269,7 +279,7 @@ public class StorageTxImpl
   public Asset createAsset(final Bucket bucket, final Component component) {
     checkNotNull(component);
     Asset asset = createAsset(bucket, component.format());
-    asset.componentId(component.getEntityMetadata().getId());
+    asset.componentId(id(component));
     return asset;
   }
 

@@ -58,6 +58,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.common.entity.EntityHelper.id;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 
 /**
@@ -329,6 +330,10 @@ public class StorageFacetImplIT
 
   @Test
   public void roundTripTest() {
+    EntityId asset1Id = null;
+    EntityId asset2Id = null;
+    EntityId componentId = null;
+
     try (StorageTx tx = underTest.openTx()) {
       // Verify initial state with browse
       Bucket bucket = tx.getBucket();
@@ -349,18 +354,34 @@ public class StorageFacetImplIT
       Asset asset2 = tx.createAsset(bucket, component);
       asset2.name("asset2");
       tx.saveAsset(asset2);
+
       tx.commit();
+
+      // In transaction mode, ORIDs are placeholders until commit, so IDs should be collected after commit
+      asset1Id = id(asset1);
+      asset2Id = id(asset2);
+      componentId = id(component);
+      System.err.println(componentId);
+    }
+
+    try (StorageTx tx = underTest.openTx()) {
+      Bucket bucket = tx.getBucket();
 
       checkSize(tx.browseAssets(bucket), 2);
       checkSize(tx.browseComponents(bucket), 1);
 
-      assertNotNull(tx.findAsset(asset1.getEntityMetadata().getId(), bucket));
-      assertNotNull(tx.findComponent(component.getEntityMetadata().getId(), bucket));
+      // TODO: Remove test code
+      for (Component c : tx.browseComponents(bucket)) {
+        System.err.println(id(c));
+      }
 
-      checkSize(tx.browseAssets(tx.findComponent(component.getEntityMetadata().getId(), bucket)), 1);
-      assertNotNull(tx.firstAsset(tx.findComponent(component.getEntityMetadata().getId(), bucket)));
-      assertNull(tx.findAsset(asset1.getEntityMetadata().getId(), bucket).componentId());
-      assertNotNull(tx.findAsset(asset2.getEntityMetadata().getId(), bucket).componentId());
+      assertNotNull(tx.findAsset(asset1Id, bucket));
+      assertNotNull(tx.findComponent(componentId, bucket));
+
+      checkSize(tx.browseAssets(tx.findComponent(componentId, bucket)), 1);
+      assertNotNull(tx.firstAsset(tx.findComponent(componentId, bucket)));
+      assertNull(tx.findAsset(asset1Id, bucket).componentId());
+      assertNotNull(tx.findAsset(asset2Id, bucket).componentId());
 
       assertNull(tx.findAssetWithProperty(P_NAME, "nomatch", bucket));
       assertNotNull(tx.findAssetWithProperty(P_NAME, "foo", bucket));
@@ -368,12 +389,9 @@ public class StorageFacetImplIT
       assertNull(tx.findComponentWithProperty(P_NAME, "nomatch", bucket));
       assertNotNull(tx.findComponentWithProperty(P_NAME, "bar", bucket));
 
-      // store ids as they are cleaned up after delete
-      EntityId asset1Id = asset1.getEntityMetadata().getId();
-      EntityId componentId = component.getEntityMetadata().getId();
       // Delete both and make sure browse and find behave as expected
-      tx.deleteAsset(asset1);
-      tx.deleteComponent(component);
+      tx.deleteAsset(tx.findAsset(asset1Id, bucket));
+      tx.deleteComponent(tx.findComponent(componentId, bucket));
 
       checkSize(tx.browseAssets(bucket), 0);
       checkSize(tx.browseComponents(bucket), 0);
@@ -383,6 +401,29 @@ public class StorageFacetImplIT
       // NOTE: It doesn't matter for this test, but you should commit when finished with one or more writes
       //       If you don't, your changes will be automatically rolled back.
       tx.commit();
+    }
+  }
+
+  @Test
+  public void componentAssetLinksAreDurable() {
+    try (StorageTx tx = underTest.openTx()) {
+      Bucket bucket = tx.getBucket();
+      final Component component = tx.createComponent(bucket, testFormat).name("component");
+      tx.saveComponent(component);
+
+      final Asset asset = tx.createAsset(bucket, component).name("asset");
+      tx.saveAsset(asset);
+
+      tx.commit();
+    }
+
+    try (StorageTx tx = underTest.openTx()) {
+      final Asset asset = tx.findAssetWithProperty("name", "asset", tx.getBucket());
+      assertThat(asset, is(notNullValue()));
+
+      final Component component = tx.findComponent(asset.componentId(), tx.getBucket());
+      assertThat(component, is(notNullValue()));
+      assertThat(component.name(), is("component"));
     }
   }
 
@@ -654,6 +695,28 @@ public class StorageFacetImplIT
       final Component component = tx.findComponentWithProperty("group", "myGroup", tx.getBucket());
       assertThat(component, is(notNullValue()));
       assertThat(component.group(), is("myGroup"));
+    }
+  }
+
+  @Test
+  public void entityIdsCanBeUsedInLaterTransactions() throws Exception {
+    EntityId componentId = null;
+
+    try (StorageTx tx = underTest.openTx()) {
+      final Component component = tx.createComponent(tx.getBucket(), testFormat).name("component");
+      tx.saveComponent(component);
+
+      final Asset asset = tx.createAsset(tx.getBucket(), component).name("hello");
+      tx.saveAsset(asset);
+
+      tx.commit();
+      componentId = id(component);
+    }
+
+    try (StorageTx tx = underTest.openTx()) {
+      final Component component = tx.findComponent(componentId, tx.getBucket());
+      assertThat("component", component, is(notNullValue()));
+      assertThat(component.name(), is("component"));
     }
   }
 
