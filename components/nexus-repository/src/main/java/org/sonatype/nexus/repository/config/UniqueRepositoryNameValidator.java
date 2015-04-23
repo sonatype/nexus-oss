@@ -22,7 +22,6 @@ import org.sonatype.nexus.repository.manager.RepositoryManager;
 import com.google.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.common.text.Strings2.lower;
 
 /**
  * Ensure that Repository names are unique case-insensitively.
@@ -48,7 +47,7 @@ public class UniqueRepositoryNameValidator
   @Override
   public boolean isValid(final String value, final ConstraintValidatorContext context) {
     for (Repository repository : repositoryManager.browse()) {
-      if (lower(repository.getName()).equals(lower(value))) {
+      if (repository.getName().equalsIgnoreCase(value)) {
         return false;
       }
     }

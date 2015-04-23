@@ -135,7 +135,7 @@ class RepositoryXOTest
     then:
       validations.size() == 1
       validations[0].propertyPath.toString() == 'name'
-      validations[0].message == 'Name must be case-insensitively unique'
+      validations[0].message == 'Name is already used, must be unique (ignoring case)'
 
     where:
       name << ['Foo', 'bAr', 'baZ']
