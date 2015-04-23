@@ -38,7 +38,7 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
     me.items = [
       {
         xtype: 'combo',
-        name: 'storage.writePolicy',
+        name: 'attributes.storage.writePolicy',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT'),
         helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP'),
         emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_PLACEHOLDER'),
