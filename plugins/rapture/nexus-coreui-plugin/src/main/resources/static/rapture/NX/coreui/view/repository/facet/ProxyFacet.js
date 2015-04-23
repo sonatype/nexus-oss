@@ -38,14 +38,14 @@ Ext.define('NX.coreui.view.repository.facet.ProxyFacet', {
     me.items = [
       {
         xtype: 'nx-url',
-        name: 'proxy.remoteUrl',
+        name: 'attributes.proxy.remoteUrl',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE'),
         helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE_HELP'),
         emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE_PLACEHOLDER')
       },
       {
         xtype: 'numberfield',
-        name: 'proxy.artifactMaxAge',
+        name: 'attributes.proxy.artifactMaxAge',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ARTIFACT_AGE'),
         helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ARTIFACT_AGE_HELP'),
         minValue: -1,

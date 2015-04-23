@@ -48,7 +48,7 @@
 
   <ciManagement>
     <system>Bamboo</system>
-    <url>https://bamboo.zion.sonatype.com/browse/NX-OSS</url>
+    <url>https://bamboo.zion.sonatype.com/browse/NX3-OSS</url>
   </ciManagement>
 
   <scm>

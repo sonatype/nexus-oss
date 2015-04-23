@@ -71,7 +71,8 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
             name: 'email',
             itemId: 'email',
             fieldLabel: 'E-mail',
-            allowBlank: false
+            allowBlank: false,
+            validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           }
         ],
 
