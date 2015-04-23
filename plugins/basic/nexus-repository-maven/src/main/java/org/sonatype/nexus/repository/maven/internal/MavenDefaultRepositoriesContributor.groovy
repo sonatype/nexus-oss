@@ -74,7 +74,7 @@ class MavenDefaultRepositoriesContributor
         new Configuration(repositoryName: DEFAULT_CENTRAL_REPO, recipeName: Maven2ProxyRecipe.NAME, online: true, attributes:
             [
                 maven     : [
-                    versionPolicy              : VersionPolicy.MIXED.toString(),
+                    versionPolicy              : VersionPolicy.RELEASE.toString(),
                     checksumPolicy             : ChecksumPolicy.WARN.toString(),
                     strictContentTypeValidation: false
                 ],
