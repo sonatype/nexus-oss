@@ -39,6 +39,10 @@ Ext.define('NX.coreui.controller.Metrics', {
     {
       ref: 'metrics',
       selector: 'nx-coreui-support-metrics'
+    },
+    {
+      ref: 'content',
+      selector: 'nx-feature-content'
     }
   ],
 
@@ -96,7 +100,7 @@ Ext.define('NX.coreui.controller.Metrics', {
       return;
     }
 
-    panel.getEl().mask(NX.I18n.get('ADMIN_METRICS_LOAD_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('ADMIN_METRICS_LOAD_MASK'));
 
     Ext.Ajax.request({
       url: NX.util.Url.urlOf('internal/metrics'),
@@ -108,7 +112,7 @@ Ext.define('NX.coreui.controller.Metrics', {
       suppressStatus: true,
 
       callback: function (response) {
-        panel.getEl().unmask();
+        me.getContent().getEl().unmask();
       },
 
       failure: function (response) {

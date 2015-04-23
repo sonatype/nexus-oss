@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -308,7 +307,7 @@ public class NugetGalleryFacetImpl
     try (StorageTx storageTx = openStorageTx();
          TempStreamSupplier tempStream = new TempStreamSupplier(inputStream)) {
 
-      final HashMap<String, String> recordMetadata = Maps.newHashMap();
+      final Map<String, String> recordMetadata = Maps.newHashMap();
       Map<String, String> packageMetadata;
       try (InputStream in = tempStream.get()) {
         packageMetadata = NugetPackageUtils.packageMetadata(in);
@@ -715,7 +714,9 @@ public class NugetGalleryFacetImpl
   {
     private final Class<ProxyFacet> facetClass;
 
-    public HasFacet(final Class<ProxyFacet> facetClass) {this.facetClass = facetClass;}
+    public HasFacet(final Class<ProxyFacet> facetClass) {
+      this.facetClass = facetClass;
+    }
 
     @Override
     public boolean apply(final Repository input) {

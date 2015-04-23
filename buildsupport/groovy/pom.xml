@@ -32,6 +32,12 @@
     <spock.version>1.0-groovy-2.3</spock.version>
   </properties>
 
+  <!--
+  The groovy-eclipse-compiler and groovy-eclipse-batch dependencies which are configured on
+  the maven-compiler-plugin must have versions defined in the plugin execution (in project root pom).
+  The groovy-all version and the groovy-eclipse-batch version need to be kept in-sync with compatible versions.
+  -->
+
   <dependencyManagement>
     <dependencies>
 
@@ -57,30 +63,6 @@
         <groupId>org.spockframework</groupId>
         <artifactId>spock-guice</artifactId>
         <version>${spock.version}</version>
-      </dependency>
-
-      <!--
-      The groovy-eclipse-compiler and groovy-eclipse-batch dependencies which are configured on
-      the maven-compiler-plugin must have versions defined in the plugin execution (in project root pom).
-      The groovy-all version and the groovy-eclipse-batch version need to be kept in-sync with compatible versions.
-      -->
-
-      <dependency>
-        <groupId>org.codehaus.groovy.modules.remote</groupId>
-        <artifactId>remote-core</artifactId>
-        <version>0.5</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.codehaus.groovy.modules.remote</groupId>
-        <artifactId>remote-transport-http</artifactId>
-        <version>0.5</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
     </dependencies>

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -15,45 +14,28 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-plugins-internal</artifactId>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-components</artifactId>
     <version>3.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-groovyremote-plugin</artifactId>
+  <artifactId>nexus-groovy</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-api</artifactId>
-      <scope>provided</scope>
+      <artifactId>nexus-common</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.goodies</groupId>
-      <artifactId>goodies-lifecycle</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.groovy.modules.remote</groupId>
-      <artifactId>remote-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.groovy.modules.remote</groupId>
-      <artifactId>remote-transport-http</artifactId>
-    </dependency>
-
-    <!-- RemoteControl uses some "illegal" Sun JDK classes, need to mark them -->
-    <dependency>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>animal-sniffer-annotations</artifactId>
-      <optional>true</optional>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
     </dependency>
 
     <dependency>
@@ -62,14 +44,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.karaf.tooling</groupId>
-        <artifactId>karaf-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

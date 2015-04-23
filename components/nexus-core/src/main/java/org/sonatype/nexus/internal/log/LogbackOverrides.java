@@ -90,14 +90,12 @@ public class LogbackOverrides
             out.println("<?xml version='1.0' encoding='UTF-8'?>");
             out.println();
             out.println("<!--");
-            out.println("DO NOT EDIT - This file includes user customised loggers and is automatically generated.");
+            out.println("DO NOT EDIT - Automatically generated; User-customized logging levels");
             out.println("-->");
             out.println();
             out.println("<included>");
             for (Entry<String, LoggerLevel> entry : overrides.entrySet()) {
-              out.format(
-                  "  <logger name=\"%s\" level=\"%s\"/>%n", entry.getKey(), entry.getValue().toString()
-              );
+              out.format("  <logger name='%s' level='%s'/>%n", entry.getKey(), entry.getValue());
             }
             out.write("</included>");
           }
