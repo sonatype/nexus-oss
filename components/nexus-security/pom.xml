@@ -112,8 +112,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-groovy</artifactId>
     </dependency>
 
     <dependency>

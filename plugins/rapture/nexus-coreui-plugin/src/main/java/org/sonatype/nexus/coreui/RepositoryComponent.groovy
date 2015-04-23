@@ -59,7 +59,7 @@ extends DirectComponentSupport
 
   @Inject
   Map<String, Recipe> recipes
-  
+
   @DirectMethod
   List<RepositoryXO> read() {
     repositoryManager.browse().collect { asRepository(it) }
@@ -95,7 +95,6 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @Validate(groups = [Create.class, Default.class])
   RepositoryXO create(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repository) {
-    convertDoublesToInts(repository.attributes)
     return asRepository(repositoryManager.create(new Configuration(
         repositoryName: repository.name,
         recipeName: repository.recipe,
@@ -108,7 +107,6 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @Validate(groups = [Update.class, Default.class])
   RepositoryXO update(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repository) {
-    convertDoublesToInts(repository.attributes)
     return asRepository(repositoryManager.update(repositoryManager.get(repository.name).configuration.with {
       online = repository.online
       attributes = repository.attributes
@@ -136,22 +134,6 @@ extends DirectComponentSupport
     )
   }
 
-  /**
-   * Gson inconveniently transforms all numbers in our Map<String, Object> to Double type.
-   * This mutates the passed in map to change all Double types to Integer.
-   */
-  @PackageScope
-  def convertDoublesToInts(final map) {
-    map.each { key, value ->
-      if (value instanceof Map) {
-        convertDoublesToInts(value)
-      }
-      else if (value instanceof Double) {
-        map[key] = (value as int)
-      }
-    }
-  }
-
   @DirectPollMethod(event = "coreui_Repository_readStatus")
   @RequiresAuthentication
   List<RepositoryStatusXO> readStatus(final Map<String, String> params) {
@@ -171,7 +153,7 @@ extends DirectComponentSupport
     catch (MissingFacetException e) {
       // no group, can refine status
     }
-    
+
     try {
       def remoteStatus = input.facet(HttpClientFacet).status
       statusXO.description = remoteStatus.description

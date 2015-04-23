@@ -495,8 +495,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // Admin -> Security -> LDAP
     ADMIN_LDAP_TITLE: 'LDAP',
     ADMIN_LDAP_SUBTITLE: 'Manage LDAP server configuration',
+    ADMIN_LDAP_UPDATE_MASK: 'Updating LDAP connection',
     ADMIN_LDAP_UPDATE_SUCCESS: 'LDAP server updated: {0}',
     ADMIN_LDAP_UPDATE_ERROR: 'You do not have permission to update LDAP servers',
+    ADMIN_LDAP_CREATE_MASK: 'Creating LDAP connection',
     ADMIN_LDAP_CREATE_CONNECTION: 'Create LDAP Connection',
     ADMIN_LDAP_CREATE_GROUP: 'Choose Users and Groups',
     ADMIN_LDAP_CREATE_SUCCESS: 'LDAP server created: {0}',
@@ -808,6 +810,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // Admin -> System -> Capabilities
     ADMIN_CAPABILITIES_TITLE: 'Capabilities',
     ADMIN_CAPABILITIES_SUBTITLE: 'Manage capabilities',
+    ADMIN_CAPABILITIES_UPDATE_MASK: 'Updating capability',
+    ADMIN_CAPABILITIES_ENABLE_MASK: 'Enabling capability',
+    ADMIN_CAPABILITIES_DISABLE_MASK: 'Disabling capability',
     ADMIN_CAPABILITIES_UPDATE_ERROR: 'You do not have permission to update capabilities',
     ADMIN_CAPABILITIES_UPDATE_SUCCESS: 'Capability updated: {0}',
     ADMIN_CAPABILITIES_CREATE_TITLE: 'Create {0} Capability',
@@ -837,7 +842,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_CAPABILITIES_SUMMARY_TYPE: 'Type',
     ADMIN_CAPABILITIES_SUMMARY_DESCRIPTION: 'Description',
     ADMIN_CAPABILITIES_SUMMARY_STATE: 'State',
-    ADMIN_CAPABILITIES_SUMMARY_NOTES: 'Notes',
     ADMIN_CAPABILITIES_SUMMARY_NOTES_HELP: 'Optional notes about configured capability',
     ADMIN_CAPABILITIES_STATUS_EMPTY_STATE: 'This capability does not provide any status',
 
@@ -921,6 +925,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_TASKS_SELECT_TITLE: 'Select a Service Type',
     ADMIN_TASKS_SELECT_LIST_FILTER_ERROR: 'No service types matched "$filter"',
     ADMIN_TASKS_SELECT_TYPE_NAME_COLUMN: 'Service type',
+    ADMIN_TASKS_UPDATE_MASK: 'Updating task',
+    ADMIN_TASKS_RUN_MASK: 'Running task',
+    ADMIN_TASKS_STOP_MASK: 'Stopping task',
     ADMIN_TASKS_CREATE_TITLE: 'Create {0} Task',
     ADMIN_TASKS_CREATE_SUCCESS: 'Task created: {0}',
     ADMIN_TASKS_LIST_NEW_BUTTON: 'Create task',

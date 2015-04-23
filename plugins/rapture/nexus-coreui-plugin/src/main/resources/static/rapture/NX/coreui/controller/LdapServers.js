@@ -36,7 +36,6 @@ Ext.define('NX.coreui.controller.LdapServers', {
     'LdapSchemaTemplate'
   ],
   views: [
-    'ldap.LdapServerAdd',
     'ldap.LdapServerChangeOrder',
     'ldap.LdapServerFeature',
     'ldap.LdapServerList',
@@ -55,7 +54,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
     'ldap.LdapServerUserAndGroupAdd'
   ],
   refs: [
+    { ref: 'main', selector: 'nx-main' },
     { ref: 'feature', selector: 'nx-coreui-ldapserver-feature' },
+    { ref: 'content', selector: 'nx-feature-content' },
     { ref: 'list', selector: 'nx-coreui-ldapserver-list' },
     { ref: 'connection', selector: 'nx-coreui-ldapserver-feature nx-coreui-ldapserver-connection' },
     { ref: 'backup', selector: 'nx-coreui-ldapserver-feature nx-coreui-ldapserver-backup' },
@@ -266,7 +267,10 @@ Ext.define('NX.coreui.controller.LdapServers', {
     });
     Ext.apply(modelData, values);
 
+    // Apply masks
+    me.getContent().getEl().mask(NX.I18n.get('ADMIN_LDAP_UPDATE_MASK'));
     NX.direct.ldap_LdapServer.update(modelData, function(response) {
+      me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
@@ -295,7 +299,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
     Ext.apply(values, connectionForm.getForm().getFieldValues());
     Ext.apply(values, userGroupForm.getForm().getFieldValues());
 
+    me.getContent().getEl().mask(NX.I18n.get('ADMIN_LDAP_CREATE_MASK'));
     NX.direct.ldap_LdapServer.create(values, function(response) {
+      me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
@@ -434,10 +440,10 @@ Ext.define('NX.coreui.controller.LdapServers', {
         values = form.getForm().getFieldValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
-    form.getEl().mask(NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_MAPPING_MASK', url));
+    me.getMain().getEl().mask(NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_MAPPING_MASK', url));
 
     NX.direct.ldap_LdapServer.verifyUserMapping(values, function(response) {
-      form.getEl().unmask();
+      me.getMain().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_MAPPING_SUCCESS', url), type: 'success' });
         Ext.widget('nx-coreui-ldapserver-userandgroup-testresults', { mappedUsers: response.data });

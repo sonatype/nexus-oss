@@ -37,6 +37,10 @@ Ext.define('NX.coreui.controller.SysInfo', {
     {
       ref: 'sysInfo',
       selector: 'nx-coreui-support-sysinfo'
+    },
+    {
+      ref: 'content',
+      selector: 'nx-feature-content'
     }
   ],
 
@@ -90,9 +94,9 @@ Ext.define('NX.coreui.controller.SysInfo', {
     if (panel) {
       me.logDebug('Refreshing sysinfo');
 
-      panel.getEl().mask(NX.I18n.get('ADMIN_SYSTEM_INFORMATION_LOAD_MASK'));
+      me.getContent().getEl().mask(NX.I18n.get('ADMIN_SYSTEM_INFORMATION_LOAD_MASK'));
       NX.direct.atlas_SystemInformation.read(function (response) {
-        panel.getEl().unmask();
+        me.getContent().getEl().unmask();
         if (Ext.isObject(response) && response.success) {
           panel.setInfo(response.data);
         }
