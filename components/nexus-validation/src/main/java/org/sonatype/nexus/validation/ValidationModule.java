@@ -25,8 +25,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 
-import org.sonatype.nexus.extender.internal.GuiceConstraintValidatorFactory;
-import org.sonatype.nexus.validation.Validate;
+import org.sonatype.nexus.validation.internal.GuiceConstraintValidatorFactory;
 import org.sonatype.nexus.validation.internal.ValidationInterceptor;
 
 import com.google.inject.AbstractModule;
@@ -48,6 +47,7 @@ public class ValidationModule
     final MethodInterceptor interceptor = new ValidationInterceptor();
     bindInterceptor(Matchers.any(), Matchers.annotatedWith(Validate.class), interceptor);
     requestInjection(interceptor);
+    bind(ConstraintValidatorFactory.class).to(GuiceConstraintValidatorFactory.class);
   }
 
   @Provides
