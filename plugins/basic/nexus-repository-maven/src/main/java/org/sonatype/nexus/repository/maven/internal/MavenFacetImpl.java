@@ -36,7 +36,6 @@ import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
-import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
@@ -122,15 +121,11 @@ public class MavenFacetImpl
     @NotNull
     public VersionPolicy versionPolicy;
 
-    @NotNull
-    public ChecksumPolicy checksumPolicy;
-
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
           "strictContentTypeValidation=" + strictContentTypeValidation +
           ", versionPolicy=" + versionPolicy +
-          ", checksumPolicy=" + checksumPolicy +
           '}';
     }
   }
@@ -177,12 +172,6 @@ public class MavenFacetImpl
   @Override
   public VersionPolicy getVersionPolicy() {
     return config.versionPolicy;
-  }
-
-  @Nonnull
-  @Override
-  public ChecksumPolicy getChecksumPolicy() {
-    return config.checksumPolicy;
   }
 
   @Nullable
