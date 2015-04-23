@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.Facet;
 
 /**
@@ -23,37 +27,47 @@ import org.sonatype.nexus.repository.Facet;
 public interface StorageFacet
     extends Facet
 {
+  String P_ATTRIBUTES = "attributes";
 
-  static String P_ATTRIBUTES = "attributes";
+  String P_BLOB_REF = "blob_ref";
 
-  static String P_BLOB_REF = "blob_ref";
+  String P_BUCKET = "bucket";
 
-  static String P_BUCKET = "bucket";
+  String P_CHECKSUM = "checksum";
 
-  static String P_CHECKSUM = "checksum";
+  String P_COMPONENT = "component";
 
-  static String P_COMPONENT = "component";
+  String P_CONTENT_TYPE = "content_type";
 
-  static String P_CONTENT_TYPE = "content_type";
+  String P_FORMAT = "format";
 
-  static String P_FORMAT = "format";
+  String P_GROUP = "group";
 
-  static String P_GROUP = "group";
+  String P_LAST_UPDATED = "last_updated";
 
-  static String P_LAST_UPDATED = "last_updated";
+  String P_NAME = "name";
 
-  static String P_NAME = "name";
+  String P_PATH = "path";
 
-  static String P_PATH = "path";
+  String P_REPOSITORY_NAME = "repository_name";
 
-  static String P_REPOSITORY_NAME = "repository_name";
+  String P_SIZE = "size";
 
-  static String P_SIZE = "size";
-
-  static String P_VERSION = "version";
+  String P_VERSION = "version";
 
   /**
    * Opens a transaction.
    */
   StorageTx openTx();
+
+  /**
+   * Visits nodes selected by {@link Cursor}, using the passed in {@link Visitor}.
+   */
+  <T> void visit(Cursor<T> cursor,
+                 Visitor<T> visitor);
+
+  /**
+   * Invokes passed in {@link Processor}s in context of this storage facet with optional initial context, if any.
+   */
+  void process(@Nullable Map<String, Object> initialContext, Processor... processors);
 }
