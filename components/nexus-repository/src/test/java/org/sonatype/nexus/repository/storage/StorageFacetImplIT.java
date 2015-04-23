@@ -46,8 +46,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -561,4 +563,101 @@ public class StorageFacetImplIT
   private void checkSize(Iterable iterable, int expectedSize) {
     assertThat(Iterators.size(iterable.iterator()), is(expectedSize));
   }
+
+  @Test
+  public void repeatedAssetModificationsAreSaved() throws Exception {
+    createComponent("testGroup", "testName", "testVersion");
+    try (StorageTx tx = underTest.openTx()) {
+      final Component component = tx.findComponentWithProperty("version", "testVersion", tx.getBucket());
+      final Asset asset = tx.createAsset(tx.getBucket(), component);
+      asset.name("asset");
+
+      final NestedAttributesMap attributes = asset.formatAttributes();
+      attributes.set("attribute1", "original");
+      tx.saveAsset(asset);
+
+
+      final Iterable<Asset> assets = tx.browseAssets(component);
+      final Asset reloadedAsset = assets.iterator().next();
+
+      reloadedAsset.formatAttributes().set("attribute2", "alternate");
+      tx.saveAsset(reloadedAsset);
+    }
+
+    try (StorageTx tx = underTest.openTx()) {
+      final Component component = tx.findComponentWithProperty("version", "testVersion", tx.getBucket());
+      final Iterable<Asset> assets = tx.browseAssets(component);
+      final Asset asset = assets.iterator().next();
+
+      assertThat(asset.formatAttributes().get("attribute1", String.class), equalTo("original"));
+      assertThat(asset.formatAttributes().get("attribute1", String.class), equalTo("original"));
+    }
+  }
+
+  @Test
+  public void transactionsRollBackWhenRequired() throws Exception {
+    try (StorageTx tx = underTest.openTx()) {
+      final Component component = tx.createComponent(tx.getBucket(), testFormat)
+          .group("myGroup")
+          .version("0.9")
+          .name("myComponent");
+      tx.saveComponent(component);
+      tx.rollback();
+    }
+
+    try (StorageTx tx = underTest.openTx()) {
+      final Component component = tx.findComponentWithProperty("group", "myGroup", tx.getBucket());
+      assertThat(component, is(nullValue()));
+    }
+  }
+
+  @Test
+  public void transactionsRollBackOnException() throws Exception {
+    try {
+      try (StorageTx tx = underTest.openTx()) {
+        final Component component = tx.createComponent(tx.getBucket(), testFormat)
+            .group("myGroup")
+            .version("0.9")
+            .name("myComponent");
+        tx.saveComponent(component);
+        if (true) {
+          throw new MidTransactionException();
+        }
+      }
+    }
+    catch (MidTransactionException ignored) {
+    }
+
+    try (StorageTx tx = underTest.openTx()) {
+      final Component component = tx.findComponentWithProperty("group", "myGroup", tx.getBucket());
+      assertThat(component, is(nullValue()));
+    }
+  }
+
+  @Test
+  public void transactionContentIsSaved() throws Exception {
+    try (StorageTx tx = underTest.openTx()) {
+      final Component component = tx.createComponent(tx.getBucket(), testFormat)
+          .group("myGroup")
+          .version("0.9")
+          .name("myComponent");
+      tx.saveComponent(component);
+      tx.commit();
+    }
+
+    try (StorageTx tx = underTest.openTx()) {
+      final Iterable<Component> components = tx.browseComponents(tx.getBucket());
+      for (Component c : components) {
+        System.err.println(c);
+      }
+
+      final Component component = tx.findComponentWithProperty("group", "myGroup", tx.getBucket());
+      assertThat(component, is(notNullValue()));
+      assertThat(component.group(), is("myGroup"));
+    }
+  }
+
+  static class MidTransactionException
+      extends Exception
+  {}
 }
