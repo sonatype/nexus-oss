@@ -34,7 +34,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = UniqueRepositoryNameValidator.class)
 public @interface UniqueRepositoryName
 {
-  String message() default "Name must be case-insensitively unique";
+  String message() default "Name is already used, must be unique (ignoring case)";
 
   Class<?>[] groups() default { };
 
