@@ -23,6 +23,7 @@ import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 import org.sonatype.nexus.orient.entity.FieldCopier;
 
+import com.orientechnologies.orient.core.collate.OCaseInsensitiveCollate;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OType;
@@ -72,7 +73,8 @@ public class ConfigurationEntityAdapter
         .setMandatory(true)
         .setNotNull(true);
     type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
-    type.createIndex(I_REPOSITORY_NAME, INDEX_TYPE.UNIQUE, P_REPOSITORY_NAME);
+    type.createIndex(I_REPOSITORY_NAME, INDEX_TYPE.UNIQUE, P_REPOSITORY_NAME)
+        .getDefinition().setCollate(new OCaseInsensitiveCollate());
   }
 
   @Override
