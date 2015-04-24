@@ -127,7 +127,7 @@ public class AssetEntityAdapter
     super.writeFields(document, entity);
 
     EntityId componentId = entity.componentId();
-    document.field(P_COMPONENT, componentId != null ? componentEntityAdapter.decode(componentId) : null);
+    document.field(P_COMPONENT, componentId != null ? componentEntityAdapter.recordIdentity(componentId) : null);
     document.field(P_NAME, entity.name());
     document.field(P_SIZE, entity.size());
     document.field(P_CONTENT_TYPE, entity.contentType());
@@ -146,5 +146,4 @@ public class AssetEntityAdapter
     Iterable<ODocument> docs = db.command(new OCommandSQL(query)).execute(parameters);
     return readEntities(docs);
   }
-
 }

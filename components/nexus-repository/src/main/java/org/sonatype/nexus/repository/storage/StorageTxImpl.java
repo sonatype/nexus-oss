@@ -298,21 +298,21 @@ public class StorageTxImpl
 
   @Override
   public void saveComponent(final Component component) {
-    if (component.isNew()) {
-      componentEntityAdapter.add(db, component);
+    if (component.isPersisted()) {
+      componentEntityAdapter.edit(db, component);
     }
     else {
-      componentEntityAdapter.edit(db, component);
+      componentEntityAdapter.add(db, component);
     }
   }
 
   @Override
   public void saveAsset(final Asset asset) {
-    if (asset.isNew()) {
-      assetEntityAdapter.add(db, asset);
+    if (asset.isPersisted()) {
+      assetEntityAdapter.edit(db, asset);
     }
     else {
-      assetEntityAdapter.edit(db, asset);
+      assetEntityAdapter.add(db, asset);
     }
   }
 

@@ -24,11 +24,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class EntityId
-  implements Serializable
+    implements Serializable
 {
   private static final long serialVersionUID = 1L;
 
-  private final String value;
+  private String value;
 
   public EntityId(final String value) {
     this.value = checkNotNull(value);
@@ -44,13 +44,10 @@ public class EntityId
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
 
     EntityId entityId = (EntityId) o;
 
-    if (!value.equals(entityId.value)) {
+    if (!getValue().equals(entityId.getValue())) {
       return false;
     }
 
@@ -59,11 +56,11 @@ public class EntityId
 
   @Override
   public int hashCode() {
-    return value.hashCode();
+    return getValue().hashCode();
   }
 
   @Override
   public String toString() {
-    return value;
+    return getValue();
   }
 }

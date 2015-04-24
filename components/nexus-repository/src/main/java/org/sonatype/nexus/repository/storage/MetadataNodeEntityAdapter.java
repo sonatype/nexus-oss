@@ -97,15 +97,6 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode>
     document.field(P_ATTRIBUTES, entity.attributes().backing());
   }
 
-  public EntityId encode(final ORID id) {
-    return new EntityId(getRecordIdObfuscator().encode(getType(), id));
-  }
-
-  public ORID decode(final EntityId id) {
-    return getRecordIdObfuscator().decode(getType(), id.toString());
-  }
-
-
   Iterable<T> browseByBucket(final ODatabaseDocumentTx db, final Bucket bucket) {
     checkNotNull(bucket);
     checkState(bucket.getEntityMetadata() != null);

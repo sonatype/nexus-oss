@@ -610,19 +610,19 @@ public class StorageFacetImplIT
     createComponent("testGroup", "testName", "testVersion");
     try (StorageTx tx = underTest.openTx()) {
       final Component component = tx.findComponentWithProperty("version", "testVersion", tx.getBucket());
-      final Asset asset = tx.createAsset(tx.getBucket(), component);
-      asset.name("asset");
+      final Asset asset = tx.createAsset(tx.getBucket(), component).name("asset");
 
       final NestedAttributesMap attributes = asset.formatAttributes();
       attributes.set("attribute1", "original");
       tx.saveAsset(asset);
-
 
       final Iterable<Asset> assets = tx.browseAssets(component);
       final Asset reloadedAsset = assets.iterator().next();
 
       reloadedAsset.formatAttributes().set("attribute2", "alternate");
       tx.saveAsset(reloadedAsset);
+
+      tx.commit();
     }
 
     try (StorageTx tx = underTest.openTx()) {
@@ -699,8 +699,30 @@ public class StorageFacetImplIT
   }
 
   @Test
-  public void entityIdsCanBeUsedInLaterTransactions() throws Exception {
+  public void entityIdCanBeUsedInLaterTransactions() throws Exception {
     EntityId componentId = null;
+    EntityId assetId = null;
+
+    try (StorageTx tx = underTest.openTx()) {
+      final Component component = tx.createComponent(tx.getBucket(), testFormat).name("component");
+      tx.saveComponent(component);
+
+      componentId = id(component);
+
+      tx.commit();
+    }
+
+    try (StorageTx tx = underTest.openTx()) {
+      final Component component = tx.findComponent(componentId, tx.getBucket());
+      assertThat("component", component, is(notNullValue()));
+      assertThat(component.name(), is("component"));
+    }
+  }
+
+  @Test
+  public void multipleEntityIdsCanBeUsedInLaterTransactions() throws Exception {
+    EntityId componentId = null;
+    EntityId assetId = null;
 
     try (StorageTx tx = underTest.openTx()) {
       final Component component = tx.createComponent(tx.getBucket(), testFormat).name("component");
@@ -711,12 +733,17 @@ public class StorageFacetImplIT
 
       tx.commit();
       componentId = id(component);
+      assetId = id(asset);
     }
 
     try (StorageTx tx = underTest.openTx()) {
       final Component component = tx.findComponent(componentId, tx.getBucket());
       assertThat("component", component, is(notNullValue()));
       assertThat(component.name(), is("component"));
+
+      final Asset asset = tx.findAsset(assetId, tx.getBucket());
+      assertThat("asset", asset, is(notNullValue()));
+      assertThat(asset.name(), is("hello"));
     }
   }
 

@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.orient.entity;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.common.entity.Entity;
@@ -27,10 +28,11 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.version.ORecordVersion;
-import com.orientechnologies.orient.core.version.OSimpleVersion;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sonatype.nexus.common.entity.EntityHelper.id;
+import static org.sonatype.nexus.common.entity.EntityHelper.metadata;
 
 /**
  * Support for entity-adapter implementations.
@@ -93,7 +95,7 @@ public abstract class EntityAdapter<T extends Entity>
     this.type = type;
   }
 
-  protected void defineType(final ODatabaseDocumentTx db, final OClass type){
+  protected void defineType(final ODatabaseDocumentTx db, final OClass type) {
     defineType(type);
   }
 
@@ -207,10 +209,6 @@ public abstract class EntityAdapter<T extends Entity>
 
     private ODocument document;
 
-    private final ORID rid;
-
-    private final ORecordVersion rversion;
-
     private EntityId id;
 
     private EntityVersion version;
@@ -219,22 +217,24 @@ public abstract class EntityAdapter<T extends Entity>
       this.owner = checkNotNull(owner);
       this.document = checkNotNull(document);
       checkNotNull(document);
-      this.rid = document.getIdentity();
-      this.rversion = document.getRecordVersion();
     }
 
     @Override
     public EntityId getId() {
       if (id == null) {
-        id = new EntityId(owner.getRecordIdObfuscator().encode(owner.getType(), rid));
+        id = new AttachedEntityId(document, owner);
       }
       return id;
+    }
+
+    protected ORecordVersion getRecordVersion() {
+      return document.getRecordVersion();
     }
 
     @Override
     public EntityVersion getVersion() {
       if (version == null) {
-        version = new EntityVersion(rversion.toString());
+        version = new EntityVersion(getRecordVersion().toString());
       }
       return version;
     }
@@ -242,11 +242,44 @@ public abstract class EntityAdapter<T extends Entity>
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
-          "rid=" + rid +
-          ", rversion=" + rversion +
-          ", id=" + id +
+          "id=" + id +
           ", version=" + version +
           '}';
+    }
+  }
+
+  /**
+   * An {@link EntityId} that remains connected to the underlying ODocument. This is necessary with OrientDb
+   * transactions mode, as ODocument ids change when the transaction is committed.
+   */
+  protected static class AttachedEntityId
+      extends EntityId
+  {
+    private final EntityAdapter owner;
+
+    private ODocument document;
+
+    private String cachedValue;
+
+    public AttachedEntityId(final ODocument document, final EntityAdapter owner) {
+      super("");
+      this.owner = checkNotNull(owner);
+      this.document = checkNotNull(document);
+    }
+
+    @Nonnull
+    @Override
+    public String getValue() {
+      if (cachedValue == null) {
+        final ORID identity = document.getIdentity();
+        checkState(!identity.isTemporary(), "attempted use of temporary document id");
+        cachedValue = owner.getRecordIdObfuscator().encode(owner.getType(), identity);
+      }
+      return cachedValue;
+    }
+
+    protected ORID recordIdentity() {
+      return document.getIdentity();
     }
   }
 
@@ -262,33 +295,28 @@ public abstract class EntityAdapter<T extends Entity>
    * Get metadata from entity.
    */
   protected EntityMetadata getMetadata(final T entity) {
-    checkNotNull(entity);
-    EntityMetadata metadata = entity.getEntityMetadata();
-    checkState(metadata != null);
-    return metadata;
+    return metadata(entity);
+  }
+
+  public EntityId encode(final ORID id) {
+    return new EntityId(getRecordIdObfuscator().encode(getType(), id));
+  }
+
+  public ORID decode(final EntityId id) {
+    return getRecordIdObfuscator().decode(getType(), id.toString());
   }
 
   /**
    * Return record identity of entity.
    */
   protected ORID recordIdentity(final T entity) {
-    EntityMetadata metadata = getMetadata(entity);
-    if (metadata instanceof AttachedEntityMetadata) {
-      return ((AttachedEntityMetadata) metadata).rid;
-    }
-    return getRecordIdObfuscator().decode(getType(), metadata.getId().getValue());
+    return recordIdentity(id(entity));
   }
 
-  /**
-   * Return record version of entity.
-   */
-  protected ORecordVersion recordVersion(final T entity) {
-    EntityMetadata metadata = getMetadata(entity);
-    if (metadata instanceof AttachedEntityMetadata) {
-      return ((AttachedEntityMetadata) metadata).rversion;
+  public ORID recordIdentity(final EntityId id) {
+    if (checkNotNull(id) instanceof AttachedEntityId) {
+      return ((AttachedEntityId) id).recordIdentity();
     }
-    ORecordVersion version = new OSimpleVersion();
-    version.getSerializer().fromString(metadata.getVersion().getValue(), version);
-    return version;
+    return decode(id);
   }
 }
