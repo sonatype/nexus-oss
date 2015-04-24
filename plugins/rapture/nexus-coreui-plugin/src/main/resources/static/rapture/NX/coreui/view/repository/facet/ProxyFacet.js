@@ -44,6 +44,20 @@ Ext.define('NX.coreui.view.repository.facet.ProxyFacet', {
         emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE_PLACEHOLDER')
       },
       {
+        xtype: 'checkbox',
+        name: 'attributes.httpclient.connection.blocked',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BLOCKED'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BLOCKED_HELP'),
+        value: false
+      },
+      {
+        xtype: 'checkbox',
+        name: 'attributes.httpclient.connection.autoBlock',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_AUTOBLOCK'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_AUTOBLOCK_HELP'),
+        value: true
+      },
+      {
         xtype: 'numberfield',
         name: 'attributes.proxy.artifactMaxAge',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ARTIFACT_AGE'),
