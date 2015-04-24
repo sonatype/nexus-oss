@@ -43,11 +43,13 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
             'background-color': '#FFFFFF'
           },
 
-          layout: {
-            type: 'hbox',
-            align: 'bottom'
+          layout: 'column',
+          defaults: {
+            style: {
+              margin: '10px 0 0 0'
+            }
           },
-          bodyPadding: 10
+          bodyPadding: '0 10px 10px 10px'
 
           // disable saving for now
           //tbar: [
