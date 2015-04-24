@@ -15,6 +15,7 @@ package org.sonatype.nexus.validation;
 import java.lang.annotation.ElementType;
 
 import javax.inject.Singleton;
+import javax.validation.ConstraintValidatorFactory;
 import javax.validation.Path;
 import javax.validation.Path.Node;
 import javax.validation.TraversableResolver;
@@ -24,6 +25,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 
+import org.sonatype.nexus.validation.internal.GuiceConstraintValidatorFactory;
 import org.sonatype.nexus.validation.internal.ValidationInterceptor;
 
 import com.google.inject.AbstractModule;
@@ -45,16 +47,18 @@ public class ValidationModule
     final MethodInterceptor interceptor = new ValidationInterceptor();
     bindInterceptor(Matchers.any(), Matchers.annotatedWith(Validate.class), interceptor);
     requestInjection(interceptor);
+    bind(ConstraintValidatorFactory.class).to(GuiceConstraintValidatorFactory.class);
   }
 
   @Provides
   @Singleton
-  ValidatorFactory validatorFactory() {
+  ValidatorFactory validatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
     ClassLoader tccl = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(HibernateValidator.class.getClassLoader());
-
+  
       ValidatorFactory factory = Validation.byDefaultProvider().configure()
+          .constraintValidatorFactory(constraintValidatorFactory)
           .traversableResolver(new AlwaysTraversableResolver()) // disable JPA reachability
           .buildValidatorFactory();
 

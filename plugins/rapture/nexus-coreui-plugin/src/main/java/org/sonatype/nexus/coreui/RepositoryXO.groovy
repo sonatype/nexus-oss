@@ -13,14 +13,14 @@
 package org.sonatype.nexus.coreui
 
 import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
 
+import org.sonatype.nexus.repository.config.UniqueRepositoryName
 import org.sonatype.nexus.validation.group.Create
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
-
-import javax.validation.constraints.NotNull
 
 /**
  * Repository exchange object.
@@ -30,7 +30,12 @@ import javax.validation.constraints.NotNull
 @ToString(includePackage = false, includeNames = true)
 class RepositoryXO
 {
-  @NotBlank
+  @Pattern(
+      regexp = /^[a-zA-Z0-9\-\.]{1}[a-zA-Z0-9_\-\.]*$/,
+      message = 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed'
+  )
+  @NotEmpty
+  @UniqueRepositoryName(groups = Create)
   String name
 
   String type

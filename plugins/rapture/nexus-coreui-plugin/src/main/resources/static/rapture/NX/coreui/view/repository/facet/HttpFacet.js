@@ -48,7 +48,7 @@ Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
         items: [
           {
             xtype: 'combo',
-            name: 'httpclient.authentication.type',
+            name: 'attributes.httpclient.authentication.type',
             fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_AUTHENTICATION_TYPE'),
             store: [
               ['username', NX.I18n.get('ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_USERNAME')],
@@ -62,13 +62,13 @@ Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
           },
           {
             xtype:'textfield',
-            name: 'httpclient.authentication.username',
+            name: 'attributes.httpclient.authentication.username',
             fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_USERNAME'),
             allowBlank: false
           },
           {
             xtype: 'nx-password',
-            name: 'httpclient.authentication.password',
+            name: 'attributes.httpclient.authentication.password',
             fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_PASSWORD')
           },
           {
@@ -78,12 +78,12 @@ Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
             items:[
               {
                 xtype:'textfield',
-                name: 'httpclient.authentication.ntlmHost',
+                name: 'attributes.httpclient.authentication.ntlmHost',
                 fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_HOST')
               },
               {
                 xtype:'textfield',
-                name: 'httpclient.authentication.ntlmDomain',
+                name: 'attributes.httpclient.authentication.ntlmDomain',
                 fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_DOMAIN')
               }
             ]
@@ -99,19 +99,19 @@ Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
         items: [
           {
             xtype: 'textfield',
-            name: 'httpclient.connection.userAgentCustomisation',
+            name: 'attributes.httpclient.connection.userAgentCustomisation',
             fieldLabel: NX.I18n.get('ADMIN_HTTP_CUSTOMIZATION'),
             helpText: NX.I18n.get('ADMIN_HTTP_CUSTOMIZATION_HELP')
           },
           {
             xtype: 'textfield',
-            name: 'httpclient.connection.urlParameters',
+            name: 'attributes.httpclient.connection.urlParameters',
             fieldLabel: NX.I18n.get('ADMIN_HTTP_PARAMETERS'),
             helpText: NX.I18n.get('ADMIN_HTTP_PARAMETERS_HELP')
           },
           {
             xtype: 'numberfield',
-            name: 'httpclient.connection.retries',
+            name: 'attributes.httpclient.connection.retries',
             fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES'),
             helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES_HELP'),
             allowDecimals: false,
@@ -121,7 +121,7 @@ Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
           },
           {
             xtype: 'numberfield',
-            name: 'httpclient.connection.timeout',
+            name: 'attributes.httpclient.connection.timeout',
             fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT'),
             helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT_HELP'),
             allowDecimals: false,

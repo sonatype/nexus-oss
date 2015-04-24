@@ -12,17 +12,20 @@
  */
 package org.sonatype.nexus.extdirect.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.ElementKind;
 import javax.validation.Path.Node;
 
 import org.sonatype.nexus.validation.ValidationMessage;
 import org.sonatype.nexus.validation.ValidationResponseException;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -63,12 +66,17 @@ public class ValidationResponse
     Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
     if (violations != null && violations.size() > 0) {
       for (ConstraintViolation<?> violation : violations) {
-        String key = null;
-        // iterate path to get the property name from leaf
+        List<String> entries = new ArrayList<>();
+        // iterate path to get the full path
         for (Node node : violation.getPropertyPath()) {
-          key = node.getName();
+          if (ElementKind.PROPERTY == node.getKind()) {
+            if (node.getKey() != null) {
+              entries.add(node.getKey().toString());
+            }
+            entries.add(node.getName());
+          }
         }
-        if (key == null || key.trim().isEmpty()) {
+        if (entries.isEmpty()) {
           if (messages == null) {
             messages = Lists.newArrayList();
           }
@@ -78,7 +86,7 @@ public class ValidationResponse
           if (errors == null) {
             errors = Maps.newHashMap();
           }
-          errors.put(key, violation.getMessage());
+          errors.put(Joiner.on('.').join(entries), violation.getMessage());
         }
       }
     }

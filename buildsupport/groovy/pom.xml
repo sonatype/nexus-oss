@@ -29,6 +29,7 @@
 
   <properties>
     <groovy.version>2.3.7</groovy.version>
+    <spock.version>1.0-groovy-2.3</spock.version>
   </properties>
 
   <!--
@@ -50,6 +51,18 @@
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy</artifactId>
         <version>${groovy.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.spockframework</groupId>
+        <artifactId>spock-core</artifactId>
+        <version>${spock.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.spockframework</groupId>
+        <artifactId>spock-guice</artifactId>
+        <version>${spock.version}</version>
       </dependency>
 
     </dependencies>
