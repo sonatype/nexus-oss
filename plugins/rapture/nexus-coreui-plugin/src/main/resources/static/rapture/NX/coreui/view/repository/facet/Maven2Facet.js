@@ -53,20 +53,6 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
         readOnly: true
       },
       {
-        xtype: 'combo',
-        name: 'attributes.maven.checksumPolicy',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM'),
-        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_PLACEHOLDER'),
-        editable: false,
-        store: [
-          ['IGNORE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_IGNORE_ITEM')],
-          ['WARN', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_WARN_ITEM')],
-          ['STRICT_IF_EXISTS', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_EXISTS_ITEM')],
-          ['STRICT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_STRICT_ITEM')]
-        ],
-        value: 'STRICT'
-      },
-      {
         xtype: 'checkbox',
         name: 'attributes.maven.strictContentTypeValidation',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION'),

@@ -231,7 +231,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_MEMBERS_FROM: 'Available',
     ADMIN_REPOSITORIES_SETTINGS_MEMBERS_TO: 'Members',
     ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT: 'Deployment policy',
-    ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP: 'Controls if deployments and/or updates to artifacts are allowed',
+    ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP: 'Controls if deployments of and updates to artifacts are allowed',
     ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_PLACEHOLDER: 'Select a policy',
     ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_ALLOW_ITEM: 'Allow redeploy',
     ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_DISABLE_ITEM: 'Disable redeploy',

@@ -47,7 +47,6 @@
     <module>capabilities</module>
     <module>internal</module>
     <module>rapture</module>
-    <module>osgi</module>
     <module>p2</module>
     <module>security</module>
     <module>yum</module>
@@ -165,14 +164,6 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-ssl-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <!-- obr -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-obr-plugin</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
