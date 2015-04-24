@@ -21,7 +21,6 @@ import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2GroupRecipe
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2HostedRecipe
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2ProxyRecipe
-import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy
 import org.sonatype.nexus.repository.storage.WritePolicy
 
@@ -50,7 +49,6 @@ class MavenDefaultRepositoriesContributor
             [
                 maven  : [
                     versionPolicy              : VersionPolicy.RELEASE.toString(),
-                    checksumPolicy             : ChecksumPolicy.STRICT.toString(),
                     strictContentTypeValidation: false
                 ],
                 storage: [
@@ -63,7 +61,6 @@ class MavenDefaultRepositoriesContributor
             [
                 maven  : [
                     versionPolicy              : VersionPolicy.SNAPSHOT.toString(),
-                    checksumPolicy             : ChecksumPolicy.STRICT.toString(),
                     strictContentTypeValidation: false
                 ],
                 storage: [
@@ -75,7 +72,6 @@ class MavenDefaultRepositoriesContributor
             [
                 maven     : [
                     versionPolicy              : VersionPolicy.RELEASE.toString(),
-                    checksumPolicy             : ChecksumPolicy.WARN.toString(),
                     strictContentTypeValidation: false
                 ],
                 proxy     : [
@@ -97,7 +93,6 @@ class MavenDefaultRepositoriesContributor
             [
                 maven  : [
                     versionPolicy              : VersionPolicy.MIXED.toString(),
-                    checksumPolicy             : ChecksumPolicy.WARN.toString(),
                     strictContentTypeValidation: false
                 ],
                 storage: [

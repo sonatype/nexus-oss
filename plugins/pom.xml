@@ -47,7 +47,6 @@
     <module>capabilities</module>
     <module>internal</module>
     <module>rapture</module>
-    <module>osgi</module>
     <module>security</module>
     <module>yum</module>
   </modules>
@@ -167,15 +166,6 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- obr -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-obr-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-
       <!-- quartz -->
 
       <dependency>
@@ -221,14 +211,6 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-siesta-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <!-- site -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-site-repository-plugin</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
