@@ -1020,11 +1020,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     NUGET_APIKEY_INSTRUCTIONS : 'A new API Key will be created the first time it is accessed. Resetting your API Key will invalidate the current key.',
     NUGET_APIKEY_ACCESS_BUTTON: 'Access API Key',
     NUGET_APIKEY_RESET_BUTTON: 'Reset API Key',
-
-
-    // Field validation messages
-    NAME_VALIDATION_MESSAGE: 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed'
-
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);
