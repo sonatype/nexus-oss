@@ -42,7 +42,6 @@
     <module>metrics</module>
     <module>osgi</module>
     <module>other</module>
-    <module>plexus</module>
     <module>rest</module>
     <module>shiro</module>
     <module>testing</module>
