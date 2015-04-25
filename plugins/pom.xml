@@ -48,7 +48,6 @@
     <module>internal</module>
     <module>rapture</module>
     <module>security</module>
-    <module>yum</module>
   </modules>
 
   <dependencyManagement>
