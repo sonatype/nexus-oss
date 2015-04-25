@@ -10,15 +10,40 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.events;
+package org.sonatype.nexus.events;
 
-/**
- * The event that is fired as last step of nexus initialization process.
- */
-public class NexusInitializedEvent
-    extends NexusStateChangeEvent
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+// FIXME: Remove event veto concept
+
+@Deprecated
+public class AbstractVetoableEvent<T>
 {
-  public NexusInitializedEvent(Object sender) {
-    super(sender);
+  private final ArrayList<Veto> vetos = new ArrayList<Veto>();
+
+  public AbstractVetoableEvent(T component) {
   }
+
+  public List<Veto> getVetos() {
+    return Collections.unmodifiableList(vetos);
+  }
+
+  public boolean isVetoed() {
+    return !vetos.isEmpty();
+  }
+
+  public void putVeto(Veto veto) {
+    vetos.add(veto);
+  }
+
+  public void putVeto(Object vetoer, Throwable reason) {
+    vetos.add(new Veto(vetoer, reason));
+  }
+
+  public boolean removeVeto(Veto veto) {
+    return vetos.remove(veto);
+  }
+
 }
