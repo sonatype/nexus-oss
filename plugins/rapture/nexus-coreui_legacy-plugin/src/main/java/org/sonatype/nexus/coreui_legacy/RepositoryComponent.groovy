@@ -63,7 +63,6 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory
 import org.sonatype.nexus.rapture.TrustStoreKeys
 import org.sonatype.nexus.scheduling.TaskConfiguration
 import org.sonatype.nexus.scheduling.TaskScheduler
-import org.sonatype.nexus.tasks.ExpireCacheTask
 import org.sonatype.nexus.templates.TemplateManager
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
 import org.sonatype.nexus.templates.repository.RepositoryTemplate
@@ -384,22 +383,6 @@ extends DirectComponentSupport
   @Validate
   void remove(final @NotEmpty(message = '[id] may not be empty') String id) {
     nexusConfiguration.deleteRepository(id)
-  }
-
-  @DirectMethod
-  @RequiresAuthentication
-  @RequiresPermissions('nexus:cache:delete')
-  @Validate
-  void clearCache(final @NotEmpty(message = '[id] may not be empty') String id,
-                  final String path)
-  {
-    // validate repository id
-    protectedRepositoryRegistry.getRepository(id)
-    TaskConfiguration taskConfiguration = nexusScheduler.createTaskConfigurationInstance(ExpireCacheTask)
-    taskConfiguration.setRepositoryId(id)
-    taskConfiguration.setPath(path)
-    taskConfiguration.setName("Clear cache ${id}:${path}")
-    nexusScheduler.submit(taskConfiguration)
   }
 
   /**
