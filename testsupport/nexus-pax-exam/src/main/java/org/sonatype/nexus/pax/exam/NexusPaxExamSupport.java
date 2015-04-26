@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.configuration.ApplicationDirectories;
+import org.sonatype.nexus.ApplicationDirectories;
 import org.sonatype.nexus.events.EventSubscriberHost;
 import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
