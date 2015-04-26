@@ -21,7 +21,7 @@ import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.events.EventSubscriberHost;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.scheduling.TaskScheduler;

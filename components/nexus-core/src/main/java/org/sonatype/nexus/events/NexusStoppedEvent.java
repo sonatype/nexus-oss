@@ -10,20 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.events;
+package org.sonatype.nexus.events;
 
 /**
- * Event fired when Nexus has started to shutdown.
+ * The event that is occured when nexus has been stopped (fired as first step of shutdown process).
  *
- * This event is emitted just prior to {@link NexusStoppedEvent} and should be used only
- * for an early hint that shutdown is going to occur, to stop network connections, etc.
- *
- * @since 2.0
+ * @author cstamas
  */
-public class NexusStoppingEvent
+public class NexusStoppedEvent
     extends NexusStateChangeEvent
 {
-  public NexusStoppingEvent(Object sender) {
+  public NexusStoppedEvent(Object sender) {
     super(sender);
   }
 }

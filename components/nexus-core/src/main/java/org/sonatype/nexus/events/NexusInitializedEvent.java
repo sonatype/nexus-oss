@@ -10,25 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.events;
+package org.sonatype.nexus.events;
 
-public class Veto
+/**
+ * The event that is fired as last step of nexus initialization process.
+ */
+public class NexusInitializedEvent
+    extends NexusStateChangeEvent
 {
-  private final Object vetoer;
-
-  private final Throwable reason;
-
-  public Veto(Object vetoer, Throwable reason) {
-    this.vetoer = vetoer;
-
-    this.reason = reason;
-  }
-
-  public Object getVetoer() {
-    return vetoer;
-  }
-
-  public Throwable getReason() {
-    return reason;
+  public NexusInitializedEvent(Object sender) {
+    super(sender);
   }
 }
