@@ -88,16 +88,16 @@ public class HttpClientFactoryImpl
 
   private void applyConfiguration(final Builder builder, final HttpClientConfig config) {
     // connection/socket timeouts
-    int timeout = 1000;
+    int timeout = 20000; // default 20 seconds
     if (config.getConnection() != null && config.getConnection().getTimeout() != null) {
-      timeout = config.getConnection().getTimeout();
+      timeout = config.getConnection().getTimeout() * 1000;
     }
     builder.getSocketConfigBuilder().setSoTimeout(timeout);
     builder.getRequestConfigBuilder().setConnectTimeout(timeout);
     builder.getRequestConfigBuilder().setSocketTimeout(timeout);
 
     // obey the given retries count and apply it to client.
-    int retries = 0;
+    int retries = 3; // default 3 retries
     if (config.getConnection() != null && config.getConnection().getRetries() != null) {
       retries = config.getConnection().getRetries();
     }
