@@ -55,12 +55,6 @@ class NugetDefaultRepositoriesContributor
                 proxy     : [
                     remoteUrl     : 'http://www.nuget.org/api/v2/',
                     artifactMaxAge: 5
-                ],
-                httpclient: [
-                    connection: [
-                        timeout: 20000,
-                        retries: 2
-                    ]
                 ]
             ]
         ),
