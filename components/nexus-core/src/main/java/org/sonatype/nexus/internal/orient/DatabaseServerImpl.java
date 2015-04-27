@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.ApplicationDirectories;
+import org.sonatype.nexus.ApplicationDirectories;
 import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
 import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.nexus.orient.DatabaseServer;
