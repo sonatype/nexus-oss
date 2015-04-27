@@ -54,7 +54,6 @@ class MavenDefaultRepositoriesContributor
                 storage: [
                     writePolicy: WritePolicy.ALLOW_ONCE.toString()
                 ]
-
             ]
         ),
         new Configuration(repositoryName: DEFAULT_SNAPSHOT_REPO, recipeName: Maven2HostedRecipe.NAME, online: true, attributes:
@@ -77,9 +76,6 @@ class MavenDefaultRepositoriesContributor
                 proxy     : [
                     remoteUrl     : 'https://repo1.maven.org/maven2/',
                     artifactMaxAge: 3600
-                ],
-                storage   : [
-                    writePolicy: WritePolicy.ALLOW.toString()
                 ]
             ]
         ),
@@ -88,9 +84,6 @@ class MavenDefaultRepositoriesContributor
                 maven  : [
                     versionPolicy              : VersionPolicy.MIXED.toString(),
                     strictContentTypeValidation: false
-                ],
-                storage: [
-                    writePolicy: WritePolicy.ALLOW.toString()
                 ],
                 group  : [
                     memberNames: [DEFAULT_RELEASE_REPO, DEFAULT_SNAPSHOT_REPO, DEFAULT_CENTRAL_REPO]
