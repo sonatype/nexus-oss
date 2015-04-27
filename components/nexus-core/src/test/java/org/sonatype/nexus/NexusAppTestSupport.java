@@ -21,15 +21,12 @@ import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.events.EventSubscriberHost;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.security.WebSecurityModule;
 import org.sonatype.nexus.security.subject.FakeAlmightySubject;
-import org.sonatype.nexus.templates.TemplateManager;
-import org.sonatype.nexus.templates.TemplateSet;
-import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -53,8 +50,6 @@ public abstract class NexusAppTestSupport
   private EventBus eventBus;
 
   private ApplicationConfiguration nexusConfiguration;
-
-  private TemplateManager templateManager;
 
   protected boolean runWithSecurityDisabled() {
     return true;
@@ -159,7 +154,6 @@ public abstract class NexusAppTestSupport
     nexusScheduler = lookup(TaskScheduler.class);
     eventSubscriberHost = lookup(EventSubscriberHost.class);
     nexusConfiguration = lookup(ApplicationConfiguration.class);
-    templateManager = lookup(TemplateManager.class);
 
     if (shouldLoadConfigurationOnStartup()) {
       loadConfiguration();
@@ -188,10 +182,6 @@ public abstract class NexusAppTestSupport
 
   protected ApplicationConfiguration nexusConfiguration() {
     return nexusConfiguration;
-  }
-
-  protected TemplateSet getRepositoryTemplates() {
-    return templateManager.getTemplates().getTemplates(RepositoryTemplate.class);
   }
 
   protected void shutDownSecurity() throws Exception {

@@ -19,9 +19,9 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.events.NexusInitializedEvent;
+import org.sonatype.nexus.events.NexusStoppingEvent;
 import org.sonatype.nexus.orient.DatabaseInstance;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmConfigurationStore;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
