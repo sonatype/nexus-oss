@@ -28,7 +28,7 @@ public class EntityId
 {
   private static final long serialVersionUID = 1L;
 
-  private String value;
+  private final String value;
 
   public EntityId(final String value) {
     this.value = checkNotNull(value);
@@ -46,6 +46,10 @@ public class EntityId
     }
 
     EntityId entityId = (EntityId) o;
+
+    if (!(o instanceof EntityId)) {
+      return false;
+    }
 
     if (!getValue().equals(entityId.getValue())) {
       return false;
