@@ -35,4 +35,11 @@ public class GroupType
   public GroupType() {
     super(NAME);
   }
+
+  @Override
+  public Class<?> getValidationGroup() {
+    return ValidationGroup.class;
+  }
+
+  public static interface ValidationGroup {}
 }

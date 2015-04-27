@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
@@ -43,6 +44,8 @@ import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.types.HostedType;
+import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
@@ -118,7 +121,7 @@ public class MavenFacetImpl
   {
     public boolean strictContentTypeValidation = false;
 
-    @NotNull
+    @NotNull(groups = {HostedType.ValidationGroup.class, ProxyType.ValidationGroup.class})
     public VersionPolicy versionPolicy;
 
     @Override
@@ -142,7 +145,9 @@ public class MavenFacetImpl
 
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
-    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class,
+        Default.class, getRepository().getType().getValidationGroup()
+    );
   }
 
   @Override
