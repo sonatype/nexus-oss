@@ -13,13 +13,13 @@
 /*global Ext, NX*/
 
 /**
- * Configuration for repository storage facet.
+ * Configuration for repository storage write policy.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
+Ext.define('NX.coreui.view.repository.facet.StorageFacetHosted', {
   extend: 'Ext.form.FieldContainer',
-  alias: 'widget.nx-coreui-repository-storage-facet',
+  alias: 'widget.nx-coreui-repository-storage-hosted-facet',
   requires: [
     'NX.I18n'
   ],
@@ -36,7 +36,21 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
     var me = this;
 
     me.items = [
-      // TODO add blob store selection
+      {
+        xtype: 'combo',
+        name: 'attributes.storage.writePolicy',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP'),
+        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_PLACEHOLDER'),
+        editable: false,
+        store: [
+          ['ALLOW', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_ALLOW_ITEM')],
+          ['ALLOW_ONCE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_DISABLE_ITEM')],
+          ['DENY', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_RO_ITEM')]
+        ],
+        value: 'ALLOW_ONCE',
+        queryMode: 'local'
+      }
     ];
 
     me.callParent(arguments);
