@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal;
+package org.sonatype.nexus.repository.maven.internal.maven2;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,6 +32,8 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacetImpl;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.maven.internal.MavenFacet;
+import org.sonatype.nexus.repository.maven.internal.MavenPath;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.MetadataEnvelope;
@@ -59,13 +61,13 @@ import org.joda.time.DateTime;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * Maven specific implementation of {@link GroupFacetImpl}.
+ * Maven2 specific implementation of {@link GroupFacetImpl}: metadata merge is specific to Maven2 format.
  *
  * @since 3.0
  */
 @Named
 @Facet.Exposed
-public class MavenGroupFacet
+public class Maven2GroupFacet
     extends GroupFacetImpl
 {
   private final Maven2MetadataMerger metadataMerger;
@@ -73,7 +75,7 @@ public class MavenGroupFacet
   private MavenFacet mavenFacet;
 
   @Inject
-  public MavenGroupFacet(final RepositoryManager repositoryManager) {
+  public Maven2GroupFacet(final RepositoryManager repositoryManager) {
     super(repositoryManager);
     this.metadataMerger = new Maven2MetadataMerger();
   }
