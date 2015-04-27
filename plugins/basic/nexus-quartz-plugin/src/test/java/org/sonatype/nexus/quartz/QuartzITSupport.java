@@ -17,8 +17,8 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.ApplicationDirectories;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.quartz.internal.QuartzSupportImpl;
 import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.web.BaseUrlDetector;
@@ -38,6 +38,7 @@ import org.eclipse.sisu.wire.WireModule;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

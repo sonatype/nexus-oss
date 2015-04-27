@@ -1,9 +1,0 @@
-
-<repositories size="1">
-
-  <repository uri="http://default/test/">
-    <artifact remotePath="/remote1/file1.txt" />
-    <artifact remotePath="/remote1/file2.txt" />
-    <artifact remotePath="/remote1/file3.txt" />
-  </repository>
-</repositories>

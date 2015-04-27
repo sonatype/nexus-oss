@@ -26,6 +26,7 @@ import javax.net.ssl.SSLContext;
 import com.sonatype.nexus.ssl.model.TrustStoreKey;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
+import org.sonatype.nexus.events.NexusStoppedEvent;
 import org.sonatype.nexus.ldap.internal.connector.DefaultLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.FailoverLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.LdapConnector;
@@ -43,7 +44,6 @@ import org.sonatype.nexus.ldap.internal.persist.LdapServerNotFoundException;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Protocol;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.ssl.SSLLdapContextFactory;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

@@ -10,28 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.configuration;
+package org.sonatype.nexus.events;
 
-import org.sonatype.nexus.events.AbstractVetoableEvent;
+// FIXME: Remove event veto concept
 
-/**
- * An event fired on configuration prepare load, when configurable components should apply configs after load. This is
- * a
- * VetoableEvent, so, save may be vetoed.
- *
- * @author cstamas
- */
-public class ConfigurationPrepareForLoadEvent
-    extends AbstractVetoableEvent<ApplicationConfiguration>
+@Deprecated
+public class Veto
 {
-  private final ApplicationConfiguration configuration;
+  private final Object vetoer;
 
-  public ConfigurationPrepareForLoadEvent(ApplicationConfiguration configuration) {
-    super(configuration);
-    this.configuration = configuration;
+  private final Throwable reason;
+
+  public Veto(Object vetoer, Throwable reason) {
+    this.vetoer = vetoer;
+
+    this.reason = reason;
   }
 
-  public ApplicationConfiguration getConfiguration() {
-    return configuration;
+  public Object getVetoer() {
+    return vetoer;
+  }
+
+  public Throwable getReason() {
+    return reason;
   }
 }

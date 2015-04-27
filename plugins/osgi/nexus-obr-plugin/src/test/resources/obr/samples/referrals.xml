@@ -1,8 +1,0 @@
-<repository>
-<referral url='osgi_alliance_obr.zip'/>
-<referral url='broken.xml'/>
-<resource name='foo' version='1' uri='bar'/>
-<referral depth='5' url='level1.xml'/>
-<referral url='missing.xml'/>
-<referral url='sample.xml'/>
-</repository>
