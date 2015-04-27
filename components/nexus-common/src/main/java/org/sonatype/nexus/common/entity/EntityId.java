@@ -45,11 +45,11 @@ public class EntityId
       return true;
     }
 
-    EntityId entityId = (EntityId) o;
-
     if (!(o instanceof EntityId)) {
       return false;
     }
+    
+    EntityId entityId = (EntityId) o;
 
     if (!getValue().equals(entityId.getValue())) {
       return false;
