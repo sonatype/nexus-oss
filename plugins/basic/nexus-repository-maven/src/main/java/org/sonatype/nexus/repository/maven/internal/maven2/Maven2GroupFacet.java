@@ -35,13 +35,11 @@ import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.internal.MavenFacet;
 import org.sonatype.nexus.repository.maven.internal.MavenPath;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
-import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.MetadataEnvelope;
 import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
@@ -158,7 +156,7 @@ public class Maven2GroupFacet
     final Content content = new Content(
         new BytesPayload(
             byteArray,
-            ContentTypes.TEXT_XML
+            Maven2Format.METADATA_CONTENT_TYPE
         ));
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
     content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}");
@@ -175,7 +173,7 @@ public class Maven2GroupFacet
     for (HashType hashType : HashType.values()) {
       final HashCode hashCode = hashCodes.get(hashType.getHashAlgorithm());
       if (hashCode != null) {
-        final Content hashContent = new Content(new StringPayload(hashCode.toString(), ContentTypes.TEXT_PLAIN));
+        final Content hashContent = new Content(new StringPayload(hashCode.toString(), Maven2Format.CHECKSUM_CONTENT_TYPE));
         hashContent.getAttributes().set(Content.CONTENT_LAST_MODIFIED, now);
         mavenFacet.put(mavenPath.hash(hashType), hashContent);
       }
