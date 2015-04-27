@@ -234,7 +234,6 @@ public class MavenFacetImpl
           .group(coordinates.getGroupId())
           .name(coordinates.getArtifactId())
           .version(coordinates.getVersion());
-      component.formatAttributes().set(StorageFacet.P_PATH, path.getPath());
 
       // Set format specific attributes
       final NestedAttributesMap componentAttributes = component.formatAttributes();
