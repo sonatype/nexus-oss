@@ -42,6 +42,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.DateUtils;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -218,6 +219,7 @@ public abstract class ProxyFacetSupport
     if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
       indicateUpToDate(context);
     }
+    HttpClientUtils.closeQuietly(response);
 
     return null;
   }
