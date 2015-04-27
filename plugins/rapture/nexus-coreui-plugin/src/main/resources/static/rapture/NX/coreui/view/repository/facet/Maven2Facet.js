@@ -41,16 +41,17 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
         xtype: 'combo',
         name: 'attributes.maven.versionPolicy',
         itemId: 'versionPolicy',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_HELP'),
-        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_PLACEHOLDER'),
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_HELP'),
+        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_PLACEHOLDER'),
         editable: false,
         store: [
-          ['RELEASE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_RELEASE_ITEM')],
-          ['SNAPSHOT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_SNAPSHOTS_ITEM')]
+          ['RELEASE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_RELEASE_ITEM')],
+          ['SNAPSHOT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_SNAPSHOTS_ITEM')],
+          ['MIXED', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_MIXED_ITEM')]
         ],
         value: 'RELEASE',
-        readOnly: true
+        readOnlyOnUpdate: true
       },
       {
         xtype: 'checkbox',
@@ -59,14 +60,6 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
         value: true
       }
     ];
-    me.listeners = {
-      beforerender: function(component) {
-        var form = component.up('form');
-        if(!Ext.isDefined(form.getForm().getRecord())) {
-          form.down('#versionPolicy').setReadOnly(false);  
-        }
-      }
-    };
 
     me.callParent(arguments);
   }
