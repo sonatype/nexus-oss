@@ -37,7 +37,7 @@ import org.sonatype.nexus.configuration.model.CSmtpConfigurationCoreConfiguratio
 import org.sonatype.nexus.email.EmailerException;
 import org.sonatype.nexus.email.NexusEmailer;
 import org.sonatype.nexus.email.SmtpSessionParametersCustomizer;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.common.SimpleFormat;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

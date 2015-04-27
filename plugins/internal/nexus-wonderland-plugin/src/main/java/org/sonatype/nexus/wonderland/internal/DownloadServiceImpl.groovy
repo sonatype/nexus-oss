@@ -12,17 +12,18 @@
  */
 package org.sonatype.nexus.wonderland.internal
 
-import org.sonatype.nexus.configuration.ApplicationDirectories
-import org.sonatype.nexus.wonderland.AuthTicketService
-import org.sonatype.nexus.wonderland.DownloadService
-import org.sonatype.sisu.goodies.common.ComponentSupport
+import java.nio.file.Files
+import java.text.SimpleDateFormat
+import java.util.concurrent.atomic.AtomicLong
 
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
-import java.nio.file.Files
-import java.text.SimpleDateFormat
-import java.util.concurrent.atomic.AtomicLong
+
+import org.sonatype.nexus.ApplicationDirectories
+import org.sonatype.nexus.wonderland.AuthTicketService
+import org.sonatype.nexus.wonderland.DownloadService
+import org.sonatype.sisu.goodies.common.ComponentSupport
 
 /**
  * Default {@link DownloadService}.

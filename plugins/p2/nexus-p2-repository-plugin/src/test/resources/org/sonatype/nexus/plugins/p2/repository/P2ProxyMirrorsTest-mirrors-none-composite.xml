@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<mirrors>
-  <repository uri="http://default/member1/"/>
-  <repository uri="http://default/member2/"/>
-  <repository uri="http://default/member3/"/>
-</mirrors>
