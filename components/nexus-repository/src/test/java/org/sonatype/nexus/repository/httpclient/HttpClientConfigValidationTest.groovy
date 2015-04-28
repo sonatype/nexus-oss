@@ -45,4 +45,29 @@ class HttpClientConfigValidationTest
     def violation = violations.iterator().next()
     assert violation.propertyPath.toString() == 'authentication.password'
   }
+
+  @Test
+  void 'authentication password with null username'() {
+    def violations = validator.validate(new HttpClientConfig(
+        authentication: new UsernameAuthenticationConfig(
+            username: null,
+            password: 'pass'
+        )
+    ))
+    assert violations.size() == 1
+    def violation = violations.iterator().next()
+    assert violation.propertyPath.toString() == 'authentication.username'
+  }
+  
+  @Test
+  void 'required fields may not be whitespace only'() {
+    def violations = validator.validate(new HttpClientConfig(
+        authentication: new UsernameAuthenticationConfig(
+            username: ' ',
+            password: ' '
+        )
+    ))
+    assert violations.size() == 2
+    assert violations.collect { it.propertyPath.toString() } == ['authentication.password', 'authentication.username']  
+  }
 }
