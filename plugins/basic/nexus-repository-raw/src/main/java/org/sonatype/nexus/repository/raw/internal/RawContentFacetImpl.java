@@ -31,6 +31,7 @@ import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.search.SearchFacet;
+import org.sonatype.nexus.repository.search.SearchItemId;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -217,9 +218,12 @@ public class RawContentFacetImpl
       if (component == null) {
         return false;
       }
+
+      final SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
+      final SearchItemId searchId = searchFacet.identifier(component);
       tx.deleteComponent(component);
-      getRepository().facet(SearchFacet.class).delete(component);
       tx.commit();
+      searchFacet.delete(searchId);
       return true;
     }
   }
