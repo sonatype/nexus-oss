@@ -33,17 +33,8 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.impl.DefaultConnectionReuseStrategy;
-import org.apache.http.impl.NoConnectionReuseStrategy;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.apache.http.params.HttpConnectionParams;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -78,104 +69,6 @@ public class HttpClientFactoryImplTest
     rcs.setConnectionTimeout(1234);
     when(globalRemoteStorageContext.getRemoteConnectionSettings()).thenReturn(rcs);
     when(globalRemoteStorageContext.getRemoteProxySettings()).thenReturn(remoteProxySettings);
-  }
-
-  @Test
-  @Ignore("DefaultHttpClient is not in use anymore")
-  public void sharedInstanceConfigurationTest() {
-    setParameters();
-    try {
-      testSubject = new HttpClientFactoryImpl(
-          Providers.of(systemStatus),
-          Providers.of(globalRemoteStorageContext),
-          eventBus,
-          jmxInstaller,
-          null);
-
-      final HttpClient client = testSubject.create();
-      // Note: shared instance is shared across Nexus instance. It does not features connection pooling as
-      // connections are
-      // never reused intentionally
-
-      // shared client does not reuse connections (no pool)
-      Assert.assertTrue(((DefaultHttpClient) client).getConnectionReuseStrategy() instanceof NoConnectionReuseStrategy);
-      Assert.assertTrue(((DefaultHttpClient) client).getConnectionManager() instanceof PoolingClientConnectionManager);
-
-      // check is all set as needed: retries
-      Assert.assertTrue(
-          ((DefaultHttpClient) client).getHttpRequestRetryHandler() instanceof StandardHttpRequestRetryHandler);
-      Assert.assertEquals(
-          globalRemoteStorageContext.getRemoteConnectionSettings().getRetrievalRetryCount(),
-          ((StandardHttpRequestRetryHandler) ((DefaultHttpClient) client).getHttpRequestRetryHandler())
-              .getRetryCount());
-      Assert.assertEquals(
-          false,
-          ((StandardHttpRequestRetryHandler) ((DefaultHttpClient) client).getHttpRequestRetryHandler())
-              .isRequestSentRetryEnabled());
-
-      // check is all set as needed: everything else
-      Assert.assertEquals(1234L, client.getParams().getLongParameter(ClientPNames.CONN_MANAGER_TIMEOUT, 0));
-      Assert.assertEquals(1234, client.getParams().getIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT, 0));
-      Assert.assertEquals(1234, client.getParams().getIntParameter(HttpConnectionParams.SO_TIMEOUT, 0));
-      Assert.assertEquals(1234, ((PoolingClientConnectionManager) client.getConnectionManager()).getMaxTotal());
-      Assert.assertEquals(1234,
-          ((PoolingClientConnectionManager) client.getConnectionManager()).getDefaultMaxPerRoute());
-    }
-    finally {
-      testSubject.shutdown();
-      unsetParameters();
-    }
-  }
-
-  @Test
-  @Ignore("DefaultHttpClient is not in use anymore")
-  public void createdInstanceConfigurationTest() {
-    setParameters();
-    try {
-      testSubject = new HttpClientFactoryImpl(
-          Providers.of(systemStatus),
-          Providers.of(globalRemoteStorageContext),
-          eventBus,
-          jmxInstaller,
-          null);
-
-      // Note: explicitly created instance (like in case of proxies), it does pool and
-      // returns customized client
-
-      // we will reuse the "global" one, but this case is treated differently anyway by factory
-      final HttpClient client =
-          testSubject.create(new RemoteStorageContextCustomizer(globalRemoteStorageContext));
-      // shared client does reuse connections (does pool)
-      Assert.assertTrue(
-          ((DefaultHttpClient) client).getConnectionReuseStrategy() instanceof DefaultConnectionReuseStrategy);
-      Assert.assertTrue(((DefaultHttpClient) client).getConnectionManager() instanceof PoolingClientConnectionManager);
-
-      // check is all set as needed: retries
-      Assert.assertTrue(
-          ((DefaultHttpClient) client).getHttpRequestRetryHandler() instanceof StandardHttpRequestRetryHandler);
-      Assert.assertEquals(
-          globalRemoteStorageContext.getRemoteConnectionSettings().getRetrievalRetryCount(),
-          ((StandardHttpRequestRetryHandler) ((DefaultHttpClient) client).getHttpRequestRetryHandler())
-              .getRetryCount());
-      Assert.assertEquals(
-          false,
-          ((StandardHttpRequestRetryHandler) ((DefaultHttpClient) client).getHttpRequestRetryHandler())
-              .isRequestSentRetryEnabled());
-
-      // check is all set as needed: everything else
-      Assert.assertEquals(1234L, client.getParams().getLongParameter(ClientPNames.CONN_MANAGER_TIMEOUT, 0));
-      Assert.assertEquals(1234, client.getParams().getIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT, 0));
-      Assert.assertEquals(1234, client.getParams().getIntParameter(HttpConnectionParams.SO_TIMEOUT, 0));
-      final PoolingClientConnectionManager realConnMgr =
-          (PoolingClientConnectionManager) client.getConnectionManager();
-      Assert.assertEquals(1234, realConnMgr.getMaxTotal());
-      Assert.assertEquals(1234, realConnMgr.getDefaultMaxPerRoute());
-      client.getConnectionManager().shutdown();
-    }
-    finally {
-      testSubject.shutdown();
-      unsetParameters();
-    }
   }
 
   @Test
