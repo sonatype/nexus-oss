@@ -15,6 +15,7 @@ package org.sonatype.nexus.capability.validator;
 import org.sonatype.nexus.capability.CapabilityIdentity;
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Validator;
+import org.sonatype.nexus.repository.Type;
 
 import com.google.inject.assistedinject.Assisted;
 
@@ -31,7 +32,7 @@ public interface ValidatorFactory
   PrimaryKeyExcludingSelfValidator uniquePerExcluding(CapabilityIdentity excludeId, CapabilityType type,
                                                       String... propertyKeys);
 
-  RepositoryTypeValidator repositoryOfType(CapabilityType type, String propertyKey, Class<?> facet);
+  RepositoryTypeValidator repositoryOfType(CapabilityType type, String propertyKey, String repositoryType);
 
   /**
    * @since capabilities 2.3

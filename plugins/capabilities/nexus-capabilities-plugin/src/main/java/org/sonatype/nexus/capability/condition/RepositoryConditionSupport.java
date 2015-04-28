@@ -19,10 +19,11 @@ import org.sonatype.nexus.capability.CapabilityContextAware;
 import org.sonatype.nexus.capability.CapabilityEvent;
 import org.sonatype.nexus.capability.CapabilityIdentity;
 import org.sonatype.nexus.capability.support.condition.ConditionSupport;
-import org.sonatype.nexus.capability.support.condition.RepositoryConditions;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.capability.support.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.manager.RepositoryCreatedEvent;
+import org.sonatype.nexus.repository.manager.RepositoryLoadedEvent;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -41,9 +42,9 @@ public abstract class RepositoryConditionSupport
     implements CapabilityContextAware
 {
 
-  private final RepositoryRegistry repositoryRegistry;
+  private final RepositoryManager repositoryManager;
 
-  private final RepositoryConditions.RepositoryId repositoryId;
+  private final RepositoryName repositoryName;
 
   private final ReentrantReadWriteLock bindLock;
 
@@ -52,12 +53,12 @@ public abstract class RepositoryConditionSupport
   private String repositoryBeforeLastUpdate;
 
   public RepositoryConditionSupport(final EventBus eventBus,
-                                    final RepositoryRegistry repositoryRegistry,
-                                    final RepositoryConditions.RepositoryId repositoryId)
+                                    final RepositoryManager repositoryManager,
+                                    final RepositoryName repositoryName)
   {
     super(eventBus, false);
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
-    this.repositoryId = checkNotNull(repositoryId);
+    this.repositoryManager = checkNotNull(repositoryManager);
+    this.repositoryName = checkNotNull(repositoryName);
     bindLock = new ReentrantReadWriteLock();
   }
 
@@ -74,8 +75,8 @@ public abstract class RepositoryConditionSupport
   protected void doBind() {
     try {
       bindLock.writeLock().lock();
-      for (final Repository repository : repositoryRegistry.getRepositories()) {
-        handle(new RepositoryRegistryEventAdd(repositoryRegistry, repository));
+      for (final Repository repository : repositoryManager.browse()) {
+        handle(new RepositoryCreatedEvent(repository));
       }
     }
     finally {
@@ -89,7 +90,7 @@ public abstract class RepositoryConditionSupport
     getEventBus().unregister(this);
   }
 
-  public abstract void handle(final RepositoryRegistryEventAdd event);
+  public abstract void handle(final RepositoryCreatedEvent event);
 
   @Override
   protected void setSatisfied(final boolean satisfied) {
@@ -104,9 +105,15 @@ public abstract class RepositoryConditionSupport
 
   @AllowConcurrentEvents
   @Subscribe
+  public void handle(final RepositoryLoadedEvent event) {
+    handle(new RepositoryCreatedEvent(event.getRepository()));
+  }
+
+  @AllowConcurrentEvents
+  @Subscribe
   public void handle(final CapabilityEvent.BeforeUpdate event) {
     if (event.getReference().context().id().equals(capabilityIdentity)) {
-      repositoryBeforeLastUpdate = getRepositoryId();
+      repositoryBeforeLastUpdate = getRepositoryName();
     }
   }
 
@@ -117,8 +124,8 @@ public abstract class RepositoryConditionSupport
       if (!sameRepositoryAs(repositoryBeforeLastUpdate)) {
         try {
           bindLock.writeLock().lock();
-          for (final Repository repository : repositoryRegistry.getRepositories()) {
-            handle(new RepositoryRegistryEventAdd(repositoryRegistry, repository));
+          for (final Repository repository : repositoryManager.browse()) {
+            handle(new RepositoryCreatedEvent(repository));
           }
         }
         finally {
@@ -129,17 +136,17 @@ public abstract class RepositoryConditionSupport
   }
 
   /**
-   * Checks that condition is about the passed in repository id.
+   * Checks that condition is about the passed in repository name.
    *
-   * @param repositoryId to check
-   * @return true, if condition repository matches the specified repository id
+   * @param repositoryName to check
+   * @return true, if condition repository matches the specified repository name
    */
-  protected boolean sameRepositoryAs(final String repositoryId) {
-    return repositoryId != null && repositoryId.equals(getRepositoryId());
+  protected boolean sameRepositoryAs(final String repositoryName) {
+    return repositoryName != null && repositoryName.equals(getRepositoryName());
   }
 
-  protected String getRepositoryId() {
-    return repositoryId.get();
+  protected String getRepositoryName() {
+    return repositoryName.get();
   }
 
 }

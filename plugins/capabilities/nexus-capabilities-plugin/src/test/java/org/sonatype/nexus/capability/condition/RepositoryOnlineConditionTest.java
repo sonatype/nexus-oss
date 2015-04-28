@@ -12,14 +12,16 @@
  */
 package org.sonatype.nexus.capability.condition;
 
+import java.util.Collections;
+
 import org.sonatype.nexus.capability.EventBusTestSupport;
-import org.sonatype.nexus.capability.support.condition.RepositoryConditions;
-import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.capability.support.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.manager.RepositoryCreatedEvent;
+import org.sonatype.nexus.repository.manager.RepositoryDeletedEvent;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.manager.RepositoryUpdatedEvent;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,11 +34,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link RepositoryLocalStatusCondition} UTs.
+ * {@link RepositoryOnlineCondition} UTs.
  *
  * @since capabilities 2.0
  */
-public class RepositoryLocalStatusConditionTest
+public class RepositoryOnlineConditionTest
     extends EventBusTestSupport
 {
 
@@ -46,30 +48,34 @@ public class RepositoryLocalStatusConditionTest
   private Repository repository;
 
   @Mock
-  private RepositoryRegistry repositoryRegistry;
+  private Configuration configuration;
 
-  private RepositoryLocalStatusCondition underTest;
+  @Mock
+  private RepositoryManager repositoryManager;
+
+  private RepositoryOnlineCondition underTest;
 
   @Before
   public final void setUpRepositoryLocalStatusCondition()
       throws Exception
   {
-    final RepositoryConditions.RepositoryId repositoryId = mock(RepositoryConditions.RepositoryId.class);
-    when(repositoryId.get()).thenReturn(TEST_REPOSITORY);
+    when(repositoryManager.browse()).thenReturn(Collections.<Repository>emptyList());
 
-    when(repository.getId()).thenReturn(TEST_REPOSITORY);
-    when(repository.getLocalStatus()).thenReturn(LocalStatus.IN_SERVICE);
+    final RepositoryName repositoryName = mock(RepositoryName.class);
+    when(repositoryName.get()).thenReturn(TEST_REPOSITORY);
 
-    underTest = new RepositoryLocalStatusCondition(
-        eventBus, repositoryRegistry, LocalStatus.IN_SERVICE, repositoryId
-    );
+    when(repository.getName()).thenReturn(TEST_REPOSITORY);
+    when(repository.getConfiguration()).thenReturn(configuration);
+    when(configuration.isOnline()).thenReturn(true);
+
+    underTest = new RepositoryOnlineCondition(eventBus, repositoryManager, repositoryName);
     underTest.bind();
 
     verify(eventBus).register(underTest);
 
     assertThat(underTest.isSatisfied(), is(false));
 
-    underTest.handle(new RepositoryRegistryEventAdd(repositoryRegistry, repository));
+    underTest.handle(new RepositoryCreatedEvent(repository));
   }
 
   /**
@@ -79,10 +85,8 @@ public class RepositoryLocalStatusConditionTest
   public void unsatisfiedWhenRepositoryIsOutOfService() {
     assertThat(underTest.isSatisfied(), is(true));
 
-    when(repository.getLocalStatus()).thenReturn(LocalStatus.OUT_OF_SERVICE);
-    RepositoryConfigurationUpdatedEvent event = new RepositoryConfigurationUpdatedEvent(repository);
-    event.setLocalStatusChanged(true);
-    underTest.handle(event);
+    when(configuration.isOnline()).thenReturn(false);
+    underTest.handle(new RepositoryUpdatedEvent(repository));
     assertThat(underTest.isSatisfied(), is(false));
 
     verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest));
@@ -95,13 +99,11 @@ public class RepositoryLocalStatusConditionTest
   public void satisfiedWhenRepositoryIsBackToService() {
     assertThat(underTest.isSatisfied(), is(true));
 
-    when(repository.getLocalStatus()).thenReturn(LocalStatus.OUT_OF_SERVICE);
-    RepositoryConfigurationUpdatedEvent event = new RepositoryConfigurationUpdatedEvent(repository);
-    event.setLocalStatusChanged(true);
-    underTest.handle(event);
+    when(configuration.isOnline()).thenReturn(false);
+    underTest.handle(new RepositoryUpdatedEvent(repository));
 
-    when(repository.getLocalStatus()).thenReturn(LocalStatus.IN_SERVICE);
-    underTest.handle(event);
+    when(configuration.isOnline()).thenReturn(true);
+    underTest.handle(new RepositoryUpdatedEvent(repository));
     assertThat(underTest.isSatisfied(), is(true));
 
     verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest), satisfied(underTest));
@@ -114,7 +116,7 @@ public class RepositoryLocalStatusConditionTest
   public void unsatisfiedWhenRepositoryIsRemoved() {
     assertThat(underTest.isSatisfied(), is(true));
 
-    underTest.handle(new RepositoryRegistryEventRemove(repositoryRegistry, repository));
+    underTest.handle(new RepositoryDeletedEvent(repository));
     assertThat(underTest.isSatisfied(), is(false));
 
     verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest));

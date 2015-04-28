@@ -22,7 +22,7 @@ import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
 import org.sonatype.nexus.capability.support.condition.Conditions;
-import org.sonatype.nexus.capability.support.condition.RepositoryConditions;
+import org.sonatype.nexus.capability.support.condition.RepositoryConditions.RepositoryName;
 
 import static org.sonatype.nexus.capability.Tag.repositoryTag;
 import static org.sonatype.nexus.capability.Tag.tags;
@@ -44,7 +44,7 @@ public class RepositoryIsInServiceCapability
   @Override
   public Condition activationCondition() {
     return conditions.logical().and(
-        conditions.repository().repositoryIsInService(new RepositoryConditions.RepositoryId()
+        conditions.repository().repositoryIsOnline(new RepositoryName()
         {
           @Override
           public String get() {
@@ -57,7 +57,7 @@ public class RepositoryIsInServiceCapability
 
   @Override
   public Condition validityCondition() {
-    return conditions.repository().repositoryExists(new RepositoryConditions.RepositoryId()
+    return conditions.repository().repositoryExists(new RepositoryName()
     {
       @Override
       public String get() {

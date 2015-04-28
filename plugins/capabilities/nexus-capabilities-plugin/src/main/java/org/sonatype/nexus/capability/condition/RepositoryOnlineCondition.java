@@ -16,21 +16,22 @@ import org.sonatype.nexus.capability.support.condition.RepositoryConditions.Repo
 import org.sonatype.nexus.repository.manager.RepositoryCreatedEvent;
 import org.sonatype.nexus.repository.manager.RepositoryDeletedEvent;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.manager.RepositoryUpdatedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
- * A condition that is satisfied when a repository exists.
+ * A condition that is satisfied when a repository is online.
  *
  * @since capabilities 2.0
  */
-public class RepositoryExistsCondition
+public class RepositoryOnlineCondition
     extends RepositoryConditionSupport
 {
 
-  public RepositoryExistsCondition(final EventBus eventBus,
+  public RepositoryOnlineCondition(final EventBus eventBus,
                                    final RepositoryManager repositoryManager,
                                    final RepositoryName repositoryName)
   {
@@ -42,7 +43,15 @@ public class RepositoryExistsCondition
   @Subscribe
   public void handle(final RepositoryCreatedEvent event) {
     if (sameRepositoryAs(event.getRepository().getName())) {
-      setSatisfied(true);
+      setSatisfied(event.getRepository().getConfiguration().isOnline());
+    }
+  }
+
+  @AllowConcurrentEvents
+  @Subscribe
+  public void handle(final RepositoryUpdatedEvent event) {
+    if (sameRepositoryAs(event.getRepository().getName())) {
+      setSatisfied(event.getRepository().getConfiguration().isOnline());
     }
   }
 
@@ -58,10 +67,10 @@ public class RepositoryExistsCondition
   public String toString() {
     try {
       final String repositoryName = getRepositoryName();
-      return String.format("Repository '%s' exists", repositoryName);
+      return String.format("Repository '%s' is online", repositoryName);
     }
     catch (Exception ignore) {
-      return "Repository '(could not be evaluated)' exists";
+      return String.format("Repository '(could not be evaluated)' is online");
     }
   }
 
@@ -69,10 +78,10 @@ public class RepositoryExistsCondition
   public String explainSatisfied() {
     try {
       final String repositoryName = getRepositoryName();
-      return String.format("Repository '%s' exists", repositoryName);
+      return String.format("Repository '%s' is online", repositoryName);
     }
     catch (Exception ignore) {
-      return "Repository '(could not be evaluated)' exists";
+      return String.format("Repository '(could not be evaluated)' is online");
     }
   }
 
@@ -80,10 +89,10 @@ public class RepositoryExistsCondition
   public String explainUnsatisfied() {
     try {
       final String repositoryName = getRepositoryName();
-      return String.format("Repository '%s' does not exist", repositoryName);
+      return String.format("Repository '%s' is offline", repositoryName);
     }
     catch (Exception ignore) {
-      return "Repository '(could not be evaluated)' does not exist";
+      return String.format("Repository '(could not be evaluated)' is offline");
     }
   }
 

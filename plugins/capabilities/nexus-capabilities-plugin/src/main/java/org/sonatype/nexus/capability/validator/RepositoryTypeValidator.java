@@ -24,9 +24,8 @@ import org.sonatype.nexus.capability.ValidationResult;
 import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.ValidatorSupport;
 import org.sonatype.nexus.capability.support.validator.DefaultValidationResult;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
 
 import com.google.inject.assistedinject.Assisted;
 
@@ -43,37 +42,35 @@ public class RepositoryTypeValidator
     implements Validator
 {
 
-  private final RepositoryRegistry repositoryRegistry;
+  private final RepositoryManager repositoryManager;
 
   private final String propertyKey;
 
-  private final Class<?> facet;
+  private final String repositoryType;
 
   @Inject
-  RepositoryTypeValidator(final RepositoryRegistry repositoryRegistry,
+  RepositoryTypeValidator(final RepositoryManager repositoryManager,
                           final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
                           final @Assisted CapabilityType type,
                           final @Assisted String propertyKey,
-                          final @Assisted Class<?> facet)
+                          final @Assisted String repositoryType)
   {
     super(capabilityDescriptorRegistryProvider, type);
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.repositoryManager = checkNotNull(repositoryManager);
     this.propertyKey = checkNotNull(propertyKey);
-    this.facet = checkNotNull(facet);
+    this.repositoryType = checkNotNull(repositoryType);
   }
 
   @Override
   public ValidationResult validate(final Map<String, String> properties) {
-    String repositoryId = properties.get(propertyKey);
-    if (repositoryId != null) {
-      try {
-        final Repository repository = repositoryRegistry.getRepository(repositoryId);
-        if (!repository.getRepositoryKind().isFacetAvailable(facet)) {
-          return new DefaultValidationResult().add(propertyKey, buildMessage(repository));
-        }
+    String repositoryName = properties.get(propertyKey);
+    if (repositoryName != null) {
+      Repository repository = repositoryManager.get(repositoryName);
+      if (repository == null) {
+        return new DefaultValidationResult().add(propertyKey, buildMessage(repositoryName));
       }
-      catch (NoSuchRepositoryException ignore) {
-        // ignore
+      if (!repositoryType.equals(repository.getType().getValue())) {
+        return new DefaultValidationResult().add(propertyKey, buildMessage(repository));
       }
     }
     return ValidationResult.VALID;
@@ -82,14 +79,14 @@ public class RepositoryTypeValidator
   @Override
   public String explainValid() {
     final StringBuilder message = new StringBuilder();
-    message.append(propertyName(propertyKey)).append(" is a ").append(facetName()).append(" repository");
+    message.append(propertyName(propertyKey)).append(" is a ").append(repositoryType).append(" repository");
     return message.toString();
   }
 
   @Override
   public String explainInvalid() {
     final StringBuilder message = new StringBuilder();
-    message.append(propertyName(propertyKey)).append(" is not a ").append(facetName())
+    message.append(propertyName(propertyKey)).append(" is not a ").append(repositoryType)
         .append(" repository");
     return message.toString();
 
@@ -99,12 +96,15 @@ public class RepositoryTypeValidator
     final StringBuilder message = new StringBuilder();
     message.append("Selected ").append(propertyName(propertyKey).toLowerCase())
         .append(" '").append(repository.getName())
-        .append("' must be a ").append(facetName()).append(" repository");
+        .append("' must be a ").append(repositoryType).append(" repository");
     return message.toString();
   }
 
-  private Object facetName() {
-    return facet.getSimpleName().toLowerCase().replace("repository", "");
+  private String buildMessage(final String repositoryName) {
+    final StringBuilder message = new StringBuilder();
+    message.append("Selected ").append(propertyName(propertyKey).toLowerCase())
+        .append(" '").append(repositoryName).append("' could not be found");
+    return message.toString();
   }
 
 }
