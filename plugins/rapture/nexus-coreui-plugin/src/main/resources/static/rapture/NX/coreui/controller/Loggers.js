@@ -223,11 +223,11 @@ Ext.define('NX.coreui.controller.Loggers', {
 
   /**
    * @protected
-   * Enable 'New' when user has 'create' permission.
+   * Enable 'New' when user has 'update' permission.
    */
   bindNewButton: function (button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:logconfig', 'create'),
+        NX.Conditions.isPermitted('nexus:logconfig', 'update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -243,7 +243,7 @@ Ext.define('NX.coreui.controller.Loggers', {
   bindDeleteButton: function (button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:logconfig', 'delete'),
+            NX.Conditions.isPermitted('nexus:logconfig', 'update'),
             NX.Conditions.gridHasSelection('nx-coreui-logger-list', function (model) {
               return model.get('name') !== 'ROOT';
             })
