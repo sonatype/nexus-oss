@@ -174,7 +174,7 @@ public abstract class EntityAdapter<T extends Entity>
     checkNotNull(entity);
 
     // new entity must not already have metadata
-    checkState(entity.getEntityMetadata() == null);
+    checkState(!entity.isPersisted());
 
     ODocument doc = db.newInstance(typeName);
     return writeEntity(doc, entity);
@@ -309,7 +309,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Return record identity of entity.
    */
-  protected ORID recordIdentity(final T entity) {
+  public ORID recordIdentity(final T entity) {
     return recordIdentity(id(entity));
   }
 

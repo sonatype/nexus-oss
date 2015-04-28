@@ -750,4 +750,14 @@ public class StorageFacetImplIT
   private static class MidTransactionException
       extends Exception
   {}
+
+  @Test
+  public void dependentQueryFromNewComponent() throws Exception{
+    try(StorageTx tx = underTest.openTx()){
+      final Component component = tx.createComponent(tx.getBucket(),testFormat).name("component");
+      tx.saveComponent(component);
+
+      final Iterable<Asset> assets = tx.browseAssets(component);
+    }
+  }
 }
