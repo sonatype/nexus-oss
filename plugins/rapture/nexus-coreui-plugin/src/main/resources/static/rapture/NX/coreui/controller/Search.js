@@ -348,6 +348,7 @@ Ext.define('NX.coreui.controller.Search', {
     searchCriteriaPanel.add({
       xtype: 'button',
       itemId: 'addButton',
+      margin: '36px 0 0 0',
       text: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_MORE_BUTTON'),
       glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
       menu: addCriteriaMenu

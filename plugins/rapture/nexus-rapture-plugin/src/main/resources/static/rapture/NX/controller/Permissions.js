@@ -104,7 +104,7 @@ Ext.define('NX.controller.Permissions', {
 
     me.getPermissionStore().clearFilter();
     me.getPermissionStore().each(function (rec) {
-      perms[rec.get('id')] = rec.get('value');
+      perms[rec.get('id')] = rec.get('permitted');
     });
 
     return perms;

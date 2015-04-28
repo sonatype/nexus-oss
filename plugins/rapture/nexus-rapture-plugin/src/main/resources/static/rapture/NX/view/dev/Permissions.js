@@ -34,7 +34,19 @@ Ext.define('NX.view.dev.Permissions', {
   },
 
   columns: [
-    { text: 'permission', dataIndex: 'id', flex: 1, editor: { xtype: 'textfield', allowBlank: false } }
+    { text: 'permission', dataIndex: 'id', flex: 1, editor: { xtype: 'textfield', allowBlank: false } },
+    {
+      xtype: 'nx-iconcolumn',
+      text: 'Permitted',
+      dataIndex: 'permitted',
+      width: 80,
+      align: 'center',
+      editor: 'checkbox',
+      iconVariant: 'x16',
+      iconName: function (value) {
+        return value ? 'permission-granted' : 'permission-denied';
+      }
+    }
   ],
 
   plugins: [
@@ -45,30 +57,5 @@ Ext.define('NX.view.dev.Permissions', {
   tbar: [
     { xtype: 'button', text: 'Add', action: 'add' },
     { xtype: 'button', text: 'Delete', action: 'delete', disabled: true }
-  ],
-
-  /**
-   * @protected
-   */
-  initComponent: function () {
-    var me = this;
-
-    // Add columns for each major permission
-    Ext.each(['CREATE', 'READ', 'UPDATE', 'DELETE'], function (perm) {
-      me.columns.push({
-        xtype: 'nx-iconcolumn',
-        text: perm,
-        dataIndex: perm.toLowerCase(),
-        width: 80,
-        align: 'center',
-        editor: 'checkbox',
-        iconVariant: 'x16',
-        iconName: function (value) {
-          return value ? 'permission-granted' : 'permission-denied';
-        }
-      });
-    });
-
-    me.callParent();
-  }
+  ]
 });

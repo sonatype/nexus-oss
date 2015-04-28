@@ -13,14 +13,19 @@
 package org.sonatype.nexus.rapture.internal.ui
 
 import groovy.transform.ToString
+import org.apache.shiro.authz.permission.WildcardPermission
 
 /**
- * Permission exchange object.
+ * Security related utilities.
  *
  * @since 3.0
  */
-@ToString(includePackage = false, includeNames = true)
-class PermissionXO
+class SecurityUtils
 {
-  String id
+  /**
+   * Access to protected {@link WildcardPermission#getParts()}.
+   */
+  static List<Set<String>> getParts(final WildcardPermission permission) {
+    return permission.parts
+  }
 }
