@@ -68,13 +68,19 @@ Ext.define('NX.Permissions', {
    * @returns {boolean} True if user is authorized for expected permission.
    */
   check: function(name, perm) {
-    var me = this;
+    var me = this,
+        hasPermission = false;
 
     if (!me.available()) {
       return false;
     }
 
-    return me.permissions[name + ':' + perm] === true;
+    hasPermission = me.permissions[name + ':' + perm] === true;
+    if (!hasPermission) {
+      hasPermission = me.permissions[name + ':*'] === true;
+    }
+
+    return hasPermission;
   },
 
   /**
