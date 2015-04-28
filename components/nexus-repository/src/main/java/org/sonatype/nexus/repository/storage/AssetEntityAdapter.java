@@ -137,10 +137,10 @@ public class AssetEntityAdapter
 
   Iterable<Asset> browseByComponent(final ODatabaseDocumentTx db, final Component component) {
     checkNotNull(component);
-    checkState(component.getEntityMetadata() != null);
+    checkState(component.isPersisted());
 
     Map<String, Object> parameters = ImmutableMap.<String, Object>of(
-        "component", componentEntityAdapter.decode(component.getEntityMetadata().getId())
+        "component", componentEntityAdapter.recordIdentity(component)
     );
     String query = String.format("select from %s where component = :component", DB_CLASS);
     Iterable<ODocument> docs = db.command(new OCommandSQL(query)).execute(parameters);
