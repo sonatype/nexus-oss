@@ -68,6 +68,6 @@ class HttpClientConfigValidationTest
         )
     ))
     assert violations.size() == 2
-    assert violations.collect { it.propertyPath.toString() } == ['authentication.password', 'authentication.username']  
+    assert violations.collect { it.propertyPath.toString() }.sort() == ['authentication.password', 'authentication.username']  
   }
 }
