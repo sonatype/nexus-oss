@@ -34,15 +34,12 @@ class HttpClientConfigValidationTest
   }
 
   @Test
-  void 'authentication username with null password'() {
+  void 'authentication with null username'() {
     def violations = validator.validate(new HttpClientConfig(
-        authentication: new UsernameAuthenticationConfig(
-            username: 'admin',
-            password: null
-        )
+        authentication: new UsernameAuthenticationConfig()
     ))
     assert violations.size() == 1
     def violation = violations.iterator().next()
-    assert violation.propertyPath.toString() == 'authentication.password'
+    assert violation.propertyPath.toString() == 'authentication.username'
   }
 }

@@ -38,7 +38,7 @@ public class NtlmAuthenticationConfig
   @NotEmpty
   private String username;
 
-  @NotEmpty
+  @Nullable
   private String password;
 
   @Nullable

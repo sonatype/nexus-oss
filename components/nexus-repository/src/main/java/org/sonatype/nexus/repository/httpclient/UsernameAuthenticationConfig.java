@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.httpclient;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.common.text.Strings2;
 
 import com.google.common.collect.Lists;
@@ -35,7 +37,7 @@ public class UsernameAuthenticationConfig
   @NotEmpty
   private String username;
 
-  @NotEmpty
+  @Nullable
   private String password;
 
   public UsernameAuthenticationConfig() {
