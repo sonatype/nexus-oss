@@ -31,6 +31,8 @@ public abstract class Type
     return value;
   }
 
+  public abstract Class<?> getValidationGroup();
+
   @Override
   public boolean equals(final Object o) {
     if (this == o) {
@@ -58,4 +60,5 @@ public abstract class Type
   public String toString() {
     return value;
   }
+
 }

@@ -13,7 +13,7 @@
 /*global Ext, NX*/
 
 /**
- * Configuration for repository storage policies.
+ * Configuration for repository storage facet.
  *
  * @since 3.0
  */
@@ -36,21 +36,7 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
     var me = this;
 
     me.items = [
-      {
-        xtype: 'combo',
-        name: 'storage.writePolicy',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP'),
-        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_PLACEHOLDER'),
-        editable: false,
-        store: [
-          ['ALLOW', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_ALLOW_ITEM')],
-          ['ALLOW_ONCE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_DISABLE_ITEM')],
-          ['DENY', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_RO_ITEM')]
-        ],
-        value: 'DENY',
-        queryMode: 'local'
-      }
+      // TODO add blob store selection
     ];
 
     me.callParent(arguments);

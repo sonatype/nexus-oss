@@ -20,6 +20,7 @@ import com.sonatype.nexus.repository.nuget.internal.proxy.NugetProxyRecipe
 
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
+import org.sonatype.nexus.repository.storage.WritePolicy
 
 /**
  * Provide default hosted and proxy repositories for NuGet.
@@ -42,18 +43,18 @@ class NugetDefaultRepositoriesContributor
   @Override
   List<Configuration> getRepositoryConfigurations() {
     return [
-        new Configuration(repositoryName: DEFAULT_HOSTED_NAME, recipeName: NugetHostedRecipe.NAME, online: true, attributes: [:]),
+        new Configuration(repositoryName: DEFAULT_HOSTED_NAME, recipeName: NugetHostedRecipe.NAME, online: true, attributes:
+            [
+                storage: [
+                    writePolicy: WritePolicy.ALLOW.toString()
+                ]
+            ]
+        ),
         new Configuration(repositoryName: DEFAULT_PROXIED_NAME, recipeName: NugetProxyRecipe.NAME, online: true, attributes:
             [
                 proxy     : [
                     remoteUrl     : 'http://www.nuget.org/api/v2/',
                     artifactMaxAge: 5
-                ],
-                httpclient: [
-                    connection: [
-                        timeout: 20000,
-                        retries: 2
-                    ]
                 ]
             ]
         ),

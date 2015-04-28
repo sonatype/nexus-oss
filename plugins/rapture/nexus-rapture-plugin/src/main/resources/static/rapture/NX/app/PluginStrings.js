@@ -166,7 +166,10 @@ Ext.define('NX.app.PluginStrings', {
 
     // Browse -> Welcome
     BROWSE_WELCOME_TITLE: 'Welcome',
-    BROWSE_WELCOME_SUBTITLE: 'Welcome to Sonatype Nexus!'
+    BROWSE_WELCOME_SUBTITLE: 'Welcome to Sonatype Nexus!',
+
+    // Field validation messages
+    NAME_VALIDATION_MESSAGE: 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed'
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);

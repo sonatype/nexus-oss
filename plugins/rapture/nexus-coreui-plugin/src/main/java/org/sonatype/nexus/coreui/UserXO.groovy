@@ -57,7 +57,6 @@ class UserXO
   @NotEmpty
   Set<String> roles
 
-  @NotNull
   Boolean external
 
   Set<String> externalRoles

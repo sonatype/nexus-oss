@@ -12,7 +12,11 @@
  */
 package org.sonatype.nexus.atlas.internal.customizers
 
-import org.sonatype.nexus.configuration.ApplicationDirectories
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+
+import org.sonatype.nexus.ApplicationDirectories
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer
 import org.sonatype.nexus.supportzip.FileContentSourceSupport
@@ -21,10 +25,6 @@ import org.sonatype.nexus.supportzip.SupportBundle
 import org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority
 import org.sonatype.nexus.supportzip.SupportBundleCustomizer
 import org.sonatype.sisu.goodies.common.ComponentSupport
-
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
 import static groovy.io.FileType.FILES

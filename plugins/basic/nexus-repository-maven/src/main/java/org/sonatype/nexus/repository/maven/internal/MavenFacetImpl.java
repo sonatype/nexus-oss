@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
@@ -36,7 +37,6 @@ import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
-import org.sonatype.nexus.repository.maven.internal.policy.ChecksumPolicy;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.search.SearchItemId;
@@ -45,6 +45,8 @@ import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.types.HostedType;
+import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
@@ -120,18 +122,14 @@ public class MavenFacetImpl
   {
     public boolean strictContentTypeValidation = false;
 
-    @NotNull
+    @NotNull(groups = {HostedType.ValidationGroup.class, ProxyType.ValidationGroup.class})
     public VersionPolicy versionPolicy;
-
-    @NotNull
-    public ChecksumPolicy checksumPolicy;
 
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
           "strictContentTypeValidation=" + strictContentTypeValidation +
           ", versionPolicy=" + versionPolicy +
-          ", checksumPolicy=" + checksumPolicy +
           '}';
     }
   }
@@ -148,7 +146,9 @@ public class MavenFacetImpl
 
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
-    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class,
+        Default.class, getRepository().getType().getValidationGroup()
+    );
   }
 
   @Override
@@ -178,12 +178,6 @@ public class MavenFacetImpl
   @Override
   public VersionPolicy getVersionPolicy() {
     return config.versionPolicy;
-  }
-
-  @Nonnull
-  @Override
-  public ChecksumPolicy getChecksumPolicy() {
-    return config.checksumPolicy;
   }
 
   @Nullable
@@ -241,7 +235,6 @@ public class MavenFacetImpl
           .group(coordinates.getGroupId())
           .name(coordinates.getArtifactId())
           .version(coordinates.getVersion());
-      component.formatAttributes().set(StorageFacet.P_PATH, path.getPath());
 
       // Set format specific attributes
       final NestedAttributesMap componentAttributes = component.formatAttributes();

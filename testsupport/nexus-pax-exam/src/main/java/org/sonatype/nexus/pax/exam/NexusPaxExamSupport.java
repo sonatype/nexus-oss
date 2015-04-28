@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.configuration.ApplicationDirectories;
+import org.sonatype.nexus.ApplicationDirectories;
 import org.sonatype.nexus.events.EventSubscriberHost;
 import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
@@ -74,9 +74,9 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.useOwnKar
  * <pre>
  * &#064;Configuration
  * public static Option[] config() {
- *   return options( //
- *       nexusDistribution(&quot;org.sonatype.nexus.assemblies&quot;, &quot;nexus-base-template&quot;), //
- *       nexusPlugin(&quot;org.sonatype.nexus.plugins&quot;, &quot;nexus-yum-repository-plugin&quot;) //
+ *   return options(
+ *       nexusDistribution(&quot;org.sonatype.nexus.assemblies&quot;, &quot;nexus-base-template&quot;),
+ *       nexusPlugin(&quot;org.sonatype.nexus.plugins&quot;, &quot;nexus-repository-raw&quot;)
  *   );
  * }
  * </pre>

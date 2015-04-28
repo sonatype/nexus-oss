@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.configuration;
 
-import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
+import org.sonatype.nexus.events.AbstractVetoableEvent;
 
 /**
  * An event fired on configuration prepare load, when configurable components should apply configs after load. This is

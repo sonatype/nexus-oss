@@ -23,7 +23,8 @@ Ext.define('NX.coreui.view.repository.recipe.NugetHosted', {
   requires: [
     'NX.Conditions',
     'NX.I18n',
-    'NX.coreui.view.repository.facet.StorageFacet'
+    'NX.coreui.view.repository.facet.StorageFacet',
+    'NX.coreui.view.repository.facet.StorageFacetHosted'
   ],
 
   /**
@@ -33,7 +34,8 @@ Ext.define('NX.coreui.view.repository.recipe.NugetHosted', {
     var me = this;
 
     me.items = [
-      { xtype: 'nx-coreui-repository-storage-facet'}
+      { xtype: 'nx-coreui-repository-storage-facet'},
+      { xtype: 'nx-coreui-repository-storage-hosted-facet'}
     ];
 
     me.callParent(arguments);

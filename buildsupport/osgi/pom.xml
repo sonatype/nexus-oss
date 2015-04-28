@@ -75,14 +75,6 @@
             <groupId>org.eclipse</groupId>
             <artifactId>org.eclipse.osgi</artifactId>
           </exclusion>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
         </exclusions>
       </dependency>
 

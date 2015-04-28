@@ -50,11 +50,15 @@ Ext.define('NX.coreui.controller.Capabilities', {
   ],
   refs: [
     { ref: 'feature', selector: 'nx-coreui-capability-feature' },
+    { ref: 'content', selector: 'nx-feature-content' },
     { ref: 'list', selector: 'nx-coreui-capability-list' },
-    { ref: 'summary', selector: 'nx-coreui-capability-summary' },
-    { ref: 'settings', selector: 'nx-coreui-capability-settings' },
-    { ref: 'status', selector: 'nx-coreui-capability-status' },
-    { ref: 'about', selector: 'nx-coreui-capability-about' }
+    { ref: 'summaryTab', selector: 'nx-coreui-capability-summary' },
+    { ref: 'settingsTab', selector: 'nx-coreui-capability-settings' },
+    { ref: 'summaryPanel', selector: '#nx-coreui-capability-summary-subsection' },
+    { ref: 'statusPanel', selector: 'nx-coreui-capability-status' },
+    { ref: 'aboutPanel', selector: 'nx-coreui-capability-about' },
+    { ref: 'notesPanel', selector: '#nx-coreui-capability-notes-subsection' },
+    { ref: 'settingsPanel', selector: 'nx-coreui-capability-settings-form' }
   ],
   icons: {
     'capability-default': {
@@ -204,7 +208,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {NX.coreui.model.Capability} model capability model
    */
   showSummary: function(model) {
-    var summary = this.getSummary(),
+    var summary = this.getSummaryTab(),
         info = {};
 
     info[NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_TYPE')] = model.get('typeName');
@@ -225,7 +229,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {NX.coreui.model.Capability} model capability model
    */
   showSettings: function(model) {
-    this.getSettings().loadRecord(model);
+    this.getSettingsTab().loadRecord(model);
   },
 
   /**
@@ -234,7 +238,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {NX.coreui.model.Capability} model capability model
    */
   showStatus: function(model) {
-    this.getStatus().showStatus(model.get('status'));
+    this.getStatusPanel().showStatus(model.get('status'));
   },
 
   /**
@@ -243,7 +247,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {NX.coreui.model.CapabilityType} capabilityTypeModel capability type model
    */
   showAbout: function(capabilityTypeModel) {
-    this.getAbout().showAbout(capabilityTypeModel ? capabilityTypeModel.get('about') : undefined);
+    this.getAboutPanel().showAbout(capabilityTypeModel ? capabilityTypeModel.get('about') : undefined);
   },
 
   /**
@@ -448,7 +452,9 @@ Ext.define('NX.coreui.controller.Capabilities', {
         form = button.up('form'),
         values = form.getValues();
 
+    me.getContent().getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_MASK'));
     NX.direct.capability_Capability.update(values, function(response) {
+      me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
@@ -498,8 +504,10 @@ Ext.define('NX.coreui.controller.Capabilities', {
     model = me.getList().getStore().getById(modelId);
     description = me.getDescription(model);
 
+    me.getContent().getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_ENABLE_MASK'));
     NX.direct.capability_Capability.enable(model.getId(), function(response) {
       me.loadStore();
+      me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('ADMIN_CAPABILITIES_DETAILS_ENABLE_SUCCESS', description),
@@ -522,8 +530,10 @@ Ext.define('NX.coreui.controller.Capabilities', {
     model = me.getList().getStore().getById(modelId);
     description = me.getDescription(model);
 
+    me.getContent().getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_DISABLE_MASK'));
     NX.direct.capability_Capability.disable(model.getId(), function(response) {
       me.loadStore();
+      me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('ADMIN_CAPABILITIES_DETAILS_DISABLE_SUCCESS', description),
@@ -532,5 +542,4 @@ Ext.define('NX.coreui.controller.Capabilities', {
       }
     });
   }
-
 });
