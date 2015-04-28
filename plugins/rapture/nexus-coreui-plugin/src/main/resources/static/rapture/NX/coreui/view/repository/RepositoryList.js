@@ -87,8 +87,7 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
   }],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_REPOSITORIES_LIST_FILTER_ERROR') },
-    { ptype: 'gridclearstate' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_REPOSITORIES_LIST_FILTER_ERROR') }
   ]
 
 });
