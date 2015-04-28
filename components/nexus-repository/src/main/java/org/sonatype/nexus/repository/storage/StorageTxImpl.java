@@ -39,13 +39,16 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.hash.HashCode;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.tx.OTransaction.TXTYPE;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sonatype.nexus.common.entity.EntityHelper.id;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_CHECKSUM;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.CLOSED;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.OPEN;
+import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.RESOLVED;
 
 /**
  * Default {@link StorageTx} implementation.
@@ -89,11 +92,15 @@ public class StorageTxImpl
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
+
+    db.begin(TXTYPE.OPTIMISTIC);
   }
 
   public static final class State
   {
     public static final String OPEN = "OPEN";
+
+    public static final String RESOLVED = "RESOLVED";
 
     public static final String CLOSED = "CLOSED";
   }
@@ -111,22 +118,28 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Transitions(from = OPEN, to = RESOLVED)
   public void commit() {
     db.commit();
     blobTx.commit();
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Transitions(from = OPEN, to = RESOLVED)
   public void rollback() {
     db.rollback();
     blobTx.rollback();
   }
 
   @Override
-  @Transitions(from = OPEN, to = CLOSED)
+  @Transitions(from = {OPEN, RESOLVED}, to = CLOSED)
   public void close() {
+
+    // If the transaction has not been committed, then we roll back.
+    if (OPEN.equals(stateGuard.getCurrent())) {
+      rollback();
+    }
+
     db.close(); // rolls back and releases ODatabaseDocumentTx to pool
     blobTx.rollback(); // no-op if no changes have occurred since last commit
   }
@@ -266,7 +279,7 @@ public class StorageTxImpl
   public Asset createAsset(final Bucket bucket, final Component component) {
     checkNotNull(component);
     Asset asset = createAsset(bucket, component.format());
-    asset.componentId(component.getEntityMetadata().getId());
+    asset.componentId(id(component));
     return asset;
   }
 
@@ -285,21 +298,21 @@ public class StorageTxImpl
 
   @Override
   public void saveComponent(final Component component) {
-    if (component.isNew()) {
-      componentEntityAdapter.add(db, component);
+    if (component.isPersisted()) {
+      componentEntityAdapter.edit(db, component);
     }
     else {
-      componentEntityAdapter.edit(db, component);
+      componentEntityAdapter.add(db, component);
     }
   }
 
   @Override
   public void saveAsset(final Asset asset) {
-    if (asset.isNew()) {
-      assetEntityAdapter.add(db, asset);
+    if (asset.isPersisted()) {
+      assetEntityAdapter.edit(db, asset);
     }
     else {
-      assetEntityAdapter.edit(db, asset);
+      assetEntityAdapter.add(db, asset);
     }
   }
 
