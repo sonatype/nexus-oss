@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
       settingsFormSuccessMessage: function(data) {
         return NX.I18n.get('ADMIN_REPOSITORIES_CREATE_SUCCESS') + data['name'];
       },
-      editableCondition: NX.Conditions.isPermitted('nexus:repositories', 'create'),
+      editableCondition: NX.Conditions.isPermitted('nexus:repository-admin:*:*', 'add'),
       editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_ERROR'),
 
       buttons: [

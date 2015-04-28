@@ -128,15 +128,7 @@ Ext.define('NX.controller.dev.Permissions', {
    * @private
    */
   update: function (editor, context) {
-    var value = NX.Permissions.NONE;
-
-    Ext.each(['CREATE', 'READ', 'UPDATE', 'DELETE'], function (perm) {
-      if (context.newValues[perm.toLowerCase()] === true) {
-        value += NX.Permissions[perm];
-      }
-    });
-
-    context.record.set('value', value);
+    context.record.set('permitted', context.newValues['permitted']);
     context.record.commit();
   },
 

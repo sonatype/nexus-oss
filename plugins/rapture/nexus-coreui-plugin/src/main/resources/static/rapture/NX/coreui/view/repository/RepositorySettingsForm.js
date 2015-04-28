@@ -35,9 +35,20 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
   editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_ERROR'),
 
   initComponent: function() {
-    var me = this;
+    var me = this,
+        permittedCondition;
 
-    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:repositories', 'update');
+    if (!me.editableCondition) {
+      me.editableCondition = NX.Conditions.and(
+          permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*', 'edit'),
+          NX.Conditions.formHasRecord('nx-coreui-repository-settings-form', function(model) {
+            var permission = 'nexus:repository-admin:' + model.get('format') + ':' + model.get('name');
+            permittedCondition.name = permission;
+            permittedCondition.evaluate();
+            return NX.Permissions.check(permission, 'edit');
+          })
+      );
+    }
 
     me.items = me.items || [];
     Ext.Array.insert(me.items, 0, [
