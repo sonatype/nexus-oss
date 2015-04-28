@@ -1,7 +1,5 @@
 package org.sonatype.nexus.repository.storage.processors;
 
-import java.util.List;
-
 import org.sonatype.nexus.repository.storage.Processor;
 import org.sonatype.nexus.repository.storage.ProcessorContext;
 
