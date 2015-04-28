@@ -127,7 +127,7 @@ public class AssetEntityAdapter
     super.writeFields(document, entity);
 
     EntityId componentId = entity.componentId();
-    document.field(P_COMPONENT, componentId != null ? componentEntityAdapter.recordIdentity(componentId) : null);
+    document.field(P_COMPONENT, componentId != null ? componentEntityAdapter.decode(componentId) : null);
     document.field(P_NAME, entity.name());
     document.field(P_SIZE, entity.size());
     document.field(P_CONTENT_TYPE, entity.contentType());
@@ -137,13 +137,14 @@ public class AssetEntityAdapter
 
   Iterable<Asset> browseByComponent(final ODatabaseDocumentTx db, final Component component) {
     checkNotNull(component);
-    checkState(component.isPersisted());
+    checkState(component.getEntityMetadata() != null);
 
     Map<String, Object> parameters = ImmutableMap.<String, Object>of(
-        "component", componentEntityAdapter.recordIdentity(component)
+        "component", componentEntityAdapter.decode(component.getEntityMetadata().getId())
     );
     String query = String.format("select from %s where component = :component", DB_CLASS);
     Iterable<ODocument> docs = db.command(new OCommandSQL(query)).execute(parameters);
     return readEntities(docs);
   }
+
 }

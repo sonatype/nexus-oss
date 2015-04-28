@@ -14,6 +14,8 @@ package com.sonatype.nexus.repository.nuget.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -44,7 +46,6 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.search.SearchFacet;
-import org.sonatype.nexus.repository.search.SearchItemId;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -69,7 +70,6 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
-import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.odata4j.producer.InlineCount;
 
@@ -78,7 +78,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.base.Strings.nullToEmpty;
 import static com.sonatype.nexus.repository.nuget.internal.NugetProperties.*;
-import static java.util.Collections.singletonList;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseInlineCount;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseSkip;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseTop;
@@ -283,8 +282,7 @@ public class NugetGalleryFacetImpl
     final StringBuilder xml = new StringBuilder();
     try (StorageTx tx = openStorageTx()) {
       final Component component = findComponent(tx, id, version);
-      final Asset asset = findAsset(tx, component);
-      final Map<String, ?> entryData = toData(asset.formatAttributes(), extra);
+      final Map<String, ?> entryData = toData(component.formatAttributes(), extra);
 
       final String nugetEntry = ODataTemplates.NUGET_ENTRY;
       xml.append(interpolateTemplate(nugetEntry, entryData));
@@ -306,8 +304,6 @@ public class NugetGalleryFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void put(final InputStream inputStream) throws IOException, NugetPackageException {
-    String componentId = null;
-
     try (StorageTx storageTx = openStorageTx();
          TempStreamSupplier tempStream = new TempStreamSupplier(inputStream)) {
 
@@ -331,7 +327,8 @@ public class NugetGalleryFacetImpl
         component = createOrUpdatePackageAndContents(storageTx, recordMetadata, in);
       }
 
-      componentId = recordMetadata.get(ID);
+      String id = recordMetadata.get(ID);
+      maintainAggregateInfo(storageTx, id);
 
       boolean isNew = component.isNew();  // must check before commit
       storageTx.commit();
@@ -341,13 +338,6 @@ public class NugetGalleryFacetImpl
       }
       else {
         getEventBus().post(new ComponentUpdatedEvent(component, getRepository()));
-      }
-    }
-
-    if (componentId != null) {
-      try (StorageTx storageTx = openStorageTx()) {
-        maintainAggregateInfo(storageTx, componentId);
-        storageTx.commit();
       }
     }
   }
@@ -399,12 +389,9 @@ public class NugetGalleryFacetImpl
       if (component == null) {
         return false;
       }
-      final SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
-      final SearchItemId searchId = searchFacet.identifier(component);
       tx.deleteComponent(component);
+      getRepository().facet(SearchFacet.class).delete(component);
       tx.commit();
-
-      searchFacet.delete(searchId);
 
       getEventBus().post(new ComponentDeletedEvent(component, getRepository()));
       return true;
@@ -432,18 +419,29 @@ public class NugetGalleryFacetImpl
   {
     final Bucket bucket = storageTx.getBucket();
     final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
-    Asset asset = findOrCreateAsset(storageTx, component);
-    updateAssetMetadata(asset, recordMetadata, component.isNew());
-    storageTx.saveAsset(asset);
+    createOrUpdateAsset(storageTx, bucket, component, recordMetadata);
     getRepository().facet(SearchFacet.class).put(component);
     return component;
   }
 
-  private void updateAssetMetadata(final Asset asset, final Map<String, String> data, final boolean componentIsNew) {
+  private Asset createOrUpdateAsset(final StorageTx storageTx, final Bucket bucket, final Component component,
+                                    final Map<String, String> data)
+  {
+    Asset asset = null;
+
+    final Iterable<Asset> assets = storageTx.browseAssets(component);
+    if (!assets.iterator().hasNext()) {
+      asset = storageTx.createAsset(bucket, component);
+      asset.name(component.name());
+    }
+    else {
+      asset = assets.iterator().next();
+    }
+
     if (data != null) {
       final NestedAttributesMap nugetAttr = asset.formatAttributes();
 
-      setDerivedAttributes(data, nugetAttr, !componentIsNew);
+      setDerivedAttributes(data, nugetAttr, !component.isNew());
 
       nugetAttr.set(P_AUTHORS, data.get(AUTHORS));
       nugetAttr.set(P_COPYRIGHT, data.get(COPYRIGHT));
@@ -468,25 +466,8 @@ public class NugetGalleryFacetImpl
       nugetAttr.set(P_TITLE, data.get(TITLE));
       nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
     }
-  }
-
-  private Asset findOrCreateAsset(final StorageTx storageTx, final Component component) {
-    Asset asset = findAsset(storageTx, component);
-    if (asset == null) {
-      asset = storageTx.createAsset(storageTx.getBucket(), component);
-      asset.name(component.name());
-    }
+    storageTx.saveAsset(asset);
     return asset;
-  }
-
-  @Nullable
-  @VisibleForTesting
-  protected Asset findAsset(final StorageTx storageTx, final Component component) {
-    final Iterable<Asset> assets = storageTx.browseAssets(component);
-    if (assets.iterator().hasNext()) {
-      return assets.iterator().next();
-    }
-    return null;
   }
 
   private String blobName(Component component) {
@@ -546,21 +527,17 @@ public class NugetGalleryFacetImpl
     return storageTx.findComponents(whereClause, parameters, getRepositories(), null);
   }
 
-  private void createOrUpdateAssetAndContents(final StorageTx storageTx, final Bucket bucket,
-                                              final Component component, final InputStream in,
-                                              final Map<String, String> data)
+  private Asset createOrUpdateAssetAndContents(final StorageTx storageTx, final Bucket bucket,
+                                               final Component component, final InputStream in,
+                                               final Map<String, String> data)
   {
-    Asset asset = findOrCreateAsset(storageTx, component);
-    updateAssetMetadata(asset, data, component.isNew());
-    attachBlob(storageTx, component, asset, in);
-    storageTx.saveAsset(asset);
-  }
+    Asset asset = createOrUpdateAsset(storageTx, bucket, component, data);
 
-  private void attachBlob(final StorageTx storageTx, final Component component, final Asset asset, final InputStream in)
-  {
     final ImmutableMap<String, String> headers = ImmutableMap
         .of(BlobStore.BLOB_NAME_HEADER, blobName(component), BlobStore.CREATED_BY_HEADER, "unknown");
-    storageTx.setBlob(in, headers, asset, singletonList(HashAlgorithm.SHA512), "application/zip");
+    storageTx.setBlob(in, headers, asset, Arrays.asList(HashAlgorithm.SHA512), "application/zip");
+
+    return asset;
   }
 
   private String checkVersion(String stringValue) {
@@ -703,7 +680,7 @@ public class NugetGalleryFacetImpl
       return facet.leafMembers();
     }
     catch (MissingFacetException e) {
-      return singletonList(getRepository());
+      return Collections.singletonList(getRepository());
     }
   }
 

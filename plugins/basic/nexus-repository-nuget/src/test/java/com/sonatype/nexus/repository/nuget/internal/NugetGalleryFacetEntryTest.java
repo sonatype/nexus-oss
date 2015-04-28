@@ -17,53 +17,45 @@ import java.util.HashMap;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
-import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Spy;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 public class NugetGalleryFacetEntryTest
     extends TestSupport
 {
-  @Mock
-  private Component component;
-
-  @Mock
-  private Asset asset;
-
-  @Spy
-  private NugetGalleryFacetImpl underTest;
-
   @Test
   public void packageEntrySmokeTest() throws Exception {
     final String packageId = "screwdriver";
     final String version = "0.1.1";
 
-    final StorageTx tx = mock(StorageTx.class);
-    doReturn(tx).when(underTest).openStorageTx();
+    final NugetGalleryFacetImpl galleryFacet = spy(new NugetGalleryFacetImpl());
 
-    // Wire the mocks together: component has asset, asset has format attributes
-    doReturn(component).when(underTest).findComponent(tx, packageId, version);
-    doReturn(asset).when(underTest).findAsset(tx, component);
-    doReturn(mock(NestedAttributesMap.class)).when(asset).formatAttributes();
+    final StorageTx tx = mock(StorageTx.class);
+    doReturn(tx).when(galleryFacet).openStorageTx();
+
+    final Component component = mock(Component.class);
+
+    // Wire the mocks together: component has asset, asset has blobRef
+    doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
+    doReturn(mock(NestedAttributesMap.class)).when(component).formatAttributes();
 
     final HashMap<String, ?> data = Maps.newHashMap();
-    doReturn(data).when(underTest).toData(any(NestedAttributesMap.class),
+    doReturn(data).when(galleryFacet).toData(any(NestedAttributesMap.class),
         anyMapOf(String.class, String.class));
 
-    underTest.entry("base", packageId, version);
+    galleryFacet.entry("base", packageId, version);
 
-    verify(underTest).interpolateTemplate(ODataTemplates.NUGET_ENTRY, data);
+    verify(galleryFacet).interpolateTemplate(ODataTemplates.NUGET_ENTRY, data);
   }
 }

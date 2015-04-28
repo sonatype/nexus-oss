@@ -44,7 +44,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
-import org.apache.shiro.authz.AuthorizationException;
 import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,9 +121,7 @@ public class ViewServlet
       log.debug("Service completed");
     }
     catch (Exception e) {
-      if (!(e instanceof AuthorizationException)) {
-        log.warn("Service failure", e);
-      }
+      log.warn("Service failure", e);
       Throwables.propagateIfPossible(e, ServletException.class, IOException.class);
       throw new ServletException(e);
     }

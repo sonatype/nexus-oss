@@ -23,15 +23,6 @@ public abstract class Entity
 {
   private EntityMetadata metadata;
 
-  /**
-   * Does the Entity correspond to a database record?
-   *
-   * This is not a dirtiness check.
-   */
-  public boolean isPersisted() {
-    return metadata != null;
-  }
-
   @Nullable
   public EntityMetadata getEntityMetadata() {
     return metadata;

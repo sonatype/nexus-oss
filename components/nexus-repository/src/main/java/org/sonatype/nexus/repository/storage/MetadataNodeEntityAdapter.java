@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 import org.sonatype.nexus.repository.Repository;
@@ -89,18 +91,27 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode>
 
   @Override
   protected void writeFields(final ODocument document, final T entity) {
-    document.field(P_BUCKET, bucketEntityAdapter.recordIdentity(entity.bucketId()));
+    document.field(P_BUCKET, bucketEntityAdapter.decode(entity.bucketId()));
     document.field(P_FORMAT, entity.format());
     document.field(P_LAST_UPDATED, new Date());
     document.field(P_ATTRIBUTES, entity.attributes().backing());
   }
 
+  public EntityId encode(final ORID id) {
+    return new EntityId(getRecordIdObfuscator().encode(getType(), id));
+  }
+
+  public ORID decode(final EntityId id) {
+    return getRecordIdObfuscator().decode(getType(), id.toString());
+  }
+
+
   Iterable<T> browseByBucket(final ODatabaseDocumentTx db, final Bucket bucket) {
     checkNotNull(bucket);
-    checkState(bucket.isPersisted());
+    checkState(bucket.getEntityMetadata() != null);
 
     Map<String, Object> parameters = ImmutableMap.<String, Object>of(
-        "bucket", bucketEntityAdapter.recordIdentity(bucket)
+        "bucket", bucketEntityAdapter.decode(bucket.getEntityMetadata().getId())
     );
     String query = String.format("select from %s where bucket = :bucket", getTypeName());
     Iterable<ODocument> docs = db.command(new OCommandSQL(query)).execute(parameters);
@@ -114,10 +125,11 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode>
     checkNotNull(propName);
     checkNotNull(propValue);
     checkNotNull(bucket);
+    checkState(bucket.getEntityMetadata() != null);
 
     Map<String, Object> parameters = ImmutableMap.of(
         "propValue", propValue,
-        "bucket", bucketEntityAdapter.recordIdentity(bucket)
+        "bucket", bucketEntityAdapter.decode(bucket.getEntityMetadata().getId())
     );
     String query = String.format("select from %s where %s = :propValue and bucket = :bucket", getTypeName(), propName);
     Iterable<ODocument> docs = db.command(new OCommandSQL(query)).execute(parameters);
