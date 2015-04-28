@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal;
+package org.sonatype.nexus.repository.maven.internal.maven2;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,14 +32,14 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacetImpl;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.maven.internal.MavenFacet;
+import org.sonatype.nexus.repository.maven.internal.MavenPath;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
-import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.MetadataEnvelope;
 import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
@@ -59,13 +59,13 @@ import org.joda.time.DateTime;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * Maven specific implementation of {@link GroupFacetImpl}.
+ * Maven2 specific implementation of {@link GroupFacetImpl}: metadata merge is specific to Maven2 format.
  *
  * @since 3.0
  */
 @Named
 @Facet.Exposed
-public class MavenGroupFacet
+public class Maven2GroupFacet
     extends GroupFacetImpl
 {
   private final Maven2MetadataMerger metadataMerger;
@@ -73,7 +73,7 @@ public class MavenGroupFacet
   private MavenFacet mavenFacet;
 
   @Inject
-  public MavenGroupFacet(final RepositoryManager repositoryManager) {
+  public Maven2GroupFacet(final RepositoryManager repositoryManager) {
     super(repositoryManager);
     this.metadataMerger = new Maven2MetadataMerger();
   }
@@ -156,7 +156,7 @@ public class MavenGroupFacet
     final Content content = new Content(
         new BytesPayload(
             byteArray,
-            ContentTypes.TEXT_XML
+            Maven2Format.METADATA_CONTENT_TYPE
         ));
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
     content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}");
@@ -173,7 +173,7 @@ public class MavenGroupFacet
     for (HashType hashType : HashType.values()) {
       final HashCode hashCode = hashCodes.get(hashType.getHashAlgorithm());
       if (hashCode != null) {
-        final Content hashContent = new Content(new StringPayload(hashCode.toString(), ContentTypes.TEXT_PLAIN));
+        final Content hashContent = new Content(new StringPayload(hashCode.toString(), Maven2Format.CHECKSUM_CONTENT_TYPE));
         hashContent.getAttributes().set(Content.CONTENT_LAST_MODIFIED, now);
         mavenFacet.put(mavenPath.hash(hashType), hashContent);
       }

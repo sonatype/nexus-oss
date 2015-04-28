@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal;
+package org.sonatype.nexus.repository.maven.internal.maven2;
 
 import java.util.LinkedHashMap;
 
@@ -21,18 +21,19 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.group.GroupHandler;
 import org.sonatype.nexus.repository.http.HttpResponses;
+import org.sonatype.nexus.repository.maven.internal.MavenPath;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Response;
 
 /**
- * Maven group metadata handler.
+ * Maven2 specific group metadata handler: metadata merge is specific to Maven2 format.
  *
  * @since 3.0
  */
 @Singleton
 @Named
-public class GroupMetadataHandler
+public class Maven2GroupMetadataHandler
     extends GroupHandler
 {
   @Override
@@ -40,7 +41,7 @@ public class GroupMetadataHandler
       throws Exception
   {
     final MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
-    final MavenGroupFacet groupFacet = context.getRepository().facet(MavenGroupFacet.class);
+    final Maven2GroupFacet groupFacet = context.getRepository().facet(Maven2GroupFacet.class);
     // get cached one
     Content content = groupFacet.getCachedMergedMetadata(mavenPath);
     if (content != null) {

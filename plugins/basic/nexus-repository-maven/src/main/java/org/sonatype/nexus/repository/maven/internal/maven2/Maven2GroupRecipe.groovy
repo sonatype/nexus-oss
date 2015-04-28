@@ -23,10 +23,8 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.group.GroupHandler
-import org.sonatype.nexus.repository.maven.internal.GroupMetadataHandler
 import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
-import org.sonatype.nexus.repository.maven.internal.MavenGroupFacet
 import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenPathParser
@@ -64,7 +62,7 @@ class Maven2GroupRecipe
   Provider<StorageFacetImpl> storageFacet
 
   @Inject
-  Provider<MavenGroupFacet> mavenGroupFacet
+  Provider<Maven2GroupFacet> mavenGroupFacet
 
   @Inject
   TimingHandler timingHandler
@@ -85,7 +83,7 @@ class Maven2GroupRecipe
   GroupHandler groupHandler
 
   @Inject
-  GroupMetadataHandler groupMetadataHandler
+  Maven2GroupMetadataHandler groupMetadataHandler
 
   @Inject
   @Named(Maven2Format.NAME)

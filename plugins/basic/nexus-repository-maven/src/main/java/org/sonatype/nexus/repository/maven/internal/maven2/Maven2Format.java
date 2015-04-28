@@ -16,6 +16,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Format;
+import org.sonatype.nexus.repository.view.ContentTypes;
 
 /**
  * Maven 2 format.
@@ -28,6 +29,21 @@ public class Maven2Format
     extends Format
 {
   public static final String NAME = "maven2";
+
+  /**
+   * File name of Maven2 repository metadata files.
+   */
+  public static final String METADATA_FILENAME = "maven-metadata.xml";
+
+  /**
+   * Content type of Maven2 repository metadata files.
+   */
+  public static final String METADATA_CONTENT_TYPE = ContentTypes.TEXT_XML;
+
+  /**
+   * Content Type of Maven2 checksum files (sha1, md5).
+   */
+  public static final String CHECKSUM_CONTENT_TYPE = ContentTypes.TEXT_PLAIN;
 
   public Maven2Format() {
     super(NAME);
