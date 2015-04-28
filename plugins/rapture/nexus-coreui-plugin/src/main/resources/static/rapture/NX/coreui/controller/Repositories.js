@@ -145,13 +145,11 @@ Ext.define('NX.coreui.controller.Repositories', {
     }
     else {
       if (Ext.isDefined(model)) {
-        if (!settingsForm || formCls.xtype !== settingsForm.xtype) {
-          settingsPanel.removeAllSettingsForms();
-          settingsPanel.addSettingsForm({ xtype: formCls.xtype, recipe: model });
-          Ext.Array.each(settingsPanel.query('field[readOnlyOnUpdate=true]'), function(field) {
-            field.setReadOnly(true);
-          });
-        }
+        settingsPanel.removeAllSettingsForms();
+        settingsPanel.addSettingsForm({ xtype: formCls.xtype, recipe: model });
+        Ext.Array.each(settingsPanel.query('field[readOnlyOnUpdate=true]'), function(field) {
+          field.setReadOnly(true);
+        });
         settingsPanel.loadRecord(model);
       }
     }
