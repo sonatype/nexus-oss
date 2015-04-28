@@ -20,6 +20,8 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
@@ -29,6 +31,7 @@ import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
+import org.sonatype.nexus.repository.types.HostedType;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
@@ -67,8 +70,7 @@ public class StorageFacetImpl
     @NotEmpty
     public String blobStoreName = "default";
 
-    // FIXME: This should be not-null, but pending property default
-    //@NotNull
+    @NotNull(groups = HostedType.ValidationGroup.class)
     public WritePolicy writePolicy;
 
     @Override
@@ -101,7 +103,9 @@ public class StorageFacetImpl
 
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
-    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class,
+        Default.class, getRepository().getType().getValidationGroup()
+    );
   }
 
   @Override

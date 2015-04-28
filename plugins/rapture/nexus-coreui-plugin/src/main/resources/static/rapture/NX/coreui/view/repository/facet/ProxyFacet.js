@@ -41,7 +41,16 @@ Ext.define('NX.coreui.view.repository.facet.ProxyFacet', {
         name: 'attributes.proxy.remoteUrl',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE'),
         helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE_HELP'),
-        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE_PLACEHOLDER')
+        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE_PLACEHOLDER'),
+        useTrustStore: function (field) {
+          if (Ext.String.startsWith(field.getValue(), 'https://')) {
+            return {
+              name: 'attributes.httpclient.connection.useTrustStore',
+              url: field
+            };
+          }
+          return undefined;
+        }
       },
       {
         xtype: 'checkbox',

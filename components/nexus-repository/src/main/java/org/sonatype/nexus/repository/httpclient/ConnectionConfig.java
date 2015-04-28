@@ -30,10 +30,10 @@ public class ConnectionConfig
   private String urlParameters;
 
   /**
-   * Timeout milliseconds.
+   * Timeout seconds.
    */
   @Min(0L)
-  @Max(3600000L) // 1 hour
+  @Max(3600L) // 1 hour
   private Integer timeout;
 
   @Min(0L)
