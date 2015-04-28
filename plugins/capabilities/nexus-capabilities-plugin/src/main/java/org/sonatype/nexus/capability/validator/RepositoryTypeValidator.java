@@ -52,8 +52,8 @@ public class RepositoryTypeValidator
   RepositoryTypeValidator(final RepositoryManager repositoryManager,
                           final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
                           final @Assisted CapabilityType type,
-                          final @Assisted String propertyKey,
-                          final @Assisted String repositoryType)
+                          final @Assisted("propertyKey") String propertyKey,
+                          final @Assisted("repositoryType") String repositoryType)
   {
     super(capabilityDescriptorRegistryProvider, type);
     this.repositoryManager = checkNotNull(repositoryManager);

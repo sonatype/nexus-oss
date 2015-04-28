@@ -32,7 +32,9 @@ public interface ValidatorFactory
   PrimaryKeyExcludingSelfValidator uniquePerExcluding(CapabilityIdentity excludeId, CapabilityType type,
                                                       String... propertyKeys);
 
-  RepositoryTypeValidator repositoryOfType(CapabilityType type, String propertyKey, String repositoryType);
+  RepositoryTypeValidator repositoryOfType(CapabilityType type,
+                                           @Assisted("propertyKey") String propertyKey,
+                                           @Assisted("repositoryType") String repositoryType);
 
   /**
    * @since capabilities 2.3
