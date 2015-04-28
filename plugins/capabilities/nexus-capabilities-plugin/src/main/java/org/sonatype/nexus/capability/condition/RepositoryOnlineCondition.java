@@ -70,7 +70,7 @@ public class RepositoryOnlineCondition
       return String.format("Repository '%s' is online", repositoryName);
     }
     catch (Exception ignore) {
-      return String.format("Repository '(could not be evaluated)' is online");
+      return "Repository '(could not be evaluated)' is online";
     }
   }
 
@@ -81,7 +81,7 @@ public class RepositoryOnlineCondition
       return String.format("Repository '%s' is online", repositoryName);
     }
     catch (Exception ignore) {
-      return String.format("Repository '(could not be evaluated)' is online");
+      return "Repository '(could not be evaluated)' is online";
     }
   }
 
@@ -92,7 +92,7 @@ public class RepositoryOnlineCondition
       return String.format("Repository '%s' is offline", repositoryName);
     }
     catch (Exception ignore) {
-      return String.format("Repository '(could not be evaluated)' is offline");
+      return "Repository '(could not be evaluated)' is offline";
     }
   }
 
