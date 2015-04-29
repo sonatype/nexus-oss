@@ -15,6 +15,7 @@ package org.sonatype.nexus.extender.modules;
 import javax.servlet.ServletContext;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.servlet.DynamicGuiceFilter;
 
 /**
  * Override guice-servlet's legacy {@link ServletContext} binding as it doesn't work well with multiple injectors.
@@ -33,5 +34,6 @@ public class ServletContextModule
   @Override
   protected void configure() {
     bind(ServletContext.class).toInstance(servletContext);
+    DynamicGuiceFilter.avoidLogSpam();
   }
 }

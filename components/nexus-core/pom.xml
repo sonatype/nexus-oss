@@ -127,7 +127,12 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-formfields</artifactId>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-guice-servlet</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-webresources-api</artifactId>
@@ -199,12 +204,12 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
+      <groupId>com.google.inject.extensions</groupId>
       <artifactId>guice-multibindings</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
+      <groupId>com.google.inject.extensions</groupId>
       <artifactId>guice-assistedinject</artifactId>
     </dependency>
 

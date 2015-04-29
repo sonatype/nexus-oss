@@ -49,7 +49,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
+      <groupId>com.google.inject.extensions</groupId>
       <artifactId>guice-servlet</artifactId>
     </dependency>
 
