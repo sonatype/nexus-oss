@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.maven.internal.maven2.metadata;
 
+import java.util.Objects;
 import java.util.Set;
 
 import org.sonatype.nexus.repository.Repository;
@@ -73,16 +74,33 @@ public class MetadataRebuildWorker
               "select group as groupId, name as artifactId, set(attributes.maven2.baseVersion) as baseVersions from component group by group, name limit=-1",
               new OCommandResultListener()
               {
+                String currentGroupId = null;
+
                 @Override
                 public boolean result(Object iRecord) {
-                  ODatabaseRecordThreadLocal.INSTANCE.set(readDatabase); // always reset thread DB
-                  final ODocument doc = (ODocument) iRecord;
-                  final String groupId = doc.field("groupId", OType.STRING);
-                  final String artifactId = doc.field("artifactId", OType.STRING);
-                  final Set<String> baseVersions = doc.field("baseVersions", OType.EMBEDDEDSET);
+                  try {
+                    final ODocument doc = (ODocument) iRecord;
+                    final String groupId = doc.field("groupId", OType.STRING);
+                    final String artifactId = doc.field("artifactId", OType.STRING);
+                    final Set<String> baseVersions = doc.field("baseVersions", OType.EMBEDDEDSET);
 
-                  txGAbVs(groupId, artifactId, baseVersions);
-                  return true;
+                    final boolean groupChange = !Objects.equals(currentGroupId, groupId);
+                    if (groupChange) {
+                      currentGroupId = groupId;
+                      metadataBuilder.onEnterGroupId(groupId);
+                    }
+                    txAbVs(groupId, artifactId, baseVersions);
+                    if (groupChange) {
+                      final Metadata groupMetadata = metadataBuilder.onExitGroupId();
+                      if (groupMetadata != null) {
+                        metadataUpdater.mayUpdateMetadata(groupMetadata);
+                      }
+                    }
+                    return true;
+                  }
+                  finally {
+                    ODatabaseRecordThreadLocal.INSTANCE.set(readDatabase); // always reset thread DB
+                  }
                 }
 
                 @Override
@@ -95,11 +113,11 @@ public class MetadataRebuildWorker
   }
 
   /**
-   * Method processing in separate TX/DB
+   * Method processing in separate TX/DB, performs writes (and mangles ThreadLocal DB, so caller should restore it).
+   * Handles A and bV on metadataBuilder.
    */
-  private void txGAbVs(final String groupId, final String artifactId, final Set<String> baseVersions) {
-    final boolean newGroup = metadataBuilder.onEnterGroupId(groupId);
-    final boolean newArtifactId = metadataBuilder.onEnterArtifactId(artifactId);
+  private void txAbVs(final String groupId, final String artifactId, final Set<String> baseVersions) {
+    metadataBuilder.onEnterArtifactId(artifactId);
     for (String baseVersion : baseVersions) {
       metadataBuilder.onEnterBaseVersion(baseVersion);
       try (StorageTx tx = storageFacet.openTx()) {
@@ -129,13 +147,9 @@ public class MetadataRebuildWorker
         metadataUpdater.mayUpdateMetadata(baseVersionMetadata);
       }
     }
-    final Metadata artifactMetadata = newArtifactId ? metadataBuilder.onExitArtifactId() : null;
+    final Metadata artifactMetadata = metadataBuilder.onExitArtifactId();
     if (artifactMetadata != null) {
       metadataUpdater.mayUpdateMetadata(artifactMetadata);
-    }
-    final Metadata groupMetadata = newGroup ? metadataBuilder.onExitGroupId() : null;
-    if (groupMetadata != null) {
-      metadataUpdater.mayUpdateMetadata(groupMetadata);
     }
   }
 }
