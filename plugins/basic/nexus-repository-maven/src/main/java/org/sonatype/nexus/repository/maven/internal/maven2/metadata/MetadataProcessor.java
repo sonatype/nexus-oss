@@ -52,9 +52,9 @@ public class MetadataProcessor
     final String baseVersion = context.getAttributes().require(StorageFacet.P_VERSION, String.class);
     try (StorageTx tx = context.getStorageTxSupplier().get()) {
       final Iterable<Component> components = tx.findComponents(
-          "bucket = :bucket and group = :group and name = :name and attributes.maven2.baseVersion = :baseVersion",
+          "group = :group and name = :name and attributes.maven2.baseVersion = :baseVersion", // bucket = :bucket and
           // TODO: bucket.rid!
-          ImmutableMap.of("bucket", tx.getBucket(), "group", groupId, "name", artifactId, "baseVersion", baseVersion),
+          ImmutableMap.<String, Object>of("group", groupId, "name", artifactId, "baseVersion", baseVersion), // "bucket", tx.getBucket(),
           null,
           "order by version asc");
       for (Component component : components) {
@@ -64,8 +64,9 @@ public class MetadataProcessor
               asset.formatAttributes().require(StorageFacet.P_PATH, String.class)
           );
           metadataBuilder.addArtifactVersion(mavenPath);
-          if ("maven-plugin".equals("TODO")) {
-            metadataBuilder.addPlugin("", "", "");
+          // TODO: crank up POM for this
+          if (artifactId.endsWith("-plugin")) {
+            metadataBuilder.addPlugin("prefix", artifactId, "Name");
           }
         }
       }

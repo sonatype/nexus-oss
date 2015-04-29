@@ -41,11 +41,13 @@ public class GProcessor
   @Override
   public void process(final ProcessorContext context) {
     final String groupId = context.getAttributes().require(StorageFacet.P_GROUP, String.class);
+    log.info(">>> G={}", groupId);
     metadataBuilder.onEnterGroupId(groupId);
     context.proceed();
     final Metadata metadata = metadataBuilder.onExitGroupId();
     if (metadata != null) {
       metadataUpdater.mayUpdateMetadata(metadata);
     }
+    log.info("<<< G={}", groupId);
   }
 }

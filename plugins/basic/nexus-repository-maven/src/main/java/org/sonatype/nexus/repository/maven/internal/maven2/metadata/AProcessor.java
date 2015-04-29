@@ -41,11 +41,13 @@ public class AProcessor
   @Override
   public void process(final ProcessorContext context) {
     final String artifactId = context.getAttributes().require(StorageFacet.P_NAME, String.class);
+    log.info(">>>>>> A={}", artifactId);
     metadataBuilder.onEnterArtifactId(artifactId);
     context.proceed();
     final Metadata metadata = metadataBuilder.onExitArtifactId();
     if (metadata != null) {
       metadataUpdater.mayUpdateMetadata(metadata);
     }
+    log.info("<<<<<< A={}", artifactId);
   }
 }

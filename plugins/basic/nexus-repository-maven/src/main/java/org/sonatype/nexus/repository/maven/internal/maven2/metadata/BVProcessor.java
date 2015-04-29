@@ -41,11 +41,13 @@ public class BVProcessor
   @Override
   public void process(final ProcessorContext context) {
     final String baseVersion = context.getAttributes().require(StorageFacet.P_VERSION, String.class);
+    log.info(">>>>>>>>> bV={}", baseVersion);
     metadataBuilder.onEnterBaseVersion(baseVersion);
     context.proceed();
     final Metadata metadata = metadataBuilder.onExitBaseVersion();
     if (metadata != null) {
       metadataUpdater.mayUpdateMetadata(metadata);
     }
+    log.info("<<<<<<<<< bV={}", baseVersion);
   }
 }
