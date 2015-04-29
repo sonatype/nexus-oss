@@ -47,7 +47,7 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
         editable: false,
         store: [
           ['RELEASE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_RELEASE_ITEM')],
-          ['SNAPSHOT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_SNAPSHOTS_ITEM')],
+          ['SNAPSHOT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_SNAPSHOT_ITEM')],
           ['MIXED', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_MIXED_ITEM')]
         ],
         value: 'RELEASE',

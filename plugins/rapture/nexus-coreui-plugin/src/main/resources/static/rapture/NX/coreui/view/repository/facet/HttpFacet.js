@@ -67,9 +67,11 @@ Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
             allowBlank: false
           },
           {
-            xtype: 'nx-password',
+            xtype: 'textfield',
+            inputType: 'password',
             name: 'attributes.httpclient.authentication.password',
-            fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_PASSWORD')
+            fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_PASSWORD'),
+            allowBlank: false
           },
           {
             xtype: 'fieldcontainer',
