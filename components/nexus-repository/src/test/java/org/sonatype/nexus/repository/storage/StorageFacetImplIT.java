@@ -625,7 +625,7 @@ public class StorageFacetImplIT
       final Asset asset = assets.iterator().next();
 
       assertThat(asset.formatAttributes().get("attribute1", String.class), equalTo("original"));
-      assertThat(asset.formatAttributes().get("attribute1", String.class), equalTo("original"));
+      assertThat(asset.formatAttributes().get("attribute2", String.class), equalTo("alternate"));
     }
   }
 
@@ -655,9 +655,7 @@ public class StorageFacetImplIT
             .version("0.9")
             .name("myComponent");
         tx.saveComponent(component);
-        if (true) {
-          throw new MidTransactionException();
-        }
+        throw new MidTransactionException();
       }
     }
     catch (MidTransactionException ignored) {
