@@ -35,9 +35,6 @@ Ext.define('NX.coreui.view.logging.LogMark', {
     defaults: {
       anchor: '100%'
     },
-    api: {
-      submit: 'NX.direct.logging_Log.mark'
-    },
     settingsFormSuccessMessage: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_SUCCESS'),
     settingsFormSubmitOnEnter: true,
     editableMarker: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_ERROR'),
@@ -46,7 +43,8 @@ Ext.define('NX.coreui.view.logging.LogMark', {
         xtype: 'textfield',
         name: 'message',
         itemId: 'message',
-        fieldLabel: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE')
+        fieldLabel: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE'),
+        allowBlank: false
       }
     ]
   },

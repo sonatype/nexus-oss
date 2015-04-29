@@ -730,6 +730,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_LOG_VIEWER_MARK_ERROR: 'You do not have permission to mark the log',
     ADMIN_LOG_VIEWER_MARK_MESSAGE: 'Log message',
     ADMIN_LOG_VIEWER_MARK_SUCCESS: 'Log has been marked',
+    ADMIN_LOG_VIEWER_MARK_MASK: 'Marking Log',
     ADMIN_LOG_VIEWER_DOWNLOAD_BUTTON: 'Download',
     ADMIN_LOG_VIEWER_MARK_BUTTON: 'Create mark',
     ADMIN_LOG_VIEWER_REFRESH_INTERVAL: 'Refresh interval:',
