@@ -148,20 +148,28 @@ public class MetadataBuilder
       return null;
     }
     final Metadata result = new Metadata();
-    result.setVersion("1.1.0");
+    result.setModelVersion("1.1.0");
     result.setGroupId(getGroupId());
     result.getPlugins().addAll(plugins);
     return result;
   }
 
-  public void addPlugin(final String prefix, final String artifactId, final String name) {
+  public boolean addPlugin(final String prefix, final String artifactId, final String name) {
     checkNotNull(prefix, "prefix");
     checkNotNull(artifactId, "artifactId");
     final Plugin plugin = new Plugin();
     plugin.setPrefix(prefix);
     plugin.setArtifactId(artifactId);
     plugin.setName(Strings.isNullOrEmpty(name) ? artifactId : name);
+    for (Plugin existing : plugins) {
+      if (Objects.equals(plugin.getArtifactId(), existing.getArtifactId())
+          && Objects.equals(plugin.getPrefix(), existing.getPrefix())) {
+        existing.setName(plugin.getName()); // update name, else is OK
+        return false;
+      }
+    }
     plugins.add(plugin);
+    return true;
   }
 
   // -----------------------------------
@@ -192,7 +200,7 @@ public class MetadataBuilder
       release = null;
     }
     final Metadata result = new Metadata();
-    result.setVersion("1.1.0");
+    result.setModelVersion("1.1.0");
     result.setGroupId(getGroupId());
     result.setArtifactId(getArtifactId());
     final Versioning versioning = new Versioning();
@@ -266,7 +274,7 @@ public class MetadataBuilder
       return null;
     }
     final Metadata result = new Metadata();
-    result.setVersion("1.1.0");
+    result.setModelVersion("1.1.0");
     result.setGroupId(getGroupId());
     result.setArtifactId(getArtifactId());
     result.setVersion(getBaseVersion());
@@ -287,6 +295,7 @@ public class MetadataBuilder
       snapshotVersion.setUpdated(
           dotlessTimestampFormat.format(new Date(versionCoordinates.coordinates.getTimestamp()))
       );
+      snapshotVersions.add(snapshotVersion);
     }
     versioning.setSnapshotVersions(snapshotVersions);
     versioning.setLastUpdatedTimestamp(DateTime.now().toDate());
@@ -296,19 +305,22 @@ public class MetadataBuilder
 
   public void addArtifactVersion(final MavenPath mavenPath) {
     checkNotNull(mavenPath, "mavenPath");
-    if (mavenPath.isSubordinate() || mavenPath.getCoordinates() == null || !mavenPath.getCoordinates().isSnapshot()) {
+    if (mavenPath.isSubordinate() || mavenPath.getCoordinates() == null) {
+      return;
+    }
+    checkState(Objects.equals(getGroupId(), mavenPath.getCoordinates().getGroupId()));
+    checkState(Objects.equals(getArtifactId(), mavenPath.getCoordinates().getArtifactId()));
+    checkState(Objects.equals(getBaseVersion(), mavenPath.getCoordinates().getBaseVersion()));
+
+    addBaseVersion(mavenPath.getCoordinates().getBaseVersion());
+
+    if (!mavenPath.getCoordinates().isSnapshot()) {
       return;
     }
     if (Objects.equals(mavenPath.getCoordinates().getBaseVersion(), mavenPath.getCoordinates().getVersion())) {
       log.warn("Non-timestamped snapshot, ignoring it: {}", mavenPath);
       return;
     }
-
-    checkState(Objects.equals(getGroupId(), mavenPath.getCoordinates().getGroupId()));
-    checkState(Objects.equals(getArtifactId(), mavenPath.getCoordinates().getArtifactId()));
-    checkState(Objects.equals(getBaseVersion(), mavenPath.getCoordinates().getBaseVersion()));
-
-    addBaseVersion(mavenPath.getCoordinates().getBaseVersion());
 
     final String key = key(mavenPath.getCoordinates());
     final Version version = parseVersion(mavenPath.getCoordinates().getVersion());

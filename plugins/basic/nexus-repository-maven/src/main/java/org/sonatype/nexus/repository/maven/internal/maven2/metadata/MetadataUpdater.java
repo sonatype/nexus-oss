@@ -129,11 +129,16 @@ public class MetadataUpdater
   }
 
   private void write(final MavenPath mavenPath, final Metadata metadata) throws IOException {
+    System.out.println(mavenPath);
+    metadataWriter.write(System.out, metadata);
+    System.out.println();
+    /*
     final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     metadataWriter.write(byteArrayOutputStream, metadata);
     mavenFacet.put(
         mavenPath,
         new BytesPayload(byteArrayOutputStream.toByteArray(), Maven2Format.METADATA_CONTENT_TYPE)
     );
+    */
   }
 }
