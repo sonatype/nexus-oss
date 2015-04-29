@@ -48,6 +48,9 @@ public abstract class MetadataNode<T>
 
   private NestedAttributesMap attributes;
 
+  /**
+   * Is this entity new as of this transaction?
+   */
   public boolean isNew() {
     return newEntity;
   }

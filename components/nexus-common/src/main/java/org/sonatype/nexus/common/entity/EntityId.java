@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class EntityId
-  implements Serializable
+    implements Serializable
 {
   private static final long serialVersionUID = 1L;
 
@@ -44,13 +44,14 @@ public class EntityId
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+
+    if (!(o instanceof EntityId)) {
       return false;
     }
-
+    
     EntityId entityId = (EntityId) o;
 
-    if (!value.equals(entityId.value)) {
+    if (!getValue().equals(entityId.getValue())) {
       return false;
     }
 
@@ -59,11 +60,11 @@ public class EntityId
 
   @Override
   public int hashCode() {
-    return value.hashCode();
+    return getValue().hashCode();
   }
 
   @Override
   public String toString() {
-    return value;
+    return getValue();
   }
 }
