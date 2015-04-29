@@ -44,8 +44,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MetadataRebuildWorker
     extends ComponentSupport
 {
-  private final Repository repository;
-
   private final StorageFacet storageFacet;
 
   private final MavenPathParser mavenPathParser;
@@ -55,7 +53,7 @@ public class MetadataRebuildWorker
   private final MetadataUpdater metadataUpdater;
 
   public MetadataRebuildWorker(final Repository repository) {
-    this.repository = checkNotNull(repository);
+    checkNotNull(repository);
     this.storageFacet = repository.facet(StorageFacet.class);
     this.metadataBuilder = new MetadataBuilder();
     final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
