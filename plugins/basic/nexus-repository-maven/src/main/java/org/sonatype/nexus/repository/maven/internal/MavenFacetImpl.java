@@ -117,7 +117,7 @@ public class MavenFacetImpl
   static final String CONFIG_KEY = "maven";
 
   @VisibleForTesting
-  static class Config
+  public static class Config
   {
     public boolean strictContentTypeValidation = false;
 

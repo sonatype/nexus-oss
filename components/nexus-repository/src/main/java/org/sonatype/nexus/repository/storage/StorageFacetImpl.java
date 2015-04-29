@@ -65,7 +65,7 @@ public class StorageFacetImpl
   static final String CONFIG_KEY = "storage";
 
   @VisibleForTesting
-  static class Config
+  public static class Config
   {
     @NotEmpty
     public String blobStoreName = "default";
