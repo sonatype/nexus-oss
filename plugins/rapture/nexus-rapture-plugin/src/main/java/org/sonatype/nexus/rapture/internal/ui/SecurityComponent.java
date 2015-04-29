@@ -17,7 +17,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -187,7 +187,7 @@ public class SecurityComponent
     List<PermissionXO> permissions = null;
     Subject subject = securitySystem.getSubject();
     if (isLoggedIn(subject)) {
-      permissions = asPermissions(calculatePrivileges(subject));
+      permissions = calculatePermissions(subject);
     }
     return permissions;
   }
@@ -218,84 +218,30 @@ public class SecurityComponent
     return subject != null && (subject.isRemembered() || subject.isAuthenticated());
   }
 
-  private Map<String, Integer> calculatePrivileges(final Subject subject) {
-    Map<String, Integer> privilegeMap = Maps.newHashMap();
-
-    for (Privilege priv : securitySystem.listPrivileges()) {
-      if (priv.getType().equals("method")) {
-        String permission = priv.getPrivilegeProperty("permission");
-        privilegeMap.put(permission, NONE);
-      }
-    }
-
+  private List<PermissionXO> calculatePermissions(final Subject subject) {
     List<Permission> permissionList = Lists.newArrayList();
     List<String> permissionNameList = Lists.newArrayList();
+    List<PermissionXO> permissions = Lists.newArrayList();
 
-    for (String privilegeKey : privilegeMap.keySet()) {
-      permissionList.add(new WildcardPermission(privilegeKey + ":read"));
-      permissionList.add(new WildcardPermission(privilegeKey + ":create"));
-      permissionList.add(new WildcardPermission(privilegeKey + ":update"));
-      permissionList.add(new WildcardPermission(privilegeKey + ":delete"));
-      permissionNameList.add(privilegeKey + ":read");
-      permissionNameList.add(privilegeKey + ":create");
-      permissionNameList.add(privilegeKey + ":update");
-      permissionNameList.add(privilegeKey + ":delete");
+    for (Privilege priv : securitySystem.listPrivileges()) {
+      if (priv.getPermission() instanceof WildcardPermission) {
+        WildcardPermission permission = (WildcardPermission) priv.getPermission();
+        List<Set<String>> parts = SecurityUtils.getParts(permission);
+        processParts(0, parts, null, permissionList, permissionNameList);
+      }
     }
 
-    // get the privileges for this subject
     boolean[] boolResults = subject.isPermitted(permissionList);
 
-    // put then in a map so we can access them easily
-    Map<String, Boolean> resultMap = Maps.newHashMap();
-    for (int ii = 0; ii < permissionList.size(); ii++) {
-      String permissionName = permissionNameList.get(ii);
-      boolean b = boolResults[ii];
-      resultMap.put(permissionName, b);
-    }
-
-    // now loop through the original set and figure out the correct value
-    for (Entry<String, Integer> priv : privilegeMap.entrySet()) {
-
-      boolean readPriv = resultMap.get(priv.getKey() + ":read");
-      boolean createPriv = resultMap.get(priv.getKey() + ":create");
-      boolean updaetPriv = resultMap.get(priv.getKey() + ":update");
-      boolean deletePriv = resultMap.get(priv.getKey() + ":delete");
-
-      int perm = NONE;
-
-      if (readPriv) {
-        perm |= READ;
-      }
-      if (createPriv) {
-        perm |= CREATE;
-      }
-      if (updaetPriv) {
-        perm |= UPDATE;
-      }
-      if (deletePriv) {
-        perm |= DELETE;
-      }
-      // now set the value
-      priv.setValue(perm);
-    }
-
-    return privilegeMap;
-  }
-
-  private List<PermissionXO> asPermissions(final Map<String, Integer> privilegeMap) {
-    List<PermissionXO> perms = Lists.newArrayList();
-
-    for (Entry<String, Integer> entry : privilegeMap.entrySet()) {
-      if (entry.getValue() > NONE) {
+    for (int i = 0; i < permissionList.size(); i++) {
+      if (boolResults[i]) {
         PermissionXO permissionXO = new PermissionXO();
-        permissionXO.setId(entry.getKey());
-        permissionXO.setValue(entry.getValue());
-
-        perms.add(permissionXO);
+        permissionXO.setId(permissionNameList.get(i));
+        permissions.add(permissionXO);
       }
     }
 
-    Collections.sort(perms, new Comparator<PermissionXO>()
+    Collections.sort(permissions, new Comparator<PermissionXO>()
     {
       @Override
       public int compare(final PermissionXO o1, final PermissionXO o2) {
@@ -303,7 +249,28 @@ public class SecurityComponent
       }
     });
 
-    return perms;
+    return permissions;
+  }
+
+  /**
+   * Expand multiple parts as for example nexus:foo:create,read into nexus:foo:create and nexus:foo:read
+   */
+  private void processParts(final int partIndex,
+                            final List<Set<String>> parts,
+                            final String name,
+                            final List<Permission> permissionList,
+                            final List<String> permissionNameList)
+  {
+    for (String part : parts.get(partIndex)) {
+      String newName = name == null ? part : name + ":" + part;
+      if (partIndex < parts.size() - 1) {
+        processParts(partIndex + 1, parts, newName, permissionList, permissionNameList);
+      }
+      else {
+        permissionList.add(new WildcardPermission(newName));
+        permissionNameList.add(newName);
+      }
+    }
   }
 
 }

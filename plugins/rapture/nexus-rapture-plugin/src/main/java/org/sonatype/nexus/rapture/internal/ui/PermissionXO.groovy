@@ -23,6 +23,4 @@ import groovy.transform.ToString
 class PermissionXO
 {
   String id
-
-  int value
 }

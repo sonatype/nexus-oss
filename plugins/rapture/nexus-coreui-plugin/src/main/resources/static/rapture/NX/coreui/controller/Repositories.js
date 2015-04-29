@@ -83,10 +83,9 @@ Ext.define('NX.coreui.controller.Repositories', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('nexus:repositories', 'read') && NX.State.getUser();
+      return NX.Permissions.checkAny('nexus:repository-admin') && NX.State.getUser();
     }
   },
-  permission: 'nexus:repositories',
 
   /**
    * @override
@@ -145,13 +144,11 @@ Ext.define('NX.coreui.controller.Repositories', {
     }
     else {
       if (Ext.isDefined(model)) {
-        if (!settingsForm || formCls.xtype !== settingsForm.xtype) {
-          settingsPanel.removeAllSettingsForms();
-          settingsPanel.addSettingsForm({ xtype: formCls.xtype, recipe: model });
-          Ext.Array.each(settingsPanel.query('field[readOnlyOnUpdate=true]'), function(field) {
-            field.setReadOnly(true);
-          });
-        }
+        settingsPanel.removeAllSettingsForms();
+        settingsPanel.addSettingsForm({ xtype: formCls.xtype, recipe: model });
+        Ext.Array.each(settingsPanel.query('field[readOnlyOnUpdate=true]'), function(field) {
+          field.setReadOnly(true);
+        });
         settingsPanel.loadRecord(model);
       }
     }
@@ -314,6 +311,46 @@ Ext.define('NX.coreui.controller.Repositories', {
     else {
       me.stopStatusPolling();
     }
+  },
+
+  /**
+   * @override
+   * @protected
+   * Enable 'New' when user has 'add' permission.
+   */
+  bindNewButton: function(button) {
+    button.mon(
+        NX.Conditions.isPermitted('nexus:repository-admin:*:*', 'add'),
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
+  },
+
+  /**
+   * @protected
+   * Enable 'Delete' when user has 'delete' permission for selected repository.
+   */
+  bindDeleteButton: function(button) {
+    var permittedCondition;
+    button.mon(
+        NX.Conditions.and(
+            permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*', 'delete'),
+            NX.Conditions.gridHasSelection('nx-coreui-repository-list', function(model) {
+              var permission = 'nexus:repository-admin:' + model.get('format') + ':' + model.get('name');
+              permittedCondition.name = permission;
+              permittedCondition.evaluate();
+              return NX.Permissions.check(permission, 'delete');
+            })
+        ),
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
   }
 
 });

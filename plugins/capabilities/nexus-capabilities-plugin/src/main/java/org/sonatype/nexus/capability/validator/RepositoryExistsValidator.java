@@ -24,8 +24,7 @@ import org.sonatype.nexus.capability.ValidationResult;
 import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.ValidatorSupport;
 import org.sonatype.nexus.capability.support.validator.DefaultValidationResult;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
 
 import com.google.inject.assistedinject.Assisted;
 
@@ -42,31 +41,26 @@ public class RepositoryExistsValidator
     implements Validator
 {
 
-  private final RepositoryRegistry repositoryRegistry;
+  private final RepositoryManager repositoryManager;
 
   private final String propertyKey;
 
   @Inject
-  RepositoryExistsValidator(final RepositoryRegistry repositoryRegistry,
+  RepositoryExistsValidator(final RepositoryManager repositoryManager,
                             final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
                             final @Assisted CapabilityType type,
                             final @Assisted String propertyKey)
   {
     super(capabilityDescriptorRegistryProvider, type);
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.repositoryManager = checkNotNull(repositoryManager);
     this.propertyKey = checkNotNull(propertyKey);
   }
 
   @Override
   public ValidationResult validate(final Map<String, String> properties) {
-    String repositoryId = properties.get(propertyKey);
-    if (repositoryId != null) {
-      try {
-        repositoryRegistry.getRepository(repositoryId);
-      }
-      catch (NoSuchRepositoryException ignore) {
-        return new DefaultValidationResult().add(propertyKey, buildMessage(repositoryId));
-      }
+    String repositoryName = properties.get(propertyKey);
+    if (repositoryName != null && repositoryManager.get(repositoryName) != null) {
+      return new DefaultValidationResult().add(propertyKey, buildMessage(repositoryName));
     }
     return ValidationResult.VALID;
   }
@@ -86,10 +80,10 @@ public class RepositoryExistsValidator
 
   }
 
-  private String buildMessage(final String repositoryId) {
+  private String buildMessage(final String repositoryName) {
     final StringBuilder message = new StringBuilder();
     message.append("Selected ").append(propertyName(propertyKey).toLowerCase())
-        .append(" '").append(repositoryId).append("' could not be found");
+        .append(" '").append(repositoryName).append("' could not be found");
     return message.toString();
   }
 

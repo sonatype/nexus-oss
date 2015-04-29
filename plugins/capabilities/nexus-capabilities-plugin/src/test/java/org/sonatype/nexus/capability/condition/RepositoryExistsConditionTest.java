@@ -12,13 +12,14 @@
  */
 package org.sonatype.nexus.capability.condition;
 
+import java.util.Collections;
+
 import org.sonatype.nexus.capability.EventBusTestSupport;
-import org.sonatype.nexus.capability.support.condition.RepositoryConditions;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.capability.support.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.manager.RepositoryCreatedEvent;
+import org.sonatype.nexus.repository.manager.RepositoryDeletedEvent;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +46,7 @@ public class RepositoryExistsConditionTest
   private Repository repository;
 
   @Mock
-  private RepositoryRegistry repositoryRegistry;
+  private RepositoryManager repositoryManager;
 
   private RepositoryExistsCondition underTest;
 
@@ -53,20 +54,21 @@ public class RepositoryExistsConditionTest
   public final void setUpRepositoryExistsCondition()
       throws Exception
   {
-    final RepositoryConditions.RepositoryId repositoryId = mock(RepositoryConditions.RepositoryId.class);
-    when(repositoryId.get()).thenReturn(TEST_REPOSITORY);
+    when(repositoryManager.browse()).thenReturn(Collections.<Repository>emptyList());
 
-    when(repository.getId()).thenReturn(TEST_REPOSITORY);
-    when(repository.getLocalStatus()).thenReturn(LocalStatus.IN_SERVICE);
+    final RepositoryName repositoryName = mock(RepositoryName.class);
+    when(repositoryName.get()).thenReturn(TEST_REPOSITORY);
 
-    underTest = new RepositoryExistsCondition(eventBus, repositoryRegistry, repositoryId);
+    when(repository.getName()).thenReturn(TEST_REPOSITORY);
+
+    underTest = new RepositoryExistsCondition(eventBus, repositoryManager, repositoryName);
     underTest.bind();
 
     verify(eventBus).register(underTest);
 
     assertThat(underTest.isSatisfied(), is(false));
 
-    underTest.handle(new RepositoryRegistryEventAdd(repositoryRegistry, repository));
+    underTest.handle(new RepositoryCreatedEvent(repository));
   }
 
   /**
@@ -84,8 +86,8 @@ public class RepositoryExistsConditionTest
   public void satisfiedWhenRepositoryAdded() {
     assertThat(underTest.isSatisfied(), is(true));
 
-    underTest.handle(new RepositoryRegistryEventRemove(repositoryRegistry, repository));
-    underTest.handle(new RepositoryRegistryEventAdd(repositoryRegistry, repository));
+    underTest.handle(new RepositoryDeletedEvent(repository));
+    underTest.handle(new RepositoryCreatedEvent(repository));
     assertThat(underTest.isSatisfied(), is(true));
 
     verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest), satisfied(underTest));
@@ -98,7 +100,7 @@ public class RepositoryExistsConditionTest
   public void repositoryIsRemoved() {
     assertThat(underTest.isSatisfied(), is(true));
 
-    underTest.handle(new RepositoryRegistryEventRemove(repositoryRegistry, repository));
+    underTest.handle(new RepositoryDeletedEvent(repository));
     assertThat(underTest.isSatisfied(), is(false));
 
     verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest));
@@ -111,8 +113,8 @@ public class RepositoryExistsConditionTest
   public void noReactionWhenAnotherRepositoryIsRemoved() {
     assertThat(underTest.isSatisfied(), is(true));
     final Repository anotherRepository = mock(Repository.class);
-    when(anotherRepository.getId()).thenReturn("another");
-    underTest.handle(new RepositoryRegistryEventRemove(repositoryRegistry, anotherRepository));
+    when(anotherRepository.getName()).thenReturn("another");
+    underTest.handle(new RepositoryDeletedEvent(anotherRepository));
     assertThat(underTest.isSatisfied(), is(true));
   }
 

@@ -23,14 +23,10 @@ import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
-import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.HostedRepository;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.proxy.repository.WebSiteRepository;
+import org.sonatype.nexus.repository.types.GroupType;
+import org.sonatype.nexus.repository.types.HostedType;
+import org.sonatype.nexus.repository.types.ProxyType;
+import org.sonatype.nexus.repository.types.VirtualType;
 
 import com.google.common.collect.Lists;
 
@@ -61,30 +57,25 @@ public class RepositoryComboCapabilityDescriptor
         new RepositoryCombobox("all", "All", "?", FormField.OPTIONAL)
             .includeAnEntryForAllRepositories(),
         new RepositoryCombobox("hosted", "Hosted", "?", FormField.OPTIONAL)
-            .includingAnyOfFacets(HostedRepository.class),
+            .includingAnyOfTypes(HostedType.NAME),
         new RepositoryCombobox("proxy", "Proxy", "?", FormField.OPTIONAL)
-            .includingAnyOfFacets(ProxyRepository.class),
+            .includingAnyOfTypes(ProxyType.NAME),
         new RepositoryCombobox("hosted+proxy", "Hosted and Proxy", "?", FormField.OPTIONAL)
-            .includingAnyOfFacets(HostedRepository.class, ProxyRepository.class),
+            .includingAnyOfTypes(HostedType.NAME, ProxyType.NAME),
         new RepositoryCombobox("group", "Groups", "?", FormField.OPTIONAL)
-            .includingAnyOfFacets(GroupRepository.class),
+            .includingAnyOfTypes(GroupType.NAME),
         new RepositoryCombobox("!group", "Any except Groups", "?", FormField.OPTIONAL)
-            .excludingAnyOfFacets(GroupRepository.class),
+            .excludingAnyOfTypes(GroupType.NAME),
         new RepositoryCombobox("virtual", "Virtual", "?", FormField.OPTIONAL)
-            .includingAnyOfFacets(ShadowRepository.class),
+            .includingAnyOfTypes(VirtualType.NAME),
         new RepositoryCombobox("maven", "Maven", "?", FormField.OPTIONAL)
-            .includingAnyOfFacets(MavenRepository.class),
-        new RepositoryCombobox("site", "Sites", "?", FormField.OPTIONAL)
-            .includingAnyOfFacets(WebSiteRepository.class),
-        new RepositoryCombobox("maven1", "Maven 1", "?", FormField.OPTIONAL)
-            .includingAnyOfFacets(MavenRepository.class)
-            .includingAnyOfContentClasses(Maven1ContentClass.ID),
-        new RepositoryCombobox("maven2", "Maven 2", "?", FormField.OPTIONAL)
-            .includingAnyOfFacets(MavenRepository.class)
-            .includingAnyOfContentClasses(Maven2ContentClass.ID),
-        new RepositoryCombobox("hosted!maven1", "Hosted except Maven 1", "?", FormField.OPTIONAL)
-            .includingAnyOfFacets(HostedRepository.class)
-            .excludingAnyOfContentClasses(Maven1ContentClass.ID)
+            .includingAnyOfFormats("maven2"),
+        new RepositoryCombobox("hosted+maven", "Hosted and Maven", "?", FormField.OPTIONAL)
+            .includingAnyOfTypes(HostedType.NAME)
+            .includingAnyOfFormats("maven2"),
+        new RepositoryCombobox("hosted!maven", "Hosted except Maven", "?", FormField.OPTIONAL)
+            .includingAnyOfTypes(HostedType.NAME)
+            .excludingAnyOfFormats("maven2")
     );
   }
 

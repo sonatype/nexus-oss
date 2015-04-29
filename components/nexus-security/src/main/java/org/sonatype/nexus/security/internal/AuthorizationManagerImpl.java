@@ -141,7 +141,7 @@ public class AuthorizationManagerImpl
     // expose permission string representation
     PrivilegeDescriptor descriptor = descriptor(source.getType());
     if (descriptor != null) {
-      target.setPermission(descriptor.createPermission(source).toString());
+      target.setPermission(descriptor.createPermission(source));
     }
 
     return target;

@@ -88,7 +88,7 @@ extends DirectComponentSupport
   @DirectMethod
   @WithWriteLock
   @RequiresAuthentication
-  @RequiresPermissions('nexus:logconfig:delete')
+  @RequiresPermissions('nexus:logconfig:update')
   @Validate
   void remove(final @NotEmpty(message = '[name] may not be empty') String name) {
     assert name != ROOT, "${ROOT} logger cannot be removed"

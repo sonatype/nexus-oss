@@ -18,11 +18,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.condition.RepositoryExistsCondition;
-import org.sonatype.nexus.capability.condition.RepositoryLocalStatusCondition;
-import org.sonatype.nexus.capability.condition.RepositoryProxyModeCondition;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
+import org.sonatype.nexus.capability.condition.RepositoryOnlineCondition;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -39,51 +36,39 @@ public class RepositoryConditions
 
   private final EventBus eventBus;
 
-  private final RepositoryRegistry repositoryRegistry;
+  private final RepositoryManager repositoryManager;
 
   @Inject
   public RepositoryConditions(final EventBus eventBus,
-                              final RepositoryRegistry repositoryRegistry)
+                              final RepositoryManager repositoryManager)
   {
     this.eventBus = checkNotNull(eventBus);
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.repositoryManager = checkNotNull(repositoryManager);
   }
 
   /**
    * Creates a new condition that is satisfied when a repository is in service.
    *
-   * @param repositoryId getter for repository id (usually condition specific property)
+   * @param repositoryName getter for repository name (usually condition specific property)
    * @return created condition
    */
-  public Condition repositoryIsInService(final RepositoryId repositoryId) {
-    return new RepositoryLocalStatusCondition(eventBus, repositoryRegistry, LocalStatus.IN_SERVICE, repositoryId);
-  }
-
-  /**
-   * Creates a new condition that is satisfied when a proxy repository proxy mode allows proxy-ing (ALLOW).
-   *
-   * @param repositoryId getter for repository id (usually condition specific property)
-   * @return created condition
-   */
-  public Condition repositoryIsNotBlocked(final RepositoryId repositoryId) {
-    return new RepositoryProxyModeCondition(eventBus, repositoryRegistry, ProxyMode.ALLOW, repositoryId);
+  public Condition repositoryIsOnline(final RepositoryName repositoryName) {
+    return new RepositoryOnlineCondition(eventBus, repositoryManager, repositoryName);
   }
 
   /**
    * Creates a new condition that is satisfied when a repository exists.
    *
-   * @param repositoryId getter for repository id (usually condition specific property)
+   * @param repositoryName getter for repository name (usually condition specific property)
    * @return created condition
    */
-  public Condition repositoryExists(final RepositoryId repositoryId) {
-    return new RepositoryExistsCondition(eventBus, repositoryRegistry, repositoryId);
+  public Condition repositoryExists(final RepositoryName repositoryName) {
+    return new RepositoryExistsCondition(eventBus, repositoryManager, repositoryName);
   }
 
-  public static interface RepositoryId
+  public static interface RepositoryName
   {
-
     String get();
-
   }
 
 }

@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus.capability.condition;
 
-import org.sonatype.nexus.capability.support.condition.RepositoryConditions;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.capability.support.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.repository.manager.RepositoryCreatedEvent;
+import org.sonatype.nexus.repository.manager.RepositoryDeletedEvent;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -31,25 +31,25 @@ public class RepositoryExistsCondition
 {
 
   public RepositoryExistsCondition(final EventBus eventBus,
-                                   final RepositoryRegistry repositoryRegistry,
-                                   final RepositoryConditions.RepositoryId repositoryId)
+                                   final RepositoryManager repositoryManager,
+                                   final RepositoryName repositoryName)
   {
-    super(eventBus, repositoryRegistry, repositoryId);
+    super(eventBus, repositoryManager, repositoryName);
   }
 
   @Override
   @AllowConcurrentEvents
   @Subscribe
-  public void handle(final RepositoryRegistryEventAdd event) {
-    if (sameRepositoryAs(event.getRepository().getId())) {
+  public void handle(final RepositoryCreatedEvent event) {
+    if (sameRepositoryAs(event.getRepository().getName())) {
       setSatisfied(true);
     }
   }
 
   @AllowConcurrentEvents
   @Subscribe
-  public void handle(final RepositoryRegistryEventRemove event) {
-    if (sameRepositoryAs(event.getRepository().getId())) {
+  public void handle(final RepositoryDeletedEvent event) {
+    if (sameRepositoryAs(event.getRepository().getName())) {
       setSatisfied(false);
     }
   }
@@ -57,8 +57,8 @@ public class RepositoryExistsCondition
   @Override
   public String toString() {
     try {
-      final String id = getRepositoryId();
-      return String.format("Repository '%s' exists", id);
+      final String repositoryName = getRepositoryName();
+      return String.format("Repository '%s' exists", repositoryName);
     }
     catch (Exception ignore) {
       return "Repository '(could not be evaluated)' exists";
@@ -68,8 +68,8 @@ public class RepositoryExistsCondition
   @Override
   public String explainSatisfied() {
     try {
-      final String id = getRepositoryId();
-      return String.format("Repository '%s' exists", id);
+      final String repositoryName = getRepositoryName();
+      return String.format("Repository '%s' exists", repositoryName);
     }
     catch (Exception ignore) {
       return "Repository '(could not be evaluated)' exists";
@@ -79,8 +79,8 @@ public class RepositoryExistsCondition
   @Override
   public String explainUnsatisfied() {
     try {
-      final String id = getRepositoryId();
-      return String.format("Repository '%s' does not exist", id);
+      final String repositoryName = getRepositoryName();
+      return String.format("Repository '%s' does not exist", repositoryName);
     }
     catch (Exception ignore) {
       return "Repository '(could not be evaluated)' does not exist";

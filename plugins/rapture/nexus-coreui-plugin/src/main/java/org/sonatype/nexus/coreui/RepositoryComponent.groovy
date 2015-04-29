@@ -30,6 +30,9 @@ import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
+import org.sonatype.nexus.repository.security.BreadActions
+import org.sonatype.nexus.repository.security.RepositoryAdminPermission
+import org.sonatype.nexus.security.SecurityHelper
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
@@ -58,11 +61,14 @@ extends DirectComponentSupport
   RepositoryManager repositoryManager
 
   @Inject
+  SecurityHelper securityHelper
+
+  @Inject
   Map<String, Recipe> recipes
 
   @DirectMethod
   List<RepositoryXO> read() {
-    repositoryManager.browse().collect { asRepository(it) }
+    browse().collect { asRepository(it) }
   }
 
   @DirectMethod
@@ -79,7 +85,6 @@ extends DirectComponentSupport
    * Retrieve a list of available repositories references.
    */
   @DirectMethod
-  @RequiresPermissions('nexus:repositories:read')
   List<RepositoryReferenceXO> readReferences(final @Nullable StoreLoadParameters parameters) {
     return filter(parameters).collect { Repository repository ->
       new RepositoryReferenceXO(
@@ -93,23 +98,26 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
+  @RequiresPermissions('nexus:repository-admin:*:*:add')
   @Validate(groups = [Create.class, Default.class])
-  RepositoryXO create(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repository) {
+  RepositoryXO create(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repositoryXO) {
     return asRepository(repositoryManager.create(new Configuration(
-        repositoryName: repository.name,
-        recipeName: repository.recipe,
-        online: repository.online,
-        attributes: repository.attributes
+        repositoryName: repositoryXO.name,
+        recipeName: repositoryXO.recipe,
+        online: repositoryXO.online,
+        attributes: repositoryXO.attributes
     )))
   }
 
   @DirectMethod
   @RequiresAuthentication
   @Validate(groups = [Update.class, Default.class])
-  RepositoryXO update(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repository) {
-    return asRepository(repositoryManager.update(repositoryManager.get(repository.name).configuration.with {
-      online = repository.online
-      attributes = repository.attributes
+  RepositoryXO update(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repositoryXO) {
+    Repository repository = repositoryManager.get(repositoryXO.name)
+    securityHelper.ensurePermitted(adminPermission(repository, BreadActions.EDIT))
+    return asRepository(repositoryManager.update(repository.configuration.with {
+      online = repositoryXO.online
+      attributes = repositoryXO.attributes
       return it
     }))
   }
@@ -118,6 +126,8 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @Validate
   void remove(final @NotEmpty(message = '[name] may not be empty') String name) {
+    Repository repository = repositoryManager.get(name)
+    securityHelper.ensurePermitted(adminPermission(repository, BreadActions.DELETE))
     repositoryManager.delete(name)
   }
 
@@ -137,7 +147,7 @@ extends DirectComponentSupport
   @DirectPollMethod(event = "coreui_Repository_readStatus")
   @RequiresAuthentication
   List<RepositoryStatusXO> readStatus(final Map<String, String> params) {
-    repositoryManager.browse().collect { Repository repository -> buildStatus(repository) }
+    browse().collect { Repository repository -> buildStatus(repository) }
   }
 
   RepositoryStatusXO buildStatus(Repository input) {
@@ -168,16 +178,27 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  List<Repository> filter(final @Nullable StoreLoadParameters parameters) {
+  Iterable<Repository> filter(final @Nullable StoreLoadParameters parameters) {
     def repositories = repositoryManager.browse()
     if (parameters) {
       String format = parameters.getFilter('format')
       if (format) {
-        return repositories.findResults { Repository repository ->
-          repository.format == format
+        repositories = repositories.findResults { Repository repository ->
+          repository.format == format ? repository : null
         }
       }
     }
     return repositories
+  }
+
+
+  Iterable<Repository> browse() {
+    return repositoryManager.browse().findResults { Repository repository ->
+      securityHelper.allPermitted(adminPermission(repository, BreadActions.READ)) ? repository : null
+    }
+  }
+
+  RepositoryAdminPermission adminPermission(final Repository repository, final String action) {
+    return new RepositoryAdminPermission(repository.format.value, repository.name, [action])
   }
 }
