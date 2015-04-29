@@ -137,6 +137,14 @@ public class StorageTxImpl
     return bucket;
   }
 
+  @Nullable
+  @Override
+  @Guarded(by = OPEN)
+  public Bucket findBucket(final EntityId id) {
+    checkNotNull(id);
+    return bucketEntityAdapter.get(db, id);
+  }
+
   @Override
   @Guarded(by = OPEN)
   public Iterable<Bucket> browseBuckets() {

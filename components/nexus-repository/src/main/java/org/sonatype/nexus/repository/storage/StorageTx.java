@@ -63,6 +63,12 @@ public interface StorageTx
   Bucket getBucket();
 
   /**
+   * Gets a bucket by id, or {@code null} if not found.
+   */
+  @Nullable
+  Bucket findBucket(EntityId id);
+
+  /**
    * Gets all buckets.
    */
   Iterable<Bucket> browseBuckets();

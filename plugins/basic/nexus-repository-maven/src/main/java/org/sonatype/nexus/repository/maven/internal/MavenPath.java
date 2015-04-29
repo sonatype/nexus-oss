@@ -34,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Immutable
 public class MavenPath
 {
-  public static enum HashType
+  public enum HashType
   {
     SHA1("sha1", HashAlgorithm.SHA1),
 
@@ -64,7 +64,7 @@ public class MavenPath
     }
   }
 
-  public static enum SignatureType
+  public enum SignatureType
   {
     GPG("asc");
 
@@ -89,6 +89,10 @@ public class MavenPath
 
     private final String version;
 
+    private final Long timestamp;
+
+    private final Integer buildNumber;
+
     private final String baseVersion;
 
     private final String classifier;
@@ -101,8 +105,10 @@ public class MavenPath
                        final String groupId,
                        final String artifactId,
                        final String version,
+                       @Nullable final Long timestamp,
+                       @Nullable final Integer buildNumber,
                        final String baseVersion,
-                       final String classifier,
+                       @Nullable final String classifier,
                        final String extension,
                        final SignatureType signatureType)
     {
@@ -110,6 +116,8 @@ public class MavenPath
       this.groupId = checkNotNull(groupId);
       this.artifactId = checkNotNull(artifactId);
       this.version = checkNotNull(version);
+      this.timestamp = snapshot ? timestamp : null;
+      this.buildNumber = snapshot ? buildNumber : null;
       this.baseVersion = checkNotNull(baseVersion);
       this.classifier = classifier;
       this.extension = checkNotNull(extension);
@@ -133,6 +141,16 @@ public class MavenPath
     @Nonnull
     public String getVersion() {
       return version;
+    }
+
+    @Nullable
+    public Long getTimestamp() {
+      return timestamp;
+    }
+
+    @Nullable
+    public Integer getBuildNumber() {
+      return buildNumber;
     }
 
     @Nonnull
@@ -251,8 +269,10 @@ public class MavenPath
             coordinates.isSnapshot(),
             coordinates.getGroupId(),
             coordinates.getArtifactId(),
-            coordinates.getBaseVersion(),
             coordinates.getVersion(),
+            coordinates.getTimestamp(),
+            coordinates.getBuildNumber(),
+            coordinates.getBaseVersion(),
             coordinates.getClassifier(),
             coordinates.getExtension().substring(0, coordinates.getExtension().length() - hashSuffixLen),
             coordinates.getSignatureType()
@@ -270,6 +290,8 @@ public class MavenPath
           coordinates.getGroupId(),
           coordinates.getArtifactId(),
           coordinates.getVersion(),
+          coordinates.getTimestamp(),
+          coordinates.getBuildNumber(),
           coordinates.getBaseVersion(),
           coordinates.getClassifier(),
           coordinates.getExtension().substring(0, coordinates.getExtension().length() - signatureSuffixLen),
@@ -297,6 +319,8 @@ public class MavenPath
           coordinates.getGroupId(),
           coordinates.getArtifactId(),
           coordinates.getVersion(),
+          coordinates.getTimestamp(),
+          coordinates.getBuildNumber(),
           coordinates.getBaseVersion(),
           coordinates.getClassifier(),
           coordinates.getExtension() + "." + hashType.getExt(),
@@ -324,6 +348,8 @@ public class MavenPath
         coordinates.getGroupId(),
         coordinates.getArtifactId(),
         coordinates.getVersion(),
+        coordinates.getTimestamp(),
+        coordinates.getBuildNumber(),
         coordinates.getBaseVersion(),
         coordinates.getClassifier(),
         coordinates.getExtension() + "." + signatureType.getExt(),

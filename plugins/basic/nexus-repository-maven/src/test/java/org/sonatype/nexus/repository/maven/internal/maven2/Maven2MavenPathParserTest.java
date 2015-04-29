@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.repository.maven.internal.maven2;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
 import org.sonatype.nexus.repository.maven.internal.MavenPath;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.SignatureType;
@@ -34,6 +38,12 @@ public class Maven2MavenPathParserTest
 {
   private final Maven2MavenPathParser pathParser = new Maven2MavenPathParser();
 
+  private long parseTimestamp(final String ts) throws ParseException {
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd.HHmmss");
+    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+    return sdf.parse(ts).getTime();
+  }
+
   @Test
   public void artifact() throws Exception
   {
@@ -49,6 +59,8 @@ public class Maven2MavenPathParserTest
     assertThat(mavenPath.getCoordinates().getGroupId(), equalTo("org.jruby"));
     assertThat(mavenPath.getCoordinates().getArtifactId(), equalTo("jruby"));
     assertThat(mavenPath.getCoordinates().getVersion(), equalTo("1.0RC1-20070504.160758-25"));
+    assertThat(mavenPath.getCoordinates().getTimestamp(), equalTo(parseTimestamp("20070504.160758")));
+    assertThat(mavenPath.getCoordinates().getBuildNumber(), equalTo(25));
     assertThat(mavenPath.getCoordinates().getBaseVersion(), equalTo("1.0RC1-SNAPSHOT"));
     assertThat(mavenPath.getCoordinates().getClassifier(), equalTo("javadoc"));
     assertThat(mavenPath.getCoordinates().getExtension(), equalTo("jar"));
@@ -64,6 +76,8 @@ public class Maven2MavenPathParserTest
     assertThat(mavenPath.getCoordinates().getGroupId(), equalTo("com.sun.xml.ws"));
     assertThat(mavenPath.getCoordinates().getArtifactId(), equalTo("jaxws-local-transport"));
     assertThat(mavenPath.getCoordinates().getVersion(), equalTo("2.1.3"));
+    assertThat(mavenPath.getCoordinates().getTimestamp(), nullValue());
+    assertThat(mavenPath.getCoordinates().getBuildNumber(), nullValue());
     assertThat(mavenPath.getCoordinates().getBaseVersion(), equalTo("2.1.3"));
     assertThat(mavenPath.getCoordinates().getClassifier(), nullValue());
     assertThat(mavenPath.getCoordinates().getExtension(), equalTo("pom.md5"));
