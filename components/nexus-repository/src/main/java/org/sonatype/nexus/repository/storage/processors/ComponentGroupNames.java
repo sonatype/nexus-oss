@@ -29,9 +29,9 @@ public class ComponentGroupNames
     final List<String> names = Lists.newArrayList();
     try (StorageTx tx = context.getStorageTxSupplier().get()) {
       Iterable<ODocument> docs = tx.getDb()
-          .command(new OCommandSQL("select distinct(name) as val from component where bucket=? and group=? limit -1"))
+          .command(new OCommandSQL("select distinct(name) as val from component where group=? limit -1")) //bucket=? and
               // TODO: bucket.rid!
-          .execute(tx.getBucket(), group);
+          .execute(group); //tx.getBucket(), group);
       for (ODocument doc : docs) {
         final String docVal = doc.field("val", OType.STRING);
         names.add(docVal);

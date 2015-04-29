@@ -35,9 +35,9 @@ public class ComponentGroupNameBaseVersions
     try (StorageTx tx = context.getStorageTxSupplier().get()) {
       Iterable<ODocument> docs = tx.getDb()
           .command(new OCommandSQL(
-              "select distinct(attributes.maven2.baseVersion) as val from component where bucket=? and group=? and name=? limit -1"))
+              "select distinct(attributes.maven2.baseVersion) as val from component where group=? and name=? limit -1")) // bucket=? and
               // TODO: bucket.rid!
-          .execute(tx.getBucket(), group, name);
+          .execute(group, name); // tx.getBucket(),
       for (ODocument doc : docs) {
         final String docVal = doc.field("val", OType.STRING);
         versions.add(docVal);
