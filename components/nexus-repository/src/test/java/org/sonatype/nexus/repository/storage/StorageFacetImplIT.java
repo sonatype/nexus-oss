@@ -361,7 +361,6 @@ public class StorageFacetImplIT
       asset1Id = id(asset1);
       asset2Id = id(asset2);
       componentId = id(component);
-      System.err.println(componentId);
     }
 
     try (StorageTx tx = underTest.openTx()) {
@@ -369,11 +368,6 @@ public class StorageFacetImplIT
 
       checkSize(tx.browseAssets(bucket), 2);
       checkSize(tx.browseComponents(bucket), 1);
-
-      // TODO: Remove test code
-      for (Component c : tx.browseComponents(bucket)) {
-        System.err.println(id(c));
-      }
 
       assertNotNull(tx.findAsset(asset1Id, bucket));
       assertNotNull(tx.findComponent(componentId, bucket));
@@ -688,10 +682,6 @@ public class StorageFacetImplIT
 
     try (StorageTx tx = underTest.openTx()) {
       final Iterable<Component> components = tx.browseComponents(tx.getBucket());
-      for (Component c : components) {
-        System.err.println(c);
-      }
-
       final Component component = tx.findComponentWithProperty("group", "myGroup", tx.getBucket());
       assertThat(component, is(notNullValue()));
       assertThat(component.group(), is("myGroup"));
@@ -752,9 +742,9 @@ public class StorageFacetImplIT
   {}
 
   @Test
-  public void dependentQueryFromNewComponent() throws Exception{
-    try(StorageTx tx = underTest.openTx()){
-      final Component component = tx.createComponent(tx.getBucket(),testFormat).name("component");
+  public void dependentQueryFromNewComponent() throws Exception {
+    try (StorageTx tx = underTest.openTx()) {
+      final Component component = tx.createComponent(tx.getBucket(), testFormat).name("component");
       tx.saveComponent(component);
 
       final Iterable<Asset> assets = tx.browseAssets(component);
