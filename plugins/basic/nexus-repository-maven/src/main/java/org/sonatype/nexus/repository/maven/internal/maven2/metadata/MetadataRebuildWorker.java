@@ -54,8 +54,6 @@ public class MetadataRebuildWorker
 
   private final MetadataUpdater metadataUpdater;
 
-  private ODatabaseDocumentTx dbWrite;
-
   public MetadataRebuildWorker(final Repository repository) {
     this.repository = checkNotNull(repository);
     this.storageFacet = repository.facet(StorageFacet.class);
