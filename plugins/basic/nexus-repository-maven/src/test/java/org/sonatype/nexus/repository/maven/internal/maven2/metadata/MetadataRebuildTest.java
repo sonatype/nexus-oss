@@ -42,6 +42,7 @@ import org.sonatype.nexus.repository.storage.processors.Loop;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.util.Providers;
@@ -161,7 +162,7 @@ public class MetadataRebuildTest
     storageFacet.stop();
   }
 
-  public void rebuildMetadata(final Repository repository) {
+  public Stopwatch rebuildMetadataNested(final Repository repository) {
     final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
 
     final MetadataBuilder metadataBuilder = new MetadataBuilder();
@@ -188,11 +189,49 @@ public class MetadataRebuildTest
             new MetadataProcessor(metadataBuilder, mavenFacet.getMavenPathParser()) // comp+asset
         ).listIterator()
     );
+    final Stopwatch stopwatch = Stopwatch.createStarted();
     context.proceed();
+    stopwatch.stop();
+    logger.info("t={}", stopwatch);
+    return stopwatch;
+  }
+
+  public Stopwatch rebuildMetadataFlat(final Repository repository) {
+    final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
+
+    final MetadataBuilder metadataBuilder = new MetadataBuilder();
+    final MetadataUpdater metadataUpdater = new MetadataUpdater(mavenFacet);
+
+    final ProcessorContext context = new ProcessorContext(
+        new Supplier<StorageTx>()
+        {
+          @Override
+          public StorageTx get() {
+            return repository.facet(StorageFacet.class).openTx();
+          }
+        },
+        Arrays.asList(
+            new Loop<>(new GAbVsElementSource()), // -- loop distinct(group, name, set(bV))
+            new Loop<>(new GAbVElementSource()), // -- expand(bV)
+            new GAbVExpando(), // GAbV -> P_XXX properties
+            new GProcessor(metadataBuilder, metadataUpdater), // around groups
+            new AProcessor(metadataBuilder, metadataUpdater), // around names
+            new BVProcessor(metadataBuilder, metadataUpdater), // around baseVersion
+            new MetadataProcessor(metadataBuilder, mavenFacet.getMavenPathParser()) // comp+asset
+        ).listIterator()
+    );
+    final Stopwatch stopwatch = Stopwatch.createStarted();
+    context.proceed();
+    stopwatch.stop();
+    logger.info("t={}", stopwatch);
+    return stopwatch;
   }
 
   @Test
   public void process() throws Exception {
-    rebuildMetadata(mavenCentral);
+    final Stopwatch nested = rebuildMetadataNested(mavenCentral);
+    final Stopwatch flat = rebuildMetadataFlat(mavenCentral);
+
+    logger.info("tNested={}, tFlat={}", nested, flat);
   }
 }
