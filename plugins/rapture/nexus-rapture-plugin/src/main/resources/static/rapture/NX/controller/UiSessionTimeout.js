@@ -24,7 +24,8 @@ Ext.define('NX.controller.UiSessionTimeout', {
     'NX.Messages',
     'NX.Security',
     'NX.State',
-    'NX.I18n'
+    'NX.I18n',
+    'NX.State'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -32,6 +33,13 @@ Ext.define('NX.controller.UiSessionTimeout', {
 
   views: [
     'ExpireSession'
+  ],
+  
+  refs: [
+    {
+      ref: 'expireSessionWindow',
+      selector: 'nx-expire-session'
+    }  
   ],
 
   SECONDS_TO_EXPIRE: 30,
@@ -46,8 +54,9 @@ Ext.define('NX.controller.UiSessionTimeout', {
     me.listen({
       controller: {
         '#State': {
-          userchanged: me.onUserChanged,
-          uisettingschanged: me.onUiSettingsChanged
+          userchanged: me.setupTimeout,
+          uisettingschanged: me.onUiSettingsChanged,
+          receivingchanged: me.setupTimeout
         }
       },
       component: {
@@ -55,30 +64,16 @@ Ext.define('NX.controller.UiSessionTimeout', {
           afterrender: me.startTicking
         },
         'nx-expire-session button[action=cancel]': {
-          click: me.stopTicking
+          click: me.setupTimeout
         }
       }
     });
   },
 
   onLaunch: function () {
-    var me = this,
-        user = NX.State.getUser(),
-        uiSettings = NX.State.getValue('uiSettings') || {};
-
-    me.setupTimeout(user ? uiSettings['sessionTimeout'] : undefined);
+    this.setupTimeout();
   },
-
-  /**
-   * @private
-   */
-  onUserChanged: function (user) {
-    var me = this,
-        uiSettings = NX.State.getValue('uiSettings') || {};
-
-    me.setupTimeout(user ? uiSettings['sessionTimeout'] : undefined);
-  },
-
+  
   /**
    * @private
    * Reset UI session timeout when uiSettings.sessionTimeout changes.
@@ -88,26 +83,27 @@ Ext.define('NX.controller.UiSessionTimeout', {
    * @param {Number} oldUiSettings.sessionTimeout
    */
   onUiSettingsChanged: function (uiSettings, oldUiSettings) {
-    var me = this,
-        user = NX.State.getUser();
+    var me = this;
 
     uiSettings = uiSettings || {};
     oldUiSettings = oldUiSettings || {};
 
     if (uiSettings.sessionTimeout !== oldUiSettings.sessionTimeout) {
-      me.setupTimeout(user ? uiSettings.sessionTimeout : undefined);
+      me.setupTimeout();
     }
   },
 
   /**
    * @private
    */
-  setupTimeout: function (sessionTimeout) {
-    var me = this;
+  setupTimeout: function () {
+    var me = this,
+        user = NX.State.getUser(),
+        uiSettings = NX.State.getValue('uiSettings') || {},
+        sessionTimeout = user ? uiSettings['sessionTimeout'] : undefined;
 
     me.cancelTimeout();
-
-    if (sessionTimeout > 0) {
+    if ((user &&  NX.State.isReceiving()) && sessionTimeout > 0) {
       me.logDebug('Session expiration enabled for ' + sessionTimeout + ' minutes');
       me.activityMonitor = Ext.create('Ext.ux.ActivityMonitor', {
         interval: 1000, // check every second,
@@ -122,17 +118,23 @@ Ext.define('NX.controller.UiSessionTimeout', {
    * @private
    */
   cancelTimeout: function () {
-    var me = this;
-
+    var me = this, 
+        expireSessionView = me.getExpireSessionWindow();
+    
+    if(expireSessionView) {
+      expireSessionView.close();
+    }
+    
     if (me.activityMonitor) {
       me.activityMonitor.stop();
       delete me.activityMonitor;
-      me.logDebug('Session expiration disabled');
+      me.logDebug('Activity monitor disabled');
     }
 
     if (me.expirationTicker) {
       me.expirationTicker.destroy();
       delete me.expirationTicker;
+      me.logDebug('Session expiration disabled');
     }
   },
 
@@ -171,23 +173,6 @@ Ext.define('NX.controller.UiSessionTimeout', {
       repeat: me.SECONDS_TO_EXPIRE
     });
     me.expirationTicker.start();
-  },
-
-  /**
-   * @private
-   */
-  stopTicking: function (button) {
-    var me = this,
-        win = button.up('window');
-
-    if (me.expirationTicker) {
-      me.expirationTicker.destroy();
-      delete me.expirationTicker;
-    }
-    if (win) {
-      win.close();
-    }
-    me.activityMonitor.start();
   }
 
 });
