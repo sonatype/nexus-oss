@@ -88,7 +88,7 @@ public class MetadataBuilder
     return groupId;
   }
 
-  public boolean setGroupId(final String groupId) {
+  private boolean setGroupId(final String groupId) {
     checkNotNull(groupId, "groupId");
     if (Objects.equals(groupId, this.getGroupId())) {
       return false;
@@ -103,7 +103,7 @@ public class MetadataBuilder
     return artifactId;
   }
 
-  public boolean setArtifactId(final String artifactId) {
+  private boolean setArtifactId(final String artifactId) {
     checkState(groupId != null, "groupId == null");
     checkNotNull(artifactId, "artifactId");
     if (Objects.equals(artifactId, this.getArtifactId())) {
@@ -118,7 +118,7 @@ public class MetadataBuilder
     return baseVersion;
   }
 
-  public boolean setBaseVersion(final String baseVersion) {
+  private boolean setBaseVersion(final String baseVersion) {
     checkState(groupId != null, "groupId == null");
     checkState(artifactId != null, "artifactId == null");
     checkNotNull(baseVersion, "baseVersion");
@@ -134,10 +134,12 @@ public class MetadataBuilder
 
   private final List<Plugin> plugins;
 
-  public void onEnterGroupId(final String groupId) {
+  public boolean onEnterGroupId(final String groupId) {
     if (setGroupId(groupId)) {
       plugins.clear();
+      return true;
     }
+    return false;
   }
 
   @Nullable
@@ -177,10 +179,12 @@ public class MetadataBuilder
 
   private final TreeSet<Version> baseVersions;
 
-  public void onEnterArtifactId(final String artifactId) {
+  public boolean onEnterArtifactId(final String artifactId) {
     if (setArtifactId(artifactId)) {
       baseVersions.clear();
+      return true;
     }
+    return false;
   }
 
   @Nullable
@@ -258,11 +262,13 @@ public class MetadataBuilder
 
   private VersionCoordinates latestVersionCoordinates;
 
-  public void onEnterBaseVersion(final String baseVersion) {
+  public boolean onEnterBaseVersion(final String baseVersion) {
     if (setBaseVersion(baseVersion)) {
       latestVersionCoordinatesMap.clear();
       latestVersionCoordinates = null;
+      return true;
     }
+    return false;
   }
 
   @Nullable

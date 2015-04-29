@@ -227,11 +227,21 @@ public class MetadataRebuildTest
     return stopwatch;
   }
 
+  public Stopwatch rebuildMetadataAsync(final Repository repository) {
+    final MetadataRebuildWorker worker = new MetadataRebuildWorker(repository);
+    final Stopwatch stopwatch = Stopwatch.createStarted();
+    worker.rebuild();
+    stopwatch.stop();
+    logger.info("t={}", stopwatch);
+    return stopwatch;
+  }
+
   @Test
   public void process() throws Exception {
     final Stopwatch nested = rebuildMetadataNested(mavenCentral);
     final Stopwatch flat = rebuildMetadataFlat(mavenCentral);
+    final Stopwatch async = rebuildMetadataAsync(mavenCentral);
 
-    logger.info("tNested={}, tFlat={}", nested, flat);
+    logger.info("tNested={}, tFlat={}, tAsync={}", nested, flat, async);
   }
 }
