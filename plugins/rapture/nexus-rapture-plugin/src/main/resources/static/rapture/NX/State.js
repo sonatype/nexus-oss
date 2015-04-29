@@ -130,6 +130,14 @@ Ext.define('NX.State', {
     return this.getValue('status')['edition'];
   },
 
+  /**
+   * Return whether or not we're receiving from the server
+   * @returns {boolean}
+   */
+  isReceiving: function() {
+    return this.getValue('receiving');
+  },
+
   getValue: function (key, defaultValue) {
     var me = this;
     return me.controller().getValue(key, defaultValue);
