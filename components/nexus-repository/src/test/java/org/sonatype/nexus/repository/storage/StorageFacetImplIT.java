@@ -655,10 +655,10 @@ public class StorageFacetImplIT
             .version("0.9")
             .name("myComponent");
         tx.saveComponent(component);
-        throw new MidTransactionException();
+        throw new IllegalStateException();
       }
     }
-    catch (MidTransactionException ignored) {
+    catch (IllegalStateException ignored) {
     }
 
     try (StorageTx tx = underTest.openTx()) {
@@ -688,8 +688,7 @@ public class StorageFacetImplIT
 
   @Test
   public void entityIdCanBeUsedInLaterTransactions() throws Exception {
-    EntityId componentId = null;
-    EntityId assetId = null;
+    EntityId componentId;
 
     try (StorageTx tx = underTest.openTx()) {
       final Component component = tx.createComponent(tx.getBucket(), testFormat).name("component");
@@ -708,14 +707,15 @@ public class StorageFacetImplIT
   }
 
   @Test
-  public void multipleEntityIdsCanBeUsedInLaterTransactions() throws Exception {
-    EntityId componentId = null;
-    EntityId assetId = null;
+  public void entityIdCanBeReferencedBeforeCommit() throws Exception {
+    EntityId componentId;
+    EntityId assetId;
 
     try (StorageTx tx = underTest.openTx()) {
       final Component component = tx.createComponent(tx.getBucket(), testFormat).name("component");
       tx.saveComponent(component);
 
+      // Implicitly reference the component's entity id
       final Asset asset = tx.createAsset(tx.getBucket(), component).name("hello");
       tx.saveAsset(asset);
 
@@ -735,17 +735,14 @@ public class StorageFacetImplIT
     }
   }
 
-  private static class MidTransactionException
-      extends Exception
-  {}
-
   @Test
-  public void dependentQueryFromNewComponent() throws Exception {
+  public void dependentQueryFromUncommittedComponentDoesNotThrowException() throws Exception {
     try (StorageTx tx = underTest.openTx()) {
       final Component component = tx.createComponent(tx.getBucket(), testFormat).name("component");
       tx.saveComponent(component);
 
-      final Iterable<Asset> assets = tx.browseAssets(component);
+      // Correct use of attached entity ids prevent an exception being thrown by this line
+      tx.browseAssets(component);
     }
   }
 }
