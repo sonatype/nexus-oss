@@ -43,12 +43,6 @@
         <groupId>com.palominolabs.metrics</groupId>
         <artifactId>metrics-guice</artifactId>
         <version>${metrics.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>
