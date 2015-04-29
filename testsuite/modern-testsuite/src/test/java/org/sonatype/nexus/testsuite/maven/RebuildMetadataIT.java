@@ -21,7 +21,7 @@ import org.sonatype.nexus.repository.maven.internal.maven2.metadata.MetadataRebu
 import org.junit.Test;
 
 /**
- * Support for Maven related integration tests.
+ * Metadata rebuild IT.
  *
  * @since 3.0
  */
