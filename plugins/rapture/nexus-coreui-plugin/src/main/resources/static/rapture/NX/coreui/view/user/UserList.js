@@ -24,6 +24,11 @@ Ext.define('NX.coreui.view.user.UserList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-user-list'
+  },
+
   store: 'User',
 
   columns: [
@@ -35,12 +40,12 @@ Ext.define('NX.coreui.view.user.UserList', {
         return 'user-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_ID_COLUMN'), dataIndex: 'userId', flex: 2 },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_REALM_COLUMN'), dataIndex: 'realm' },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_FIRST_COLUMN'), dataIndex: 'firstName', flex: 2 },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_LAST_COLUMN'), dataIndex: 'lastName', flex: 2 },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_EMAIL_COLUMN'), dataIndex: 'email', flex: 2 },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_STATUS_COLUMN'), dataIndex: 'status' }
+    { header: NX.I18n.get('ADMIN_USERS_LIST_ID_COLUMN'), dataIndex: 'userId', stateId: 'userId', flex: 2 },
+    { header: NX.I18n.get('ADMIN_USERS_LIST_REALM_COLUMN'), dataIndex: 'realm', stateId: 'realm' },
+    { header: NX.I18n.get('ADMIN_USERS_LIST_FIRST_COLUMN'), dataIndex: 'firstName', stateId: 'firstName', flex: 2 },
+    { header: NX.I18n.get('ADMIN_USERS_LIST_LAST_COLUMN'), dataIndex: 'lastName', stateId: 'lastName', flex: 2 },
+    { header: NX.I18n.get('ADMIN_USERS_LIST_EMAIL_COLUMN'), dataIndex: 'email', stateId: 'email', flex: 2 },
+    { header: NX.I18n.get('ADMIN_USERS_LIST_STATUS_COLUMN'), dataIndex: 'status', stateId: 'status' }
   ],
 
   viewConfig: {

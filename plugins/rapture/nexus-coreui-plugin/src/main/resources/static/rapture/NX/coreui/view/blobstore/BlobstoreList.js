@@ -24,6 +24,11 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-blobstore-list'
+  },
+
   store: 'NX.coreui.store.Blobstore',
   
   columns: [
@@ -35,14 +40,14 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreList', {
         return 'blobstore-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_BLOBSTORES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
-    { header: NX.I18n.get('ADMIN_BLOBSTORES_LIST_TYPE_COLUMN'), dataIndex: 'type' },
-    { header: NX.I18n.get('ADMIN_BLOBSTORES_LIST_BLOB_COUNT_COLUMN'), dataIndex: 'blobCount' },
-    { header: NX.I18n.get('ADMIN_BLOBSTORES_LIST_TOTAL_SIZE_COLUMN'), dataIndex: 'totalSize', 
+    { header: NX.I18n.get('ADMIN_BLOBSTORES_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 1 },
+    { header: NX.I18n.get('ADMIN_BLOBSTORES_LIST_TYPE_COLUMN'), dataIndex: 'type', stateId: 'type' },
+    { header: NX.I18n.get('ADMIN_BLOBSTORES_LIST_BLOB_COUNT_COLUMN'), dataIndex: 'blobCount', stateId: 'blobCount' },
+    { header: NX.I18n.get('ADMIN_BLOBSTORES_LIST_TOTAL_SIZE_COLUMN'), dataIndex: 'totalSize', stateId: 'totalSize', 
       renderer:Ext.util.Format.fileSize 
     },
-    { header: NX.I18n.get('ADMIN_BLOBSTORES_LIST_AVAILABLE_SPACE_COLUMN'), dataIndex: 'availableSpace',
-      renderer: Ext.util.Format.fileSize, flex: 1 
+    { header: NX.I18n.get('ADMIN_BLOBSTORES_LIST_AVAILABLE_SPACE_COLUMN'), dataIndex: 'availableSpace', 
+      stateId: 'availableSpace', renderer: Ext.util.Format.fileSize, flex: 1 
     }
   ],
 

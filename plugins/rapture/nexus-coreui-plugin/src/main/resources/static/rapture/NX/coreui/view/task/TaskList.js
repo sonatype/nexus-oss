@@ -24,6 +24,11 @@ Ext.define('NX.coreui.view.task.TaskList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-task-list'
+  },
+
   store: 'Task',
 
   columns: [
@@ -35,13 +40,13 @@ Ext.define('NX.coreui.view.task.TaskList', {
         return 'task-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_TYPE_COLUMN'), dataIndex: 'typeName', flex: 1 },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_STATUS_COLUMN'), dataIndex: 'statusDescription' },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_SCHEDULE_COLUMN'), dataIndex: 'schedule' },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_NEXT_RUN_COLUMN'), dataIndex: 'nextRun', flex: 1 },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_LAST_RUN_COLUMN'), dataIndex: 'lastRun', flex: 1 },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_LAST_RESULT_COLUMN'), dataIndex: 'lastRunResult' }
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 1 },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_TYPE_COLUMN'), dataIndex: 'typeName', stateId: 'typeName', flex: 1 },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_STATUS_COLUMN'), dataIndex: 'statusDescription', stateId: 'statusDescription' },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_SCHEDULE_COLUMN'), dataIndex: 'schedule', stateId: 'schedule' },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_NEXT_RUN_COLUMN'), dataIndex: 'nextRun', stateId: 'nextRun', flex: 1 },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_LAST_RUN_COLUMN'), dataIndex: 'lastRun', stateId: 'lastRun', flex: 1 },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_LAST_RESULT_COLUMN'), dataIndex: 'lastRunResult', stateId: 'lastRunResult' }
   ],
 
   viewConfig: {

@@ -25,6 +25,11 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-sslcertificate-list'
+  },
+
   store: 'SslCertificate',
 
   columns: [
@@ -36,10 +41,30 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
         return 'sslcertificate-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_SSL_LIST_NAME_COLUMN'), dataIndex: 'subjectCommonName', flex: 1 },
-    { header: NX.I18n.get('ADMIN_SSL_LIST_TO_COLUMN'), dataIndex: 'issuerCommonName', flex: 1 },
-    { header: NX.I18n.get('ADMIN_SSL_LIST_BY_COLUMN'), dataIndex: 'issuerCommonName', flex: 1 },
-    { header: NX.I18n.get('ADMIN_SSL_LIST_FINGERPRINT_COLUMN'), dataIndex: 'fingerprint', flex: 1 }
+    {
+      header: NX.I18n.get('ADMIN_SSL_LIST_NAME_COLUMN'),
+      dataIndex: 'subjectCommonName',
+      stateId: 'issuerCommonName',
+      flex: 1
+    },
+    {
+      header: NX.I18n.get('ADMIN_SSL_LIST_TO_COLUMN'),
+      dataIndex: 'subjectCommonName',
+      stateId: 'subjectCommonName',
+      flex: 1
+    },
+    {
+      header: NX.I18n.get('ADMIN_SSL_LIST_BY_COLUMN'),
+      dataIndex: 'issuerCommonName',
+      stateId: 'issuerCommonName',
+      flex: 1
+    },
+    {
+      header: NX.I18n.get('ADMIN_SSL_LIST_FINGERPRINT_COLUMN'),
+      dataIndex: 'fingerprint',
+      stateId: 'fingerprint',
+      flex: 1
+    }
   ],
 
   viewConfig: {
