@@ -55,8 +55,10 @@ import static org.ops4j.pax.exam.CoreOptions.propagateSystemProperty;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.systemTimeout;
 import static org.ops4j.pax.exam.CoreOptions.vmOptions;
+import static org.ops4j.pax.exam.CoreOptions.when;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.doNotModifyLogConfiguration;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
@@ -303,6 +305,8 @@ public abstract class NexusPaxExamSupport
       frameworkZip.classifier(System.getProperty("it.nexus.bundle.classifier"));
     }
 
+    boolean debugging = Boolean.parseBoolean(System.getProperty("it.debug"));
+
     return composite(
 
         vmOptions("-Xmx400m", "-XX:MaxPermSize=192m"), // taken from testsuite config
@@ -318,6 +322,8 @@ public abstract class NexusPaxExamSupport
             .frameworkUrl(frameworkZip) //
             .unpackDirectory(resolveBaseFile("target/it-data")) //
             .useDeployFolder(false), //
+
+        when(debugging).useOptions(debugConfiguration()), // port 5005, suspend=y
 
         configureConsole().ignoreLocalConsole().ignoreRemoteShell(), // no need for console
 
