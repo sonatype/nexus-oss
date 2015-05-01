@@ -42,7 +42,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 class NugetHostedRecipe
     extends NugetRecipeSupport
 {
-  static final String NAME = "nuget-hosted"
+  public static final String NAME = "nuget-hosted"
 
   @Inject
   Provider<NugetGalleryFacetImpl> galleryFacet
