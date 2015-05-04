@@ -223,8 +223,9 @@ public class DefaultFSLocalRepositoryStorage
 
       DefaultStorageCollectionItem coll =
           new DefaultStorageCollectionItem(repository, request, target.canRead(), target.canWrite());
-      coll.setModified(target.lastModified());
-      coll.setCreated(target.lastModified());
+      final long lastModified = target.lastModified();
+      coll.setModified(lastModified);
+      coll.setCreated(lastModified);
       return coll;
     }
     else if (target.isFile() && !mustBeACollection) {
@@ -244,8 +245,10 @@ public class DefaultFSLocalRepositoryStorage
                 new DefaultStorageLinkItem(repository, request, target.canRead(), target.canWrite(),
                     getLinkPersister().readLinkContent(fileContent));
             repository.getAttributesHandler().fetchAttributes(link);
-            link.setModified(target.lastModified());
-            link.setCreated(target.lastModified());
+
+            final long lastModified = target.lastModified();
+            link.setModified(lastModified);
+            link.setCreated(lastModified);
 
             // NEXUS-7850: NEXUS-7851: filter out unwanted cases, by not treating them as links
             final Attributes attributes = link.getRepositoryItemAttributes();
@@ -268,8 +271,9 @@ public class DefaultFSLocalRepositoryStorage
             new DefaultStorageFileItem(repository, request, target.canRead(), target.canWrite(),
                 fileContent);
         repository.getAttributesHandler().fetchAttributes(file);
-        file.setModified(target.lastModified());
-        file.setCreated(target.lastModified());
+        final long lastModified = target.lastModified();
+        file.setModified(lastModified);
+        file.setCreated(lastModified);
 
         repository.getAttributesHandler().touchItemLastRequested(System.currentTimeMillis(), file);
         return file;
