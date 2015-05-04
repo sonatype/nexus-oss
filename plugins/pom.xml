@@ -47,10 +47,7 @@
     <module>capabilities</module>
     <module>internal</module>
     <module>rapture</module>
-    <module>osgi</module>
-    <module>p2</module>
     <module>security</module>
-    <module>yum</module>
   </modules>
 
   <dependencyManagement>
@@ -168,28 +165,6 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- obr -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-obr-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <!-- p2 -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-p2-bridge-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-p2-repository-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
       <!-- quartz -->
 
       <dependency>
@@ -238,14 +213,6 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- site -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-site-repository-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
       <!-- atlas -->
 
       <dependency>
@@ -261,20 +228,6 @@
         <artifactId>nexus-timeline-plugin</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
-
-      <!-- yum -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-yum-repository-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <!--<dependency>-->
-        <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
-        <!--<artifactId>nexus-yum-repository-client</artifactId>-->
-        <!--<version>3.0.0-SNAPSHOT</version>-->
-      <!--</dependency>-->
 
       <!-- wonderland -->
 

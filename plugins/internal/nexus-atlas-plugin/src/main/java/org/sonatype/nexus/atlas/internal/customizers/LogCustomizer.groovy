@@ -16,7 +16,7 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
-import org.sonatype.nexus.configuration.ApplicationDirectories
+import org.sonatype.nexus.ApplicationDirectories
 import org.sonatype.nexus.log.LogManager
 import org.sonatype.nexus.supportzip.FileContentSourceSupport
 import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport

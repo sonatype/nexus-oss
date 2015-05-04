@@ -14,7 +14,6 @@ package org.sonatype.nexus;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 
 import javax.crypto.Cipher;
 import javax.inject.Inject;
@@ -22,20 +21,14 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.ApplicationDirectories;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.events.EventSubscriberHost;
+import org.sonatype.nexus.events.NexusInitializedEvent;
+import org.sonatype.nexus.events.NexusStartedEvent;
+import org.sonatype.nexus.events.NexusStoppedEvent;
+import org.sonatype.nexus.events.NexusStoppingEvent;
 import org.sonatype.nexus.internal.orient.OrientBootstrap;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
-import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.scheduling.TaskConfiguration;
-import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.security.SecuritySystem;
-import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
@@ -65,10 +58,6 @@ public class NxApplication
 
   private final SecuritySystem securitySystem;
 
-  private final TaskScheduler taskScheduler;
-
-  private final RepositoryRegistry repositoryRegistry;
-
   private final EventSubscriberHost eventSubscriberHost;
 
   private final OrientBootstrap orientBootstrap;
@@ -81,8 +70,6 @@ public class NxApplication
                        final ApplicationConfiguration applicationConfiguration,
                        final ApplicationStatusSource applicationStatusSource,
                        final SecuritySystem securitySystem,
-                       final TaskScheduler taskScheduler,
-                       final RepositoryRegistry repositoryRegistry,
                        final EventSubscriberHost eventSubscriberHost,
                        final OrientBootstrap orientBootstrap,
                        final BeanManager beanManager)
@@ -92,8 +79,6 @@ public class NxApplication
     this.applicationDirectories = checkNotNull(applicationDirectories);
     this.applicationConfiguration = checkNotNull(applicationConfiguration);
     this.securitySystem = checkNotNull(securitySystem);
-    this.taskScheduler = checkNotNull(taskScheduler);
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.eventSubscriberHost = checkNotNull(eventSubscriberHost);
     this.orientBootstrap = checkNotNull(orientBootstrap);
     this.beanManager = checkNotNull(beanManager);
@@ -148,8 +133,6 @@ public class NxApplication
 
       applicationStatusSource.getSystemStatus().setState(SystemState.STARTED);
 
-      synchronizeShadowsAtStartup();
-
       if (log.isInfoEnabled()) {
         final File workDir = applicationDirectories.getWorkDirectory();
         String workDirPath = null;
@@ -195,18 +178,5 @@ public class NxApplication
 
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPED);
     log.info("Stopped {}", getNexusNameForLogs());
-  }
-
-  private void synchronizeShadowsAtStartup() {
-    final Collection<ShadowRepository> shadows = repositoryRegistry.getRepositoriesWithFacet(ShadowRepository.class);
-    for (ShadowRepository shadow : shadows) {
-      if (shadow.isSynchronizeAtStartup()) {
-        final TaskConfiguration taskConfiguration = taskScheduler
-            .createTaskConfigurationInstance(SynchronizeShadowsTask.class);
-        taskConfiguration.setRepositoryId(shadow.getId());
-        taskConfiguration.setName("Shadow Sync (" + shadow.getId() + ")");
-        taskScheduler.submit(taskConfiguration);
-      }
-    }
   }
 }

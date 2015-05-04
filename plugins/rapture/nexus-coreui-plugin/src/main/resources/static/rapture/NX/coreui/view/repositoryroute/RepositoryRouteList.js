@@ -24,6 +24,11 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-repositoryroute-list'
+  },
+
   store: 'RepositoryRoute',
 
   columns: [
@@ -35,16 +40,23 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteList', {
         return 'repositoryroute-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_ROUTING_LIST_ROUTE_COLUMN'), dataIndex: 'pattern', flex: 1 },
-    { header: NX.I18n.get('ADMIN_ROUTING_LIST_RULE_COLUMN'), dataIndex: 'mappingType', renderer: function (val) {
-      return {
-        BLOCKING: NX.I18n.get('ADMIN_ROUTING_SETTINGS_BLOCKING_ITEM'),
-        INCLUSION: NX.I18n.get('ADMIN_ROUTING_SETTINGS_INCLUSIVE_ITEM'),
-        EXCLUSION: NX.I18n.get('ADMIN_ROUTING_SETTINGS_EXCLUSIVE_ITEM')
-      }[val];
-    }},
-    { header: NX.I18n.get('ADMIN_ROUTING_LIST_GROUP_COLUMN'), dataIndex: 'groupName' },
-    { header: NX.I18n.get('ADMIN_ROUTING_LIST_REPOSITORIES_COLUMN'), dataIndex: 'mappedRepositoriesNames', flex: 1 }
+    { header: NX.I18n.get('ADMIN_ROUTING_LIST_ROUTE_COLUMN'), dataIndex: 'pattern', stateId: 'pattern', flex: 1 },
+    {
+      header: NX.I18n.get('ADMIN_ROUTING_LIST_RULE_COLUMN'), dataIndex: 'mappingType', stateId: 'mappingType',
+      renderer: function(val) {
+        return {
+          BLOCKING: NX.I18n.get('ADMIN_ROUTING_SETTINGS_BLOCKING_ITEM'),
+          INCLUSION: NX.I18n.get('ADMIN_ROUTING_SETTINGS_INCLUSIVE_ITEM'),
+          EXCLUSION: NX.I18n.get('ADMIN_ROUTING_SETTINGS_EXCLUSIVE_ITEM')
+        }[val];
+      }},
+    { header: NX.I18n.get('ADMIN_ROUTING_LIST_GROUP_COLUMN'), dataIndex: 'groupName', stateId: 'groupName' },
+    {
+      header: NX.I18n.get('ADMIN_ROUTING_LIST_REPOSITORIES_COLUMN'),
+      dataIndex: 'mappedRepositoriesNames',
+      stateId: 'mappedRepositoriesNames',
+      flex: 1
+    }
   ],
 
   viewConfig: {

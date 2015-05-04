@@ -24,6 +24,11 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-search-result-list'
+  },
+
   store: 'SearchResult',
 
   style: {
@@ -44,11 +49,16 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
         return 'search-component';
       }
     },
-    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_NAME_COLUMN'), dataIndex: 'name', flex: 3 },
-    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_GROUP_COLUMN'), dataIndex: 'group', flex: 4 },
-    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_VERSION_COLUMN'), dataIndex: 'version', flex: 1 },
-    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_FORMAT_COLUMN'), dataIndex: 'format', width: 70 },
-    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_REPOSITORY_COLUMN'), dataIndex: 'repositoryName', hidden: true }
+    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 3 },
+    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_GROUP_COLUMN'), dataIndex: 'group', stateId: 'group', flex: 4 },
+    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_VERSION_COLUMN'), dataIndex: 'version', stateId: 'version', flex: 1 },
+    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_FORMAT_COLUMN'), dataIndex: 'format', stateId: 'format', width: 70 },
+    {
+      header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_REPOSITORY_COLUMN'),
+      dataIndex: 'repositoryName',
+      stateId: 'repositoryName',
+      hidden: true
+    }
   ],
 
   dockedItems: [

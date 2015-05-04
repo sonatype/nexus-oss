@@ -35,4 +35,11 @@ public class HostedType
   public HostedType() {
     super(NAME);
   }
+
+  @Override
+  public Class<?> getValidationGroup() {
+    return ValidationGroup.class;
+  }
+
+  public static interface ValidationGroup {}
 }

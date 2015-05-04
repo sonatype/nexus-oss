@@ -17,7 +17,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import org.sonatype.nexus.events.NexusInitializedEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.Subscribe;

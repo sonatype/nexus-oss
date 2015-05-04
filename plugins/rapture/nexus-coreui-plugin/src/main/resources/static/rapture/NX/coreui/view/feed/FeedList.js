@@ -24,6 +24,11 @@ Ext.define('NX.coreui.view.feed.FeedList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-feed-list'
+  },
+
   store: 'Feed',
 
   /*
@@ -42,8 +47,13 @@ Ext.define('NX.coreui.view.feed.FeedList', {
           return 'feed-default';
         }
       },
-      { header: NX.I18n.get('BROWSE_FEEDS_LIST_FEED_COLUMN'), dataIndex: 'name', flex: 1 },
-      { header: NX.I18n.get('BROWSE_FEEDS_LIST_URL_COLUMN'), dataIndex: 'url', flex: 2, xtype: 'nx-linkcolumn' }
+      { header: NX.I18n.get('BROWSE_FEEDS_LIST_FEED_COLUMN'), dataIndex: 'name', stateId: 'name',flex: 1 },
+      {
+        xtype: 'nx-linkcolumn',
+        header: NX.I18n.get('BROWSE_FEEDS_LIST_URL_COLUMN'),
+        dataIndex: 'url',
+        flex: 2
+      }
     ];
 
     me.callParent(arguments);

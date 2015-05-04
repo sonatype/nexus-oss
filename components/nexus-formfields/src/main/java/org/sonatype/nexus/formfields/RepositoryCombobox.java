@@ -38,15 +38,15 @@ public class RepositoryCombobox
 
   public static final String ALL_REPOS_ENTRY = "allReposEntry";
 
-  private List<Class<?>> includingFacets;
+  private List<String> includingTypes;
 
-  private List<Class<?>> excludingFacets;
+  private List<String> excludingTypes;
 
   private boolean regardlessViewPermissions;
 
-  private List<String> includingContentClasses;
+  private List<String> includingFormats;
 
-  private List<String> excludingContentClasses;
+  private List<String> excludingFormats;
 
   private boolean generateAllRepositoriesEntry;
 
@@ -81,34 +81,34 @@ public class RepositoryCombobox
   }
 
   /**
-   * Repository will be present if implements any of specified facets.
+   * Repository will be present if is of any of specified types.
    */
-  public RepositoryCombobox includingAnyOfFacets(final Class<?>... facets) {
-    this.includingFacets = Arrays.asList(facets);
+  public RepositoryCombobox includingAnyOfTypes(final String... types) {
+    this.includingTypes = Arrays.asList(types);
     return this;
   }
 
   /**
-   * Repository will not be present if implements any of specified facets.
+   * Repository will not be present if is of any of specified types.
    */
-  public RepositoryCombobox excludingAnyOfFacets(final Class<?>... facets) {
-    this.excludingFacets = Arrays.asList(facets);
+  public RepositoryCombobox excludingAnyOfTypes(final String... types) {
+    this.excludingTypes = Arrays.asList(types);
     return this;
   }
 
   /**
-   * Repository will be present if has any of specified content classes.
+   * Repository will be present if is of any of specified formats.
    */
-  public RepositoryCombobox includingAnyOfContentClasses(final String... contentClasses) {
-    this.includingContentClasses = Arrays.asList(contentClasses);
+  public RepositoryCombobox includingAnyOfFormats(final String... formats) {
+    this.includingFormats = Arrays.asList(formats);
     return this;
   }
 
   /**
-   * Repository will not be present if has any of specified content classes.
+   * Repository will not be present if is of any of specified formats.
    */
-  public RepositoryCombobox excludingAnyOfContentClasses(final String... contentClasses) {
-    this.excludingContentClasses = Arrays.asList(contentClasses);
+  public RepositoryCombobox excludingAnyOfFormats(final String... formats) {
+    this.excludingFormats = Arrays.asList(formats);
     return this;
   }
 
@@ -133,7 +133,7 @@ public class RepositoryCombobox
    */
   @Override
   public String getStoreApi() {
-    return "coreui_legacy_Repository." + (generateAllRepositoriesEntry ? "readReferencesAddingEntryForAll" : "readReferences");
+    return "coreui_Repository." + (generateAllRepositoriesEntry ? "readReferencesAddingEntryForAll" : "readReferences");
   }
 
   /**
@@ -143,44 +143,47 @@ public class RepositoryCombobox
   public Map<String, String> getStoreFilters() {
     Map<String, String> storeFilters = Maps.newHashMap();
     StringBuilder types = new StringBuilder();
-    if (includingFacets != null) {
-      for (Class<?> facet : includingFacets) {
+    if (includingTypes != null) {
+      for (String type : includingTypes) {
         if (types.length() > 0) {
           types.append(',');
         }
-        types.append(facet.getName());
+        types.append(type);
       }
     }
-    if (excludingFacets != null) {
-      for (Class<?> facet : excludingFacets) {
+    if (excludingTypes != null) {
+      for (String type : excludingTypes) {
         if (types.length() > 0) {
           types.append(',');
         }
-        types.append('!').append(facet.getName());
+        types.append('!').append(type);
       }
     }
     if (types.length() > 0) {
       storeFilters.put("type", types.toString());
     }
     StringBuilder contentClasses = new StringBuilder();
-    if (includingContentClasses != null) {
-      for (String contentClass : includingContentClasses) {
+    if (includingFormats != null) {
+      for (String format : includingFormats) {
         if (contentClasses.length() > 0) {
           contentClasses.append(',');
         }
-        contentClasses.append(contentClass);
+        contentClasses.append(format);
       }
     }
-    if (excludingContentClasses != null) {
-      for (String contentClass : excludingContentClasses) {
+    if (excludingFormats != null) {
+      for (String format : excludingFormats) {
         if (contentClasses.length() > 0) {
           contentClasses.append(',');
         }
-        contentClasses.append("!").append(contentClass);
+        contentClasses.append("!").append(format);
       }
     }
     if (contentClasses.length() > 0) {
       storeFilters.put("format", contentClasses.toString());
+    }
+    if (regardlessViewPermissions) {
+      storeFilters.put("regardlessViewPermissions", "true");
     }
     return storeFilters.isEmpty() ? null : storeFilters;
   }

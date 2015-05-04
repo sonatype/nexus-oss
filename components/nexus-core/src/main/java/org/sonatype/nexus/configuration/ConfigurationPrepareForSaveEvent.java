@@ -15,7 +15,7 @@ package org.sonatype.nexus.configuration;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
+import org.sonatype.nexus.events.AbstractVetoableEvent;
 
 /**
  * An event fired on configuration prepare save, when configurable components should prepare configs for save. This is

@@ -17,7 +17,7 @@ import org.sonatype.nexus.common.text.Strings2;
 import com.google.common.collect.Lists;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.NotBlank;
 
 import static org.apache.http.client.config.AuthSchemes.BASIC;
 import static org.apache.http.client.config.AuthSchemes.DIGEST;
@@ -32,10 +32,10 @@ public class UsernameAuthenticationConfig
 {
   public static final String TYPE = "username";
 
-  @NotEmpty
+  @NotBlank
   private String username;
 
-  @NotEmpty
+  @NotBlank
   private String password;
 
   public UsernameAuthenticationConfig() {

@@ -14,9 +14,9 @@ package org.sonatype.nexus.capability.support.condition;
 
 import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.condition.RepositoryExistsCondition;
-import org.sonatype.nexus.capability.condition.RepositoryLocalStatusCondition;
-import org.sonatype.nexus.capability.condition.RepositoryProxyModeCondition;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.capability.condition.RepositoryOnlineCondition;
+import org.sonatype.nexus.capability.support.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -42,7 +42,7 @@ public class RepositoryConditionsTest
   @Before
   public void setUpRepositoryConditions() {
     final EventBus eventBus = mock(EventBus.class);
-    underTest = new RepositoryConditions(eventBus, mock(RepositoryRegistry.class));
+    underTest = new RepositoryConditions(eventBus, mock(RepositoryManager.class));
   }
 
   /**
@@ -51,19 +51,8 @@ public class RepositoryConditionsTest
   @Test
   public void repositoryIsInService() {
     assertThat(
-        underTest.repositoryIsInService(mock(RepositoryConditions.RepositoryId.class)),
-        is(Matchers.<Condition>instanceOf(RepositoryLocalStatusCondition.class))
-    );
-  }
-
-  /**
-   * repositoryIsNotBlocked() factory method returns expected condition.
-   */
-  @Test
-  public void repositoryIsNotBlocked() {
-    assertThat(
-        underTest.repositoryIsNotBlocked(mock(RepositoryConditions.RepositoryId.class)),
-        is(Matchers.<Condition>instanceOf(RepositoryProxyModeCondition.class))
+        underTest.repositoryIsOnline(mock(RepositoryName.class)),
+        is(Matchers.<Condition>instanceOf(RepositoryOnlineCondition.class))
     );
   }
 
@@ -73,7 +62,7 @@ public class RepositoryConditionsTest
   @Test
   public void repositoryExists() {
     assertThat(
-        underTest.repositoryExists(mock(RepositoryConditions.RepositoryId.class)),
+        underTest.repositoryExists(mock(RepositoryName.class)),
         is(Matchers.<Condition>instanceOf(RepositoryExistsCondition.class))
     );
   }

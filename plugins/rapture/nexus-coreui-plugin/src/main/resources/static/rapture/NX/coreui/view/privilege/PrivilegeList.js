@@ -25,6 +25,11 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-privilege-list'
+  },
+
   store: 'Privilege',
 
   columns: [
@@ -38,13 +43,23 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
 
     // NOTE: Not including ID here as for user-created privileges these are random strings
 
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 2 },
+    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 2 },
 
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', flex: 4 },
+    {
+      header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_DESCRIPTION_COLUMN'),
+      dataIndex: 'description',
+      stateId: 'description',
+      flex: 4
+    },
 
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TYPE_COLUMN'), dataIndex: 'type', flex: 1 },
+    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TYPE_COLUMN'), dataIndex: 'type', stateId: 'type', flex: 1 },
 
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_PERMISSION_COLUMN'), dataIndex: 'permission', flex: 2 }
+    {
+      header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_PERMISSION_COLUMN'),
+      dataIndex: 'permission',
+      stateId: 'permission',
+      flex: 2
+    }
   ],
 
   viewConfig: {

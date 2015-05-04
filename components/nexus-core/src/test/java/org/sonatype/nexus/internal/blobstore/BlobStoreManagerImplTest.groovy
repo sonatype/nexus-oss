@@ -14,10 +14,10 @@ package org.sonatype.nexus.internal.blobstore
 
 import javax.inject.Provider
 
+import org.sonatype.nexus.ApplicationDirectories
 import org.sonatype.nexus.blobstore.api.BlobStore
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
 import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore
-import org.sonatype.nexus.configuration.ApplicationDirectories
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import com.google.common.collect.Lists

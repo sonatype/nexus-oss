@@ -24,6 +24,11 @@ Ext.define('NX.coreui.view.system.BundleList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-system-bundlelist'
+  },
+
   store: 'Bundle',
 
   columns: [
@@ -35,14 +40,42 @@ Ext.define('NX.coreui.view.system.BundleList', {
         return 'bundle-default';
       }
     },
-    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_ID_COLUMN'), dataIndex: 'id', width: 60, resizable: false},
-    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_STATE_COLUMN'), dataIndex: 'state', width: 80, resizable: false},
-    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_START_LEVEL_COLUMN'), dataIndex: 'startLevel', width: 60, resizable: false},
-    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 2},
-    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_SYMBOLIC_NAME_COLUMN'), dataIndex: 'symbolicName', flex: 2, hidden: true},
-    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_VERSION_COLUMN'), dataIndex: 'version', flex: 1},
-    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_LOCATION_COLUMN'), dataIndex: 'location', hidden: true},
-    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_FRAGMENT_COLUMN'), dataIndex: 'fragment', hidden: true}
+    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_ID_COLUMN'), dataIndex: 'id', stateId: 'id', width: 60, resizable: false},
+    {
+      header: NX.I18n.get('ADMIN_BUNDLES_LIST_STATE_COLUMN'),
+      dataIndex: 'state',
+      stateId: 'state',
+      width: 80,
+      resizable: false
+    },
+    {
+      header: NX.I18n.get('ADMIN_BUNDLES_LIST_START_LEVEL_COLUMN'),
+      dataIndex: 'startLevel',
+      stateId: 'startLevel',
+      width: 60,
+      resizable: false
+    },
+    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 2},
+    {
+      header: NX.I18n.get('ADMIN_BUNDLES_LIST_SYMBOLIC_NAME_COLUMN'),
+      dataIndex: 'symbolicName',
+      stateId: 'symbolicName',
+      flex: 2,
+      hidden: true
+    },
+    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_VERSION_COLUMN'), dataIndex: 'version', stateId: 'version', flex: 1},
+    {
+      header: NX.I18n.get('ADMIN_BUNDLES_LIST_LOCATION_COLUMN'),
+      dataIndex: 'location',
+      stateId: 'location',
+      hidden: true
+    },
+    {
+      header: NX.I18n.get('ADMIN_BUNDLES_LIST_FRAGMENT_COLUMN'),
+      dataIndex: 'fragment',
+      stateId: 'fragment',
+      hidden: true
+    }
   ],
 
   dockedItems: [{

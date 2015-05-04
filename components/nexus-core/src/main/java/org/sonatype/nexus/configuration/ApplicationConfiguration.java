@@ -15,6 +15,7 @@ package org.sonatype.nexus.configuration;
 import java.io.File;
 import java.io.IOException;
 
+import org.sonatype.nexus.ApplicationDirectories;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.AccessDeniedException;

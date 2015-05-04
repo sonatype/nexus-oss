@@ -23,7 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.property.SystemPropertiesHelper;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;

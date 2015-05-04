@@ -230,6 +230,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_DETAILS_SETTINGS_RAW_FACET: 'Raw Content',
     ADMIN_REPOSITORIES_DETAILS_SETTINGS_PROXY_FACET: 'Proxy',
     ADMIN_REPOSITORIES_DETAILS_SETTINGS_STORAGE_FACET: 'Storage',
+    ADMIN_REPOSITORIES_SETTINGS_AUTOBLOCK: 'Auto blocking enabled',
+    ADMIN_REPOSITORIES_SETTINGS_AUTOBLOCK_HELP: 'Auto-block outbound connections on the repository if remote peer is detected as unreachable/unresponsive',
+    ADMIN_REPOSITORIES_SETTINGS_BLOCKED: 'Blocked',
+    ADMIN_REPOSITORIES_SETTINGS_BLOCKED_HELP: 'Block outbound connections on the repository',
     ADMIN_REPOSITORIES_SETTINGS_RECIPE: 'Recipe',
     ADMIN_REPOSITORIES_SETTINGS_RECIPE_PLACEHOLDER: 'Select a recipe',
     ADMIN_REPOSITORIES_SETTINGS_NAME: 'Name',
@@ -239,7 +243,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_MEMBERS_FROM: 'Available',
     ADMIN_REPOSITORIES_SETTINGS_MEMBERS_TO: 'Members',
     ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT: 'Deployment policy',
-    ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP: 'Controls if deployments and/or updates to artifacts are allowed',
+    ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP: 'Controls if deployments of and updates to artifacts are allowed',
     ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_PLACEHOLDER: 'Select a policy',
     ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_ALLOW_ITEM: 'Allow redeploy',
     ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_DISABLE_ITEM: 'Disable redeploy',
@@ -247,11 +251,12 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_REMOTE: 'Remote storage',
     ADMIN_REPOSITORIES_SETTINGS_REMOTE_HELP: 'Location of the remote repository being proxied',
     ADMIN_REPOSITORIES_SETTINGS_REMOTE_PLACEHOLDER: 'Enter a URL',
-    ADMIN_REPOSITORIES_SETTINGS_POLICY: 'Repository policy',
-    ADMIN_REPOSITORIES_SETTINGS_POLICY_HELP: 'What type of artifacts does this repository store?',
-    ADMIN_REPOSITORIES_SETTINGS_POLICY_PLACEHOLDER: 'Select a policy',
-    ADMIN_REPOSITORIES_SETTINGS_POLICY_RELEASE_ITEM: 'Release',
-    ADMIN_REPOSITORIES_SETTINGS_POLICY_SNAPSHOTS_ITEM: 'Snapshots',
+    ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY: 'Version policy',
+    ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_HELP: 'What type of artifacts does this repository store?',
+    ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_PLACEHOLDER: 'Select a policy',
+    ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_MIXED_ITEM: 'Mixed',
+    ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_RELEASE_ITEM: 'Release',
+    ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_SNAPSHOT_ITEM: 'Snapshot',
     ADMIN_REPOSITORIES_SETTINGS_CHECKSUM: 'Checksum policy',
     ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_PLACEHOLDER: 'Select a policy',
     ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_IGNORE_ITEM: 'Ignore',
@@ -267,7 +272,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES: 'Connection retries',
     ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES_HELP: 'How many times to try to connect before giving up',
     ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT: 'Connection timeout',
-    ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT_HELP: 'How long (in ms) to wait before timing out connections',
+    ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT_HELP: 'How long (in seconds) to wait before timing out connections',
     ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION: 'Strict Content Type Validation',
     ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_ENABLED: 'Not found cache enabled',
     ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL: 'Not found cache TTL',
@@ -733,6 +738,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_LOG_VIEWER_MARK_ERROR: 'You do not have permission to mark the log',
     ADMIN_LOG_VIEWER_MARK_MESSAGE: 'Log message',
     ADMIN_LOG_VIEWER_MARK_SUCCESS: 'Log has been marked',
+    ADMIN_LOG_VIEWER_MARK_MASK: 'Marking Log',
     ADMIN_LOG_VIEWER_DOWNLOAD_BUTTON: 'Download',
     ADMIN_LOG_VIEWER_MARK_BUTTON: 'Create mark',
     ADMIN_LOG_VIEWER_REFRESH_INTERVAL: 'Refresh interval:',
@@ -1028,11 +1034,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     NUGET_APIKEY_INSTRUCTIONS : 'A new API Key will be created the first time it is accessed. Resetting your API Key will invalidate the current key.',
     NUGET_APIKEY_ACCESS_BUTTON: 'Access API Key',
     NUGET_APIKEY_RESET_BUTTON: 'Reset API Key',
-
-
-    // Field validation messages
-    NAME_VALIDATION_MESSAGE: 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed'
-
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);

@@ -23,7 +23,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.common.throwables.ConfigurationException;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.sisu.goodies.common.ComponentSupport;

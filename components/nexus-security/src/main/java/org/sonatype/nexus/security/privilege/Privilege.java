@@ -15,6 +15,8 @@ package org.sonatype.nexus.security.privilege;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.shiro.authz.Permission;
+
 /**
  * A simple bean that represents a privilege.
  */
@@ -132,13 +134,13 @@ public class Privilege
   }
 
   // HACK: expose the real shiro permission string
-  private String permission;
+  private Permission permission;
 
-  public String getPermission() {
+  public Permission getPermission() {
     return permission;
   }
 
-  public void setPermission(final String permission) {
+  public void setPermission(final Permission permission) {
     this.permission = permission;
   }
 }

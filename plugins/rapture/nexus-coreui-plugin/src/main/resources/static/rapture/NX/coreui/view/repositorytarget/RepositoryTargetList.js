@@ -24,6 +24,11 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-repositorytarget-list'
+  },
+
   store: 'RepositoryTarget',
 
   columns: [
@@ -35,9 +40,9 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
         return 'target-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_TARGETS_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
-    { header: NX.I18n.get('ADMIN_TARGETS_LIST_REPOSITORY_COLUMN'), dataIndex: 'format' },
-    { header: NX.I18n.get('ADMIN_TARGETS_LIST_PATTERNS_COLUMN'), dataIndex: 'patterns', flex: 1 }
+    { header: NX.I18n.get('ADMIN_TARGETS_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 1 },
+    { header: NX.I18n.get('ADMIN_TARGETS_LIST_REPOSITORY_COLUMN'), dataIndex: 'format', stateId: 'format' },
+    { header: NX.I18n.get('ADMIN_TARGETS_LIST_PATTERNS_COLUMN'), dataIndex: 'patterns', stateId: 'patterns', flex: 1 }
   ],
 
   viewConfig: {

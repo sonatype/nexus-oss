@@ -30,7 +30,6 @@ import org.sonatype.nexus.configuration.model.CRemoteAuthentication
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings
 import org.sonatype.nexus.configuration.model.CRemoteStorage
 import org.sonatype.nexus.configuration.model.CRepository
-import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
@@ -61,13 +60,7 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory
 import org.sonatype.nexus.rapture.TrustStoreKeys
-import org.sonatype.nexus.scheduling.TaskConfiguration
 import org.sonatype.nexus.scheduling.TaskScheduler
-import org.sonatype.nexus.tasks.ExpireCacheTask
-import org.sonatype.nexus.templates.TemplateManager
-import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
-import org.sonatype.nexus.templates.repository.RepositoryTemplate
-import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemplate
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.ValidationMessage
 import org.sonatype.nexus.validation.ValidationResponse
@@ -114,13 +107,7 @@ extends DirectComponentSupport
   UrlBuilder urlBuilder
 
   @Inject
-  TemplateManager templateManager
-
-  @Inject
   ApplicationConfiguration nexusConfiguration
-
-  @Inject
-  DefaultRepositoryTemplateProvider repositoryTemplateProvider
 
   @Inject
   RemoteProviderHintFactory remoteProviderHintFactory
@@ -220,44 +207,7 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:componentsrepotypes:read')
   List<RepositoryTemplateXO> readTemplates(final @Nullable StoreLoadParameters parameters) {
-    def templates = []
-    def typeFilter = parameters?.getFilter('type')
-    def formatFilter = parameters?.getFilter('format')
-    def policyFilter = parameters?.getFilter('policy')
-    RepositoryPolicy policy = null
-    if (policyFilter && !policyFilter.trim().isEmpty()) {
-      policy = RepositoryPolicy.valueOf(policyFilter)
-    }
-    def types = typesToClass
-    templateManager.templates.getTemplates(RepositoryTemplate.class).templatesList.each { RepositoryTemplate template ->
-      types.each {
-        if (template.targetFits(it.value)) {
-          def masterFormat = null,
-              type = it.key == 'shadow' ? 'virtual' : it.key,
-              format = template.contentClass.id
-
-          if (type == 'virtual' && template.contentClass.id.startsWith('maven')) {
-            masterFormat = template.contentClass.id == 'maven1' ? 'maven2' : 'maven1'
-          }
-          if (type == (typeFilter ?: type)
-              && format == (formatFilter ?: format)
-              && (!policy || !(template instanceof AbstractMavenRepositoryTemplate) || policy == template.repositoryPolicy)) {
-            templates.add(
-                new RepositoryTemplateXO(
-                    id: template.id,
-                    type: type,
-                    provider: template.repositoryProviderHint,
-                    providerName: template.description,
-                    format: template.contentClass.id,
-                    formatName: template.contentClass.name,
-                    masterFormat: masterFormat
-                )
-            )
-          }
-        }
-      }
-    }
-    return templates
+    return []
   }
 
   /**
@@ -386,22 +336,6 @@ extends DirectComponentSupport
     nexusConfiguration.deleteRepository(id)
   }
 
-  @DirectMethod
-  @RequiresAuthentication
-  @RequiresPermissions('nexus:cache:delete')
-  @Validate
-  void clearCache(final @NotEmpty(message = '[id] may not be empty') String id,
-                  final String path)
-  {
-    // validate repository id
-    protectedRepositoryRegistry.getRepository(id)
-    TaskConfiguration taskConfiguration = nexusScheduler.createTaskConfigurationInstance(ExpireCacheTask)
-    taskConfiguration.setRepositoryId(id)
-    taskConfiguration.setPath(path)
-    taskConfiguration.setName("Clear cache ${id}:${path}")
-    nexusScheduler.submit(taskConfiguration)
-  }
-
   /**
    * Update local status/proxy mode of a repository. It also updates local status of any dependant shadow repository.
    * @param id of repository
@@ -437,13 +371,7 @@ extends DirectComponentSupport
 
   @PackageScope
   RepositoryXO create(RepositoryXO repositoryXO, Closure... createClosures) {
-    def template = templateManager.templates.getTemplateById(repositoryXO.template) as RepositoryTemplate
-    CRepository configuration = template.configurableRepository.getCurrentConfiguration(true)
-    createClosures.each { createClosure ->
-      createClosure(configuration, repositoryXO)
-    }
-    Repository created = template.create()
-    return asRepositoryXO(created, readTemplates(null))
+    throw new UnsupportedOperationException()
   }
 
   @PackageScope

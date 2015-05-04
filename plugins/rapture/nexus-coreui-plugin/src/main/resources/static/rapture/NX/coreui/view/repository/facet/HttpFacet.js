@@ -46,12 +46,37 @@ Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
 
         items: [
           {
-            xtype: 'nx-optionalfieldset',
-            title: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_AUTHENTICATION'),
-            checkboxToggle: true,
-            checkboxName: 'authEnabled',
-            collapsed: true,
-            items: [
+            xtype: 'combo',
+            name: 'attributes.httpclient.authentication.type',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_AUTHENTICATION_TYPE'),
+            store: [
+              ['username', NX.I18n.get('ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_USERNAME')],
+              ['ntlm', NX.I18n.get('ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_NTLM')]
+            ],
+            value: 'username' ,
+            listeners: {
+              'select': me.updateAuthenticationFields,
+              'beforerender': me.updateAuthenticationFields
+              }
+          },
+          {
+            xtype:'textfield',
+            name: 'attributes.httpclient.authentication.username',
+            fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_USERNAME'),
+            allowBlank: false
+          },
+          {
+            xtype: 'textfield',
+            inputType: 'password',
+            name: 'attributes.httpclient.authentication.password',
+            fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_PASSWORD'),
+            allowBlank: false
+          },
+          {
+            xtype: 'fieldcontainer',
+            itemId: 'ntlmFields',
+            hidden: true,
+            items:[
               {
                 xtype: 'combo',
                 name: 'attributes.httpclient.authentication.type',

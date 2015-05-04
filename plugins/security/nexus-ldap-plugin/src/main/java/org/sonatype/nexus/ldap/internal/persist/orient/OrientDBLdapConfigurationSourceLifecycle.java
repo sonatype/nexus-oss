@@ -17,8 +17,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.events.NexusStartedEvent;
+import org.sonatype.nexus.events.NexusStoppedEvent;
 
 import com.google.common.eventbus.Subscribe;
 

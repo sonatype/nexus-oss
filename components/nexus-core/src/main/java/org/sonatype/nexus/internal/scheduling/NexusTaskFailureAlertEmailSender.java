@@ -13,11 +13,16 @@
 
 package org.sonatype.nexus.internal.scheduling;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.email.NexusPostOffice;
+import org.sonatype.micromailer.Address;
+import org.sonatype.micromailer.MailRequest;
+import org.sonatype.nexus.email.NexusEmailer;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.scheduling.Task;
@@ -39,11 +44,11 @@ public class NexusTaskFailureAlertEmailSender
     extends ComponentSupport
     implements EventSubscriber, Asynchronous
 {
-  private final NexusPostOffice postOffice;
+  private final NexusEmailer nexusEmailer;
 
   @Inject
-  public NexusTaskFailureAlertEmailSender(final NexusPostOffice postOffice) {
-    this.postOffice = checkNotNull(postOffice);
+  public NexusTaskFailureAlertEmailSender(final NexusEmailer nexusEmailer) {
+    this.nexusEmailer = checkNotNull(nexusEmailer);
   }
 
   /**
@@ -56,11 +61,40 @@ public class NexusTaskFailureAlertEmailSender
     if (failedTask == null || failedTask.getConfiguration().getAlertEmail() == null) {
       return;
     }
-    postOffice.sendNexusTaskFailure(
+    sendNexusTaskFailure(
         failedTask.getConfiguration().getAlertEmail(),
         failedTask.getId(),
         failedTask.getName(),
         failureEvent.getFailureCause()
     );
+  }
+
+  private void sendNexusTaskFailure(final String email,
+                                    final String taskId,
+                                    final String taskName,
+                                    final Throwable cause)
+  {
+    final StringBuilder body = new StringBuilder();
+
+    if (taskId != null) {
+      body.append(String.format("Task ID: %s", taskId)).append("\n");
+    }
+
+    if (taskName != null) {
+      body.append(String.format("Task Name: %s", taskName)).append("\n");
+    }
+
+    if (cause != null) {
+      final StringWriter sw = new StringWriter();
+      final PrintWriter pw = new PrintWriter(sw);
+      cause.printStackTrace(pw);
+      body.append("Stack trace: ").append("\n").append(sw.toString());
+    }
+
+    MailRequest request = nexusEmailer.getDefaultMailRequest("Nexus: Task execution failure", body.toString());
+
+    request.getToAddresses().add(new Address(email));
+
+    nexusEmailer.sendMail(request);
   }
 }

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<mirrors>
-  <mirror label="Remote Mirror 1" url="http://remote1/" />
-  <mirror label="Remote Mirror 2" url="http://remote2/" />
-  <mirror label="Remote Mirror 3" url="http://remote3/" />
-</mirrors>

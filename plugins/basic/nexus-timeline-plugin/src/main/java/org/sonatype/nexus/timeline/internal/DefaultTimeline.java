@@ -24,11 +24,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.NexusInitializedEvent;
+import org.sonatype.nexus.events.NexusStoppedEvent;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.DatabasePool;
 import org.sonatype.nexus.orient.OIndexNameBuilder;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineCallback;

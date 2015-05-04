@@ -28,6 +28,8 @@ Ext.define('NX.ext.form.OptionalFieldSet', {
   initComponent: function () {
     var me = this;
 
+    me.on('add', me.setupMonitorOnChange, me);
+
     me.callParent(arguments);
 
     // When state changes, repeat the evaluation
@@ -36,6 +38,9 @@ Ext.define('NX.ext.form.OptionalFieldSet', {
     me.on('afterrender', me.enableContainedItems, me);
   },
 
+  /**
+   * @private
+   */
   enableContainedItems: function (container, enable) {
     var me = this;
 
@@ -76,6 +81,22 @@ Ext.define('NX.ext.form.OptionalFieldSet', {
         }
         if (Ext.isFunction(item.validate)) {
           item.validate();
+        }
+      });
+    }
+  },
+
+  /**
+   * @private
+   * Watch for change events for contained components in order to automatically expand the toggle/checkbox.
+   */
+  setupMonitorOnChange: function(container, component) {
+    var me = this;
+
+    if (me === container) {
+      me.mon(component, 'change', function(field, newValue) {
+        if (Ext.isDefined(newValue)) {
+          me.expand();
         }
       });
     }

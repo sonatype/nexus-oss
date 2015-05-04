@@ -24,9 +24,9 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.events.NexusInitializedEvent;
+import org.sonatype.nexus.events.NexusStoppingEvent;
 import org.sonatype.nexus.orient.DatabaseInstance;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CRole;
 import org.sonatype.nexus.security.config.CUser;

@@ -12,22 +12,24 @@
  */
 package org.sonatype.nexus.atlas.internal
 
-import org.apache.karaf.bundle.core.BundleService
-import org.eclipse.sisu.Parameters
-import org.osgi.framework.BundleContext
-import org.sonatype.nexus.SystemStatus
-import org.sonatype.nexus.atlas.SystemInformationGenerator
-import org.sonatype.nexus.common.guice.GlobalComponentLookupHelper
-import org.sonatype.nexus.common.text.Strings2
-import org.sonatype.nexus.configuration.ApplicationDirectories
-import org.sonatype.sisu.goodies.common.ComponentSupport
-import org.sonatype.sisu.goodies.common.Iso8601Date
+import java.nio.file.FileSystems
 
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import javax.inject.Singleton
-import java.nio.file.FileSystems
+
+import org.sonatype.nexus.ApplicationDirectories
+import org.sonatype.nexus.SystemStatus
+import org.sonatype.nexus.atlas.SystemInformationGenerator
+import org.sonatype.nexus.common.guice.GlobalComponentLookupHelper
+import org.sonatype.nexus.common.text.Strings2
+import org.sonatype.sisu.goodies.common.ComponentSupport
+import org.sonatype.sisu.goodies.common.Iso8601Date
+
+import org.apache.karaf.bundle.core.BundleService
+import org.eclipse.sisu.Parameters
+import org.osgi.framework.BundleContext
 
 import static com.google.common.base.Preconditions.checkNotNull
 

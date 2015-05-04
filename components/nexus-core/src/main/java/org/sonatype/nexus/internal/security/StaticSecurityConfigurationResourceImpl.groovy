@@ -500,6 +500,16 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
+                id: 'logs-update',
+                type: 'method',
+                name: 'Logs - (update)',
+                description: 'Give permission to update the nexus log files.',
+                properties: [
+                    'method'    : 'update',
+                    'permission': 'nexus:logs'
+                ]
+            ),
+            new CPrivilege(
                 id: 'configuration-read', // 43
                 type: 'method',
                 name: 'Configuration - (read)',

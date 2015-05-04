@@ -81,14 +81,14 @@ Ext.define('NX.coreui.controller.Log', {
           afterrender: me.bindMarkButton,
           click: me.showMarkWindow
         },
-        'nx-coreui-log-mark form': {
-          submitted: me.onLogMarked
-        },
         'nx-coreui-log-viewer #refreshPeriod': {
           change: me.changeRefreshPeriod
         },
         'nx-coreui-log-viewer #refreshSize': {
           change: me.changeRefreshSize
+        },
+        'nx-coreui-log-mark button[action=add]': {
+          click: me.mark
         }
       }
     });
@@ -105,9 +105,28 @@ Ext.define('NX.coreui.controller.Log', {
   /**
    * @private
    */
-  onLogMarked: function (form) {
-    this.retrieveLog();
-    form.up('window').close();
+  mark: function(button) {
+    var me = this,
+        form = button.up('form'),
+        win = form.up('window'),
+        values = form.getValues();
+
+    win.hide();
+    me.getContent().getEl().mask(NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MASK'));
+    NX.direct.logging_Log.mark(values, function(response) {
+      me.getContent().getEl().unmask();
+      if (Ext.isObject(response)) {
+        if (response.success) {
+          NX.Messages.add({ text: form.settingsFormSuccessMessage, type: 'success' });
+          me.retrieveLog();
+          win.close();
+        }
+        else if (Ext.isDefined(response.errors)) {
+          win.show();
+          form.getForm().markInvalid(response.errors);
+        }
+      }
+    });
   },
 
   /**

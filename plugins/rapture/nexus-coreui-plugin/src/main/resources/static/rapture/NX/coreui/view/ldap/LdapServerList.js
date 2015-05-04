@@ -24,6 +24,11 @@ Ext.define('NX.coreui.view.ldap.LdapServerList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-ldapserver-list'
+  },
+
   store: 'LdapServer',
 
   columns: [
@@ -35,9 +40,9 @@ Ext.define('NX.coreui.view.ldap.LdapServerList', {
         return 'ldapserver-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_LDAP_LIST_ORDER_COLUMN'), dataIndex: 'order', width: 80 },
-    { header: NX.I18n.get('ADMIN_LDAP_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
-    { header: NX.I18n.get('ADMIN_LDAP_LIST_URL_COLUMN'), dataIndex: 'url', flex: 1 }
+    { header: NX.I18n.get('ADMIN_LDAP_LIST_ORDER_COLUMN'), dataIndex: 'order', stateId: 'order', width: 80 },
+    { header: NX.I18n.get('ADMIN_LDAP_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 1 },
+    { header: NX.I18n.get('ADMIN_LDAP_LIST_URL_COLUMN'), dataIndex: 'url', stateId: 'url', flex: 1 }
   ],
 
   viewConfig: {

@@ -57,6 +57,8 @@ Ext.define('NX.view.drilldown.Master', {
         sortable: false,
         menuDisabled: true,
         resizable: false,
+        draggable: false,
+        stateId: 'affordance',
         cls: 'nx-drilldown-affordance',
 
         defaultRenderer: function() {

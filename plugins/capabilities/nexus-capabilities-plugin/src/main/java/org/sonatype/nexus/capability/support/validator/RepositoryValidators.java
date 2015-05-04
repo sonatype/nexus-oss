@@ -19,6 +19,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.validator.ValidatorFactory;
+import org.sonatype.nexus.repository.Type;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,14 +45,14 @@ public class RepositoryValidators
    *
    * @param type        capability type
    * @param propertyKey key of property that contains teh repository id
-   * @param facet       type of repository
+   * @param repositoryType        type of repository
    * @return created validator
    */
   public Validator repositoryOfType(final CapabilityType type,
                                     final String propertyKey,
-                                    final Class<?> facet)
+                                    final String repositoryType)
   {
-    return validatorFactory.repositoryOfType(type, propertyKey, facet);
+    return validatorFactory.repositoryOfType(type, propertyKey, repositoryType);
   }
 
   /**

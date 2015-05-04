@@ -25,6 +25,11 @@ Ext.define('NX.coreui.view.role.RoleList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-role-list'
+  },
+
   store: 'Role',
 
   columns: [
@@ -36,9 +41,9 @@ Ext.define('NX.coreui.view.role.RoleList', {
         return 'role-default';
       }
     },
-    {header: NX.I18n.get('ADMIN_ROLES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1},
-    {header: NX.I18n.get('ADMIN_ROLES_LIST_SOURCE_COLUMN'), dataIndex: 'source'},
-    {header: NX.I18n.get('ADMIN_ROLES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', flex: 1}
+    {header: NX.I18n.get('ADMIN_ROLES_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 1},
+    {header: NX.I18n.get('ADMIN_ROLES_LIST_SOURCE_COLUMN'), dataIndex: 'source', stateId: 'source'},
+    {header: NX.I18n.get('ADMIN_ROLES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', stateId: 'description', flex: 1}
   ],
 
   viewConfig: {

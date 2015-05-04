@@ -12,18 +12,19 @@
  */
 package org.sonatype.nexus.internal.commands
 
+import javax.inject.Inject
+import javax.inject.Named
+
+import org.sonatype.nexus.ApplicationDirectories
+import org.sonatype.nexus.commands.Complete
+import org.sonatype.nexus.common.guice.GlobalComponentLookupHelper
+
 import org.apache.karaf.shell.commands.Argument
 import org.apache.karaf.shell.commands.Command
 import org.apache.karaf.shell.console.AbstractAction
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.eclipse.sisu.inject.BeanLocator
 import org.slf4j.LoggerFactory
-import org.sonatype.nexus.commands.Complete
-import org.sonatype.nexus.common.guice.GlobalComponentLookupHelper
-import org.sonatype.nexus.configuration.ApplicationDirectories
-
-import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * Action to execute a Groovy script.

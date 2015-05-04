@@ -27,6 +27,8 @@ Ext.define('NX.ext.grid.column.Icon', {
   sortable: false,
   menuDisabled: true,
   resizable: false,
+  draggable: false,
+  stateId: 'icon',
 
   /**
    * @cfg {String} iconVariant
