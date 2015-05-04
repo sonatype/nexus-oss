@@ -245,7 +245,6 @@ public class DefaultFSLocalRepositoryStorage
                 new DefaultStorageLinkItem(repository, request, target.canRead(), target.canWrite(),
                     getLinkPersister().readLinkContent(fileContent));
             repository.getAttributesHandler().fetchAttributes(link);
-
             final long lastModified = target.lastModified();
             link.setModified(lastModified);
             link.setCreated(lastModified);
