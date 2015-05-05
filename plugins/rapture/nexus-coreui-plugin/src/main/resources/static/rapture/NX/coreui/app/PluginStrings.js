@@ -230,6 +230,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_DETAILS_SETTINGS_RAW_FACET: 'Raw Content',
     ADMIN_REPOSITORIES_DETAILS_SETTINGS_PROXY_FACET: 'Proxy',
     ADMIN_REPOSITORIES_DETAILS_SETTINGS_STORAGE_FACET: 'Storage',
+    ADMIN_REPOSITORIES_DETAILS_SETTINGS_HOSTED_FACET: 'Hosted',
     ADMIN_REPOSITORIES_SETTINGS_AUTOBLOCK: 'Auto blocking enabled',
     ADMIN_REPOSITORIES_SETTINGS_AUTOBLOCK_HELP: 'Auto-block outbound connections on the repository if remote peer is detected as unreachable/unresponsive',
     ADMIN_REPOSITORIES_SETTINGS_BLOCKED: 'Blocked',
