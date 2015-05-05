@@ -50,7 +50,7 @@ public class CUserRoleMappingEntityAdapter
 {
   public static final String DB_CLASS = new OClassNameBuilder()
       .prefix("security")
-      .type("user-role-mapping")
+      .type("user_role_mapping")
       .build();
 
   public static final String P_USER_ID = "userId";
