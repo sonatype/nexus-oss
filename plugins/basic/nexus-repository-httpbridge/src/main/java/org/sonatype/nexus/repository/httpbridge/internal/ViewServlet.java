@@ -121,7 +121,6 @@ public class ViewServlet
       log.debug("Service completed");
     }
     catch (Exception e) {
-      log.warn("Service failure", e);
       Throwables.propagateIfPossible(e, ServletException.class, IOException.class);
       throw new ServletException(e);
     }

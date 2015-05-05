@@ -20,12 +20,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OType;
@@ -77,14 +75,6 @@ public class BucketEntityAdapter
   @Override
   protected void writeFields(final ODocument document, final Bucket entity) {
     document.field(P_REPOSITORY_NAME, entity.repositoryName());
-  }
-
-  public EntityId encode(final ORID id) {
-    return new EntityId(getRecordIdObfuscator().encode(getType(), id));
-  }
-
-  public ORID decode(final EntityId id) {
-    return getRecordIdObfuscator().decode(getType(), id.toString());
   }
 
   @Nullable
