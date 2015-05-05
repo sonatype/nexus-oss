@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.SortedSet;
 
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
+import com.sonatype.nexus.repository.nuget.odata.ODataFeedUtils;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.time.Clock;

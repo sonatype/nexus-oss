@@ -14,7 +14,7 @@ package com.sonatype.nexus.repository.nuget.internal;
 
 import java.util.HashMap;
 
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
+import com.sonatype.nexus.repository.nuget.odata.ODataTemplates;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.storage.Asset;

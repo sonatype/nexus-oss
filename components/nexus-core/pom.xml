@@ -163,6 +163,11 @@
       <artifactId>httpclient</artifactId>
     </dependency>
 
+    <!--<dependency>-->
+      <!--<groupId>org.apache.httpcomponents</groupId>-->
+      <!--<artifactId>httpmime</artifactId>-->
+    <!--</dependency>-->
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-httpclient-api</artifactId>

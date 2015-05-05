@@ -16,6 +16,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
+import com.sonatype.nexus.repository.nuget.internal.ComponentQuery;
+
 import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.StringUtils;
 import org.joda.time.format.DateTimeFormatter;

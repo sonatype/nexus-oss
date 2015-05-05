@@ -14,8 +14,7 @@ package com.sonatype.nexus.repository.nuget.odata;
 
 import java.util.Map;
 
-import com.sonatype.nexus.repository.nuget.odata.ComponentQuery;
-import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
+import com.sonatype.nexus.repository.nuget.internal.ComponentQuery;
 
 import com.google.common.collect.Maps;
 import org.junit.Test;

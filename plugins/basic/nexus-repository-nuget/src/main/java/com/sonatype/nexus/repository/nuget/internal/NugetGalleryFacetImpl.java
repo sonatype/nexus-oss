@@ -23,12 +23,11 @@ import java.util.SortedSet;
 
 import javax.inject.Named;
 
-import com.sonatype.nexus.repository.nuget.internal.odata.ComponentQuery;
-import com.sonatype.nexus.repository.nuget.internal.odata.ComponentQuery.Builder;
-import com.sonatype.nexus.repository.nuget.internal.odata.NugetPackageUtils;
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
+import com.sonatype.nexus.repository.nuget.internal.ComponentQuery.Builder;
+import com.sonatype.nexus.repository.nuget.odata.NugetPackageUtils;
+import com.sonatype.nexus.repository.nuget.odata.ODataFeedUtils;
+import com.sonatype.nexus.repository.nuget.odata.ODataTemplates;
+import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
@@ -689,7 +688,7 @@ public class NugetGalleryFacetImpl
   private int executeCount(final ComponentQuery query, final StorageTx storageTx,
                            final Iterable<Repository> repositories)
   {
-    return (int) storageTx.countComponents(query.getWhere(), query.getParameters(), repositories,
+    return (int) storageTx.countAssets(query.getWhere(), query.getParameters(), repositories,
         query.getQuerySuffix());
   }
 
