@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.repository.recipe.RawProxy', {
     'NX.I18n',
     'NX.coreui.view.repository.facet.ProxyFacet',
     'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.HttpFacet',
+    'NX.coreui.view.repository.facet.HttpClientFacet',
     'NX.coreui.view.repository.facet.RawContentFacet',
     'NX.coreui.view.repository.facet.NegativeCacheFacet'
   ],
@@ -40,7 +40,7 @@ Ext.define('NX.coreui.view.repository.recipe.RawProxy', {
       { xtype: 'nx-coreui-repository-proxy-facet'},
       { xtype: 'nx-coreui-repository-storage-facet'},
       { xtype: 'nx-coreui-repository-negativecache-facet'},
-      { xtype: 'nx-coreui-repository-http-facet'},
+      { xtype: 'nx-coreui-repository-httpclient-facet'},
       { xtype: 'nx-coreui-repository-content-rawcontent-facet' }
     ];
 

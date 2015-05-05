@@ -26,7 +26,7 @@ Ext.define('NX.coreui.view.repository.recipe.Maven2Proxy', {
     'NX.coreui.view.repository.facet.Maven2Facet',
     'NX.coreui.view.repository.facet.ProxyFacet',
     'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.HttpFacet',
+    'NX.coreui.view.repository.facet.HttpClientFacet',
     'NX.coreui.view.repository.facet.NegativeCacheFacet'
   ],
 
@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.repository.recipe.Maven2Proxy', {
       { xtype: 'nx-coreui-repository-storage-facet'},
       { xtype: 'nx-coreui-repository-maven2-facet'},
       { xtype: 'nx-coreui-repository-negativecache-facet'},
-      { xtype: 'nx-coreui-repository-http-facet'}
+      { xtype: 'nx-coreui-repository-httpclient-facet'}
     ];
 
     me.callParent(arguments);

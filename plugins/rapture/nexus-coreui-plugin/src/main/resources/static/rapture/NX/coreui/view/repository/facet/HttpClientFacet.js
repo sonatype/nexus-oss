@@ -17,9 +17,9 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.facet.HttpFacet', {
+Ext.define('NX.coreui.view.repository.facet.HttpClientFacet', {
   extend: 'Ext.form.FieldContainer',
-  alias: 'widget.nx-coreui-repository-http-facet',
+  alias: 'widget.nx-coreui-repository-httpclient-facet',
   requires: [
     'NX.I18n'
   ],
