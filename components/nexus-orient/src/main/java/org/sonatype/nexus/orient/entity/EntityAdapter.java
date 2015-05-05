@@ -302,10 +302,6 @@ public abstract class EntityAdapter<T extends Entity>
     return new EntityId(getRecordIdObfuscator().encode(getType(), id));
   }
 
-  public ORID decode(final EntityId id) {
-    return getRecordIdObfuscator().decode(getType(), id.toString());
-  }
-
   /**
    * Return record identity of entity.
    */
@@ -317,6 +313,6 @@ public abstract class EntityAdapter<T extends Entity>
     if (checkNotNull(id) instanceof AttachedEntityId) {
       return ((AttachedEntityId) id).recordIdentity();
     }
-    return decode(id);
+    return getRecordIdObfuscator().decode(getType(), id.toString());
   }
 }
