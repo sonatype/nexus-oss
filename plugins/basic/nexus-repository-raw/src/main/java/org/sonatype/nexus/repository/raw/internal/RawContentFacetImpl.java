@@ -219,7 +219,7 @@ public class RawContentFacetImpl
         return false;
       }
 
-      final SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
+      final SearchFacet searchFacet = facet(SearchFacet.class);
       final SearchItemId searchId = searchFacet.identifier(component);
       tx.deleteComponent(component);
       tx.commit();

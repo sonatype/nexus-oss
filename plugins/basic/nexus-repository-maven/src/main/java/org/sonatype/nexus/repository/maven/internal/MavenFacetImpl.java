@@ -32,9 +32,9 @@ import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
-import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
@@ -354,9 +354,8 @@ public class MavenFacetImpl
     }
     tx.deleteAsset(asset);
     if (!tx.browseAssets(component).iterator().hasNext()) {
-      final SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
-      final SearchItemId searchId = searchFacet.identifier(component);
-      searchFacet.delete(searchId);
+      final SearchItemId searchId = facet(SearchFacet.class).identifier(component);
+      facet(SearchFacet.class).delete(searchId);
 
       tx.deleteComponent(component);
     }

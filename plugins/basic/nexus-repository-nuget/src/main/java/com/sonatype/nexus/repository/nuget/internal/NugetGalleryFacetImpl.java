@@ -399,12 +399,11 @@ public class NugetGalleryFacetImpl
       if (component == null) {
         return false;
       }
-      final SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
-      final SearchItemId searchId = searchFacet.identifier(component);
+      final SearchItemId searchId = facet(SearchFacet.class).identifier(component);
       tx.deleteComponent(component);
       tx.commit();
 
-      searchFacet.delete(searchId);
+      facet(SearchFacet.class).delete(searchId);
 
       getEventBus().post(new ComponentDeletedEvent(component, getRepository()));
       return true;
