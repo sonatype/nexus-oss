@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.dirs.ApplicationDirectories;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -44,17 +45,15 @@ public class NodeProvider
     extends ComponentSupport
     implements Provider<Node>
 {
-  private final File appDir;
+  private final ApplicationDirectories directories;
 
   private Node node;
 
-  // FIXME: Replace with ApplicationDirectories once we we have access to that class
-
   @Inject
-  public NodeProvider(final @Named("${nexus-app}") File appDir,
+  public NodeProvider(final ApplicationDirectories directories,
                       final Map<String, NativeScriptFactory> scripts)
   {
-    this.appDir = checkNotNull(appDir);
+    this.directories = checkNotNull(directories);
   }
 
   @Override
@@ -77,7 +76,7 @@ public class NodeProvider
   }
 
   private Node create() throws Exception {
-    File file = new File(appDir, "etc/elasticsearch.yml");
+    File file = directories.getAppDirectory("etc/elasticsearch.yml");
     checkState(file.exists(), "Missing configuration: %s", file);
     URL url = file.toURI().toURL();
     log.info("Creating node with config: {}", url);

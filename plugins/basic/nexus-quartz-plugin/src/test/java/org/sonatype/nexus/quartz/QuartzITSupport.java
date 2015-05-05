@@ -17,7 +17,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.ApplicationDirectories;
+import org.sonatype.nexus.common.dirs.ApplicationDirectories;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.quartz.internal.QuartzSupportImpl;
 import org.sonatype.nexus.scheduling.TaskScheduler;
