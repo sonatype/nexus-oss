@@ -36,18 +36,26 @@ Ext.define('NX.coreui.view.repository.facet.NegativeCacheFacet', {
 
     me.items = [
       {
-        xtype: 'checkbox',
-        name: 'attributes.negativeCache.enabled',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_ENABLED'),
-        value: true
-      },
-      {
-        xtype: 'numberfield',
-        name: 'attributes.negativeCache.timeToLive',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL_HELP'),
-        minValue: -1,
-        value: 1440
+        xtype: 'fieldset',
+        cls: 'nx-form-section',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_CACHE_FACET'),
+
+        items: [
+          {
+            xtype: 'checkbox',
+            name: 'attributes.negativeCache.enabled',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_ENABLED'),
+            value: true
+          },
+          {
+            xtype: 'numberfield',
+            name: 'attributes.negativeCache.timeToLive',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL'),
+            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL_HELP'),
+            minValue: -1,
+            value: 1440
+          }
+        ]
       }
     ];
 

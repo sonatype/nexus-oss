@@ -37,19 +37,27 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacetHosted', {
 
     me.items = [
       {
-        xtype: 'combo',
-        name: 'attributes.storage.writePolicy',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP'),
-        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_PLACEHOLDER'),
-        editable: false,
-        store: [
-          ['ALLOW', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_ALLOW_ITEM')],
-          ['ALLOW_ONCE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_DISABLE_ITEM')],
-          ['DENY', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_RO_ITEM')]
-        ],
-        value: 'ALLOW_ONCE',
-        queryMode: 'local'
+        xtype: 'fieldset',
+        cls: 'nx-form-section',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_HOSTED_FACET'),
+
+        items: [
+          {
+            xtype: 'combo',
+            name: 'attributes.storage.writePolicy',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT'),
+            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP'),
+            emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_PLACEHOLDER'),
+            editable: false,
+            store: [
+              ['ALLOW', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_ALLOW_ITEM')],
+              ['ALLOW_ONCE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_DISABLE_ITEM')],
+              ['DENY', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_RO_ITEM')]
+            ],
+            value: 'ALLOW_ONCE',
+            queryMode: 'local'
+          }
+        ]
       }
     ];
 

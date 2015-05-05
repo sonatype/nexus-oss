@@ -38,26 +38,34 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
 
     me.items = [
       {
-        xtype: 'combo',
-        name: 'attributes.maven.versionPolicy',
-        itemId: 'versionPolicy',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_HELP'),
-        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_PLACEHOLDER'),
-        editable: false,
-        store: [
-          ['RELEASE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_RELEASE_ITEM')],
-          ['SNAPSHOT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_SNAPSHOT_ITEM')],
-          ['MIXED', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_MIXED_ITEM')]
-        ],
-        value: 'RELEASE',
-        readOnlyOnUpdate: true
-      },
-      {
-        xtype: 'checkbox',
-        name: 'attributes.maven.strictContentTypeValidation',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION'),
-        value: true
+        xtype: 'fieldset',
+        cls: 'nx-form-section',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_MAVEN2_FACET'),
+
+        items: [
+          {
+            xtype: 'combo',
+            name: 'attributes.maven.versionPolicy',
+            itemId: 'versionPolicy',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY'),
+            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_HELP'),
+            emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_PLACEHOLDER'),
+            editable: false,
+            store: [
+              ['RELEASE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_RELEASE_ITEM')],
+              ['SNAPSHOT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_SNAPSHOT_ITEM')],
+              ['MIXED', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_MIXED_ITEM')]
+            ],
+            value: 'RELEASE',
+            readOnlyOnUpdate: true
+          },
+          {
+            xtype: 'checkbox',
+            name: 'attributes.maven.strictContentTypeValidation',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION'),
+            value: true
+          }
+        ]
       }
     ];
 

@@ -44,6 +44,17 @@
 }
 
 /**
+ * De-emphasizes fields that will never be edited
+ */
+.x-field.nx-no-border {
+  .x-form-field[readonly] {
+    border: none !important;
+    background-color: white !important;
+    padding-left: 0;
+  }
+}
+
+/**
  * IE10 adds a second 'x' icon to text fields. Hide this.
  */
 ::-ms-clear {

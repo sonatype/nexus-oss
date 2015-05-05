@@ -19,3 +19,17 @@
     background-color: rgba(0, 0, 0, 0.05);
   }
 }
+
+fieldset.nx-form-section {
+  margin-bottom: 0;
+  padding-bottom: 20px;
+
+  &.nx-no-title {
+    padding-top: 0;
+  }
+}
+
+fieldset.nx-form-section > legend > span > div > .x-fieldset-header-text {
+  font-size: $font-size-h4;
+  line-height: 22px;
+}

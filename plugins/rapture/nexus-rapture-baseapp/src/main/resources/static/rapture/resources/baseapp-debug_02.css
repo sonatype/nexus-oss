@@ -16766,9 +16766,19 @@
 }
 
 /**
+ * De-emphasizes fields that will never be edited
+ */
+/* line 50, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+.x-field.nx-no-border .x-form-field[readonly] {
+  border: none !important;
+  background-color: white !important;
+  padding-left: 0;
+}
+
+/**
  * IE10 adds a second 'x' icon to text fields. Hide this.
  */
-/* line 49, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 60, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 ::-ms-clear {
   width: 0;
   height: 0;
@@ -16801,6 +16811,22 @@
 /* line 18, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
 .nx-optionalfieldset .nx-optionalfieldset .x-fieldset-body {
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* line 23, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
+fieldset.nx-form-section {
+  margin-bottom: 0;
+  padding-bottom: 20px;
+}
+/* line 27, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
+fieldset.nx-form-section.nx-no-title {
+  padding-top: 0;
+}
+
+/* line 32, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
+fieldset.nx-form-section > legend > span > div > .x-fieldset-header-text {
+  font-size: 18px;
+  line-height: 22px;
 }
 
 /**
