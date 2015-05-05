@@ -30,7 +30,7 @@
 <div class="nexus-body">
   <img src="$nexusRoot/static/images/robot.png?$urlSuffix"/>
   <div class="error-message">
-    <span class="code">ERROR $errorCode</span>
+    <span class="code">Error $errorCode</span>
     <span class="name">$errorName</span>
   </div>
   <div class="error-detail">
