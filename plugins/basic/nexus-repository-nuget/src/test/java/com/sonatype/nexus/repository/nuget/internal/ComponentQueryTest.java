@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.nexus.repository.nuget.internal.odata;
+package com.sonatype.nexus.repository.nuget.internal;
 
 import java.util.Map;
 
-import com.sonatype.nexus.repository.nuget.internal.odata.ComponentQuery.Builder;
+import com.sonatype.nexus.repository.nuget.odata.ComponentQuery;
+import com.sonatype.nexus.repository.nuget.odata.ComponentQuery.Builder;
 
 import org.junit.Test;
 

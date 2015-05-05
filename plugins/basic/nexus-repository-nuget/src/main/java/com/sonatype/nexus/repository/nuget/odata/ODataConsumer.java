@@ -10,31 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.nexus.repository.nuget.internal.odata;
+package com.sonatype.nexus.repository.nuget.odata;
 
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-import org.junit.Test;
-
-public class ODataUtilsTest
+/**
+ * Represents a consumer of OData.
+ */
+public interface ODataConsumer
 {
-  @Test
-  public void testQuery() throws Exception {
-
-    Map<String, String> query = Maps.newHashMap();
-    query.put("$filter", "IsLatestVersion");
-    query.put("$orderby", "DownloadCount desc,Id");
-    query.put("$skip", "0");
-    query.put("$top", "30");
-    query.put("searchTerm", "'jilted'");
-    query.put("targetFramework", "'net45'");
-    query.put("includePrerelease", "false");
-
-    final ComponentQuery foo = ODataUtils.query(query, false);
-
-    System.err.println(foo.getWhere());
-    System.err.println(foo.getQuerySuffix());
-    System.err.println(foo.getParameters());
-  }
+  /**
+   * Consumes the given OData (in key-value form).
+   *
+   * @param data Key-value data
+   */
+  void consume(Map<String, String> data);
 }
