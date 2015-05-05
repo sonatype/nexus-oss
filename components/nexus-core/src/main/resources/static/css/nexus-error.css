@@ -22,14 +22,24 @@ body {
   color: #ffffff;
   padding: 4px 4px 4px 16px;
   font-weight: 100;
-  font-size: 20px;
 }
 
 .nexus-header img,
 .nexus-header span {
-  font-size: 20px;
   vertical-align: middle;
-  padding-right: 3px;
+}
+
+.nexus-header .name {
+  font-size: 20px;
+  padding-left: 3px;
+}
+
+.nexus-header .version {
+  font-size: 10px;
+  padding-left: 4px;
+  font-weight: bold;
+  display: inline-block;
+  padding-top: 6px;
 }
 
 .nexus-body {

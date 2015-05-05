@@ -25,7 +25,8 @@
 <body>
 <div class="nexus-header">
   <img src="$nexusRoot/static/images/nexus.png?$urlSuffix"/>
-  <span>Sonatype Nexus</span>
+  <span class="name">Sonatype Nexus</span>
+  <span class="version">$urlSuffix</span>
 </div>
 <div class="nexus-body">
   <img src="$nexusRoot/static/images/robot.png?$urlSuffix"/>

@@ -25,7 +25,8 @@
 <body>
 <div class="nexus-header">
   <img src="$nexusRoot/static/images/nexus.png?$nexusVersion"/>
-  <span>Sonatype Nexus</span>
+  <span class="name">Sonatype Nexus</span>
+  <span class="version">$nexusVersion</span>
 </div>
 <div class="nexus-body">
   <img src="$nexusRoot/static/images/robot.png?$nexusVersion"/>
