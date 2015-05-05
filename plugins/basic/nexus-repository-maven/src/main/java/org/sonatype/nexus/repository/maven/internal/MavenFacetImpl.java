@@ -356,8 +356,9 @@ public class MavenFacetImpl
     if (!tx.browseAssets(component).iterator().hasNext()) {
       final SearchFacet searchFacet = getRepository().facet(SearchFacet.class);
       final SearchItemId searchId = searchFacet.identifier(component);
-      tx.deleteComponent(component);
       searchFacet.delete(searchId);
+
+      tx.deleteComponent(component);
     }
     else {
       getRepository().facet(SearchFacet.class).put(component);
