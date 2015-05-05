@@ -12,7 +12,7 @@
  *###
 <html>
 <head>
-  <title>ERROR: Access Denied</title>
+  <title>403 - Sonatype Nexus</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
   <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
@@ -23,12 +23,20 @@
   <link rel="stylesheet" type="text/css" href="$nexusRoot/static/css/nexus-error.css?$nexusVersion"/>
 </head>
 <body>
-<div class="nexus-error-message">
+<div class="nexus-header">
   <img src="$nexusRoot/static/images/nexus.png?$nexusVersion"/>
-  <span>ERROR: Access Denied</span>
+  <span class="name">Sonatype Nexus</span>
+  <span class="version">$nexusVersion</span>
 </div>
-<div class="nexus-error-detail">
-  Please <a href="$nexusRoot">sign-in</a> before attempting further requests.
+<div class="nexus-body">
+  <img src="$nexusRoot/static/images/robot.png?$nexusVersion"/>
+  <div class="error-message">
+    <span class="code">Error 403</span>
+    <span class="name">Access Denied</span>
+  </div>
+  <div class="error-detail">
+    Please <a href="$nexusRoot">sign-in</a> before attempting further requests.
+  </div>
 </div>
 </body>
 </html>

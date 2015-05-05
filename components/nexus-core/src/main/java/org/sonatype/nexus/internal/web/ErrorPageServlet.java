@@ -142,7 +142,7 @@ public class ErrorPageServlet
       errorName = StringEscapeUtils.escapeHtml(errorName);
     }
     else {
-      errorName = errorMessage; // already sanitized above
+      errorName = "";
     }
 
     response.setStatus(errorCode, errorName);
