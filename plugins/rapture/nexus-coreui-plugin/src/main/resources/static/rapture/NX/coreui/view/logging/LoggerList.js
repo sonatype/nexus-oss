@@ -24,6 +24,11 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-logger-list'
+  },
+  
   store: 'Logger',
 
   columns: [
@@ -35,10 +40,12 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
         return 'logger-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_LOGGING_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
+    { header: NX.I18n.get('ADMIN_LOGGING_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', hideable: false, flex: 1 },
     {
       header: NX.I18n.get('ADMIN_LOGGING_LEVEL_COLUMN'),
       dataIndex: 'level',
+      stateId: 'level',
+      hideable: false,
       editor: {
         xtype: 'combo',
         editable: false,
