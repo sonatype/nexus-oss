@@ -12,14 +12,13 @@
  */
 package org.sonatype.nexus.repository.config;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
-
-import com.google.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
