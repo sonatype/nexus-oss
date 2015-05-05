@@ -16,7 +16,7 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
-import org.sonatype.nexus.ApplicationDirectories
+import org.sonatype.nexus.common.dirs.ApplicationDirectories
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer
 import org.sonatype.nexus.supportzip.FileContentSourceSupport

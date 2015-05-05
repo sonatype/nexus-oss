@@ -21,8 +21,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationDirectories;
 import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.dirs.ApplicationDirectories;
 import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
