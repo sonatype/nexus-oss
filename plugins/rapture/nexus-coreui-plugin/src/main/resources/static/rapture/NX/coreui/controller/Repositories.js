@@ -144,6 +144,9 @@ Ext.define('NX.coreui.controller.Repositories', {
     }
     else {
       if (Ext.isDefined(model)) {
+        // Show the correct icon in the breadcrumb
+        me.getFeature().setItemClass(1, NX.Icons.cls('repository-' + model.get('type'), 'x16'));
+
         settingsPanel.removeAllSettingsForms();
         settingsPanel.addSettingsForm({ xtype: formCls.xtype, recipe: model });
         Ext.Array.each(settingsPanel.query('field[readOnlyOnUpdate=true]'), function(field) {
@@ -163,6 +166,9 @@ Ext.define('NX.coreui.controller.Repositories', {
 
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(1, NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TITLE'));
+    feature.setItemClass(1, NX.Icons.cls('repository-hosted', 'x16'));
+
+    // Show the panel
     me.loadCreateWizard(1, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -194,6 +200,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     else {
       // Show the second panel in the create wizard, and set the breadcrumb
       feature.setItemName(2, NX.I18n.format('ADMIN_REPOSITORIES_CREATE_TITLE', model.get('name')));
+      feature.setItemClass(2, NX.Icons.cls('repository-hosted', 'x16'));
       me.loadCreateWizard(2, true, { xtype: 'nx-coreui-repository-add', recipe: model });
     }
   },

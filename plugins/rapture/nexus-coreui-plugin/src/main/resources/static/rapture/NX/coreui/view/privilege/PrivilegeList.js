@@ -67,6 +67,12 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
     deferEmptyText: false
   },
 
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless'
+  }],
+
   plugins: [
     { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_PRIVILEGES_LIST_FILTER_ERROR') }
   ]

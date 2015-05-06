@@ -192,6 +192,8 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_REMOTE: 'Remote storage',
     ADMIN_REPOSITORIES_SETTINGS_REMOTE_HELP: 'Location of the remote repository being proxied',
     ADMIN_REPOSITORIES_SETTINGS_REMOTE_PLACEHOLDER: 'Enter a URL',
+    ADMIN_REPOSITORIES_SETTINGS_TRUST_STORE: 'Use the Nexus truststore',
+    ADMIN_REPOSITORIES_SETTINGS_CERTIFICATE_BUTTON: 'View certificate',
     ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY: 'Version policy',
     ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_HELP: 'What type of artifacts does this repository store?',
     ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_PLACEHOLDER: 'Select a policy',
@@ -917,7 +919,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     NUGET_APIKEY_DETAIL_AUTOCLOSE_MESSAGE: 'Automatically closing NuGet API Key details due to timeout',
     NUGET_APIKEY_INSTRUCTIONS : 'A new API Key will be created the first time it is accessed. Resetting your API Key will invalidate the current key.',
     NUGET_APIKEY_ACCESS_BUTTON: 'Access API Key',
+    NUGET_APIKEY_ACCESS_HELP: 'Accessing NuGet API Key requires validation of your credentials.',
     NUGET_APIKEY_RESET_BUTTON: 'Reset API Key',
+    NUGET_APIKEY_RESET_HELP: 'Resetting NuGet API Key requires validation of your credentials.',
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);
