@@ -119,7 +119,7 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
     NX.direct.ssl_Certificate.retrieveFromHost(hostAndPort.host, hostAndPort.port, undefined, function(response) {
       me.getMain().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        sslCertificates.showCertificateDetails(response.data);
+        sslCertificates.showCertificateDetailsWindow(response.data);
       }
     });
   },

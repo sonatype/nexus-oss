@@ -13,28 +13,24 @@
 /*global Ext, NX*/
 
 /**
- * Ssl Certificate detail window.
+ * Ssl Certificate detail panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
-  extend: 'NX.view.AddWindow',
-  alias: 'widget.nx-coreui-sslcertificate-details-window',
+Ext.define('NX.coreui.view.ssl.SslCertificateDetailsPanel', {
+  extend: 'NX.view.AddPanel',
+  alias: 'widget.nx-coreui-sslcertificate-details-panel',
   requires: [
     'NX.Conditions',
     'NX.I18n'
   ],
-  ui: 'nx-inset',
 
-  title: NX.I18n.get('ADMIN_SSL_DETAILS_TITLE'),
-
-  items: {
+  settingsForm: {
     xtype: 'nx-coreui-sslcertificate-details-form',
-    frame: false,
     buttons: [
       { text: NX.I18n.get('ADMIN_SSL_DETAILS_CANCEL_BUTTON'),
         handler: function () {
-          this.up('window').close();
+          this.up('nx-drilldown').showChild(0, true);
         }
       }
     ]
