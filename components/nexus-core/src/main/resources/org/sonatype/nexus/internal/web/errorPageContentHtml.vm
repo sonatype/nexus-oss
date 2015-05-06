@@ -12,7 +12,7 @@
  *###
 <html>
 <head>
-  <title>ERROR $errorCode $errorName</title>
+  <title>$errorCode - Sonatype Nexus</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
   <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
@@ -23,12 +23,20 @@
   <link rel="stylesheet" type="text/css" href="$nexusRoot/static/css/nexus-error.css?$urlSuffix"/>
 </head>
 <body>
-<div class="nexus-error-message">
+<div class="nexus-header">
   <img src="$nexusRoot/static/images/nexus.png?$urlSuffix"/>
-  <span>ERROR $errorCode $errorName</span>
+  <span class="name">Sonatype Nexus</span>
+  <span class="version">$urlSuffix</span>
 </div>
-<div class="nexus-error-detail">
-  $errorDescription
+<div class="nexus-body">
+  <img src="$nexusRoot/static/images/robot.png?$urlSuffix"/>
+  <div class="error-message">
+    <span class="code">Error $errorCode</span>
+    <span class="name">$errorName</span>
+  </div>
+  <div class="error-detail">
+    $errorDescription
+  </div>
 </div>
 </body>
 </html>

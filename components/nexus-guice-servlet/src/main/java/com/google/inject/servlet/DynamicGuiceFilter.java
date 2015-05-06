@@ -10,24 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.web;
+package com.google.inject.servlet;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import org.sonatype.nexus.internal.web.DynamicFilterPipeline;
-
-import com.google.inject.servlet.GuiceFilter;
 
 /**
  * {@link GuiceFilter} that supports a dynamic ordered pipeline of filters and servlets.
  */
 @Singleton
-public final class NexusGuiceFilter
+public final class DynamicGuiceFilter
     extends GuiceFilter
 {
   @Inject
-  NexusGuiceFilter(DynamicFilterPipeline pipeline) {
+  DynamicGuiceFilter(DynamicFilterPipeline pipeline) {
     super(pipeline);
+  }
+
+  /**
+   * ServletContextModule uses this to avoid "Multiple Servlet injectors detected" log spam.
+   * 
+   * @see nexus-extender
+   */
+  public static void avoidLogSpam() {
+    GuiceFilter.pipeline = null;
   }
 }

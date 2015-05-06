@@ -15,8 +15,8 @@ package org.sonatype.nexus.internal.commands
 import javax.inject.Inject
 import javax.inject.Named
 
-import org.sonatype.nexus.ApplicationDirectories
 import org.sonatype.nexus.commands.Complete
+import org.sonatype.nexus.common.dirs.ApplicationDirectories
 import org.sonatype.nexus.common.guice.GlobalComponentLookupHelper
 
 import org.apache.karaf.shell.commands.Argument

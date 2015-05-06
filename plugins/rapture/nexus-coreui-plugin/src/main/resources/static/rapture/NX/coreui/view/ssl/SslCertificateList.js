@@ -44,19 +44,19 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
     {
       header: NX.I18n.get('ADMIN_SSL_LIST_NAME_COLUMN'),
       dataIndex: 'subjectCommonName',
-      stateId: 'issuerCommonName',
-      flex: 1
-    },
-    {
-      header: NX.I18n.get('ADMIN_SSL_LIST_TO_COLUMN'),
-      dataIndex: 'subjectCommonName',
       stateId: 'subjectCommonName',
       flex: 1
     },
     {
+      header: NX.I18n.get('ADMIN_SSL_LIST_TO_COLUMN'),
+      dataIndex: 'subjectOrganization',
+      stateId: 'subjectOrganization',
+      flex: 1
+    },
+    {
       header: NX.I18n.get('ADMIN_SSL_LIST_BY_COLUMN'),
-      dataIndex: 'issuerCommonName',
-      stateId: 'issuerCommonName',
+      dataIndex: 'issuerOrganization',
+      stateId: 'issuerOrganization',
       flex: 1
     },
     {

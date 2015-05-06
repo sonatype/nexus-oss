@@ -35,7 +35,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationDirectories;
+import org.sonatype.nexus.common.dirs.ApplicationDirectories;
 import org.sonatype.nexus.common.io.FileSupport;
 import org.sonatype.nexus.common.io.LimitedInputStream;
 import org.sonatype.nexus.common.io.StreamSupport;

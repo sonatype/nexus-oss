@@ -36,20 +36,28 @@ Ext.define('NX.coreui.view.repository.facet.NugetProxyFacet', {
 
     me.items = [
       {
-        xtype: 'numberfield',
-        name: 'attributes.nugetProxy.queryCacheSize',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_SIZE'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_SIZE_HELP'),
-        minValue: 0,
-        value: 300
-      },
-      {
-        xtype: 'numberfield',
-        name: 'attributes.nugetProxy.queryCacheItemMaxAge',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_ITEM_MAX_AGE'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_ITEM_MAX_AGE_HELP'),
-        minValue: 0,
-        value: 3600
+        xtype: 'fieldset',
+        cls: 'nx-form-section',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_NUGET_FACET'),
+
+        items: [
+          {
+            xtype: 'numberfield',
+            name: 'attributes.nugetProxy.queryCacheSize',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_SIZE'),
+            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_SIZE_HELP'),
+            minValue: 0,
+            value: 300
+          },
+          {
+            xtype: 'numberfield',
+            name: 'attributes.nugetProxy.queryCacheItemMaxAge',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_ITEM_MAX_AGE'),
+            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_QUERY_CACHE_ITEM_MAX_AGE_HELP'),
+            minValue: 0,
+            value: 3600
+          }
+        ]
       }
     ];
 

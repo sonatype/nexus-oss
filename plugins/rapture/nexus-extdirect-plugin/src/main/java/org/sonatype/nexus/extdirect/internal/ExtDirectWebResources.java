@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationDirectories;
+import org.sonatype.nexus.common.dirs.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.webresources.FileWebResource;
 import org.sonatype.nexus.webresources.WebResource;

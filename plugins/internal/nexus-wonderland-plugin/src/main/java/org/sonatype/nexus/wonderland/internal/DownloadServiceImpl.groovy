@@ -20,7 +20,7 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
-import org.sonatype.nexus.ApplicationDirectories
+import org.sonatype.nexus.common.dirs.ApplicationDirectories
 import org.sonatype.nexus.wonderland.AuthTicketService
 import org.sonatype.nexus.wonderland.DownloadService
 import org.sonatype.sisu.goodies.common.ComponentSupport

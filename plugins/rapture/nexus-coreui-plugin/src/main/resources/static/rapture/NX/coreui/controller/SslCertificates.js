@@ -38,6 +38,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     'ssl.SslCertificateAddFromServer',
     'ssl.SslCertificateDetails',
     'ssl.SslCertificateDetailsForm',
+    'ssl.SslCertificateDetailsPanel',
     'ssl.SslCertificateDetailsWindow',
     'ssl.SslCertificateFeature',
     'ssl.SslCertificateList'
@@ -100,6 +101,12 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         'nx-coreui-sslcertificate-add-from-server button[action=load]': {
           click: me.loadCertificateByServer
         },
+        'nx-coreui-sslcertificate-details-panel button[action=add]': {
+          click: me.create
+        },
+        'nx-coreui-sslcertificate-details-panel button[action=remove]': {
+          click: me.remove
+        },
         'nx-coreui-sslcertificate-details-window button[action=add]': {
           click: me.create
         },
@@ -154,21 +161,39 @@ Ext.define('NX.coreui.controller.SslCertificates', {
 
   /**
    * @private
-   * Shows certificate details window.
+   * Shows certificate details panel.
    */
-  showCertificateDetails: function (certificate) {
+  showCertificateDetailsPanel: function(certificate) {
     var me = this,
-      feature = me.getFeature(),
-      window = Ext.widget('nx-coreui-sslcertificate-details-window'),
-      form = window.down('form'),
-      model = me.getSslCertificateModel().create(certificate);
+        feature = me.getFeature(),
+        panel = Ext.widget('nx-coreui-sslcertificate-details-panel'),
+        form = panel.down('form'),
+        model = me.getSslCertificateModel().create(certificate);
 
+    // override form to show buttons
+    me.overrideLoadRecord(form);
     // Load the certificate
     form.loadRecord(model);
 
     // Show the second panel in the create wiard, and set the breadcrumb
     feature.setItemName(2, NX.I18n.get('ADMIN_SSL_DETAILS_TITLE'));
-    me.loadCreateWizard(2, true, window);
+    me.loadCreateWizard(2, true, panel);
+  },
+
+  /**
+   * @private
+   * Shows certificate details window.
+   */
+  showCertificateDetailsWindow: function (certificate) {
+    var me = this,
+        window = Ext.widget('nx-coreui-sslcertificate-details-window'),
+        form = window.down('form'),
+        model = me.getSslCertificateModel().create(certificate);
+
+    // override form to show buttons
+    me.overrideLoadRecord(form);
+    // Load the certificate
+    form.loadRecord(model);
   },
 
   /**
@@ -177,14 +202,13 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   loadCertificateByPem: function (button) {
     var me = this,
-        win = button.up('nx-coreui-sslcertificate-add-from-pem'),
         pem = button.up('form').getForm().getFieldValues().pem;
 
     me.getContent().getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
     NX.direct.ssl_Certificate.details({ value: pem }, function (response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        me.showCertificateDetails(response.data);
+        me.showCertificateDetailsPanel(response.data);
       }
     });
   },
@@ -195,7 +219,6 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   loadCertificateByServer: function (button) {
     var me = this,
-        win = button.up('nx-coreui-sslcertificate-add-from-server'),
         server = button.up('form').getForm().getFieldValues()['server'],
         parsed = me.parseHostAndPort(server),
         protocolHint = server && Ext.String.startsWith(server, "https://") ? 'https' : undefined;
@@ -204,7 +227,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     NX.direct.ssl_Certificate.retrieveFromHost(parsed[0], parsed[1], protocolHint, function (response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        me.showCertificateDetails(response.data);
+        me.showCertificateDetailsPanel(response.data);
       }
     });
   },
@@ -241,12 +264,16 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   create: function (button) {
     var me = this,
+        win = button.up('nx-coreui-sslcertificate-details-window'),
         form = button.up('form'),
         model = form.getRecord(),
         description = me.getDescription(model);
 
     NX.direct.ssl_TrustStore.create({ value: model.get('pem') }, function (response) {
       if (Ext.isObject(response) && response.success) {
+        if (win) {
+          win.close();
+        }
         me.loadStoreAndSelect(model.internalId, false);
         NX.Messages.add({ text: NX.I18n.format('ADMIN_SSL_LOAD_SUCCESS', description), type: 'success' });
       }
@@ -259,12 +286,16 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   remove: function (button) {
     var me = this,
+        win = button.up('nx-coreui-sslcertificate-details-window'),
         form = button.up('form'),
         model = form.getRecord(),
         description = me.getDescription(model);
 
     NX.direct.ssl_TrustStore.remove(model.getId(), function (response) {
       if (Ext.isObject(response) && response.success) {
+        if (win) {
+          win.close();
+        }
         me.loadStore(Ext.emptyFn);
         NX.Messages.add({ text: NX.I18n.format('ADMIN_SSL_DETAILS_DELETE_SUCCESS', description), type: 'success' });
       }
@@ -285,6 +316,62 @@ Ext.define('NX.coreui.controller.SslCertificates', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: NX.I18n.format('ADMIN_SSL_DETAILS_DELETE_SUCCESS', description), type: 'success' });
+      }
+    });
+  },
+
+  /**
+   * @private
+   * Override loadRecord() in order to show add/delete from store buttons.
+   */
+  overrideLoadRecord: function (form) {
+    Ext.override(form, {
+      loadRecord: function (model) {
+        var me = this,
+            tbar = me.getDockedItems('toolbar[dock="bottom"]')[0],
+            button;
+
+        if (model) {
+          if (model.get('inNexusSSLTrustStore')) {
+            tbar.insert(0, {
+              text: NX.I18n.get('ADMIN_SSL_DETAILS_REMOVE'),
+              action: 'remove',
+              formBind: true,
+              disabled: true,
+              ui: 'nx-primary',
+              glyph: 'xf056@FontAwesome' /* fa-minus-circle */
+            });
+            button = tbar.down('button[action=remove]');
+            me.mon(
+                NX.Conditions.isPermitted('nexus:ssl:truststore', 'delete'),
+                {
+                  satisfied: button.enable,
+                  unsatisfied: button.disable,
+                  scope: button
+                }
+            );
+          }
+          else {
+            tbar.insert(0, {
+              text: NX.I18n.get('ADMIN_SSL_DETAILS_ADD'),
+              action: 'add',
+              formBind: true,
+              disabled: true,
+              ui: 'nx-primary',
+              glyph: 'xf055@FontAwesome' /* fa-plus-circle */
+            });
+            button = tbar.down('button[action=add]');
+            me.mon(
+                NX.Conditions.isPermitted('nexus:ssl:truststore', 'create'),
+                {
+                  satisfied: button.enable,
+                  unsatisfied: button.disable,
+                  scope: button
+                }
+            );
+          }
+        }
+        me.callParent(arguments);
       }
     });
   }

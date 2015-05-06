@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
@@ -41,7 +42,6 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkArgument;

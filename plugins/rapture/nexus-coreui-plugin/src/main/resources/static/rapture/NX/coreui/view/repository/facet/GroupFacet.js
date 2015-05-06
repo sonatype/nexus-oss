@@ -69,17 +69,23 @@ Ext.define('NX.coreui.view.repository.facet.GroupFacet', {
     });
     me.items = [
       {
-        xtype: 'nx-itemselector',
-        name: 'attributes.group.memberNames',
-        itemId: 'groupMemberNames',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_HELP'),
-        buttons: ['up', 'add', 'remove', 'down'],
-        fromTitle: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_FROM'),
-        toTitle: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_TO'),
-        store: me.repositoryStore,
-        valueField: 'id',
-        displayField: 'name'
+        xtype: 'fieldset',
+        cls: 'nx-form-section',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_GROUP_FACET'),
+
+        items: {
+          xtype: 'nx-itemselector',
+          name: 'attributes.group.memberNames',
+          itemId: 'groupMemberNames',
+          fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS'),
+          helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_HELP'),
+          buttons: ['up', 'add', 'remove', 'down'],
+          fromTitle: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_FROM'),
+          toTitle: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_TO'),
+          store: me.repositoryStore,
+          valueField: 'id',
+          displayField: 'name'
+        }
       }
     ];
 

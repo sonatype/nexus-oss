@@ -20,6 +20,8 @@ import org.sonatype.nexus.internal.web.EnvironmentFilter;
 import org.sonatype.nexus.internal.web.ErrorPageFilter;
 import org.sonatype.nexus.internal.web.ErrorPageServlet;
 
+import com.google.inject.servlet.DynamicGuiceFilter;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.ServletModule;
@@ -38,7 +40,7 @@ public class NexusServletModule
   @Override
   protected void configure() {
 
-    bind(GuiceFilter.class).to(NexusGuiceFilter.class);
+    bind(GuiceFilter.class).to(DynamicGuiceFilter.class);
 
     install(new ServletModule()
     {

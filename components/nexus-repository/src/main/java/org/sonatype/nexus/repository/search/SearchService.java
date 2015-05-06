@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.search;
 
+import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Component;
 
@@ -40,12 +41,12 @@ public interface SearchService
   /**
    * Index component metadata.
    */
-  void put(Repository repository, Component component);
+  void put(Repository repository, Component component, String identifier);
 
   /**
    * Remove component metadata from index.
    */
-  void delete(Repository repository, Component component);
+  void delete(Repository repository, String identifier);
 
   /**
    * Search component metadata and browse results.

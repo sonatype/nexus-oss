@@ -10,37 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.web;
+package com.google.inject.servlet;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Key;
-import com.google.inject.servlet.AbstractFilterPipeline;
-import com.google.inject.servlet.FilterDefinition;
-import com.google.inject.servlet.FilterPipeline;
 import org.eclipse.sisu.inject.BeanLocator;
 import org.eclipse.sisu.wire.EntryListAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.google.inject.servlet.DynamicServletPipeline.DUMMY_INJECTOR;
 
 /**
  * Dynamic {@link FilterPipeline} that can update its sequence of filter definitions on-demand.
+ * Includes patched methods from {@link ManagedFilterPipeline} where delegating isn't possible.
  */
 @Singleton
 // don't use @Named, keep as implicit JIT-binding
-public final class DynamicFilterPipeline
-    extends AbstractFilterPipeline
+final class DynamicFilterPipeline
+    extends ManagedFilterPipeline
 {
-  private static final String NL = System.getProperty("line.separator");
-
-  private static final Logger log = LoggerFactory.getLogger(DynamicFilterPipeline.class);
-
   private final DynamicServletPipeline servletPipeline;
 
   private final BeanLocator locator;
@@ -55,7 +59,8 @@ public final class DynamicFilterPipeline
 
   @Inject
   DynamicFilterPipeline(final DynamicServletPipeline servletPipeline, final BeanLocator locator) {
-    super(null, servletPipeline, null);
+    super(DUMMY_INJECTOR, servletPipeline, null);
+
     this.servletPipeline = servletPipeline;
     this.locator = locator;
 
@@ -74,19 +79,11 @@ public final class DynamicFilterPipeline
     return servletContext;
   }
 
-  /**
-   * Refreshes stable cache with the latest dynamic definitions.
-   */
   public synchronized void refreshCache() {
     final Object[] snapshot = filterDefinitions.toArray();
     filterDefinitionCache = Arrays.copyOf(snapshot, snapshot.length, FilterDefinition[].class);
-    if (log.isDebugEnabled()) {
-      final StringBuilder buf = new StringBuilder("Updated filter definitions:");
-      for (final FilterDefinition fd : filterDefinitionCache) {
-        buf.append(NL).append(fd.toPaddedString(30));
-      }
-      log.debug(buf.toString());
-    }
+    PipelineLogger.dump(filterDefinitionCache);
+
     servletPipeline.refreshCache();
   }
 
@@ -101,12 +98,41 @@ public final class DynamicFilterPipeline
   }
 
   @Override
-  protected boolean hasFiltersMapped() {
-    return filterDefinitionCache.length > 0;
+  public void dispatch(ServletRequest request, ServletResponse response, FilterChain proceedingFilterChain)
+      throws IOException, ServletException
+  {
+    new FilterChainInvocation(filterDefinitions(), servletPipeline, proceedingFilterChain).doFilter(
+        withDispatcher(request, servletPipeline), response);
   }
 
   @Override
-  protected FilterDefinition[] filterDefinitions() {
+  public void destroyPipeline() {
+    servletPipeline.destroy();
+
+    Set<Filter> destroyedSoFar = Sets.newIdentityHashSet();
+    for (FilterDefinition filterDefinition : filterDefinitions()) {
+      filterDefinition.destroy(destroyedSoFar);
+    }
+  }
+
+  private static ServletRequest withDispatcher(ServletRequest servletRequest,
+      final DynamicServletPipeline servletPipeline)
+  {
+    if (!servletPipeline.hasServletsMapped()) {
+      return servletRequest;
+    }
+
+    return new HttpServletRequestWrapper((HttpServletRequest) servletRequest)
+    {
+      @Override
+      public RequestDispatcher getRequestDispatcher(String path) {
+        final RequestDispatcher dispatcher = servletPipeline.getRequestDispatcher(path);
+        return (null != dispatcher) ? dispatcher : super.getRequestDispatcher(path);
+      }
+    };
+  }
+
+  private FilterDefinition[] filterDefinitions() {
     return filterDefinitionCache;
   }
 }

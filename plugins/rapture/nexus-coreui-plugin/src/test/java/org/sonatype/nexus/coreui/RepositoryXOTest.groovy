@@ -12,12 +12,12 @@
  */
 package org.sonatype.nexus.coreui
 
+import javax.inject.Inject
 import javax.validation.Validator
 
 import org.sonatype.nexus.validation.ValidationModule
 import org.sonatype.nexus.validation.group.Create
 
-import com.google.inject.Inject
 import spock.guice.UseModules
 import spock.lang.Shared
 import spock.lang.Specification

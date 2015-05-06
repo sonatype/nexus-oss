@@ -18,81 +18,26 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
-  extend: 'NX.view.AddPanel',
+  extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-sslcertificate-details-window',
   requires: [
     'NX.Conditions',
     'NX.I18n'
   ],
+  ui: 'nx-inset',
 
-  settingsForm: {
+  title: NX.I18n.get('ADMIN_SSL_DETAILS_TITLE'),
+
+  items: {
     xtype: 'nx-coreui-sslcertificate-details-form',
+    frame: false,
     buttons: [
       { text: NX.I18n.get('ADMIN_SSL_DETAILS_CANCEL_BUTTON'),
         handler: function () {
-          this.up('nx-drilldown').showChild(0, true);
+          this.up('window').close();
         }
       }
     ]
-  },
-
-  initComponent: function () {
-    var me = this,
-        form;
-
-    me.callParent(arguments);
-
-    Ext.override(me.down('form'), {
-      loadRecord: function (model) {
-        var me = this,
-            tbar = me.getDockedItems('toolbar[dock="bottom"]')[0],
-            button;
-
-        if (model) {
-          if (model.get('inNexusSSLTrustStore')) {
-            tbar.insert(0, {
-              text: NX.I18n.get('ADMIN_SSL_DETAILS_REMOVE'),
-              action: 'remove',
-              formBind: true,
-              disabled: true,
-              ui: 'nx-primary',
-              glyph: 'xf056@FontAwesome' /* fa-minus-circle */
-            });
-            button = tbar.down('button[action=remove]');
-            me.mon(
-                NX.Conditions.isPermitted('nexus:ssl:truststore', 'delete'),
-                {
-                  satisfied: button.enable,
-                  unsatisfied: button.disable,
-                  scope: button
-                }
-            );
-          }
-          else {
-            tbar.insert(0, {
-              text: NX.I18n.get('ADMIN_SSL_DETAILS_ADD'),
-              action: 'add',
-              formBind: true,
-              disabled: true,
-              ui: 'nx-primary',
-              glyph: 'xf055@FontAwesome' /* fa-plus-circle */
-            });
-            button = tbar.down('button[action=add]');
-            me.mon(
-                NX.Conditions.isPermitted('nexus:ssl:truststore', 'create'),
-                {
-                  satisfied: button.enable,
-                  unsatisfied: button.disable,
-                  scope: button
-                }
-            );
-          }
-        }
-        me.callParent(arguments);
-      }
-    });
   }
-
-
 
 });
