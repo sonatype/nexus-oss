@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.is;
  * @since 3.0
  */
 @ExamReactorStrategy(PerClass.class)
-public class NugetHostedPushIT
+public class NugetHostedIT
     extends NugetITSupport
 {
   private static final String HOSTED_REPO = "nuget-test-hosted";
@@ -100,4 +100,31 @@ public class NugetHostedPushIT
     assertThat(delete, is(HttpStatus.NOT_FOUND));
   }
 
+  @Test
+  public void searchForPackage() throws Exception {
+    nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
+
+    final String feedXml = nuget.feedXml(
+        "Search()/$count?$filter=IsAbsoluteLatestVersion&searchTerm='SONATYPE.TEST'&targetFramework='net45'&includePrerelease=true");
+
+    final List<Map<String, String>> entries = parseFeedXml(feedXml);
+    assertThat("entry count", entries.size(), is(1));
+    assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
+  }
+
+  @Test
+  public void visualStudioSearchForUpdates() throws Exception {
+    nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
+
+    final String feedXml = nuget.feedXml("Packages()?$filter=((((tolower(Id)%20eq%20'sonatype.test')" +
+        "%20or%20(tolower(Id)%20eq%20'51degrees.mobi'))" +
+        "%20or%20(tolower(Id)%20eq%20'microsoft.aspnet.razor'))" +
+        "%20or%20(tolower(Id)%20eq%20'microsoft.aspnet.webpages'))" +
+        "%20or%20(tolower(Id)%20eq%20'microsoft.aspnet.mvc')" +
+        "&$orderby=Id");
+
+    final List<Map<String, String>> entries = parseFeedXml(feedXml);
+    assertThat("entry count", entries.size(), is(1));
+    assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
+  }
 }
