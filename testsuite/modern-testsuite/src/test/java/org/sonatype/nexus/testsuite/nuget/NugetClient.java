@@ -46,7 +46,7 @@ public class NugetClient
   }
 
   public String getRepositoryMetadata() throws Exception {
-    return asString(response("$metadata"));
+    return asString(get("$metadata"));
   }
 
   /**
@@ -70,16 +70,16 @@ public class NugetClient
   }
 
   public String feedXml(final String query) throws IOException {
-    return asString(response(query));
+    return asString(get(query));
   }
 
   public int count(final String query) throws IOException {
-    final String s = asString(response(query));
+    final String s = asString(get(query));
     return Integer.parseInt(s);
   }
 
   public HttpResponse entry(final String packageId, final String version) throws IOException {
-    return response(String.format("Packages(Id='%s',Version='%s')", packageId, version));
+    return get(String.format("Packages(Id='%s',Version='%s')", packageId, version));
   }
 
   public String entryXml(final String packageId, final String version) throws IOException {
@@ -99,15 +99,16 @@ public class NugetClient
     return response.getStatusLine().getStatusCode();
   }
 
-  private String asString(final HttpResponse response) throws IOException {
+    private String asString(final HttpResponse response) throws IOException {
     assert response.getStatusLine().getStatusCode() == HttpStatus.OK;
     return EntityUtils.toString(response.getEntity());
   }
 
-  private HttpResponse response(final String path) throws IOException {
+  /**
+   * GET a response from the repository.
+   */
+  private HttpResponse get(final String path) throws IOException {
     final HttpGet get = new HttpGet(repositoryBaseUri.resolve(path));
     return httpClient.execute(get, httpClientContext);
   }
-
-
 }
