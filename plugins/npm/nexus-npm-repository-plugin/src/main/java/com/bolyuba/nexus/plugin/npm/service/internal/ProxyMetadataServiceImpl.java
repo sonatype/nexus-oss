@@ -117,7 +117,7 @@ public class ProxyMetadataServiceImpl
    * 2. the complete filename after "/-/"
    */
   private final static Pattern TARBALL_PATH_PATTERN = Pattern
-      .compile("/([[a-z][A-Z][0-9]-_\\.]+)/-/([[a-z][A-Z][0-9]-_\\.]+\\.tgz)");
+      .compile("/([[a-z][A-Z][0-9]-_\\.]+)/-/([[a-z][A-Z][0-9]-_\\.]+tgz)");
 
   @Nullable
   @Override
