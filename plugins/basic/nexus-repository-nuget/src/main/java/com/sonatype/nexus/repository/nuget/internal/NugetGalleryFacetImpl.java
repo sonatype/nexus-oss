@@ -240,9 +240,10 @@ public class NugetGalleryFacetImpl
   @Override
   public void putMetadata(final Map<String, String> metadata) {
     try (StorageTx tx = openStorageTx()) {
-      createOrUpdatePackage(tx, metadata);
+      final Component component = createOrUpdatePackage(tx, metadata);
       maintainAggregateInfo(tx, metadata.get(ID));
       tx.commit();
+      getRepository().facet(SearchFacet.class).put(component);
     }
   }
 
@@ -282,6 +283,10 @@ public class NugetGalleryFacetImpl
     final StringBuilder xml = new StringBuilder();
     try (StorageTx tx = openStorageTx()) {
       final Component component = findComponent(tx, id, version);
+      if (component == null) {
+        return null;
+      }
+
       final Asset asset = findAsset(tx, component);
       final Map<String, ?> entryData = toData(asset.formatAttributes(), extra);
 
@@ -334,6 +339,7 @@ public class NugetGalleryFacetImpl
 
       boolean isNew = component.isNew();  // must check before commit
       storageTx.commit();
+      getRepository().facet(SearchFacet.class).put(component);
 
       if (isNew) {
         getEventBus().post(new ComponentCreatedEvent(component, getRepository()));
@@ -421,7 +427,6 @@ public class NugetGalleryFacetImpl
     final Bucket bucket = storageTx.getBucket();
     final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
     createOrUpdateAssetAndContents(storageTx, bucket, component, packageStream, recordMetadata);
-    getRepository().facet(SearchFacet.class).put(component);
     return component;
   }
 
@@ -433,7 +438,6 @@ public class NugetGalleryFacetImpl
     Asset asset = findOrCreateAsset(storageTx, component);
     updateAssetMetadata(asset, recordMetadata, component.isNew());
     storageTx.saveAsset(asset);
-    getRepository().facet(SearchFacet.class).put(component);
     return component;
   }
 
