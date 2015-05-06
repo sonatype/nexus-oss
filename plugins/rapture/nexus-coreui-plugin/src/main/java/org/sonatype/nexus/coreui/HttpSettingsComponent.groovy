@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
+import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 import javax.validation.Valid
@@ -19,6 +20,7 @@ import javax.validation.constraints.NotNull
 
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.httpclient.HttpClientManager
 import org.sonatype.nexus.validation.Validate
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -37,16 +39,11 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 class HttpSettingsComponent
 extends DirectComponentSupport
 {
-
-//  @Inject
-//  GlobalRemoteConnectionSettings connectionSettings
-//
-//  @Inject
-//  GlobalRemoteProxySettings proxySettings
+  @Inject
+  HttpClientManager httpClientManager
 
   /**
    * Retrieves HTTP system settings
-   * @return HTTP system settings
    */
   @DirectMethod
   @RequiresPermissions('nexus:settings:read')
@@ -83,8 +80,7 @@ extends DirectComponentSupport
   }
 
   /**
-   * Updates HTTP system settings .
-   * @return updated HTTP system settings
+   * Updates HTTP system settings.
    */
   @DirectMethod
   @RequiresAuthentication
