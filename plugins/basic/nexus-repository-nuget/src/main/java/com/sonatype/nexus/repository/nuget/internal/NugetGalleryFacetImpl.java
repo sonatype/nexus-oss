@@ -155,7 +155,6 @@ public class NugetGalleryFacetImpl
   @Guarded(by = STARTED)
   public String feed(final String base, final String operation, final Map<String, String> query) {
     log.debug("Select: {}", query);
-    setFeedQueryDefaults(query);
 
     final List<Repository> repositories = getRepositories();
 
@@ -222,19 +221,6 @@ public class NugetGalleryFacetImpl
       xml.append("()?").append(ODataFeedUtils.skipLink(result.getSkipLinkEntry(), result.getQuery())).append("\"/>\n");
     }
     return xml.append("</feed>").toString();
-  }
-
-  private void setFeedQueryDefaults(final Map<String, String> query)
-  {
-    // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
-    if (!query.containsKey("$orderby")) {
-      query.put("$orderby", DOWNLOAD_COUNT + " desc");
-    }
-    else {
-      // OrientDB only supports ordering by identifiers, not by functions
-      final String orderby = query.get("$orderby");
-      query.put("$orderby", orderby.replaceAll("(?i)concat\\(title,id\\)", NAME_ORDER));
-    }
   }
 
   @Override

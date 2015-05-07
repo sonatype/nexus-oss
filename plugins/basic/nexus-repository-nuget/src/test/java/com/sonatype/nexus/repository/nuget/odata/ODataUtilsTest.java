@@ -19,6 +19,9 @@ import com.sonatype.nexus.repository.nuget.internal.ComponentQuery;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 public class ODataUtilsTest
 {
   @Test
@@ -39,4 +42,22 @@ public class ODataUtilsTest
     System.err.println(foo.getQuerySuffix());
     System.err.println(foo.getParameters());
   }
+
+  @Test
+  public void singleTokenFilterNamesAreExpandedToBooleanExpressions() {
+    Map<String, String> query = Maps.newHashMap();
+    query.put("$filter", "IsLatestVersion");
+
+    final ComponentQuery foo = ODataUtils.query(query, false);
+
+    assertThat(foo.getWhere(), is("((attributes.nuget.is_latest_version = true))"));
+  }
+
+  @Test
+  public void testBackReference() {
+
+    System.err.println(
+        "$filter=IsLatestVersion".replaceAll("(?i)(IsLatestVersion|IsAbsoluteLatestVersion)", "($1 eq true)"));
+  }
+
 }
