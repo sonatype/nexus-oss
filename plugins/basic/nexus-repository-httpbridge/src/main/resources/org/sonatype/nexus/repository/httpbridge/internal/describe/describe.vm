@@ -37,7 +37,7 @@
           #foreach ($entry in $map.entrySet())
           <tr>
             <td>$entry.key</td>
-            <td>$entry.value</td>
+            <td>$esc.html($entry.value)</td>
           </tr>
           #end
         </tbody>
@@ -64,7 +64,7 @@
       <h2>$item.name</h2>
     #elseif($item.type == "string")
       <h3>$item.name</h3>
-      <p>$item.value</p>
+      <p>$esc.html($item.value)</p>
     #elseif($item.type == "table")
       <h3>$item.name</h3>
       #table($item.value)
