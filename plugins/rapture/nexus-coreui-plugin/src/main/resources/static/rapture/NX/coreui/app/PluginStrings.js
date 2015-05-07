@@ -993,19 +993,25 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_TASKS_SCHEDULE_DAYS: 'Days to run this task',
     ADMIN_TASKS_SCHEDULE_DAYS_PLACEHOLDER: 'At least one day should be selected',
     ADMIN_TASKS_SCHEDULE_CRON: 'CRON expression',
+    ADMIN_TASKS_SCHEDULE_CRON_PLACEHOLDER: '* * * * * * *',
     ADMIN_TASKS_SCHEDULE_CRON_HELP: 'A cron expression that will control the running of the task.',
-    ADMIN_TASKS_SCHEDULE_CRON_HELP_EXAMPLES: '<table style="font-size: 11px">' + '<tr><td><b>Example</b></td><td><b>Description</b></td></tr>'
-    + '<tr><td><code>0 0 12 * * ?</code></td><td>Fire at 12pm (noon) every day</td></tr>' + '<tr><td><code>0 15 10 ? * *</code></td><td>Fire at 10:15am every day</td></tr>'
-    + '<tr><td><code>0 15 10 * * ?</code></td><td>Fire at 10:15am every day</td></tr>' + '<tr><td><code>0 15 10 * * ? *</code></td><td>Fire at 10:15am every day</td></tr>'
-    + '<tr><td><code>0 15 10 * * ? 2005</code></td><td>Fire at 10:15am every day during the year 2005</td></tr>' + '<tr><td><code>0 * 14 * * ?</code></td><td>Fire every minute starting at 2pm and ending at 2:59pm, every day</td></tr>'
-    + '<tr><td><code>0 0/5 14 * * ?</code></td><td>Fire every 5 minutes starting at 2pm and ending at 2:55pm, every day</td></tr>'
-    + '<tr valign="top"><td><code>0 0/5 14,18 * * ?</code></td><td>Fire every 5 minutes starting at 2pm and ending at 2:55pm, AND fire every 5 minutes starting at 6pm and ending at 6:55pm, every day</td></tr>'
-    + '<tr><td><code>0 0-5 14 * * ?</code></td><td>Fire every minute starting at 2pm and ending at 2:05pm, every day</td></tr>'
-    + '<tr><td><code>0 10,44 14 ? 3 WED</code></td><td>Fire at 2:10pm and at 2:44pm every Wednesday in the month of March.</td></tr>'
-    + '<tr><td><code>0 15 10 ? * MON-FRI</code></td><td>Fire at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday</td></tr>' + '<tr><td><code>0 15 10 15 * ?</code></td><td>Fire at 10:15am on the 15th day of every month</td></tr>'
-    + '<tr><td><code>0 15 10 L * ?</code></td><td>Fire at 10:15am on the last day of every month</td></tr>' + '<tr><td><code>0 15 10 ? * 6L</code></td><td>Fire at 10:15am on the last Friday of every month</td></tr>'
-    + '<tr valign="top"><td nowrap><code>0 15 10 ? * 6L 2002-2005 &nbsp; &nbsp;</code></td><td>Fire at 10:15am on every last friday of every month during the years 2002, 2003, 2004 and 2005</td></tr>'
-    + '<tr><td><code>0 15 10 ? * 6#3</code></td><td>Fire at 10:15am on the third Friday of every month</td></tr>' + '</table>',
+    ADMIN_TASKS_SCHEDULE_CRON_HELP_EXAMPLES: '<div style="font-size: 11px"><p>From left to right the fields and accepted values are:</p>' +
+    '<table>' +
+    '<thead><tr><th>Field Name</th><th>Allowed Values</th></tr></thead>' +
+    '<tbody>' +
+    '<tr><td>Seconds</td><td>0-59</td></tr>' +
+    '<tr><td>Minutes</td><td>0-59</td></tr>' +
+    '<tr><td>Hours</td><td>0-23</td></tr>' +
+    '<tr><td>Day of month</td><td>1-31</td></tr>' +
+    '<tr><td>Month</td><td>1-12 or JAN-DEC</td></tr>' +
+    '<tr><td>Day of week</td><td>1-7 or SUN-SAT</td></tr>' +
+    '<tr><td>Year(optional)</td><td>empty, 1970-2099</td></tr>' +
+    '</tbody>' +
+    '</table>' +
+    '<br/>'+
+    '<p>Special tokens include: * (all acceptable values), ? (no specific value), - (ranges, e.g. 10-12)</p>' +
+    '</div> '
+    ,
     ADMIN_TASKS_SCHEDULE_MANUAL_HELP: 'Without recurrence, this service can only be run manually.',
 
     // Authentication section

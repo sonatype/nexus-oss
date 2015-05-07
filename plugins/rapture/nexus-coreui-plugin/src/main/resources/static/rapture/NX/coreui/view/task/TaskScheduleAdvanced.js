@@ -34,6 +34,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleAdvanced', {
         fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_CRON'),
         helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_CRON_HELP'),
         afterBodyEl: NX.I18n.get('ADMIN_TASKS_SCHEDULE_CRON_HELP_EXAMPLES'),
+        emptyText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_CRON_PLACEHOLDER'),
         allowBlank: false
       }
     ];
