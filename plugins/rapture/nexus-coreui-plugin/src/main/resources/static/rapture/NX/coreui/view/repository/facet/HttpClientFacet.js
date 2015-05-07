@@ -56,6 +56,7 @@ Ext.define('NX.coreui.view.repository.facet.HttpClientFacet', {
                 xtype: 'combo',
                 name: 'attributes.httpclient.authentication.type',
                 fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_AUTHENTICATION_TYPE'),
+                editable: false,
                 store: [
                   ['username', NX.I18n.get('ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_USERNAME')],
                   ['ntlm', NX.I18n.get('ADMIN_REPOSITORIES_AUTHENTICATION_TYPE_NTLM')]

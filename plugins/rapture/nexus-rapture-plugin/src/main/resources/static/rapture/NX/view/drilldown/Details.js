@@ -50,11 +50,10 @@ Ext.define('NX.view.drilldown.Details', {
       {
         xtype: 'panel',
         itemId: 'warning',
-        title: 'This is an example of a warning message',
         ui: 'nx-drilldown-message',
         cls: 'nx-drilldown-warning',
         iconCls: NX.Icons.cls('drilldown-warning', 'x16'),
-        //hidden: true
+        hidden: true
       },
       {
         xtype: 'nx-actions',
