@@ -98,7 +98,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_MESSAGES_EMPTY_STATE: 'No messages',
 
     // Server
-    GLOBAL_SERVER_EXTDIRECT_WARNING: 'Operation failed as server could not be contacted',
+    GLOBAL_SERVER_CONNECT_FAILURE: 'Operation failed as server could not be contacted',
     GLOBAL_SERVER_RECONNECTED_SUCCESS: 'Server reconnected',
     GLOBAL_SERVER_DISCONNECTED: 'Server disconnected',
     GLOBAL_SERVER_EXPIRE_WARNING: 'Session is about to expire',

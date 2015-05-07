@@ -248,10 +248,14 @@ Ext.define('NX.controller.User', {
           win.options.success.call(win.options.scope, win.options);
         }
       },
-      failure: function() {
+      failure: function(response) {
+        var message = NX.I18n.get('GLOBAL_SERVER_INCORRECT_CREDENTIALS_WARNING');
+        if(response.status === 0) {
+          message = NX.I18n.get('GLOBAL_SERVER_CONNECT_FAILURE');  
+        }
         win.getEl().unmask();
         NX.Messages.add({
-          text: NX.I18n.get('GLOBAL_SERVER_INCORRECT_CREDENTIALS_WARNING'),
+          text: message,
           type: 'warning'
         });
       }
