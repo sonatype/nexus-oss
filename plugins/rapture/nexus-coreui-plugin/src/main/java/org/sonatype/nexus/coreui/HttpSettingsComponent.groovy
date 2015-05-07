@@ -97,6 +97,10 @@ class HttpSettingsComponent
     return read()
   }
 
+  //
+  // FIXME: overly complex conversion due to lack of nested structure in exchange-object payload
+  //
+
   @PackageScope
   HttpClientConfiguration convert(final HttpSettingsXO value) {
     def result = new HttpClientConfiguration()
