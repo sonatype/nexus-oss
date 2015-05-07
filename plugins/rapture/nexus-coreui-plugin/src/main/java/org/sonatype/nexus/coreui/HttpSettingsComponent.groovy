@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
+import javax.annotation.Nullable
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -20,11 +21,14 @@ import javax.validation.constraints.NotNull
 
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.httpclient.HttpClientManager
+import org.sonatype.nexus.httpclient.config.AuthenticationConfiguration
 import org.sonatype.nexus.httpclient.config.ConnectionConfiguration
 import org.sonatype.nexus.httpclient.config.HttpClientConfiguration
 import org.sonatype.nexus.httpclient.config.NtlmAuthenticationConfiguration
 import org.sonatype.nexus.httpclient.config.ProxyConfiguration
+import org.sonatype.nexus.httpclient.config.ProxyServerConfiguration
 import org.sonatype.nexus.httpclient.config.UsernameAuthenticationConfiguration
 import org.sonatype.nexus.validation.Validate
 
@@ -33,6 +37,10 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+
+//
+// FIXME: overly complex conversion due to lack of nested structure in exchange-object payload
+//
 
 /**
  * HTTP System Settings {@link DirectComponent}.
@@ -72,16 +80,15 @@ class HttpSettingsComponent
         result.httpHost = host
         result.httpPort = port
 
-        // FIXME: Sort out enabled and password
         authentication instanceof UsernameAuthenticationConfiguration && authentication.with {
           result.httpAuthEnabled = true
           result.httpAuthUsername = username
-          // result.httpAuthPassword = password
+          result.httpAuthPassword = Password.fakePassword()
         }
         authentication instanceof NtlmAuthenticationConfiguration && authentication.with {
           result.httpAuthEnabled = true
           result.httpAuthUsername = username
-          // result.httpAuthPassword = password
+          result.httpAuthPassword = Password.fakePassword()
           result.httpAuthNtlmHost = host
           result.httpAuthNtlmDomain = domain
         }
@@ -91,7 +98,19 @@ class HttpSettingsComponent
         result.httpsEnabled = enabled
         result.httpsHost = host
         result.httpsPort = port
-        // TODO: authentication
+
+        authentication instanceof UsernameAuthenticationConfiguration && authentication.with {
+          result.httpsAuthEnabled = true
+          result.httpsAuthUsername = username
+          result.httpsAuthPassword = Password.fakePassword()
+        }
+        authentication instanceof NtlmAuthenticationConfiguration && authentication.with {
+          result.httpsAuthEnabled = true
+          result.httpsAuthUsername = username
+          result.httpsAuthPassword = Password.fakePassword()
+          result.httpsAuthNtlmHost = host
+          result.httpsAuthNtlmDomain = domain
+        }
       }
 
       if (nonProxyHosts) {
@@ -115,10 +134,6 @@ class HttpSettingsComponent
     httpClientManager.configuration = convert(settings)
     return read()
   }
-
-  //
-  // FIXME: overly complex conversion due to lack of nested structure in exchange-object payload
-  //
 
   @PackageScope
   HttpClientConfiguration convert(final HttpSettingsXO value) {
@@ -149,12 +164,34 @@ class HttpSettingsComponent
 
     // http proxy
     if (value.httpEnabled) {
-      // TODO: proxy configuration
+      proxy().http = new ProxyServerConfiguration(
+          enabled: true,
+          host: value.httpHost,
+          port: value.httpPort,
+          authentication: auth(
+              value.httpAuthEnabled,
+              value.httpAuthUsername,
+              value.httpAuthPassword,
+              value.httpAuthNtlmHost,
+              value.httpAuthNtlmDomain
+          )
+      )
     }
 
     // https proxy
     if (value.httpsEnabled) {
-      // TODO: proxy configuration
+      proxy().https = new ProxyServerConfiguration(
+          enabled: true,
+          host: value.httpsHost,
+          port: value.httpsPort,
+          authentication: auth(
+              value.httpsAuthEnabled,
+              value.httpsAuthUsername,
+              value.httpsAuthPassword,
+              value.httpsAuthNtlmHost,
+              value.httpsAuthNtlmDomain
+          )
+      )
     }
 
     if (value.nonProxyHosts) {
@@ -164,5 +201,36 @@ class HttpSettingsComponent
     // ignore authentication, this is not exposed for global configuration
 
     return result
+  }
+
+  // FIXME: Password type assumes we have the previous value, which is problematic/complex
+
+  @PackageScope
+  @Nullable
+  AuthenticationConfiguration auth(final Boolean enabled,
+                                   final String username,
+                                   final Password password,
+                                   final String host,
+                                   final String domain)
+  {
+    if (!enabled) {
+      return null
+    }
+
+    // HACK: non-optimal use of host/domain to determine authentication type
+    if (host || domain) {
+      return new NtlmAuthenticationConfiguration(
+          username: username,
+          password: password.valueIfValid, // FIXME: This won't work unless the value is customized
+          host: host,
+          domain: domain
+      )
+    }
+    else {
+      return new UsernameAuthenticationConfiguration(
+          username: username,
+          password: password.valueIfValid  // FIXME: This won't work unless the value is customized
+      )
+    }
   }
 }
