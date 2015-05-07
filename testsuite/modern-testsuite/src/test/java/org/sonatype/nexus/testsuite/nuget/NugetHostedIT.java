@@ -20,8 +20,6 @@ import static org.hamcrest.Matchers.is;
 
 /**
  * Tests NuGet hosted repositories.
- *
- * @since 3.0
  */
 @ExamReactorStrategy(PerClass.class)
 public class NugetHostedIT

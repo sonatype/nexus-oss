@@ -23,8 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A simple NuGet client for ITs.
- *
- * @since 3.0
  */
 public class NugetClient
 {
