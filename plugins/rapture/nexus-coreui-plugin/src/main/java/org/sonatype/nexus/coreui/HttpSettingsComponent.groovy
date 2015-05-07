@@ -23,7 +23,9 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.httpclient.HttpClientManager
 import org.sonatype.nexus.httpclient.config.ConnectionConfiguration
 import org.sonatype.nexus.httpclient.config.HttpClientConfiguration
+import org.sonatype.nexus.httpclient.config.NtlmAuthenticationConfiguration
 import org.sonatype.nexus.httpclient.config.ProxyConfiguration
+import org.sonatype.nexus.httpclient.config.UsernameAuthenticationConfiguration
 import org.sonatype.nexus.validation.Validate
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -69,7 +71,20 @@ class HttpSettingsComponent
         result.httpEnabled = enabled
         result.httpHost = host
         result.httpPort = port
-        // TODO: authentication
+
+        // FIXME: Sort out enabled and password
+        authentication instanceof UsernameAuthenticationConfiguration && authentication.with {
+          result.httpAuthEnabled = true
+          result.httpAuthUsername = username
+          // result.httpAuthPassword = password
+        }
+        authentication instanceof NtlmAuthenticationConfiguration && authentication.with {
+          result.httpAuthEnabled = true
+          result.httpAuthUsername = username
+          // result.httpAuthPassword = password
+          result.httpAuthNtlmHost = host
+          result.httpAuthNtlmDomain = domain
+        }
       }
 
       https?.with {
@@ -77,6 +92,10 @@ class HttpSettingsComponent
         result.httpsHost = host
         result.httpsPort = port
         // TODO: authentication
+      }
+
+      if (nonProxyHosts) {
+        result.nonProxyHosts = nonProxyHosts as Set<String>
       }
     }
 
@@ -136,6 +155,10 @@ class HttpSettingsComponent
     // https proxy
     if (value.httpsEnabled) {
       // TODO: proxy configuration
+    }
+
+    if (value.nonProxyHosts) {
+      proxy().nonProxyHosts = value.nonProxyHosts as String[]
     }
 
     // ignore authentication, this is not exposed for global configuration
