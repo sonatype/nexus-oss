@@ -52,12 +52,4 @@ public class ODataUtilsTest
 
     assertThat(foo.getWhere(), is("((attributes.nuget.is_latest_version = true))"));
   }
-
-  @Test
-  public void testBackReference() {
-
-    System.err.println(
-        "$filter=IsLatestVersion".replaceAll("(?i)(IsLatestVersion|IsAbsoluteLatestVersion)", "($1 eq true)"));
-  }
-
 }

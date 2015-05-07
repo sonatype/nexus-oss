@@ -71,8 +71,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents
-      </groupId>
+      <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
       <scope>test</scope>
     </dependency>

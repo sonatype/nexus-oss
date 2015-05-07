@@ -101,10 +101,4 @@ public class NugetITSupport
       return entries;
     }
   }
-  //protected NugetClient nugetClient(final Repository repository) throws Exception {
-  //
-  //  final CloseableHttpClient httpClient = clientBuilder().setDefaultCredentialsProvider(credentialsProvider()).build();
-  //  final URL url = resolveUrl(nexusUrl, "/repository/" + repository.getName() + "/");
-  //  return new NugetClient(httpClient, clientContext(), url.toURI());
-  //}
 }
