@@ -82,6 +82,18 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   },
 
   /**
+   * @protected
+   * Clear the filter before destroying this plugin
+   */
+  destroy: function() {
+    var me = this;
+
+    me.clearFilter();
+
+    me.callParent();
+  },
+
+  /**
    * @private
    * Clear filtering on grid.
    */
