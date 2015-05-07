@@ -28,6 +28,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 /**
@@ -37,7 +38,14 @@ import static org.hamcrest.Matchers.is;
 public class NugetHostedIT
     extends NugetITSupport
 {
+
   private static final String HOSTED_REPO = "nuget-test-hosted";
+
+  public static final String VISUAL_STUDIO_INITIAL_COUNT_QUERY =
+      "Search()/$count?$filter=IsLatestVersion&searchTerm=''&targetFramework='net45'&includePrerelease=false";
+
+  public static final String VISUAL_STUDIO_INITIAL_FEED_QUERY =
+      "Search()?$filter=IsLatestVersion&$orderby=DownloadCount%20desc,Id&$skip=0&$top=30&searchTerm=''&targetFramework='net45'&includePrerelease=false";
 
   private NugetClient nuget;
 
@@ -45,7 +53,7 @@ public class NugetHostedIT
   public void createHostedRepository() throws Exception {
     final Configuration config = hostedConfig(HOSTED_REPO);
 
-    final Repository repository = createOrReplaceRepository(config);
+    final Repository repository = createRepository(config);
 
     nuget = nugetClient(repository);
   }
@@ -59,7 +67,7 @@ public class NugetHostedIT
   public void hostedRepositoryIsAvailable() throws Exception {
     final String repositoryMetadata = nuget.getRepositoryMetadata();
     assertThat(repositoryMetadata, is(notNullValue()));
-    assertThat(repositoryMetadata.contains("<Schema Namespace=\"NuGetGallery\""), is(true));
+    assertThat(repositoryMetadata, containsString("<Schema Namespace=\"NuGetGallery\""));
   }
 
   @Test
@@ -69,14 +77,10 @@ public class NugetHostedIT
     waitFor(calmPeriod());
 
     // Visual Studio-style queries
-    int count = nuget
-        .count("Search()/$count?$filter=IsLatestVersion&searchTerm=''&targetFramework='net45'&includePrerelease=false");
-
+    int count = nuget.count(VISUAL_STUDIO_INITIAL_COUNT_QUERY);
     assertThat("count", count, is(1));
 
-    String feed = nuget.feedXml(
-        "Search()?$filter=IsLatestVersion&$orderby=DownloadCount%20desc,Id&$skip=0&$top=30&searchTerm=''&targetFramework='net45'&includePrerelease=false");
-
+    String feed = nuget.feedXml(VISUAL_STUDIO_INITIAL_FEED_QUERY);
     final List<Map<String, String>> entries = parseFeedXml(feed);
 
     assertThat("entry count", entries.size(), is(1));
@@ -84,6 +88,12 @@ public class NugetHostedIT
 
     final int delete = nuget.delete("SONATYPE.TEST", "1.0");
     assertThat(delete, is(HttpStatus.NO_CONTENT));
+
+    // Now ensure that the item has been deleted
+    assertThat("count after deletion", nuget.count(VISUAL_STUDIO_INITIAL_COUNT_QUERY), is(0));
+
+    final List<Map<String, String>> remainingEntries = parseFeedXml(nuget.feedXml(VISUAL_STUDIO_INITIAL_FEED_QUERY));
+    assertThat("entries after deletion", remainingEntries.size(), is(0));
   }
 
   @Test

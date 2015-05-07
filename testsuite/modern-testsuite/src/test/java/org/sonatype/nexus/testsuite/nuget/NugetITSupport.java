@@ -71,12 +71,9 @@ public class NugetITSupport
   /**
    * Creates a repository, first removing an existing one if necessary.
    */
-  protected Repository createOrReplaceRepository(final Configuration config) throws Exception {
+  protected Repository createRepository(final Configuration config) throws Exception {
     waitFor(responseFrom(nexusUrl));
-    repositoryManager.get(config.getRepositoryName());
-
-    final Repository repository = repositoryManager.create(config);
-    return repository;
+    return repositoryManager.create(config);
   }
 
   protected void deleteRepository(String name) throws Exception {
