@@ -37,15 +37,16 @@ public class ODataUtilsTest
     query.put("targetFramework", "'net45'");
     query.put("includePrerelease", "false");
 
-    final ComponentQuery foo = ODataUtils.query(query, false);
+    final ComponentQuery componentQuery = ODataUtils.query(query, false);
 
-    assertThat(foo.getWhere(), is("(attributes.nuget.keywords LIKE :p0) AND  attributes.nuget.is_prerelease=false  " +
-        "AND ((attributes.nuget.is_latest_version = true))"));
+    assertThat(componentQuery.getWhere(),
+        is("(attributes.nuget.keywords LIKE :p0) AND  attributes.nuget.is_prerelease=false  " +
+            "AND ((attributes.nuget.is_latest_version = true))"));
 
-    assertThat(foo.getQuerySuffix(), is(
+    assertThat(componentQuery.getQuerySuffix(), is(
         "ORDER BY attributes.nuget.download_count DESC, attributes.nuget.id ASC, id asc, version asc LIMIT 30 OFFSET 0"));
 
-    assertThat(ImmutableMap.of("p0", (Object) "%jilted%").equals(foo.getParameters()), is(true));
+    assertThat(ImmutableMap.of("p0", (Object) "%jilted%").equals(componentQuery.getParameters()), is(true));
   }
 
   @Test
@@ -53,8 +54,8 @@ public class ODataUtilsTest
     Map<String, String> query = Maps.newHashMap();
     query.put("$filter", "IsLatestVersion");
 
-    final ComponentQuery foo = ODataUtils.query(query, false);
+    final ComponentQuery componentQuery = ODataUtils.query(query, false);
 
-    assertThat(foo.getWhere(), is("((attributes.nuget.is_latest_version = true))"));
+    assertThat(componentQuery.getWhere(), is("((attributes.nuget.is_latest_version = true))"));
   }
 }
