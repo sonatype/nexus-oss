@@ -21,10 +21,14 @@ import javax.validation.constraints.NotNull
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.httpclient.HttpClientManager
+import org.sonatype.nexus.httpclient.config.ConnectionConfiguration
+import org.sonatype.nexus.httpclient.config.HttpClientConfiguration
+import org.sonatype.nexus.httpclient.config.ProxyConfiguration
 import org.sonatype.nexus.validation.Validate
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 
@@ -37,7 +41,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 @Singleton
 @DirectAction(action = 'coreui_HttpSettings')
 class HttpSettingsComponent
-extends DirectComponentSupport
+    extends DirectComponentSupport
 {
   @Inject
   HttpClientManager httpClientManager
@@ -48,35 +52,37 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:settings:read')
   HttpSettingsXO read() {
-//    def httpSettingsXO = new HttpSettingsXO(
-//        userAgentCustomisation: connectionSettings.userAgentCustomizationString,
-//        urlParameters: connectionSettings.queryString,
-//        timeout: connectionSettings.connectionTimeout == 0 ? 0 : connectionSettings.connectionTimeout / 1000,
-//        retries: connectionSettings.retrievalRetryCount,
-//        nonProxyHosts: proxySettings.nonProxyHosts
-//    )
-//
-//    def (enabled, host, port, username, ntlmHost, ntlmDomain) = fromRemoteHttpProxySettings(proxySettings.httpProxySettings)
-//    httpSettingsXO.httpEnabled = enabled
-//    httpSettingsXO.httpHost = host
-//    httpSettingsXO.httpPort = port
-//    httpSettingsXO.httpAuthEnabled = StringUtils.isNotBlank(username as String)
-//    httpSettingsXO.httpAuthUsername = username
-//    httpSettingsXO.httpAuthPassword = httpSettingsXO.httpAuthEnabled ? Password.fakePassword() : null
-//    httpSettingsXO.httpAuthNtlmHost = ntlmHost
-//    httpSettingsXO.httpAuthNtlmDomain = ntlmDomain
-//
-//    (enabled, host, port, username, ntlmHost, ntlmDomain) = fromRemoteHttpProxySettings(proxySettings.httpsProxySettings)
-//    httpSettingsXO.httpsEnabled = enabled
-//    httpSettingsXO.httpsHost = host
-//    httpSettingsXO.httpsPort = port
-//    httpSettingsXO.httpsAuthEnabled = StringUtils.isNotBlank(username as String)
-//    httpSettingsXO.httpsAuthUsername = username
-//    httpSettingsXO.httpAuthPassword = httpSettingsXO.httpsAuthEnabled ? Password.fakePassword() : null
-//    httpSettingsXO.httpsAuthNtlmHost = ntlmHost
-//    httpSettingsXO.httpsAuthNtlmDomain = ntlmDomain
-//
-//    return httpSettingsXO
+    return convert(httpClientManager.configuration)
+  }
+
+  @PackageScope
+  HttpSettingsXO convert(final HttpClientConfiguration value) {
+    HttpSettingsXO result = new HttpSettingsXO()
+
+    value.connection?.with {
+      result.timeout = timeout
+      result.retries = maximumRetries
+    }
+
+    value.proxy?.with {
+      http?.with {
+        result.httpEnabled = enabled
+        result.httpHost = host
+        result.httpPort = port
+        // TODO: authentication
+      }
+
+      https?.with {
+        result.httpsEnabled = enabled
+        result.httpsHost = host
+        result.httpsPort = port
+        // TODO: authentication
+      }
+    }
+
+    // ignore authentication, this is not exposed for global configuration
+
+    return result
   }
 
   /**
@@ -86,90 +92,50 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
   @Validate
-  HttpSettingsXO update(final @NotNull(message = '[httpSettingsXO] may not be null') @Valid HttpSettingsXO httpSettingsXO) {
-//    connectionSettings.userAgentCustomizationString = httpSettingsXO.userAgentCustomisation
-//    connectionSettings.queryString = httpSettingsXO.urlParameters
-//    connectionSettings.connectionTimeout = httpSettingsXO.timeout * 1000
-//    connectionSettings.retrievalRetryCount = httpSettingsXO.retries
-//
-//    proxySettings.nonProxyHosts = httpSettingsXO.httpEnabled ? httpSettingsXO.nonProxyHosts : null
-//    proxySettings.httpProxySettings = toRemoteHttpProxySettings(
-//        httpSettingsXO.httpEnabled, httpSettingsXO.httpHost, httpSettingsXO.httpPort,
-//        httpSettingsXO.httpAuthEnabled,
-//        httpSettingsXO.httpAuthUsername, getPassword(httpSettingsXO.httpAuthPassword, proxySettings.httpProxySettings?.proxyAuthentication),
-//        httpSettingsXO.httpAuthNtlmHost, httpSettingsXO.httpAuthNtlmDomain
-//    )
-//    proxySettings.httpsProxySettings = toRemoteHttpProxySettings(
-//        httpSettingsXO.httpsEnabled, httpSettingsXO.httpsHost, httpSettingsXO.httpsPort,
-//        httpSettingsXO.httpsAuthEnabled,
-//        httpSettingsXO.httpsAuthUsername, getPassword(httpSettingsXO.httpsAuthPassword, proxySettings.httpsProxySettings?.proxyAuthentication),
-//        httpSettingsXO.httpsAuthNtlmHost, httpSettingsXO.httpsAuthNtlmDomain
-//    )
-
+  HttpSettingsXO update(final @NotNull(message = '[httpSettingsXO] may not be null') @Valid HttpSettingsXO settings) {
+    httpClientManager.configuration = convert(settings)
     return read()
   }
 
-//  @PackageScope
-//  fromRemoteHttpProxySettings(final RemoteHttpProxySettings settings) {
-//    def enabled = false, hostname = null, port = null, username = null, ntlmHost = null, ntlmDomain = null
-//    if (settings) {
-//      enabled = settings.enabled
-//      if (enabled) {
-//        hostname = settings.hostname
-//        port = settings.port
-//        if (settings.proxyAuthentication) {
-//          if (settings.proxyAuthentication instanceof UsernamePasswordRemoteAuthenticationSettings) {
-//            def auth = (UsernamePasswordRemoteAuthenticationSettings) settings.proxyAuthentication
-//            username = auth.username
-//          }
-//          if (settings.proxyAuthentication instanceof NtlmRemoteAuthenticationSettings) {
-//            def auth = (NtlmRemoteAuthenticationSettings) settings.proxyAuthentication
-//            ntlmHost = auth.ntlmHost
-//            ntlmDomain = auth.ntlmDomain
-//          }
-//        }
-//      }
-//    }
-//    return [enabled, hostname, port, username, ntlmHost, ntlmDomain]
-//  }
-//
-//  @PackageScope
-//  DefaultRemoteHttpProxySettings toRemoteHttpProxySettings(final Boolean enabled,
-//                                           final String hostname,
-//                                           final Integer port,
-//                                           final Boolean auth,
-//                                           final String username,
-//                                           final String password,
-//                                           final String ntlmHost,
-//                                           final String ntlmDomain)
-//  {
-//    if (enabled) {
-//      def proxy = new DefaultRemoteHttpProxySettings(
-//          hostname: hostname,
-//          port: port ?: 0
-//      )
-//      if (auth) {
-//        if (StringUtils.isNotBlank(ntlmHost)) {
-//          proxy.proxyAuthentication = new NtlmRemoteAuthenticationSettings(username, password, ntlmDomain, ntlmHost)
-//        }
-//        else {
-//          proxy.proxyAuthentication = new UsernamePasswordRemoteAuthenticationSettings(username, password)
-//        }
-//      }
-//      return proxy
-//    }
-//    return null
-//  }
-//
-//  @PackageScope
-//  String getPassword(Password password, RemoteAuthenticationSettings settings) {
-//    if (password?.valid) {
-//      return password.value
-//    }
-//    if (settings instanceof UsernamePasswordRemoteAuthenticationSettings) {
-//      return settings.password
-//    }
-//    return null
-//  }
+  @PackageScope
+  HttpClientConfiguration convert(final HttpSettingsXO value) {
+    def result = new HttpClientConfiguration()
 
+    // convert connection configuration
+    def connection = {
+      if (result.connection == null) {
+        result.connection = new ConnectionConfiguration()
+      }
+      return result.connection
+    }
+
+    if (value.timeout != null) {
+      connection().timeout = value.timeout
+    }
+    if (value.retries != null) {
+      connection().maximumRetries = value.retries
+    }
+
+    // convert proxy configuration
+    def proxy = {
+      if (result.proxy == null) {
+        result.proxy = new ProxyConfiguration()
+      }
+      return result.proxy
+    }
+
+    // http proxy
+    if (value.httpEnabled) {
+      // TODO: proxy configuration
+    }
+
+    // https proxy
+    if (value.httpsEnabled) {
+      // TODO: proxy configuration
+    }
+
+    // ignore authentication, this is not exposed for global configuration
+
+    return result
+  }
 }

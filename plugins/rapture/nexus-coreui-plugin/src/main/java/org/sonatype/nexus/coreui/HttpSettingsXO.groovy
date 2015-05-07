@@ -41,6 +41,8 @@ class HttpSettingsXO
   @Max(10L)
   Integer retries
 
+  // HTTP proxy
+
   Boolean httpEnabled
   String httpHost
 
@@ -48,11 +50,15 @@ class HttpSettingsXO
   @Max(65535L)
   Integer httpPort
 
+  // HTTP proxy-authentication
+
   Boolean httpAuthEnabled
   String httpAuthUsername
   Password httpAuthPassword
   String httpAuthNtlmHost
   String httpAuthNtlmDomain
+
+  // HTTPS proxy
 
   Boolean httpsEnabled
   String httpsHost
@@ -61,11 +67,15 @@ class HttpSettingsXO
   @Max(65535L)
   Integer httpsPort
 
+  // HTTPS proxy-authentication
+
   Boolean httpsAuthEnabled
   String httpsAuthUsername
   Password httpsAuthPassword
   String httpsAuthNtlmHost
   String httpsAuthNtlmDomain
+
+  // HTTP[S] non-proxy hosts
 
   Set<String> nonProxyHosts
 }
