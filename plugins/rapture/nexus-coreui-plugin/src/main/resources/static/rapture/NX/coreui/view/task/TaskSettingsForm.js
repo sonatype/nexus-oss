@@ -94,8 +94,8 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     if (task.startDate) {
       task.startDate = task.startDate.toJSON();
     }
-    
-    if(task.schedule === 'advanced') {
+
+    if (task.schedule === 'advanced') {
       task.cronExpression = values.cronExpression;
     }
 
