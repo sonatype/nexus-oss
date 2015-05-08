@@ -14,7 +14,7 @@ package com.sonatype.nexus.repository.nuget.internal;
 
 import javax.annotation.Nonnull;
 
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
+import com.sonatype.nexus.repository.nuget.odata.ODataFeedUtils;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Response;

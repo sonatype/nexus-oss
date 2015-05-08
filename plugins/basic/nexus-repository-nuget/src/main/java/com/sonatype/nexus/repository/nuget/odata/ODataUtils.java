@@ -10,14 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.nexus.repository.nuget.internal.odata;
+package com.sonatype.nexus.repository.nuget.odata;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import com.sonatype.nexus.repository.nuget.internal.ComponentQuery;
+
 import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.odata4j.expression.OrderByExpression;
@@ -65,10 +69,12 @@ public final class ODataUtils
   /**
    * Converts the given OData query and select clause into an SQL expression.
    *
-   * @param query OData parameters
+   * @param originalQuery OData parameters
    * @param count True if the intention is to merely count the items rather than itemizing them
    */
-  public static ComponentQuery query(final Map<String, String> query, final boolean count) {
+  public static ComponentQuery query(final Map<String, String> originalQuery, final boolean count) {
+    final Map<String, String> query = applyQueryDefaults(originalQuery);
+
     ComponentQuery.Builder q = new ComponentQuery.Builder();
 
     // TODO: parameters should be case-insensitive
@@ -165,6 +171,32 @@ public final class ODataUtils
       }
     }
     return q.build();
+  }
+
+  @NotNull
+  private static Map<String, String> applyQueryDefaults(final Map<String, String> originalQuery) {
+    final Map<String,String> query = new HashMap<>(originalQuery);
+
+    // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
+    if (!query.containsKey("$orderby")) {
+
+      // TODO: Restore this once the orientdb regression has been fixed
+      // OrientDB can't currently ORDER BY attributes.nuget.download_count
+
+
+      //query.put("$orderby", DOWNLOAD_COUNT + " desc");
+    }
+    else {
+      // OrientDB only supports ordering by identifiers, not by functions
+      final String orderby = query.get("$orderby");
+      query.put("$orderby", orderby.replaceAll("(?i)concat\\(title,id\\)", NAME_ORDER));
+    }
+
+    if (query.containsKey("$filter")) {
+      final String filter = query.get("$filter");
+      query.put("$filter", filter.replaceAll("(?i)(IsLatestVersion|IsAbsoluteLatestVersion)", "($1 eq true)"));
+    }
+    return query;
   }
 
   private static Map<String, String> columnAliases() {

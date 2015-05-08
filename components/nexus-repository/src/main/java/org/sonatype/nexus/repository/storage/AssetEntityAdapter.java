@@ -136,8 +136,8 @@ public class AssetEntityAdapter
   }
 
   Iterable<Asset> browseByComponent(final ODatabaseDocumentTx db, final Component component) {
-    checkNotNull(component);
-    checkState(component.isPersisted());
+    checkNotNull(component, "component");
+    checkState(component.isPersisted(), "component must be persisted");
 
     Map<String, Object> parameters = ImmutableMap.<String, Object>of(
         "component", componentEntityAdapter.recordIdentity(component)

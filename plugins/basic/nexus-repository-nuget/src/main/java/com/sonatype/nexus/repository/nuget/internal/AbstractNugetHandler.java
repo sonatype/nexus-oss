@@ -15,7 +15,7 @@ package com.sonatype.nexus.repository.nuget.internal;
 import java.io.IOException;
 import java.util.Map;
 
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
+import com.sonatype.nexus.repository.nuget.odata.ODataTemplates;
 
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.view.Context;

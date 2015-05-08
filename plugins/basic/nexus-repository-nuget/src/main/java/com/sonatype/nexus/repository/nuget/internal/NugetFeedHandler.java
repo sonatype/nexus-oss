@@ -59,6 +59,9 @@ public class NugetFeedHandler
 
       case PACKAGE_ENTRY_PATTERN:
         final String entry = facet.entry(getRepositoryBase(context), tokens.get("id"), tokens.get("version"));
+        if (entry == null) {
+          return HttpResponses.notFound();
+        }
         return xmlPayload(200, entry);
 
       default:

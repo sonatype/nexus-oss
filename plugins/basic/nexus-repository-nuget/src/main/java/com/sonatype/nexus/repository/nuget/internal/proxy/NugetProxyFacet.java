@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacet;
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataConsumer;
+import com.sonatype.nexus.repository.nuget.odata.ODataConsumer;
 
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;

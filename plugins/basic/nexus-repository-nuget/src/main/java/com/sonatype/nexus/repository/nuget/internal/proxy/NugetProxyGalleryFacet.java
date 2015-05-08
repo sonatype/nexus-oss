@@ -32,8 +32,8 @@ import javax.inject.Named;
 import com.sonatype.nexus.repository.nuget.internal.FeedResult;
 import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacet;
 import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacetImpl;
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataConsumer;
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
+import com.sonatype.nexus.repository.nuget.odata.ODataConsumer;
+import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
