@@ -18,7 +18,6 @@ import java.util.Properties;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.common.dirs.ApplicationDirectories;
-import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.quartz.internal.QuartzSupportImpl;
 import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.web.BaseUrlDetector;
@@ -63,19 +62,13 @@ public abstract class QuartzITSupport
   @Inject
   static protected QuartzSupportImpl quartzSupport;
 
-
-  // ==
-
   static protected ApplicationDirectories applicationDirectories;
-
-  static protected ApplicationConfiguration applicationConfiguration;
 
   static protected BaseUrlDetector baseUrlDetector;
 
   @BeforeClass
   public static void prepare() throws Exception {
     applicationDirectories = mock(ApplicationDirectories.class);
-    applicationConfiguration = mock(ApplicationConfiguration.class);
     baseUrlDetector = mock(BaseUrlDetector.class);
     Guice.createInjector(new WireModule(new SetUpModule(),
         new SpaceModule(new URLClassSpace(QuartzITSupport.class.getClassLoader()), BeanScanning.INDEX)));
@@ -107,9 +100,6 @@ public abstract class QuartzITSupport
       System.out.println("Workdir: " + workDir);
       when(applicationDirectories.getWorkDirectory(anyString())).thenReturn(workDir);
       binder.bind(ApplicationDirectories.class).toInstance(applicationDirectories);
-
-      when(applicationConfiguration.getConfigurationDirectory()).thenReturn(new File(workDir, "conf"));
-      binder.bind(ApplicationConfiguration.class).toInstance(applicationConfiguration);
 
       binder.bind(BaseUrlDetector.class).toInstance(baseUrlDetector);
 

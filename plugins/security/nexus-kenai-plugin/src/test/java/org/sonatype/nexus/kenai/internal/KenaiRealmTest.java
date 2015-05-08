@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.kenai.internal;
 
-import org.sonatype.nexus.httpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientManager;
 import org.sonatype.nexus.kenai.AbstractKenaiRealmTest;
 
 import junit.framework.Assert;
@@ -30,9 +30,9 @@ public class KenaiRealmTest
   private KenaiRealm getRealm()
       throws Exception
   {
-    final HttpClientFactory mockHttpClientFactory = Mockito.mock(HttpClientFactory.class);
-    Mockito.when(mockHttpClientFactory.create()).thenReturn(new DefaultHttpClient());
-    return new KenaiRealm(mockKenai(), mockHttpClientFactory);
+    HttpClientManager httpClientManager = Mockito.mock(HttpClientManager.class);
+    Mockito.when(httpClientManager.create()).thenReturn(new DefaultHttpClient());
+    return new KenaiRealm(mockKenai(), httpClientManager);
   }
 
   @Test

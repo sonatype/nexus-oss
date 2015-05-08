@@ -15,18 +15,17 @@ package com.sonatype.nexus.ssl.plugin.internal.smtp;
 import java.util.Properties;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
 import org.sonatype.nexus.common.property.SystemPropertiesHelper;
-import org.sonatype.nexus.email.SmtpSessionParametersCustomizer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sonatype.nexus.ssl.model.SMTPTrustStoreKey.smtpTrustStoreKey;
+
+// FIXME: Need to sort out changes to sisu-mailer or replacement
 
 /**
  * An {@link SmtpSessionParametersCustomizer} that will configure SMTP parameters to use Nexus SSL Trust Store in case
@@ -34,11 +33,11 @@ import static com.sonatype.nexus.ssl.model.SMTPTrustStoreKey.smtpTrustStoreKey;
  *
  * @since ssl 1.0
  */
-@Named
-@Singleton
+//@Named
+//@Singleton
 public class SMTPSessionParametersCustomizer
     extends ComponentSupport
-    implements SmtpSessionParametersCustomizer
+    //implements SmtpSessionParametersCustomizer
 {
 
   private final TrustStore trustStore;
@@ -52,7 +51,7 @@ public class SMTPSessionParametersCustomizer
     this.trustStore = checkNotNull(trustStore);
   }
 
-  @Override
+  //@Override
   public Properties customize(final Properties params) {
     final SSLContext sslContext = trustStore.getSSLContextFor(smtpTrustStoreKey());
     final String host = params.getProperty("mail.smtp.host");

@@ -15,8 +15,6 @@ package org.sonatype.nexus.coreui
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
-import org.sonatype.nexus.extdirect.model.Password
-
 import groovy.transform.ToString
 
 /**
@@ -41,6 +39,8 @@ class HttpSettingsXO
   @Max(10L)
   Integer retries
 
+  // HTTP proxy
+
   Boolean httpEnabled
   String httpHost
 
@@ -48,11 +48,15 @@ class HttpSettingsXO
   @Max(65535L)
   Integer httpPort
 
+  // HTTP proxy-authentication
+
   Boolean httpAuthEnabled
   String httpAuthUsername
-  Password httpAuthPassword
+  String httpAuthPassword
   String httpAuthNtlmHost
   String httpAuthNtlmDomain
+
+  // HTTPS proxy
 
   Boolean httpsEnabled
   String httpsHost
@@ -61,11 +65,15 @@ class HttpSettingsXO
   @Max(65535L)
   Integer httpsPort
 
+  // HTTPS proxy-authentication
+
   Boolean httpsAuthEnabled
   String httpsAuthUsername
-  Password httpsAuthPassword
+  String httpsAuthPassword
   String httpsAuthNtlmHost
   String httpsAuthNtlmDomain
+
+  // HTTP[S] non-proxy hosts
 
   Set<String> nonProxyHosts
 }

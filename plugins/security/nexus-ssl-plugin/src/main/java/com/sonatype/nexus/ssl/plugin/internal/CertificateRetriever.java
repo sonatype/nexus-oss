@@ -26,15 +26,16 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.sonatype.nexus.httpclient.HttpClientFactory;
-import org.sonatype.nexus.httpclient.HttpClientFactory.Builder;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.storage.remote.httpclient.RemoteStorageContextCustomizer;
+import org.sonatype.nexus.httpclient.HttpClientManager;
+import org.sonatype.nexus.httpclient.HttpClientPlan;
+import org.sonatype.nexus.httpclient.HttpClientPlan.Customizer;
+import org.sonatype.nexus.httpclient.HttpSchemes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.http.HttpException;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -48,6 +49,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.http.conn.ssl.SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 
 /**
  * Certificates retriever from a host:port using Apache Http Client 4.
@@ -56,15 +58,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 @Named
+@SuppressWarnings("PackageAccessibility") // FIXME: httpclient usage is producing lots of OSGI warnings in IDEA
 public class CertificateRetriever
     extends ComponentSupport
 {
-
-  private final HttpClientFactory httpClientFactory;
+  private final HttpClientManager httpClientManager;
 
   @Inject
-  public CertificateRetriever(final HttpClientFactory httpClientFactory) {
-    this.httpClientFactory = checkNotNull(httpClientFactory);
+  public CertificateRetriever(final HttpClientManager httpClientManager) {
+    this.httpClientManager = checkNotNull(httpClientManager);
   }
 
   private static final TrustManager ACCEPT_ALL_TRUST_MANAGER = new X509TrustManager()
@@ -85,58 +87,62 @@ public class CertificateRetriever
    *
    * @param host    to get certificate chain from (cannot be null)
    * @param port    of host to connect to
-   * @param context used to configure proxy, authentication, other connection params (cannot be null)
    * @return certificate chain
    * @throws Exception Re-thrown from accessing the remote host
    */
-  public Certificate[] retrieveCertificatesFromHttpsServer(final String host,
-                                                           final int port,
-                                                           final RemoteStorageContext context)
-      throws Exception
-  {
-    checkNotNull(context);
+  public Certificate[] retrieveCertificatesFromHttpsServer(final String host, final int port) throws Exception {
     checkNotNull(host);
 
     log.info("Retrieving certificate from https://{}:{}", host, port);
 
-    Builder httpClientBuilder = null;
-    HttpClientConnectionManager connectionManager = null;
+    // setup custom connection manager so we can configure SSL to trust-all
+    SSLContext sc = SSLContext.getInstance("TLS");
+    sc.init(null, new TrustManager[]{ACCEPT_ALL_TRUST_MANAGER}, null);
+    SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sc, ALLOW_ALL_HOSTNAME_VERIFIER);
+    Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
+        .register(HttpSchemes.HTTP, PlainConnectionSocketFactory.getSocketFactory())
+        .register(HttpSchemes.HTTPS, sslSocketFactory).build();
+    final HttpClientConnectionManager connectionManager = new BasicHttpClientConnectionManager(registry);
+
     try {
-      final AtomicReference<Certificate[]> chain = new AtomicReference<Certificate[]>();
-      final SSLContext sc = SSLContext.getInstance("TLS");
-      sc.init(null, new TrustManager[]{ACCEPT_ALL_TRUST_MANAGER}, null);
+      final AtomicReference<Certificate[]> certificates = new AtomicReference<>();
 
-      final SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sc, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-      final Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
-          .register("http", PlainConnectionSocketFactory.getSocketFactory())
-          .register("https", sslSocketFactory).build();
+      HttpClient httpClient = httpClientManager.create(new Customizer()
+      {
+        @Override
+        public void customize(final HttpClientPlan plan) {
+          // replace connection-manager with customized version needed to fetch SSL certificates
+          plan.getClient().setConnectionManager(connectionManager);
 
-      httpClientBuilder = httpClientFactory.prepare(new RemoteStorageContextCustomizer(context));
-      connectionManager = new BasicHttpClientConnectionManager(registry);
-      httpClientBuilder.getHttpClientBuilder().setConnectionManager(connectionManager);
-      httpClientBuilder.getHttpClientBuilder().addInterceptorFirst(
-          new HttpResponseInterceptor()
+          // add interceptor to grab peer-certificates
+          plan.getClient().addInterceptorFirst(new HttpRequestInterceptor()
           {
             @Override
-            public void process(final HttpResponse response, final HttpContext context)
+            public void process(final HttpRequest request, final HttpContext context)
                 throws HttpException, IOException
             {
-              final ManagedHttpClientConnection connection = HttpCoreContext.adapt(context).getConnection(ManagedHttpClientConnection.class);
+              ManagedHttpClientConnection connection =
+                  HttpCoreContext.adapt(context).getConnection(ManagedHttpClientConnection.class);
+
+              // grab the peer-certificates from the session
               if (connection != null) {
                 SSLSession session = connection.getSSLSession();
                 if (session != null) {
-                  chain.set(session.getPeerCertificates());
+                  certificates.set(session.getPeerCertificates());
                 }
               }
             }
           });
-      httpClientBuilder.build().execute(new HttpGet("https://" + host + ":" + port));
-      return chain.get();
+        }
+      });
+
+      httpClient.execute(new HttpGet("https://" + host + ":" + port));
+
+      return certificates.get();
     }
     finally {
-      if (connectionManager != null) {
-        connectionManager.shutdown();
-      }
+      // shutdown single-use connection manager
+      connectionManager.shutdown();
     }
   }
 
@@ -148,23 +154,21 @@ public class CertificateRetriever
    * @return certificate chain
    * @throws Exception Re-thrown from accessing the remote host
    */
-  public Certificate[] retrieveCertificates(final String host,
-                                            final int port)
-      throws Exception
-  {
+  public Certificate[] retrieveCertificates(final String host, final int port) throws Exception {
     checkNotNull(host);
 
     log.info("Retrieving certificate from {}:{} using direct socket connection", host, port);
 
     SSLSocket socket = null;
     try {
-      final SSLContext sc = SSLContext.getInstance("TLS");
+      SSLContext sc = SSLContext.getInstance("TLS");
       sc.init(null, new TrustManager[]{ACCEPT_ALL_TRUST_MANAGER}, null);
 
-      final javax.net.ssl.SSLSocketFactory sslSocketFactory = sc.getSocketFactory();
+      javax.net.ssl.SSLSocketFactory sslSocketFactory = sc.getSocketFactory();
       socket = (SSLSocket) sslSocketFactory.createSocket(host, port);
       socket.startHandshake();
-      final SSLSession session = socket.getSession();
+
+      SSLSession session = socket.getSession();
       return session.getPeerCertificates();
     }
     finally {
@@ -173,5 +177,4 @@ public class CertificateRetriever
       }
     }
   }
-
 }

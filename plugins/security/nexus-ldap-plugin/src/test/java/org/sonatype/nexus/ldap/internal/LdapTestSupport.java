@@ -27,8 +27,6 @@ import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Host;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Protocol;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
-import org.sonatype.nexus.proxy.maven.routing.Config;
-import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.WebSecurityModule;
 import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
@@ -68,7 +66,6 @@ public abstract class LdapTestSupport
     {
       @Override
       public void configure(final Binder binder) {
-        binder.bind(Config.class).toInstance(new ConfigImpl(false));
         binder.bind(LdapConfigurationSource.class).toInstance(ldapConfigurationSource);
         final SecuritySystem securitySystem = getBoundSecuritySystem();
         if (securitySystem != null) {

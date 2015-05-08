@@ -15,25 +15,15 @@ package org.sonatype.nexus.coreui
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
-import javax.validation.groups.Default
 
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry
-import org.sonatype.nexus.proxy.repository.GroupRepository
-import org.sonatype.nexus.proxy.repository.Repository
-import org.sonatype.nexus.proxy.targets.TargetPrivilegeDescriptor
-import org.sonatype.nexus.proxy.targets.TargetRegistry
 import org.sonatype.nexus.security.SecuritySystem
 import org.sonatype.nexus.security.authz.AuthorizationManager
-import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor
 import org.sonatype.nexus.security.privilege.Privilege
 import org.sonatype.nexus.security.privilege.PrivilegeDescriptor
 import org.sonatype.nexus.security.user.UserManager
 import org.sonatype.nexus.validation.Validate
-import org.sonatype.nexus.validation.group.Create
 
 import com.google.common.collect.Maps
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -52,19 +42,12 @@ import org.hibernate.validator.constraints.NotEmpty
 @Singleton
 @DirectAction(action = 'coreui_Privilege')
 class PrivilegeComponent
-extends DirectComponentSupport
+    extends DirectComponentSupport
 {
-
   public static final String DEFAULT_SOURCE = UserManager.DEFAULT_SOURCE
 
   @Inject
   SecuritySystem securitySystem
-
-  @Inject
-  RepositoryRegistry repositoryRegistry
-
-  @Inject
-  TargetRegistry targetRegistry
 
   @Inject
   List<PrivilegeDescriptor> privilegeDescriptors
@@ -76,53 +59,9 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('security:privileges:read')
   List<PrivilegeXO> read() {
-    return securitySystem.listPrivileges().collect { input ->
+    return securitySystem.listPrivileges().collect {input ->
       return asPrivilegeXO(input)
     }
-  }
-
-  /**
-   * Creates repository target privileges.
-   * @param privilegeXO to be created
-   * @return created privileges
-   */
-  @DirectMethod
-  @RequiresAuthentication
-  @RequiresPermissions('security:privileges:create')
-  @Validate(groups = [Create.class, Default.class])
-  List<PrivilegeXO> createForRepositoryTarget(final @NotNull(message = '[privilegeXO] may not be null') @Valid PrivilegeRepositoryTargetXO privilegeXO) {
-    def repositoryId = '', groupId = ''
-    if (privilegeXO.repositoryId) {
-      Repository repository = repositoryRegistry.getRepository(privilegeXO.repositoryId)
-      if (repository.getRepositoryKind().isFacetAvailable(GroupRepository.class)) {
-        groupId = privilegeXO.repositoryId
-      }
-      else {
-        repositoryId = privilegeXO.repositoryId
-      }
-    }
-    def manager = securitySystem.getAuthorizationManager(DEFAULT_SOURCE)
-    List<PrivilegeXO> created = []
-    ['create', 'read', 'update', 'delete'].each { String method ->
-      created << asPrivilegeXO(
-          manager.addPrivilege(
-              new Privilege(
-                  id: Long.toHexString(System.nanoTime()),
-                  name: privilegeXO.name ? "${privilegeXO.name} - (${method})" : null,
-                  description: privilegeXO.description,
-                  type: TargetPrivilegeDescriptor.TYPE,
-                  readOnly: false,
-                  properties: [
-                      (MethodPrivilegeDescriptor.P_METHOD)     : method,
-                      (TargetPrivilegeDescriptor.P_TARGET_ID): privilegeXO.repositoryTargetId,
-                      (TargetPrivilegeDescriptor.P_REPOSITORY_ID)      : repositoryId,
-                      (TargetPrivilegeDescriptor.P_GROUP_ID)           : groupId
-                  ]
-              )
-          )
-      )
-    }
-    return created
   }
 
   /**

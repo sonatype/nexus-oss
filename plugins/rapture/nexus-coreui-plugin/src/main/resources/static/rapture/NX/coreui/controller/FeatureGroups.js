@@ -79,17 +79,6 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       },
       {
         mode: 'browse',
-        path: '/Repository',
-        text: NX.I18n.get('BROWSE_REPOSITORY_TITLE'),
-        description: NX.I18n.get('BROWSE_REPOSITORY_SUBTITLE'),
-        group: true,
-        iconConfig: {
-          file: 'database.png',
-          variants: ['x16', 'x32']
-        }
-      },
-      {
-        mode: 'browse',
         path: '/Upload',
         text: NX.I18n.get('BROWSE_UPLOAD_TITLE'),
         description: NX.I18n.get('BROWSE_UPLOAD_SUBTITLE'),

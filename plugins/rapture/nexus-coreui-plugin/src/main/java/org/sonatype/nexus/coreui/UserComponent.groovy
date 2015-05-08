@@ -20,12 +20,11 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
 
-import org.sonatype.micromailer.Address
 import org.sonatype.nexus.common.text.Strings2
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
+import org.sonatype.nexus.rapture.PasswordPlaceholder
 import org.sonatype.nexus.security.SecuritySystem
 import org.sonatype.nexus.security.anonymous.AnonymousManager
 import org.sonatype.nexus.security.role.RoleIdentifier
@@ -33,9 +32,6 @@ import org.sonatype.nexus.security.user.User
 import org.sonatype.nexus.security.user.UserManager
 import org.sonatype.nexus.security.user.UserSearchCriteria
 import org.sonatype.nexus.validation.Validate
-import org.sonatype.nexus.validation.ValidationMessage
-import org.sonatype.nexus.validation.ValidationResponse
-import org.sonatype.nexus.validation.ValidationResponseException
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
 import org.sonatype.nexus.wonderland.AuthTicketService
@@ -279,7 +275,7 @@ extends DirectComponentSupport
         lastName: user.lastName,
         email: user.emailAddress,
         status: user.status,
-        password: Password.fakePassword(),
+        password: PasswordPlaceholder.get(),
         roles: user.roles.collect { role ->
           role.roleId
         },
@@ -308,20 +304,22 @@ extends DirectComponentSupport
 
   @PackageScope
   String validateEmail(final String email) {
-    if (email) {
-      try {
-        new Address(email)
-      }
-      catch (IllegalArgumentException e) {
-        def validations = new ValidationResponse()
-        def message = e.message
-        if (e.cause?.message) {
-          message += ': ' + e.cause.message
-        }
-        validations.addError(new ValidationMessage('email', message))
-        throw new ValidationResponseException(validations)
-      }
-    }
+//    if (email) {
+//      try {
+//        new Address(email)
+//      }
+//      catch (IllegalArgumentException e) {
+//        def validations = new ValidationResponse()
+//        def message = e.message
+//        if (e.cause?.message) {
+//          message += ': ' + e.cause.message
+//        }
+//        validations.addError(new ValidationMessage('email', message))
+//        throw new ValidationResponseException(validations)
+//      }
+//    }
+
+    // FIXME: do not use sisu-mailer junk
     return email
   }
 

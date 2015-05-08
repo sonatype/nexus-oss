@@ -70,7 +70,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-httpclient-api</artifactId>
+      <artifactId>nexus-httpclient</artifactId>
     </dependency>
 
     <dependency>

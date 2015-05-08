@@ -74,7 +74,7 @@ public class SimpleSessionCookieIT
 
   @Test
   public void authenticatedContentCRUDActionsShouldNotCreateSession() throws Exception {
-    final String target = resolveUrl(nexusUrl, "content/repositories/releases/test.txt").toExternalForm();
+    final String target = resolveUrl(nexusUrl, "repository/maven-releases/foo/bar/1/bar-1.txt").toExternalForm();
 
     final HttpPut put = new HttpPut(target);
     put.setEntity(new StringEntity("text content"));
@@ -139,7 +139,6 @@ public class SimpleSessionCookieIT
    * Validate Nexus Cookies during Sign-in and Sign-out
    */
   private void exerciseCookieSpec(final URL baseUrl) throws Exception {
-
     // handle cookies like a browser to aid validation
     final CookieSpec spec = new DefaultCookieSpecProvider().create(null);
     final CookieOrigin cookieOrigin = cookieOrigin(baseUrl);
@@ -245,8 +244,9 @@ public class SimpleSessionCookieIT
   /**
    * Validate standard session cookie properties
    */
-  private void assertCommonSessionCookieAttributes(final URL baseUrl, final SetCookie serverCookie,
-      final String headerText)
+  private void assertCommonSessionCookieAttributes(final URL baseUrl,
+                                                   final SetCookie serverCookie,
+                                                   final String headerText)
   {
     assertThat(serverCookie, notNullValue());
     assertThat("cookie value must be present", serverCookie.getValue(), notNullValue());

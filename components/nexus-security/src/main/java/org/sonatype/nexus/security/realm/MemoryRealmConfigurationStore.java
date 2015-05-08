@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * In-memory {@link RealmConfigurationStore}.
+ *
+ * @since 3.0
  */
 @Named("memory")
 @Singleton

@@ -56,6 +56,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.calculateFingerprint;
 
+// TODO: Remove
+
 /**
  * Trust store resource.
  *

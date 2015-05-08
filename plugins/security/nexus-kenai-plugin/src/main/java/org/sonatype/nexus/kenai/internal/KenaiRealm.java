@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.httpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientManager;
 import org.sonatype.nexus.kenai.Kenai;
 import org.sonatype.nexus.kenai.KenaiConfiguration;
 
@@ -68,14 +68,14 @@ public class KenaiRealm
 
   private final Kenai kenai;
 
-  private final HttpClientFactory httpClientFactory;
+  private final HttpClientManager httpClientManager;
 
   @Inject
   public KenaiRealm(final Kenai kenai,
-                    final HttpClientFactory httpClientFactory)
+                    final HttpClientManager httpClientManager)
   {
     this.kenai = checkNotNull(kenai);
-    this.httpClientFactory = checkNotNull(httpClientFactory);
+    this.httpClientManager = checkNotNull(httpClientManager);
     setName(ROLE);
     setAuthenticationCachingEnabled(true);
     setAuthorizationCachingEnabled(true);
@@ -109,7 +109,7 @@ public class KenaiRealm
   }
 
   private boolean authenticateViaUrl(final UsernamePasswordToken usernamePasswordToken) {
-    final HttpClient client = httpClientFactory.create();
+    final HttpClient client = httpClientManager.create();
 
     try {
       final String url = configuration().getBaseUrl() + "api/login/authenticate.json";

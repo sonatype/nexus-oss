@@ -67,38 +67,13 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
     deferEmptyText: false
   },
 
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless'
+  }],
+
   plugins: [
     { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_PRIVILEGES_LIST_FILTER_ERROR') }
-  ],
-
-  /**
-   * @override
-   */
-  initComponent: function () {
-    var me = this;
-
-    me.dockedItems = [{
-      xtype: 'toolbar',
-      dock: 'top',
-      cls: 'nx-actions nx-borderless',
-      items: [
-        {
-          xtype: 'button',
-          text: NX.I18n.get('ADMIN_PRIVILEGES_LIST_NEW_BUTTON'),
-          glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
-          action: 'new',
-          disabled: true,
-          menu: [
-            {
-              text: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TARGET_ITEM'),
-              action: 'newrepositorytarget',
-              iconCls: NX.Icons.cls('privilege-target', 'x16')
-            }
-          ]
-        }
-      ]
-    }];
-
-    me.callParent();
-  }
+  ]
 });

@@ -16,7 +16,6 @@ import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 
-import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.validation.group.Update
 
 import groovy.transform.ToString
@@ -63,7 +62,7 @@ class LdapServerConnectionXO
   String authUsername
 
   @NotNull(groups = AuthScheme)
-  Password authPassword
+  String authPassword
 
   @Min(0L)
   Integer connectionTimeout

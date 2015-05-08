@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.repository.RepositorySelectRecipe', {
       width: 36,
       iconVariant: 'x16',
       iconName: function() {
-        return 'repository-default';
+        return 'repository-hosted';
       }
     },
     { header: 'Recipe', dataIndex: 'name', flex: 1 }

@@ -82,7 +82,7 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
     var me = this;
 
     NX.Security.doWithAuthenticationToken(
-        NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_NUGET_ACCESS'),
+        NX.I18n.get('NUGET_APIKEY_ACCESS_HELP'),
         {
           success: function(authToken) {
             NX.direct.nuget_NuGetApiKey.readKey(authToken, function(response) {
@@ -103,7 +103,7 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
     var me = this;
 
     NX.Security.doWithAuthenticationToken(
-        NX.I18n.get('LEGACY_ADMIN_REPOSITORIES_NUGET_RESET'),
+        NX.I18n.get('NUGET_APIKEY_RESET_HELP'),
         {
           success: function(authToken) {
             NX.direct.nuget_NuGetApiKey.resetKey(authToken, function(response) {

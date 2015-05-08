@@ -29,7 +29,7 @@ import org.eclipse.sisu.Priority;
  */
 @Named
 @Singleton
-@Priority(Integer.MAX_VALUE - 100) // after nexus-coreui_legacy-plugin
+@Priority(Integer.MAX_VALUE - 100) // after nexus-rapture-plugin
 public class UiPluginDescriptorImpl
   extends UiPluginDescriptorSupport
 {
