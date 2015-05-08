@@ -43,7 +43,7 @@ import org.sonatype.nexus.ldap.internal.ssl.SSLLdapContextFactory
 import org.sonatype.nexus.ldap.internal.templates.LdapSchemaTemplate
 import org.sonatype.nexus.ldap.internal.templates.LdapSchemaTemplateManager
 import org.sonatype.nexus.ldap.model.LdapTrustStoreKey
-import org.sonatype.nexus.rapture.Password
+import org.sonatype.nexus.rapture.PasswordPlaceholder
 import org.sonatype.nexus.rapture.TrustStoreKeys
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.group.Create
@@ -259,7 +259,7 @@ extends DirectComponentSupport
         authScheme: connectionInfo.authScheme,
         authRealm: connectionInfo.saslRealm,
         authUsername: connectionInfo.systemUsername,
-        authPassword: Password.placeholder(connectionInfo.systemPassword),
+        authPassword: PasswordPlaceholder.get(connectionInfo.systemPassword),
 
         connectionTimeout: connectionInfo.connectionTimeout,
         connectionRetryDelay: connectionInfo.connectionRetryDelay,

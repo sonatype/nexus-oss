@@ -17,32 +17,32 @@ import javax.annotation.Nullable;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
- * Helper for password fields.
+ * Helper for password-placeholder data.
  *
  * @since 3.0
  */
-public class Password
+public class PasswordPlaceholder
 {
   /**
    * Token used for passwords that are defined, but which are not transmitted.
    */
   @VisibleForTesting
-  static final String PASSWORD_PLACEHOLDER = "#~NEXUS~PLACEHOLDER~PASSWORD~#";
+  static final String VALUE = "#~NEXUS~PLACEHOLDER~PASSWORD~#";
 
   /**
    * Returns password placeholder.
    */
-  public static String placeholder() {
-    return PASSWORD_PLACEHOLDER;
+  public static String get() {
+    return VALUE;
   }
 
   /**
    * Returns fake password placeholder unless value is {@code null}.
    */
   @Nullable
-  public static String placeholder(@Nullable final String value) {
+  public static String get(@Nullable final String value) {
     if (value != null) {
-      return PASSWORD_PLACEHOLDER;
+      return VALUE;
     }
     return null;
   }
@@ -50,7 +50,7 @@ public class Password
   /**
    * Determine if given value is a password placeholder.
    */
-  public static boolean isPlaceholder(@Nullable final String value) {
-    return value != null && PASSWORD_PLACEHOLDER.equals(value);
+  public static boolean is(@Nullable final String value) {
+    return value != null && VALUE.equals(value);
   }
 }

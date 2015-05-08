@@ -29,7 +29,7 @@ import org.sonatype.nexus.httpclient.config.NtlmAuthenticationConfiguration
 import org.sonatype.nexus.httpclient.config.ProxyConfiguration
 import org.sonatype.nexus.httpclient.config.ProxyServerConfiguration
 import org.sonatype.nexus.httpclient.config.UsernameAuthenticationConfiguration
-import org.sonatype.nexus.rapture.Password
+import org.sonatype.nexus.rapture.PasswordPlaceholder
 import org.sonatype.nexus.validation.Validate
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -83,12 +83,12 @@ class HttpSettingsComponent
         authentication instanceof UsernameAuthenticationConfiguration && authentication.with {
           result.httpAuthEnabled = true
           result.httpAuthUsername = username
-          result.httpAuthPassword = Password.placeholder(password)
+          result.httpAuthPassword = PasswordPlaceholder.get(password)
         }
         authentication instanceof NtlmAuthenticationConfiguration && authentication.with {
           result.httpAuthEnabled = true
           result.httpAuthUsername = username
-          result.httpAuthPassword = Password.placeholder(password)
+          result.httpAuthPassword = PasswordPlaceholder.get(password)
           result.httpAuthNtlmHost = host
           result.httpAuthNtlmDomain = domain
         }
@@ -102,12 +102,12 @@ class HttpSettingsComponent
         authentication instanceof UsernameAuthenticationConfiguration && authentication.with {
           result.httpsAuthEnabled = true
           result.httpsAuthUsername = username
-          result.httpsAuthPassword = Password.placeholder(password)
+          result.httpsAuthPassword = PasswordPlaceholder.get(password)
         }
         authentication instanceof NtlmAuthenticationConfiguration && authentication.with {
           result.httpsAuthEnabled = true
           result.httpsAuthUsername = username
-          result.httpsAuthPassword = Password.placeholder(password)
+          result.httpsAuthPassword = PasswordPlaceholder.get(password)
           result.httpsAuthNtlmHost = host
           result.httpsAuthNtlmDomain = domain
         }
@@ -240,10 +240,10 @@ class HttpSettingsComponent
    */
   @PackageScope
   void replacePasswordPlaceholders(final HttpClientConfiguration previous, final HttpClientConfiguration updated) {
-    if (Password.isPlaceholder(updated?.proxy?.http?.authentication?.password)) {
+    if (PasswordPlaceholder.is(updated?.proxy?.http?.authentication?.password)) {
       updated.proxy.http.authentication.password = previous?.proxy?.http?.authentication?.password
     }
-    if (Password.isPlaceholder(updated?.proxy?.https?.authentication?.password)) {
+    if (PasswordPlaceholder.is(updated?.proxy?.https?.authentication?.password)) {
       updated.proxy.https.authentication.password = previous?.proxy?.https?.authentication?.password
     }
   }
