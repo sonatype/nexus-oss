@@ -142,7 +142,7 @@ class TaskComponent
     nexusTask.setName(taskXO.name)
     nexusTask.setEnabled(taskXO.enabled)
 
-    TaskInfo<?> task = nexusScheduler.scheduleTask(nexusTask, schedule)
+    TaskInfo<?> task = scheduleTask { nexusScheduler.scheduleTask(nexusTask, schedule) }
 
     log.debug "Created task with type '${nexusTask.class}': ${nexusTask.name} (${nexusTask.id})"
     return asTaskXO(task)
@@ -169,19 +169,7 @@ class TaskComponent
     task.configuration.setAlertEmail(taskXO.alertEmail)
     task.configuration.setName(taskXO.name)
 
-    try {
-      task = nexusScheduler.rescheduleTask(task.configuration.id, schedule)
-    }
-    catch (Exception e) {
-      if(e.cause instanceof ParseException) {
-        def response = new ValidationResponse()
-        response.addError(new ValidationMessage('cronExpression', e.cause.message))
-        throw new ValidationResponseException(response)
-      }
-      else {
-        Throwables.propagate(e)
-      }
-    }
+    task = scheduleTask { nexusScheduler.rescheduleTask(task.configuration.id, schedule) }
 
     return asTaskXO(task)
   }
@@ -358,14 +346,7 @@ class TaskComponent
   @PackageScope
   Schedule asSchedule(final TaskXO taskXO) {
     if (taskXO.schedule == 'advanced') {
-      try {
-        return new Cron(new Date(), taskXO.cronExpression)
-      }
-      catch (Exception e) {
-        def response = new ValidationResponse()
-        response.addError(new ValidationMessage('cronExpression', e.getMessage()))
-        throw new ValidationResponseException(response)
-      }
+      return new Cron(new Date(), taskXO.cronExpression)
     }
     if (taskXO.schedule != 'manual') {
       if (!taskXO.startDate) {
@@ -411,6 +392,26 @@ class TaskComponent
     State state = task.currentState.state;
     if (State.RUNNING == state) {
       throw new Exception('Task can\'t be edited while it is being executed or it is in line to be executed');
+    }
+  }
+
+  /**
+   * Handle parsing errors at the quartz level, which include logically incorrect settings in addition to the purely
+   * syntactic validations (regex) we already apply.
+   */
+  @PackageScope
+  TaskInfo scheduleTask(Closure taskScheduler) {
+    try {
+      taskScheduler.call()
+    }
+    catch (Exception e) {
+      log.error('Failed to schedule task', e)
+      if (e.cause instanceof ParseException) {
+        def response = new ValidationResponse()
+        response.addError(new ValidationMessage('cronExpression', e.cause.message))
+        throw new ValidationResponseException(response)
+      }
+      Throwables.propagate(e)
     }
   }
 
