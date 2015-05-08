@@ -83,12 +83,12 @@ class HttpSettingsComponent
         authentication instanceof UsernameAuthenticationConfiguration && authentication.with {
           result.httpAuthEnabled = true
           result.httpAuthUsername = username
-          result.httpAuthPassword = Password.fakePassword()
+          result.httpAuthPassword = password ? Password.fakePassword() : null
         }
         authentication instanceof NtlmAuthenticationConfiguration && authentication.with {
           result.httpAuthEnabled = true
           result.httpAuthUsername = username
-          result.httpAuthPassword = Password.fakePassword()
+          result.httpAuthPassword = password ? Password.fakePassword() : null
           result.httpAuthNtlmHost = host
           result.httpAuthNtlmDomain = domain
         }
@@ -102,12 +102,12 @@ class HttpSettingsComponent
         authentication instanceof UsernameAuthenticationConfiguration && authentication.with {
           result.httpsAuthEnabled = true
           result.httpsAuthUsername = username
-          result.httpsAuthPassword = Password.fakePassword()
+          result.httpsAuthPassword = password ? Password.fakePassword() : null
         }
         authentication instanceof NtlmAuthenticationConfiguration && authentication.with {
           result.httpsAuthEnabled = true
           result.httpsAuthUsername = username
-          result.httpsAuthPassword = Password.fakePassword()
+          result.httpsAuthPassword = password ? Password.fakePassword() : null
           result.httpsAuthNtlmHost = host
           result.httpsAuthNtlmDomain = domain
         }
@@ -131,7 +131,10 @@ class HttpSettingsComponent
   @RequiresPermissions('nexus:settings:update')
   @Validate
   HttpSettingsXO update(final @NotNull(message = '[httpSettingsXO] may not be null') @Valid HttpSettingsXO settings) {
-    httpClientManager.configuration = convert(settings)
+    def previous = httpClientManager.configuration
+    def model = convert(settings)
+    replaceFakePasswords(previous, model)
+    httpClientManager.configuration = model
     return read()
   }
 
@@ -203,8 +206,6 @@ class HttpSettingsComponent
     return result
   }
 
-  // FIXME: Password type assumes we have the previous value, which is problematic/complex
-
   @PackageScope
   @Nullable
   AuthenticationConfiguration auth(final Boolean enabled,
@@ -221,7 +222,7 @@ class HttpSettingsComponent
     if (host || domain) {
       return new NtlmAuthenticationConfiguration(
           username: username,
-          password: password.valueIfValid, // FIXME: This won't work unless the value is customized
+          password: password.value,
           host: host,
           domain: domain
       )
@@ -229,8 +230,21 @@ class HttpSettingsComponent
     else {
       return new UsernameAuthenticationConfiguration(
           username: username,
-          password: password.valueIfValid  // FIXME: This won't work unless the value is customized
+          password: password.value
       )
+    }
+  }
+
+  /**
+   * Replace FAKE_PASSWORD tokens in updated model with values from previous module.
+   */
+  @PackageScope
+  void replaceFakePasswords(final HttpClientConfiguration previous, final HttpClientConfiguration updated) {
+    if (updated?.proxy?.http?.authentication?.password == Password.FAKE_PASSWORD) {
+      updated.proxy.http.authentication.password = previous?.proxy?.http?.authentication?.password
+    }
+    if (updated?.proxy?.https?.authentication?.password == Password.FAKE_PASSWORD) {
+      updated.proxy.https.authentication.password = previous?.proxy?.https?.authentication?.password
     }
   }
 }
