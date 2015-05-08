@@ -63,13 +63,19 @@ public class NugetHostedIT
     deleteRepository(HOSTED_REPO);
   }
 
-  @Test
+  /**
+   * Simple smoke test to ensure a hosted repo is actually reachable.
+   */
+    @Test
   public void hostedRepositoryIsAvailable() throws Exception {
     final String repositoryMetadata = nuget.getRepositoryMetadata();
     assertThat(repositoryMetadata, is(notNullValue()));
     assertThat(repositoryMetadata, containsString("<Schema Namespace=\"NuGetGallery\""));
   }
 
+  /**
+   * Push a package, ensure it turns up in Visual Studio's default feed, then delete it and ensure it's gone.
+   */
   @Test
   public void putFindDeletePackage() throws Exception {
     final int publish = nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
@@ -96,6 +102,10 @@ public class NugetHostedIT
     assertThat("entries after deletion", remainingEntries.size(), is(0));
   }
 
+
+  /**
+   * Ensure an uploaded package shows up in its single-package feed.
+   */
   @Test
   public void entryForPackage() throws Exception {
     nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
@@ -108,18 +118,28 @@ public class NugetHostedIT
     assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
   }
 
+
+  /**
+   * Requesting the entry for a nonexistent package should return 404.
+   */
   @Test
   public void entryForMissingPackageReturns404() throws Exception {
     final HttpResponse response = nuget.entry("no-such-package", "1.0");
     assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NOT_FOUND));
   }
 
+  /**
+   * Deleting a nonexistent package should return 404.
+   */
   @Test
   public void deleteMissingPackageReturns404() throws Exception {
     final int delete = nuget.delete("no-such-package", "1.0");
     assertThat(delete, is(HttpStatus.NOT_FOUND));
   }
 
+  /**
+   * Search for an uploaded package with a search term.
+   */
   @Test
   public void searchForPackage() throws Exception {
     nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
@@ -137,6 +157,10 @@ public class NugetHostedIT
     assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
   }
 
+
+  /**
+   * Ensure that Visual Studio's 'specific packages'-style ODATA queries can find an uploaded test package.
+   */
   @Test
   public void visualStudioSearchForUpdates() throws Exception {
     nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
