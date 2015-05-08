@@ -127,7 +127,11 @@ public class ProxyMetadataServiceImpl
     if (matcher.matches()) {
       final String packageName = matcher.group(1);
       final String tarballFilename = matcher.group(2);
-      final PackageRoot packageRoot = mayUpdatePackageRoot(packageName, true);
+      PackageRoot packageRoot = mayUpdatePackageRoot(packageName, true);
+      if (packageRoot == null) {
+        // not yet fetched metadata, go remote and try again
+        packageRoot = mayUpdatePackageRoot(packageName, false);
+      }
       if (packageRoot != null) {
         log.debug("Looking up package {} version for tarball request: {}", packageRoot.getName(),
             request.getRequestPath());
@@ -140,9 +144,13 @@ public class ProxyMetadataServiceImpl
             return new TarballRequest(request, packageRoot, version);
           }
         }
+        log.debug("Package not found in metadata: {}", request.getRequestPath());
+      } else {
+        log.debug("Package metadata not available: {}", request.getRequestPath());
       }
+    } else {
+      log.debug("Not a tarball request: {}", request.getRequestPath());
     }
-    log.debug("Not a tarball request: {}", request.getRequestPath());
     return null;
   }
 
