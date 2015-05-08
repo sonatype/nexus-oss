@@ -878,7 +878,25 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_TASKS_SCHEDULE_DAYS: 'Days to run this task',
     ADMIN_TASKS_SCHEDULE_DAYS_PLACEHOLDER: 'At least one day should be selected',
     ADMIN_TASKS_SCHEDULE_CRON: 'CRON expression',
+    ADMIN_TASKS_SCHEDULE_CRON_PLACEHOLDER: '* * * * * * *',
     ADMIN_TASKS_SCHEDULE_CRON_HELP: 'A cron expression that will control the running of the task.',
+    ADMIN_TASKS_SCHEDULE_CRON_HELP_EXAMPLES: '<div style="font-size: 11px"><p>From left to right the fields and accepted values are:</p>' +
+    '<table>' +
+    '<thead><tr><th>Field Name</th><th>Allowed Values</th></tr></thead>' +
+    '<tbody>' +
+    '<tr><td>Seconds</td><td>0-59</td></tr>' +
+    '<tr><td>Minutes</td><td>0-59</td></tr>' +
+    '<tr><td>Hours</td><td>0-23</td></tr>' +
+    '<tr><td>Day of month</td><td>1-31</td></tr>' +
+    '<tr><td>Month</td><td>1-12 or JAN-DEC</td></tr>' +
+    '<tr><td>Day of week</td><td>1-7 or SUN-SAT</td></tr>' +
+    '<tr><td>Year(optional)</td><td>empty, 1970-2099</td></tr>' +
+    '</tbody>' +
+    '</table>' +
+    '<br/>'+
+    '<p>Special tokens include: * (all acceptable values), ? (no specific value), - (ranges, e.g. 10-12)</p>' +
+    '</div> '
+    ,
     ADMIN_TASKS_SCHEDULE_MANUAL_HELP: 'Without recurrence, this service can only be run manually.',
 
     // Authentication section

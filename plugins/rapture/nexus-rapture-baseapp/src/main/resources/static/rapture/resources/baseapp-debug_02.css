@@ -1,3 +1,10 @@
+/* line 360, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-nx-drilldown-medium-icon .x-btn-arrow-right .x-btn-inner,
+.x-btn-nx-drilldown-medium-noicon .x-btn-arrow-right .x-btn-inner,
+.x-btn-nx-drilldown-medium-icon-text-left .x-btn-arrow-right .x-btn-inner {
+  padding-right: 0;
+}
+
 /* line 375, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-nx-drilldown-medium-icon .x-btn-inner {
   width: 24px;
