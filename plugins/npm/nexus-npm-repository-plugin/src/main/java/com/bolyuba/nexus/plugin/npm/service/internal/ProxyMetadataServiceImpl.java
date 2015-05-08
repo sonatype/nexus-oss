@@ -124,26 +124,23 @@ public class ProxyMetadataServiceImpl
   public TarballRequest createTarballRequest(final ResourceStoreRequest request) throws IOException {
     checkNotNull(request);
     final Matcher matcher = TARBALL_PATH_PATTERN.matcher(request.getRequestPath());
+    TarballRequest tarballRequest = null;
+
     if (matcher.matches()) {
       final String packageName = matcher.group(1);
       final String tarballFilename = matcher.group(2);
-      final PackageRoot packageRoot = mayUpdatePackageRoot(packageName, true);
-      if (packageRoot != null) {
-        log.debug("Looking up package {} version for tarball request: {}", packageRoot.getName(),
-            request.getRequestPath());
-        for (PackageVersion version : packageRoot.getVersions().values()) {
-          // TODO: simpler regex with filename matching used for simplicity's sake. Version extracting might be less
-          // robust due to complex regex
-          if (version.getDistTarball().endsWith(tarballFilename)) {
-            log.debug("Package {} version {} matched for tarball request: {}", packageRoot.getName(),
-                version.getVersion(), request.getRequestPath());
-            return new TarballRequest(request, packageRoot, version);
-          }
-        }
+
+      tarballRequest = requestTarball(request, mayUpdatePackageRoot(packageName, true), tarballFilename);
+      if (tarballRequest == null && !request.isRequestLocalOnly()) {
+        // might be new package so check the upstream metadata
+        tarballRequest = requestTarball(request, mayUpdatePackageRoot(packageName, false), tarballFilename);
       }
     }
-    log.debug("Not a tarball request: {}", request.getRequestPath());
-    return null;
+    else {
+      log.debug("Not a tarball request: {}", request.getRequestPath());
+    }
+
+    return tarballRequest;
   }
 
   @Override
@@ -209,6 +206,32 @@ public class ProxyMetadataServiceImpl
   }
 
   // ==
+
+  /**
+   * Attempts to find the given tarball in the cached package metadata, returns null if not found.
+   */
+  private TarballRequest requestTarball(final ResourceStoreRequest request, final PackageRoot packageRoot,
+      final String tarballFilename)
+  {
+    final String path = request.getRequestPath();
+    if (packageRoot != null) {
+      log.debug("Looking up package {} version for tarball request: {}", packageRoot.getName(), path);
+      for (PackageVersion version : packageRoot.getVersions().values()) {
+        // TODO: simpler regex with filename matching used for simplicity's sake. Version extracting might be less
+        // robust due to complex regex
+        if (version.getDistTarball().endsWith(tarballFilename)) {
+          log.debug("Package {} version {} matched for tarball request: {}", packageRoot.getName(),
+              version.getVersion(), path);
+          return new TarballRequest(request, packageRoot, version);
+        }
+      }
+      log.debug("Package not found in metadata: {}", path);
+    }
+    else {
+      log.debug("Package metadata not available: {}", path);
+    }
+    return null;
+  }
 
   /**
    * May fetch package root from remote if not found locally, or is found but is expired. The package root returned
