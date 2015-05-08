@@ -106,6 +106,14 @@ p {
   margin-bottom: 1em;
 }
 
+/**
+ * Tables
+ */
+/* line 154, ../../../baseapp/packages/rapture-theme/sass/etc/all.scss */
+th {
+  text-align: left;
+}
+
 /* including package rapture-theme */
 /**
  * @class Ext.Component
