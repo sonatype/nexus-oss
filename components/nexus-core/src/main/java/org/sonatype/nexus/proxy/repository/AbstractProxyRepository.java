@@ -25,6 +25,7 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -110,6 +111,8 @@ public abstract class AbstractProxyRepository
 
   // == injected
 
+  private SystemStatus systemStatus;
+
   private ThreadPoolManager poolManager;
 
   // == set by this
@@ -161,7 +164,8 @@ public abstract class AbstractProxyRepository
       REMOTE_STATUS_RETAIN_TIME);
 
   @Inject
-  public void populateAbstractProxyRepository(ThreadPoolManager poolManager) {
+  public void populateAbstractProxyRepository(SystemStatus systemStatus, ThreadPoolManager poolManager) {
+    this.systemStatus = checkNotNull(systemStatus);
     this.poolManager = checkNotNull(poolManager);
 
     // we have been not configured yet! So, we have no ID and stuff coming from config!
@@ -188,7 +192,7 @@ public abstract class AbstractProxyRepository
       if (repositoryStatusCheckerThread == null) {
         repositoryStatusCheckerThread =
             new RepositoryStatusCheckerThread(LoggerFactory.getLogger(getClass().getName() + "-"
-                + getId()), this);
+                + getId()), systemStatus, this);
         repositoryStatusCheckerThread.setRunning(true);
         repositoryStatusCheckerThread.setDaemon(true);
         repositoryStatusCheckerThread.start();

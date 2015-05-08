@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
@@ -23,14 +24,20 @@ public class RepositoryStatusCheckerThread
 {
   private final Logger logger;
 
+  private final SystemStatus systemStatus;
+
   private final ProxyRepository repository;
 
-  private boolean running;
+  private volatile boolean running;
 
-  public RepositoryStatusCheckerThread(final Logger logger, final ProxyRepository repository) {
+  public RepositoryStatusCheckerThread(final Logger logger, final SystemStatus systemStatus,
+      final ProxyRepository repository)
+  {
     super("RepositoryStatusChecker-" + repository.getId());
 
     this.logger = logger;
+
+    this.systemStatus = systemStatus;
 
     this.repository = repository;
 
@@ -53,6 +60,18 @@ public class RepositoryStatusCheckerThread
     boolean interrupted = false;
 
     while (isRunning() && getRepository().getProxyMode() != null) {
+
+      // wait for Nexus to fully start
+      if (!systemStatus.isNexusStarted()) {
+        try {
+          Thread.sleep(5 * 1000);
+        }
+        catch (InterruptedException e) {
+          Thread.yield();
+        }
+        continue; // check again
+      }
+
       // if interrupted from sleep, since autoBlock happened, do NOT try to unblock it immediately
       // it has to sleep the 1st amount of time repo says, and THEN try to unblock it
       if (!interrupted) {
