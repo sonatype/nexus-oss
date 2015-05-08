@@ -154,3 +154,11 @@ p {
 th {
   text-align: left;
 }
+
+td {
+  padding-right: 5px;
+}
+
+td:last-child {
+  padding-right: 0;
+}
