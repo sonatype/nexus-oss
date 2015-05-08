@@ -49,6 +49,7 @@ Ext.define('NX.view.ExpireSession', {
           text: NX.I18n.get('GLOBAL_EXPIRE_SIGN_IN_BUTTON'),
           action: 'signin',
           hidden: true,
+          itemId: 'expiredSignIn',
           ui: 'nx-primary',
           handler: function() {
             this.up('nx-expire-session').close();
@@ -66,6 +67,15 @@ Ext.define('NX.view.ExpireSession', {
     });
 
     me.callParent();
+  },
+
+  /**
+   * Check to see if the dialog is showing that it is expired.
+   * @public
+   * @returns {boolean}
+   */
+  sessionExpired: function() {
+    return this.down('#expiredSignIn').isVisible();
   }
 
 });
