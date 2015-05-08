@@ -123,7 +123,8 @@ public class ProxyMetadataServiceImpl
   @Override
   public TarballRequest createTarballRequest(final ResourceStoreRequest request) throws IOException {
     checkNotNull(request);
-    final Matcher matcher = TARBALL_PATH_PATTERN.matcher(request.getRequestPath());
+    final String path = request.getRequestPath();
+    final Matcher matcher = TARBALL_PATH_PATTERN.matcher(path);
     if (matcher.matches()) {
       final String packageName = matcher.group(1);
       final String tarballFilename = matcher.group(2);
@@ -133,23 +134,24 @@ public class ProxyMetadataServiceImpl
         packageRoot = mayUpdatePackageRoot(packageName, false);
       }
       if (packageRoot != null) {
-        log.debug("Looking up package {} version for tarball request: {}", packageRoot.getName(),
-            request.getRequestPath());
+        log.debug("Looking up package {} version for tarball request: {}", packageRoot.getName(), path);
         for (PackageVersion version : packageRoot.getVersions().values()) {
           // TODO: simpler regex with filename matching used for simplicity's sake. Version extracting might be less
           // robust due to complex regex
           if (version.getDistTarball().endsWith(tarballFilename)) {
             log.debug("Package {} version {} matched for tarball request: {}", packageRoot.getName(),
-                version.getVersion(), request.getRequestPath());
+                version.getVersion(), path);
             return new TarballRequest(request, packageRoot, version);
           }
         }
-        log.debug("Package not found in metadata: {}", request.getRequestPath());
-      } else {
-        log.debug("Package metadata not available: {}", request.getRequestPath());
+        log.debug("Package not found in metadata: {}", path);
       }
-    } else {
-      log.debug("Not a tarball request: {}", request.getRequestPath());
+      else {
+        log.debug("Package metadata not available: {}", path);
+      }
+    }
+    else {
+      log.debug("Not a tarball request: {}", path);
     }
     return null;
   }
