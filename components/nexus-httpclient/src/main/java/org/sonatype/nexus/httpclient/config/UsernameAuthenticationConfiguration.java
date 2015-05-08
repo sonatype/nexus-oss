@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.httpclient.config;
 
-import org.sonatype.nexus.common.text.Strings2;
-
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
@@ -56,7 +54,9 @@ public class UsernameAuthenticationConfiguration
   public String toString() {
     return getClass().getSimpleName() + "{" +
         "username='" + username + '\'' +
-        ", password='" + Strings2.mask(password) + '\'' +
+        // HACK: testing
+        ", password='" + password + '\'' +
+        //", password='" + Strings2.mask(password) + '\'' +
         '}';
   }
 }

@@ -83,12 +83,12 @@ class HttpSettingsComponent
         authentication instanceof UsernameAuthenticationConfiguration && authentication.with {
           result.httpAuthEnabled = true
           result.httpAuthUsername = username
-          result.httpAuthPassword = password ? Password.fakePassword() : null
+          result.httpAuthPassword = Password.placeholder(password)
         }
         authentication instanceof NtlmAuthenticationConfiguration && authentication.with {
           result.httpAuthEnabled = true
           result.httpAuthUsername = username
-          result.httpAuthPassword = password ? Password.fakePassword() : null
+          result.httpAuthPassword = Password.placeholder(password)
           result.httpAuthNtlmHost = host
           result.httpAuthNtlmDomain = domain
         }
@@ -102,12 +102,12 @@ class HttpSettingsComponent
         authentication instanceof UsernameAuthenticationConfiguration && authentication.with {
           result.httpsAuthEnabled = true
           result.httpsAuthUsername = username
-          result.httpsAuthPassword = password ? Password.fakePassword() : null
+          result.httpsAuthPassword = Password.placeholder(password)
         }
         authentication instanceof NtlmAuthenticationConfiguration && authentication.with {
           result.httpsAuthEnabled = true
           result.httpsAuthUsername = username
-          result.httpsAuthPassword = password ? Password.fakePassword() : null
+          result.httpsAuthPassword = Password.placeholder(password)
           result.httpsAuthNtlmHost = host
           result.httpsAuthNtlmDomain = domain
         }
@@ -133,7 +133,7 @@ class HttpSettingsComponent
   HttpSettingsXO update(final @NotNull(message = '[httpSettingsXO] may not be null') @Valid HttpSettingsXO settings) {
     def previous = httpClientManager.configuration
     def model = convert(settings)
-    replaceFakePasswords(previous, model)
+    replacePasswordPlaceholders(previous, model)
     httpClientManager.configuration = model
     return read()
   }
@@ -210,7 +210,7 @@ class HttpSettingsComponent
   @Nullable
   AuthenticationConfiguration auth(final Boolean enabled,
                                    final String username,
-                                   final Password password,
+                                   final String password,
                                    final String host,
                                    final String domain)
   {
@@ -222,7 +222,7 @@ class HttpSettingsComponent
     if (host || domain) {
       return new NtlmAuthenticationConfiguration(
           username: username,
-          password: password.value,
+          password: password,
           host: host,
           domain: domain
       )
@@ -230,20 +230,20 @@ class HttpSettingsComponent
     else {
       return new UsernameAuthenticationConfiguration(
           username: username,
-          password: password.value
+          password: password
       )
     }
   }
 
   /**
-   * Replace FAKE_PASSWORD tokens in updated model with values from previous module.
+   * Replace password placeholders updated model with values from previous module.
    */
   @PackageScope
-  void replaceFakePasswords(final HttpClientConfiguration previous, final HttpClientConfiguration updated) {
-    if (updated?.proxy?.http?.authentication?.password == Password.FAKE_PASSWORD) {
+  void replacePasswordPlaceholders(final HttpClientConfiguration previous, final HttpClientConfiguration updated) {
+    if (Password.isPlaceholder(updated?.proxy?.http?.authentication?.password)) {
       updated.proxy.http.authentication.password = previous?.proxy?.http?.authentication?.password
     }
-    if (updated?.proxy?.https?.authentication?.password == Password.FAKE_PASSWORD) {
+    if (Password.isPlaceholder(updated?.proxy?.https?.authentication?.password)) {
       updated.proxy.https.authentication.password = previous?.proxy?.https?.authentication?.password
     }
   }

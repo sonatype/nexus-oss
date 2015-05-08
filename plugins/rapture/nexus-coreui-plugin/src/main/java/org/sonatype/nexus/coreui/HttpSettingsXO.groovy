@@ -15,8 +15,6 @@ package org.sonatype.nexus.coreui
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
-import org.sonatype.nexus.extdirect.model.Password
-
 import groovy.transform.ToString
 
 /**
@@ -54,7 +52,7 @@ class HttpSettingsXO
 
   Boolean httpAuthEnabled
   String httpAuthUsername
-  Password httpAuthPassword
+  String httpAuthPassword
   String httpAuthNtlmHost
   String httpAuthNtlmDomain
 
@@ -71,7 +69,7 @@ class HttpSettingsXO
 
   Boolean httpsAuthEnabled
   String httpsAuthUsername
-  Password httpsAuthPassword
+  String httpsAuthPassword
   String httpsAuthNtlmHost
   String httpsAuthNtlmDomain
 

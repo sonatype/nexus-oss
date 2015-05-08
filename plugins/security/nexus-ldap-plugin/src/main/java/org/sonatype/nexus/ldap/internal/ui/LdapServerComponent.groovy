@@ -259,7 +259,7 @@ extends DirectComponentSupport
         authScheme: connectionInfo.authScheme,
         authRealm: connectionInfo.saslRealm,
         authUsername: connectionInfo.systemUsername,
-        authPassword: connectionInfo.systemPassword ? Password.fakePassword() : null,
+        authPassword: Password.placeholder(connectionInfo.systemPassword),
 
         connectionTimeout: connectionInfo.connectionTimeout,
         connectionRetryDelay: connectionInfo.connectionRetryDelay,

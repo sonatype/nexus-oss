@@ -275,7 +275,7 @@ extends DirectComponentSupport
         lastName: user.lastName,
         email: user.emailAddress,
         status: user.status,
-        password: Password.fakePassword(),
+        password: Password.placeholder(),
         roles: user.roles.collect { role ->
           role.roleId
         },

@@ -12,38 +12,47 @@
  */
 package org.sonatype.nexus.extdirect.model;
 
+import javax.annotation.Nullable;
+
+import com.google.common.annotations.VisibleForTesting;
+
+// FIXME: Move to nexus-rapture-plugin
+
 /**
- * A password field.
+ * Helper for password fields.
  *
  * @since 3.0
  */
 public class Password
-    extends Base64String
 {
+  /**
+   * Token used for passwords that are defined, but which are not transmitted.
+   */
+  @VisibleForTesting
+  static final String PASSWORD_PLACEHOLDER = "#~FAKE~NEXUS~PASSWORD~#";
 
-  public static final String FAKE_PASSWORD = "|$|N|E|X|U|S|$|";
-
-  public Password() {
+  /**
+   * Returns password placeholder.
+   */
+  public static String placeholder() {
+    return PASSWORD_PLACEHOLDER;
   }
 
-  public Password(final String value) {
-    super(value);
+  /**
+   * Returns fake password placeholder unless value is {@code null}.
+   */
+  @Nullable
+  public static String placeholder(@Nullable final String value) {
+    if (value != null) {
+      return PASSWORD_PLACEHOLDER;
+    }
+    return null;
   }
 
-  public boolean isValid() {
-    return !FAKE_PASSWORD.equals(getValue());
+  /**
+   * Determine if given value is a password placeholder.
+   */
+  public static boolean isPlaceholder(@Nullable final String value) {
+    return value != null && PASSWORD_PLACEHOLDER.equals(value);
   }
-
-  public String getValueIfValid() {
-    return isValid() ? getValue() : null;
-  }
-
-  public static Password password(final String value) {
-    return new Password(value);
-  }
-
-  public static Password fakePassword() {
-    return password(FAKE_PASSWORD);
-  }
-
 }

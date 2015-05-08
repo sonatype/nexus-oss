@@ -14,7 +14,6 @@ package org.sonatype.nexus.coreui
 
 import javax.validation.constraints.NotNull
 
-import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.security.user.UserStatus
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
@@ -52,7 +51,7 @@ class UserXO
   UserStatus status
 
   @NotNull(groups = Create.class)
-  Password password
+  String password
 
   @NotEmpty
   Set<String> roles
