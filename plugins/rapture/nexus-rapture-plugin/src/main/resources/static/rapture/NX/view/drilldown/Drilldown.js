@@ -299,7 +299,14 @@ Ext.define('NX.view.drilldown.Drilldown', {
     var me = this,
       feature = me.up('nx-feature-content'),
       items = me.query('nx-drilldown-item'),
-      item = items[index];
+      item = items[index],
+      createContainer;
+
+    // Destroy any create wizard panels after current
+    for (var i = index + 1; i < items.length; ++i) {
+      createContainer = items[i].down('#create' + i);
+      createContainer.removeAll();
+    }
 
     if (item.el) {
 
