@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.coreui
 
+import java.text.ParseException
+
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -47,6 +49,7 @@ import org.sonatype.nexus.validation.ValidationResponseException
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
 
+import com.google.common.base.Throwables
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import groovy.transform.PackageScope
@@ -166,7 +169,19 @@ class TaskComponent
     task.configuration.setAlertEmail(taskXO.alertEmail)
     task.configuration.setName(taskXO.name)
 
-    task = nexusScheduler.rescheduleTask(task.configuration.id, schedule)
+    try {
+      task = nexusScheduler.rescheduleTask(task.configuration.id, schedule)
+    }
+    catch (Exception e) {
+      if(e.cause instanceof ParseException) {
+        def response = new ValidationResponse()
+        response.addError(new ValidationMessage('cronExpression', e.cause.message))
+        throw new ValidationResponseException(response)
+      }
+      else {
+        Throwables.propagate(e)
+      }
+    }
 
     return asTaskXO(task)
   }
