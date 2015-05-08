@@ -95,7 +95,7 @@ Ext.define('NX.ext.form.OptionalFieldSet', {
 
     if (me === container) {
       me.mon(component, 'change', function(field, newValue) {
-        if (Ext.isDefined(newValue)) {
+        if (Ext.isDefined(newValue) && me.collapsed) {
           me.expand();
         }
       });
