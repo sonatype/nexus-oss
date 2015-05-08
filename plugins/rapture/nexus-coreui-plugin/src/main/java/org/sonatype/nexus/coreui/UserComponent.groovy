@@ -23,8 +23,8 @@ import javax.validation.groups.Default
 import org.sonatype.nexus.common.text.Strings2
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
+import org.sonatype.nexus.rapture.Password
 import org.sonatype.nexus.security.SecuritySystem
 import org.sonatype.nexus.security.anonymous.AnonymousManager
 import org.sonatype.nexus.security.role.RoleIdentifier

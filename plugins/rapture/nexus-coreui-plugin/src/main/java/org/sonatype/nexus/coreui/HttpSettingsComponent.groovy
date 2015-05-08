@@ -21,7 +21,6 @@ import javax.validation.constraints.NotNull
 
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.httpclient.HttpClientManager
 import org.sonatype.nexus.httpclient.config.AuthenticationConfiguration
 import org.sonatype.nexus.httpclient.config.ConnectionConfiguration
@@ -30,6 +29,7 @@ import org.sonatype.nexus.httpclient.config.NtlmAuthenticationConfiguration
 import org.sonatype.nexus.httpclient.config.ProxyConfiguration
 import org.sonatype.nexus.httpclient.config.ProxyServerConfiguration
 import org.sonatype.nexus.httpclient.config.UsernameAuthenticationConfiguration
+import org.sonatype.nexus.rapture.Password
 import org.sonatype.nexus.validation.Validate
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
