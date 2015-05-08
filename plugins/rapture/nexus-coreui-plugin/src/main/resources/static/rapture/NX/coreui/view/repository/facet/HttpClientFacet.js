@@ -29,15 +29,6 @@ Ext.define('NX.coreui.view.repository.facet.HttpClientFacet', {
   initComponent: function() {
     var me = this;
 
-    me.updateAuthenticationFields = function(combo, record) {
-      var me = this, ntlmFields = me.up('form').down('#ntlmFields');
-      if(combo.getValue() === 'ntlm') {
-        ntlmFields.show();  
-      }
-      else {
-        ntlmFields.hide();
-      }
-    };
     me.items = [
       {
         xtype: 'fieldset',
@@ -63,8 +54,19 @@ Ext.define('NX.coreui.view.repository.facet.HttpClientFacet', {
                 ],
                 value: 'username' ,
                 listeners: {
-                  'select': me.updateAuthenticationFields,
-                  'beforerender': me.updateAuthenticationFields
+                  'change': function(combo) {
+                    var me = this,
+                        ntlmFields = me.up('form').down('#ntlmFields');
+
+                    if(combo.getValue() === 'ntlm') {
+                      ntlmFields.show();
+                      ntlmFields.enable();
+                    }
+                    else {
+                      ntlmFields.hide();
+                      ntlmFields.disable();
+                    }
+                  }
                 }
               },
               {
