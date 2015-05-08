@@ -22,6 +22,7 @@ import org.sonatype.nexus.common.entity.EntityVersion;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Throwables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
@@ -112,9 +113,9 @@ public abstract class EntityAdapter<T extends Entity>
 
   protected abstract T newEntity();
 
-  protected abstract void readFields(final ODocument document, final T entity);
+  protected abstract void readFields(final ODocument document, final T entity) throws Exception;
 
-  protected abstract void writeFields(final ODocument document, final T entity);
+  protected abstract void writeFields(final ODocument document, final T entity) throws Exception;
 
   /**
    * Browse all documents.
@@ -131,7 +132,12 @@ public abstract class EntityAdapter<T extends Entity>
     checkNotNull(document);
 
     T entity = newEntity();
-    readFields(document, entity);
+    try {
+      readFields(document, entity);
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
     setMetadata(entity, document);
 
     return entity;
@@ -146,7 +152,12 @@ public abstract class EntityAdapter<T extends Entity>
 
     // TODO: MVCC
 
-    writeFields(document, entity);
+    try {
+      writeFields(document, entity);
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
     setMetadata(entity, document);
 
     return document.save();

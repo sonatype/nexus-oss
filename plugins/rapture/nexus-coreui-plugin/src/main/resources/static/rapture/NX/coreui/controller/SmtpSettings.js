@@ -106,7 +106,7 @@ Ext.define('NX.coreui.controller.SmtpSettings', {
     win.close();
     me.getContent().mask(NX.I18n.format('ADMIN_SMTP_VERIFY_MASK', smtpSettings.host));
 
-    NX.direct.coreui_SmtpSettings.verifyConnection(smtpSettings, email, function (response) {
+    NX.direct.coreui_Email.sendVerification(smtpSettings, email, function (response) {
       me.getContent().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: NX.I18n.get('ADMIN_SMTP_VERIFY_SUCCESS'), type: 'success' });

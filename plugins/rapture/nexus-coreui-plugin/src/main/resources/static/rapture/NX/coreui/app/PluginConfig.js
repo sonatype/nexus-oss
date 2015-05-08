@@ -59,12 +59,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-capabilities-plugin');
       }
     },
-    {
-      id: 'NX.coreui.controller.BrowseRepositories',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
-      }
-    },
     'NX.coreui.controller.FeatureGroups',
     {
       id: 'NX.coreui.controller.Feeds',
@@ -110,12 +104,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
-      id: 'NX.coreui.controller.MavenUpload',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
-      }
-    },
-    {
       id: 'NX.coreui.controller.Metrics',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
@@ -139,20 +127,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
-      id: 'NX.coreui.controller.HealthCheckRepositorySettings',
-      active: function () {
-        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-healthcheck-oss-plugin')
-          || NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-clm-plugin');
-      }
-    },
-    {
-      id: 'NX.coreui.controller.HealthCheckRepositoryColumn',
-      active: function () {
-        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-healthcheck-oss-plugin')
-            || NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-clm-plugin');
-      }
-    },
-    {
       id: 'NX.coreui.controller.Repositories',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
@@ -160,24 +134,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
     },
     {
       id: 'NX.coreui.controller.Blobstores',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
-      }
-    },
-    {
-      id: 'NX.coreui.controller.RepositoryTargets',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
-      }
-    },
-    {
-      id: 'NX.coreui.controller.RepositoryRoutes',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
-      }
-    },
-    {
-      id: 'NX.coreui.controller.RoutingRepositorySettings',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
       }
@@ -196,12 +152,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
     },
     {
       id: 'NX.coreui.controller.Roles',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
-      }
-    },
-    {
-      id: 'NX.coreui.controller.StorageFileContainer',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
       }
@@ -249,18 +199,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
-      id: 'NX.coreui.controller.StorageFileInfo',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
-      }
-    },
-    {
-      id: 'NX.coreui.controller.StorageFileMavenInfo',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
-      }
-    },
-    {
       id: 'NX.coreui.controller.SupportRequest',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
@@ -280,18 +218,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
     },
     {
       id: 'NX.coreui.controller.Tasks',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
-      }
-    },
-    {
-      id: 'NX.coreui.controller.UploadArtifact',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
-      }
-    },
-    {
-      id: 'NX.coreui.controller.UploadFile',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
       }

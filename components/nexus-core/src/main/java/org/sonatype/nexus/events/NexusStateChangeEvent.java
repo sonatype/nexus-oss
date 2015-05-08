@@ -20,12 +20,10 @@ import java.util.Date;
  * @author cstamas
  */
 public abstract class NexusStateChangeEvent
-    extends AbstractVetoableEvent<Object>
 {
   private final Date date;
 
   public NexusStateChangeEvent(Object sender) {
-    super(sender);
     this.date = new Date();
   }
 

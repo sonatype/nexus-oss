@@ -22,8 +22,8 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
   alias: 'widget.nx-coreui-system-http-settings',
   requires: [
     'NX.Conditions',
-    'NX.coreui_legacy.view.AuthenticationSettings',
-    'NX.coreui_legacy.view.HttpRequestSettings',
+    'NX.coreui.view.system.AuthenticationSettings',
+    'NX.coreui.view.system.HttpRequestSettings',
     'NX.I18n'
   ],
 
@@ -46,7 +46,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
         items: [
           // request settings
           {
-            xtype: 'nx-coreui_legacy-httprequestsettings'
+            xtype: 'nx-coreui-system-httprequestsettings'
           },
           {
             xtype: 'nx-optionalfieldset',
@@ -78,7 +78,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
                 checkboxName: 'httpAuthEnabled',
                 collapsed: true,
                 items: {
-                  xtype: 'nx-coreui_legacy-authenticationsettings',
+                  xtype: 'nx-coreui-system-authenticationsettings',
                   namePrefix: 'http'
                 }
               },
@@ -124,7 +124,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
                 checkboxName: 'httpsAuthEnabled',
                 collapsed: true,
                 items: {
-                  xtype: 'nx-coreui_legacy-authenticationsettings',
+                  xtype: 'nx-coreui-system-authenticationsettings',
                   namePrefix: 'http'
                 }
               }

@@ -36,60 +36,26 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
         xtype: 'nx-settingsform',
         settingsFormSuccessMessage: NX.I18n.get('ADMIN_SMTP_UPDATE_SUCCESS'),
         api: {
-          load: 'NX.direct.coreui_SmtpSettings.read',
-          submit: 'NX.direct.coreui_SmtpSettings.update'
+          load: 'NX.direct.coreui_Email.read',
+          submit: 'NX.direct.coreui_Email.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
         editableMarker: NX.I18n.get('ADMIN_SMTP_UPDATE_ERROR'),
 
         items: [
           {
-            xtype: 'nx-email',
-            name: 'systemEmail',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_EMAIL'),
-            helpText: NX.I18n.get('ADMIN_SMTP_EMAIL_HELP')
+            xtype: 'checkbox',
+            name: 'enabled',
+            fieldLabel: NX.I18n.get('ADMIN_SMTP_ENABLED')
           },
           {
-            xtype: 'combo',
-            name: 'connectionType',
-            itemId: 'connectionType',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_TYPE'),
-            helpText: NX.I18n.get('ADMIN_SMTP_TYPE_HELP'),
-            emptyText: NX.I18n.get('ADMIN_SMTP_TYPE_PLACEHOLDER'),
-            editable: false,
-            store: [
-              ['PLAIN', NX.I18n.get('ADMIN_SMTP_TYPE_PLAIN_ITEM')],
-              ['SSL', NX.I18n.get('ADMIN_SMTP_TYPE_SSL_ITEM')],
-              ['TLS', NX.I18n.get('ADMIN_SMTP_TYPE_TLS_ITEM')]
-            ],
-            queryMode: 'local',
-            useTrustStore: function (combo) {
-              var form = combo.up('form');
-              if (combo.getValue() === 'SSL') {
-                return {
-                  name: 'useTrustStore',
-                  host: form.down('#host'),
-                  port: form.down('#port')
-                };
-              }
-              return undefined;
-            }
-          },
-          {
+            xtype: 'textfield',
             name: 'host',
-            itemId: 'host',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_HOSTNAME'),
-            listeners: {
-              change: function(){
-                var cType = this.up('form').down('#connectionType');
-                cType.fireEvent('change', cType, cType.getValue(), cType.getValue());
-              }
-            }
+            fieldLabel: NX.I18n.get('ADMIN_SMTP_HOST')
           },
           {
             xtype: 'numberfield',
             name: 'port',
-            itemId: 'port',
             fieldLabel: NX.I18n.get('ADMIN_SMTP_PORT'),
             minValue: 1,
             maxValue: 65536,
@@ -97,9 +63,21 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
             allowExponential: false
           },
           {
+            xtype: 'nx-email',
+            name: 'fromAddress',
+            fieldLabel: NX.I18n.get('ADMIN_SMTP_FROM_ADDRESS')
+          },
+          {
+            xtype: 'textfield',
+            name: 'subjectPrefix',
+            fieldLabel: NX.I18n.get('ADMIN_SMTP_SUBJECT_PREFIX'),
+            allowBlank: true
+          },
+          {
+            xtype: 'textfield',
             name: 'username',
-            allowBlank: true,
             fieldLabel: NX.I18n.get('ADMIN_SMTP_USERNAME'),
+            allowBlank: true
           },
           {
             xtype: 'nx-password',
@@ -114,7 +92,11 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
     me.callParent(arguments);
 
     me.down('nx-settingsform').getDockedItems('toolbar[dock="bottom"]')[0].add({
-      xtype: 'button', text: NX.I18n.get('ADMIN_SMTP_VERIFY_BUTTON'), formBind: true, action: 'verify', glyph: 'xf003@FontAwesome' /* fa-envelope-o */
+      xtype: 'button',
+      text: NX.I18n.get('ADMIN_SMTP_VERIFY_BUTTON'),
+      formBind: true,
+      action: 'verify',
+      glyph: 'xf003@FontAwesome' /* fa-envelope-o */
     });
   }
 });

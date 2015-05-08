@@ -21,30 +21,5 @@ Ext.define('NX.ext.form.field.Password', {
   extend: 'Ext.form.field.Text',
   alias: 'widget.nx-password',
 
-  requires: [
-    'NX.util.Base64'
-  ],
-
-  inputType: 'password',
-
-  getValue: function () {
-    var me = this,
-        value = me.callParent(arguments);
-
-    if (value) {
-      return NX.util.Base64.encode(value);
-    }
-    return value;
-  },
-
-  setValue: function (value) {
-    var me = this;
-
-    if (value) {
-      arguments[0] = NX.util.Base64.decode(value);
-    }
-
-    return me.callParent(arguments);
-  }
-
+  inputType: 'password'
 });

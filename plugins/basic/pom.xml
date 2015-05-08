@@ -29,7 +29,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>nexus-content-plugin</module>
     <module>nexus-logging-plugin</module>
     <module>nexus-quartz-plugin</module>
     <module>nexus-repository-httpbridge</module>

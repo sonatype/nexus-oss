@@ -47,7 +47,7 @@ public class OrientRealmConfigurationStore
   private final RealmConfigurationEntityAdapter entityAdapter;
 
   @Inject
-  public OrientRealmConfigurationStore(final @Named("security") Provider<DatabaseInstance> databaseInstance,
+  public OrientRealmConfigurationStore(@Named("security") final Provider<DatabaseInstance> databaseInstance,
                                        final RealmConfigurationEntityAdapter entityAdapter)
   {
     this.databaseInstance = checkNotNull(databaseInstance);

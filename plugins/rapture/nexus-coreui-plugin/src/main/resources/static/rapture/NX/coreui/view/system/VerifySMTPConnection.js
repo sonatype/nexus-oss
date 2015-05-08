@@ -61,7 +61,9 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
             },
             items: [
               { xtype: 'component', html: NX.Icons.img('verifysmtpconnection', 'x32') },
-              { xtype: 'label', html: NX.I18n.get('ADMIN_SMTP_VERIFY_HELP'),
+              {
+                xtype: 'label',
+                html: NX.I18n.get('ADMIN_SMTP_VERIFY_HELP'),
                 margin: '0 0 0 5'
               }
             ]

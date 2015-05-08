@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NonNls;
  *
  * @since 2.7
  */
+@Deprecated
 public class PluginIdentity
     extends ComponentSupport
 {
