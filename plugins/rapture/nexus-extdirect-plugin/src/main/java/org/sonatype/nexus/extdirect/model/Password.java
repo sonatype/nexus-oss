@@ -29,7 +29,7 @@ public class Password
    * Token used for passwords that are defined, but which are not transmitted.
    */
   @VisibleForTesting
-  static final String PASSWORD_PLACEHOLDER = "#~FAKE~NEXUS~PASSWORD~#";
+  static final String PASSWORD_PLACEHOLDER = "#~NEXUS~PLACEHOLDER~PASSWORD~#";
 
   /**
    * Returns password placeholder.
