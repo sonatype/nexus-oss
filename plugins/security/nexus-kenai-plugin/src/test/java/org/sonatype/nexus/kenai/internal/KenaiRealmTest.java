@@ -24,7 +24,6 @@ import org.sonatype.nexus.httpclient.HttpClientManager;
 import org.sonatype.nexus.kenai.Kenai;
 import org.sonatype.nexus.kenai.KenaiConfiguration;
 import org.sonatype.nexus.security.WebSecurityModule;
-import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.tests.http.runner.junit.ServerResource;
 import org.sonatype.tests.http.server.fluent.Server;
 

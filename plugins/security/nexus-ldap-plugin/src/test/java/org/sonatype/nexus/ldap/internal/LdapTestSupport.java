@@ -32,7 +32,6 @@ import org.sonatype.nexus.security.WebSecurityModule;
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration;
 import org.sonatype.nexus.security.config.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.nexus.security.config.SecurityConfigurationSource;
-import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
 import org.sonatype.sisu.litmus.testsupport.port.PortRegistry;
 

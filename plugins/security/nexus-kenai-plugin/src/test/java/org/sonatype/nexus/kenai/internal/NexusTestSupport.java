@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.test;
+package org.sonatype.nexus.kenai.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +41,8 @@ import org.eclipse.sisu.wire.WireModule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+
+// HACK: Duplicated to isolate to few places where used, pending removal
 
 /**
  * Abstract test case for nexus tests.
