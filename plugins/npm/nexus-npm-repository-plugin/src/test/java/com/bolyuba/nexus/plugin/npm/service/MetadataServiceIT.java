@@ -21,6 +21,7 @@ import java.util.Map;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -202,6 +203,9 @@ public class MetadataServiceIT
 
       @Override
       public ProxyMode getProxyMode() { return ProxyMode.ALLOW; }
+
+      @Override
+      public PathCache getNotFoundCache() { return mock(PathCache.class); }
     };
 
     // not using mock as it would OOM when it tracks invocations, as we work with large files here

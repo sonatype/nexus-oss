@@ -245,6 +245,8 @@ public class ProxyMetadataServiceImpl
       if (packageRoot == null) {
         return null;
       }
+      // On remote fetch of metadata, evict /packageName and children from NFC
+      getNpmRepository().getNotFoundCache().removeWithChildren("/" + packageName);
       packageRoot.getProperties().put(PROP_EXPIRED, Boolean.FALSE.toString());
       packageRoot.getProperties().put(PROP_CACHED, Long.toString(now));
       return metadataStore.updatePackage(getNpmRepository(), packageRoot);
