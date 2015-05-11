@@ -55,6 +55,13 @@ public class PackageRootHandler
   }
 
   @Override
+  protected void updateSchema(final OSchema schema, final OClass clazz) {
+    if (clazz.getClassIndex(clazz.getName() + ".pagedRepositoryId") == null) {
+      clazz.createIndex(clazz.getName() + ".pagedRepositoryId", INDEX_TYPE.UNIQUE, "repositoryId", "@rid");
+    }
+  }
+
+  @Override
   public ODocument toDocument(final PackageRoot entity, final ODocument doc) {
     try {
       doc.field("componentId", entity.getComponentId());

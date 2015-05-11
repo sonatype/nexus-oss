@@ -60,10 +60,15 @@ public abstract class EntityHandlerSupport<T>
       clazz = schema.createClass(getSchemaName());
       createSchema(schema, clazz);
     }
+    else {
+      updateSchema(schema, clazz);
+    }
     return clazz;
   }
 
   protected abstract void createSchema(final OSchema schema, OClass clazz);
+
+  protected abstract void updateSchema(final OSchema schema, OClass clazz);
 
   @Override
   public String toString() {
