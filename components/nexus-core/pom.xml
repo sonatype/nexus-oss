@@ -145,17 +145,6 @@
       <artifactId>h2</artifactId>
     </dependency>
 
-    <!-- FIXME: unused in core, but was in core and breaks plugins using it -->
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-resource-scanner</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-mime</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-supportzip-api</artifactId>
