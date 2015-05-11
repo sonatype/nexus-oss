@@ -31,9 +31,7 @@ import org.sonatype.nexus.repository.maven.internal.MavenPathParser
 import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
 import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.search.SearchFacet
-import org.sonatype.nexus.repository.search.SearchPostCommitHookSupplier
 import org.sonatype.nexus.repository.security.SecurityHandler
-import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
@@ -102,13 +100,9 @@ class Maven2HostedRecipe
 
   @Override
   void apply(@Nonnull final Repository repository) throws Exception {
-    SearchFacet searchFacet = this.searchFacet.get()
-    StorageFacet storageFacet = this.storageFacet.get()
-    storageFacet.registerHookSupplier(new SearchPostCommitHookSupplier(searchFacet))
-
     repository.attach(securityFacet.get())
-    repository.attach(storageFacet)
-    repository.attach(searchFacet)
+    repository.attach(storageFacet.get())
+    repository.attach(searchFacet.get())
     repository.attach(mavenFacet.get())
     repository.attach(configure(viewFacet.get()))
   }
