@@ -14,14 +14,17 @@ package org.sonatype.nexus.repository.search;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.StorageTxPostCommitHook;
+
+import com.google.common.base.Supplier;
 
 /**
- * Search {@link Facet}, providing means to index/de-index component metadata.
+ * Search {@link Facet}, that index/de-index component metadata.
  *
  * @since 3.0
  */
 @Facet.Exposed
 public interface SearchFacet
-    extends Facet
+    extends Facet, Supplier<StorageTxPostCommitHook>
 {
 }

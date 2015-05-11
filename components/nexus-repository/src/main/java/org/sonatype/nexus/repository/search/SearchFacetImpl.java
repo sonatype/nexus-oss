@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 public class SearchFacetImpl
     extends FacetSupport
-    implements SearchFacet, Supplier<StorageTxPostCommitHook>
+    implements SearchFacet
 
 {
   private final SearchService searchService;
