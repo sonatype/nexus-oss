@@ -136,7 +136,6 @@ Ext.define('NX.coreui.controller.Repositories', {
   onSelection: function(list, model) {
     var me = this,
         settingsPanel = me.getSettings(),
-        settingsForm = settingsPanel.down('nx-settingsform'),
         formCls = Ext.ClassManager.getByAlias('widget.nx-coreui-repository-' + model.get('recipe'));
 
     if (!formCls) {
@@ -151,6 +150,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         settingsPanel.addSettingsForm({ xtype: formCls.xtype, recipe: model });
         Ext.Array.each(settingsPanel.query('field[readOnlyOnUpdate=true]'), function(field) {
           field.setReadOnly(true);
+          field.setDisabled(true);
         });
         settingsPanel.loadRecord(model);
       }

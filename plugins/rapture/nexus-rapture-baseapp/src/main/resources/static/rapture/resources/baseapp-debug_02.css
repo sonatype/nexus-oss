@@ -16733,20 +16733,34 @@
  *
  * cls: 'x-form-readonly'
  */
-/* line 11, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 17, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .x-form-field[readonly].x-form-field:not([role="combobox"]) {
   color: #777777;
   background-color: #ebebeb;
   opacity: 1;
 }
 
-/* line 18, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/**
+* editable = false on a combo sets readonly already, so use disabled to achieve the same effect
+*/
+/* line 25, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+.nx-combo-disabled input {
+  color: #777777;
+  background-color: #ebebeb;
+  opacity: 1;
+}
+/* line 28, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+.nx-combo-disabled .x-trigger-cell {
+  display: none;
+}
+
+/* line 34, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-log-viewer-field,
 .nx-log-viewer-field textarea {
   background-color: white !important;
 }
 
-/* line 22, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 38, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .x-form-fieldcontainer .x-mask {
   background-color: #dddddd;
   opacity: 0.6;
@@ -16755,38 +16769,28 @@
 /**
  * Styles which allow for horizontal alignment of form fields
  */
-/* line 31, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 47, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-float-left {
   position: relative;
   float: left !important;
   margin-right: 5px;
 }
 
-/* line 37, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 53, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-interstitial-label {
   font-size: 13px;
   padding-top: 5px;
 }
 
-/* line 42, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 58, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-clear-both {
   clear: both;
 }
 
 /**
- * De-emphasizes fields that will never be edited
- */
-/* line 50, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
-.x-field.nx-no-border .x-form-field[readonly] {
-  border: none !important;
-  background-color: white !important;
-  padding-left: 0;
-}
-
-/**
  * IE10 adds a second 'x' icon to text fields. Hide this.
  */
-/* line 60, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 65, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 ::-ms-clear {
   width: 0;
   height: 0;
