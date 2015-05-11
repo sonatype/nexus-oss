@@ -29,7 +29,6 @@ import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
-import org.sonatype.nexus.repository.search.SearchPostCommitHook;
 import org.sonatype.nexus.repository.types.HostedType;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -37,6 +36,7 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.hibernate.validator.constraints.NotEmpty;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.NEW;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
@@ -103,6 +103,13 @@ public class StorageFacetImpl
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
 
     this.hookSuppliers = Lists.newArrayList();
+    this.hookSuppliers.add(new Supplier<StorageTxPostCommitHook>()
+    {
+      @Override
+      public StorageTxPostCommitHook get() {
+        return new ComponentEventsPostCommitHook(getEventBus(), getRepository());
+      }
+    });
   }
 
   @Override

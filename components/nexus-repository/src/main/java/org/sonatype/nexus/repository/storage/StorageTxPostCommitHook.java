@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repository.storage;
 
 /**
- * Storage TX hook.
+ * Storage TX hook. It shares same lifecycle as {@link StorageTx}.
  *
  * @since 3.0
  */
@@ -22,17 +22,17 @@ public abstract class StorageTxPostCommitHook
   /**
    * Called when {@link StorageTx#saveComponent(Component)} invoked with created component.
    */
-  public void createComponent(final Component... component) {}
+  public void createComponent(final Component... components) {}
 
   /**
    * Called when {@link StorageTx#saveComponent(Component)} invoked with updated component.
    */
-  public void updateComponent(final Component... component) {}
+  public void updateComponent(final Component... components) {}
 
   /**
    * Called when {@link StorageTx#deleteComponent(Component)} invoked.
    */
-  public void deleteComponent(final Component... component) {}
+  public void deleteComponent(final Component... components) {}
 
   /**
    * Called after {@link StorageTx#commit()} successfuly executed.
