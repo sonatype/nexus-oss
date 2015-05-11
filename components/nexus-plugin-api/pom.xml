@@ -60,6 +60,7 @@
     <!--
     FIXME: Remove xstream usage, some straggling bits in ldap, maybe more?
     FIXME: Leaving here for now, as karaf configuration has some special wrap bits for this
+    FIXME: Still references to xstream in clm, crowd, healthcheck, usertoken and ldap
     -->
     <dependency>
       <groupId>org.sonatype.nexus.xstream</groupId>
