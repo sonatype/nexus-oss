@@ -22,8 +22,6 @@ import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
-import com.sonatype.nexus.ssl.model.CertificatePemXO
-import com.sonatype.nexus.ssl.model.CertificateXO
 import com.sonatype.nexus.ssl.plugin.TrustStore
 import com.sonatype.nexus.ssl.plugin.internal.CertificateRetriever
 
