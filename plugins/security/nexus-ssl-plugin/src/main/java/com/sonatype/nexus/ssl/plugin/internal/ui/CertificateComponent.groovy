@@ -38,7 +38,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.hibernate.validator.constraints.NotEmpty
 
-import static com.sonatype.nexus.ssl.plugin.internal.rest.TrustStoreResource.asCertificateXO
+import static com.sonatype.nexus.ssl.plugin.internal.ui.TrustStoreComponent.asCertificateXO
 import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.calculateFingerprint
 import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.decodePEMFormattedCertificate
 
