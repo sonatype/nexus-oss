@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.storage;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -77,13 +78,16 @@ public class StorageTxImpl
 
   private final AssetEntityAdapter assetEntityAdapter;
 
+  private final List<StorageTxPostCommitHook> hooks;
+
   public StorageTxImpl(final BlobTx blobTx,
                        final ODatabaseDocumentTx db,
                        final Bucket bucket,
                        final WritePolicy writePolicy,
                        final BucketEntityAdapter bucketEntityAdapter,
                        final ComponentEntityAdapter componentEntityAdapter,
-                       final AssetEntityAdapter assetEntityAdapter)
+                       final AssetEntityAdapter assetEntityAdapter,
+                       final List<StorageTxPostCommitHook> hooks)
   {
     this.blobTx = checkNotNull(blobTx);
     this.db = checkNotNull(db);
@@ -92,6 +96,7 @@ public class StorageTxImpl
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
+    this.hooks = checkNotNull(hooks);
 
     db.begin(TXTYPE.OPTIMISTIC);
   }
@@ -122,6 +127,9 @@ public class StorageTxImpl
   public void commit() {
     db.commit();
     blobTx.commit();
+    for (StorageTxPostCommitHook hook : hooks) {
+      hook.execute();
+    }
   }
 
   @Override
@@ -300,9 +308,15 @@ public class StorageTxImpl
   public void saveComponent(final Component component) {
     if (component.isPersisted()) {
       componentEntityAdapter.edit(db, component);
+      for (StorageTxPostCommitHook hook : hooks) {
+        hook.updateComponent(component);
+      }
     }
     else {
       componentEntityAdapter.add(db, component);
+      for (StorageTxPostCommitHook hook : hooks) {
+        hook.createComponent(component);
+      }
     }
   }
 
@@ -327,6 +341,9 @@ public class StorageTxImpl
 
     for (Asset asset : browseAssets(component)) {
       deleteAsset(asset, checkWritePolicy);
+    }
+    for (StorageTxPostCommitHook hook : hooks) {
+      hook.deleteComponent(component);
     }
     componentEntityAdapter.delete(db, component);
   }

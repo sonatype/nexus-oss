@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -27,12 +29,16 @@ import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
+import org.sonatype.nexus.repository.search.SearchPostCommitHook;
 import org.sonatype.nexus.repository.types.HostedType;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Supplier;
+import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.hibernate.validator.constraints.NotEmpty;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.NEW;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
 
 /**
@@ -54,6 +60,8 @@ public class StorageFacetImpl
   private final ComponentEntityAdapter componentEntityAdapter;
 
   private final AssetEntityAdapter assetEntityAdapter;
+
+  private final List<Supplier<StorageTxPostCommitHook>> hookSuppliers;
 
   @VisibleForTesting
   static final String CONFIG_KEY = "storage";
@@ -93,6 +101,8 @@ public class StorageFacetImpl
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
+
+    this.hookSuppliers = Lists.newArrayList();
   }
 
   @Override
@@ -149,6 +159,13 @@ public class StorageFacetImpl
   }
 
   @Override
+  @Guarded(by = NEW)
+  public void registerHookSupplier(final Supplier<StorageTxPostCommitHook> hookSupplier) {
+    checkNotNull(hookSupplier);
+    hookSuppliers.add(hookSupplier);
+  }
+
+  @Override
   @Guarded(by = STARTED)
   public StorageTx openTx() {
     return openStorageTx();
@@ -156,9 +173,13 @@ public class StorageFacetImpl
 
   private StorageTx openStorageTx() {
     BlobStore blobStore = blobStoreManager.get(config.blobStoreName);
+    final List<StorageTxPostCommitHook> hooks = Lists.newArrayList();
+    for (Supplier<StorageTxPostCommitHook> hookSupplier : hookSuppliers) {
+      hooks.add(hookSupplier.get());
+    }
     return StateGuardAspect.around(new StorageTxImpl(
         new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucket, config.writePolicy,
-        bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter
+        bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, hooks
     ));
   }
 

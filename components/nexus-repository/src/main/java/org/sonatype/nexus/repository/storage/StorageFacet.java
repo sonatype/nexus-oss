@@ -14,6 +14,8 @@ package org.sonatype.nexus.repository.storage;
 
 import org.sonatype.nexus.repository.Facet;
 
+import com.google.common.base.Supplier;
+
 /**
  * Storage {@link Facet}, providing component and asset storage for a repository.
  *
@@ -51,6 +53,8 @@ public interface StorageFacet
   static String P_SIZE = "size";
 
   static String P_VERSION = "version";
+
+  void registerHookSupplier(Supplier<StorageTxPostCommitHook> hookSupplier);
 
   /**
    * Opens a transaction.

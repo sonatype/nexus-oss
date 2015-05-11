@@ -35,7 +35,9 @@ import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler
 import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
+import org.sonatype.nexus.repository.search.SearchPostCommitHookSupplier
 import org.sonatype.nexus.repository.security.SecurityHandler
+import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
@@ -116,9 +118,13 @@ class Maven2ProxyRecipe
 
   @Override
   void apply(@Nonnull final Repository repository) throws Exception {
+    SearchFacet searchFacet = this.searchFacet.get()
+    StorageFacet storageFacet = this.storageFacet.get()
+    storageFacet.registerHookSupplier(new SearchPostCommitHookSupplier(searchFacet))
+
     repository.attach(securityFacet.get())
-    repository.attach(storageFacet.get())
-    repository.attach(searchFacet.get())
+    repository.attach(storageFacet)
+    repository.attach(searchFacet)
     repository.attach(httpClientFacet.get())
     repository.attach(negativeCacheFacet.get())
     repository.attach(mavenFacet.get())
