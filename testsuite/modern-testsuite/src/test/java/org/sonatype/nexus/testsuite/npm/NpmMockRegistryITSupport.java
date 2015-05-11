@@ -88,6 +88,13 @@ public abstract class NpmMockRegistryITSupport
   }
 
   /**
+   * When set to true requests are served as usual, when set to false 404 is always returned.
+   */
+  public void mockRegistryServeRequests(boolean enabled) {
+    mockNpmRegistry.serveRequests(enabled);
+  }
+
+  /**
    * Creates a NPM Proxy repository in NX instance for this ITs mock NPM registry..
    */
   public NpmProxyRepository createNpmProxyRepository(final String id) {

@@ -57,6 +57,7 @@ public class NpmCacheNfcEvictIT
     final Location commonjs = Location.repositoryLocation(proxy.id(), "/commonjs");
     final Location commonjs001Tar = Location.repositoryLocation(proxy.id(), "/commonjs/-/commonjs-0.0.1.tgz");
 
+    mockRegistryServeRequests(false);
     try {
       content().download(commonjs001Tar, irrelevant);
       fail("Nexus did not cache metadata, should not be able to get tarball");
@@ -64,6 +65,7 @@ public class NpmCacheNfcEvictIT
     catch (NexusClientNotFoundException e) {
       // we expect this
     }
+    mockRegistryServeRequests(true);
 
     // Fetch metadata, should evict NFC too
     content().download(commonjs, irrelevant);

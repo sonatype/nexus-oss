@@ -58,6 +58,8 @@ public class MockNpmRegistry
 
   private PathRecorderBehaviour pathRecorderBehaviour;
 
+  private boolean serveRequests;
+
   /**
    * Constructor that access an existing directory as input.
    */
@@ -133,6 +135,13 @@ public class MockNpmRegistry
     return pathRecorderBehaviour;
   }
 
+  /**
+   * When set to true requests are served as usual, when set to false 404 is always returned.
+   */
+  public void serveRequests(boolean enabled) {
+    serveRequests = enabled;
+  }
+
   // ==
 
   /**
@@ -141,7 +150,7 @@ public class MockNpmRegistry
    * called {@code data.json} in that directory and serve that instead. This allows one to lay down a directory
    * that resembles NPM registry.
    */
-  private static class NpmGet
+  private class NpmGet
       implements Behaviour
   {
     private final Logger log = LoggerFactory.getLogger(NpmGet.class);
@@ -162,18 +171,20 @@ public class MockNpmRegistry
     {
       if ("GET".equals(request.getMethod())) {
         log.info("Requested {} {}", request.getMethod(), request.getPathInfo());
-        final File file = new File(root, request.getPathInfo());
-        if (file.isFile()) {
-          log.info("Serving file {}", file.getAbsolutePath());
-          sendFile(request, response, file);
-          return false;
-        }
-        else if (file.isDirectory()) {
-          final File metadata = new File(file, "data.json");
-          if (metadata.isFile()) {
-            log.info("Serving metadata {}", metadata.getAbsolutePath());
-            sendMetadataFile(request, response, metadata);
+        if (MockNpmRegistry.this.serveRequests) {
+          final File file = new File(root, request.getPathInfo());
+          if (file.isFile()) {
+            log.info("Serving file {}", file.getAbsolutePath());
+            sendFile(request, response, file);
             return false;
+          }
+          else if (file.isDirectory()) {
+            final File metadata = new File(file, "data.json");
+            if (metadata.isFile()) {
+              log.info("Serving metadata {}", metadata.getAbsolutePath());
+              sendMetadataFile(request, response, metadata);
+              return false;
+            }
           }
         }
         response.sendError(404);
