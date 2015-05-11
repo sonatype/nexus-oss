@@ -231,7 +231,7 @@ public class StateComponent
     List<String> plugins = Lists.newArrayList();
 
     for (PluginIdentity plugin : pluginIdentities) {
-      plugins.add(plugin.getCoordinates().getGroupId() + ":" + plugin.getCoordinates().getArtifactId());
+      plugins.add(plugin.getGroupId() + ":" + plugin.getArtifactId());
     }
 
     Collections.sort(plugins);

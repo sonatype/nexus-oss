@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Maven GAV coordinates.
  */
 @Deprecated
-public final class GAVCoordinate
+final class GAVCoordinate
 {
   private final String groupId;
 
