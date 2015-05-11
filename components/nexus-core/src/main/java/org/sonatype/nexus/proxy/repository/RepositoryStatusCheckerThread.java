@@ -64,7 +64,7 @@ public class RepositoryStatusCheckerThread
       // wait for Nexus to fully start
       if (!systemStatus.isNexusStarted()) {
         try {
-          Thread.sleep(10 * 1000);
+          Thread.sleep(5 * 1000);
         }
         catch (InterruptedException e) {
           Thread.yield();
