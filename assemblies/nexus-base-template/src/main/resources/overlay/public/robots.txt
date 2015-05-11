@@ -1,5 +1,4 @@
 User-agent: *
-Disallow: /content/
+Disallow: /repository/
 Disallow: /service/
 Allow: /
-Allow: /content/sites/

@@ -74,12 +74,13 @@ public interface NugetGalleryFacet
   String feed(final String base, final String operation, final Map<String, String> parameters);
 
   /**
-   * Returns entry XML for a given package ID and version.
+   * Returns entry XML for a given package ID and version, or {@code null} if there is no such package.
    *
    * @param base    Base URI
    * @param id      package id
    * @param version package version
    */
+  @Nullable
   String entry(final String base, final String id, final String version);
 
   /**

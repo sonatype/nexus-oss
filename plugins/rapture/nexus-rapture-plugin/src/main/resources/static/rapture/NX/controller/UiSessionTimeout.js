@@ -121,7 +121,8 @@ Ext.define('NX.controller.UiSessionTimeout', {
     var me = this, 
         expireSessionView = me.getExpireSessionWindow();
     
-    if(expireSessionView) {
+    //close the window if the session has not yet expired or if the server is disconnected
+    if(expireSessionView  && (!expireSessionView.sessionExpired() || !NX.State.isReceiving())) {
       expireSessionView.close();
     }
     

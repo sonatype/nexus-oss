@@ -23,12 +23,11 @@ import java.util.SortedSet;
 
 import javax.inject.Named;
 
-import com.sonatype.nexus.repository.nuget.internal.odata.ComponentQuery;
-import com.sonatype.nexus.repository.nuget.internal.odata.ComponentQuery.Builder;
-import com.sonatype.nexus.repository.nuget.internal.odata.NugetPackageUtils;
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
+import com.sonatype.nexus.repository.nuget.internal.ComponentQuery.Builder;
+import com.sonatype.nexus.repository.nuget.odata.NugetPackageUtils;
+import com.sonatype.nexus.repository.nuget.odata.ODataFeedUtils;
+import com.sonatype.nexus.repository.nuget.odata.ODataTemplates;
+import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
@@ -156,7 +155,6 @@ public class NugetGalleryFacetImpl
   @Guarded(by = STARTED)
   public String feed(final String base, final String operation, final Map<String, String> query) {
     log.debug("Select: {}", query);
-    setFeedQueryDefaults(query);
 
     final List<Repository> repositories = getRepositories();
 
@@ -225,25 +223,13 @@ public class NugetGalleryFacetImpl
     return xml.append("</feed>").toString();
   }
 
-  private void setFeedQueryDefaults(final Map<String, String> query)
-  {
-    // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
-    if (!query.containsKey("$orderby")) {
-      query.put("$orderby", DOWNLOAD_COUNT + " desc");
-    }
-    else {
-      // OrientDB only supports ordering by identifiers, not by functions
-      final String orderby = query.get("$orderby");
-      query.put("$orderby", orderby.replaceAll("(?i)concat\\(title,id\\)", NAME_ORDER));
-    }
-  }
-
   @Override
   public void putMetadata(final Map<String, String> metadata) {
     try (StorageTx tx = openStorageTx()) {
-      createOrUpdatePackage(tx, metadata);
+      final Component component = createOrUpdatePackage(tx, metadata);
       maintainAggregateInfo(tx, metadata.get(ID));
       tx.commit();
+      getRepository().facet(SearchFacet.class).put(component);
     }
   }
 
@@ -283,6 +269,10 @@ public class NugetGalleryFacetImpl
     final StringBuilder xml = new StringBuilder();
     try (StorageTx tx = openStorageTx()) {
       final Component component = findComponent(tx, id, version);
+      if (component == null) {
+        return null;
+      }
+
       final Asset asset = findAsset(tx, component);
       final Map<String, ?> entryData = toData(asset.formatAttributes(), extra);
 
@@ -335,6 +325,7 @@ public class NugetGalleryFacetImpl
 
       boolean isNew = component.isNew();  // must check before commit
       storageTx.commit();
+      getRepository().facet(SearchFacet.class).put(component);
 
       if (isNew) {
         getEventBus().post(new ComponentCreatedEvent(component, getRepository()));
@@ -422,7 +413,6 @@ public class NugetGalleryFacetImpl
     final Bucket bucket = storageTx.getBucket();
     final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
     createOrUpdateAssetAndContents(storageTx, bucket, component, packageStream, recordMetadata);
-    getRepository().facet(SearchFacet.class).put(component);
     return component;
   }
 
@@ -434,7 +424,6 @@ public class NugetGalleryFacetImpl
     Asset asset = findOrCreateAsset(storageTx, component);
     updateAssetMetadata(asset, recordMetadata, component.isNew());
     storageTx.saveAsset(asset);
-    getRepository().facet(SearchFacet.class).put(component);
     return component;
   }
 
@@ -689,7 +678,7 @@ public class NugetGalleryFacetImpl
   private int executeCount(final ComponentQuery query, final StorageTx storageTx,
                            final Iterable<Repository> repositories)
   {
-    return (int) storageTx.countComponents(query.getWhere(), query.getParameters(), repositories,
+    return (int) storageTx.countAssets(query.getWhere(), query.getParameters(), repositories,
         query.getQuerySuffix());
   }
 

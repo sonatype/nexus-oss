@@ -23,8 +23,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
-import com.sonatype.nexus.repository.nuget.internal.odata.FeedSplicer;
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataConsumer;
+import com.sonatype.nexus.repository.nuget.odata.FeedSplicer;
+import com.sonatype.nexus.repository.nuget.odata.ODataConsumer;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;

@@ -19,11 +19,12 @@ import java.util.Date;
 import java.util.Map;
 import java.util.SortedSet;
 
-import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
+import com.sonatype.nexus.repository.nuget.odata.ODataFeedUtils;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
@@ -41,6 +42,7 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -69,6 +71,14 @@ public class NugetGalleryFacetImplPutTest
 
   @Mock
   private Repository repository;
+
+  @Mock
+  private SearchFacet searchFacet;
+
+  @Before
+  public void wireSearchFacet(){
+    when(repository.facet(SearchFacet.class)).thenReturn(searchFacet);
+  }
 
   @Test
   public void putCreatesPackageMetadataAndBlob() throws Exception {

@@ -45,7 +45,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
             var permission = 'nexus:repository-admin:' + model.get('format') + ':' + model.get('name');
             permittedCondition.name = permission;
             permittedCondition.evaluate();
-            return NX.Permissions.check(permission, 'edit');
+            return true;
           })
       );
     }

@@ -51,6 +51,7 @@ import org.junit.Before;
 /**
  * Abstract test case for nexus tests.
  */
+@Deprecated
 public abstract class NexusTestSupport
 {
   public static final String WORK_CONFIGURATION_KEY = "nexus-work";
