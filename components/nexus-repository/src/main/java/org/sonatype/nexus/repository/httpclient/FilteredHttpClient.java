@@ -41,6 +41,8 @@ import org.joda.time.Duration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// FIXME: Describe what this class is for in javadocs instead of leaving it empty!
+
 /**
  * @since 3.0
  */
@@ -66,13 +68,12 @@ public class FilteredHttpClient
   private RemoteConnectionStatus status;
 
   public FilteredHttpClient(final HttpClient delegate,
-                            final HttpClientConfig config)
+                            final HttpClientFacetImpl.Config config)
   {
     this.delegate = checkNotNull(delegate);
     checkNotNull(config);
-    ConnectionConfig conConfig = config.getConnection();
-    blocked = conConfig != null && conConfig.isBlocked() != null && conConfig.isBlocked();
-    autoBlock = conConfig == null || conConfig.shouldAutoBlock() == null || conConfig.shouldAutoBlock();
+    blocked = config.blocked != null ? config.blocked : false;
+    autoBlock = config.autoBlock != null ? config.autoBlock : false;
     status = new RemoteConnectionStatus(blocked ? "Remote Manually Blocked" : "Remote Connection Pending...");
     // TODO shall we use config.getConnectionConfig().getTimeout() * 2 as in NX2?
     autoBlockSequence = new FibonacciNumberSequence(Time.seconds(40).toMillis());

@@ -34,7 +34,6 @@ Ext.define('NX.coreui.controller.Privileges', {
   views: [
     'privilege.PrivilegeFeature',
     'privilege.PrivilegeList',
-    'privilege.PrivilegeAddRepositoryTarget',
     'privilege.PrivilegeTrace'
   ],
   refs: [
@@ -83,30 +82,8 @@ Ext.define('NX.coreui.controller.Privileges', {
     },
     weight: 10
   },
+
   permission: 'security:privileges',
-
-  /**
-   * @override
-   */
-  init: function () {
-    var me = this;
-
-    me.callParent();
-
-    me.listen({
-      component: {
-        'nx-coreui-privilege-list menuitem[action=newrepositorytarget]': {
-          click: me.showAddWindowRepositoryTarget
-        },
-        'nx-coreui-privilege-add-repositorytarget form': {
-          submitted: me.onSettingsSubmitted
-        },
-        'nx-coreui-privilege-add-repositorytarget #repositoryId': {
-          change: me.filterRepositoryTargets
-        }
-      }
-    });
-  },
 
   /**
    * @override
@@ -137,39 +114,6 @@ Ext.define('NX.coreui.controller.Privileges', {
   },
 
   /**
-   * @private
-   */
-  showAddWindowRepositoryTarget: function () {
-    var me = this,
-        feature = me.getFeature();
-
-    // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TITLE'));
-    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-privilege-add-repositorytarget'));
-  },
-
-  /**
-   * Updates repository-target store used in create-repository-target-privileges wizard to include compatible targets
-   * with selected repository-format.
-   *
-   * @private
-   */
-  filterRepositoryTargets: function (repositoryIdCombo) {
-    var targetCombo = repositoryIdCombo.up('form').down('#repositoryTargetId'),
-        repositoryId = repositoryIdCombo.getValue(),
-        format;
-
-    targetCombo.setValue(undefined);
-    if (repositoryId) {
-      format = repositoryIdCombo.getStore().getById(repositoryId).get('format');
-      targetCombo.getStore().filterByFormat(format);
-    }
-    else {
-      targetCombo.getStore().removeFilterByFormat();
-    }
-  },
-
-  /**
    * @protected
    * Enable 'Delete' when user has 'delete' permission and privilege is not read only.
    */
@@ -189,27 +133,6 @@ Ext.define('NX.coreui.controller.Privileges', {
           scope: button
         }
     );
-  },
-
-  /**
-   * @private
-   */
-  onSettingsSubmitted: function (form, action) {
-    var me = this,
-        win = form.up('nx-coreui-privilege-add-repositorytarget');
-
-    if (win) {
-      me.loadStoreAndSelect(action.result.data[0].id, false);
-      Ext.Array.each(action.result.data, function (privilege) {
-        NX.Messages.add({
-          text: NX.I18n.format('ADMIN_PRIVILEGES_CREATE_SUCCESS', privilege.name),
-          type: 'success'
-        });
-      });
-    }
-    else {
-      me.loadStore(Ext.emptyFn);
-    }
   },
 
   /**

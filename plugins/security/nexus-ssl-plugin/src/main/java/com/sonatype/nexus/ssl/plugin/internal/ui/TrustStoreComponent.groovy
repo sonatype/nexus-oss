@@ -45,6 +45,7 @@ class TrustStoreComponent
 extends DirectComponentSupport
 {
 
+  // FIXME: Do not inject a REST endpoint component as a service
   @Inject
   TrustStoreResource trustStoreResource
 

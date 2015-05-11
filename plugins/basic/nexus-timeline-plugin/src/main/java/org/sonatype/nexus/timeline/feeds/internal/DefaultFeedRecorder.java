@@ -13,7 +13,6 @@
 package org.sonatype.nexus.timeline.feeds.internal;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,12 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineCallback;
@@ -54,47 +47,48 @@ public class DefaultFeedRecorder
     implements FeedRecorder
 {
   private final Timeline timeline;
-
-  private final NexusItemAuthorizer nexusItemAuthorizer;
-
-  private final RepositoryRegistry repositoryRegistry;
+  //
+  //private final NexusItemAuthorizer nexusItemAuthorizer;
+  //
+  //private final RepositoryRegistry repositoryRegistry;
 
   @Inject
-  public DefaultFeedRecorder(final Timeline timeline,
-                             final NexusItemAuthorizer nexusItemAuthorizer,
-                             final RepositoryRegistry repositoryRegistry)
+  public DefaultFeedRecorder(final Timeline timeline
+                             //final NexusItemAuthorizer nexusItemAuthorizer,
+                             //final RepositoryRegistry repositoryRegistry
+                              )
   {
     this.timeline = checkNotNull(timeline);
-    this.nexusItemAuthorizer = checkNotNull(nexusItemAuthorizer);
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    //this.nexusItemAuthorizer = checkNotNull(nexusItemAuthorizer);
+    //this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
 
   // filtering
 
-  /**
-   * Filters out "item related" records based on required privileges of the caller. It's okay to invoke this method
-   * for any record (ie. even non "item related" records) as it will quickly return in a moment in realises that record
-   * is not about item. For non-item records this filter will always return {@code true}. In other words, this method
-   * will return {@code false} only for records that are about item, and caller does not have permissions to {@link
-   * Action#read} the item.
-   */
-  private boolean filterRecord(final Entry record) {
-    final String repoId = record.getData().get("repo.id");
-    final String itemPath = record.getData().get("item.path");
-    if (repoId == null || itemPath == null) {
-      return true;
-    }
-    try {
-      final Repository repo = repositoryRegistry.getRepository(repoId);
-      final ResourceStoreRequest req = new ResourceStoreRequest(itemPath);
-      return nexusItemAuthorizer.authorizePath(repo, req, Action.read);
-    }
-    catch (NoSuchRepositoryException e) {
-      // Can't get repository for artifact, therefore we can't authorize access, therefore you don't see it
-      log.debug("Feed entry contained invalid repository ID={}", repoId, e);
-      return false;
-    }
-  }
+  ///**
+  // * Filters out "item related" records based on required privileges of the caller. It's okay to invoke this method
+  // * for any record (ie. even non "item related" records) as it will quickly return in a moment in realises that record
+  // * is not about item. For non-item records this filter will always return {@code true}. In other words, this method
+  // * will return {@code false} only for records that are about item, and caller does not have permissions to {@link
+  // * Action#read} the item.
+  // */
+  //private boolean filterRecord(final Entry record) {
+  //  final String repoId = record.getData().get("repo.id");
+  //  final String itemPath = record.getData().get("item.path");
+  //  if (repoId == null || itemPath == null) {
+  //    return true;
+  //  }
+  //  try {
+  //    final Repository repo = repositoryRegistry.getRepository(repoId);
+  //    final ResourceStoreRequest req = new ResourceStoreRequest(itemPath);
+  //    return nexusItemAuthorizer.authorizePath(repo, req, Action.read);
+  //  }
+  //  catch (NoSuchRepositoryException e) {
+  //    // Can't get repository for artifact, therefore we can't authorize access, therefore you don't see it
+  //    log.debug("Feed entry contained invalid repository ID={}", repoId, e);
+  //    return false;
+  //  }
+  //}
 
   @Override
   public void addEvent(final FeedEvent evt) {
@@ -128,22 +122,22 @@ public class DefaultFeedRecorder
       public boolean processNext(final Entry rec) throws IOException {
         // we filter for permission only after Timeline used passed in filter predicate
         // filtering for permission is more costly than checking field equalities
-        if (filterRecord(rec)) {
-          final Map<String, String> data = Maps.newHashMap(rec.getData());
-          data.remove("_type");
-          data.remove("_subType");
-          data.remove("_link");
-          data.remove("_author");
-          final FeedEvent evt = new FeedEvent(
-              rec.getType(),
-              rec.getSubType(),
-              new Date(rec.getTimestamp()),
-              rec.getData().get("_author"), // nullable
-              rec.getData().get("_link"), // nullable
-              data
-          );
-          result.add(evt);
-        }
+        //if (filterRecord(rec)) {
+        //  final Map<String, String> data = Maps.newHashMap(rec.getData());
+        //  data.remove("_type");
+        //  data.remove("_subType");
+        //  data.remove("_link");
+        //  data.remove("_author");
+        //  final FeedEvent evt = new FeedEvent(
+        //      rec.getType(),
+        //      rec.getSubType(),
+        //      new Date(rec.getTimestamp()),
+        //      rec.getData().get("_author"), // nullable
+        //      rec.getData().get("_link"), // nullable
+        //      data
+        //  );
+        //  result.add(evt);
+        //}
         return true;
       }
     };

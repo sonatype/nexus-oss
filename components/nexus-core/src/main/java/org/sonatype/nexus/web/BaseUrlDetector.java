@@ -20,12 +20,13 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.nexus.configuration.GlobalRestApiSettings;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+// FIXME: merge with BaseUrlManager
 
 /**
  * Detect application base-url.
@@ -38,15 +39,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BaseUrlDetector
     extends ComponentSupport
 {
-  private final GlobalRestApiSettings settings;
+  private final BaseUrlManager baseUrlManager;
 
   private final Provider<HttpServletRequest> requestProvider;
 
   @Inject
-  public BaseUrlDetector(final GlobalRestApiSettings settings,
+  public BaseUrlDetector(final BaseUrlManager baseUrlManager,
                          final Provider<HttpServletRequest> requestProvider)
   {
-    this.settings = checkNotNull(settings);
+    this.baseUrlManager = checkNotNull(baseUrlManager);
     this.requestProvider = checkNotNull(requestProvider);
   }
 
@@ -70,8 +71,8 @@ public class BaseUrlDetector
   @Nullable
   public String detect() {
     // force base-url always wins if set
-    if (settings.isEnabled() && settings.isForceBaseUrl() && !Strings.isNullOrEmpty(settings.getBaseUrl())) {
-      return settings.getBaseUrl();
+    if (baseUrlManager.isForce() && !Strings.isNullOrEmpty(baseUrlManager.getUrl())) {
+      return baseUrlManager.getUrl();
     }
 
     // attempt to detect from HTTP request
@@ -94,8 +95,8 @@ public class BaseUrlDetector
     }
 
     // no request in context, non-forced base-url
-    if (!Strings.isNullOrEmpty(settings.getBaseUrl())) {
-      return settings.getBaseUrl();
+    if (!Strings.isNullOrEmpty(baseUrlManager.getUrl())) {
+      return baseUrlManager.getUrl();
     }
 
     // unable to determine base-url

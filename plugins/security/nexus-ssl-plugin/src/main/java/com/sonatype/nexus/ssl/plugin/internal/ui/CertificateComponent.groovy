@@ -43,6 +43,7 @@ class CertificateComponent
 extends DirectComponentSupport
 {
 
+  // FIXME: Do not inject a REST endpoint component as a service
   @Inject
   CertificatesResource certificatesResource
 
@@ -59,7 +60,7 @@ extends DirectComponentSupport
                                  final @Nullable Integer port,
                                  final @Nullable String protocolHint)
   {
-    return certificatesResource.get(null, host, port as String, protocolHint) as CertificateXO
+    return certificatesResource.get(host, port as String, protocolHint) as CertificateXO
   }
 
   /**

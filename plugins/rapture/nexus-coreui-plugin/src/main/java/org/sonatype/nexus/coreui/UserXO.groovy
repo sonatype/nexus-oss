@@ -14,12 +14,12 @@ package org.sonatype.nexus.coreui
 
 import javax.validation.constraints.NotNull
 
-import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.security.user.UserStatus
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.Email
 import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
 
@@ -46,13 +46,14 @@ class UserXO
   String lastName
 
   @NotBlank
+  @Email
   String email
 
   @NotNull
   UserStatus status
 
   @NotNull(groups = Create.class)
-  Password password
+  String password
 
   @NotEmpty
   Set<String> roles

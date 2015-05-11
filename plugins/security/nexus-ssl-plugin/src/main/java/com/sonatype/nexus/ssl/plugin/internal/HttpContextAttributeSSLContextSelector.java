@@ -38,7 +38,6 @@ public class HttpContextAttributeSSLContextSelector
     extends ComponentSupport
     implements SSLContextSelector
 {
-
   private final TrustStore trustStore;
 
   @Inject
@@ -54,6 +53,4 @@ public class HttpContextAttributeSSLContextSelector
     }
     return null;
   }
-
-
 }

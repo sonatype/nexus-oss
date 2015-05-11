@@ -165,7 +165,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-httpclient-api</artifactId>
+      <artifactId>nexus-httpclient</artifactId>
     </dependency>
 
     <dependency>
@@ -214,11 +214,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-locks</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.velocity</groupId>
       <artifactId>velocity</artifactId>
     </dependency>
@@ -229,8 +224,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-mailer</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-email</artifactId>
     </dependency>
 
     <!-- FIXME: unused in core, but was in core and breaks plugins using it -->
@@ -373,47 +368,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>nexus.xml</id>
-            <goals>
-              <goal>java</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xpp3-writer</goal>
-            </goals>
-            <configuration>
-              <useJava5>true</useJava5>
-              <version>2.8.0</version>
-              <models>
-                <model>src/main/mdo/nexus.xml</model>
-              </models>
-            </configuration>
-          </execution>
-
-        </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-        </configuration>
-      </plugin>
-
-      <!--
-      FIXME: Get rid of test-jar, these artifacts cause problems with transitive dependencies.
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

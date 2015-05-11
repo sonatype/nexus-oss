@@ -13,7 +13,6 @@
 package com.sonatype.nexus.ssl.plugin.internal.keystore;
 
 import java.io.File;
-import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -21,11 +20,9 @@ import javax.inject.Singleton;
 
 import com.sonatype.nexus.ssl.plugin.SSLPlugin;
 
-import org.sonatype.nexus.configuration.ApplicationConfiguration;
+import org.sonatype.nexus.common.dirs.ApplicationDirectories;
 import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManagerConfigurationSupport;
-
-import com.google.common.base.Throwables;
 
 /**
  * SSL plugin specific key store manager configuration.
@@ -61,7 +58,7 @@ public class KeyStoreManagerConfigurationImpl
 
   @Inject
   public KeyStoreManagerConfigurationImpl(
-      final ApplicationConfiguration parent,
+      final ApplicationDirectories directories,
       final @Named(CPREFIX + ".keyStoreType:-JKS}") String keyStoreType,
       final @Named(CPREFIX + ".keyAlgorithm:-RSA}") String keyAlgorithm,
       final @Named(CPREFIX + ".keyAlgorithmSize:-2048}") int keyAlgorithmSize,
@@ -70,12 +67,8 @@ public class KeyStoreManagerConfigurationImpl
       final @Named(CPREFIX + ".keyManagerAlgorithm:-DEFAULT}") String keyManagerAlgorithm,
       final @Named(CPREFIX + ".trustManagerAlgorithm:-DEFAULT}") String trustManagerAlgorithm)
   {
-    try {
-      setBaseDir(new File(parent.getConfigurationDirectory().getCanonicalFile(), KEYSTORE_DIR_NAME));
-    }
-    catch (IOException e) {
-      throw Throwables.propagate(e);
-    }
+    setBaseDir(new File(directories.getWorkDirectory("etc"), KEYSTORE_DIR_NAME));
+
     setPrivateKeyStorePassword(PKSP);
     setTrustedKeyStorePassword(TKSP);
     setPrivateKeyPassword(PKP);

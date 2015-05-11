@@ -19,15 +19,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-
-import com.google.common.collect.ImmutableSet;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Predicates.and;
 
 @Named(RecentCachedOrDeployedReleaseArtifactFeedSource.CHANNEL_KEY)
 @Singleton
@@ -36,30 +29,30 @@ public class RecentCachedOrDeployedReleaseArtifactFeedSource
 {
   public static final String CHANNEL_KEY = "recentlyCachedOrDeployedReleaseArtifacts";
 
-  private final RepositoryRegistry repositoryRegistry;
+  //private final RepositoryRegistry repositoryRegistry;
 
   @Inject
   public RecentCachedOrDeployedReleaseArtifactFeedSource(
-      final FeedRecorder feedRecorder,
-      final RepositoryRegistry repositoryRegistry)
+      final FeedRecorder feedRecorder
+      /*final RepositoryRegistry repositoryRegistry*/)
   {
     super(feedRecorder,
         CHANNEL_KEY,
         "Cached or deployed release artifacts",
         "New release artifacts (cached or deployed).");
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    //this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
 
   @Override
   public void fillInEntries(final List<FeedEvent> entries, final int from, final int count,
                             final Map<String, String> params)
   {
-    entries.addAll(getFeedRecorder()
-        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_ITEM),
-            ImmutableSet.of(FeedRecorder.ITEM_CACHED, FeedRecorder.ITEM_DEPLOYED, FeedRecorder.ITEM_CACHED_UPDATE, FeedRecorder.ITEM_DEPLOYED_UPDATE), from, count,
-            and(isMavenArtifact(repositoryRegistry),
-                isMavenRepositoryWithPolicy(repositoryRegistry, RepositoryPolicy.RELEASE),
-                filters(params))
-        ));
+    //entries.addAll(getFeedRecorder()
+    //    .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_ITEM),
+    //        ImmutableSet.of(FeedRecorder.ITEM_CACHED, FeedRecorder.ITEM_DEPLOYED, FeedRecorder.ITEM_CACHED_UPDATE, FeedRecorder.ITEM_DEPLOYED_UPDATE), from, count,
+    //        and(isMavenArtifact(repositoryRegistry),
+    //            isMavenRepositoryWithPolicy(repositoryRegistry, RepositoryPolicy.RELEASE),
+    //            filters(params))
+    //    ));
   }
 }

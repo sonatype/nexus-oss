@@ -18,6 +18,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -30,6 +31,7 @@ import com.google.common.io.Closeables;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.protocol.HttpContext;
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
@@ -49,7 +51,8 @@ public class NexusSSLConnectionSocketFactory
 
   private final SSLSocketFactory defaultSocketFactory;
 
-  private final List<SSLContextSelector> selectors;
+  @Nullable
+  private final List<SSLContextSelector> sslContextSelectors;
 
   private final X509HostnameVerifier hostnameVerifier;
 
@@ -57,21 +60,26 @@ public class NexusSSLConnectionSocketFactory
 
   private final String[] supportedCipherSuites;
 
-  public NexusSSLConnectionSocketFactory(
-      final SSLSocketFactory defaultSocketFactory,
-      final X509HostnameVerifier hostnameVerifier,
-      final List<SSLContextSelector> selectors)
+  public NexusSSLConnectionSocketFactory(final SSLSocketFactory defaultSocketFactory,
+                                         final X509HostnameVerifier hostnameVerifier,
+                                         @Nullable final List<SSLContextSelector> sslContextSelectors)
   {
     this.defaultSocketFactory = checkNotNull(defaultSocketFactory);
     this.hostnameVerifier = checkNotNull(hostnameVerifier);
-    this.selectors = selectors; // might be null
+    this.sslContextSelectors = sslContextSelectors; // might be null
     this.supportedProtocols = split(System.getProperty("https.protocols"));
     this.supportedCipherSuites = split(System.getProperty("https.cipherSuites"));
   }
 
+  public NexusSSLConnectionSocketFactory(@Nullable final List<SSLContextSelector> sslContextSelectors) {
+    this((javax.net.ssl.SSLSocketFactory) javax.net.ssl.SSLSocketFactory.getDefault(),
+        SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER,
+        sslContextSelectors);
+  }
+
   private SSLSocketFactory select(final HttpContext context) {
-    if (selectors != null) {
-      for (SSLContextSelector selector : selectors) {
+    if (sslContextSelectors != null) {
+      for (SSLContextSelector selector : sslContextSelectors) {
         SSLContext sslContext = selector.select(context);
         if (sslContext != null) {
           return sslContext.getSocketFactory();
@@ -98,9 +106,13 @@ public class NexusSSLConnectionSocketFactory
 
   @Override
   @IgnoreJRERequirement
-  public Socket connectSocket(final int connectTimeout, final Socket socket, final HttpHost host,
+  public Socket connectSocket(final int connectTimeout,
+                              final Socket socket,
+                              final HttpHost host,
                               final InetSocketAddress remoteAddress,
-                              final InetSocketAddress localAddress, final HttpContext context) throws IOException
+                              final InetSocketAddress localAddress,
+                              final HttpContext context)
+      throws IOException
   {
     checkNotNull(host);
     checkNotNull(remoteAddress);
@@ -141,11 +153,7 @@ public class NexusSSLConnectionSocketFactory
   {
     checkNotNull(socket);
     checkNotNull(target);
-    final SSLSocket sslsock = configure((SSLSocket) select(context).createSocket(
-        socket,
-        target,
-        port,
-        true));
+    final SSLSocket sslsock = configure((SSLSocket) select(context).createSocket(socket, target, port, true));
     sslsock.startHandshake();
     verifyHostname(sslsock, target);
     return sslsock;

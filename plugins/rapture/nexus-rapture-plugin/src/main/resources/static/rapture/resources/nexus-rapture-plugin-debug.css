@@ -48,12 +48,13 @@
 
 .nx-info-entry-name {
   padding-left: 0;
+  padding-right: 6px;
   font-weight: bold;
   white-space: nowrap;
 }
 
 .nx-info-entry-value {
-  padding-left: 5px;
+  padding-left: 0;
   padding-right: 25px;
 }
 

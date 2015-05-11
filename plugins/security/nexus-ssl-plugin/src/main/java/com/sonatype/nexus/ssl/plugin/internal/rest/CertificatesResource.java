@@ -12,14 +12,12 @@
  */
 package com.sonatype.nexus.ssl.plugin.internal.rest;
 
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateParsingException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -34,9 +32,6 @@ import com.sonatype.nexus.ssl.plugin.SSLPlugin;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 import com.sonatype.nexus.ssl.plugin.internal.CertificateRetriever;
 
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.siesta.Resource;
 import org.sonatype.siesta.ValidationErrorsException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -50,6 +45,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.calculateFingerprint;
 import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.decodePEMFormattedCertificate;
 
+// TODO: Remove
+
 /**
  * Certificate resource.
  *
@@ -62,52 +59,29 @@ public class CertificatesResource
     extends ComponentSupport
     implements Resource
 {
-
-  private final RepositoryRegistry repositoryRegistry;
-
   private final TrustStore trustStore;
-
-  private final Provider<RemoteStorageContext> remoteStorageContextProvider;
 
   private final CertificateRetriever certificateRetriever;
 
   @Inject
   public CertificatesResource(final CertificateRetriever certificateRetriever,
-                              final @Named("global") Provider<RemoteStorageContext> remoteStorageContextProvider,
-                              final RepositoryRegistry repositoryRegistry,
                               final TrustStore trustStore)
   {
     this.certificateRetriever = checkNotNull(certificateRetriever);
-    this.remoteStorageContextProvider = checkNotNull(remoteStorageContextProvider);
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.trustStore = checkNotNull(trustStore);
   }
 
   @GET
   @Produces({APPLICATION_XML, APPLICATION_JSON})
   @RequiresPermissions(SSLPlugin.PERMISSION_PREFIX + "truststore:read")
-  public Object get(final @QueryParam("repositoryId") String repositoryId,
-                    final @QueryParam("host") String host,
+  public Object get(final @QueryParam("host") String host,
                     final @QueryParam("port") String port,
                     final @QueryParam("protocolHint") String protocolHint)
       throws Exception
   {
-    RemoteStorageContext remoteStorageContext = remoteStorageContextProvider.get();
     String actualProtocolHint = protocolHint;
     String actualHost = host;
     String actualPort = port;
-    if (repositoryId != null) {
-      final ProxyRepository repository = repositoryRegistry.getRepositoryWithFacet(
-          repositoryId, ProxyRepository.class
-      );
-      final URL url = new URL(repository.getRemoteUrl());
-      actualHost = url.getHost();
-      actualPort = String.valueOf(url.getPort() == -1 ? url.getDefaultPort() : url.getPort());
-      remoteStorageContext = repository.getRemoteStorageContext();
-      if (actualProtocolHint == null) {
-        actualProtocolHint = "https";
-      }
-    }
     if (actualHost != null) {
       int actualPortInt = 443;
       if (actualPort != null) {
@@ -121,7 +95,7 @@ public class CertificatesResource
 
       Certificate[] chain;
       try {
-        chain = retrieveCertificates(remoteStorageContext, actualHost, actualPortInt, actualProtocolHint);
+        chain = retrieveCertificates(actualHost, actualPortInt, actualProtocolHint);
       }
       catch (Exception e) {
         String errorMessage = e.getMessage();
@@ -141,8 +115,7 @@ public class CertificatesResource
     throw new ValidationErrorsException("One of repositoryId or host/port should be specified");
   }
 
-  private Certificate[] retrieveCertificates(final RemoteStorageContext remoteStorageContext,
-                                             final String host,
+  private Certificate[] retrieveCertificates(final String host,
                                              final int port,
                                              final String protocolHint)
       throws Exception
@@ -163,11 +136,11 @@ public class CertificatesResource
               host, port, e.getClass().getName(), e.getMessage()
           );
         }
-        return certificateRetriever.retrieveCertificatesFromHttpsServer(host, port, remoteStorageContext);
+        return certificateRetriever.retrieveCertificatesFromHttpsServer(host, port);
       }
     }
     else if ("https".equalsIgnoreCase(protocolHint)) {
-      return certificateRetriever.retrieveCertificatesFromHttpsServer(host, port, remoteStorageContext);
+      return certificateRetriever.retrieveCertificatesFromHttpsServer(host, port);
     }
     return certificateRetriever.retrieveCertificates(host, port);
   }

@@ -23,8 +23,8 @@ import org.sonatype.nexus.log.LoggerLevel;
  *
  * @since 2.7
  */
-@Singleton
 @Named
+@Singleton
 public class CoreLogConfigurationCustomizer
     implements LogConfigurationCustomizer
 {
@@ -32,14 +32,9 @@ public class CoreLogConfigurationCustomizer
   public void customize(final Configuration configuration) {
     // non Nexus loggers
     configuration.setLoggerLevel("org.apache.commons", LoggerLevel.WARN);
-    configuration.setLoggerLevel("org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter", LoggerLevel.INFO);
-    configuration.setLoggerLevel("org.apache.shiro.web.filter.mgt.DefaultFilterChainManager", LoggerLevel.INFO);
+
     configuration.setLoggerLevel("org.eclipse.jetty", LoggerLevel.INFO);
     configuration.setLoggerLevel("eu.medsea.mimeutil.MimeUtil2", LoggerLevel.INFO);
-
-    // NEXUS-6134: make it easy for user to debug outbound request headers
-    configuration.setLoggerLevel("org.apache.http", LoggerLevel.INFO);
-    configuration.setLoggerLevel("org.apache.http.wire", LoggerLevel.ERROR);
 
     // NEXUS-5456: limit noisy guice timing logger
     configuration.setLoggerLevel("com.google.inject.internal.util.Stopwatch", LoggerLevel.INFO);
@@ -48,19 +43,12 @@ public class CoreLogConfigurationCustomizer
     configuration.setLoggerLevel("javax.management", LoggerLevel.INFO);
     configuration.setLoggerLevel("sun.rmi", LoggerLevel.INFO);
 
-    // Nexus loggers
-    configuration.setLoggerLevel("org.sonatype.nexus.rest.NexusApplication", LoggerLevel.WARN);
-
     // Useful loggers (level will be calculated as effective level)
     configuration.setLoggerLevel("org.sonatype.nexus", LoggerLevel.DEFAULT);
-    configuration.setLoggerLevel("org.sonatype.nexus.security", LoggerLevel.DEFAULT);
+
     configuration.setLoggerLevel("org.sonatype.nexus.jmx", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.internal.log", LoggerLevel.DEFAULT);
-    configuration.setLoggerLevel("org.sonatype.nexus.internal.httpclient", LoggerLevel.DEFAULT);
-    configuration.setLoggerLevel("org.sonatype.nexus.configuration", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.plugins", LoggerLevel.DEFAULT);
-    configuration.setLoggerLevel("org.sonatype.nexus.proxy", LoggerLevel.DEFAULT);
-    configuration.setLoggerLevel("org.sonatype.nexus.tasks", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.threads", LoggerLevel.DEFAULT);
   }
 }

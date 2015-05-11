@@ -69,7 +69,7 @@ Ext.define('NX.controller.ExtDirect', {
       }
     }
     else {
-      message = NX.I18n.get('GLOBAL_SERVER_EXTDIRECT_WARNING');
+      message = NX.I18n.get('GLOBAL_SERVER_CONNECT_FAILURE');
     }
 
     if (message) {

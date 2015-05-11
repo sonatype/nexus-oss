@@ -170,8 +170,6 @@ public class RealmManagerImpl
     checkNotNull(configuration);
 
     RealmConfiguration model = configuration.copy();
-    // TODO: Validate configuration before saving?  Or leave to ext.direct?
-
     log.info("Saving configuration: {}", model);
     synchronized (lock) {
       store.save(model);

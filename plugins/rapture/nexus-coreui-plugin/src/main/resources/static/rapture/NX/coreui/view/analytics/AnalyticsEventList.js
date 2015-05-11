@@ -25,6 +25,11 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
     'NX.I18n'
   ],
 
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-analytics-event-list'
+  },
+
   store: 'AnalyticsEvent',
 
   viewConfig: {
@@ -51,31 +56,37 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
     {
       header: NX.I18n.get('ADMIN_EVENTS_TYPE_COLUMN'),
       dataIndex: 'type',
+      stateId: 'type',
       flex: 1
     },
     {
       header: NX.I18n.get('ADMIN_EVENTS_TIMESTAMP_COLUMN'),
       dataIndex: 'timestamp',
+      stateId: 'timestamp',
       flex: 1
     },
     {
       header: NX.I18n.get('ADMIN_EVENTS_SEQUENCE_COLUMN'),
       dataIndex: 'sequence',
+      stateId: 'sequence',
       flex: 1
     },
     {
       header: NX.I18n.get('ADMIN_EVENTS_DURATION_COLUMN'),
       dataIndex: 'duration',
+      stateId: 'duration',
       flex: 1
     },
     {
       header: NX.I18n.get('ADMIN_EVENTS_USER_COLUMN'),
       dataIndex: 'userId',
+      stateId: 'userId',
       flex: 1
     },
     {
       header: NX.I18n.get('ADMIN_EVENTS_ATTRIBUTES_COLUMN'),
       dataIndex: 'attributes',
+      stateId: 'attributes',
       flex: 3,
       renderer: function (value) {
         var text = '';
