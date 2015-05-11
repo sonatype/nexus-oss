@@ -15,14 +15,14 @@ package org.sonatype.nexus.repository.search;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.common.entity.EntityHelper;
-import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageTxPostCommitHook;
+
+import com.google.common.base.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 
 /**
  * Default {@link StorageFacet} implementation.
@@ -32,7 +32,8 @@ import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 @Named
 public class SearchFacetImpl
     extends FacetSupport
-    implements SearchFacet
+    implements SearchFacet, Supplier<StorageTxPostCommitHook>
+
 {
   private final SearchService searchService;
 
@@ -42,23 +43,9 @@ public class SearchFacetImpl
   }
 
   @Override
-  @Guarded(by = STARTED)
-  public SearchItemId identifier(final Component component) {
-    return new SearchItemId(EntityHelper.id(component).toString());
-  }
-
-  @Override
-  @Guarded(by = STARTED)
-  public SearchItemId put(final Component component) {
-    final SearchItemId searchId = identifier(component);
-    searchService.put(getRepository(), component, searchId.getValue());
-    return searchId;
-  }
-
-  @Override
-  @Guarded(by = STARTED)
-  public void delete(final SearchItemId identifier) {
-    searchService.delete(getRepository(), identifier.getValue());
+  protected void doInit(final Configuration configuration) throws Exception {
+    super.doInit(configuration);
+    facet(StorageFacet.class).registerHookSupplier(this);
   }
 
   @Override
@@ -69,5 +56,10 @@ public class SearchFacetImpl
   @Override
   protected void doDelete() {
     searchService.deleteIndex(getRepository());
+  }
+
+  @Override
+  public StorageTxPostCommitHook get() {
+    return new SearchPostCommitHook(searchService, getRepository());
   }
 }

@@ -14,6 +14,9 @@ package org.sonatype.nexus.repository.search;
 
 import java.util.List;
 
+import org.sonatype.nexus.common.entity.EntityHelper;
+import org.sonatype.nexus.common.entity.EntityId;
+import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTxPostCommitHook;
 
@@ -29,14 +32,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SearchPostCommitHook
     extends StorageTxPostCommitHook
 {
-  private SearchFacet searchFacet;
+  private final SearchService searchService;
+
+  private final Repository repository;
 
   private final List<Component> indexable;
 
-  private final List<SearchItemId> deindexable;
+  private final List<EntityId> deindexable;
 
-  public SearchPostCommitHook(final SearchFacet searchFacet) {
-    this.searchFacet = checkNotNull(searchFacet);
+  public SearchPostCommitHook(final SearchService searchService, final Repository repository) {
+    this.searchService = checkNotNull(searchService);
+    this.repository = checkNotNull(repository);
     this.indexable = Lists.newArrayList();
     this.deindexable = Lists.newArrayList();
   }
@@ -56,17 +62,17 @@ public class SearchPostCommitHook
   @Override
   public void deleteComponent(final Component... components) {
     for (Component component : components) {
-      deindexable.add(searchFacet.identifier(component));
+      deindexable.add(EntityHelper.id(component));
     }
   }
 
   @Override
   public void execute() {
-    for (SearchItemId searchItemId : deindexable) {
-      searchFacet.delete(searchItemId);
+    for (EntityId entityId : deindexable) {
+      searchService.delete(repository, entityId.toString());
     }
     for (Component component : indexable) {
-      searchFacet.put(component);
+      searchService.put(repository, component, EntityHelper.id(component).toString());
     }
   }
 }
