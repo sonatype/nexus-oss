@@ -117,31 +117,35 @@ extends DirectComponentSupport
   {
     String fingerprint = calculateFingerprint(certificate)
 
-    CertificateXO certificateXO = new CertificateXO()
-        .withId(fingerprint)
-        .withPem(CertificateUtil.serializeCertificateInPEM(certificate))
-        .withFingerprint(fingerprint)
-
     if (certificate instanceof X509Certificate) {
       X509Certificate x509Certificate = (X509Certificate) certificate
 
       Map<String, String> subjectRdns = getRdns(x509Certificate.subjectX500Principal.name)
       Map<String, String> issuerRdns = getRdns(x509Certificate.issuerX500Principal.name)
 
-      certificateXO
-          .withSerialNumber(x509Certificate.getSerialNumber().toString())
-          .withSubjectCommonName(subjectRdns.get("CN"))
-          .withSubjectOrganization(subjectRdns.get("O"))
-          .withSubjectOrganizationalUnit(subjectRdns.get("OU"))
-          .withIssuerCommonName(issuerRdns.get("CN"))
-          .withIssuerOrganization(issuerRdns.get("O"))
-          .withIssuerOrganizationalUnit(issuerRdns.get("OU"))
-          .withIssuedOn(x509Certificate.getNotBefore().getTime())
-          .withExpiresOn(x509Certificate.getNotAfter().getTime())
-          .withInNexusSSLTrustStore(inNexusSSLTrustStore)
+      return new CertificateXO(
+          id: fingerprint,
+          pem: CertificateUtil.serializeCertificateInPEM(certificate),
+          fingerprint: fingerprint,
+          serialNumber: x509Certificate.getSerialNumber().toString(),
+          subjectCommonName: subjectRdns.get("CN"),
+          subjectOrganization: subjectRdns.get("O"),
+          subjectOrganizationalUnit: subjectRdns.get("OU"),
+          issuerCommonName: issuerRdns.get("CN"),
+          issuerOrganization: issuerRdns.get("O"),
+          issuerOrganizationalUnit: issuerRdns.get("OU"),
+          issuedOn: x509Certificate.getNotBefore().getTime(),
+          expiresOn: x509Certificate.getNotAfter().getTime(),
+          inNexusSSLTrustStore: inNexusSSLTrustStore
+      )
     }
-
-    return certificateXO
+    else {
+      return new CertificateXO(
+          id: fingerprint,
+          pem: CertificateUtil.serializeCertificateInPEM(certificate),
+          fingerprint: fingerprint
+      )
+    }
   }
 
   static Map<String, String> getRdns(final String dn) {
