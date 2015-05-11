@@ -115,12 +115,12 @@ th {
 }
 
 /* line 158, ../../../baseapp/packages/rapture-theme/sass/etc/all.scss */
-td {
+td:not([class|=x]) {
   padding-right: 5px;
 }
 
 /* line 162, ../../../baseapp/packages/rapture-theme/sass/etc/all.scss */
-td:last-child {
+td:not([class|=x]):last-child {
   padding-right: 0;
 }
 

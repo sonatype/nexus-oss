@@ -218,7 +218,6 @@ public class MavenFacetImpl
       else {
         putFile(path, payload, tx);
       }
-      tx.commit();
     }
   }
 
@@ -269,6 +268,7 @@ public class MavenFacetImpl
 
     putAssetPayload(path, tx, asset, payload);
     tx.saveAsset(asset);
+    tx.commit();
   }
 
   private void putFile(final MavenPath path, final Payload payload, final StorageTx tx)
@@ -288,6 +288,7 @@ public class MavenFacetImpl
 
     putAssetPayload(path, tx, asset, payload);
     tx.saveAsset(asset);
+    tx.commit();
   }
 
   private void putAssetPayload(final MavenPath path,
