@@ -58,7 +58,7 @@ public class MockNpmRegistry
 
   private PathRecorderBehaviour pathRecorderBehaviour;
 
-  private boolean serveRequests;
+  private boolean serveRequests = true;
 
   /**
    * Constructor that access an existing directory as input.
