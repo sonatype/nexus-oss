@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
 import com.google.common.collect.Lists;
@@ -27,7 +28,6 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
-import org.apache.commons.io.FileUtils;
 import org.eclipse.sisu.bean.BeanManager;
 import org.eclipse.sisu.bean.LifecycleModule;
 import org.eclipse.sisu.inject.BeanLocator;
@@ -228,7 +228,7 @@ public abstract class NexusTestSupport
   private void cleanDir(File dir) {
     if (dir != null) {
       try {
-        FileUtils.deleteDirectory(dir);
+        DirSupport.delete(dir.toPath());
       }
       catch (IOException e) {
         // couldn't delete directory, too bad
