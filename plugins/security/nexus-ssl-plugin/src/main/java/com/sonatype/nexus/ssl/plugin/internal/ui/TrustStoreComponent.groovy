@@ -26,9 +26,6 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
 
-import com.sonatype.nexus.ssl.model.CertificatePemXO
-import com.sonatype.nexus.ssl.model.CertificateXO
-import com.sonatype.nexus.ssl.plugin.SSLPlugin
 import com.sonatype.nexus.ssl.plugin.TrustStore
 
 import org.sonatype.nexus.extdirect.DirectComponent
