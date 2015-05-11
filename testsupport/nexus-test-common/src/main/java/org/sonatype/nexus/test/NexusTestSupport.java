@@ -38,8 +38,6 @@ import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.space.URLClassSpace;
 import org.eclipse.sisu.wire.ParameterKeys;
 import org.eclipse.sisu.wire.WireModule;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -260,27 +258,5 @@ public abstract class NexusTestSupport
 
   private String getBasedir() {
     return util.getBaseDir().getAbsolutePath();
-  }
-
-  // FIXME: This is only used by nexus-ldap-plugin
-
-  /**
-   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
-   */
-  @Deprecated
-  protected void assertEquals(String message, Object expected, Object actual) {
-    // don't use junit framework Assert due to autoboxing bug
-    MatcherAssert.assertThat(message, actual, Matchers.equalTo(expected));
-  }
-
-  // FIXME: This is only used by nexus-ldap-plugin
-
-  /**
-   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
-   */
-  @Deprecated
-  protected void assertEquals(Object expected, Object actual) {
-    // don't use junit framework Assert
-    MatcherAssert.assertThat(actual, Matchers.equalTo(expected));
   }
 }
