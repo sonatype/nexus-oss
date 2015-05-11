@@ -16750,7 +16750,7 @@
   opacity: 1;
 }
 /* line 28, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
-.nx-combo-disabled .x-form-trigger {
+.nx-combo-disabled .x-trigger-cell {
   display: none;
 }
 
