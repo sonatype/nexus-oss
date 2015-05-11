@@ -40,14 +40,17 @@ public final class Connection
 
     private int port;
 
+    private boolean useTrustStore;
+
     @VisibleForTesting
     public Host() {
     }
 
-    public Host(final Protocol protocol, final String hostName, final int port) {
+    public Host(final Protocol protocol, final String hostName, final int port, final boolean useTrustStore) {
       setProtocol(protocol);
       setHostName(hostName);
       setPort(port);
+      setUseTrustStore(useTrustStore);
     }
 
     public Protocol getProtocol() {
@@ -75,6 +78,14 @@ public final class Connection
     public void setPort(final int port) {
       checkArgument(port > 0 && port < 65536, "Invalid LDAP port: %s", port);
       this.port = port;
+    }
+
+    public boolean isUseTrustStore() {
+      return useTrustStore;
+    }
+
+    public void setUseTrustStore(final boolean useTrustStore) {
+      this.useTrustStore = useTrustStore;
     }
 
     @Override

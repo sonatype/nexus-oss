@@ -23,12 +23,11 @@ import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sonatype.nexus.ssl.model.SMTPTrustStoreKey.smtpTrustStoreKey;
 
 // FIXME: Need to sort out changes to sisu-mailer or replacement
 
 /**
- * An {@link SmtpSessionParametersCustomizer} that will configure SMTP parameters to use Nexus SSL Trust Store in case
+ * An SmtpSessionParametersCustomizer that will configure SMTP parameters to use Nexus SSL Trust Store in case
  * that is enabled.
  *
  * @since ssl 1.0
@@ -53,7 +52,10 @@ public class SMTPSessionParametersCustomizer
 
   //@Override
   public Properties customize(final Properties params) {
-    final SSLContext sslContext = trustStore.getSSLContextFor(smtpTrustStoreKey());
+    SSLContext sslContext = null;
+    if (Boolean.valueOf(params.getProperty("mail.smtp.ssl.useTrustStore"))) {
+      sslContext = trustStore.getSSLContext();
+    }
     final String host = params.getProperty("mail.smtp.host");
     final String port = params.getProperty("mail.smtp.port");
     if (sslContext != null && params.remove("mail.smtp.socketFactory.class") != null) {

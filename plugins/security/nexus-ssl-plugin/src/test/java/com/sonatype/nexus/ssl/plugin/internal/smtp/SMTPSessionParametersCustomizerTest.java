@@ -22,7 +22,6 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
 
-import static com.sonatype.nexus.ssl.model.SMTPTrustStoreKey.smtpTrustStoreKey;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
@@ -47,10 +46,11 @@ public class SMTPSessionParametersCustomizerTest
       throws Exception
   {
     final TrustStore trustStore = mock(TrustStore.class);
-    when(trustStore.getSSLContextFor(smtpTrustStoreKey())).thenReturn(SSLContext.getDefault());
+    when(trustStore.getSSLContext()).thenReturn(SSLContext.getDefault());
 
     final SMTPSessionParametersCustomizer underTest = new SMTPSessionParametersCustomizer(trustStore);
     final Properties properties = new Properties();
+    properties.setProperty("mail.smtp.ssl.useTrustStore", Boolean.TRUE.toString());
     properties.setProperty("mail.smtp.socketFactory.class", "Foo.class");
     underTest.customize(properties);
 
@@ -67,7 +67,6 @@ public class SMTPSessionParametersCustomizerTest
       throws Exception
   {
     final TrustStore trustStore = mock(TrustStore.class);
-    when(trustStore.getSSLContextFor(smtpTrustStoreKey())).thenReturn(null);
 
     final SMTPSessionParametersCustomizer underTest = new SMTPSessionParametersCustomizer(trustStore);
     final Properties properties = new Properties();
@@ -88,10 +87,11 @@ public class SMTPSessionParametersCustomizerTest
       throws Exception
   {
     final TrustStore trustStore = mock(TrustStore.class);
-    when(trustStore.getSSLContextFor(smtpTrustStoreKey())).thenReturn(SSLContext.getDefault());
+    when(trustStore.getSSLContext()).thenReturn(SSLContext.getDefault());
 
     final SMTPSessionParametersCustomizer underTest = new SMTPSessionParametersCustomizer(trustStore);
     final Properties properties = new Properties();
+    properties.setProperty("mail.smtp.ssl.useTrustStore", Boolean.TRUE.toString());
     underTest.customize(properties);
 
     assertThat(properties.keySet(), not(hasItem((Object) "mail.smtp.ssl.enable")));

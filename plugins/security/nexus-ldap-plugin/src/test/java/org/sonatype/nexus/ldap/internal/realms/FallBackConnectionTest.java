@@ -59,7 +59,7 @@ public class FallBackConnectionTest
     connection.setSystemUsername("uid=admin,ou=system");
     connection.setSystemPassword("secret");
     connection.setAuthScheme("simple");
-    connection.setHost(new Host(Protocol.ldap, "localhost", 12345));
+    connection.setHost(new Host(Protocol.ldap, "localhost", 12345, false));
     ldapConfiguration.setConnection(connection);
 
     final Mapping mapping = new Mapping();

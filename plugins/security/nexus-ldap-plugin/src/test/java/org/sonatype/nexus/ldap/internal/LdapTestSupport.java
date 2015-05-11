@@ -187,7 +187,7 @@ public abstract class LdapTestSupport
     connection.setSystemUsername("uid=admin,ou=system");
     connection.setSystemPassword("secret");
     connection.setAuthScheme("simple");
-    connection.setHost(new Host(Protocol.ldap, "localhost", ldapServer.getPort()));
+    connection.setHost(new Host(Protocol.ldap, "localhost", ldapServer.getPort(), false));
     ldapConfiguration.setConnection(connection);
 
     final Mapping mapping = new Mapping();

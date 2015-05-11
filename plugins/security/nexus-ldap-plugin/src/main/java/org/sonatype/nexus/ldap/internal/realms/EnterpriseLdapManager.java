@@ -23,7 +23,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 
-import com.sonatype.nexus.ssl.model.TrustStoreKey;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
 import org.sonatype.nexus.events.NexusStoppedEvent;
@@ -55,7 +54,6 @@ import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.ldap.model.LdapTrustStoreKey.ldapTrustStoreKey;
 
 // TODO: this really should be threaded so we make multiple parallel requests
 
@@ -336,20 +334,18 @@ public class EnterpriseLdapManager
     final DefaultLdapContextFactory ldapContextFactory = LdapConnectionUtils.getLdapContextFactory(
         ldapServer, useBackupUrl
     );
-    final TrustStoreKey key = ldapTrustStoreKey(ldapServer.getId() == null ? "<unknown>" : ldapServer.getId());
-    if (Protocol.ldaps == ldapServer.getConnection().getHost().getProtocol()) {
-      final SSLContext sslContext = trustStore.getSSLContextFor(key);
-      if (sslContext != null) {
-        log.debug(
-            "{} is using a Nexus SSL Trust Store for accessing {}",
-            key, ldapServer.getConnection().getHost().getHostName()
-        );
-        return new SSLLdapContextFactory(sslContext, ldapContextFactory);
-      }
+    if (Protocol.ldaps == ldapServer.getConnection().getHost().getProtocol()
+        && ldapServer.getConnection().getHost().isUseTrustStore()) {
+      final SSLContext sslContext = trustStore.getSSLContext();
+      log.debug(
+          "LDAP is using a Nexus SSL Trust Store for accessing {}",
+          ldapServer.getConnection().getHost().getHostName()
+      );
+      return new SSLLdapContextFactory(sslContext, ldapContextFactory);
     }
     log.debug(
-        "{} is using a JVM Trust Store for accessing {}",
-        key, ldapServer.getConnection().getHost().getHostName()
+        "LDAP is using a JVM Trust Store for accessing {}",
+        ldapServer.getConnection().getHost().getHostName()
     );
     return ldapContextFactory;
   }
