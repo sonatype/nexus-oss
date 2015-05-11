@@ -324,9 +324,15 @@ public class StorageTxImpl
   public void saveAsset(final Asset asset) {
     if (asset.isPersisted()) {
       assetEntityAdapter.edit(db, asset);
+      for (StorageTxPostCommitHook hook : hooks) {
+        hook.updateAsset(asset);
+      }
     }
     else {
       assetEntityAdapter.add(db, asset);
+      for (StorageTxPostCommitHook hook : hooks) {
+        hook.createAsset(asset);
+      }
     }
   }
 
@@ -360,6 +366,9 @@ public class StorageTxImpl
     BlobRef blobRef = asset.blobRef();
     if (blobRef != null) {
       deleteBlob(blobRef, checkWritePolicy);
+    }
+    for (StorageTxPostCommitHook hook : hooks) {
+      hook.deleteAsset(asset);
     }
     assetEntityAdapter.delete(db, asset);
   }

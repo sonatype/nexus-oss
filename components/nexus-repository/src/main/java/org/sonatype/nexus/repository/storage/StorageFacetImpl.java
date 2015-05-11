@@ -107,7 +107,7 @@ public class StorageFacetImpl
     {
       @Override
       public StorageTxPostCommitHook get() {
-        return new ComponentEventsPostCommitHook(getEventBus(), getRepository());
+        return new StorageEventsPostCommitHook(getEventBus(), getRepository());
       }
     });
   }

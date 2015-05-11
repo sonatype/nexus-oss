@@ -35,6 +35,21 @@ public abstract class StorageTxPostCommitHook
   public void deleteComponent(final Component... components) {}
 
   /**
+   * Called when {@link StorageTx#saveAsset(Asset)} invoked with created asset.
+   */
+  public void createAsset(final Asset... assets) {}
+
+  /**
+   * Called when {@link StorageTx#saveAsset(Asset)} invoked with updated asset.
+   */
+  public void updateAsset(final Asset... assets) {}
+
+  /**
+   * Called when {@link StorageTx#deleteAsset(Asset)} invoked.
+   */
+  public void deleteAsset(final Asset... assets) {}
+
+  /**
    * Called after {@link StorageTx#commit()} successfuly executed.
    */
   public void execute() {}

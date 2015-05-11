@@ -26,16 +26,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class ComponentEventsPostCommitHook
+public class StorageEventsPostCommitHook
     extends StorageTxPostCommitHook
 {
   private final EventBus eventBus;
 
   private final Repository repository;
 
-  final List<ComponentEvent> events;
+  private final List<Object> events;
 
-  public ComponentEventsPostCommitHook(final EventBus eventBus, final Repository repository) {
+  public StorageEventsPostCommitHook(final EventBus eventBus, final Repository repository) {
     this.eventBus = checkNotNull(eventBus);
     this.repository = checkNotNull(repository);
     this.events = Lists.newArrayList();
@@ -64,8 +64,29 @@ public class ComponentEventsPostCommitHook
   }
 
   @Override
+  public void createAsset(final Asset... assets) {
+    for (Asset asset : assets) {
+      events.add(new AssetCreatedEvent(asset, repository));
+    }
+  }
+
+  @Override
+  public void updateAsset(final Asset... assets) {
+    for (Asset asset : assets) {
+      events.add(new AssetUpdatedEvent(asset, repository));
+    }
+  }
+
+  @Override
+  public void deleteAsset(final Asset... assets) {
+    for (Asset asset : assets) {
+      events.add(new AssetDeletedEvent(asset, repository));
+    }
+  }
+
+  @Override
   public void execute() {
-    for (ComponentEvent event : events) {
+    for (Object event : events) {
       eventBus.post(event);
     }
   }
