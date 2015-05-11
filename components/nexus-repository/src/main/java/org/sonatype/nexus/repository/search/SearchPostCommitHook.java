@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Search TX hook.
+ * Search related {@link StorageTxPostCommitHook}.
  *
  * @since 3.0
  */
@@ -65,10 +65,8 @@ public class SearchPostCommitHook
     for (SearchItemId searchItemId : deindexable) {
       searchFacet.delete(searchItemId);
     }
-    deindexable.clear();
     for (Component component : indexable) {
       searchFacet.put(component);
     }
-    indexable.clear();
   }
 }
