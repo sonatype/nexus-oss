@@ -155,10 +155,10 @@ th {
   text-align: left;
 }
 
-td {
+td:not([class|=x]) {
   padding-right: 5px;
 }
 
-td:last-child {
+td:not([class|=x]):last-child {
   padding-right: 0;
 }
