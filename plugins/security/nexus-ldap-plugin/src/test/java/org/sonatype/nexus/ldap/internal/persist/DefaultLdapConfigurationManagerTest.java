@@ -81,11 +81,11 @@ public class DefaultLdapConfigurationManagerTest
   private Connection buildConnectionInfo() throws Exception {
     Connection connInfo = new Connection();
     connInfo.setAuthScheme("ldap");
-    connInfo.setBackupHost(new Host(Protocol.ldap, "backupHost", 11111));
+    connInfo.setBackupHost(new Host(Protocol.ldap, "backupHost", 11111, false));
     connInfo.setMaxIncidentsCount(3);
     connInfo.setConnectionRetryDelay(300);
     connInfo.setConnectionTimeout(15);
-    connInfo.setHost(new Host(Protocol.ldap, "localhost", 386));
+    connInfo.setHost(new Host(Protocol.ldap, "localhost", 386, false));
     connInfo.setSaslRealm("");
     connInfo.setSearchBase("ou=searchbase");
     connInfo.setSystemPassword(encodeBase64("systemPassword"));

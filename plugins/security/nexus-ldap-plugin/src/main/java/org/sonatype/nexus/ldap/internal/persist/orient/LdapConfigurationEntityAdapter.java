@@ -97,6 +97,7 @@ public class LdapConfigurationEntityAdapter
       connectionHostType.createProperty("hostName", OType.STRING).setNotNull(true);
       connectionHostType.createProperty("port", OType.INTEGER).setNotNull(true);
       OClass connectionType = schema.createClass(DB_CONNECTION_CLASS);
+      connectionType.createProperty("useTrustStore", OType.BOOLEAN).setNotNull(true);
       connectionType.createProperty("searchBase", OType.STRING).setNotNull(true);
       connectionType.createProperty("systemUsername", OType.STRING);
       connectionType.createProperty("systemPassword", OType.STRING);
@@ -201,7 +202,8 @@ public class LdapConfigurationEntityAdapter
     final Host host = new Host(
         Protocol.valueOf(hostDocument.<String>field("protocol", OType.STRING)),
         hostDocument.<String>field("hostName", OType.STRING),
-        hostDocument.<Integer>field("port", OType.INTEGER)
+        hostDocument.<Integer>field("port", OType.INTEGER),
+        hostDocument.<Boolean>field("useTrustStore", OType.BOOLEAN)
     );
     connection.setHost(host);
     final ODocument backupHostDocument = document.field("backupHost", OType.EMBEDDED);
@@ -209,7 +211,8 @@ public class LdapConfigurationEntityAdapter
       final Host backupHost = new Host(
           Protocol.valueOf(backupHostDocument.<String>field("protocol", OType.STRING)),
           backupHostDocument.<String>field("hostName", OType.STRING),
-          backupHostDocument.<Integer>field("port", OType.INTEGER)
+          backupHostDocument.<Integer>field("port", OType.INTEGER),
+          backupHostDocument.<Boolean>field("useTrustStore", OType.BOOLEAN)
       );
       connection.setBackupHost(backupHost);
     }
@@ -232,12 +235,14 @@ public class LdapConfigurationEntityAdapter
     hostDocument.field("protocol", connection.getHost().getProtocol().name());
     hostDocument.field("hostName", connection.getHost().getHostName());
     hostDocument.field("port", connection.getHost().getPort());
+    hostDocument.field("useTrustStore", connection.getHost().isUseTrustStore());
     document.field("host", hostDocument);
     if (connection.getBackupHost() != null) {
       final ODocument backupHostDocument = db.newInstance(DB_CONNECTION_HOST_CLASS);
       backupHostDocument.field("protocol", connection.getBackupHost().getProtocol().name());
       backupHostDocument.field("hostName", connection.getBackupHost().getHostName());
       backupHostDocument.field("port", connection.getBackupHost().getPort());
+      hostDocument.field("useTrustStore", connection.getBackupHost().isUseTrustStore());
       document.field("backupHost", backupHostDocument);
     }
     document.field("saslRealm", connection.getSaslRealm());

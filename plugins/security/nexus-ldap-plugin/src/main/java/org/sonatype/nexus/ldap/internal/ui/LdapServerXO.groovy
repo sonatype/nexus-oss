@@ -42,6 +42,8 @@ extends LdapServerConnectionXO
   @Max(65535L)
   Integer backupMirrorPort
 
+  Boolean useTrustStoreForBackupMirror = false
+
   String userBaseDn
   Boolean userSubtree
 
