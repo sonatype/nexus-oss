@@ -16733,11 +16733,11 @@
  *
  * cls: 'x-form-readonly'
  */
-/* line 16, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 17, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .x-form-field[readonly].x-form-field:not([role="combobox"]) {
   color: #777777;
-  opacity: 1;
   background-color: #ebebeb;
+  opacity: 1;
 }
 
 /**
@@ -16746,6 +16746,7 @@
 /* line 25, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-combo-disabled input {
   color: #777777;
+  background-color: #ebebeb;
   opacity: 1;
 }
 /* line 28, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */

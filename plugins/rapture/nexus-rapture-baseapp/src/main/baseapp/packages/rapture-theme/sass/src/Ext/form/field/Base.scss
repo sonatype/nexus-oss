@@ -10,12 +10,12 @@
 
 @mixin nx-form-field-readonly {
   color: $color-dark-gray;
+  background-color: $color-smoke;
   opacity: 1;  
 }
 
 .x-form-field[readonly].x-form-field:not([role="combobox"]) {
   @include nx-form-field-readonly;
-  background-color: $color-smoke;
 }
 
 /**
