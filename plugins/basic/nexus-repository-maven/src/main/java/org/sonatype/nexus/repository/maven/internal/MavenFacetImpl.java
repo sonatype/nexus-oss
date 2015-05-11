@@ -220,7 +220,6 @@ public class MavenFacetImpl
       else {
         putFile(path, payload, tx);
       }
-      tx.commit();
     }
   }
 
@@ -271,7 +270,9 @@ public class MavenFacetImpl
 
     putAssetPayload(path, tx, asset, payload);
     tx.saveAsset(asset);
-    getRepository().facet(SearchFacet.class).put(component);
+    tx.commit();
+
+    facet(SearchFacet.class).put(component);
   }
 
   private void putFile(final MavenPath path, final Payload payload, final StorageTx tx)
@@ -291,6 +292,7 @@ public class MavenFacetImpl
 
     putAssetPayload(path, tx, asset, payload);
     tx.saveAsset(asset);
+    tx.commit();
   }
 
   private void putAssetPayload(final MavenPath path,
@@ -352,17 +354,23 @@ public class MavenFacetImpl
     if (asset == null) {
       return false;
     }
-    tx.deleteAsset(asset);
-    if (!tx.browseAssets(component).iterator().hasNext()) {
-      final SearchItemId searchId = facet(SearchFacet.class).identifier(component);
-      facet(SearchFacet.class).delete(searchId);
 
+    final SearchItemId searchId = facet(SearchFacet.class).identifier(component);
+
+    tx.deleteAsset(asset);
+    final boolean isEmpty = !tx.browseAssets(component).iterator().hasNext();
+    if (isEmpty) {
       tx.deleteComponent(component);
     }
-    else {
-      getRepository().facet(SearchFacet.class).put(component);
-    }
     tx.commit();
+
+    if (!isEmpty) {
+      facet(SearchFacet.class).put(component);
+    }
+    else {
+      facet(SearchFacet.class).delete(searchId);
+    }
+
     return true;
   }
 
