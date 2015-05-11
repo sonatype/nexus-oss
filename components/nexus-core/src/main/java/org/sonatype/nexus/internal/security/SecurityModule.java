@@ -32,10 +32,10 @@ import com.google.inject.AbstractModule;
 import static org.sonatype.nexus.security.FilterProviderSupport.filterKey;
 
 /**
- * Sets up Nexus's security filter configuration.
+ * Security module.
  */
 @Named
-public class NexusSecurityFilterModule
+public class SecurityModule
     extends AbstractModule
 {
   @Override
@@ -51,7 +51,6 @@ public class NexusSecurityFilterModule
     // FIXME: This likely should be normalized with the auth-token bits
     bind(filterKey("authcApiKey")).toProvider(AuthcApiKeyFilterProvider.class);
 
-    // HACK: Not filter related directly, configure orient stores
     bind(AnonymousConfigurationStore.class).to(OrientAnonymousConfigurationStore.class);
     bind(RealmConfigurationStore.class).to(OrientRealmConfigurationStore.class);
   }
