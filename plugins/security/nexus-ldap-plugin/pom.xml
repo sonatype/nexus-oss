@@ -45,17 +45,6 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-ldap-model</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.sonatype.nexus.plugins</groupId>
-          <artifactId>nexus-ssl-model</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ssl-plugin</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -76,6 +65,11 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-extdirect-plugin</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
     </dependency>
 
     <!--
@@ -107,11 +101,6 @@
       <groupId>org.apache.directory.server</groupId>
       <artifactId>apacheds-test-framework</artifactId>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
     </dependency>
   </dependencies>
 
