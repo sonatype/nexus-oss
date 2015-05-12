@@ -23,11 +23,11 @@ import org.sonatype.nexus.capability.ValidationResult;
 import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.ValidatorSupport;
 import org.sonatype.nexus.capability.support.validator.DefaultValidationResult;
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
 import com.google.inject.assistedinject.Assisted;
-import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -72,7 +72,7 @@ public class IntegerValidator
   @Override
   public ValidationResult validate(final Map<String, String> properties) {
     String value = properties.get(key);
-    if (StringUtils.isNotEmpty(value)) {
+    if (!Strings2.isEmpty(value)) {
       try {
         Integer.valueOf(value);
       }
