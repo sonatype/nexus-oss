@@ -86,7 +86,7 @@ extends DirectComponentSupport
     if (!chain || chain.length == 0) {
       throw new IOException("Could not retrieve an SSL certificate from '${host}:${actualPort}'")
     }
-    return asCertificateXO(chain[0], isInNexusSSLTrustStore(chain[0]))
+    return asCertificateXO(chain[0], isInTrustStore(chain[0]))
   }
 
   /**
@@ -99,7 +99,7 @@ extends DirectComponentSupport
   CertificateXO details(final @NotNull @Valid CertificatePemXO pem) {
     try {
       Certificate certificate = decodePEMFormattedCertificate(pem.getValue())
-      return asCertificateXO(certificate, isInNexusSSLTrustStore(certificate))
+      return asCertificateXO(certificate, isInTrustStore(certificate))
     }
     catch (CertificateParsingException e) {
       ValidationResponse validations = new ValidationResponse()
@@ -127,7 +127,7 @@ extends DirectComponentSupport
     return certificateRetriever.retrieveCertificates(host, port)
   }
 
-  boolean isInNexusSSLTrustStore(final Certificate certificate) {
+  boolean isInTrustStore(final Certificate certificate) {
     try {
       return trustStore.getTrustedCertificate(calculateFingerprint(certificate)) != null
     }

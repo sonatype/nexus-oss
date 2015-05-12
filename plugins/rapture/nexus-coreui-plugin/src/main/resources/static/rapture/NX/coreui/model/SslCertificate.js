@@ -32,6 +32,6 @@ Ext.define('NX.coreui.model.SslCertificate', {
     {name: 'issuerOrganizationalUnit', type: 'string'},
     {name: 'issuedOn', type: 'int'},
     {name: 'expiresOn', type: 'int'},
-    {name: 'inNexusSSLTrustStore', type: 'boolean'}
+    {name: 'inTrustStore', type: 'boolean'}
   ]
 });

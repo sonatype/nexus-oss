@@ -35,5 +35,5 @@ public class CertificateXO
   String issuerOrganizationalUnit
   long issuedOn
   long expiresOn
-  boolean inNexusSSLTrustStore
+  boolean inTrustStore
 }

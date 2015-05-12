@@ -107,7 +107,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static CertificateXO asCertificateXO(final Certificate certificate, final boolean inNexusSSLTrustStore) {
+  static CertificateXO asCertificateXO(final Certificate certificate, final boolean inTrustStore) {
     String fingerprint = calculateFingerprint(certificate)
 
     if (certificate instanceof X509Certificate) {
@@ -129,7 +129,7 @@ extends DirectComponentSupport
           issuerOrganizationalUnit: issuerRdns.get("OU"),
           issuedOn: x509Certificate.getNotBefore().getTime(),
           expiresOn: x509Certificate.getNotAfter().getTime(),
-          inNexusSSLTrustStore: inNexusSSLTrustStore
+          inTrustStore: inTrustStore
       )
     }
     else {

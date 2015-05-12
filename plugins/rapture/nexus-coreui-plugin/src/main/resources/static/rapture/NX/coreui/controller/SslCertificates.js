@@ -332,7 +332,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
             button;
 
         if (model) {
-          if (model.get('inNexusSSLTrustStore')) {
+          if (model.get('inTrustStore')) {
             tbar.insert(0, {
               text: NX.I18n.get('ADMIN_SSL_DETAILS_REMOVE'),
               action: 'remove',
