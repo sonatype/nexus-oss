@@ -27,6 +27,7 @@ import com.sonatype.nexus.ssl.model.TrustStoreKey;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
 import org.sonatype.nexus.common.app.NexusStoppedEvent;
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.ldap.internal.connector.DefaultLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.FailoverLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.LdapConnector;
@@ -52,7 +53,6 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
-import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.ldap.model.LdapTrustStoreKey.ldapTrustStoreKey;
@@ -362,7 +362,7 @@ public class EnterpriseLdapManager
                                 LdapConfiguration ldapServer)
       throws LdapServerNotFoundException, AuthenticationException, LdapDAOException
   {
-    if (StringUtils.isEmpty(ldapServer.getMapping().getUserPasswordAttribute())) {
+    if (Strings2.isEmpty(ldapServer.getMapping().getUserPasswordAttribute())) {
       // auth with bind
       log.debug("Checking auth with bind for ldap user: {}", ldapUser.getUsername());
       ldapAuthenticator.authenticateUserWithBind(ldapUser, password, ldapConnector.getLdapContextFactory(),
