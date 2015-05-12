@@ -30,7 +30,7 @@ import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapUserException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.apache.commons.collections.CollectionUtils;
+import com.google.common.collect.Sets;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -174,7 +174,7 @@ public class DefaultLdapConnector
         }
 
         // searchUsers is expensive with static mapping, so check roles exist in LDAP first
-        if (isStaticGroupMapping(conf) && CollectionUtils.intersection( //
+        if (isStaticGroupMapping(conf) && Sets.intersection(
             roleIds, ldapGroupManager.getAllGroups(context, conf)).isEmpty()) {
           return new TreeSet<>();
         }

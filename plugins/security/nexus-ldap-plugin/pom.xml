@@ -67,11 +67,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-    </dependency>
-
     <!--
     FIXME: If this is promoted to DM in nexus/pom.xml, then tests will start to fail with JCE exceptions.
     -->
