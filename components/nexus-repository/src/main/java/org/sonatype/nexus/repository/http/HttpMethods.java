@@ -21,6 +21,8 @@ public class HttpMethods
 {
   private HttpMethods() {}
 
+  // http://ietf.org/rfc/rfc2616
+
   public static final String OPTIONS = "OPTIONS";
 
   public static final String GET = "GET";
@@ -37,5 +39,59 @@ public class HttpMethods
 
   public static final String CONNECT = "CONNECT";
 
+  // http://ietf.org/rfc/rfc2518
+
+  public static final String PROPFIND = "PROPFIND";
+
+  public static final String PROPPATCH = "PROPPATCH";
+
+  public static final String MKCOL = "MKCOL";
+
+  public static final String COPY = "COPY";
+
+  public static final String MOVE = "MOVE";
+
+  public static final String LOCK = "LOCK";
+
+  public static final String UNLOCK = "UNLOCK";
+
+  // http://ietf.org/rfc/rfc3253
+
+  public static final String VERSION_CONTROL = "VERSION-CONTROL";
+
+  public static final String REPORT = "REPORT";
+
+  public static final String CHECKOUT = "CHECKOUT";
+
+  public static final String CHECKIN = "CHECKIN";
+
+  public static final String UNCHECKOUT = "UNCHECKOUT";
+
+  public static final String MKWORKSPACE = "MKWORKSPACE";
+
+  public static final String UPDATE = "UPDATE";
+
+  public static final String LABEL = "LABEL";
+
+  public static final String MERGE = "MERGE";
+
+  public static final String BASELINE_CONTROL = "BASELINE-CONTROL";
+
+  public static final String MKACTIVITY = "MKACTIVITY";
+
+  // http://ietf.org/rfc/rfc3648
+
+  public static final String ORDERPATCH = "ORDERPATCH";
+
+  // http://ietf.org/rfc/rfc3744
+
+  public static final String ACL = "ACL";
+
+  // https://datatracker.ietf.org/drafts/draft-dusseault-http-patch/
+
   public static final String PATCH = "PATCH";
+
+  // https://datatracker.ietf.org/drafts/draft-reschke-webdav-search/
+
+  public static final String SEARCH = "SEARCH";
 }
