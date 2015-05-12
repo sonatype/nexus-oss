@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.maven.internal.maven2.metadata;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -103,7 +105,8 @@ public class MetadataUpdater
   /**
    * Writes/updates metadata, merges existing one, if any.
    */
-  public void update(final StorageTx tx, final MavenPath mavenPath, final Maven2Metadata metadata) {
+  @VisibleForTesting
+  void update(final StorageTx tx, final MavenPath mavenPath, final Maven2Metadata metadata) {
     checkNotNull(mavenPath);
     checkNotNull(metadata);
     try {
@@ -132,7 +135,8 @@ public class MetadataUpdater
   /**
    * Writes/overwrites metadata, replacing existing one, if any.
    */
-  public void replace(final StorageTx tx, final MavenPath mavenPath, final Maven2Metadata metadata) {
+  @VisibleForTesting
+  void replace(final StorageTx tx, final MavenPath mavenPath, final Maven2Metadata metadata) {
     checkNotNull(mavenPath);
     checkNotNull(metadata);
     try {
@@ -146,10 +150,16 @@ public class MetadataUpdater
   /**
    * Deletes metadata.
    */
-  public void delete(final StorageTx tx, final MavenPath mavenPath) {
+  @VisibleForTesting
+  void delete(final StorageTx tx, final MavenPath mavenPath) {
     checkNotNull(mavenPath);
     try {
-      mavenFacet.delete(tx, mavenPath, mavenPath.hash(HashType.SHA1), mavenPath.hash(HashType.MD5));
+      final ArrayList<MavenPath> paths = new ArrayList<>();
+      paths.add(mavenPath);
+      for (HashType hashType : HashType.values()) {
+        paths.add(mavenPath.hash(hashType));
+      }
+      mavenFacet.delete(tx, paths.toArray(new MavenPath[paths.size()]));
     }
     catch (IOException e) {
       throw Throwables.propagate(e);

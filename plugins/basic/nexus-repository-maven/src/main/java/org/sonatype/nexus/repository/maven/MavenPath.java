@@ -248,7 +248,7 @@ public class MavenPath
    * Returns {@code true} if this path represents an artifact POM.
    */
   public boolean isPom() {
-    return coordinates != null && coordinates.getExtension().equals("pom");
+    return coordinates != null && "pom".equals(coordinates.getExtension());
   }
 
   /**
@@ -369,7 +369,7 @@ public class MavenPath
   }
 
   /**
-   * Returns path pointing to given extension and optionally classifier within this same GAV. Only usable for artifact
+   * Returns path pointing to given extension and optional classifier within this same GAV. Only usable for artifact
    * paths, those having non-null {@link #getCoordinates()}.
    */
   @Nonnull
@@ -391,8 +391,7 @@ public class MavenPath
         null
     );
     // strip ".ext"
-    String newPath = origin.path
-        .substring(0, origin.path.length() - (origin.getCoordinates().getExtension().length() + 1));
+    String newPath = origin.path.substring(0, origin.path.length() - (origin.coordinates.extension.length() + 1));
     if (origin.coordinates.classifier != null) {
       // strip "-classifier"
       newPath = newPath.substring(0, newPath.length() - origin.coordinates.classifier.length() + 1);

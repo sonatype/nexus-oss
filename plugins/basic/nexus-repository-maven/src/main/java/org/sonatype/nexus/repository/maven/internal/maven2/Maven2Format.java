@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.maven.internal.maven2;
 
+import java.util.Locale;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -47,13 +49,13 @@ public class Maven2Format
    * {@link DateTimeFormatter} for dotted timestamps used in Maven2 repository metadata.
    */
   public static final DateTimeFormatter METADATA_DOTTED_TIMESTAMP = DateTimeFormat.forPattern("YYYYMMdd.HHmmss")
-      .withZoneUTC();
+      .withZoneUTC().withLocale(Locale.ENGLISH);
 
   /**
    * {@link DateTimeFormatter} for dotless timestamps used in Maven2 repository metadata.
    */
   public static final DateTimeFormatter METADATA_DOTLESS_TIMESTAMP = DateTimeFormat.forPattern("YYYYMMddHHmmss")
-      .withZoneUTC();
+      .withZoneUTC().withLocale(Locale.ENGLISH);
 
   /**
    * Content Type of Maven2 checksum files (sha1, md5).

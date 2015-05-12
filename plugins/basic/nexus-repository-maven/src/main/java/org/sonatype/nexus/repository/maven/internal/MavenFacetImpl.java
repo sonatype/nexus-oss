@@ -193,8 +193,7 @@ public class MavenFacetImpl
   @Nullable
   @Override
   public Content get(final StorageTx tx, final MavenPath path) throws IOException {
-    final Asset asset;
-    asset = findAsset(tx, tx.getBucket(), path);
+    final Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
       return null;
     }
@@ -251,10 +250,8 @@ public class MavenFacetImpl
   private Content putArtifact(final StorageTx tx, final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
-    Component component;
-    Asset asset;
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
-    component = findComponent(tx, tx.getBucket(), path);
+    Component component = findComponent(tx, tx.getBucket(), path);
     if (component == null) {
       // Create and set top-level properties
       component = tx.createComponent(tx.getBucket(), getRepository().getFormat())
@@ -272,7 +269,7 @@ public class MavenFacetImpl
       tx.saveComponent(component);
     }
 
-    asset = selectComponentAsset(tx, component, path);
+    Asset asset = selectComponentAsset(tx, component, path);
     if (asset == null) {
       asset = tx.createAsset(tx.getBucket(), component);
 
@@ -328,7 +325,7 @@ public class MavenFacetImpl
         final String contentType = determineContentType(path, supplier, payload.getContentType());
         try (InputStream is = supplier.get()) {
           final BlobRef blobRef = tx.setBlob(is, headers, asset, HashType.ALGORITHMS, contentType);
-          log.debug("Asset {} have blob {}", path.getPath(), blobRef);
+          log.debug("Asset {} has blob {}", path.getPath(), blobRef);
         }
       }
     }

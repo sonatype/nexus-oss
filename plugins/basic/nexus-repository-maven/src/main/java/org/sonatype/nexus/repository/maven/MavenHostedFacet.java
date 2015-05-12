@@ -30,7 +30,7 @@ public interface MavenHostedFacet
    *
    * @param groupId     scope the work to given groupId.
    * @param artifactId  scope the work to given artifactId (groupId must be given).
-   * @param baseVersion scope the work to given baseVersion (groupId and artifactId must ge given).
+   * @param baseVersion scope the work to given baseVersion (groupId and artifactId must be given).
    */
   void rebuildMetadata(@Nullable String groupId,
                        @Nullable String artifactId,

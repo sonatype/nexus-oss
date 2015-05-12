@@ -92,7 +92,7 @@ public class MetadataRebuilder
   /**
    * Rebuilds/updates Maven metadata.
    *
-   * @param repository  The repository who's metadata needs rebuild (Maven2 format, Hosted type only).
+   * @param repository  The repository whose metadata needs rebuild (Maven2 format, Hosted type only).
    * @param update      if {@code true}, updates existing metadata, otherwise overwrites them with newly generated
    *                    ones.
    * @param groupId     scope the work to given groupId.
@@ -106,14 +106,36 @@ public class MetadataRebuilder
                       @Nullable final String baseVersion)
   {
     checkNotNull(repository);
-    final StringBuilder sql = new StringBuilder(
+    final StringBuilder sql = new StringBuilder();
+    final Map<String, Object> sqlParams = Maps.newHashMap();
+    buildSql(sql, sqlParams, groupId, artifactId, baseVersion);
+
+    try (StorageTx tx = repository.facet(StorageFacet.class).openTx()) {
+      final ORID bucketOrid = bucketEntityAdapter.recordIdentity(tx.getBucket());
+      sqlParams.put("bucket", bucketOrid);
+    }
+    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
+      final Worker worker = new Worker(repository, update, sql.toString(), sqlParams);
+      worker.rebuildMetadata(db);
+    }
+  }
+
+  /**
+   * Builds up SQL and populates parameters map for it based on passed in parameters.
+   */
+  private void buildSql(final StringBuilder sql,
+                        final Map<String, Object> sqlParams,
+                        @Nullable final String groupId,
+                        @Nullable final String artifactId,
+                        @Nullable final String baseVersion)
+  {
+    sql.append(
         "SELECT " +
             "group as groupId, " +
             "name as artifactId, " +
             "set(attributes.maven2.baseVersion) as baseVersions " +
             "FROM component WHERE bucket=:bucket"
     );
-    final Map<String, Object> sqlParams = Maps.newHashMap();
     if (!Strings.isNullOrEmpty(groupId)) {
       sql.append(" and group=:groupId");
       sqlParams.put("groupId", groupId);
@@ -127,18 +149,10 @@ public class MetadataRebuilder
       }
     }
     sql.append(" GROUP BY group, name");
-    try (StorageTx tx = repository.facet(StorageFacet.class).openTx()) {
-      final ORID bucketOrid = bucketEntityAdapter.recordIdentity(tx.getBucket());
-      sqlParams.put("bucket", bucketOrid);
-    }
-    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
-      final Worker worker = new Worker(repository, update, sql.toString(), sqlParams);
-      worker.rebuildMetadata(db);
-    }
   }
 
   /**
-   * Inner class (non static) that encapsulates the work, as metadata builder is stateful.
+   * Inner class that encapsulates the work, as metadata builder is stateful.
    */
   private static class Worker
       extends ComponentSupport
@@ -287,8 +301,7 @@ public class MetadataRebuilder
               null // order by
           );
           for (Component component : components) {
-            final Iterable<Asset> assets = tx.browseAssets(component);
-            for (Asset asset : assets) {
+            for (Asset asset : tx.browseAssets(component)) {
               final MavenPath mavenPath = mavenPathParser.parsePath(
                   asset.formatAttributes().require(StorageFacet.P_PATH, String.class)
               );
