@@ -12,9 +12,11 @@
  */
 package org.sonatype.nexus.timeline.internal.ui
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.shiro.authz.annotation.RequiresPermissions
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+
+import org.sonatype.nexus.common.app.BaseUrlHolder
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.PagedResponse
@@ -22,11 +24,10 @@ import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.timeline.TimelinePlugin
 import org.sonatype.nexus.timeline.feeds.FeedSource
 import org.sonatype.nexus.timeline.feeds.rest.FeedContentRenderer
-import org.sonatype.nexus.web.BaseUrlHolder
 
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.shiro.authz.annotation.RequiresPermissions
 
 /**
  * Feed {@link DirectComponent}.

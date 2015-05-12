@@ -18,8 +18,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.events.Asynchronous;
-import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.common.event.Asynchronous;
+import org.sonatype.nexus.common.event.EventSubscriber;
 import org.sonatype.nexus.security.ClientInfo;
 import org.sonatype.nexus.security.anonymous.AnonymousManager;
 import org.sonatype.nexus.security.authc.NexusAuthenticationEvent;

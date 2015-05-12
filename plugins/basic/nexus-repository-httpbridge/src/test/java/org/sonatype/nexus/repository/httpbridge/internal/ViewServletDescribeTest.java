@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.Description;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionHelper;
@@ -25,7 +26,6 @@ import org.sonatype.nexus.repository.view.Parameters;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.ViewFacet;
-import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;

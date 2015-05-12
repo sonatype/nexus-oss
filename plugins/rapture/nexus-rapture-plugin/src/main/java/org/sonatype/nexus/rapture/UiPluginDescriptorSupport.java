@@ -40,7 +40,7 @@ public class UiPluginDescriptorSupport
 
   public UiPluginDescriptorSupport(final PluginIdentity owner) {
     checkNotNull(owner);
-    this.pluginId = owner.getCoordinates().getArtifactId();
+    this.pluginId = owner.getArtifactId();
   }
 
   @Override

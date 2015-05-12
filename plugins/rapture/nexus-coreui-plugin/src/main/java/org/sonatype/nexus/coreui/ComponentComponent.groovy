@@ -54,9 +54,7 @@ extends DirectComponentSupport
   }
 
   @Validate
-  List<AssetXO> readAssets(final @NotNull(message = '[repositoryName] may not be null') String repositoryName,
-                           final @NotNull(message = '[componentId] may not be null') String componentId)
-  {
+  List<AssetXO> readAssets(final @NotNull String repositoryName, final @NotNull String componentId) {
     Repository repository = repositoryManager.get(repositoryName)
     if (!repository.configuration.online) {
       return null

@@ -47,19 +47,21 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-odata4j</artifactId>
-      <version>0.0.7</version>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-servlet</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-odata4j</artifactId>
+    </dependency>
+
+    <!--
+    FIXME: Resolve usage of plexus-utils for xml parsing
+    -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-core</artifactId>
     </dependency>
 
     <dependency>

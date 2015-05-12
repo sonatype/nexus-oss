@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.sonatype.nexus.common.app.BaseUrlManager;
 import org.sonatype.nexus.quartz.JobSupport;
 import org.sonatype.nexus.scheduling.Cancelable;
 import org.sonatype.nexus.scheduling.Task;
@@ -29,7 +30,6 @@ import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.TaskInterruptedException;
 import org.sonatype.nexus.scheduling.events.TaskEventCanceled;
-import org.sonatype.nexus.web.BaseUrlDetector;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Predicate;
@@ -79,7 +79,7 @@ public class NexusTaskJobSupport
 
   private final TaskFactory taskFactory;
 
-  private final BaseUrlDetector baseUrlDetector;
+  private final BaseUrlManager baseUrlManager;
 
   private NexusTaskInfo nexusTaskInfo;
 
@@ -91,12 +91,12 @@ public class NexusTaskJobSupport
   public NexusTaskJobSupport(final EventBus eventBus,
                              final Provider<QuartzTaskExecutorSPI> quartzNexusSchedulerSPIProvider,
                              final TaskFactory taskFactory,
-                             final BaseUrlDetector baseUrlDetector)
+                             final BaseUrlManager baseUrlManager)
   {
     this.eventBus = checkNotNull(eventBus);
     this.quartzNexusSchedulerSPIProvider = checkNotNull(quartzNexusSchedulerSPIProvider);
     this.taskFactory = checkNotNull(taskFactory);
-    this.baseUrlDetector = checkNotNull(baseUrlDetector);
+    this.baseUrlManager = checkNotNull(baseUrlManager);
   }
 
   @Override
@@ -111,7 +111,7 @@ public class NexusTaskJobSupport
       future.setJobExecutingThread(Thread.currentThread());
 
       // detect and set the application base-url
-      baseUrlDetector.set();
+      baseUrlManager.detectAndHoldUrl();
 
       // create TaskConfiguration, and using that the Task
       final TaskConfiguration taskConfiguration = toTaskConfiguration(context.getJobDetail().getJobDataMap());

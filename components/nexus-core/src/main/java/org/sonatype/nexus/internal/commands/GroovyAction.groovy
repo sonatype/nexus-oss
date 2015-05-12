@@ -16,8 +16,8 @@ import javax.inject.Inject
 import javax.inject.Named
 
 import org.sonatype.nexus.commands.Complete
-import org.sonatype.nexus.common.dirs.ApplicationDirectories
-import org.sonatype.nexus.common.guice.GlobalComponentLookupHelper
+import org.sonatype.nexus.common.app.ApplicationDirectories
+import org.sonatype.nexus.common.app.GlobalComponentLookupHelper
 
 import org.apache.karaf.shell.commands.Argument
 import org.apache.karaf.shell.commands.Command

@@ -47,6 +47,11 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -77,7 +82,13 @@
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
         <configuration>
-          <addBundlesToPrimaryFeature>false</addBundlesToPrimaryFeature>
+          <!--
+          patched directjngine and gson are embedded in the plugin
+          -->
+          <excludedArtifactIds combine.children="append">
+            <id>directjngine</id>
+            <id>gson</id>
+          </excludedArtifactIds>
         </configuration>
       </plugin>
     </plugins>

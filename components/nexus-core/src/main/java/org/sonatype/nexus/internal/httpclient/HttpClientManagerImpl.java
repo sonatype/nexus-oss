@@ -21,11 +21,11 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.app.NexusInitializedEvent;
+import org.sonatype.nexus.common.app.NexusStoppedEvent;
+import org.sonatype.nexus.common.event.EventSubscriber;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
-import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.events.NexusInitializedEvent;
-import org.sonatype.nexus.events.NexusStoppedEvent;
 import org.sonatype.nexus.httpclient.GlobalHttpClientConfigurationChanged;
 import org.sonatype.nexus.httpclient.HttpClientConfigurationStore;
 import org.sonatype.nexus.httpclient.HttpClientManager;

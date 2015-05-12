@@ -18,9 +18,9 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.CapabilityRegistryEvent.Ready;
 import org.sonatype.nexus.capability.internal.storage.OrientCapabilityStorage;
-import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.events.NexusInitializedEvent;
-import org.sonatype.nexus.events.NexusStoppingEvent;
+import org.sonatype.nexus.common.app.NexusInitializedEvent;
+import org.sonatype.nexus.common.app.NexusStoppingEvent;
+import org.sonatype.nexus.common.event.EventSubscriber;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;

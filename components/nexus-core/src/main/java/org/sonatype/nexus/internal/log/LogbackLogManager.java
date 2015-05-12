@@ -35,13 +35,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.dirs.ApplicationDirectories;
+import org.sonatype.nexus.common.app.ApplicationDirectories;
+import org.sonatype.nexus.common.app.NexusInitializedEvent;
 import org.sonatype.nexus.common.io.FileSupport;
 import org.sonatype.nexus.common.io.LimitedInputStream;
 import org.sonatype.nexus.common.io.StreamSupport;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
-import org.sonatype.nexus.events.NexusInitializedEvent;
 import org.sonatype.nexus.log.LogConfigurationCustomizer;
 import org.sonatype.nexus.log.LogConfigurationCustomizer.Configuration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;

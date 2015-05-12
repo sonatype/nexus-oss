@@ -82,7 +82,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:ssl:truststore:create')
   @Validate(groups = [Create.class, Default.class])
-  CertificateXO create(final @NotNull(message = '[pem] may not be null') @Valid CertificatePemXO pem) {
+  CertificateXO create(final @NotNull @Valid CertificatePemXO pem) {
     try {
       Certificate certificate = CertificateUtil.decodePEMFormattedCertificate(pem.value)
       trustStore.importTrustCertificate(certificate, calculateFingerprint(certificate))
@@ -103,7 +103,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:ssl:truststore:delete')
   @Validate
-  void remove(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void remove(final @NotEmpty String id) {
     try {
       trustStore.removeTrustCertificate(id)
     }

@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.dirs.ApplicationDirectories;
+import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.quartz.QuartzPlugin;
 import org.sonatype.sisu.goodies.common.ComponentSupport;

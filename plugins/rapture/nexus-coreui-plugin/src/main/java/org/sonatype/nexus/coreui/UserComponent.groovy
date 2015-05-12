@@ -129,7 +129,7 @@ class UserComponent
   @RequiresAuthentication
   @RequiresPermissions('security:users:create')
   @Validate(groups = [Create.class, Default.class])
-  UserXO create(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
+  UserXO create(final @NotNull @Valid UserXO userXO) {
     def user = new User(
         userId: userXO.userId,
         source: DEFAULT_SOURCE,
@@ -153,7 +153,7 @@ class UserComponent
   @RequiresAuthentication
   @RequiresPermissions('security:users:update')
   @Validate(groups = [Update.class, Default.class])
-  UserXO update(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
+  UserXO update(final @NotNull @Valid UserXO userXO) {
     asUserXO(securitySystem.updateUser(new User(
         userId: userXO.userId,
         version: userXO.version,
@@ -177,9 +177,7 @@ class UserComponent
   @RequiresAuthentication
   @RequiresPermissions('security:users:update')
   @Validate(groups = [Update.class, Default.class])
-  UserXO updateRoleMappings(
-      final @NotNull(message = '[UserRoleMappingsXO] may not be null') @Valid UserRoleMappingsXO userRoleMappingsXO)
-  {
+  UserXO updateRoleMappings(final @NotNull @Valid UserRoleMappingsXO userRoleMappingsXO) {
     def mappedRoles = userRoleMappingsXO.roles
     if (mappedRoles?.size()) {
       User user = securitySystem.getUser(userRoleMappingsXO.userId, userRoleMappingsXO.realm)
@@ -208,9 +206,7 @@ class UserComponent
   @RequiresUser
   @RequiresAuthentication
   @Validate
-  UserAccountXO updateAccount(
-      final @NotNull(message = '[userAccountXO] may not be null') @Valid UserAccountXO userAccountXO)
-  {
+  UserAccountXO updateAccount(final @NotNull @Valid UserAccountXO userAccountXO) {
     User user = securitySystem.currentUser().with {
       firstName = userAccountXO.firstName
       lastName = userAccountXO.lastName
@@ -232,9 +228,9 @@ class UserComponent
   @RequiresAuthentication
   @RequiresPermissions('security:userschangepw:create')
   @Validate
-  void changePassword(final @NotEmpty(message = '[authToken] may not be empty') String authToken,
-                      final @NotEmpty(message = '[userId] may not be empty') String userId,
-                      final @NotEmpty(message = '[password] may not be empty') String password)
+  void changePassword(final @NotEmpty String authToken,
+                      final @NotEmpty String userId,
+                      final @NotEmpty String password)
   {
     if (authTickets.redeemTicket(authToken)) {
       if (isAnonymousUser(userId)) {
@@ -256,9 +252,7 @@ class UserComponent
   @RequiresAuthentication
   @RequiresPermissions('security:users:delete')
   @Validate
-  void remove(final @NotEmpty(message = '[id] may not be empty') String id,
-              final @NotEmpty(message = '[source] may not be empty') String source)
-  {
+  void remove(final @NotEmpty String id, final @NotEmpty String source) {
     // TODO check if source is required or we always delete from default realm
     if (isAnonymousUser(id)) {
       throw new Exception("User ${id} cannot be deleted, since is marked as the Anonymous user")
