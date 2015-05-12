@@ -27,9 +27,6 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
-import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
-import org.sonatype.nexus.repository.storage.ComponentEvent;
-import org.sonatype.nexus.repository.storage.ComponentUpdatedEvent;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -45,12 +42,10 @@ import org.eclipse.aether.version.VersionScheme;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import static com.sonatype.nexus.repository.nuget.internal.NugetProperties.*;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -59,7 +54,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -82,17 +76,16 @@ public class NugetGalleryFacetImplPutTest
 
   @Test
   public void putCreatesPackageMetadataAndBlob() throws Exception {
-    putPackageMetadataAndBlob(true, ComponentCreatedEvent.class);
+    putPackageMetadataAndBlob(true);
   }
 
   @Test
   public void putUpdatesPackageMetadataAndBlob() throws Exception {
-    putPackageMetadataAndBlob(false, ComponentUpdatedEvent.class);
+    putPackageMetadataAndBlob(false);
   }
 
   @SuppressWarnings("unchecked")
-  private void putPackageMetadataAndBlob(final boolean isNew,
-                                         final Class eventClass) throws Exception
+  private void putPackageMetadataAndBlob(final boolean isNew) throws Exception
   {
     final NugetGalleryFacetImpl galleryFacet = buildSpy(true);
 
@@ -113,12 +106,6 @@ public class NugetGalleryFacetImplPutTest
     galleryFacet.put(packageStream);
 
     verify(galleryFacet).maintainAggregateInfo(tx, "SONATYPE.TEST");
-    ArgumentCaptor<ComponentEvent> o = ArgumentCaptor.forClass(ComponentEvent.class);
-    verify(eventBus, times(1)).post(o.capture());
-    ComponentEvent actual = o.getValue();
-    assertThat(actual, instanceOf(eventClass));
-    assertThat(actual.getComponent(), is(component));
-    assertThat(actual.getRepository(), is(repository));
   }
 
   @Test
