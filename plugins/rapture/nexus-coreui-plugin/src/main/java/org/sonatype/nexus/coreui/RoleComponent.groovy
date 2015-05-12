@@ -107,7 +107,7 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('security:roles:read')
   @Validate
-  List<RoleXO> readFromSource(final @NotEmpty(message = '[source] may not be empty') String source) {
+  List<RoleXO> readFromSource(final @NotEmpty String source) {
     return securitySystem.listRoles(source).collect { input ->
       return asRoleXO(input)
     }
@@ -122,7 +122,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:roles:create')
   @Validate(groups = [Create.class, Default.class])
-  RoleXO create(final @NotNull(message = '[roleXO] may not be null') @Valid RoleXO roleXO) {
+  RoleXO create(final @NotNull @Valid RoleXO roleXO) {
     return asRoleXO(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).addRole(
         new Role(
             roleId: roleXO.id,
@@ -145,7 +145,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:roles:update')
   @Validate(groups = [Update.class, Default.class])
-  RoleXO update(final @NotNull(message = '[roleXO] may not be null') @Valid RoleXO roleXO) {
+  RoleXO update(final @NotNull @Valid RoleXO roleXO) {
     return asRoleXO(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).updateRole(
         new Role(
             roleId: roleXO.id,
@@ -168,7 +168,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:roles:delete')
   @Validate
-  void remove(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void remove(final @NotEmpty String id) {
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deleteRole(id)
   }
 

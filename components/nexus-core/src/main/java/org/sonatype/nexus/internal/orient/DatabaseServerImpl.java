@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.dirs.ApplicationDirectories;
+import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
 import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.nexus.orient.DatabaseServer;
@@ -96,6 +96,7 @@ public class DatabaseServerImpl
     // Log global configuration
     if (log.isDebugEnabled()) {
       StringWriter buff = new StringWriter();
+      // FIXME: Remove need for commons-io WriterOutputStream
       OGlobalConfiguration.dumpConfiguration(new PrintStream(new WriterOutputStream(buff), true));
       log.debug("Global configuration:\n{}", buff);
     }

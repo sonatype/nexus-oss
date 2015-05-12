@@ -12,33 +12,92 @@
  */
 package org.sonatype.nexus.kenai.internal;
 
-import org.sonatype.nexus.httpclient.HttpClientManager;
-import org.sonatype.nexus.kenai.AbstractKenaiRealmTest;
+import java.io.IOException;
+import java.util.List;
 
+import javax.servlet.ServletContext;
+
+import org.sonatype.nexus.common.app.AbstractApplicationStatusSource;
+import org.sonatype.nexus.common.app.ApplicationStatusSource;
+import org.sonatype.nexus.common.app.SystemStatus;
+import org.sonatype.nexus.httpclient.HttpClientManager;
+import org.sonatype.nexus.kenai.Kenai;
+import org.sonatype.nexus.kenai.KenaiConfiguration;
+import org.sonatype.nexus.security.WebSecurityModule;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.fluent.Server;
+
+import com.google.inject.Binder;
+import com.google.inject.Module;
 import junit.framework.Assert;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class KenaiRealmTest
-    extends AbstractKenaiRealmTest
+    extends NexusTestSupport
 {
-  private KenaiRealm getRealm()
-      throws Exception
-  {
+  protected final String username = "test-user";
+
+  protected final String password = "test-user123";
+
+  protected final static String DEFAULT_ROLE = "default-url-role";
+
+  protected static final String AUTH_APP_NAME = "auth_app";
+
+  @Rule
+  public ServerResource server = new ServerResource(
+      Server.server().serve("/api/login/*").withServlet(new KenaiMockAuthcServlet()).getServerProvider());
+
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new WebSecurityModule(mock(ServletContext.class)));
+    modules.add(new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        ApplicationStatusSource statusSource = mock(AbstractApplicationStatusSource.class);
+        when(statusSource.getSystemStatus()).thenReturn(new SystemStatus());
+        binder.bind(ApplicationStatusSource.class).toInstance(statusSource);
+
+        binder.bind(Kenai.class).toInstance(mockKenai());
+      }
+    });
+  }
+
+  protected Kenai mockKenai() {
+    KenaiConfiguration kenaiConfiguration = new KenaiConfiguration();
+    kenaiConfiguration.setBaseUrl(server.getServerProvider().getUrl() + AUTH_APP_NAME + "/");
+    kenaiConfiguration.setDefaultRole(DEFAULT_ROLE);
+
+    Kenai kenai = mock(Kenai.class);
+    when(kenai.isEnabled()).thenReturn(true);
+    try {
+      when(kenai.getConfiguration()).thenReturn(kenaiConfiguration);
+    }
+    catch (IOException e) {
+      // not way, we are mocking
+    }
+    return kenai;
+  }
+
+  private KenaiRealm getRealm() throws Exception {
     HttpClientManager httpClientManager = Mockito.mock(HttpClientManager.class);
     Mockito.when(httpClientManager.create()).thenReturn(new DefaultHttpClient());
     return new KenaiRealm(mockKenai(), httpClientManager);
   }
 
   @Test
-  public void testAuthenticate()
-      throws Exception
-  {
+  public void testAuthenticate() throws Exception {
     KenaiRealm kenaiRealm = this.getRealm();
 
     AuthenticationInfo info = kenaiRealm.getAuthenticationInfo(new UsernamePasswordToken(username, password));
@@ -46,17 +105,13 @@ public class KenaiRealmTest
   }
 
   @Test
-  public void testAuthorize()
-      throws Exception
-  {
+  public void testAuthorize() throws Exception {
     KenaiRealm kenaiRealm = this.getRealm();
     kenaiRealm.checkRole(new SimplePrincipalCollection(username, kenaiRealm.getName()), DEFAULT_ROLE);
   }
 
   @Test
-  public void testAuthFail()
-      throws Exception
-  {
+  public void testAuthFail() throws Exception {
     KenaiRealm kenaiRealm = this.getRealm();
 
     try {
@@ -69,14 +124,12 @@ public class KenaiRealmTest
   }
 
   @Test
-  public void testAuthFailAuthFail()
-      throws Exception
-  {
+  public void testAuthFailAuthFail() throws Exception {
     KenaiRealm kenaiRealm = this.getRealm();
 
     try {
-      Assert.assertNotNull(kenaiRealm.getAuthenticationInfo(new UsernamePasswordToken("unknown-user-foo-bar",
-          "invalid")));
+      Assert.assertNotNull(kenaiRealm.getAuthenticationInfo(
+          new UsernamePasswordToken("unknown-user-foo-bar", "invalid")));
       Assert.fail("Expected: AccountException to be thrown");
     }
     catch (AccountException e) {

@@ -25,10 +25,10 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.app.BaseUrlHolder;
+import org.sonatype.nexus.common.app.SystemStatus;
 import org.sonatype.nexus.rapture.UiPluginDescriptor;
 import org.sonatype.nexus.rapture.internal.ui.StateComponent;
-import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.webresources.GeneratedWebResource;
 import org.sonatype.nexus.webresources.WebResource;
 import org.sonatype.nexus.webresources.WebResourceBundle;

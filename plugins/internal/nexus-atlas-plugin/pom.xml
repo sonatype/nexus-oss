@@ -63,6 +63,18 @@
     </dependency>
 
     <dependency>
+      <groupId>com.codahale.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.palominolabs.metrics</groupId>
+      <artifactId>metrics-guice</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.karaf.bundle</groupId>
       <artifactId>org.apache.karaf.bundle.core</artifactId>
       <scope>provided</scope>

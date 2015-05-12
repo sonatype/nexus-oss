@@ -22,7 +22,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.app.SystemStatus;
 import org.sonatype.nexus.wonderland.WonderlandPlugin;
 import org.sonatype.nexus.wonderland.model.StatusXO;
 import org.sonatype.siesta.Resource;

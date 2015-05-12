@@ -8,10 +8,26 @@
  * cls: 'x-form-readonly'
  */
 
-.x-form-field[readonly].x-form-field:not([role="combobox"]) {
+@mixin nx-form-field-readonly {
   color: $color-dark-gray;
   background-color: $color-smoke;
-  opacity: 1;
+  opacity: 1;  
+}
+
+.x-form-field[readonly].x-form-field:not([role="combobox"]) {
+  @include nx-form-field-readonly;
+}
+
+/**
+* editable = false on a combo sets readonly already, so use disabled to achieve the same effect
+*/
+.nx-combo-disabled {
+  input {
+    @include nx-form-field-readonly;
+  }
+  .x-trigger-cell {
+    display: none;
+  }
 }
 
 .nx-log-viewer-field,
@@ -41,17 +57,6 @@
 
 .nx-clear-both {
   clear: both;
-}
-
-/**
- * De-emphasizes fields that will never be edited
- */
-.x-field.nx-no-border {
-  .x-form-field[readonly] {
-    border: none !important;
-    background-color: white !important;
-    padding-left: 0;
-  }
 }
 
 /**

@@ -17,7 +17,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.app.SystemStatus;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;

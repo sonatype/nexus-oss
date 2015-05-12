@@ -39,6 +39,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-mime</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.inject.extensions</groupId>
       <artifactId>guice-assistedinject</artifactId>
     </dependency>

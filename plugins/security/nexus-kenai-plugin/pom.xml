@@ -47,8 +47,17 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-testsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!--
+    FIXME: Needed for injected UT that are really IT
+    -->
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
+      <artifactId>nexus-core</artifactId>
       <scope>test</scope>
     </dependency>
 
