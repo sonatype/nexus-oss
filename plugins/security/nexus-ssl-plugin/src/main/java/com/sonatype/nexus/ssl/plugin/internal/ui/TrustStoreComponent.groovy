@@ -35,7 +35,6 @@ import org.sonatype.nexus.validation.ValidationResponse
 import org.sonatype.nexus.validation.ValidationResponseException
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil
-import org.sonatype.sisu.goodies.ssl.keystore.KeyNotFoundException
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
@@ -103,12 +102,7 @@ extends DirectComponentSupport
   @RequiresPermissions('nexus:ssl:truststore:delete')
   @Validate
   void remove(final @NotEmpty String id) {
-    try {
-      trustStore.removeTrustCertificate(id)
-    }
-    catch (KeyNotFoundException e) {
-      throw new Exception("Certificate with fingerprint '${id}' not found")
-    }
+    trustStore.removeTrustCertificate(id)
   }
 
   static CertificateXO asCertificateXO(final Certificate certificate, final boolean inNexusSSLTrustStore)
