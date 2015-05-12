@@ -34,6 +34,7 @@ import javax.naming.ldap.LdapName;
 import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Strings;
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -104,7 +105,7 @@ public class DefaultLdapGroupDAO
         if (Strings2.isEmpty(configuration.getUserMemberOfAttribute())) {
           // static groups
           String groupIdAttribute = configuration.getGroupIdAttribute();
-          String groupBaseDn = StringUtils.defaultString(configuration.getGroupBaseDn(), "");
+          String groupBaseDn = Strings.nullToEmpty(configuration.getGroupBaseDn());
 
           String filter = "(objectClass=" + configuration.getGroupObjectClass() + ")";
 
@@ -130,7 +131,7 @@ public class DefaultLdapGroupDAO
 
           SearchControls ctls = this.getBaseSearchControls(new String[]{memberOfAttribute}, true);
 
-          String userBaseDn = StringUtils.defaultString(configuration.getUserBaseDn(), "");
+          String userBaseDn = Strings.nullToEmpty(configuration.getUserBaseDn());
 
           Set<String> roles = this.getGroupIdsFromSearch(
               context.search(userBaseDn, filter, ctls),
@@ -207,7 +208,7 @@ public class DefaultLdapGroupDAO
   {
     String groupIdAttribute = configuration.getGroupIdAttribute();
     String groupMemberAttribute = configuration.getGroupMemberAttribute();
-    String groupBaseDn = StringUtils.defaultString(configuration.getGroupBaseDn(), "");
+    String groupBaseDn = Strings.nullToEmpty(configuration.getGroupBaseDn());
 
     String groupMemberFormat = configuration.getGroupMemberFormat();
 
@@ -217,7 +218,7 @@ public class DefaultLdapGroupDAO
     filterValues.add(groupIdAttribute);
 
     if (groupMemberFormat != null) {
-      String member = StringUtils.replace( groupMemberFormat, "${username}", "{2}" );
+      String member = StringUtils.replace(groupMemberFormat, "${username}", "{2}");
       if (groupMemberFormat.contains("${username}")) {
         filterValues.add(nameEncode(username));
       }
@@ -288,7 +289,7 @@ public class DefaultLdapGroupDAO
     if (Strings2.isEmpty(configuration.getUserMemberOfAttribute())) {
       // static groups
       String groupIdAttribute = configuration.getGroupIdAttribute();
-      String groupBaseDn = StringUtils.defaultString(configuration.getGroupBaseDn(), "");
+      String groupBaseDn = Strings.nullToEmpty(configuration.getGroupBaseDn());
 
       String filter = "(&(objectClass=" + configuration.getGroupObjectClass() + ") (" + groupIdAttribute
           + "=" + groupId + "))";
@@ -326,7 +327,7 @@ public class DefaultLdapGroupDAO
 
       SearchControls ctls = this.getBaseSearchControls(new String[]{memberOfAttribute}, true);
 
-      String userBaseDn = StringUtils.defaultString(configuration.getUserBaseDn(), "");
+      String userBaseDn = Strings.nullToEmpty(configuration.getUserBaseDn());
 
       Set<String> roles;
       try {
