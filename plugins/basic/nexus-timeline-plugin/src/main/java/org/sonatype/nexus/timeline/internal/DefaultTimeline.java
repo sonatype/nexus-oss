@@ -24,8 +24,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.events.NexusInitializedEvent;
-import org.sonatype.nexus.events.NexusStoppedEvent;
+import org.sonatype.nexus.common.app.NexusInitializedEvent;
+import org.sonatype.nexus.common.app.NexusStoppedEvent;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.DatabasePool;
 import org.sonatype.nexus.orient.OIndexNameBuilder;

@@ -59,7 +59,7 @@ public class DescriptionRendererImpl
     TemplateParameters params = new TemplateParameters();
     params.setAll(description.getParameters());
     params.set("items", description.getItems());
-
+    params.set("esc", new EscapeHelper());
     return templateEngine.render(this, template, params);
   }
 

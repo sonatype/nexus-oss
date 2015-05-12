@@ -17,8 +17,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
-import org.sonatype.nexus.events.NexusStartedEvent;
-import org.sonatype.nexus.events.NexusStoppedEvent;
+import org.sonatype.nexus.common.app.NexusStartedEvent;
+import org.sonatype.nexus.common.app.NexusStoppedEvent;
 import org.sonatype.nexus.repository.config.ConfigurationStore;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;

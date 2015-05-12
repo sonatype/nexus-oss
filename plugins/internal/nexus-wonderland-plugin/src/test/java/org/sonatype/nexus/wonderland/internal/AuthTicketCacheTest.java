@@ -13,10 +13,10 @@
 package org.sonatype.nexus.wonderland.internal;
 
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.apache.commons.lang.mutable.MutableBoolean;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,12 +51,12 @@ public class AuthTicketCacheTest
 
   @Test
   public void testExpiredRemoveIsFalse() {
-    final MutableBoolean expired = new MutableBoolean(false);
+    final AtomicBoolean expired = new AtomicBoolean(false);
     AuthTicketCache tokens = new AuthTicketCache()
     {
       @Override
       protected boolean isTokenExpired(long now, Entry<String, Long> entry) {
-        return expired.booleanValue();
+        return expired.get();
       }
     };
 
@@ -65,7 +65,7 @@ public class AuthTicketCacheTest
 
     tokens.add("foo");
     // simulate expire
-    expired.setValue(true);
+    expired.set(true);
     assertThat(tokens.remove("foo"), is(false));
   }
 }

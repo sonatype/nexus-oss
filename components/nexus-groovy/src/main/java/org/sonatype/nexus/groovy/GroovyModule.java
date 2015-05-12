@@ -20,7 +20,7 @@ import com.google.inject.name.Names;
 import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 
 /**
- * Groovy plugin Guice module.
+ * Groovy module.
  *
  * @since 2.7
  */

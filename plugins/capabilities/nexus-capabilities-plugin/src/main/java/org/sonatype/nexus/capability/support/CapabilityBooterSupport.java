@@ -20,7 +20,7 @@ import org.sonatype.nexus.capability.CapabilityReference;
 import org.sonatype.nexus.capability.CapabilityRegistry;
 import org.sonatype.nexus.capability.CapabilityRegistryEvent.Ready;
 import org.sonatype.nexus.capability.CapabilityType;
-import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.common.event.EventSubscriber;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;

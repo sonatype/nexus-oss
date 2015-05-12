@@ -18,11 +18,11 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.app.NexusInitializedEvent;
+import org.sonatype.nexus.common.app.NexusStoppingEvent;
+import org.sonatype.nexus.common.event.EventSubscriber;
 import org.sonatype.nexus.email.EmailConfiguration;
 import org.sonatype.nexus.email.EmailConfigurationStore;
-import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.events.NexusInitializedEvent;
-import org.sonatype.nexus.events.NexusStoppingEvent;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 

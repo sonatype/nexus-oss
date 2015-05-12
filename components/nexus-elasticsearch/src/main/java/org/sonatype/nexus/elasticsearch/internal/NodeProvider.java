@@ -23,7 +23,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.dirs.ApplicationDirectories;
+import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.elasticsearch.common.settings.ImmutableSettings;

@@ -13,10 +13,10 @@
 package org.sonatype.nexus.internal.metrics;
 
 import org.sonatype.nexus.security.FilterChainModule;
+import org.sonatype.nexus.security.SecurityFilter;
 import org.sonatype.nexus.security.anonymous.AnonymousFilter;
 import org.sonatype.nexus.security.authc.NexusBasicHttpAuthenticationFilter;
 import org.sonatype.nexus.security.authz.PermissionsFilter;
-import org.sonatype.nexus.web.SecurityFilter;
 
 import com.codahale.metrics.Clock;
 import com.codahale.metrics.servlet.InstrumentedFilter;

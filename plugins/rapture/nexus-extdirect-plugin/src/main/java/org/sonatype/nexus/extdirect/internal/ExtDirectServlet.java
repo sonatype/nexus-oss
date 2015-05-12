@@ -39,7 +39,7 @@ import javax.validation.ValidationException;
 
 import org.sonatype.nexus.analytics.EventDataBuilder;
 import org.sonatype.nexus.analytics.EventRecorder;
-import org.sonatype.nexus.common.dirs.ApplicationDirectories;
+import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.extdirect.model.Response;

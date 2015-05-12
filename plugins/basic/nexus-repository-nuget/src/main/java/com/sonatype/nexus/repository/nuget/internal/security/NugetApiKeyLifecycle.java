@@ -16,8 +16,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.sonatype.nexus.events.NexusStartedEvent;
-import org.sonatype.nexus.events.NexusStoppedEvent;
+import org.sonatype.nexus.common.app.NexusStartedEvent;
+import org.sonatype.nexus.common.app.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleManagerImpl;
 

@@ -12,13 +12,14 @@
  */
 package org.sonatype.nexus.internal.commands
 
-import org.apache.karaf.shell.commands.Command
-import org.apache.karaf.shell.console.AbstractAction
-import org.sonatype.nexus.SystemStatus
-
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
+
+import org.sonatype.nexus.common.app.SystemStatus
+
+import org.apache.karaf.shell.commands.Command
+import org.apache.karaf.shell.console.AbstractAction
 
 /**
  * Display Nexus system status.

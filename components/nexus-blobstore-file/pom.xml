@@ -30,12 +30,12 @@
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-blobstore-api</artifactId>
+      <artifactId>nexus-common</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-common</artifactId>
+      <artifactId>nexus-blobstore-api</artifactId>
     </dependency>
 
     <dependency>

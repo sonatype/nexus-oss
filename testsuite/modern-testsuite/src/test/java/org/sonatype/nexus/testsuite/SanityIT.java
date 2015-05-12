@@ -14,8 +14,8 @@ package org.sonatype.nexus.testsuite;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.SystemState;
-import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.app.SystemState;
+import org.sonatype.nexus.common.app.SystemStatus;
 
 import org.junit.Test;
 

@@ -163,7 +163,7 @@ public class SecurityConfigurationValidatorImpl
 
   private String getRoleTextForDisplay(String roleId, SecurityConfigurationValidationContext ctx) {
     String name = ctx.getExistingRoleNameMap().get(roleId);
-    if (Strings2.isEmpty(name)) {
+    if (Strings2.isBlank(name)) {
       return roleId;
     }
     return name;
@@ -236,7 +236,7 @@ public class SecurityConfigurationValidatorImpl
       response.addError(message);
     }
 
-    if (!update && (Strings2.isEmpty(role.getId()) || "0".equals(role.getId()))) {
+    if (!update && (Strings2.isBlank(role.getId()) || "0".equals(role.getId()))) {
       String newId = idGenerator.generateId();
       response.addWarning("Fixed wrong role ID from '" + role.getId() + "' to '" + newId + "'");
       role.setId(newId);
@@ -245,7 +245,7 @@ public class SecurityConfigurationValidatorImpl
 
     Map<String, String> existingRoleNameMap = context.getExistingRoleNameMap();
 
-    if (Strings2.isEmpty(role.getName())) {
+    if (Strings2.isBlank(role.getName())) {
       ValidationMessage message = new ValidationMessage("name", "Role ID '" + role.getId() + "' requires a name.");
       response.addError(message);
     }
@@ -308,36 +308,36 @@ public class SecurityConfigurationValidatorImpl
       existingIds = context.getExistingUserIds();
     }
 
-    if (!update && Strings2.isEmpty(user.getId())) {
+    if (!update && Strings2.isBlank(user.getId())) {
       ValidationMessage message = new ValidationMessage("userId", "User ID is required.");
 
       response.addError(message);
     }
 
-    if (!update && Strings2.isNotEmpty(user.getId()) && existingIds.contains(user.getId())) {
+    if (!update && Strings2.isNotBlank(user.getId()) && existingIds.contains(user.getId())) {
       ValidationMessage message = new ValidationMessage("userId", "User ID '" + user.getId() + "' is already in use.");
       response.addError(message);
     }
 
-    if (Strings2.isNotEmpty(user.getId()) && user.getId().contains(" ")) {
+    if (Strings2.isNotBlank(user.getId()) && user.getId().contains(" ")) {
       ValidationMessage message = new ValidationMessage("userId", "User ID '" + user.getId() + "' cannot contain spaces.");
       response.addError(message);
     }
 
-    if (Strings2.isNotEmpty(user.getFirstName())) {
+    if (Strings2.isNotBlank(user.getFirstName())) {
       user.setFirstName(user.getFirstName());
     }
 
-    if (Strings2.isNotEmpty(user.getLastName())) {
+    if (Strings2.isNotBlank(user.getLastName())) {
       user.setLastName(user.getLastName());
     }
 
-    if (Strings2.isEmpty(user.getPassword())) {
+    if (Strings2.isBlank(user.getPassword())) {
       ValidationMessage message = new ValidationMessage("password", "User ID '" + user.getId() + "' has no password.  This is a required field.");
       response.addError(message);
     }
 
-    if (Strings2.isEmpty(user.getEmail())) {
+    if (Strings2.isBlank(user.getEmail())) {
       ValidationMessage message = new ValidationMessage("email", "User ID '" + user.getId() + "' has no email address");
       response.addError(message);
     }
@@ -370,7 +370,7 @@ public class SecurityConfigurationValidatorImpl
       }
     }
 
-    if (!Strings2.isEmpty(user.getId())) {
+    if (!Strings2.isBlank(user.getId())) {
       existingIds.add(user.getId());
     }
 
@@ -384,13 +384,13 @@ public class SecurityConfigurationValidatorImpl
     ValidationResponse response = new ValidationResponse();
 
     // ID must be not empty
-    if (Strings2.isEmpty(userRoleMapping.getUserId())) {
+    if (Strings2.isBlank(userRoleMapping.getUserId())) {
       ValidationMessage message = new ValidationMessage("userId", "UserRoleMapping has no userId.  This is a required field.");
       response.addError(message);
     }
 
     // source must be not empty
-    if (Strings2.isEmpty(userRoleMapping.getSource())) {
+    if (Strings2.isBlank(userRoleMapping.getSource())) {
       ValidationMessage message = new ValidationMessage("source", "User Role Mapping for user '" + userRoleMapping.getUserId() + "' has no source.  This is a required field.");
       response.addError(message);
     }
