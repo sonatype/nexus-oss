@@ -29,7 +29,6 @@
 
   <modules>
     <module>nexus-atlas-plugin</module>
-    <module>nexus-wonderland-model</module>
     <module>nexus-wonderland-plugin</module>
   </modules>
 
