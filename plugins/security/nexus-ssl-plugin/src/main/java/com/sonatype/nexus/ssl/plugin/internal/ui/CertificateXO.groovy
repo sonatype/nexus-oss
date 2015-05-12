@@ -15,6 +15,11 @@ package com.sonatype.nexus.ssl.plugin.internal.ui
 
 import groovy.transform.ToString
 
+/**
+ * Certificate exchange object.
+ *
+ * @since 3.0
+ */
 @ToString(includePackage = false, includeNames = true)
 public class CertificateXO
 {

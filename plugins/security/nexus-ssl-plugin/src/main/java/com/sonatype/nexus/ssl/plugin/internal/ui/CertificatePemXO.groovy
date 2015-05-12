@@ -16,6 +16,11 @@ package com.sonatype.nexus.ssl.plugin.internal.ui
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotBlank
 
+/**
+ * Certificate PEM exchange object.
+ *
+ * @since 3.0
+ */
 @ToString(includePackage = false, includeNames = true)
 public class CertificatePemXO
 {
