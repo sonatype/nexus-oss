@@ -57,11 +57,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-model</artifactId>
-    </dependency>
-
     <!--
     FIXME: Replace usage with guava or nexus-common helpers.  Here only for org.codehaus.plexus.util.StringUtils
     -->
