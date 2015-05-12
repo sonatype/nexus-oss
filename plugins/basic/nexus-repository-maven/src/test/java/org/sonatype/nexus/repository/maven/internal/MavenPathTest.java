@@ -170,7 +170,7 @@ public class MavenPathTest
   @Test
   public void locateJar() {
     final String path = "/org/apache/maven/maven-repository-metadata/3.3.0-SNAPSHOT/maven-repository-metadata-3.3.0-20150311.160242-1.jar.sha1";
-    final MavenPath mavenPath = pathParser.parsePath(path).locateMain("jar");
+    final MavenPath mavenPath = pathParser.parsePath(path).locateMainArtifact("jar");
     assertThat(mavenPath, is(notNullValue()));
 
     assertThat(mavenPath.getPath(), equalTo(

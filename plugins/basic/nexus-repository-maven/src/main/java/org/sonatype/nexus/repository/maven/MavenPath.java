@@ -421,7 +421,7 @@ public class MavenPath
    * paths, those having non-null {@link #getCoordinates()}.
    */
   @Nonnull
-  public MavenPath locateMain(final String extension) {
+  public MavenPath locateMainArtifact(final String extension) {
     return locate(extension, null);
   }
 
