@@ -90,8 +90,7 @@ public class SecurityComponent
 
   @DirectMethod
   @Validate
-  public UserXO authenticate(final @NotEmpty(message = "[base64Username] may not be empty") String base64Username,
-                             final @NotEmpty(message = "[base64Password] may not be empty") String base64Password)
+  public UserXO authenticate(final @NotEmpty String base64Username, final @NotEmpty String base64Password)
       throws Exception
   {
     boolean rememberMe = false;
@@ -116,9 +115,7 @@ public class SecurityComponent
 
   @DirectMethod
   @Validate
-  public String authenticationToken(
-      final @NotEmpty(message = "[base64Username] may not be empty") String base64Username,
-      final @NotEmpty(message = "[base64Password] may not be empty") String base64Password)
+  public String authenticationToken(final @NotEmpty String base64Username, final @NotEmpty String base64Password)
       throws Exception
   {
     Subject subject = securitySystem.getSubject();

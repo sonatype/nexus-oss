@@ -55,7 +55,7 @@ class NugetApiKeyComponent
     @DirectMethod
     @RequiresPermissions('apikey:access:read')
     @Validate
-    String readKey(final @NotEmpty(message = '[authToken] may not be empty') String authToken) {
+    String readKey(final @NotEmpty String authToken) {
         validateAuthToken(authToken)
 
         def principals = securityHelper.subject().principals
@@ -73,7 +73,7 @@ class NugetApiKeyComponent
     @RequiresAuthentication
     @RequiresPermissions('apikey:access:delete')
     @Validate
-    String resetKey(final @NotEmpty(message = '[authToken] may not be empty') String authToken) {
+    String resetKey(final @NotEmpty String authToken) {
         validateAuthToken(authToken)
 
         def principals = securityHelper.subject().principals

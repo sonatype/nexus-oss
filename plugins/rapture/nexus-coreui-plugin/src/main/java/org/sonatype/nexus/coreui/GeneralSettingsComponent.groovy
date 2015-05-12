@@ -63,9 +63,7 @@ class GeneralSettingsComponent
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
-  GeneralSettingsXO update(
-      final @NotNull(message = '[generalSettings] may not be null') @Valid GeneralSettingsXO generalSettingsXO)
-  {
+  GeneralSettingsXO update(final @NotNull @Valid GeneralSettingsXO generalSettingsXO) {
     validate(generalSettingsXO)
     baseUrlManager.url = generalSettingsXO.baseUrl
     return read()

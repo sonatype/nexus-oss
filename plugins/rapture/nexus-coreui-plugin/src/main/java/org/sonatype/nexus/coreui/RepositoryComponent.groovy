@@ -100,7 +100,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:repository-admin:*:*:add')
   @Validate(groups = [Create.class, Default.class])
-  RepositoryXO create(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repositoryXO) {
+  RepositoryXO create(final @NotNull @Valid RepositoryXO repositoryXO) {
     return asRepository(repositoryManager.create(new Configuration(
         repositoryName: repositoryXO.name,
         recipeName: repositoryXO.recipe,
@@ -112,7 +112,7 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @Validate(groups = [Update.class, Default.class])
-  RepositoryXO update(final @NotNull(message = '[repository] may not be null') @Valid RepositoryXO repositoryXO) {
+  RepositoryXO update(final @NotNull @Valid RepositoryXO repositoryXO) {
     Repository repository = repositoryManager.get(repositoryXO.name)
     securityHelper.ensurePermitted(adminPermission(repository, BreadActions.EDIT))
     return asRepository(repositoryManager.update(repository.configuration.with {
@@ -125,7 +125,7 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @Validate
-  void remove(final @NotEmpty(message = '[name] may not be empty') String name) {
+  void remove(final @NotEmpty String name) {
     Repository repository = repositoryManager.get(name)
     securityHelper.ensurePermitted(adminPermission(repository, BreadActions.DELETE))
     repositoryManager.delete(name)

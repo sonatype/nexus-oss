@@ -52,7 +52,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:logs:update')
   @Validate
-  void mark(final @NotNull(message = '[markerXO] may not be null') @Valid MarkerXO markerXO) {
+  void mark(final @NotNull @Valid MarkerXO markerXO) {
     // ensure that level for marking logger is enabled
     logManager.setLoggerLevel(log.getName(), LoggerLevel.INFO)
 

@@ -130,7 +130,7 @@ class HttpSettingsComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
   @Validate
-  HttpSettingsXO update(final @NotNull(message = '[httpSettingsXO] may not be null') @Valid HttpSettingsXO settings) {
+  HttpSettingsXO update(final @NotNull @Valid HttpSettingsXO settings) {
     def previous = httpClientManager.configuration
     def model = convert(settings)
     replacePasswordPlaceholders(previous, model)

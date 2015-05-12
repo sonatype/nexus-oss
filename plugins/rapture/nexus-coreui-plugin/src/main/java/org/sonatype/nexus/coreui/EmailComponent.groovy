@@ -74,8 +74,7 @@ class EmailComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
   @Validate
-  EmailConfigurationXO update(
-      @NotNull(message = '[configuration] may not be null') @Valid final EmailConfigurationXO configuration)
+  EmailConfigurationXO update(@NotNull @Valid final EmailConfigurationXO configuration)
   {
     emailManager.configuration = convert(configuration)
     return read()
@@ -102,8 +101,8 @@ class EmailComponent
   @RequiresPermissions('nexus:settings:update')
   @Validate
   void sendVerification(
-      @NotNull(message = '[configuration] may not be null') @Valid final EmailConfigurationXO configuration,
-      @NotNull(message = '[address] may not be null') @Email final String address)
+      @NotNull @Valid final EmailConfigurationXO configuration,
+      @NotNull @Email final String address)
   {
     emailManager.sendVerification(convert(configuration), address)
   }
