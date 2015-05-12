@@ -202,13 +202,19 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   loadCertificateByPem: function (button) {
     var me = this,
-        pem = button.up('form').getForm().getFieldValues().pem;
+        basicForm = button.up('form').getForm(),
+        pem = basicForm.getFieldValues()['pem'];
 
     me.getContent().getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
-    NX.direct.ssl_Certificate.details({ value: pem }, function (response) {
+    NX.direct.ssl_Certificate.details({ value: pem }, function(response) {
       me.getContent().getEl().unmask();
-      if (Ext.isObject(response) && response.success) {
-        me.showCertificateDetailsPanel(response.data);
+      if (Ext.isObject(response)) {
+        if (response.success) {
+          me.showCertificateDetailsPanel(response.data);
+        }
+        else if (response.errors) {
+          basicForm.markInvalid(response.errors);
+        }
       }
     });
   },
@@ -332,7 +338,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
             button;
 
         if (model) {
-          if (model.get('inNexusSSLTrustStore')) {
+          if (model.get('inTrustStore')) {
             tbar.insert(0, {
               text: NX.I18n.get('ADMIN_SSL_DETAILS_REMOVE'),
               action: 'remove',

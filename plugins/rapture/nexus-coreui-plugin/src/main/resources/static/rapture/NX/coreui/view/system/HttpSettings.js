@@ -125,7 +125,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
                 collapsed: true,
                 items: {
                   xtype: 'nx-coreui-system-authenticationsettings',
-                  namePrefix: 'http'
+                  namePrefix: 'https'
                 }
               }
             ]

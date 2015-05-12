@@ -11,37 +11,19 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package com.sonatype.nexus.ssl.model;
+package com.sonatype.nexus.ssl.plugin.internal.ui
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "certificatePem", propOrder = {
-    "value"
-})
-@XmlRootElement(name = "certificatePem")
+/**
+ * Certificate PEM exchange object.
+ *
+ * @since 3.0
+ */
+@ToString(includePackage = false, includeNames = true)
 public class CertificatePemXO
 {
-  @XmlElement(required = true)
-  @JsonProperty("value")
-  private String value;
-
-  public String getValue() {
-    return value;
-  }
-
-  public void setValue(String value) {
-    this.value = value;
-  }
-
-  public CertificatePemXO withValue(String value) {
-    setValue(value);
-    return this;
-  }
+  @NotBlank
+  String value
 }
