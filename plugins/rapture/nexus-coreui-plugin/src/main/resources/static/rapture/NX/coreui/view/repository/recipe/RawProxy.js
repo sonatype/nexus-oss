@@ -37,11 +37,11 @@ Ext.define('NX.coreui.view.repository.recipe.RawProxy', {
     var me = this;
 
     me.items = [
+      { xtype: 'nx-coreui-repository-content-rawcontent-facet' },
       { xtype: 'nx-coreui-repository-proxy-facet'},
       { xtype: 'nx-coreui-repository-storage-facet'},
       { xtype: 'nx-coreui-repository-negativecache-facet'},
-      { xtype: 'nx-coreui-repository-httpclient-facet'},
-      { xtype: 'nx-coreui-repository-content-rawcontent-facet' }
+      { xtype: 'nx-coreui-repository-httpclient-facet'}
     ];
 
     me.callParent(arguments);
