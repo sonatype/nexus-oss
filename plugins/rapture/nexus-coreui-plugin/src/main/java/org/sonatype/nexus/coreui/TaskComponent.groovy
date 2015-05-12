@@ -131,7 +131,7 @@ class TaskComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasks:create')
   @Validate(groups = [Create.class, Default.class])
-  TaskXO create(final @NotNull(message = '[taskXO] may not be null') @Valid TaskXO taskXO) {
+  TaskXO create(final @NotNull @Valid TaskXO taskXO) {
     Schedule schedule = asSchedule(taskXO)
 
     TaskConfiguration nexusTask = nexusScheduler.createTaskConfigurationInstance(taskXO.typeId)
@@ -157,7 +157,7 @@ class TaskComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasks:update')
   @Validate(groups = [Update.class, Default.class])
-  TaskXO update(final @NotNull(message = '[taskXO] may not be null') @Valid TaskXO taskXO) {
+  TaskXO update(final @NotNull @Valid TaskXO taskXO) {
     TaskInfo task = nexusScheduler.getTaskById(taskXO.id);
     validateState(task)
     Schedule schedule = asSchedule(taskXO)
@@ -178,7 +178,7 @@ class TaskComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasks:delete')
   @Validate
-  void remove(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void remove(final @NotEmpty String id) {
     nexusScheduler.getTaskById(id)?.remove()
   }
 
@@ -186,7 +186,7 @@ class TaskComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasksrun:get')
   @Validate
-  void run(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void run(final @NotEmpty String id) {
     nexusScheduler.getTaskById(id)?.runNow()
   }
 
@@ -194,7 +194,7 @@ class TaskComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasksrun:delete')
   @Validate
-  void stop(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void stop(final @NotEmpty String id) {
     nexusScheduler.getTaskById(id)?.currentState?.future?.cancel(false)
   }
 

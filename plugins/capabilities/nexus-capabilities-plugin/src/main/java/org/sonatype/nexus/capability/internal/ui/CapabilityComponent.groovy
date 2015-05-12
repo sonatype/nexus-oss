@@ -121,7 +121,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:capabilities:create')
   @Validate(groups = [Create.class, Default.class])
-  CapabilityXO create(final @NotNull(message = '[capabilityXO] may not be null') @Valid CapabilityXO capabilityXO) {
+  CapabilityXO create(final @NotNull @Valid CapabilityXO capabilityXO) {
     return asCapability(capabilityRegistry.add(
         capabilityType(capabilityXO.typeId),
         capabilityXO.enabled,
@@ -139,7 +139,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:capabilities:update')
   @Validate(groups = [Update.class, Default.class])
-  CapabilityXO update(final @NotNull(message = '[capabilityXO] may not be null') @Valid CapabilityXO capabilityXO) {
+  CapabilityXO update(final @NotNull @Valid CapabilityXO capabilityXO) {
     return asCapability(capabilityRegistry.update(
         capabilityIdentity(capabilityXO.id),
         capabilityXO.enabled,
@@ -157,7 +157,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:capabilities:update')
   @Validate(groups = [Update.class, Default.class])
-  CapabilityXO updateNotes(final @NotNull(message = '[capabilityNotesXO] may not be null') @Valid CapabilityNotesXO capabilityNotesXO) {
+  CapabilityXO updateNotes(final @NotNull @Valid CapabilityNotesXO capabilityNotesXO) {
     def reference = capabilityRegistry.get(capabilityIdentity(capabilityNotesXO.id))
     return asCapability(capabilityRegistry.update(
         reference.context().id(),
@@ -175,7 +175,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:capabilities:delete')
   @Validate
-  void remove(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void remove(final @NotEmpty String id) {
     capabilityRegistry.remove(capabilityIdentity(id))
   }
 
@@ -186,7 +186,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:capabilities:update')
   @Validate
-  void enable(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void enable(final @NotEmpty String id) {
     capabilityRegistry.enable(capabilityIdentity(id))
   }
 
@@ -197,7 +197,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:capabilities:update')
   @Validate
-  void disable(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void disable(final @NotEmpty String id) {
     capabilityRegistry.disable(capabilityIdentity(id))
   }
 

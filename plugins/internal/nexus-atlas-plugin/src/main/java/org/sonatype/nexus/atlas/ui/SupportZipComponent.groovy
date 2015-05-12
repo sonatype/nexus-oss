@@ -49,7 +49,7 @@ class SupportZipComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:atlas')
   @Validate
-  SupportZipXO create(final @NotNull(message = '[request] may not be null') SupportZipGenerator.Request request) {
+  SupportZipXO create(final @NotNull SupportZipGenerator.Request request) {
     def result = supportZipGenerator.generate(request)
     return new SupportZipXO(
         file: result.file.canonicalPath,

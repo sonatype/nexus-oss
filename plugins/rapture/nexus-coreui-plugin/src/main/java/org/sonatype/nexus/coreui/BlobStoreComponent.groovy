@@ -67,7 +67,7 @@ class BlobStoreComponent
   @DirectMethod
   @RequiresAuthentication
   @Validate(groups = [Create.class, Default.class])
-  BlobStoreXO create(final @NotNull(message = '[blobstore] may not be null') @Valid BlobStoreXO blobStore) {
+  BlobStoreXO create(final @NotNull @Valid BlobStoreXO blobStore) {
     return asBlobStore(blobStoreManager.create(
         new BlobStoreConfiguration(name: blobStore.name, type: blobStore.type,
             attributes: attributeConverter.asAttributes(blobStore.attributes))))
@@ -76,7 +76,7 @@ class BlobStoreComponent
   @DirectMethod
   @RequiresAuthentication
   @Validate
-  void remove(final @NotEmpty(message = '[name] may not be empty') String name) {
+  void remove(final @NotEmpty String name) {
     blobStoreManager.delete(name)
   }
 

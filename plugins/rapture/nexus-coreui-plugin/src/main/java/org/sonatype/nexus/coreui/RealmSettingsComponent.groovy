@@ -85,9 +85,7 @@ class RealmSettingsComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
   @Validate
-  RealmSettingsXO update(
-      final @NotNull(message = '[realmSettings] may not be null') @Valid RealmSettingsXO realmSettingsXO)
-  {
+  RealmSettingsXO update(final @NotNull @Valid RealmSettingsXO realmSettingsXO) {
     realmManager.configuration = new RealmConfiguration(
         realmNames: realmSettingsXO.realms
     )

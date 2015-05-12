@@ -13,20 +13,21 @@
 
 package org.sonatype.nexus.coreui
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.shiro.authz.annotation.RequiresAuthentication
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.sonatype.nexus.extdirect.DirectComponent
-import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.security.anonymous.AnonymousConfiguration
-import org.sonatype.nexus.security.anonymous.AnonymousManager
-
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
+
+import org.sonatype.nexus.extdirect.DirectComponent
+import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.security.anonymous.AnonymousConfiguration
+import org.sonatype.nexus.security.anonymous.AnonymousManager
+
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.apache.shiro.authz.annotation.RequiresPermissions
 
 /**
  * Anonymous Security Settings {@link DirectComponent}.
@@ -64,9 +65,7 @@ class AnonymousSettingsComponent
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
-  AnonymousSettingsXO update(
-      final @NotNull(message = '[anonymousXO] may not be null') @Valid AnonymousSettingsXO anonymousXO)
-  {
+  AnonymousSettingsXO update(final @NotNull @Valid AnonymousSettingsXO anonymousXO) {
     anonymousManager.configuration = new AnonymousConfiguration(
         enabled: anonymousXO.enabled,
         userId: anonymousXO.userId,

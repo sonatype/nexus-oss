@@ -56,7 +56,7 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @Validate
-  CertificateXO retrieveFromHost(final @NotEmpty(message = '[host] may not be empty') String host,
+  CertificateXO retrieveFromHost(final @NotEmpty String host,
                                  final @Nullable Integer port,
                                  final @Nullable String protocolHint)
   {
@@ -70,7 +70,7 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @Validate
-  CertificateXO details(final @NotNull(message = '[pem] may not be null') @Valid CertificatePemXO pem) {
+  CertificateXO details(final @NotNull @Valid CertificatePemXO pem) {
     return certificatesResource.details(pem)
   }
 

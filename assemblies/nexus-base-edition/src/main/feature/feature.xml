@@ -19,6 +19,7 @@
     -->
     <bundle>wrap:${mvn:javax.el}$overwrite=merge&amp;Fragment-Host=org.hibernate.validator</bundle>
     <bundle>wrap:${mvn:validation-api}$overwrite=merge&amp;Fragment-Host=org.hibernate.validator</bundle>
+    <bundle>wrap:${mvn:paranamer}$overwrite=merge&amp;Fragment-Host=org.hibernate.validator</bundle>
     <bundle>wrap:${mvn:httpcore}$Bundle-SymbolicName=httpcore</bundle>
     <bundle>wrap:${mvn:httpclient}$Bundle-SymbolicName=httpclient&amp;Fragment-Host=httpcore</bundle>
     <bundle>wrap:${mvn:xmlpull}$Bundle-SymbolicName=xmlpull</bundle>

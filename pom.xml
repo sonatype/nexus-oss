@@ -600,6 +600,7 @@
               -->
               <id>javax.el</id>
               <id>validation-api</id>
+              <id>paranamer</id>
               <id>httpcore</id>
               <id>httpclient</id>
               <id>xmlpull</id>
