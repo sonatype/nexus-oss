@@ -407,14 +407,15 @@ public class StorageTxImpl
     checkNotNull(hashAlgorithms);
     checkNotNull(contentType);
 
-    if (writePolicySelector.select(asset, writePolicy) == WritePolicy.DENY) {
+    final WritePolicy effectiveWritePolicy = writePolicySelector.select(asset, writePolicy);
+    if (effectiveWritePolicy == WritePolicy.DENY) {
       throw new IllegalOperationException("Repository is read only.");
     }
 
     // Delete old blob if necessary
     BlobRef oldBlobRef = asset.blobRef();
     if (oldBlobRef != null) {
-      if (writePolicySelector.select(asset, writePolicy) == WritePolicy.ALLOW_ONCE) {
+      if (effectiveWritePolicy == WritePolicy.ALLOW_ONCE) {
         throw new IllegalOperationException("Repository does not allow updating assets.");
       }
       deleteBlob(asset, oldBlobRef, true);
