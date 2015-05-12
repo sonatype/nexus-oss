@@ -15,7 +15,6 @@ package org.sonatype.nexus.repository.maven.internal.maven2.metadata;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -73,10 +72,6 @@ public class MetadataUpdater
 
   private final MetadataXpp3Writer metadataWriter;
 
-  private final DateFormat dotlessTimestampFormat;
-
-  private final DateFormat dottedTimestampFormat;
-
   public MetadataUpdater(final boolean update, final Repository repository) {
     this.update = update;
     this.repository = checkNotNull(repository);
@@ -84,8 +79,6 @@ public class MetadataUpdater
     this.metadataMerger = new Maven2MetadataMerger();
     this.metadataReader = new MetadataXpp3Reader();
     this.metadataWriter = new MetadataXpp3Writer();
-    this.dotlessTimestampFormat = Maven2Format.METADATA_DOTLESS_TIMESTAMP_SUPPLIER.get();
-    this.dottedTimestampFormat = Maven2Format.METADATA_DOTTED_TIMESTAMP_SUPPLIER.get();
   }
 
   /**
@@ -186,14 +179,14 @@ public class MetadataUpdater
       versioning.setLatest(maven2Metadata.getBaseVersions().getLatest());
       versioning.setRelease(maven2Metadata.getBaseVersions().getRelease());
       versioning.setVersions(maven2Metadata.getBaseVersions().getVersions());
-      versioning.setLastUpdated(dotlessTimestampFormat.format(maven2Metadata.getLastUpdated().toDate()));
+      versioning.setLastUpdated(Maven2Format.METADATA_DOTLESS_TIMESTAMP.print(maven2Metadata.getLastUpdated()));
       result.setVersioning(versioning);
     }
     if (maven2Metadata.getSnapshots() != null) {
       final Versioning versioning = result.getVersioning() != null ? result.getVersioning() : new Versioning();
       final org.apache.maven.artifact.repository.metadata.Snapshot snapshot = new org.apache.maven.artifact.repository.metadata.Snapshot();
-      snapshot.setTimestamp(dottedTimestampFormat.format(
-          new DateTime(maven2Metadata.getSnapshots().getSnapshotTimestamp()).toDate()));
+      snapshot.setTimestamp(Maven2Format.METADATA_DOTTED_TIMESTAMP.print(
+          new DateTime(maven2Metadata.getSnapshots().getSnapshotTimestamp())));
       snapshot.setBuildNumber(maven2Metadata.getSnapshots().getSnapshotBuildNumber());
       versioning.setSnapshot(snapshot);
 
@@ -203,11 +196,11 @@ public class MetadataUpdater
         snapshotVersion.setExtension(snap.getExtension());
         snapshotVersion.setClassifier(snap.getClassifier());
         snapshotVersion.setVersion(snap.getVersion());
-        snapshotVersion.setUpdated(dotlessTimestampFormat.format(snap.getLastUpdated().toDate()));
+        snapshotVersion.setUpdated(Maven2Format.METADATA_DOTLESS_TIMESTAMP.print(snap.getLastUpdated()));
         snapshotVersions.add(snapshotVersion);
       }
       versioning.setSnapshotVersions(snapshotVersions);
-      versioning.setLastUpdated(dotlessTimestampFormat.format(maven2Metadata.getLastUpdated().toDate()));
+      versioning.setLastUpdated(Maven2Format.METADATA_DOTLESS_TIMESTAMP.print(maven2Metadata.getLastUpdated()));
       result.setVersioning(versioning);
     }
     return result;

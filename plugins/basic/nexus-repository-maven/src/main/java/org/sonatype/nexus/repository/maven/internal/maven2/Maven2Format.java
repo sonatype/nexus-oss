@@ -23,6 +23,8 @@ import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.view.ContentTypes;
 
 import com.google.common.base.Supplier;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Maven 2 format.
@@ -47,35 +49,14 @@ public class Maven2Format
   public static final String METADATA_CONTENT_TYPE = ContentTypes.TEXT_XML;
 
   /**
-   * {@link TimeZone} of timestamps used in Maven2 repository metadata.
+   * {@link DateTimeFormatter} for dotted timestamps used in Maven2 repository metadata.
    */
-  public static final TimeZone METADATA_TIMESTAMP_UTC_TZ = TimeZone.getTimeZone("UTC");
+  public static final DateTimeFormatter METADATA_DOTTED_TIMESTAMP = DateTimeFormat.forPattern("YYYYMMdd.HHmmss").withZoneUTC();
 
   /**
-   * {@link Supplier} of dotted {@link DateFormat} for timestamps used in Maven2 repository metadata.
+   * {@link DateFormat} for dotless timestamps used in Maven2 repository metadata.
    */
-  public static final Supplier<DateFormat> METADATA_DOTTED_TIMESTAMP_SUPPLIER = new Supplier<DateFormat>()
-  {
-    @Override
-    public DateFormat get() {
-      final SimpleDateFormat result = new SimpleDateFormat("yyyyMMdd.HHmmss");
-      result.setTimeZone(METADATA_TIMESTAMP_UTC_TZ);
-      return result;
-    }
-  };
-
-  /**
-   * {@link Supplier} of dotless {@link DateFormat} for timestamps used in Maven2 repository metadata.
-   */
-  public static final Supplier<DateFormat> METADATA_DOTLESS_TIMESTAMP_SUPPLIER = new Supplier<DateFormat>()
-  {
-    @Override
-    public DateFormat get() {
-      final SimpleDateFormat result = new SimpleDateFormat("yyyyMMddHHmmss");
-      result.setTimeZone(METADATA_TIMESTAMP_UTC_TZ);
-      return result;
-    }
-  };
+  public static final DateTimeFormatter METADATA_DOTLESS_TIMESTAMP = DateTimeFormat.forPattern("YYYYMMddHHmmss").withZoneUTC();
 
   /**
    * Content Type of Maven2 checksum files (sha1, md5).

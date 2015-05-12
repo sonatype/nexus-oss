@@ -12,9 +12,6 @@
  */
 package org.sonatype.nexus.repository.maven.internal.maven2;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-
 import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -117,10 +114,10 @@ public class Maven2MavenPathParser
           );
 
           try {
-            final DateFormat df = Maven2Format.METADATA_DOTTED_TIMESTAMP_SUPPLIER.get();
-            timestamp = Long.valueOf(df.parse(snapshotTimestampedVersion.toString()).getTime());
+            timestamp = Maven2Format.METADATA_DOTTED_TIMESTAMP.parseDateTime(
+                snapshotTimestampedVersion.toString()).getMillis();
           }
-          catch (ParseException e) {
+          catch (IllegalArgumentException e) {
             // skip it
           }
 
