@@ -20,6 +20,7 @@ import java.util.TreeSet;
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapAuthConfiguration;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapGroupDAO;
@@ -32,7 +33,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Sets;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
-import org.codehaus.plexus.util.StringUtils;
 
 public class DefaultLdapConnector
     extends ComponentSupport
@@ -201,7 +201,7 @@ public class DefaultLdapConnector
   }
 
   private static boolean isStaticGroupMapping(LdapAuthConfiguration conf) {
-    return conf.isLdapGroupsAsRoles() && StringUtils.isEmpty(conf.getUserMemberOfAttribute());
+    return conf.isLdapGroupsAsRoles() && Strings2.isEmpty(conf.getUserMemberOfAttribute());
   }
 
   private void updateGroupMembership(LdapContext context, LdapAuthConfiguration conf, LdapUser ldapUser)

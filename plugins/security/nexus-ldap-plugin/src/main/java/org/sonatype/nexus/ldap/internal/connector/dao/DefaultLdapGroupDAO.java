@@ -31,6 +31,7 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.LdapName;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -63,7 +64,7 @@ public class DefaultLdapGroupDAO
              NoLdapUserRolesFoundException
   {
 
-    boolean dynamicGroups = !StringUtils.isEmpty(configuration.getUserMemberOfAttribute());
+    boolean dynamicGroups = !Strings2.isEmpty(configuration.getUserMemberOfAttribute());
     boolean groupsEnabled = isGroupsEnabled(configuration);
 
     Set<String> roleIds = new HashSet<String>();
@@ -100,7 +101,7 @@ public class DefaultLdapGroupDAO
     if (isGroupsEnabled(configuration)) {
       try {
 
-        if (StringUtils.isEmpty(configuration.getUserMemberOfAttribute())) {
+        if (Strings2.isEmpty(configuration.getUserMemberOfAttribute())) {
           // static groups
           String groupIdAttribute = configuration.getGroupIdAttribute();
           String groupBaseDn = StringUtils.defaultString(configuration.getGroupBaseDn(), "");
@@ -284,7 +285,7 @@ public class DefaultLdapGroupDAO
       throw new NoSuchLdapGroupException(groupId, groupId);
     }
 
-    if (StringUtils.isEmpty(configuration.getUserMemberOfAttribute())) {
+    if (Strings2.isEmpty(configuration.getUserMemberOfAttribute())) {
       // static groups
       String groupIdAttribute = configuration.getGroupIdAttribute();
       String groupBaseDn = StringUtils.defaultString(configuration.getGroupBaseDn(), "");

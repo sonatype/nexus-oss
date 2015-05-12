@@ -30,6 +30,7 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.LdapName;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.ldap.internal.connector.dao.password.PasswordEncoderManager;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -101,7 +102,7 @@ public class DefaultLdapUserDAO
 
     Attributes modAttrs = new BasicAttributes();
 
-    if (!StringUtils.isEmpty(user.getRealName())) {
+    if (!Strings2.isEmpty(user.getRealName())) {
       if (inLdap.getRealName() == null) {
         addAttrs.put(configuration.getUserRealNameAttribute(), user.getRealName());
       }
@@ -110,7 +111,7 @@ public class DefaultLdapUserDAO
       }
     }
 
-    if (!StringUtils.isEmpty(user.getEmail())) {
+    if (!Strings2.isEmpty(user.getEmail())) {
       if (inLdap.getEmail() == null) {
         addAttrs.put(configuration.getEmailAddressAttribute(), user.getEmail());
       }
@@ -119,7 +120,7 @@ public class DefaultLdapUserDAO
       }
     }
 
-    if (!StringUtils.isEmpty(user.getWebsite())) {
+    if (!Strings2.isEmpty(user.getWebsite())) {
       if (inLdap.getWebsite() == null) {
         if (configuration.isWebsiteAttributeLabelUri()) {
           addAttrs.put(configuration.getWebsiteAttribute(), user.getWebsite() + " "
@@ -346,20 +347,20 @@ public class DefaultLdapUserDAO
 
     Attributes userAttrs = new BasicAttributes();
 
-    if (!StringUtils.isEmpty(user.getPassword())) {
+    if (!Strings2.isEmpty(user.getPassword())) {
       userAttrs.put(configuration.getPasswordAttribute(),
           passwordEncoderManager.encodePassword(user.getPassword(), null));
     }
 
-    if (!StringUtils.isEmpty(user.getRealName())) {
+    if (!Strings2.isEmpty(user.getRealName())) {
       userAttrs.put(configuration.getUserRealNameAttribute(), user.getRealName());
     }
 
-    if (!StringUtils.isEmpty(user.getEmail())) {
+    if (!Strings2.isEmpty(user.getEmail())) {
       userAttrs.put(configuration.getEmailAddressAttribute(), user.getEmail());
     }
 
-    if (!StringUtils.isEmpty(user.getWebsite())) {
+    if (!Strings2.isEmpty(user.getWebsite())) {
       if (configuration.isWebsiteAttributeLabelUri()) {
         userAttrs.put(configuration.getWebsiteAttribute(), user.getWebsite() + " "
             + configuration.getWebsiteUriLabel());

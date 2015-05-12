@@ -14,12 +14,12 @@ package org.sonatype.nexus.rapture.internal.capability;
 
 import java.util.Map;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.rapture.internal.ui.BrandingXO;
 
 import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.codehaus.plexus.util.StringUtils.isEmpty;
 
 /**
  * Configuration adapter for {@link BrandingCapability}.
@@ -51,14 +51,14 @@ public class BrandingCapabilityConfiguration
   }
 
   private boolean parseBoolean(final String value, final boolean defaultValue) {
-    if (!isEmpty(value)) {
+    if (!Strings2.isEmpty(value)) {
       return Boolean.parseBoolean(value);
     }
     return defaultValue;
   }
 
   private String parseString(final String value) {
-    if (!isEmpty(value)) {
+    if (!Strings2.isEmpty(value)) {
       return value;
     }
     return null;
