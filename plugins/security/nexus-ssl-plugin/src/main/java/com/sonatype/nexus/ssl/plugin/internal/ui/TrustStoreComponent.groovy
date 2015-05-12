@@ -19,7 +19,6 @@ import java.security.cert.X509Certificate
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
-import javax.naming.InvalidNameException
 import javax.naming.ldap.LdapName
 import javax.naming.ldap.Rdn
 import javax.validation.Valid
@@ -150,14 +149,9 @@ extends DirectComponentSupport
 
   static Map<String, String> getRdns(final String dn) {
     Map<String, String> rdns = [:]
-    try {
-      LdapName ldapName = new LdapName(dn)
-      for (Rdn rdn : ldapName.rdns) {
-        rdns.put(rdn.type, rdn.value.toString())
-      }
-    }
-    catch (InvalidNameException e) {
-      // TODO ?
+    LdapName ldapName = new LdapName(dn)
+    for (Rdn rdn : ldapName.rdns) {
+      rdns.put(rdn.type, rdn.value.toString())
     }
     return rdns
   }
