@@ -64,6 +64,15 @@
       <artifactId>goodies-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!--
+    FIXME: For Injected non-pax-exam IT that live outside of testsuite module.
+    -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-core</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

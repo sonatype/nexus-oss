@@ -28,7 +28,6 @@ import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.codehaus.plexus.util.StringUtils
 
 /**
  * Log {@link DirectComponent}.
@@ -53,11 +52,11 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:logs:update')
   @Validate
-  void mark(final @NotNull(message = '[markerXO] may not be null') @Valid MarkerXO markerXO) {
+  void mark(final @NotNull @Valid MarkerXO markerXO) {
     // ensure that level for marking logger is enabled
     logManager.setLoggerLevel(log.getName(), LoggerLevel.INFO)
 
-    String asterixes = StringUtils.repeat('*', markerXO.getMessage().length() + 4)
+    String asterixes = '*' * (markerXO.message.length() + 4)
     log.info "\n${asterixes}\n* ${markerXO.message} *\n${asterixes}"
   }
 

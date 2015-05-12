@@ -38,6 +38,12 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-orient</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- For RRS/Atom feed support, using Rome -->
     <dependency>
       <groupId>rome</groupId>
@@ -62,6 +68,14 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-extdirect-plugin</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <!--
+    FIXME: Replace usage with guava or nexus-common helpers.  Here only for org.codehaus.plexus.util.StringUtils
+    -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
     </dependency>
 
     <!-- Test -->

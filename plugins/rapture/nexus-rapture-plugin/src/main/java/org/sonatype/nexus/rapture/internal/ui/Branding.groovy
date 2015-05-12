@@ -12,13 +12,14 @@
  */
 package org.sonatype.nexus.rapture.internal.ui
 
-import org.sonatype.nexus.rapture.StateContributor
-import org.sonatype.nexus.rapture.internal.capability.BrandingCapabilityConfiguration
-import org.sonatype.nexus.web.BaseUrlHolder
+import java.util.regex.Matcher
 
 import javax.inject.Named
 import javax.inject.Singleton
-import java.util.regex.Matcher
+
+import org.sonatype.nexus.common.app.BaseUrlHolder
+import org.sonatype.nexus.rapture.StateContributor
+import org.sonatype.nexus.rapture.internal.capability.BrandingCapabilityConfiguration
 
 /**
  * Branding state contributor.

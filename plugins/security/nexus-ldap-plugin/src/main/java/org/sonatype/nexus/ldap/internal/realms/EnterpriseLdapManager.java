@@ -26,7 +26,7 @@ import javax.net.ssl.SSLContext;
 import com.sonatype.nexus.ssl.model.TrustStoreKey;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
-import org.sonatype.nexus.events.NexusStoppedEvent;
+import org.sonatype.nexus.common.app.NexusStoppedEvent;
 import org.sonatype.nexus.ldap.internal.connector.DefaultLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.FailoverLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.LdapConnector;

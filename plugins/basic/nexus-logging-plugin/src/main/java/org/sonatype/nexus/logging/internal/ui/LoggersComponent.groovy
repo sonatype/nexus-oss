@@ -73,7 +73,7 @@ extends DirectComponentSupport
   @WithWriteLock
   @RequiresPermissions('nexus:logconfig:update')
   @Validate
-  LoggerXO update(final @NotNull(message = '[loggerXO] may not be null') @Valid LoggerXO loggerXO) {
+  LoggerXO update(final @NotNull @Valid LoggerXO loggerXO) {
     logManager.setLoggerLevel(loggerXO.name, loggerXO.level)
     return new LoggerXO(
         name: loggerXO.name,
@@ -90,7 +90,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:logconfig:update')
   @Validate
-  void remove(final @NotEmpty(message = '[name] may not be empty') String name) {
+  void remove(final @NotEmpty String name) {
     assert name != ROOT, "${ROOT} logger cannot be removed"
     logManager.unsetLoggerLevel(name)
   }

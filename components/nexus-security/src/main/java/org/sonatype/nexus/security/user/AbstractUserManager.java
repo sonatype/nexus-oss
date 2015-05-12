@@ -61,7 +61,7 @@ public abstract class AbstractUserManager
                                     final Collection<String> usersRoles,
                                     final UserSearchCriteria criteria)
   {
-    if (Strings2.isNotEmpty(criteria.getUserId())
+    if (Strings2.isNotBlank(criteria.getUserId())
         && !userId.toLowerCase().startsWith(criteria.getUserId().toLowerCase())) {
       return false;
     }

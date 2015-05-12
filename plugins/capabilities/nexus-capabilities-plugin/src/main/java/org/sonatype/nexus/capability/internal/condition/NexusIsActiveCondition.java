@@ -18,8 +18,8 @@ import javax.inject.Provider;
 
 import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.support.condition.ConditionSupport;
-import org.sonatype.nexus.events.NexusStartedEvent;
-import org.sonatype.nexus.events.NexusStoppedEvent;
+import org.sonatype.nexus.common.app.NexusStartedEvent;
+import org.sonatype.nexus.common.app.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;

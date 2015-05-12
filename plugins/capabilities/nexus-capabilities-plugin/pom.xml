@@ -40,6 +40,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-repository</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-siesta-plugin</artifactId>
       <scope>provided</scope>
@@ -54,6 +60,14 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-model</artifactId>
+    </dependency>
+
+    <!--
+    FIXME: Replace usage with guava or nexus-common helpers.  Here only for org.codehaus.plexus.util.StringUtils
+    -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
     </dependency>
 
     <dependency>

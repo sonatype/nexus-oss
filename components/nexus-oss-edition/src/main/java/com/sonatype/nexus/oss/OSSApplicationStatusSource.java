@@ -15,9 +15,9 @@ package com.sonatype.nexus.oss;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.AbstractApplicationStatusSource;
-import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.app.AbstractApplicationStatusSource;
+import org.sonatype.nexus.common.app.ApplicationStatusSource;
+import org.sonatype.nexus.common.app.SystemStatus;
 
 @Singleton
 @Named

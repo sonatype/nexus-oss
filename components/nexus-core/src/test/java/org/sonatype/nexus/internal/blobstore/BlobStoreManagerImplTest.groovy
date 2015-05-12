@@ -17,7 +17,7 @@ import javax.inject.Provider
 import org.sonatype.nexus.blobstore.api.BlobStore
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
 import org.sonatype.nexus.blobstore.api.BlobStoreConfigurationStore
-import org.sonatype.nexus.common.dirs.ApplicationDirectories
+import org.sonatype.nexus.common.app.ApplicationDirectories
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import com.google.common.collect.Lists

@@ -47,11 +47,11 @@ public class MethodPrivilegeDescriptor
     String permission = privilege.getProperty(P_PERMISSION);
     String method = privilege.getProperty(P_METHOD);
 
-    if (Strings2.isEmpty(permission)) {
+    if (Strings2.isBlank(permission)) {
       permission = "*:*";
     }
 
-    if (Strings2.isEmpty(method)) {
+    if (Strings2.isBlank(method)) {
       method = "*";
     }
 
@@ -73,11 +73,11 @@ public class MethodPrivilegeDescriptor
     String method = privilege.getProperty(P_METHOD);
     String permission = privilege.getProperty(P_PERMISSION);
 
-    if (Strings2.isEmpty(permission)) {
+    if (Strings2.isBlank(permission)) {
       response.addError("Permission cannot be empty on a privilege!");
     }
 
-    if (Strings2.isEmpty(method)) {
+    if (Strings2.isBlank(method)) {
       response.addError("Method cannot be empty on a privilege!");
     }
     else {

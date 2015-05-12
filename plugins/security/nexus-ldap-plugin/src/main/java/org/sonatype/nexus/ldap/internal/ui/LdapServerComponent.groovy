@@ -126,7 +126,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:ldapconfig:create')
   @Validate(groups = [Create, Default])
-  LdapServerXO create(final @NotNull(message = '[ldapServerXO] may not be null') @Valid LdapServerXO ldapServerXO) {
+  LdapServerXO create(final @NotNull @Valid LdapServerXO ldapServerXO) {
     def id = ldapConfigurationManager.addLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), null))
     trustStoreKeys?.setEnabled(LdapTrustStoreKey.TYPE, id, ldapServerXO.useTrustStore)
     return asLdapServerXO(ldapConfigurationManager.getLdapServerConfiguration(id))
@@ -136,7 +136,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:ldapconfig:update')
   @Validate(groups = [Update, Default])
-  LdapServerXO update(final @NotNull(message = '[ldapServerXO] may not be null') @Valid LdapServerXO ldapServerXO) {
+  LdapServerXO update(final @NotNull @Valid LdapServerXO ldapServerXO) {
     LdapConfiguration existing = ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id)
     if (existing) {
       ldapConfigurationManager.updateLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), existing.connection.systemPassword))
@@ -150,7 +150,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:ldapconfig:delete')
   @Validate
-  void remove(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void remove(final @NotEmpty String id) {
     ldapConfigurationManager.deleteLdapServerConfiguration(id)
   }
 
@@ -172,7 +172,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:ldapconfig:update')
   @Validate
-  void verifyConnection(final @NotNull(message = '[ldapServerConnectionXO] may not be null') @Valid LdapServerConnectionXO ldapServerConnectionXO) {
+  void verifyConnection(final @NotNull @Valid LdapServerConnectionXO ldapServerConnectionXO) {
     String authPassword = null
     if (ldapServerConnectionXO.id) {
       LdapConfiguration existing = ldapConfigurationManager.getLdapServerConfiguration(ldapServerConnectionXO.id)
@@ -193,7 +193,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:ldapconfig:update')
   @Validate
-  Collection<LdapUser> verifyUserMapping(final @NotNull(message = '[ldapServerXO] may not be null') @Valid LdapServerXO ldapServerXO) {
+  Collection<LdapUser> verifyUserMapping(final @NotNull @Valid LdapServerXO ldapServerXO) {
     String authPassword = null
     if (ldapServerXO.id) {
       LdapConfiguration existing = ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id)
@@ -218,9 +218,9 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:ldapconfig:update')
   @Validate
-  void verifyLogin(final @NotNull(message = '[ldapServerXO] may not be null') @Valid LdapServerXO ldapServerXO,
-                   final @NotEmpty(message = '[base64Username] may not be empty') String base64Username,
-                   final @NotEmpty(message = '[base64Password] may not be empty') String base64Password)
+  void verifyLogin(final @NotNull @Valid LdapServerXO ldapServerXO,
+                   final @NotEmpty String base64Username,
+                   final @NotEmpty String base64Password)
   {
     String authPassword = null
     if (ldapServerXO.id) {
