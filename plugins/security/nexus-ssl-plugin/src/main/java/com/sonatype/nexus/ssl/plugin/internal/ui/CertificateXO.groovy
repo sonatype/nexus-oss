@@ -11,35 +11,29 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package com.sonatype.nexus.ssl.model;
+package com.sonatype.nexus.ssl.plugin.internal.ui
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import groovy.transform.ToString
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "trustStoreKey", propOrder = {
-    "enabled"
-})
-@XmlRootElement(name = "trustStoreKey")
-public class TrustStoreKeyXO
+/**
+ * Certificate exchange object.
+ *
+ * @since 3.0
+ */
+@ToString(includePackage = false, includeNames = true)
+public class CertificateXO
 {
-  @JsonProperty("enabled")
-  private boolean enabled;
-
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  public void setEnabled(boolean value) {
-    this.enabled = value;
-  }
-
-  public TrustStoreKeyXO withEnabled(boolean value) {
-    setEnabled(value);
-    return this;
-  }
+  String id
+  String fingerprint
+  String pem
+  String serialNumber
+  String subjectCommonName
+  String subjectOrganization
+  String subjectOrganizationalUnit
+  String issuerCommonName
+  String issuerOrganization
+  String issuerOrganizationalUnit
+  long issuedOn
+  long expiresOn
+  boolean inTrustStore
 }

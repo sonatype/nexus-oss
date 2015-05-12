@@ -12,6 +12,9 @@
  */
 package com.sonatype.nexus.ssl.plugin.internal.ui
 
+import java.security.cert.Certificate
+import java.security.cert.CertificateParsingException
+
 import javax.annotation.Nullable
 import javax.inject.Inject
 import javax.inject.Named
@@ -19,17 +22,23 @@ import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
-import com.sonatype.nexus.ssl.model.CertificatePemXO
-import com.sonatype.nexus.ssl.model.CertificateXO
-import com.sonatype.nexus.ssl.plugin.internal.rest.CertificatesResource
+import com.sonatype.nexus.ssl.plugin.TrustStore
+import com.sonatype.nexus.ssl.plugin.internal.CertificateRetriever
 
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.validation.ValidationMessage
+import org.sonatype.nexus.validation.ValidationResponse
+import org.sonatype.nexus.validation.ValidationResponseException
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.hibernate.validator.constraints.NotEmpty
+
+import static com.sonatype.nexus.ssl.plugin.internal.ui.TrustStoreComponent.asCertificateXO
+import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.calculateFingerprint
+import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.decodePEMFormattedCertificate
 
 /**
  * SSL Certificate {@link DirectComponent}.
@@ -43,9 +52,11 @@ class CertificateComponent
 extends DirectComponentSupport
 {
 
-  // FIXME: Do not inject a REST endpoint component as a service
   @Inject
-  CertificatesResource certificatesResource
+  TrustStore trustStore
+
+  @Inject
+  CertificateRetriever certificateRetriever
 
   /**
    * Retrieves certificate given a host/port.
@@ -60,7 +71,22 @@ extends DirectComponentSupport
                                  final @Nullable Integer port,
                                  final @Nullable String protocolHint)
   {
-    return certificatesResource.get(host, port as String, protocolHint) as CertificateXO
+    int actualPort = port ?: 443
+    Certificate[] chain
+    try {
+      chain = retrieveCertificates(host, actualPort, protocolHint)
+    }
+    catch (Exception e) {
+      String errorMessage = e.message
+      if (e instanceof UnknownHostException) {
+        errorMessage = "Unknown host '${host}'"
+      }
+      throw new IOException(errorMessage)
+    }
+    if (!chain || chain.length == 0) {
+      throw new IOException("Could not retrieve an SSL certificate from '${host}:${actualPort}'")
+    }
+    return asCertificateXO(chain[0], isInTrustStore(chain[0]))
   }
 
   /**
@@ -71,7 +97,43 @@ extends DirectComponentSupport
   @DirectMethod
   @Validate
   CertificateXO details(final @NotNull @Valid CertificatePemXO pem) {
-    return certificatesResource.details(pem)
+    try {
+      Certificate certificate = decodePEMFormattedCertificate(pem.getValue())
+      return asCertificateXO(certificate, isInTrustStore(certificate))
+    }
+    catch (CertificateParsingException e) {
+      ValidationResponse validations = new ValidationResponse()
+      validations.addError(new ValidationMessage('pem', 'Invalid PEM formatted certificate'))
+      throw new ValidationResponseException(validations)
+    }
+  }
+
+  Certificate[] retrieveCertificates(final String host,
+                                     final int port,
+                                     final String protocolHint)
+  {
+    if (protocolHint) {
+      try {
+        return certificateRetriever.retrieveCertificates(host, port)
+      }
+      catch (Exception e) {
+        log.debug('Cannot connect directly to {}:{}. Will retry using https protocol.', host, port, e)
+        return certificateRetriever.retrieveCertificatesFromHttpsServer(host, port)
+      }
+    }
+    else if ('https'.equalsIgnoreCase(protocolHint)) {
+      return certificateRetriever.retrieveCertificatesFromHttpsServer(host, port)
+    }
+    return certificateRetriever.retrieveCertificates(host, port)
+  }
+
+  boolean isInTrustStore(final Certificate certificate) {
+    try {
+      return trustStore.getTrustedCertificate(calculateFingerprint(certificate)) != null
+    }
+    catch (Exception ignore) {
+      return false
+    }
   }
 
 }
