@@ -21,7 +21,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -75,7 +74,6 @@ import static com.google.common.base.Preconditions.checkState;
  */
 @Singleton
 @Named
-@ThreadSafe
 public class MetadataRebuilder
     extends ComponentSupport
 {
