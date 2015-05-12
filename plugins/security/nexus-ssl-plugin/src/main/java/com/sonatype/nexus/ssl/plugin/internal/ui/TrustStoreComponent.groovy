@@ -120,15 +120,15 @@ extends DirectComponentSupport
           id: fingerprint,
           pem: CertificateUtil.serializeCertificateInPEM(certificate),
           fingerprint: fingerprint,
-          serialNumber: x509Certificate.getSerialNumber().toString(),
+          serialNumber: x509Certificate.serialNumber,
           subjectCommonName: subjectRdns.get("CN"),
           subjectOrganization: subjectRdns.get("O"),
           subjectOrganizationalUnit: subjectRdns.get("OU"),
           issuerCommonName: issuerRdns.get("CN"),
           issuerOrganization: issuerRdns.get("O"),
           issuerOrganizationalUnit: issuerRdns.get("OU"),
-          issuedOn: x509Certificate.getNotBefore().getTime(),
-          expiresOn: x509Certificate.getNotAfter().getTime(),
+          issuedOn: x509Certificate.notBefore.time,
+          expiresOn: x509Certificate.notAfter.time,
           inTrustStore: inTrustStore
       )
     }
