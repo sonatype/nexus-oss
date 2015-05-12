@@ -15,10 +15,10 @@ package org.sonatype.nexus.repository.httpbridge.internal;
 import javax.inject.Named;
 
 import org.sonatype.nexus.security.FilterChainModule;
+import org.sonatype.nexus.security.SecurityFilter;
 import org.sonatype.nexus.security.anonymous.AnonymousFilter;
 import org.sonatype.nexus.security.authc.NexusApiKeyAuthenticationFilter;
 import org.sonatype.nexus.security.authc.NexusBasicHttpAuthenticationFilter;
-import org.sonatype.nexus.web.SecurityFilter;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;

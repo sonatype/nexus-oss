@@ -19,7 +19,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.app.SystemStatus;
 
 import org.apache.karaf.shell.commands.InfoProvider;
 

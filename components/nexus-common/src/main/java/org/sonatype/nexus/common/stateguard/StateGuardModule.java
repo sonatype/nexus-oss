@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.common.stateguard;
 
-import javax.inject.Named;
-
 import org.sonatype.nexus.common.guice.AbstractInterceptorModule;
 
 import com.google.inject.matcher.Matchers;
@@ -23,7 +21,6 @@ import com.google.inject.matcher.Matchers;
  *
  * @since 3.0
  */
-@Named
 public class StateGuardModule
   extends AbstractInterceptorModule
 {

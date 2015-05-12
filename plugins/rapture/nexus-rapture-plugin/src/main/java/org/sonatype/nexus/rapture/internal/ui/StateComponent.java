@@ -24,13 +24,15 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
 
-import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.app.SystemStatus;
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.nexus.rapture.Rapture;
 import org.sonatype.nexus.rapture.StateContributor;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.hash.Hashing;
@@ -39,8 +41,6 @@ import com.google.gson.GsonBuilder;
 import com.softwarementors.extjs.djn.config.annotations.DirectAction;
 import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod;
 import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -104,7 +104,7 @@ public class StateComponent
         Map<String, Object> stateValues = contributor.get().getState();
         if (stateValues != null) {
           for (Entry<String, Object> entry : stateValues.entrySet()) {
-            if (StringUtils.isNotBlank(entry.getKey())) {
+            if (Strings2.isNotBlank(entry.getKey())) {
               send(values, hashes, entry.getKey(), entry.getValue());
             }
             else {
@@ -143,7 +143,7 @@ public class StateComponent
         Map<String, Object> stateCommands = contributor.get().getCommands();
         if (stateCommands != null) {
           for (Entry<String, Object> entry : stateCommands.entrySet()) {
-            if (StringUtils.isNotBlank(entry.getKey())) {
+            if (Strings2.isNotBlank(entry.getKey())) {
               CommandXO command = new CommandXO();
               command.setType(entry.getKey());
               command.setData(entry.getValue());
@@ -170,7 +170,7 @@ public class StateComponent
   {
     values.remove(key);
     String hash = hash(value);
-    if (!ObjectUtils.equals(hash, hashes.get(key))) {
+    if (!Objects.equal(hash, hashes.get(key))) {
       StateValueXO stateValueXO = new StateValueXO();
       stateValueXO.setHash(hash);
       stateValueXO.setValue(value);
@@ -198,7 +198,7 @@ public class StateComponent
           // TODO is there another way to not use serialized json? :D
           newDigest = Hashing.sha1().hashString(gson.toJson(value), Charsets.UTF_8).toString();
         }
-        if (ObjectUtils.equals(currentDigest, newDigest)) {
+        if (Objects.equal(currentDigest, newDigest)) {
           shouldSend = false;
         }
         else {
@@ -231,7 +231,7 @@ public class StateComponent
     List<String> plugins = Lists.newArrayList();
 
     for (PluginIdentity plugin : pluginIdentities) {
-      plugins.add(plugin.getCoordinates().getGroupId() + ":" + plugin.getCoordinates().getArtifactId());
+      plugins.add(plugin.getGroupId() + ":" + plugin.getArtifactId());
     }
 
     Collections.sort(plugins);

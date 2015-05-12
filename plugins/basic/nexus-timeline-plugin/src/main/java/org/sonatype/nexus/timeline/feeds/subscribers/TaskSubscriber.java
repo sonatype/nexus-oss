@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.common.event.EventSubscriber;
 import org.sonatype.nexus.scheduling.events.TaskEventStarted;
 import org.sonatype.nexus.scheduling.events.TaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.TaskEventStoppedDone;

@@ -12,7 +12,9 @@
  */
 package org.sonatype.nexus.plugin;
 
-import org.codehaus.plexus.util.StringUtils;
+import javax.annotation.Nullable;
+
+import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -20,12 +22,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Maven GAV coordinates.
  */
 @Deprecated
-public final class GAVCoordinate
+final class GAVCoordinate
 {
-  // ----------------------------------------------------------------------
-  // Implementation fields
-  // ----------------------------------------------------------------------
-
   private final String groupId;
 
   private final String artifactId;
@@ -36,10 +34,6 @@ public final class GAVCoordinate
 
   private final String type;
 
-  // ----------------------------------------------------------------------
-  // Constructors
-  // ----------------------------------------------------------------------
-
   GAVCoordinate(final String groupId, final String artifactId, final String version) {
     this(groupId, artifactId, version, null, null);
   }
@@ -47,8 +41,8 @@ public final class GAVCoordinate
   GAVCoordinate(final String groupId,
                 final String artifactId,
                 final String version,
-                final String classifier,
-                final String type)
+                @Nullable final String classifier,
+                @Nullable final String type)
   {
     this.groupId = checkNotNull(groupId);
     this.artifactId = checkNotNull(artifactId);
@@ -56,10 +50,6 @@ public final class GAVCoordinate
     this.classifier = classifier;
     this.type = type;
   }
-
-  // ----------------------------------------------------------------------
-  // Public methods
-  // ----------------------------------------------------------------------
 
   public String getGroupId() {
     return groupId;
@@ -73,10 +63,12 @@ public final class GAVCoordinate
     return version;
   }
 
+  @Nullable
   public String getClassifier() {
     return classifier;
   }
 
+  @Nullable
   public String getType() {
     return type;
   }
@@ -101,8 +93,8 @@ public final class GAVCoordinate
   public String toString() {
     final StringBuilder buf = new StringBuilder();
     buf.append(groupId).append(':').append(artifactId).append(':').append(version);
-    final boolean haveType = StringUtils.isNotEmpty(type);
-    if (StringUtils.isNotEmpty(classifier)) {
+    final boolean haveType = Strings.emptyToNull(type) != null;
+    if (Strings.emptyToNull(classifier) != null) {
       buf.append(':').append(classifier);
     }
     else if (haveType) {

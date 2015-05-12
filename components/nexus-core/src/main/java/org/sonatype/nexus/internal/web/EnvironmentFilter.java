@@ -26,9 +26,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.app.BaseUrlManager;
+import org.sonatype.nexus.common.app.SystemStatus;
 import org.sonatype.nexus.security.UserIdMdcHelper;
-import org.sonatype.nexus.web.BaseUrlDetector;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -48,14 +48,14 @@ public class EnvironmentFilter
 {
   private final String serverHeader;
 
-  private final BaseUrlDetector baseUrlDetector;
+  private final BaseUrlManager baseUrlManager;
 
   @Inject
   public EnvironmentFilter(final Provider<SystemStatus> statusProvider,
-                           final BaseUrlDetector baseUrlDetector)
+                           final BaseUrlManager baseUrlManager)
   {
     checkNotNull(statusProvider);
-    this.baseUrlDetector = checkNotNull(baseUrlDetector);
+    this.baseUrlManager = checkNotNull(baseUrlManager);
 
     // cache "Server" header value
     SystemStatus status = statusProvider.get();
@@ -83,7 +83,7 @@ public class EnvironmentFilter
     UserIdMdcHelper.unknown();
 
     // detect base-url
-    baseUrlDetector.set();
+    baseUrlManager.detectAndHoldUrl();
 
     // fill in default response headers
     defaultHeaders(httpResponse);

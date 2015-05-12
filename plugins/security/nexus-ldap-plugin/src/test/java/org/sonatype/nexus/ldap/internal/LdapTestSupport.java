@@ -29,13 +29,20 @@ import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.WebSecurityModule;
+import org.sonatype.nexus.security.config.MemorySecurityConfiguration;
+import org.sonatype.nexus.security.config.PreconfiguredSecurityConfigurationSource;
+import org.sonatype.nexus.security.config.SecurityConfigurationSource;
 import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
 import org.sonatype.sisu.litmus.testsupport.port.PortRegistry;
 
 import com.google.common.collect.Maps;
+import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import com.google.inject.name.Names;
 import net.sf.ehcache.CacheManager;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 
@@ -47,7 +54,7 @@ import static org.mockito.Mockito.mock;
  * Support for LDAP UTs with in-memory configuration source.
  */
 public abstract class LdapTestSupport
-    extends SecurityTestSupport
+    extends NexusTestSupport
 {
   private final PortRegistry portRegistry = new PortRegistry();
 
@@ -60,8 +67,22 @@ public abstract class LdapTestSupport
   @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
+
     modules.add(new WebSecurityModule(mock(ServletContext.class)));
-    // test specific bindings
+
+    final MemorySecurityConfiguration securityModelConfig = getSecurityModelConfig();
+    if (securityModelConfig != null) {
+      modules.add(new AbstractModule()
+      {
+        @Override
+        protected void configure() {
+          bind(SecurityConfigurationSource.class)
+              .annotatedWith(Names.named("default"))
+              .toInstance(new PreconfiguredSecurityConfigurationSource(securityModelConfig));
+        }
+      });
+    }
+
     modules.add(new Module()
     {
       @Override
@@ -73,6 +94,10 @@ public abstract class LdapTestSupport
         }
       }
     });
+  }
+
+  protected MemorySecurityConfiguration getSecurityModelConfig() {
+    return null;
   }
 
   /**
@@ -220,5 +245,23 @@ public abstract class LdapTestSupport
 
   protected File resolveDefaultLdifFile() {
     return util.resolveFile("src/test/resources/defaults/ut/default-ldap.ldif");
+  }
+
+  /**
+   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
+   */
+  @Deprecated
+  protected void assertEquals(String message, Object expected, Object actual) {
+    // don't use junit framework Assert due to autoboxing bug
+    MatcherAssert.assertThat(message, actual, Matchers.equalTo(expected));
+  }
+
+  /**
+   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
+   */
+  @Deprecated
+  protected void assertEquals(Object expected, Object actual) {
+    // don't use junit framework Assert
+    MatcherAssert.assertThat(actual, Matchers.equalTo(expected));
   }
 }

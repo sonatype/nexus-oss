@@ -30,6 +30,8 @@ import org.jetbrains.annotations.NonNls;
  * even if the class is not directly injected.
  *
  * @since 2.7
+ *
+ * @deprecated To be removed, or replaced in the future, avoid using for new code.
  */
 @Deprecated
 public class PluginIdentity
@@ -44,7 +46,7 @@ public class PluginIdentity
     this.coordinates = loadCoordinates(groupId, artifactId);
   }
 
-  protected GAVCoordinate loadCoordinates(final String groupId, final String artifactId) throws IOException {
+  private GAVCoordinate loadCoordinates(final String groupId, final String artifactId) throws IOException {
     String path = String.format("/META-INF/maven/%s/%s/pom.properties", groupId, artifactId); //NON-NLS
     URL url = getClass().getResource(path);
 
@@ -73,15 +75,15 @@ public class PluginIdentity
     return gav;
   }
 
-  public GAVCoordinate getCoordinates() {
-    return coordinates;
+  public String getGroupId() {
+    return coordinates.getGroupId();
   }
 
-  public String getId() {
-    return getCoordinates().getArtifactId();
+  public String getArtifactId() {
+    return coordinates.getArtifactId();
   }
 
   public String getVersion() {
-    return getCoordinates().getVersion();
+    return coordinates.getVersion();
   }
 }

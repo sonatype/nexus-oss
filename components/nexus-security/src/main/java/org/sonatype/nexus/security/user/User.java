@@ -55,7 +55,7 @@ public class User
 
   public String getName() {
     String name = this.getFirstName() != null ? this.getFirstName() : "";
-    if (Strings2.isNotEmpty(this.getLastName())) {
+    if (Strings2.isNotBlank(this.getLastName())) {
       name += " " + this.getLastName();
     }
     return name;
@@ -63,7 +63,7 @@ public class User
 
   public void setName(String name) {
     // deprecated, but attempt to use
-    if (Strings2.isNotEmpty(name)) {
+    if (Strings2.isNotBlank(name)) {
       String[] nameParts = name.trim().split(" ", 2);
       this.setFirstName(nameParts[0]);
       if (nameParts.length > 1) {

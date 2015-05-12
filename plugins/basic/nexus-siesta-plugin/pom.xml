@@ -50,8 +50,9 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-servlet</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

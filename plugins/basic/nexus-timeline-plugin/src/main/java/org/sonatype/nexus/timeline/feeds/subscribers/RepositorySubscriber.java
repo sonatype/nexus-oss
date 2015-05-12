@@ -17,9 +17,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.events.Asynchronous;
-import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.common.app.SystemStatus;
+import org.sonatype.nexus.common.event.Asynchronous;
+import org.sonatype.nexus.common.event.EventSubscriber;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
 import static com.google.common.base.Preconditions.checkNotNull;

@@ -24,7 +24,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
@@ -35,7 +34,6 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
  * @since 2.8
  *
  * @see ErrorPageServlet
- * @see ErrorStatusException
  */
 @Singleton
 public class ErrorPageFilter
@@ -63,10 +61,6 @@ public class ErrorPageFilter
     // Custom handling here to avoid logging from Jetty implementation
     try {
       chain.doFilter(request, response);
-    }
-    catch (ErrorStatusException e) {
-      ErrorPageServlet.attachCause(request, e);
-      response.sendError(e.getResponseCode(), e.getReasonPhrase());
     }
     catch (Exception e) {
       ErrorPageServlet.attachCause(request, e);

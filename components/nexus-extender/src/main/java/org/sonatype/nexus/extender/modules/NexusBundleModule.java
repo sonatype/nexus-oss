@@ -117,7 +117,7 @@ public class NexusBundleModule
   }
 
   private void maybeAddSecurityFilter(List<Module> modules) {
-    if (imports.contains("org.sonatype.nexus.web")) {
+    if (imports.contains("org.sonatype.nexus.security")) {
       modules.add(securityFilterModule);
     }
   }

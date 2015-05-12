@@ -32,11 +32,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.app.BaseUrlHolder;
+import org.sonatype.nexus.common.app.SystemStatus;
 import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedSource;
-import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.siesta.Resource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 

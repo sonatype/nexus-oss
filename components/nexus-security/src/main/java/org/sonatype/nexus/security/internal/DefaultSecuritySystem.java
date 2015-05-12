@@ -457,7 +457,7 @@ public class DefaultSecuritySystem
     Set<User> result = new HashSet<>();
 
     // if the source is not set search all realms.
-    if (Strings2.isEmpty(criteria.getSource())) {
+    if (Strings2.isBlank(criteria.getSource())) {
       // search all user managers
       for (UserManager userManager : getUserManagers()) {
         Set<User> users = userManager.searchUsers(criteria);

@@ -639,14 +639,14 @@ public class SecurityConfigurationManagerImpl
     newRole.setPrivileges(Sets.newHashSet(privs));
 
     // now for the name and description
-    if (Strings2.isNotEmpty(roleA.getName())) {
+    if (Strings2.isNotBlank(roleA.getName())) {
       newRole.setName(roleA.getName());
     }
     else {
       newRole.setName(roleB.getName());
     }
 
-    if (Strings2.isNotEmpty(roleA.getDescription())) {
+    if (Strings2.isNotBlank(roleA.getDescription())) {
       newRole.setDescription(roleA.getDescription());
     }
     else {

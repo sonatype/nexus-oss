@@ -22,11 +22,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.nexus.timeline.feeds.FeedSource;
 import org.sonatype.nexus.timeline.feeds.rest.model.FeedEntriesXO;
 import org.sonatype.nexus.timeline.feeds.rest.model.FeedEntryXO;
-import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.siesta.Resource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 

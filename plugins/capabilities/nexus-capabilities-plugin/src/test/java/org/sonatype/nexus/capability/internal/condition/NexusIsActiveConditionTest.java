@@ -13,8 +13,8 @@
 package org.sonatype.nexus.capability.internal.condition;
 
 import org.sonatype.nexus.capability.EventBusTestSupport;
-import org.sonatype.nexus.events.NexusStartedEvent;
-import org.sonatype.nexus.events.NexusStoppedEvent;
+import org.sonatype.nexus.common.app.NexusStartedEvent;
+import org.sonatype.nexus.common.app.NexusStoppedEvent;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -12,12 +12,9 @@
  */
 package org.sonatype.nexus.internal.security.model
 
-import com.google.inject.util.Providers
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+
 import org.sonatype.nexus.orient.MemoryDatabaseManager
 import org.sonatype.nexus.orient.MinimalDatabaseServer
 import org.sonatype.nexus.security.config.CPrivilege
@@ -29,16 +26,18 @@ import org.sonatype.nexus.security.config.StaticSecurityConfigurationSource
 import org.sonatype.nexus.security.internal.SecurityConfigurationCleanerImpl
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import com.google.inject.util.Providers
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.hasSize
 
 /**
  * Parallel security cleanup UTs.
- *
- * @since 3.0
  */
 class ConcurrentCleanupTest
 extends TestSupport
