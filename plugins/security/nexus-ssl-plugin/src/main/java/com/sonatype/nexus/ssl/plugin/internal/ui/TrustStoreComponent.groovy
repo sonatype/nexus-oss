@@ -107,9 +107,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static CertificateXO asCertificateXO(final Certificate certificate, final boolean inNexusSSLTrustStore)
-  throws Exception
-  {
+  static CertificateXO asCertificateXO(final Certificate certificate, final boolean inNexusSSLTrustStore) {
     String fingerprint = calculateFingerprint(certificate)
 
     if (certificate instanceof X509Certificate) {
