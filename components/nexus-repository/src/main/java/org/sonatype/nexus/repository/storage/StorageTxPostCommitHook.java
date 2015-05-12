@@ -50,7 +50,7 @@ public abstract class StorageTxPostCommitHook
   public void deleteAsset(final Asset... assets) {}
 
   /**
-   * Called after {@link StorageTx#commit()} successfuly executed.
+   * Called after {@link StorageTx#commit()} successfully executed.
    */
   public void execute() {}
 }

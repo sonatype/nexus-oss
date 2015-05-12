@@ -12,17 +12,16 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.collect.Lists;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Component eventing related {@link StorageTxPostCommitHook}.
+ * A {@link StorageTxPostCommitHook} that fires component events.
  *
  * @since 3.0
  */
@@ -38,11 +37,10 @@ public class StorageEventsPostCommitHook
   public StorageEventsPostCommitHook(final EventBus eventBus, final Repository repository) {
     this.eventBus = checkNotNull(eventBus);
     this.repository = checkNotNull(repository);
-    this.events = Lists.newArrayList();
+    this.events = new ArrayList<>();
   }
 
   @Override
-
   public void createComponent(final Component... components) {
     for (Component component : components) {
       events.add(new ComponentCreatedEvent(component, repository));

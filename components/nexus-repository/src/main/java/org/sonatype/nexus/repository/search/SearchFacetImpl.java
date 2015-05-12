@@ -45,7 +45,13 @@ public class SearchFacetImpl
   @Override
   protected void doInit(final Configuration configuration) throws Exception {
     super.doInit(configuration);
-    facet(StorageFacet.class).registerHookSupplier(this);
+    facet(StorageFacet.class).registerHookSupplier(new Supplier<StorageTxPostCommitHook>()
+    {
+      @Override
+      public StorageTxPostCommitHook get() {
+        return new SearchPostCommitHook(searchService, getRepository());
+      }
+    });
   }
 
   @Override
@@ -56,10 +62,5 @@ public class SearchFacetImpl
   @Override
   protected void doDelete() {
     searchService.deleteIndex(getRepository());
-  }
-
-  @Override
-  public StorageTxPostCommitHook get() {
-    return new SearchPostCommitHook(searchService, getRepository());
   }
 }
