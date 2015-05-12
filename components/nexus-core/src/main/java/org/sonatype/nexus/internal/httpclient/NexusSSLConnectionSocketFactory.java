@@ -15,29 +15,22 @@ package org.sonatype.nexus.internal.httpclient;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.httpclient.SSLContextSelector;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.google.common.io.Closeables;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.protocol.HttpContext;
-import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
-import sun.security.ssl.SSLSocketImpl;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.http.conn.ssl.SSLConnectionSocketFactory.getDefaultHostnameVerifier;
 
 /**
  * Nexus specific implementation of {@link LayeredConnectionSocketFactory}, used for HTTPS connections.
@@ -49,63 +42,42 @@ public class NexusSSLConnectionSocketFactory
 {
   private static final Splitter propertiesSplitter = Splitter.on(',').trimResults().omitEmptyStrings();
 
-  private final SSLSocketFactory defaultSocketFactory;
+  private final SSLConnectionSocketFactory defaultSocketFactory;
 
   @Nullable
   private final List<SSLContextSelector> sslContextSelectors;
-
-  private final X509HostnameVerifier hostnameVerifier;
 
   private final String[] supportedProtocols;
 
   private final String[] supportedCipherSuites;
 
-  public NexusSSLConnectionSocketFactory(final SSLSocketFactory defaultSocketFactory,
-                                         final X509HostnameVerifier hostnameVerifier,
-                                         @Nullable final List<SSLContextSelector> sslContextSelectors)
-  {
-    this.defaultSocketFactory = checkNotNull(defaultSocketFactory);
-    this.hostnameVerifier = checkNotNull(hostnameVerifier);
+  public NexusSSLConnectionSocketFactory(final @Nullable List<SSLContextSelector> sslContextSelectors) {
+    this.defaultSocketFactory = SSLConnectionSocketFactory.getSystemSocketFactory();
     this.sslContextSelectors = sslContextSelectors; // might be null
     this.supportedProtocols = split(System.getProperty("https.protocols"));
     this.supportedCipherSuites = split(System.getProperty("https.cipherSuites"));
   }
 
-  public NexusSSLConnectionSocketFactory(@Nullable final List<SSLContextSelector> sslContextSelectors) {
-    this((javax.net.ssl.SSLSocketFactory) javax.net.ssl.SSLSocketFactory.getDefault(),
-        SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER,
-        sslContextSelectors);
-  }
-
-  private SSLSocketFactory select(final HttpContext context) {
+  private SSLConnectionSocketFactory select(final HttpContext context) {
     if (sslContextSelectors != null) {
       for (SSLContextSelector selector : sslContextSelectors) {
         SSLContext sslContext = selector.select(context);
         if (sslContext != null) {
-          return sslContext.getSocketFactory();
+          return new SSLConnectionSocketFactory(
+              sslContext, supportedProtocols, supportedCipherSuites, getDefaultHostnameVerifier()
+          );
         }
       }
     }
     return defaultSocketFactory;
   }
 
-  private void verifyHostname(final SSLSocket sslsock, final String hostname) throws IOException {
-    try {
-      hostnameVerifier.verify(hostname, sslsock);
-    }
-    catch (final IOException e) {
-      Closeables.close(sslsock, true);
-      throw e;
-    }
-  }
-
   @Override
   public Socket createSocket(final HttpContext context) throws IOException {
-    return configure((SSLSocket) select(context).createSocket());
+    return select(context).createSocket(context);
   }
 
   @Override
-  @IgnoreJRERequirement
   public Socket connectSocket(final int connectTimeout,
                               final Socket socket,
                               final HttpHost host,
@@ -114,74 +86,18 @@ public class NexusSSLConnectionSocketFactory
                               final HttpContext context)
       throws IOException
   {
-    checkNotNull(host);
-    checkNotNull(remoteAddress);
-    final Socket sock = socket != null ? socket : createSocket(context);
-    if (localAddress != null) {
-      sock.bind(localAddress);
-    }
-    // NEXUS-6838: Server Name Indication support, a TLS feature that allows SSL
-    // "virtual hosting" (multiple certificates) over single IP address + port.
-    // Some CDN solutions requires this for HTTPS, as they choose certificate
-    // to use based on "expected" hostname that is being passed here below
-    // and is used during SSL handshake. Requires Java7+
-    if (sock instanceof SSLSocketImpl) {
-      ((SSLSocketImpl) sock).setHost(host.getHostName());
-    }
-    try {
-      sock.connect(remoteAddress, connectTimeout);
-    }
-    catch (final IOException e) {
-      Closeables.close(sock, true);
-      throw e;
-    }
-    // Setup SSL layering if necessary
-    if (sock instanceof SSLSocket) {
-      final SSLSocket sslsock = (SSLSocket) sock;
-      sslsock.startHandshake();
-      verifyHostname(sslsock, host.getHostName());
-      return sock;
-    }
-    else {
-      return createLayeredSocket(sock, host.getHostName(), remoteAddress.getPort(), context);
-    }
+    return select(context).connectSocket(connectTimeout, socket, host, remoteAddress, localAddress, context);
   }
 
   @Override
   public Socket createLayeredSocket(final Socket socket, final String target, final int port, final HttpContext context)
       throws IOException
   {
-    checkNotNull(socket);
-    checkNotNull(target);
-    final SSLSocket sslsock = configure((SSLSocket) select(context).createSocket(socket, target, port, true));
-    sslsock.startHandshake();
-    verifyHostname(sslsock, target);
-    return sslsock;
-  }
-
-  private SSLSocket configure(final SSLSocket socket) {
-    if (supportedProtocols != null) {
-      socket.setEnabledProtocols(supportedProtocols);
-    }
-    else {
-      // If supported protocols are not explicitly set, remove all SSL protocol versions
-      String[] allProtocols = socket.getSupportedProtocols();
-      List<String> enabledProtocols = new ArrayList<>(allProtocols.length);
-      for (String protocol : allProtocols) {
-        if (!protocol.startsWith("SSL")) {
-          enabledProtocols.add(protocol);
-        }
-      }
-      socket.setEnabledProtocols(enabledProtocols.toArray(new String[enabledProtocols.size()]));
-    }
-    if (supportedCipherSuites != null) {
-      socket.setEnabledCipherSuites(supportedCipherSuites);
-    }
-    return socket;
+    return select(context).createLayeredSocket(socket, target, port, context);
   }
 
   private static String[] split(final String s) {
-    if (StringUtils.isBlank(s)) {
+    if (Strings2.isBlank(s)) {
       return null;
     }
     return Iterables.toArray(propertiesSplitter.split(s), String.class);
