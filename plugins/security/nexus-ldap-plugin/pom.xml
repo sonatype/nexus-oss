@@ -68,7 +68,7 @@
     </dependency>
 
     <!--
-    FIXME: Replace usage with guava or nexus-common helpers.  Here only for org.codehaus.plexus.util.StringUtils
+    FIXME: Replace usage with guava or nexus-common helpers.  Here only for org.codehaus.plexus.util.StringUtils.replace()
     -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
