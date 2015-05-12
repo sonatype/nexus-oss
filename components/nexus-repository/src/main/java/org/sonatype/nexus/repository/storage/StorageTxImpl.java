@@ -69,6 +69,8 @@ public class StorageTxImpl
 
   private final WritePolicy writePolicy;
 
+  private final WritePolicySelector writePolicySelector;
+
   private final StateGuard stateGuard = new StateGuard.Builder().initial(OPEN).create();
 
   private final BucketEntityAdapter bucketEntityAdapter;
@@ -81,6 +83,7 @@ public class StorageTxImpl
                        final ODatabaseDocumentTx db,
                        final Bucket bucket,
                        final WritePolicy writePolicy,
+                       final WritePolicySelector writePolicySelector,
                        final BucketEntityAdapter bucketEntityAdapter,
                        final ComponentEntityAdapter componentEntityAdapter,
                        final AssetEntityAdapter assetEntityAdapter)
@@ -89,6 +92,7 @@ public class StorageTxImpl
     this.db = checkNotNull(db);
     this.bucket = checkNotNull(bucket);
     this.writePolicy = writePolicy;
+    this.writePolicySelector = checkNotNull(writePolicySelector);
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
@@ -342,7 +346,7 @@ public class StorageTxImpl
 
     BlobRef blobRef = asset.blobRef();
     if (blobRef != null) {
-      deleteBlob(blobRef, checkWritePolicy);
+      deleteBlob(asset, blobRef, checkWritePolicy);
     }
     assetEntityAdapter.delete(db, asset);
   }
@@ -403,17 +407,17 @@ public class StorageTxImpl
     checkNotNull(hashAlgorithms);
     checkNotNull(contentType);
 
-    if (writePolicy == WritePolicy.DENY) {
+    if (writePolicySelector.select(asset, writePolicy) == WritePolicy.DENY) {
       throw new IllegalOperationException("Repository is read only.");
     }
 
     // Delete old blob if necessary
     BlobRef oldBlobRef = asset.blobRef();
     if (oldBlobRef != null) {
-      if (writePolicy == WritePolicy.ALLOW_ONCE) {
+      if (writePolicySelector.select(asset, writePolicy) == WritePolicy.ALLOW_ONCE) {
         throw new IllegalOperationException("Repository does not allow updating assets.");
       }
-      deleteBlob(oldBlobRef, true);
+      deleteBlob(asset, oldBlobRef, true);
     }
 
     // Store new blob while calculating hashes in one pass
@@ -451,9 +455,9 @@ public class StorageTxImpl
     return blob;
   }
 
-  private void deleteBlob(final BlobRef blobRef, boolean checkWritePolicy) {
+  private void deleteBlob(final Asset asset, final BlobRef blobRef, boolean checkWritePolicy) {
     checkNotNull(blobRef);
-    if (checkWritePolicy && writePolicy == WritePolicy.DENY) {
+    if (checkWritePolicy && writePolicySelector.select(asset, writePolicy) == WritePolicy.DENY) {
       throw new IllegalOperationException("Repository is read only.");
     }
     blobTx.delete(blobRef);
