@@ -222,7 +222,9 @@ public class MetadataBuilder
       }
     }
     catch (InvalidVersionSpecificationException e) {
-      // nada
+      // According to versionScheme implementation we use, this exception will never happen
+      // log + ignore
+      log.info("Invalid baseVersion discovered: " + baseVersion , e);
     }
   }
 
