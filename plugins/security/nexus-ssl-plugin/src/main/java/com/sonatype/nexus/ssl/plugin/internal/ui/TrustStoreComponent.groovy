@@ -38,6 +38,7 @@ import org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
@@ -105,6 +106,7 @@ extends DirectComponentSupport
     trustStore.removeTrustCertificate(id)
   }
 
+  @PackageScope
   static CertificateXO asCertificateXO(final Certificate certificate, final boolean inNexusSSLTrustStore)
   throws Exception
   {
@@ -141,7 +143,7 @@ extends DirectComponentSupport
     }
   }
 
-  static Map<String, String> getRdns(final String dn) {
+  private static Map<String, String> getRdns(final String dn) {
     Map<String, String> rdns = [:]
     LdapName ldapName = new LdapName(dn)
     for (Rdn rdn : ldapName.rdns) {
