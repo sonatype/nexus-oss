@@ -17,24 +17,21 @@ package org.sonatype.nexus.repository.storage;
  *
  * @since 3.0
  */
-public abstract class WritePolicySelector
+public interface WritePolicySelector
 {
   /**
    * Default instance of {@link WritePolicy} selector, that returns the configured {@link WritePolicy} unchanged.
    */
-  public static final WritePolicySelector DEFAULT = new DefaultWritePolicySelector();
-
-  private static class DefaultWritePolicySelector
-      extends WritePolicySelector
+  WritePolicySelector DEFAULT = new WritePolicySelector()
   {
     @Override
     public WritePolicy select(final Asset asset, final WritePolicy configured) {
       return configured;
     }
-  }
+  };
 
   /**
    * Returns the effective {@link WritePolicy} for given asset blob changes.
    */
-  public abstract WritePolicy select(final Asset asset, final WritePolicy configured);
+  WritePolicy select(final Asset asset, final WritePolicy configured);
 }

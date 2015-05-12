@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class MavenWritePolicySelector
-    extends WritePolicySelector
+    implements WritePolicySelector
 {
   private final MavenPathParser mavenPathParser;
 

@@ -54,7 +54,7 @@ public interface StorageFacet
 
   /**
    * Registers format specific selector for {@link WritePolicy}. If not set, the {@link
-   * WritePolicySelector#DEFAULT} is used (returns the configured write policy).
+   * WritePolicySelector#DEFAULT} is used which returns the configured write policy.
    */
   void registerWritePolicySelector(WritePolicySelector writePolicySelector);
 

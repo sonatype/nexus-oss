@@ -330,7 +330,7 @@ public class StorageTxImpl
     checkNotNull(component);
 
     for (Asset asset : browseAssets(component)) {
-      deleteAsset(asset, checkWritePolicy);
+      deleteAsset(asset, checkWritePolicy ? writePolicySelector.select(asset, writePolicy) : null);
     }
     componentEntityAdapter.delete(db, component);
   }
@@ -338,15 +338,15 @@ public class StorageTxImpl
   @Override
   @Guarded(by = OPEN)
   public void deleteAsset(Asset asset) {
-    deleteAsset(asset, true);
+    deleteAsset(asset, writePolicySelector.select(asset, writePolicy));
   }
 
-  private void deleteAsset(final Asset asset, final boolean checkWritePolicy) {
+  private void deleteAsset(final Asset asset, @Nullable final WritePolicy effectiveWritePolicy) {
     checkNotNull(asset);
 
     BlobRef blobRef = asset.blobRef();
     if (blobRef != null) {
-      deleteBlob(asset, blobRef, checkWritePolicy);
+      deleteBlob(blobRef, effectiveWritePolicy);
     }
     assetEntityAdapter.delete(db, asset);
   }
@@ -370,7 +370,7 @@ public class StorageTxImpl
 
     // then delete all standalone assets
     for (Asset asset : browseAssets(bucket)) {
-      deleteAsset(asset, false);
+      deleteAsset(asset, null);
       count++;
       if (count == DELETE_BATCH_SIZE) {
         commit();
@@ -418,7 +418,7 @@ public class StorageTxImpl
       if (effectiveWritePolicy == WritePolicy.ALLOW_ONCE) {
         throw new IllegalOperationException("Repository does not allow updating assets.");
       }
-      deleteBlob(asset, oldBlobRef, true);
+      deleteBlob(oldBlobRef, effectiveWritePolicy);
     }
 
     // Store new blob while calculating hashes in one pass
@@ -456,9 +456,14 @@ public class StorageTxImpl
     return blob;
   }
 
-  private void deleteBlob(final Asset asset, final BlobRef blobRef, boolean checkWritePolicy) {
+  /**
+   * Deletes a blob w/ enforcing {@link WritePolicy} if not {@code null}. Write policy will NOT be checked if {@code
+   * null}
+   * passed in.
+   */
+  private void deleteBlob(final BlobRef blobRef, @Nullable WritePolicy effectiveWritePolicy) {
     checkNotNull(blobRef);
-    if (checkWritePolicy && writePolicySelector.select(asset, writePolicy) == WritePolicy.DENY) {
+    if (effectiveWritePolicy != null && effectiveWritePolicy == WritePolicy.DENY) {
       throw new IllegalOperationException("Repository is read only.");
     }
     blobTx.delete(blobRef);
