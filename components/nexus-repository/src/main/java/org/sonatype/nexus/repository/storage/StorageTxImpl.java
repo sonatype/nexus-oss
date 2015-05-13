@@ -79,7 +79,7 @@ public class StorageTxImpl
 
   private final AssetEntityAdapter assetEntityAdapter;
 
-  private final StorageTxPostCommitHook hook;
+  private final StorageTxHook hook;
 
   public StorageTxImpl(final BlobTx blobTx,
                        final ODatabaseDocumentTx db,
@@ -89,7 +89,7 @@ public class StorageTxImpl
                        final BucketEntityAdapter bucketEntityAdapter,
                        final ComponentEntityAdapter componentEntityAdapter,
                        final AssetEntityAdapter assetEntityAdapter,
-                       final StorageTxPostCommitHook hook)
+                       final StorageTxHook hook)
   {
     this.blobTx = checkNotNull(blobTx);
     this.db = checkNotNull(db);

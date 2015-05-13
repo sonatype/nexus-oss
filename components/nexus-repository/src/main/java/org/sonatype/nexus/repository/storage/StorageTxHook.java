@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
  *
  * @since 3.0
  */
-public abstract class StorageTxPostCommitHook
+public abstract class StorageTxHook
 {
   /**
    * Called when {@link StorageTx#saveComponent(Component)} invoked with created component.

@@ -61,7 +61,7 @@ public class StorageFacetImpl
 
   private final AssetEntityAdapter assetEntityAdapter;
 
-  private final List<Supplier<StorageTxPostCommitHook>> hookSuppliers;
+  private final List<Supplier<StorageTxHook>> hookSuppliers;
 
   @VisibleForTesting
   static final String CONFIG_KEY = "storage";
@@ -105,11 +105,11 @@ public class StorageFacetImpl
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
 
     this.hookSuppliers = Lists.newArrayList();
-    this.hookSuppliers.add(new Supplier<StorageTxPostCommitHook>()
+    this.hookSuppliers.add(new Supplier<StorageTxHook>()
     {
       @Override
-      public StorageTxPostCommitHook get() {
-        return new StorageEventsPostCommitHook(getEventBus(), getRepository());
+      public StorageTxHook get() {
+        return new EventsHook(getEventBus(), getRepository());
       }
     });
   }
@@ -170,7 +170,7 @@ public class StorageFacetImpl
 
   @Override
   @Guarded(by = NEW)
-  public void registerHookSupplier(final Supplier<StorageTxPostCommitHook> hookSupplier) {
+  public void registerHookSupplier(final Supplier<StorageTxHook> hookSupplier) {
     checkNotNull(hookSupplier);
     hookSuppliers.add(hookSupplier);
   }
@@ -190,8 +190,8 @@ public class StorageFacetImpl
 
   private StorageTx openStorageTx() {
     BlobStore blobStore = blobStoreManager.get(config.blobStoreName);
-    final List<StorageTxPostCommitHook> hooks = Lists.newArrayList();
-    for (Supplier<StorageTxPostCommitHook> hookSupplier : hookSuppliers) {
+    final List<StorageTxHook> hooks = Lists.newArrayList();
+    for (Supplier<StorageTxHook> hookSupplier : hookSuppliers) {
       hooks.add(hookSupplier.get());
     }
     return StateGuardAspect.around(new StorageTxImpl(

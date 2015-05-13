@@ -10,93 +10,84 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.search;
+package org.sonatype.nexus.repository.storage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.common.entity.EntityHelper;
-import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.storage.Asset;
-import org.sonatype.nexus.repository.storage.Component;
-import org.sonatype.nexus.repository.storage.StorageTxPostCommitHook;
-
-import com.google.common.collect.Lists;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Search related {@link StorageTxPostCommitHook}.
+ * A {@link StorageTxHook} that fires component events.
  *
  * @since 3.0
  */
-public class SearchPostCommitHook
-    extends StorageTxPostCommitHook
+public class EventsHook
+    extends StorageTxHook
 {
-  private final SearchService searchService;
+  private final EventBus eventBus;
 
   private final Repository repository;
 
-  private final List<Component> indexable;
+  private final List<Object> events;
 
-  private final List<EntityId> deindexable;
-
-  public SearchPostCommitHook(final SearchService searchService, final Repository repository) {
-    this.searchService = checkNotNull(searchService);
+  public EventsHook(final EventBus eventBus, final Repository repository) {
+    this.eventBus = checkNotNull(eventBus);
     this.repository = checkNotNull(repository);
-    this.indexable = Lists.newArrayList();
-    this.deindexable = Lists.newArrayList();
+    this.events = new ArrayList<>();
   }
 
   @Override
   public void createComponent(final Component... components) {
-    updateComponent(components);
+    for (Component component : components) {
+      events.add(new ComponentCreatedEvent(component, repository));
+    }
   }
 
   @Override
   public void updateComponent(final Component... components) {
     for (Component component : components) {
-      indexable.add(component);
+      events.add(new ComponentUpdatedEvent(component, repository));
     }
   }
 
   @Override
   public void deleteComponent(final Component... components) {
     for (Component component : components) {
-      deindexable.add(EntityHelper.id(component));
+      events.add(new ComponentDeletedEvent(component, repository));
     }
   }
 
   @Override
   public void createAsset(@Nullable final Component component, final Asset... assets) {
-    if (component != null) {
-      updateComponent(component);
+    for (Asset asset : assets) {
+      events.add(new AssetCreatedEvent(component, asset, repository));
     }
   }
 
   @Override
   public void updateAsset(@Nullable final Component component, final Asset... assets) {
-    if (component != null) {
-      updateComponent(component);
+    for (Asset asset : assets) {
+      events.add(new AssetUpdatedEvent(component, asset, repository));
     }
   }
 
   @Override
   public void deleteAsset(@Nullable final Component component, final Asset... assets) {
-    if (component != null) {
-      updateComponent(component);
+    for (Asset asset : assets) {
+      events.add(new AssetDeletedEvent(component, asset, repository));
     }
   }
 
   @Override
   public void postCommit() {
-    for (EntityId entityId : deindexable) {
-      searchService.delete(repository, entityId.toString());
-    }
-    for (Component component : indexable) {
-      searchService.put(repository, component, EntityHelper.id(component).toString());
+    for (Object event : events) {
+      eventBus.post(event);
     }
   }
 }

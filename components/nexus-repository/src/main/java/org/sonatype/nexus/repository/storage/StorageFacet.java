@@ -55,10 +55,10 @@ public interface StorageFacet
   static String P_VERSION = "version";
 
   /**
-   * Registers a supplier for {@link StorageTxPostCommitHook}. Only possible while this facet is new, most appropriate
+   * Registers a supplier for {@link StorageTxHook}. Only possible while this facet is new, most appropriate
    * in a recipe or alike.
    */
-  void registerHookSupplier(Supplier<StorageTxPostCommitHook> hookSupplier);
+  void registerHookSupplier(Supplier<StorageTxHook> hookSupplier);
 
   /**
    * Registers format specific selector for {@link WritePolicy}. If not set, the {@link

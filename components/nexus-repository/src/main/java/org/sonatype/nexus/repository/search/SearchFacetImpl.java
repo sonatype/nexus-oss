@@ -18,7 +18,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.storage.StorageFacet;
-import org.sonatype.nexus.repository.storage.StorageTxPostCommitHook;
+import org.sonatype.nexus.repository.storage.StorageTxHook;
 
 import com.google.common.base.Supplier;
 
@@ -45,11 +45,11 @@ public class SearchFacetImpl
   @Override
   protected void doInit(final Configuration configuration) throws Exception {
     super.doInit(configuration);
-    facet(StorageFacet.class).registerHookSupplier(new Supplier<StorageTxPostCommitHook>()
+    facet(StorageFacet.class).registerHookSupplier(new Supplier<StorageTxHook>()
     {
       @Override
-      public StorageTxPostCommitHook get() {
-        return new SearchPostCommitHook(searchService, getRepository());
+      public StorageTxHook get() {
+        return new SearchHook(searchService, getRepository());
       }
     });
   }

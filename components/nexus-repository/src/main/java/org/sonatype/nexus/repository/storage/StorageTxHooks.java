@@ -24,66 +24,66 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 class StorageTxHooks
-    extends StorageTxPostCommitHook
+    extends StorageTxHook
 {
-  private final List<StorageTxPostCommitHook> hooks;
+  private final List<StorageTxHook> hooks;
 
-  public StorageTxHooks(final List<StorageTxPostCommitHook> hooks) {
+  public StorageTxHooks(final List<StorageTxHook> hooks) {
     this.hooks = checkNotNull(hooks);
   }
 
   @Override
   public void createComponent(final Component... components) {
-    for (StorageTxPostCommitHook hook : hooks) {
+    for (StorageTxHook hook : hooks) {
       hook.createComponent(components);
     }
   }
 
   @Override
   public void updateComponent(final Component... components) {
-    for (StorageTxPostCommitHook hook : hooks) {
+    for (StorageTxHook hook : hooks) {
       hook.updateComponent(components);
     }
   }
 
   @Override
   public void deleteComponent(final Component... components) {
-    for (StorageTxPostCommitHook hook : hooks) {
+    for (StorageTxHook hook : hooks) {
       hook.deleteComponent(components);
     }
   }
 
   @Override
   public void createAsset(@Nullable final Component component, final Asset... assets) {
-    for (StorageTxPostCommitHook hook : hooks) {
+    for (StorageTxHook hook : hooks) {
       hook.createAsset(component, assets);
     }
   }
 
   @Override
   public void updateAsset(@Nullable final Component component, final Asset... assets) {
-    for (StorageTxPostCommitHook hook : hooks) {
+    for (StorageTxHook hook : hooks) {
       hook.updateAsset(component, assets);
     }
   }
 
   @Override
   public void deleteAsset(@Nullable final Component component, final Asset... assets) {
-    for (StorageTxPostCommitHook hook : hooks) {
+    for (StorageTxHook hook : hooks) {
       hook.deleteAsset(component, assets);
     }
   }
 
   @Override
   public void postCommit() {
-    for (StorageTxPostCommitHook hook : hooks) {
+    for (StorageTxHook hook : hooks) {
       hook.postCommit();
     }
   }
 
   @Override
   public void postRollback() {
-    for (StorageTxPostCommitHook hook : hooks) {
+    for (StorageTxHook hook : hooks) {
       hook.postRollback();
     }
   }
