@@ -338,7 +338,7 @@ class StaticSecurityConfigurationResourceImpl
                 id: 'admin',
                 privileges: [
                     'all',
-                    // FIXME: These don't start with "nexus:*"
+                    // FIXME: These don't start with "nexus:*", once that is fixed can be removed
                     'security-admin',
                     'apikey-access'
                 ]
@@ -346,6 +346,7 @@ class StaticSecurityConfigurationResourceImpl
             new CRole(
                 id: 'anonymous',
                 privileges: [
+                    // FIXME: Sort out what we need for defaults
                     'status'
                 ]
             )
