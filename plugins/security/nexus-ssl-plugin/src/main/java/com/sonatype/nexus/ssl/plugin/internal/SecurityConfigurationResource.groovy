@@ -38,7 +38,7 @@ class SecurityConfigurationResource
                 type: 'method',
                 properties: [
                     'method'    : 'read',
-                    'permission': 'nexus:ssl:truststore'
+                    'permission': 'nexus:ssl-truststore'
                 ]
             ),
             new CPrivilege(
@@ -46,7 +46,7 @@ class SecurityConfigurationResource
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
-                    'permission': 'nexus:ssl:truststore'
+                    'permission': 'nexus:ssl-truststore'
                 ]
             ),
             new CPrivilege(
@@ -54,7 +54,7 @@ class SecurityConfigurationResource
                 type: 'method',
                 properties: [
                     'method'    : 'update,read',
-                    'permission': 'nexus:ssl:truststore'
+                    'permission': 'nexus:ssl-truststore'
                 ]
             ),
             new CPrivilege(
@@ -62,7 +62,7 @@ class SecurityConfigurationResource
                 type: 'method',
                 properties: [
                     'method'    : 'delete,read',
-                    'permission': 'nexus:ssl:truststore'
+                    'permission': 'nexus:ssl-truststore'
                 ]
             )
         ]

@@ -65,7 +65,7 @@ extends DirectComponentSupport
    * @return a list of certificates
    */
   @DirectMethod
-  @RequiresPermissions('nexus:ssl:truststore:read')
+  @RequiresPermissions('nexus:ssl-truststore:read')
   List<CertificateXO> read() {
     return trustStore.trustedCertificates?.collect { certificate ->
       asCertificateXO(certificate, true)
@@ -79,7 +79,7 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('nexus:ssl:truststore:create')
+  @RequiresPermissions('nexus:ssl-truststore:create')
   @Validate(groups = [Create.class, Default.class])
   CertificateXO create(final @NotNull @Valid CertificatePemXO pem) {
     try {
@@ -100,7 +100,7 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('nexus:ssl:truststore:delete')
+  @RequiresPermissions('nexus:ssl-truststore:delete')
   @Validate
   void remove(final @NotEmpty String id) {
     trustStore.removeTrustCertificate(id)
