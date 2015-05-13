@@ -70,34 +70,10 @@ class StaticSecurityConfigurationResourceImpl
 
             // TODO: nexus:repositories used by UI, remove these are legacy
             new CPrivilege(
-                id: 'repositories-create',
-                type: 'method',
-                properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:repositories'
-                ]
-            ),
-            new CPrivilege(
                 id: 'repositories-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
-                    'permission': 'nexus:repositories'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repositories-update',
-                type: 'method',
-                properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:repositories'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repositories-delete',
-                type: 'method',
-                properties: [
-                    'method'    : 'delete,read',
                     'permission': 'nexus:repositories'
                 ]
             ),
