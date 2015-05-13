@@ -163,6 +163,8 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:logs'
                 ]
             ),
+
+            // TODO: nexus:tasksrun used by UI, refactor
             new CPrivilege(
                 id: 'tasksrun', // 68
                 type: 'method',
@@ -171,6 +173,8 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:tasksrun'
                 ]
             ),
+
+            // TODO: nexus:tasktypes used by UI, refactor
             new CPrivilege(
                 id: 'tasktypes-read', // 69
                 type: 'method',
@@ -179,14 +183,7 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:tasktypes'
                 ]
             ),
-            new CPrivilege(
-                id: 'scheduletypes-read', // 71
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:componentscheduletypes'
-                ]
-            ),
+
             new CPrivilege(
                 id: 'realmtypes-read', // 73
                 type: 'method',
