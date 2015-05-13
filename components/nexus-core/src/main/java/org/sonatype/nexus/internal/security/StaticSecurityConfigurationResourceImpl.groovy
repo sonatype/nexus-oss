@@ -183,22 +183,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'wastebasket-read', // 50
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:wastebasket'
-                ]
-            ),
-            new CPrivilege(
-                id: 'wastebasket-delete', // 51
-                type: 'method',
-                properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:wastebasket'
-                ]
-            ),
-            new CPrivilege(
                 id: 'artifact-read', // 54
                 type: 'method',
                 properties: [
