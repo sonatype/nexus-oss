@@ -29,6 +29,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
@@ -152,15 +153,17 @@ public class SearchServiceImpl
   }
 
   @Override
-  public void put(final Repository repository, final Component component, final String identifier) {
+  public void put(final Repository repository, final EntityId componentId, final String identifier) {
     checkNotNull(repository);
-    checkNotNull(component);
-    log.debug("Indexing metadata of {} from {}", component, repository);
+    checkNotNull(componentId);
+    log.debug("Indexing metadata of {} from {}", componentId, repository);
     try {
       Map<String, Object> additional = Maps.newHashMap();
       additional.put(P_REPOSITORY_NAME, repository.getName());
+      Component component;
       List<Asset> assets;
       try (StorageTx tx = repository.facet(StorageFacet.class).openTx()) {
+        component = tx.findComponent(componentId, tx.getBucket());
         assets = Lists.newArrayList(tx.browseAssets(component));
       }
       String json = JsonUtils.merge(componentMetadata(component, assets), JsonUtils.from(additional));

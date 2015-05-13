@@ -12,8 +12,7 @@
  */
 package org.sonatype.nexus.repository.search;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 
 import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.entity.EntityId;
@@ -23,6 +22,7 @@ import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTxHook;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.common.entity.EntityHelper.id;
 
 /**
  * Search related {@link StorageTxHook}.
@@ -36,15 +36,15 @@ public class SearchHook
 
   private final Repository repository;
 
-  private final List<Component> indexable;
+  private final LinkedHashSet<EntityId> indexable;
 
-  private final List<EntityId> deindexable;
+  private final LinkedHashSet<EntityId> deindexable;
 
   public SearchHook(final SearchService searchService, final Repository repository) {
     this.searchService = checkNotNull(searchService);
     this.repository = checkNotNull(repository);
-    this.indexable = new ArrayList<>();
-    this.deindexable = new ArrayList<>();
+    this.indexable = new LinkedHashSet<>();
+    this.deindexable = new LinkedHashSet<>();
   }
 
   @Override
@@ -55,30 +55,34 @@ public class SearchHook
   @Override
   public void updateComponent(final Component... components) {
     for (Component component : components) {
-      indexable.add(component);
+      indexable.add(id(component));
     }
   }
 
   @Override
   public void deleteComponent(final Component... components) {
     for (Component component : components) {
-      deindexable.add(EntityHelper.id(component));
+      deindexable.add(id(component));
     }
   }
 
   @Override
   public void createAsset(final Asset... assets) {
-    // TODO: updateCompponent
+    updateAsset(assets);
   }
 
   @Override
   public void updateAsset(final Asset... assets) {
-    // TODO: updateCompponent
+    for (Asset asset : assets) {
+      indexable.add(asset.componentId());
+    }
   }
 
   @Override
   public void deleteAsset(final Asset... assets) {
-    // TODO: updateCompponent
+    for (Asset asset : assets) {
+      deindexable.add(asset.componentId());
+    }
   }
 
   @Override
@@ -86,8 +90,8 @@ public class SearchHook
     for (EntityId entityId : deindexable) {
       searchService.delete(repository, entityId.toString());
     }
-    for (Component component : indexable) {
-      searchService.put(repository, component, EntityHelper.id(component).toString());
+    for (EntityId entityId : indexable) {
+      searchService.put(repository, entityId, entityId.toString());
     }
   }
 }

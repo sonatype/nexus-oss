@@ -14,7 +14,6 @@ package org.sonatype.nexus.repository.search;
 
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.storage.Component;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -41,7 +40,7 @@ public interface SearchService
   /**
    * Index component metadata.
    */
-  void put(Repository repository, Component component, String identifier);
+  void put(Repository repository, EntityId componentId, String identifier);
 
   /**
    * Remove component metadata from index.
