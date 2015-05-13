@@ -197,13 +197,12 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
-            // FIXME: change namespace to use nexus:
             new CPrivilege(
-                id: 'apikey-access',
+                id: 'apikey-all',
                 type: 'method',
                 properties: [
                     'method'    : '*',
-                    'permission': 'apikey:access'
+                    'permission': 'nexus:apikey'
                 ]
             ),
 
@@ -339,8 +338,7 @@ class StaticSecurityConfigurationResourceImpl
                 privileges: [
                     'all',
                     // FIXME: These don't start with "nexus:*", once that is fixed can be removed
-                    'security-admin',
-                    'apikey-access'
+                    'security-admin'
                 ]
             ),
             new CRole(
