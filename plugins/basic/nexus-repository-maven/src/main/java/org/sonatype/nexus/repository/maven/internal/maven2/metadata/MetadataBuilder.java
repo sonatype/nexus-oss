@@ -151,10 +151,10 @@ public class MetadataBuilder
     Iterator<Version> vi = baseVersions.descendingIterator();
     String latest = vi.next().toString();
     String release = latest;
-    while (release.contains("SNAPSHOT") && vi.hasNext()) {
+    while (release.endsWith("SNAPSHOT") && vi.hasNext()) {
       release = vi.next().toString();
     }
-    if (release.contains("SNAPSHOT")) {
+    if (release.endsWith("SNAPSHOT")) {
       release = null;
     }
     return Maven2Metadata.newArtifactLevel(
