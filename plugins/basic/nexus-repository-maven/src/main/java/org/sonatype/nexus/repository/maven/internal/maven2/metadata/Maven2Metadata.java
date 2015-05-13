@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.maven.internal.maven2.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -189,7 +190,7 @@ public class Maven2Metadata
       if (!extension.equals(snapshot.extension)) {
         return false;
       }
-      if (classifier != null ? !classifier.equals(snapshot.classifier) : snapshot.classifier != null) {
+      if (!Objects.equals(classifier, snapshot.classifier)) {
         return false;
       }
       return version.equals(snapshot.version);
