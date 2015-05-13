@@ -131,6 +131,22 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:tasks'
                 ]
             ),
+            new CPrivilege(
+                id: 'tasksrun',
+                type: 'method',
+                properties: [
+                    'method'    : 'read,delete',
+                    'permission': 'nexus:tasksrun'
+                ]
+            ),
+            new CPrivilege(
+                id: 'tasktypes-read',
+                type: 'method',
+                properties: [
+                    'method'    : 'read',
+                    'permission': 'nexus:tasktypes'
+                ]
+            ),
 
             // TODO: nexus:logs used by UI, refactor
             new CPrivilege(
@@ -149,24 +165,12 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:logs'
                 ]
             ),
-
-            // TODO: nexus:tasksrun used by UI, refactor
             new CPrivilege(
-                id: 'tasksrun',
+                id: 'logconfig-update',
                 type: 'method',
                 properties: [
-                    'method'    : 'read,delete',
-                    'permission': 'nexus:tasksrun'
-                ]
-            ),
-
-            // TODO: nexus:tasktypes used by UI, refactor
-            new CPrivilege(
-                id: 'tasktypes-read',
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:tasktypes'
+                    'method'    : 'read,update',
+                    'permission': 'nexus:logconfig'
                 ]
             ),
 
@@ -177,16 +181,6 @@ class StaticSecurityConfigurationResourceImpl
                 properties: [
                     'method'    : 'read',
                     'permission': 'nexus:componentrealmtypes'
-                ]
-            ),
-
-            // TODO: nexus:logconfig used by UI, refactor
-            new CPrivilege(
-                id: 'logconfig-update',
-                type: 'method',
-                properties: [
-                    'method'    : 'read,update',
-                    'permission': 'nexus:logconfig'
                 ]
             ),
 
