@@ -14,8 +14,6 @@ package org.sonatype.nexus.repository.storage;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -54,23 +52,23 @@ class StorageTxHooks
   }
 
   @Override
-  public void createAsset(@Nullable final Component component, final Asset... assets) {
+  public void createAsset(final Asset... assets) {
     for (StorageTxHook hook : hooks) {
-      hook.createAsset(component, assets);
+      hook.createAsset(assets);
     }
   }
 
   @Override
-  public void updateAsset(@Nullable final Component component, final Asset... assets) {
+  public void updateAsset(final Asset... assets) {
     for (StorageTxHook hook : hooks) {
-      hook.updateAsset(component, assets);
+      hook.updateAsset(assets);
     }
   }
 
   @Override
-  public void deleteAsset(@Nullable final Component component, final Asset... assets) {
+  public void deleteAsset(final Asset... assets) {
     for (StorageTxHook hook : hooks) {
-      hook.deleteAsset(component, assets);
+      hook.deleteAsset(assets);
     }
   }
 

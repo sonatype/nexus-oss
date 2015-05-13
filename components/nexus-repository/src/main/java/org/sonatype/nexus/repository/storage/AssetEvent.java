@@ -26,21 +26,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public abstract class AssetEvent
 {
-  private final Component component;
-
   private final Asset asset;
 
   private final Repository repository;
 
-  public AssetEvent(@Nullable final Component component, final Asset asset, final Repository repository) {
-    this.component = component;
+  public AssetEvent(final Asset asset, final Repository repository) {
     this.asset = checkNotNull(asset);
     this.repository = checkNotNull(repository);
-  }
-
-  @Nullable
-  public Component getComponent() {
-    return component;
   }
 
   @Nonnull

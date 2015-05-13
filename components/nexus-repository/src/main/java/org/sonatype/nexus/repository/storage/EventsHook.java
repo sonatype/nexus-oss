@@ -15,8 +15,6 @@ package org.sonatype.nexus.repository.storage;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -64,23 +62,23 @@ public class EventsHook
   }
 
   @Override
-  public void createAsset(@Nullable final Component component, final Asset... assets) {
+  public void createAsset(final Asset... assets) {
     for (Asset asset : assets) {
-      events.add(new AssetCreatedEvent(component, asset, repository));
+      events.add(new AssetCreatedEvent(asset, repository));
     }
   }
 
   @Override
-  public void updateAsset(@Nullable final Component component, final Asset... assets) {
+  public void updateAsset(final Asset... assets) {
     for (Asset asset : assets) {
-      events.add(new AssetUpdatedEvent(component, asset, repository));
+      events.add(new AssetUpdatedEvent(asset, repository));
     }
   }
 
   @Override
-  public void deleteAsset(@Nullable final Component component, final Asset... assets) {
+  public void deleteAsset(final Asset... assets) {
     for (Asset asset : assets) {
-      events.add(new AssetDeletedEvent(component, asset, repository));
+      events.add(new AssetDeletedEvent(asset, repository));
     }
   }
 

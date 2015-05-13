@@ -15,8 +15,6 @@ package org.sonatype.nexus.repository.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.Repository;
@@ -69,24 +67,18 @@ public class SearchHook
   }
 
   @Override
-  public void createAsset(@Nullable final Component component, final Asset... assets) {
-    if (component != null) {
-      updateComponent(component);
-    }
+  public void createAsset(final Asset... assets) {
+    // TODO: updateCompponent
   }
 
   @Override
-  public void updateAsset(@Nullable final Component component, final Asset... assets) {
-    if (component != null) {
-      updateComponent(component);
-    }
+  public void updateAsset(final Asset... assets) {
+    // TODO: updateCompponent
   }
 
   @Override
-  public void deleteAsset(@Nullable final Component component, final Asset... assets) {
-    if (component != null) {
-      updateComponent(component);
-    }
+  public void deleteAsset(final Asset... assets) {
+    // TODO: updateCompponent
   }
 
   @Override

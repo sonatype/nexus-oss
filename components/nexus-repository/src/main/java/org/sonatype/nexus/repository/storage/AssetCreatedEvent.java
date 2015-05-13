@@ -24,9 +24,7 @@ import org.sonatype.nexus.repository.Repository;
 public class AssetCreatedEvent
     extends AssetEvent
 {
-  public AssetCreatedEvent(@Nullable final Component component,
-                           final Asset asset,
-                           final Repository repository) {
-    super(component, asset, repository);
+  public AssetCreatedEvent(final Asset asset, final Repository repository) {
+    super(asset, repository);
   }
 }

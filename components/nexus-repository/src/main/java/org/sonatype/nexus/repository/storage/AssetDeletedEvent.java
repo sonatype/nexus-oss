@@ -24,9 +24,7 @@ import org.sonatype.nexus.repository.Repository;
 public class AssetDeletedEvent
   extends AssetEvent
 {
-  public AssetDeletedEvent(@Nullable final Component component,
-                           final Asset asset,
-                           final Repository repository) {
-    super(component, asset, repository);
+  public AssetDeletedEvent(final Asset asset, final Repository repository) {
+    super(asset, repository);
   }
 }
