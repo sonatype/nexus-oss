@@ -183,38 +183,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'targets-create', // 45
-                type: 'method',
-                properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:targets'
-                ]
-            ),
-            new CPrivilege(
-                id: 'targets-read', // 46
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:targets'
-                ]
-            ),
-            new CPrivilege(
-                id: 'targets-update', // 47
-                type: 'method',
-                properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:targets'
-                ]
-            ),
-            new CPrivilege(
-                id: 'targets-delete', // 48
-                type: 'method',
-                properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:targets'
-                ]
-            ),
-            new CPrivilege(
                 id: 'wastebasket-read', // 50
                 type: 'method',
                 properties: [
