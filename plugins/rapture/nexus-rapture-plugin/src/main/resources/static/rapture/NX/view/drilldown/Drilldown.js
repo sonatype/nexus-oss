@@ -273,12 +273,6 @@ Ext.define('NX.view.drilldown.Drilldown', {
             panel.getForm().reset();
           }
         });
-
-        Ext.each(items[i].query('nx-drilldown-master'), function(master) {
-          if (master.getStore()) {
-            master.getStore().clearFilter();
-          }
-        });
       }
     }
 
@@ -325,8 +319,18 @@ Ext.define('NX.view.drilldown.Drilldown', {
       }
 
       // Slide the requested panel into view
-      var left = item.el.getLeft() - feature.el.getLeft();
-      me.el.first().move('l', left, animate);
+      var left = feature.el.getX() - (index * feature.el.getWidth());
+      if (animate) {
+        me.animate({
+          easing: 'easeInOut',
+          duration: 200,
+          to: {
+            x: left
+          }
+        });
+      } else {
+        me.setX(left, false);
+      }
       me.currentIndex = index;
 
       // Update the breadcrumb

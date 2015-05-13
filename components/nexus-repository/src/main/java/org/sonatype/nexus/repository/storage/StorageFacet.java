@@ -53,6 +53,12 @@ public interface StorageFacet
   static String P_VERSION = "version";
 
   /**
+   * Registers format specific selector for {@link WritePolicy}. If not set, the {@link
+   * WritePolicySelector#DEFAULT} is used which returns the configured write policy.
+   */
+  void registerWritePolicySelector(WritePolicySelector writePolicySelector);
+
+  /**
    * Opens a transaction.
    */
   StorageTx openTx();
