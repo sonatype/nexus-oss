@@ -38,8 +38,6 @@ class StaticSecurityConfigurationResourceImpl
             new CPrivilege(
                 id: 'metrics-endpoints',
                 type: 'method',
-                name: 'Metrics Endpoints',
-                description: 'Allows access to metrics endpoints.',
                 properties: [
                     'method'    : '*',
                     'permission': 'nexus:metrics-endpoints'
@@ -49,8 +47,6 @@ class StaticSecurityConfigurationResourceImpl
         roles: [
             new CRole(
                 id: 'metrics-endpoints',
-                name: 'Metrics Endpoints',
-                description: 'Allows access to metrics endpoints.',
                 privileges: ['metrics-endpoints']
             )
         ]

@@ -37,8 +37,6 @@ class StaticSecurityConfigurationResourceImpl
             new CPrivilege(
                 id: 'blobstores-create',
                 type: 'method',
-                name: 'Blobstores - (create,read)',
-                description: 'Give permission to create,read new blobstores.',
                 properties: [
                     'method'    : 'create,read',
                     'permission': 'nexus:blobstores'
@@ -47,8 +45,6 @@ class StaticSecurityConfigurationResourceImpl
             new CPrivilege(
                 id: 'blobstores-read',
                 type: 'method',
-                name: 'Blobstores - (read)',
-                description: 'Give permission to read existing blobstore configuration.',
                 properties: [
                     'method'    : 'read',
                     'permission': 'nexus:blobstores'
@@ -57,8 +53,6 @@ class StaticSecurityConfigurationResourceImpl
             new CPrivilege(
                 id: 'blobstores-delete',
                 type: 'method',
-                name: 'Blobstores - (delete,read)',
-                description: 'Give permission to delete,read existing blobstores.',
                 properties: [
                     'method'    : 'delete,read',
                     'permission': 'nexus:blobstores'
