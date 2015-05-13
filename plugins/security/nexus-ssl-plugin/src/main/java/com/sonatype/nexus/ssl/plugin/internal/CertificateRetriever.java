@@ -43,13 +43,13 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.ManagedHttpClientConnection;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.http.conn.ssl.SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 
 /**
  * Certificates retriever from a host:port using Apache Http Client 4.
@@ -85,8 +85,8 @@ public class CertificateRetriever
   /**
    * Retrieves certificate chain of specified host:port using https protocol.
    *
-   * @param host    to get certificate chain from (cannot be null)
-   * @param port    of host to connect to
+   * @param host to get certificate chain from (cannot be null)
+   * @param port of host to connect to
    * @return certificate chain
    * @throws Exception Re-thrown from accessing the remote host
    */
@@ -98,7 +98,7 @@ public class CertificateRetriever
     // setup custom connection manager so we can configure SSL to trust-all
     SSLContext sc = SSLContext.getInstance("TLS");
     sc.init(null, new TrustManager[]{ACCEPT_ALL_TRUST_MANAGER}, null);
-    SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sc, ALLOW_ALL_HOSTNAME_VERIFIER);
+    SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sc, NoopHostnameVerifier.INSTANCE);
     Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
         .register(HttpSchemes.HTTP, PlainConnectionSocketFactory.getSocketFactory())
         .register(HttpSchemes.HTTPS, sslSocketFactory).build();
