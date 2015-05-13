@@ -147,6 +147,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
+            // TODO: nexus:logs used by UI, refactor
             new CPrivilege(
                 id: 'logs-read', // 42
                 type: 'method',
@@ -184,6 +185,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
+            // TODO: Used by RealmSettingsComponent
             new CPrivilege(
                 id: 'realmtypes-read', // 73
                 type: 'method',
@@ -192,14 +194,7 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:componentrealmtypes'
                 ]
             ),
-            new CPrivilege(
-                id: 'repotypes-read', // 74
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:componentsrepotypes'
-                ]
-            ),
+
             new CPrivilege(
                 id: 'logconfig-update', // 77
                 type: 'method',
