@@ -325,8 +325,13 @@ Ext.define('NX.view.drilldown.Drilldown', {
       }
 
       // Slide the requested panel into view
-      var left = item.el.getLeft() - feature.el.getLeft();
-      me.el.first().move('l', left, animate);
+      me.animate({
+        easing: 'easeInOut',
+        duration: 200,
+        to: {
+          x: feature.el.getX() - (index * feature.el.getWidth())
+        }
+      });
       me.currentIndex = index;
 
       // Update the breadcrumb
