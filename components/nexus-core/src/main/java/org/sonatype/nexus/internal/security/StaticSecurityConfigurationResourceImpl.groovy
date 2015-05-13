@@ -580,22 +580,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'usersforgotpw', // 57
-                type: 'method',
-                properties: [
-                    'method'    : 'create,read',
-                    'permission': 'security:usersforgotpw'
-                ]
-            ),
-            new CPrivilege(
-                id: 'usersforgotid', // 58
-                type: 'method',
-                properties: [
-                    'method'    : 'create,read',
-                    'permission': 'security:usersforgotid'
-                ]
-            ),
-            new CPrivilege(
                 id: 'userschangepw', // 64
                 type: 'method',
                 properties: [
@@ -640,7 +624,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CRole(
                 id: 'anonymous',
-                privileges: ['status', 'artifact-read', 'usersforgotpw', 'usersforgotid', 'contentclasses-read', 'repotypes-read'],
+                privileges: ['status', 'artifact-read', 'contentclasses-read', 'repotypes-read'],
                 roles: ['ui-repo-browser', 'ui-search']
             ),
             new CRole(
