@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.httpclient.config;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,16 +24,21 @@ import java.util.regex.PatternSyntaxException;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.httpclient.HttpClientPlan;
+import org.sonatype.nexus.httpclient.SSLContextSelector;
 import org.sonatype.nexus.httpclient.internal.NexusHttpRoutePlanner;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
+import org.apache.http.protocol.HttpContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.http.client.config.AuthSchemes.BASIC;
@@ -91,7 +97,15 @@ public class ConfigurationCustomizer
 
     // TODO: query-string? (or don't do this, it may not bee a good idea anymore)
 
-    // TODO: SSL trust-store (and/or custom context attributes)?
+    if (Boolean.TRUE.equals(connection.getUseTrustStore())) {
+      plan.getClient().addInterceptorFirst(new HttpRequestInterceptor()
+      {
+        @Override
+        public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
+          context.setAttribute(SSLContextSelector.USE_TRUST_STORE, Boolean.TRUE);
+        }
+      });
+    }
   }
 
   /**

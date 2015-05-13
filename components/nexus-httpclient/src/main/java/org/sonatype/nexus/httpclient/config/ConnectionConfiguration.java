@@ -28,7 +28,10 @@ public class ConnectionConfiguration
   @Nullable
   private Integer maximumRetries;
 
-  // TODO: user-agent, query-string, trust-store
+  // TODO: user-agent, query-string
+
+  @Nullable
+  private Boolean useTrustStore;
 
   @Nullable
   public Integer getTimeout() {
@@ -47,6 +50,11 @@ public class ConnectionConfiguration
   public void setMaximumRetries(@Nullable final Integer maximumRetries) {
     this.maximumRetries = maximumRetries;
   }
+
+  @Nullable
+  public Boolean getUseTrustStore() { return useTrustStore; }
+
+  public void setUseTrustStore(@Nullable final Boolean useTrustStore) { this.useTrustStore = useTrustStore; }
 
   @Override
   public String toString() {
