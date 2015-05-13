@@ -532,14 +532,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'userlocatortypes-read', // 75
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'security:componentsuserlocatortypes'
-                ]
-            ),
-            new CPrivilege(
                 id: 'privilegetypes-read', // 80
                 type: 'method',
                 properties: [
@@ -615,7 +607,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CRole(
                 id: 'ui-users-admin',
-                privileges: ['roles-read', 'users-create', 'users-read', 'users-update', 'users-delete', 'userssetpw', 'userlocatortypes-read']
+                privileges: ['roles-read', 'users-create', 'users-read', 'users-update', 'users-delete', 'userssetpw']
             ),
             new CRole(
                 id: 'ui-roles-admin',
