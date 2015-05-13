@@ -140,38 +140,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'repogroups-create', // 13
-                type: 'method',
-                properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:repogroups'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repogroups-read', // 14
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:repogroups'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repogroups-update', // 15
-                type: 'method',
-                properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:repogroups'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repogroups-delete', // 16
-                type: 'method',
-                properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:repogroups'
-                ]
-            ),
-            new CPrivilege(
                 id: 'attributes-delete', // 20
                 type: 'method',
                 properties: [
@@ -649,7 +617,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CRole(
                 id: 'ui-repo-browser',
-                privileges: ['repositories-read', 'repogroups-read', 'repostatus-read']
+                privileges: ['repositories-read', 'repostatus-read']
             ),
             new CRole(
                 id: 'ui-logs-config-files',
@@ -666,16 +634,16 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CRole(
                 id: 'ui-group-admin',
-                privileges: ['repositories-read', 'repogroups-create', 'repogroups-read', 'repogroups-update', 'repogroups-delete', 'repository-all'],
+                privileges: ['repositories-read', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
                 id: 'ui-routing-admin',
-                privileges: ['repositories-read', 'repogroups-read', 'routes-create', 'routes-read', 'routes-update', 'routes-delete']
+                privileges: ['repositories-read', 'routes-create', 'routes-read', 'routes-update', 'routes-delete']
             ),
             new CRole(
                 id: 'ui-scheduled-tasks-admin',
-                privileges: ['repositories-read', 'repogroups-read', 'tasks-create', 'tasks-read', 'tasks-update', 'tasks-delete', 'tasksrun', 'tasktypes-read', 'scheduletypes-read']
+                privileges: ['repositories-read', 'tasks-create', 'tasks-read', 'tasks-update', 'tasks-delete', 'tasksrun', 'tasktypes-read', 'scheduletypes-read']
             ),
             new CRole(
                 id: 'ui-repository-targets-admin',
@@ -691,7 +659,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CRole(
                 id: 'ui-privileges-admin',
-                privileges: ['repositories-read', 'repogroups-read', 'privileges-create', 'privileges-read', 'privileges-update', 'privileges-delete', 'targets-read', 'privilegetypes-read']
+                privileges: ['repositories-read', 'privileges-create', 'privileges-read', 'privileges-update', 'privileges-delete', 'targets-read', 'privilegetypes-read']
             ),
             new CRole(
                 id: 'ui-basic',
