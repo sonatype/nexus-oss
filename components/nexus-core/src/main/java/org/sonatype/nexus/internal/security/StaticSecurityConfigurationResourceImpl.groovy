@@ -97,7 +97,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'repositories-update', // 7
+                id: 'repositories-update',
                 type: 'method',
                 properties: [
                     'method'    : 'update,read',
@@ -105,7 +105,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'repositories-delete', // 8
+                id: 'repositories-delete',
                 type: 'method',
                 properties: [
                     'method'    : 'delete,read',
@@ -115,7 +115,7 @@ class StaticSecurityConfigurationResourceImpl
 
             // TODO: nexus:tasks used by UI, refactor
             new CPrivilege(
-                id: 'tasks-create', // 26
+                id: 'tasks-create',
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
@@ -123,7 +123,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'tasks-read', // 27
+                id: 'tasks-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
@@ -131,7 +131,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'tasks-update', // 28
+                id: 'tasks-update',
                 type: 'method',
                 properties: [
                     'method'    : 'update,read',
@@ -139,7 +139,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'tasks-delete', // 29
+                id: 'tasks-delete',
                 type: 'method',
                 properties: [
                     'method'    : 'delete,read',
@@ -149,7 +149,7 @@ class StaticSecurityConfigurationResourceImpl
 
             // TODO: nexus:logs used by UI, refactor
             new CPrivilege(
-                id: 'logs-read', // 42
+                id: 'logs-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
@@ -167,7 +167,7 @@ class StaticSecurityConfigurationResourceImpl
 
             // TODO: nexus:tasksrun used by UI, refactor
             new CPrivilege(
-                id: 'tasksrun', // 68
+                id: 'tasksrun',
                 type: 'method',
                 properties: [
                     'method'    : 'read,delete',
@@ -177,7 +177,7 @@ class StaticSecurityConfigurationResourceImpl
 
             // TODO: nexus:tasktypes used by UI, refactor
             new CPrivilege(
-                id: 'tasktypes-read', // 69
+                id: 'tasktypes-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
@@ -187,7 +187,7 @@ class StaticSecurityConfigurationResourceImpl
 
             // TODO: Used by RealmSettingsComponent
             new CPrivilege(
-                id: 'realmtypes-read', // 73
+                id: 'realmtypes-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
@@ -197,7 +197,7 @@ class StaticSecurityConfigurationResourceImpl
 
             // TODO: nexus:logconfig used by UI, refactor
             new CPrivilege(
-                id: 'logconfig-update', // 77
+                id: 'logconfig-update',
                 type: 'method',
                 properties: [
                     'method'    : 'read,update',
@@ -205,16 +205,19 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
+            // FIXME: change namespace to use nexus:
             new CPrivilege(
-                id: 'apikey-access', // 83
+                id: 'apikey-access',
                 type: 'method',
                 properties: [
                     'method'    : '*',
                     'permission': 'apikey:access'
                 ]
             ),
+
+            // FIXME: change namespace to use nexus:
             new CPrivilege(
-                id: 'security-admin', // 1001
+                id: 'security-admin',
                 type: 'method',
                 properties: [
                     'method'    : '*',
@@ -222,7 +225,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'privileges-create', // 30
+                id: 'privileges-create',
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
@@ -230,7 +233,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'privileges-read', // 31
+                id: 'privileges-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
@@ -238,7 +241,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'privileges-update', // 32
+                id: 'privileges-update',
                 type: 'method',
                 properties: [
                     'method'    : 'update,read',
@@ -246,7 +249,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'privileges-delete', // 33
+                id: 'privileges-delete',
                 type: 'method',
                 properties: [
                     'method'    : 'delete,read',
@@ -254,7 +257,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'roles-create', // 34
+                id: 'roles-create',
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
@@ -262,7 +265,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'roles-read', // 35
+                id: 'roles-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
@@ -270,7 +273,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'roles-update', // 36
+                id: 'roles-update',
                 type: 'method',
                 properties: [
                     'method'    : 'update,read',
@@ -278,7 +281,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'roles-delete', // 37
+                id: 'roles-delete',
                 type: 'method',
                 properties: [
                     'method'    : 'delete,read',
@@ -286,7 +289,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'users-create', // 38
+                id: 'users-create',
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
@@ -294,7 +297,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'users-read', // 39
+                id: 'users-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
@@ -302,7 +305,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'users-update', // 40
+                id: 'users-update',
                 type: 'method',
                 properties: [
                     'method'    : 'update,read',
@@ -310,35 +313,31 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'users-delete', // 41
+                id: 'users-delete',
                 type: 'method',
                 properties: [
                     'method'    : 'delete,read',
                     'permission': 'security:users'
                 ]
             ),
+
+            // FIXME: Normalize name scheme
             new CPrivilege(
-                id: 'userschangepw', // 64
+                id: 'userschangepw',
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
                     'permission': 'security:userschangepw'
                 ]
             ),
+
+            // FIXME: Normalize name scheme
             new CPrivilege(
-                id: 'userssetpw', // 72
+                id: 'userssetpw',
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
                     'permission': 'security:userssetpw'
-                ]
-            ),
-            new CPrivilege(
-                id: 'privilegetypes-read', // 80
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'security:privilegetypes'
                 ]
             )
         ],
