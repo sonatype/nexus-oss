@@ -17,7 +17,6 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import org.sonatype.nexus.security.config.CPrivilege
-import org.sonatype.nexus.security.config.CRole
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
 
@@ -42,12 +41,6 @@ class StaticSecurityConfigurationResourceImpl
                     'method'    : '*',
                     'permission': 'nexus:wonderland'
                 ]
-            )
-        ],
-        roles: [
-            new CRole(
-                id: 'wonderland',
-                privileges: ['wonderland-all']
             )
         ]
     )

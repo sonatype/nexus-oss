@@ -16,7 +16,6 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import org.sonatype.nexus.security.config.CPrivilege
-import org.sonatype.nexus.security.config.CRole
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
 
@@ -73,12 +72,6 @@ implements StaticSecurityConfigurationResource
                     'method': 'read',
                     'permission': 'nexus:capabilityTypes'
                 ]
-            )
-        ],
-        roles: [
-            new CRole(
-                id: 'ui-capabilities-admin',
-                privileges: ['repositories-read', 'repogroups-read', 'capabilities-create-read', 'capabilities-read', 'capabilities-update-read', 'capabilities-delete-read', 'capability-types-read']
             )
         ]
     )

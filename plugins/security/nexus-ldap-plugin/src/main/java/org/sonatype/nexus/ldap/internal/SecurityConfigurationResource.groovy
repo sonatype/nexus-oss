@@ -16,7 +16,6 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import org.sonatype.nexus.security.config.CPrivilege
-import org.sonatype.nexus.security.config.CRole
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
 
@@ -65,12 +64,6 @@ class SecurityConfigurationResource
                     'method'    : 'delete,read',
                     'permission': 'security:ldapconfig'
                 ]
-            )
-        ],
-        roles: [
-            new CRole(
-                id: 'ui-enterprise-ldap-admin',
-                privileges: ['enterprise-ldap-create', 'enterprise-ldap-read', 'enterprise-ldap-update', 'enterprise-ldap-delete']
             )
         ]
     )

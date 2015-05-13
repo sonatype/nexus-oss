@@ -16,7 +16,6 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import org.sonatype.nexus.security.config.CPrivilege
-import org.sonatype.nexus.security.config.CRole
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
 
@@ -65,16 +64,6 @@ class SecurityConfigurationResource
                     'method'    : 'delete,read',
                     'permission': 'nexus:ssl:truststore'
                 ]
-            )
-        ],
-        roles: [
-            new CRole(
-                id: 'ssl-truststore-view',
-                privileges: ['ssl-truststore-read']
-            ),
-            new CRole(
-                id: 'ssl-truststore-admin',
-                privileges: ['ssl-truststore-create', 'ssl-truststore-update', 'ssl-truststore-delete']
             )
         ]
     )
