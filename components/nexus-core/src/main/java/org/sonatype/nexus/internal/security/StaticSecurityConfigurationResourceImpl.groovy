@@ -304,16 +304,6 @@ class StaticSecurityConfigurationResourceImpl
                     'method'    : 'create,read',
                     'permission': 'security:userschangepw'
                 ]
-            ),
-
-            // FIXME: Normalize name scheme
-            new CPrivilege(
-                id: 'userssetpw',
-                type: 'method',
-                properties: [
-                    'method'    : 'create,read',
-                    'permission': 'security:userssetpw'
-                ]
             )
         ],
         roles: [
