@@ -316,14 +316,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'contentclasses-read', // 70
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:componentscontentclasses'
-                ]
-            ),
-            new CPrivilege(
                 id: 'scheduletypes-read', // 71
                 type: 'method',
                 properties: [
@@ -552,7 +544,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CRole(
                 id: 'anonymous',
-                privileges: ['status', 'artifact-read', 'contentclasses-read', 'repotypes-read'],
+                privileges: ['status', 'artifact-read', 'repotypes-read'],
                 roles: ['ui-repo-browser', 'ui-search']
             ),
             new CRole(
@@ -603,7 +595,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CRole(
                 id: 'ui-repository-targets-admin',
-                privileges: ['targets-create', 'targets-read', 'targets-update', 'targets-delete', 'contentclasses-read', 'repotypes-read']
+                privileges: ['targets-create', 'targets-read', 'targets-update', 'targets-delete', 'repotypes-read']
             ),
             new CRole(
                 id: 'ui-users-admin',
