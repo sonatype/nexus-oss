@@ -251,7 +251,7 @@ public class ProxyMetadataServiceImpl
       getNpmRepository().getNotFoundCache().removeWithChildren("/" + packageName);
       packageRoot.getProperties().put(PROP_EXPIRED, Boolean.FALSE.toString());
       packageRoot.getProperties().put(PROP_CACHED, Long.toString(now));
-      return metadataStore.updatePackage(getNpmRepository(), packageRoot);
+      return metadataStore.replacePackage(getNpmRepository(), packageRoot);
     }
     else {
       return packageRoot;
