@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -33,7 +34,6 @@ import org.sonatype.nexus.repository.types.HostedType;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
-import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -104,7 +104,7 @@ public class StorageFacetImpl
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
 
-    this.hookSuppliers = Lists.newArrayList();
+    this.hookSuppliers = new ArrayList<>();
     this.hookSuppliers.add(new Supplier<StorageTxHook>()
     {
       @Override
@@ -190,7 +190,7 @@ public class StorageFacetImpl
 
   private StorageTx openStorageTx() {
     BlobStore blobStore = blobStoreManager.get(config.blobStoreName);
-    final List<StorageTxHook> hooks = Lists.newArrayList();
+    final List<StorageTxHook> hooks = new ArrayList<>(hookSuppliers.size());
     for (Supplier<StorageTxHook> hookSupplier : hookSuppliers) {
       hooks.add(hookSupplier.get());
     }

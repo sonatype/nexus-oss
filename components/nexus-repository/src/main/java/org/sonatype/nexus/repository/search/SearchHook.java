@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.search;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -22,8 +23,6 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTxHook;
-
-import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,8 +45,8 @@ public class SearchHook
   public SearchHook(final SearchService searchService, final Repository repository) {
     this.searchService = checkNotNull(searchService);
     this.repository = checkNotNull(repository);
-    this.indexable = Lists.newArrayList();
-    this.deindexable = Lists.newArrayList();
+    this.indexable = new ArrayList<>();
+    this.deindexable = new ArrayList<>();
   }
 
   @Override
