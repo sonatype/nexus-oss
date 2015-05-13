@@ -223,14 +223,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'maven-metadata-delete', // 76
-                type: 'method',
-                properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:metadata'
-                ]
-            ),
-            new CPrivilege(
                 id: 'logconfig-update', // 77
                 type: 'method',
                 properties: [
