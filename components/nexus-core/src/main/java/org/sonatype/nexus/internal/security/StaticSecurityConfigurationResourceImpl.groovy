@@ -184,7 +184,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
-                    'permission': 'security:privileges'
+                    'permission': 'nexus:privileges'
                 ]
             ),
             new CPrivilege(
@@ -192,7 +192,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'method',
                 properties: [
                     'method'    : 'read',
-                    'permission': 'security:privileges'
+                    'permission': 'nexus:privileges'
                 ]
             ),
             new CPrivilege(
@@ -200,7 +200,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'method',
                 properties: [
                     'method'    : 'update,read',
-                    'permission': 'security:privileges'
+                    'permission': 'nexus:privileges'
                 ]
             ),
             new CPrivilege(
@@ -208,7 +208,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'method',
                 properties: [
                     'method'    : 'delete,read',
-                    'permission': 'security:privileges'
+                    'permission': 'nexus:privileges'
                 ]
             ),
             new CPrivilege(

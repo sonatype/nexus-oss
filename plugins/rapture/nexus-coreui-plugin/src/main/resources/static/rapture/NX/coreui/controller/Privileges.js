@@ -78,12 +78,12 @@ Ext.define('NX.coreui.controller.Privileges', {
       variants: ['x16', 'x32']
     },
     visible: function () {
-      return NX.Permissions.check('security:privileges', 'read');
+      return NX.Permissions.check('nexus:privileges', 'read');
     },
     weight: 10
   },
 
-  permission: 'security:privileges',
+  permission: 'nexus:privileges',
 
   /**
    * @override

@@ -57,7 +57,7 @@ class PrivilegeComponent
    * @return a list of privileges
    */
   @DirectMethod
-  @RequiresPermissions('security:privileges:read')
+  @RequiresPermissions('nexus:privileges:read')
   List<PrivilegeXO> read() {
     return securitySystem.listPrivileges().collect { input ->
       return convert(input)
@@ -70,7 +70,7 @@ class PrivilegeComponent
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:privileges:delete')
+  @RequiresPermissions('nexus:privileges:delete')
   @Validate
   void remove(final @NotEmpty String id) {
     AuthorizationManager authorizationManager = securitySystem.getAuthorizationManager(DEFAULT_SOURCE)
