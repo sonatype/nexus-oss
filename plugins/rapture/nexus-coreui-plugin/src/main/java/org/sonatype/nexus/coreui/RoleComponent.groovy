@@ -45,9 +45,8 @@ import org.hibernate.validator.constraints.NotEmpty
 @Singleton
 @DirectAction(action = 'coreui_Role')
 class RoleComponent
-extends DirectComponentSupport
+    extends DirectComponentSupport
 {
-
   public static final String DEFAULT_SOURCE = UserManager.DEFAULT_SOURCE
 
   @Inject
@@ -63,8 +62,8 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('security:roles:read')
   List<RoleXO> read() {
-    return securitySystem.listRoles(DEFAULT_SOURCE).collect { input ->
-      return asRoleXO(input)
+    return securitySystem.listRoles(DEFAULT_SOURCE).collect {input ->
+      return convert(input)
     }
   }
 
@@ -75,7 +74,7 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('security:roles:read')
   List<ReferenceXO> readReferences() {
-    return securitySystem.listRoles(DEFAULT_SOURCE).collect { input ->
+    return securitySystem.listRoles(DEFAULT_SOURCE).collect {input ->
       return new ReferenceXO(
           id: input.roleId,
           name: input.name
@@ -89,9 +88,9 @@ extends DirectComponentSupport
    */
   @DirectMethod
   List<ReferenceXO> readSources() {
-    return authorizationManagers.findResults { manager ->
+    return authorizationManagers.findResults {manager ->
       return manager.source == DEFAULT_SOURCE ? null : manager
-    }.collect { manager ->
+    }.collect {manager ->
       return new ReferenceXO(
           id: manager.source,
           name: manager.source
@@ -108,8 +107,8 @@ extends DirectComponentSupport
   @RequiresPermissions('security:roles:read')
   @Validate
   List<RoleXO> readFromSource(final @NotEmpty String source) {
-    return securitySystem.listRoles(source).collect { input ->
-      return asRoleXO(input)
+    return securitySystem.listRoles(source).collect {input ->
+      return convert(input)
     }
   }
 
@@ -123,7 +122,7 @@ extends DirectComponentSupport
   @RequiresPermissions('security:roles:create')
   @Validate(groups = [Create.class, Default.class])
   RoleXO create(final @NotNull @Valid RoleXO roleXO) {
-    return asRoleXO(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).addRole(
+    return convert(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).addRole(
         new Role(
             roleId: roleXO.id,
             source: roleXO.source,
@@ -146,7 +145,7 @@ extends DirectComponentSupport
   @RequiresPermissions('security:roles:update')
   @Validate(groups = [Update.class, Default.class])
   RoleXO update(final @NotNull @Valid RoleXO roleXO) {
-    return asRoleXO(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).updateRole(
+    return convert(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).updateRole(
         new Role(
             roleId: roleXO.id,
             version: roleXO.version,
@@ -173,17 +172,16 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  RoleXO asRoleXO(Role input) {
+  RoleXO convert(final Role input) {
     return new RoleXO(
         id: input.roleId,
         version: input.version,
         source: (input.source == DEFAULT_SOURCE || !input.source) ? 'Nexus' : input.source,
-        name: input.name,
-        description: input.description,
+        name: input.name != null ? input.name : input.roleId,
+        description: input.description != null ? input.description : input.roleId,
         readOnly: input.readOnly,
         privileges: input.privileges,
         roles: input.roles
     )
   }
-
 }

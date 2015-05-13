@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.timeline.internal
 
+import javax.inject.Named
+import javax.inject.Singleton
+
 import org.sonatype.nexus.security.config.CPrivilege
 import org.sonatype.nexus.security.config.CRole
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
-
-import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * Timeline plugin static security resource.
@@ -28,7 +28,7 @@ import javax.inject.Singleton
 @Named
 @Singleton
 class SecurityConfigurationResource
-implements StaticSecurityConfigurationResource
+    implements StaticSecurityConfigurationResource
 {
   @Override
   MemorySecurityConfiguration getConfiguration() {
@@ -37,10 +37,8 @@ implements StaticSecurityConfigurationResource
             new CPrivilege(
                 id: 'feeds-read', // 44
                 type: 'method',
-                name: 'Feeds - (read)',
-                description: 'Give permission to view the different feeds. The extents of this privilege are related to the allowed targets.',
                 properties: [
-                    'method': 'read',
+                    'method'    : 'read',
                     'permission': 'nexus:feeds'
                 ]
             )
@@ -48,8 +46,6 @@ implements StaticSecurityConfigurationResource
         roles: [
             new CRole(
                 id: 'ui-system-feeds',
-                name: 'UI: System Feeds',
-                description: 'Gives access to the System Feeds screen in Nexus UI',
                 privileges: ['feeds-read']
             )
         ]

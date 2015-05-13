@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.ldap.internal
 
+import javax.inject.Named
+import javax.inject.Singleton
+
 import org.sonatype.nexus.security.config.CPrivilege
 import org.sonatype.nexus.security.config.CRole
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
-
-import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * LDAP plugin static security resource.
@@ -28,7 +28,7 @@ import javax.inject.Singleton
 @Named
 @Singleton
 class SecurityConfigurationResource
-implements StaticSecurityConfigurationResource
+    implements StaticSecurityConfigurationResource
 {
   @Override
   MemorySecurityConfiguration getConfiguration() {
@@ -37,40 +37,32 @@ implements StaticSecurityConfigurationResource
             new CPrivilege(
                 id: 'enterprise-ldap-create',
                 type: 'method',
-                name: 'LDAP (create,read)',
-                description: 'Give permission to create new LDAP Servers.',
                 properties: [
-                    'method': 'create',
+                    'method'    : 'create',
                     'permission': 'security:ldapconfig'
                 ]
             ),
             new CPrivilege(
                 id: 'enterprise-ldap-read',
                 type: 'method',
-                name: 'LDAP (read)',
-                description: 'Give permission to read LDAP Server configurations.',
                 properties: [
-                    'method': 'read',
+                    'method'    : 'read',
                     'permission': 'security:ldapconfig'
                 ]
             ),
             new CPrivilege(
                 id: 'enterprise-ldap-update',
                 type: 'method',
-                name: 'LDAP (update,read)',
-                description: 'Give permission to update LDAP Server configurations.',
                 properties: [
-                    'method': 'update',
+                    'method'    : 'update',
                     'permission': 'security:ldapconfig'
                 ]
             ),
             new CPrivilege(
                 id: 'enterprise-ldap-delete',
                 type: 'method',
-                name: 'LDAP (delete,read)',
-                description: 'Give permission to delete LDAP Servers.',
                 properties: [
-                    'method': 'delete,read',
+                    'method'    : 'delete,read',
                     'permission': 'security:ldapconfig'
                 ]
             )
@@ -78,8 +70,6 @@ implements StaticSecurityConfigurationResource
         roles: [
             new CRole(
                 id: 'ui-enterprise-ldap-admin',
-                name: 'UI: LDAP Administrator',
-                description: 'Gives access to create and edit LDAP Servers.',
                 privileges: ['enterprise-ldap-create', 'enterprise-ldap-read', 'enterprise-ldap-update', 'enterprise-ldap-delete']
             )
         ]

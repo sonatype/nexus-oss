@@ -23,7 +23,6 @@ import org.sonatype.nexus.security.config.MemorySecurityConfiguration
  */
 class AuthorizationManagerTestSecurity
 {
-
   static MemorySecurityConfiguration securityModel() {
     return new MemorySecurityConfiguration(
         users: [
@@ -136,6 +135,5 @@ class AuthorizationManagerTestSecurity
         ]
     )
   }
-
 }
 

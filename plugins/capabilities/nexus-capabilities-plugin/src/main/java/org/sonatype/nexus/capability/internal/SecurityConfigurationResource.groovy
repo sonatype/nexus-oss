@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.capability.internal
 
+import javax.inject.Named
+import javax.inject.Singleton
+
 import org.sonatype.nexus.security.config.CPrivilege
 import org.sonatype.nexus.security.config.CRole
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
-
-import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * Capabilities plugin static security resource.
@@ -37,8 +37,6 @@ implements StaticSecurityConfigurationResource
             new CPrivilege(
                 id: 'capabilities-create-read',
                 type: 'method',
-                name: 'Capabilities - (create,read)',
-                description: 'Give permission to create,read capability configurations.',
                 properties: [
                     'method': 'create,read',
                     'permission': 'nexus:capabilities'
@@ -47,8 +45,6 @@ implements StaticSecurityConfigurationResource
             new CPrivilege(
                 id: 'capabilities-read',
                 type: 'method',
-                name: 'Capabilities - (read)',
-                description: 'Give permission to read existing configured capabilities.',
                 properties: [
                     'method': 'read',
                     'permission': 'nexus:capabilities'
@@ -57,8 +53,6 @@ implements StaticSecurityConfigurationResource
             new CPrivilege(
                 id: 'capabilities-update-read',
                 type: 'method',
-                name: 'Capabilities - (update,read)',
-                description: 'Give permission to update,read existing configured capabilities.',
                 properties: [
                     'method': 'update,read',
                     'permission': 'nexus:capabilities'
@@ -67,8 +61,6 @@ implements StaticSecurityConfigurationResource
             new CPrivilege(
                 id: 'capabilities-delete-read',
                 type: 'method',
-                name: 'Capabilities - (delete,read)',
-                description: 'Give permission to delete,read existing configured capabilities.',
                 properties: [
                     'method': 'delete,read',
                     'permission': 'nexus:capabilities'
@@ -77,8 +69,6 @@ implements StaticSecurityConfigurationResource
             new CPrivilege(
                 id: 'capability-types-read',
                 type: 'method',
-                name: 'Capability Types - (read)',
-                description: 'Give permission to retrieve list of support capability types available in nexus.',
                 properties: [
                     'method': 'read',
                     'permission': 'nexus:capabilityTypes'
@@ -88,8 +78,6 @@ implements StaticSecurityConfigurationResource
         roles: [
             new CRole(
                 id: 'ui-capabilities-admin',
-                name: 'UI: Capabilities Administration',
-                description: 'Gives access to Capabilities Administration screen in Nexus UI',
                 privileges: ['repositories-read', 'repogroups-read', 'capabilities-create-read', 'capabilities-read', 'capabilities-update-read', 'capabilities-delete-read', 'capability-types-read']
             )
         ]

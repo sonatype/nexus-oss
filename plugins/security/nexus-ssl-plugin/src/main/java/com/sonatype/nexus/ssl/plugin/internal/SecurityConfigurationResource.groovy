@@ -12,13 +12,13 @@
  */
 package com.sonatype.nexus.ssl.plugin.internal
 
+import javax.inject.Named
+import javax.inject.Singleton
+
 import org.sonatype.nexus.security.config.CPrivilege
 import org.sonatype.nexus.security.config.CRole
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
-
-import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * SSL plugin static security resource.
@@ -28,7 +28,7 @@ import javax.inject.Singleton
 @Named
 @Singleton
 class SecurityConfigurationResource
-implements StaticSecurityConfigurationResource
+    implements StaticSecurityConfigurationResource
 {
   @Override
   MemorySecurityConfiguration getConfiguration() {
@@ -37,40 +37,32 @@ implements StaticSecurityConfigurationResource
             new CPrivilege(
                 id: 'ssl-truststore-read',
                 type: 'method',
-                name: 'Nexus SSL Trust Store - (read)',
-                description: 'Give permission to read certificates from Nexus SSL Trust Store.',
                 properties: [
-                    'method': 'read',
+                    'method'    : 'read',
                     'permission': 'nexus:ssl:truststore'
                 ]
             ),
             new CPrivilege(
                 id: 'ssl-truststore-create',
                 type: 'method',
-                name: 'Nexus SSL Trust Store - (create,read)',
-                description: 'Give permission to create,read certificates from Nexus SSL Trust Store.',
                 properties: [
-                    'method': 'create,read',
+                    'method'    : 'create,read',
                     'permission': 'nexus:ssl:truststore'
                 ]
             ),
             new CPrivilege(
                 id: 'ssl-truststore-update',
                 type: 'method',
-                name: 'Nexus SSL Trust Store - (create,read)',
-                description: 'Give permission to update,read certificates from Nexus SSL Trust Store.',
                 properties: [
-                    'method': 'update,read',
+                    'method'    : 'update,read',
                     'permission': 'nexus:ssl:truststore'
                 ]
             ),
             new CPrivilege(
                 id: 'ssl-truststore-delete',
                 type: 'method',
-                name: 'Nexus SSL Trust Store - (delete,read)',
-                description: 'Give permission to delete,read certificates from Nexus SSL Trust Store.',
                 properties: [
-                    'method': 'delete,read',
+                    'method'    : 'delete,read',
                     'permission': 'nexus:ssl:truststore'
                 ]
             )
@@ -78,14 +70,10 @@ implements StaticSecurityConfigurationResource
         roles: [
             new CRole(
                 id: 'ssl-truststore-view',
-                name: 'Nexus SSL: Trust Store View',
-                description: 'Gives access to view Nexus SSL Trust Store',
                 privileges: ['ssl-truststore-read']
             ),
             new CRole(
                 id: 'ssl-truststore-admin',
-                name: 'Nexus SSL: Trust Store Administration',
-                description: 'Gives access to manage Nexus SSL Trust Store',
                 privileges: ['ssl-truststore-create', 'ssl-truststore-update', 'ssl-truststore-delete']
             )
         ]

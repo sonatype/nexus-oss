@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.atlas.internal
 
+import javax.inject.Named
+import javax.inject.Singleton
+
 import org.sonatype.nexus.security.config.CPrivilege
 import org.sonatype.nexus.security.config.CRole
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
-
-import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * Atlas plugin static security resource.
@@ -28,7 +28,7 @@ import javax.inject.Singleton
 @Named
 @Singleton
 class SecurityConfigurationResource
-implements StaticSecurityConfigurationResource
+    implements StaticSecurityConfigurationResource
 {
   @Override
   MemorySecurityConfiguration getConfiguration() {
@@ -37,10 +37,8 @@ implements StaticSecurityConfigurationResource
             new CPrivilege(
                 id: 'atlas-all',
                 type: 'method',
-                name: 'Atlas: Support Tools',
-                description: 'Give permission to use Atlas support tools',
                 properties: [
-                    'method': '*',
+                    'method'    : '*',
                     'permission': 'nexus:atlas'
                 ]
             )
@@ -48,8 +46,6 @@ implements StaticSecurityConfigurationResource
         roles: [
             new CRole(
                 id: 'atlas',
-                name: 'Atlas: Support Tools',
-                description: 'Gives access to Atlas support tools',
                 privileges: ['atlas-all']
             )
         ]
