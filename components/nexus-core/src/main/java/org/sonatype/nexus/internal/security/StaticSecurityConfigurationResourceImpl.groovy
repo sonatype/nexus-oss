@@ -111,38 +111,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'repotemplates-create', // 9
-                type: 'method',
-                properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:repotemplates'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repotemplates-read', // 10
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:repotemplates'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repotemplates-update', // 11
-                type: 'method',
-                properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:repotemplates'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repotemplates-delete', // 12
-                type: 'method',
-                properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:repotemplates'
-                ]
-            ),
-            new CPrivilege(
                 id: 'attributes-delete', // 20
                 type: 'method',
                 properties: [
