@@ -225,7 +225,7 @@ class UserComponent
   @DirectMethod
   @RequiresUser
   @RequiresAuthentication
-  @RequiresPermissions('security:userschangepw:create')
+  @RequiresPermissions('nexus:userschangepw:create')
   @Validate
   void changePassword(final @NotEmpty String authToken,
                       final @NotEmpty String userId,

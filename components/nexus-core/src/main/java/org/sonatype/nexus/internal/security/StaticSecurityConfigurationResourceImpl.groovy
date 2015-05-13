@@ -68,7 +68,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
-            // TODO: nexus:repositories used by UI, refactor
+            // TODO: nexus:repositories used by UI, remove these are legacy
             new CPrivilege(
                 id: 'repositories-create',
                 type: 'method',
@@ -102,7 +102,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
-            // TODO: nexus:tasks used by UI, refactor
+            // TODO: nexus:tasks used by UI, refine... move to more specific security configuration component
             new CPrivilege(
                 id: 'tasks-create',
                 type: 'method',
@@ -135,6 +135,8 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:tasks'
                 ]
             ),
+
+            // FIXME: 'read' means 'start' and 'delete' means 'stop', should be actions on 'nexus:tasks' instead
             new CPrivilege(
                 id: 'tasksrun',
                 type: 'method',
@@ -143,6 +145,8 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:tasksrun'
                 ]
             ),
+
+            // FIXME: Unsure what the reason is for a distinct permission for reading task-types
             new CPrivilege(
                 id: 'tasktypes-read',
                 type: 'method',
@@ -172,16 +176,6 @@ class StaticSecurityConfigurationResourceImpl
                 properties: [
                     'method'    : '*',
                     'permission': 'nexus:apikey'
-                ]
-            ),
-
-            // FIXME: change namespace to use nexus:
-            new CPrivilege(
-                id: 'security-admin',
-                type: 'method',
-                properties: [
-                    'method'    : '*',
-                    'permission': 'security:*'
                 ]
             ),
 
@@ -296,31 +290,33 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
-            // FIXME: Normalize name scheme
+            // FIXME: Sort out what the use-case is for this distinct permission
             new CPrivilege(
                 id: 'userschangepw',
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
-                    'permission': 'security:userschangepw'
+                    'permission': 'nexus:userschangepw'
                 ]
             )
         ],
+
         roles: [
+            /**
+             * Admin role provides super-user access (all permissions).
+             */
             new CRole(
                 id: 'admin',
                 privileges: [
-                    'all',
-                    // FIXME: These don't start with "nexus:*", once that is fixed can be removed
-                    'security-admin'
+                    'all'
                 ]
             ),
+
+            /**
+             * Anonymous role grants permissions to non-authenticated users.
+             */
             new CRole(
-                id: 'anonymous',
-                privileges: [
-                    // FIXME: Sort out what we need for defaults
-                    'status'
-                ]
+                id: 'anonymous'
             )
         ]
     )

@@ -513,7 +513,7 @@ Ext.define('NX.coreui.controller.Users', {
 
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('security:userschangepw', 'create'),
+            NX.Conditions.isPermitted('nexus:userschangepw', 'create'),
             NX.Conditions.gridHasSelection(me.masters[0], function(model) {
               return !model.get('external') && model.getId() !== NX.State.getValue('anonymousUsername');
             })
@@ -526,7 +526,7 @@ Ext.define('NX.coreui.controller.Users', {
     );
 
     setMenuItem.mon(
-        NX.Conditions.isPermitted('security:userschangepw', 'create'),
+        NX.Conditions.isPermitted('nexus:userschangepw', 'create'),
         {
           satisfied: setMenuItem.enable,
           unsatisfied: setMenuItem.disable,
@@ -538,12 +538,12 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @override
    * @private
-   * Enable 'Change Password' when user has 'security:userschangepw:create' permission.
+   * Enable 'Change Password' when user has 'nexus:userschangepw:create' permission.
    */
   bindChangePasswordButton: function(button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('security:userschangepw', 'create')
+            NX.Conditions.isPermitted('nexus:userschangepw', 'create')
         ),
         {
           satisfied: button.enable,
