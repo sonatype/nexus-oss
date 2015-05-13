@@ -156,7 +156,7 @@ public class SecurityComponent
 
       // HACK: roles for the current user are not exposed to the UI.
       // HACK: but we need to know if user is admin or not for some things (like outreach)
-      if (subject.hasRole("nx-admin")) {
+      if (subject.hasRole("admin")) {
         userXO.setAdministrator(true);
       }
 

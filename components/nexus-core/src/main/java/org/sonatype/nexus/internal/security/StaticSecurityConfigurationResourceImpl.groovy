@@ -35,12 +35,15 @@ class StaticSecurityConfigurationResourceImpl
   MemorySecurityConfiguration getConfiguration() {
     return new MemorySecurityConfiguration(
         privileges: [
+            /**
+             * Grants permission for anything in the 'nexus:' namespace.
+             */
             new CPrivilege(
-                id: 'admin', // 1000
+                id: 'all',
                 type: 'method',
                 properties: [
                     'method'    : '*',
-                    'permission': 'nexus:*'
+                    'permission': 'nexus'
                 ]
             ),
             new CPrivilege(
@@ -534,18 +537,19 @@ class StaticSecurityConfigurationResourceImpl
         ],
         roles: [
             new CRole(
-                id: 'nx-admin',
-                privileges: ['admin', 'security-admin', 'apikey-access']
-            ),
-            new CRole(
-                id: 'nx-deployment',
-                privileges: ['apikey-access'],
-                roles: ['anonymous', 'ui-basic']
+                id: 'admin',
+                privileges: [
+                    'all',
+                    // FIXME: These don't start with "nexus:*"
+                    'security-admin',
+                    'apikey-access'
+                ]
             ),
             new CRole(
                 id: 'anonymous',
-                privileges: ['status', 'artifact-read', 'repotypes-read'],
-                roles: ['ui-repo-browser', 'ui-search']
+                privileges: [
+                    'status'
+                ]
             )
         ]
     )

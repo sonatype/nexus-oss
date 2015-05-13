@@ -25,7 +25,7 @@ class PermissionTrial
 {
   @Test
   void 'test implied wildcard'() {
-    def perm = new WildcardPermission('nexus:security:read')
+    def perm = new WildcardPermission('nexus:something:special:read')
     def granted = new WildcardPermission('nexus:*')
     assert granted.implies(perm)
   }

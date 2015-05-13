@@ -27,7 +27,7 @@ class UserXO
   boolean authenticated
 
   /**
-   * True if the current user has general administrator privileges (ie. nx-admin role).
+   * True if the current user has general administrator privileges (ie. admin role).
    */
   boolean administrator
 }
