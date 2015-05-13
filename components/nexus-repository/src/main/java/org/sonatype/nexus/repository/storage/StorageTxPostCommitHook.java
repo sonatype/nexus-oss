@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import javax.annotation.Nullable;
+
 /**
  * Storage TX hook. It shares same lifecycle as {@link StorageTx}.
  *
@@ -35,22 +37,30 @@ public abstract class StorageTxPostCommitHook
   public void deleteComponent(final Component... components) {}
 
   /**
-   * Called when {@link StorageTx#saveAsset(Asset)} invoked with created asset.
+   * Called when {@link StorageTx#saveAsset(Asset)} invoked with created asset. Component parameter is {@code null} for
+   * standalone assets.
    */
-  public void createAsset(final Asset... assets) {}
+  public void createAsset(@Nullable final Component component, final Asset... assets) {}
 
   /**
-   * Called when {@link StorageTx#saveAsset(Asset)} invoked with updated asset.
+   * Called when {@link StorageTx#saveAsset(Asset)} invoked with updated asset. Component parameter is {@code null} for
+   * standalone assets.
    */
-  public void updateAsset(final Asset... assets) {}
+  public void updateAsset(@Nullable final Component component, final Asset... assets) {}
 
   /**
-   * Called when {@link StorageTx#deleteAsset(Asset)} invoked.
+   * Called when {@link StorageTx#deleteAsset(Asset)} invoked. Component parameter is {@code null} for standalone
+   * assets.
    */
-  public void deleteAsset(final Asset... assets) {}
+  public void deleteAsset(@Nullable final Component component, final Asset... assets) {}
 
   /**
    * Called after {@link StorageTx#commit()} successfully executed.
    */
-  public void execute() {}
+  public void postCommit() {}
+
+  /**
+   * Called after {@link StorageTx#rollback()} executed.
+   */
+  public void postRollback() {}
 }

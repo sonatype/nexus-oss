@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.Repository;
 
 /**
@@ -22,7 +24,9 @@ import org.sonatype.nexus.repository.Repository;
 public class AssetUpdatedEvent
   extends AssetEvent
 {
-  public AssetUpdatedEvent(final Asset asset, final Repository repository) {
-    super(asset, repository);
+  public AssetUpdatedEvent(@Nullable final Component component,
+                           final Asset asset,
+                           final Repository repository) {
+    super(component, asset, repository);
   }
 }

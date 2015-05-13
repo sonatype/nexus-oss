@@ -14,7 +14,6 @@ package org.sonatype.nexus.repository.storage;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -80,7 +79,7 @@ public class StorageTxImpl
 
   private final AssetEntityAdapter assetEntityAdapter;
 
-  private final List<StorageTxPostCommitHook> hooks;
+  private final StorageTxPostCommitHook hook;
 
   public StorageTxImpl(final BlobTx blobTx,
                        final ODatabaseDocumentTx db,
@@ -90,7 +89,7 @@ public class StorageTxImpl
                        final BucketEntityAdapter bucketEntityAdapter,
                        final ComponentEntityAdapter componentEntityAdapter,
                        final AssetEntityAdapter assetEntityAdapter,
-                       final List<StorageTxPostCommitHook> hooks)
+                       final StorageTxPostCommitHook hook)
   {
     this.blobTx = checkNotNull(blobTx);
     this.db = checkNotNull(db);
@@ -100,7 +99,7 @@ public class StorageTxImpl
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
-    this.hooks = checkNotNull(hooks);
+    this.hook = checkNotNull(hook);
 
     db.begin(TXTYPE.OPTIMISTIC);
   }
@@ -131,9 +130,7 @@ public class StorageTxImpl
   public void commit() {
     db.commit();
     blobTx.commit();
-    for (StorageTxPostCommitHook hook : hooks) {
-      hook.execute();
-    }
+    hook.postCommit();
   }
 
   @Override
@@ -141,6 +138,7 @@ public class StorageTxImpl
   public void rollback() {
     db.rollback();
     blobTx.rollback();
+    hook.postRollback();
   }
 
   @Override
@@ -312,31 +310,35 @@ public class StorageTxImpl
   public void saveComponent(final Component component) {
     if (component.isPersisted()) {
       componentEntityAdapter.edit(db, component);
-      for (StorageTxPostCommitHook hook : hooks) {
-        hook.updateComponent(component);
-      }
+      hook.updateComponent(component);
     }
     else {
       componentEntityAdapter.add(db, component);
-      for (StorageTxPostCommitHook hook : hooks) {
-        hook.createComponent(component);
-      }
+      hook.createComponent(component);
     }
+  }
+
+  /**
+   * Returns the {@link Component} of an {@link Asset} or {@code null} if it's standalone.
+   */
+  @Nullable
+  private Component assetComponent(final Asset asset) {
+    final EntityId componentId = asset.componentId();
+    if (componentId == null) {
+      return null;
+    }
+    return componentEntityAdapter.get(db, componentId);
   }
 
   @Override
   public void saveAsset(final Asset asset) {
     if (asset.isPersisted()) {
       assetEntityAdapter.edit(db, asset);
-      for (StorageTxPostCommitHook hook : hooks) {
-        hook.updateAsset(asset);
-      }
+      hook.updateAsset(assetComponent(asset), asset);
     }
     else {
       assetEntityAdapter.add(db, asset);
-      for (StorageTxPostCommitHook hook : hooks) {
-        hook.createAsset(asset);
-      }
+      hook.createAsset(assetComponent(asset), asset);
     }
   }
 
@@ -352,9 +354,7 @@ public class StorageTxImpl
     for (Asset asset : browseAssets(component)) {
       deleteAsset(asset, checkWritePolicy ? writePolicySelector.select(asset, writePolicy) : null);
     }
-    for (StorageTxPostCommitHook hook : hooks) {
-      hook.deleteComponent(component);
-    }
+    hook.deleteComponent(component);
     componentEntityAdapter.delete(db, component);
   }
 
@@ -371,9 +371,7 @@ public class StorageTxImpl
     if (blobRef != null) {
       deleteBlob(blobRef, effectiveWritePolicy);
     }
-    for (StorageTxPostCommitHook hook : hooks) {
-      hook.deleteAsset(asset);
-    }
+    hook.deleteAsset(assetComponent(asset), asset);
     assetEntityAdapter.delete(db, asset);
   }
 

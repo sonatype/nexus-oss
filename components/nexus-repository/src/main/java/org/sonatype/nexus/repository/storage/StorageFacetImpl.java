@@ -196,8 +196,7 @@ public class StorageFacetImpl
     }
     return StateGuardAspect.around(new StorageTxImpl(
         new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucket, config.writePolicy,
-        writePolicySelector,
-        bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, hooks
+        writePolicySelector, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(hooks)
     ));
   }
 

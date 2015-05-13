@@ -14,9 +14,12 @@ package org.sonatype.nexus.repository.search;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTxPostCommitHook;
 
@@ -67,7 +70,28 @@ public class SearchPostCommitHook
   }
 
   @Override
-  public void execute() {
+  public void createAsset(@Nullable final Component component, final Asset... assets) {
+    if (component != null) {
+      updateComponent(component);
+    }
+  }
+
+  @Override
+  public void updateAsset(@Nullable final Component component, final Asset... assets) {
+    if (component != null) {
+      updateComponent(component);
+    }
+  }
+
+  @Override
+  public void deleteAsset(@Nullable final Component component, final Asset... assets) {
+    if (component != null) {
+      updateComponent(component);
+    }
+  }
+
+  @Override
+  public void postCommit() {
     for (EntityId entityId : deindexable) {
       searchService.delete(repository, entityId.toString());
     }
