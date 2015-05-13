@@ -140,6 +140,8 @@ public class MavenFacetImpl
 
   private MavenPathParser mavenPathParser;
 
+  private StorageFacet storageFacet;
+
   @Inject
   public MavenFacetImpl(final MimeSupport mimeSupport, final Map<String, MavenPathParser> mavenPathParsers) {
     this.mimeSupport = checkNotNull(mimeSupport);
@@ -157,6 +159,8 @@ public class MavenFacetImpl
   protected void doInit(final Configuration configuration) throws Exception {
     super.doInit(configuration);
     mavenPathParser = checkNotNull(mavenPathParsers.get(getRepository().getFormat().getValue()));
+    storageFacet = getRepository().facet(StorageFacet.class);
+    storageFacet.registerWritePolicySelector(new MavenWritePolicySelector(mavenPathParser));
   }
 
   @Override
@@ -185,7 +189,7 @@ public class MavenFacetImpl
   @Nullable
   @Override
   public Content get(final MavenPath path) throws IOException {
-    try (StorageTx tx = getStorage().openTx()) {
+    try (StorageTx tx = storageFacet.openTx()) {
       return get(tx, path);
     }
   }
@@ -228,7 +232,7 @@ public class MavenFacetImpl
   public Content put(final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
-    try (StorageTx tx = getStorage().openTx()) {
+    try (StorageTx tx = storageFacet.openTx()) {
       Content content = put(tx, path, payload);
       tx.commit();
       return content;
@@ -346,7 +350,7 @@ public class MavenFacetImpl
 
   @Override
   public boolean delete(final MavenPath... paths) throws IOException {
-    try (StorageTx tx = getStorage().openTx()) {
+    try (StorageTx tx = storageFacet.openTx()) {
       boolean result = delete(tx, paths);
       tx.commit();
       return result;
@@ -394,7 +398,7 @@ public class MavenFacetImpl
 
   @Override
   public DateTime getLastVerified(final MavenPath path) throws IOException {
-    try (StorageTx tx = getStorage().openTx()) {
+    try (StorageTx tx = storageFacet.openTx()) {
       final Asset asset = findAsset(tx, tx.getBucket(), path);
       if (asset == null) {
         return null;
@@ -410,7 +414,7 @@ public class MavenFacetImpl
 
   @Override
   public boolean setLastVerified(final MavenPath path, final DateTime verified) throws IOException {
-    try (StorageTx tx = getStorage().openTx()) {
+    try (StorageTx tx = storageFacet.openTx()) {
       final Asset asset = findAsset(tx, tx.getBucket(), path);
       if (asset == null) {
         return false;
@@ -520,9 +524,5 @@ public class MavenFacetImpl
       }
     }
     return contentType;
-  }
-
-  private StorageFacet getStorage() {
-    return getRepository().facet(StorageFacet.class);
   }
 }
