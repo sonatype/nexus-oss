@@ -224,7 +224,7 @@ public class MetadataBuilder
     catch (InvalidVersionSpecificationException e) {
       // According to versionScheme implementation we use, this exception will never happen
       // log + ignore
-      log.info("Invalid baseVersion discovered: " + baseVersion , e);
+      log.info("Invalid baseVersion discovered: " + baseVersion, e);
     }
   }
 
@@ -313,8 +313,10 @@ public class MetadataBuilder
       return;
     }
 
-    final String key = key(mavenPath.getCoordinates());
     final Version version = parseVersion(mavenPath.getCoordinates().getVersion());
+    if (version == null) {
+      return; // could not parse, omit it from "latest" maintenance
+    }
     final VersionCoordinates versionCoordinates = new VersionCoordinates(version, mavenPath.getCoordinates());
 
     // maintain latestVersionCoordinates
@@ -323,15 +325,11 @@ public class MetadataBuilder
     }
 
     // maintain latestVersionCoordinatesMap
-    if (!latestVersionCoordinatesMap.containsKey(key)) {
+    final String key = key(mavenPath.getCoordinates());
+    final VersionCoordinates other = latestVersionCoordinatesMap.get(key);
+    // add if contained version is less than version
+    if (other == null || other.version.compareTo(versionCoordinates.version) < 0) {
       latestVersionCoordinatesMap.put(key, versionCoordinates);
-    }
-    else {
-      // add if contained version is less than version
-      final VersionCoordinates other = latestVersionCoordinatesMap.get(key);
-      if (other.version.compareTo(versionCoordinates.version) < 0) {
-        latestVersionCoordinatesMap.put(key, versionCoordinates);
-      }
     }
   }
 
@@ -344,13 +342,14 @@ public class MetadataBuilder
     }
   }
 
+  @Nullable
   private Version parseVersion(final String version) {
     try {
       return versionScheme.parseVersion(version);
     }
     catch (InvalidVersionSpecificationException e) {
-      // nada
-      throw Throwables.propagate(e); // make IDEA happy wrt NPE
+      log.warn("Invalid version: {}", version, e);
+      return null;
     }
   }
 }

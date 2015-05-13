@@ -225,51 +225,19 @@ public class MetadataRebuilder
                   final boolean groupChange = !Objects.equals(currentGroupId, groupId);
                   if (groupChange) {
                     if (currentGroupId != null) {
-                      isolate(new Runnable()
-                      {
-                        @Override
-                        public void run() {
-                          try (StorageTx tx = storageFacet.openTx()) {
-                            metadataUpdater.processMetadata(
-                                tx,
-                                metadataMavenPath(currentGroupId, null, null),
-                                metadataBuilder.onExitGroupId()
-                            );
-                            tx.commit();
-                          }
-                        }
-                      });
+                      rebuildMetadataExitGroup(currentGroupId);
                     }
                     currentGroupId = groupId;
                     metadataBuilder.onEnterGroupId(groupId);
                   }
-                  isolate(new Runnable()
-                  {
-                    @Override
-                    public void run() {
-                      rebuildMetadataInner(groupId, artifactId, baseVersions);
-                    }
-                  });
+                  rebuildMetadataInner(groupId, artifactId, baseVersions);
                   return true;
                 }
 
                 @Override
                 public void end() {
                   if (currentGroupId != null) {
-                    isolate(new Runnable()
-                    {
-                      @Override
-                      public void run() {
-                        try (StorageTx tx = storageFacet.openTx()) {
-                          metadataUpdater.processMetadata(
-                              tx,
-                              metadataMavenPath(currentGroupId, null, null),
-                              metadataBuilder.onExitGroupId()
-                          );
-                          tx.commit();
-                        }
-                      }
-                    });
+                    rebuildMetadataExitGroup(currentGroupId);
                   }
                 }
               }
@@ -278,68 +246,94 @@ public class MetadataRebuilder
     }
 
     /**
+     * Process exits from group level, executed in isolation.
+     */
+    private void rebuildMetadataExitGroup(final String currentGroupId) {
+      isolate(new Runnable()
+      {
+        @Override
+        public void run() {
+          try (StorageTx tx = storageFacet.openTx()) {
+            metadataUpdater.processMetadata(
+                tx,
+                metadataMavenPath(currentGroupId, null, null),
+                metadataBuilder.onExitGroupId()
+            );
+            tx.commit();
+          }
+        }
+      });
+    }
+
+    /**
      * Method rebuilding metadata that performs artifact and baseVersion processing. While it is called from {@link
      * #rebuildMetadata(ODatabaseDocumentTx)} method, it will use a separate TX/DB to perform writes, it does NOT
-     * accept the TX from caller.
+     * accept the TX from caller. Executed in isolation.
      */
     private void rebuildMetadataInner(final String groupId,
                                       final String artifactId,
                                       final Set<String> baseVersions)
     {
-      metadataBuilder.onEnterArtifactId(artifactId);
-      for (String baseVersion : baseVersions) {
-        metadataBuilder.onEnterBaseVersion(baseVersion);
-        try (StorageTx tx = storageFacet.openTx()) {
-          final Iterable<Component> components = tx.findComponents(
-              "group = :groupId and name = :artifactId and attributes.maven2.baseVersion = :baseVersion",
-              ImmutableMap.<String, Object>of(
-                  "groupId", groupId,
-                  "artifactId", artifactId,
-                  "baseVersion", baseVersion
-              ),
-              ImmutableList.of(repository),
-              null // order by
-          );
-          for (Component component : components) {
-            for (Asset asset : tx.browseAssets(component)) {
-              final MavenPath mavenPath = mavenPathParser.parsePath(
-                  asset.formatAttributes().require(StorageFacet.P_PATH, String.class)
+      isolate(new Runnable()
+      {
+        @Override
+        public void run() {
+          metadataBuilder.onEnterArtifactId(artifactId);
+          for (String baseVersion : baseVersions) {
+            metadataBuilder.onEnterBaseVersion(baseVersion);
+            try (StorageTx tx = storageFacet.openTx()) {
+              final Iterable<Component> components = tx.findComponents(
+                  "group = :groupId and name = :artifactId and attributes.maven2.baseVersion = :baseVersion",
+                  ImmutableMap.<String, Object>of(
+                      "groupId", groupId,
+                      "artifactId", artifactId,
+                      "baseVersion", baseVersion
+                  ),
+                  ImmutableList.of(repository),
+                  null // order by
               );
-              if (mavenPath.isSubordinate()) {
-                continue;
-              }
-              metadataBuilder.addArtifactVersion(mavenPath);
-              mayUpdateChecksum(tx, asset, mavenPath, HashType.SHA1);
-              mayUpdateChecksum(tx, asset, mavenPath, HashType.MD5);
-              if (mavenPath.isPom()) {
-                final Document pom = getModel(tx, mavenPath);
-                if (pom != null) {
-                  final String packaging = getChildValue(pom, "packaging", "jar");
-                  log.debug("POM packaging: {}", packaging);
-                  if ("maven-plugin".equals(packaging)) {
-                    metadataBuilder.addPlugin(getPluginPrefix(tx, mavenPath.locateMainArtifact("jar")), artifactId,
-                        getChildValue(pom, "name", null));
+              for (Component component : components) {
+                for (Asset asset : tx.browseAssets(component)) {
+                  final MavenPath mavenPath = mavenPathParser.parsePath(
+                      asset.formatAttributes().require(StorageFacet.P_PATH, String.class)
+                  );
+                  if (mavenPath.isSubordinate()) {
+                    continue;
+                  }
+                  metadataBuilder.addArtifactVersion(mavenPath);
+                  mayUpdateChecksum(tx, asset, mavenPath, HashType.SHA1);
+                  mayUpdateChecksum(tx, asset, mavenPath, HashType.MD5);
+                  if (mavenPath.isPom()) {
+                    final Document pom = getModel(tx, mavenPath);
+                    if (pom != null) {
+                      final String packaging = getChildValue(pom, "packaging", "jar");
+                      log.debug("POM packaging: {}", packaging);
+                      if ("maven-plugin".equals(packaging)) {
+                        metadataBuilder.addPlugin(getPluginPrefix(tx, mavenPath.locateMainArtifact("jar")), artifactId,
+                            getChildValue(pom, "name", null));
+                      }
+                    }
                   }
                 }
               }
+              metadataUpdater.processMetadata(
+                  tx,
+                  metadataMavenPath(groupId, artifactId, baseVersion),
+                  metadataBuilder.onExitBaseVersion()
+              );
+              tx.commit();
             }
           }
-          metadataUpdater.processMetadata(
-              tx,
-              metadataMavenPath(groupId, artifactId, baseVersion),
-              metadataBuilder.onExitBaseVersion()
-          );
-          tx.commit();
+          try (StorageTx tx = storageFacet.openTx()) {
+            metadataUpdater.processMetadata(
+                tx,
+                metadataMavenPath(groupId, artifactId, null),
+                metadataBuilder.onExitArtifactId()
+            );
+            tx.commit();
+          }
         }
-      }
-      try (StorageTx tx = storageFacet.openTx()) {
-        metadataUpdater.processMetadata(
-            tx,
-            metadataMavenPath(groupId, artifactId, null),
-            metadataBuilder.onExitArtifactId()
-        );
-        tx.commit();
-      }
+      });
     }
 
     /**
@@ -349,9 +343,12 @@ public class MetadataRebuilder
                                    final HashType hashType)
     {
       final AttributesMap checksums = asset.attributes().child(StorageFacet.P_CHECKSUM);
-      checkState(checksums != null, "checksums");
       final String assetChecksum = (String) checksums.get(hashType.getHashAlgorithm().name());
-      checkState(!Strings.isNullOrEmpty(assetChecksum), "assetChecksum");
+      if (Strings.isNullOrEmpty(assetChecksum)) {
+        // this means that an asset stored in maven repository lacks checksum required by maven repository (see maven facet)
+        log.warn("Asset with path {} lacks checksum {}", mavenPath, hashType);
+        return;
+      }
       final MavenPath checksumPath = mavenPath.hash(hashType);
       try {
         final Content content = mavenFacet.get(tx, checksumPath);
@@ -424,7 +421,7 @@ public class MetadataRebuilder
     }
 
     /**
-     * Returns the plugin prefix of a Maven plugin, by cranking up the plugin JAR, and reading the Maven Plugin
+     * Returns the plugin prefix of a Maven plugin, by opening up the plugin JAR, and reading the Maven Plugin
      * Descriptor. If fails, falls back to mangle artifactId (ie. extract XXX from XXX-maven-plugin or
      * maven-XXX-plugin).
      */

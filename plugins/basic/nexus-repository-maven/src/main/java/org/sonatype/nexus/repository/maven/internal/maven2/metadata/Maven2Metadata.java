@@ -343,7 +343,7 @@ public class Maven2Metadata
                                                 final String groupId,
                                                 final String artifactId,
                                                 final String latest,
-                                                final String release,
+                                                @Nullable final String release,
                                                 final Iterable<String> versions)
   {
     checkNotNull(lastUpdated);
