@@ -16,9 +16,9 @@ import javax.validation.Validation
 import javax.validation.ValidatorFactory
 import javax.validation.constraints.NotNull
 
+import org.sonatype.nexus.validation.internal.AopAwareParanamerParameterNameProvider
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
-import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider
 import org.junit.Before
 import org.junit.Test
 
@@ -33,7 +33,7 @@ class ParanamerValidationTest
   @Before
   void setUp() {
     factory = Validation.byDefaultProvider().configure()
-        .parameterNameProvider(new ParanamerParameterNameProvider())
+        .parameterNameProvider(new AopAwareParanamerParameterNameProvider())
         .buildValidatorFactory()
   }
 
