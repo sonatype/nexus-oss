@@ -231,38 +231,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'repositorymirrors-read', // 78
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:repositorymirrors'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repositorymirrors-create', // 79
-                type: 'method',
-                properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:repositorymirrors'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repositorypredefinedmirrors-read', // 81
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:repositorypredefinedmirrors'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repositorymirrorsstatus-read', // 82
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:repositorymirrorsstatus'
-                ]
-            ),
-            new CPrivilege(
                 id: 'search', // 17
                 type: 'method',
                 properties: [
