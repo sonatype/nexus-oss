@@ -199,14 +199,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'repometa-read', // 67
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:repometa'
-                ]
-            ),
-            new CPrivilege(
                 id: 'tasksrun', // 68
                 type: 'method',
                 properties: [
