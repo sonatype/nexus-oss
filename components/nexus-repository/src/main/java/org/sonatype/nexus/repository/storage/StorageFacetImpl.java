@@ -32,7 +32,9 @@ import org.sonatype.nexus.repository.types.HostedType;
 import com.google.common.annotations.VisibleForTesting;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.hibernate.validator.constraints.NotEmpty;
+
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.NEW;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
 
 /**
@@ -80,6 +82,8 @@ public class StorageFacetImpl
 
   private Bucket bucket;
 
+  private WritePolicySelector writePolicySelector;
+
   @Inject
   public StorageFacetImpl(final BlobStoreManager blobStoreManager,
                           final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
@@ -112,6 +116,7 @@ public class StorageFacetImpl
   protected void doInit(final Configuration configuration) throws Exception {
     initSchema();
     initBucket();
+    writePolicySelector = WritePolicySelector.DEFAULT;
     super.doInit(configuration);
   }
 
@@ -149,6 +154,13 @@ public class StorageFacetImpl
   }
 
   @Override
+  @Guarded(by = NEW)
+  public void registerWritePolicySelector(final WritePolicySelector writePolicySelector) {
+    checkNotNull(writePolicySelector);
+    this.writePolicySelector = writePolicySelector;
+  }
+
+  @Override
   @Guarded(by = STARTED)
   public StorageTx openTx() {
     return openStorageTx();
@@ -157,7 +169,7 @@ public class StorageFacetImpl
   private StorageTx openStorageTx() {
     BlobStore blobStore = blobStoreManager.get(config.blobStoreName);
     return StateGuardAspect.around(new StorageTxImpl(
-        new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucket, config.writePolicy,
+        new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucket, config.writePolicy, writePolicySelector,
         bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter
     ));
   }
