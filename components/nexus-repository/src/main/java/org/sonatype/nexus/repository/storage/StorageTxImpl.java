@@ -457,9 +457,7 @@ public class StorageTxImpl
   }
 
   /**
-   * Deletes a blob w/ enforcing {@link WritePolicy} if not {@code null}. Write policy will NOT be checked if {@code
-   * null}
-   * passed in.
+   * Deletes a blob w/ enforcing {@link WritePolicy} if not {@code null}. otherwise write policy will NOT be checked.
    */
   private void deleteBlob(final BlobRef blobRef, @Nullable WritePolicy effectiveWritePolicy) {
     checkNotNull(blobRef);
