@@ -337,8 +337,6 @@ Ext.define('NX.view.drilldown.Drilldown', {
       } else {
         me.setX(left, false);
       }
-
-      //me.el.first().move('l', left, animate);
       me.currentIndex = index;
 
       // Update the breadcrumb
