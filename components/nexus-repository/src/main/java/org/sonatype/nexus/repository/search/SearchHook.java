@@ -14,7 +14,6 @@ package org.sonatype.nexus.repository.search;
 
 import java.util.LinkedHashSet;
 
-import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
