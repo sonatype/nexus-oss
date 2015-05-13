@@ -46,14 +46,7 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus'
                 ]
             ),
-            new CPrivilege(
-                id: 'signin',
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:authentication'
-                ]
-            ),
+
             new CPrivilege(
                 id: 'settings-read',
                 type: 'method',
