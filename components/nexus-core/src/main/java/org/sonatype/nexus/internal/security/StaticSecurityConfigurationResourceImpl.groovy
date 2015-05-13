@@ -47,9 +47,10 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
-            /**
-             * Grants permission for general/core settings.
-             */
+            //
+            // nexus:settings
+            //
+
             new CPrivilege(
                 id: 'settings-read',
                 type: 'method',
@@ -161,6 +162,10 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
+            //
+            // nexus:apikey
+            //
+
             new CPrivilege(
                 id: 'apikey-all',
                 type: 'method',
@@ -263,7 +268,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
-                    'permission': 'security:users'
+                    'permission': 'nexus:users'
                 ]
             ),
             new CPrivilege(
@@ -271,7 +276,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'method',
                 properties: [
                     'method'    : 'read',
-                    'permission': 'security:users'
+                    'permission': 'nexus:users'
                 ]
             ),
             new CPrivilege(
@@ -279,7 +284,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'method',
                 properties: [
                     'method'    : 'update,read',
-                    'permission': 'security:users'
+                    'permission': 'nexus:users'
                 ]
             ),
             new CPrivilege(
@@ -287,7 +292,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'method',
                 properties: [
                     'method'    : 'delete,read',
-                    'permission': 'security:users'
+                    'permission': 'nexus:users'
                 ]
             ),
 

@@ -20,7 +20,6 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
 
-import org.sonatype.nexus.common.text.Strings2
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
@@ -77,7 +76,7 @@ class UserComponent
    * @return a list of users
    */
   @DirectMethod
-  @RequiresPermissions('security:users:read')
+  @RequiresPermissions('nexus:users:read')
   List<UserXO> read(final @Nullable StoreLoadParameters parameters) {
     def source = parameters?.getFilter('source')
     if (!source) {
@@ -94,7 +93,7 @@ class UserComponent
    * @return a list of available user sources (user managers)
    */
   @DirectMethod
-  @RequiresPermissions('security:users:read')
+  @RequiresPermissions('nexus:users:read')
   List<ReferenceXO> readSources() {
     beanLocator.locate(Key.get(UserManager.class, Named.class)).collect { entry ->
       new ReferenceXO(
@@ -127,7 +126,7 @@ class UserComponent
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:users:create')
+  @RequiresPermissions('nexus:users:create')
   @Validate(groups = [Create.class, Default.class])
   UserXO create(final @NotNull @Valid UserXO userXO) {
     def user = new User(
@@ -151,7 +150,7 @@ class UserComponent
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:users:update')
+  @RequiresPermissions('nexus:users:update')
   @Validate(groups = [Update.class, Default.class])
   UserXO update(final @NotNull @Valid UserXO userXO) {
     asUserXO(securitySystem.updateUser(new User(
@@ -175,7 +174,7 @@ class UserComponent
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:users:update')
+  @RequiresPermissions('nexus:users:update')
   @Validate(groups = [Update.class, Default.class])
   UserXO updateRoleMappings(final @NotNull @Valid UserRoleMappingsXO userRoleMappingsXO) {
     def mappedRoles = userRoleMappingsXO.roles
@@ -250,7 +249,7 @@ class UserComponent
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:users:delete')
+  @RequiresPermissions('nexus:users:delete')
   @Validate
   void remove(final @NotEmpty String id, final @NotEmpty String source) {
     // TODO check if source is required or we always delete from default realm
