@@ -114,14 +114,6 @@ class StaticSecurityConfigurationResourceImpl
             ),
 
             new CPrivilege(
-                id: 'cache-delete', // 21
-                type: 'method',
-                properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:cache'
-                ]
-            ),
-            new CPrivilege(
                 id: 'tasks-create', // 26
                 type: 'method',
                 properties: [
