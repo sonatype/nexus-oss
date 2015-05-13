@@ -78,6 +78,8 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:settings'
                 ]
             ),
+
+            // TODO: nexus:repositories used by UI, refactor
             new CPrivilege(
                 id: 'repositories-create',
                 type: 'method',
@@ -110,14 +112,7 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:repositories'
                 ]
             ),
-            new CPrivilege(
-                id: 'attributes-delete', // 20
-                type: 'method',
-                properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:attributes'
-                ]
-            ),
+
             new CPrivilege(
                 id: 'cache-delete', // 21
                 type: 'method',
