@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.maven.internal.maven2.metadata;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
@@ -22,6 +23,7 @@ import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MavenPathParser;
+import org.sonatype.nexus.repository.maven.internal.maven2.metadata.Maven2Metadata.Plugin;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
@@ -89,7 +91,7 @@ public class MetadataUpdaterTest
 
   @Test
   public void updateWithNonExisting() throws IOException {
-    testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", null));
+    testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
     verify(tx, times(0)).commit();
     verify(mavenFacet, times(1)).get(eq(tx), eq(mavenPath));
     verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
@@ -101,7 +103,7 @@ public class MetadataUpdaterTest
         new Content(
             new StringPayload("<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadata><groupId>group</groupId></metadata>",
                 "text/xml")));
-    testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", null));
+    testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
     verify(tx, times(0)).commit();
     verify(mavenFacet, times(1)).get(eq(tx), eq(mavenPath));
     verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
@@ -111,7 +113,7 @@ public class MetadataUpdaterTest
   public void updateWithExistingCorrupted() throws IOException {
     when(mavenFacet.get(tx, mavenPath)).thenReturn(
         new Content(new StringPayload("ThisIsNotAnXml", "text/xml")));
-    testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", null));
+    testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
     verify(tx, times(0)).commit();
     verify(mavenFacet, times(1)).get(eq(tx), eq(mavenPath));
     verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
@@ -119,7 +121,7 @@ public class MetadataUpdaterTest
 
   @Test
   public void replace() throws IOException {
-    testSubject.replace(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", null));
+    testSubject.replace(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
     verify(tx, times(0)).commit();
     verify(mavenFacet, times(0)).get(eq(tx), eq(mavenPath));
     verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
