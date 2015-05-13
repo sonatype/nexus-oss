@@ -156,38 +156,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'routes-create', // 22
-                type: 'method',
-                properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:routes'
-                ]
-            ),
-            new CPrivilege(
-                id: 'routes-read', // 23
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:routes'
-                ]
-            ),
-            new CPrivilege(
-                id: 'routes-update', // 24
-                type: 'method',
-                properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:routes'
-                ]
-            ),
-            new CPrivilege(
-                id: 'routes-delete', // 25
-                type: 'method',
-                properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:routes'
-                ]
-            ),
-            new CPrivilege(
                 id: 'tasks-create', // 26
                 type: 'method',
                 properties: [
@@ -636,10 +604,6 @@ class StaticSecurityConfigurationResourceImpl
                 id: 'ui-group-admin',
                 privileges: ['repositories-read', 'repository-all'],
                 roles: ['ui-repo-browser']
-            ),
-            new CRole(
-                id: 'ui-routing-admin',
-                privileges: ['repositories-read', 'routes-create', 'routes-read', 'routes-update', 'routes-delete']
             ),
             new CRole(
                 id: 'ui-scheduled-tasks-admin',
