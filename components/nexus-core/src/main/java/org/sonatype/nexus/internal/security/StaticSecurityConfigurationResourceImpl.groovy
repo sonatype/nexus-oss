@@ -735,19 +735,6 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'security:usersforgotid'
                 ]
             ),
-
-            // NOTE: This privilege is no longer used by anything
-//            new CPrivilege(
-//                id: 'usersresetpw', // 59
-//                type: 'method',
-//                name: 'User Reset Password - (delete,read)',
-//                description: 'Give permission to reset any user\'s password.',
-//                properties: [
-//                    'method'    : 'delete,read',
-//                    'permission': 'security:usersreset'
-//                ]
-//            ),
-
             new CPrivilege(
                 id: 'userschangepw', // 64
                 type: 'method',
