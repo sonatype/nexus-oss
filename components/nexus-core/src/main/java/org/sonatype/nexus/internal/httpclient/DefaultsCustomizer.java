@@ -78,6 +78,5 @@ public class DefaultsCustomizer
     plan.getRequest().setConnectionRequestTimeout(requestTimeout.toMillisI());
     plan.getRequest().setCookieSpec(CookieSpecs.IGNORE_COOKIES);
     plan.getRequest().setExpectContinueEnabled(false);
-    plan.getRequest().setStaleConnectionCheckEnabled(false);
   }
 }

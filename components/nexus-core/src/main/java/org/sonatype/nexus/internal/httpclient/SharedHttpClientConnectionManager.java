@@ -71,6 +71,8 @@ public class SharedHttpClientConnectionManager
 
     this.connectionPoolIdleTime = checkNotNull(connectionPoolIdleTime);
     log.debug("Connection pool idle-time: {}", connectionPoolIdleTime);
+
+    setValidateAfterInactivity(-1);
   }
 
   private static Registry<ConnectionSocketFactory> createRegistry(final List<SSLContextSelector> sslContextSelectors) {

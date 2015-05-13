@@ -61,6 +61,12 @@ public interface StorageFacet
   void registerHookSupplier(Supplier<StorageTxPostCommitHook> hookSupplier);
 
   /**
+   * Registers format specific selector for {@link WritePolicy}. If not set, the {@link
+   * WritePolicySelector#DEFAULT} is used which returns the configured write policy.
+   */
+  void registerWritePolicySelector(WritePolicySelector writePolicySelector);
+
+  /**
    * Opens a transaction.
    */
   StorageTx openTx();

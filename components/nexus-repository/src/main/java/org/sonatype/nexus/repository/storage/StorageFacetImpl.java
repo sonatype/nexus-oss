@@ -88,6 +88,8 @@ public class StorageFacetImpl
 
   private Bucket bucket;
 
+  private WritePolicySelector writePolicySelector;
+
   @Inject
   public StorageFacetImpl(final BlobStoreManager blobStoreManager,
                           final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
@@ -129,6 +131,7 @@ public class StorageFacetImpl
   protected void doInit(final Configuration configuration) throws Exception {
     initSchema();
     initBucket();
+    writePolicySelector = WritePolicySelector.DEFAULT;
     super.doInit(configuration);
   }
 
@@ -173,6 +176,13 @@ public class StorageFacetImpl
   }
 
   @Override
+  @Guarded(by = NEW)
+  public void registerWritePolicySelector(final WritePolicySelector writePolicySelector) {
+    checkNotNull(writePolicySelector);
+    this.writePolicySelector = writePolicySelector;
+  }
+
+  @Override
   @Guarded(by = STARTED)
   public StorageTx openTx() {
     return openStorageTx();
@@ -186,6 +196,7 @@ public class StorageFacetImpl
     }
     return StateGuardAspect.around(new StorageTxImpl(
         new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucket, config.writePolicy,
+        writePolicySelector,
         bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, hooks
     ));
   }
