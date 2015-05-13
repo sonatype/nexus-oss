@@ -191,22 +191,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'repostatus-read', // 55
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:repostatus'
-                ]
-            ),
-            new CPrivilege(
-                id: 'repostatus-update', // 56
-                type: 'method',
-                properties: [
-                    'method'    : 'update',
-                    'permission': 'nexus:repostatus'
-                ]
-            ),
-            new CPrivilege(
                 id: 'artifact-create', // 65
                 type: 'method',
                 properties: [
