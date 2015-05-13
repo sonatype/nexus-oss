@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.repository.maven.internal.maven2.metadata;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -219,12 +219,7 @@ public class Maven2Metadata
     {
       this.snapshotTimestamp = snapshotTimestamp;
       this.snapshotBuildNumber = snapshotBuildNumber;
-      if (snapshots != null) {
-        this.snapshots = ImmutableList.copyOf(snapshots);
-      }
-      else {
-        this.snapshots = null;
-      }
+      this.snapshots = ImmutableList.copyOf(snapshots);
     }
 
     public long getSnapshotTimestamp() {
@@ -336,6 +331,7 @@ public class Maven2Metadata
   {
     checkNotNull(lastUpdated);
     checkNotNull(groupId);
+    checkNotNull(plugins);
     return new Maven2Metadata(Level.GROUP, lastUpdated, groupId, null, null, plugins, null, null);
   }
 
@@ -372,7 +368,7 @@ public class Maven2Metadata
                                                final String version,
                                                final long snapshotTimestamp,
                                                final int snapshotBuildNumber,
-                                               final List<Snapshot> snapshots)
+                                               @Nullable final List<Snapshot> snapshots)
   {
     checkNotNull(lastUpdated);
     checkNotNull(groupId);
@@ -380,7 +376,7 @@ public class Maven2Metadata
     checkNotNull(version);
     checkArgument(snapshotTimestamp > 0, "snapshotTimestamp: %s", snapshotTimestamp);
     checkArgument(snapshotBuildNumber > 0, "snapshotBuildNumber: %s", snapshotBuildNumber);
-    List<Snapshot> ss = Lists.newArrayList();
+    List<Snapshot> ss = new ArrayList<>();
     if (snapshots != null) {
       ss.addAll(snapshots);
     }
