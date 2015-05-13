@@ -236,7 +236,7 @@ class UserComponent
       if (isAnonymousUser(userId)) {
         throw new Exception("Password cannot be changed for user ${userId}, since is marked as the Anonymous user")
       }
-      securitySystem.changePassword(userId, Strings2.decodeBase64(password))
+      securitySystem.changePassword(userId, password)
     }
     else {
       throw new IllegalAccessException('Invalid authentication ticket')
