@@ -183,22 +183,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'artifact-read', // 54
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:artifact'
-                ]
-            ),
-            new CPrivilege(
-                id: 'artifact-create', // 65
-                type: 'method',
-                properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:artifact'
-                ]
-            ),
-            new CPrivilege(
                 id: 'tasksrun', // 68
                 type: 'method',
                 properties: [
