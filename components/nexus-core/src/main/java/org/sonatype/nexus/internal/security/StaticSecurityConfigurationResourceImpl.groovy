@@ -47,6 +47,9 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
+            /**
+             * Grants permission for general/core settings.
+             */
             new CPrivilege(
                 id: 'settings-read',
                 type: 'method',
@@ -145,32 +148,6 @@ class StaticSecurityConfigurationResourceImpl
                 properties: [
                     'method'    : 'read',
                     'permission': 'nexus:tasktypes'
-                ]
-            ),
-
-            // TODO: nexus:logs used by UI, refactor
-            new CPrivilege(
-                id: 'logs-read',
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:logs'
-                ]
-            ),
-            new CPrivilege(
-                id: 'logs-update',
-                type: 'method',
-                properties: [
-                    'method'    : 'update',
-                    'permission': 'nexus:logs'
-                ]
-            ),
-            new CPrivilege(
-                id: 'logconfig-update',
-                type: 'method',
-                properties: [
-                    'method'    : 'read,update',
-                    'permission': 'nexus:logconfig'
                 ]
             ),
 
