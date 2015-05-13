@@ -195,6 +195,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
+            // TODO: nexus:logconfig used by UI, refactor
             new CPrivilege(
                 id: 'logconfig-update', // 77
                 type: 'method',
@@ -203,14 +204,7 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:logconfig'
                 ]
             ),
-            new CPrivilege(
-                id: 'search', // 17
-                type: 'method',
-                properties: [
-                    'method': 'read',
-                    'permission': 'nexus:index'
-                ]
-            ),
+
             new CPrivilege(
                 id: 'apikey-access', // 83
                 type: 'method',
