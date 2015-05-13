@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import javax.annotation.Nullable;
-
 import org.sonatype.nexus.repository.Repository;
 
 /**
