@@ -303,7 +303,7 @@ class StaticSecurityConfigurationResourceImpl
 
         roles: [
             /**
-             * Admin role provides super-user access (all permissions).
+             * Admin role grants all permissions (ie. super-user)
              */
             new CRole(
                 id: 'admin',
