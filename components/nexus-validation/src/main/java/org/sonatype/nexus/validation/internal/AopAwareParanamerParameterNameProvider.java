@@ -66,7 +66,7 @@ public class AopAwareParanamerParameterNameProvider
   }
 
   @Override
-  public List<String> getParameterNames(Method method) {
+  public List<String> getParameterNames(final Method method) {
     return super.getParameterNames(resolve(method));
   }
 
