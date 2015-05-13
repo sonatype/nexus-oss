@@ -47,7 +47,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'status', // 1
+                id: 'status',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
@@ -55,7 +55,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'signin', // 2
+                id: 'signin',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
@@ -63,7 +63,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'settings-read', // 3
+                id: 'settings-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
@@ -71,7 +71,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'settings-update', // 4
+                id: 'settings-update',
                 type: 'method',
                 properties: [
                     'method'    : 'update,read',
@@ -79,7 +79,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'repositories-create', // 5
+                id: 'repositories-create',
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
@@ -87,7 +87,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'repositories-read', // 6
+                id: 'repositories-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
