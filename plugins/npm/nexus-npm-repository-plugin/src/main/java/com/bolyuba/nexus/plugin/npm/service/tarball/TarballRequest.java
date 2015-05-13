@@ -34,10 +34,12 @@ public class TarballRequest
   public TarballRequest(final ResourceStoreRequest resourceStoreRequest, final PackageRoot packageRoot,
                         final PackageVersion packageVersion)
   {
-    checkArgument(!packageRoot.isIncomplete(), "Incomplete package %s tarball cannot be requested");
     this.resourceStoreRequest = checkNotNull(resourceStoreRequest);
     this.packageRoot = checkNotNull(packageRoot);
     this.packageVersion = checkNotNull(packageVersion);
+
+    checkArgument(!packageVersion.isIncomplete(), "Incomplete tarball %s cannot be requested",
+        resourceStoreRequest.getRequestPath());
   }
 
   public ResourceStoreRequest getResourceStoreRequest() {

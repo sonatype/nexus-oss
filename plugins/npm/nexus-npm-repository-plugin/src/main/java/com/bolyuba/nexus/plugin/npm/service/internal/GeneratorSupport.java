@@ -75,7 +75,7 @@ public abstract class GeneratorSupport<R extends NpmRepository>
   @Override
   public ContentLocator producePackageRoot(final PackageRequest request) throws IOException {
     final PackageRoot root = generatePackageRoot(request);
-    if (root == null || root.isIncomplete()) {
+    if (root == null) {
       return null;
     }
     filterPackageRoot(root);
@@ -106,7 +106,7 @@ public abstract class GeneratorSupport<R extends NpmRepository>
     checkArgument(request.isPackageRoot(), "Package root request expected, but got %s",
         request.getPath());
     final PackageRoot root = doGeneratePackageRoot(request);
-    if (root == null || root.isIncomplete()) {
+    if (root == null) {
       return null;
     }
     filterPackageRootDist(request, root);
