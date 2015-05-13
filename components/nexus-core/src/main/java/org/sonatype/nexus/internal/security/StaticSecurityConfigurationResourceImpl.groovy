@@ -113,6 +113,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
+            // TODO: nexus:tasks used by UI, refactor
             new CPrivilege(
                 id: 'tasks-create', // 26
                 type: 'method',
@@ -145,6 +146,7 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:tasks'
                 ]
             ),
+
             new CPrivilege(
                 id: 'logs-read', // 42
                 type: 'method',
@@ -159,14 +161,6 @@ class StaticSecurityConfigurationResourceImpl
                 properties: [
                     'method'    : 'update',
                     'permission': 'nexus:logs'
-                ]
-            ),
-            new CPrivilege(
-                id: 'configuration-read', // 43
-                type: 'method',
-                properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:configuration'
                 ]
             ),
             new CPrivilege(
