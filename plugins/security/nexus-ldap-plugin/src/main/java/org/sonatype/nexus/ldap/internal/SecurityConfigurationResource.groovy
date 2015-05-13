@@ -34,35 +34,35 @@ class SecurityConfigurationResource
     return new MemorySecurityConfiguration(
         privileges: [
             new CPrivilege(
-                id: 'enterprise-ldap-create',
+                id: 'ldap-create',
                 type: 'method',
                 properties: [
                     'method'    : 'create',
-                    'permission': 'security:ldapconfig'
+                    'permission': 'nexus:ldap'
                 ]
             ),
             new CPrivilege(
-                id: 'enterprise-ldap-read',
+                id: 'ldap-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
-                    'permission': 'security:ldapconfig'
+                    'permission': 'nexus:ldap'
                 ]
             ),
             new CPrivilege(
-                id: 'enterprise-ldap-update',
+                id: 'ldap-update',
                 type: 'method',
                 properties: [
                     'method'    : 'update',
-                    'permission': 'security:ldapconfig'
+                    'permission': 'nexus:ldap'
                 ]
             ),
             new CPrivilege(
-                id: 'enterprise-ldap-delete',
+                id: 'ldap-delete',
                 type: 'method',
                 properties: [
                     'method'    : 'delete,read',
-                    'permission': 'security:ldapconfig'
+                    'permission': 'nexus:ldap'
                 ]
             )
         ]
