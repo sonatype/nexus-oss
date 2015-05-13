@@ -273,12 +273,6 @@ Ext.define('NX.view.drilldown.Drilldown', {
             panel.getForm().reset();
           }
         });
-
-        Ext.each(items[i].query('nx-drilldown-master'), function(master) {
-          if (master.getStore()) {
-            master.getStore().clearFilter();
-          }
-        });
       }
     }
 
