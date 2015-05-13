@@ -60,7 +60,7 @@ class RoleComponent
    * @return a list of roles
    */
   @DirectMethod
-  @RequiresPermissions('security:roles:read')
+  @RequiresPermissions('nexus:roles:read')
   List<RoleXO> read() {
     return securitySystem.listRoles(DEFAULT_SOURCE).collect {input ->
       return convert(input)
@@ -72,7 +72,7 @@ class RoleComponent
    * @return a list of role references
    */
   @DirectMethod
-  @RequiresPermissions('security:roles:read')
+  @RequiresPermissions('nexus:roles:read')
   List<ReferenceXO> readReferences() {
     return securitySystem.listRoles(DEFAULT_SOURCE).collect {input ->
       return new ReferenceXO(
@@ -104,7 +104,7 @@ class RoleComponent
    * @return a list of roles
    */
   @DirectMethod
-  @RequiresPermissions('security:roles:read')
+  @RequiresPermissions('nexus:roles:read')
   @Validate
   List<RoleXO> readFromSource(final @NotEmpty String source) {
     return securitySystem.listRoles(source).collect {input ->
@@ -119,7 +119,7 @@ class RoleComponent
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:roles:create')
+  @RequiresPermissions('nexus:roles:create')
   @Validate(groups = [Create.class, Default.class])
   RoleXO create(final @NotNull @Valid RoleXO roleXO) {
     return convert(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).addRole(
@@ -142,7 +142,7 @@ class RoleComponent
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:roles:update')
+  @RequiresPermissions('nexus:roles:update')
   @Validate(groups = [Update.class, Default.class])
   RoleXO update(final @NotNull @Valid RoleXO roleXO) {
     return convert(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).updateRole(
@@ -165,7 +165,7 @@ class RoleComponent
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:roles:delete')
+  @RequiresPermissions('nexus:roles:delete')
   @Validate
   void remove(final @NotEmpty String id) {
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deleteRole(id)

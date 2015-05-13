@@ -179,6 +179,11 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'security:*'
                 ]
             ),
+
+            //
+            // nexus:privileges
+            //
+
             new CPrivilege(
                 id: 'privileges-create',
                 type: 'method',
@@ -211,12 +216,17 @@ class StaticSecurityConfigurationResourceImpl
                     'permission': 'nexus:privileges'
                 ]
             ),
+
+            //
+            // nexus:roles
+            //
+
             new CPrivilege(
                 id: 'roles-create',
                 type: 'method',
                 properties: [
                     'method'    : 'create,read',
-                    'permission': 'security:roles'
+                    'permission': 'nexus:roles'
                 ]
             ),
             new CPrivilege(
@@ -224,7 +234,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'method',
                 properties: [
                     'method'    : 'read',
-                    'permission': 'security:roles'
+                    'permission': 'nexus:roles'
                 ]
             ),
             new CPrivilege(
@@ -232,7 +242,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'method',
                 properties: [
                     'method'    : 'update,read',
-                    'permission': 'security:roles'
+                    'permission': 'nexus:roles'
                 ]
             ),
             new CPrivilege(
@@ -240,9 +250,14 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'method',
                 properties: [
                     'method'    : 'delete,read',
-                    'permission': 'security:roles'
+                    'permission': 'nexus:roles'
                 ]
             ),
+
+            //
+            // nexus:users
+            //
+
             new CPrivilege(
                 id: 'users-create',
                 type: 'method',
