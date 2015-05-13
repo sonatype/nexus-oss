@@ -43,6 +43,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.bolyuba.nexus.plugin.npm.service.PackageRoot.PROP_ETAG;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -55,8 +56,6 @@ public class HttpProxyMetadataTransport
     implements ProxyMetadataTransport
 {
   private static final Logger outboundRequestLog = LoggerFactory.getLogger("remote.storage.outbound");
-
-  private static final String PROP_ETAG = "remote.etag";
 
   private final MetadataParser metadataParser;
 

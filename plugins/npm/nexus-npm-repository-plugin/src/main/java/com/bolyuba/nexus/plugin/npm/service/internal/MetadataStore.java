@@ -48,6 +48,11 @@ public interface MetadataStore
   boolean deletePackageByName(NpmRepository repository, String packageName);
 
   /**
+   * Replaces one single package, without merging it.
+   */
+  PackageRoot replacePackage(NpmRepository repository, PackageRoot packageRoot);
+
+  /**
    * Updates one single package, merging it if necessary.
    *
    * @see PackageRoot#overlay(PackageRoot)
