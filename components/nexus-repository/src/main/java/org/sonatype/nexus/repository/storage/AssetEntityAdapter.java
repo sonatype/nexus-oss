@@ -25,6 +25,7 @@ import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.nexus.orient.OIndexNameBuilder;
 
 import com.google.common.collect.ImmutableMap;
+import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
@@ -105,14 +106,22 @@ public class AssetEntityAdapter
   protected void readFields(final ODocument document, final Asset entity) {
     super.readFields(document, entity);
 
+    Component component = null;
     ORID componentId = document.field(P_COMPONENT, ORID.class);
+    if (componentId != null) {
+      // TODO: big FAT HACK warning here
+      component = componentEntityAdapter.get(
+          (ODatabaseDocumentTx)ODatabaseRecordThreadLocal.INSTANCE.get(),
+          componentEntityAdapter.encode(componentId)
+      );
+    }
     String name = document.field(P_NAME, OType.STRING);
     Long size = document.field(P_SIZE, OType.LONG);
     String contentType = document.field(P_CONTENT_TYPE, OType.STRING);
     String blobRef = document.field(P_BLOB_REF, OType.STRING);
 
-    if (componentId != null) {
-      entity.componentId(componentEntityAdapter.encode(componentId));
+    if (component != null) {
+      entity.component(component);
     }
     entity.name(name);
     entity.size(size);

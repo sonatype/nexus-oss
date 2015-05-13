@@ -289,7 +289,7 @@ public class StorageTxImpl
   public Asset createAsset(final Bucket bucket, final Component component) {
     checkNotNull(component);
     Asset asset = createAsset(bucket, component.format());
-    asset.componentId(id(component));
+    asset.component(component);
     return asset;
   }
 
@@ -318,27 +318,15 @@ public class StorageTxImpl
     }
   }
 
-  /**
-   * Returns the {@link Component} of an {@link Asset} or {@code null} if it's standalone.
-   */
-  @Nullable
-  private Component assetComponent(final Asset asset) {
-    final EntityId componentId = asset.componentId();
-    if (componentId == null) {
-      return null;
-    }
-    return componentEntityAdapter.get(db, componentId);
-  }
-
   @Override
   public void saveAsset(final Asset asset) {
     if (asset.isPersisted()) {
       assetEntityAdapter.edit(db, asset);
-      hook.updateAsset(assetComponent(asset), asset);
+      hook.updateAsset(asset.component(), asset);
     }
     else {
       assetEntityAdapter.add(db, asset);
-      hook.createAsset(assetComponent(asset), asset);
+      hook.createAsset(asset.component(), asset);
     }
   }
 
@@ -371,7 +359,7 @@ public class StorageTxImpl
     if (blobRef != null) {
       deleteBlob(blobRef, effectiveWritePolicy);
     }
-    hook.deleteAsset(assetComponent(asset), asset);
+    hook.deleteAsset(asset.component(), asset);
     assetEntityAdapter.delete(db, asset);
   }
 

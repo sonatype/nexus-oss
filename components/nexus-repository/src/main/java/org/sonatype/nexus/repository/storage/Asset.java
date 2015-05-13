@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.storage;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.BlobRef;
+import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.entity.EntityId;
 
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
@@ -29,7 +30,7 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
 public class Asset
     extends MetadataNode<Asset>
 {
-  private EntityId componentId;
+  private Component component;
 
   private Long size;
 
@@ -38,18 +39,29 @@ public class Asset
   private BlobRef blobRef;
 
   /**
-   * Gets the component this asset is part of, or {@code null} if it's standalone.
+   * Gets the component's {@link EntityId} this asset is part of, or {@code null} if it's standalone.
    */
   @Nullable
   public EntityId componentId() {
-    return componentId;
+    if (component != null) {
+      return EntityHelper.id(component);
+    }
+    return null;
   }
 
   /**
-   * Sets the component id.
+   * Gets the component this asset is part of, or {@code null} if it's standalone.
    */
-  Asset componentId(final EntityId componentId) {
-    this.componentId = componentId;
+  @Nullable
+  public Component component() {
+    return component;
+  }
+
+  /**
+   * Sets the component this asset is part of.
+   */
+  Asset component(final Component component) {
+    this.component = component;
     return this;
   }
 
