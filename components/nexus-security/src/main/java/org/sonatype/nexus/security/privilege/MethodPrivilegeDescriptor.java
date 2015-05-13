@@ -21,6 +21,8 @@ import org.sonatype.nexus.security.config.SecurityConfigurationValidationContext
 import org.sonatype.nexus.validation.ValidationMessage;
 import org.sonatype.nexus.validation.ValidationResponse;
 
+// FIXME: Remove this, it implies HTTP "method" semantics which aren't really sane or good for general use
+
 @Named
 @Singleton
 public class MethodPrivilegeDescriptor
