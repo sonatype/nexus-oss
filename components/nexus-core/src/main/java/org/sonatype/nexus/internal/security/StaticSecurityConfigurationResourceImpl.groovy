@@ -40,9 +40,9 @@ class StaticSecurityConfigurationResourceImpl
              */
             new CPrivilege(
                 id: 'all',
-                type: 'application',
+                type: 'wildcard',
                 properties: [
-                    actions: '*'
+                    pattern: 'nexus:*'
                 ]
             ),
 

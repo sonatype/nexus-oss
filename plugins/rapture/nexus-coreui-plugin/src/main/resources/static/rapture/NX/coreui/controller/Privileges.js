@@ -43,15 +43,15 @@ Ext.define('NX.coreui.controller.Privileges', {
   ],
   icons: {
     'privilege-default': {
-      file: 'medal_gold_1.png',
+      file: 'medal_gold_red.png',
       variants: ['x16', 'x32']
     },
     'privilege-application': {
-      file: 'medal_gold_1.png',
+      file: 'medal_gold_green.png',
       variants: ['x16', 'x32']
     },
     'privilege-wildcard': {
-      file: 'medal_gold_1.png',
+      file: 'medal_gold_blue.png',
       variants: ['x16', 'x32']
     },
     'privilege-repository': {
@@ -74,7 +74,7 @@ Ext.define('NX.coreui.controller.Privileges', {
     description: NX.I18n.get('ADMIN_PRIVILEGES_SUBTITLE'),
     view: {xtype: 'nx-coreui-privilege-feature'},
     iconConfig: {
-      file: 'medal_gold_1.png',
+      file: 'medal_gold_green.png',
       variants: ['x16', 'x32']
     },
     visible: function () {
