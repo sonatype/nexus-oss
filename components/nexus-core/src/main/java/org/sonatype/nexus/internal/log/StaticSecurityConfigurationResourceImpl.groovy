@@ -34,29 +34,30 @@ class StaticSecurityConfigurationResourceImpl
   MemorySecurityConfiguration getConfiguration() {
     return new MemorySecurityConfiguration(
         privileges: [
-            // TODO: refactor namespace
             new CPrivilege(
                 id: 'logs-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:logs'
+                    domain: 'logs',
+                    actions: 'read'
                 ]
             ),
             new CPrivilege(
                 id: 'logs-update',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'update',
-                    'permission': 'nexus:logs'
+                    domain: 'logs',
+                    actions: 'update'
                 ]
             ),
+
+            // FIXME: normalize namespace
             new CPrivilege(
                 id: 'logconfig-update',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read,update',
-                    'permission': 'nexus:logconfig'
+                    domain: 'logconfig',
+                    actions: 'read,update'
                 ]
             )
         ]

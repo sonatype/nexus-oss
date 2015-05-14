@@ -35,10 +35,10 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'atlas-all',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : '*',
-                    'permission': 'nexus:atlas'
+                    domain : 'atlas',
+                    actions: '*'
                 ]
             )
         ]

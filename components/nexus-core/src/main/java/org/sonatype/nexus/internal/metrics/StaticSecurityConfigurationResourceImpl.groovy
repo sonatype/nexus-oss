@@ -38,8 +38,8 @@ class StaticSecurityConfigurationResourceImpl
                 id: 'metrics-all',
                 type: 'application',
                 properties: [
-                    'domain': 'metrics',
-                    'actions': '*'
+                    domain: 'metrics',
+                    actions: '*'
                 ]
             )
         ]

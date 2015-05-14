@@ -35,10 +35,10 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'feeds-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:feeds'
+                    domain : 'feeds',
+                    actions: 'read'
                 ]
             )
         ]

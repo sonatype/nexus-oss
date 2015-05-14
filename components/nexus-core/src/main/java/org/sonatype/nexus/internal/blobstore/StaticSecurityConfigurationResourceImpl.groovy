@@ -36,26 +36,26 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'blobstores-create',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:blobstores'
+                    domain : 'blobstores',
+                    actions: 'create,read'
                 ]
             ),
             new CPrivilege(
                 id: 'blobstores-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:blobstores'
+                    domain : 'blobstores',
+                    actions: 'read'
                 ]
             ),
             new CPrivilege(
                 id: 'blobstores-delete',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:blobstores'
+                    domain : 'blobstores',
+                    actions: 'delete,read'
                 ]
             )
         ]

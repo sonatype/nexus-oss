@@ -35,34 +35,34 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'ldap-create',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'create',
-                    'permission': 'nexus:ldap'
+                    domain : 'ldap',
+                    actions: 'create'
                 ]
             ),
             new CPrivilege(
                 id: 'ldap-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:ldap'
+                    domain : 'ldap',
+                    actions: 'read'
                 ]
             ),
             new CPrivilege(
                 id: 'ldap-update',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'update',
-                    'permission': 'nexus:ldap'
+                    domain : 'ldap',
+                    actions: 'update'
                 ]
             ),
             new CPrivilege(
                 id: 'ldap-delete',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:ldap'
+                    domain : 'ldap',
+                    actions: 'delete,read'
                 ]
             )
         ]

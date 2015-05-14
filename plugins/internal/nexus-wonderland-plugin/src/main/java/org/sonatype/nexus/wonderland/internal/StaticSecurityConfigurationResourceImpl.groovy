@@ -36,10 +36,10 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'wonderland-all',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : '*',
-                    'permission': 'nexus:wonderland'
+                    domain: 'wonderland',
+                    actions: '*'
                 ]
             )
         ]
