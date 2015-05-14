@@ -76,16 +76,6 @@ class StaticSecurityConfigurationResourceImpl
                     domain : 'tasksrun',
                     actions: 'read,delete'
                 ]
-            ),
-
-            // FIXME: Unsure what the reason is for a distinct permission for reading task-types
-            new CPrivilege(
-                id: 'tasktypes-read',
-                type: 'application',
-                properties: [
-                    domain : 'tasktypes',
-                    actions: 'read'
-                ]
             )
         ]
     )

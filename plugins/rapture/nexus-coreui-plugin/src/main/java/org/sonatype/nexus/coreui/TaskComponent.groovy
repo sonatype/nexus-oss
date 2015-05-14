@@ -91,7 +91,7 @@ class TaskComponent
    * @return a list of task types
    */
   @DirectMethod
-  @RequiresPermissions('nexus:tasktypes:read')
+  @RequiresPermissions('nexus:tasks:read')
   List<TaskTypeXO> readTypes() {
     return nexusScheduler.listTaskDescriptors().findAll { descriptor ->
       descriptor.exposed ? descriptor : null
