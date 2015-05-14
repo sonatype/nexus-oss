@@ -25,6 +25,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class PackageRoot
     extends NpmJson
 {
+  public static final String PROP_CACHED = "remote.cached";
+
+  public static final String PROP_EXPIRED = "remote.expired";
+
+  public static final String PROP_ETAG = "remote.etag";
+
   private final Map<String, String> properties;
 
   private final Map<String, PackageVersion> wrappedVersions;

@@ -27,12 +27,14 @@ import com.bolyuba.nexus.plugin.npm.service.PackageRequest;
 import com.bolyuba.nexus.plugin.npm.service.PackageRoot;
 import com.bolyuba.nexus.plugin.npm.service.PackageVersion;
 import com.bolyuba.nexus.plugin.npm.service.ProxyMetadataService;
-import com.bolyuba.nexus.plugin.npm.service.internal.proxy.HttpProxyMetadataTransport;
 import com.bolyuba.nexus.plugin.npm.service.tarball.TarballRequest;
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 
+import static com.bolyuba.nexus.plugin.npm.service.PackageRoot.PROP_CACHED;
+import static com.bolyuba.nexus.plugin.npm.service.PackageRoot.PROP_ETAG;
+import static com.bolyuba.nexus.plugin.npm.service.PackageRoot.PROP_EXPIRED;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -43,10 +45,6 @@ public class ProxyMetadataServiceImpl
     implements ProxyMetadataService
 {
   private static final String REGISTRY_ROOT_PACKAGE_NAME = "-";
-
-  private static final String PROP_CACHED = "remote.cached";
-
-  private static final String PROP_EXPIRED = "remote.expired";
 
   private final Object registryRootUpdateLock;
 
@@ -268,7 +266,7 @@ public class ProxyMetadataServiceImpl
       // registry root is made incomplete for simplicity's sake
       log.trace("EXPIRED: package {} is incomplete", packageRoot.getName());
       // force full download of package metadata to remove incomplete elements
-      packageRoot.getProperties().remove(HttpProxyMetadataTransport.PROP_ETAG);
+      packageRoot.getProperties().remove(PROP_ETAG);
       return true;
     }
     if (!getNpmRepository().isItemAgingActive()) {
