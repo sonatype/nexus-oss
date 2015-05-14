@@ -19,14 +19,11 @@
 }
 
 /**
-* editable = false on a combo sets readonly already, so use disabled to achieve the same effect
-*/
+  * editable = false on a combo sets readonly already, so use a custom class to achieve the same effect
+  */
 .nx-combo-disabled {
   input {
     @include nx-form-field-readonly;
-  }
-  .x-trigger-cell {
-    display: none;
   }
 }
 

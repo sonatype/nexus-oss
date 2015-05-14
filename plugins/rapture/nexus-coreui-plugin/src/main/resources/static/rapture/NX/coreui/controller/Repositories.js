@@ -146,13 +146,16 @@ Ext.define('NX.coreui.controller.Repositories', {
         // Show the correct icon in the breadcrumb
         me.getFeature().setItemClass(1, NX.Icons.cls('repository-' + model.get('type'), 'x16'));
 
+        // Load the form
         settingsPanel.removeAllSettingsForms();
         settingsPanel.addSettingsForm({ xtype: formCls.xtype, recipe: model });
+        settingsPanel.loadRecord(model);
+
+        // Set immutable fields to readonly
         Ext.Array.each(settingsPanel.query('field[readOnlyOnUpdate=true]'), function(field) {
           field.setReadOnly(true);
-          field.setDisabled(true);
+          field.addCls('nx-combo-disabled');
         });
-        settingsPanel.loadRecord(model);
       }
     }
   },
