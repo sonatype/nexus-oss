@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.capabilities.model;
+package org.sonatype.nexus.capability.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -21,11 +21,11 @@ import javax.xml.bind.annotation.XmlType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tag", propOrder = {
+@XmlType(name = "property", propOrder = {
     "key",
     "value"
 })
-public class TagXO
+public class PropertyXO
 {
   @XmlElement(required = true)
   @JsonProperty("key")
@@ -51,12 +51,12 @@ public class TagXO
     this.value = value;
   }
 
-  public TagXO withKey(String value) {
+  public PropertyXO withKey(String value) {
     setKey(value);
     return this;
   }
 
-  public TagXO withValue(String value) {
+  public PropertyXO withValue(String value) {
     setValue(value);
     return this;
   }

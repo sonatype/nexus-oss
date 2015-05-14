@@ -11,55 +11,53 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.capabilities.model;
+package org.sonatype.nexus.capability.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "selectableEntry", propOrder = {
-    "id",
-    "name"
+@XmlType(name = "tag", propOrder = {
+    "key",
+    "value"
 })
-@XmlRootElement(name = "selectableEntry")
-public class SelectableEntryXO
+public class TagXO
 {
   @XmlElement(required = true)
-  @JsonProperty("id")
-  private String id;
+  @JsonProperty("key")
+  private String key;
 
   @XmlElement(required = true)
-  @JsonProperty("name")
-  private String name;
+  @JsonProperty("value")
+  private String value;
 
-  public String getId() {
-    return id;
+  public String getKey() {
+    return key;
   }
 
-  public void setId(String value) {
-    this.id = value;
+  public void setKey(String value) {
+    this.key = value;
   }
 
-  public String getName() {
-    return name;
+  public String getValue() {
+    return value;
   }
 
-  public void setName(String value) {
-    this.name = value;
+  public void setValue(String value) {
+    this.value = value;
   }
 
-  public SelectableEntryXO withId(String value) {
-    setId(value);
+  public TagXO withKey(String value) {
+    setKey(value);
     return this;
   }
 
-  public SelectableEntryXO withName(String value) {
-    setName(value);
+  public TagXO withValue(String value) {
+    setValue(value);
     return this;
   }
 }

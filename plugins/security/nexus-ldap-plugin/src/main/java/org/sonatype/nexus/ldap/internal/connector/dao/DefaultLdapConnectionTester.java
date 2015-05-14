@@ -20,10 +20,10 @@ import javax.inject.Singleton;
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
-import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -80,7 +80,7 @@ public class DefaultLdapConnectionTester
           numberOfResults);
 
       if (ldapAuthConfiguration.isLdapGroupsAsRoles()
-          && StringUtils.isEmpty(ldapAuthConfiguration.getUserMemberOfAttribute())) {
+          && Strings2.isEmpty(ldapAuthConfiguration.getUserMemberOfAttribute())) {
         for (LdapUser ldapUser : users) {
           try {
             ldapUser.setMembership(

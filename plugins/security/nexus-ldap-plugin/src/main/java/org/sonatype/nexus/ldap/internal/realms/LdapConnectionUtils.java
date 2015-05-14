@@ -26,8 +26,8 @@ import org.sonatype.nexus.ldap.internal.persist.entity.Connection;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
 
+import com.google.common.base.Strings;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,13 +91,13 @@ public class LdapConnectionUtils
     LdapAuthConfiguration authConfig = new LdapAuthConfiguration();
 
     authConfig.setEmailAddressAttribute(userAndGroupsConf.getEmailAddressAttribute());
-    authConfig.setUserBaseDn(StringUtils.defaultString(userAndGroupsConf.getUserBaseDn(), ""));
+    authConfig.setUserBaseDn(Strings.nullToEmpty(userAndGroupsConf.getUserBaseDn()));
     authConfig.setUserIdAttribute(userAndGroupsConf.getUserIdAttribute());
     authConfig.setUserObjectClass(userAndGroupsConf.getUserObjectClass());
     authConfig.setPasswordAttribute(userAndGroupsConf.getUserPasswordAttribute());
     authConfig.setUserRealNameAttribute(userAndGroupsConf.getUserRealNameAttribute());
 
-    authConfig.setGroupBaseDn(StringUtils.defaultString(userAndGroupsConf.getGroupBaseDn(), ""));
+    authConfig.setGroupBaseDn(Strings.nullToEmpty(userAndGroupsConf.getGroupBaseDn()));
     authConfig.setGroupIdAttribute(userAndGroupsConf.getGroupIdAttribute());
     authConfig.setGroupMemberAttribute(userAndGroupsConf.getGroupMemberAttribute());
     authConfig.setGroupMemberFormat(userAndGroupsConf.getGroupMemberFormat());

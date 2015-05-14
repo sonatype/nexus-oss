@@ -14,7 +14,7 @@ package org.sonatype.nexus.ldap.internal;
 
 import java.net.MalformedURLException;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.common.text.Strings2;
 
 /**
  * It would be nice to create a Protocol Handler, but thats a bit over kill.
@@ -34,16 +34,16 @@ public class LdapURL
       throws MalformedURLException
   {
 
-    if (StringUtils.isEmpty(protocol)) {
+    if (Strings2.isEmpty(protocol)) {
       throw new MalformedURLException("LDAP protocol can not be empty.");
     }
-    if (StringUtils.isEmpty(host)) {
+    if (Strings2.isEmpty(host)) {
       throw new MalformedURLException("LDAP host can not be empty.");
     }
     if (port < 1) {
       throw new MalformedURLException("LDAP port is not a valid port.");
     }
-    if (StringUtils.isEmpty(searchBase)) {
+    if (Strings2.isEmpty(searchBase)) {
       throw new MalformedURLException("LDAP searchBase can not be empty.");
     }
 

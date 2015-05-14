@@ -47,6 +47,9 @@
       <optional>true</optional>
     </dependency>
 
+    <!--
+    Maven plugins are still allowed to use plexus-utils
+    -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>

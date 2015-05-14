@@ -58,19 +58,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-model</artifactId>
-    </dependency>
-
-    <!--
-    FIXME: Replace usage with guava or nexus-common helpers.  Here only for org.codehaus.plexus.util.StringUtils
-    -->
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-testsupport</artifactId>
       <scope>test</scope>
