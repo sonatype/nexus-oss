@@ -25,6 +25,7 @@ import org.sonatype.nexus.validation.ValidationResponse;
 
 @Named
 @Singleton
+@Deprecated
 public class MethodPrivilegeDescriptor
     extends AbstractPrivilegeDescriptor
     implements PrivilegeDescriptor

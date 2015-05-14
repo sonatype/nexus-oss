@@ -23,6 +23,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 // NOTE: Not using existing AbstractPrivilegeDescriptor to investigate divorcing from legacy
 
@@ -71,6 +72,16 @@ public abstract class PrivilegeDescriptorSupport
     if (Strings.nullToEmpty(value).isEmpty()) {
       value = defaultValue;
     }
+    return value;
+  }
+
+  /**
+   * Helper to read a required privilege property.
+   * @throws IllegalStateException  Missing required property.
+   */
+  protected String readProperty(final CPrivilege privilege, final String name) {
+    String value = privilege.getProperty(name);
+    checkState(!Strings.nullToEmpty(value).isEmpty(), "Missing required property: %s", name);
     return value;
   }
 
