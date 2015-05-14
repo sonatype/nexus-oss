@@ -27,6 +27,7 @@ import com.bolyuba.nexus.plugin.npm.service.PackageRequest;
 import com.bolyuba.nexus.plugin.npm.service.PackageRoot;
 import com.bolyuba.nexus.plugin.npm.service.PackageVersion;
 import com.bolyuba.nexus.plugin.npm.service.ProxyMetadataService;
+import com.bolyuba.nexus.plugin.npm.service.internal.proxy.HttpProxyMetadataTransport;
 import com.bolyuba.nexus.plugin.npm.service.tarball.TarballRequest;
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
@@ -266,6 +267,8 @@ public class ProxyMetadataServiceImpl
     if (!REGISTRY_ROOT_PACKAGE_NAME.equals(packageRoot.getName()) && packageRoot.isIncomplete()) {
       // registry root is made incomplete for simplicity's sake
       log.trace("EXPIRED: package {} is incomplete", packageRoot.getName());
+      // force full download of package metadata to remove incomplete elements
+      packageRoot.getProperties().remove(HttpProxyMetadataTransport.PROP_ETAG);
       return true;
     }
     if (!getNpmRepository().isItemAgingActive()) {

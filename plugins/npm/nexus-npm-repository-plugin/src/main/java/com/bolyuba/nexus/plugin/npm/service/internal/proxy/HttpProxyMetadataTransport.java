@@ -56,7 +56,7 @@ public class HttpProxyMetadataTransport
 {
   private static final Logger outboundRequestLog = LoggerFactory.getLogger("remote.storage.outbound");
 
-  private static final String PROP_ETAG = "remote.etag";
+  public static final String PROP_ETAG = "remote.etag";
 
   private final MetadataParser metadataParser;
 
