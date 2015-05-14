@@ -340,7 +340,7 @@ extends DirectComponentSupport
             authScheme: ldapServerXO.authScheme,
             saslRealm: ldapServerXO.authRealm,
             systemUsername: ldapServerXO.authUsername,
-            systemPassword: ldapServerXO.authPassword?.valueIfValid ?: authPassword,
+            systemPassword: PasswordPlaceholder.is(ldapServerXO.authPassword) ? authPassword : ldapServerXO.authPassword,
 
             connectionTimeout: ldapServerXO.connectionTimeout,
             connectionRetryDelay: ldapServerXO.connectionRetryDelay,
@@ -395,7 +395,7 @@ extends DirectComponentSupport
         authentication: ldapServerConnectionXO.authScheme,
         searchBase: ldapServerConnectionXO.searchBase,
         systemUsername: ldapServerConnectionXO.authUsername,
-        systemPassword: ldapServerConnectionXO.authPassword?.valueIfValid ?: authPassword,
+        systemPassword: PasswordPlaceholder.is(ldapServerConnectionXO.authPassword) ? authPassword : ldapServerConnectionXO.authPassword,
         url: new LdapURL(ldapServerConnectionXO.protocol.toString(), ldapServerConnectionXO.host, ldapServerConnectionXO.port, ldapServerConnectionXO.searchBase)
     )
     if (ldapServerConnectionXO.protocol == LdapServerConnectionXO.Protocol.ldaps && ldapServerConnectionXO.useTrustStore) {
