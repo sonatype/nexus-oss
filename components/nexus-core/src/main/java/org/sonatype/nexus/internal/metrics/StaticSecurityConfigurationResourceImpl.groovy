@@ -35,11 +35,11 @@ class StaticSecurityConfigurationResourceImpl
     return new MemorySecurityConfiguration(
         privileges: [
             new CPrivilege(
-                id: 'metrics-endpoints',
+                id: 'metrics-all',
                 type: 'method',
                 properties: [
                     'method'    : '*',
-                    'permission': 'nexus:metrics-endpoints'
+                    'permission': 'nexus:metrics'
                 ]
             )
         ]

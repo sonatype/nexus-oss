@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * <li>/internal/healthcheck</li>
  * </ul>
  * 
- * Protected by {@code nexus:metrics-endpoints} permission.
+ * Protected by {@code nexus:metrics:read} permission.
  * 
  * @since 2.5
  */
@@ -96,7 +96,7 @@ public class MetricsModule
         addFilterChain(MOUNT_POINT + "/**",
             NexusBasicHttpAuthenticationFilter.NAME,
             AnonymousFilter.NAME,
-            PermissionsFilter.config("nexus:metrics-endpoints"));
+            PermissionsFilter.config("nexus:metrics:read"));
       }
     });
 
