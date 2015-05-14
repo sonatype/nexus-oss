@@ -77,16 +77,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
-            // TODO: Used by RealmSettingsComponent
-            new CPrivilege(
-                id: 'realmtypes-read',
-                type: 'application',
-                properties: [
-                    domain : 'componentrealmtypes',
-                    actions: 'read'
-                ]
-            ),
-
             //
             // nexus:apikey
             //

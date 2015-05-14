@@ -67,7 +67,7 @@ class RealmSettingsComponent
    * @return a list of realm types
    */
   @DirectMethod
-  @RequiresPermissions('nexus:componentrealmtypes:read')
+  @RequiresPermissions('nexus:settings:read')
   List<ReferenceXO> readRealmTypes() {
     beanLocator.locate(Key.get(Realm.class, Named.class)).collect { entry ->
       new ReferenceXO(
