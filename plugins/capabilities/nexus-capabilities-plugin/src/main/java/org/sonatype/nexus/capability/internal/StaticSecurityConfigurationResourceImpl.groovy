@@ -33,44 +33,47 @@ class StaticSecurityConfigurationResourceImpl
   MemorySecurityConfiguration getConfiguration() {
     return new MemorySecurityConfiguration(
         privileges: [
+            // FIXME: normalize ids
             new CPrivilege(
                 id: 'capabilities-create-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:capabilities'
+                    domain : 'capabilities',
+                    actions: 'create,read'
                 ]
             ),
             new CPrivilege(
                 id: 'capabilities-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:capabilities'
+                    domain : 'capabilities',
+                    actions: 'read'
                 ]
             ),
             new CPrivilege(
                 id: 'capabilities-update-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:capabilities'
+                    domain : 'capabilities',
+                    actions: 'update,read'
                 ]
             ),
             new CPrivilege(
                 id: 'capabilities-delete-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:capabilities'
+                    domain : 'capabilities',
+                    actions: 'delete,read'
                 ]
             ),
+
+            // FIXME: normalize domain
             new CPrivilege(
                 id: 'capability-types-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:capabilityTypes'
+                    domain : 'capabilityTypes',
+                    actions: 'read'
                 ]
             )
         ]

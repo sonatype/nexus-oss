@@ -35,34 +35,34 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'ssl-truststore-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:ssl-truststore'
+                    domain : 'ssl-truststore',
+                    actions: 'read',
                 ]
             ),
             new CPrivilege(
                 id: 'ssl-truststore-create',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:ssl-truststore'
+                    domain : 'ssl-truststore',
+                    actions: 'create,read'
                 ]
             ),
             new CPrivilege(
                 id: 'ssl-truststore-update',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:ssl-truststore'
+                    domain : 'ssl-truststore',
+                    actions: 'update,read'
                 ]
             ),
             new CPrivilege(
                 id: 'ssl-truststore-delete',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:ssl-truststore'
+                    domain : 'ssl-truststore',
+                    actions: 'delete,read'
                 ]
             )
         ]
