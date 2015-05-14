@@ -34,6 +34,9 @@ public class WildcardPermission2
     super(wildcardString, caseSensitive);
   }
 
+  /**
+   * Caches {@link #hashCode()} after parts are installed.
+   */
   @Override
   protected void setParts(final String wildcardString, final boolean caseSensitive) {
     super.setParts(wildcardString, caseSensitive);
