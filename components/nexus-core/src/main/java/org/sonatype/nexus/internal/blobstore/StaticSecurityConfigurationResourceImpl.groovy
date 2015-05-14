@@ -35,6 +35,14 @@ class StaticSecurityConfigurationResourceImpl
     return new MemorySecurityConfiguration(
         privileges: [
             new CPrivilege(
+                id: 'blobstores-all',
+                type: 'application',
+                properties: [
+                    domain : 'blobstores',
+                    actions: '*'
+                ]
+            ),
+            new CPrivilege(
                 id: 'blobstores-create',
                 type: 'application',
                 properties: [
