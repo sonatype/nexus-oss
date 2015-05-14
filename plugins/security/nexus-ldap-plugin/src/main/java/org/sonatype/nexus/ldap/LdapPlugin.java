@@ -45,21 +45,6 @@ public class LdapPlugin
   public static final String ARTIFACT_ID = "nexus-ldap-plugin";
 
   /**
-   * Prefix for @Named configuration.
-   */
-  public static final String CONFIG_PREFIX = "${" + ID_PREFIX;
-
-  /**
-   * Prefix for REST resources
-   */
-  public static final String REST_PREFIX = "/" + ID_PREFIX;
-
-  /**
-   * Prefix for permissions.
-   */
-  public static final String PERMISSION_PREFIX = "nexus:" + ID_PREFIX + ":";
-
-  /**
    * LDAP realm name.
    */
   public static final String REALM_NAME = "LdapRealm";

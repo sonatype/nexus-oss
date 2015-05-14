@@ -50,16 +50,6 @@ public class LoggingPlugin
    */
   public static final String REST_PREFIX = "/" + ID_PREFIX;
 
-  /**
-   * Prefix for permissions related to loggers.
-   */
-  public static final String PERMISSION_PREFIX_LOGGERS = "nexus:logconfig:";
-
-  /**
-   * Prefix for permissions related to log.
-   */
-  public static final String PERMISSION_PREFIX_LOG = "nexus:logs:";
-
   @Inject
   public LoggingPlugin()
       throws Exception

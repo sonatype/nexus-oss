@@ -58,11 +58,6 @@ public class WonderlandPlugin
    */
   public static final String REST_PREFIX = "/" + ID_PREFIX;
 
-  /**
-   * Prefix for permissions.
-   */
-  public static final String PERMISSION_PREFIX = "nexus:" + ID_PREFIX + ":";
-
   @Inject
   public WonderlandPlugin() throws Exception {
     super(GROUP_ID, ARTIFACT_ID);

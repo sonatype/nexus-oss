@@ -55,11 +55,6 @@ public class CapabilitiesPlugin
    */
   public static final String PERMISSION_PREFIX = "nexus:" + ID_PREFIX + ":";
 
-  /**
-   * Prefix for permissions.
-   */
-  public static final String PERMISSION_PREFIX_TYPES = "nexus:capabilityTypes:";
-
   @Inject
   public CapabilitiesPlugin()
       throws Exception
