@@ -40,10 +40,9 @@ class StaticSecurityConfigurationResourceImpl
              */
             new CPrivilege(
                 id: 'all',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : '*',
-                    'permission': 'nexus'
+                    actions: '*'
                 ]
             ),
 
@@ -53,92 +52,92 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'settings-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:settings'
+                    domain : 'settings',
+                    actions: 'read',
                 ]
             ),
             new CPrivilege(
                 id: 'settings-update',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:settings'
+                    domain : 'settings',
+                    actions: 'update,read'
                 ]
             ),
 
             // TODO: nexus:repositories used by UI, remove these are legacy
             new CPrivilege(
                 id: 'repositories-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:repositories'
+                    domain : 'repositories',
+                    actions: 'read',
                 ]
             ),
 
             // TODO: nexus:tasks used by UI, refine... move to more specific security configuration component
             new CPrivilege(
                 id: 'tasks-create',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:tasks'
+                    domain : 'tasks',
+                    actions: 'create,read'
                 ]
             ),
             new CPrivilege(
                 id: 'tasks-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:tasks'
+                    domain : 'tasks',
+                    actions: 'read'
                 ]
             ),
             new CPrivilege(
                 id: 'tasks-update',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:tasks'
+                    domain : 'tasks',
+                    actions: 'update,read'
                 ]
             ),
             new CPrivilege(
                 id: 'tasks-delete',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:tasks'
+                    domain : 'tasks',
+                    actions: 'delete,read'
                 ]
             ),
 
             // FIXME: 'read' means 'start' and 'delete' means 'stop', should be actions on 'nexus:tasks' instead
             new CPrivilege(
                 id: 'tasksrun',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read,delete',
-                    'permission': 'nexus:tasksrun'
+                    domain : 'tasksrun',
+                    actions: 'read,delete'
                 ]
             ),
 
             // FIXME: Unsure what the reason is for a distinct permission for reading task-types
             new CPrivilege(
                 id: 'tasktypes-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:tasktypes'
+                    domain : 'tasktypes',
+                    actions: 'read'
                 ]
             ),
 
             // TODO: Used by RealmSettingsComponent
             new CPrivilege(
                 id: 'realmtypes-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:componentrealmtypes'
+                    domain : 'componentrealmtypes',
+                    actions: 'read'
                 ]
             ),
 
@@ -148,10 +147,10 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'apikey-all',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : '*',
-                    'permission': 'nexus:apikey'
+                    domain : 'apikey',
+                    actions: '*'
                 ]
             ),
 
@@ -161,34 +160,34 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'privileges-create',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:privileges'
+                    domain : 'privileges',
+                    actions: 'create,read'
                 ]
             ),
             new CPrivilege(
                 id: 'privileges-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:privileges'
+                    domain : 'privileges',
+                    actions: 'read'
                 ]
             ),
             new CPrivilege(
                 id: 'privileges-update',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:privileges'
+                    domain : 'privileges',
+                    actions: 'update,read'
                 ]
             ),
             new CPrivilege(
                 id: 'privileges-delete',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:privileges'
+                    domain : 'privileges',
+                    actions: 'delete,read'
                 ]
             ),
 
@@ -198,34 +197,34 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'roles-create',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:roles'
+                    domain : 'roles',
+                    actions: 'create,read'
                 ]
             ),
             new CPrivilege(
                 id: 'roles-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:roles'
+                    domain : 'roles',
+                    actions: 'read'
                 ]
             ),
             new CPrivilege(
                 id: 'roles-update',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:roles'
+                    domain : 'roles',
+                    actions: 'update,read'
                 ]
             ),
             new CPrivilege(
                 id: 'roles-delete',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:roles'
+                    domain : 'roles',
+                    actions: 'delete,read'
                 ]
             ),
 
@@ -235,44 +234,44 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'users-create',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:users'
+                    domain : 'users',
+                    actions: 'create,read'
                 ]
             ),
             new CPrivilege(
                 id: 'users-read',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'read',
-                    'permission': 'nexus:users'
+                    domain : 'users',
+                    actions: 'read'
                 ]
             ),
             new CPrivilege(
                 id: 'users-update',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'update,read',
-                    'permission': 'nexus:users'
+                    domain : 'users',
+                    actions: 'update,read'
                 ]
             ),
             new CPrivilege(
                 id: 'users-delete',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'delete,read',
-                    'permission': 'nexus:users'
+                    domain : 'users',
+                    actions: 'delete,read'
                 ]
             ),
 
             // FIXME: Sort out what the use-case is for this distinct permission
             new CPrivilege(
                 id: 'userschangepw',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : 'create,read',
-                    'permission': 'nexus:userschangepw'
+                    domain : 'userschangepw',
+                    actions: 'create,read'
                 ]
             )
         ],
