@@ -21,7 +21,7 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Application permission.
+ * Application permission, using {@code nexus:} namespace.
  *
  * @since 3.0
  */
