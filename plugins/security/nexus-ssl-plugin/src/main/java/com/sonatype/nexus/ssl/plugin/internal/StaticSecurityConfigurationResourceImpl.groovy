@@ -34,6 +34,14 @@ class StaticSecurityConfigurationResourceImpl
     return new MemorySecurityConfiguration(
         privileges: [
             new CPrivilege(
+                id: 'ssl-truststore-all',
+                type: 'application',
+                properties: [
+                    domain : 'ssl-truststore',
+                    actions: '*',
+                ]
+            ),
+            new CPrivilege(
                 id: 'ssl-truststore-read',
                 type: 'application',
                 properties: [
