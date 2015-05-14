@@ -12,13 +12,14 @@
  */
 package org.sonatype.nexus.repository.search;
 
-import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.sonatype.nexus.common.entity.EntityId;
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTxHook;
+
+import com.google.common.collect.Sets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.entity.EntityHelper.id;
@@ -31,19 +32,16 @@ import static org.sonatype.nexus.common.entity.EntityHelper.id;
 public class SearchHook
     extends StorageTxHook
 {
-  private final SearchService searchService;
+  private final SearchFacetImpl searchFacet;
 
-  private final Repository repository;
+  private final Set<Component> indexable;
 
-  private final LinkedHashSet<EntityId> indexable;
+  private final Set<EntityId> deindexable;
 
-  private final LinkedHashSet<EntityId> deindexable;
-
-  public SearchHook(final SearchService searchService, final Repository repository) {
-    this.searchService = checkNotNull(searchService);
-    this.repository = checkNotNull(repository);
-    this.indexable = new LinkedHashSet<>();
-    this.deindexable = new LinkedHashSet<>();
+  public SearchHook(final SearchFacetImpl searchFacet) {
+    this.searchFacet = checkNotNull(searchFacet);
+    this.indexable = Sets.newIdentityHashSet(); // use Object identity, as new entity hashCode changes
+    this.deindexable = Sets.newHashSet();
   }
 
   @Override
@@ -54,7 +52,7 @@ public class SearchHook
   @Override
   public void updateComponent(final Component... components) {
     for (Component component : components) {
-      indexable.add(id(component));
+      indexable.add(component);
     }
   }
 
@@ -73,24 +71,24 @@ public class SearchHook
   @Override
   public void updateAsset(final Asset... assets) {
     for (Asset asset : assets) {
-      indexable.add(asset.componentId());
+      // indexable.add(asset.component()); NOT POSSIBLE CURRENTLY WITH ENTITY FRAMEWORK
     }
   }
 
   @Override
   public void deleteAsset(final Asset... assets) {
     for (Asset asset : assets) {
-      deindexable.add(asset.componentId());
+      // indexable.add(asset.componentId()); NOT POSSIBLE CURRENTLY WITH ENTITY FRAMEWORK
     }
   }
 
   @Override
   public void postCommit() {
     for (EntityId entityId : deindexable) {
-      searchService.delete(repository, entityId.toString());
+      searchFacet.delete(entityId);
     }
-    for (EntityId entityId : indexable) {
-      searchService.put(repository, entityId, entityId.toString());
+    for (Component component : indexable) {
+      searchFacet.put(component);
     }
   }
 }
