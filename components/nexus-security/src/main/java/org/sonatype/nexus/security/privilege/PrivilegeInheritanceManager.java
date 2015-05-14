@@ -14,6 +14,8 @@ package org.sonatype.nexus.security.privilege;
 
 import java.util.List;
 
+// FIXME: This is highly HTTP "method" specific, remove
+
 /**
  * Allows for an method to inherit from another. For example: 'delete' imply that a user has access to 'read'.
  */
