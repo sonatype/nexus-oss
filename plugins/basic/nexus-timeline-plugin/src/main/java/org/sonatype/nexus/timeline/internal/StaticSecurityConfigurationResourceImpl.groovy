@@ -26,7 +26,7 @@ import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
  */
 @Named
 @Singleton
-class SecurityConfigurationResource
+class StaticSecurityConfigurationResourceImpl
     implements StaticSecurityConfigurationResource
 {
   @Override

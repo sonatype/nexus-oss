@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.internal
+package org.sonatype.nexus.ldap.internal
 
 import javax.inject.Named
 import javax.inject.Singleton
@@ -20,57 +20,49 @@ import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
 
 /**
- * Capabilities plugin static security resource.
+ * LDAP plugin static security resource.
  *
  * @since 3.0
  */
 @Named
 @Singleton
-class SecurityConfigurationResource
-implements StaticSecurityConfigurationResource
+class StaticSecurityConfigurationResourceImpl
+    implements StaticSecurityConfigurationResource
 {
   @Override
   MemorySecurityConfiguration getConfiguration() {
     return new MemorySecurityConfiguration(
         privileges: [
             new CPrivilege(
-                id: 'capabilities-create-read',
+                id: 'ldap-create',
                 type: 'method',
                 properties: [
-                    'method': 'create,read',
-                    'permission': 'nexus:capabilities'
+                    'method'    : 'create',
+                    'permission': 'nexus:ldap'
                 ]
             ),
             new CPrivilege(
-                id: 'capabilities-read',
+                id: 'ldap-read',
                 type: 'method',
                 properties: [
-                    'method': 'read',
-                    'permission': 'nexus:capabilities'
+                    'method'    : 'read',
+                    'permission': 'nexus:ldap'
                 ]
             ),
             new CPrivilege(
-                id: 'capabilities-update-read',
+                id: 'ldap-update',
                 type: 'method',
                 properties: [
-                    'method': 'update,read',
-                    'permission': 'nexus:capabilities'
+                    'method'    : 'update',
+                    'permission': 'nexus:ldap'
                 ]
             ),
             new CPrivilege(
-                id: 'capabilities-delete-read',
+                id: 'ldap-delete',
                 type: 'method',
                 properties: [
-                    'method': 'delete,read',
-                    'permission': 'nexus:capabilities'
-                ]
-            ),
-            new CPrivilege(
-                id: 'capability-types-read',
-                type: 'method',
-                properties: [
-                    'method': 'read',
-                    'permission': 'nexus:capabilityTypes'
+                    'method'    : 'delete,read',
+                    'permission': 'nexus:ldap'
                 ]
             )
         ]
