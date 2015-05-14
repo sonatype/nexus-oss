@@ -51,7 +51,6 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
             helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_HELP'),
             emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_PLACEHOLDER'),
             editable: false,
-            disabledCls: 'nx-combo-disabled',
             store: [
               ['RELEASE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_RELEASE_ITEM')],
               ['SNAPSHOT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_SNAPSHOT_ITEM')],
