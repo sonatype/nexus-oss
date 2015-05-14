@@ -23,7 +23,7 @@ import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.internal.AuthenticatingRealmImpl;
 import org.sonatype.nexus.security.internal.AuthorizingRealmImpl;
 import org.sonatype.nexus.security.internal.SecurityConfigurationManagerImpl;
-import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
+import org.sonatype.nexus.security.privilege.WildcardPrivilegeDescriptor;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.security.user.User;
@@ -163,14 +163,7 @@ public class EmptyRoleTest
   }
 
   private String createTestPriv() throws Exception {
-    CPrivilege priv = new CPrivilege();
-    priv.setId("priv-" + Math.random());
-    priv.setName("somepriv");
-    priv.setType(MethodPrivilegeDescriptor.TYPE);
-    priv.setDescription("somedescription");
-    priv.setProperty(MethodPrivilegeDescriptor.P_PERMISSION, "app:config");
-    priv.setProperty(MethodPrivilegeDescriptor.P_METHOD, "read");
-
+    CPrivilege priv = WildcardPrivilegeDescriptor.privilege("app:config:read");
     this.lookup(SecurityConfigurationManagerImpl.class).createPrivilege(priv);
 
     return priv.getId();
