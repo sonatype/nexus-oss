@@ -51,6 +51,14 @@ class StaticSecurityConfigurationResourceImpl
             //
 
             new CPrivilege(
+                id: 'settings-all',
+                type: 'application',
+                properties: [
+                    domain : 'settings',
+                    actions: '*',
+                ]
+            ),
+            new CPrivilege(
                 id: 'settings-read',
                 type: 'application',
                 properties: [
