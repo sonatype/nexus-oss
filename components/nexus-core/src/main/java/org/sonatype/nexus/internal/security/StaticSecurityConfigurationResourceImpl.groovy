@@ -77,60 +77,6 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
-            // TODO: nexus:tasks used by UI, refine... move to more specific security configuration component
-            new CPrivilege(
-                id: 'tasks-create',
-                type: 'application',
-                properties: [
-                    domain : 'tasks',
-                    actions: 'create,read'
-                ]
-            ),
-            new CPrivilege(
-                id: 'tasks-read',
-                type: 'application',
-                properties: [
-                    domain : 'tasks',
-                    actions: 'read'
-                ]
-            ),
-            new CPrivilege(
-                id: 'tasks-update',
-                type: 'application',
-                properties: [
-                    domain : 'tasks',
-                    actions: 'update,read'
-                ]
-            ),
-            new CPrivilege(
-                id: 'tasks-delete',
-                type: 'application',
-                properties: [
-                    domain : 'tasks',
-                    actions: 'delete,read'
-                ]
-            ),
-
-            // FIXME: 'read' means 'start' and 'delete' means 'stop', should be actions on 'nexus:tasks' instead
-            new CPrivilege(
-                id: 'tasksrun',
-                type: 'application',
-                properties: [
-                    domain : 'tasksrun',
-                    actions: 'read,delete'
-                ]
-            ),
-
-            // FIXME: Unsure what the reason is for a distinct permission for reading task-types
-            new CPrivilege(
-                id: 'tasktypes-read',
-                type: 'application',
-                properties: [
-                    domain : 'tasktypes',
-                    actions: 'read'
-                ]
-            ),
-
             // TODO: Used by RealmSettingsComponent
             new CPrivilege(
                 id: 'realmtypes-read',
