@@ -70,6 +70,8 @@ public class DefaultsCustomizer
     checkNotNull(plan);
 
     plan.getHeaders().put(HttpHeaders.USER_AGENT, userAgentGenerator.generate());
+    // store UA also as (context) attribute so it can be reused by other customizers without injecting userAgentGenerator
+    plan.getAttributes().put(HttpHeaders.USER_AGENT, plan.getHeaders().get(HttpHeaders.USER_AGENT));
 
     plan.getClient().setKeepAliveStrategy(new NexusConnectionKeepAliveStrategy(keepAliveDuration.toMillis()));
 

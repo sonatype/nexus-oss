@@ -28,6 +28,7 @@ import org.sonatype.nexus.httpclient.internal.NexusHttpRoutePlanner;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.net.HttpHeaders;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -88,7 +89,12 @@ public class ConfigurationCustomizer
       plan.getClient().setRetryHandler(new StandardHttpRequestRetryHandler(connection.getMaximumRetries(), false));
     }
 
-    // TODO: user-agent (and/or custom headers?)
+    if (connection.getUserAgentCustomisation() != null) {
+      // append UA customisation to one stored as attribute by DefaultsCustomizer
+      plan.getHeaders().put(HttpHeaders.USER_AGENT,
+          plan.getAttributes().get(HttpHeaders.USER_AGENT) + " " + connection.getUserAgentCustomisation()
+      );
+    }
 
     // TODO: query-string? (or don't do this, it may not bee a good idea anymore)
 

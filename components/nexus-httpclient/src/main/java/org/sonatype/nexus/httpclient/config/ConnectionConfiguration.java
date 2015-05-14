@@ -28,7 +28,10 @@ public class ConnectionConfiguration
   @Nullable
   private Integer maximumRetries;
 
-  // TODO: user-agent, query-string
+  @Nullable
+  private String userAgentCustomisation;
+
+  // TODO: query-string
 
   @Nullable
   private Boolean useTrustStore;
@@ -52,6 +55,13 @@ public class ConnectionConfiguration
   }
 
   @Nullable
+  public String getUserAgentCustomisation() { return userAgentCustomisation; }
+
+  public void setUserAgentCustomisation(@Nullable final String userAgentCustomisation) {
+    this.userAgentCustomisation = userAgentCustomisation;
+  }
+
+  @Nullable
   public Boolean getUseTrustStore() { return useTrustStore; }
 
   public void setUseTrustStore(@Nullable final Boolean useTrustStore) { this.useTrustStore = useTrustStore; }
@@ -61,6 +71,8 @@ public class ConnectionConfiguration
     return getClass().getSimpleName() + "{" +
         "timeout=" + timeout +
         ", maximumRetries=" + maximumRetries +
+        ", userAgentCustomisation=" + userAgentCustomisation +
+        ", useTrustStore=" + useTrustStore +
         '}';
   }
 }
