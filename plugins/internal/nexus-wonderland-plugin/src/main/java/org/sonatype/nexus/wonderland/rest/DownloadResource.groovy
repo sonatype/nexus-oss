@@ -33,6 +33,8 @@ import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.jetbrains.annotations.NonNls
 
+import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION
+import static com.google.common.net.HttpHeaders.CONTENT_LENGTH
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST
 import static javax.ws.rs.core.Response.Status.FORBIDDEN
 import static javax.ws.rs.core.Response.Status.NOT_FOUND
@@ -99,8 +101,8 @@ class DownloadResource
 
       log.debug 'Sending support ZIP file: {}', file
       return Response.ok(file.newInputStream())
-          .header('Content-Disposition', "attachment; filename=\"${fileName}\"")
-          .header('Content-Length', file.length())
+          .header(CONTENT_DISPOSITION, "attachment; filename=\"${fileName}\"")
+          .header(CONTENT_LENGTH, file.length())
           .build()
     }
     catch (IllegalAccessException e) {
