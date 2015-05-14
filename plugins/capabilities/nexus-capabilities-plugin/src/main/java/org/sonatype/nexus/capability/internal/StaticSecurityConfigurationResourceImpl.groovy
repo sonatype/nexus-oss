@@ -20,7 +20,7 @@ import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
 
 /**
- * Capabilities plugin static security resource.
+ * Capabilities security configuration.
  *
  * @since 3.0
  */
@@ -33,9 +33,8 @@ class StaticSecurityConfigurationResourceImpl
   MemorySecurityConfiguration getConfiguration() {
     return new MemorySecurityConfiguration(
         privileges: [
-            // FIXME: normalize ids
             new CPrivilege(
-                id: 'capabilities-create-read',
+                id: 'capabilities-create',
                 type: 'application',
                 properties: [
                     domain : 'capabilities',
@@ -51,7 +50,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'capabilities-update-read',
+                id: 'capabilities-update',
                 type: 'application',
                 properties: [
                     domain : 'capabilities',
@@ -59,21 +58,11 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
             new CPrivilege(
-                id: 'capabilities-delete-read',
+                id: 'capabilities-delete',
                 type: 'application',
                 properties: [
                     domain : 'capabilities',
                     actions: 'delete,read'
-                ]
-            ),
-
-            // FIXME: normalize domain
-            new CPrivilege(
-                id: 'capability-types-read',
-                type: 'application',
-                properties: [
-                    domain : 'capabilityTypes',
-                    actions: 'read'
                 ]
             )
         ]
