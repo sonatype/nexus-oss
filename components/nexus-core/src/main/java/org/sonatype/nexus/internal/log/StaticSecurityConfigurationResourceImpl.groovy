@@ -35,6 +35,14 @@ class StaticSecurityConfigurationResourceImpl
     return new MemorySecurityConfiguration(
         privileges: [
             new CPrivilege(
+                id: 'logging-all',
+                type: 'application',
+                properties: [
+                    domain: 'logging',
+                    actions: '*'
+                ]
+            ),
+            new CPrivilege(
                 id: 'logging-read',
                 type: 'application',
                 properties: [
