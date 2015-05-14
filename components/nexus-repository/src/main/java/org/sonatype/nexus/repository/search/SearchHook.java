@@ -77,9 +77,7 @@ public class SearchHook
 
   @Override
   public void deleteAsset(final Asset... assets) {
-    for (Asset asset : assets) {
-      deindexable.add(asset.componentId());
-    }
+    updateAsset(assets);
   }
 
   @Override
