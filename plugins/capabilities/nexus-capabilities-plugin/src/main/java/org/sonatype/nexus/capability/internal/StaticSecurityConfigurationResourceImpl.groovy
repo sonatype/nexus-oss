@@ -34,6 +34,14 @@ class StaticSecurityConfigurationResourceImpl
     return new MemorySecurityConfiguration(
         privileges: [
             new CPrivilege(
+                id: 'capabilities-all',
+                type: 'application',
+                properties: [
+                    domain : 'capabilities',
+                    actions: '*'
+                ]
+            ),
+            new CPrivilege(
                 id: 'capabilities-create',
                 type: 'application',
                 properties: [
