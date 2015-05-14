@@ -28,6 +28,8 @@ import javax.validation.groups.Default;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.common.entity.EntityHelper;
+import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
@@ -39,7 +41,6 @@ import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.search.SearchFacet;
-import org.sonatype.nexus.repository.search.SearchItemId;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -359,7 +360,7 @@ public class MavenFacetImpl
       return false;
     }
 
-    final SearchItemId searchId = facet(SearchFacet.class).identifier(component);
+    final EntityId entityId = EntityHelper.id(component);
 
     tx.deleteAsset(asset);
     final boolean isEmpty = !tx.browseAssets(component).iterator().hasNext();
@@ -372,7 +373,7 @@ public class MavenFacetImpl
       facet(SearchFacet.class).put(component);
     }
     else {
-      facet(SearchFacet.class).delete(searchId);
+      facet(SearchFacet.class).delete(entityId);
     }
 
     return true;

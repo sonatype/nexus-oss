@@ -12,16 +12,14 @@
  */
 package org.sonatype.nexus.repository.search;
 
-import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.storage.Component;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
 /**
- * Search service.
+ * Search service: maintains indexes for repositories and performs indexing/deindexing of data, along with search.
  *
  * @since 3.0
  */
@@ -41,7 +39,7 @@ public interface SearchService
   /**
    * Index component metadata.
    */
-  void put(Repository repository, Component component, String identifier);
+  void put(Repository repository, String identifier, String json);
 
   /**
    * Remove component metadata from index.
