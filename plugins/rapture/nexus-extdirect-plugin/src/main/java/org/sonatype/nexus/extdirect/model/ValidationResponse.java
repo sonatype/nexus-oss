@@ -69,7 +69,7 @@ public class ValidationResponse
         List<String> entries = new ArrayList<>();
         // iterate path to get the full path
         for (Node node : violation.getPropertyPath()) {
-          if (ElementKind.PROPERTY == node.getKind()) {
+          if (ElementKind.PROPERTY == node.getKind() || ElementKind.PARAMETER == node.getKind()) {
             if (node.getKey() != null) {
               entries.add(node.getKey().toString());
             }
