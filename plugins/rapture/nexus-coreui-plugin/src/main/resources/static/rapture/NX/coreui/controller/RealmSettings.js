@@ -40,6 +40,10 @@ Ext.define('NX.coreui.controller.RealmSettings', {
     {
       ref: 'panel',
       selector: 'nx-coreui-security-realm-settings'
+    },
+    {
+      ref: 'form',
+      selector: 'nx-coreui-security-realm-settings nx-settingsform'
     }
   ],
 
@@ -83,7 +87,10 @@ Ext.define('NX.coreui.controller.RealmSettings', {
         panel = me.getPanel();
 
     if (panel) {
-      me.getRealmTypeStore().load();
+      me.getRealmTypeStore().load(function() {
+        // The form depends on this store, so load it after the store has loaded
+        me.getForm().load();
+      });
     }
   }
 
