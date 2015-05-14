@@ -74,14 +74,19 @@ public class SearchFacetImpl
     });
   }
 
-  protected void put(final Component component) {
-    checkNotNull(component);
-    log.debug("Indexing metadata of {} from {}", component, getRepository());
+  protected void put(final EntityId componentId) {
+    checkNotNull(componentId);
+    log.debug("Indexing metadata of component ID {} from {}", componentId, getRepository());
     try {
       Map<String, Object> additional = Maps.newHashMap();
       additional.put(P_REPOSITORY_NAME, getRepository().getName());
+      Component component;
       List<Asset> assets;
       try (StorageTx tx = getRepository().facet(StorageFacet.class).openTx()) {
+        component = tx.findComponent(componentId, tx.getBucket());
+        if (component == null) {
+          return;
+        }
         assets = Lists.newArrayList(tx.browseAssets(component));
       }
       String json = JsonUtils.merge(componentMetadata(component, assets), JsonUtils.from(additional));

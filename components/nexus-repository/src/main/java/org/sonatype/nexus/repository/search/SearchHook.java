@@ -34,7 +34,7 @@ public class SearchHook
 {
   private final SearchFacetImpl searchFacet;
 
-  private final Set<Component> indexable;
+  private final Set<EntityId> indexable;
 
   private final Set<EntityId> deindexable;
 
@@ -52,7 +52,7 @@ public class SearchHook
   @Override
   public void updateComponent(final Component... components) {
     for (Component component : components) {
-      indexable.add(component);
+      indexable.add(id(component));
     }
   }
 
@@ -71,14 +71,14 @@ public class SearchHook
   @Override
   public void updateAsset(final Asset... assets) {
     for (Asset asset : assets) {
-      // indexable.add(asset.component()); NOT POSSIBLE CURRENTLY WITH ENTITY FRAMEWORK
+      indexable.add(asset.componentId());
     }
   }
 
   @Override
   public void deleteAsset(final Asset... assets) {
     for (Asset asset : assets) {
-      // indexable.add(asset.componentId()); NOT POSSIBLE CURRENTLY WITH ENTITY FRAMEWORK
+      deindexable.add(asset.componentId());
     }
   }
 
@@ -87,8 +87,8 @@ public class SearchHook
     for (EntityId entityId : deindexable) {
       searchFacet.delete(entityId);
     }
-    for (Component component : indexable) {
-      searchFacet.put(component);
+    for (EntityId entityId : indexable) {
+      searchFacet.put(entityId);
     }
   }
 }
