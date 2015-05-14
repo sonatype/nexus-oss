@@ -67,7 +67,7 @@ public class LogResource
    */
   @GET
   @Produces({TEXT_PLAIN})
-  @RequiresPermissions("nexus:logs:read")
+  @RequiresPermissions("nexus:logging:read")
   public Response get(final @QueryParam("fromByte") Long fromByte,
                       final @QueryParam("bytesCount") Long bytesCount)
       throws Exception

@@ -35,31 +35,29 @@ class StaticSecurityConfigurationResourceImpl
     return new MemorySecurityConfiguration(
         privileges: [
             new CPrivilege(
-                id: 'logs-read',
+                id: 'logging-read',
                 type: 'application',
                 properties: [
-                    domain: 'logs',
+                    domain: 'logging',
                     actions: 'read'
                 ]
             ),
             new CPrivilege(
-                id: 'logs-update',
+                id: 'logging-update',
                 type: 'application',
                 properties: [
-                    domain: 'logs',
+                    domain: 'logging',
                     actions: 'update'
                 ]
             ),
-
-            // FIXME: normalize namespace
             new CPrivilege(
-                id: 'logconfig-update',
+                id: 'logging-mark',
                 type: 'application',
                 properties: [
-                    domain: 'logconfig',
-                    actions: 'read,update'
+                    domain: 'logging',
+                    actions: 'mark'
                 ]
-            )
+            ),
         ]
     )
   }
