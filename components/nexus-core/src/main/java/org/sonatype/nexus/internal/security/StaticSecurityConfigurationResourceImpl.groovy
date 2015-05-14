@@ -75,6 +75,27 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
+            //
+            // nexus:bundles
+            //
+
+            new CPrivilege(
+                id: 'bundles-all',
+                type: 'application',
+                properties: [
+                    domain : 'bundles',
+                    actions: '*'
+                ]
+            ),
+            new CPrivilege(
+                id: 'bundles-read',
+                type: 'application',
+                properties: [
+                    domain : 'bundles',
+                    actions: 'read'
+                ]
+            ),
+
             // TODO: nexus:repositories used by UI for search and component/asset access, remove these are legacy
             new CPrivilege(
                 id: 'repositories-read',
