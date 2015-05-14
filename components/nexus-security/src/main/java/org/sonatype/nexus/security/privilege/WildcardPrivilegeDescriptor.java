@@ -16,6 +16,7 @@ package org.sonatype.nexus.security.privilege;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.security.authz.WildcardPermission2;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CPrivilegeBuilder;
 
@@ -45,7 +46,7 @@ public class WildcardPrivilegeDescriptor
   public Permission createPermission(final CPrivilege privilege) {
     assert privilege != null;
     String pattern = readProperty(privilege, P_PATTERN);
-    return new WildcardPermission(pattern);
+    return new WildcardPermission2(pattern);
   }
 
   //

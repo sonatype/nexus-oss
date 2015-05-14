@@ -16,9 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.security.authz.WildcardPermission2;
 
 import com.google.common.base.Joiner;
-import org.apache.shiro.authz.permission.WildcardPermission;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class RepositoryViewPermission
-    extends WildcardPermission
+    extends WildcardPermission2
 {
   public static final String SYSTEM = "nexus";
 

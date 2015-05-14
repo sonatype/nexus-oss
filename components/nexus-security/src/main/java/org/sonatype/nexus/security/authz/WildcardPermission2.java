@@ -22,10 +22,21 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 public class WildcardPermission2
   extends WildcardPermission
 {
-  private final int cachedHash;
+  private int cachedHash;
+
+  protected WildcardPermission2() {}
 
   public WildcardPermission2(final String wildcardString) {
-    super(wildcardString);
+    this(wildcardString, DEFAULT_CASE_SENSITIVE);
+  }
+
+  public WildcardPermission2(final String wildcardString, final boolean caseSensitive) {
+    super(wildcardString, caseSensitive);
+  }
+
+  @Override
+  protected void setParts(final String wildcardString, final boolean caseSensitive) {
+    super.setParts(wildcardString, caseSensitive);
     this.cachedHash = super.hashCode();
   }
 
