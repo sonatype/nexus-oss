@@ -75,7 +75,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
-            // TODO: nexus:repositories used by UI, remove these are legacy
+            // TODO: nexus:repositories used by UI for search and component/asset access, remove these are legacy
             new CPrivilege(
                 id: 'repositories-read',
                 type: 'application',
