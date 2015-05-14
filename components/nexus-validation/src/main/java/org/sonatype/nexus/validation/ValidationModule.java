@@ -25,6 +25,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 
+import org.sonatype.nexus.validation.internal.AopAwareParanamerParameterNameProvider;
 import org.sonatype.nexus.validation.internal.GuiceConstraintValidatorFactory;
 import org.sonatype.nexus.validation.internal.ValidationInterceptor;
 
@@ -33,7 +34,6 @@ import com.google.inject.Provides;
 import com.google.inject.matcher.Matchers;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider;
 
 /**
  * Provides validation of methods annotated with {@link Validate}.
@@ -60,7 +60,7 @@ public class ValidationModule
   
       ValidatorFactory factory = Validation.byDefaultProvider().configure()
           .constraintValidatorFactory(constraintValidatorFactory)
-          .parameterNameProvider(new ParanamerParameterNameProvider())
+          .parameterNameProvider(new AopAwareParanamerParameterNameProvider())
           .traversableResolver(new AlwaysTraversableResolver()) // disable JPA reachability
           .buildValidatorFactory();
 
