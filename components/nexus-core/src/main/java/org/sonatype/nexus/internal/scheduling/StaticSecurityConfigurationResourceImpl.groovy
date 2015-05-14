@@ -34,7 +34,6 @@ class StaticSecurityConfigurationResourceImpl
   MemorySecurityConfiguration getConfiguration() {
     return new MemorySecurityConfiguration(
         privileges: [
-            // TODO: nexus:tasks used by UI, refine... move to more specific security configuration component
             new CPrivilege(
                 id: 'tasks-create',
                 type: 'application',
@@ -68,13 +67,12 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
-            // FIXME: 'read' means 'start' and 'delete' means 'stop', should be actions on 'nexus:tasks' instead
             new CPrivilege(
-                id: 'tasksrun',
+                id: 'tasks-run',
                 type: 'application',
                 properties: [
-                    domain : 'tasksrun',
-                    actions: 'read,delete'
+                    domain : 'tasks',
+                    actions: 'start,stop'
                 ]
             )
         ]

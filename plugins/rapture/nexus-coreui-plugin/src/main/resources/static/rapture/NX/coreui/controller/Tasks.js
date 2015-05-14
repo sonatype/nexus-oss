@@ -337,7 +337,7 @@ Ext.define('NX.coreui.controller.Tasks', {
   bindRunButton: function(button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:tasksrun', 'read'),
+            NX.Conditions.isPermitted('nexus:tasks', 'start'),
             NX.Conditions.gridHasSelection('nx-coreui-task-list', function(model) {
               return model.get('runnable');
             })
@@ -358,7 +358,7 @@ Ext.define('NX.coreui.controller.Tasks', {
   bindStopButton: function(button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:tasksrun', 'delete'),
+            NX.Conditions.isPermitted('nexus:tasks', 'stop'),
             NX.Conditions.gridHasSelection('nx-coreui-task-list', function(model) {
               return model.get('stoppable');
             })
