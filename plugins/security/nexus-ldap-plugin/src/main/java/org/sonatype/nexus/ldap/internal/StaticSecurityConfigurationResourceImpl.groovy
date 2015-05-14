@@ -34,6 +34,14 @@ class StaticSecurityConfigurationResourceImpl
     return new MemorySecurityConfiguration(
         privileges: [
             new CPrivilege(
+                id: 'ldap-all',
+                type: 'application',
+                properties: [
+                    domain : 'ldap',
+                    actions: '*'
+                ]
+            ),
+            new CPrivilege(
                 id: 'ldap-create',
                 type: 'application',
                 properties: [
