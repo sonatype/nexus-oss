@@ -103,6 +103,14 @@ class StaticSecurityConfigurationResourceImpl
             //
 
             new CPrivilege(
+                id: 'privileges-all',
+                type: 'application',
+                properties: [
+                    domain : 'privileges',
+                    actions: '*'
+                ]
+            ),
+            new CPrivilege(
                 id: 'privileges-create',
                 type: 'application',
                 properties: [
@@ -140,6 +148,14 @@ class StaticSecurityConfigurationResourceImpl
             //
 
             new CPrivilege(
+                id: 'roles-all',
+                type: 'application',
+                properties: [
+                    domain : 'roles',
+                    actions: '*'
+                ]
+            ),
+            new CPrivilege(
                 id: 'roles-create',
                 type: 'application',
                 properties: [
@@ -176,6 +192,14 @@ class StaticSecurityConfigurationResourceImpl
             // nexus:users
             //
 
+            new CPrivilege(
+                id: 'users-all',
+                type: 'application',
+                properties: [
+                    domain : 'users',
+                    actions: '*'
+                ]
+            ),
             new CPrivilege(
                 id: 'users-create',
                 type: 'application',
