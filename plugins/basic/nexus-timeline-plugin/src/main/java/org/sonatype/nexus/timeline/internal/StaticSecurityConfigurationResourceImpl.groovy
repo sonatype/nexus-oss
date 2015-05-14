@@ -34,7 +34,7 @@ class StaticSecurityConfigurationResourceImpl
     return new MemorySecurityConfiguration(
         privileges: [
             new CPrivilege(
-                id: 'feeds-read', // 44
+                id: 'feeds-read',
                 type: 'method',
                 properties: [
                     'method'    : 'read',
