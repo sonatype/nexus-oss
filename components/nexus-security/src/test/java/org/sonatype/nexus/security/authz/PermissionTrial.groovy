@@ -29,4 +29,11 @@ class PermissionTrial
     def granted = new WildcardPermission('nexus:*')
     assert granted.implies(perm)
   }
+
+  @Test
+  void 'test implied wildcard without *'() {
+    def perm = new WildcardPermission('nexus:something:special:read')
+    def granted = new WildcardPermission('nexus')
+    assert granted.implies(perm)
+  }
 }
