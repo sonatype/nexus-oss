@@ -36,10 +36,10 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'metrics-all',
-                type: 'method',
+                type: 'application',
                 properties: [
-                    'method'    : '*',
-                    'permission': 'nexus:metrics'
+                    'domain': 'metrics',
+                    'actions': '*'
                 ]
             )
         ]

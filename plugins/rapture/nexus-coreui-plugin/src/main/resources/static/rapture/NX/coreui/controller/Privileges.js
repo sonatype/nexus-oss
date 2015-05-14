@@ -46,6 +46,10 @@ Ext.define('NX.coreui.controller.Privileges', {
       file: 'medal_gold_1.png',
       variants: ['x16', 'x32']
     },
+    'privilege-application': {
+      file: 'medal_gold_1.png',
+      variants: ['x16', 'x32']
+    },
     'privilege-method': {
       file: 'medal_gold_1.png',
       variants: ['x16', 'x32']

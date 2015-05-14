@@ -1,0 +1,59 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-2015 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.nexus.security.privilege;
+
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.common.base.Joiner;
+import org.apache.shiro.authz.permission.WildcardPermission;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Application permission.
+ *
+ * @since 3.0
+ */
+public class ApplicationPermission
+    extends WildcardPermission
+{
+  public static final String SYSTEM = "nexus";
+
+  private final String domain;
+
+  private final List<String> actions;
+
+  public ApplicationPermission(final String domain, final List<String> actions) {
+    this.domain = checkNotNull(domain);
+    this.actions = checkNotNull(actions);
+
+    setParts(String.format("%s:%s:%s",
+        SYSTEM,
+        domain,
+        Joiner.on(',').join(actions)
+    ));
+  }
+
+  public ApplicationPermission(final String domain, final String... actions) {
+    this(domain, Arrays.asList(actions));
+  }
+
+  public String getDomain() {
+    return domain;
+  }
+
+  public List<String> getActions() {
+    return actions;
+  }
+}
