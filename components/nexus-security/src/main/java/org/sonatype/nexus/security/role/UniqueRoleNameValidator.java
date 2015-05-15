@@ -44,6 +44,8 @@ public class UniqueRoleNameValidator
     // empty
   }
 
+  // FIXME: This is a problem on update, since it has no good way to tell if the name changed is unique or not
+
   @Override
   public boolean isValid(final String value, final ConstraintValidatorContext context) {
     log.trace("Validating unique role-name: {}", value);
