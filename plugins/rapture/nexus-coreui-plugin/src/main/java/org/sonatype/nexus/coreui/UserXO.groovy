@@ -14,6 +14,7 @@ package org.sonatype.nexus.coreui
 
 import javax.validation.constraints.NotNull
 
+import org.sonatype.nexus.security.role.RolesExist
 import org.sonatype.nexus.security.user.UniqueUserId
 import org.sonatype.nexus.security.user.UserStatus
 import org.sonatype.nexus.validation.group.Create
@@ -57,7 +58,7 @@ class UserXO
   @NotBlank(groups = Create.class)
   String password
 
-  // @RolesExist
+  @RolesExist
   @NotEmpty
   Set<String> roles
 

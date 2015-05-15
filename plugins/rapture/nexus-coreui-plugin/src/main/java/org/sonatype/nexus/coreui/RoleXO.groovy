@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
+import org.sonatype.nexus.security.role.RolesExist
 import org.sonatype.nexus.security.role.UniqueRoleId
 import org.sonatype.nexus.security.role.UniqueRoleName
 import org.sonatype.nexus.validation.group.Create
@@ -48,7 +49,7 @@ class RoleXO
   // @PrivilegesExist
   Set<String> privileges
 
-  // @RolesExist
+  @RolesExist
   // @NonRecursiveRole
   Set<String> roles
 }
