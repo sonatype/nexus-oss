@@ -16741,26 +16741,22 @@
 }
 
 /**
-* editable = false on a combo sets readonly already, so use disabled to achieve the same effect
-*/
+  * editable = false on a combo sets readonly already, so use a custom class to achieve the same effect
+  */
 /* line 25, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-combo-disabled input {
   color: #777777;
   background-color: #ebebeb;
   opacity: 1;
 }
-/* line 28, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
-.nx-combo-disabled .x-trigger-cell {
-  display: none;
-}
 
-/* line 34, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 31, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-log-viewer-field,
 .nx-log-viewer-field textarea {
   background-color: white !important;
 }
 
-/* line 38, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 35, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .x-form-fieldcontainer .x-mask {
   background-color: #dddddd;
   opacity: 0.6;
@@ -16769,20 +16765,20 @@
 /**
  * Styles which allow for horizontal alignment of form fields
  */
-/* line 47, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 44, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-float-left {
   position: relative;
   float: left !important;
   margin-right: 5px;
 }
 
-/* line 53, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 50, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-interstitial-label {
   font-size: 13px;
   padding-top: 5px;
 }
 
-/* line 58, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 55, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 .nx-clear-both {
   clear: both;
 }
@@ -16790,7 +16786,7 @@
 /**
  * IE10 adds a second 'x' icon to text fields. Hide this.
  */
-/* line 65, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+/* line 62, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 ::-ms-clear {
   width: 0;
   height: 0;

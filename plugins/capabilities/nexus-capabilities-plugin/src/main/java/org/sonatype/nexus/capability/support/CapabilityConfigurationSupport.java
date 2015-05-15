@@ -16,10 +16,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.sonatype.nexus.capability.Capability;
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
-import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -31,7 +31,7 @@ public abstract class CapabilityConfigurationSupport
     extends ComponentSupport
 {
   protected boolean isEmpty(final String value) {
-    return StringUtils.isEmpty(value);
+    return Strings2.isEmpty(value);
   }
 
   /**
