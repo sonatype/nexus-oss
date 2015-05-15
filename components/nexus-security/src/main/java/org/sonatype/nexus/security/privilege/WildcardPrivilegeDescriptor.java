@@ -21,12 +21,11 @@ import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CPrivilegeBuilder;
 
 import org.apache.shiro.authz.Permission;
-import org.apache.shiro.authz.permission.WildcardPermission;
 
 /**
  * Wildcard {@link PrivilegeDescriptor}.
  *
- * @see WildcardPermission
+ * @see WildcardPermission2
  * @since 3.0
  */
 @Named(WildcardPrivilegeDescriptor.TYPE)
