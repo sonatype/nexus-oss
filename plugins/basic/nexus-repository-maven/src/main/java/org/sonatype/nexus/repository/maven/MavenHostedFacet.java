@@ -10,27 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal.policy;
+package org.sonatype.nexus.repository.maven;
+
+import javax.annotation.Nullable;
+
+import org.sonatype.nexus.repository.Facet;
 
 /**
- * Repository version policy.
+ * Maven hosted facet, present on all Maven hosted-type repositories.
  *
  * @since 3.0
  */
-public enum VersionPolicy
+@Facet.Exposed
+public interface MavenHostedFacet
+    extends Facet
 {
   /**
-   * Only release coordinates allowed.
+   * Rebuilds/updates Maven metadata.
+   *
+   * @param groupId     scope the work to given groupId.
+   * @param artifactId  scope the work to given artifactId (groupId must be given).
+   * @param baseVersion scope the work to given baseVersion (groupId and artifactId must be given).
    */
-  RELEASE,
-
-  /**
-   * Only snapshot coordinate allowed.
-   */
-  SNAPSHOT,
-
-  /**
-   * Both kind of coordinates allowed.
-   */
-  MIXED
+  void rebuildMetadata(@Nullable String groupId,
+                       @Nullable String artifactId,
+                       @Nullable String baseVersion);
 }

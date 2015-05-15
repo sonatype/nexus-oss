@@ -10,25 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal;
-
-import javax.annotation.Nonnull;
+package org.sonatype.nexus.repository.maven.policy;
 
 /**
- * Component representing Maven layout specific bits, like parsing request paths into {@link MavenPath}.
+ * Repository version policy.
  *
  * @since 3.0
  */
-public interface MavenPathParser
+public enum VersionPolicy
 {
   /**
-   * Parses path into {@link MavenPath}.
+   * Only release coordinates allowed.
    */
-  @Nonnull
-  MavenPath parsePath(String path);
+  RELEASE,
 
   /**
-   * Returns {@code true} if passed in path represent repository metadata path.
+   * Only snapshot coordinate allowed.
    */
-  boolean isRepositoryMetadata(MavenPath path);
+  SNAPSHOT,
+
+  /**
+   * Both kind of coordinates allowed.
+   */
+  MIXED
 }

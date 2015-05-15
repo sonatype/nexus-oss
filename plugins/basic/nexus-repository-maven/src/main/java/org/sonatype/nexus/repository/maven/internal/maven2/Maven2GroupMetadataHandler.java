@@ -21,7 +21,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.group.GroupHandler;
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.maven.internal.MavenPath;
+import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Response;
