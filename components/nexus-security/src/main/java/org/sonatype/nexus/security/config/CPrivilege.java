@@ -19,7 +19,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 
 /**
- * Base privilege class contains items common to all types of privileges.
+ * Persistent privilege.
  */
 public class CPrivilege
     implements Serializable, Cloneable

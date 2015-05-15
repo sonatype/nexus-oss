@@ -19,7 +19,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 
 /**
- * Defines the mapping between users and roles.
+ * Persistent user-role mapping.
  */
 public class CUserRoleMapping
     implements Serializable, Cloneable

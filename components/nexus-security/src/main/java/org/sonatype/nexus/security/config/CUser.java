@@ -17,7 +17,7 @@ import java.io.Serializable;
 import com.google.common.base.Throwables;
 
 /**
- * A User is a security object, where, based upon its role, will have certain privileged access to the system.
+ * Persistent user.
  */
 public class CUser
     implements Serializable, Cloneable

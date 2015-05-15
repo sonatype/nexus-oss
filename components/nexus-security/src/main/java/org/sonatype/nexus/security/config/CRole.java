@@ -19,7 +19,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 
 /**
- * A Role is a bucket for privileges, can also contain other roles.
+ * Persistent role.
  */
 public class CRole
     implements Serializable, Cloneable
