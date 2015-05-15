@@ -16,11 +16,11 @@ import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.maven.internal.MavenPath;
-import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
-import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
-import org.sonatype.nexus.repository.maven.internal.MavenPath.SignatureType;
-import org.sonatype.nexus.repository.maven.internal.MavenPathParser;
+import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.maven.MavenPath.Coordinates;
+import org.sonatype.nexus.repository.maven.MavenPath.HashType;
+import org.sonatype.nexus.repository.maven.MavenPath.SignatureType;
+import org.sonatype.nexus.repository.maven.MavenPathParser;
 
 /**
  * Maven 2 path parser.
@@ -96,6 +96,8 @@ public class Maven2MavenPathParser
       }
 
       String version = baseVersion;
+      Long timestamp = null;
+      Integer buildNumber = null;
       String tail;
       if (snapshot) {
         int vSnapshotStart = artifactId.length() + baseVersion.length() - 9 + 2;
@@ -106,23 +108,41 @@ public class Maven2MavenPathParser
           tail = str.substring(nTailPos);
         }
         else {
-          StringBuilder snapshotBuildNumber = new StringBuilder(version);
-          snapshotBuildNumber
-              .append(str.substring(vSnapshotStart + version.length(), vSnapshotStart + version.length() + 8));
+          final StringBuilder snapshotTimestampedVersion = new StringBuilder(version);
+          snapshotTimestampedVersion.append(
+              str.substring(vSnapshotStart + version.length(), vSnapshotStart + version.length() + 7)
+          );
 
-          int buildNumberCount = 0;
-          int buildNumberPos = vSnapshotStart + snapshotBuildNumber.length();
-          while (str.charAt(buildNumberPos) >= '0' && str.charAt(buildNumberPos) <= '9') {
-            snapshotBuildNumber.append(str.charAt(buildNumberPos));
-            buildNumberPos++;
-            buildNumberCount++;
+          try {
+            timestamp = Maven2Format.METADATA_DOTTED_TIMESTAMP.parseDateTime(
+                snapshotTimestampedVersion.toString()).getMillis();
           }
-          if (buildNumberCount == 0) {
+          catch (IllegalArgumentException e) {
+            // skip it
+          }
+
+          // add the dash between timestamp and buildNo
+          snapshotTimestampedVersion.append('-');
+
+          int buildNumberPos = vSnapshotStart + snapshotTimestampedVersion.length();
+          final StringBuilder bnr = new StringBuilder();
+          while (str.charAt(buildNumberPos) >= '0' && str.charAt(buildNumberPos) <= '9') {
+            snapshotTimestampedVersion.append(str.charAt(buildNumberPos));
+            bnr.append(str.charAt(buildNumberPos));
+            buildNumberPos++;
+          }
+          if (bnr.length() == 0) {
             return null;
           }
+          try {
+            buildNumber = Integer.parseInt(bnr.toString());
+          }
+          catch (NumberFormatException e) {
+            // skip it
+          }
           int n = baseVersion.length() > 8 ? baseVersion.length() - 8 : 0;
-          tail = str.substring(artifactId.length() + n + snapshotBuildNumber.length() + 1);
-          version = baseVersion.substring(0, baseVersion.length() - 8) + snapshotBuildNumber;
+          tail = str.substring(artifactId.length() + n + snapshotTimestampedVersion.length() + 1);
+          version = baseVersion.substring(0, baseVersion.length() - 8) + snapshotTimestampedVersion;
         }
       }
       else {
@@ -152,6 +172,8 @@ public class Maven2MavenPathParser
           groupId,
           artifactId,
           version,
+          timestamp,
+          buildNumber,
           baseVersion,
           classifier,
           ext + extSuffix,

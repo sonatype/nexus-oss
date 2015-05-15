@@ -19,6 +19,8 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.InvalidContentException;
+import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.maven.MavenPathParser;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;

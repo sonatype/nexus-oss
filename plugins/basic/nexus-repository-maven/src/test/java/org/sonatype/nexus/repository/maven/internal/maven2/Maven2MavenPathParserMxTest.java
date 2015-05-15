@@ -14,10 +14,10 @@ package org.sonatype.nexus.repository.maven.internal.maven2;
 
 import java.util.List;
 
-import org.sonatype.nexus.repository.maven.internal.MavenPath;
-import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
-import org.sonatype.nexus.repository.maven.internal.MavenPath.SignatureType;
-import org.sonatype.nexus.repository.maven.internal.MavenPathParser;
+import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.maven.MavenPath.HashType;
+import org.sonatype.nexus.repository.maven.MavenPath.SignatureType;
+import org.sonatype.nexus.repository.maven.MavenPathParser;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Lists;
