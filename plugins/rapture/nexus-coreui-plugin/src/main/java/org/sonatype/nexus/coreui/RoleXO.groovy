@@ -15,7 +15,6 @@ package org.sonatype.nexus.coreui
 import org.sonatype.nexus.security.privilege.PrivilegesExist
 import org.sonatype.nexus.security.role.RolesExist
 import org.sonatype.nexus.security.role.UniqueRoleId
-import org.sonatype.nexus.security.role.UniqueRoleName
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
 
@@ -39,7 +38,6 @@ class RoleXO
 
   String source
 
-  @UniqueRoleName(groups = [Create, Update])
   @NotEmpty
   String name
 
