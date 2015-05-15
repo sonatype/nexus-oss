@@ -14,6 +14,7 @@ package org.sonatype.nexus.coreui
 
 import javax.validation.constraints.NotNull
 
+import org.sonatype.nexus.security.user.UniqueUserId
 import org.sonatype.nexus.security.user.UserStatus
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
@@ -31,6 +32,7 @@ import org.hibernate.validator.constraints.NotEmpty
 @ToString(includePackage = false, includeNames = true)
 class UserXO
 {
+  @UniqueUserId(groups = Create)
   @NotBlank
   String userId
 
@@ -52,9 +54,10 @@ class UserXO
   @NotNull
   UserStatus status
 
-  @NotNull(groups = Create.class)
+  @NotBlank(groups = Create.class)
   String password
 
+  // @RolesExist
   @NotEmpty
   Set<String> roles
 

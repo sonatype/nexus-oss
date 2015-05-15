@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.coreui
 
+import org.sonatype.nexus.security.role.UniqueRoleId
+import org.sonatype.nexus.security.role.UniqueRoleName
+import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
 
 import groovy.transform.ToString
@@ -25,6 +28,7 @@ import org.hibernate.validator.constraints.NotEmpty
 @ToString(includePackage = false, includeNames = true)
 class RoleXO
 {
+  @UniqueRoleId(groups = Create)
   @NotEmpty
   String id
 
@@ -33,11 +37,18 @@ class RoleXO
 
   String source
 
+  @UniqueRoleName(groups = [Create, Update])
   @NotEmpty
   String name
 
   String description
+
   Boolean readOnly
+
+  // @PrivilegesExist
   Set<String> privileges
+
+  // @RolesExist
+  // @NonRecursiveRole
   Set<String> roles
 }

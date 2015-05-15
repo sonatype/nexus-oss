@@ -13,7 +13,7 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
-import org.hibernate.validator.constraints.NotEmpty
+import org.hibernate.validator.constraints.NotBlank
 
 /**
  * User role mappings exchange object.
@@ -23,11 +23,14 @@ import org.hibernate.validator.constraints.NotEmpty
 @ToString(includePackage = false, includeNames = true)
 class UserRoleMappingsXO
 {
-  @NotEmpty
+  // @UserExists
+  @NotBlank
   String userId
 
-  @NotEmpty
+  // @RealmExists
+  @NotBlank
   String realm
 
+  // @RolesExist
   Set<String> roles
 }
