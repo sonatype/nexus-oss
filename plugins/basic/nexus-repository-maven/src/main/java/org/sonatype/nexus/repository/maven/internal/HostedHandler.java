@@ -18,6 +18,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpResponses;
+import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
