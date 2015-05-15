@@ -147,7 +147,7 @@ public class SearchServiceImpl
     checkNotNull(repository);
     checkNotNull(identifier);
     checkNotNull(json);
-    log.debug("Adding to index document {} from {}", identifier, repository);
+    log.debug("Adding to index document {} from {}: {}", identifier, repository, json);
     Map<String, Object> additional = Maps.newHashMap();
     additional.put(P_REPOSITORY_NAME, repository.getName());
     client.get().prepareIndex(safeIndexName(repository), TYPE, identifier)

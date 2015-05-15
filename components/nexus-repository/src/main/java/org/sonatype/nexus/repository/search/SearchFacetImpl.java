@@ -21,6 +21,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.entity.EntityId;
+import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
@@ -38,6 +39,7 @@ import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
 /**
@@ -79,15 +81,15 @@ public class SearchFacetImpl
   /**
    * Indexes a component with given id.
    */
+  @Guarded(by = STARTED)
   protected void put(final EntityId componentId) {
     checkNotNull(componentId);
-    log.debug("Indexing metadata of component ID {} from {}", componentId, getRepository());
     try {
       Map<String, Object> additional = Maps.newHashMap();
       additional.put(P_REPOSITORY_NAME, getRepository().getName());
       Component component;
       List<Asset> assets;
-      try (StorageTx tx = getRepository().facet(StorageFacet.class).openTx()) {
+      try (StorageTx tx = facet(StorageFacet.class).openTx()) {
         component = tx.findComponent(componentId, tx.getBucket());
         if (component == null) {
           return;
@@ -105,6 +107,7 @@ public class SearchFacetImpl
   /**
    * Deindexes a component with given id.
    */
+  @Guarded(by = STARTED)
   protected void delete(final EntityId componentId) {
     searchService.delete(getRepository(), componentId.toString());
   }
