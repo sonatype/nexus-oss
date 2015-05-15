@@ -20,9 +20,7 @@ import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.security.role.RoleIdentifier;
 
 /**
- * Default implementation of a User.
- *
- * @author Brian Demers
+ * User.
  */
 public class User
     implements Comparable<User>
