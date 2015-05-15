@@ -28,8 +28,6 @@ import javax.validation.groups.Default;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
-import org.sonatype.nexus.common.entity.EntityHelper;
-import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
@@ -40,7 +38,6 @@ import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
-import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -276,8 +273,6 @@ public class MavenFacetImpl
     putAssetPayload(path, tx, asset, payload);
     tx.saveAsset(asset);
     tx.commit();
-
-    facet(SearchFacet.class).put(component);
   }
 
   private void putFile(final MavenPath path, final Payload payload, final StorageTx tx)
@@ -346,6 +341,7 @@ public class MavenFacetImpl
           result = deleteFile(path, tx) || result;
         }
       }
+      tx.commit();
     }
     return result;
   }
@@ -359,23 +355,10 @@ public class MavenFacetImpl
     if (asset == null) {
       return false;
     }
-
-    final EntityId entityId = EntityHelper.id(component);
-
     tx.deleteAsset(asset);
-    final boolean isEmpty = !tx.browseAssets(component).iterator().hasNext();
-    if (isEmpty) {
+    if (!tx.browseAssets(component).iterator().hasNext()) {
       tx.deleteComponent(component);
     }
-    tx.commit();
-
-    if (!isEmpty) {
-      facet(SearchFacet.class).put(component);
-    }
-    else {
-      facet(SearchFacet.class).delete(entityId);
-    }
-
     return true;
   }
 
@@ -385,7 +368,6 @@ public class MavenFacetImpl
       return false;
     }
     tx.deleteAsset(asset);
-    tx.commit();
     return true;
   }
 

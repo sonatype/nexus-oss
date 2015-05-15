@@ -38,7 +38,7 @@ public class Asset
   private BlobRef blobRef;
 
   /**
-   * Gets the component this asset is part of, or {@code null} if it's standalone.
+   * Gets the component's {@link EntityId} this asset is part of, or {@code null} if it's standalone.
    */
   @Nullable
   public EntityId componentId() {
@@ -46,7 +46,7 @@ public class Asset
   }
 
   /**
-   * Sets the component id.
+   * Sets the component id this asset is part of.
    */
   Asset componentId(final EntityId componentId) {
     this.componentId = componentId;

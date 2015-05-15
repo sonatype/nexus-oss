@@ -147,7 +147,7 @@ public class SearchServiceImpl
     checkNotNull(repository);
     checkNotNull(identifier);
     checkNotNull(json);
-    log.debug("Indexing document {} from {}", identifier, repository);
+    log.debug("Adding to index document {} from {}: {}", identifier, repository, json);
     Map<String, Object> additional = Maps.newHashMap();
     additional.put(P_REPOSITORY_NAME, repository.getName());
     client.get().prepareIndex(safeIndexName(repository), TYPE, identifier)
@@ -158,7 +158,7 @@ public class SearchServiceImpl
   public void delete(final Repository repository, final String identifier) {
     checkNotNull(repository);
     checkNotNull(identifier);
-    log.debug("Removing indexed metadata of {} from {}", identifier, repository);
+    log.debug("Removing from index document {} from {}", identifier, repository);
     client.get().prepareDelete(safeIndexName(repository), TYPE, identifier).execute();
   }
 

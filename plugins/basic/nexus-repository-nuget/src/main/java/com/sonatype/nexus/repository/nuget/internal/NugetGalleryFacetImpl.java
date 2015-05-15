@@ -32,8 +32,6 @@ import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
-import org.sonatype.nexus.common.entity.EntityHelper;
-import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.common.stateguard.Guarded;
@@ -44,13 +42,9 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
-import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
-import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
-import org.sonatype.nexus.repository.storage.ComponentDeletedEvent;
-import org.sonatype.nexus.repository.storage.ComponentUpdatedEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
@@ -230,7 +224,6 @@ public class NugetGalleryFacetImpl
       final Component component = createOrUpdatePackage(tx, metadata);
       maintainAggregateInfo(tx, metadata.get(ID));
       tx.commit();
-      getRepository().facet(SearchFacet.class).put(component);
     }
   }
 
@@ -323,17 +316,7 @@ public class NugetGalleryFacetImpl
       }
 
       componentId = recordMetadata.get(ID);
-
-      boolean isNew = component.isNew();  // must check before commit
       storageTx.commit();
-      getRepository().facet(SearchFacet.class).put(component);
-
-      if (isNew) {
-        getEventBus().post(new ComponentCreatedEvent(component, getRepository()));
-      }
-      else {
-        getEventBus().post(new ComponentUpdatedEvent(component, getRepository()));
-      }
     }
 
     if (componentId != null) {
@@ -391,13 +374,8 @@ public class NugetGalleryFacetImpl
       if (component == null) {
         return false;
       }
-      final EntityId entityId = EntityHelper.id(component);
       tx.deleteComponent(component);
       tx.commit();
-
-      facet(SearchFacet.class).delete(entityId);
-
-      getEventBus().post(new ComponentDeletedEvent(component, getRepository()));
       return true;
     }
   }

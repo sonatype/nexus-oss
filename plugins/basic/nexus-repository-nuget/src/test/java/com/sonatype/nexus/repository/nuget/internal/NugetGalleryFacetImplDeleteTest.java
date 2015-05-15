@@ -19,8 +19,6 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
-import org.sonatype.nexus.repository.storage.ComponentDeletedEvent;
-import org.sonatype.nexus.repository.storage.ComponentEvent;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -85,11 +83,5 @@ public class NugetGalleryFacetImplDeleteTest
 
     // Verify that everything got deleted
     verify(tx).deleteComponent(component);
-    ArgumentCaptor<ComponentEvent> o = ArgumentCaptor.forClass(ComponentEvent.class);
-    verify(eventBus, times(1)).post(o.capture());
-    ComponentEvent actual = o.getValue();
-    assertThat(actual, instanceOf(ComponentDeletedEvent.class));
-    assertThat(actual.getComponent(), is(component));
-    assertThat(actual.getRepository(), is(repository));
   }
 }
