@@ -13,6 +13,8 @@
 package com.sonatype.nexus.repository.nuget.internal;
 
 import org.sonatype.nexus.blobstore.api.BlobRef;
+import org.sonatype.nexus.common.entity.EntityId;
+import org.sonatype.nexus.common.entity.EntityMetadata;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
@@ -70,11 +72,14 @@ public class NugetGalleryFacetImplDeleteTest
     final Component component = mock(Component.class);
     final Asset asset = mock(Asset.class);
     final BlobRef blobRef = mock(BlobRef.class); //new BlobRef("local", "default", "a34af31");
+    final EntityMetadata metadata = mock(EntityMetadata.class);
 
     // Wire the mocks together: component has asset, asset has blobRef
     doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
     when(tx.browseAssets(component)).thenReturn(asList(asset));
     when(asset.blobRef()).thenReturn(blobRef);
+    when(component.getEntityMetadata()).thenReturn(metadata);
+    when(metadata.getId()).thenReturn(mock(EntityId.class));
 
     galleryFacet.delete(packageId, version);
 

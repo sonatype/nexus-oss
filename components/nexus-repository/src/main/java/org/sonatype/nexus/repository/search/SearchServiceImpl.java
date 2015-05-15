@@ -29,16 +29,11 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.security.BreadActions;
 import org.sonatype.nexus.repository.security.RepositoryViewPermission;
-import org.sonatype.nexus.repository.storage.Asset;
-import org.sonatype.nexus.repository.storage.Component;
-import org.sonatype.nexus.repository.storage.StorageFacet;
-import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.security.SecurityHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -58,11 +53,11 @@ import org.elasticsearch.search.internal.InternalSearchResponse;
 import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
 /**
- * Default {@link SearchService} implementation.
+ * Default {@link SearchService} implementation. It does not expects that {@link Repository} have storage facet
+ * attached.
  *
  * @since 3.0
  */
@@ -87,20 +82,16 @@ public class SearchServiceImpl
 
   private final List<IndexSettingsContributor> indexSettingsContributors;
 
-  private final Map<String, ComponentMetadataProducer> componentMetadataProducers;
-
   @Inject
   public SearchServiceImpl(final Provider<Client> client,
                            final RepositoryManager repositoryManager,
                            final SecurityHelper securityHelper,
-                           final List<IndexSettingsContributor> indexSettingsContributors,
-                           final Map<String, ComponentMetadataProducer> componentMetadataProducers)
+                           final List<IndexSettingsContributor> indexSettingsContributors)
   {
     this.client = checkNotNull(client);
     this.repositoryManager = checkNotNull(repositoryManager);
     this.securityHelper = checkNotNull(securityHelper);
     this.indexSettingsContributors = checkNotNull(indexSettingsContributors);
-    this.componentMetadataProducers = checkNotNull(componentMetadataProducers);
   }
 
   @Override
@@ -152,24 +143,15 @@ public class SearchServiceImpl
   }
 
   @Override
-  public void put(final Repository repository, final Component component, final String identifier) {
+  public void put(final Repository repository, final String identifier, final String json) {
     checkNotNull(repository);
-    checkNotNull(component);
-    log.debug("Indexing metadata of {} from {}", component, repository);
-    try {
-      Map<String, Object> additional = Maps.newHashMap();
-      additional.put(P_REPOSITORY_NAME, repository.getName());
-      List<Asset> assets;
-      try (StorageTx tx = repository.facet(StorageFacet.class).openTx()) {
-        assets = Lists.newArrayList(tx.browseAssets(component));
-      }
-      String json = JsonUtils.merge(componentMetadata(component, assets), JsonUtils.from(additional));
-      client.get().prepareIndex(safeIndexName(repository), TYPE, identifier)
-          .setSource(json).execute();
-    }
-    catch (IOException e) {
-      throw Throwables.propagate(e);
-    }
+    checkNotNull(identifier);
+    checkNotNull(json);
+    log.debug("Indexing document {} from {}", identifier, repository);
+    Map<String, Object> additional = Maps.newHashMap();
+    additional.put(P_REPOSITORY_NAME, repository.getName());
+    client.get().prepareIndex(safeIndexName(repository), TYPE, identifier)
+        .setSource(json).execute();
   }
 
   @Override
@@ -300,23 +282,6 @@ public class SearchServiceImpl
     }
     return indexes.toArray(new String[indexes.size()]);
   }
-
-  /**
-   * Creates component metadata to be indexed out of a component using {@link ComponentMetadataProducer} specific to
-   * component {@link Format}.
-   * If one is not available will use a default one ({@link DefaultComponentMetadataProducer}).
-   */
-  private String componentMetadata(final Component component, final Iterable<Asset> assets) {
-    checkNotNull(component);
-    String format = component.format();
-    ComponentMetadataProducer producer = componentMetadataProducers.get(format);
-    if (producer == null) {
-      producer = componentMetadataProducers.get("default");
-    }
-    checkState(producer != null, "Could not find a component metadata producer for format: {}", format);
-    return producer.getMetadata(component, assets);
-  }
-
 
   /**
    * Sanitize repository name in a consistent fashion to ensure that the name used for an index is safe.
