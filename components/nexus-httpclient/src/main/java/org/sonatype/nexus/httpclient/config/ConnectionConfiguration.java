@@ -29,7 +29,7 @@ public class ConnectionConfiguration
   private Integer maximumRetries;
 
   @Nullable
-  private String userAgentCustomisation;
+  private String userAgentSuffix;
 
   // TODO: query-string
 
@@ -55,11 +55,9 @@ public class ConnectionConfiguration
   }
 
   @Nullable
-  public String getUserAgentCustomisation() { return userAgentCustomisation; }
+  public String getUserAgentSuffix() { return userAgentSuffix; }
 
-  public void setUserAgentCustomisation(@Nullable final String userAgentCustomisation) {
-    this.userAgentCustomisation = userAgentCustomisation;
-  }
+  public void setUserAgentSuffix(@Nullable final String userAgentSuffix) { this.userAgentSuffix = userAgentSuffix; }
 
   @Nullable
   public Boolean getUseTrustStore() { return useTrustStore; }
@@ -71,7 +69,7 @@ public class ConnectionConfiguration
     return getClass().getSimpleName() + "{" +
         "timeout=" + timeout +
         ", maximumRetries=" + maximumRetries +
-        ", userAgentCustomisation=" + userAgentCustomisation +
+        ", userAgentSuffix=" + userAgentSuffix +
         ", useTrustStore=" + useTrustStore +
         '}';
   }

@@ -89,10 +89,10 @@ public class ConfigurationCustomizer
       plan.getClient().setRetryHandler(new StandardHttpRequestRetryHandler(connection.getMaximumRetries(), false));
     }
 
-    if (connection.getUserAgentCustomisation() != null) {
+    if (connection.getUserAgentSuffix() != null) {
       // append UA customisation to one stored as attribute by DefaultsCustomizer
       plan.getHeaders().put(HttpHeaders.USER_AGENT,
-          plan.getAttributes().get(HttpHeaders.USER_AGENT) + " " + connection.getUserAgentCustomisation()
+          plan.getAttributes().get(HttpHeaders.USER_AGENT) + " " + connection.getUserAgentSuffix()
       );
     }
 

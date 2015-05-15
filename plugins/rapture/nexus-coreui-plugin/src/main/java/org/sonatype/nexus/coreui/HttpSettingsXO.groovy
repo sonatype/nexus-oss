@@ -25,7 +25,7 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class HttpSettingsXO
 {
-  String userAgentCustomisation
+  String userAgentSuffix
   String urlParameters
 
   /**

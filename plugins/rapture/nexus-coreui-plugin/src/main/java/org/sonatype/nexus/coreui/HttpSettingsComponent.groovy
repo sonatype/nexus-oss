@@ -71,7 +71,7 @@ class HttpSettingsComponent
     HttpSettingsXO result = new HttpSettingsXO()
 
     value.connection?.with {
-      result.userAgentCustomisation = userAgentCustomisation
+      result.userAgentSuffix = userAgentSuffix
       result.timeout = timeout
       result.retries = maximumRetries
     }
@@ -152,8 +152,8 @@ class HttpSettingsComponent
       return result.connection
     }
 
-    if (!Strings2.isBlank(value.userAgentCustomisation)) {
-      connection().userAgentCustomisation = value.userAgentCustomisation
+    if (!Strings2.isBlank(value.userAgentSuffix)) {
+      connection().userAgentSuffix = value.userAgentSuffix
     }
 
     if (value.timeout != null) {
