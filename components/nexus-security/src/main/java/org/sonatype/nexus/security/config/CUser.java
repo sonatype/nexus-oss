@@ -14,6 +14,8 @@ package org.sonatype.nexus.security.config;
 
 import java.io.Serializable;
 
+import com.google.common.base.Throwables;
+
 /**
  * A User is a security object, where, based upon its role, will have certain privileged access to the system.
  */
@@ -40,13 +42,10 @@ public class CUser
 
   public CUser clone() {
     try {
-      CUser copy = (CUser) super.clone();
-
-      return copy;
+      return (CUser) super.clone();
     }
-    catch (Exception ex) {
-      throw (RuntimeException) new UnsupportedOperationException(getClass().getName() + " does not support clone()")
-          .initCause(ex);
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
     }
   }
 

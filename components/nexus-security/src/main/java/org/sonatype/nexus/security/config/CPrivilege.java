@@ -15,6 +15,7 @@ package org.sonatype.nexus.security.config;
 import java.io.Serializable;
 import java.util.Map;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 
 /**
@@ -51,9 +52,8 @@ public class CPrivilege
 
       return copy;
     }
-    catch (Exception ex) {
-      throw (RuntimeException) new UnsupportedOperationException(getClass().getName() + " does not support clone()")
-          .initCause(ex);
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
     }
   }
 
