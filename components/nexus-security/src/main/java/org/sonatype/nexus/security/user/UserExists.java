@@ -25,7 +25,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Validate user existance.
+ * Validate user existence.
  *
  * @since 3.0
  */

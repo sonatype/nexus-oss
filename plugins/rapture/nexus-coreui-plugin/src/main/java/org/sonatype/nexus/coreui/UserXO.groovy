@@ -58,11 +58,12 @@ class UserXO
   @NotBlank(groups = Create.class)
   String password
 
-  @RolesExist
+  @RolesExist(groups = [Create, Update])
   @NotEmpty
   Set<String> roles
 
   Boolean external
 
+  // FIXME: Sort out what this is used for
   Set<String> externalRoles
 }

@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
+import org.sonatype.nexus.security.privilege.PrivilegesExist
 import org.sonatype.nexus.security.role.RolesExist
 import org.sonatype.nexus.security.role.UniqueRoleId
 import org.sonatype.nexus.security.role.UniqueRoleName
@@ -46,10 +47,10 @@ class RoleXO
 
   Boolean readOnly
 
-  // @PrivilegesExist
+  @PrivilegesExist(groups = [Create, Update])
   Set<String> privileges
 
-  @RolesExist
+  @RolesExist(groups = [Create, Update])
   // @NonRecursiveRole
   Set<String> roles
 }

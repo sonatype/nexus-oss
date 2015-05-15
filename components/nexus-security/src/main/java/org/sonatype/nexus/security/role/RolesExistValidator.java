@@ -51,12 +51,12 @@ public class RolesExistValidator
   @Override
   public boolean isValid(final Collection<?> value, final ConstraintValidatorContext context) {
     log.trace("Validating roles exist: {}", value);
-
     Set<String> ids = new HashSet<>();
     // TODO: sort out if we should limit to DEFAULT_SOURCE?
     for (Role role : securitySystem.listRoles()) {
       ids.add(role.getRoleId());
     }
+    // TODO: Can we inform which were missing?
     return ids.containsAll(value);
   }
 }
