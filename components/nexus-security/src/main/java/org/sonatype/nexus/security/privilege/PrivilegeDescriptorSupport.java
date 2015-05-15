@@ -25,8 +25,6 @@ import com.google.common.collect.Lists;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-// NOTE: Not using existing AbstractPrivilegeDescriptor to investigate divorcing from legacy
-
 /**
  * Support for {@link PrivilegeDescriptor} implementations.
  *
