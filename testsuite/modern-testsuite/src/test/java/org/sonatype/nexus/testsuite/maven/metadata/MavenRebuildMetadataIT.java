@@ -36,7 +36,7 @@ import static org.hamcrest.Matchers.hasSize;
  * Metadata rebuild IT.
  */
 @ExamReactorStrategy(PerClass.class)
-public class RebuildMetadataIT
+public class MavenRebuildMetadataIT
     extends MavenITSupport
 {
   @Inject
