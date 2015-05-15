@@ -64,6 +64,8 @@ public class ValidationModule
           .traversableResolver(new AlwaysTraversableResolver()) // disable JPA reachability
           .buildValidatorFactory();
 
+      // FIXME: Install custom MessageInterpolator that can properly find/merge ValidationMessages.properties for bundles
+
       // exercise interpolator to preload elements (avoids issues later when TCCL might be different)
       factory.getValidator().validate(new Object()
       {
