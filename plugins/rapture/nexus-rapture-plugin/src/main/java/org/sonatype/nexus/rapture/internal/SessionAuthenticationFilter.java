@@ -66,12 +66,12 @@ public class SessionAuthenticationFilter
   protected boolean onAccessDenied(final ServletRequest request, final ServletResponse response) throws Exception {
     boolean authenticated = false;
     if (isLoginRequest(request, response)) {
-      log.info("Attempting authentication");
+      log.trace("Attempting authentication");
       authenticated = executeLogin(request, response);
     }
 
     if (!authenticated) {
-      log.info("Access denied");
+      log.trace("Access denied");
       denied(response);
     }
 
@@ -114,7 +114,7 @@ public class SessionAuthenticationFilter
                                    final ServletResponse response)
       throws Exception
   {
-    log.info("Success: token={}, subject={}", token, subject);
+    log.debug("Success: token={}, subject={}", token, subject);
     return true;
   }
 
@@ -124,7 +124,7 @@ public class SessionAuthenticationFilter
                                    final ServletRequest request,
                                    final ServletResponse response)
   {
-    log.info("Failure: token={}", token, e);
+    log.debug("Failure: token={}", token, e);
     denied(response);
     return false;
   }
