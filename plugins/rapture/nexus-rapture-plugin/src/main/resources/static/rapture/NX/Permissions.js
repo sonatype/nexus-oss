@@ -69,18 +69,62 @@ Ext.define('NX.Permissions', {
    */
   check: function(name, perm) {
     var me = this,
+        expectedPermission = name + ':' + perm,
         hasPermission = false;
 
     if (!me.available()) {
       return false;
     }
 
-    hasPermission = me.permissions[name + ':' + perm] === true;
-    if (!hasPermission) {
-      hasPermission = me.permissions[name + ':*'] === true;
+    if (me.permissions[expectedPermission] === true) {
+      return true;
     }
 
+    Ext.Object.each(me.permissions, function(permission, given) {
+      if (given && me.implies(permission, expectedPermission)) {
+        hasPermission = true;
+        return false;
+      }
+      return true;
+    });
+
     return hasPermission;
+  },
+
+  /**
+   * @private
+   *
+   * Returns true if permission 1 implies permission 2 using logic similar to Shiro wildcard permission.
+   */
+  implies: function(permission1, permission2){
+    var parts1 = permission1.split(':'),
+        parts2 = permission2.split(':'),
+        part1, part2, i;
+
+    for (i = 0; i < parts2.length; i++) {
+      // If this permission has less parts than the other permission, everything after the number of parts contained
+      // in this permission is automatically implied, so return true
+      if (parts1.length - 1 < i) {
+        return true;
+      }
+      else {
+        part1 = parts1[i];
+        part2 = parts2[i];
+        if (part1.indexOf('*') === -1 && part1 !== part2) {
+          return false;
+        }
+      }
+    }
+
+    // If this permission has more parts than the other parts, only imply it if all of the other parts are wildcards
+    for (; i < parts1.length; i++) {
+      part1 = parts1[i];
+      if (part1.indexOf('*') === -1) {
+        return false;
+      }
+    }
+
+    return true;
   },
 
   /**
