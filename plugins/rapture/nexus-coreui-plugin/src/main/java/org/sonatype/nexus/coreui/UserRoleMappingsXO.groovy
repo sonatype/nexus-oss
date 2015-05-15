@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
+import org.sonatype.nexus.security.realm.RealmExists
 import org.sonatype.nexus.security.role.RolesExist
 import org.sonatype.nexus.security.user.UserExists
 import org.sonatype.nexus.validation.group.Create
@@ -28,11 +29,11 @@ import org.hibernate.validator.constraints.NotBlank
 @ToString(includePackage = false, includeNames = true)
 class UserRoleMappingsXO
 {
-  @UserExists
+  @UserExists(groups = Create)
   @NotBlank
   String userId
 
-  // @RealmExists
+  @RealmExists(groups = Create)
   @NotBlank
   String realm
 
