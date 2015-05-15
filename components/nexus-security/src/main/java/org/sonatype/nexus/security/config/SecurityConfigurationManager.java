@@ -32,20 +32,14 @@ import org.sonatype.nexus.security.user.UserNotFoundException;
  */
 public interface SecurityConfigurationManager
 {
+  //
+  // Users
+  //
+
   /**
    * Retrieve all users
    */
   List<CUser> listUsers();
-
-  /**
-   * Retrieve all roles
-   */
-  List<CRole> listRoles();
-
-  /**
-   * Retrieve all privileges
-   */
-  List<CPrivilege> listPrivileges();
 
   /**
    * Create a new user.
@@ -58,29 +52,9 @@ public interface SecurityConfigurationManager
   void createUser(CUser user, String password, Set<String> roles);
 
   /**
-   * Create a new role
-   */
-  void createRole(CRole role);
-
-  /**
-   * Create a new privilege
-   */
-  void createPrivilege(CPrivilege privilege);
-
-  /**
    * Retrieve an existing user
    */
   CUser readUser(String id) throws UserNotFoundException;
-
-  /**
-   * Retrieve an existing role
-   */
-  CRole readRole(String id) throws NoSuchRoleException;
-
-  /**
-   * Retrieve an existing privilege
-   */
-  CPrivilege readPrivilege(String id) throws NoSuchPrivilegeException;
 
   /**
    * Update an existing user. Roles are unchanged
@@ -95,9 +69,75 @@ public interface SecurityConfigurationManager
   void updateUser(CUser user, Set<String> roles) throws UserNotFoundException;
 
   /**
+   * Delete an existing user
+   */
+  void deleteUser(String id) throws UserNotFoundException;
+
+  //
+  // Roles
+  //
+
+  /**
+   * Retrieve all roles
+   */
+  List<CRole> listRoles();
+
+  /**
+   * Create a new role
+   */
+  void createRole(CRole role);
+
+  /**
+   * Retrieve an existing role
+   */
+  CRole readRole(String id) throws NoSuchRoleException;
+
+  /**
    * Update an existing role
    */
   void updateRole(CRole role) throws NoSuchRoleException;
+
+  /**
+   * Delete an existing role
+   */
+  void deleteRole(String id) throws NoSuchRoleException;
+
+  void cleanRemovedRole(String roleId);
+
+  //
+  // Privileges
+  //
+
+  /**
+   * Retrieve all privileges
+   */
+  List<CPrivilege> listPrivileges();
+
+  /**
+   * Create a new privilege
+   */
+  void createPrivilege(CPrivilege privilege);
+
+  /**
+   * Retrieve an existing privilege
+   */
+  CPrivilege readPrivilege(String id) throws NoSuchPrivilegeException;
+
+  /**
+   * Update an existing privilege
+   */
+  void updatePrivilege(CPrivilege privilege) throws NoSuchPrivilegeException;
+
+  /**
+   * Delete an existing privilege
+   */
+  void deletePrivilege(String id) throws NoSuchPrivilegeException;
+
+  void cleanRemovedPrivilege(String privilegeId);
+
+  //
+  // User-role mapping
+  //
 
   void createUserRoleMapping(CUserRoleMapping userRoleMapping);
 
@@ -108,28 +148,4 @@ public interface SecurityConfigurationManager
   List<CUserRoleMapping> listUserRoleMappings();
 
   void deleteUserRoleMapping(String userId, String source) throws NoSuchRoleMappingException;
-
-  /**
-   * Update an existing privilege
-   */
-  void updatePrivilege(CPrivilege privilege) throws NoSuchPrivilegeException;
-
-  /**
-   * Delete an existing user
-   */
-  void deleteUser(String id) throws UserNotFoundException;
-
-  /**
-   * Delete an existing role
-   */
-  void deleteRole(String id) throws NoSuchRoleException;
-
-  /**
-   * Delete an existing privilege
-   */
-  void deletePrivilege(String id) throws NoSuchPrivilegeException;
-
-  void cleanRemovedRole(String roleId);
-
-  void cleanRemovedPrivilege(String privilegeId);
 }
