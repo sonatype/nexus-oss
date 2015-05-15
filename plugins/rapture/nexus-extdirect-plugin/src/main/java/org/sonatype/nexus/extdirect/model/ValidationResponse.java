@@ -45,7 +45,7 @@ public class ValidationResponse
 
   public ValidationResponse(final ValidationResponseException cause) {
     super(false, Lists.newArrayList());
-    checkNotNull(cause, "cause may not be null");
+    checkNotNull(cause);
     if (cause.getErrors().isEmpty()) {
       messages = Lists.newArrayList();
       messages.add(cause.getMessage());
@@ -62,7 +62,7 @@ public class ValidationResponse
 
   public ValidationResponse(final ConstraintViolationException cause) {
     super(false, Lists.newArrayList());
-    checkNotNull(cause, "cause may not be null");
+    checkNotNull(cause);
     Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
     if (violations != null && violations.size() > 0) {
       for (ConstraintViolation<?> violation : violations) {
