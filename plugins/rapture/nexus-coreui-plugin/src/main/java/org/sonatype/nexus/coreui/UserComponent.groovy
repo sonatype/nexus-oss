@@ -46,6 +46,8 @@ import org.apache.shiro.subject.Subject
 import org.eclipse.sisu.inject.BeanLocator
 import org.hibernate.validator.constraints.NotEmpty
 
+import static org.sonatype.nexus.security.user.UserManager.DEFAULT_SOURCE
+
 /**
  * User {@link DirectComponent}.
  *
@@ -57,8 +59,6 @@ import org.hibernate.validator.constraints.NotEmpty
 class UserComponent
     extends DirectComponentSupport
 {
-  public static final String DEFAULT_SOURCE = UserManager.DEFAULT_SOURCE
-
   @Inject
   SecuritySystem securitySystem
 
@@ -77,14 +77,14 @@ class UserComponent
    */
   @DirectMethod
   @RequiresPermissions('nexus:users:read')
-  List<UserXO> read(final @Nullable StoreLoadParameters parameters) {
+  List<UserXO> read(@Nullable final StoreLoadParameters parameters) {
     def source = parameters?.getFilter('source')
     if (!source) {
       source = DEFAULT_SOURCE
     }
     def userId = parameters?.getFilter('userId')
     securitySystem.searchUsers(new UserSearchCriteria(source: source, userId: userId)).collect { user ->
-      asUserXO(user)
+      convert(user)
     }
   }
 
@@ -128,7 +128,7 @@ class UserComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:users:create')
   @Validate(groups = [Create.class, Default.class])
-  UserXO create(final @NotNull @Valid UserXO userXO) {
+  UserXO create(@NotNull @Valid final UserXO userXO) {
     def user = new User(
         userId: userXO.userId,
         source: DEFAULT_SOURCE,
@@ -140,7 +140,7 @@ class UserComponent
           new RoleIdentifier(DEFAULT_SOURCE, id)
         }
     )
-    asUserXO(securitySystem.addUser(user, userXO.password))
+    convert(securitySystem.addUser(user, userXO.password))
   }
 
   /**
@@ -152,8 +152,8 @@ class UserComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:users:update')
   @Validate(groups = [Update.class, Default.class])
-  UserXO update(final @NotNull @Valid UserXO userXO) {
-    asUserXO(securitySystem.updateUser(new User(
+  UserXO update(@NotNull @Valid final UserXO userXO) {
+    convert(securitySystem.updateUser(new User(
         userId: userXO.userId,
         version: userXO.version,
         source: DEFAULT_SOURCE,
@@ -176,7 +176,7 @@ class UserComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:users:update')
   @Validate(groups = [Update.class, Default.class])
-  UserXO updateRoleMappings(final @NotNull @Valid UserRoleMappingsXO userRoleMappingsXO) {
+  UserXO updateRoleMappings(@NotNull @Valid final UserRoleMappingsXO userRoleMappingsXO) {
     def mappedRoles = userRoleMappingsXO.roles
     if (mappedRoles?.size()) {
       User user = securitySystem.getUser(userRoleMappingsXO.userId, userRoleMappingsXO.realm)
@@ -193,7 +193,7 @@ class UserComponent
             ? mappedRoles?.collect {roleId -> new RoleIdentifier(DEFAULT_SOURCE, roleId)} as Set
             : null
     )
-    return asUserXO(securitySystem.getUser(userRoleMappingsXO.userId, userRoleMappingsXO.realm))
+    return convert(securitySystem.getUser(userRoleMappingsXO.userId, userRoleMappingsXO.realm))
   }
 
   /**
@@ -205,7 +205,7 @@ class UserComponent
   @RequiresUser
   @RequiresAuthentication
   @Validate
-  UserAccountXO updateAccount(final @NotNull @Valid UserAccountXO userAccountXO) {
+  UserAccountXO updateAccount(@NotNull @Valid final UserAccountXO userAccountXO) {
     User user = securitySystem.currentUser().with {
       firstName = userAccountXO.firstName
       lastName = userAccountXO.lastName
@@ -227,9 +227,9 @@ class UserComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:userschangepw:create')
   @Validate
-  void changePassword(final @NotEmpty String authToken,
-                      final @NotEmpty String userId,
-                      final @NotEmpty String password)
+  void changePassword(@NotEmpty final String authToken,
+                      @NotEmpty final String userId,
+                      @NotEmpty final String password)
   {
     if (authTickets.redeemTicket(authToken)) {
       if (isAnonymousUser(userId)) {
@@ -251,7 +251,7 @@ class UserComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:users:delete')
   @Validate
-  void remove(final @NotEmpty String id, final @NotEmpty String source) {
+  void remove(@NotEmpty final String id, @NotEmpty final String source) {
     // TODO check if source is required or we always delete from default realm
     if (isAnonymousUser(id)) {
       throw new Exception("User ${id} cannot be deleted, since is marked as the Anonymous user")
@@ -262,8 +262,11 @@ class UserComponent
     securitySystem.deleteUser(id, source)
   }
 
+  /**
+   * Convert user to XO.
+   */
   @PackageScope
-  UserXO asUserXO(final User user) {
+  UserXO convert(final User user) {
     UserXO userXO = new UserXO(
         userId: user.userId,
         version: user.version,

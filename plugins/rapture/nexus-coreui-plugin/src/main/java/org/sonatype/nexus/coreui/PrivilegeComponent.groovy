@@ -21,7 +21,6 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.security.SecuritySystem
 import org.sonatype.nexus.security.authz.AuthorizationManager
 import org.sonatype.nexus.security.privilege.Privilege
-import org.sonatype.nexus.security.user.UserManager
 import org.sonatype.nexus.validation.Validate
 
 import com.google.common.collect.Maps
@@ -31,6 +30,8 @@ import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
+
+import static org.sonatype.nexus.security.user.UserManager.DEFAULT_SOURCE
 
 /**
  * Privilege {@link DirectComponent}.
@@ -67,7 +68,7 @@ class PrivilegeComponent
   @RequiresPermissions('nexus:privileges:delete')
   @Validate
   void remove(@NotEmpty final String id) {
-    AuthorizationManager authorizationManager = securitySystem.getAuthorizationManager(UserManager.DEFAULT_SOURCE)
+    AuthorizationManager authorizationManager = securitySystem.getAuthorizationManager(DEFAULT_SOURCE)
     if (authorizationManager.getPrivilege(id)?.readOnly) {
       throw new IllegalAccessException("Privilege [${id}] is readonly and cannot be deleted")
     }

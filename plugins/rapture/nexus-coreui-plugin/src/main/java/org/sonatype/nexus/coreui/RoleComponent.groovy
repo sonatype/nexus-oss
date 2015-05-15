@@ -24,7 +24,6 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.security.SecuritySystem
 import org.sonatype.nexus.security.authz.AuthorizationManager
 import org.sonatype.nexus.security.role.Role
-import org.sonatype.nexus.security.user.UserManager
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
@@ -35,6 +34,8 @@ import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
+
+import static org.sonatype.nexus.security.user.UserManager.DEFAULT_SOURCE
 
 /**
  * Role {@link DirectComponent}.
@@ -47,8 +48,6 @@ import org.hibernate.validator.constraints.NotEmpty
 class RoleComponent
     extends DirectComponentSupport
 {
-  public static final String DEFAULT_SOURCE = UserManager.DEFAULT_SOURCE
-
   @Inject
   SecuritySystem securitySystem
 
@@ -106,7 +105,7 @@ class RoleComponent
   @DirectMethod
   @RequiresPermissions('nexus:roles:read')
   @Validate
-  List<RoleXO> readFromSource(final @NotEmpty String source) {
+  List<RoleXO> readFromSource(@NotEmpty final String source) {
     return securitySystem.listRoles(source).collect {input ->
       return convert(input)
     }
@@ -121,7 +120,7 @@ class RoleComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:roles:create')
   @Validate(groups = [Create.class, Default.class])
-  RoleXO create(final @NotNull @Valid RoleXO roleXO) {
+  RoleXO create(@NotNull @Valid final RoleXO roleXO) {
     return convert(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).addRole(
         new Role(
             roleId: roleXO.id,
@@ -144,7 +143,7 @@ class RoleComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:roles:update')
   @Validate(groups = [Update.class, Default.class])
-  RoleXO update(final @NotNull @Valid RoleXO roleXO) {
+  RoleXO update(@NotNull @Valid final RoleXO roleXO) {
     return convert(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).updateRole(
         new Role(
             roleId: roleXO.id,
@@ -167,10 +166,13 @@ class RoleComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:roles:delete')
   @Validate
-  void remove(final @NotEmpty String id) {
+  void remove(@NotEmpty final String id) {
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deleteRole(id)
   }
 
+  /**
+   * Convert role to XO.
+   */
   @PackageScope
   RoleXO convert(final Role input) {
     return new RoleXO(
