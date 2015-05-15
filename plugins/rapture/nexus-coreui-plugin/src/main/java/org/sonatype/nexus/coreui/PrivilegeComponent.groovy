@@ -21,7 +21,6 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.security.SecuritySystem
 import org.sonatype.nexus.security.authz.AuthorizationManager
 import org.sonatype.nexus.security.privilege.Privilege
-import org.sonatype.nexus.security.privilege.PrivilegeDescriptor
 import org.sonatype.nexus.security.user.UserManager
 import org.sonatype.nexus.validation.Validate
 
@@ -46,9 +45,6 @@ class PrivilegeComponent
 {
   @Inject
   SecuritySystem securitySystem
-
-  @Inject
-  List<PrivilegeDescriptor> privilegeDescriptors
 
   /**
    * Retrieves privileges.
