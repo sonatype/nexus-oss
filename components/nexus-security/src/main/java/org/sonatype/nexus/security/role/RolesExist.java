@@ -25,7 +25,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Validate roles exist.
+ * Validate roles existance.
  *
  * @since 3.0
  */

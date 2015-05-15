@@ -13,6 +13,7 @@
 package org.sonatype.nexus.coreui
 
 import org.sonatype.nexus.security.role.RolesExist
+import org.sonatype.nexus.security.user.UserExists
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotBlank
@@ -25,7 +26,7 @@ import org.hibernate.validator.constraints.NotBlank
 @ToString(includePackage = false, includeNames = true)
 class UserRoleMappingsXO
 {
-  // @UserExists
+  @UserExists
   @NotBlank
   String userId
 
