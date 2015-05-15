@@ -32,6 +32,8 @@ import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.common.entity.EntityHelper;
+import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.common.stateguard.Guarded;
@@ -43,7 +45,6 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.search.SearchFacet;
-import org.sonatype.nexus.repository.search.SearchItemId;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -390,11 +391,11 @@ public class NugetGalleryFacetImpl
       if (component == null) {
         return false;
       }
-      final SearchItemId searchId = facet(SearchFacet.class).identifier(component);
+      final EntityId entityId = EntityHelper.id(component);
       tx.deleteComponent(component);
       tx.commit();
 
-      facet(SearchFacet.class).delete(searchId);
+      facet(SearchFacet.class).delete(entityId);
 
       getEventBus().post(new ComponentDeletedEvent(component, getRepository()));
       return true;

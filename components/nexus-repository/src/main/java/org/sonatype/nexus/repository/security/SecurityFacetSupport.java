@@ -76,6 +76,7 @@ public class SecurityFacetSupport
         return BreadActions.READ;
 
       case HttpMethods.POST:
+      case HttpMethods.MKCOL:
         return BreadActions.ADD;
 
       case HttpMethods.PUT:

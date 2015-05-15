@@ -30,10 +30,11 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.LdapName;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.ldap.internal.connector.dao.password.PasswordEncoderManager;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.codehaus.plexus.util.StringUtils;
+import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -66,7 +67,7 @@ public class DefaultLdapUserDAO
     log.info("Remove user: " + username);
 
     try {
-      context = (LdapContext) context.lookup(StringUtils.defaultString(configuration.getUserBaseDn(), ""));
+      context = (LdapContext) context.lookup(Strings.nullToEmpty(configuration.getUserBaseDn()));
 
       context.destroySubcontext(configuration.getUserIdAttribute() + "=" + username);
     }
@@ -84,7 +85,7 @@ public class DefaultLdapUserDAO
     LdapUser inLdap = getUser(user.getUsername(), context, configuration);
 
     String userIdAttribute = configuration.getUserIdAttribute();
-    String userBaseDn = StringUtils.defaultString(configuration.getUserBaseDn(), "");
+    String userBaseDn = Strings.nullToEmpty(configuration.getUserBaseDn());
 
     LdapContext userContext;
 
@@ -101,7 +102,7 @@ public class DefaultLdapUserDAO
 
     Attributes modAttrs = new BasicAttributes();
 
-    if (!StringUtils.isEmpty(user.getRealName())) {
+    if (!Strings2.isEmpty(user.getRealName())) {
       if (inLdap.getRealName() == null) {
         addAttrs.put(configuration.getUserRealNameAttribute(), user.getRealName());
       }
@@ -110,7 +111,7 @@ public class DefaultLdapUserDAO
       }
     }
 
-    if (!StringUtils.isEmpty(user.getEmail())) {
+    if (!Strings2.isEmpty(user.getEmail())) {
       if (inLdap.getEmail() == null) {
         addAttrs.put(configuration.getEmailAddressAttribute(), user.getEmail());
       }
@@ -119,7 +120,7 @@ public class DefaultLdapUserDAO
       }
     }
 
-    if (!StringUtils.isEmpty(user.getWebsite())) {
+    if (!Strings2.isEmpty(user.getWebsite())) {
       if (inLdap.getWebsite() == null) {
         if (configuration.isWebsiteAttributeLabelUri()) {
           addAttrs.put(configuration.getWebsiteAttribute(), user.getWebsite() + " "
@@ -172,7 +173,7 @@ public class DefaultLdapUserDAO
       throws NoSuchLdapUserException, LdapDAOException
   {
     String userIdAttribute = configuration.getUserIdAttribute();
-    String userBaseDn = StringUtils.defaultString(configuration.getUserBaseDn(), "");
+    String userBaseDn = Strings.nullToEmpty(configuration.getUserBaseDn());
     String passwordAttribute = configuration.getPasswordAttribute();
 
     try {
@@ -270,7 +271,7 @@ public class DefaultLdapUserDAO
             + (username != null ? username : "*") + ")" + (f != null && !f.isEmpty() ? "(" + f + ")" : "") + ")";
     log.debug("Searching for users with filter: \'" + filter + "\'");
 
-    String baseDN = StringUtils.defaultString(configuration.getUserBaseDn(), "");
+    String baseDN = Strings.nullToEmpty(configuration.getUserBaseDn());
 
     return context.search(baseDN, filter, ctls);
   }
@@ -313,7 +314,7 @@ public class DefaultLdapUserDAO
       throws LdapDAOException
   {
     String userIdAttribute = configuration.getUserIdAttribute();
-    String userBaseDn = StringUtils.defaultString(configuration.getUserBaseDn(), "");
+    String userBaseDn = Strings.nullToEmpty(configuration.getUserBaseDn());
 
     try {
       NamingEnumeration<SearchResult> existing =
@@ -346,20 +347,20 @@ public class DefaultLdapUserDAO
 
     Attributes userAttrs = new BasicAttributes();
 
-    if (!StringUtils.isEmpty(user.getPassword())) {
+    if (!Strings2.isEmpty(user.getPassword())) {
       userAttrs.put(configuration.getPasswordAttribute(),
           passwordEncoderManager.encodePassword(user.getPassword(), null));
     }
 
-    if (!StringUtils.isEmpty(user.getRealName())) {
+    if (!Strings2.isEmpty(user.getRealName())) {
       userAttrs.put(configuration.getUserRealNameAttribute(), user.getRealName());
     }
 
-    if (!StringUtils.isEmpty(user.getEmail())) {
+    if (!Strings2.isEmpty(user.getEmail())) {
       userAttrs.put(configuration.getEmailAddressAttribute(), user.getEmail());
     }
 
-    if (!StringUtils.isEmpty(user.getWebsite())) {
+    if (!Strings2.isEmpty(user.getWebsite())) {
       if (configuration.isWebsiteAttributeLabelUri()) {
         userAttrs.put(configuration.getWebsiteAttribute(), user.getWebsite() + " "
             + configuration.getWebsiteUriLabel());
@@ -435,7 +436,7 @@ public class DefaultLdapUserDAO
     }
 
     // The user might contain the groups that he is in
-    if (configuration.isLdapGroupsAsRoles() && StringUtils.isNotEmpty(configuration.getUserMemberOfAttribute())) {
+    if (configuration.isLdapGroupsAsRoles() && !Strings2.isEmpty(configuration.getUserMemberOfAttribute())) {
       Set<String> groups = LdapUtils.getAttributeValues(attributes, memberOfAttribute, "Member Of");
       Set<String> resolvedGroups = new HashSet<String>();
       // now these groups are fully qualified dn's, if not we will return the full entry

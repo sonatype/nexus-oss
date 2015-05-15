@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.common.text.Strings2;
 
 public class LdapAuthConfiguration
 {
@@ -438,7 +438,7 @@ public class LdapAuthConfiguration
             websiteAttribute, userMemberOfAttribute
         };
     for (String attribute : allAttributes) {
-      if (StringUtils.isNotBlank(attribute)) {
+      if (!Strings2.isBlank(attribute)) {
         result.add(attribute);
       }
     }

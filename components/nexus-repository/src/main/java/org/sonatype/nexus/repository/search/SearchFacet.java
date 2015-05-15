@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.search;
 
+import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.storage.Component;
 
@@ -25,22 +26,17 @@ public interface SearchFacet
     extends Facet
 {
   /**
-   * Returns a unique identifier for the index entry of this component.
-   */
-  SearchItemId identifier(Component component);
-
-  /**
    * Index component metadata.
    *
    * @param component to be indexed
    */
-  SearchItemId put(Component component);
+  void put(Component component);
 
   /**
    * Deletes component metadata from index.
    *
-   * @param identifier to be deleted from index
+   * @param componentId id of the component to be deleted from index
    */
-  void delete(SearchItemId identifier);
-
+  // TODO: EntityId use here is wrong! Pending a discussion about this
+  void delete(EntityId componentId);
 }
