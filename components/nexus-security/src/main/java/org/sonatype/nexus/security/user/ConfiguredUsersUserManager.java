@@ -126,7 +126,7 @@ public class ConfiguredUsersUserManager
                                     final UserSearchCriteria criteria)
   {
     // basically the same as the super, but we don't want to check the source
-    if (Strings2.isNotBlank(criteria.getUserId())
+    if (!Strings2.isBlank(criteria.getUserId())
         && !userId.toLowerCase().startsWith(criteria.getUserId().toLowerCase())) {
       return false;
     }
