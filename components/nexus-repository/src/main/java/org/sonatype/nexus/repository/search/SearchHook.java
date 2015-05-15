@@ -71,7 +71,10 @@ public class SearchHook
   @Override
   public void updateAsset(final Asset... assets) {
     for (Asset asset : assets) {
-      indexable.add(asset.componentId());
+      final EntityId componentId = asset.componentId();
+      if (componentId != null) {
+        indexable.add(componentId);
+      }
     }
   }
 
