@@ -134,23 +134,7 @@ public class SecurityConfigurationManagerImpl
 
   @Override
   public void createPrivilege(CPrivilege privilege) {
-    createPrivilege(privilege, initializeContext());
-  }
-
-  private void createPrivilege(CPrivilege privilege, SecurityConfigurationValidationContext context) {
-    if (context == null) {
-      context = initializeContext();
-    }
-
-    ValidationResponse vr = validator.validatePrivilege(context, privilege, false);
-
-    if (vr.isValid()) {
-      getDefaultConfiguration().addPrivilege(privilege);
-      logValidationWarnings(vr);
-    }
-    else {
-      throw new ValidationResponseException(vr);
-    }
+    getDefaultConfiguration().addPrivilege(privilege);
   }
 
   @Override
@@ -184,7 +168,9 @@ public class SecurityConfigurationManagerImpl
     createUser(user, password, roles, initializeContext());
   }
 
-  private void createUser(CUser user, String password, Set<String> roles, SecurityConfigurationValidationContext context) {
+  private void createUser(CUser user, String password, Set<String> roles,
+                          SecurityConfigurationValidationContext context)
+  {
     if (context == null) {
       context = initializeContext();
     }
@@ -274,25 +260,7 @@ public class SecurityConfigurationManagerImpl
 
   @Override
   public void updatePrivilege(CPrivilege privilege) throws NoSuchPrivilegeException {
-    updatePrivilege(privilege, initializeContext());
-  }
-
-  private void updatePrivilege(CPrivilege privilege, SecurityConfigurationValidationContext context)
-      throws NoSuchPrivilegeException
-  {
-    if (context == null) {
-      context = initializeContext();
-    }
-
-    ValidationResponse vr = validator.validatePrivilege(context, privilege, true);
-
-    if (vr.isValid()) {
-      getDefaultConfiguration().updatePrivilege(privilege);
-      logValidationWarnings(vr);
-    }
-    else {
-      throw new ValidationResponseException(vr);
-    }
+    getDefaultConfiguration().updatePrivilege(privilege);
   }
 
   @Override

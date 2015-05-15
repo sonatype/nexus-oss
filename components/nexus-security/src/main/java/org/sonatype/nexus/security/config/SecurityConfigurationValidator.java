@@ -20,10 +20,6 @@ public interface SecurityConfigurationValidator
 {
   ValidationResponse validateModel(SecurityConfiguration model);
 
-  ValidationResponse validatePrivilege(SecurityConfigurationValidationContext ctx,
-                                       CPrivilege privilege,
-                                       boolean update);
-
   ValidationResponse validateRoleContainment(SecurityConfigurationValidationContext ctx);
 
   ValidationResponse validateRole(SecurityConfigurationValidationContext ctx, CRole role, boolean update);

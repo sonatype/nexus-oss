@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.text.Strings2;
-import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CRole;
 import org.sonatype.nexus.security.config.CUser;
 import org.sonatype.nexus.security.config.CUserRoleMapping;
@@ -61,13 +60,6 @@ public class SecurityConfigurationValidatorImpl
     ValidationResponse response = new ValidationResponse();
     response.setContext(new SecurityConfigurationValidationContext());
     SecurityConfigurationValidationContext context = (SecurityConfigurationValidationContext) response.getContext();
-
-    List<CPrivilege> privs = model.getPrivileges();
-    if (privs != null) {
-      for (CPrivilege priv : privs) {
-        response.append(validatePrivilege(context, priv, false));
-      }
-    }
 
     List<CRole> roles = model.getRoles();
     if (roles != null) {
@@ -110,25 +102,6 @@ public class SecurityConfigurationValidatorImpl
     else {
       log.info("Security configuration validated successfully");
     }
-
-    return response;
-  }
-
-  public ValidationResponse validatePrivilege(SecurityConfigurationValidationContext ctx, CPrivilege privilege, boolean update) {
-    ValidationResponse response = new ValidationResponse();
-    if (ctx != null) {
-      response.setContext(ctx);
-    }
-
-    for (PrivilegeDescriptor descriptor : privilegeDescriptors) {
-      ValidationResponse resp = descriptor.validatePrivilege(privilege, ctx, update);
-
-      if (resp != null) {
-        response.append(resp);
-      }
-    }
-
-    ctx.getExistingPrivilegeIds().add(privilege.getId());
 
     return response;
   }

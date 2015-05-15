@@ -15,8 +15,6 @@ package org.sonatype.nexus.security.privilege;
 import java.util.List;
 
 import org.sonatype.nexus.security.config.CPrivilege;
-import org.sonatype.nexus.security.config.SecurityConfigurationValidationContext;
-import org.sonatype.nexus.validation.ValidationResponse;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -51,15 +49,6 @@ public abstract class PrivilegeDescriptorSupport
     return getClass().getSimpleName() + "{" +
         "type='" + type + '\'' +
         '}';
-  }
-
-  @Override
-  public ValidationResponse validatePrivilege(final CPrivilege privilege,
-                                              final SecurityConfigurationValidationContext context,
-                                              final boolean update)
-  {
-    // FIXME: For now ignore validation
-    return new ValidationResponse();
   }
 
   /**
