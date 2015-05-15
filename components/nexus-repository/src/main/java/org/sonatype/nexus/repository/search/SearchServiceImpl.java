@@ -56,7 +56,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
 /**
- * Default {@link SearchService} implementation.
+ * Default {@link SearchService} implementation. It does not expects that {@link Repository} have storage facet
+ * attached.
  *
  * @since 3.0
  */

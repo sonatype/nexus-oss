@@ -341,6 +341,7 @@ public class MavenFacetImpl
           result = deleteFile(path, tx) || result;
         }
       }
+      tx.commit();
     }
     return result;
   }
@@ -358,7 +359,6 @@ public class MavenFacetImpl
     if (!tx.browseAssets(component).iterator().hasNext()) {
       tx.deleteComponent(component);
     }
-    tx.commit();
     return true;
   }
 
@@ -368,7 +368,6 @@ public class MavenFacetImpl
       return false;
     }
     tx.deleteAsset(asset);
-    tx.commit();
     return true;
   }
 

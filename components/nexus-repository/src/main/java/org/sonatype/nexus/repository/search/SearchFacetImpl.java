@@ -23,6 +23,7 @@ import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Format;
+import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
@@ -40,7 +41,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
 /**
- * Default {@link StorageFacet} implementation.
+ * Default {@link SearchFacet} implementation. It depends on presence of a {@link StorageFacet} attached to {@link
+ * Repository}.
  *
  * @since 3.0
  */
@@ -74,6 +76,9 @@ public class SearchFacetImpl
     });
   }
 
+  /**
+   * Indexes a component with given id.
+   */
   protected void put(final EntityId componentId) {
     checkNotNull(componentId);
     log.debug("Indexing metadata of component ID {} from {}", componentId, getRepository());
@@ -97,8 +102,21 @@ public class SearchFacetImpl
     }
   }
 
+  /**
+   * Deindexes a component with given id.
+   */
   protected void delete(final EntityId componentId) {
     searchService.delete(getRepository(), componentId.toString());
+  }
+
+  @Override
+  protected void doStart() throws Exception {
+    searchService.createIndex(getRepository());
+  }
+
+  @Override
+  protected void doDelete() {
+    searchService.deleteIndex(getRepository());
   }
 
   /**
@@ -115,16 +133,5 @@ public class SearchFacetImpl
     }
     checkState(producer != null, "Could not find a component metadata producer for format: {}", format);
     return producer.getMetadata(component, assets);
-  }
-
-
-  @Override
-  protected void doStart() throws Exception {
-    searchService.createIndex(getRepository());
-  }
-
-  @Override
-  protected void doDelete() {
-    searchService.deleteIndex(getRepository());
   }
 }

@@ -14,10 +14,10 @@ package org.sonatype.nexus.rapture.internal.capability;
 
 import java.util.Map;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.rapture.RaptureSettings;
 
 import com.google.common.collect.Maps;
-import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -95,7 +95,7 @@ public class SettingsCapabilityConfiguration
   }
 
   private boolean isEmpty(final String value) {
-    return StringUtils.isEmpty(value);
+    return Strings2.isEmpty(value);
   }
 
   @Override

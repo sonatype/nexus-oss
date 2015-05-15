@@ -19,7 +19,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
 /**
- * Search service.
+ * Search service: maintains indexes for repositories and performs indexing/deindexing of data, along with search.
  *
  * @since 3.0
  */

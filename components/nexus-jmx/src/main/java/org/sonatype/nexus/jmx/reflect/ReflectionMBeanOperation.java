@@ -179,6 +179,8 @@ public class ReflectionMBeanOperation
     // Helpers
     //
 
+    // FIXME: Many need to use AOP-aware Paranamer logic, could also use a caching Paranamer too?
+
     /**
      * Extract {@link MBeanParameterInfo} signature for given method.
      */
