@@ -36,6 +36,7 @@ public class CUserRoleMapping
     getRoles().add(string);
   }
 
+  @Override
   public CUserRoleMapping clone() {
     try {
       CUserRoleMapping copy = (CUserRoleMapping) super.clone();

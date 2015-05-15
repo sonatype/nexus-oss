@@ -42,6 +42,7 @@ public class CPrivilege
     getProperties().put(key, value);
   }
 
+  @Override
   public CPrivilege clone() {
     try {
       CPrivilege copy = (CPrivilege) super.clone();

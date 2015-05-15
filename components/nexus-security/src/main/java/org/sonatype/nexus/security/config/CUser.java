@@ -40,6 +40,7 @@ public class CUser
 
   private String version;
 
+  @Override
   public CUser clone() {
     try {
       return (CUser) super.clone();

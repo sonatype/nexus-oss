@@ -46,6 +46,7 @@ public class CRole
     getRoles().add(string);
   }
 
+  @Override
   public CRole clone() {
     try {
       CRole copy = (CRole) super.clone();
