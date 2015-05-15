@@ -12,16 +12,14 @@
  */
 package org.sonatype.nexus.repository.search;
 
-import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.storage.Component;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
 /**
- * Search service.
+ * Search service: maintains indexes for repositories and performs indexing/deindexing of data, along with search.
  *
  * @since 3.0
  */
@@ -29,22 +27,22 @@ public interface SearchService
 {
 
   /**
-   * Create component metadata index for specified repository, if does not already exits.
+   * Create index for specified repository, if does not already exits.
    */
   void createIndex(Repository repository);
 
   /**
-   * Deletes component metadata index for specified repository.
+   * Deletes index for specified repository.
    */
   void deleteIndex(Repository repository);
 
   /**
-   * Index component metadata.
+   * Puts data with given identifier into index of given repository.
    */
-  void put(Repository repository, Component component, String identifier);
+  void put(Repository repository, String identifier, String json);
 
   /**
-   * Remove component metadata from index.
+   * Removes data with given identifier from index of given repository.
    */
   void delete(Repository repository, String identifier);
 

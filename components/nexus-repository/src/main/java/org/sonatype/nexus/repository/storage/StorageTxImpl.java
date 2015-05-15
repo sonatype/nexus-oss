@@ -79,6 +79,8 @@ public class StorageTxImpl
 
   private final AssetEntityAdapter assetEntityAdapter;
 
+  private final StorageTxHook hook;
+
   public StorageTxImpl(final BlobTx blobTx,
                        final ODatabaseDocumentTx db,
                        final Bucket bucket,
@@ -86,7 +88,8 @@ public class StorageTxImpl
                        final WritePolicySelector writePolicySelector,
                        final BucketEntityAdapter bucketEntityAdapter,
                        final ComponentEntityAdapter componentEntityAdapter,
-                       final AssetEntityAdapter assetEntityAdapter)
+                       final AssetEntityAdapter assetEntityAdapter,
+                       final StorageTxHook hook)
   {
     this.blobTx = checkNotNull(blobTx);
     this.db = checkNotNull(db);
@@ -96,6 +99,7 @@ public class StorageTxImpl
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
+    this.hook = checkNotNull(hook);
 
     db.begin(TXTYPE.OPTIMISTIC);
   }
@@ -126,6 +130,7 @@ public class StorageTxImpl
   public void commit() {
     db.commit();
     blobTx.commit();
+    hook.postCommit();
   }
 
   @Override
@@ -133,6 +138,7 @@ public class StorageTxImpl
   public void rollback() {
     db.rollback();
     blobTx.rollback();
+    hook.postRollback();
   }
 
   @Override
@@ -304,9 +310,11 @@ public class StorageTxImpl
   public void saveComponent(final Component component) {
     if (component.isPersisted()) {
       componentEntityAdapter.edit(db, component);
+      hook.updateComponent(component);
     }
     else {
       componentEntityAdapter.add(db, component);
+      hook.createComponent(component);
     }
   }
 
@@ -314,9 +322,11 @@ public class StorageTxImpl
   public void saveAsset(final Asset asset) {
     if (asset.isPersisted()) {
       assetEntityAdapter.edit(db, asset);
+      hook.updateAsset(asset);
     }
     else {
       assetEntityAdapter.add(db, asset);
+      hook.createAsset(asset);
     }
   }
 
@@ -332,6 +342,7 @@ public class StorageTxImpl
     for (Asset asset : browseAssets(component)) {
       deleteAsset(asset, checkWritePolicy ? writePolicySelector.select(asset, writePolicy) : null);
     }
+    hook.deleteComponent(component);
     componentEntityAdapter.delete(db, component);
   }
 
@@ -348,6 +359,7 @@ public class StorageTxImpl
     if (blobRef != null) {
       deleteBlob(blobRef, effectiveWritePolicy);
     }
+    hook.deleteAsset(asset);
     assetEntityAdapter.delete(db, asset);
   }
 

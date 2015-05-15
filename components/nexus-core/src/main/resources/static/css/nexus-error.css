@@ -24,6 +24,20 @@ body {
   font-weight: 100;
 }
 
+.nexus-header a {
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+.nexus-header a:hover,
+.nexus-header a:focus {
+  color: #96CAEE;
+}
+
+.nexus-header a:active {
+  color: #0F4976;
+}
+
 .nexus-header img,
 .nexus-header span {
   vertical-align: middle;
