@@ -280,7 +280,12 @@ class StaticSecurityConfigurationResourceImpl
              * Anonymous role grants permissions to non-authenticated users.
              */
             new CRole(
-                id: 'anonymous'
+                id: 'anonymous',
+
+                privileges: [
+                    'repository-view-*-*-browse',
+                    'repository-view-*-*-read'
+                ]
             )
         ]
     )
