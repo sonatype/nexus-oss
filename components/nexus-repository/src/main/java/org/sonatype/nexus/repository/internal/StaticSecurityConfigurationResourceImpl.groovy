@@ -16,16 +16,9 @@ package org.sonatype.nexus.repository.internal
 import javax.inject.Named
 import javax.inject.Singleton
 
-import org.sonatype.nexus.repository.security.RepositoryViewPrivilegeDescriptor
+import org.sonatype.nexus.security.config.CPrivilege
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
-
-import static org.sonatype.nexus.repository.security.BreadActions.ADD
-import static org.sonatype.nexus.repository.security.BreadActions.BROWSE
-import static org.sonatype.nexus.repository.security.BreadActions.DELETE
-import static org.sonatype.nexus.repository.security.BreadActions.EDIT
-import static org.sonatype.nexus.repository.security.BreadActions.READ
-import static org.sonatype.nexus.security.privilege.PrivilegeDescriptorSupport.ALL
 
 /**
  * Repository security configuration.
@@ -45,12 +38,60 @@ class StaticSecurityConfigurationResourceImpl
             // nexus:repository-view
             //
 
-            RepositoryViewPrivilegeDescriptor.privilege(ALL, ALL, ALL),
-            RepositoryViewPrivilegeDescriptor.privilege(ALL, ALL, BROWSE),
-            RepositoryViewPrivilegeDescriptor.privilege(ALL, ALL, READ),
-            RepositoryViewPrivilegeDescriptor.privilege(ALL, ALL, EDIT),
-            RepositoryViewPrivilegeDescriptor.privilege(ALL, ALL, ADD),
-            RepositoryViewPrivilegeDescriptor.privilege(ALL, ALL, DELETE),
+            new CPrivilege(
+                id: 'repository-view-*-*-*',
+                type: 'repository-view',
+                properties: [
+                    format: '*',
+                    repository: '*',
+                    actions: '*'
+                ]
+            ),
+            new CPrivilege(
+                id: 'repository-view-*-*-browse',
+                type: 'repository-view',
+                properties: [
+                    format: '*',
+                    repository: '*',
+                    actions: 'browse'
+                ]
+            ),
+            new CPrivilege(
+                id: 'repository-view-*-*-read',
+                type: 'repository-view',
+                properties: [
+                    format: '*',
+                    repository: '*',
+                    actions: 'read'
+                ]
+            ),
+            new CPrivilege(
+                id: 'repository-view-*-*-edit',
+                type: 'repository-view',
+                properties: [
+                    format: '*',
+                    repository: '*',
+                    actions: 'edit'
+                ]
+            ),
+            new CPrivilege(
+                id: 'repository-view-*-*-add',
+                type: 'repository-view',
+                properties: [
+                    format: '*',
+                    repository: '*',
+                    actions: 'add'
+                ]
+            ),
+            new CPrivilege(
+                id: 'repository-view-*-*-delete',
+                type: 'repository-view',
+                properties: [
+                    format: '*',
+                    repository: '*',
+                    actions: 'delete'
+                ]
+            ),
         ]
     )
   }
