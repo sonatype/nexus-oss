@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.httpclient.config;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,18 +25,29 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.httpclient.HttpClientPlan;
 import org.sonatype.nexus.httpclient.SSLContextSelector;
 import org.sonatype.nexus.httpclient.internal.NexusHttpRoutePlanner;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.http.Consts;
+import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpRequestWrapper;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
+import org.apache.http.protocol.HttpContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.http.client.config.AuthSchemes.BASIC;
@@ -90,7 +104,34 @@ public class ConfigurationCustomizer
 
     // TODO: user-agent (and/or custom headers?)
 
-    // TODO: query-string? (or don't do this, it may not bee a good idea anymore)
+    if (!Strings2.isBlank(connection.getUrlParameters())) {
+      plan.getClient().addInterceptorLast(new HttpRequestInterceptor()
+      {
+        @Override
+        public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
+          if (request instanceof HttpUriRequest) {
+            try {
+              URI uri = new URIBuilder(((HttpUriRequest) request).getURI())
+                  .addParameters(URLEncodedUtils.parse(connection.getUrlParameters(), Consts.UTF_8))
+                  .build();
+
+              if (request instanceof HttpRequestBase) {
+                ((HttpRequestBase) request).setURI(uri);
+              }
+              else if(request instanceof HttpRequestWrapper){
+                ((HttpRequestWrapper) request).setURI(uri);
+              }
+              else {
+                log.warn("Could not configure url parameters on {}", request.getRequestLine());
+              }
+            }
+            catch (URISyntaxException e) {
+              throw new IOException(e);
+            }
+          }
+        }
+      });
+    }
 
     if (Boolean.TRUE.equals(connection.getUseTrustStore())) {
       plan.getAttributes().put(SSLContextSelector.USE_TRUST_STORE, Boolean.TRUE);
