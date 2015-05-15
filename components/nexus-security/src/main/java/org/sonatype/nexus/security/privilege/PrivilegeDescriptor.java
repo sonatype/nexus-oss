@@ -18,12 +18,15 @@ import org.sonatype.nexus.validation.ValidationResponse;
 
 import org.apache.shiro.authz.Permission;
 
+/**
+ * Privilege descriptor.
+ */
 public interface PrivilegeDescriptor
 {
   String getType();
 
   Permission createPermission(CPrivilege privilege);
 
-  // TODO: Sort out validation
+  // FIXME: Sort out validation
   ValidationResponse validatePrivilege(CPrivilege privilege, SecurityConfigurationValidationContext ctx, boolean update);
 }
