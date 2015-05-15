@@ -13,57 +13,43 @@
 body {
   font-family: 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   background-color: #ffffff;
+  font-size: 13px;
   margin: 0;
   padding: 0;
-  font-size: 13px;
 }
 
-h2 {
-  font-size: 18px;
-  font-weight: bold;
-  padding: 20px 0 10px 0;
-  margin-bottom: 0;
-}
-
-h3 {
-  font-size: 13px;
-  font-weight: bold;
-  padding: 15px 0 0 0;
-  margin-bottom: 0;
-}
-
-.nexus-describe-message {
+.nexus-content-message {
   background-color: #000000;
   color: #ffffff;
   padding: 4px 4px 4px 16px;
   font-weight: 100;
 }
 
-.nexus-describe-message a {
+.nexus-content-message a {
   text-decoration: none;
   color: #FFFFFF;
 }
 
-.nexus-describe-message a:hover,
-.nexus-describe-message a:focus {
+.nexus-content-message a:hover,
+.nexus-content-message a:focus {
   color: #96CAEE;
 }
 
-.nexus-describe-message a:active {
+.nexus-content-message a:active {
   color: #0F4976;
 }
 
-.nexus-describe-message img,
-.nexus-describe-message span {
+.nexus-content-message img,
+.nexus-content-message span {
   vertical-align: middle;
 }
 
-.nexus-describe-message .name {
+.nexus-content-message .name {
   font-size: 20px;
   padding-left: 3px;
 }
 
-.nexus-describe-message .version {
+.nexus-content-message .version {
   font-size: 10px;
   padding-left: 4px;
   font-weight: bold;
@@ -71,45 +57,50 @@ h3 {
   padding-top: 6px;
 }
 
-.nexus-describe-detail {
+.nexus-content-browser {
   padding: 20px;
 }
 
-.nexus-describe-title .title {
+.nexus-content-browser th,
+.nexus-content-browser td {
+  text-align: left;
+}
+
+.nexus-content-title .title {
   font-size: 26px;
   font-weight: bold;
 }
 
-.nexus-describe-title .path {
+.nexus-content-title .path {
   font-size: 18px;
   padding-left: 10px;
   font-weight: normal;
 }
 
-.nexus-describe-detail table {
+.nexus-content-children {
   font-size: 13px;
-  margin-top: 13px;
-  border-spacing: 0;
+  padding-top: 20px;
 }
 
-.nexus-describe-detail tbody tr:nth-child(odd) {
-  background-color: #FAFAFA;
+.nexus-content-children th {
+  padding-bottom: 5px;
 }
 
-.nexus-describe-detail th,
-.nexus-describe-detail td {
-  text-align: left;
-  vertical-align: top;
-  padding: 5px 24px 5px 5px;
-  border-bottom: solid 1px #EDEDED;
+.nexus-content-children td {
+  padding: 0 24px 5px 0;
 }
 
-.nexus-describe-detail th:last-child,
-.nexus-describe-detail td:last-child {
-  padding-right: 5px;
+.nexus-content-parent a {
+  background: transparent url('../images/arrow_up.png') left top no-repeat;
+  padding-left: 24px;
 }
 
-.nexus-describe-detail th {
-  font-weight: normal;
-  font-style: italic;
+.nexus-content-directory a {
+  background: transparent url('../images/folder.png') left top no-repeat;
+  padding-left: 24px;
+}
+
+.nexus-content-file a {
+  background: transparent url('../images/page_white.png') left top no-repeat;
+  padding-left: 24px;
 }

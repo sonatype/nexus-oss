@@ -12,7 +12,7 @@
  *###
 <html>
 <head>
-  <title>Describe $path - Sonatype Nexus</title>
+  <title>Index $path - Sonatype Nexus</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
   <link rel="icon" type="image/png" href="$nexusUrl/favicon.png">
@@ -20,34 +20,11 @@
   <link rel="SHORTCUT ICON" href="$nexusUrl/favicon.ico"/>
   <![endif]-->
 
-  <link rel="stylesheet" type="text/css" href="$nexusUrl/static/css/nexus-describe.css?$nexusVersion"/>
-
-  #macro(table $map)
-    #if($map.isEmpty())
-      <p>No entries</p>
-    #else
-      <table>
-        <thead>
-        <tr>
-          <th>Key</th>
-          <th>Value</th>
-        </tr>
-        </thead>
-        <tbody>
-          #foreach ($entry in $map.entrySet())
-          <tr>
-            <td>$entry.key</td>
-            <td>$esc.html($entry.value)</td>
-          </tr>
-          #end
-        </tbody>
-      </table>
-    #end
-  #end
+  <link rel="stylesheet" type="text/css" href="$nexusUrl/static/css/nexus-content.css?$nexusVersion"/>
 </head>
 <body>
 
-<div class="nexus-describe-message">
+<div class="nexus-content-message">
   <a href="$nexusUrl">
     <img src="$nexusUrl/static/images/nexus.png?$nexusVersion"/>
     <span class="name">Sonatype Nexus</span>
@@ -55,28 +32,43 @@
   <span class="version">$nexusVersion</span>
 </div>
 
-<div class="nexus-describe-detail">
-  <div class="nexus-describe-title">
-    <span class="title">Describe</span>
+<div class="nexus-content-browser">
+  <div class="nexus-content-title">
+    <span class="title">Index</span>
     <span class="path">$path</span>
   </div>
-
-  <p>
-    This page describes the processing of a request made by external client,
-    using information from the request, retrieved item (or exception if not item was retrieved)
-    and some intermittent processing states.
-  </p>
-
-  #foreach ($item in $items)
-    #if($item.type == "topic")
-      <h2>$item.name</h2>
-    #elseif($item.type == "string")
-      <h3>$item.name</h3>
-      <p>$esc.html($item.value)</p>
-    #elseif($item.type == "table")
-      <h3>$item.name</h3>
-      #table($item.value)
+  <table class="nexus-content-children">
+    <tr>
+      <th>Name</th>
+      <th>Last Modified</th>
+      <th>Size</th>
+    </tr>
+    <tr class="nexus-content-parent">
+      <td>
+        <a href="../">Parent directory</a>
+      </td>
+    </tr>
+    #foreach ($listItem in $listItems)
+      #if ($listItem.collection)
+        <tr class="nexus-content-directory">
+      #else
+        <tr class="nexus-content-file">
+      #end
+        <td>
+          <a href="$listItem.resourceUri">$listItem.name</a>
+        </td>
+        <td>$listItem.lastModifiedIso8601</td>
+        <td>
+          #if ($listItem.collection)
+            n/a
+          #else
+            $listItem.size bytes
+          #end
+        </td>
+      </tr>
     #end
-  #end
+  </table>
+</div>
+
 </body>
 </html>
