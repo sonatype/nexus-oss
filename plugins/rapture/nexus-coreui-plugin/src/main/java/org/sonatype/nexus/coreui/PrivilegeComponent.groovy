@@ -44,8 +44,6 @@ import org.hibernate.validator.constraints.NotEmpty
 class PrivilegeComponent
     extends DirectComponentSupport
 {
-  public static final String DEFAULT_SOURCE = UserManager.DEFAULT_SOURCE
-
   @Inject
   SecuritySystem securitySystem
 
@@ -72,8 +70,8 @@ class PrivilegeComponent
   @RequiresAuthentication
   @RequiresPermissions('nexus:privileges:delete')
   @Validate
-  void remove(final @NotEmpty String id) {
-    AuthorizationManager authorizationManager = securitySystem.getAuthorizationManager(DEFAULT_SOURCE)
+  void remove(@NotEmpty final String id) {
+    AuthorizationManager authorizationManager = securitySystem.getAuthorizationManager(UserManager.DEFAULT_SOURCE)
     if (authorizationManager.getPrivilege(id)?.readOnly) {
       throw new IllegalAccessException("Privilege [${id}] is readonly and cannot be deleted")
     }
