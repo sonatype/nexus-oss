@@ -36,22 +36,6 @@ public class CUserRoleMapping
     getRoles().add(string);
   }
 
-  @Override
-  public CUserRoleMapping clone() {
-    try {
-      CUserRoleMapping copy = (CUserRoleMapping) super.clone();
-
-      if (this.roles != null) {
-        copy.roles = Sets.newHashSet(this.roles);
-      }
-
-      return copy;
-    }
-    catch (CloneNotSupportedException e) {
-      throw Throwables.propagate(e);
-    }
-  }
-
   public Set<String> getRoles() {
     if (this.roles == null) {
       this.roles = Sets.newHashSet();
@@ -89,5 +73,31 @@ public class CUserRoleMapping
 
   public void setVersion(final String version) {
     this.version = version;
+  }
+
+  @Override
+  public CUserRoleMapping clone() {
+    try {
+      CUserRoleMapping copy = (CUserRoleMapping) super.clone();
+
+      if (this.roles != null) {
+        copy.roles = Sets.newHashSet(this.roles);
+      }
+
+      return copy;
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "userId='" + userId + '\'' +
+        ", source='" + source + '\'' +
+        ", roles=" + roles +
+        ", version='" + version + '\'' +
+        '}';
   }
 }

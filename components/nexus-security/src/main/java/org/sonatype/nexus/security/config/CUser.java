@@ -14,6 +14,8 @@ package org.sonatype.nexus.security.config;
 
 import java.io.Serializable;
 
+import org.sonatype.nexus.common.text.Strings2;
+
 import com.google.common.base.Throwables;
 
 /**
@@ -39,16 +41,6 @@ public class CUser
   private String email;
 
   private String version;
-
-  @Override
-  public CUser clone() {
-    try {
-      return (CUser) super.clone();
-    }
-    catch (CloneNotSupportedException e) {
-      throw Throwables.propagate(e);
-    }
-  }
 
   public String getEmail() {
     return this.email;
@@ -104,5 +96,28 @@ public class CUser
 
   public void setVersion(final String version) {
     this.version = version;
+  }
+
+  @Override
+  public CUser clone() {
+    try {
+      return (CUser) super.clone();
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "id='" + id + '\'' +
+        ", firstName='" + firstName + '\'' +
+        ", lastName='" + lastName + '\'' +
+        ", password='" + Strings2.mask(password) + '\'' +
+        ", status='" + status + '\'' +
+        ", email='" + email + '\'' +
+        ", version='" + version + '\'' +
+        '}';
   }
 }

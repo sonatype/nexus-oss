@@ -42,22 +42,6 @@ public class CPrivilege
     getProperties().put(key, value);
   }
 
-  @Override
-  public CPrivilege clone() {
-    try {
-      CPrivilege copy = (CPrivilege) super.clone();
-
-      if (this.properties != null) {
-        copy.properties = Maps.newHashMap(this.properties);
-      }
-
-      return copy;
-    }
-    catch (CloneNotSupportedException e) {
-      throw Throwables.propagate(e);
-    }
-  }
-
   public String getDescription() {
     return this.description;
   }
@@ -123,5 +107,34 @@ public class CPrivilege
 
   public void setVersion(final String version) {
     this.version = version;
+  }
+
+  @Override
+  public CPrivilege clone() {
+    try {
+      CPrivilege copy = (CPrivilege) super.clone();
+
+      if (this.properties != null) {
+        copy.properties = Maps.newHashMap(this.properties);
+      }
+
+      return copy;
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "id='" + id + '\'' +
+        ", name='" + name + '\'' +
+        ", description='" + description + '\'' +
+        ", type='" + type + '\'' +
+        ", properties=" + properties +
+        ", readOnly=" + readOnly +
+        ", version='" + version + '\'' +
+        '}';
   }
 }

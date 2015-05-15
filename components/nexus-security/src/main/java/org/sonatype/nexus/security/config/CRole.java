@@ -46,26 +46,6 @@ public class CRole
     getRoles().add(string);
   }
 
-  @Override
-  public CRole clone() {
-    try {
-      CRole copy = (CRole) super.clone();
-
-      if (this.privileges != null) {
-        copy.privileges = Sets.newHashSet(this.privileges);
-      }
-
-      if (this.roles != null) {
-        copy.roles = Sets.newHashSet(this.roles);
-      }
-
-      return copy;
-    }
-    catch (CloneNotSupportedException e) {
-      throw Throwables.propagate(e);
-    }
-  }
-
   public String getDescription() {
     return this.description;
   }
@@ -136,5 +116,38 @@ public class CRole
 
   public void setVersion(final String version) {
     this.version = version;
+  }
+
+  @Override
+  public CRole clone() {
+    try {
+      CRole copy = (CRole) super.clone();
+
+      if (this.privileges != null) {
+        copy.privileges = Sets.newHashSet(this.privileges);
+      }
+
+      if (this.roles != null) {
+        copy.roles = Sets.newHashSet(this.roles);
+      }
+
+      return copy;
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "id='" + id + '\'' +
+        ", name='" + name + '\'' +
+        ", description='" + description + '\'' +
+        ", privileges=" + privileges +
+        ", roles=" + roles +
+        ", readOnly=" + readOnly +
+        ", version='" + version + '\'' +
+        '}';
   }
 }
