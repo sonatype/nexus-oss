@@ -758,3 +758,11 @@
 .x-form-fieldcontainer.nx-invalid .nx-multiselect:nth-child(3) .x-panel-body {
   border: 1px #CF4C35 solid !important;
 }
+
+/**
+* @class Ext.ux.form.ItemSelector
+*/
+/* line 6, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/ItemSelector.scss */
+.nx-itemselector-disabled .x-form-item-label {
+  opacity: 1;
+}
