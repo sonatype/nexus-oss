@@ -23,14 +23,17 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.manager.RepositoryManager
+import org.sonatype.nexus.repository.security.RepositoryViewPermission
 import org.sonatype.nexus.repository.storage.Component
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageTx
+import org.sonatype.nexus.security.SecurityHelper
 import org.sonatype.nexus.validation.Validate
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.shiro.authz.annotation.RequiresPermissions
+
+import static org.sonatype.nexus.repository.security.BreadActions.READ
 
 /**
  * Component {@link DirectComponent}.
@@ -41,14 +44,15 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 @Singleton
 @DirectAction(action = 'coreui_Component')
 class ComponentComponent
-extends DirectComponentSupport
+    extends DirectComponentSupport
 {
+  @Inject
+  SecurityHelper securityHelper
 
   @Inject
   RepositoryManager repositoryManager
 
   @DirectMethod
-  @RequiresPermissions('nexus:repositories:read')
   List<AssetXO> readAssets(final StoreLoadParameters parameters) {
     return readAssets(parameters.getFilter('repositoryName'), parameters.getFilter('componentId'))
   }
@@ -56,6 +60,8 @@ extends DirectComponentSupport
   @Validate
   List<AssetXO> readAssets(final @NotNull String repositoryName, final @NotNull String componentId) {
     Repository repository = repositoryManager.get(repositoryName)
+    securityHelper.ensurePermitted(new RepositoryViewPermission(repository, READ))
+
     if (!repository.configuration.online) {
       return null
     }
@@ -66,7 +72,7 @@ extends DirectComponentSupport
         return null
       }
 
-      return storageTx.browseAssets(component).collect { asset ->
+      return storageTx.browseAssets(component).collect {asset ->
         new AssetXO(
             id: asset.entityMetadata.id,
             name: asset.name() ?: component.name(),
@@ -78,5 +84,4 @@ extends DirectComponentSupport
       storageTx.close()
     }
   }
-
 }
