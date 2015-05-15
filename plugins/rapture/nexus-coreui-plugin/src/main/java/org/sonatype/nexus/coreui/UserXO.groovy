@@ -14,7 +14,6 @@ package org.sonatype.nexus.coreui
 
 import javax.validation.constraints.NotNull
 
-import org.sonatype.nexus.security.realm.RealmExists
 import org.sonatype.nexus.security.role.RolesExist
 import org.sonatype.nexus.security.user.UniqueUserId
 import org.sonatype.nexus.security.user.UserStatus
@@ -41,7 +40,7 @@ class UserXO
   @NotBlank(groups = Update)
   String version
 
-  @RealmExists(groups = Create)
+  // Null on create
   String realm
 
   @NotBlank
