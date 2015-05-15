@@ -28,7 +28,10 @@ public class ConnectionConfiguration
   @Nullable
   private Integer maximumRetries;
 
-  // TODO: user-agent, query-string
+  // TODO: user-agent
+
+  @Nullable
+  private String urlParameters;
 
   @Nullable
   private Boolean useTrustStore;
@@ -50,6 +53,11 @@ public class ConnectionConfiguration
   public void setMaximumRetries(@Nullable final Integer maximumRetries) {
     this.maximumRetries = maximumRetries;
   }
+
+  @Nullable
+  public String getUrlParameters() { return urlParameters; }
+
+  public void setUrlParameters(@Nullable final String urlParameters) { this.urlParameters = urlParameters; }
 
   @Nullable
   public Boolean getUseTrustStore() { return useTrustStore; }
