@@ -29,8 +29,8 @@ import org.hibernate.validator.constraints.NotEmpty
 @ToString(includePackage = false, includeNames = true)
 class RoleXO
 {
-  @UniqueRoleId(groups = Create)
   @NotEmpty
+  @UniqueRoleId(groups = Create)
   String id
 
   @NotEmpty(groups = Update)
@@ -49,6 +49,5 @@ class RoleXO
   Set<String> privileges
 
   @RolesExist(groups = [Create, Update])
-  // @NonRecursiveRole
   Set<String> roles
 }

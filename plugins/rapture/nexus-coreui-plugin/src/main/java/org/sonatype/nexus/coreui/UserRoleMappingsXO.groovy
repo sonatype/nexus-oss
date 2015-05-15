@@ -29,12 +29,12 @@ import org.hibernate.validator.constraints.NotBlank
 @ToString(includePackage = false, includeNames = true)
 class UserRoleMappingsXO
 {
-  @UserExists(groups = Create)
   @NotBlank
+  @UserExists(groups = Create)
   String userId
 
-  @RealmExists(groups = Create)
   @NotBlank
+  @RealmExists(groups = Create)
   String realm
 
   @RolesExist(groups = [Create, Update])

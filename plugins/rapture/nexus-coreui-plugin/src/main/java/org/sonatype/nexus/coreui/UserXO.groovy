@@ -33,8 +33,8 @@ import org.hibernate.validator.constraints.NotEmpty
 @ToString(includePackage = false, includeNames = true)
 class UserXO
 {
-  @UniqueUserId(groups = Create)
   @NotBlank
+  @UniqueUserId(groups = Create)
   String userId
 
   @NotBlank(groups = Update)
@@ -59,8 +59,8 @@ class UserXO
   @NotBlank(groups = Create.class)
   String password
 
-  @RolesExist(groups = [Create, Update])
   @NotEmpty
+  @RolesExist(groups = [Create, Update])
   Set<String> roles
 
   Boolean external

@@ -30,8 +30,8 @@ import org.hibernate.validator.constraints.NotEmpty
 @ToString(includePackage = false, includeNames = true)
 class PrivilegeXO
 {
-  @UniquePrivilegeId(groups = Create)
   @NotBlank
+  @UniquePrivilegeId(groups = Create)
   String id
 
   @NotBlank(groups = Update)
