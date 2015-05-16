@@ -104,7 +104,7 @@ public class StateComponent
         Map<String, Object> stateValues = contributor.get().getState();
         if (stateValues != null) {
           for (Entry<String, Object> entry : stateValues.entrySet()) {
-            if (Strings2.isNotBlank(entry.getKey())) {
+            if (!Strings2.isBlank(entry.getKey())) {
               send(values, hashes, entry.getKey(), entry.getValue());
             }
             else {
@@ -143,7 +143,7 @@ public class StateComponent
         Map<String, Object> stateCommands = contributor.get().getCommands();
         if (stateCommands != null) {
           for (Entry<String, Object> entry : stateCommands.entrySet()) {
-            if (Strings2.isNotBlank(entry.getKey())) {
+            if (!Strings2.isBlank(entry.getKey())) {
               CommandXO command = new CommandXO();
               command.setType(entry.getKey());
               command.setData(entry.getValue());
