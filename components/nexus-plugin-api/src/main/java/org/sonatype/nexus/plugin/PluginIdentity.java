@@ -23,6 +23,8 @@ import org.sonatype.sisu.goodies.common.Properties2;
 
 import org.jetbrains.annotations.NonNls;
 
+// TODO: Remove, currently only needed by StateComponent and UiPluginDescriptorSupport
+
 /**
  * Helper for plugin identity components.
  *

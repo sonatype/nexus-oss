@@ -38,6 +38,8 @@ public class UiPluginDescriptorSupport
 
   private String configClassName;
 
+  // FIXME: Avoid use of PluginIdentity, how should we replace this?
+
   public UiPluginDescriptorSupport(final PluginIdentity owner) {
     checkNotNull(owner);
     this.pluginId = owner.getArtifactId();
