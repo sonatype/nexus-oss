@@ -22,7 +22,7 @@ import com.google.inject.Injector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Allow ConstraintValidators to be enhanced by Guice.
+ * Allow {@link ConstraintValidator validators} to be enhanced by Guice.
  * 
  * @since 3.0
  */
