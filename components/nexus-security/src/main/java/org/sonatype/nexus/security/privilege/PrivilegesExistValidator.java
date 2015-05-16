@@ -14,6 +14,8 @@ package org.sonatype.nexus.security.privilege;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -48,7 +50,20 @@ public class PrivilegesExistValidator
     for (Privilege privilege : securitySystem.listPrivileges()) {
       ids.add(privilege.getId());
     }
-    // TODO: Can we inform which were missing?
-    return ids.containsAll(value);
+
+    List<Object> missing = new LinkedList<>();
+    for (Object item : value) {
+      if (!ids.contains(item)) {
+        missing.add(item);
+      }
+    }
+    if (missing.isEmpty()) {
+      return true;
+    }
+
+    context.disableDefaultConstraintViolation();
+    context.buildConstraintViolationWithTemplate("Missing privileges: " + missing)
+        .addConstraintViolation();
+    return false;
   }
 }
