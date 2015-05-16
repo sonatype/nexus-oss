@@ -53,7 +53,7 @@ public class DescriptionRendererImpl
 
   @Inject
   public DescriptionRendererImpl(final Provider<SystemStatus> systemStatus,
-                                 final @Named("shared") TemplateEngine templateEngine)
+                                 final @Named("shared-velocity") TemplateEngine templateEngine)
   {
     this.systemStatus = checkNotNull(systemStatus);
     this.templateEngine = checkNotNull(templateEngine);
