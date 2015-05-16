@@ -12,6 +12,8 @@
  */
 package com.sonatype.nexus.ssl.model;
 
+// FIXME: Find a better home for this
+
 /**
  * SMTP {@link TrustStoreKey}.
  *
