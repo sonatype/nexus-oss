@@ -13,7 +13,6 @@
 package com.sonatype.nexus.ssl.plugin.internal.ui
 
 import java.security.cert.Certificate
-import java.security.cert.CertificateParsingException
 import java.security.cert.X509Certificate
 
 import javax.inject.Inject
@@ -30,9 +29,6 @@ import com.sonatype.nexus.ssl.plugin.TrustStore
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.validation.Validate
-import org.sonatype.nexus.validation.ValidationMessage
-import org.sonatype.nexus.validation.ValidationResponse
-import org.sonatype.nexus.validation.ValidationResponseException
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil
 
@@ -56,7 +52,6 @@ import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.calculateFi
 class TrustStoreComponent
 extends DirectComponentSupport
 {
-
   @Inject
   TrustStore trustStore
 
@@ -82,16 +77,9 @@ extends DirectComponentSupport
   @RequiresPermissions('nexus:ssl-truststore:create')
   @Validate(groups = [Create.class, Default.class])
   CertificateXO create(final @NotNull @Valid CertificatePemXO pem) {
-    try {
-      Certificate certificate = CertificateUtil.decodePEMFormattedCertificate(pem.value)
-      trustStore.importTrustCertificate(certificate, calculateFingerprint(certificate))
-      return asCertificateXO(certificate, true)
-    }
-    catch (CertificateParsingException e) {
-      ValidationResponse validations = new ValidationResponse()
-      validations.addError(new ValidationMessage('pem', 'Invalid PEM formatted certificate'))
-      throw new ValidationResponseException(validations)
-    }
+    Certificate certificate = CertificateUtil.decodePEMFormattedCertificate(pem.value)
+    trustStore.importTrustCertificate(certificate, calculateFingerprint(certificate))
+    return asCertificateXO(certificate, true);
   }
 
   /**
@@ -149,5 +137,4 @@ extends DirectComponentSupport
     }
     return rdns
   }
-
 }
