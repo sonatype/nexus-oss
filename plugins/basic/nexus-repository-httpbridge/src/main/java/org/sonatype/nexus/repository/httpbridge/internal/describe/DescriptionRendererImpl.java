@@ -16,8 +16,11 @@ import java.net.URL;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.app.BaseUrlHolder;
+import org.sonatype.nexus.common.app.SystemStatus;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
@@ -40,6 +43,8 @@ public class DescriptionRendererImpl
 {
   private static final String TEMPLATE_RESOURCE = "describe.vm";
 
+  private final Provider<SystemStatus> systemStatus;
+
   private final TemplateEngine templateEngine;
 
   private final URL template;
@@ -47,7 +52,10 @@ public class DescriptionRendererImpl
   private final ObjectMapper objectMapper;
 
   @Inject
-  public DescriptionRendererImpl(final @Named("shared") TemplateEngine templateEngine) {
+  public DescriptionRendererImpl(final Provider<SystemStatus> systemStatus,
+                                 final @Named("shared") TemplateEngine templateEngine)
+  {
+    this.systemStatus = checkNotNull(systemStatus);
     this.templateEngine = checkNotNull(templateEngine);
     template = getClass().getResource(TEMPLATE_RESOURCE);
     objectMapper = new ObjectMapper();
@@ -58,6 +66,8 @@ public class DescriptionRendererImpl
   public String renderHtml(final Description description) {
     TemplateParameters params = new TemplateParameters();
     params.setAll(description.getParameters());
+    params.set("nexusVersion", systemStatus.get().getVersion());
+    params.set("nexusUrl", BaseUrlHolder.get());
     params.set("items", description.getItems());
     params.set("esc", new EscapeHelper());
     return templateEngine.render(this, template, params);
