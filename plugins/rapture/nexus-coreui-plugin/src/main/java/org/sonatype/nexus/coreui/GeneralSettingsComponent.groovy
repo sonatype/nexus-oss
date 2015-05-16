@@ -21,6 +21,7 @@ import javax.validation.constraints.NotNull
 import org.sonatype.nexus.common.app.BaseUrlManager
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.validation.Validate
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
@@ -58,6 +59,7 @@ class GeneralSettingsComponent
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
+  @Validate
   GeneralSettingsXO update(final @NotNull @Valid GeneralSettingsXO settings) {
     baseUrlManager.url = settings.baseUrl
     return read()
