@@ -14,11 +14,10 @@ package org.sonatype.nexus.security.user;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.sonatype.nexus.security.SecuritySystem;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.validation.ConstraintValidatorSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,19 +28,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class UniqueUserIdValidator
-    extends ComponentSupport
-    implements ConstraintValidator<UniqueUserId, String>
+    extends ConstraintValidatorSupport<UniqueUserId, String>
 {
   private final SecuritySystem securitySystem;
 
   @Inject
   public UniqueUserIdValidator(final SecuritySystem securitySystem) {
     this.securitySystem = checkNotNull(securitySystem);
-  }
-
-  @Override
-  public void initialize(final UniqueUserId constraintAnnotation) {
-    // empty
   }
 
   @Override

@@ -18,11 +18,10 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.sonatype.nexus.security.SecuritySystem;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.validation.ConstraintValidatorSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -33,19 +32,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class RolesExistValidator
-    extends ComponentSupport
-    implements ConstraintValidator<RolesExist, Collection<?>> // Collection<String> expected
+    extends ConstraintValidatorSupport<RolesExist, Collection<?>> // Collection<String> expected
 {
   private final SecuritySystem securitySystem;
 
   @Inject
   public RolesExistValidator(final SecuritySystem securitySystem) {
     this.securitySystem = checkNotNull(securitySystem);
-  }
-
-  @Override
-  public void initialize(final RolesExist constraintAnnotation) {
-    // empty
   }
 
   @Override

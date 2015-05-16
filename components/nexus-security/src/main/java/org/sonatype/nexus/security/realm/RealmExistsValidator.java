@@ -14,11 +14,10 @@ package org.sonatype.nexus.security.realm;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.sonatype.nexus.security.SecuritySystem;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.validation.ConstraintValidatorSupport;
 
 import org.apache.shiro.realm.Realm;
 
@@ -31,19 +30,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class RealmExistsValidator
-    extends ComponentSupport
-    implements ConstraintValidator<RealmExists, String>
+    extends ConstraintValidatorSupport<RealmExists, String>
 {
   private final SecuritySystem securitySystem;
 
   @Inject
   public RealmExistsValidator(final SecuritySystem securitySystem) {
     this.securitySystem = checkNotNull(securitySystem);
-  }
-
-  @Override
-  public void initialize(final RealmExists constraintAnnotation) {
-    // empty
   }
 
   @Override

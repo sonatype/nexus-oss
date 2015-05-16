@@ -14,8 +14,9 @@ package org.sonatype.nexus.validation.constraint;
 
 import java.util.Locale;
 
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import org.sonatype.nexus.validation.ConstraintValidatorSupport;
 
 /**
  * {@link Case} validator.
@@ -23,7 +24,7 @@ import javax.validation.ConstraintValidatorContext;
  * @since 3.0
  */
 public class CaseValidator
-  implements ConstraintValidator<Case,String>
+  extends ConstraintValidatorSupport<Case,String>
 {
   private CaseType type;
 
