@@ -19,14 +19,14 @@ import javax.annotation.Nonnull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// TODO: Consider extending javax.validation.ValidationException?
-
 /**
  * {@link ValidationResponse} exception.
  *
  * @see ValidationMessage
  * @since 3.0
+ * @deprecated Prefer bean-validation instead
  */
+@Deprecated
 public class ValidationResponseException
     extends RuntimeException
 {
