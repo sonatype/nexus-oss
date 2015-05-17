@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.rapture.internal.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,11 +39,6 @@ import com.google.gson.GsonBuilder;
 import com.softwarementors.extjs.djn.config.annotations.DirectAction;
 import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod;
 import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager;
-import org.apache.karaf.bundle.core.BundleInfo;
-import org.apache.karaf.bundle.core.BundleService;
-import org.apache.karaf.bundle.core.BundleState;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -65,10 +58,6 @@ public class StateComponent
 
   private final Provider<SystemStatus> systemStatus;
 
-  private final BundleContext bundleContext;
-
-  private final BundleService bundleService;
-
   private final List<Provider<StateContributor>> stateContributors;
 
   private final static Gson gson = new GsonBuilder().create();
@@ -78,14 +67,10 @@ public class StateComponent
   @Inject
   public StateComponent(final Rapture rapture,
                         final Provider<SystemStatus> systemStatus,
-                        final BundleContext bundleContext,
-                        final BundleService bundleService,
                         final List<Provider<StateContributor>> stateContributors)
   {
     this.rapture = checkNotNull(rapture);
     this.systemStatus = checkNotNull(systemStatus);
-    this.bundleContext = checkNotNull(bundleContext);
-    this.bundleService = checkNotNull(bundleService);
     this.stateContributors = checkNotNull(stateContributors);
   }
 
@@ -131,7 +116,6 @@ public class StateComponent
     send(values, hashes, "status", getStatus());
     send(values, hashes, "license", getLicense());
     send(values, hashes, "uiSettings", rapture.getSettings());
-    send(values, hashes, "activeBundles", getActivateBundles());
 
     return values;
   }
@@ -229,32 +213,5 @@ public class StateComponent
     result.setRequired(!"OSS".equals(status.getEditionShort()));
     result.setInstalled(status.isLicenseInstalled());
     return result;
-  }
-
-  /**
-   * Returns sorted list of activate bundle symbolic-names to use for UI feature activation.
-   */
-  private List<String> getActivateBundles() {
-    List<String> bundles = new ArrayList<>();
-
-    for (Bundle bundle : bundleContext.getBundles()) {
-      BundleInfo info = bundleService.getInfo(bundle);
-      String name = info.getSymbolicName();
-
-      // ignore wrapped bundles
-      if (name.startsWith("wrap_mvn")) {
-        continue;
-      }
-
-      // TODO: Should we strip out any others?
-
-      // only report active bundles
-      if (info.getState() == BundleState.Active) {
-        bundles.add(name);
-      }
-    }
-
-    Collections.sort(bundles);
-    return bundles;
   }
 }
