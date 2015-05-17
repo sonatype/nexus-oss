@@ -10,47 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rutauth;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.sonatype.nexus.plugin.PluginIdentity;
-
-import org.eclipse.sisu.EagerSingleton;
-import org.jetbrains.annotations.NonNls;
+package com.sonatype.nexus.ssl.plugin.internal;
 
 /**
- * Rut Auth plugin.
+ * SSL constants.
  *
- * @since 2.7
+ * @since ssl 1.0
  */
-@Named
-@EagerSingleton
-public class RutAuthPlugin
-    extends PluginIdentity
+public class SSLConstants
 {
   /**
    * Prefix for ID-like things.
    */
-  @NonNls
-  public static final String ID_PREFIX = "rutauth";
+  public static final String ID_PREFIX = "ssl";
 
   /**
-   * Expected groupId for plugin artifact.
+   * Prefix for @Named configuration.
    */
-  @NonNls
-  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
-
-  /**
-   * Expected artifactId for plugin artifact.
-   */
-  @NonNls
-  public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
-
-  @Inject
-  public RutAuthPlugin() throws Exception {
-    super(GROUP_ID, ARTIFACT_ID);
-  }
-
+  public static final String CONFIG_PREFIX = "${" + ID_PREFIX;
 }

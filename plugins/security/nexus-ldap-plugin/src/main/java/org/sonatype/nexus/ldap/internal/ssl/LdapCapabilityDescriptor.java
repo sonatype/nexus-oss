@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.sonatype.nexus.ssl.plugin.SSLPlugin;
+import com.sonatype.nexus.ssl.plugin.internal.SSLConstants;
 
 import org.sonatype.nexus.capability.CapabilityIdentity;
 import org.sonatype.nexus.capability.CapabilityType;
@@ -56,7 +56,7 @@ public class LdapCapabilityDescriptor
   /**
    * {@link LdapCapability} type ID (ssl.key.ldap)
    */
-  public static final String TYPE_ID = SSLPlugin.ID_PREFIX + ".key.ldap";
+  public static final String TYPE_ID = SSLConstants.ID_PREFIX + ".key.ldap";
 
   /**
    * {@link LdapCapability} type

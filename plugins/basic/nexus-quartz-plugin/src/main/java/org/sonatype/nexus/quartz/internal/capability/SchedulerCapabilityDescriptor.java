@@ -26,28 +26,27 @@ import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.NumberTextFormField;
-import org.sonatype.nexus.quartz.QuartzPlugin;
+import org.sonatype.nexus.quartz.internal.QuartzConstants;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
 import static org.sonatype.nexus.capability.CapabilityType.capabilityType;
 import static org.sonatype.nexus.capability.Tag.categoryTag;
 import static org.sonatype.nexus.capability.Tag.tags;
-import static org.sonatype.nexus.quartz.QuartzPlugin.CAPABILITY_CATEGORY_TAG;
+import static org.sonatype.nexus.quartz.internal.QuartzConstants.CAPABILITY_CATEGORY_TAG;
 
 /**
  * {@link SchedulerCapability} descriptor.
  *
  * @since 3.0
  */
-@Named(QuartzPlugin.CAPABILITY_ID)
+@Named(QuartzConstants.CAPABILITY_ID)
 @Singleton
 public class SchedulerCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements Taggable
 {
-  public static final CapabilityType TYPE = capabilityType(QuartzPlugin.CAPABILITY_ID);
+  public static final CapabilityType TYPE = capabilityType(QuartzConstants.CAPABILITY_ID);
 
   private static interface Messages
       extends MessageBundle
@@ -100,7 +99,7 @@ public class SchedulerCapabilityDescriptor
 
   @Override
   protected String renderAbout() throws Exception {
-    return render(QuartzPlugin.CAPABILITY_ID + "-about.vm");
+    return render(QuartzConstants.CAPABILITY_ID + "-about.vm");
   }
 
   @Override

@@ -31,7 +31,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import org.sonatype.nexus.capability.CapabilitiesPlugin;
 import org.sonatype.nexus.capability.Capability;
 import org.sonatype.nexus.capability.CapabilityDescriptor;
 import org.sonatype.nexus.capability.CapabilityIdentity;
@@ -78,7 +77,7 @@ public class CapabilitiesResource
     implements Resource
 {
 
-  public static final String RESOURCE_URI = CapabilitiesPlugin.REST_PREFIX;
+  public static final String RESOURCE_URI = "/capabilities";
 
   private static final String $TYPE = "$type";
 
@@ -105,7 +104,7 @@ public class CapabilitiesResource
   @GET
   @Path("/{id}")
   @Produces({APPLICATION_XML, APPLICATION_JSON})
-  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "read")
+  @RequiresPermissions("nexus:capabilities:read")
   public CapabilityXO get(final @PathParam("id") String id) {
     final CapabilityIdentity capabilityId = capabilityIdentity(id);
     final CapabilityReference reference = capabilityRegistry.get(capabilityId);
@@ -118,7 +117,7 @@ public class CapabilitiesResource
   @GET
   @Path("/{id}/status")
   @Produces({APPLICATION_XML, APPLICATION_JSON})
-  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "read")
+  @RequiresPermissions("nexus:capabilities:read")
   public CapabilityStatusXO getInfo(final @PathParam("id") String id) {
     final CapabilityIdentity capabilityId = capabilityIdentity(id);
     final CapabilityReference reference = capabilityRegistry.get(capabilityId);
@@ -133,7 +132,7 @@ public class CapabilitiesResource
    */
   @GET
   @Produces({APPLICATION_XML, APPLICATION_JSON})
-  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "read")
+  @RequiresPermissions("nexus:capabilities:read")
   public List<CapabilityStatusXO> get(@QueryParam($TYPE) String type,
                                       @QueryParam($ENABLED) Boolean enabled,
                                       @QueryParam($ACTIVE) Boolean active,
@@ -163,7 +162,7 @@ public class CapabilitiesResource
   @POST
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_JSON, APPLICATION_XML})
-  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "create")
+  @RequiresPermissions("nexus:capabilities:create")
   public CapabilityStatusXO post(final CapabilityXO capability)
       throws Exception
   {
@@ -184,7 +183,7 @@ public class CapabilitiesResource
   @Path("/{id}")
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_XML, APPLICATION_JSON})
-  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "update")
+  @RequiresPermissions("nexus:capabilities:update")
   public CapabilityStatusXO put(final @PathParam("id") String id,
                                 final CapabilityXO capability)
       throws Exception
@@ -204,7 +203,7 @@ public class CapabilitiesResource
    */
   @DELETE
   @Path("/{id}")
-  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "delete")
+  @RequiresPermissions("nexus:capabilities:delete")
   public void delete(final @PathParam("id") String id)
       throws Exception
   {
@@ -218,7 +217,7 @@ public class CapabilitiesResource
   @Path("/{id}/enable")
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_XML, APPLICATION_JSON})
-  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "update")
+  @RequiresPermissions("nexus:capabilities:update")
   public CapabilityStatusXO enable(final @PathParam("id") String id)
       throws Exception
   {
@@ -232,7 +231,7 @@ public class CapabilitiesResource
   @Path("/{id}/disable")
   @Consumes({APPLICATION_JSON, APPLICATION_XML})
   @Produces({APPLICATION_XML, APPLICATION_JSON})
-  @RequiresPermissions(CapabilitiesPlugin.PERMISSION_PREFIX + "update")
+  @RequiresPermissions("nexus:capabilities:update")
   public CapabilityStatusXO disable(final @PathParam("id") String id)
       throws Exception
   {

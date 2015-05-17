@@ -10,40 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rapture;
-
-import javax.inject.Named;
-
-import org.sonatype.nexus.plugin.PluginIdentity;
-
-import org.eclipse.sisu.EagerSingleton;
+package org.sonatype.nexus.ldap.internal;
 
 /**
- * Rapture plugin.
+ * LDAP constants.
  *
- * @since 3.0
+ * @since 2.4
  */
-@Named
-@EagerSingleton
-public class RapturePlugin
-    extends PluginIdentity
+public class LdapConstants
 {
   /**
-   * Prefix for ID-like things.
+   * LDAP realm name.
    */
-  public static final String ID_PREFIX = "rapture";
+  public static final String REALM_NAME = "LdapRealm";
 
   /**
-   * Expected groupId for plugin artifact.
+   * LDAP user source name.
    */
-  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
-
-  /**
-   * Expected artifactId for plugin artifact.
-   */
-  public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
-
-  public RapturePlugin() throws Exception {
-    super(GROUP_ID, ARTIFACT_ID);
-  }
+  public static final String USER_SOURCE = "LDAP";
 }

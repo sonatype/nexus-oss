@@ -10,46 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.atlas;
+package org.sonatype.nexus.kenai.internal;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.sonatype.nexus.plugin.PluginIdentity;
-
-import org.eclipse.sisu.EagerSingleton;
 import org.jetbrains.annotations.NonNls;
 
 /**
- * Atlas (support) plugin.
+ * Kenai constants.
  *
- * @since 2.7
+ * @since 2.8
  */
-@Named
-@EagerSingleton
-public class AtlasPlugin
-    extends PluginIdentity
+public class KenaiConstants
 {
   /**
    * Prefix for ID-like things.
    */
   @NonNls
-  public static final String ID_PREFIX = "atlas";
-
-  /**
-   * Expected groupId for plugin artifact.
-   */
-  @NonNls
-  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
-
-  /**
-   * Expected artifactId for plugin artifact.
-   */
-  @NonNls
-  public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
-
-  @Inject
-  public AtlasPlugin() throws Exception {
-    super(GROUP_ID, ARTIFACT_ID);
-  }
+  public static final String ID_PREFIX = "kenai";
 }

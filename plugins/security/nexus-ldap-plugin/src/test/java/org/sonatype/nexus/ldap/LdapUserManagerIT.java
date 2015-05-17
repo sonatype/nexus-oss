@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.sonatype.nexus.ldap.internal.LdapConstants;
 import org.sonatype.nexus.ldap.internal.LdapITSupport;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
@@ -67,7 +68,7 @@ public class LdapUserManagerIT
   }
 
   private UserManager getUserManager() throws Exception {
-    return this.lookup(UserManager.class, LdapPlugin.USER_SOURCE);
+    return this.lookup(UserManager.class, LdapConstants.USER_SOURCE);
   }
 
   @Override
@@ -226,7 +227,7 @@ public class LdapUserManagerIT
     RealmConfiguration realmConfiguration;
 
     realmConfiguration = new RealmConfiguration();
-    realmConfiguration.setRealmNames(ImmutableList.of(AuthenticatingRealmImpl.NAME, LdapPlugin.REALM_NAME));
+    realmConfiguration.setRealmNames(ImmutableList.of(AuthenticatingRealmImpl.NAME, LdapConstants.REALM_NAME));
     realmManager.setConfiguration(realmConfiguration);
 
     // the user developer is in both realms, we need to make sure the order is honored
@@ -235,7 +236,7 @@ public class LdapUserManagerIT
 
     // change realm order
     realmConfiguration = new RealmConfiguration();
-    realmConfiguration.setRealmNames(ImmutableList.of(LdapPlugin.REALM_NAME, AuthenticatingRealmImpl.NAME));
+    realmConfiguration.setRealmNames(ImmutableList.of(LdapConstants.REALM_NAME, AuthenticatingRealmImpl.NAME));
     realmManager.setConfiguration(realmConfiguration);
 
     // now the user should belong to the LDAP realm

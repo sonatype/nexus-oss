@@ -25,7 +25,7 @@ import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
-import org.sonatype.nexus.rutauth.RutAuthPlugin;
+import org.sonatype.nexus.rutauth.internal.RutAuthConstants;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
@@ -48,7 +48,7 @@ public class RutAuthCapabilityDescriptor
     implements Taggable
 {
   @NonNls
-  public static final String TYPE_ID = RutAuthPlugin.ID_PREFIX;
+  public static final String TYPE_ID = RutAuthConstants.ID_PREFIX;
 
   public static final CapabilityType TYPE = capabilityType(TYPE_ID);
 

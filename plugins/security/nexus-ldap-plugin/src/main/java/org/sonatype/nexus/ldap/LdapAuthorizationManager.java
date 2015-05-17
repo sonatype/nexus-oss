@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.ldap.internal.LdapConstants;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.nexus.ldap.internal.realms.LdapManager;
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
-@Named(LdapPlugin.USER_SOURCE)
+@Named(LdapConstants.USER_SOURCE)
 public class LdapAuthorizationManager
     extends AbstractReadOnlyAuthorizationManager
 {
@@ -50,7 +51,7 @@ public class LdapAuthorizationManager
 
   @Override
   public String getSource() {
-    return LdapPlugin.USER_SOURCE;
+    return LdapConstants.USER_SOURCE;
   }
 
   public Set<String> listRoleIds() {

@@ -10,51 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.siesta;
+package org.sonatype.nexus.rutauth.internal;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.sonatype.nexus.plugin.PluginIdentity;
-
-import org.eclipse.sisu.EagerSingleton;
 import org.jetbrains.annotations.NonNls;
 
 /**
- * Siesta plugin.
+ * Rut-Auth constants.
  *
  * @since 2.7
  */
-@Named
-@EagerSingleton
-public class SiestaPlugin
-    extends PluginIdentity
+public class RutAuthConstants
 {
   /**
    * Prefix for ID-like things.
    */
   @NonNls
-  public static final String ID_PREFIX = "siesta";
-
-  /**
-   * Expected groupId for plugin artifact.
-   */
-  @NonNls
-  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
-
-  /**
-   * Expected artifactId for plugin artifact.
-   */
-  @NonNls
-  public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
-
-  /**
-   * Prefix for REST resources
-   */
-  public static final String REST_PREFIX = "/" + ID_PREFIX;
-
-  @Inject
-  public SiestaPlugin() throws Exception {
-    super(GROUP_ID, ARTIFACT_ID);
-  }
+  public static final String ID_PREFIX = "rutauth";
 }

@@ -10,56 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.wonderland;
+package org.sonatype.nexus.quartz.internal;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.sonatype.nexus.plugin.PluginIdentity;
-
-import org.eclipse.sisu.EagerSingleton;
 import org.jetbrains.annotations.NonNls;
 
 /**
- * Wonderland plugin.
+ * Quartz constants.
  *
- * @since 2.7
+ * @since 3.0
  */
-@Named
-@EagerSingleton
-public class WonderlandPlugin
-    extends PluginIdentity
+public class QuartzConstants
 {
   /**
    * Prefix for ID-like things.
    */
   @NonNls
-  public static final String ID_PREFIX = "wonderland";
+  public static final String ID_PREFIX = "quartz";
 
   /**
-   * Expected groupId for plugin artifact.
-   */
-  @NonNls
-  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
-
-  /**
-   * Expected artifactId for plugin artifact.
-   */
-  @NonNls
-  public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
-
   /**
    * Prefix for @Named configuration.
    */
   public static final String CONFIG_PREFIX = "${" + ID_PREFIX;
 
   /**
-   * Prefix for REST resources
+   * Scheduler capability ID.
    */
-  public static final String REST_PREFIX = "/" + ID_PREFIX;
+  public static final String CAPABILITY_ID = ID_PREFIX + ".scheduler";
 
-  @Inject
-  public WonderlandPlugin() throws Exception {
-    super(GROUP_ID, ARTIFACT_ID);
-  }
+  /**
+   * Capabilities tag.
+   */
+  public static final String CAPABILITY_CATEGORY_TAG = "Quartz";
+
+  /**
+   * Name of the KV store used by plugin.
+   */
+  public static final String STORE_NAME = "nexusquartz";
 }

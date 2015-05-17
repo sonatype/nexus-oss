@@ -40,7 +40,6 @@ import org.sonatype.nexus.analytics.EventDataBuilder;
 import org.sonatype.nexus.analytics.EventRecorder;
 import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
-import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.extdirect.model.Response;
 import org.sonatype.nexus.validation.ValidationResponseException;
 
@@ -142,7 +141,7 @@ public class ExtDirectServlet
           }
         })
     );
-    File apiFile = new File(directories.getTemporaryDirectory(), ExtDirectPlugin.ARTIFACT_ID + "/api.js");
+    File apiFile = new File(directories.getTemporaryDirectory(), "nexus-extdirect-plugin/api.js");
     return Lists.newArrayList(
         new ApiConfiguration(
             "nexus",

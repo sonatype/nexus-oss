@@ -25,14 +25,11 @@ import org.sonatype.nexus.log.LoggerLevel;
  */
 @Singleton
 @Named
-public class CoreUiLogConfigurationCustomizer
+public class LogConfigurationCustomizerImpl
     implements LogConfigurationCustomizer
 {
-
   @Override
   public void customize(final Configuration configuration) {
-    // Useful loggers (level will be calculated as effective level)
     configuration.setLoggerLevel("org.sonatype.nexus.coreui", LoggerLevel.DEFAULT);
   }
-
 }

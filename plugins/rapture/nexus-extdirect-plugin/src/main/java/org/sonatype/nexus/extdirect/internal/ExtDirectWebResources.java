@@ -20,7 +20,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.app.ApplicationDirectories;
-import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.webresources.FileWebResource;
 import org.sonatype.nexus.webresources.WebResource;
 import org.sonatype.nexus.webresources.WebResourceBundle;
@@ -58,8 +57,8 @@ public class ExtDirectWebResources
   @Override
   public List<WebResource> getResources() {
     return ImmutableList.of(
-        create(ExtDirectPlugin.ARTIFACT_ID + "/api.js", "/static/rapture/extdirect-prod.js"),
-        create(ExtDirectPlugin.ARTIFACT_ID + "/api-debug.js", "/static/rapture/extdirect-debug.js")
+        create("nexus-extdirect-plugin/api.js", "/static/rapture/extdirect-prod.js"),
+        create("nexus-extdirect-plugin/api-debug.js", "/static/rapture/extdirect-debug.js")
     );
   }
 }

@@ -21,7 +21,6 @@ import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.PagedResponse
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
-import org.sonatype.nexus.timeline.TimelinePlugin
 import org.sonatype.nexus.timeline.feeds.FeedSource
 import org.sonatype.nexus.timeline.feeds.rest.FeedContentRenderer
 
@@ -40,7 +39,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 class FeedComponent
 extends DirectComponentSupport
 {
-
   @Inject
   Map<String, FeedSource> feedSources
 
@@ -59,7 +57,7 @@ extends DirectComponentSupport
           key: source.feedKey,
           name: source.feedName,
           description: source.feedDescription,
-          url: "${BaseUrlHolder.get()}/service/siesta${TimelinePlugin.SERVICE_PREFIX}/feeds/${source.feedKey}"
+          url: "${BaseUrlHolder.get()}/service/siesta/timeline/feeds/${source.feedKey}"
       )
     }
   }
@@ -88,5 +86,4 @@ extends DirectComponentSupport
       }
     }
   }
-
 }
