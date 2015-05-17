@@ -46,7 +46,7 @@ public class ActiveBundlesStateContributor
 
   @Override
   public Map<String, Object> getState() {
-    return ImmutableMap.of("activeBundles", (Object) caclulateActivateBundles());
+    return ImmutableMap.of("activeBundles", calculateActivateBundles());
   }
 
   @Override
@@ -59,7 +59,7 @@ public class ActiveBundlesStateContributor
   /**
    * Returns sorted list of activate bundle symbolic-names to use for UI feature activation.
    */
-  private List<String> caclulateActivateBundles() {
+  private Object calculateActivateBundles() {
     log.info("Determining active bundles");
 
     List<String> bundles = new ArrayList<>();
