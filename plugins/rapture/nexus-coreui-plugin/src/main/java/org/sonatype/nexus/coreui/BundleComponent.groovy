@@ -24,8 +24,6 @@ import org.apache.karaf.bundle.core.BundleService
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.osgi.framework.BundleContext
 
-import static com.google.common.base.Preconditions.checkNotNull
-
 /**
  * OSGI bundle component.
  *
@@ -37,15 +35,11 @@ import static com.google.common.base.Preconditions.checkNotNull
 class BundleComponent
     extends DirectComponentSupport
 {
-  final BundleContext bundleContext
-
-  final BundleService bundleService
+  @Inject
+  BundleContext bundleContext
 
   @Inject
-  BundleComponent(BundleContext bundleContext, BundleService bundleService) {
-    this.bundleContext = checkNotNull(bundleContext)
-    this.bundleService = checkNotNull(bundleService)
-  }
+  BundleService bundleService
 
   @DirectMethod
   @RequiresPermissions('nexus:bundles:read')

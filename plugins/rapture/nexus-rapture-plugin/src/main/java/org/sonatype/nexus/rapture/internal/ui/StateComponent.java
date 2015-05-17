@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.rapture.internal.ui;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,6 @@ import javax.servlet.http.HttpSession;
 import org.sonatype.nexus.common.app.SystemStatus;
 import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
-import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.nexus.rapture.Rapture;
 import org.sonatype.nexus.rapture.StateContributor;
 
@@ -41,6 +41,11 @@ import com.google.gson.GsonBuilder;
 import com.softwarementors.extjs.djn.config.annotations.DirectAction;
 import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod;
 import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager;
+import org.apache.karaf.bundle.core.BundleInfo;
+import org.apache.karaf.bundle.core.BundleService;
+import org.apache.karaf.bundle.core.BundleState;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -60,7 +65,9 @@ public class StateComponent
 
   private final Provider<SystemStatus> systemStatusProvider;
 
-  private final List<PluginIdentity> pluginIdentities;
+  private final BundleContext bundleContext;
+
+  private final BundleService bundleService;
 
   private final List<Provider<StateContributor>> stateContributors;
 
@@ -71,12 +78,14 @@ public class StateComponent
   @Inject
   public StateComponent(final Rapture rapture,
                         final Provider<SystemStatus> systemStatusProvider,
-                        final List<PluginIdentity> pluginIdentities,
+                        final BundleContext bundleContext,
+                        final BundleService bundleService,
                         final List<Provider<StateContributor>> stateContributors)
   {
-    this.rapture = checkNotNull(rapture, "rapture");
+    this.rapture = checkNotNull(rapture);
     this.systemStatusProvider = checkNotNull(systemStatusProvider);
-    this.pluginIdentities = checkNotNull(pluginIdentities);
+    this.bundleContext = checkNotNull(bundleContext);
+    this.bundleService = checkNotNull(bundleService);
     this.stateContributors = checkNotNull(stateContributors);
   }
 
@@ -122,7 +131,9 @@ public class StateComponent
     send(values, hashes, "status", getStatus());
     send(values, hashes, "license", getLicense());
     send(values, hashes, "uiSettings", rapture.getSettings());
-    send(values, hashes, "plugins", getPlugins());
+
+    // TODO: Rename to "bundles"?
+    send(values, hashes, "plugins", getActivatedBundles());
 
     return values;
   }
@@ -225,18 +236,19 @@ public class StateComponent
   }
 
   /**
-   * @return a sorted list of successfully activated plugins.
+   * @return sorted list of activate bundle symbolic-names.
    */
-  private List<String> getPlugins() {
-    List<String> plugins = Lists.newArrayList();
+  private List<String> getActivatedBundles() {
+    List<String> bundles = new ArrayList<>();
 
-    for (PluginIdentity plugin : pluginIdentities) {
-      plugins.add(plugin.getGroupId() + ":" + plugin.getArtifactId());
+    for (Bundle bundle : bundleContext.getBundles()) {
+      BundleInfo info = bundleService.getInfo(bundle);
+      if (info.getState() == BundleState.Active) {
+        bundles.add(info.getSymbolicName());
+      }
     }
 
-    Collections.sort(plugins);
-
-    return plugins;
+    Collections.sort(bundles);
+    return bundles;
   }
-
 }
