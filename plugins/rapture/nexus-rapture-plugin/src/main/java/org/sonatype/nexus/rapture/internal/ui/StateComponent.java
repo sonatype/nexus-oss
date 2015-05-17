@@ -232,15 +232,25 @@ public class StateComponent
   }
 
   /**
-   * @return sorted list of activate bundle symbolic-names.
+   * Returns sorted list of activate bundle symbolic-names to use for UI feature activation.
    */
   private List<String> getActivateBundles() {
     List<String> bundles = new ArrayList<>();
 
     for (Bundle bundle : bundleContext.getBundles()) {
       BundleInfo info = bundleService.getInfo(bundle);
+      String name = info.getSymbolicName();
+
+      // ignore wrapped bundles
+      if (name.startsWith("wrap_mvn")) {
+        continue;
+      }
+
+      // TODO: Should we strip out any others?
+
+      // only report active bundles
       if (info.getState() == BundleState.Active) {
-        bundles.add(info.getSymbolicName());
+        bundles.add(name);
       }
     }
 
