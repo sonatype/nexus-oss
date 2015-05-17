@@ -63,7 +63,7 @@ public class StateComponent
 
   private final Rapture rapture;
 
-  private final Provider<SystemStatus> systemStatusProvider;
+  private final Provider<SystemStatus> systemStatus;
 
   private final BundleContext bundleContext;
 
@@ -77,13 +77,13 @@ public class StateComponent
 
   @Inject
   public StateComponent(final Rapture rapture,
-                        final Provider<SystemStatus> systemStatusProvider,
+                        final Provider<SystemStatus> systemStatus,
                         final BundleContext bundleContext,
                         final BundleService bundleService,
                         final List<Provider<StateContributor>> stateContributors)
   {
     this.rapture = checkNotNull(rapture);
-    this.systemStatusProvider = checkNotNull(systemStatusProvider);
+    this.systemStatus = checkNotNull(systemStatus);
     this.bundleContext = checkNotNull(bundleContext);
     this.bundleService = checkNotNull(bundleService);
     this.stateContributors = checkNotNull(stateContributors);
@@ -131,19 +131,17 @@ public class StateComponent
     send(values, hashes, "status", getStatus());
     send(values, hashes, "license", getLicense());
     send(values, hashes, "uiSettings", rapture.getSettings());
-
-    // TODO: Rename to "bundles"?
-    send(values, hashes, "plugins", getActivatedBundles());
+    send(values, hashes, "activeBundles", getActivateBundles());
 
     return values;
   }
 
   private StatusXO getStatus() {
-    SystemStatus systemStatus = systemStatusProvider.get();
-    StatusXO status = new StatusXO();
-    status.setEdition(systemStatus.getEditionShort());
-    status.setVersion(systemStatus.getVersion());
-    return status;
+    SystemStatus status = systemStatus.get();
+    StatusXO result = new StatusXO();
+    result.setEdition(status.getEditionShort());
+    result.setVersion(status.getVersion());
+    return result;
   }
 
   private List<CommandXO> getCommands() {
@@ -226,19 +224,17 @@ public class StateComponent
   }
 
   public LicenseXO getLicense() {
-    LicenseXO licenseXO = new LicenseXO();
-    SystemStatus status = systemStatusProvider.get();
-
-    licenseXO.setRequired(!"OSS".equals(status.getEditionShort()));
-    licenseXO.setInstalled(status.isLicenseInstalled());
-
-    return licenseXO;
+    SystemStatus status = systemStatus.get();
+    LicenseXO result = new LicenseXO();
+    result.setRequired(!"OSS".equals(status.getEditionShort()));
+    result.setInstalled(status.isLicenseInstalled());
+    return result;
   }
 
   /**
    * @return sorted list of activate bundle symbolic-names.
    */
-  private List<String> getActivatedBundles() {
+  private List<String> getActivateBundles() {
     List<String> bundles = new ArrayList<>();
 
     for (Bundle bundle : bundleContext.getBundles()) {

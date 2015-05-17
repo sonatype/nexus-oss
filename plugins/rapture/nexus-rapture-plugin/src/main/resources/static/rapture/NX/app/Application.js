@@ -139,9 +139,9 @@ Ext.define('NX.app.Application', {
     debugMode: function () {
       return NX.State.getValue('debug') === true;
     },
-    bundleActive: function (coordinates) {
+    bundleActive: function (symbolicName) {
       // FIXME: Rename key
-      return NX.State.getValue('plugins').indexOf(coordinates) > -1;
+      return NX.State.getValue('activeBundles').indexOf(symbolicName) > -1;
     }
   },
 
