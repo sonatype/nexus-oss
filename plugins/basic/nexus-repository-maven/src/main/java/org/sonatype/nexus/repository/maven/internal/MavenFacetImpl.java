@@ -197,6 +197,7 @@ public class MavenFacetImpl
   @Nullable
   @Override
   public Content get(final StorageTx tx, final MavenPath path) throws IOException {
+    log.debug("GET {} : {}", getRepository().getName(), path.getPath());
     final Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
       return null;
@@ -243,6 +244,7 @@ public class MavenFacetImpl
   public Content put(final StorageTx tx, final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
+    log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
     if (path.getCoordinates() != null) {
       return putArtifact(tx, path, payload);
     }
@@ -328,8 +330,7 @@ public class MavenFacetImpl
       try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
         final String contentType = determineContentType(path, supplier, payload.getContentType());
         try (InputStream is = supplier.get()) {
-          final BlobRef blobRef = tx.setBlob(is, headers, asset, HashType.ALGORITHMS, contentType);
-          log.debug("Asset {} has blob {}", path.getPath(), blobRef);
+          tx.setBlob(is, headers, asset, HashType.ALGORITHMS, contentType);
         }
       }
     }
@@ -361,6 +362,7 @@ public class MavenFacetImpl
   public boolean delete(final StorageTx tx, final MavenPath... paths) throws IOException {
     boolean result = false;
     for (MavenPath path : paths) {
+      log.debug("DELETE {} : {}", getRepository().getName(), path.getPath());
       if (path.getCoordinates() != null) {
         result = deleteArtifact(path, tx) || result;
       }
