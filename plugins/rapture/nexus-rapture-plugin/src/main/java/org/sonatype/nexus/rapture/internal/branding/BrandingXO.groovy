@@ -23,7 +23,10 @@ import groovy.transform.ToString
 class BrandingXO
 {
   Boolean headerEnabled
+
   String headerHtml
+
   Boolean footerEnabled
+
   String footerHtml
 }
