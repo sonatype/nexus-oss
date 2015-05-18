@@ -72,6 +72,9 @@ public class SimpleSessionCookieIT
 
   private static final String TYPICAL_BROWSER_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36";
 
+  // FIXME: This relies on the default 'maven-releases' repository to function, this test should instead
+  // FIXME: ... setup a repository to test with
+
   @Test
   public void authenticatedContentCRUDActionsShouldNotCreateSession() throws Exception {
     final String target = resolveUrl(nexusUrl, "repository/maven-releases/foo/bar/1/bar-1.txt").toExternalForm();

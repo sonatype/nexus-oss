@@ -29,6 +29,7 @@ import com.sonatype.nexus.ssl.plugin.TrustStore;
 import org.sonatype.nexus.common.app.NexusStoppedEvent;
 import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.ldap.internal.connector.DefaultLdapConnector;
+import org.sonatype.nexus.ldap.internal.connector.FailoverLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.LdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapAuthConfiguration;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
@@ -307,6 +308,12 @@ public class EnterpriseLdapManager
             new DefaultLdapConnector(ldapServer.getId(), ldapUserManager, ldapGroupManager,
                 getLdapContextFactory(ldapServer),
                 getLdapAuthConfiguration(ldapServer));
+
+        ldapConnectors.add(new FailoverLdapConnector(
+            originalLdapConnector,
+            null,
+            ldapServer.getConnection().getConnectionRetryDelay(),
+            ldapServer.getConnection().getMaxIncidentsCount()));
       }
     }
     return this.ldapConnectors;
