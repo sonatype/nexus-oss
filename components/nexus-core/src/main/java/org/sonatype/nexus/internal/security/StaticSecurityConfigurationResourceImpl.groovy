@@ -286,6 +286,7 @@ class StaticSecurityConfigurationResourceImpl
                 id: 'anonymous',
 
                 privileges: [
+                    'search-read',
                     'repository-view-*-*-browse',
                     'repository-view-*-*-read'
                 ]
