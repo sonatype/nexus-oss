@@ -19,6 +19,9 @@
  */
 Ext.define('NX.Permissions', {
   singleton: true,
+  requires: [
+    'NX.util.Array'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
@@ -129,7 +132,11 @@ Ext.define('NX.Permissions', {
   /**
    * @private
    *
-   * Returns true if permission 1 implies permission 2 using logic similar to Shiro wildcard permission.
+   * Returns true if permission1 implies permission2 using same logic as WildcardPermission.
+   *
+   * @param {string} permission1    Granted permission
+   * @param {string} permission2    Permission under-test
+   * @return {boolean}
    */
   implies: function(permission1, permission2) {
     var me = this,
@@ -148,9 +155,9 @@ Ext.define('NX.Permissions', {
         return true;
       }
       else {
-        part1 = parts1[i];
-        part2 = parts2[i];
-        if (part1.indexOf('*') === -1 && part1 !== part2) {
+        part1 = parts1[i].split(',');
+        part2 = parts2[i].split(',');
+        if (!Ext.Array.contains(part1, '*') && !NX.util.Array.containsAll(part1, part2)) {
           return false;
         }
       }
@@ -158,8 +165,8 @@ Ext.define('NX.Permissions', {
 
     // If this permission has more parts than the other parts, only imply it if all of the other parts are wildcards
     for (; i < parts1.length; i++) {
-      part1 = parts1[i];
-      if (part1.indexOf('*') === -1) {
+      part1 = parts1[i].split(',');
+      if (!Ext.Array.contains(part1, '*')) {
         return false;
       }
     }
