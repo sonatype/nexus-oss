@@ -81,7 +81,6 @@ public class DefaultLdapConfigurationManagerTest
   private Connection buildConnectionInfo() throws Exception {
     Connection connInfo = new Connection();
     connInfo.setAuthScheme("ldap");
-    connInfo.setBackupHost(new Host(Protocol.ldap, "backupHost", 11111));
     connInfo.setMaxIncidentsCount(3);
     connInfo.setConnectionRetryDelay(300);
     connInfo.setConnectionTimeout(15);

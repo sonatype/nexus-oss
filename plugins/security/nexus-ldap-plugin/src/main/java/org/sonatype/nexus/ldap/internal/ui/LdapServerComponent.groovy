@@ -265,11 +265,6 @@ extends DirectComponentSupport
         connectionRetryDelay: connectionInfo.connectionRetryDelay,
         maxIncidentsCount: connectionInfo.maxIncidentsCount,
 
-        backupMirrorEnabled: connectionInfo.backupHost != null,
-        backupMirrorProtocol: connectionInfo.backupHost?.protocol?.name(),
-        backupMirrorHost: connectionInfo.backupHost?.hostName,
-        backupMirrorPort: connectionInfo.backupHost?.port,
-
         userBaseDn: userAndGroupConfig.userBaseDn,
         userSubtree: userAndGroupConfig.userSubtree,
         userObjectClass: userAndGroupConfig.userObjectClass,
@@ -345,8 +340,6 @@ extends DirectComponentSupport
             connectionTimeout: ldapServerXO.connectionTimeout,
             connectionRetryDelay: ldapServerXO.connectionRetryDelay,
             maxIncidentsCount: ldapServerXO.maxIncidentsCount,
-
-            backupHost: ldapServerXO.backupMirrorEnabled ? new Host(Protocol.valueOf(ldapServerXO.backupMirrorProtocol.name()), ldapServerXO.backupMirrorHost, ldapServerXO.backupMirrorPort) : null
         ),
         mapping: new Mapping(
             userBaseDn: ldapServerXO.userBaseDn,
@@ -381,9 +374,6 @@ extends DirectComponentSupport
   @PackageScope
   LdapServerXO validate(final LdapServerXO ldapServerXO) {
     validate(ldapServerXO as LdapServerConnectionXO)
-    if (ldapServerXO.backupMirrorEnabled) {
-      validator.validate(ldapServerXO, LdapServerXO.BackupMirror)
-    }
     if (ldapServerXO.ldapGroupsAsRoles) {
       validator.validate(ldapServerXO, ldapServerXO.groupType == 'static' ? LdapServerXO.GroupStatic : LdapServerXO.GroupDynamic)
     }

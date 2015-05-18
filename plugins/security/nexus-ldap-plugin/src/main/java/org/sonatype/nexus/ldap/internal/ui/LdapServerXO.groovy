@@ -29,19 +29,6 @@ class LdapServerXO
 extends LdapServerConnectionXO
 {
 
-  Boolean backupMirrorEnabled
-
-  @NotNull(groups = BackupMirror)
-  Protocol backupMirrorProtocol
-
-  @NotEmpty(groups = BackupMirror)
-  String backupMirrorHost
-
-  @NotNull(groups = BackupMirror)
-  @Min(1L)
-  @Max(65535L)
-  Integer backupMirrorPort
-
   String userBaseDn
   Boolean userSubtree
 
@@ -83,9 +70,6 @@ extends LdapServerConnectionXO
 
   @NotEmpty(groups = GroupStatic)
   String userMemberOfAttribute
-
-  public interface BackupMirror
-  {}
 
   public interface GroupDynamic
   {}

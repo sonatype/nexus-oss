@@ -18,7 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.sonatype.nexus.ldap.internal.MockLdapConnector;
-import org.sonatype.nexus.ldap.internal.connector.FailoverLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.LdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapGroupException;
@@ -39,8 +38,6 @@ public class FallBackConnectionTest
 {
 
   private MockLdapConnector mainConnector = null;
-
-  private MockLdapConnector backupConnector = null;
 
   @Override
   protected Collection<String> getLdapServerNames() {
@@ -91,10 +88,6 @@ public class FallBackConnectionTest
     final String id = connectors.get(0).getIdentifier();
     connectors.clear();
     this.mainConnector = this.buildMainMockServer(id);
-    this.backupConnector = this.buildBackupMockServer(id);
-    // important: maxIncidentCount = 1
-    LdapConnector fallBackConnector = new FailoverLdapConnector(mainConnector, backupConnector, 2, 1);
-    connectors.add(fallBackConnector);
   }
 
   @Override
@@ -109,24 +102,6 @@ public class FallBackConnectionTest
   {
     // all systems are good
     Assert.assertEquals(3, this.getLdapManager().getAllUsers().size());
-
-    // stop the main server
-    mainConnector.stop();
-
-    // try again, this time it should hit the backup
-    Assert.assertEquals(2, this.getLdapManager().getAllUsers().size());
-
-    // now start the server backup
-    mainConnector.start();
-
-    // should still be 2 users
-    Assert.assertEquals(2, this.getLdapManager().getAllUsers().size());
-
-    // now wait another 3
-    Thread.sleep(1000 * 3);
-
-    // we should be hitting the main again
-    Assert.assertEquals(3, this.getLdapManager().getAllUsers().size());
   }
 
   @Test
@@ -134,24 +109,6 @@ public class FallBackConnectionTest
       throws Exception
   {
     // all systems are good
-    Assert.assertEquals(3, this.getLdapManager().getAllGroups().size());
-
-    // stop the main server
-    mainConnector.stop();
-
-    // try again, this time it should hit the backup
-    Assert.assertEquals(2, this.getLdapManager().getAllGroups().size());
-
-    // now start the server backup
-    mainConnector.start();
-
-    // should still be 2 users
-    Assert.assertEquals(2, this.getLdapManager().getAllGroups().size());
-
-    // now wait another 10 seconds and we should be back at 3
-    Thread.sleep(1000 * 3);
-
-    // we should be hitting the main again
     Assert.assertEquals(3, this.getLdapManager().getAllGroups().size());
   }
 
@@ -161,36 +118,6 @@ public class FallBackConnectionTest
   {
     // all systems are good
     Assert.assertEquals("gamma", this.getLdapManager().getGroupName("gamma"));
-
-    // stop the main server
-    mainConnector.stop();
-
-    // try again, this time it should hit the backup
-    try {
-      this.getLdapManager().getGroupName("gamma");
-      Assert.fail("expected NoSuchLdapGroupException");
-    }
-    catch (NoSuchLdapGroupException e) {
-      // expected
-    }
-
-    // now start the server backup
-    mainConnector.start();
-
-    // try again, should still fail
-    try {
-      this.getLdapManager().getGroupName("gamma");
-      Assert.fail("expected NoSuchLdapGroupException");
-    }
-    catch (NoSuchLdapGroupException e) {
-      // expected
-    }
-
-    // now wait another 10 seconds and we should be back at 3
-    Thread.sleep(1000 * 3);
-
-    // we should be hitting the main again
-    Assert.assertEquals("gamma", this.getLdapManager().getGroupName("gamma"));
   }
 
   @Test
@@ -198,36 +125,6 @@ public class FallBackConnectionTest
       throws Exception
   {
     // all systems are good
-    Assert.assertNotNull(this.getLdapManager().getUser("rwalker"));
-
-    // stop the main server
-    mainConnector.stop();
-
-    // try again, this time it should hit the backup
-    try {
-      this.getLdapManager().getUser("rwalker");
-      Assert.fail("expected NoSuchLdapGroupException");
-    }
-    catch (NoSuchLdapUserException e) {
-      // expected
-    }
-
-    // now start the server backup
-    mainConnector.start();
-
-    // try again, should still fail
-    try {
-      this.getLdapManager().getUser("rwalker");
-      Assert.fail("expected NoSuchLdapGroupException");
-    }
-    catch (NoSuchLdapUserException e) {
-      // expected
-    }
-
-    // now wait another 10 seconds and we should be back at 3
-    Thread.sleep(1000 * 3);
-
-    // we should be hitting the main again
     Assert.assertNotNull(this.getLdapManager().getUser("rwalker"));
   }
 
@@ -237,36 +134,6 @@ public class FallBackConnectionTest
   {
     // all systems are good
     Assert.assertEquals(3, this.getLdapManager().getUserRoles("rwalker").size());
-
-    // stop the main server
-    mainConnector.stop();
-
-    // try again, this time it should hit the backup
-    try {
-      this.getLdapManager().getUserRoles("rwalker");
-      Assert.fail("expected NoLdapUserRolesFoundException");
-    }
-    catch (NoLdapUserRolesFoundException e) {
-      // expected
-    }
-
-    // now start the server backup
-    mainConnector.start();
-
-    // try again, should still fail
-    try {
-      this.getLdapManager().getUserRoles("rwalker");
-      Assert.fail("expected NoLdapUserRolesFoundException");
-    }
-    catch (NoLdapUserRolesFoundException e) {
-      // expected
-    }
-
-    // now wait another 10 seconds and we should be back at 3
-    Thread.sleep(1000 * 3);
-
-    // we should be hitting the main again
-    Assert.assertEquals(3, this.getLdapManager().getUserRoles("rwalker").size());
   }
 
   @Test
@@ -274,24 +141,6 @@ public class FallBackConnectionTest
       throws Exception
   {
     // all systems are good
-    Assert.assertEquals(3, this.getLdapManager().getUsers(3).size());
-
-    // stop the main server
-    mainConnector.stop();
-
-    // try again, this time it should hit the backup
-    Assert.assertEquals(2, this.getLdapManager().getUsers(3).size());
-
-    // now start the server backup
-    mainConnector.start();
-
-    // should still be 2 users
-    Assert.assertEquals(2, this.getLdapManager().getUsers(3).size());
-
-    // now wait another 10 seconds and we should be back at 3
-    Thread.sleep(1000 * 3);
-
-    // we should be hitting the main again
     Assert.assertEquals(3, this.getLdapManager().getUsers(3).size());
   }
 
@@ -301,24 +150,6 @@ public class FallBackConnectionTest
   {
     // all systems are good
     Assert.assertEquals(3, this.getLdapManager().searchUsers("", null).size());
-
-    // stop the main server
-    mainConnector.stop();
-
-    // try again, this time it should hit the backup
-    Assert.assertEquals(2, this.getLdapManager().searchUsers("", null).size());
-
-    // now start the server backup
-    mainConnector.start();
-
-    // should still be 2 users
-    Assert.assertEquals(2, this.getLdapManager().searchUsers("", null).size());
-
-    // now wait another 10 seconds and we should be back at 3
-    Thread.sleep(1000 * 3);
-
-    // we should be hitting the main again
-    Assert.assertEquals(3, this.getLdapManager().searchUsers("", null).size());
   }
 
   @Test
@@ -327,35 +158,5 @@ public class FallBackConnectionTest
   {
     // all systems are good
     Assert.assertNotNull(this.getLdapManager().authenticateUser("rwalker", "rwalker123"));
-
-    // stop the main server
-    mainConnector.stop();
-
-    // try again, this time it should hit the backup
-    try {
-      this.getLdapManager().authenticateUser("rwalker", "rwalker123");
-      Assert.fail("expected AuthenticationException");
-    }
-    catch (AuthenticationException e) {
-      // expected
-    }
-
-    // now start the server backup
-    mainConnector.start();
-
-    // try again, should still fail
-    try {
-      this.getLdapManager().authenticateUser("rwalker", "rwalker123");
-      Assert.fail("expected AuthenticationException");
-    }
-    catch (AuthenticationException e) {
-      // expected
-    }
-
-    // now wait another 10 seconds and we should be back at 3
-    Thread.sleep(1000 * 3);
-
-    // we should be hitting the main again
-    Assert.assertNotNull(this.getLdapManager().getUser("rwalker"));
   }
 }
