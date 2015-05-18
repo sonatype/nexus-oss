@@ -13,22 +13,41 @@
 package org.sonatype.nexus.testsuite.maven;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.maven.MavenFacet;
+import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.maven.MavenPath.HashType;
+import org.sonatype.nexus.repository.util.TypeTokens;
+import org.sonatype.nexus.repository.view.Content;
+import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.testsuite.NexusCoreITSupport;
 
 import com.google.common.base.Charsets;
+import com.google.common.hash.HashCode;
+import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.it.Verifier;
 import org.junit.Before;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 
@@ -40,6 +59,8 @@ public abstract class MavenITSupport
 {
   @Inject
   private LogManager logManager;
+
+  private final MetadataXpp3Reader reader = new MetadataXpp3Reader();
 
   @Configuration
   public static Option[] configureNexus() {
@@ -88,5 +109,42 @@ public abstract class MavenITSupport
             "/repository/" + deployRepositoryName);
     verifier.executeGoals(Arrays.asList("clean", "deploy"));
     verifier.verifyErrorFreeLog();
+  }
+
+  protected void write(final Repository repository, final String path, final Payload payload) throws IOException {
+    final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
+    final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
+    mavenFacet.put(mavenPath, payload);
+  }
+
+  protected Content read(final Repository repository, final String path) throws IOException {
+    final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
+    final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
+    return mavenFacet.get(mavenPath);
+  }
+
+  protected Metadata parseMetadata(final Content content) throws Exception {
+    assertThat(content, notNullValue());
+    try (InputStream is = content.openInputStream()) {
+      return reader.read(is);
+    }
+  }
+
+  protected void verifyHashesExistAndCorrect(final Repository repository, final String path) throws Exception {
+    final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
+    final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
+    final Content content = mavenFacet.get(mavenPath);
+    assertThat(content, notNullValue());
+    final Map<HashAlgorithm, HashCode> hashCodes = content.getAttributes()
+        .require(Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
+    for (HashType hashType : HashType.values()) {
+      final Content contentHash = mavenFacet.get(mavenPath.hash(hashType));
+      final String storageHash = hashCodes.get(hashType.getHashAlgorithm()).toString();
+      assertThat(storageHash, notNullValue());
+      try (InputStream is = contentHash.openInputStream()) {
+        final String mavenHash = CharStreams.toString(new InputStreamReader(is, Charsets.UTF_8));
+        assertThat(storageHash, equalTo(mavenHash));
+      }
+    }
   }
 }

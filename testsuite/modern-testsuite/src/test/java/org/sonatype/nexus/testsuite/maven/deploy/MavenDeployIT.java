@@ -12,27 +12,12 @@
  */
 package org.sonatype.nexus.testsuite.maven.deploy;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Map;
-
 import javax.inject.Inject;
 
-import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
-import org.sonatype.nexus.repository.maven.MavenFacet;
-import org.sonatype.nexus.repository.maven.MavenPath;
-import org.sonatype.nexus.repository.maven.MavenPath.HashType;
-import org.sonatype.nexus.repository.util.TypeTokens;
-import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
 
-import com.google.common.base.Charsets;
-import com.google.common.hash.HashCode;
-import com.google.common.io.CharStreams;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.it.VerificationException;
@@ -41,7 +26,6 @@ import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -68,43 +52,6 @@ public class MavenDeployIT
   public void prepare() throws Exception {
     mavenSnapshots = repositoryManager.get("maven-snapshots");
     mavenReleases = repositoryManager.get("maven-releases");
-  }
-
-  private void write(final Repository repository, final String path, final Payload payload) throws IOException {
-    final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
-    final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
-    mavenFacet.put(mavenPath, payload);
-  }
-
-  private Content read(final Repository repository, final String path) throws IOException {
-    final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
-    final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
-    return mavenFacet.get(mavenPath);
-  }
-
-  private Metadata parse(final Content content) throws Exception {
-    assertThat(content, notNullValue());
-    try (InputStream is = content.openInputStream()) {
-      return reader.read(is);
-    }
-  }
-
-  private void verifyHashesExistAndCorrect(final Repository repository, final String path) throws Exception {
-    final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
-    final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
-    final Content content = mavenFacet.get(mavenPath);
-    assertThat(content, notNullValue());
-    final Map<HashAlgorithm, HashCode> hashCodes = content.getAttributes()
-        .require(Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
-    for (HashType hashType : HashType.values()) {
-      final Content contentHash = mavenFacet.get(mavenPath.hash(hashType));
-      final String storageHash = hashCodes.get(hashType.getHashAlgorithm()).toString();
-      assertThat(storageHash, notNullValue());
-      try (InputStream is = contentHash.openInputStream()) {
-        final String mavenHash = CharStreams.toString(new InputStreamReader(is, Charsets.UTF_8));
-        assertThat(storageHash, equalTo(mavenHash));
-      }
-    }
   }
 
   final String G_MD_PATH = "/org/sonatype/nexus/testsuite/maven-metadata.xml";
@@ -146,7 +93,7 @@ public class MavenDeployIT
 
     // A level
     verifyHashesExistAndCorrect(mavenReleases, A_MD_JAR_PATH);
-    final Metadata aLevel = parse(read(mavenReleases, A_MD_JAR_PATH));
+    final Metadata aLevel = parseMetadata(read(mavenReleases, A_MD_JAR_PATH));
     assertThat(aLevel.getVersioning(), notNullValue());
     assertThat(aLevel.getVersioning().getVersions(), hasSize(2));
     assertThat(aLevel.getVersioning().getVersions(), hasItems("1.0", "1.1"));
@@ -167,14 +114,14 @@ public class MavenDeployIT
 
     // A level
     verifyHashesExistAndCorrect(mavenSnapshots, A_MD_JAR_PATH);
-    final Metadata aLevel = parse(read(mavenSnapshots, A_MD_JAR_PATH));
+    final Metadata aLevel = parseMetadata(read(mavenSnapshots, A_MD_JAR_PATH));
     assertThat(aLevel.getVersioning(), notNullValue());
     assertThat(aLevel.getVersioning().getVersions(), hasSize(1));
     assertThat(aLevel.getVersioning().getVersions(), hasItems("1.0-SNAPSHOT"));
 
     // V level
     verifyHashesExistAndCorrect(mavenSnapshots, V_MD_JAR_PATH);
-    final Metadata vLevel = parse(read(mavenSnapshots, V_MD_JAR_PATH));
+    final Metadata vLevel = parseMetadata(read(mavenSnapshots, V_MD_JAR_PATH));
     assertThat(vLevel.getVersioning(), notNullValue());
     assertThat(vLevel.getVersioning().getSnapshot(), notNullValue());
     assertThat(vLevel.getVersioning().getSnapshotVersions(), hasSize(2));
@@ -187,12 +134,12 @@ public class MavenDeployIT
 
     // G level
     verifyHashesExistAndCorrect(mavenReleases, G_MD_PATH);
-    final Metadata gLevel = parse(read(mavenReleases, G_MD_PATH));
+    final Metadata gLevel = parseMetadata(read(mavenReleases, G_MD_PATH));
     assertThat(gLevel.getPlugins(), hasSize(1));
 
     // A level
     verifyHashesExistAndCorrect(mavenReleases, A_MD_PLUGIN_PATH);
-    final Metadata aLevel = parse(read(mavenReleases, A_MD_PLUGIN_PATH));
+    final Metadata aLevel = parseMetadata(read(mavenReleases, A_MD_PLUGIN_PATH));
     assertThat(aLevel.getVersioning(), notNullValue());
     assertThat(aLevel.getVersioning().getVersions(), hasSize(2));
     assertThat(aLevel.getVersioning().getVersions(), hasItems("1.0", "1.1"));
@@ -207,19 +154,19 @@ public class MavenDeployIT
 
     // G level
     verifyHashesExistAndCorrect(mavenSnapshots, G_MD_PATH);
-    final Metadata gLevel = parse(read(mavenSnapshots, G_MD_PATH));
+    final Metadata gLevel = parseMetadata(read(mavenSnapshots, G_MD_PATH));
     assertThat(gLevel.getPlugins(), hasSize(1));
 
     // A level
     verifyHashesExistAndCorrect(mavenSnapshots, A_MD_PLUGIN_PATH);
-    final Metadata aLevel = parse(read(mavenSnapshots, A_MD_PLUGIN_PATH));
+    final Metadata aLevel = parseMetadata(read(mavenSnapshots, A_MD_PLUGIN_PATH));
     assertThat(aLevel.getVersioning(), notNullValue());
     assertThat(aLevel.getVersioning().getVersions(), hasSize(1));
     assertThat(aLevel.getVersioning().getVersions(), contains("1.0-SNAPSHOT"));
 
     // V level
     verifyHashesExistAndCorrect(mavenSnapshots, V_MD_PLUGIN_PATH);
-    final Metadata vLevel = parse(read(mavenSnapshots, V_MD_PLUGIN_PATH));
+    final Metadata vLevel = parseMetadata(read(mavenSnapshots, V_MD_PLUGIN_PATH));
     assertThat(vLevel.getVersioning(), notNullValue());
     assertThat(vLevel.getVersioning().getSnapshot(), notNullValue());
     assertThat(vLevel.getVersioning().getSnapshotVersions(), hasSize(2));
