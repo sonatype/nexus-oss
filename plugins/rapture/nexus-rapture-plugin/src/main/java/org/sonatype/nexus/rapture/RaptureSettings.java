@@ -23,6 +23,8 @@ public class RaptureSettings
 
   public static final boolean DEFAULT_DEBUG_ALLOWED = true;
 
+  // FIXME: Use Goodies Time
+
   public static final int DEFAULT_STATUS_INTERVAL_AUTHENTICATED = 5; // seconds
 
   public static final int DEFAULT_STATUS_INTERVAL_ANONYMOUS = 60; // seconds
