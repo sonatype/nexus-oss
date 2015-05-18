@@ -421,14 +421,14 @@ public class StorageTxImpl
 
     final WritePolicy effectiveWritePolicy = writePolicySelector.select(asset, writePolicy);
     if (effectiveWritePolicy == WritePolicy.DENY) {
-      throw new IllegalOperationException("Repository is read only.");
+      throw new IllegalOperationException("Repository is read only: " + getBucket().repositoryName());
     }
 
     // Delete old blob if necessary
     BlobRef oldBlobRef = asset.blobRef();
     if (oldBlobRef != null) {
       if (effectiveWritePolicy == WritePolicy.ALLOW_ONCE) {
-        throw new IllegalOperationException("Repository does not allow updating assets.");
+        throw new IllegalOperationException("Repository does not allow updating assets: " + getBucket().repositoryName());
       }
       deleteBlob(oldBlobRef, effectiveWritePolicy);
     }
@@ -474,7 +474,7 @@ public class StorageTxImpl
   private void deleteBlob(final BlobRef blobRef, @Nullable WritePolicy effectiveWritePolicy) {
     checkNotNull(blobRef);
     if (effectiveWritePolicy != null && effectiveWritePolicy == WritePolicy.DENY) {
-      throw new IllegalOperationException("Repository is read only.");
+      throw new IllegalOperationException("Repository is read only: " + getBucket().repositoryName());
     }
     blobTx.delete(blobRef);
   }

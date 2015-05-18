@@ -21,7 +21,7 @@ body {
 h2 {
   font-size: 18px;
   font-weight: bold;
-  padding: 20px 0 10px 0;
+  padding: 20px 0 0 0;
   margin-bottom: 0;
 }
 
@@ -90,6 +90,7 @@ h3 {
   font-size: 13px;
   margin-top: 13px;
   border-spacing: 0;
+  width: 100%;
 }
 
 .nexus-describe-detail tbody tr:nth-child(odd) {
@@ -102,6 +103,12 @@ h3 {
   vertical-align: top;
   padding: 5px 24px 5px 5px;
   border-bottom: solid 1px #EDEDED;
+}
+
+/* Force the first column to have a fixed width */
+.nexus-describe-detail td:first-child {
+  width: 1%;
+  white-space: nowrap;
 }
 
 .nexus-describe-detail th:last-child,

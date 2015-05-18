@@ -26,6 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
 import org.sonatype.nexus.blobstore.api.Blob;
+import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
@@ -35,9 +36,12 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
-import org.sonatype.nexus.repository.maven.internal.MavenPath.Coordinates;
-import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
-import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy;
+import org.sonatype.nexus.repository.maven.MavenFacet;
+import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.maven.MavenPath.Coordinates;
+import org.sonatype.nexus.repository.maven.MavenPath.HashType;
+import org.sonatype.nexus.repository.maven.MavenPathParser;
+import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -186,46 +190,70 @@ public class MavenFacetImpl
   @Override
   public Content get(final MavenPath path) throws IOException {
     try (StorageTx tx = storageFacet.openTx()) {
-      final Asset asset = findAsset(tx, tx.getBucket(), path);
-      if (asset == null) {
-        return null;
-      }
-      final Blob blob = tx.requireBlob(asset.requireBlobRef());
-      final String contentType = asset.contentType();
+      return get(tx, path);
+    }
+  }
 
-      final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
-      final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
-      for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
-        final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
-        hashCodes.put(algorithm, hashCode);
-      }
-      final NestedAttributesMap attributesMap = asset.formatAttributes();
-      final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-      final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
-      final Content result = new Content(new BlobPayload(blob, contentType));
-      result.getAttributes()
-          .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
-      result.getAttributes().set(Content.CONTENT_ETAG, eTag);
-      result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
-      return result;
+  @Nullable
+  @Override
+  public Content get(final StorageTx tx, final MavenPath path) throws IOException {
+    log.debug("GET {} : {}", getRepository().getName(), path.getPath());
+    final Asset asset = findAsset(tx, tx.getBucket(), path);
+    if (asset == null) {
+      return null;
+    }
+    return toContent(tx, asset);
+  }
+
+  /**
+   * Creates {@link Content} from passed in {@link Asset}.
+   */
+  private Content toContent(final StorageTx tx, final Asset asset) throws IOException {
+    final Blob blob = tx.requireBlob(asset.requireBlobRef());
+    final String contentType = asset.contentType();
+
+    final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
+    final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
+    for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
+      final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
+      hashCodes.put(algorithm, hashCode);
+    }
+    final NestedAttributesMap attributesMap = asset.formatAttributes();
+    final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
+    final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
+    final Content result = new Content(new BlobPayload(blob, contentType));
+    result.getAttributes()
+        .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
+    result.getAttributes().set(Content.CONTENT_ETAG, eTag);
+    result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
+    return result;
+  }
+
+  @Override
+  public Content put(final MavenPath path, final Payload payload)
+      throws IOException, InvalidContentException
+  {
+    try (StorageTx tx = storageFacet.openTx()) {
+      Content content = put(tx, path, payload);
+      tx.commit();
+      return content;
     }
   }
 
   @Override
-  public void put(final MavenPath path, final Payload payload)
+  public Content put(final StorageTx tx, final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
-    try (StorageTx tx = storageFacet.openTx()) {
-      if (path.getCoordinates() != null) {
-        putArtifact(path, payload, tx);
-      }
-      else {
-        putFile(path, payload, tx);
-      }
+    log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
+    if (path.getCoordinates() != null) {
+      return putArtifact(tx, path, payload);
+    }
+    else {
+      return putFile(tx, path, payload);
     }
   }
 
-  private void putArtifact(final MavenPath path, final Payload payload, final StorageTx tx)
+  private Content putArtifact(final StorageTx tx, final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
@@ -243,9 +271,7 @@ public class MavenFacetImpl
       componentAttributes.set(P_GROUP_ID, coordinates.getGroupId());
       componentAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
       componentAttributes.set(P_VERSION, coordinates.getVersion());
-      if (coordinates.isSnapshot()) {
-        componentAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
-      }
+      componentAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
       tx.saveComponent(component);
     }
 
@@ -261,21 +287,17 @@ public class MavenFacetImpl
       assetAttributes.set(P_GROUP_ID, coordinates.getGroupId());
       assetAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
       assetAttributes.set(P_VERSION, coordinates.getVersion());
-      if (coordinates.isSnapshot()) {
-        assetAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
-      }
+      assetAttributes.set(P_BASE_VERSION, coordinates.getBaseVersion());
       assetAttributes.set(P_CLASSIFIER, coordinates.getClassifier());
       assetAttributes.set(P_EXTENSION, coordinates.getExtension());
-
-      // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
     }
 
     putAssetPayload(path, tx, asset, payload);
     tx.saveAsset(asset);
-    tx.commit();
+    return toContent(tx, asset);
   }
 
-  private void putFile(final MavenPath path, final Payload payload, final StorageTx tx)
+  private Content putFile(final StorageTx tx, final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
@@ -286,13 +308,11 @@ public class MavenFacetImpl
 
       final NestedAttributesMap assetAttributes = asset.formatAttributes();
       assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
-
-      // TODO: if subordinate asset (sha1/md5/asc), should we link it somehow to main asset?
     }
 
     putAssetPayload(path, tx, asset, payload);
     tx.saveAsset(asset);
-    tx.commit();
+    return toContent(tx, asset);
   }
 
   private void putAssetPayload(final MavenPath path,
@@ -331,17 +351,24 @@ public class MavenFacetImpl
 
   @Override
   public boolean delete(final MavenPath... paths) throws IOException {
-    boolean result = false;
     try (StorageTx tx = storageFacet.openTx()) {
-      for (MavenPath path : paths) {
-        if (path.getCoordinates() != null) {
-          result = deleteArtifact(path, tx) || result;
-        }
-        else {
-          result = deleteFile(path, tx) || result;
-        }
-      }
+      boolean result = delete(tx, paths);
       tx.commit();
+      return result;
+    }
+  }
+
+  @Override
+  public boolean delete(final StorageTx tx, final MavenPath... paths) throws IOException {
+    boolean result = false;
+    for (MavenPath path : paths) {
+      log.debug("DELETE {} : {}", getRepository().getName(), path.getPath());
+      if (path.getCoordinates() != null) {
+        result = deleteArtifact(path, tx) || result;
+      }
+      else {
+        result = deleteFile(path, tx) || result;
+      }
     }
     return result;
   }

@@ -10,42 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, NX*/
+package org.sonatype.nexus.repository.maven.policy;
 
 /**
- * LDAP Server "Backup" form.
+ * Repository version policy.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.ldap.LdapServerBackupForm', {
-  extend: 'NX.view.SettingsForm',
-  alias: 'widget.nx-coreui-ldapserver-backup-form',
-  requires: [
-    'NX.Conditions',
-    'NX.I18n'
-  ],
+public enum VersionPolicy
+{
+  /**
+   * Only release coordinates allowed.
+   */
+  RELEASE,
 
   /**
-   * @override
+   * Only snapshot coordinate allowed.
    */
-  initComponent: function() {
-    var me = this;
-
-    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:ldap', 'update');
-    me.items = {
-      xtype: 'nx-coreui-ldapserver-backup-fieldset'
-    };
-
-    me.callParent(arguments);
-  },
+  SNAPSHOT,
 
   /**
-   * @override
-   * Additionally, marks invalid properties.
+   * Both kind of coordinates allowed.
    */
-  markInvalid: function(errors) {
-    var me = this;
-
-    me.down('nx-coreui-ldapserver-backup-fieldset').markInvalid(errors);
-  }
-});
+  MIXED
+}

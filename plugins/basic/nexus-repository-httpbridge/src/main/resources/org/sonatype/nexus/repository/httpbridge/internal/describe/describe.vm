@@ -52,7 +52,7 @@
     <img src="$nexusUrl/static/images/nexus.png?$nexusVersion"/>
     <span class="name">Sonatype Nexus</span>
   </a>
-  <span class="version">$nexusVersion</span>
+  <span class="version">$nexusEdition $nexusVersion</span>
 </div>
 
 <div class="nexus-describe-detail">

@@ -102,7 +102,6 @@ public class LdapConfigurationEntityAdapter
       connectionType.createProperty("systemPassword", OType.STRING);
       connectionType.createProperty("authScheme", OType.STRING).setNotNull(true);
       connectionType.createProperty("host", OType.EMBEDDED, connectionHostType).setNotNull(true);
-      connectionType.createProperty("backupHost", OType.EMBEDDED, connectionHostType);
       connectionType.createProperty("saslRealm", OType.STRING);
       connectionType.createProperty("connectionTimeout", OType.INTEGER).setNotNull(true);
       connectionType.createProperty("connectionRetryDelay", OType.INTEGER).setNotNull(true);
@@ -204,15 +203,6 @@ public class LdapConfigurationEntityAdapter
         hostDocument.<Integer>field("port", OType.INTEGER)
     );
     connection.setHost(host);
-    final ODocument backupHostDocument = document.field("backupHost", OType.EMBEDDED);
-    if (backupHostDocument != null) {
-      final Host backupHost = new Host(
-          Protocol.valueOf(backupHostDocument.<String>field("protocol", OType.STRING)),
-          backupHostDocument.<String>field("hostName", OType.STRING),
-          backupHostDocument.<Integer>field("port", OType.INTEGER)
-      );
-      connection.setBackupHost(backupHost);
-    }
     connection.setSaslRealm(document.<String>field("saslRealm", OType.STRING));
     connection.setConnectionTimeout(document.<Integer>field("connectionTimeout", OType.INTEGER));
     connection.setConnectionRetryDelay(document.<Integer>field("connectionRetryDelay", OType.INTEGER));
@@ -233,13 +223,6 @@ public class LdapConfigurationEntityAdapter
     hostDocument.field("hostName", connection.getHost().getHostName());
     hostDocument.field("port", connection.getHost().getPort());
     document.field("host", hostDocument);
-    if (connection.getBackupHost() != null) {
-      final ODocument backupHostDocument = db.newInstance(DB_CONNECTION_HOST_CLASS);
-      backupHostDocument.field("protocol", connection.getBackupHost().getProtocol().name());
-      backupHostDocument.field("hostName", connection.getBackupHost().getHostName());
-      backupHostDocument.field("port", connection.getBackupHost().getPort());
-      document.field("backupHost", backupHostDocument);
-    }
     document.field("saslRealm", connection.getSaslRealm());
     document.field("connectionTimeout", connection.getConnectionTimeout());
     document.field("connectionRetryDelay", connection.getConnectionRetryDelay());

@@ -73,22 +73,6 @@ public class LdapConnectionInfoDTO
   private int port = 0;
 
   /**
-   * Backup mirror protocol. The protocol used for the backup
-   * mirror URL: ldap, ldaps.
-   */
-  private String backupMirrorProtocol;
-
-  /**
-   * Backup mirror host.  The host name of the backup LDAP server.
-   */
-  private String backupMirrorHost;
-
-  /**
-   * Backup mirror port.  The port of the backup LDAP Server.
-   */
-  private int backupMirrorPort = 0;
-
-  /**
    * SASL Realm.  The authentication realm.
    */
   private String realm;
@@ -127,35 +111,6 @@ public class LdapConnectionInfoDTO
   public String getAuthScheme() {
     return this.authScheme;
   } //-- String getAuthScheme()
-
-  /**
-   * Get backup mirror host.  The host name of the backup LDAP
-   * server.
-   *
-   * @return String
-   */
-  public String getBackupMirrorHost() {
-    return this.backupMirrorHost;
-  } //-- String getBackupMirrorHost()
-
-  /**
-   * Get backup mirror port.  The port of the backup LDAP Server.
-   *
-   * @return int
-   */
-  public int getBackupMirrorPort() {
-    return this.backupMirrorPort;
-  } //-- int getBackupMirrorPort()
-
-  /**
-   * Get backup mirror protocol. The protocol used for the backup
-   * mirror URL: ldap, ldaps.
-   *
-   * @return String
-   */
-  public String getBackupMirrorProtocol() {
-    return this.backupMirrorProtocol;
-  } //-- String getBackupMirrorProtocol()
 
   /**
    * Get cache timeout.  Cache timeout in seconds.
@@ -257,29 +212,6 @@ public class LdapConnectionInfoDTO
   public void setAuthScheme(String authScheme) {
     this.authScheme = authScheme;
   } //-- void setAuthScheme( String )
-
-  /**
-   * Set backup mirror host.  The host name of the backup LDAP
-   * server.
-   */
-  public void setBackupMirrorHost(String backupMirrorHost) {
-    this.backupMirrorHost = backupMirrorHost;
-  } //-- void setBackupMirrorHost( String )
-
-  /**
-   * Set backup mirror port.  The port of the backup LDAP Server.
-   */
-  public void setBackupMirrorPort(int backupMirrorPort) {
-    this.backupMirrorPort = backupMirrorPort;
-  } //-- void setBackupMirrorPort( int )
-
-  /**
-   * Set backup mirror protocol. The protocol used for the backup
-   * mirror URL: ldap, ldaps.
-   */
-  public void setBackupMirrorProtocol(String backupMirrorProtocol) {
-    this.backupMirrorProtocol = backupMirrorProtocol;
-  } //-- void setBackupMirrorProtocol( String )
 
   /**
    * Set cache timeout.  Cache timeout in seconds.

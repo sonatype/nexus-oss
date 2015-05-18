@@ -36,11 +36,6 @@ Ext.define('NX.coreui.model.LdapServer', {
     {name: 'authUsername', type: 'string'},
     {name: 'authPassword', type: 'string'},
 
-    {name: 'backupMirrorEnabled', type: 'string'},
-    {name: 'backupMirrorProtocol', type: 'string'},
-    {name: 'backupMirrorHost', type: 'string'},
-    {name: 'backupMirrorPort', type: 'int'},
-
     {name: 'connectionTimeout', type: 'int'},
     {name: 'connectionRetryDelay', type: 'int'},
     {name: 'maxIncidentsCount', type: 'int'},

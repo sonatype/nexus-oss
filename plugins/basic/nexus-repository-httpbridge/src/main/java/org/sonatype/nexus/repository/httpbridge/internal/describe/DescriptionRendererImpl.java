@@ -64,9 +64,11 @@ public class DescriptionRendererImpl
 
   @Override
   public String renderHtml(final Description description) {
+    SystemStatus status = systemStatus.get();
     TemplateParameters params = new TemplateParameters();
     params.setAll(description.getParameters());
-    params.set("nexusVersion", systemStatus.get().getVersion());
+    params.set("nexusVersion", status.getVersion());
+    params.set("nexusEdition", status.getEditionShort());
     params.set("nexusUrl", BaseUrlHolder.get());
     params.set("items", description.getItems());
     params.set("esc", new EscapeHelper());
