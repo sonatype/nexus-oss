@@ -179,6 +179,7 @@ Ext.define('NX.Permissions', {
    * Check if any permission exists with given prefix and is permitted.
    *
    * This does not perform any implied checking, use with caution.
+   *
    * @public
    * @param {string} prefix
    */
