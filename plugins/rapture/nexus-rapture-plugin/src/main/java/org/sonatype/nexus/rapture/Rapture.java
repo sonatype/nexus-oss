@@ -19,6 +19,8 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// TODO: rename to SettingsManager?
+
 /**
  * Rapture.
  *
