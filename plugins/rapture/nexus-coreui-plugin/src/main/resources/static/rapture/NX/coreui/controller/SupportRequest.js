@@ -49,7 +49,7 @@ Ext.define('NX.coreui.controller.SupportRequest', {
       visible: function () {
         // only show if edition is not OSS (ie. PRO or trial) and we have perms
         return NX.State.getEdition() !== 'OSS' &&
-            NX.Permissions.check('nexus:atlas', 'create');
+            NX.Permissions.check('nexus:atlas:create');
       }
     }, me);
 

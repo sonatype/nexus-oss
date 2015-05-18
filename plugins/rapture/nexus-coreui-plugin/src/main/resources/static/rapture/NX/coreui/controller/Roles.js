@@ -73,7 +73,7 @@ Ext.define('NX.coreui.controller.Roles', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('nexus:roles', 'read');
+      return NX.Permissions.check('nexus:roles:read');
     },
     weight: 20
   },

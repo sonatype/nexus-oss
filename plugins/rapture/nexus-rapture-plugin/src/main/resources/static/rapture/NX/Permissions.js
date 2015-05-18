@@ -90,12 +90,14 @@ Ext.define('NX.Permissions', {
   },
 
   /**
+   * Check if the current subject has the expected permission.
+   *
    * @public
+   * @param {String} expectedPermission
    * @returns {boolean} True if user is authorized for expected permission.
    */
-  check: function(name, action) {
+  check: function(expectedPermission) {
     var me = this,
-        expectedPermission = name + ':' + action,
         hasPermission = false;
 
     if (!me.available()) {
@@ -172,29 +174,5 @@ Ext.define('NX.Permissions', {
     }
 
     return true;
-  },
-
-  /**
-   * @public
-   * @returns {boolean} True if user is authorized for at least one permission that starts with expected string.
-   */
-  checkAny: function(perm) {
-    var me = this,
-        hasAny = false;
-
-    if (!me.available()) {
-      return false;
-    }
-
-    Ext.Object.each(me.permissions, function(key, value) {
-      if (Ext.String.startsWith(key, perm) && value === true) {
-        hasAny = true;
-        return false;
-      }
-      return true;
-    });
-
-    return hasAny;
   }
-
 });

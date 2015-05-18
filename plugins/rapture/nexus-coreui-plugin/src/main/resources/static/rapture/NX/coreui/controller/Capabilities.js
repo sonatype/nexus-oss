@@ -93,7 +93,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('nexus:capabilities', 'read');
+      return NX.Permissions.check('nexus:capabilities:read');
     }
   },
   permission: 'nexus:capabilities',

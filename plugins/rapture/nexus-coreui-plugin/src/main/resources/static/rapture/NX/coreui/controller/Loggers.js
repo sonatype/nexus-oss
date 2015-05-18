@@ -66,7 +66,7 @@ Ext.define('NX.coreui.controller.Loggers', {
         variants: ['x16', 'x32']
       },
       visible: function () {
-        return NX.Permissions.check('nexus:logging', 'read');
+        return NX.Permissions.check('nexus:logging:read');
       }
     }, me);
 
@@ -151,7 +151,7 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Cancels edit when user does not have 'update' permission.
    */
   onBeforeEdit: function () {
-    return NX.Permissions.check('nexus:logging', 'update');
+    return NX.Permissions.check('nexus:logging:update');
   },
 
   /**

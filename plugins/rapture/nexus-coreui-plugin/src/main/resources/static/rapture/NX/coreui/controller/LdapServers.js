@@ -83,7 +83,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('nexus:ldap', 'read');
+      return NX.Permissions.check('nexus:ldap:read');
     }
   },
   permission: 'nexus:ldap',

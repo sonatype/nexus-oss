@@ -83,7 +83,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.checkAny('nexus:repository-admin') && NX.State.getUser();
+      return NX.Permissions.check('nexus:repository-admin') && NX.State.getUser();
     }
   },
 

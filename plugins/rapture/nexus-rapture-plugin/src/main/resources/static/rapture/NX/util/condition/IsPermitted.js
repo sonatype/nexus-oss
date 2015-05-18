@@ -44,7 +44,7 @@ Ext.define('NX.util.condition.IsPermitted', {
     var me = this;
 
     if (me.bounded) {
-      me.setSatisfied(NX.Permissions.check(me.name, me.right));
+      me.setSatisfied(NX.Permissions.check(me.name + ':' + me.right));
     }
   },
 

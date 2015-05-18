@@ -95,7 +95,7 @@ Ext.define('NX.coreui.controller.Search', {
       iconName: 'search-folder',
       weight: 500,
       visible: function() {
-        return NX.Permissions.check('nexus:repositories', 'read');
+        return NX.Permissions.check('nexus:repositories:read');
       }
     }, me);
 
@@ -209,7 +209,7 @@ Ext.define('NX.coreui.controller.Search', {
         weight: 20,
         expanded: false,
         visible: function() {
-          return NX.Permissions.check('nexus:repositories', 'read');
+          return NX.Permissions.check('nexus:repositories:read');
         }
       }, owner);
     }
@@ -223,7 +223,7 @@ Ext.define('NX.coreui.controller.Search', {
         description: model.get('description'),
         authenticationRequired: false,
         visible: function() {
-          return NX.Permissions.check('nexus:repositories', 'read');
+          return NX.Permissions.check('nexus:repositories:read');
         }
       }, owner);
     }

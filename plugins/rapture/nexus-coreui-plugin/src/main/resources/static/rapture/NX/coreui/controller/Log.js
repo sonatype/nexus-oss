@@ -59,7 +59,7 @@ Ext.define('NX.coreui.controller.Log', {
         variants: ['x16', 'x32']
       },
       visible: function () {
-        return NX.Permissions.check('nexus:logging', 'read');
+        return NX.Permissions.check('nexus:logging:read');
       }
     }, me);
 
