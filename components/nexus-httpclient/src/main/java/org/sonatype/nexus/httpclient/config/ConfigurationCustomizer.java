@@ -37,6 +37,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.apache.http.client.config.AuthSchemes.BASIC;
 import static org.apache.http.client.config.AuthSchemes.DIGEST;
 import static org.apache.http.client.config.AuthSchemes.NTLM;
@@ -90,10 +91,8 @@ public class ConfigurationCustomizer
     }
 
     if (connection.getUserAgentSuffix() != null) {
-      // append UA customisation to one stored as attribute by DefaultsCustomizer
-      plan.getHeaders().put(HttpHeaders.USER_AGENT,
-          plan.getAttributes().get(HttpHeaders.USER_AGENT) + " " + connection.getUserAgentSuffix()
-      );
+      checkState(plan.getUserAgent() != null, "Default User-Agent not set");
+      plan.getHeaders().put(HttpHeaders.USER_AGENT, plan.getUserAgent() + " " + connection.getUserAgentSuffix());
     }
 
     if (Boolean.TRUE.equals(connection.getUseTrustStore())) {
