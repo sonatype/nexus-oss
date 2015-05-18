@@ -36,7 +36,7 @@ public class BrandingCapability
 
   @Inject
   public BrandingCapability(final Branding branding) {
-    this.branding = checkNotNull(branding, "branding");
+    this.branding = checkNotNull(branding);
   }
 
   @Override

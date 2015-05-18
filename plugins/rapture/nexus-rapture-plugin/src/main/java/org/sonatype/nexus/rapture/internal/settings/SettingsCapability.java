@@ -37,7 +37,7 @@ public class SettingsCapability
 
   @Inject
   public SettingsCapability(final Rapture rapture) {
-    this.rapture = checkNotNull(rapture, "rapture");
+    this.rapture = checkNotNull(rapture);
   }
 
   @Override
