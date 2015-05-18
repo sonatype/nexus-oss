@@ -19,12 +19,21 @@
  */
 Ext.define('NX.Permissions', {
   singleton: true,
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
   /**
    * @private
    * Map between permissions id and value.
    */
   permissions: undefined,
+
+  /**
+   * @private
+   * Map of permission to implied calculated value.
+   */
+  impliedCache: undefined,
 
   /**
    * @public
@@ -53,6 +62,13 @@ Ext.define('NX.Permissions', {
     }
 
     me.permissions = Ext.apply({}, perms);
+
+    // reset implied cache
+    me.impliedCache = {};
+
+    //<if debug>
+    me.logDebug('Permissions installed');
+    //</if>
   },
 
   /**
@@ -60,27 +76,95 @@ Ext.define('NX.Permissions', {
    * Resets all permissions.
    */
   resetPermissions: function() {
-    delete this.permissions;
+    var me = this;
+
+    //<if debug>
+    me.logDebug('Resetting permissions');
+    //</if>
+
+    delete me.permissions;
+    delete me.impliedCache;
   },
 
   /**
    * @public
    * @returns {boolean} True if user is authorized for expected permission.
    */
-  check: function(name, perm) {
+  check: function(name, action) {
     var me = this,
+        expectedPermission = name + ':' + action,
         hasPermission = false;
 
     if (!me.available()) {
       return false;
     }
 
-    hasPermission = me.permissions[name + ':' + perm] === true;
-    if (!hasPermission) {
-      hasPermission = me.permissions[name + ':*'] === true;
+    // use cached implied if we know it
+    if (me.impliedCache[expectedPermission] !== undefined) {
+      //<if debug>
+      me.logDebug('Using cached implied permission: ' + expectedPermission + ' is: ' + me.impliedCache[expectedPermission]);
+      //</if>
+      return me.impliedCache[expectedPermission];
     }
 
+    // Calculate if permission is implied or not
+    Ext.Object.each(me.permissions, function(permission, given) {
+      if (given && me.implies(permission, expectedPermission)) {
+        hasPermission = true;
+        return false; // break
+      }
+      return true; // continue
+    });
+
+    // cache calculated implied
+    me.impliedCache[expectedPermission] = hasPermission;
+
+    //<if debug>
+    me.logDebug('Cached implied permission: ' + expectedPermission + ' is: ' + hasPermission);
+    //</if>
+
     return hasPermission;
+  },
+
+  /**
+   * @private
+   *
+   * Returns true if permission 1 implies permission 2 using logic similar to Shiro wildcard permission.
+   */
+  implies: function(permission1, permission2) {
+    var me = this,
+        parts1 = permission1.split(':'),
+        parts2 = permission2.split(':'),
+        part1, part2, i;
+
+    //<if debug>
+    me.logDebug('Checking if: ' + permission1 + ' implies: ' + permission2);
+    //</if>
+
+    for (i = 0; i < parts2.length; i++) {
+      // If this permission has less parts than the other permission, everything after the number of parts contained
+      // in this permission is automatically implied, so return true
+      if (parts1.length - 1 < i) {
+        return true;
+      }
+      else {
+        part1 = parts1[i];
+        part2 = parts2[i];
+        if (part1.indexOf('*') === -1 && part1 !== part2) {
+          return false;
+        }
+      }
+    }
+
+    // If this permission has more parts than the other parts, only imply it if all of the other parts are wildcards
+    for (; i < parts1.length; i++) {
+      part1 = parts1[i];
+      if (part1.indexOf('*') === -1) {
+        return false;
+      }
+    }
+
+    return true;
   },
 
   /**
