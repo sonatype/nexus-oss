@@ -257,7 +257,7 @@ class StaticSecurityConfigurationResourceImpl
                 ]
             ),
 
-            // FIXME: Sort out what the use-case is for this distinct permission
+            // FIXME: Sort out what the use-case is for this distinct permission, consider nexus:users:change-password?
             new CPrivilege(
                 id: 'userschangepw',
                 type: 'application',
