@@ -55,6 +55,7 @@ Ext.define('NX.coreui.view.logging.LogMark', {
   initComponent: function () {
     var me = this;
 
+    // FIXME: This does nothing; https://issues.sonatype.org/browse/NEXUS-8647
     me.editableCondition = NX.Conditions.isPermitted('nexus:logging:mark');
 
     me.items.buttons = [
