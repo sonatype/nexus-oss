@@ -316,7 +316,7 @@ public class RaptureWebResourceBundle
   /**
    * Generate a URI for the given path.
    */
-  private URI uri(String path) {
+  private URI uri(final String path) {
     try {
       return new URI(String.format("%s/static/rapture/%s", BaseUrlHolder.get(), path));
     }
