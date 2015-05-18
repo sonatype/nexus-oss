@@ -43,8 +43,7 @@ Ext.define('NX.Permissions', {
    * @returns {boolean} True, if permissions had been set (loaded from server)
    */
   available: function() {
-    var me = this;
-    return Ext.isDefined(me.permissions);
+    return Ext.isDefined(this.permissions);
   },
 
   /**
@@ -92,6 +91,7 @@ Ext.define('NX.Permissions', {
     var me = this,
         hasPermission = false;
 
+    // short-circuit if permissions are not installed
     if (!me.available()) {
       return false;
     }
@@ -173,5 +173,32 @@ Ext.define('NX.Permissions', {
     }
 
     return true;
+  },
+
+  /**
+   * Check if any permission exists with given prefix and is permitted.
+   *
+   * This does not perform any implied checking, use with caution.
+   * @public
+   * @param {string} prefix
+   */
+  checkExistsWithPrefix: function(prefix) {
+    var me = this,
+        exists = false;
+
+    // short-circuit if permissions are not installed
+    if (!me.available()) {
+      return false;
+    }
+
+    Ext.Object.each(me.permissions, function(permission, permitted) {
+      if (Ext.String.startsWith(permission, prefix) && permitted === true) {
+        exists = true;
+        return false; // break
+      }
+      return true; // continue
+    });
+
+    return exists;
   }
 });
