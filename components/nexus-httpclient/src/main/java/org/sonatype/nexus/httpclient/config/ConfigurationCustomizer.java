@@ -90,8 +90,6 @@ public class ConfigurationCustomizer
 
     // TODO: user-agent (and/or custom headers?)
 
-    // TODO: query-string? (or don't do this, it may not bee a good idea anymore)
-
     if (Boolean.TRUE.equals(connection.getUseTrustStore())) {
       plan.getAttributes().put(SSLContextSelector.USE_TRUST_STORE, Boolean.TRUE);
     }
