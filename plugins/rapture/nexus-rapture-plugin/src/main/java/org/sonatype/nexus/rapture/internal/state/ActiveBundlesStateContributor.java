@@ -76,7 +76,7 @@ public class ActiveBundlesStateContributor
    * Returns sorted list of activate bundle symbolic-names to use for UI feature activation.
    */
   private Object calculateActivateBundles() {
-    log.info("Determining active bundles");
+    log.debug("Calculating active bundles");
 
     List<String> bundles = new ArrayList<>();
 

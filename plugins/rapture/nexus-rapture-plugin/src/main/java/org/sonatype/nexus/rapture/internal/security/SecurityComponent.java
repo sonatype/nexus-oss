@@ -202,7 +202,11 @@ public class SecurityComponent
     return subject != null && (subject.isRemembered() || subject.isAuthenticated());
   }
 
+  // FIXME: Avoid calculating permissions for every poll request
+
   private List<PermissionXO> calculatePermissions(final Subject subject) {
+    log.debug("Calculating permissions");
+
     List<Permission> granted = new ArrayList<>();
     List<PermissionXO> result = new ArrayList<>();
 
