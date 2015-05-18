@@ -243,7 +243,7 @@ Ext.define('NX.coreui.controller.Search', {
    */
   bindQuickSearch: function(quickSearch) {
     quickSearch.up('panel').mon(
-        NX.Conditions.isPermitted('nexus:repositories', 'read'),
+        NX.Conditions.isPermitted('nexus:repositories:read'),
         {
           satisfied: quickSearch.show,
           unsatisfied: quickSearch.hide,

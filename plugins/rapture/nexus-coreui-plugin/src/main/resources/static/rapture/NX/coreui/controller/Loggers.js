@@ -227,7 +227,7 @@ Ext.define('NX.coreui.controller.Loggers', {
    */
   bindNewButton: function (button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:logging', 'update'),
+        NX.Conditions.isPermitted('nexus:logging:update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -243,7 +243,7 @@ Ext.define('NX.coreui.controller.Loggers', {
   bindDeleteButton: function (button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:logging', 'update'),
+            NX.Conditions.isPermitted('nexus:logging:update'),
             NX.Conditions.gridHasSelection('nx-coreui-logger-list', function (model) {
               return model.get('name') !== 'ROOT';
             })
@@ -262,7 +262,7 @@ Ext.define('NX.coreui.controller.Loggers', {
    */
   bindResetButton: function (button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:logging', 'update'),
+        NX.Conditions.isPermitted('nexus:logging:update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,

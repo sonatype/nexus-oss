@@ -366,7 +366,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission, 'create'),
+            NX.Conditions.isPermitted(me.permission + ':create'),
             NX.Conditions.storeHasRecords('CapabilityType')
         ),
         {
@@ -384,7 +384,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
   bindEnableButton: function(button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:capabilities', 'update'),
+            NX.Conditions.isPermitted('nexus:capabilities:update'),
             NX.Conditions.gridHasSelection('nx-coreui-capability-list', function(model) {
               return !model.get('enabled');
             })
@@ -404,7 +404,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
   bindDisableButton: function(button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:capabilities', 'update'),
+            NX.Conditions.isPermitted('nexus:capabilities:update'),
             NX.Conditions.gridHasSelection('nx-coreui-capability-list', function(model) {
               return model.get('enabled');
             })

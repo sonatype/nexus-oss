@@ -468,7 +468,7 @@ Ext.define('NX.coreui.controller.Users', {
     var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission, 'delete'),
+            NX.Conditions.isPermitted(me.permission + ':delete'),
             NX.Conditions.gridHasSelection(me.masters[0], function(model) {
               return !model.get('external')
                   && (model.getId() !== NX.State.getUser().id)
@@ -513,7 +513,7 @@ Ext.define('NX.coreui.controller.Users', {
 
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:userschangepw', 'create'),
+            NX.Conditions.isPermitted('nexus:userschangepw:create'),
             NX.Conditions.gridHasSelection(me.masters[0], function(model) {
               return !model.get('external') && model.getId() !== NX.State.getValue('anonymousUsername');
             })
@@ -526,7 +526,7 @@ Ext.define('NX.coreui.controller.Users', {
     );
 
     setMenuItem.mon(
-        NX.Conditions.isPermitted('nexus:userschangepw', 'create'),
+        NX.Conditions.isPermitted('nexus:userschangepw:create'),
         {
           satisfied: setMenuItem.enable,
           unsatisfied: setMenuItem.disable,
@@ -543,7 +543,7 @@ Ext.define('NX.coreui.controller.Users', {
   bindChangePasswordButton: function(button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:userschangepw', 'create')
+            NX.Conditions.isPermitted('nexus:userschangepw:create')
         ),
         {
           satisfied: button.enable,

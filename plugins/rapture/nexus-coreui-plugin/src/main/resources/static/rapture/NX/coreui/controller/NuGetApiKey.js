@@ -134,7 +134,7 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
    */
   bindAccessApiKeyButton: function(button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:apikey', 'read'),
+        NX.Conditions.isPermitted('nexus:apikey:read'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -150,7 +150,7 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
    */
   bindResetApiKeyButton: function(button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:apikey', 'delete'),
+        NX.Conditions.isPermitted('nexus:apikey:delete'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,

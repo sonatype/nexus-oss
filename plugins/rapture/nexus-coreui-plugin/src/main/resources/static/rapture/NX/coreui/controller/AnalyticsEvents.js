@@ -216,7 +216,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
    */
   bindClearButton: function (button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:analytics', 'delete'),
+        NX.Conditions.isPermitted('nexus:analytics:delete'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -231,7 +231,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
    */
   bindSubmitButton: function (button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:analytics', 'create'),
+        NX.Conditions.isPermitted('nexus:analytics:create'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,

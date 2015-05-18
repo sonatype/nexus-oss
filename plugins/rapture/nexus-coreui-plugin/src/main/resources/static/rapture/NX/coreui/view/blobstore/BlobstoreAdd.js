@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreAdd', {
       settingsFormSuccessMessage: function(data) {
         return NX.I18n.get('ADMIN_BLOBSTORES_CREATE_SUCCESS') + data['name'];
       },
-      editableCondition: NX.Conditions.isPermitted('nexus:blobstores', 'create'),
+      editableCondition: NX.Conditions.isPermitted('nexus:blobstores:create'),
       editableMarker: NX.I18n.get('ADMIN_BLOBSTORES_CREATE_ERROR'),
 
       buttons: [

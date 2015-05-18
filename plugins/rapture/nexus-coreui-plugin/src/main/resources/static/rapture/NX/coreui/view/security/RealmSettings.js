@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
           load: 'NX.direct.coreui_RealmSettings.read',
           submit: 'NX.direct.coreui_RealmSettings.update'
         },
-        editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
+        editableCondition: NX.Conditions.isPermitted('nexus:settings:update'),
         editableMarker: NX.I18n.get('ADMIN_REALMS_UPDATE_ERROR'),
 
         items: [

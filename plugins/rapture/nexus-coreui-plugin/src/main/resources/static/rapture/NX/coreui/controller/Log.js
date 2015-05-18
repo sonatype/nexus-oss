@@ -252,7 +252,7 @@ Ext.define('NX.coreui.controller.Log', {
    */
   bindMarkButton: function (button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:logging', 'update'),
+        NX.Conditions.isPermitted('nexus:logging:update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,

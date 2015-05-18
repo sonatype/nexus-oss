@@ -349,7 +349,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
             });
             button = tbar.down('button[action=remove]');
             me.mon(
-                NX.Conditions.isPermitted('nexus:ssl-truststore', 'delete'),
+                NX.Conditions.isPermitted('nexus:ssl-truststore:delete'),
                 {
                   satisfied: button.enable,
                   unsatisfied: button.disable,
@@ -368,7 +368,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
             });
             button = tbar.down('button[action=add]');
             me.mon(
-                NX.Conditions.isPermitted('nexus:ssl-truststore', 'create'),
+                NX.Conditions.isPermitted('nexus:ssl-truststore:create'),
                 {
                   satisfied: button.enable,
                   unsatisfied: button.disable,
