@@ -13,13 +13,12 @@
 package org.sonatype.nexus.rapture;
 
 /**
- * RaptureSettings.
+ * Rapture settings.
  *
  * @since 3.0
  */
 public class RaptureSettings
 {
-
   public static final String DEFAULT_TITLE = "Sonatype Nexus";
 
   public static final boolean DEFAULT_DEBUG_ALLOWED = true;
@@ -79,5 +78,4 @@ public class RaptureSettings
   public void setTitle(final String title) {
     this.title = title;
   }
-
 }

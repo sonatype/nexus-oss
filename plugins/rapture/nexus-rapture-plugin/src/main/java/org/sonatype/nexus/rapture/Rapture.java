@@ -17,7 +17,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Rapture.
@@ -29,20 +29,17 @@ import com.google.common.base.Preconditions;
 public class Rapture
     extends ComponentSupport
 {
-
   private RaptureSettings settings = new RaptureSettings();
-
 
   public RaptureSettings getSettings() {
     return settings;
   }
 
   public void setSettings(final RaptureSettings settings) {
-    this.settings = Preconditions.checkNotNull(settings);
+    this.settings = checkNotNull(settings);
   }
 
   public void resetSettings() {
     this.settings = new RaptureSettings();
   }
-
 }
