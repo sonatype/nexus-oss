@@ -58,17 +58,6 @@ public class SecurityComponent
     extends DirectComponentSupport
     implements StateContributor
 {
-
-  private static final int NONE = 0;
-
-  private static final int READ = 1;
-
-  private static final int UPDATE = 2;
-
-  private static final int DELETE = 4;
-
-  private static final int CREATE = 8;
-
   private final SecuritySystem securitySystem;
 
   private final AnonymousManager anonymousManager;
