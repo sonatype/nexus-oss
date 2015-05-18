@@ -12,6 +12,19 @@
  */
 package org.sonatype.nexus.coreui
 
+import javax.annotation.Nullable
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import javax.validation.ValidationException
+
+import org.sonatype.nexus.coreui.search.SearchContribution
+import org.sonatype.nexus.extdirect.DirectComponent
+import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.extdirect.model.PagedResponse
+import org.sonatype.nexus.extdirect.model.StoreLoadParameters
+import org.sonatype.nexus.repository.search.SearchService
+
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresPermissions
@@ -22,18 +35,6 @@ import org.elasticsearch.index.query.FilterBuilders
 import org.elasticsearch.index.query.FilteredQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
-import org.sonatype.nexus.coreui.search.SearchContribution
-import org.sonatype.nexus.extdirect.DirectComponent
-import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.extdirect.model.PagedResponse
-import org.sonatype.nexus.extdirect.model.StoreLoadParameters
-import org.sonatype.nexus.repository.search.SearchService
-
-import javax.annotation.Nullable
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import javax.validation.ValidationException
 
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP
@@ -66,7 +67,7 @@ extends DirectComponentSupport
    * @return search results
    */
   @DirectMethod
-  @RequiresPermissions('nexus:repositories:read')
+  @RequiresPermissions('nexus:search:read')
   PagedResponse<ComponentXO> read(final @Nullable StoreLoadParameters parameters) {
     QueryBuilder query = buildQuery(parameters)
     if (!query) {
