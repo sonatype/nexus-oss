@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.security.authz;
 
+import java.util.Set;
+
+import com.google.common.base.Joiner;
 import org.apache.shiro.authz.permission.WildcardPermission;
 
 /**
@@ -46,5 +49,21 @@ public class WildcardPermission2
   @Override
   public int hashCode() {
     return cachedHash;
+  }
+
+  private static final Joiner JOINER = Joiner.on(',');
+
+  /**
+   * Customized string representation to avoid {@code []} syntax from sets.
+   */
+  public String toString() {
+    StringBuilder buff = new StringBuilder();
+    for (Set<String> part : getParts()) {
+      if (buff.length() > 0) {
+        buff.append(':');
+      }
+      JOINER.appendTo(buff, part);
+    }
+    return buff.toString();
   }
 }
