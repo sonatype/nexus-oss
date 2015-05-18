@@ -78,7 +78,7 @@ public class SecurityComponent
 
   @DirectMethod
   @Validate
-  public UserXO authenticate(final @NotEmpty String base64Username, final @NotEmpty String base64Password)
+  public UserXO authenticate(@NotEmpty final String base64Username, @NotEmpty final String base64Password)
       throws Exception
   {
     boolean rememberMe = false;
@@ -103,7 +103,7 @@ public class SecurityComponent
 
   @DirectMethod
   @Validate
-  public String authenticationToken(final @NotEmpty String base64Username, final @NotEmpty String base64Password)
+  public String authenticationToken(@NotEmpty final String base64Username, @NotEmpty final String base64Password)
       throws Exception
   {
     Subject subject = securitySystem.getSubject();
