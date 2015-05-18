@@ -80,7 +80,10 @@ Ext.define('NX.controller.Bookmarking', {
     }
 
     if (bookmark && oldValue !== bookmark.getToken()) {
+      //<if debug>
       me.logDebug('Bookmark: ' + bookmark.getToken() + (caller ? ' (' + caller.self.getName() + ')' : ''));
+      //</if>
+
       Ext.History.bookmark = bookmark.getToken();
       Ext.History.add(bookmark.getToken());
     }
@@ -100,7 +103,10 @@ Ext.define('NX.controller.Bookmarking', {
     }
 
     if (bookmark) {
+      //<if debug>
       me.logDebug('Navigate to: ' + bookmark.getToken() + (caller ? ' (' + caller.self.getName() + ')' : ''));
+      //</if>
+
       me.bookmark(bookmark, caller);
       me.fireEvent('navigate', bookmark);
     }
