@@ -28,7 +28,7 @@ Ext.define('NX.Permissions', {
 
   /**
    * @private
-   * Map between permissions id and value.
+   * Map between permissions id and permitted boolean value.
    */
   permissions: undefined,
 
