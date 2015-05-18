@@ -76,19 +76,20 @@ public class Maven2MavenPathParser
 
       StringBuilder extSuffix = new StringBuilder();
       SignatureType signatureType = null;
-      if (str.endsWith("." + HashType.SHA1.getExt())) {
-        extSuffix.insert(0, "." + HashType.SHA1.getExt());
-        str = str.substring(0, str.length() - 5);
-      }
-      else if (str.endsWith("." + HashType.MD5.getExt())) {
-        extSuffix.insert(0, "." + HashType.MD5.getExt());
-        str = str.substring(0, str.length() - 4);
+      for (HashType hashType : HashType.values()) {
+        if (str.endsWith("." + hashType.getExt())) {
+          extSuffix.insert(0, "." + hashType.getExt());
+          str = str.substring(0, str.length() - (hashType.getExt().length() + 1));
+          break;
+        }
       }
 
-      if (str.endsWith("." + SignatureType.GPG.getExt())) {
-        extSuffix.insert(0, "." + SignatureType.GPG.getExt());
-        signatureType = SignatureType.GPG;
-        str = str.substring(0, str.length() - (signatureType.getExt().length() + 1));
+      for (SignatureType sType : SignatureType.values()) {
+        if (str.endsWith("." + sType.getExt())) {
+          extSuffix.insert(0, "." + sType.getExt());
+          str = str.substring(0, str.length() - (sType.getExt().length() + 1));
+          signatureType = sType;
+        }
       }
 
       if (str.endsWith(Maven2Format.METADATA_FILENAME)) {
@@ -100,7 +101,7 @@ public class Maven2MavenPathParser
       Integer buildNumber = null;
       String tail;
       if (snapshot) {
-        int vSnapshotStart = artifactId.length() + baseVersion.length() - 9 + 2;
+        int vSnapshotStart = artifactId.length() + baseVersion.length() - 10 + 3;
         version = str.substring(vSnapshotStart, vSnapshotStart + 8);
         if ("SNAPSHOT".equals(version)) {
           version = baseVersion; // reset it

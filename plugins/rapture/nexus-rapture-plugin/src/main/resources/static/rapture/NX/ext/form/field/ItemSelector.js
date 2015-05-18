@@ -28,6 +28,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
   width: 600,
   height: 253,
 
+  disabledCls: 'nx-itemselector-disabled',
   invalidCls: 'nx-invalid',
 
   /**

@@ -17,8 +17,8 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 
-import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.InvalidContentException;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;

@@ -908,8 +908,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // HTTP Request section
     ADMIN_HTTP_CUSTOMIZATION: 'User-agent customization',
     ADMIN_HTTP_CUSTOMIZATION_HELP: 'Custom fragment to append to "User-Agent" header in HTTP requests.',
-    ADMIN_HTTP_PARAMETERS: 'URL parameters',
-    ADMIN_HTTP_PARAMETERS_HELP: 'Additional parameters appended to HTTP requests after \'?\'',
     ADMIN_HTTP_TIMEOUT: 'Timeout',
     ADMIN_HTTP_TIMEOUT_HELP: 'Seconds before retry',
     ADMIN_HTTP_ATTEMPTS: 'Max retry attempts',

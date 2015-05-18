@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.common.app.BaseUrlHolder;
+import org.sonatype.nexus.repository.IllegalOperationException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
@@ -121,10 +122,15 @@ public class ViewServlet
       doService(httpRequest, httpResponse);
       log.debug("Service completed");
     }
+    catch (AuthorizationException e) {
+      throw e;
+    }
+    catch (IllegalOperationException e) {
+      log.info("Illegal operation {} {}: {}", httpRequest.getMethod(), httpRequest.getRequestURI(), e.getMessage());
+      send(null, HttpResponses.badRequest(e.getMessage()), httpResponse);
+    }
     catch (Exception e) {
-      if (!(e instanceof AuthorizationException)) {
-        log.warn("Service failure", e);
-      }
+      log.warn("Service failure", e);
       Throwables.propagateIfPossible(e, ServletException.class, IOException.class);
       throw new ServletException(e);
     }
