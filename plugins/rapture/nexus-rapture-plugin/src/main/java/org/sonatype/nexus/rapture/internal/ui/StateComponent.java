@@ -12,33 +12,33 @@
  */
 package org.sonatype.nexus.rapture.internal.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
 
-import org.sonatype.nexus.common.app.SystemStatus;
 import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
-import org.sonatype.nexus.rapture.Rapture;
 import org.sonatype.nexus.rapture.StateContributor;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.hash.Hashing;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.softwarementors.extjs.djn.config.annotations.DirectAction;
 import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod;
 import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -53,39 +53,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StateComponent
     extends DirectComponentSupport
 {
-
-  private final Rapture rapture;
-
-  private final Provider<SystemStatus> systemStatus;
+  private static final Logger log = LoggerFactory.getLogger(StateComponent.class);
 
   private final List<Provider<StateContributor>> stateContributors;
-
-  private final static Gson gson = new GsonBuilder().create();
 
   private final static String serverId = String.valueOf(System.nanoTime());
 
   @Inject
-  public StateComponent(final Rapture rapture,
-                        final Provider<SystemStatus> systemStatus,
-                        final List<Provider<StateContributor>> stateContributors)
-  {
-    this.rapture = checkNotNull(rapture);
-    this.systemStatus = checkNotNull(systemStatus);
+  public StateComponent(final List<Provider<StateContributor>> stateContributors) {
     this.stateContributors = checkNotNull(stateContributors);
   }
 
   @DirectPollMethod(event = "rapture_State_get")
   public StateXO get(final Map<String, String> hashes) {
-    StateXO stateXO = new StateXO();
-
-    stateXO.setValues(getValues(hashes));
-    stateXO.setCommands(getCommands());
-
-    return stateXO;
+    StateXO state = new StateXO();
+    state.setValues(getValues(hashes));
+    state.setCommands(getCommands());
+    return state;
   }
 
   public Map<String, Object> getValues(final Map<String, String> hashes) {
-    HashMap<String, Object> values = Maps.newHashMap();
+    HashMap<String, Object> values = new HashMap<>();
 
     // First add an entry for each hash we got.
     // If state will not contribute a value for it, the state will be send back as null and such will be removed in UI
@@ -99,10 +87,10 @@ public class StateComponent
         if (stateValues != null) {
           for (Entry<String, Object> entry : stateValues.entrySet()) {
             if (!Strings2.isBlank(entry.getKey())) {
-              send(values, hashes, entry.getKey(), entry.getValue());
+              maybeSend(values, hashes, entry.getKey(), entry.getValue());
             }
             else {
-              log.warn("Empty state id returned by {} (ignored)", contributor.getClass().getName());
+              log.warn("Blank state-id returned by {} (ignored)", contributor.getClass().getName());
             }
           }
         }
@@ -112,24 +100,13 @@ public class StateComponent
       }
     }
 
-    send(values, hashes, "serverId", serverId);
-    send(values, hashes, "status", getStatus());
-    send(values, hashes, "license", getLicense());
-    send(values, hashes, "uiSettings", rapture.getSettings());
+    maybeSend(values, hashes, "serverId", serverId);
 
     return values;
   }
 
-  private StatusXO getStatus() {
-    SystemStatus status = systemStatus.get();
-    StatusXO result = new StatusXO();
-    result.setEdition(status.getEditionShort());
-    result.setVersion(status.getVersion());
-    return result;
-  }
-
   private List<CommandXO> getCommands() {
-    List<CommandXO> commands = Lists.newArrayList();
+    List<CommandXO> commands = new ArrayList<>();
 
     for (Provider<StateContributor> contributor : stateContributors) {
       try {
@@ -143,7 +120,7 @@ public class StateComponent
               commands.add(command);
             }
             else {
-              log.warn("Empty command id returned by {} (ignored)", contributor.getClass().getName());
+              log.warn("Blank command-id returned by {} (ignored)", contributor.getClass().getName());
             }
           }
         }
@@ -156,25 +133,39 @@ public class StateComponent
     return commands;
   }
 
-  private void send(final Map<String, Object> values,
-                    final Map<String, String> hashes,
-                    final String key,
-                    final Object value)
+  /**
+   * Include value in state unless its hash is unchanged.
+   */
+  private void maybeSend(final Map<String, Object> values,
+                         final Map<String, String> hashes,
+                         final String key,
+                         final Object value)
   {
     values.remove(key);
     String hash = hash(value);
     if (!Objects.equal(hash, hashes.get(key))) {
-      StateValueXO stateValueXO = new StateValueXO();
-      stateValueXO.setHash(hash);
-      stateValueXO.setValue(value);
-      values.put(key, stateValueXO);
+      StateValueXO data = new StateValueXO();
+      data.setHash(hash);
+      data.setValue(value);
+      values.put(key, data);
     }
   }
 
-  public static String hash(final Object value) {
+  /**
+   * Gson instance used to calculate hashes.
+   */
+  private static final Gson gson = new GsonBuilder().setPrettyPrinting().create(); // pretty for debugging
+
+  /**
+   * Calculate (opaque) hash for given non-null value.
+   */
+  @Nullable
+  private static String hash(@Nullable final Object value) {
     if (value != null) {
-      // TODO is there another way to not use serialized json? :D
-      return Hashing.sha1().hashString(gson.toJson(value), Charsets.UTF_8).toString();
+      // TODO: consider using Object.hashCode() and getting state contributors to ensure values have proper impls?
+      // TODO: ... or something else which is more efficient than object->gson->sha1?
+      String json = gson.toJson(value);
+      return Hashing.sha1().hashString(json, Charsets.UTF_8).toString();
     }
     return null;
   }
@@ -188,8 +179,7 @@ public class StateComponent
         String currentDigest = (String) session.getAttribute(sessionAttribute);
         String newDigest = null;
         if (value != null) {
-          // TODO is there another way to not use serialized json? :D
-          newDigest = Hashing.sha1().hashString(gson.toJson(value), Charsets.UTF_8).toString();
+          newDigest = hash(value);
         }
         if (Objects.equal(currentDigest, newDigest)) {
           shouldSend = false;
@@ -205,13 +195,5 @@ public class StateComponent
       }
     }
     return shouldSend;
-  }
-
-  public LicenseXO getLicense() {
-    SystemStatus status = systemStatus.get();
-    LicenseXO result = new LicenseXO();
-    result.setRequired(!"OSS".equals(status.getEditionShort()));
-    result.setInstalled(status.isLicenseInstalled());
-    return result;
   }
 }

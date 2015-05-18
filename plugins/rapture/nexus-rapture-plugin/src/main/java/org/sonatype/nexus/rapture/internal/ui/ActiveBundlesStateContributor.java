@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -44,6 +45,8 @@ public class ActiveBundlesStateContributor
   extends ComponentSupport
   implements StateContributor
 {
+  public static final String STATE_ID = "activeBundles";
+
   private final BundleContext bundleContext;
 
   private final BundleService bundleService;
@@ -58,10 +61,11 @@ public class ActiveBundlesStateContributor
 
   @Override
   public Map<String, Object> getState() {
-    return ImmutableMap.of("activeBundles", calculateActivateBundles());
+    return ImmutableMap.of(STATE_ID, calculateActivateBundles());
   }
 
   @Override
+  @Nullable
   public Map<String, Object> getCommands() {
     return null;
   }

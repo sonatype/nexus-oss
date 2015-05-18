@@ -14,12 +14,15 @@ package org.sonatype.nexus.rapture.internal.ui
 
 import java.util.regex.Matcher
 
+import javax.annotation.Nullable
 import javax.inject.Named
 import javax.inject.Singleton
 
 import org.sonatype.nexus.common.app.BaseUrlHolder
 import org.sonatype.nexus.rapture.StateContributor
 import org.sonatype.nexus.rapture.internal.capability.BrandingCapabilityConfiguration
+
+import groovy.transform.PackageScope
 
 /**
  * Branding state contributor.
@@ -29,23 +32,30 @@ import org.sonatype.nexus.rapture.internal.capability.BrandingCapabilityConfigur
 @Named
 @Singleton
 class Branding
-implements StateContributor
+    implements StateContributor
 {
-
   private BrandingCapabilityConfiguration config
 
   @Override
   Map<String, Object> getState() {
-    Map<String, Object> state = null
     if (config) {
-      state = ['branding': new BrandingXO(
+      return ['branding': new BrandingXO(
           headerEnabled: config.headerEnabled,
-          headerHtml: config.headerHtml ? config.headerHtml.replaceAll(Matcher.quoteReplacement('$baseUrl'), BaseUrlHolder.get()) : null,
+          headerHtml: interpolate(config.headerHtml),
           footerEnabled: config.footerEnabled,
-          footerHtml: config.footerHtml ? config.footerHtml.replaceAll(Matcher.quoteReplacement('$baseUrl'), BaseUrlHolder.get()) : null
-      )];
+          footerHtml: interpolate(config.footerHtml)
+      )]
     }
-    return state;
+    return null
+  }
+
+  @PackageScope
+  @Nullable
+  String interpolate(@Nullable final String html) {
+    if (html != null) {
+      return html.replaceAll(Matcher.quoteReplacement('$baseUrl'), BaseUrlHolder.get())
+    }
+    return null
   }
 
   @Override
@@ -53,12 +63,11 @@ implements StateContributor
     return null
   }
 
-  public void set(final BrandingCapabilityConfiguration config) {
+  void set(final BrandingCapabilityConfiguration config) {
     this.config = config
   }
 
-  public void reset() {
+  void reset() {
     this.config = null
   }
-
 }

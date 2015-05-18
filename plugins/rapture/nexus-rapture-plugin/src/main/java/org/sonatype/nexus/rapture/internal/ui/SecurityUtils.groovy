@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.rapture.internal.ui
 
-import groovy.transform.ToString
 import org.apache.shiro.authz.permission.WildcardPermission
 
 /**
@@ -22,6 +21,8 @@ import org.apache.shiro.authz.permission.WildcardPermission
  */
 class SecurityUtils
 {
+  // FIXME: Remove this, used in 1 place
+
   /**
    * Access to protected {@link WildcardPermission#getParts()}.
    */

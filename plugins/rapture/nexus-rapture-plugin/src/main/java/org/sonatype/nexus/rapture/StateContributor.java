@@ -14,6 +14,8 @@ package org.sonatype.nexus.rapture;
 
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 /**
  * Implemented by components that provide state values/commands.
  *
@@ -21,15 +23,15 @@ import java.util.Map;
  */
 public interface StateContributor
 {
-
   /**
-   * @return a state map between state id and state value (value can be null)
+   * Returns mapping of state-id to state-value (state-value can be null).
    */
+  @Nullable
   Map<String, Object> getState();
 
   /**
-   * @return a map of commands between command id and its payload (payload can be null)
+   * Returns mapping of command-id to command-payload (command-payload can be null).
    */
+  @Nullable
   Map<String, Object> getCommands();
-
 }
