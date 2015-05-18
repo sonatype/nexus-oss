@@ -55,7 +55,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'application',
                 properties: [
                     domain : 'settings',
-                    actions: '*',
+                    actions: '*'
                 ]
             ),
             new CPrivilege(
@@ -63,7 +63,7 @@ class StaticSecurityConfigurationResourceImpl
                 type: 'application',
                 properties: [
                     domain : 'settings',
-                    actions: 'read',
+                    actions: 'read'
                 ]
             ),
             new CPrivilege(
