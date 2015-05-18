@@ -16,7 +16,6 @@ import org.sonatype.nexus.security.realm.RealmExists
 import org.sonatype.nexus.security.role.RolesExist
 import org.sonatype.nexus.security.user.UserExists
 import org.sonatype.nexus.validation.group.Create
-import org.sonatype.nexus.validation.group.Update
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotBlank
@@ -37,6 +36,6 @@ class UserRoleMappingsXO
   @RealmExists(groups = Create)
   String realm
 
-  @RolesExist(groups = [Create, Update])
+  @RolesExist
   Set<String> roles
 }
