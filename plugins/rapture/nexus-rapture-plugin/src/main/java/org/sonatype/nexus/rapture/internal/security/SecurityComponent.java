@@ -18,7 +18,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +29,7 @@ import org.sonatype.nexus.rapture.StateContributor;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.anonymous.AnonymousConfiguration;
 import org.sonatype.nexus.security.anonymous.AnonymousManager;
+import org.sonatype.nexus.security.authz.WildcardPermission2;
 import org.sonatype.nexus.security.privilege.Privilege;
 import org.sonatype.nexus.validation.Validate;
 import org.sonatype.nexus.wonderland.AuthTicketService;
@@ -39,7 +39,6 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.Permission;
-import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.subject.Subject;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -204,29 +203,29 @@ public class SecurityComponent
   }
 
   private List<PermissionXO> calculatePermissions(final Subject subject) {
-    List<Permission> permissionList = new ArrayList<>();
-    List<String> permissionNameList = new ArrayList<>();
-    List<PermissionXO> permissions = new ArrayList<>();
+    List<Permission> granted = new ArrayList<>();
+    List<PermissionXO> result = new ArrayList<>();
 
-    for (Privilege priv : securitySystem.listPrivileges()) {
-      if (priv.getPermission() instanceof WildcardPermission) {
-        WildcardPermission permission = (WildcardPermission) priv.getPermission();
-        List<Set<String>> parts = SecurityUtils.getParts(permission);
-        processParts(0, parts, null, permissionList, permissionNameList);
+    // find all privileges which we expose the UI, , which we can deconstruct and evaluate
+    for (Privilege privilege : securitySystem.listPrivileges()) {
+      // only WildcardPermission2 presently is supported due to toString() implementation
+      if (privilege.getPermission() instanceof WildcardPermission2) {
+        granted.add(privilege.getPermission());
       }
     }
 
-    boolean[] boolResults = subject.isPermitted(permissionList);
-
-    for (int i = 0; i < permissionList.size(); i++) {
+    // determine which of the exposed privilege permissions the current subject is granted
+    boolean[] boolResults = subject.isPermitted(granted);
+    for (int i = 0; i < granted.size(); i++) {
       if (boolResults[i]) {
-        PermissionXO permissionXO = new PermissionXO();
-        permissionXO.setId(permissionNameList.get(i));
-        permissions.add(permissionXO);
+        PermissionXO entry = new PermissionXO();
+        entry.setId(granted.get(i).toString());
+        result.add(entry);
       }
     }
 
-    Collections.sort(permissions, new Comparator<PermissionXO>()
+    // FIXME: Permissions must be sorted for state-hash calculation :-(
+    Collections.sort(result, new Comparator<PermissionXO>()
     {
       @Override
       public int compare(final PermissionXO o1, final PermissionXO o2) {
@@ -234,28 +233,6 @@ public class SecurityComponent
       }
     });
 
-    return permissions;
+    return result;
   }
-
-  /**
-   * Expand multiple parts as for example nexus:foo:create,read into nexus:foo:create and nexus:foo:read
-   */
-  private void processParts(final int partIndex,
-                            final List<Set<String>> parts,
-                            final String name,
-                            final List<Permission> permissionList,
-                            final List<String> permissionNameList)
-  {
-    for (String part : parts.get(partIndex)) {
-      String newName = name == null ? part : name + ":" + part;
-      if (partIndex < parts.size() - 1) {
-        processParts(partIndex + 1, parts, newName, permissionList, permissionNameList);
-      }
-      else {
-        permissionList.add(new WildcardPermission(newName));
-        permissionNameList.add(newName);
-      }
-    }
-  }
-
 }
