@@ -54,7 +54,7 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @WithReadLock
-  @RequiresPermissions('nexus:logconfig:read')
+  @RequiresPermissions('nexus:logging:read')
   List<LoggerXO> read() {
     return logManager.getLoggers().collect { key, value ->
       new LoggerXO(
@@ -71,7 +71,7 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @WithWriteLock
-  @RequiresPermissions('nexus:logconfig:update')
+  @RequiresPermissions('nexus:logging:update')
   @Validate
   LoggerXO update(final @NotNull @Valid LoggerXO loggerXO) {
     logManager.setLoggerLevel(loggerXO.name, loggerXO.level)
@@ -88,7 +88,7 @@ extends DirectComponentSupport
   @DirectMethod
   @WithWriteLock
   @RequiresAuthentication
-  @RequiresPermissions('nexus:logconfig:update')
+  @RequiresPermissions('nexus:logging:update')
   @Validate
   void remove(final @NotEmpty String name) {
     assert name != ROOT, "${ROOT} logger cannot be removed"
@@ -101,7 +101,7 @@ extends DirectComponentSupport
   @DirectMethod
   @WithWriteLock
   @RequiresAuthentication
-  @RequiresPermissions('nexus:logconfig:update')
+  @RequiresPermissions('nexus:logging:update')
   void reset() {
     logManager.resetLoggers()
   }

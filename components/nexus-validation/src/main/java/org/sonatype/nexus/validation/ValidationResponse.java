@@ -27,7 +27,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @see ValidationMessage
  * @see ValidationResponseException
+ * @deprecated Prefer bean-validation instead
  */
+@Deprecated
 public class ValidationResponse
 {
   // FIXME: Remove, this is only used for deprecated non-message based add methods
@@ -163,7 +165,7 @@ public class ValidationResponse
       buff.append(messages.size());
       buff.append(" ").append(type).append(":\n");
 
-      int c=0;
+      int c = 0;
       for (ValidationMessage message : messages) {
         buff.append("[").append(++c).append("] ");
         buff.append(message);

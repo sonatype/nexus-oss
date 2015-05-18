@@ -56,6 +56,7 @@ public class RepositoryAdminSecurityConfigurationResource
    * Initial (static) security configuration.
    */
   private void initial(final SecurityConfiguration model) {
+    model.addPrivilege(privilege(ALL, ALL, ALL));
     model.addPrivilege(privilege(ALL, ALL, BROWSE));
     model.addPrivilege(privilege(ALL, ALL, READ));
     model.addPrivilege(privilege(ALL, ALL, EDIT));
@@ -75,6 +76,7 @@ public class RepositoryAdminSecurityConfigurationResource
       @Override
       public void apply(final SecurityConfiguration model) {
         // no per-repo repository-admin ADD action
+        model.addPrivilege(privilege(format, name, ALL));
         model.addPrivilege(privilege(format, name, BROWSE));
         model.addPrivilege(privilege(format, name, READ));
         model.addPrivilege(privilege(format, name, EDIT));
@@ -95,6 +97,7 @@ public class RepositoryAdminSecurityConfigurationResource
       @Override
       public void apply(final SecurityConfiguration model) {
         // no per-repo repository-admin ADD action
+        model.removePrivilege(id(format, name, ALL));
         model.removePrivilege(id(format, name, BROWSE));
         model.removePrivilege(id(format, name, READ));
         model.removePrivilege(id(format, name, EDIT));

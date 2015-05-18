@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     var me = this;
 
     me.editableCondition = me.editableCondition || NX.Conditions.and(
-      NX.Conditions.isPermitted('nexus:tasks', 'update'),
+      NX.Conditions.isPermitted('nexus:tasks:update'),
       NX.Conditions.formHasRecord('nx-coreui-task-settings-form', function (model) {
         return model.get('schedule') !== 'internal';
       })

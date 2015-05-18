@@ -87,7 +87,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
             }
             return description;
           },
-          editableCondition: NX.Conditions.isPermitted('nexus:capabilities', 'update'),
+          editableCondition: NX.Conditions.isPermitted('nexus:capabilities:update'),
           editableMarker: NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_ERROR'),
           items: [
             {

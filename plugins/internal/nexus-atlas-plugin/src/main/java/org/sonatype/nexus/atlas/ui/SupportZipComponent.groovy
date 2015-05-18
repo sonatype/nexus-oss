@@ -47,7 +47,7 @@ class SupportZipComponent
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('nexus:atlas')
+  @RequiresPermissions('nexus:atlas:create')
   @Validate
   SupportZipXO create(final @NotNull SupportZipGenerator.Request request) {
     def result = supportZipGenerator.generate(request)

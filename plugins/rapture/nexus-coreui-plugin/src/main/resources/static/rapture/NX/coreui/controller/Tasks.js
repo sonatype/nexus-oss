@@ -77,7 +77,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('nexus:tasks', 'read');
+      return NX.Permissions.check('nexus:tasks:read');
     }
   },
   permission: 'nexus:tasks',
@@ -318,7 +318,7 @@ Ext.define('NX.coreui.controller.Tasks', {
   bindNewButton: function(button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:tasks', 'create'),
+            NX.Conditions.isPermitted('nexus:tasks:create'),
             NX.Conditions.storeHasRecords('TaskType')
         ),
         {
@@ -337,7 +337,7 @@ Ext.define('NX.coreui.controller.Tasks', {
   bindRunButton: function(button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:tasksrun', 'read'),
+            NX.Conditions.isPermitted('nexus:tasks:start'),
             NX.Conditions.gridHasSelection('nx-coreui-task-list', function(model) {
               return model.get('runnable');
             })
@@ -358,7 +358,7 @@ Ext.define('NX.coreui.controller.Tasks', {
   bindStopButton: function(button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:tasksrun', 'delete'),
+            NX.Conditions.isPermitted('nexus:tasks:stop'),
             NX.Conditions.gridHasSelection('nx-coreui-task-list', function(model) {
               return model.get('stoppable');
             })

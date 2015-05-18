@@ -18,7 +18,7 @@ import java.util.Set;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.sonatype.nexus.ssl.plugin.SSLPlugin;
+import com.sonatype.nexus.ssl.plugin.internal.SSLConstants;
 
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Tag;
@@ -50,7 +50,7 @@ public class SMTPCapabilityDescriptor
   /**
    * {@link SMTPCapability} type ID (ssl.key.smtp)
    */
-  public static final String TYPE_ID = SSLPlugin.ID_PREFIX + ".key.smtp";
+  public static final String TYPE_ID = SSLConstants.ID_PREFIX + ".key.smtp";
 
   /**
    * {@link SMTPCapability} type

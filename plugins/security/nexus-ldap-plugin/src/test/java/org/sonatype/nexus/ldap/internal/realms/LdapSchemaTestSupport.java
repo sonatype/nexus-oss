@@ -15,7 +15,7 @@ package org.sonatype.nexus.ldap.internal.realms;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.sonatype.nexus.ldap.LdapPlugin;
+import org.sonatype.nexus.ldap.internal.LdapConstants;
 import org.sonatype.nexus.ldap.internal.LdapITSupport;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapUser;
@@ -64,7 +64,7 @@ public abstract class LdapSchemaTestSupport
       throws Exception
   {
     this.ldapManager = lookup(LdapManager.class);
-    this.realm = lookup(Realm.class, LdapPlugin.REALM_NAME);
+    this.realm = lookup(Realm.class, LdapConstants.REALM_NAME);
   }
 
   @Test

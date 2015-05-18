@@ -165,8 +165,8 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
     useTrustStoreButton = useTrustStoreField.down('button');
     useTrustStoreField.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:ssl:truststore', 'create'),
-            NX.Conditions.isPermitted('nexus:ssl:truststore', 'update')
+            NX.Conditions.isPermitted('nexus:ssl-truststore:create'),
+            NX.Conditions.isPermitted('nexus:ssl-truststore:update')
         ),
         {
           satisfied: useTrustStoreCheckbox.enable,
@@ -175,7 +175,7 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
         }
     );
     useTrustStoreField.mon(
-        NX.Conditions.isPermitted('nexus:ssl:truststore', 'read'),
+        NX.Conditions.isPermitted('nexus:ssl-truststore:read'),
         {
           satisfied: useTrustStoreButton.enable,
           unsatisfied: useTrustStoreButton.disable,

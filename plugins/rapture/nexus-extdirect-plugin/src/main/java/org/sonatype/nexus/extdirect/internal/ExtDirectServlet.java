@@ -35,13 +35,11 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
 
 import org.sonatype.nexus.analytics.EventDataBuilder;
 import org.sonatype.nexus.analytics.EventRecorder;
 import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
-import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.extdirect.model.Response;
 import org.sonatype.nexus.validation.ValidationResponseException;
 
@@ -143,7 +141,7 @@ public class ExtDirectServlet
           }
         })
     );
-    File apiFile = new File(directories.getTemporaryDirectory(), ExtDirectPlugin.ARTIFACT_ID + "/api.js");
+    File apiFile = new File(directories.getTemporaryDirectory(), "nexus-extdirect-plugin/api.js");
     return Lists.newArrayList(
         new ApiConfiguration(
             "nexus",
@@ -229,29 +227,24 @@ public class ExtDirectServlet
         log.debug("Failed to invoke action method: {}, java-method: {}",
             method.getFullName(), method.getFullJavaMethodName(), e);
 
+        // handle validation message responses which have contents
         if (e instanceof ValidationResponseException) {
           ValidationResponseException cause = (ValidationResponseException) e;
-          if (cause.getErrors().isEmpty()) {
-            return asResponse(error(e));
+          if (!cause.getErrors().isEmpty()) {
+            return asResponse(invalid(cause));
           }
-          return asResponse(invalid(cause));
         }
         else if (e instanceof ConstraintViolationException) {
           ConstraintViolationException cause = (ConstraintViolationException) e;
           Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
-          if (violations == null || violations.size() == 0) {
-            return asResponse(error(e));
+          if (violations != null && !violations.isEmpty()) {
+            return asResponse(invalid(cause));
           }
-          return asResponse(invalid(cause));
-        }
-        else if (e instanceof ValidationException) {
-          return asResponse(error(e));
         }
 
-        // Not validation exception, log error
+        // everything else report as an error and log
         log.error("Failed to invoke action method: {}, java-method: {}",
             method.getFullName(), method.getFullJavaMethodName(), e);
-
         return asResponse(error(e));
       }
 

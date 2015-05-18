@@ -437,8 +437,10 @@ Ext.define('NX.controller.Drilldown', {
         list_ids, tab_id = null, model, modelId, index;
 
     if (lists.length && bookmark) {
-
+      //<if debug>
       me.logDebug('Navigate to: ' + bookmark.getSegments().join(':'));
+      //</if>
+
       list_ids = bookmark.getSegments().slice(1);
 
       if (list_ids.length > lists.length) {
@@ -532,7 +534,7 @@ Ext.define('NX.controller.Drilldown', {
   bindNewButton: function (button) {
     var me = this;
     button.mon(
-        NX.Conditions.isPermitted(me.permission, 'create'),
+        NX.Conditions.isPermitted(me.permission + ':create'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -549,7 +551,7 @@ Ext.define('NX.controller.Drilldown', {
     var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission, 'delete')
+            NX.Conditions.isPermitted(me.permission + ':delete')
         ),
         {
           satisfied: button.enable,

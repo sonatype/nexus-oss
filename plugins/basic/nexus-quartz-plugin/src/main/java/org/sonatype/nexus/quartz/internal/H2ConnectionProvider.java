@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.nexus.common.io.DirSupport;
-import org.sonatype.nexus.quartz.QuartzPlugin;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
@@ -45,7 +44,7 @@ public class H2ConnectionProvider
     extends ComponentSupport
     implements ConnectionProvider
 {
-  private static final String H2_SETTINGS_KEY = QuartzPlugin.CONFIG_PREFIX + ".h2-settings";
+  private static final String H2_SETTINGS_KEY = QuartzConstants.CONFIG_PREFIX + ".h2-settings";
 
   private static final String H2_DEFAULTS =
       ";FILE_LOCK=FS;MVCC=TRUE;QUERY_CACHE_SIZE=0;CACHE_SIZE=0;CACHE_TYPE=SOFT_LRU;LOCK_TIMEOUT=60000;MAX_MEMORY_ROWS=1000000";

@@ -12,18 +12,17 @@
  */
 package org.sonatype.nexus.coreui
 
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+
+import org.sonatype.nexus.extdirect.DirectComponentSupport
+
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.karaf.bundle.core.BundleService
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.osgi.framework.BundleContext
-import org.sonatype.nexus.extdirect.DirectComponentSupport
-
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-
-import static com.google.common.base.Preconditions.checkNotNull
 
 /**
  * OSGI bundle component.
@@ -36,17 +35,12 @@ import static com.google.common.base.Preconditions.checkNotNull
 class BundleComponent
     extends DirectComponentSupport
 {
-  final BundleContext bundleContext
-
-  final BundleService bundleService
+  @Inject
+  BundleContext bundleContext
 
   @Inject
-  BundleComponent(BundleContext bundleContext, BundleService bundleService) {
-    this.bundleContext = checkNotNull(bundleContext)
-    this.bundleService = checkNotNull(bundleService)
-  }
+  BundleService bundleService
 
-  // TODO: Sort out permission
   @DirectMethod
   @RequiresPermissions('nexus:bundles:read')
   List<BundleXO> read() {

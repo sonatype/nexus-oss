@@ -12,8 +12,9 @@
  */
 package org.sonatype.nexus.validation.constraint;
 
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import org.sonatype.nexus.validation.ConstraintValidatorSupport;
 
 /**
  * {@link PortNumber} validator.
@@ -21,7 +22,7 @@ import javax.validation.ConstraintValidatorContext;
  * @since 3.0
  */
 public class PortNumberValidator
-  implements ConstraintValidator<PortNumber,Integer>
+  extends ConstraintValidatorSupport<PortNumber,Integer>
 {
   private int min;
 

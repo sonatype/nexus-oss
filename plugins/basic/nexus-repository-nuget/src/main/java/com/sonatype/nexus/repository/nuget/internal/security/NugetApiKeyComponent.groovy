@@ -53,7 +53,7 @@ class NugetApiKeyComponent
      * Read NuGet API Key for current signed on user.
      */
     @DirectMethod
-    @RequiresPermissions('apikey:access:read')
+    @RequiresPermissions('nexus:apikey:read')
     @Validate
     String readKey(final @NotEmpty String authToken) {
         validateAuthToken(authToken)
@@ -71,7 +71,7 @@ class NugetApiKeyComponent
      */
     @DirectMethod
     @RequiresAuthentication
-    @RequiresPermissions('apikey:access:delete')
+    @RequiresPermissions('nexus:apikey:delete')
     @Validate
     String resetKey(final @NotEmpty String authToken) {
         validateAuthToken(authToken)

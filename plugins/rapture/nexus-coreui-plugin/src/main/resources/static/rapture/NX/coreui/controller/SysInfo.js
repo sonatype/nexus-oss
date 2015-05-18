@@ -61,7 +61,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
         variants: ['x16', 'x32']
       },
       visible: function () {
-        return NX.Permissions.check('nexus:atlas', 'read');
+        return NX.Permissions.check('nexus:atlas:read');
       }
     }, me);
 

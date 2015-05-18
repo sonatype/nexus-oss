@@ -45,7 +45,7 @@ Ext.define('NX.coreui.controller.GeneralSettings', {
         variants: ['x16', 'x32']
       },
       visible: function () {
-        return NX.Permissions.check('nexus:settings', 'read');
+        return NX.Permissions.check('nexus:settings:read');
       }
     }, me);
   }

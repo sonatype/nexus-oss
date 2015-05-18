@@ -20,8 +20,8 @@ import java.util.Map;
 import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.SecuritySystem;
 import org.sonatype.nexus.security.internal.AuthorizingRealmImpl;
-import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
 import org.sonatype.nexus.security.privilege.Privilege;
+import org.sonatype.nexus.security.privilege.WildcardPrivilegeDescriptor;
 import org.sonatype.nexus.security.realm.MockRealm;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmManager;
@@ -68,15 +68,15 @@ public class ExternalRoleMappedTest
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
 
     Map<String, String> properties = new HashMap<String, String>();
-    properties.put(MethodPrivilegeDescriptor.P_METHOD, "read");
-    properties.put(MethodPrivilegeDescriptor.P_PERMISSION, "permissionOne");
+    properties.put(WildcardPrivilegeDescriptor.P_PATTERN, "permissionOne:read");
 
     securitySystem.getAuthorizationManager("default").addPrivilege(new Privilege(
         "randomId",
         "permissionOne",
         "permissionOne",
-        MethodPrivilegeDescriptor.TYPE,
-        properties, false));
+        WildcardPrivilegeDescriptor.TYPE,
+        properties,
+        false));
 
     securitySystem.getAuthorizationManager("default").addRole(new Role("mockrole1", "mockrole1", "mockrole1",
         "default", false, null,

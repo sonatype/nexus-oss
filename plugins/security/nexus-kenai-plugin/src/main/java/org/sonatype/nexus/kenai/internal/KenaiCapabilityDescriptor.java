@@ -29,7 +29,6 @@ import org.sonatype.nexus.formfields.ComboboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.kenai.KenaiConfiguration;
-import org.sonatype.nexus.kenai.KenaiPlugin;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
@@ -55,7 +54,7 @@ public class KenaiCapabilityDescriptor
   /**
    * {@link KenaiCapability} type ID (kenai)
    */
-  public static final String TYPE_ID = KenaiPlugin.ID_PREFIX;
+  public static final String TYPE_ID = KenaiConstants.ID_PREFIX;
 
   /**
    * {@link KenaiCapability} type

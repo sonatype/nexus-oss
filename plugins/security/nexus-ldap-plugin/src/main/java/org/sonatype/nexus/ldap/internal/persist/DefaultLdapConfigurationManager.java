@@ -22,8 +22,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ldap.LdapPlugin;
 import org.sonatype.nexus.ldap.LdapRealm;
+import org.sonatype.nexus.ldap.internal.LdapConstants;
 import org.sonatype.nexus.ldap.internal.events.LdapClearCacheEvent;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Validator;
@@ -181,7 +181,7 @@ public class DefaultLdapConfigurationManager
    * @since 2.7.0
    */
   private void mayActivateLdapRealm() {
-    realmManager.enableRealm(LdapPlugin.REALM_NAME);
+    realmManager.enableRealm(LdapConstants.REALM_NAME);
   }
 
   /**
@@ -190,7 +190,7 @@ public class DefaultLdapConfigurationManager
    * @since 2.7.0
    */
   private void mayDeactivateLdapRealm() {
-    realmManager.disableRealm(LdapPlugin.REALM_NAME);
+    realmManager.disableRealm(LdapConstants.REALM_NAME);
   }
 
   /**

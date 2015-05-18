@@ -79,10 +79,10 @@ Ext.define('NX.coreui.controller.LdapServers', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('security:ldapconfig', 'read');
+      return NX.Permissions.check('nexus:ldap:read');
     }
   },
-  permission: 'security:ldapconfig',
+  permission: 'nexus:ldap',
 
   /**
    * @override
@@ -326,7 +326,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
     var me = this;
 
     button.mon(
-        NX.Conditions.isPermitted(me.permission, 'update'),
+        NX.Conditions.isPermitted(me.permission + ':update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -343,7 +343,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
     var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission, 'delete'),
+            NX.Conditions.isPermitted(me.permission + ':delete'),
             NX.Conditions.storeHasRecords('LdapServer')
         ),
         {

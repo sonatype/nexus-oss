@@ -21,7 +21,7 @@ import org.sonatype.nexus.security.config.CRole;
 import org.sonatype.nexus.security.config.CUser;
 import org.sonatype.nexus.security.internal.AuthorizingRealmImpl;
 import org.sonatype.nexus.security.internal.SecurityConfigurationManagerImpl;
-import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
+import org.sonatype.nexus.security.privilege.WildcardPrivilegeDescriptor;
 import org.sonatype.nexus.security.user.UserStatus;
 
 import org.apache.shiro.authz.permission.RolePermissionResolver;
@@ -80,14 +80,7 @@ public class AuthorizingRealmImplTest
   }
 
   private void buildTestAuthorizationConfig(String userId) throws Exception {
-    CPrivilege priv = new CPrivilege();
-    priv.setId("priv");
-    priv.setName("somepriv");
-    priv.setType(MethodPrivilegeDescriptor.TYPE);
-    priv.setDescription("somedescription");
-    priv.setProperty(MethodPrivilegeDescriptor.P_PERMISSION, "app:config");
-    priv.setProperty(MethodPrivilegeDescriptor.P_METHOD, "read");
-
+    CPrivilege priv = WildcardPrivilegeDescriptor.privilege("app:config:read");
     configurationManager.createPrivilege(priv);
 
     CRole role = new CRole();

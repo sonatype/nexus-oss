@@ -19,16 +19,12 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 import org.sonatype.nexus.common.app.BaseUrlManager
-import org.sonatype.nexus.common.text.Strings2
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.validation.ValidationMessage
-import org.sonatype.nexus.validation.ValidationResponse
-import org.sonatype.nexus.validation.ValidationResponseException
+import org.sonatype.nexus.validation.Validate
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 
@@ -63,27 +59,9 @@ class GeneralSettingsComponent
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
-  GeneralSettingsXO update(final @NotNull @Valid GeneralSettingsXO generalSettingsXO) {
-    validate(generalSettingsXO)
-    baseUrlManager.url = generalSettingsXO.baseUrl
+  @Validate
+  GeneralSettingsXO update(@NotNull @Valid final GeneralSettingsXO settings) {
+    baseUrlManager.url = settings.baseUrl
     return read()
-  }
-
-  // FIXME: use bean-validation constraint
-
-  @PackageScope
-  def validate(final GeneralSettingsXO generalSettingsXO) {
-    def validations = new ValidationResponse()
-    if (!Strings2.isBlank(generalSettingsXO.baseUrl)) {
-      try {
-        new URL(generalSettingsXO.baseUrl)
-      }
-      catch (MalformedURLException e) {
-        validations.addError(new ValidationMessage('baseUrl', e.message))
-      }
-    }
-    if (!validations.valid) {
-      throw new ValidationResponseException(validations)
-    }
   }
 }

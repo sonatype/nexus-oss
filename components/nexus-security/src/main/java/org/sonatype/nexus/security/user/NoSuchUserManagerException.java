@@ -21,6 +21,6 @@ public class NoSuchUserManagerException
   private static final long serialVersionUID = -2561129270233203244L;
 
   public NoSuchUserManagerException(final String source) {
-    super("User-manager with source '" + source + "' could not be found");
+    super("User-manager not found: " + source);
   }
 }

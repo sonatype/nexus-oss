@@ -59,7 +59,7 @@ Ext.define('NX.coreui.controller.Log', {
         variants: ['x16', 'x32']
       },
       visible: function () {
-        return NX.Permissions.check('nexus:logs', 'read');
+        return NX.Permissions.check('nexus:logging:read');
       }
     }, me);
 
@@ -252,7 +252,7 @@ Ext.define('NX.coreui.controller.Log', {
    */
   bindMarkButton: function (button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:logs', 'update'),
+        NX.Conditions.isPermitted('nexus:logging:update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,

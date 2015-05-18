@@ -12,11 +12,9 @@
  */
 package org.sonatype.nexus.coreui.internal;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.coreui.CoreUiPlugin;
 import org.sonatype.nexus.rapture.UiPluginDescriptor;
 import org.sonatype.nexus.rapture.UiPluginDescriptorSupport;
 
@@ -33,9 +31,8 @@ import org.eclipse.sisu.Priority;
 public class UiPluginDescriptorImpl
   extends UiPluginDescriptorSupport
 {
-  @Inject
-  public UiPluginDescriptorImpl(final CoreUiPlugin owner) {
-    super(owner);
+  public UiPluginDescriptorImpl() {
+    super("nexus-coreui-plugin");
     setNamespace("NX.coreui");
     setConfigClassName("NX.coreui.app.PluginConfig");
   }

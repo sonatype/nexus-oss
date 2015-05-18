@@ -13,6 +13,8 @@
 
 package com.sonatype.nexus.ssl.plugin.internal.ui
 
+import com.sonatype.nexus.ssl.plugin.PemCertificate
+
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotBlank
 
@@ -25,5 +27,6 @@ import org.hibernate.validator.constraints.NotBlank
 public class CertificatePemXO
 {
   @NotBlank
+  @PemCertificate
   String value
 }

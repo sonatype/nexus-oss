@@ -326,6 +326,7 @@ Ext.define('NX.controller.Menu', {
             //<if debug>
             me.logDebug('Asking user to authenticate as feature exists but is not visible');
             //</if>
+
             NX.Security.askToAuthenticate();
           }
           me.selectFeature(me.createNotAvailableFeature(feature));

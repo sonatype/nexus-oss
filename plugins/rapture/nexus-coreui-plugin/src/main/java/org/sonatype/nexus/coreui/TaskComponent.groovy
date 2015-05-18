@@ -91,7 +91,7 @@ class TaskComponent
    * @return a list of task types
    */
   @DirectMethod
-  @RequiresPermissions('nexus:tasktypes:read')
+  @RequiresPermissions('nexus:tasks:read')
   List<TaskTypeXO> readTypes() {
     return nexusScheduler.listTaskDescriptors().findAll { descriptor ->
       descriptor.exposed ? descriptor : null
@@ -184,7 +184,7 @@ class TaskComponent
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('nexus:tasksrun:get')
+  @RequiresPermissions('nexus:tasks:start')
   @Validate
   void run(final @NotEmpty String id) {
     nexusScheduler.getTaskById(id)?.runNow()
@@ -192,7 +192,7 @@ class TaskComponent
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('nexus:tasksrun:delete')
+  @RequiresPermissions('nexus:tasks:stop')
   @Validate
   void stop(final @NotEmpty String id) {
     nexusScheduler.getTaskById(id)?.currentState?.future?.cancel(false)

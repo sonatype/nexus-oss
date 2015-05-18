@@ -20,8 +20,7 @@
 Ext.define('NX.util.condition.IsPermitted', {
   extend: 'NX.util.condition.Condition',
 
-  name: undefined,
-  right: undefined,
+  permission: undefined,
 
   bind: function () {
     var me = this,
@@ -44,13 +43,13 @@ Ext.define('NX.util.condition.IsPermitted', {
     var me = this;
 
     if (me.bounded) {
-      me.setSatisfied(NX.Permissions.check(me.name, me.right));
+      me.setSatisfied(NX.Permissions.check(me.permission));
     }
   },
 
   toString: function () {
     var me = this;
-    return me.self.getName() + '{ permission=' + me.name + ':' + me.right + ' }';
+    return me.self.getName() + '{ permission=' + me.permission + ' }';
   }
 
 });

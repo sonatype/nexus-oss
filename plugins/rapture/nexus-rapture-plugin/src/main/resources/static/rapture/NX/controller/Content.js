@@ -74,7 +74,9 @@ Ext.define('NX.controller.Content', {
       cmp = Ext.widget(view);
     }
     me.mon(cmp, 'destroy', function () {
+      //<if debug>
       me.logDebug('Destroyed: ' + cmp.self.getName());
+      //</if>
     });
 
     // remove the current contents
@@ -105,7 +107,9 @@ Ext.define('NX.controller.Content', {
     // fire activate event to view component
     cmp.fireEvent('activate', cmp);
 
+    //<if debug>
     me.logDebug('Content changed to: ' + text + ' (' + cmp.self.getName() + ')');
+    //</if>
   }
 
 });

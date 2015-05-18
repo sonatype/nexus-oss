@@ -21,14 +21,10 @@ public class UserNotFoundException
   private static final long serialVersionUID = -177760017345640029L;
 
   public UserNotFoundException(final String userId, final String message, final Throwable cause) {
-    super(buildMessage(userId, message), cause);
+    super("User not found: " + userId + "; " + message, cause);
   }
 
   public UserNotFoundException(final String userId) {
-    super(buildMessage(userId, ""));
-  }
-
-  private static String buildMessage(final String userId, final String message) {
-    return "User: '" + userId + "' could not be found. " + message;
+    super("User not found: " + userId);
   }
 }

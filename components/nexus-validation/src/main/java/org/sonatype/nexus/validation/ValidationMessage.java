@@ -22,7 +22,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Validation message.
  *
  * @see ValidationResponse
+ * @deprecated Prefer bean-validation instead
  */
+@Deprecated
 public class ValidationMessage
 {
   private final String key;
@@ -38,7 +40,7 @@ public class ValidationMessage
   }
 
   public ValidationMessage(final String key, final String message) {
-    this(key, message,  null);
+    this(key, message, null);
   }
 
   public String getKey() {

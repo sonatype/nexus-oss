@@ -17,9 +17,7 @@ package org.sonatype.nexus.rapture;
  */
 public interface TrustStoreKeys
 {
-
   boolean isEnabled(String type, String id);
 
   TrustStoreKeys setEnabled(String type, String id, Boolean enabled);
-
 }

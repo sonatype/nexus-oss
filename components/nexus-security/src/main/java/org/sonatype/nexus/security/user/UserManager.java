@@ -17,7 +17,7 @@ import java.util.Set;
 import org.apache.shiro.realm.Realm;
 
 /**
- * A DAO for users coming from a given source.
+ * User manager.
  */
 public interface UserManager
 {

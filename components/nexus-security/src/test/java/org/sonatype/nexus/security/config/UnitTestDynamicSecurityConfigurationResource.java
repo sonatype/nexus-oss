@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.security.config;
 
-import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
+import org.sonatype.nexus.security.privilege.WildcardPrivilegeDescriptor;
 
 public class UnitTestDynamicSecurityConfigurationResource
     extends AbstractDynamicSecurityConfigurationResource
@@ -34,14 +34,7 @@ public class UnitTestDynamicSecurityConfigurationResource
     setConfigCalledAfterSetDirty(true);
     MemorySecurityConfiguration config = new MemorySecurityConfiguration();
 
-    CPrivilege priv = new CPrivilege();
-    priv.setId(privId);
-    priv.setName(privId);
-    priv.setReadOnly(true);
-    priv.setType(MethodPrivilegeDescriptor.TYPE);
-    priv.setProperty(MethodPrivilegeDescriptor.P_METHOD, "read");
-    priv.setProperty(MethodPrivilegeDescriptor.P_PERMISSION, "foo:bar:" + privId);
-
+    CPrivilege priv = WildcardPrivilegeDescriptor.privilege("foo:bar:" + privId + ":read");
     config.addPrivilege(priv);
 
     return config;

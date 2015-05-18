@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.quartz.QuartzPlugin;
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
@@ -64,7 +63,7 @@ public class QuartzSupportImpl
     extends LifecycleSupport
     implements QuartzSupport, JobFactory
 {
-  private static final String QUARTZ_POOL_SIZE_KEY = QuartzPlugin.CONFIG_PREFIX + ".poolSize";
+  private static final String QUARTZ_POOL_SIZE_KEY = QuartzConstants.CONFIG_PREFIX + ".poolSize";
 
   private static final int QUARTZ_POOL_SIZE_DEFAULT = 20;
 
@@ -154,7 +153,7 @@ public class QuartzSupportImpl
     final JobStoreTX jobStoreTX = new JobStoreTX();
     jobStoreTX.setDriverDelegateClass(StdJDBCDelegate.class.getName());
     jobStoreTX.setUseProperties(Boolean.FALSE.toString());
-    jobStoreTX.setDataSource(QuartzPlugin.STORE_NAME);
+    jobStoreTX.setDataSource(QuartzConstants.STORE_NAME);
     jobStoreTX.setTablePrefix("QRTZ_");
     jobStoreTX.setIsClustered(false);
     jobStoreTX.setUseProperties(Boolean.TRUE.toString());
@@ -168,7 +167,7 @@ public class QuartzSupportImpl
     mayCreateDBSchema(h2ConnectionProvider.getConnection());
 
     // register ConnectionProvider
-    DBConnectionManager.getInstance().addConnectionProvider(QuartzPlugin.STORE_NAME, h2ConnectionProvider);
+    DBConnectionManager.getInstance().addConnectionProvider(QuartzConstants.STORE_NAME, h2ConnectionProvider);
 
     // create Scheduler (implicitly registers it with repository)
     DirectSchedulerFactory.getInstance().createScheduler(

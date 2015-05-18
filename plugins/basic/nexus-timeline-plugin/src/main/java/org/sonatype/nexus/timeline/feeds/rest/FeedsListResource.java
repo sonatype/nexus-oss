@@ -23,7 +23,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.sonatype.nexus.common.app.BaseUrlHolder;
-import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.nexus.timeline.feeds.FeedSource;
 import org.sonatype.nexus.timeline.feeds.rest.model.FeedEntriesXO;
 import org.sonatype.nexus.timeline.feeds.rest.model.FeedEntryXO;
@@ -40,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-@Path(TimelinePlugin.SERVICE_PREFIX + "/feeds")
+@Path("/timeline/feeds")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Named
 @Singleton
@@ -64,7 +63,7 @@ public class FeedsListResource
     final FeedEntriesXO result = new FeedEntriesXO();
     for (FeedSource feedSource : feedSources) {
       final FeedEntryXO entry = new FeedEntryXO();
-      entry.setResourceURI(BaseUrlHolder.get() + "/service/siesta" + TimelinePlugin.SERVICE_PREFIX + "/feeds/" + feedSource.getFeedKey());
+      entry.setResourceURI(BaseUrlHolder.get() + "/service/siesta/timeline/feeds/" + feedSource.getFeedKey());
       entry.setName(feedSource.getFeedName());
       entry.setDescription(feedSource.getFeedDescription());
       result.getFeedEntries().add(entry);

@@ -55,7 +55,8 @@ Ext.define('NX.coreui.view.logging.LogMark', {
   initComponent: function () {
     var me = this;
 
-    me.editableCondition = NX.Conditions.isPermitted('nexus:logconfig', 'update');
+    // FIXME: This does nothing; https://issues.sonatype.org/browse/NEXUS-8647
+    me.editableCondition = NX.Conditions.isPermitted('nexus:logging:mark');
 
     me.items.buttons = [
       { text: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary', bindToEnter: me.items.settingsFormSubmitOnEnter },
