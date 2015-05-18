@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal;
+package org.sonatype.nexus.repository.maven;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Immutable
 public class MavenPath
 {
-  public static enum HashType
+  public enum HashType
   {
     SHA1("sha1", HashAlgorithm.SHA1),
 
@@ -64,7 +64,7 @@ public class MavenPath
     }
   }
 
-  public static enum SignatureType
+  public enum SignatureType
   {
     GPG("asc");
 
@@ -89,6 +89,10 @@ public class MavenPath
 
     private final String version;
 
+    private final Long timestamp;
+
+    private final Integer buildNumber;
+
     private final String baseVersion;
 
     private final String classifier;
@@ -101,8 +105,10 @@ public class MavenPath
                        final String groupId,
                        final String artifactId,
                        final String version,
+                       @Nullable final Long timestamp,
+                       @Nullable final Integer buildNumber,
                        final String baseVersion,
-                       final String classifier,
+                       @Nullable final String classifier,
                        final String extension,
                        final SignatureType signatureType)
     {
@@ -110,6 +116,8 @@ public class MavenPath
       this.groupId = checkNotNull(groupId);
       this.artifactId = checkNotNull(artifactId);
       this.version = checkNotNull(version);
+      this.timestamp = snapshot ? timestamp : null;
+      this.buildNumber = snapshot ? buildNumber : null;
       this.baseVersion = checkNotNull(baseVersion);
       this.classifier = classifier;
       this.extension = checkNotNull(extension);
@@ -133,6 +141,16 @@ public class MavenPath
     @Nonnull
     public String getVersion() {
       return version;
+    }
+
+    @Nullable
+    public Long getTimestamp() {
+      return timestamp;
+    }
+
+    @Nullable
+    public Integer getBuildNumber() {
+      return buildNumber;
     }
 
     @Nonnull
@@ -227,6 +245,13 @@ public class MavenPath
   }
 
   /**
+   * Returns {@code true} if this path represents an artifact POM.
+   */
+  public boolean isPom() {
+    return coordinates != null && "pom".equals(coordinates.getExtension());
+  }
+
+  /**
    * Returns the "main", non-subordinate path of this path. The "main" path is never a hash nor a signature.
    */
   @Nonnull
@@ -251,8 +276,10 @@ public class MavenPath
             coordinates.isSnapshot(),
             coordinates.getGroupId(),
             coordinates.getArtifactId(),
-            coordinates.getBaseVersion(),
             coordinates.getVersion(),
+            coordinates.getTimestamp(),
+            coordinates.getBuildNumber(),
+            coordinates.getBaseVersion(),
             coordinates.getClassifier(),
             coordinates.getExtension().substring(0, coordinates.getExtension().length() - hashSuffixLen),
             coordinates.getSignatureType()
@@ -270,6 +297,8 @@ public class MavenPath
           coordinates.getGroupId(),
           coordinates.getArtifactId(),
           coordinates.getVersion(),
+          coordinates.getTimestamp(),
+          coordinates.getBuildNumber(),
           coordinates.getBaseVersion(),
           coordinates.getClassifier(),
           coordinates.getExtension().substring(0, coordinates.getExtension().length() - signatureSuffixLen),
@@ -297,6 +326,8 @@ public class MavenPath
           coordinates.getGroupId(),
           coordinates.getArtifactId(),
           coordinates.getVersion(),
+          coordinates.getTimestamp(),
+          coordinates.getBuildNumber(),
           coordinates.getBaseVersion(),
           coordinates.getClassifier(),
           coordinates.getExtension() + "." + hashType.getExt(),
@@ -324,6 +355,8 @@ public class MavenPath
         coordinates.getGroupId(),
         coordinates.getArtifactId(),
         coordinates.getVersion(),
+        coordinates.getTimestamp(),
+        coordinates.getBuildNumber(),
         coordinates.getBaseVersion(),
         coordinates.getClassifier(),
         coordinates.getExtension() + "." + signatureType.getExt(),
@@ -333,6 +366,62 @@ public class MavenPath
         path + "." + signatureType.getExt(),
         signatureCoordinates
     );
+  }
+
+  /**
+   * Returns path pointing to given extension and optional classifier within this same GAV. Only usable for artifact
+   * paths, those having non-null {@link #getCoordinates()}.
+   */
+  @Nonnull
+  public MavenPath locate(final String extension, @Nullable final String classifier) {
+    checkNotNull(extension);
+    checkArgument(coordinates != null, "Only artifact paths may locate: %s", this);
+
+    MavenPath origin = main();
+    Coordinates coordinates = new Coordinates(
+        origin.coordinates.isSnapshot(),
+        origin.coordinates.getGroupId(),
+        origin.coordinates.getArtifactId(),
+        origin.coordinates.getVersion(),
+        origin.coordinates.getTimestamp(),
+        origin.coordinates.getBuildNumber(),
+        origin.coordinates.getBaseVersion(),
+        classifier,
+        extension,
+        null
+    );
+    // strip ".ext"
+    String newPath = origin.path.substring(0, origin.path.length() - (origin.coordinates.extension.length() + 1));
+    if (origin.coordinates.classifier != null) {
+      // strip "-classifier"
+      newPath = newPath.substring(0, newPath.length() - origin.coordinates.classifier.length() + 1);
+    }
+    if (classifier != null) {
+      newPath += "-" + classifier;
+    }
+    newPath += "." + extension;
+    return new MavenPath(
+        newPath,
+        coordinates
+    );
+  }
+
+  /**
+   * Returns path pointing to POM within this same GAV. Only usable for artifact
+   * paths, those having non-null {@link #getCoordinates()}.
+   */
+  @Nonnull
+  public MavenPath locatePom() {
+    return locate("pom", null);
+  }
+
+  /**
+   * Returns path pointing to non-classifier artifact within this same GAV. Only usable for artifact
+   * paths, those having non-null {@link #getCoordinates()}.
+   */
+  @Nonnull
+  public MavenPath locateMainArtifact(final String extension) {
+    return locate(extension, null);
   }
 
   @Override
