@@ -111,8 +111,8 @@ Ext.define('NX.Permissions', {
     }
     else {
       // otherwise calculate if permission is implied or not
-      Ext.Object.each(me.permissions, function (permission, given) {
-        if (given && me.implies(permission, expectedPermission)) {
+      Ext.Object.each(me.permissions, function (permission, permitted) {
+        if (permitted && me.implies(permission, expectedPermission)) {
           hasPermission = true;
           return false; // break
         }
