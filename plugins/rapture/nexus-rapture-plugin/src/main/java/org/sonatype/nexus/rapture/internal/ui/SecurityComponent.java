@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.rapture.internal.ui;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -33,8 +34,6 @@ import org.sonatype.nexus.security.privilege.Privilege;
 import org.sonatype.nexus.validation.Validate;
 import org.sonatype.nexus.wonderland.AuthTicketService;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.softwarementors.extjs.djn.config.annotations.DirectAction;
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod;
 import org.apache.shiro.authc.AuthenticationException;
@@ -191,7 +190,7 @@ public class SecurityComponent
 
   @Override
   public Map<String, Object> getState() {
-    HashMap<String, Object> state = Maps.newHashMap();
+    Map<String, Object> state = new HashMap<>();
     state.put("user", getUser());
 
     AnonymousConfiguration anonymousConfiguration = anonymousManager.getConfiguration();
@@ -201,7 +200,7 @@ public class SecurityComponent
 
   @Override
   public Map<String, Object> getCommands() {
-    HashMap<String, Object> commands = Maps.newHashMap();
+    HashMap<String, Object> commands = new HashMap<>();
 
     List<PermissionXO> permissions = calculatePermissions();
     if (permissions != null && shouldSend("permissions", permissions)) {
@@ -216,9 +215,9 @@ public class SecurityComponent
   }
 
   private List<PermissionXO> calculatePermissions(final Subject subject) {
-    List<Permission> permissionList = Lists.newArrayList();
-    List<String> permissionNameList = Lists.newArrayList();
-    List<PermissionXO> permissions = Lists.newArrayList();
+    List<Permission> permissionList = new ArrayList<>();
+    List<String> permissionNameList = new ArrayList<>();
+    List<PermissionXO> permissions = new ArrayList<>();
 
     for (Privilege priv : securitySystem.listPrivileges()) {
       if (priv.getPermission() instanceof WildcardPermission) {
