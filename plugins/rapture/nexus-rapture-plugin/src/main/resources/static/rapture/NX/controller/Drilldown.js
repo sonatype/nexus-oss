@@ -437,8 +437,10 @@ Ext.define('NX.controller.Drilldown', {
         list_ids, tab_id = null, model, modelId, index;
 
     if (lists.length && bookmark) {
-
+      //<if debug>
       me.logDebug('Navigate to: ' + bookmark.getSegments().join(':'));
+      //</if>
+
       list_ids = bookmark.getSegments().slice(1);
 
       if (list_ids.length > lists.length) {

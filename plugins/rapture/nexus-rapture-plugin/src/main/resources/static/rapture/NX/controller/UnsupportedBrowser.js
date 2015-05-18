@@ -73,7 +73,10 @@ Ext.define('NX.controller.UnsupportedBrowser', {
         viewport = me.getViewport();
 
     if (viewport) {
+      //<if debug>
       me.logDebug('Showing unsupported browser view');
+      //</if>
+
       viewport.add({ xtype: 'nx-unsupported-browser' });
     }
   },
@@ -87,7 +90,10 @@ Ext.define('NX.controller.UnsupportedBrowser', {
         viewport = me.getViewport();
 
     if (viewport) {
+      //<if debug>
       me.logDebug('Removing unsupported browser view');
+      //</if>
+
       viewport.remove(me.getUnsupportedBrowser());
     }
   },

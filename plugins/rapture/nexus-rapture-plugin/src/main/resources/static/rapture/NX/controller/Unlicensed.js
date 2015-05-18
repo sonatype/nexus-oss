@@ -67,7 +67,10 @@ Ext.define('NX.controller.Unlicensed', {
         viewport = me.getViewport();
 
     if (viewport) {
+      //<if debug>
       me.logDebug('Showing unlicensed view');
+      //</if>
+
       viewport.add({ xtype: 'nx-unlicensed' });
     }
   },
@@ -81,7 +84,10 @@ Ext.define('NX.controller.Unlicensed', {
         viewport = me.getViewport();
 
     if (viewport) {
+      //<if debug>
       me.logDebug('Removing unlicensed view');
+      //</if>
+
       viewport.remove(me.getUnlicensed());
     }
   }
