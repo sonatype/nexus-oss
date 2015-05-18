@@ -40,20 +40,12 @@ public class LdapManagerTest
 {
   @Override
   protected Collection<String> getLdapServerNames() {
-    return Arrays.asList("default", "second", "backup");
+    return Arrays.asList("default", "second");
   }
 
   @Override
   protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
     final LinkedHashMap<String, LdapConfiguration> result = super.createLdapClientConfigurations();
-
-    // backup is not default kind
-    final LdapConfiguration backup = result.get("backup");
-    backup.getMapping().setGroupMemberAttribute("uniqueMember");
-    backup.getMapping().setGroupMemberFormat("uid=${username},ou=people,o=sonatype");
-    backup.getMapping().setGroupObjectClass("groupOfUniqueNames");
-    backup.getMapping().setUserMemberOfAttribute(null);
-    backup.getMapping().setUserSubtree(false);
 
     return result;
   }
@@ -142,11 +134,6 @@ public class LdapManagerTest
     expectedGroups.add("cilbup");
     expectedGroups.add("groupone");
     expectedGroups.add("grouptwo");
-
-    // from backup
-    expectedGroups.add("alpha");
-    expectedGroups.add("beta");
-    expectedGroups.add("gamma");
 
     SortedSet<String> actualGroups = ldapManager.getAllGroups();
     Assert.assertEquals(expectedGroups, actualGroups);

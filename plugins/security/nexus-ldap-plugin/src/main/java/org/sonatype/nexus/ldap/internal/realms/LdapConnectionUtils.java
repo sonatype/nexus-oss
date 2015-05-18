@@ -35,8 +35,7 @@ public class LdapConnectionUtils
 {
   private static Logger logger = LoggerFactory.getLogger(LdapConnectionUtils.class);
 
-  public static DefaultLdapContextFactory getLdapContextFactory(LdapConfiguration ldapServer,
-                                                                boolean useBackupUrl)
+  public static DefaultLdapContextFactory getLdapContextFactory(LdapConfiguration ldapServer)
       throws LdapDAOException
   {
     DefaultLdapContextFactory defaultLdapContextFactory = new DefaultLdapContextFactory();
@@ -49,15 +48,9 @@ public class LdapConnectionUtils
 
     String url;
     try {
-      if (useBackupUrl) {
-        url = new LdapURL(connInfo.getBackupHost().getProtocol().name(), connInfo.getBackupHost().getHostName(),
-            connInfo.getBackupHost().getPort(), connInfo.getSearchBase()).toString();
-      }
-      else {
-        url = new LdapURL(connInfo.getHost().getProtocol().name(), connInfo.getHost().getHostName(),
-            connInfo.getHost().getPort(), connInfo
-            .getSearchBase()).toString();
-      }
+      url = new LdapURL(connInfo.getHost().getProtocol().name(), connInfo.getHost().getHostName(),
+          connInfo.getHost().getPort(), connInfo
+          .getSearchBase()).toString();
     }
     catch (MalformedURLException e) {
       // log an error, because the user could still log in and fix the config.
@@ -113,7 +106,7 @@ public class LdapConnectionUtils
   public static void testUserAuthentication(LdapConfiguration ldapServer, LdapUserDAO ldapUserDAO,
                                             LdapGroupDAO ldapGroupDAO) throws LdapDAOException
   {
-    LdapContextFactory contextFactory = getLdapContextFactory(ldapServer, false);
+    LdapContextFactory contextFactory = getLdapContextFactory(ldapServer);
     LdapAuthConfiguration authConfig = getLdapAuthConfiguration(ldapServer);
 
     new DefaultLdapConnector("test", ldapUserDAO, ldapGroupDAO, contextFactory, authConfig);
