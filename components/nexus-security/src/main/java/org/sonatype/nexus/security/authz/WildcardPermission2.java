@@ -56,6 +56,7 @@ public class WildcardPermission2
   /**
    * Customized string representation to avoid {@code []} syntax from sets.
    */
+  @Override
   public String toString() {
     StringBuilder buff = new StringBuilder();
     for (Set<String> part : getParts()) {
