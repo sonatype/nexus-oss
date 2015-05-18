@@ -28,7 +28,7 @@ Ext.define('NX.Permissions', {
 
   /**
    * @private
-   * Map between permissions id and permitted boolean value.
+   * Map between permission and permitted boolean value.
    */
   permissions: undefined,
 
@@ -104,29 +104,36 @@ Ext.define('NX.Permissions', {
       return false;
     }
 
-    // use cached implied if we know it
-    if (me.impliedCache[expectedPermission] !== undefined) {
-      //<if debug>
-      me.logDebug('Using cached implied permission: ' + expectedPermission + ' is: ' + me.impliedCache[expectedPermission]);
-      //</if>
-      return me.impliedCache[expectedPermission];
+    // check for exact match first
+    if (me.permissions[expectedPermission] !== undefined) {
+      return me.permissions[expectedPermission];
     }
 
-    // Calculate if permission is implied or not
-    Ext.Object.each(me.permissions, function(permission, given) {
-      if (given && me.implies(permission, expectedPermission)) {
-        hasPermission = true;
-        return false; // break
-      }
-      return true; // continue
-    });
+    // or use cached implied if we know it
+    if (me.impliedCache[expectedPermission] !== undefined) {
+      //<if debug>
+      me.logDebug('Using cached implied permission: ' + expectedPermission + ' is: ' +
+          me.impliedCache[expectedPermission]);
+      //</if>
+      hasPermission = me.impliedCache[expectedPermission];
+    }
+    else {
+      // otherwise calculate if permission is implied or not
+      Ext.Object.each(me.permissions, function (permission, given) {
+        if (given && me.implies(permission, expectedPermission)) {
+          hasPermission = true;
+          return false; // break
+        }
+        return true; // continue
+      });
 
-    // cache calculated implied
-    me.impliedCache[expectedPermission] = hasPermission;
+      // cache calculated implied
+      me.impliedCache[expectedPermission] = hasPermission;
 
-    //<if debug>
-    me.logDebug('Cached implied permission: ' + expectedPermission + ' is: ' + hasPermission);
-    //</if>
+      //<if debug>
+      me.logDebug('Cached implied permission: ' + expectedPermission + ' is: ' + hasPermission);
+      //</if>
+    }
 
     return hasPermission;
   },
