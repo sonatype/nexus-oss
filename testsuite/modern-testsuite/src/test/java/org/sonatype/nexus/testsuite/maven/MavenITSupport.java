@@ -83,7 +83,7 @@ public abstract class MavenITSupport
     Verifier verifier = new Verifier(mavenBaseDir.getAbsolutePath());
     verifier.addCliOption("-s " + mavenSettings.getAbsolutePath());
     verifier.addCliOption(
-        // TODO: verifier replaces // -> /
+        // Verifier replaces // -> /
         "-DaltDeploymentRepository=local-nexus-admin::default::http:////localhost:" + nexusUrl.getPort() +
             "/repository/" + deployRepositoryName);
     verifier.executeGoals(Arrays.asList("clean", "deploy"));
