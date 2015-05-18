@@ -21,7 +21,7 @@ import org.apache.shiro.authz.permission.WildcardPermission
  */
 class SecurityUtils
 {
-  // FIXME: Remove this, used in 1 place
+  // FIXME: Remove this, used in 1 place, also us abusing access restrictions
 
   /**
    * Access to protected {@link WildcardPermission#getParts()}.
