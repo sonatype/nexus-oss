@@ -26,7 +26,8 @@ public interface MavenHostedFacet
     extends Facet
 {
   /**
-   * Rebuilds/updates Maven metadata.
+   * Rebuilds/updates Maven metadata. The parameters depend each on previous, and if any of those are set (ie. G, GA or
+   * GAV), the metadata will be updated. Rebuild is possible only against repository as whole, not a sub-part of it.
    *
    * @param groupId     scope the work to given groupId.
    * @param artifactId  scope the work to given artifactId (groupId must be given).
