@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rapture.internal.ui;
+package org.sonatype.nexus.rapture.internal.state;
 
 import java.util.Map;
 
@@ -29,29 +29,29 @@ import com.google.common.collect.ImmutableMap;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Contributes {@code status} state.
+ * Contributes {@code license} state.
  *
  * @since 3.0
  */
 @Named
 @Singleton
-public class StatusStateContributor
+public class LicenseStateContributor
   extends ComponentSupport
   implements StateContributor
 {
-  private static final String STATE_ID = "status";
+  private static final String STATE_ID = "license";
 
   private final Provider<SystemStatus> systemStatus;
 
   @Inject
-  public StatusStateContributor(final Provider<SystemStatus> systemStatus) {
+  public LicenseStateContributor(final Provider<SystemStatus> systemStatus) {
     this.systemStatus = checkNotNull(systemStatus);
   }
 
   @Nullable
   @Override
   public Map<String, Object> getState() {
-    return ImmutableMap.of(STATE_ID, calculateStatus());
+    return ImmutableMap.of(STATE_ID, calculateLicense());
   }
 
   @Nullable
@@ -60,11 +60,11 @@ public class StatusStateContributor
     return null;
   }
 
-  private Object calculateStatus() {
+  private Object calculateLicense() {
     SystemStatus status = systemStatus.get();
-    StatusXO result = new StatusXO();
-    result.setEdition(status.getEditionShort());
-    result.setVersion(status.getVersion());
+    LicenseXO result = new LicenseXO();
+    result.setRequired(!"OSS".equals(status.getEditionShort()));
+    result.setInstalled(status.isLicenseInstalled());
     return result;
   }
 }

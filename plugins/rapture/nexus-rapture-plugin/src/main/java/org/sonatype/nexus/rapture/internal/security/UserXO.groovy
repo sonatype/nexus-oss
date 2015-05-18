@@ -10,19 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rapture.internal.ui
+package org.sonatype.nexus.rapture.internal.security
 
 import groovy.transform.ToString
 
 /**
- * State value exchange object.
+ * User exchange object.
  *
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-class StateValueXO
+class UserXO
 {
-  String hash
+  String id
 
-  Object value
+  boolean authenticated
+
+  /**
+   * True if the current user has general administrator privileges (ie. admin role).
+   */
+  boolean administrator
 }

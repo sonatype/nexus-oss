@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rapture.internal.ui;
+package org.sonatype.nexus.rapture.internal.security;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +44,7 @@ import org.apache.shiro.subject.Subject;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.rapture.internal.ui.StateComponent.shouldSend;
+import static org.sonatype.nexus.rapture.internal.state.StateComponent.shouldSend;
 
 /**
  * Security Ext.Direct component.

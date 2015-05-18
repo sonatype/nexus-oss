@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.rapture.internal;
+package org.sonatype.nexus.rapture.internal.security;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

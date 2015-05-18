@@ -10,19 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rapture.internal.ui
+package org.sonatype.nexus.rapture.internal.security
 
 import groovy.transform.ToString
 
 /**
- * Command exchange object.
+ * Permission exchange object.
  *
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-class CommandXO
+class PermissionXO
 {
-  String type
-
-  Object data
+  String id
 }
