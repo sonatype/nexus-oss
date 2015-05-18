@@ -13,12 +13,12 @@
 package com.sonatype.nexus.repository.nuget.internal;
 
 import org.sonatype.nexus.blobstore.api.BlobRef;
+import org.sonatype.nexus.common.entity.EntityId;
+import org.sonatype.nexus.common.entity.EntityMetadata;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
-import org.sonatype.nexus.repository.storage.ComponentDeletedEvent;
-import org.sonatype.nexus.repository.storage.ComponentEvent;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -70,21 +70,18 @@ public class NugetGalleryFacetImplDeleteTest
     final Component component = mock(Component.class);
     final Asset asset = mock(Asset.class);
     final BlobRef blobRef = mock(BlobRef.class); //new BlobRef("local", "default", "a34af31");
+    final EntityMetadata metadata = mock(EntityMetadata.class);
 
     // Wire the mocks together: component has asset, asset has blobRef
     doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
     when(tx.browseAssets(component)).thenReturn(asList(asset));
     when(asset.blobRef()).thenReturn(blobRef);
+    when(component.getEntityMetadata()).thenReturn(metadata);
+    when(metadata.getId()).thenReturn(mock(EntityId.class));
 
     galleryFacet.delete(packageId, version);
 
     // Verify that everything got deleted
     verify(tx).deleteComponent(component);
-    ArgumentCaptor<ComponentEvent> o = ArgumentCaptor.forClass(ComponentEvent.class);
-    verify(eventBus, times(1)).post(o.capture());
-    ComponentEvent actual = o.getValue();
-    assertThat(actual, instanceOf(ComponentDeletedEvent.class));
-    assertThat(actual.getComponent(), is(component));
-    assertThat(actual.getRepository(), is(repository));
   }
 }

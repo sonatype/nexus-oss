@@ -45,11 +45,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-wonderland-model</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-testsupport</artifactId>
       <scope>test</scope>

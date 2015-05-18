@@ -88,7 +88,7 @@ public class ErrorPageServlet
   private final WebUtils webUtils;
 
   @Inject
-  public ErrorPageServlet(@Named("shared") final TemplateEngine templateEngine,
+  public ErrorPageServlet(@Named("shared-velocity") final TemplateEngine templateEngine,
                           final SystemStatus systemStatus,
                           final WebUtils webUtils)
   {

@@ -32,9 +32,9 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacetImpl;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
-import org.sonatype.nexus.repository.maven.internal.MavenFacet;
-import org.sonatype.nexus.repository.maven.internal.MavenPath;
-import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
+import org.sonatype.nexus.repository.maven.MavenFacet;
+import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.maven.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.MetadataEnvelope;
 import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
@@ -173,7 +173,8 @@ public class Maven2GroupFacet
     for (HashType hashType : HashType.values()) {
       final HashCode hashCode = hashCodes.get(hashType.getHashAlgorithm());
       if (hashCode != null) {
-        final Content hashContent = new Content(new StringPayload(hashCode.toString(), Maven2Format.CHECKSUM_CONTENT_TYPE));
+        final Content hashContent = new Content(
+            new StringPayload(hashCode.toString(), Maven2Format.CHECKSUM_CONTENT_TYPE));
         hashContent.getAttributes().set(Content.CONTENT_LAST_MODIFIED, now);
         mavenFacet.put(mavenPath.hash(hashType), hashContent);
       }

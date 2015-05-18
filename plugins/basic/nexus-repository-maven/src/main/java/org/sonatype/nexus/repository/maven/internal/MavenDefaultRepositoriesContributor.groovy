@@ -21,7 +21,7 @@ import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2GroupRecipe
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2HostedRecipe
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2ProxyRecipe
-import org.sonatype.nexus.repository.maven.internal.policy.VersionPolicy
+import org.sonatype.nexus.repository.maven.policy.VersionPolicy
 import org.sonatype.nexus.repository.storage.WritePolicy
 
 /**

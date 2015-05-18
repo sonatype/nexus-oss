@@ -25,7 +25,7 @@ import org.sonatype.sisu.goodies.template.TemplateEngine;
  *
  * @since 2.7
  */
-@Named("shared")
+@Named("shared-velocity")
 @Singleton
 public class SharedTemplateEngineProvider
     extends ComponentSupport

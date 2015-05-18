@@ -29,7 +29,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>nexus-capabilities-model</module>
     <module>nexus-capabilities-plugin</module>
     <module>nexus-capabilities-testsuite-plugin</module>
   </modules>
