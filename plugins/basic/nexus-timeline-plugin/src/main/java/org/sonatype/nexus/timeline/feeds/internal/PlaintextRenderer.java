@@ -41,10 +41,8 @@ public class PlaintextRenderer
   private final Provider<TemplateEngine> templateEngineProvider;
 
   @Inject
-  public PlaintextRenderer(
-      final Provider<TemplateEngine> templateEngineProvider)
-  {
-    this.templateEngineProvider = checkNotNull(templateEngineProvider, "velocityEngineProvider");
+  public PlaintextRenderer(@Named("shared-velocity") final Provider<TemplateEngine> templateEngineProvider) {
+    this.templateEngineProvider = checkNotNull(templateEngineProvider);
   }
 
   public String getTitle(final FeedEvent evt) {

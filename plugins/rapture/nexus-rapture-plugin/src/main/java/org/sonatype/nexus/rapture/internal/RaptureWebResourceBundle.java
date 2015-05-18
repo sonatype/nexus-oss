@@ -81,7 +81,7 @@ public class RaptureWebResourceBundle
   public RaptureWebResourceBundle(final Provider<SystemStatus> systemStatusProvider,
                                   final Provider<HttpServletRequest> servletRequestProvider,
                                   final Provider<StateComponent> stateComponentProvider,
-                                  final TemplateEngine templateEngine,
+                                  @Named("shared-velocity") final TemplateEngine templateEngine,
                                   final List<UiPluginDescriptor> pluginDescriptors)
   {
     this.systemStatusProvider = checkNotNull(systemStatusProvider);
