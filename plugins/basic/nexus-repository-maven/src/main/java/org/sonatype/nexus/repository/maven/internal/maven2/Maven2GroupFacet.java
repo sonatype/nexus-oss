@@ -189,7 +189,8 @@ public class Maven2GroupFacet
     if (member(event.getRepository())) {
       final String path = event.getAsset().formatAttributes().require(StorageFacet.P_PATH, String.class);
       final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
-      if (mavenFacet.getMavenPathParser().isRepositoryMetadata(mavenPath)) {
+      // group deletes md + hashes, but it should do only on md change in member
+      if (!mavenPath.isHash() && mavenFacet.getMavenPathParser().isRepositoryMetadata(mavenPath)) {
         try {
           final List<MavenPath> paths = Lists.newArrayList();
           paths.add(mavenPath.main());
