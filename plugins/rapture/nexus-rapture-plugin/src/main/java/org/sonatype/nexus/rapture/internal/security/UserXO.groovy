@@ -14,6 +14,8 @@ package org.sonatype.nexus.rapture.internal.security
 
 import groovy.transform.ToString
 
+// TODO: Rename to CurrentUserXO?
+
 /**
  * User exchange object.
  *
