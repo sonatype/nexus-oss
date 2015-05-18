@@ -31,6 +31,8 @@ public interface StateContributor
 
   /**
    * Returns mapping of command-id to command-payload (command-payload can be null).
+   *
+   * Commands are instructions to the UI to do something, like fetch permission because they have changed.
    */
   @Nullable
   Map<String, Object> getCommands();
