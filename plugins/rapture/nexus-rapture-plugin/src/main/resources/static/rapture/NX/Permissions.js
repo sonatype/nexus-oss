@@ -49,22 +49,14 @@ Ext.define('NX.Permissions', {
 
   /**
    * @public
+   * @param {object} permissions
    * Sets permissions.
    */
   setPermissions: function(permissions) {
-    var me = this,
-        perms = permissions;
+    var me = this;
 
-    if (Ext.isArray(permissions)) {
-      perms = {};
-      Ext.each(permissions, function(entry) {
-        if (entry.id && entry.value) {
-          perms[entry.id] = entry.value;
-        }
-      });
-    }
-
-    me.permissions = Ext.apply({}, perms);
+    // defensive copy
+    me.permissions = Ext.clone(permissions);
 
     // reset implied cache
     me.impliedCache = {};
