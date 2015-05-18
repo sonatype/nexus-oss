@@ -47,7 +47,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
     },
     {
       ref: 'main',
-      selector: 'nx-main',
+      selector: 'nx-main'
     }
   ],
 
