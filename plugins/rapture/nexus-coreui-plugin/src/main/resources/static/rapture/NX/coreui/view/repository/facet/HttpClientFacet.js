@@ -115,12 +115,6 @@ Ext.define('NX.coreui.view.repository.facet.HttpClientFacet', {
                 helpText: NX.I18n.get('ADMIN_HTTP_CUSTOMIZATION_HELP')
               },
               {
-                xtype: 'textfield',
-                name: 'attributes.httpclient.connection.urlParameters',
-                fieldLabel: NX.I18n.get('ADMIN_HTTP_PARAMETERS'),
-                helpText: NX.I18n.get('ADMIN_HTTP_PARAMETERS_HELP')
-              },
-              {
                 xtype: 'numberfield',
                 name: 'attributes.httpclient.connection.retries',
                 fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES'),

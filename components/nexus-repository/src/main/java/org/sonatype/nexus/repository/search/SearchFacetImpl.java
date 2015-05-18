@@ -25,11 +25,14 @@ import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.storage.StorageTxHook;
 
+import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -49,6 +52,7 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NA
 public class SearchFacetImpl
     extends FacetSupport
     implements SearchFacet
+
 {
   private final SearchService searchService;
 
@@ -63,15 +67,33 @@ public class SearchFacetImpl
   }
 
   @Override
+  protected void doInit(final Configuration configuration) throws Exception {
+    super.doInit(configuration);
+    facet(StorageFacet.class).registerHookSupplier(new Supplier<StorageTxHook>()
+    {
+      @Override
+      public StorageTxHook get() {
+        return new SearchHook(SearchFacetImpl.this);
+      }
+    });
+  }
+
+  /**
+   * Indexes a component with given id.
+   */
   @Guarded(by = STARTED)
-  public void put(final Component component) {
-    checkNotNull(component);
-    log.debug("Indexing metadata of {} from {}", component, getRepository());
+  protected void put(final EntityId componentId) {
+    checkNotNull(componentId);
     try {
       Map<String, Object> additional = Maps.newHashMap();
       additional.put(P_REPOSITORY_NAME, getRepository().getName());
+      Component component;
       List<Asset> assets;
-      try (StorageTx tx = getRepository().facet(StorageFacet.class).openTx()) {
+      try (StorageTx tx = facet(StorageFacet.class).openTx()) {
+        component = tx.findComponent(componentId, tx.getBucket());
+        if (component == null) {
+          return;
+        }
         assets = Lists.newArrayList(tx.browseAssets(component));
       }
       String json = JsonUtils.merge(componentMetadata(component, assets), JsonUtils.from(additional));
@@ -82,9 +104,11 @@ public class SearchFacetImpl
     }
   }
 
-  @Override
+  /**
+   * Deindexes a component with given id.
+   */
   @Guarded(by = STARTED)
-  public void delete(final EntityId componentId) {
+  protected void delete(final EntityId componentId) {
     searchService.delete(getRepository(), componentId.toString());
   }
 

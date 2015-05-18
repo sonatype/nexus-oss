@@ -27,22 +27,22 @@ public interface SearchService
 {
 
   /**
-   * Create component metadata index for specified repository, if does not already exits.
+   * Create index for specified repository, if does not already exits.
    */
   void createIndex(Repository repository);
 
   /**
-   * Deletes component metadata index for specified repository.
+   * Deletes index for specified repository.
    */
   void deleteIndex(Repository repository);
 
   /**
-   * Index component metadata.
+   * Puts data with given identifier into index of given repository.
    */
   void put(Repository repository, String identifier, String json);
 
   /**
-   * Remove component metadata from index.
+   * Removes data with given identifier from index of given repository.
    */
   void delete(Repository repository, String identifier);
 

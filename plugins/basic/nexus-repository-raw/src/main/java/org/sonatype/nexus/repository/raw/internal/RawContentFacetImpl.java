@@ -22,8 +22,6 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
-import org.sonatype.nexus.common.entity.EntityHelper;
-import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.mime.MimeSupport;
@@ -32,7 +30,6 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
-import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -154,8 +151,6 @@ public class RawContentFacetImpl
       }
 
       tx.saveAsset(asset);
-      getRepository().facet(SearchFacet.class).put(component);
-
       tx.commit();
     }
   }
@@ -220,11 +215,8 @@ public class RawContentFacetImpl
         return false;
       }
 
-      final SearchFacet searchFacet = facet(SearchFacet.class);
-      final EntityId entityId = EntityHelper.id(component);
       tx.deleteComponent(component);
       tx.commit();
-      searchFacet.delete(entityId);
       return true;
     }
   }

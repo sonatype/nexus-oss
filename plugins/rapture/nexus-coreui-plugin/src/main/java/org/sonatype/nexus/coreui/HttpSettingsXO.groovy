@@ -26,7 +26,6 @@ import groovy.transform.ToString
 class HttpSettingsXO
 {
   String userAgentCustomisation
-  String urlParameters
 
   /**
    * Timeout seconds.

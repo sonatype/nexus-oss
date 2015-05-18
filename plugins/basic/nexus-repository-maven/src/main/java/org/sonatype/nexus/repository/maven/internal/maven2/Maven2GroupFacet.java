@@ -173,7 +173,8 @@ public class Maven2GroupFacet
     for (HashType hashType : HashType.values()) {
       final HashCode hashCode = hashCodes.get(hashType.getHashAlgorithm());
       if (hashCode != null) {
-        final Content hashContent = new Content(new StringPayload(hashCode.toString(), Maven2Format.CHECKSUM_CONTENT_TYPE));
+        final Content hashContent = new Content(
+            new StringPayload(hashCode.toString(), Maven2Format.CHECKSUM_CONTENT_TYPE));
         hashContent.getAttributes().set(Content.CONTENT_LAST_MODIFIED, now);
         mavenFacet.put(mavenPath.hash(hashType), hashContent);
       }
