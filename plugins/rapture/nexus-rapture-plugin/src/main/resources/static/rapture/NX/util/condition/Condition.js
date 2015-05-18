@@ -118,7 +118,11 @@ Ext.define('NX.util.condition.Condition', {
         if (!bounded) {
           me.setSatisfied(false);
         }
+
+        //<if debug>
         me.logDebug((bounded ? 'Bounded: ' : 'Unbounded: ') + me);
+        //</if>
+
         me.bounded = bounded;
         Ext.defer(function () {
           NX.getApplication().getStateController().fireEvent('conditionboundedchanged', me);
@@ -148,7 +152,10 @@ Ext.define('NX.util.condition.Condition', {
     var me = this;
     if (Ext.isDefined(me.satisfied)) {
       if (satisfied !== me.satisfied) {
+        //<if debug>
         me.logDebug((satisfied ? 'Satisfied: ' : 'Unsatisfied: ') + me);
+        //</if>
+
         me.satisfied = satisfied;
         me.fireEvent(satisfied ? 'satisfied' : 'unsatisfied', me);
         Ext.defer(function () {

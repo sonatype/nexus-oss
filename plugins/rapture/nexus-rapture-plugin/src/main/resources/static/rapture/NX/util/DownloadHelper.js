@@ -60,7 +60,10 @@ Ext.define('NX.util.DownloadHelper', {
         id: me.windowId,
         name: me.windowName
       });
+
+      //<if debug>
       me.logDebug('Created download-frame: ' + frame);
+      //</if>
     }
 
     return frame;
@@ -73,7 +76,9 @@ Ext.define('NX.util.DownloadHelper', {
   downloadUrl: function (url) {
     var me = this;
 
+    //<if debug>
     me.logDebug('Downloading URL: ' + url);
+    //</if>
 
     // resolve the download frame
     me.getFrame();
