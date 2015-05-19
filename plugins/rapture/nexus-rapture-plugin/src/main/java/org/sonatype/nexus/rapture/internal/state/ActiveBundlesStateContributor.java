@@ -45,8 +45,6 @@ public class ActiveBundlesStateContributor
 {
   public static final String STATE_ID = "activeBundles";
 
-  private final BundleTracker bundleTracker;
-
   private final Set<String> activeBundles = new ConcurrentSkipListSet<>();
 
   @Inject
@@ -54,7 +52,7 @@ public class ActiveBundlesStateContributor
     checkNotNull(bundleContext);
 
     // install tracker to invalidate cache
-    this.bundleTracker = new BundleTracker<String>(bundleContext, Bundle.ACTIVE, null)
+    new BundleTracker<String>(bundleContext, Bundle.ACTIVE, null)
     {
       @Override
       public String addingBundle(final Bundle bundle, final BundleEvent event) {
@@ -73,8 +71,7 @@ public class ActiveBundlesStateContributor
       public void removedBundle(final Bundle bundle, final BundleEvent event, final String name) {
         activeBundles.remove(name);
       }
-    };
-    bundleTracker.open();
+    }.open();
   }
 
   @Override
