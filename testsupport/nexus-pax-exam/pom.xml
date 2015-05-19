@@ -30,6 +30,11 @@
   <dependencies>
     <dependency>
       <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -63,11 +68,15 @@
     </dependency>
 
     <!--
-    Support test injection of core nexus components
+    Minimum API expected by nexus-pax-exam
     -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-core</artifactId>
+      <artifactId>nexus-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-scheduling</artifactId>
     </dependency>
   </dependencies>
 
