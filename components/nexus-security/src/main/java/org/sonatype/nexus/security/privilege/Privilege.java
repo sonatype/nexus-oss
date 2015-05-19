@@ -18,33 +18,18 @@ import java.util.Map;
 import org.apache.shiro.authz.Permission;
 
 /**
- * A simple bean that represents a privilege.
+ * Privilege, runtime rapper around a defined permission.
  */
 public class Privilege
 {
-  /**
-   * Field id
-   */
   private String id;
 
-  /**
-   * Field name
-   */
   private String name;
 
-  /**
-   * Field description
-   */
   private String description;
 
-  /**
-   * Field type
-   */
   private String type;
 
-  /**
-   * Field properties
-   */
   private Map<String, String> properties = new HashMap<String, String>();
 
   private boolean readOnly;

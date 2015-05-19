@@ -63,7 +63,7 @@ Ext.define('NX.coreui.controller.Metrics', {
         variants: ['x16', 'x32']
       },
       visible: function () {
-        return NX.Permissions.check('nexus:metrics-endpoints');
+        return NX.Permissions.check('nexus:metrics:read');
       }
     }, me);
 

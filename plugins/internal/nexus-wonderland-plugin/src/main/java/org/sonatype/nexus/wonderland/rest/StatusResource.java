@@ -23,7 +23,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.sonatype.nexus.common.app.SystemStatus;
-import org.sonatype.nexus.wonderland.WonderlandPlugin;
+import org.sonatype.nexus.wonderland.internal.WonderlandConstants;
 import org.sonatype.nexus.wonderland.model.StatusXO;
 import org.sonatype.siesta.Resource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -46,7 +46,7 @@ public class StatusResource
     implements Resource
 {
   @NonNls
-  public static final String RESOURCE_URI = WonderlandPlugin.REST_PREFIX + "/status";
+  public static final String RESOURCE_URI = WonderlandConstants.REST_PREFIX + "/status";
 
   private final Provider<SystemStatus> statusProvider;
 

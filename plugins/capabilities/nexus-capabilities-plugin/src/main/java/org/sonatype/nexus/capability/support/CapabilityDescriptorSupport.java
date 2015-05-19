@@ -130,7 +130,7 @@ public abstract class CapabilityDescriptorSupport
   }
 
   @Inject
-  public void installTemplateEngine(final @Named("shared") TemplateEngine templateEngine) {
+  public void installTemplateEngine(final @Named("shared-velocity") TemplateEngine templateEngine) {
     checkState(this.templateEngine == null);
     this.templateEngine = checkNotNull(templateEngine);
   }

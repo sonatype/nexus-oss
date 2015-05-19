@@ -326,6 +326,7 @@ Ext.define('NX.controller.Menu', {
             //<if debug>
             me.logDebug('Asking user to authenticate as feature exists but is not visible');
             //</if>
+
             NX.Security.askToAuthenticate();
           }
           me.selectFeature(me.createNotAvailableFeature(feature));
@@ -391,7 +392,6 @@ Ext.define('NX.controller.Menu', {
 
     me.refreshVisibleModes();
     me.refreshTree();
-    me.toggleMenu();
     me.navigateTo(NX.Bookmarks.getBookmark());
   },
 
@@ -449,40 +449,6 @@ Ext.define('NX.controller.Menu', {
     if (me.mode) {
       modeButton = headerPanel.down('button[mode=' + me.mode + ']');
       modeButton.toggle(true, true);
-    }
-  },
-
-  /**
-   * @private
-   * Automatically expand/collapse menu if there is only one feature to display and button is configured to do so.
-   */
-  toggleMenu: function () {
-    var me = this,
-        menu = me.getFeatureMenu(),
-        menuCollapsed = false,
-        numberOfFeatures = me.getFeatureMenuStore().getRootNode().childNodes.length;
-
-    if (me.mode) {
-      menu.show();
-
-      if (numberOfFeatures <= 1) {
-        Ext.each(me.availableModes, function (button) {
-          if ((me.mode === button.mode) && (button.collapseMenu === true)) {
-            menuCollapsed = true;
-          }
-        });
-      }
-
-      // expand/collapse w/o animation to avoid problems with undefined panel placeholder.el
-      if (menuCollapsed) {
-        menu.collapse(undefined, false);
-      }
-      else {
-        menu.expand(false);
-      }
-    }
-    else {
-      menu.hide();
     }
   },
 
@@ -616,7 +582,6 @@ Ext.define('NX.controller.Menu', {
 
     me.mode = mode;
     me.refreshTree();
-    me.toggleMenu();
     me.navigateTo(NX.Bookmarks.fromToken(me.getFeatureMenuStore().getRootNode().firstChild.get('bookmark')));
     NX.Bookmarks.bookmark(me.getBookmark());
   },
@@ -660,7 +625,6 @@ Ext.define('NX.controller.Menu', {
     var me = this;
     me.refreshModeButtons();
     me.refreshTree();
-    me.toggleMenu();
   },
 
   /**

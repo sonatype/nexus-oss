@@ -21,6 +21,6 @@ public class InvalidCredentialsException
   private static final long serialVersionUID = 294536984704055394L;
 
   public InvalidCredentialsException() {
-    super("Invalid credentials supplied!");
+    super("Invalid credentials");
   }
 }

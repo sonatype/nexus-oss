@@ -15,7 +15,6 @@ package org.sonatype.nexus.wonderland.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.wonderland.WonderlandPlugin;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.crypto.RandomBytesGenerator;
 
@@ -34,7 +33,7 @@ public class AuthTicketGenerator
     extends ComponentSupport
 {
   @NonNls
-  private static final String CPREFIX = WonderlandPlugin.CONFIG_PREFIX + ".authTicketGenerator";
+  private static final String CPREFIX = WonderlandConstants.CONFIG_PREFIX + ".authTicketGenerator";
 
   private final RandomBytesGenerator randomBytes;
 

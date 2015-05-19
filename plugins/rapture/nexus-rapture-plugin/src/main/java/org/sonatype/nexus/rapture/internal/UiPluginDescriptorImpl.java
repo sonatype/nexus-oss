@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.rapture.RapturePlugin;
 import org.sonatype.nexus.rapture.UiPluginDescriptor;
 import org.sonatype.nexus.rapture.UiPluginDescriptorSupport;
 
@@ -34,8 +33,8 @@ public class UiPluginDescriptorImpl
   extends UiPluginDescriptorSupport
 {
   @Inject
-  public UiPluginDescriptorImpl(final RapturePlugin owner) {
-    super(owner);
+  public UiPluginDescriptorImpl() {
+    super("nexus-rapture-plugin");
     setConfigClassName("NX.app.PluginConfig");
   }
 }

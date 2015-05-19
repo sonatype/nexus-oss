@@ -48,7 +48,7 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
 
     me.items = {
       xtype: 'form',
-      editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'create'),
+      editableCondition: NX.Conditions.isPermitted('nexus:userschangepw:create'),
       editableMarker: NX.I18n.get('ADMIN_USERS_PASSWORD_ERROR'),
       defaults: {
         anchor: '100%',

@@ -12,15 +12,6 @@
  */
 package org.sonatype.nexus.atlas.rest
 
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.sonatype.nexus.security.SecuritySystem
-import org.sonatype.nexus.security.privilege.NoSuchPrivilegeException
-import org.sonatype.nexus.security.role.NoSuchRoleException
-import org.sonatype.nexus.security.user.User
-import org.sonatype.nexus.security.user.UserNotFoundException
-import org.sonatype.siesta.Resource
-import org.sonatype.sisu.goodies.common.ComponentSupport
-
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -30,6 +21,16 @@ import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
+
+import org.sonatype.nexus.security.SecuritySystem
+import org.sonatype.nexus.security.privilege.NoSuchPrivilegeException
+import org.sonatype.nexus.security.role.NoSuchRoleException
+import org.sonatype.nexus.security.user.User
+import org.sonatype.nexus.security.user.UserNotFoundException
+import org.sonatype.siesta.Resource
+import org.sonatype.sisu.goodies.common.ComponentSupport
+
+import org.apache.shiro.authz.annotation.RequiresPermissions
 
 import static com.google.common.base.Preconditions.checkNotNull
 
@@ -60,7 +61,7 @@ class SecurityDiagnosticResource
    */
   @GET
   @Path('user/{userId}')
-  @RequiresPermissions('nexus:atlas')
+  @RequiresPermissions('nexus:atlas:read')
   Map userDiagnostic(final @PathParam('userId') String userId) {
     log.info 'Generating security diagnostics for user: {}', userId
 

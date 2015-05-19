@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -81,19 +82,19 @@ public class ErrorPageServlet
    */
   private static final String ERROR_EXCEPTION = "javax.servlet.error.exception";
 
-  private final TemplateEngine templateEngine;
+  private final Provider<SystemStatus> systemStatus;
 
-  private final String applicationVersion;
+  private final TemplateEngine templateEngine;
 
   private final WebUtils webUtils;
 
   @Inject
-  public ErrorPageServlet(@Named("shared") final TemplateEngine templateEngine,
-                          final SystemStatus systemStatus,
+  public ErrorPageServlet(final Provider<SystemStatus> systemStatus,
+                          @Named("shared-velocity") final TemplateEngine templateEngine,
                           final WebUtils webUtils)
   {
+    this.systemStatus = checkNotNull(systemStatus);
     this.templateEngine = checkNotNull(templateEngine);
-    this.applicationVersion = checkNotNull(systemStatus).getVersion();
     this.webUtils = checkNotNull(webUtils);
   }
 
@@ -144,9 +145,12 @@ public class ErrorPageServlet
                       final String errorMessage)
       throws IOException
   {
+    SystemStatus status = systemStatus.get();
     Map<String, Object> dataModel = Maps.newHashMapWithExpectedSize(5);
     dataModel.put("nexusRoot", BaseUrlHolder.get());
-    dataModel.put("urlSuffix", applicationVersion); // for cache busting
+    dataModel.put("nexusVersion", status.getVersion());
+    dataModel.put("nexusEdition", status.getEditionShort());
+    dataModel.put("urlSuffix", status.getVersion()); // for cache busting
     dataModel.put("errorCode", errorCode);
     dataModel.put("errorName", errorName);
     dataModel.put("errorDescription", errorMessage);

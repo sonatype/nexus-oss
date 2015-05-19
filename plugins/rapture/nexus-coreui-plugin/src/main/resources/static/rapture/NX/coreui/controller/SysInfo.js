@@ -61,7 +61,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
         variants: ['x16', 'x32']
       },
       visible: function () {
-        return NX.Permissions.check('nexus:atlas', 'read');
+        return NX.Permissions.check('nexus:atlas:read');
       }
     }, me);
 
@@ -92,7 +92,9 @@ Ext.define('NX.coreui.controller.SysInfo', {
         panel = me.getSysInfo();
 
     if (panel) {
+      //<if debug>
       me.logDebug('Refreshing sysinfo');
+      //</if>
 
       me.getContent().getEl().mask(NX.I18n.get('ADMIN_SYSTEM_INFORMATION_LOAD_MASK'));
       NX.direct.atlas_SystemInformation.read(function (response) {

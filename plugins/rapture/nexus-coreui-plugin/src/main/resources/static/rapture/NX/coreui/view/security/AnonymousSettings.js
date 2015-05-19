@@ -36,7 +36,7 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
           load: 'NX.direct.coreui_AnonymousSettings.read',
           submit: 'NX.direct.coreui_AnonymousSettings.update'
         },
-        editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
+        editableCondition: NX.Conditions.isPermitted('nexus:settings:update'),
         editableMarker: NX.I18n.get('ADMIN_ANONYMOUS_UPDATE_ERROR'),
         items: [
           {

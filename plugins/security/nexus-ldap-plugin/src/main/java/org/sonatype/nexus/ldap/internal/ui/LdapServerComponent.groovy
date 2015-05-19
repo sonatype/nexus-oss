@@ -92,7 +92,7 @@ extends DirectComponentSupport
   Validator validator
 
   @DirectMethod
-  @RequiresPermissions('security:ldapconfig:read')
+  @RequiresPermissions('nexus:ldap:read')
   List<LdapServerXO> read() {
     def counter = 1
     return ldapConfigurationManager.listLdapServerConfigurations().collect { input ->
@@ -104,7 +104,7 @@ extends DirectComponentSupport
   }
 
   @DirectMethod
-  @RequiresPermissions('security:ldapconfig:read')
+  @RequiresPermissions('nexus:ldap:read')
   List<ReferenceXO> readReferences() {
     return ldapConfigurationManager.listLdapServerConfigurations().collect { input ->
       new ReferenceXO(
@@ -115,7 +115,7 @@ extends DirectComponentSupport
   }
 
   @DirectMethod
-  @RequiresPermissions('security:ldapconfig:read')
+  @RequiresPermissions('nexus:ldap:read')
   List<LdapSchemaTemplateXO> readTemplates() {
     return templateManager.schemaTemplates.collect { template ->
       asLdapSchemaTemplateXO(template)
@@ -124,7 +124,7 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:create')
+  @RequiresPermissions('nexus:ldap:create')
   @Validate(groups = [Create, Default])
   LdapServerXO create(final @NotNull @Valid LdapServerXO ldapServerXO) {
     def id = ldapConfigurationManager.addLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), null))
@@ -134,7 +134,7 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:update')
+  @RequiresPermissions('nexus:ldap:update')
   @Validate(groups = [Update, Default])
   LdapServerXO update(final @NotNull @Valid LdapServerXO ldapServerXO) {
     LdapConfiguration existing = ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id)
@@ -148,7 +148,7 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:delete')
+  @RequiresPermissions('nexus:ldap:delete')
   @Validate
   void remove(final @NotEmpty String id) {
     ldapConfigurationManager.deleteLdapServerConfiguration(id)
@@ -156,21 +156,21 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:update')
+  @RequiresPermissions('nexus:ldap:update')
   void changeOrder(final List<String> orderedServerIds) {
     ldapConfigurationManager.setServerOrder(orderedServerIds)
   }
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:delete')
+  @RequiresPermissions('nexus:ldap:delete')
   void clearCache() {
     ldapConfigurationManager.clearCache()
   }
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:update')
+  @RequiresPermissions('nexus:ldap:update')
   @Validate
   void verifyConnection(final @NotNull @Valid LdapServerConnectionXO ldapServerConnectionXO) {
     String authPassword = null
@@ -191,7 +191,7 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:update')
+  @RequiresPermissions('nexus:ldap:update')
   @Validate
   Collection<LdapUser> verifyUserMapping(final @NotNull @Valid LdapServerXO ldapServerXO) {
     String authPassword = null
@@ -216,7 +216,7 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:update')
+  @RequiresPermissions('nexus:ldap:update')
   @Validate
   void verifyLogin(final @NotNull @Valid LdapServerXO ldapServerXO,
                    final @NotEmpty String base64Username,
@@ -264,11 +264,6 @@ extends DirectComponentSupport
         connectionTimeout: connectionInfo.connectionTimeout,
         connectionRetryDelay: connectionInfo.connectionRetryDelay,
         maxIncidentsCount: connectionInfo.maxIncidentsCount,
-
-        backupMirrorEnabled: connectionInfo.backupHost != null,
-        backupMirrorProtocol: connectionInfo.backupHost?.protocol?.name(),
-        backupMirrorHost: connectionInfo.backupHost?.hostName,
-        backupMirrorPort: connectionInfo.backupHost?.port,
 
         userBaseDn: userAndGroupConfig.userBaseDn,
         userSubtree: userAndGroupConfig.userSubtree,
@@ -345,8 +340,6 @@ extends DirectComponentSupport
             connectionTimeout: ldapServerXO.connectionTimeout,
             connectionRetryDelay: ldapServerXO.connectionRetryDelay,
             maxIncidentsCount: ldapServerXO.maxIncidentsCount,
-
-            backupHost: ldapServerXO.backupMirrorEnabled ? new Host(Protocol.valueOf(ldapServerXO.backupMirrorProtocol.name()), ldapServerXO.backupMirrorHost, ldapServerXO.backupMirrorPort) : null
         ),
         mapping: new Mapping(
             userBaseDn: ldapServerXO.userBaseDn,
@@ -381,9 +374,6 @@ extends DirectComponentSupport
   @PackageScope
   LdapServerXO validate(final LdapServerXO ldapServerXO) {
     validate(ldapServerXO as LdapServerConnectionXO)
-    if (ldapServerXO.backupMirrorEnabled) {
-      validator.validate(ldapServerXO, LdapServerXO.BackupMirror)
-    }
     if (ldapServerXO.ldapGroupsAsRoles) {
       validator.validate(ldapServerXO, ldapServerXO.groupType == 'static' ? LdapServerXO.GroupStatic : LdapServerXO.GroupDynamic)
     }

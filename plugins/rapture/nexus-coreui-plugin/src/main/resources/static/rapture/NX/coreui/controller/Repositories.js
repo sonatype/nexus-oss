@@ -83,7 +83,8 @@ Ext.define('NX.coreui.controller.Repositories', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.checkAny('nexus:repository-admin') && NX.State.getUser();
+      // Show feature if the current user is permitted any repository-admin permissions
+      return NX.Permissions.checkExistsWithPrefix('nexus:repository-admin') && NX.State.getUser();
     }
   },
 
@@ -275,7 +276,10 @@ Ext.define('NX.coreui.controller.Repositories', {
         scope: me
       }
     });
+
+    //<if debug>
     me.logDebug('Repository status pooling started');
+    //</if>
   },
 
   /**
@@ -288,7 +292,10 @@ Ext.define('NX.coreui.controller.Repositories', {
     if (me.statusProvider) {
       me.statusProvider.disconnect();
     }
+
+    //<if debug>
     me.logDebug('Repository status pooling stopped');
+    //</if>
   },
 
   /**
@@ -330,7 +337,7 @@ Ext.define('NX.coreui.controller.Repositories', {
    */
   bindNewButton: function(button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:repository-admin:*:*', 'add'),
+        NX.Conditions.isPermitted('nexus:repository-admin:*:*:add'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -347,7 +354,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     var permittedCondition;
     button.mon(
         NX.Conditions.and(
-            permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*', 'delete'),
+            permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*:delete'),
             NX.Conditions.gridHasSelection('nx-coreui-repository-list', function(model) {
               var permission = 'nexus:repository-admin:' + model.get('format') + ':' + model.get('name');
               permittedCondition.name = permission;

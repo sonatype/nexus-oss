@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
+import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.maven.MavenPathParser;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.repository.storage.WritePolicySelector;

@@ -105,7 +105,7 @@ public class EnterpriseLdapManager
       // first build the connector
       LdapConnector testLdapConnector =
           new DefaultLdapConnector(ldapServer.getId(), this.ldapUserManager, this.ldapGroupManager,
-              this.getLdapContextFactory(ldapServer, false),
+              this.getLdapContextFactory(ldapServer),
               this.getLdapAuthConfiguration(ldapServer));
 
       LdapUser user = testLdapConnector.getUser(userId);
@@ -306,36 +306,23 @@ public class EnterpriseLdapManager
         // first get the connector for the server
         LdapConnector originalLdapConnector =
             new DefaultLdapConnector(ldapServer.getId(), ldapUserManager, ldapGroupManager,
-                getLdapContextFactory(ldapServer, false),
+                getLdapContextFactory(ldapServer),
                 getLdapAuthConfiguration(ldapServer));
-
-        LdapConnector backupLdapConnector = null;
-
-        // if we have a backup mirror defined we need to include that
-        if (ldapServer.getConnection().getBackupHost() != null) {
-          backupLdapConnector =
-              new DefaultLdapConnector(ldapServer.getId(), ldapUserManager, ldapGroupManager,
-                  getLdapContextFactory(ldapServer, true),
-                  getLdapAuthConfiguration(ldapServer));
-        }
 
         ldapConnectors.add(new FailoverLdapConnector(
             originalLdapConnector,
-            backupLdapConnector,
+            null,
             ldapServer.getConnection().getConnectionRetryDelay(),
             ldapServer.getConnection().getMaxIncidentsCount()));
-
       }
     }
     return this.ldapConnectors;
   }
 
-  private LdapContextFactory getLdapContextFactory(LdapConfiguration ldapServer, boolean useBackupUrl)
+  private LdapContextFactory getLdapContextFactory(LdapConfiguration ldapServer)
       throws LdapDAOException
   {
-    final DefaultLdapContextFactory ldapContextFactory = LdapConnectionUtils.getLdapContextFactory(
-        ldapServer, useBackupUrl
-    );
+    final DefaultLdapContextFactory ldapContextFactory = LdapConnectionUtils.getLdapContextFactory(ldapServer);
     final TrustStoreKey key = ldapTrustStoreKey(ldapServer.getId() == null ? "<unknown>" : ldapServer.getId());
     if (Protocol.ldaps == ldapServer.getConnection().getHost().getProtocol()) {
       final SSLContext sslContext = trustStore.getSSLContextFor(key);

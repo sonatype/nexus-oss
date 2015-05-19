@@ -12,7 +12,7 @@
  *###
 <html>
 <head>
-  <title>DESCRIBE $path</title>
+  <title>Describe $path - Sonatype Nexus</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
   <link rel="icon" type="image/png" href="$nexusUrl/favicon.png">
@@ -26,10 +26,10 @@
     #if($map.isEmpty())
       <p>No entries</p>
     #else
-      <table border="1" cellpadding="10">
+      <table>
         <thead>
         <tr>
-          <th width="33%">Key</th>
+          <th>Key</th>
           <th>Value</th>
         </tr>
         </thead>
@@ -48,11 +48,19 @@
 <body>
 
 <div class="nexus-describe-message">
-  <img src="$nexusUrl/static/images/nexus.png?$nexusVersion"/>
-  <span>DESCRIBE $path</span>
+  <a href="$nexusUrl">
+    <img src="$nexusUrl/static/images/nexus.png?$nexusVersion"/>
+    <span class="name">Sonatype Nexus</span>
+  </a>
+  <span class="version">$nexusEdition $nexusVersion</span>
 </div>
 
 <div class="nexus-describe-detail">
+  <div class="nexus-describe-title">
+    <span class="title">Describe</span>
+    <span class="path">$path</span>
+  </div>
+
   <p>
     This page describes the processing of a request made by external client,
     using information from the request, retrieved item (or exception if not item was retrieved)

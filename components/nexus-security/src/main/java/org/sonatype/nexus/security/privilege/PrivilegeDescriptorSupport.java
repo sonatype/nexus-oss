@@ -15,16 +15,13 @@ package org.sonatype.nexus.security.privilege;
 import java.util.List;
 
 import org.sonatype.nexus.security.config.CPrivilege;
-import org.sonatype.nexus.security.config.SecurityConfigurationValidationContext;
-import org.sonatype.nexus.validation.ValidationResponse;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-// NOTE: Not using existing AbstractPrivilegeDescriptor to investigate divorcing from legacy
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Support for {@link PrivilegeDescriptor} implementations.
@@ -54,15 +51,6 @@ public abstract class PrivilegeDescriptorSupport
         '}';
   }
 
-  @Override
-  public ValidationResponse validatePrivilege(final CPrivilege privilege,
-                                              final SecurityConfigurationValidationContext context,
-                                              final boolean update)
-  {
-    // FIXME: For now ignore validation
-    return new ValidationResponse();
-  }
-
   /**
    * Helper to read a privilege property and return default-value if unset or empty.
    */
@@ -71,6 +59,16 @@ public abstract class PrivilegeDescriptorSupport
     if (Strings.nullToEmpty(value).isEmpty()) {
       value = defaultValue;
     }
+    return value;
+  }
+
+  /**
+   * Helper to read a required privilege property.
+   * @throws IllegalStateException  Missing required property.
+   */
+  protected String readProperty(final CPrivilege privilege, final String name) {
+    String value = privilege.getProperty(name);
+    checkState(!Strings.nullToEmpty(value).isEmpty(), "Missing required property: %s", name);
     return value;
   }
 

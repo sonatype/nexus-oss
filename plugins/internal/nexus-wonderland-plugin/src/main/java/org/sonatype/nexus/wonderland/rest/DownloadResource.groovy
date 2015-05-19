@@ -12,13 +12,6 @@
  */
 package org.sonatype.nexus.wonderland.rest
 
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.jetbrains.annotations.NonNls
-import org.sonatype.nexus.common.text.Strings2
-import org.sonatype.nexus.wonderland.DownloadService
-import org.sonatype.siesta.Resource
-import org.sonatype.sisu.goodies.common.ComponentSupport
-
 import javax.annotation.Nullable
 import javax.inject.Inject
 import javax.inject.Named
@@ -32,6 +25,16 @@ import javax.ws.rs.QueryParam
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Response
 
+import org.sonatype.nexus.common.text.Strings2
+import org.sonatype.nexus.wonderland.DownloadService
+import org.sonatype.siesta.Resource
+import org.sonatype.sisu.goodies.common.ComponentSupport
+
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.jetbrains.annotations.NonNls
+
+import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION
+import static com.google.common.net.HttpHeaders.CONTENT_LENGTH
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST
 import static javax.ws.rs.core.Response.Status.FORBIDDEN
 import static javax.ws.rs.core.Response.Status.NOT_FOUND
@@ -66,7 +69,7 @@ class DownloadResource
   @GET
   @Path('{fileName}')
   @Produces('application/zip')
-  @RequiresPermissions('nexus:wonderland')
+  @RequiresPermissions('nexus:wonderland:download')
   Response downloadZip(final @PathParam('fileName') String fileName,
                        final @Nullable @QueryParam('t') String authTicketParam, // Base64
                        final @Nullable @HeaderParam(AUTH_TICKET_HEADER) String authTicketHeader)
@@ -98,8 +101,8 @@ class DownloadResource
 
       log.debug 'Sending support ZIP file: {}', file
       return Response.ok(file.newInputStream())
-          .header('Content-Disposition', "attachment; filename=\"${fileName}\"")
-          .header('Content-Length', file.length())
+          .header(CONTENT_DISPOSITION, "attachment; filename=\"${fileName}\"")
+          .header(CONTENT_LENGTH, file.length())
           .build()
     }
     catch (IllegalAccessException e) {

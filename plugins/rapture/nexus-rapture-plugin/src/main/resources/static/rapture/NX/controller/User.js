@@ -226,7 +226,9 @@ Ext.define('NX.controller.User', {
 
     win.getEl().mask(NX.I18n.get('GLOBAL_SIGN_IN_MASK'));
 
+    //<if debug>
     me.logDebug('Sign-in user: "' + values.username + '" ...');
+    //</if>
 
     Ext.Ajax.request({
       url: NX.util.Url.urlOf('service/rapture/session'),
@@ -293,7 +295,9 @@ Ext.define('NX.controller.User', {
 
     win.getEl().mask(NX.I18n.get('GLOBAL_AUTHENTICATE_MASK'));
 
+    //<if debug>
     me.logDebug('Authenticating user "' + values.username + '" ...');
+    //</if>
 
     NX.direct.rapture_Security.authenticate(b64username, b64password, function (response) {
       win.getEl().unmask();
@@ -323,7 +327,9 @@ Ext.define('NX.controller.User', {
 
     win.getEl().mask(NX.I18n.get('GLOBAL_AUTHENTICATE_RETRIEVING_MASK'));
 
+    //<if debug>
     me.logDebug('Retrieving authentication token...');
+    //</if>
 
     NX.direct.rapture_Security.authenticationToken(b64username, b64password, function (response) {
       win.getEl().unmask();

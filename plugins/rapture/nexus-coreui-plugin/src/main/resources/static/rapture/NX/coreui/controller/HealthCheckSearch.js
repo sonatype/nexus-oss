@@ -132,7 +132,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     var me = this;
     grid.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted("nexus:healthcheck", "read")
+            NX.Conditions.isPermitted('nexus:healthcheck:read')
         ),
         {
           satisfied: Ext.pass(me.addHealthCheckColumns, grid),

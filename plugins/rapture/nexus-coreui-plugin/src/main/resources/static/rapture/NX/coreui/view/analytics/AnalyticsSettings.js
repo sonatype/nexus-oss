@@ -38,7 +38,7 @@ Ext.define('NX.coreui.view.analytics.AnalyticsSettings', {
         load: 'NX.direct.analytics_Settings.read',
         submit: 'NX.direct.analytics_Settings.update'
       },
-      editableCondition: NX.Conditions.isPermitted('nexus:analytics', 'update'),
+      editableCondition: NX.Conditions.isPermitted('nexus:analytics:update'),
       editableMarker: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_ERROR'),
 
       items: [

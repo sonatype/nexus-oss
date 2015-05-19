@@ -32,12 +32,6 @@ Ext.define('NX.coreui.view.system.HttpRequestSettings', {
       helpText: NX.I18n.get('ADMIN_HTTP_CUSTOMIZATION_HELP')
     },
     {
-      xtype: 'textfield',
-      name: 'urlParameters',
-      fieldLabel: NX.I18n.get('ADMIN_HTTP_PARAMETERS'),
-      helpText: NX.I18n.get('ADMIN_HTTP_PARAMETERS_HELP')
-    },
-    {
       xtype: 'numberfield',
       name: 'timeout',
       fieldLabel: NX.I18n.get('ADMIN_HTTP_TIMEOUT'),

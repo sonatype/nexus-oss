@@ -251,14 +251,20 @@ Ext.define('NX.controller.State', {
             scope: me
           }
         });
+
+        //<if debug>
         me.logDebug('State pooling configured for ' + newStatusInterval + ' seconds');
+        //</if>
       }
     }
     else {
       if (me.statusProvider) {
         me.statusProvider.disconnect();
       }
+
+      //<if debug>
       me.logDebug('State pooling disabled');
+      //</if>
     }
   },
 

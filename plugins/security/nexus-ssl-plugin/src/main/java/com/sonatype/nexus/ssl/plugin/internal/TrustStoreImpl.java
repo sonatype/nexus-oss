@@ -34,7 +34,6 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import com.sonatype.nexus.ssl.model.TrustStoreKey;
-import com.sonatype.nexus.ssl.plugin.SSLPlugin;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -74,7 +73,7 @@ public class TrustStoreImpl
 
   @Inject
   public TrustStoreImpl(
-      final @Named(SSLPlugin.ID_PREFIX) KeyStoreManager keyStoreManager)
+      final @Named(SSLConstants.ID_PREFIX) KeyStoreManager keyStoreManager)
       throws Exception
   {
     this.keyStoreManager = checkNotNull(keyStoreManager);

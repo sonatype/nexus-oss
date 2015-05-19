@@ -13,6 +13,7 @@
 package org.sonatype.nexus.extdirect.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,8 +27,6 @@ import org.sonatype.nexus.validation.ValidationMessage;
 import org.sonatype.nexus.validation.ValidationResponseException;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,10 +43,11 @@ public class ValidationResponse
   private Map<String, String> errors;
 
   public ValidationResponse(final ValidationResponseException cause) {
-    super(false, Lists.newArrayList());
-    checkNotNull(cause, "cause may not be null");
+    super(false, new ArrayList<>());
+    //noinspection ThrowableResultOfMethodCallIgnored
+    checkNotNull(cause);
     if (cause.getErrors().isEmpty()) {
-      messages = Lists.newArrayList();
+      messages = new ArrayList<>();
       messages.add(cause.getMessage());
     }
     else {
@@ -55,14 +55,15 @@ public class ValidationResponse
     }
   }
 
-  public ValidationResponse(List<ValidationMessage> validationMessages) {
-    super(false, Lists.newArrayList());
+  public ValidationResponse(final List<ValidationMessage> validationMessages) {
+    super(false, new ArrayList<>());
     convertValidationMessages(validationMessages);
   }
 
   public ValidationResponse(final ConstraintViolationException cause) {
-    super(false, Lists.newArrayList());
-    checkNotNull(cause, "cause may not be null");
+    super(false, new ArrayList<>());
+    //noinspection ThrowableResultOfMethodCallIgnored
+    checkNotNull(cause);
     Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
     if (violations != null && violations.size() > 0) {
       for (ConstraintViolation<?> violation : violations) {
@@ -78,31 +79,31 @@ public class ValidationResponse
         }
         if (entries.isEmpty()) {
           if (messages == null) {
-            messages = Lists.newArrayList();
+            messages = new ArrayList<>();
           }
           messages.add(violation.getMessage());
         }
         else {
           if (errors == null) {
-            errors = Maps.newHashMap();
+            errors = new HashMap<>();
           }
           errors.put(Joiner.on('.').join(entries), violation.getMessage());
         }
       }
     }
     else if (cause.getMessage() != null) {
-      messages = Lists.newArrayList();
+      messages = new ArrayList<>();
       messages.add(cause.getMessage());
     }
   }
 
   private void convertValidationMessages(final List<ValidationMessage> validationMessages) {
     if (validationMessages != null) {
-      errors = Maps.newHashMap();
+      errors = new HashMap<>();
       for (ValidationMessage validationMessage : validationMessages) {
         if ("*".equals(validationMessage.getKey())) {
           if (messages == null) {
-            messages = Lists.newArrayList();
+            messages = new ArrayList<>();
           }
           messages.add(validationMessage.getMessage());
         }
@@ -112,5 +113,4 @@ public class ValidationResponse
       }
     }
   }
-
 }

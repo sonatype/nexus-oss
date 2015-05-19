@@ -12,8 +12,9 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
-import org.sonatype.nexus.repository.maven.internal.MavenPath.HashType;
-import org.sonatype.nexus.repository.maven.internal.MavenPath.SignatureType;
+import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.maven.MavenPath.HashType;
+import org.sonatype.nexus.repository.maven.MavenPath.SignatureType;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MavenPathParser;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -33,10 +34,10 @@ import static org.hamcrest.Matchers.nullValue;
 public class MavenPathTest
     extends TestSupport
 {
+  private final Maven2MavenPathParser pathParser = new Maven2MavenPathParser();
+
   @Test
   public void pom() {
-    final Maven2MavenPathParser pathParser = new Maven2MavenPathParser();
-
     final String path = "/org/eclipse/jetty/jetty-io/8.1.16.v20140903/jetty-io-8.1.16.v20140903.pom";
     final MavenPath mavenPath = pathParser.parsePath(path);
     assertThat(mavenPath, is(notNullValue()));
@@ -76,8 +77,6 @@ public class MavenPathTest
 
   @Test
   public void pomSnapshot() {
-    final Maven2MavenPathParser pathParser = new Maven2MavenPathParser();
-
     final String path = "/org/eclipse/jetty/jetty-io/8.1.16-SNAPSHOT/jetty-io-8.1.16-20140903.180000-1.pom";
     final MavenPath mavenPath = pathParser.parsePath(path);
     assertThat(mavenPath, is(notNullValue()));
@@ -117,8 +116,6 @@ public class MavenPathTest
 
   @Test
   public void jarSnapshotHash() {
-    final Maven2MavenPathParser pathParser = new Maven2MavenPathParser();
-
     final String path = "/org/apache/maven/maven-repository-metadata/3.3.0-SNAPSHOT/maven-repository-metadata-3.3.0-20150311.160242-1.jar.sha1";
     final MavenPath mavenPath = pathParser.parsePath(path);
     assertThat(mavenPath, is(notNullValue()));
@@ -148,5 +145,65 @@ public class MavenPathTest
     assertThat(coordinatesAscSha1.isSubordinate(), is(true));
     assertThat(coordinatesAscSha1.subordinateOf().subordinateOf(), equalTo(mavenPath.subordinateOf()));
     assertThat(coordinatesAscSha1.main(), equalTo(mavenPath.main()));
+  }
+
+  @Test
+  public void locatePom() {
+    final String path = "/org/apache/maven/maven-repository-metadata/3.3.0-SNAPSHOT/maven-repository-metadata-3.3.0-20150311.160242-1.jar.sha1";
+    final MavenPath mavenPath = pathParser.parsePath(path).locatePom();
+    assertThat(mavenPath, is(notNullValue()));
+
+    assertThat(mavenPath.getPath(), equalTo(
+        "/org/apache/maven/maven-repository-metadata/3.3.0-SNAPSHOT/maven-repository-metadata-3.3.0-20150311.160242-1.pom"));
+    assertThat(mavenPath.getFileName(),
+        equalTo("maven-repository-metadata-3.3.0-20150311.160242-1.pom"));
+    assertThat(mavenPath.getHashType(), nullValue());
+    assertThat(mavenPath.getCoordinates().getGroupId(), equalTo("org.apache.maven"));
+    assertThat(mavenPath.getCoordinates().getArtifactId(), equalTo("maven-repository-metadata"));
+    assertThat(mavenPath.getCoordinates().getVersion(), equalTo("3.3.0-20150311.160242-1"));
+    assertThat(mavenPath.getCoordinates().getBaseVersion(), equalTo("3.3.0-SNAPSHOT"));
+    assertThat(mavenPath.getCoordinates().getClassifier(), nullValue());
+    assertThat(mavenPath.getCoordinates().getExtension(), equalTo("pom"));
+    assertThat(mavenPath.isSubordinate(), is(false));
+  }
+
+  @Test
+  public void locateJar() {
+    final String path = "/org/apache/maven/maven-repository-metadata/3.3.0-SNAPSHOT/maven-repository-metadata-3.3.0-20150311.160242-1.jar.sha1";
+    final MavenPath mavenPath = pathParser.parsePath(path).locateMainArtifact("jar");
+    assertThat(mavenPath, is(notNullValue()));
+
+    assertThat(mavenPath.getPath(), equalTo(
+        "/org/apache/maven/maven-repository-metadata/3.3.0-SNAPSHOT/maven-repository-metadata-3.3.0-20150311.160242-1.jar"));
+    assertThat(mavenPath.getFileName(),
+        equalTo("maven-repository-metadata-3.3.0-20150311.160242-1.jar"));
+    assertThat(mavenPath.getHashType(), nullValue());
+    assertThat(mavenPath.getCoordinates().getGroupId(), equalTo("org.apache.maven"));
+    assertThat(mavenPath.getCoordinates().getArtifactId(), equalTo("maven-repository-metadata"));
+    assertThat(mavenPath.getCoordinates().getVersion(), equalTo("3.3.0-20150311.160242-1"));
+    assertThat(mavenPath.getCoordinates().getBaseVersion(), equalTo("3.3.0-SNAPSHOT"));
+    assertThat(mavenPath.getCoordinates().getClassifier(), nullValue());
+    assertThat(mavenPath.getCoordinates().getExtension(), equalTo("jar"));
+    assertThat(mavenPath.isSubordinate(), is(false));
+  }
+
+  @Test
+  public void locateJavadoc() {
+    final String path = "/org/apache/maven/maven-repository-metadata/3.3.0-SNAPSHOT/maven-repository-metadata-3.3.0-20150311.160242-1.jar.sha1";
+    final MavenPath mavenPath = pathParser.parsePath(path).locate("jar", "javadoc");
+    assertThat(mavenPath, is(notNullValue()));
+
+    assertThat(mavenPath.getPath(), equalTo(
+        "/org/apache/maven/maven-repository-metadata/3.3.0-SNAPSHOT/maven-repository-metadata-3.3.0-20150311.160242-1-javadoc.jar"));
+    assertThat(mavenPath.getFileName(),
+        equalTo("maven-repository-metadata-3.3.0-20150311.160242-1-javadoc.jar"));
+    assertThat(mavenPath.getHashType(), nullValue());
+    assertThat(mavenPath.getCoordinates().getGroupId(), equalTo("org.apache.maven"));
+    assertThat(mavenPath.getCoordinates().getArtifactId(), equalTo("maven-repository-metadata"));
+    assertThat(mavenPath.getCoordinates().getVersion(), equalTo("3.3.0-20150311.160242-1"));
+    assertThat(mavenPath.getCoordinates().getBaseVersion(), equalTo("3.3.0-SNAPSHOT"));
+    assertThat(mavenPath.getCoordinates().getClassifier(), equalTo("javadoc"));
+    assertThat(mavenPath.getCoordinates().getExtension(), equalTo("jar"));
+    assertThat(mavenPath.isSubordinate(), is(false));
   }
 }

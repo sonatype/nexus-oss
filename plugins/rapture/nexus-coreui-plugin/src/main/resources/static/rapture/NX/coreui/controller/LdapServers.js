@@ -39,9 +39,6 @@ Ext.define('NX.coreui.controller.LdapServers', {
     'ldap.LdapServerChangeOrder',
     'ldap.LdapServerFeature',
     'ldap.LdapServerList',
-    'ldap.LdapServerBackup',
-    'ldap.LdapServerBackupFieldSet',
-    'ldap.LdapServerBackupForm',
     'ldap.LdapServerConnection',
     'ldap.LdapServerConnectionFieldSet',
     'ldap.LdapServerConnectionForm',
@@ -59,7 +56,6 @@ Ext.define('NX.coreui.controller.LdapServers', {
     { ref: 'content', selector: 'nx-feature-content' },
     { ref: 'list', selector: 'nx-coreui-ldapserver-list' },
     { ref: 'connection', selector: 'nx-coreui-ldapserver-feature nx-coreui-ldapserver-connection' },
-    { ref: 'backup', selector: 'nx-coreui-ldapserver-feature nx-coreui-ldapserver-backup' },
     { ref: 'userAndGroup', selector: 'nx-coreui-ldapserver-feature nx-coreui-ldapserver-userandgroup' }
   ],
   icons: {
@@ -83,10 +79,10 @@ Ext.define('NX.coreui.controller.LdapServers', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('security:ldapconfig', 'read');
+      return NX.Permissions.check('nexus:ldap:read');
     }
   },
-  permission: 'security:ldapconfig',
+  permission: 'nexus:ldap',
 
   /**
    * @override
@@ -116,9 +112,6 @@ Ext.define('NX.coreui.controller.LdapServers', {
           click: me.createServer
         },
         'nx-coreui-ldapserver-connection-form button[action=save]': {
-          click: me.updateServer
-        },
-        'nx-coreui-ldapserver-backup-form button[action=save]': {
           click: me.updateServer
         },
         'nx-coreui-ldapserver-userandgroup-form button[action=save]': {
@@ -177,7 +170,6 @@ Ext.define('NX.coreui.controller.LdapServers', {
       Ext.suspendLayouts();
 
       me.getConnection().loadRecord(model);
-      me.getBackup().loadRecord(model);
       me.getUserAndGroup().loadRecord(model);
 
       Ext.resumeLayouts(true);
@@ -252,13 +244,11 @@ Ext.define('NX.coreui.controller.LdapServers', {
       feature = me.getFeature(),
       connectionForm = feature.down('nx-coreui-ldapserver-connection').down('nx-coreui-ldapserver-connection-form'),
       userGroupForm = feature.down('nx-coreui-ldapserver-userandgroup').down('nx-coreui-ldapserver-userandgroup-form'),
-      backupForm = feature.down('nx-coreui-ldapserver-backup').down('nx-coreui-ldapserver-backup-form'),
       values = {};
 
     // Get fields from all relevant forms
     Ext.apply(values, connectionForm.getForm().getFieldValues());
     Ext.apply(values, userGroupForm.getForm().getFieldValues());
-    Ext.apply(values, backupForm.getForm().getFieldValues());
 
     var modelData = connectionForm.getForm().getRecord().getData(false);
 
@@ -336,7 +326,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
     var me = this;
 
     button.mon(
-        NX.Conditions.isPermitted(me.permission, 'update'),
+        NX.Conditions.isPermitted(me.permission + ':update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -353,7 +343,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
     var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission, 'delete'),
+            NX.Conditions.isPermitted(me.permission + ':delete'),
             NX.Conditions.storeHasRecords('LdapServer')
         ),
         {

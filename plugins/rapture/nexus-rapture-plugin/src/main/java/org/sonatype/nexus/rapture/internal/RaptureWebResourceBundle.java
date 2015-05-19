@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.common.app.SystemStatus;
 import org.sonatype.nexus.rapture.UiPluginDescriptor;
-import org.sonatype.nexus.rapture.internal.ui.StateComponent;
+import org.sonatype.nexus.rapture.internal.state.StateComponent;
 import org.sonatype.nexus.webresources.GeneratedWebResource;
 import org.sonatype.nexus.webresources.WebResource;
 import org.sonatype.nexus.webresources.WebResourceBundle;
@@ -81,7 +81,7 @@ public class RaptureWebResourceBundle
   public RaptureWebResourceBundle(final Provider<SystemStatus> systemStatusProvider,
                                   final Provider<HttpServletRequest> servletRequestProvider,
                                   final Provider<StateComponent> stateComponentProvider,
-                                  final TemplateEngine templateEngine,
+                                  @Named("shared-velocity") final TemplateEngine templateEngine,
                                   final List<UiPluginDescriptor> pluginDescriptors)
   {
     this.systemStatusProvider = checkNotNull(systemStatusProvider);
@@ -316,7 +316,7 @@ public class RaptureWebResourceBundle
   /**
    * Generate a URI for the given path.
    */
-  private URI uri(String path) {
+  private URI uri(final String path) {
     try {
       return new URI(String.format("%s/static/rapture/%s", BaseUrlHolder.get(), path));
     }

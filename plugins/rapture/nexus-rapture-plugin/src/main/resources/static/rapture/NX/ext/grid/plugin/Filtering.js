@@ -111,15 +111,21 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
       me.filteredStore.remoteFilter = false;
     }
     if (me.filterValue) {
+      //<if debug>
       me.logDebug(
           'Filtering ' + me.filteredStore.self.getName() + ' on [' + me.filterValue
               + '] using fields: ' + me.filteredFields
       );
+      //</if>
+
       me.filteredStore.filter(me.filteringFilter);
     }
     else {
       me.filteredStore.removeFilter(me.filteringFilter);
+
+      //<if debug>
       me.logDebug('Filtering cleared on ' + me.filteredStore.self.getName());
+      //</if>
     }
     if (remoteFilter) {
       me.filteredStore.remoteFilter = remoteFilter;
@@ -214,7 +220,10 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
     var me = this,
         store = store || me.grid.getStore();
 
+    //<if debug>
     me.logDebug('Grid ' + grid.id + ' reconfigured, binding to new store');
+    //</if>
+
     me.reconfigureStore(store, me.extractColumnsWithDataIndex(columns));
   },
 
@@ -243,7 +252,10 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
     var me = this;
     me.filteredStore = store;
     if (store) {
+      //<if debug>
       me.logDebug('Binding to store ' + me.filteredStore.self.getName());
+      //</if>
+
       me.grid.mon(store, 'load', me.applyFilter, me);
       me.grid.mon(store, 'filterchange', me.syncFilterValue, me);
     }
@@ -257,7 +269,10 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   unbindFromStore: function (store) {
     var me = this;
     if (store) {
+      //<if debug>
       me.logDebug('Unbinding from store ' + me.filteredStore.self.getName());
+      //</if>
+
       me.grid.mun(store, 'load', me.applyFilter, me);
       me.grid.mun(store, 'filterchange', me.syncFilterValue, me);
     }

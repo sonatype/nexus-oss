@@ -15,6 +15,8 @@ package org.sonatype.nexus.ldap.internal.connector;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
@@ -25,6 +27,8 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class FailoverLdapConnector
     implements LdapConnector
@@ -45,11 +49,11 @@ public class FailoverLdapConnector
   private int incidents = 0;
 
   public FailoverLdapConnector(final LdapConnector originalLdapManagerConnector,
-                               final LdapConnector backupLdapManagerConnector,
+                               @Nullable final LdapConnector backupLdapManagerConnector,
                                final int retryDelaySeconds,
                                final int maxIncidentsCount)
   {
-    this.originalLdapManagerConnector = originalLdapManagerConnector;
+    this.originalLdapManagerConnector = checkNotNull(originalLdapManagerConnector);
     this.backupLdapManagerConnector = backupLdapManagerConnector;
     this.retryDelay = retryDelaySeconds * 1000;
     this.maxIncidentsCount = maxIncidentsCount;

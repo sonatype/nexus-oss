@@ -39,7 +39,7 @@ Ext.define('NX.coreui.view.support.SupportZip', {
       api: {
         submit: 'NX.direct.atlas_SupportZip.create'
       },
-      editableCondition: NX.Conditions.isPermitted('nexus:atlas', 'create'),
+      editableCondition: NX.Conditions.isPermitted('nexus:atlas:create'),
       editableMarker: NX.I18n.get('ADMIN_SUPPORT_ZIP_PERMISSION_ERROR'),
       items: [
         {

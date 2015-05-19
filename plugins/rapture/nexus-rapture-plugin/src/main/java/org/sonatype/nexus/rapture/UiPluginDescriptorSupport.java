@@ -14,7 +14,6 @@ package org.sonatype.nexus.rapture;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -28,6 +27,9 @@ public class UiPluginDescriptorSupport
   extends ComponentSupport
   implements UiPluginDescriptor
 {
+  /**
+   * Artifact ID of UI-contributing plugin.  Used to resolve the location of its contributed web-resources.
+   */
   private final String pluginId;
 
   private boolean hasStyle = true;
@@ -38,9 +40,8 @@ public class UiPluginDescriptorSupport
 
   private String configClassName;
 
-  public UiPluginDescriptorSupport(final PluginIdentity owner) {
-    checkNotNull(owner);
-    this.pluginId = owner.getArtifactId();
+  public UiPluginDescriptorSupport(final String artifactId) {
+    this.pluginId = checkNotNull(artifactId);
   }
 
   @Override

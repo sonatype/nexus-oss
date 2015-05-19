@@ -24,6 +24,8 @@ import static org.sonatype.nexus.repository.security.BreadActions.BROWSE;
 import static org.sonatype.nexus.repository.security.BreadActions.DELETE;
 import static org.sonatype.nexus.repository.security.BreadActions.EDIT;
 import static org.sonatype.nexus.repository.security.BreadActions.READ;
+import static org.sonatype.nexus.repository.security.RepositoryViewPrivilegeDescriptor.id;
+import static org.sonatype.nexus.repository.security.RepositoryViewPrivilegeDescriptor.privilege;
 import static org.sonatype.nexus.security.privilege.PrivilegeDescriptorSupport.ALL;
 
 /**
@@ -58,11 +60,12 @@ public class RepositoryFormatSecurityConfigurationResource
     String format = this.format.getValue();
 
     // add repository-view <format> ALL privileges
-    model.addPrivilege(RepositoryViewPrivilegeDescriptor.privilege(format, ALL, BROWSE));
-    model.addPrivilege(RepositoryViewPrivilegeDescriptor.privilege(format, ALL, READ));
-    model.addPrivilege(RepositoryViewPrivilegeDescriptor.privilege(format, ALL, EDIT));
-    model.addPrivilege(RepositoryViewPrivilegeDescriptor.privilege(format, ALL, ADD));
-    model.addPrivilege(RepositoryViewPrivilegeDescriptor.privilege(format, ALL, DELETE));
+    model.addPrivilege(privilege(format, ALL, ALL));
+    model.addPrivilege(privilege(format, ALL, BROWSE));
+    model.addPrivilege(privilege(format, ALL, READ));
+    model.addPrivilege(privilege(format, ALL, EDIT));
+    model.addPrivilege(privilege(format, ALL, ADD));
+    model.addPrivilege(privilege(format, ALL, DELETE));
   }
 
   /**
@@ -78,11 +81,12 @@ public class RepositoryFormatSecurityConfigurationResource
       @Override
       public void apply(final SecurityConfiguration model) {
         // add repository-view <format> <name> privileges
-        model.addPrivilege(RepositoryViewPrivilegeDescriptor.privilege(format, name, BROWSE));
-        model.addPrivilege(RepositoryViewPrivilegeDescriptor.privilege(format, name, READ));
-        model.addPrivilege(RepositoryViewPrivilegeDescriptor.privilege(format, name, EDIT));
-        model.addPrivilege(RepositoryViewPrivilegeDescriptor.privilege(format, name, ADD));
-        model.addPrivilege(RepositoryViewPrivilegeDescriptor.privilege(format, name, DELETE));
+        model.addPrivilege(privilege(format, name, ALL));
+        model.addPrivilege(privilege(format, name, BROWSE));
+        model.addPrivilege(privilege(format, name, READ));
+        model.addPrivilege(privilege(format, name, EDIT));
+        model.addPrivilege(privilege(format, name, ADD));
+        model.addPrivilege(privilege(format, name, DELETE));
       }
     });
   }
@@ -100,11 +104,12 @@ public class RepositoryFormatSecurityConfigurationResource
       @Override
       public void apply(final SecurityConfiguration model) {
         // remove repository-view <format> <name> privileges
-        model.removePrivilege(RepositoryViewPrivilegeDescriptor.id(format, name, BROWSE));
-        model.removePrivilege(RepositoryViewPrivilegeDescriptor.id(format, name, READ));
-        model.removePrivilege(RepositoryViewPrivilegeDescriptor.id(format, name, EDIT));
-        model.removePrivilege(RepositoryViewPrivilegeDescriptor.id(format, name, ADD));
-        model.removePrivilege(RepositoryViewPrivilegeDescriptor.id(format, name, DELETE));
+        model.removePrivilege(id(format, name, ALL));
+        model.removePrivilege(id(format, name, BROWSE));
+        model.removePrivilege(id(format, name, READ));
+        model.removePrivilege(id(format, name, EDIT));
+        model.removePrivilege(id(format, name, ADD));
+        model.removePrivilege(id(format, name, DELETE));
       }
     });
   }

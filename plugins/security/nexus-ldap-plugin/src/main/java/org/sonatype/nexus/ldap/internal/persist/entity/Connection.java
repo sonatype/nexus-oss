@@ -115,12 +115,6 @@ public final class Connection
   private Host host;
 
   /**
-   * The LDAP backup mirror host.
-   */
-  @Nullable
-  private Host backupHost;
-
-  /**
    * SASL Realm. The authentication realm.
    */
   @Nullable
@@ -181,16 +175,6 @@ public final class Connection
   public void setHost(final Host host) {
     checkArgument(host != null, "host null");
     this.host = host;
-  }
-
-  @Nullable
-  public Host getBackupHost() {
-    return backupHost;
-  }
-
-  public void setBackupHost(final @Nullable Host backupHost)
-  {
-    this.backupHost = backupHost;
   }
 
   public String getSaslRealm() {
