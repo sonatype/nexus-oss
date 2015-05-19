@@ -21,6 +21,7 @@ import javax.inject.Singleton
 import org.sonatype.nexus.common.app.BaseUrlHolder
 import org.sonatype.nexus.rapture.StateContributor
 
+import com.google.common.collect.ImmutableMap
 import groovy.transform.PackageScope
 
 /**
@@ -33,19 +34,17 @@ import groovy.transform.PackageScope
 class Branding
     implements StateContributor
 {
-  private BrandingCapabilityConfiguration config
+  private static final String STATE_ID = 'branding'
 
-  @Override
-  Map<String, Object> getState() {
-    if (config) {
-      return ['branding': new BrandingXO(
-          headerEnabled: config.headerEnabled,
-          headerHtml: interpolate(config.headerHtml),
-          footerEnabled: config.footerEnabled,
-          footerHtml: interpolate(config.footerHtml)
-      )]
-    }
-    return null
+  private volatile BrandingXO branding
+
+  void set(final BrandingCapabilityConfiguration config) {
+    branding = new BrandingXO(
+        headerEnabled: config.headerEnabled,
+        headerHtml: interpolate(config.headerHtml),
+        footerEnabled: config.footerEnabled,
+        footerHtml: interpolate(config.footerHtml)
+    )
   }
 
   @PackageScope
@@ -57,16 +56,22 @@ class Branding
     return null
   }
 
+  void reset() {
+    branding = null
+  }
+
   @Override
-  Map<String, Object> getCommands() {
+  @Nullable
+  Map<String, Object> getState() {
+    if (branding) {
+      return ImmutableMap.of(STATE_ID, branding)
+    }
     return null
   }
 
-  void set(final BrandingCapabilityConfiguration config) {
-    this.config = config
-  }
-
-  void reset() {
-    this.config = null
+  @Override
+  @Nullable
+  Map<String, Object> getCommands() {
+    return null
   }
 }
