@@ -22,6 +22,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -48,9 +49,37 @@ public class SystemFeedSource
   public void fillInEntries(final List<FeedEvent> entries, final int from, final int count,
                             final Map<String, String> params)
   {
-    entries.addAll(getFeedRecorder()
-        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_SYSTEM, FeedRecorder.FAMILY_REPO), null, from, count,
-            filters(params)
-        ));
+    entries.addAll(
+        getFeedRecorder().getEvents(
+            ImmutableSet.of(FeedRecorder.FAMILY_SYSTEM, FeedRecorder.FAMILY_REPO),
+            null,
+            from,
+            count,
+            new Function<FeedEvent, FeedEvent>()
+            {
+              @Override
+              public FeedEvent apply(final FeedEvent input) {
+                input.setTitle(title(input));
+                return input;
+              }
+            }
+        )
+    );
+  }
+
+  /**
+   * Formats entry title for event.
+   */
+  private String title(FeedEvent evt) {
+    if (FeedRecorder.SYSTEM_BOOT.equals(evt.getEventSubType())) {
+      return "Nexus " + evt.getData().get("bootAction");
+    }
+    else if (FeedRecorder.SYSTEM_CONFIG.equals(evt.getEventSubType())) {
+      return "Configuration change";
+    }
+    else {
+      // TODO: Some human-readable fallback?
+      return evt.getEventType() + ":" + evt.getEventSubType();
+    }
   }
 }

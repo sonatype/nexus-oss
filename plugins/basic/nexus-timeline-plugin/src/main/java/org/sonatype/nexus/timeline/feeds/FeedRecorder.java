@@ -15,10 +15,11 @@ package org.sonatype.nexus.timeline.feeds;
 import java.util.List;
 import java.util.Set;
 
-import org.sonatype.nexus.timeline.Entry;
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.timeline.Timeline;
 
-import com.google.common.base.Predicate;
+import com.google.common.base.Function;
 
 /**
  * A recorder for events and their retrieval. The Actions are "generic" Nexus event related. This component
@@ -102,11 +103,24 @@ public interface FeedRecorder
 
   // creating
 
+  /**
+   * Adds feed event to timeline.
+   */
   void addEvent(FeedEvent entry);
 
-  List<FeedEvent> getEvents(Set<String> types,
-                            Set<String> subtypes,
+  /**
+   * Retrieves feed events from timeline.
+   *
+   * @param types    to filter for types or {@code null}.
+   * @param subtypes to filter for subtypes or {@code null}.
+   * @param from     paging, from
+   * @param count    paging, to
+   * @param function custom transormation or {@code null}. Useful to fill in parts of data NOT stored in timeline (or
+   *                 composed from data present), like generated content, event title etc.
+   */
+  List<FeedEvent> getEvents(@Nullable Set<String> types,
+                            @Nullable Set<String> subtypes,
                             int from,
                             int count,
-                            Predicate<Entry> filter);
+                            @Nullable Function<FeedEvent, FeedEvent> function);
 }

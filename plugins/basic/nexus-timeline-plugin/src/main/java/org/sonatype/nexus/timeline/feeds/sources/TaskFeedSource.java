@@ -22,6 +22,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 
 @Named(TaskFeedSource.CHANNEL_KEY)
@@ -43,9 +44,40 @@ public class TaskFeedSource
   public void fillInEntries(final List<FeedEvent> entries, final int from, final int count,
                             final Map<String, String> params)
   {
-    entries.addAll(getFeedRecorder()
-        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_TASK), null, from, count,
-            filters(params)
-        ));
+    entries.addAll(
+        getFeedRecorder().getEvents(
+            ImmutableSet.of(FeedRecorder.FAMILY_TASK),
+            null,
+            from,
+            count,
+            new Function<FeedEvent, FeedEvent>()
+            {
+              @Override
+              public FeedEvent apply(final FeedEvent input) {
+                input.setTitle(title(input));
+                return input;
+              }
+            }
+        )
+    );
+  }
+
+  private String title(final FeedEvent evt) {
+    if (FeedRecorder.TASK_STARTED.equals(evt.getEventSubType())) {
+      return "Started: " + evt.getData().get("taskName");
+    }
+    else if (FeedRecorder.TASK_FINISHED.equals(evt.getEventSubType())) {
+      return "Finished: " + evt.getData().get("taskName");
+    }
+    else if (FeedRecorder.TASK_CANCELED.equals(evt.getEventSubType())) {
+      return "Canceled: " + evt.getData().get("taskName");
+    }
+    else if (FeedRecorder.TASK_FAILED.equals(evt.getEventSubType())) {
+      return "Failed: " + evt.getData().get("taskName");
+    }
+    else {
+      // TODO: Some human-readable fallback?
+      return evt.getEventType() + ":" + evt.getEventSubType();
+    }
   }
 }

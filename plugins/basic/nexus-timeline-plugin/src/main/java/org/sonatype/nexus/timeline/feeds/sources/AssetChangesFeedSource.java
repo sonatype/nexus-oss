@@ -24,7 +24,6 @@ import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 
 @Named(AssetChangesFeedSource.CHANNEL_KEY)
 @Singleton
@@ -47,20 +46,18 @@ public class AssetChangesFeedSource
                             final int count,
                             final Map<String, String> params)
   {
-    Iterables.addAll(entries,
-        Iterables.transform(
-            getFeedRecorder().getEvents(
-                ImmutableSet.of(FeedRecorder.FAMILY_ASSET),
-                ImmutableSet.of(
-                    FeedRecorder.ASSET_CACHED,
-                    FeedRecorder.ASSET_DEPLOYED,
-                    FeedRecorder.ASSET_CACHED_UPDATE,
-                    FeedRecorder.ASSET_DEPLOYED_UPDATE,
-                    FeedRecorder.ASSET_DELETED
-                ),
-                from,
-                count,
-                filters(params)),
+    entries.addAll(
+        getFeedRecorder().getEvents(
+            ImmutableSet.of(FeedRecorder.FAMILY_ASSET),
+            ImmutableSet.of(
+                FeedRecorder.ASSET_CACHED,
+                FeedRecorder.ASSET_DEPLOYED,
+                FeedRecorder.ASSET_CACHED_UPDATE,
+                FeedRecorder.ASSET_DEPLOYED_UPDATE,
+                FeedRecorder.ASSET_DELETED
+            ),
+            from,
+            count,
             new Function<FeedEvent, FeedEvent>()
             {
               @Override
@@ -69,7 +66,8 @@ public class AssetChangesFeedSource
                 return input;
               }
             }
-        ));
+        )
+    );
   }
 
   /**

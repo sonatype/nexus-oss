@@ -21,7 +21,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
-import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
@@ -43,63 +42,6 @@ public class PlaintextRenderer
   @Inject
   public PlaintextRenderer(@Named("shared-velocity") final Provider<TemplateEngine> templateEngineProvider) {
     this.templateEngineProvider = checkNotNull(templateEngineProvider);
-  }
-
-  public String getTitle(final FeedEvent evt) {
-    // OOTB provided recorder titles
-    if (FeedRecorder.FAMILY_SYSTEM.equals(evt.getEventType())) {
-      if (FeedRecorder.SYSTEM_BOOT.equals(evt.getEventSubType())) {
-        return "Nexus " + evt.getData().get("bootAction");
-      }
-      else if (FeedRecorder.SYSTEM_CONFIG.equals(evt.getEventSubType())) {
-        return "Configuration change";
-      }
-    }
-
-    if (FeedRecorder.FAMILY_AUTH.equals(evt.getEventType())) {
-      if (FeedRecorder.AUTH_AUTHC.equals(evt.getEventSubType())) {
-        return "Authentication";
-      }
-      else if (FeedRecorder.AUTH_AUTHZ.equals(evt.getEventSubType())) {
-        return "Authorization";
-      }
-    }
-
-    if (FeedRecorder.FAMILY_REPO.equals(evt.getEventType())) {
-      if (FeedRecorder.REPO_CREATED.equals(evt.getEventSubType())) {
-        return "Repository created";
-      }
-      else if (FeedRecorder.REPO_UPDATED.equals(evt.getEventSubType())) {
-        return "Repository updated";
-      }
-      else if (FeedRecorder.REPO_DROPPED.equals(evt.getEventSubType())) {
-        return "Repository dropped";
-      }
-      else if (FeedRecorder.REPO_LSTATUS.equals(evt.getEventSubType())) {
-        return "Repository service state change";
-      }
-      else if (FeedRecorder.REPO_PSTATUS.equals(evt.getEventSubType())) {
-        return "Repository proxy state change";
-      }
-    }
-
-    if (FeedRecorder.FAMILY_TASK.equals(evt.getEventType())) {
-      if (FeedRecorder.TASK_STARTED.equals(evt.getEventSubType())) {
-        return "Started: " + evt.getData().get("taskName");
-      }
-      else if (FeedRecorder.TASK_FINISHED.equals(evt.getEventSubType())) {
-        return "Finished: " + evt.getData().get("taskName");
-      }
-      else if (FeedRecorder.TASK_CANCELED.equals(evt.getEventSubType())) {
-        return "Canceled: " + evt.getData().get("taskName");
-      }
-      else if (FeedRecorder.TASK_FAILED.equals(evt.getEventSubType())) {
-        return "Failed: " + evt.getData().get("taskName");
-      }
-    }
-
-    // TODO: Some human-readable fallback?
-    return evt.getEventType() + ":" + evt.getEventSubType();
   }
 
   public String getContent(final FeedEvent evt) {

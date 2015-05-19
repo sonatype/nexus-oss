@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -52,7 +53,36 @@ public class AuthcAuthzFeedSource
       throws IOException
   {
     feed.addAll(
-        getFeedRecorder().getEvents(ImmutableSet.of(FeedRecorder.FAMILY_AUTH), null, from, count, filters(params)));
+        getFeedRecorder().getEvents(
+            ImmutableSet.of(FeedRecorder.FAMILY_AUTH),
+            null,
+            from,
+            count,
+            new Function<FeedEvent, FeedEvent>()
+            {
+              @Override
+              public FeedEvent apply(final FeedEvent input) {
+                input.setTitle(title(input));
+                return input;
+              }
+            }
+        )
+    );
   }
 
+  /**
+   * Formats entry title for event.
+   */
+  private String title(FeedEvent evt) {
+    if (FeedRecorder.AUTH_AUTHC.equals(evt.getEventSubType())) {
+      return "Authentication";
+    }
+    else if (FeedRecorder.AUTH_AUTHZ.equals(evt.getEventSubType())) {
+      return "Authorization";
+    }
+    else {
+      // TODO: Some human-readable fallback?
+      return evt.getEventType() + ":" + evt.getEventSubType();
+    }
+  }
 }

@@ -22,6 +22,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -50,10 +51,44 @@ public class SystemRepositoryStatusChangesFeedSource
   public void fillInEntries(final List<FeedEvent> entries, final int from, final int count,
                             final Map<String, String> params)
   {
-    entries.addAll(getFeedRecorder()
-        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_REPO),
-            ImmutableSet.of(FeedRecorder.REPO_LSTATUS, FeedRecorder.REPO_PSTATUS), from, count,
-            filters(params)
-        ));
+    entries.addAll(
+        getFeedRecorder().getEvents(
+            ImmutableSet.of(FeedRecorder.FAMILY_REPO),
+            ImmutableSet.of(FeedRecorder.REPO_LSTATUS, FeedRecorder.REPO_PSTATUS),
+            from,
+            count,
+            new Function<FeedEvent, FeedEvent>()
+            {
+              @Override
+              public FeedEvent apply(final FeedEvent input) {
+                input.setTitle(title(input));
+                return input;
+              }
+            }
+        )
+    );
   }
+
+  private String title(FeedEvent evt) {
+    if (FeedRecorder.REPO_CREATED.equals(evt.getEventSubType())) {
+      return "Repository created";
+    }
+    else if (FeedRecorder.REPO_UPDATED.equals(evt.getEventSubType())) {
+      return "Repository updated";
+    }
+    else if (FeedRecorder.REPO_DROPPED.equals(evt.getEventSubType())) {
+      return "Repository dropped";
+    }
+    else if (FeedRecorder.REPO_LSTATUS.equals(evt.getEventSubType())) {
+      return "Repository service state change";
+    }
+    else if (FeedRecorder.REPO_PSTATUS.equals(evt.getEventSubType())) {
+      return "Repository proxy state change";
+    }
+    else {
+      // TODO: Some human-readable fallback?
+      return evt.getEventType() + ":" + evt.getEventSubType();
+    }
+  }
+
 }

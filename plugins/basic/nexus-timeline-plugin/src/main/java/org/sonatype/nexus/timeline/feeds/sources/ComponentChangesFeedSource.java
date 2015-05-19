@@ -25,7 +25,6 @@ import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 
 @Named(ComponentChangesFeedSource.CHANNEL_KEY)
 @Singleton
@@ -49,20 +48,18 @@ public class ComponentChangesFeedSource
                             final int count,
                             final Map<String, String> params)
   {
-    Iterables.addAll(entries,
-        Iterables.transform(
-            getFeedRecorder().getEvents(
-                ImmutableSet.of(FeedRecorder.FAMILY_COMPONENT),
-                ImmutableSet.of(
-                    FeedRecorder.COMPONENT_CACHED,
-                    FeedRecorder.COMPONENT_DEPLOYED,
-                    FeedRecorder.COMPONENT_CACHED_UPDATE,
-                    FeedRecorder.COMPONENT_DEPLOYED_UPDATE,
-                    FeedRecorder.COMPONENT_DELETED
-                ),
-                from,
-                count,
-                filters(params)),
+    entries.addAll(
+        getFeedRecorder().getEvents(
+            ImmutableSet.of(FeedRecorder.FAMILY_COMPONENT),
+            ImmutableSet.of(
+                FeedRecorder.COMPONENT_CACHED,
+                FeedRecorder.COMPONENT_DEPLOYED,
+                FeedRecorder.COMPONENT_CACHED_UPDATE,
+                FeedRecorder.COMPONENT_DEPLOYED_UPDATE,
+                FeedRecorder.COMPONENT_DELETED
+            ),
+            from,
+            count,
             new Function<FeedEvent, FeedEvent>()
             {
               @Override
@@ -83,19 +80,19 @@ public class ComponentChangesFeedSource
         evt.getData().get("componentGroup"),
         evt.getData().get("componentName"),
         evt.getData().get("componentVersion"));
-    if (FeedRecorder.ASSET_CACHED.equals(evt.getEventSubType())) {
+    if (FeedRecorder.COMPONENT_CACHED.equals(evt.getEventSubType())) {
       return "Cached: " + componentName;
     }
-    else if (FeedRecorder.ASSET_CACHED_UPDATE.equals(evt.getEventSubType())) {
+    else if (FeedRecorder.COMPONENT_CACHED_UPDATE.equals(evt.getEventSubType())) {
       return "Cached (update): " + componentName;
     }
-    else if (FeedRecorder.ASSET_DEPLOYED.equals(evt.getEventSubType())) {
+    else if (FeedRecorder.COMPONENT_DEPLOYED.equals(evt.getEventSubType())) {
       return "Deployed: " + componentName;
     }
-    else if (FeedRecorder.ASSET_DEPLOYED_UPDATE.equals(evt.getEventSubType())) {
+    else if (FeedRecorder.COMPONENT_DEPLOYED_UPDATE.equals(evt.getEventSubType())) {
       return "Deployed (update): " + componentName;
     }
-    else if (FeedRecorder.ASSET_DELETED.equals(evt.getEventSubType())) {
+    else if (FeedRecorder.COMPONENT_DELETED.equals(evt.getEventSubType())) {
       return "Deleted: " + componentName;
     }
     else {

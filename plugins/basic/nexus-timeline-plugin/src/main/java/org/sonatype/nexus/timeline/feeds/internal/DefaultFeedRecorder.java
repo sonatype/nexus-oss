@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,7 +31,7 @@ import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.nexus.timeline.internal.EntryRecord;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Predicate;
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -77,8 +78,11 @@ public class DefaultFeedRecorder
   }
 
   @Override
-  public List<FeedEvent> getEvents(final Set<String> types, final Set<String> subTypes, final int from, final int count,
-                                   final Predicate<Entry> filter)
+  public List<FeedEvent> getEvents(@Nullable final Set<String> types,
+                                   @Nullable final Set<String> subTypes,
+                                   final int from,
+                                   final int count,
+                                   @Nullable final Function<FeedEvent, FeedEvent> function)
   {
     final List<FeedEvent> result = Lists.newArrayList();
     // TODO: filter by perms
@@ -99,11 +103,16 @@ public class DefaultFeedRecorder
             rec.getData().get("_link"), // nullable
             data
         );
-        result.add(evt);
+        if (function != null) {
+          result.add(function.apply(evt));
+        }
+        else {
+          result.add(evt);
+        }
         return true;
       }
     };
-    timeline.retrieve(from, count, types, subTypes, filter, callback);
+    timeline.retrieve(from, count, types, subTypes, callback);
     return result;
   }
 }

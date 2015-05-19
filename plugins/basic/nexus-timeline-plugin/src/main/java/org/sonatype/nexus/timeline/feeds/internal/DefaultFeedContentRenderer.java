@@ -25,7 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * The default {@link FeedContentRenderer} honors overrides, and if needed, dispatches to some rendered (for now
  * "plaintext" only).
- * 
+ *
  * @since 3.0
  */
 @Singleton
@@ -54,7 +54,8 @@ public class DefaultFeedContentRenderer
     if (title != null) {
       return title;
     }
-    return plainTextRenderer.getTitle(evt);
+    // TODO: Some human-readable fallback?
+    return evt.getEventType() + ":" + evt.getEventSubType();
   }
 
   @Override

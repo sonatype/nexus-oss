@@ -15,11 +15,10 @@ package org.sonatype.nexus.timeline.feeds.subscribers;
 import java.util.List;
 import java.util.Set;
 
-import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
-import com.google.common.base.Predicate;
+import com.google.common.base.Function;
 
 public class DummyFeedRecorder
     implements FeedRecorder
@@ -37,7 +36,7 @@ public class DummyFeedRecorder
 
   @Override
   public List<FeedEvent> getEvents(final Set<String> types, final Set<String> subtypes, final int from, final int count,
-                                   final Predicate<Entry> filter)
+                                   final Function<FeedEvent, FeedEvent> function)
   {
     return null;
   }

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -28,10 +29,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.common.app.NexusInitializedEvent;
 import org.sonatype.nexus.common.app.NexusStoppedEvent;
 import org.sonatype.nexus.orient.DatabaseInstance;
-import org.sonatype.nexus.orient.DatabaseManager;
-import org.sonatype.nexus.orient.DatabasePool;
 import org.sonatype.nexus.orient.OIndexNameBuilder;
-import org.sonatype.nexus.repository.storage.ComponentDatabase;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineCallback;
@@ -41,6 +39,7 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -98,7 +97,8 @@ public class DefaultTimeline
 
   @Inject
   public DefaultTimeline(final EventBus eventBus,
-                         final @Named(TimelineDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider) {
+                         final @Named(TimelineDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider)
+  {
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
     eventBus.register(this);
   }
@@ -243,56 +243,63 @@ public class DefaultTimeline
   }
 
   @Override
-  public void retrieve(final int fromItem, final int count, final Set<String> types, final Set<String> subTypes,
-                       final Predicate<Entry> filter, final TimelineCallback callback)
+  public void retrieve(final int fromItem,
+                       final int count,
+                       @Nullable final Set<String> types,
+                       @Nullable final Set<String> subTypes,
+                       final TimelineCallback callback)
   {
     if (!isStarted() || count == 0) {
       return;
     }
     try (ODatabaseDocumentTx db = openDb()) {
-      db.begin();
-      try {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("SELECT FROM ").append(DB_CLASS);
-        if ((types != null && !types.isEmpty()) || (subTypes != null && !subTypes.isEmpty())) {
-          sb.append(" WHERE ");
-        }
-        if ((types != null && !types.isEmpty())) {
-          sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] ");
-        }
-        if (subTypes != null && !subTypes.isEmpty()) {
-          if ((types != null && !types.isEmpty())) {
-            sb.append(" AND ");
-          }
-          sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] ");
-        }
-        sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
-
-        log.debug("Query: {}", sb);
-
-        final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(sb.toString());
-
-        final OResultSet<ODocument> results = db.query(query);
-        if (results.isEmpty()) {
-          return;
-        }
-        for (ODocument doc : results) {
-          final EntryRecord record = new EntryRecord((Long) doc.field(P_TIMESTAMP, OType.LONG), (String) doc.field(
-              P_TYPE, OType.STRING), (String) doc.field(P_SUBTYPE, OType.STRING), null);
-          final Map<String, String> attributes = doc.field(P_DATA, OType.EMBEDDEDMAP);
-          record.getData().putAll(attributes);
-          if (!callback.processNext(record)) {
-            break;
-          }
-        }
+      final StringBuilder sb = new StringBuilder();
+      sb.append("SELECT FROM ").append(DB_CLASS);
+      if (!isEmpty(types) || !isEmpty(subTypes)) {
+        sb.append(" WHERE ");
       }
-      finally {
-        db.commit();
+      if (!isEmpty(types)) {
+        sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] ");
+      }
+      if (!isEmpty(subTypes)) {
+        if (!isEmpty(types)) {
+          sb.append(" AND ");
+        }
+        sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] ");
+      }
+      sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
+
+      log.debug("Query: {}", sb);
+
+      final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(sb.toString());
+
+      final OResultSet<ODocument> results = db.query(query);
+      if (results.isEmpty()) {
+        return;
+      }
+      for (ODocument doc : results) {
+        final EntryRecord record = new EntryRecord((Long) doc.field(P_TIMESTAMP, OType.LONG), (String) doc.field(
+            P_TYPE, OType.STRING), (String) doc.field(P_SUBTYPE, OType.STRING), null);
+        final Map<String, String> attributes = doc.field(P_DATA, OType.EMBEDDEDMAP);
+        record.getData().putAll(attributes);
+        if (!callback.processNext(record)) {
+          break;
+        }
       }
     }
     catch (IOException e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  /**
+   * Shortcut method to check nullable sets. Considers null set as empty.
+   */
+  private boolean isEmpty(@Nullable Set<?> set) {
+    if (set == null) {
+      return true;
+    }
+    return set.isEmpty();
   }
 
   /**
