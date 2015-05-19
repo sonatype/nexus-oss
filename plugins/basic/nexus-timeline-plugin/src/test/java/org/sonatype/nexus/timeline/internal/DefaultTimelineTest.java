@@ -19,8 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.sonatype.nexus.orient.MemoryDatabaseManager;
-import org.sonatype.nexus.orient.MinimalDatabaseServer;
+import org.sonatype.nexus.orient.DatabaseInstanceRule;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.TimelineCallback;
@@ -33,11 +32,13 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.inject.util.Providers;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -54,21 +55,14 @@ import static org.mockito.Mockito.mock;
 public class DefaultTimelineTest
     extends TestSupport
 {
-  private MinimalDatabaseServer databaseServer;
-
-  private MemoryDatabaseManager databaseManager;
+  @Rule
+  public DatabaseInstanceRule dbRule = new DatabaseInstanceRule(TimelineDatabase.NAME);
 
   private DefaultTimeline underTest;
 
   @Before
   public void prepare() throws Exception {
-    this.databaseServer = new MinimalDatabaseServer();
-    databaseServer.start();
-
-    this.databaseManager = new MemoryDatabaseManager();
-    databaseManager.start();
-
-    underTest = new DefaultTimeline(mock(EventBus.class), databaseManager);
+    underTest = new DefaultTimeline(mock(EventBus.class), Providers.of(dbRule.getInstance()));
     underTest.start();
     underTest.purgeOlderThan(0);
   }
@@ -78,16 +72,6 @@ public class DefaultTimelineTest
     if (underTest != null) {
       underTest.stop();
       underTest = null;
-    }
-
-    if (databaseManager != null) {
-      databaseManager.stop();
-      databaseManager = null;
-    }
-
-    if (databaseServer != null) {
-      databaseServer.stop();
-      databaseServer = null;
     }
   }
 
@@ -284,7 +268,8 @@ public class DefaultTimelineTest
    * Handy method that does what was done before: keeps all in memory, but this is usable for small amount of data,
    * like these in UT. This should NOT be used in production code, unless you want app that kills itself with OOM.
    */
-  protected List<Entry> asList(int fromItem, int count, Set<String> types, Set<String> subTypes, Predicate<Entry> filter)
+  protected List<Entry> asList(int fromItem, int count, Set<String> types, Set<String> subTypes,
+                               Predicate<Entry> filter)
       throws Exception
   {
     final EntryListCallback result = new EntryListCallback();

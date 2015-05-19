@@ -22,13 +22,16 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.app.NexusInitializedEvent;
 import org.sonatype.nexus.common.app.NexusStoppedEvent;
+import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.DatabasePool;
 import org.sonatype.nexus.orient.OIndexNameBuilder;
+import org.sonatype.nexus.repository.storage.ComponentDatabase;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineCallback;
@@ -67,8 +70,6 @@ public class DefaultTimeline
     extends LifecycleSupport
     implements Timeline
 {
-  private static final String DB_NAME = "timeline";
-
   @VisibleForTesting
   static final String DB_CLASS = "entryrecord";
 
@@ -93,13 +94,12 @@ public class DefaultTimeline
       .property(P_SUBTYPE)
       .build();
 
-  private final DatabaseManager databaseManager;
-
-  private DatabasePool pool;
+  private final Provider<DatabaseInstance> databaseInstanceProvider;
 
   @Inject
-  public DefaultTimeline(final EventBus eventBus, final DatabaseManager databaseManager) {
-    this.databaseManager = checkNotNull(databaseManager);
+  public DefaultTimeline(final EventBus eventBus,
+                         final @Named(TimelineDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider) {
+    this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
     eventBus.register(this);
   }
 
@@ -129,8 +129,7 @@ public class DefaultTimeline
 
   @Override
   public void doStart() throws Exception {
-    try (ODatabaseDocumentTx db = databaseManager.connect(DB_NAME, true)) {
-
+    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().connect()) {
       // entities
       final OSchema schema = db.getMetadata().getSchema();
       if (!schema.existsClass(DB_CLASS)) {
@@ -145,20 +144,12 @@ public class DefaultTimeline
         log.info("Created schema: {}, properties: {}", type, type.properties());
       }
     }
-
-    this.pool = databaseManager.newPool(DB_NAME);
-  }
-
-  @Override
-  public void doStop() throws Exception {
-    pool.close();
-    pool = null;
   }
 
   @VisibleForTesting
   ODatabaseDocumentTx openDb() {
     ensureStarted();
-    return pool.acquire();
+    return databaseInstanceProvider.get().acquire();
   }
 
   // API
