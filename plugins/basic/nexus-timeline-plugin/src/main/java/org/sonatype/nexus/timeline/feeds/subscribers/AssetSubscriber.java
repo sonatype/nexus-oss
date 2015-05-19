@@ -15,7 +15,6 @@ package org.sonatype.nexus.timeline.feeds.subscribers;
 import java.util.Date;
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,6 +25,7 @@ import org.sonatype.nexus.repository.storage.AssetCreatedEvent;
 import org.sonatype.nexus.repository.storage.AssetDeletedEvent;
 import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.AssetUpdatedEvent;
+import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.security.ClientInfo;
 import org.sonatype.nexus.security.ClientInfoProvider;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
@@ -61,10 +61,20 @@ public class AssetSubscriber
   public void onAssetEvent(AssetEvent e) {
     String action;
     if (e instanceof AssetCreatedEvent) {
-      action = FeedRecorder.ITEM_DEPLOYED;
+      if (ProxyType.NAME.equals(e.getRepository().getType().getValue())) {
+        action = FeedRecorder.ITEM_CACHED;
+      }
+      else {
+        action = FeedRecorder.ITEM_DEPLOYED;
+      }
     }
     else if (e instanceof AssetUpdatedEvent) {
-      action = FeedRecorder.ITEM_DEPLOYED_UPDATE;
+      if (ProxyType.NAME.equals(e.getRepository().getType().getValue())) {
+        action = FeedRecorder.ITEM_CACHED_UPDATE;
+      }
+      else {
+        action = FeedRecorder.ITEM_DEPLOYED_UPDATE;
+      }
     }
     else if (e instanceof AssetDeletedEvent) {
       action = FeedRecorder.ITEM_DELETED;
