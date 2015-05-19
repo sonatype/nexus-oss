@@ -29,6 +29,7 @@ import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.rapture.StateContributor;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.hash.Hashing;
@@ -64,6 +65,7 @@ public class StateComponent
     this.stateContributors = checkNotNull(stateContributors);
   }
 
+  @Timed
   @DirectPollMethod(event = "rapture_State_get")
   public StateXO get(final Map<String, String> hashes) {
     StateXO state = new StateXO();
