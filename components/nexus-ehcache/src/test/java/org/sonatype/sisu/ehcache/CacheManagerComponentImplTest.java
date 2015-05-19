@@ -50,7 +50,7 @@ public class CacheManagerComponentImplTest
 
   @Test
   public void testConfigFromClasspath() throws Exception {
-    underTest = new CacheManagerComponentImpl(null);
+    underTest = new CacheManagerComponentImpl((File) null);
     assertConfigurationValid();
   }
 

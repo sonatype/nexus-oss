@@ -19,6 +19,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
+import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.nexus.security.config.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.nexus.security.config.SecurityConfiguration;
 import org.sonatype.nexus.security.config.SecurityConfigurationSource;
@@ -79,6 +80,8 @@ public abstract class AbstractSecurityTest
         RealmConfiguration realmConfiguration = new RealmConfiguration();
         realmConfiguration.setRealmNames(Arrays.asList("MockRealmA", "MockRealmB"));
         bind(RealmConfiguration.class).annotatedWith(Names.named("initial")).toInstance(realmConfiguration);
+
+        bind(ApplicationDirectories.class).toInstance(mock(ApplicationDirectories.class));
 
         requestInjection(AbstractSecurityTest.this);
       }
