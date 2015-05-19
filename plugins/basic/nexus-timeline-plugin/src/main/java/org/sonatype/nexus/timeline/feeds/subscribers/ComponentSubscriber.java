@@ -21,10 +21,10 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.event.Asynchronous;
 import org.sonatype.nexus.common.event.EventSubscriber;
-import org.sonatype.nexus.repository.storage.AssetCreatedEvent;
-import org.sonatype.nexus.repository.storage.AssetDeletedEvent;
-import org.sonatype.nexus.repository.storage.AssetEvent;
-import org.sonatype.nexus.repository.storage.AssetUpdatedEvent;
+import org.sonatype.nexus.repository.storage.ComponentCreatedEvent;
+import org.sonatype.nexus.repository.storage.ComponentDeletedEvent;
+import org.sonatype.nexus.repository.storage.ComponentEvent;
+import org.sonatype.nexus.repository.storage.ComponentUpdatedEvent;
 import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.security.ClientInfo;
 import org.sonatype.nexus.security.ClientInfoProvider;
@@ -38,46 +38,46 @@ import com.google.common.eventbus.Subscribe;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Subscriber listening for asset events.
+ * Subscriber listening for component events.
  *
  * @since 3.0
  */
 @Named
 @Singleton
-public class AssetSubscriber
+public class ComponentSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
   private final ClientInfoProvider clientInfoProvider;
 
   @Inject
-  public AssetSubscriber(final FeedRecorder feedRecorder, final ClientInfoProvider clientInfoProvider) {
+  public ComponentSubscriber(final FeedRecorder feedRecorder, final ClientInfoProvider clientInfoProvider) {
     super(feedRecorder);
     this.clientInfoProvider = checkNotNull(clientInfoProvider);
   }
 
   @Subscribe
   @AllowConcurrentEvents
-  public void onEvent(AssetEvent e) {
+  public void onEvent(ComponentEvent e) {
     String action;
-    if (e instanceof AssetCreatedEvent) {
+    if (e instanceof ComponentCreatedEvent) {
       if (ProxyType.NAME.equals(e.getRepository().getType().getValue())) {
-        action = FeedRecorder.ASSET_CACHED;
+        action = FeedRecorder.COMPONENT_CACHED;
       }
       else {
-        action = FeedRecorder.ASSET_DEPLOYED;
+        action = FeedRecorder.COMPONENT_DEPLOYED;
       }
     }
-    else if (e instanceof AssetUpdatedEvent) {
+    else if (e instanceof ComponentUpdatedEvent) {
       if (ProxyType.NAME.equals(e.getRepository().getType().getValue())) {
-        action = FeedRecorder.ASSET_CACHED_UPDATE;
+        action = FeedRecorder.COMPONENT_CACHED_UPDATE;
       }
       else {
-        action = FeedRecorder.ASSET_DEPLOYED_UPDATE;
+        action = FeedRecorder.COMPONENT_DEPLOYED_UPDATE;
       }
     }
-    else if (e instanceof AssetDeletedEvent) {
-      action = FeedRecorder.ASSET_DELETED;
+    else if (e instanceof ComponentDeletedEvent) {
+      action = FeedRecorder.COMPONENT_DELETED;
     }
     else {
       return;
@@ -90,17 +90,19 @@ public class AssetSubscriber
     final Map<String, String> data = Maps.newHashMap();
     // map is for display/templating purposes
     putIfNotNull(data, "repoName", e.getRepository().getName());
-    putIfNotNull(data, "assetName", e.getAsset().name());
+    putIfNotNull(data, "componentGroup", e.getComponent().group());
+    putIfNotNull(data, "componentName", e.getComponent().name());
+    putIfNotNull(data, "componentVersion", e.getComponent().version());
     putIfNotNull(data, "userId", clientInfo == null ? "n/a" : clientInfo.getUserid());
     putIfNotNull(data, "userIp", clientInfo == null ? "n/a" : clientInfo.getRemoteIP());
     putIfNotNull(data, "userUa", clientInfo == null ? "n/a" : clientInfo.getUserAgent());
     // feed event is persisted, is searchable/filterable by these properties
     final FeedEvent fe = new FeedEvent(
-        FeedRecorder.FAMILY_ASSET,
+        FeedRecorder.FAMILY_COMPONENT,
         action,
         new Date(),
         clientInfo == null ? "SYSTEM" : (clientInfo.getUserid() == null ? "unknown" : clientInfo.getUserid()),
-        "/repository/" + e.getRepository().getName() + e.getAsset().name(),
+        "/repository/" + e.getRepository().getName() + e.getComponent().name(),
         data
     );
     getFeedRecorder().addEvent(fe);

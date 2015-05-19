@@ -83,37 +83,6 @@ public class PlaintextRenderer
       }
     }
 
-    if (FeedRecorder.FAMILY_ITEM.equals(evt.getEventType())) {
-      final String itemPath = evt.getData().get("itemPath");
-      if (FeedRecorder.ITEM_RETRIEVED.equals(evt.getEventSubType())) {
-        return "Retrieved: " + itemPath;
-      }
-      else if (FeedRecorder.ITEM_CACHED.equals(evt.getEventSubType())) {
-        return "Cached: " + itemPath;
-      }
-      else if (FeedRecorder.ITEM_CACHED_UPDATE.equals(evt.getEventSubType())) {
-        return "Cached (update): " + itemPath;
-      }
-      else if (FeedRecorder.ITEM_DEPLOYED.equals(evt.getEventSubType())) {
-        return "Deployed: " + itemPath;
-      }
-      else if (FeedRecorder.ITEM_DEPLOYED_UPDATE.equals(evt.getEventSubType())) {
-        return "Deployed (update): " + itemPath;
-      }
-      else if (FeedRecorder.ITEM_DELETED.equals(evt.getEventSubType())) {
-        return "Deleted: " + itemPath;
-      }
-      else if (FeedRecorder.ITEM_BROKEN.equals(evt.getEventSubType())) {
-        return "Validation failure: " + itemPath;
-      }
-      else if (FeedRecorder.ITEM_BROKEN_INVALID_CONTENT.equals(evt.getEventSubType())) {
-        return "Invalid content: " + itemPath;
-      }
-      else if (FeedRecorder.ITEM_BROKEN_WRONG_REMOTE_CHECKSUM.equals(evt.getEventSubType())) {
-        return "Invalid checksum: " + itemPath;
-      }
-    }
-
     if (FeedRecorder.FAMILY_TASK.equals(evt.getEventType())) {
       if (FeedRecorder.TASK_STARTED.equals(evt.getEventSubType())) {
         return "Started: " + evt.getData().get("taskName");

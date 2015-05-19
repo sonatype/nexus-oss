@@ -10,4 +10,4 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
-Re-deployed $itemPath in hosted repository $repoId ($repoName). Deployed by $userId (IP=$userIp, UA=$userUa)
+Re-deployed $componentGroup:$componentName:$componentVersion in hosted repository $repoName. Initiated by $userId (IP=$userIp, UA=$userUa)

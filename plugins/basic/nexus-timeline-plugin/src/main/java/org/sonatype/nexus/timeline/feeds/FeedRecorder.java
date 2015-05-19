@@ -62,25 +62,31 @@ public interface FeedRecorder
 
   // ==
 
-  String FAMILY_ITEM = "item";
+  String FAMILY_ASSET = "asset";
 
-  String ITEM_CACHED = "cached";
+  String ASSET_CACHED = "cached";
 
-  String ITEM_CACHED_UPDATE = "cachedU";
+  String ASSET_CACHED_UPDATE = "cachedU";
 
-  String ITEM_DEPLOYED = "deployed";
+  String ASSET_DEPLOYED = "deployed";
 
-  String ITEM_DEPLOYED_UPDATE = "deployedU";
+  String ASSET_DEPLOYED_UPDATE = "deployedU";
 
-  String ITEM_DELETED = "deleted";
+  String ASSET_DELETED = "deleted";
 
-  String ITEM_RETRIEVED = "retrieved";
+  // ==
 
-  String ITEM_BROKEN = "broken";
+  String FAMILY_COMPONENT = "component";
 
-  String ITEM_BROKEN_WRONG_REMOTE_CHECKSUM = "brokenWRC";
+  String COMPONENT_CACHED = "cached";
 
-  String ITEM_BROKEN_INVALID_CONTENT = "brokenIC";
+  String COMPONENT_CACHED_UPDATE = "cachedU";
+
+  String COMPONENT_DEPLOYED = "deployed";
+
+  String COMPONENT_DEPLOYED_UPDATE = "deployedU";
+
+  String COMPONENT_DELETED = "deleted";
 
   // ==
 
@@ -98,6 +104,9 @@ public interface FeedRecorder
 
   void addEvent(FeedEvent entry);
 
-  List<FeedEvent> getEvents(Set<String> types, Set<String> subtypes, int from, int count,
+  List<FeedEvent> getEvents(Set<String> types,
+                            Set<String> subtypes,
+                            int from,
+                            int count,
                             Predicate<Entry> filter);
 }
