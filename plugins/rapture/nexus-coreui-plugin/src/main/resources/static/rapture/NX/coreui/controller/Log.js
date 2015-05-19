@@ -175,7 +175,10 @@ Ext.define('NX.coreui.controller.Log', {
         interval: period * 1000
       });
       me.retrieveLogTask.start();
+
+      //<if debug>
       me.logDebug('Started refreshing log every ' + period + ' seconds');
+      //</if>
     }
   },
 
@@ -189,7 +192,10 @@ Ext.define('NX.coreui.controller.Log', {
     if (me.retrieveLogTask) {
       me.retrieveLogTask.destroy();
       delete me.retrieveLogTask;
+
+      //<if debug>
       me.logDebug('Stopped refreshing log');
+      //</if>
     }
   },
 
@@ -207,7 +213,9 @@ Ext.define('NX.coreui.controller.Log', {
 
       me.getContent().getEl().mask(NX.I18n.get('ADMIN_LOG_VIEWER_LOAD_MASK'));
 
+      //<if debug>
       me.logDebug('Retrieving last ' + size + 'kb from log');
+      //</if>
 
       Ext.Ajax.request({
         url: NX.util.Url.urlOf('service/siesta/logging/log'),

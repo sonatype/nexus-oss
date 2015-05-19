@@ -276,7 +276,10 @@ Ext.define('NX.coreui.controller.Repositories', {
         scope: me
       }
     });
+
+    //<if debug>
     me.logDebug('Repository status pooling started');
+    //</if>
   },
 
   /**
@@ -289,7 +292,10 @@ Ext.define('NX.coreui.controller.Repositories', {
     if (me.statusProvider) {
       me.statusProvider.disconnect();
     }
+
+    //<if debug>
     me.logDebug('Repository status pooling stopped');
+    //</if>
   },
 
   /**
