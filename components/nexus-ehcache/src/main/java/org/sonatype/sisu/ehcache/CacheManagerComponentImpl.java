@@ -51,7 +51,7 @@ public class CacheManagerComponentImpl
 
   @Inject
   public CacheManagerComponentImpl(final ApplicationDirectories directories) throws IOException {
-    this(directories.getAppDirectory("etc/ehcache.xml"));
+    this(new File(directories.getAppDirectory("etc"), "ehcache.xml"));
   }
 
   @VisibleForTesting
