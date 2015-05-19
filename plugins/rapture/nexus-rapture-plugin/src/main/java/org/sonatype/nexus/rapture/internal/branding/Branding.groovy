@@ -35,6 +35,9 @@ class Branding
 {
   private BrandingCapabilityConfiguration config
 
+  // FIXME: This will perform interpolation (when configured) each poll,
+  // FIXME: ... but is needed due to interpolation of baseUrl which can change
+
   @Override
   Map<String, Object> getState() {
     if (config) {
