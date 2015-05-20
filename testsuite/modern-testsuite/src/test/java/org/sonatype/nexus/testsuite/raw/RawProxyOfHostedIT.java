@@ -47,8 +47,6 @@ public class RawProxyOfHostedIT
 
   private Repository hostedRepo;
 
-  private Repository proxyRepo;
-
   @Before
   public void setUpRepositories() throws Exception {
     hostedRepo = createRepository(hostedConfig("raw-test-hosted"));
@@ -57,6 +55,7 @@ public class RawProxyOfHostedIT
     URL hostedRepoUrl = repositoryBaseUrl(hostedRepo);
     final Configuration proxyConfig = proxyConfig("raw-test-proxy", hostedRepoUrl.toExternalForm());
     proxyClient = client(createRepository(proxyConfig));
+    Repository proxyRepo = createRepository(proxyConfig);
   }
 
   @Test
@@ -75,8 +74,6 @@ public class RawProxyOfHostedIT
   public void fetchFromRemote() throws Exception {
     final File testFile = resolveTestFile(TEST_CONTENT);
     hostedClient.put(TEST_PATH, testFile);
-
-    final HttpResponse httpResponse = proxyClient.get(TEST_PATH);
 
     final byte[] bytes = proxyClient.getBytes(TEST_PATH);
     assertThat(bytes, is(Files.toByteArray(testFile)));
