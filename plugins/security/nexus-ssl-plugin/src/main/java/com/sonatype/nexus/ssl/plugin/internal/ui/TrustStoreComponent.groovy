@@ -24,6 +24,7 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
 
+import com.sonatype.nexus.ssl.plugin.PemCertificate
 import com.sonatype.nexus.ssl.plugin.TrustStore
 
 import org.sonatype.nexus.extdirect.DirectComponent
@@ -37,6 +38,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
 
 import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.calculateFingerprint
@@ -69,15 +71,15 @@ extends DirectComponentSupport
 
   /**
    * Creates a certificate.
-   * @param pem to be created
+   * @param pem certificate in PEM format
    * @return created certificate
    */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:ssl-truststore:create')
-  @Validate(groups = [Create.class, Default.class])
-  CertificateXO create(final @NotNull @Valid CertificatePemXO pem) {
-    Certificate certificate = CertificateUtil.decodePEMFormattedCertificate(pem.value)
+  @Validate
+  CertificateXO create(final @NotBlank @PemCertificate String pem) {
+    Certificate certificate = CertificateUtil.decodePEMFormattedCertificate(pem)
     trustStore.importTrustCertificate(certificate, calculateFingerprint(certificate))
     return asCertificateXO(certificate, true);
   }
