@@ -65,10 +65,14 @@ public class FormatClientSupport
    * GET a response from the repository.
    */
   public HttpResponse get(final String path) throws IOException {
-
     final URI uri = resolve(path);
     final HttpGet get = new HttpGet(uri);
     return execute(get);
+  }
+
+  @NotNull
+  protected URI resolve(final String path) {
+    return repositoryBaseUri.resolve(path);
   }
 
   protected HttpResponse execute(final HttpUriRequest request) throws IOException {
@@ -76,11 +80,6 @@ public class FormatClientSupport
     final HttpResponse response = httpClient.execute(request, httpClientContext);
     log.info("Received {}", response);
     return response;
-  }
-
-  @NotNull
-  protected URI resolve(final String path) {
-    return repositoryBaseUri.resolve(path);
   }
 
   public static int status(HttpResponse response) {
