@@ -21,6 +21,7 @@ import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
+import com.sonatype.nexus.ssl.plugin.PemCertificate
 import com.sonatype.nexus.ssl.plugin.TrustStore
 import com.sonatype.nexus.ssl.plugin.internal.CertificateRetriever
 
@@ -30,6 +31,7 @@ import org.sonatype.nexus.validation.Validate
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
 
 import static com.sonatype.nexus.ssl.plugin.internal.ui.TrustStoreComponent.asCertificateXO
@@ -86,13 +88,13 @@ extends DirectComponentSupport
 
   /**
    * Retrieves certificate given a certificate pem.
-   * @param pem to get details from
+   * @param pem certificate in PEM format
    * @return certificate
    */
   @DirectMethod
   @Validate
-  CertificateXO details(final @NotNull @Valid CertificatePemXO pem) {
-    Certificate certificate = decodePEMFormattedCertificate(pem.getValue())
+  CertificateXO details(final @NotBlank @PemCertificate String pem) {
+    Certificate certificate = decodePEMFormattedCertificate(pem)
     return asCertificateXO(certificate, isInTrustStore(certificate))
   }
 

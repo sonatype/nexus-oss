@@ -19,6 +19,7 @@ import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
+import org.sonatype.nexus.common.text.Strings2
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.httpclient.HttpClientManager
@@ -70,6 +71,7 @@ class HttpSettingsComponent
     HttpSettingsXO result = new HttpSettingsXO()
 
     value.connection?.with {
+      result.userAgentSuffix = userAgentSuffix
       result.timeout = timeout
       result.retries = maximumRetries
     }
@@ -148,6 +150,10 @@ class HttpSettingsComponent
         result.connection = new ConnectionConfiguration()
       }
       return result.connection
+    }
+
+    if (!Strings2.isBlank(value.userAgentSuffix)) {
+      connection().userAgentSuffix = value.userAgentSuffix
     }
 
     if (value.timeout != null) {

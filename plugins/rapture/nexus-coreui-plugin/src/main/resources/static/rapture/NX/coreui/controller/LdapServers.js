@@ -426,7 +426,8 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Verify LDAP user mapping.
    */
   verifyUserMapping: function(button) {
-    var form = button.up('form'),
+    var me = this,
+        form = button.up('form'),
         values = form.getForm().getFieldValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
