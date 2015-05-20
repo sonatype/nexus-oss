@@ -56,7 +56,7 @@ class Shoes4Scenario
     nexus "shoes-swt-${version}.gem"
     nexus "shoes-${version}.gem"
     // install them
-    gem(['install', 'shoes'])
+    gem(['install', 'shoes', '--version', "${version}"])
 
     assertThat(lastOutFile, FileMatchers.contains("Successfully installed shoes-${version}"))
   }
