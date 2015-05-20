@@ -28,6 +28,7 @@ import org.sonatype.nexus.httpclient.internal.NexusHttpRoutePlanner;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.net.HttpHeaders;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -36,6 +37,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.apache.http.client.config.AuthSchemes.BASIC;
 import static org.apache.http.client.config.AuthSchemes.DIGEST;
 import static org.apache.http.client.config.AuthSchemes.NTLM;
@@ -88,7 +90,10 @@ public class ConfigurationCustomizer
       plan.getClient().setRetryHandler(new StandardHttpRequestRetryHandler(connection.getMaximumRetries(), false));
     }
 
-    // TODO: user-agent (and/or custom headers?)
+    if (connection.getUserAgentSuffix() != null) {
+      checkState(plan.getUserAgent() != null, "Default User-Agent not set");
+      plan.getHeaders().put(HttpHeaders.USER_AGENT, plan.getUserAgent() + " " + connection.getUserAgentSuffix());
+    }
 
     if (Boolean.TRUE.equals(connection.getUseTrustStore())) {
       plan.getAttributes().put(SSLContextSelector.USE_TRUST_STORE, Boolean.TRUE);

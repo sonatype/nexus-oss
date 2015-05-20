@@ -53,6 +53,9 @@ public class HttpClientPlan
   @Nullable
   private CredentialsProvider credentials;
 
+  @Nullable
+  private String userAgent;
+
   public HttpClientPlan() {
     this.client = HttpClientBuilder.create();
     this.connection = ConnectionConfig.copy(ConnectionConfig.DEFAULT);
@@ -98,6 +101,11 @@ public class HttpClientPlan
   public CredentialsProvider getCredentials() {
     return credentials;
   }
+
+  @Nullable
+  public String getUserAgent() { return userAgent; }
+
+  public void setUserAgent(@Nullable final String userAgent) { this.userAgent = userAgent; }
 
   //
   // Customizer

@@ -25,13 +25,15 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class HttpSettingsXO
 {
-  String userAgentCustomisation
+  String userAgentSuffix
 
   /**
    * Timeout seconds.
    */
+
   @Min(0L)
-  @Max(3600L) // 1 hour
+  @Max(3600L)
+  // 1 hour
   Integer timeout
 
   @Min(0L)
@@ -41,6 +43,7 @@ class HttpSettingsXO
   // HTTP proxy
 
   Boolean httpEnabled
+
   String httpHost
 
   @Min(1L)
@@ -50,14 +53,19 @@ class HttpSettingsXO
   // HTTP proxy-authentication
 
   Boolean httpAuthEnabled
+
   String httpAuthUsername
+
   String httpAuthPassword
+
   String httpAuthNtlmHost
+
   String httpAuthNtlmDomain
 
   // HTTPS proxy
 
   Boolean httpsEnabled
+
   String httpsHost
 
   @Min(1L)
@@ -67,9 +75,13 @@ class HttpSettingsXO
   // HTTPS proxy-authentication
 
   Boolean httpsAuthEnabled
+
   String httpsAuthUsername
+
   String httpsAuthPassword
+
   String httpsAuthNtlmHost
+
   String httpsAuthNtlmDomain
 
   // HTTP[S] non-proxy hosts

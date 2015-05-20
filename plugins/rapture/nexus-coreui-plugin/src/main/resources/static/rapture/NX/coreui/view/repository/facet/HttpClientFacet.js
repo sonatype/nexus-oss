@@ -110,9 +110,9 @@ Ext.define('NX.coreui.view.repository.facet.HttpClientFacet', {
             items: [
               {
                 xtype: 'textfield',
-                name: 'attributes.httpclient.connection.userAgentCustomisation',
-                fieldLabel: NX.I18n.get('ADMIN_HTTP_CUSTOMIZATION'),
-                helpText: NX.I18n.get('ADMIN_HTTP_CUSTOMIZATION_HELP')
+                name: 'attributes.httpclient.connection.userAgentSuffix',
+                fieldLabel: NX.I18n.get('ADMIN_HTTP_USER_AGENT_SUFFIX'),
+                helpText: NX.I18n.get('ADMIN_HTTP_USER_AGENT_SUFFIX_HELP')
               },
               {
                 xtype: 'numberfield',
