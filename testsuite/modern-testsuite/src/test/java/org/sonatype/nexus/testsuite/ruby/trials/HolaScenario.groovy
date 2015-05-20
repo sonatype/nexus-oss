@@ -52,7 +52,7 @@ class HolaScenario
     // this is how gem file will be named
     nexus("hola-${gemFileVersion}.gem")
     // install it
-    gem(['install', 'hola'])
+    gem(['install', 'hola', '--pre'])
 
     assertThat(lastOutFile, FileMatchers.contains("Successfully installed hola-${gemFileVersion}"))
   }
