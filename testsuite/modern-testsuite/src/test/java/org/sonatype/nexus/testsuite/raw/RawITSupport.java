@@ -18,6 +18,9 @@ import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.raw.internal.RawGroupRecipe;
+
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.raw.internal.RawHostedRecipe;
 import org.sonatype.nexus.repository.raw.internal.RawProxyRecipe;
 import org.sonatype.nexus.repository.storage.WritePolicy;
