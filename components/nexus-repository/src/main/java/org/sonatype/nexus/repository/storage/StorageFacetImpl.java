@@ -26,11 +26,14 @@ import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardAspect;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.types.HostedType;
+import org.sonatype.nexus.security.ClientInfo;
+import org.sonatype.nexus.security.ClientInfoProvider;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
@@ -61,6 +64,10 @@ public class StorageFacetImpl
 
   private final AssetEntityAdapter assetEntityAdapter;
 
+  private final MimeSupport mimeSupport;
+
+  private final ClientInfoProvider clientInfoProvider;
+
   private final List<Supplier<StorageTxHook>> hookSuppliers;
 
   @VisibleForTesting
@@ -75,11 +82,14 @@ public class StorageFacetImpl
     @NotNull(groups = HostedType.ValidationGroup.class)
     public WritePolicy writePolicy;
 
+    public boolean strictContentTypeValidation = false;
+
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
           "blobStoreName='" + blobStoreName + '\'' +
           ", writePolicy=" + writePolicy +
+          ", strictContentTypeValidation=" + strictContentTypeValidation +
           '}';
     }
   }
@@ -95,7 +105,9 @@ public class StorageFacetImpl
                           final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
                           final BucketEntityAdapter bucketEntityAdapter,
                           final ComponentEntityAdapter componentEntityAdapter,
-                          final AssetEntityAdapter assetEntityAdapter)
+                          final AssetEntityAdapter assetEntityAdapter,
+                          final MimeSupport mimeSupport,
+                          final ClientInfoProvider clientInfoProvider)
   {
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
@@ -103,6 +115,8 @@ public class StorageFacetImpl
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
+    this.mimeSupport = checkNotNull(mimeSupport);
+    this.clientInfoProvider = checkNotNull(clientInfoProvider);
 
     this.hookSuppliers = new ArrayList<>();
     this.hookSuppliers.add(new Supplier<StorageTxHook>()
@@ -194,9 +208,24 @@ public class StorageFacetImpl
     for (Supplier<StorageTxHook> hookSupplier : hookSuppliers) {
       hooks.add(hookSupplier.get());
     }
+    String txPrincipalName = "system";
+    ClientInfo clientInfo = clientInfoProvider.getCurrentThreadClientInfo();
+    if (clientInfo != null && clientInfo.getUserid() != null) {
+      txPrincipalName = clientInfo.getUserid();
+    }
     return StateGuardAspect.around(new StorageTxImpl(
-        new BlobTx(blobStore), databaseInstanceProvider.get().acquire(), bucket, config.writePolicy,
-        writePolicySelector, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(hooks)
+        new BlobTx(blobStore),
+        databaseInstanceProvider.get().acquire(),
+        bucket,
+        config.writePolicy,
+        writePolicySelector,
+        bucketEntityAdapter,
+        componentEntityAdapter,
+        assetEntityAdapter,
+        mimeSupport,
+        config.strictContentTypeValidation,
+        txPrincipalName,
+        new StorageTxHooks(hooks)
     ));
   }
 

@@ -16,19 +16,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.common.io.TempStreamSupplier;
-import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
-import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -41,7 +37,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
@@ -57,8 +52,6 @@ public class RawContentFacetImpl
     implements RawContentFacet
 {
   private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(MD5, SHA1);
-
-  private final MimeSupport mimeSupport;
 
   @VisibleForTesting
   static final String CONFIG_KEY = "rawContent";
@@ -79,9 +72,8 @@ public class RawContentFacetImpl
   private Config config;
 
   @Inject
-  public RawContentFacetImpl(final MimeSupport mimeSupport)
+  public RawContentFacetImpl()
   {
-    this.mimeSupport = checkNotNull(mimeSupport);
   }
 
   @Override
@@ -140,49 +132,17 @@ public class RawContentFacetImpl
         asset = tx.firstAsset(component);
       }
 
-      // TODO: Figure out created-by header
-      final ImmutableMap<String, String> headers = ImmutableMap
-          .of(BlobStore.BLOB_NAME_HEADER, path, BlobStore.CREATED_BY_HEADER, "unknown");
-
-      try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
-        try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
-          tx.setBlob(is1, headers, asset, hashAlgorithms, determineContentType(path, is2, content.getContentType()));
-        }
-      }
-
+      tx.setBlob(
+          path,
+          content.openInputStream(),
+          ImmutableMap.<String, String>of(),
+          asset,
+          hashAlgorithms,
+          content.getContentType()
+      );
       tx.saveAsset(asset);
       tx.commit();
     }
-  }
-
-  /**
-   * Determines or confirms the content type for the content, or throws {@link InvalidContentException} if it cannot.
-   */
-  @Nonnull
-  private String determineContentType(final String path, final InputStream is, final String declaredContentType)
-      throws IOException {
-    String contentType = declaredContentType;
-
-    if (contentType == null) {
-      log.trace("Content PUT to {} has no content type", path);
-      contentType = mimeSupport.detectMimeType(is, path);
-      log.trace("Mime support implies content type {}", contentType);
-
-      if (contentType == null && config.strictContentTypeValidation) {
-        throw new InvalidContentException("Content type could not be determined.");
-      }
-    }
-    else {
-      final List<String> types = mimeSupport.detectMimeTypes(is, path);
-      if (!types.isEmpty() && !types.contains(contentType)) {
-        log.debug("Discovered content type {} ", types.get(0));
-        if (config.strictContentTypeValidation) {
-          throw new InvalidContentException(
-              String.format("Declared content type %s, but declared %s.", contentType, types.get(0)));
-        }
-      }
-    }
-    return contentType;
   }
 
   private String getGroup(String path) {

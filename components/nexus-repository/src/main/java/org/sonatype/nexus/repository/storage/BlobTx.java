@@ -48,7 +48,8 @@ class BlobTx
     this.blobStore = checkNotNull(blobStore);
   }
 
-  public AssetBlob create(final InputStream inputStream,
+  public AssetBlob create(final String blobName,
+                          final InputStream inputStream,
                           final Map<String, String> headers,
                           final Iterable<HashAlgorithm> hashAlgorithms,
                           final String contentType)
@@ -56,7 +57,7 @@ class BlobTx
     final MultiHashingInputStream hashingStream = new MultiHashingInputStream(hashAlgorithms, inputStream);
     Blob blob = blobStore.create(hashingStream, headers);
     BlobRef blobRef = new BlobRef("NODE", "STORE", blob.getId().asUniqueString());
-    AssetBlob assetBlob = new AssetBlob(blobRef, hashingStream.count(), contentType, hashingStream.hashes());
+    AssetBlob assetBlob = new AssetBlob(blobName, blobRef, hashingStream.count(), contentType, hashingStream.hashes());
     newlyCreatedBlobs.add(assetBlob);
     return assetBlob;
   }

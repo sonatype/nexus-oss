@@ -30,6 +30,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AssetBlob
 {
+  private final String blobName;
+
   private final BlobRef blobRef;
 
   private final long size;
@@ -40,11 +42,13 @@ public class AssetBlob
 
   private boolean attached;
 
-  public AssetBlob(final BlobRef blobRef,
+  public AssetBlob(final String blobName,
+                   final BlobRef blobRef,
                    final long size,
                    final String contentType,
                    final Map<HashAlgorithm, HashCode> hashes)
   {
+    this.blobName = checkNotNull(blobName);
     this.blobRef = checkNotNull(blobRef);
     this.size = size;
     this.contentType = checkNotNull(contentType);
@@ -58,6 +62,11 @@ public class AssetBlob
 
   void setAttached(final boolean attached) {
     this.attached = attached;
+  }
+
+  @Nonnull
+  public String getBlobName() {
+    return blobName;
   }
 
   @Nonnull

@@ -12,8 +12,10 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -22,18 +24,24 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
+import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuard;
 import org.sonatype.nexus.common.stateguard.StateGuardAware;
 import org.sonatype.nexus.common.stateguard.Transitions;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.IllegalOperationException;
+import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -77,6 +85,12 @@ public class StorageTxImpl
 
   private final AssetEntityAdapter assetEntityAdapter;
 
+  private final MimeSupport mimeSupport;
+
+  private final boolean strictContentTypeValidation;
+
+  private final String txPrincipalName;
+
   private final StorageTxHook hook;
 
   public StorageTxImpl(final BlobTx blobTx,
@@ -87,6 +101,9 @@ public class StorageTxImpl
                        final BucketEntityAdapter bucketEntityAdapter,
                        final ComponentEntityAdapter componentEntityAdapter,
                        final AssetEntityAdapter assetEntityAdapter,
+                       final MimeSupport mimeSupport,
+                       final boolean strictContentTypeValidation,
+                       final String txPrincipalName,
                        final StorageTxHook hook)
   {
     this.blobTx = checkNotNull(blobTx);
@@ -97,6 +114,9 @@ public class StorageTxImpl
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
+    this.mimeSupport = checkNotNull(mimeSupport);
+    this.strictContentTypeValidation = strictContentTypeValidation;
+    this.txPrincipalName = checkNotNull(txPrincipalName);
     this.hook = checkNotNull(hook);
 
     db.begin(TXTYPE.OPTIMISTIC);
@@ -396,24 +416,69 @@ public class StorageTxImpl
 
   @Override
   @Guarded(by = OPEN)
-  public AssetBlob createBlob(final InputStream inputStream,
-                               final Map<String, String> headers,
-                               final Iterable<HashAlgorithm> hashAlgorithms,
-                               final String contentType)
+  public AssetBlob createBlob(final String blobName,
+                              final InputStream inputStream,
+                              final Map<String, String> headers,
+                              final Iterable<HashAlgorithm> hashAlgorithms,
+                              @Nullable final String declaredDontentType) throws IOException
   {
+    checkNotNull(blobName);
     checkNotNull(inputStream);
     checkNotNull(headers);
     checkNotNull(hashAlgorithms);
-    checkNotNull(contentType);
 
     if (writePolicy == WritePolicy.DENY) {
       throw new IllegalOperationException("Repository is read only.");
     }
 
-    ImmutableMap.Builder<String, String> storageHeaders = ImmutableMap.builder();
-    storageHeaders.put(Bucket.REPO_NAME_HEADER, bucket.repositoryName());
-    storageHeaders.putAll(headers);
-    return blobTx.create(inputStream, storageHeaders.build(), hashAlgorithms, contentType);
+    try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
+      final String contentType = determineContentType(blobName, supplier, declaredDontentType);
+
+      ImmutableMap.Builder<String, String> storageHeaders = ImmutableMap.builder();
+      storageHeaders.put(Bucket.REPO_NAME_HEADER, bucket.repositoryName());
+      storageHeaders.put(BlobStore.BLOB_NAME_HEADER, blobName);
+      storageHeaders.put(BlobStore.CREATED_BY_HEADER, txPrincipalName);
+      storageHeaders.put(BlobStore.CONTENT_TYPE_HEADER, contentType);
+      storageHeaders.putAll(headers);
+      return blobTx.create(blobName, supplier.get(), storageHeaders.build(), hashAlgorithms, contentType);
+    }
+  }
+
+  /**
+   * Determines or confirms the content type for the content, or throws {@link InvalidContentException} if it cannot.
+   */
+  @Nonnull
+  private String determineContentType(final String blobName,
+                                      final Supplier<InputStream> inputStreamSupplier,
+                                      @Nullable final String declaredContentType)
+      throws IOException
+  {
+    String contentType = declaredContentType;
+
+    if (contentType == null) {
+      log.trace("Content of BLOB {} has no content type.", blobName);
+      try (InputStream is = inputStreamSupplier.get()) {
+        contentType = mimeSupport.detectMimeType(is, blobName);
+      }
+      log.trace("Mime support implies content type {}", contentType);
+
+      if (contentType == null && strictContentTypeValidation) {
+        throw new InvalidContentException("Content type of BLOB could not be determined: " + blobName);
+      }
+    }
+    else {
+      try (InputStream is = inputStreamSupplier.get()) {
+        final List<String> types = mimeSupport.detectMimeTypes(is, blobName);
+        if (!types.isEmpty() && !types.contains(contentType)) {
+          log.debug("Discovered BLOB {} content type {} ", blobName, types);
+          if (strictContentTypeValidation) {
+            throw new InvalidContentException(
+                String.format("Declared BLOB %s content type %s, but discovered %s.", blobName, contentType, types));
+          }
+        }
+      }
+    }
+    return contentType;
   }
 
   @Override
@@ -432,7 +497,8 @@ public class StorageTxImpl
     BlobRef oldBlobRef = asset.blobRef();
     if (oldBlobRef != null) {
       if (effectiveWritePolicy == WritePolicy.ALLOW_ONCE) {
-        throw new IllegalOperationException("Repository does not allow updating assets: " + getBucket().repositoryName());
+        throw new IllegalOperationException(
+            "Repository does not allow updating assets: " + getBucket().repositoryName());
       }
       deleteBlob(oldBlobRef, effectiveWritePolicy);
     }
@@ -451,7 +517,8 @@ public class StorageTxImpl
   }
 
   @Override
-  public BlobRef setBlob(final InputStream inputStream, final Map<String, String> headers, final Asset asset,
+  public BlobRef setBlob(final String blobName, final InputStream inputStream, final Map<String, String> headers,
+                         final Asset asset,
                          final Iterable<HashAlgorithm> hashAlgorithms, final String contentType)
   {
     checkNotNull(asset);
@@ -463,9 +530,14 @@ public class StorageTxImpl
         throw new IllegalOperationException("Repository does not allow updating assets.");
       }
     }
-    final AssetBlob assetBlob = createBlob(inputStream, headers, hashAlgorithms, contentType);
-    attachBlob(asset, assetBlob);
-    return assetBlob.getBlobRef();
+    try {
+      final AssetBlob assetBlob = createBlob(blobName, inputStream, headers, hashAlgorithms, contentType);
+      attachBlob(asset, assetBlob);
+      return assetBlob.getBlobRef();
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Nullable

@@ -13,9 +13,7 @@
 package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -26,12 +24,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.blobstore.api.BlobRef;
-import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.common.io.TempStreamSupplier;
-import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -54,7 +48,6 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
@@ -112,8 +105,6 @@ public class MavenFacetImpl
 
   private static final String P_LAST_VERIFIED = "lastVerified";
 
-  private final MimeSupport mimeSupport;
-
   private final Map<String, MavenPathParser> mavenPathParsers;
 
   @VisibleForTesting
@@ -122,16 +113,13 @@ public class MavenFacetImpl
   @VisibleForTesting
   static class Config
   {
-    public boolean strictContentTypeValidation = false;
-
     @NotNull(groups = {HostedType.ValidationGroup.class, ProxyType.ValidationGroup.class})
     public VersionPolicy versionPolicy;
 
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
-          "strictContentTypeValidation=" + strictContentTypeValidation +
-          ", versionPolicy=" + versionPolicy +
+          "versionPolicy=" + versionPolicy +
           '}';
     }
   }
@@ -143,8 +131,7 @@ public class MavenFacetImpl
   private StorageFacet storageFacet;
 
   @Inject
-  public MavenFacetImpl(final MimeSupport mimeSupport, final Map<String, MavenPathParser> mavenPathParsers) {
-    this.mimeSupport = checkNotNull(mimeSupport);
+  public MavenFacetImpl(final Map<String, MavenPathParser> mavenPathParsers) {
     this.mavenPathParsers = checkNotNull(mavenPathParsers);
   }
 
@@ -320,20 +307,14 @@ public class MavenFacetImpl
                                final Asset asset,
                                final Payload payload) throws IOException
   {
-    // TODO: Figure out created-by header
-    final ImmutableMap<String, String> headers = ImmutableMap.of(
-        BlobStore.BLOB_NAME_HEADER, path.getPath(),
-        BlobStore.CREATED_BY_HEADER, "unknown"
+    tx.setBlob(
+        path.getPath(),
+        payload.openInputStream(),
+        ImmutableMap.<String, String>of(),
+        asset,
+        HashType.ALGORITHMS,
+        payload.getContentType()
     );
-
-    try (InputStream inputStream = payload.openInputStream()) {
-      try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
-        final String contentType = determineContentType(path, supplier, payload.getContentType());
-        try (InputStream is = supplier.get()) {
-          tx.setBlob(is, headers, asset, HashType.ALGORITHMS, contentType);
-        }
-      }
-    }
 
     final NestedAttributesMap formatAttributes = asset.formatAttributes();
     if (payload instanceof Content) {
@@ -489,42 +470,5 @@ public class MavenFacetImpl
     final String assetKeyName =
         StorageFacet.P_ATTRIBUTES + "." + getRepository().getFormat().getValue() + "." + P_ASSET_KEY;
     return tx.findAssetWithProperty(assetKeyName, getAssetKey(mavenPath), bucket);
-  }
-
-  /**
-   * Determines or confirms the content type for the content, or throws {@link InvalidContentException} if it cannot.
-   */
-  @Nonnull
-  private String determineContentType(final MavenPath mavenPath,
-                                      final Supplier<InputStream> inputStreamSupplier,
-                                      final String declaredContentType)
-      throws IOException
-  {
-    String contentType = declaredContentType;
-
-    if (contentType == null) {
-      log.trace("Content PUT to {} has no content type.", mavenPath);
-      try (InputStream is = inputStreamSupplier.get()) {
-        contentType = mimeSupport.detectMimeType(is, mavenPath.getPath());
-      }
-      log.trace("Mime support implies content type {}", contentType);
-
-      if (contentType == null && config.strictContentTypeValidation) {
-        throw new InvalidContentException("Content type could not be determined.");
-      }
-    }
-    else {
-      try (InputStream is = inputStreamSupplier.get()) {
-        final List<String> types = mimeSupport.detectMimeTypes(is, mavenPath.getPath());
-        if (!types.isEmpty() && !types.contains(contentType)) {
-          log.debug("Discovered content type {} ", types.get(0));
-          if (config.strictContentTypeValidation) {
-            throw new InvalidContentException(
-                String.format("Declared content type %s, but declared %s.", contentType, types.get(0)));
-          }
-        }
-      }
-    }
-    return contentType;
   }
 }

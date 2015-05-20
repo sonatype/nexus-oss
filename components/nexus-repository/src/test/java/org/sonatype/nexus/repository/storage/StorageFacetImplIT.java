@@ -21,6 +21,7 @@ import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.entity.EntityVersion;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.orient.HexRecordIdObfuscator;
 import org.sonatype.nexus.orient.PersistentDatabaseInstanceRule;
 import org.sonatype.nexus.repository.Format;
@@ -28,6 +29,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.search.SearchFacet;
+import org.sonatype.nexus.security.ClientInfoProvider;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -102,7 +104,8 @@ public class StorageFacetImplIT
     underTest = new StorageFacetImpl(
         mockBlobStoreManager,
         Providers.of(database.getInstance()),
-        bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter
+        bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter,
+        mock(MimeSupport.class), mock(ClientInfoProvider.class)
     );
     underTest.installDependencies(mock(EventBus.class));
 

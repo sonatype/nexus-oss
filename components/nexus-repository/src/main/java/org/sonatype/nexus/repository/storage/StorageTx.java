@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -211,17 +212,18 @@ public interface StorageTx
    * Creates a new Blob and updates the given asset with a reference to it, hash metadata, size, and content type.
    * The old blob, if any, will be deleted.
    */
-  BlobRef setBlob(InputStream inputStream, Map<String, String> headers, Asset asset,
+  BlobRef setBlob(String blobName, InputStream inputStream, Map<String, String> headers, Asset asset,
                   Iterable<HashAlgorithm> hashAlgorithms, String contentType);
 
   /**
    * Creates a new Blob and returns it's {@link AssetBlob}. Blobs created but not attached in a scope of a TX to any
    * asset are considered as "orphans", and they will be deleted from blob store at the end of a TX.
    */
-  AssetBlob createBlob(InputStream inputStream,
+  AssetBlob createBlob(String blobName,
+                       InputStream inputStream,
                        Map<String, String> headers,
                        Iterable<HashAlgorithm> hashAlgorithms,
-                       String contentType);
+                       @Nullable String declaredContentType) throws IOException;
 
   /**
    * Attaches a Blob to asset and updates the given asset with a reference to it, hash metadata, size, and content
