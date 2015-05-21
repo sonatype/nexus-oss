@@ -603,10 +603,7 @@
               <id>paranamer</id>
               <id>httpcore</id>
               <id>httpclient</id>
-              <id>xmlpull</id>
-              <id>xpp3_min</id>
               <id>shiro-guice</id>
-              <id>xstream</id>
             </excludedArtifactIds>
           </configuration>
         </plugin>
