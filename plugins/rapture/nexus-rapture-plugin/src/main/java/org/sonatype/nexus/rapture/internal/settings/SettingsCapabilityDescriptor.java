@@ -13,16 +13,15 @@
 package org.sonatype.nexus.rapture.internal.settings;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.capability.CapabilityIdentity;
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
-import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
@@ -42,7 +41,7 @@ import org.jetbrains.annotations.NonNls;
 @Named(SettingsCapabilityDescriptor.TYPE_ID)
 @Singleton
 public class SettingsCapabilityDescriptor
-    extends CapabilityDescriptorSupport
+    extends CapabilityDescriptorSupport<SettingsCapabilityConfiguration>
     implements Taggable
 {
   @NonNls
@@ -50,7 +49,7 @@ public class SettingsCapabilityDescriptor
 
   public static final CapabilityType TYPE = CapabilityType.capabilityType(TYPE_ID);
 
-  private static interface Messages
+  private interface Messages
       extends MessageBundle
   {
     @DefaultMessage("UI: Settings")
@@ -144,23 +143,8 @@ public class SettingsCapabilityDescriptor
   }
 
   @Override
-  public Validator validator() {
-    return validators().logical().and(
-        validators().capability().uniquePer(TYPE),
-        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED),
-        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS),
-        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.SESSION_TIMEOUT)
-    );
-  }
-
-  @Override
-  public Validator validator(final CapabilityIdentity id) {
-    return validators().logical().and(
-        validators().capability().uniquePerExcluding(id, TYPE),
-        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED),
-        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS),
-        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.SESSION_TIMEOUT)
-    );
+  protected SettingsCapabilityConfiguration createConfig(final Map<String, String> properties) {
+    return new SettingsCapabilityConfiguration(properties);
   }
 
   @Override

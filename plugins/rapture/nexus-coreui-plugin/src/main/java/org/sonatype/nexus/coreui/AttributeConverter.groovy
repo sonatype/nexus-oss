@@ -14,15 +14,10 @@ package org.sonatype.nexus.coreui
 
 import javax.inject.Named
 
-import org.sonatype.nexus.validation.ValidationMessage
-import org.sonatype.nexus.validation.ValidationResponse
-import org.sonatype.nexus.validation.ValidationResponseException
-
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectWriter
 import org.eclipse.sisu.EagerSingleton
-
 
 /**
  * Facilities to convert nested maps to/from JSON representation for DTOs.
@@ -46,14 +41,7 @@ class AttributeConverter
       return null;
     }
     TypeReference<Map<String, Map<String, Object>>> typeRef = new TypeReference<Map<String, Map<String, Object>>>() {}
-    try {
-      return MAPPER.readValue(attributes, typeRef)
-    }
-    catch (Exception e) {
-      def validations = new ValidationResponse()
-      validations.addError(new ValidationMessage('attributes', e.message))
-      throw new ValidationResponseException(validations)
-    }
+    return MAPPER.readValue(attributes, typeRef)
   }
 
   /**

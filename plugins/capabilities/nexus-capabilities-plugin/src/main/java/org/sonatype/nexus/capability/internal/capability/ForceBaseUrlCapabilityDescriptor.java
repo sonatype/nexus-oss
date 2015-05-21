@@ -13,13 +13,12 @@
 package org.sonatype.nexus.capability.internal.capability;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.capability.CapabilityIdentity;
 import org.sonatype.nexus.capability.CapabilityType;
-import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.sisu.goodies.i18n.I18N;
@@ -32,10 +31,10 @@ import org.jetbrains.annotations.NonNls;
  *
  * @since 3.0
  */
-@Named(ForceBaseUrlDescriptor.TYPE_ID)
+@Named(ForceBaseUrlCapabilityDescriptor.TYPE_ID)
 @Singleton
-public class ForceBaseUrlDescriptor
-    extends CapabilityDescriptorSupport
+public class ForceBaseUrlCapabilityDescriptor
+    extends CapabilityDescriptorSupport<ForceBaseUrlCapabilityConfiguration>
 {
   @NonNls
   public static final String TYPE_ID = "forceBaseUrl";
@@ -67,13 +66,8 @@ public class ForceBaseUrlDescriptor
   }
 
   @Override
-  public Validator validator() {
-    return validators().capability().uniquePer(TYPE);
-  }
-
-  @Override
-  public Validator validator(final CapabilityIdentity id) {
-    return validators().capability().uniquePerExcluding(id, TYPE);
+  protected ForceBaseUrlCapabilityConfiguration createConfig(final Map<String, String> properties) {
+    return new ForceBaseUrlCapabilityConfiguration();
   }
 
   @Override

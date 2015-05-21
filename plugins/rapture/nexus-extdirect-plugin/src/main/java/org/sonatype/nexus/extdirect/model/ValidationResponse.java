@@ -24,9 +24,6 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
 import javax.validation.Path.Node;
 
-import org.sonatype.nexus.validation.ValidationMessage;
-import org.sonatype.nexus.validation.ValidationResponseException;
-
 import com.google.common.base.Joiner;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -42,24 +39,6 @@ public class ValidationResponse
   private List<String> messages;
 
   private Map<String, String> errors;
-
-  public ValidationResponse(final ValidationResponseException cause) {
-    super(false, new ArrayList<>());
-    //noinspection ThrowableResultOfMethodCallIgnored
-    checkNotNull(cause);
-    if (cause.getErrors().isEmpty()) {
-      messages = new ArrayList<>();
-      messages.add(cause.getMessage());
-    }
-    else {
-      convertValidationMessages(cause.getErrors());
-    }
-  }
-
-  public ValidationResponse(final List<ValidationMessage> validationMessages) {
-    super(false, new ArrayList<>());
-    convertValidationMessages(validationMessages);
-  }
 
   public ValidationResponse(final ConstraintViolationException cause) {
     super(false, new ArrayList<>());
@@ -100,20 +79,4 @@ public class ValidationResponse
     }
   }
 
-  private void convertValidationMessages(final List<ValidationMessage> validationMessages) {
-    if (validationMessages != null) {
-      errors = new HashMap<>();
-      for (ValidationMessage validationMessage : validationMessages) {
-        if ("*".equals(validationMessage.getKey())) {
-          if (messages == null) {
-            messages = new ArrayList<>();
-          }
-          messages.add(validationMessage.getMessage());
-        }
-        else {
-          errors.put(validationMessage.getKey(), validationMessage.getMessage());
-        }
-      }
-    }
-  }
 }

@@ -12,6 +12,11 @@
  */
 package org.sonatype.nexus.rapture.internal.settings;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
+
 /**
  * Rapture settings.
  *
@@ -33,12 +38,19 @@ public class RaptureSettings
 
   private boolean debugAllowed = DEFAULT_DEBUG_ALLOWED;
 
-  private int statusIntervalAuthenticated = DEFAULT_STATUS_INTERVAL_AUTHENTICATED;
+  @NotNull
+  @Min(0)
+  private Integer statusIntervalAuthenticated = DEFAULT_STATUS_INTERVAL_AUTHENTICATED;
 
-  private int statusIntervalAnonymous = DEFAULT_STATUS_INTERVAL_ANONYMOUS;
+  @NotNull
+  @Min(0)
+  private Integer statusIntervalAnonymous = DEFAULT_STATUS_INTERVAL_ANONYMOUS;
 
-  private int sessionTimeout = DEFAULT_SESSION_TIMEOUT;
+  @NotNull
+  @Min(0)
+  private Integer sessionTimeout = DEFAULT_SESSION_TIMEOUT;
 
+  @NotBlank
   private String title;
 
   public boolean isDebugAllowed() {

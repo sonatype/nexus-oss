@@ -14,9 +14,12 @@ package org.sonatype.nexus.capability.internal.ui
 
 import javax.validation.constraints.NotNull
 
+import org.sonatype.nexus.capability.CapabilityTypeExists
+import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
 
 /**
@@ -27,10 +30,11 @@ import org.hibernate.validator.constraints.NotEmpty
 @ToString(includePackage = false, includeNames = true)
 class CapabilityXO
 {
-  @NotEmpty(groups = Update.class)
+  @NotEmpty(groups = Update)
   String id
 
-  @NotEmpty
+  @NotBlank(groups = Create)
+  @CapabilityTypeExists(groups = Create)
   String typeId
 
   @NotNull
@@ -41,11 +45,18 @@ class CapabilityXO
   Map<String, String> properties
 
   Boolean active
+
   Boolean error
+
   String description
+
   String state
+
   String stateDescription
+
   String status
+
   String typeName
+
   Map<String, String> tags
 }
