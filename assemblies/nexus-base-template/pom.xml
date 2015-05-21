@@ -283,9 +283,12 @@
                 </copy>
 
                 <!-- install some custom lib/ jar -->
-                <copy file="${javax.annotation:javax.annotation-api:jar}" todir="${project.build.directory}/assembly/lib"/>
-                <copy file="${com.google.code.findbugs:jsr305:jar}" todir="${project.build.directory}/assembly/lib"/>
-                <copy file="${org.sonatype.nexus.assemblies:karaf-nexus-branding:jar}" todir="${project.build.directory}/assembly/lib/karaf-nexus-branding.jar"/>
+                <copy file="${javax.annotation:javax.annotation-api:jar}"
+                      todir="${project.build.directory}/assembly/lib"/>
+                <copy file="${com.google.code.findbugs:jsr305:jar}"
+                      todir="${project.build.directory}/assembly/lib"/>
+                <copy file="${org.sonatype.nexus.assemblies:karaf-nexus-branding:jar}"
+                      tofile="${project.build.directory}/assembly/lib/karaf-nexus-branding.jar"/>
 
                 <delete>
                   <fileset dir="${project.build.directory}/assembly">
