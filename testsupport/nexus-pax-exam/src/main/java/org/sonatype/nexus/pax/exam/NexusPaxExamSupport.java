@@ -24,6 +24,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 
 import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.nexus.common.event.EventSubscriberHost;
@@ -40,6 +43,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.ops4j.net.URLUtils;
 import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
@@ -212,6 +216,16 @@ public abstract class NexusPaxExamSupport
         HttpURLConnection conn = null;
         try {
           conn = (HttpURLConnection) url.openConnection();
+          if (conn instanceof HttpsURLConnection) {
+            // relax host and certificate checks as we just want to see if it's up
+            ((HttpsURLConnection) conn).setHostnameVerifier(new HostnameVerifier()
+            {
+              public boolean verify(String hostname, SSLSession session) {
+                return true;
+              }
+            });
+            URLUtils.prepareForSSL(conn);
+          }
           conn.setRequestMethod("HEAD");
           conn.connect();
           return true;

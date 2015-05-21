@@ -13,6 +13,8 @@
 package org.sonatype.nexus.repository.storage
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx
+import com.orientechnologies.orient.core.tx.OTransaction
+import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.sonatype.nexus.blobstore.api.BlobRef
@@ -42,6 +44,8 @@ extends TestSupport
   @Mock
   private ODatabaseDocumentTx db
   @Mock
+  private OTransaction tx
+  @Mock
   private Bucket bucket
   @Mock
   private BucketEntityAdapter bucketEntityAdapter
@@ -57,6 +61,11 @@ extends TestSupport
   private Map<String, String> expectedHeaders = [(Bucket.REPO_NAME_HEADER) : 'testRepo']
   private Iterable<HashAlgorithm> hashAlgorithms = []
 
+  @Before
+  void prepare() {
+    when(db.getTransaction()).thenReturn(tx)
+  }
+
   /**
    * Given:
    * - an asset with a blob
@@ -71,7 +80,7 @@ extends TestSupport
   @Test
   void 'deleting assets fails when DENY write policy'() {
     when(asset.blobRef()).thenReturn(mock(BlobRef))
-    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.DENY, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
+    def underTest = new StorageTxImpl(blobTx, db, false, bucket, WritePolicy.DENY, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
     try {
       underTest.deleteAsset(asset)
       assertThat 'Expected IllegalOperationException', false
@@ -92,7 +101,7 @@ extends TestSupport
    */
   @Test
   void 'deleting assets pass when DENY write policy without blob'() {
-    new StorageTxImpl(blobTx, db, bucket, WritePolicy.DENY, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList())).deleteAsset(asset)
+    new StorageTxImpl(blobTx, db, false, bucket, WritePolicy.DENY, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList())).deleteAsset(asset)
     verify(assetEntityAdapter, times(1)).delete(db, asset)
   }
 
@@ -144,7 +153,7 @@ extends TestSupport
   void deleteAssetWhenWritePolicy(final WritePolicy writePolicy) {
     def blobRef = mock(BlobRef)
     when(asset.blobRef()).thenReturn(blobRef)
-    new StorageTxImpl(blobTx, db, bucket, writePolicy, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter , new StorageTxHooks(emptyList())).deleteAsset(asset)
+    new StorageTxImpl(blobTx, db, false, bucket, writePolicy, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter , new StorageTxHooks(emptyList())).deleteAsset(asset)
     verify(blobTx, times(1)).delete(blobRef)
     verify(assetEntityAdapter, times(1)).delete(db, asset)
   }
@@ -165,7 +174,7 @@ extends TestSupport
   void 'setting blob fails on asset with blob when DENY write policy'() {
     def blobRef = mock(BlobRef)
     when(asset.blobRef()).thenReturn(blobRef)
-    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.DENY, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
+    def underTest = new StorageTxImpl(blobTx, db, false, bucket, WritePolicy.DENY, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
     try {
       underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
       assertThat 'Expected IllegalOperationException', false
@@ -189,7 +198,7 @@ extends TestSupport
    */
   @Test
   void 'setting blob fails on asset without blob when DENY write policy'() {
-    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.DENY, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
+    def underTest = new StorageTxImpl(blobTx, db, false, bucket, WritePolicy.DENY, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
     try {
       underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
       assertThat 'Expected IllegalOperationException', false
@@ -216,7 +225,7 @@ extends TestSupport
   void 'setting blob fails on asset with blob when ALLOW_ONCE write policy'() {
     def blobRef = mock(BlobRef)
     when(asset.blobRef()).thenReturn(blobRef)
-    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW_ONCE, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
+    def underTest = new StorageTxImpl(blobTx, db, false, bucket, WritePolicy.ALLOW_ONCE, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
     try {
       underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
       assertThat 'Expected IllegalOperationException', false
@@ -243,7 +252,7 @@ extends TestSupport
     def newBlobRef = mock(BlobRef)
     when(bucket.repositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), any(Map))).thenReturn(newBlobRef)
-    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW_ONCE, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
+    def underTest = new StorageTxImpl(blobTx, db, false, bucket, WritePolicy.ALLOW_ONCE, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
     verify(blobTx, times(1)).create(any(InputStream), eq(expectedHeaders))
     verify(asset, times(1)).blobRef(newBlobRef)
@@ -268,7 +277,7 @@ extends TestSupport
     def newBlobRef = mock(BlobRef)
     when(bucket.repositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), any(Map))).thenReturn(newBlobRef)
-    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
+    def underTest = new StorageTxImpl(blobTx, db, false, bucket, WritePolicy.ALLOW, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
     verify(blobTx, times(1)).delete(blobRef)
     verify(blobTx, times(1)).create(any(InputStream), eq(expectedHeaders))
@@ -291,7 +300,7 @@ extends TestSupport
     def newBlobRef = mock(BlobRef)
     when(bucket.repositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), any(Map))).thenReturn(newBlobRef)
-    def underTest = new StorageTxImpl(blobTx, db, bucket, WritePolicy.ALLOW, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
+    def underTest = new StorageTxImpl(blobTx, db, false, bucket, WritePolicy.ALLOW, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, new StorageTxHooks(emptyList()))
     underTest.setBlob(inputStream, headers, asset, hashAlgorithms, "text/plain")
     verify(blobTx, times(1)).create(any(InputStream), eq(expectedHeaders))
     verify(asset, times(1)).blobRef(newBlobRef)

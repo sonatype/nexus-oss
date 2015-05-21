@@ -28,6 +28,7 @@ import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
 import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.maven.MavenPathParser
+import org.sonatype.nexus.repository.maven.internal.MavenRecipeSupport
 import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
@@ -41,43 +42,19 @@ import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 
 /**
- * Raw group repository recipe.
+ * Maven 2 group repository recipe.
  *
  * @since 3.0
  */
 @Named(Maven2GroupRecipe.NAME)
 @Singleton
 class Maven2GroupRecipe
-    extends RecipeSupport
+extends MavenRecipeSupport
 {
   static final String NAME = 'maven2-group'
 
   @Inject
-  Provider<Maven2SecurityFacet> securityFacet
-
-  @Inject
-  Provider<ConfigurableViewFacet> viewFacet
-
-  @Inject
-  Provider<StorageFacetImpl> storageFacet
-
-  @Inject
   Provider<Maven2GroupFacet> mavenGroupFacet
-
-  @Inject
-  TimingHandler timingHandler
-
-  @Inject
-  SecurityHandler securityHandler
-
-  @Inject
-  PartialFetchHandler partialFetchHandler
-
-  @Inject
-  Provider<MavenFacetImpl> mavenFacet
-
-  @Inject
-  MavenHeadersHandler mavenHeadersHandler
 
   @Inject
   GroupHandler groupHandler
@@ -86,14 +63,12 @@ class Maven2GroupRecipe
   Maven2GroupMetadataHandler groupMetadataHandler
 
   @Inject
-  @Named(Maven2Format.NAME)
-  MavenPathParser mavenPathParser
-
-  @Inject
   Maven2GroupRecipe(@Named(GroupType.NAME) Type type,
-                    @Named(Maven2Format.NAME) Format format)
+                    @Named(Maven2Format.NAME) Format format,
+                    @Named(Maven2Format.NAME) MavenPathParser mavenPathParser,
+                    Provider<Maven2SecurityFacet> securityFacet)
   {
-    super(type, format)
+    super(type, format, mavenPathParser, securityFacet)
   }
 
   @Override
@@ -111,19 +86,13 @@ class Maven2GroupRecipe
   private ViewFacet configure(final ConfigurableViewFacet viewFacet) {
     Router.Builder builder = new Router.Builder()
 
-    builder.route(new Route.Builder()
-        .matcher(new MavenArtifactMatcher(mavenPathParser))
-        .handler(timingHandler)
-        .handler(securityHandler)
+    builder.route(newArtifactRouteBuilder()
         .handler(partialFetchHandler)
         .handler(groupHandler)
         .create())
 
     // Note: partialFetchHandler NOT added for Maven metadata
-    builder.route(new Route.Builder()
-        .matcher(new MavenMetadataMatcher(mavenPathParser))
-        .handler(timingHandler)
-        .handler(securityHandler)
+    builder.route(newMetadataRouteBuilder()
         .handler(mavenHeadersHandler)
         .handler(groupMetadataHandler)
         .create())
