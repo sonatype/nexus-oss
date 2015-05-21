@@ -86,6 +86,7 @@ class NugetProxyRecipe
         .matcher(new TokenMatcher("/{id}/{version}"))
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(exceptionHandler)
         .handler(proxyHandler)
         .handler(notFound())
         .create())
