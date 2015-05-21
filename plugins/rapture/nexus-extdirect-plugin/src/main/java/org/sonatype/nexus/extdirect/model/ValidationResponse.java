@@ -14,6 +14,7 @@ package org.sonatype.nexus.extdirect.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,8 +70,10 @@ public class ValidationResponse
       for (ConstraintViolation<?> violation : violations) {
         List<String> entries = new ArrayList<>();
         // iterate path to get the full path
-        for (Node node : violation.getPropertyPath()) {
-          if (ElementKind.PROPERTY == node.getKind() || ElementKind.PARAMETER == node.getKind()) {
+        Iterator<Node> it = violation.getPropertyPath().iterator();
+        while (it.hasNext()) {
+          Node node = it.next();
+          if (ElementKind.PROPERTY == node.getKind() || (ElementKind.PARAMETER == node.getKind() && !it.hasNext())) {
             if (node.getKey() != null) {
               entries.add(node.getKey().toString());
             }
