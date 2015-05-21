@@ -13,6 +13,8 @@
 package org.sonatype.nexus.repository.storage
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx
+import com.orientechnologies.orient.core.tx.OTransaction
+import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.sonatype.nexus.blobstore.api.BlobRef
@@ -42,6 +44,8 @@ extends TestSupport
   @Mock
   private ODatabaseDocumentTx db
   @Mock
+  private OTransaction tx
+  @Mock
   private Bucket bucket
   @Mock
   private BucketEntityAdapter bucketEntityAdapter
@@ -56,6 +60,11 @@ extends TestSupport
   private Map<String, String> headers = [:]
   private Map<String, String> expectedHeaders = [(Bucket.REPO_NAME_HEADER) : 'testRepo']
   private Iterable<HashAlgorithm> hashAlgorithms = []
+
+  @Before
+  void prepare() {
+    when(db.getTransaction()).thenReturn(tx)
+  }
 
   /**
    * Given:
