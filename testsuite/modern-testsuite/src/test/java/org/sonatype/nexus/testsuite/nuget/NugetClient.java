@@ -82,14 +82,14 @@ public class NugetClient
     return status(httpClient.execute(put, httpClientContext));
   }
 
+  public String feedXml(final String query) throws IOException {
+    return asString(get(query));
+  }
+
   private void addNugetApiKey(final HttpRequest request) {
     if (apiKey != null) {
       request.setHeader(new BasicHeader(NugetApiKey.NAME, apiKey));
     }
-  }
-
-  public String feedXml(final String query) throws IOException {
-    return asString(get(query));
   }
 
   public int count(final String query) throws IOException {

@@ -1,5 +1,3 @@
-
-
 /*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2008-2015 Sonatype, Inc.
@@ -70,16 +68,17 @@ public class FormatClientSupport
     return execute(get);
   }
 
-  @NotNull
-  protected URI resolve(final String path) {
-    return repositoryBaseUri.resolve(path);
-  }
 
   protected HttpResponse execute(final HttpUriRequest request) throws IOException {
     log.info("Requesting {}", request);
     final HttpResponse response = httpClient.execute(request, httpClientContext);
     log.info("Received {}", response);
     return response;
+  }
+
+  @NotNull
+  protected URI resolve(final String path) {
+    return repositoryBaseUri.resolve(path);
   }
 
   public static int status(HttpResponse response) {
