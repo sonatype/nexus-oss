@@ -30,6 +30,7 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
+import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -45,7 +46,7 @@ import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
  * Support for Nuget ITs
  */
 public abstract class NugetITSupport
-    extends NexusHttpsITSupport
+    extends RepositoryTestSupport
 {
   public static final String VISUAL_STUDIO_INITIAL_COUNT_QUERY =
       "Search()/$count?$filter=IsLatestVersion&searchTerm=''&targetFramework='net45'&includePrerelease=false";
@@ -54,11 +55,6 @@ public abstract class NugetITSupport
       "Search()?$filter=IsLatestVersion&$orderby=DownloadCount%20desc,Id&$skip=0&$top=30&searchTerm=''&targetFramework='net45'&includePrerelease=false";
 
   public static final int VS_DEFAULT_PAGE_REQUEST_SIZE = 30;
-
-  private List<Repository> repositories = new ArrayList<>();
-
-  @Inject
-  private RepositoryManager repositoryManager;
 
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
@@ -84,26 +80,9 @@ public abstract class NugetITSupport
     return config;
   }
 
-  /**
-   * Creates a repository, first removing an existing one if necessary.
-   */
-  protected Repository createRepository(final Configuration config) throws Exception {
-    waitFor(responseFrom(nexusUrl));
-    final Repository repository = repositoryManager.create(config);
-    repositories.add(repository);
-    return repository;
-  }
-
-  @After
-  public void deleteRepositories() throws Exception {
-    for (Repository repository : repositories) {
-      repositoryManager.delete(repository.getName());
-    }
-  }
-
   @NotNull
   protected NugetClient nugetClient(final Repository repository) throws Exception {
-    final URL url = resolveUrl(nexusUrl, "/repository/" + repository.getName() + "/");
+    final URL url = repositoryBaseUrl(repository);
     waitFor(responseFrom(url));
     return new NugetClient(clientBuilder().build(), clientContext(), url.toURI());
   }

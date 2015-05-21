@@ -46,7 +46,7 @@ import javax.inject.Singleton
 class RawHostedRecipe
     extends RecipeSupport
 {
-  static final String NAME = "raw-hosted"
+  public static final String NAME = "raw-hosted"
 
   @Inject
   Provider<RawSecurityFacet> securityFacet
