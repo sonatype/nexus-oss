@@ -42,6 +42,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Before;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 
@@ -61,6 +62,14 @@ public abstract class NexusHttpsITSupport
   @Configuration
   public static Option[] configureNexus() {
     return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"), withHttps());
+  }
+
+  /**
+   * Make sure Nexus is responding on the secure base URL before continuing
+   */
+  @Before
+  public void waitForSecureNexus() throws Exception {
+    waitFor(responseFrom(nexusSecureUrl));
   }
 
   /**
