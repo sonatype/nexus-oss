@@ -28,7 +28,6 @@ public class QuartzConstants
   public static final String ID_PREFIX = "quartz";
 
   /**
-  /**
    * Prefix for @Named configuration.
    */
   public static final String CONFIG_PREFIX = "${" + ID_PREFIX;

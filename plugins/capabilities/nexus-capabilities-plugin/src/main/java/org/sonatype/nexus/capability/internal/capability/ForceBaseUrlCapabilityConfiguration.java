@@ -10,32 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability;
+package org.sonatype.nexus.capability.internal.capability;
 
-import java.util.Collection;
+import org.sonatype.nexus.capability.UniquePerCapabilityType;
+import org.sonatype.nexus.capability.support.CapabilityConfigurationSupport;
+import org.sonatype.nexus.validation.group.Create;
 
 /**
- * Registry of capability validators.
+ * {@link ForceBaseUrlCapability} configuration.
  *
- * @since capabilities 1.10
+ * @since 3.0
  */
-public interface ValidatorRegistry
+@UniquePerCapabilityType(value = ForceBaseUrlCapabilityDescriptor.TYPE_ID, groups = Create.class)
+public class ForceBaseUrlCapabilityConfiguration
+    extends CapabilityConfigurationSupport
 {
-
-  /**
-   * Returns the validators that applies to specified capability type.
-   *
-   * @param type capability type to get validators for
-   * @return validators or an empty collection if no validators applies to specified type
-   */
-  Collection<Validator> get(CapabilityType type);
-
-  /**
-   * Returns the validators that applies to specified capability instance.
-   *
-   * @param id id of capability to get validators for
-   * @return validators or an empty collection if no validators applies to specified instance
-   */
-  Collection<Validator> get(CapabilityIdentity id);
-
+  @Override
+  public String toString() {
+    return "ForceBaseUrlCapabilityConfiguration{}";
+  }
 }

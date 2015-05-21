@@ -12,12 +12,12 @@
  */
 package org.sonatype.nexus.coreui
 
-import java.text.ParseException
-
 import javax.inject.Inject
 import javax.inject.Named
+import javax.inject.Provider
 import javax.inject.Singleton
 import javax.validation.Valid
+import javax.validation.Validator
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
 
@@ -43,13 +43,9 @@ import org.sonatype.nexus.scheduling.schedule.Schedule
 import org.sonatype.nexus.scheduling.schedule.Weekly
 import org.sonatype.nexus.scheduling.schedule.Weekly.Weekday
 import org.sonatype.nexus.validation.Validate
-import org.sonatype.nexus.validation.ValidationMessage
-import org.sonatype.nexus.validation.ValidationResponse
-import org.sonatype.nexus.validation.ValidationResponseException
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
 
-import com.google.common.base.Throwables
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import groovy.transform.PackageScope
@@ -71,6 +67,9 @@ class TaskComponent
 
   @Inject
   TaskScheduler nexusScheduler
+
+  @Inject
+  Provider<Validator> validatorProvider
 
   /**
    * Retrieve a list of scheduled tasks.
@@ -346,13 +345,12 @@ class TaskComponent
   @PackageScope
   Schedule asSchedule(final TaskXO taskXO) {
     if (taskXO.schedule == 'advanced') {
+      validatorProvider.get().validate(taskXO, TaskXO.AdvancedSchedule)
       return new Cron(new Date(), taskXO.cronExpression)
     }
     if (taskXO.schedule != 'manual') {
       if (!taskXO.startDate) {
-        def response = new ValidationResponse()
-        response.addError(new ValidationMessage('startDate', 'May not be null'))
-        throw new ValidationResponseException(response)
+        validatorProvider.get().validate(taskXO, TaskXO.OnceToMonthlySchedule)
       }
       def date = Calendar.instance
       date.setTimeInMillis(taskXO.startDate.time)
@@ -360,28 +358,17 @@ class TaskComponent
       date.set(Calendar.MILLISECOND, 0)
       switch (taskXO.schedule) {
         case 'once':
-          def currentDate = Calendar.instance
-          if (currentDate.after(date)) {
-            def response = new ValidationResponse()
-            if (currentDate.get(Calendar.YEAR) == date.get(Calendar.YEAR)
-                && currentDate.get(Calendar.MONTH) == date.get(Calendar.MONTH)
-                && currentDate.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR)) {
-              response.addError(new ValidationMessage('startTime', 'Time is in the past'))
-            }
-            else {
-              response.addError(new ValidationMessage('startDate', 'Date is in the past'))
-            }
-            throw new ValidationResponseException(response)
-          }
+          validatorProvider.get().validate(taskXO, TaskXO.OnceSchedule)
           return new Once(date.time)
         case 'hourly':
           return new Hourly(date.time)
         case 'daily':
           return new Daily(date.time)
         case 'weekly':
-          return new Weekly(date.time, taskXO.recurringDays.collect { Weekday.values()[it-1] } as Set<Weekday>)
+          return new Weekly(date.time, taskXO.recurringDays.collect { Weekday.values()[it - 1] } as Set<Weekday>)
         case 'monthly':
-          return new Monthly(date.time, taskXO.recurringDays.collect { it == 999 ? CalendarDay.lastDay() : CalendarDay.day(it) } as Set<CalendarDay>)
+          return new Monthly(date.time, taskXO.recurringDays.
+              collect { it == 999 ? CalendarDay.lastDay() : CalendarDay.day(it) } as Set<CalendarDay>)
       }
     }
     return new Manual()
@@ -406,12 +393,7 @@ class TaskComponent
     }
     catch (Exception e) {
       log.error('Failed to schedule task', e)
-      if (e.cause instanceof ParseException) {
-        def response = new ValidationResponse()
-        response.addError(new ValidationMessage('cronExpression', e.cause.message))
-        throw new ValidationResponseException(response)
-      }
-      Throwables.propagate(e)
+      throw e
     }
   }
 

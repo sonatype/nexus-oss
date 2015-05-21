@@ -21,11 +21,9 @@ import com.sonatype.nexus.ssl.plugin.TrustStore;
 
 import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.support.CapabilitySupport;
-import org.sonatype.nexus.capability.support.WithoutConfiguration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sonatype.nexus.ssl.model.SMTPTrustStoreKey.smtpTrustStoreKey;
-import static org.sonatype.nexus.capability.support.WithoutConfiguration.WITHOUT_CONFIGURATION;
 
 /**
  * SMTP capability (enables Nexus SSL Trust Store / SMTP).
@@ -34,7 +32,7 @@ import static org.sonatype.nexus.capability.support.WithoutConfiguration.WITHOUT
  */
 @Named(SMTPCapabilityDescriptor.TYPE_ID)
 public class SMTPCapability
-    extends CapabilitySupport<WithoutConfiguration>
+    extends CapabilitySupport<SMTPCapabilityConfiguration>
 {
 
   private final TrustStore trustStore;
@@ -46,17 +44,17 @@ public class SMTPCapability
   }
 
   @Override
-  protected WithoutConfiguration createConfig(final Map<String, String> properties) {
-    return WITHOUT_CONFIGURATION;
+  protected SMTPCapabilityConfiguration createConfig(final Map<String, String> properties) {
+    return new SMTPCapabilityConfiguration();
   }
 
   @Override
-  protected void onActivate(final WithoutConfiguration config) {
+  protected void onActivate(final SMTPCapabilityConfiguration config) {
     trustStore.enableFor(smtpTrustStoreKey());
   }
 
   @Override
-  protected void onPassivate(final WithoutConfiguration config) {
+  protected void onPassivate(final SMTPCapabilityConfiguration config) {
     trustStore.disableFor(smtpTrustStoreKey());
   }
 

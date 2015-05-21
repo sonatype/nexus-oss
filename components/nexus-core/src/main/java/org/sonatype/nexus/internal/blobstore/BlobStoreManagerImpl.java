@@ -32,9 +32,6 @@ import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
 import org.sonatype.nexus.jmx.reflect.ManagedObject;
-import org.sonatype.nexus.validation.ValidationMessage;
-import org.sonatype.nexus.validation.ValidationResponse;
-import org.sonatype.nexus.validation.ValidationResponseException;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
@@ -202,18 +199,9 @@ public class BlobStoreManagerImpl
     store.delete(blobStore.getBlobStoreConfiguration());
   }
 
-  private BlobStore newBlobStore(final BlobStoreConfiguration blobStoreConfiguration) {
+  private BlobStore newBlobStore(final BlobStoreConfiguration blobStoreConfiguration) throws Exception {
     BlobStore blobStore = blobstorePrototypes.get(blobStoreConfiguration.getType()).get();
-    try {
-      blobStore.init(blobStoreConfiguration);
-    }
-    catch (Exception e) {
-      ValidationResponse validations = new ValidationResponse();
-      validations.addError(
-          new ValidationMessage("attributes",
-              "Unable to configure BlobStore with given attributes: " + e.getMessage()));
-      throw new ValidationResponseException(validations);  
-    }
+    blobStore.init(blobStoreConfiguration);
     return blobStore;
   }
 

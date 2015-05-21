@@ -53,19 +53,18 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.command.OCommandResultListener;
-import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLAsynchQuery;
+import com.orientechnologies.orient.core.tx.OTransaction.TXTYPE;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Maven 2 repository metadata re-builder.
@@ -110,13 +109,13 @@ public class MetadataRebuilder
     final Map<String, Object> sqlParams = Maps.newHashMap();
     buildSql(sql, sqlParams, groupId, artifactId, baseVersion);
 
-    try (StorageTx tx = repository.facet(StorageFacet.class).openTx()) {
-      final ORID bucketOrid = bucketEntityAdapter.recordIdentity(tx.getBucket());
-      sqlParams.put("bucket", bucketOrid);
-    }
     try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
-      final Worker worker = new Worker(repository, update, sql.toString(), sqlParams);
-      worker.rebuildMetadata(db);
+      try (StorageTx tx = repository.facet(StorageFacet.class).openTx(db)) {
+        final ORID bucketOrid = bucketEntityAdapter.recordIdentity(tx.getBucket());
+        sqlParams.put("bucket", bucketOrid);
+      }
+      final Worker worker = new Worker(db, repository, update, sql.toString(), sqlParams);
+      worker.rebuildMetadata();
     }
   }
 
@@ -157,16 +156,7 @@ public class MetadataRebuilder
   private static class Worker
       extends ComponentSupport
   {
-    private void isolate(final Runnable operation) {
-      final ODatabaseDocumentTx currentDb = (ODatabaseDocumentTx) ODatabaseRecordThreadLocal.INSTANCE.get();
-      try {
-        operation.run();
-      }
-      finally {
-        // hack to restore potential write TX/DB uses of inner method: reset thread-bound DB
-        ODatabaseRecordThreadLocal.INSTANCE.set(currentDb);
-      }
-    }
+    private final ODatabaseDocumentTx db;
 
     private final String sql;
 
@@ -186,11 +176,13 @@ public class MetadataRebuilder
 
     private final DocumentBuilderFactory documentBuilderFactory;
 
-    public Worker(final Repository repository,
+    public Worker(final ODatabaseDocumentTx db,
+                  final Repository repository,
                   final boolean update,
                   final String sql,
                   final Map<String, Object> sqlParams)
     {
+      this.db = db;
       this.sql = sql;
       this.sqlParams = sqlParams;
       this.repository = repository;
@@ -206,7 +198,7 @@ public class MetadataRebuilder
      * Method rebuilding metadata that performs the group level processing. It uses memory conservative "async" SQL
      * approach, and calls {@link #rebuildMetadataInner(String, String, Set)} method as results are arriving.
      */
-    public void rebuildMetadata(final ODatabaseDocumentTx db)
+    public void rebuildMetadata()
     {
       db.command(
           new OSQLAsynchQuery<ODocument>(
@@ -249,91 +241,79 @@ public class MetadataRebuilder
      * Process exits from group level, executed in isolation.
      */
     private void rebuildMetadataExitGroup(final String currentGroupId) {
-      isolate(new Runnable()
-      {
-        @Override
-        public void run() {
-          try (StorageTx tx = storageFacet.openTx()) {
-            metadataUpdater.processMetadata(
-                tx,
-                metadataMavenPath(currentGroupId, null, null),
-                metadataBuilder.onExitGroupId()
-            );
-            tx.commit();
-          }
-        }
-      });
+      try (StorageTx tx = storageFacet.openTx(db)) {
+        metadataUpdater.processMetadata(
+            tx,
+            metadataMavenPath(currentGroupId, null, null),
+            metadataBuilder.onExitGroupId()
+        );
+        tx.commit();
+      }
     }
 
     /**
      * Method rebuilding metadata that performs artifact and baseVersion processing. While it is called from {@link
-     * #rebuildMetadata(ODatabaseDocumentTx)} method, it will use a separate TX/DB to perform writes, it does NOT
+     * #rebuildMetadata()} method, it will use a separate TX/DB to perform writes, it does NOT
      * accept the TX from caller. Executed in isolation.
      */
     private void rebuildMetadataInner(final String groupId,
                                       final String artifactId,
                                       final Set<String> baseVersions)
     {
-      isolate(new Runnable()
-      {
-        @Override
-        public void run() {
-          metadataBuilder.onEnterArtifactId(artifactId);
-          for (String baseVersion : baseVersions) {
-            metadataBuilder.onEnterBaseVersion(baseVersion);
-            try (StorageTx tx = storageFacet.openTx()) {
-              final Iterable<Component> components = tx.findComponents(
-                  "group = :groupId and name = :artifactId and attributes.maven2.baseVersion = :baseVersion",
-                  ImmutableMap.<String, Object>of(
-                      "groupId", groupId,
-                      "artifactId", artifactId,
-                      "baseVersion", baseVersion
-                  ),
-                  ImmutableList.of(repository),
-                  null // order by
+      metadataBuilder.onEnterArtifactId(artifactId);
+      for (String baseVersion : baseVersions) {
+        metadataBuilder.onEnterBaseVersion(baseVersion);
+        try (StorageTx tx = storageFacet.openTx(db)) {
+          final Iterable<Component> components = tx.findComponents(
+              "group = :groupId and name = :artifactId and attributes.maven2.baseVersion = :baseVersion",
+              ImmutableMap.<String, Object>of(
+                  "groupId", groupId,
+                  "artifactId", artifactId,
+                  "baseVersion", baseVersion
+              ),
+              ImmutableList.of(repository),
+              null // order by
+          );
+          for (Component component : components) {
+            for (Asset asset : tx.browseAssets(component)) {
+              final MavenPath mavenPath = mavenPathParser.parsePath(
+                  asset.formatAttributes().require(StorageFacet.P_PATH, String.class)
               );
-              for (Component component : components) {
-                for (Asset asset : tx.browseAssets(component)) {
-                  final MavenPath mavenPath = mavenPathParser.parsePath(
-                      asset.formatAttributes().require(StorageFacet.P_PATH, String.class)
-                  );
-                  if (mavenPath.isSubordinate()) {
-                    continue;
-                  }
-                  metadataBuilder.addArtifactVersion(mavenPath);
-                  mayUpdateChecksum(tx, asset, mavenPath, HashType.SHA1);
-                  mayUpdateChecksum(tx, asset, mavenPath, HashType.MD5);
-                  if (mavenPath.isPom()) {
-                    final Document pom = getModel(tx, mavenPath);
-                    if (pom != null) {
-                      final String packaging = getChildValue(pom, "packaging", "jar");
-                      log.debug("POM packaging: {}", packaging);
-                      if ("maven-plugin".equals(packaging)) {
-                        metadataBuilder.addPlugin(getPluginPrefix(tx, mavenPath.locateMainArtifact("jar")), artifactId,
-                            getChildValue(pom, "name", null));
-                      }
-                    }
+              if (mavenPath.isSubordinate()) {
+                continue;
+              }
+              metadataBuilder.addArtifactVersion(mavenPath);
+              mayUpdateChecksum(tx, asset, mavenPath, HashType.SHA1);
+              mayUpdateChecksum(tx, asset, mavenPath, HashType.MD5);
+              if (mavenPath.isPom()) {
+                final Document pom = getModel(tx, mavenPath);
+                if (pom != null) {
+                  final String packaging = getChildValue(pom, "packaging", "jar");
+                  log.debug("POM packaging: {}", packaging);
+                  if ("maven-plugin".equals(packaging)) {
+                    metadataBuilder.addPlugin(getPluginPrefix(tx, mavenPath.locateMainArtifact("jar")), artifactId,
+                        getChildValue(pom, "name", null));
                   }
                 }
               }
-              metadataUpdater.processMetadata(
-                  tx,
-                  metadataMavenPath(groupId, artifactId, baseVersion),
-                  metadataBuilder.onExitBaseVersion()
-              );
-              tx.commit();
             }
           }
-          try (StorageTx tx = storageFacet.openTx()) {
-            metadataUpdater.processMetadata(
-                tx,
-                metadataMavenPath(groupId, artifactId, null),
-                metadataBuilder.onExitArtifactId()
-            );
-            tx.commit();
-          }
+          metadataUpdater.processMetadata(
+              tx,
+              metadataMavenPath(groupId, artifactId, baseVersion),
+              metadataBuilder.onExitBaseVersion()
+          );
+          tx.commit();
         }
-      });
+      }
+      try (StorageTx tx = storageFacet.openTx(db)) {
+        metadataUpdater.processMetadata(
+            tx,
+            metadataMavenPath(groupId, artifactId, null),
+            metadataBuilder.onExitArtifactId()
+        );
+        tx.commit();
+      }
     }
 
     /**
@@ -440,7 +420,6 @@ public class MetadataRebuilder
                 final DocumentBuilder db = documentBuilderFactory.newDocumentBuilder();
                 final Document document = db.parse(zip);
                 prefix = getChildValue(document, "goalPrefix", null);
-                zip.closeEntry();
                 break;
               }
               zip.closeEntry();

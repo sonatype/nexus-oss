@@ -10,25 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.validation
+package com.sonatype.nexus.ssl.plugin.internal.smtp;
 
-import org.sonatype.sisu.litmus.testsupport.TestSupport
-
-import org.junit.Test
+import org.sonatype.nexus.capability.UniquePerCapabilityType;
+import org.sonatype.nexus.capability.support.CapabilityConfigurationSupport;
+import org.sonatype.nexus.validation.group.Create;
 
 /**
- * Trials of {@link ValidationMessage}
+ * {@link SMTPCapability} configuration.
+ *
+ * @since 3.0
  */
-class ValidationMessageTrial
-    extends TestSupport
+@UniquePerCapabilityType(value = SMTPCapabilityDescriptor.TYPE_ID, groups = Create.class)
+public class SMTPCapabilityConfiguration
+    extends CapabilityConfigurationSupport
 {
-  @Test
-  void 'string representation'() {
-    log new ValidationMessage('key', 'message')
-  }
-
-  @Test
-  void 'string representation with exception'() {
-    log new ValidationMessage('key', 'message', new Throwable('TEST'))
+  @Override
+  public String toString() {
+    return "SMTPCapabilityConfiguration{}";
   }
 }

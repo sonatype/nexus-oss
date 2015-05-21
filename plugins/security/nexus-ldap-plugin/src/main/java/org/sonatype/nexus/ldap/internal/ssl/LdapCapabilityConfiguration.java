@@ -17,6 +17,7 @@ import java.util.Map;
 import org.sonatype.nexus.capability.support.CapabilityConfigurationSupport;
 
 import com.google.common.collect.Maps;
+import org.hibernate.validator.constraints.NotBlank;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,6 +32,7 @@ public class LdapCapabilityConfiguration
 
   public static final String LDAP_SERVER_ID = "ldapServer";
 
+  @NotBlank
   private String ldapServerId;
 
   public LdapCapabilityConfiguration() {

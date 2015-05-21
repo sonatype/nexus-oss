@@ -167,6 +167,7 @@ public class StateComponent
       // TODO: consider using Object.hashCode() and getting state contributors to ensure values have proper impls?
       // TODO: ... or something else which is more efficient than object->gson->sha1?
       String json = gson.toJson(value);
+      log.trace("Hashing state: {}", json);
       return Hashing.sha1().hashString(json, Charsets.UTF_8).toString();
     }
     return null;

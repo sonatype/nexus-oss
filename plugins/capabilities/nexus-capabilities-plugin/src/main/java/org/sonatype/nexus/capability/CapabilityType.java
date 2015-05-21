@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.capability;
 
+import javax.validation.constraints.NotNull;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -22,10 +24,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CapabilityType
 {
 
-  private final String value;
+  @NotNull
+  @CapabilityTypeExists
+  private final String typeId;
 
-  public CapabilityType(final String value) {
-    this.value = checkNotNull(value, "Capability type value cannot be null");
+  public CapabilityType(final String typeId) {
+    this.typeId = checkNotNull(typeId, "Capability type value cannot be null");
   }
 
   @Override
@@ -39,7 +43,7 @@ public class CapabilityType
 
     final CapabilityType that = (CapabilityType) o;
 
-    if (value != null ? !value.equals(that.value) : that.value != null) {
+    if (typeId != null ? !typeId.equals(that.typeId) : that.typeId != null) {
       return false;
     }
 
@@ -48,16 +52,16 @@ public class CapabilityType
 
   @Override
   public int hashCode() {
-    return value != null ? value.hashCode() : 0;
+    return typeId != null ? typeId.hashCode() : 0;
   }
 
   @Override
   public String toString() {
-    return value;
+    return typeId;
   }
 
-  public static CapabilityType capabilityType(final String value) {
-    return new CapabilityType(value);
+  public static CapabilityType capabilityType(final String typeId) {
+    return new CapabilityType(typeId);
   }
 
 }

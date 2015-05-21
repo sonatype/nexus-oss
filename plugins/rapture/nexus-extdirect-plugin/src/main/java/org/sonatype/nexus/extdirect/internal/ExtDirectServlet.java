@@ -41,7 +41,6 @@ import org.sonatype.nexus.analytics.EventRecorder;
 import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.model.Response;
-import org.sonatype.nexus.validation.ValidationResponseException;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -228,13 +227,7 @@ public class ExtDirectServlet
             method.getFullName(), method.getFullJavaMethodName(), e);
 
         // handle validation message responses which have contents
-        if (e instanceof ValidationResponseException) {
-          ValidationResponseException cause = (ValidationResponseException) e;
-          if (!cause.getErrors().isEmpty()) {
-            return asResponse(invalid(cause));
-          }
-        }
-        else if (e instanceof ConstraintViolationException) {
+        if (e instanceof ConstraintViolationException) {
           ConstraintViolationException cause = (ConstraintViolationException) e;
           Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
           if (violations != null && !violations.isEmpty()) {

@@ -29,6 +29,7 @@ import org.sonatype.nexus.repository.maven.internal.MavenHostedFacetImpl
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
 import org.sonatype.nexus.repository.maven.MavenPathParser
+import org.sonatype.nexus.repository.maven.internal.MavenRecipeSupport
 import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
 import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.search.SearchFacet
@@ -51,42 +52,18 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 @Named(Maven2HostedRecipe.NAME)
 @Singleton
 class Maven2HostedRecipe
-    extends RecipeSupport
+extends MavenRecipeSupport
 {
   static final String NAME = 'maven2-hosted'
 
   @Inject
-  Provider<Maven2SecurityFacet> securityFacet
-
-  @Inject
-  Provider<ConfigurableViewFacet> viewFacet
-
-  @Inject
-  Provider<StorageFacetImpl> storageFacet
-
-  @Inject
   Provider<SearchFacet> searchFacet
-
-  @Inject
-  TimingHandler timingHandler
-
-  @Inject
-  SecurityHandler securityHandler
-
-  @Inject
-  PartialFetchHandler partialFetchHandler
-
-  @Inject
-  Provider<MavenFacetImpl> mavenFacet
 
   @Inject
   Provider<MavenHostedFacetImpl> mavenHostedFacet
 
   @Inject
   VersionPolicyHandler versionPolicyHandler
-
-  @Inject
-  MavenHeadersHandler mavenHeadersHandler
 
   @Inject
   HostedHandler hostedHandler
@@ -97,9 +74,11 @@ class Maven2HostedRecipe
 
   @Inject
   Maven2HostedRecipe(@Named(HostedType.NAME) final Type type,
-                     @Named(Maven2Format.NAME) final Format format)
+                     @Named(Maven2Format.NAME) final Format format,
+                     @Named(Maven2Format.NAME) MavenPathParser mavenPathParser,
+                     Provider<Maven2SecurityFacet> securityFacet)
   {
-    super(type, format)
+    super(type, format, mavenPathParser, securityFacet)
   }
 
   @Override
@@ -115,10 +94,7 @@ class Maven2HostedRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    builder.route(new Route.Builder()
-        .matcher(new MavenArtifactMatcher(mavenPathParser))
-        .handler(timingHandler)
-        .handler(securityHandler)
+    builder.route(newArtifactRouteBuilder()
         .handler(partialFetchHandler)
         .handler(versionPolicyHandler)
         .handler(mavenHeadersHandler)
@@ -126,10 +102,7 @@ class Maven2HostedRecipe
         .create())
 
     // Note: partialFetchHandler NOT added for Maven metadata
-    builder.route(new Route.Builder()
-        .matcher(new MavenMetadataMatcher(mavenPathParser))
-        .handler(timingHandler)
-        .handler(securityHandler)
+    builder.route(newMetadataRouteBuilder()
         .handler(mavenHeadersHandler)
         .handler(hostedHandler)
         .create())

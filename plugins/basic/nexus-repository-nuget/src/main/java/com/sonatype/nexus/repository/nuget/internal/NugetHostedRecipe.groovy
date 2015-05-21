@@ -71,6 +71,7 @@ class NugetHostedRecipe
         .matcher(new ActionMatcher(HttpMethods.PUT))
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(exceptionHandler)
         .handler(pushHandler)
         .create())
 

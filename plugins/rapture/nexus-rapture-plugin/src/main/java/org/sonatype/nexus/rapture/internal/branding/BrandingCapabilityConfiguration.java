@@ -14,7 +14,9 @@ package org.sonatype.nexus.rapture.internal.branding;
 
 import java.util.Map;
 
+import org.sonatype.nexus.capability.UniquePerCapabilityType;
 import org.sonatype.nexus.common.text.Strings2;
+import org.sonatype.nexus.validation.group.Create;
 
 import org.jetbrains.annotations.NonNls;
 
@@ -25,6 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@UniquePerCapabilityType(value = BrandingCapabilityDescriptor.TYPE_ID, groups = Create.class)
 public class BrandingCapabilityConfiguration
     extends BrandingXO
 {
