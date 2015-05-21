@@ -25,7 +25,6 @@ import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.common.hash.MultiHashingInputStream;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuard;
 import org.sonatype.nexus.common.stateguard.StateGuardAware;
@@ -37,7 +36,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.hash.HashCode;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.tx.OTransaction.TXTYPE;
 
@@ -409,26 +407,32 @@ public class StorageTxImpl
 
   @Override
   @Guarded(by = OPEN)
-  public BlobRef createBlob(final InputStream inputStream, Map<String, String> headers) {
+  public AssetBlob createBlob(final InputStream inputStream,
+                               final Map<String, String> headers,
+                               final Iterable<HashAlgorithm> hashAlgorithms,
+                               final String contentType)
+  {
     checkNotNull(inputStream);
     checkNotNull(headers);
+    checkNotNull(hashAlgorithms);
+    checkNotNull(contentType);
+
+    if (writePolicy == WritePolicy.DENY) {
+      throw new IllegalOperationException("Repository is read only.");
+    }
 
     ImmutableMap.Builder<String, String> storageHeaders = ImmutableMap.builder();
     storageHeaders.put(Bucket.REPO_NAME_HEADER, bucket.repositoryName());
     storageHeaders.putAll(headers);
-
-    return blobTx.create(inputStream, storageHeaders.build());
+    return blobTx.create(inputStream, storageHeaders.build(), hashAlgorithms, contentType);
   }
 
   @Override
-  public BlobRef setBlob(final InputStream inputStream, final Map<String, String> headers, final Asset asset,
-                         final Iterable<HashAlgorithm> hashAlgorithms, final String contentType)
+  @Guarded(by = OPEN)
+  public void attachBlob(final Asset asset, final AssetBlob assetBlob)
   {
-    checkNotNull(inputStream);
-    checkNotNull(headers);
     checkNotNull(asset);
-    checkNotNull(hashAlgorithms);
-    checkNotNull(contentType);
+    checkNotNull(assetBlob);
 
     final WritePolicy effectiveWritePolicy = writePolicySelector.select(asset, writePolicy);
     if (effectiveWritePolicy == WritePolicy.DENY) {
@@ -444,22 +448,35 @@ public class StorageTxImpl
       deleteBlob(oldBlobRef, effectiveWritePolicy);
     }
 
-    // Store new blob while calculating hashes in one pass
-    final MultiHashingInputStream hashingStream = new MultiHashingInputStream(hashAlgorithms, inputStream);
-    final BlobRef newBlobRef = createBlob(hashingStream, headers);
-
-    asset.blobRef(newBlobRef);
-    asset.size(hashingStream.count());
-    asset.contentType(contentType);
+    asset.blobRef(assetBlob.getBlobRef());
+    asset.size(assetBlob.getSize());
+    asset.contentType(assetBlob.getContentType());
 
     // Set attributes map to contain computed checksum metadata
-    Map<HashAlgorithm, HashCode> hashes = hashingStream.hashes();
     NestedAttributesMap checksums = asset.attributes().child(P_CHECKSUM);
-    for (HashAlgorithm algorithm : hashAlgorithms) {
-      checksums.set(algorithm.name(), hashes.get(algorithm).toString());
+    for (HashAlgorithm algorithm : assetBlob.getHashes().keySet()) {
+      checksums.set(algorithm.name(), assetBlob.getHashes().get(algorithm).toString());
     }
 
-    return newBlobRef;
+    assetBlob.setAttached(true);
+  }
+
+  @Override
+  public BlobRef setBlob(final InputStream inputStream, final Map<String, String> headers, final Asset asset,
+                         final Iterable<HashAlgorithm> hashAlgorithms, final String contentType)
+  {
+    checkNotNull(asset);
+
+    // Enforce write policy ahead, as we have asset here
+    BlobRef oldBlobRef = asset.blobRef();
+    if (oldBlobRef != null) {
+      if (writePolicySelector.select(asset, writePolicy) == WritePolicy.ALLOW_ONCE) {
+        throw new IllegalOperationException("Repository does not allow updating assets.");
+      }
+    }
+    final AssetBlob assetBlob = createBlob(inputStream, headers, hashAlgorithms, contentType);
+    attachBlob(asset, assetBlob);
+    return assetBlob.getBlobRef();
   }
 
   @Nullable
