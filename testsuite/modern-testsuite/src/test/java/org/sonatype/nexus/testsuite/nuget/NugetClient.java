@@ -18,12 +18,14 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -37,7 +39,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * A simple NuGet client for ITs.
  */
 public class NugetClient
+    extends ComponentSupport
 {
+  public static final String VS_SEARCH_COUNT_TEMPLATE = "Search()/$count?$filter=IsAbsoluteLatestVersion&searchTerm='%s'&targetFramework='net45'&includePrerelease=true";
+
+  public static final String VS_SEARCH_FEED_TEMPLATE = "Search()?$filter=IsAbsoluteLatestVersion&$skip=0&$top=30&searchTerm='%s'&targetFramework='net45'&includePrerelease=true";
+
   private final HttpClient httpClient;
 
   private final HttpClientContext httpClientContext;
@@ -96,6 +103,13 @@ public class NugetClient
     return asString(entry(packageId, version));
   }
 
+  public String vsSearchFeedXml(final String searchTerm) throws IOException {
+    return feedXml(String.format(VS_SEARCH_FEED_TEMPLATE, searchTerm));
+  }
+
+  public int vsSearchCount(final String searchTerm) throws IOException {
+    return count(String.format(VS_SEARCH_COUNT_TEMPLATE, searchTerm));
+  }
 
   /**
    * Issues a delete request to the NuGet repository.
@@ -105,13 +119,19 @@ public class NugetClient
   public int delete(final String packageId, final String version) throws IOException {
     final URI deleteURI = repositoryBaseUri.resolve(String.format("%s/%s", packageId, version));
     final HttpDelete delete = new HttpDelete(deleteURI);
-    final HttpResponse response = httpClient.execute(delete, httpClientContext);
+    final HttpResponse response = execute(delete);
     return response.getStatusLine().getStatusCode();
   }
 
-    private String asString(final HttpResponse response) throws IOException {
+  private String asString(final HttpResponse response) throws IOException {
     assert response.getStatusLine().getStatusCode() == HttpStatus.OK;
-    return EntityUtils.toString(response.getEntity());
+    final String asString = EntityUtils.toString(response.getEntity());
+
+    String synopsis = asString.substring(0, Math.min(asString.length(), 60));
+    synopsis = synopsis.replaceAll("\\n", "");
+    log.info("Nuget client received {}", synopsis);
+
+    return asString;
   }
 
   /**
@@ -119,6 +139,15 @@ public class NugetClient
    */
   private HttpResponse get(final String path) throws IOException {
     final HttpGet get = new HttpGet(repositoryBaseUri.resolve(path));
-    return httpClient.execute(get, httpClientContext);
+    return execute(get);
   }
+
+  private HttpResponse execute(final HttpUriRequest request) throws IOException {
+    log.info("Nuget client requesting {}", request);
+    final HttpResponse response = httpClient.execute(request, httpClientContext);
+    log.info("Nuget client received {}", response);
+    return response;
+  }
+
+
 }

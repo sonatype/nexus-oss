@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.storage;
 import org.sonatype.nexus.repository.Facet;
 
 import com.google.common.base.Supplier;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
  * Storage {@link Facet}, providing component and asset storage for a repository.
@@ -70,4 +71,9 @@ public interface StorageFacet
    * Opens a transaction.
    */
   StorageTx openTx();
+
+  /**
+   * Opens a transaction with given OrientDB connection.
+   */
+  StorageTx openTx(ODatabaseDocumentTx db);
 }

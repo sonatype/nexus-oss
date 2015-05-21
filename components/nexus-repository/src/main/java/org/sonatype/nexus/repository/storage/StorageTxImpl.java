@@ -39,6 +39,7 @@ import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.tx.OTransaction.TXTYPE;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.common.entity.EntityHelper.id;
@@ -63,6 +64,8 @@ public class StorageTxImpl
 
   private final ODatabaseDocumentTx db;
 
+  private final boolean userManagedDb;
+
   private final Bucket bucket;
 
   private final WritePolicy writePolicy;
@@ -81,6 +84,7 @@ public class StorageTxImpl
 
   public StorageTxImpl(final BlobTx blobTx,
                        final ODatabaseDocumentTx db,
+                       final boolean userManagedDb,
                        final Bucket bucket,
                        final WritePolicy writePolicy,
                        final WritePolicySelector writePolicySelector,
@@ -91,6 +95,7 @@ public class StorageTxImpl
   {
     this.blobTx = checkNotNull(blobTx);
     this.db = checkNotNull(db);
+    this.userManagedDb = userManagedDb;
     this.bucket = checkNotNull(bucket);
     this.writePolicy = writePolicy;
     this.writePolicySelector = checkNotNull(writePolicySelector);
@@ -99,6 +104,10 @@ public class StorageTxImpl
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.hook = checkNotNull(hook);
 
+    // This is only here for now to yell in case of nested TX
+    // To be discussed in future, or at the point when we will have need for nested TX
+    // Note: orient DB sports some rudimentary support for nested TXes
+    checkArgument(!db.getTransaction().isActive(), "Nested DB TX!");
     db.begin(TXTYPE.OPTIMISTIC);
   }
 
@@ -148,7 +157,9 @@ public class StorageTxImpl
       rollback();
     }
 
-    db.close(); // rolls back and releases ODatabaseDocumentTx to pool
+    if (!userManagedDb) {
+      db.close(); // rolls back and releases ODatabaseDocumentTx to pool
+    }
     blobTx.rollback(); // no-op if no changes have occurred since last commit
   }
 

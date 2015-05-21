@@ -44,7 +44,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 class NugetProxyRecipe
     extends NugetRecipeSupport
 {
-  static final String NAME = "nuget-proxy"
+  public static final String NAME = "nuget-proxy"
 
   @Inject
   Provider<NugetProxyGalleryFacet> galleryFacet
@@ -86,6 +86,7 @@ class NugetProxyRecipe
         .matcher(new TokenMatcher("/{id}/{version}"))
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(exceptionHandler)
         .handler(proxyHandler)
         .handler(notFound())
         .create())
