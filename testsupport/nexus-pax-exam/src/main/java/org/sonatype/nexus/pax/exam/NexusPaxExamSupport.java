@@ -436,8 +436,8 @@ public abstract class NexusPaxExamSupport
   @After
   public void stopTestRecording() {
     testIndex.recordAndCopyLink("karaf.log", resolveAppFile("data/log/karaf.log"));
-    testIndex.recordAndCopyLink("nexus.log", resolveWorkFile("logs/nexus.log"));
-    testIndex.recordAndCopyLink("request.log", resolveWorkFile("logs/request.log"));
+    testIndex.recordAndCopyLink("nexus.log", resolveWorkFile("log/nexus.log"));
+    testIndex.recordAndCopyLink("request.log", resolveWorkFile("log/request.log"));
 
     final String surefirePrefix = "target/surefire-reports/" + getClass().getName();
     testIndex.recordLink("surefire result", resolveBaseFile(surefirePrefix + ".txt"));
