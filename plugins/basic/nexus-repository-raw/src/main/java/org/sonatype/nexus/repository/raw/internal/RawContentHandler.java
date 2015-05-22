@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
+import static org.sonatype.nexus.repository.http.HttpMethods.MKCOL;
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toContent;
 import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toPayload;
@@ -49,10 +50,6 @@ public class RawContentHandler
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
-    if(true)
-      throw new NullPointerException("fake to cause 500");
-
-
     String name = contentName(context);
     String method = context.getRequest().getAction();
 
