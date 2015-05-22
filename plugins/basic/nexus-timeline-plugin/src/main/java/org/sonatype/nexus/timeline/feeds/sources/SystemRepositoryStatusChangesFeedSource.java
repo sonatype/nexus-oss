@@ -76,8 +76,8 @@ public class SystemRepositoryStatusChangesFeedSource
     else if (FeedRecorder.REPO_UPDATED.equals(evt.getEventSubType())) {
       return "Repository updated";
     }
-    else if (FeedRecorder.REPO_DROPPED.equals(evt.getEventSubType())) {
-      return "Repository dropped";
+    else if (FeedRecorder.REPO_DELETED.equals(evt.getEventSubType())) {
+      return "Repository deleted";
     }
     else if (FeedRecorder.REPO_LSTATUS.equals(evt.getEventSubType())) {
       return "Repository service state change";
