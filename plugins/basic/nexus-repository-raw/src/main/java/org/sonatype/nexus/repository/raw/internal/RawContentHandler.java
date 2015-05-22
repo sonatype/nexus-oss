@@ -49,6 +49,10 @@ public class RawContentHandler
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
+    if(true)
+      throw new NullPointerException("fake to cause 500");
+
+
     String name = contentName(context);
     String method = context.getRequest().getAction();
 

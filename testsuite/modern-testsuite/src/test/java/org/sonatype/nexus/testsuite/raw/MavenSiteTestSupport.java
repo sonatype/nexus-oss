@@ -42,27 +42,21 @@ public class MavenSiteTestSupport
     final File projectDir = resolveTestFile(project);
     DirSupport.copy(projectDir.toPath(), mavenBaseDir.toPath());
 
-    writeModifiedFile(new File(projectDir, "pom.xml"),
-        new File(mavenBaseDir, "pom.xml").getAbsoluteFile(),
-        replacements);
+    writePom(mavenBaseDir, projectDir, replacements);
 
     Verifier verifier = buildMavenVerifier(repositoryName, mavenBaseDir, mavenSettings);
     verifier.executeGoals(asList(goals));
     verifier.verifyErrorFreeLog();
   }
 
-  @NotNull
-  private Verifier buildMavenVerifier(final String repositoryName, final File mavenBaseDir,
-                                      final File mavenSettings) throws VerificationException
+  private void writePom(final File mavenBaseDir, final File projectDir, final ImmutableMap<String, String> replacements)
+      throws IOException
   {
-    Verifier verifier = new Verifier(mavenBaseDir.getAbsolutePath());
-    verifier.addCliOption("-s " + mavenSettings.getAbsolutePath());
-    verifier.addCliOption(
-        // Verifier replaces // -> /
-        "-DaltDeploymentRepository=local-nexus-admin::default::http:////localhost:" + nexusUrl.getPort() +
-            "/repository/" + repositoryName);
-    return verifier;
+    writeModifiedFile(new File(projectDir, "pom.xml"),
+        new File(mavenBaseDir, "pom.xml").getAbsoluteFile(),
+        replacements);
   }
+
 
   /**
    * Produces a maven settings file, pointing to the test Nexus instance.
@@ -88,5 +82,18 @@ public class MavenSiteTestSupport
     Files.write(content, target, Charsets.UTF_8);
 
     return target;
+  }
+
+  @NotNull
+  private Verifier buildMavenVerifier(final String repositoryName, final File mavenBaseDir,
+                                      final File mavenSettings) throws VerificationException
+  {
+    Verifier verifier = new Verifier(mavenBaseDir.getAbsolutePath());
+    verifier.addCliOption("-s " + mavenSettings.getAbsolutePath());
+    verifier.addCliOption(
+        // Verifier replaces // -> /
+        "-DaltDeploymentRepository=local-nexus-admin::default::http:////localhost:" + nexusUrl.getPort() +
+            "/repository/" + repositoryName);
+    return verifier;
   }
 }
