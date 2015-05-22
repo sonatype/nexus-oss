@@ -38,7 +38,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- TODO: this should probably go into nexus-plugin-api? -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-repository</artifactId>

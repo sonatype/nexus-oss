@@ -44,8 +44,8 @@ public interface Timeline
 
   /**
    * Retrieves the timeline records that are timestamped in between of fromTs, in descending order (newest 1st,
-   * oldest
-   * last).
+   * oldest last).
+   * TODO: storageTx query filtering (whereClause + params)
    *
    * @param fromItem    the count of items you want to "skip" (paging). 0 if none, "from beginning".
    * @param count       the max count of records you want to fetch.

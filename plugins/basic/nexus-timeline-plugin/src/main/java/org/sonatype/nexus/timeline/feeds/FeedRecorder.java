@@ -53,7 +53,7 @@ public interface FeedRecorder
 
   String REPO_CREATED = "created";
 
-  String REPO_DROPPED = "dropped";
+  String REPO_DELETED = "deleted";
 
   String REPO_UPDATED = "updated";
 
