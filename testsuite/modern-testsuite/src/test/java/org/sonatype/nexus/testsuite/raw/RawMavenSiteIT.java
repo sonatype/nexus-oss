@@ -1,88 +1,53 @@
 package org.sonatype.nexus.testsuite.raw;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.http.HttpStatus;
 
-import org.sonatype.nexus.common.io.DirSupport;
+import org.apache.http.HttpResponse;
+import org.junit.Before;
+import org.junit.Test;
+import org.ops4j.pax.exam.Option;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Files;
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
-import org.jetbrains.annotations.NotNull;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerClass;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.asString;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
- * Deploys a maven site to a raw repository.
+ * Tests deployment of a maven site to a raw hosted repository.
  */
-@ExamReactorStrategy(PerClass.class)
 public class RawMavenSiteIT
-    extends RawITSupport
+    extends MavenSiteTestSupport
 {
-  protected void mvn(final String project, final String version, final String deployRepositoryName)
-      throws Exception
-  {
-    List<String> goals = Arrays.asList("clean", "site:deploy");
+  private Repository repository;
 
-    final File mavenBaseDir = resolveBaseFile("target/raw-mvn-site/" + project).getAbsoluteFile();
-    DirSupport.mkdir(mavenBaseDir.toPath());
+  private RawClient client;
 
-    final File mavenPom = new File(mavenBaseDir, "pom.xml").getAbsoluteFile();
-
-    final File mavenSettings = createMavenSettings(mavenBaseDir);
-
-    final File projectDir = resolveTestFile(project);
-    DirSupport.copy(projectDir.toPath(), mavenBaseDir.toPath());
-
-    writeModifiedFile(new File(projectDir, "pom.xml"),
-        mavenPom,
-        ImmutableMap.of("${project.version}", version));
-
-    Verifier verifier = buildMavenVerifier(deployRepositoryName, mavenBaseDir, mavenSettings);
-    verifier.executeGoals(goals);
-    verifier.verifyErrorFreeLog();
+  @org.ops4j.pax.exam.Configuration
+  public static Option[] configureNexus() {
+    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
+        wrappedBundle(maven("org.apache.maven.shared", "maven-verifier").versionAsInProject()),
+        wrappedBundle(maven("org.apache.maven.shared", "maven-shared-utils").versionAsInProject()));
   }
 
-  @NotNull
-  private Verifier buildMavenVerifier(final String deployRepositoryName, final File mavenBaseDir,
-                                      final File mavenSettings) throws VerificationException
-  {
-    Verifier verifier = new Verifier(mavenBaseDir.getAbsolutePath());
-    verifier.addCliOption("-s " + mavenSettings.getAbsolutePath());
-    verifier.addCliOption(
-        // Verifier replaces // -> /
-        "-DaltDeploymentRepository=local-nexus-admin::default::http:////localhost:" + nexusUrl.getPort() +
-            "/repository/" + deployRepositoryName);
-    return verifier;
+  @Before
+  public void createHostedRepository() throws Exception {
+    final Configuration configuration = hostedConfig("test-raw-repo");
+    repository = createRepository(configuration);
+    client = client(repository);
   }
 
-  /**
-   * Produces a maven settings file, pointing to the test Nexus instance.
-   */
-  private File createMavenSettings(final File mavenBaseDir) throws IOException {
-    // set settings NX port
-    return writeModifiedFile(resolveTestFile("settings.xml"),
-        new File(mavenBaseDir, "settings.xml").getAbsoluteFile(),
-        ImmutableMap.of("${nexus.port}", String.valueOf(nexusUrl.getPort())));
-  }
+  @Test
+  public void deploySimpleSite() throws Exception {
+    mvn("testproject", "version", repository.getName(), "clean", "site:site", "site:deploy");
 
-  @NotNull
-  private File writeModifiedFile(final File source, final File target, final Map<String, String> replacements)
-      throws IOException
-  {
-    String content = Files.toString(source, Charsets.UTF_8);
-    for (Entry<String, String> entry : replacements.entrySet()) {
-      content = content.replace(entry.getKey(), entry.getValue());
-    }
+    final HttpResponse index = client.get("index.html");
 
-    Files.write(content, target, Charsets.UTF_8);
-
-    return target;
+    assertThat(status(index), is(HttpStatus.OK));
+    assertThat(asString(index), containsString("About testproject"));
   }
 }
