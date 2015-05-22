@@ -83,6 +83,10 @@ public class RawContentHandler
         return HttpResponses.noContent();
       }
 
+      // Maven site:deploy tends to try to create directories
+      case MKCOL:
+        return HttpResponses.noContent();
+
       default:
         return HttpResponses.methodNotAllowed(method, GET, HEAD, PUT, DELETE);
     }
