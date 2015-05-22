@@ -48,14 +48,8 @@ public class FormatClientSupport
     this.repositoryBaseUri = checkNotNull(repositoryBaseUri);
   }
 
-  protected String asString(final HttpResponse response) throws IOException {
-    assert status(response) == HttpStatus.OK;
+  public static String asString(final HttpResponse response) throws IOException {
     final String asString = EntityUtils.toString(response.getEntity());
-
-    String synopsis = asString.substring(0, Math.min(asString.length(), 60));
-    synopsis = synopsis.replaceAll("\\n", "");
-    log.info("Received {}", synopsis);
-
     return asString;
   }
 

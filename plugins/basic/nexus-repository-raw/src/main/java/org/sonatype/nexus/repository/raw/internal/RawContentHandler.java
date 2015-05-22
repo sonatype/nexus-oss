@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
+import static org.sonatype.nexus.repository.http.HttpMethods.MKCOL;
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toContent;
 import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toPayload;
@@ -81,6 +82,10 @@ public class RawContentHandler
         }
         return HttpResponses.noContent();
       }
+
+      // Maven site:deploy tends to try to create directories
+      case MKCOL:
+        return HttpResponses.noContent();
 
       default:
         return HttpResponses.methodNotAllowed(method, GET, HEAD, PUT, DELETE);
