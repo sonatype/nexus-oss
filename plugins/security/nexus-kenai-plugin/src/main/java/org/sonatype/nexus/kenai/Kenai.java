@@ -16,8 +16,6 @@ import java.io.IOException;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.validation.ValidationResponseException;
-
 /**
  * Kenai facade.
  *
@@ -28,8 +26,6 @@ public interface Kenai
 
   /**
    * Configure Kenai.
-   *
-   * @throws ValidationResponseException If configuration is invalid
    */
   Kenai configure(KenaiConfiguration config) throws IOException;
 

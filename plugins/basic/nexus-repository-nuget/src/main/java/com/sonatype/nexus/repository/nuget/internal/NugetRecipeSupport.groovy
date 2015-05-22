@@ -21,6 +21,7 @@ import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
+import org.sonatype.nexus.repository.view.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
@@ -54,6 +55,9 @@ abstract class NugetRecipeSupport
 
   @Inject
   Provider<SearchFacet> searchFacet
+
+  @Inject
+  ExceptionHandler exceptionHandler
 
   @Inject
   TimingHandler timingHandler

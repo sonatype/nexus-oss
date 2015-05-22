@@ -14,6 +14,7 @@ package org.sonatype.nexus.extdirect.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,9 +23,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
 import javax.validation.Path.Node;
-
-import org.sonatype.nexus.validation.ValidationMessage;
-import org.sonatype.nexus.validation.ValidationResponseException;
 
 import com.google.common.base.Joiner;
 
@@ -42,24 +40,6 @@ public class ValidationResponse
 
   private Map<String, String> errors;
 
-  public ValidationResponse(final ValidationResponseException cause) {
-    super(false, new ArrayList<>());
-    //noinspection ThrowableResultOfMethodCallIgnored
-    checkNotNull(cause);
-    if (cause.getErrors().isEmpty()) {
-      messages = new ArrayList<>();
-      messages.add(cause.getMessage());
-    }
-    else {
-      convertValidationMessages(cause.getErrors());
-    }
-  }
-
-  public ValidationResponse(final List<ValidationMessage> validationMessages) {
-    super(false, new ArrayList<>());
-    convertValidationMessages(validationMessages);
-  }
-
   public ValidationResponse(final ConstraintViolationException cause) {
     super(false, new ArrayList<>());
     //noinspection ThrowableResultOfMethodCallIgnored
@@ -69,8 +49,10 @@ public class ValidationResponse
       for (ConstraintViolation<?> violation : violations) {
         List<String> entries = new ArrayList<>();
         // iterate path to get the full path
-        for (Node node : violation.getPropertyPath()) {
-          if (ElementKind.PROPERTY == node.getKind() || ElementKind.PARAMETER == node.getKind()) {
+        Iterator<Node> it = violation.getPropertyPath().iterator();
+        while (it.hasNext()) {
+          Node node = it.next();
+          if (ElementKind.PROPERTY == node.getKind() || (ElementKind.PARAMETER == node.getKind() && !it.hasNext())) {
             if (node.getKey() != null) {
               entries.add(node.getKey().toString());
             }
@@ -97,20 +79,4 @@ public class ValidationResponse
     }
   }
 
-  private void convertValidationMessages(final List<ValidationMessage> validationMessages) {
-    if (validationMessages != null) {
-      errors = new HashMap<>();
-      for (ValidationMessage validationMessage : validationMessages) {
-        if ("*".equals(validationMessage.getKey())) {
-          if (messages == null) {
-            messages = new ArrayList<>();
-          }
-          messages.add(validationMessage.getMessage());
-        }
-        else {
-          errors.put(validationMessage.getKey(), validationMessage.getMessage());
-        }
-      }
-    }
-  }
 }

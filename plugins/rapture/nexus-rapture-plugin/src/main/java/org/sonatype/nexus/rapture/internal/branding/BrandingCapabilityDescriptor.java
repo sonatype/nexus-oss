@@ -13,16 +13,15 @@
 package org.sonatype.nexus.rapture.internal.branding;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.capability.CapabilityIdentity;
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
-import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
@@ -41,7 +40,7 @@ import org.jetbrains.annotations.NonNls;
 @Named(BrandingCapabilityDescriptor.TYPE_ID)
 @Singleton
 public class BrandingCapabilityDescriptor
-    extends CapabilityDescriptorSupport
+    extends CapabilityDescriptorSupport<BrandingCapabilityConfiguration>
     implements Taggable
 {
   @NonNls
@@ -49,7 +48,7 @@ public class BrandingCapabilityDescriptor
 
   public static final CapabilityType TYPE = CapabilityType.capabilityType(TYPE_ID);
 
-  private static interface Messages
+  private interface Messages
       extends MessageBundle
   {
     @DefaultMessage("UI: Branding")
@@ -135,13 +134,8 @@ public class BrandingCapabilityDescriptor
   }
 
   @Override
-  public Validator validator() {
-    return validators().capability().uniquePer(TYPE);
-  }
-
-  @Override
-  public Validator validator(final CapabilityIdentity id) {
-    return validators().capability().uniquePerExcluding(id, TYPE);
+  protected BrandingCapabilityConfiguration createConfig(final Map<String, String> properties) {
+    return new BrandingCapabilityConfiguration(properties);
   }
 
   @Override

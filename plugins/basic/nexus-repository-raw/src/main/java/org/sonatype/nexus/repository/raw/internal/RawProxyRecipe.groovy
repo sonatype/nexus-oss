@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
+import org.sonatype.nexus.repository.view.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
@@ -77,6 +78,9 @@ class RawProxyRecipe
   Provider<SearchFacet> searchFacet
 
   @Inject
+  ExceptionHandler exceptionHandler
+
+  @Inject
   TimingHandler timingHandler
 
   @Inject
@@ -119,6 +123,8 @@ class RawProxyRecipe
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
+        .handler(securityHandler)
+        .handler(exceptionHandler)
         .handler(negativeCacheHandler)
         .handler(partialFetchHandler)
         .handler(proxyHandler)

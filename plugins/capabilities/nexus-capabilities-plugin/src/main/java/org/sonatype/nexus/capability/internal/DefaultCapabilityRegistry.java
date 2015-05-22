@@ -24,9 +24,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.validation.Validator;
 
 import org.sonatype.nexus.capability.Capability;
 import org.sonatype.nexus.capability.CapabilityDescriptor;
+import org.sonatype.nexus.capability.CapabilityDescriptor.ValidationMode;
 import org.sonatype.nexus.capability.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.capability.CapabilityEvent;
 import org.sonatype.nexus.capability.CapabilityFactory;
@@ -37,17 +39,11 @@ import org.sonatype.nexus.capability.CapabilityReference;
 import org.sonatype.nexus.capability.CapabilityRegistry;
 import org.sonatype.nexus.capability.CapabilityRegistryEvent.AfterLoad;
 import org.sonatype.nexus.capability.CapabilityType;
-import org.sonatype.nexus.capability.ValidationResult;
-import org.sonatype.nexus.capability.Validator;
-import org.sonatype.nexus.capability.ValidatorRegistry;
 import org.sonatype.nexus.capability.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.capability.internal.storage.CapabilityStorageItem;
 import org.sonatype.nexus.formfields.Encrypted;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.security.PasswordHelper;
-import org.sonatype.nexus.validation.ValidationMessage;
-import org.sonatype.nexus.validation.ValidationResponse;
-import org.sonatype.nexus.validation.ValidationResponseException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -73,8 +69,6 @@ public class DefaultCapabilityRegistry
 
   private final CapabilityStorage capabilityStorage;
 
-  private final Provider<ValidatorRegistry> validatorRegistryProvider;
-
   private final CapabilityFactoryRegistry capabilityFactoryRegistry;
 
   private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
@@ -87,30 +81,32 @@ public class DefaultCapabilityRegistry
 
   private final PasswordHelper passwordHelper;
 
+  private final Provider<Validator> validatorProvider;
+
   private final Map<CapabilityIdentity, DefaultCapabilityReference> references;
 
   private final ReentrantReadWriteLock lock;
 
   @Inject
   DefaultCapabilityRegistry(final CapabilityStorage capabilityStorage,
-                            final Provider<ValidatorRegistry> validatorRegistryProvider,
                             final CapabilityFactoryRegistry capabilityFactoryRegistry,
                             final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
                             final EventBus eventBus,
                             final ActivationConditionHandlerFactory activationConditionHandlerFactory,
                             final ValidityConditionHandlerFactory validityConditionHandlerFactory,
-                            final PasswordHelper passwordHelper)
+                            final PasswordHelper passwordHelper,
+                            final Provider<Validator> validatorProvider)
   {
     this.capabilityStorage = checkNotNull(capabilityStorage);
-    this.validatorRegistryProvider = checkNotNull(validatorRegistryProvider);
     this.capabilityFactoryRegistry = checkNotNull(capabilityFactoryRegistry);
     this.capabilityDescriptorRegistry = checkNotNull(capabilityDescriptorRegistry);
     this.eventBus = checkNotNull(eventBus);
     this.activationConditionHandlerFactory = checkNotNull(activationConditionHandlerFactory);
     this.validityConditionHandlerFactory = checkNotNull(validityConditionHandlerFactory);
     this.passwordHelper = checkNotNull(passwordHelper);
+    this.validatorProvider = checkNotNull(validatorProvider);
 
-    references = new HashMap<CapabilityIdentity, DefaultCapabilityReference>();
+    references = new HashMap<>();
     lock = new ReentrantReadWriteLock();
   }
 
@@ -121,16 +117,18 @@ public class DefaultCapabilityRegistry
                                  final Map<String, String> properties)
       throws IOException
   {
+    checkNotNull(type);
+
     try {
       lock.writeLock().lock();
 
       final Map<String, String> props = properties == null ? Maps.<String, String>newHashMap() : properties;
 
-      validateType(type);
-
-      validate(checkNotNull(validatorRegistryProvider.get()).get(type), props);
+      validatorProvider.get().validate(type);
 
       final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get(type);
+
+      descriptor.validate(props, ValidationMode.CREATE);
 
       final Map<String, String> encryptedProps = encryptValuesIfNeeded(descriptor, props);
 
@@ -170,14 +168,14 @@ public class DefaultCapabilityRegistry
 
       validateId(id);
 
-      validate(checkNotNull(validatorRegistryProvider.get()).get(id), props);
-
       final DefaultCapabilityReference reference = get(id);
+
+      reference.descriptor().validate(props, ValidationMode.UPDATE);
 
       final Map<String, String> encryptedProps = encryptValuesIfNeeded(reference.descriptor(), props);
 
       capabilityStorage.update(id, new CapabilityStorageItem(
-          reference.descriptor().version(), reference.type().toString(), enabled, notes, encryptedProps)
+              reference.descriptor().version(), reference.type().toString(), enabled, notes, encryptedProps)
       );
 
       log.debug(
@@ -338,11 +336,13 @@ public class DefaultCapabilityRegistry
           continue;
         }
         capabilityStorage.update(id, new CapabilityStorageItem(
-            descriptor.version(), item.getType(), item.isEnabled(), item.getNotes(), properties)
+                descriptor.version(), item.getType(), item.isEnabled(), item.getNotes(), properties)
         );
       }
 
       final DefaultCapabilityReference reference = create(id, capabilityType(item.getType()), descriptor);
+
+      reference.descriptor().validate(properties, ValidationMode.LOAD);
 
       reference.setNotes(item.getNotes());
       reference.load(properties);
@@ -394,48 +394,9 @@ public class DefaultCapabilityRegistry
     );
   }
 
-  private void validateType(final CapabilityType type) {
-    final ValidationResponse vr = new ValidationResponse();
-
-    if (type == null) {
-      vr.addError(new ValidationMessage("typeId", "Type must be provided"));
-    }
-    else {
-      if (capabilityFactoryRegistry.get(type) == null || capabilityDescriptorRegistry.get(type) == null) {
-        vr.addError(new ValidationMessage("typeId", "Type '" + type + "' is not supported"));
-      }
-    }
-
-    if (!vr.getErrors().isEmpty()) {
-      throw new ValidationResponseException(vr);
-    }
-  }
-
   private void validateId(final CapabilityIdentity id) throws CapabilityNotFoundException {
     if (get(id) == null) {
       throw new CapabilityNotFoundException(id);
-    }
-  }
-
-  private void validate(final Collection<Validator> validators, final Map<String, String> properties) {
-    if (validators != null && !validators.isEmpty()) {
-      final ValidationResponse vr = new ValidationResponse();
-
-      for (final Validator validator : validators) {
-        final ValidationResult validationResult = validator.validate(properties);
-        if (!validationResult.isValid()) {
-          for (final ValidationResult.Violation violation : validationResult.violations()) {
-            vr.addError(new ValidationMessage(
-                violation.key(),
-                violation.message()
-            ));
-          }
-        }
-      }
-
-      if (!vr.getErrors().isEmpty()) {
-        throw new ValidationResponseException(vr);
-      }
     }
   }
 

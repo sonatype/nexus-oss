@@ -12,12 +12,7 @@
  */
 package org.sonatype.nexus.extdirect.model;
 
-import java.util.List;
-
 import javax.validation.ConstraintViolationException;
-
-import org.sonatype.nexus.validation.ValidationMessage;
-import org.sonatype.nexus.validation.ValidationResponseException;
 
 /**
  * Ext.Direct response builder.
@@ -40,14 +35,6 @@ public class Responses
 
   public static ErrorResponse error(final String message) {
     return new ErrorResponse(message);
-  }
-
-  public static ValidationResponse invalid(final ValidationResponseException cause) {
-    return new ValidationResponse(cause);
-  }
-
-  public static ValidationResponse invalid(final List<ValidationMessage> messages) {
-    return new ValidationResponse(messages);
   }
 
   public static ValidationResponse invalid(final ConstraintViolationException cause) {

@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.sonatype.nexus.validation.ValidationResponseException;
-
 import com.google.common.base.Predicate;
 
 /**
@@ -34,8 +32,7 @@ public interface CapabilityRegistry
    * @param notes      optional capability notes (can be null)
    * @param properties optional capability properties (can be null)
    * @return reference to created capability (never null)
-   * @throws ValidationResponseException    If validation failed
-   * @throws IOException                    If capabilities could not be stored
+   * @throws IOException If capabilities could not be stored
    */
   CapabilityReference add(CapabilityType type,
                           boolean enabled,
@@ -51,9 +48,8 @@ public interface CapabilityRegistry
    * @param notes      optional capability notes (can be null)
    * @param properties optional capability properties (can be null)
    * @return reference to updated capability (never null)
-   * @throws ValidationResponseException    If validation failed
-   * @throws IOException                    If capabilities could not be stored
-   * @throws CapabilityNotFoundException    If capability with specified id does not exist
+   * @throws IOException                 If capabilities could not be stored
+   * @throws CapabilityNotFoundException If capability with specified id does not exist
    */
   CapabilityReference update(CapabilityIdentity id,
                              boolean enabled,
@@ -112,7 +108,7 @@ public interface CapabilityRegistry
    * @return collection of capabilities, never null
    * @since capabilities 2.0
    */
-  public Collection<? extends CapabilityReference> get(Predicate<CapabilityReference> filter);
+  Collection<? extends CapabilityReference> get(Predicate<CapabilityReference> filter);
 
   /**
    * Retrieves all capabilities from registry. If no capability exists, result will be empty.

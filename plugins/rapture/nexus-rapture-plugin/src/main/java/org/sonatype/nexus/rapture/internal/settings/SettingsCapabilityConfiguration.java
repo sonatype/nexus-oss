@@ -14,7 +14,9 @@ package org.sonatype.nexus.rapture.internal.settings;
 
 import java.util.Map;
 
+import org.sonatype.nexus.capability.UniquePerCapabilityType;
 import org.sonatype.nexus.common.text.Strings2;
+import org.sonatype.nexus.validation.group.Create;
 
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NonNls;
@@ -26,6 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@UniquePerCapabilityType(value = SettingsCapabilityDescriptor.TYPE_ID, groups = Create.class)
 public class SettingsCapabilityConfiguration
     extends RaptureSettings
 {

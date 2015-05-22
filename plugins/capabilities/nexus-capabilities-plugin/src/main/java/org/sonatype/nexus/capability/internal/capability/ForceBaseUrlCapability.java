@@ -19,22 +19,20 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.sonatype.nexus.capability.support.CapabilitySupport;
-import org.sonatype.nexus.capability.support.WithoutConfiguration;
 import org.sonatype.nexus.common.app.BaseUrlManager;
 import org.sonatype.nexus.common.app.SystemState;
 import org.sonatype.nexus.common.app.SystemStatus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.capability.support.WithoutConfiguration.WITHOUT_CONFIGURATION;
 
 /**
  * Force Base URL capability.
  *
  * @since 3.0
  */
-@Named(ForceBaseUrlDescriptor.TYPE_ID)
+@Named(ForceBaseUrlCapabilityDescriptor.TYPE_ID)
 public class ForceBaseUrlCapability
-    extends CapabilitySupport<WithoutConfiguration>
+    extends CapabilitySupport<ForceBaseUrlCapabilityConfiguration>
 {
   private final BaseUrlManager baseUrlManager;
 
@@ -49,19 +47,19 @@ public class ForceBaseUrlCapability
   }
 
   @Override
-  protected WithoutConfiguration createConfig(final Map<String, String> properties) {
-    return WITHOUT_CONFIGURATION;
+  protected ForceBaseUrlCapabilityConfiguration createConfig(final Map<String, String> properties) {
+    return new ForceBaseUrlCapabilityConfiguration();
   }
 
   @Override
-  protected void onActivate(final WithoutConfiguration config) throws Exception {
+  protected void onActivate(final ForceBaseUrlCapabilityConfiguration config) throws Exception {
     if (!baseUrlManager.isForce()) {
       baseUrlManager.setForce(true);
     }
   }
 
   @Override
-  protected void onPassivate(final WithoutConfiguration config) throws Exception {
+  protected void onPassivate(final ForceBaseUrlCapabilityConfiguration config) throws Exception {
     if (SystemState.STOPPING != systemStatusProvider.get().getState()) {
       baseUrlManager.setForce(false);
     }

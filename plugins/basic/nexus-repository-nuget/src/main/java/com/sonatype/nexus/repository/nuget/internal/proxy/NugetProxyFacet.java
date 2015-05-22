@@ -71,7 +71,7 @@ public class NugetProxyFacet
 
     // Cache the metadata from the remote, grabbing the content location as we go
     final StringBuilder contentLocation = new StringBuilder();
-    fetcher.cachePackageFeed(getRepository(), remoteEntryUri, 2, true, new ODataConsumer()
+    fetcher.cachePackageFeed(getRepository(), remoteEntryUri, 2, false, new ODataConsumer()
     {
       @Override
       public void consume(final Map<String, String> data) {

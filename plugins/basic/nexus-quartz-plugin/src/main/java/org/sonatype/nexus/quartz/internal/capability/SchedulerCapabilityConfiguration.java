@@ -14,7 +14,9 @@ package org.sonatype.nexus.quartz.internal.capability;
 
 import java.util.Map;
 
+import org.sonatype.nexus.capability.UniquePerCapabilityType;
 import org.sonatype.nexus.capability.support.CapabilityConfigurationSupport;
+import org.sonatype.nexus.validation.group.Create;
 
 import com.google.common.collect.Maps;
 
@@ -25,6 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@UniquePerCapabilityType(value = SchedulerCapabilityDescriptor.TYPE_ID, groups = Create.class)
 public class SchedulerCapabilityConfiguration
     extends CapabilityConfigurationSupport
 {

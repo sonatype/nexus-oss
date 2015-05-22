@@ -71,19 +71,9 @@ public interface CapabilityDescriptor
   String about();
 
   /**
-   * Validator to be used to validate capability properties before a capability is created.
-   *
-   * @return validator or null if no validation is required
+   * Validate properties before create/update/load.
    */
-  Validator validator();
-
-  /**
-   * Validator to be used to validate capability properties before a capability is updated.
-   *
-   * @param id identity of capability that will be updated
-   * @return validator or null if no validation is required
-   */
-  Validator validator(CapabilityIdentity id);
+  void validate(Map<String, String> properties, ValidationMode validationMode);
 
   /**
    * Returns the version of descriptor. The version should change when the descriptor fields change, case when the
@@ -102,5 +92,10 @@ public interface CapabilityDescriptor
    * @return converted
    */
   Map<String, String> convert(Map<String, String> properties, int fromVersion);
+
+  enum ValidationMode
+  {
+    CREATE, UPDATE, LOAD
+  }
 
 }

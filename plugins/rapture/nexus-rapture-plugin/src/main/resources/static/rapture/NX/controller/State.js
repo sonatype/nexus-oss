@@ -108,15 +108,18 @@ Ext.define('NX.controller.State', {
     return this.receiving;
   },
 
-  getValue: function (key, defaultValue) {
+  getValue: function(key, defaultValue) {
     var me = this,
         model = me.getStateStore().getById(key),
-        value = defaultValue;
+        value;
 
     if (model) {
       value = model.get('value');
+      if (Ext.isDefined(value)) {
+        return value;
+      }
     }
-    return value;
+    return defaultValue;
   },
 
   /**

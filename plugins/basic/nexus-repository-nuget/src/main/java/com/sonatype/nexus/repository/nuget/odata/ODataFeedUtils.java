@@ -14,20 +14,15 @@ package com.sonatype.nexus.repository.nuget.odata;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import com.sonatype.nexus.repository.nuget.internal.NugetProperties;
+import java.util.Map.Entry;
 
 import com.google.common.collect.ImmutableMap;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.odata4j.expression.EntitySimpleProperty;
-import org.odata4j.expression.OrderByExpression;
-
-import static org.odata4j.expression.Expression.asFilterString;
-import static org.odata4j.expression.Expression.literal;
-import static org.odata4j.producer.resources.OptionsQueryParser.parseOrderBy;
 
 /**
  * Helper methods for constructing NuGet XML responses.
@@ -42,56 +37,48 @@ public class ODataFeedUtils
   /**
    * Constructs an OData skip link for the given data position.
    *
-   * @param data  Current data position
    * @param query Components of the query string
    * @return Encoded skip link
    */
-  public static String skipLink(final Map<String, ?> data, final Map<String, String> query) {
+  public static String skipLinkQueryString(final Map<String, String> query) {
+    Map<String, String> nextPageQuery = queryForNextPage(query);
+    return toQueryString(nextPageQuery);
+
+  }
+
+  @NotNull
+  private static String toQueryString(final Map<String, String> nextPageQuery) {
     final StringBuilder link = new StringBuilder();
-    final String searchterm = query.get("searchterm");
-    if (null != searchterm) {
-      link.append("searchterm=").append(encode(searchterm)).append("&amp;");
+
+    for (Entry<String, String> entry : nextPageQuery.entrySet()) {
+      if (link.length() > 0) {
+        link.append("&");
+      }
+      link.append(entry.getKey()).append("=").append(encode(entry.getValue()));
     }
-    final String id = query.get("id");
-    if (null != id) {
-      link.append("id=").append(encode(id)).append("&amp;");
-    }
-    final String filter = query.get("$filter");
-    if (null != filter) {
-      link.append("$filter=").append(encode(filter)).append("&amp;");
-    }
-    final String orderby = query.get("$orderby");
-    if (null != orderby) {
-      link.append("$orderby=").append(encode(orderby)).append("&amp;");
-    }
-    final String top = query.get("$top");
-    if (null != top) {
-      link.append("$top=").append(Integer.parseInt(top) - ODataUtils.PAGE_SIZE).append("&amp;");
-    }
-    final String skipToken = skipToken(orderby, data);
-    link.append("$skiptoken=").append(encode(skipToken));
+
     return link.toString();
   }
 
-  /**
-   * Constructs an OData skip token for the given data position.
-   *
-   * @param orderBy $orderBy parameter
-   * @param data    Current data position
-   * @return Raw skip token
-   */
-  public static String skipToken(final String orderBy, final Map<String, ?> data) {
-    final StringBuilder token = new StringBuilder();
-    if (null != orderBy) {
-      for (final OrderByExpression o : parseOrderBy(orderBy)) {
-        final String name = ((EntitySimpleProperty) o.getExpression()).getPropertyName().toUpperCase();
-        final Object value = data.get(NugetProperties.ATTRIB_NAMES.get(name));
-        token.append(asFilterString(literal(value))).append(',');
-      }
+  @NotNull
+  private static Map<String, String> queryForNextPage(final Map<String, String> query) {
+    Map<String, String> nextPageQuery = new HashMap<>(query);
+
+    if (query.containsKey("$top")) {
+      // Since the original query asked for the top 'x' entries, subtract a page's worth from that
+      final int top = Integer.parseInt(query.get("$top"));
+      nextPageQuery.put("$top", Integer.toString(Math.max(1, top - ODataUtils.PAGE_SIZE)));
     }
-    token.append(asFilterString(literal(data.get(NugetProperties.P_ID)))).append(',');
-    token.append(asFilterString(literal(data.get(NugetProperties.P_VERSION))));
-    return token.toString();
+
+    int currentSkip;
+    if (query.containsKey("$skip")) {
+      currentSkip = Integer.parseInt(query.get("$skip"));
+    }
+    else {
+      currentSkip = 0;
+    }
+    nextPageQuery.put("$skip", Integer.toString(currentSkip + ODataUtils.PAGE_SIZE));
+    return nextPageQuery;
   }
 
   /**

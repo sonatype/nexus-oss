@@ -14,7 +14,13 @@ package org.sonatype.nexus.kenai;
 
 import java.util.Map;
 
+import org.sonatype.nexus.capability.UniquePerCapabilityType;
+import org.sonatype.nexus.kenai.internal.KenaiCapabilityDescriptor;
+import org.sonatype.nexus.validation.group.Create;
+
 import com.google.common.collect.Maps;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.URL;
 import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -24,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@UniquePerCapabilityType(value = KenaiCapabilityDescriptor.TYPE_ID, groups = Create.class)
 public class KenaiConfiguration
 {
 
@@ -36,11 +43,14 @@ public class KenaiConfiguration
   /**
    * The remote Kenai used for authentication.
    */
+  @NotBlank
+  @URL
   private String baseUrl = "https://java.net/";
 
   /**
    * A role it assigned to all Kenai Realm users.
    */
+  @NotBlank
   private String defaultRole;
 
   public KenaiConfiguration() {}
