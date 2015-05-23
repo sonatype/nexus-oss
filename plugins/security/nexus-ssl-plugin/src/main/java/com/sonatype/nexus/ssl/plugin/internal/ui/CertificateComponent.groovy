@@ -102,7 +102,7 @@ extends DirectComponentSupport
                                      final int port,
                                      final String protocolHint)
   {
-    if (protocolHint) {
+    if (!protocolHint) {
       try {
         return certificateRetriever.retrieveCertificates(host, port)
       }
