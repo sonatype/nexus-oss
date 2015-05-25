@@ -12,9 +12,13 @@
  */
 package org.sonatype.nexus.httpclient;
 
+import javax.annotation.Nullable;
+
+import org.sonatype.nexus.httpclient.HttpClientPlan.Customizer;
 import org.sonatype.nexus.httpclient.config.HttpClientConfiguration;
 
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 /**
  * HTTP-client manager.
@@ -45,4 +49,9 @@ public interface HttpClientManager
    * Consider using {@code Provider<HttpClient>} instead.
    */
   CloseableHttpClient create();
+
+  /**
+   * Create customized HTTP-client builder.
+   */
+  HttpClientBuilder prepare(final @Nullable Customizer customizer);
 }
