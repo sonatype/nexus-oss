@@ -26,9 +26,9 @@ Ext.define('NX.coreui.model.LdapServer', {
     {name: 'url', type: 'string'},
 
     {name: 'protocol', type: 'auto' /*object*/},
-    {name: 'useTrustStore', type: 'boolean'},
     {name: 'host', type: 'string'},
     {name: 'port', type: 'int'},
+    {name: 'useTrustStore', type: 'boolean'},
     {name: 'searchBase', type: 'string'},
 
     {name: 'authScheme', type: 'string'},
