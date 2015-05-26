@@ -10,45 +10,57 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.nexus.repository.nuget.internal.security;
+package com.sonatype.nexus.repository.nuget.security;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
+import javax.inject.Provider;
 
-import org.sonatype.nexus.common.event.EventSubscriber;
-import org.sonatype.nexus.security.UserPrincipalsExpired;
+import org.sonatype.nexus.common.app.NexusStartedEvent;
+import org.sonatype.nexus.common.app.NexusStoppedEvent;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.sisu.goodies.lifecycle.LifecycleManagerImpl;
 
-import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
-import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.eclipse.sisu.EagerSingleton;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Ensures that API keys for deleted users are removed.
+ * Manages the lifecycle for the {@link NugetApiKeyStoreImpl}.
+ *
+ * @since 3.0
  */
 @Named
-@Singleton
-final class NugetApiKeyEventInspector
-    implements EventSubscriber
+@EagerSingleton
+public class NugetApiKeyLifecycle
+    extends LifecycleManagerImpl
 {
-  private final NugetApiKeyStore keyStore;
+  private final EventBus eventBus;
+
+  private final Provider<NugetApiKeyStore> keyStore;
 
   @Inject
-  public NugetApiKeyEventInspector(final NugetApiKeyStore keyStore) {
+  public NugetApiKeyLifecycle(final EventBus eventBus, final Provider<NugetApiKeyStore> keyStore)
+  {
+    this.eventBus = checkNotNull(eventBus);
     this.keyStore = checkNotNull(keyStore);
+
+    eventBus.register(this);
   }
 
   @Subscribe
-  @AllowConcurrentEvents
-  public void inspect(final UserPrincipalsExpired expiredEvent) {
-    final String userId = expiredEvent.getUserId();
-    if (userId != null) {
-      keyStore.deleteApiKey(new SimplePrincipalCollection(userId, expiredEvent.getSource()));
-    }
-    else {
-      keyStore.purgeApiKeys();
-    }
+  public void on(final NexusStartedEvent event) throws Exception {
+    add(keyStore.get());
+
+    start();
+  }
+
+  @Subscribe
+  public void on(final NexusStoppedEvent event) throws Exception {
+    eventBus.unregister(this);
+
+    stop();
+    clear();
   }
 }
