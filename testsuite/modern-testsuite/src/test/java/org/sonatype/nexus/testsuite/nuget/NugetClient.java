@@ -17,9 +17,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+import com.sonatype.nexus.repository.nuget.security.NugetApiKey;
+
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -30,6 +33,7 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -51,13 +55,17 @@ public class NugetClient
 
   private final URI repositoryBaseUri;
 
+  private final String apiKey;
+
   public NugetClient(final HttpClient httpClient,
                      final HttpClientContext httpClientContext,
-                     final URI repositoryBaseUri)
+                     final URI repositoryBaseUri,
+                     final String apiKey)
   {
     this.httpClient = checkNotNull(httpClient);
     this.httpClientContext = checkNotNull(httpClientContext);
     this.repositoryBaseUri = checkNotNull(repositoryBaseUri);
+    this.apiKey = apiKey;
 
     checkArgument(repositoryBaseUri.toString().endsWith("/"));
   }
@@ -81,9 +89,17 @@ public class NugetClient
 
     put.setEntity(reqEntity.build());
 
+    addNugetApiKey(put);
+
     final HttpResponse execute = httpClient.execute(put, httpClientContext);
 
     return execute.getStatusLine().getStatusCode();
+  }
+
+  private void addNugetApiKey(final HttpRequest request) {
+    if (apiKey != null) {
+      request.setHeader(new BasicHeader(NugetApiKey.NAME, apiKey));
+    }
   }
 
   public String feedXml(final String query) throws IOException {
@@ -118,8 +134,9 @@ public class NugetClient
    */
   public int delete(final String packageId, final String version) throws IOException {
     final URI deleteURI = repositoryBaseUri.resolve(String.format("%s/%s", packageId, version));
-    final HttpDelete delete = new HttpDelete(deleteURI);
-    final HttpResponse response = execute(delete);
+    final HttpDelete deleteRequest = new HttpDelete(deleteURI);
+    addNugetApiKey(deleteRequest);
+    final HttpResponse response = execute(deleteRequest);
     return response.getStatusLine().getStatusCode();
   }
 

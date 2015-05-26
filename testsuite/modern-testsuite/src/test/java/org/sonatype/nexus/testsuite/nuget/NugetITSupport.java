@@ -24,19 +24,31 @@ import javax.inject.Inject;
 import com.sonatype.nexus.repository.nuget.internal.NugetHostedRecipe;
 import com.sonatype.nexus.repository.nuget.odata.FeedSplicer;
 import com.sonatype.nexus.repository.nuget.odata.ODataConsumer;
+import com.sonatype.nexus.repository.nuget.security.NugetApiKey;
+import com.sonatype.nexus.repository.nuget.security.NugetApiKeyStore;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.storage.WritePolicy;
+import org.sonatype.nexus.security.realm.RealmConfiguration;
+import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
+import org.sonatype.sisu.goodies.common.Loggers;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
+import org.junit.Before;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.WrappedUrlProvisionOption.OverwriteMode;
+import org.slf4j.Logger;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
@@ -59,6 +71,19 @@ public abstract class NugetITSupport
 
   @Inject
   private RepositoryManager repositoryManager;
+
+  @Inject
+  private NugetApiKeyStore keyStore;
+
+  @Inject
+  private RealmManager realmManager;
+
+  @NonNls
+  protected final Logger log = (Logger) Preconditions.checkNotNull(this.createLogger());
+
+  protected Logger createLogger() {
+    return Loggers.getLogger(this);
+  }
 
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
@@ -105,7 +130,49 @@ public abstract class NugetITSupport
   protected NugetClient nugetClient(final Repository repository) throws Exception {
     final URL url = resolveUrl(nexusUrl, "/repository/" + repository.getName() + "/");
     waitFor(responseFrom(url));
-    return new NugetClient(clientBuilder().build(), clientContext(), url.toURI());
+
+    final String apiKey = prepareApiKey(new SimplePrincipalCollection("admin", "NexusAuthenticatingRealm"));
+
+    return new NugetClient(clientBuilder().build(), clientContext(), url.toURI(), apiKey);
+  }
+
+  @NotNull
+  private String prepareApiKey(final PrincipalCollection admin) {
+    char[] apiKey = keyStore.getApiKey(admin);
+    log.info("Existing nuget api key for {} is {}", admin, apiKey);
+    if (apiKey == null) {
+      log.info("Creating new API key for {}", admin);
+      apiKey = keyStore.createApiKey(admin);
+    }
+    return new String(apiKey);
+  }
+
+  @Override
+  protected void doUseCredentials(final HttpClientBuilder builder) {
+    // Do nothing, don't use basic auth credentials
+  }
+
+  @Before
+  public void enableNugetRealm() {
+    log.info("Realm configuration {}", realmManager.getConfiguration());
+
+    //final String realmName = NugetApiKeyRealm.class.getName();
+    //final String nugetRealmName = NugetApiKeyRealm.ID;
+    final String nugetRealmName = NugetApiKey.NAME;
+
+    final RealmConfiguration config = realmManager.getConfiguration();
+
+    if (!config.getRealmNames().contains(nugetRealmName)) {
+
+      log.info("Adding Nuget realm.");
+
+      config.getRealmNames().add(nugetRealmName);
+      realmManager.setConfiguration(config);
+      calmPeriod();
+    }
+    else {
+      log.info("Nuget realm already configured.");
+    }
   }
 
   protected ParsedFeed parse(final String feedXml) throws Exception {
