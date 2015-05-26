@@ -12,51 +12,48 @@
  */
 package org.sonatype.nexus.testsuite.raw;
 
-import java.io.File;
-
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpStatus;
 
-import com.google.common.io.Files;
+import org.apache.http.HttpResponse;
 import org.junit.Before;
 import org.junit.Test;
+import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.asString;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
- * IT for hosted raw repositories
+ * Tests deployment of a maven site to a raw hosted repository.
  */
-public class RawHostedIT
-    extends RawITSupport
+@ExamReactorStrategy(PerClass.class)
+public class RawMavenSiteIT
+    extends MavenSiteTestSupport
 {
-  public static final String HOSTED_REPO = "raw-test-hosted";
+  private Repository repository;
 
-  private RawClient rawClient;
+  private RawClient client;
 
   @Before
   public void createHostedRepository() throws Exception {
-    final Configuration config = hostedConfig(HOSTED_REPO);
-    final Repository repository = createRepository(config);
-    rawClient = client(repository);
+    final Configuration configuration = hostedConfig("test-raw-repo");
+    repository = createRepository(configuration);
+    client = client(repository);
   }
 
   @Test
-  public void uploadAndDownload() throws Exception {
-    final String path = "alphabet.txt";
+  public void deploySimpleSite() throws Exception {
+    log.info("deploySimpleSite() starting");
+    mvn("testproject", "version", repository.getName(), "clean", "site:site", "site:deploy");
 
-    final File testFile = resolveTestFile(path);
-    final int response = rawClient.put(path, testFile);
-    assertThat(response, is(HttpStatus.CREATED));
+    final HttpResponse index = client.get("index.html");
 
-    final byte[] bytes = rawClient.getBytes(path);
-
-    assertThat(bytes, is(Files.toByteArray(testFile)));
-
-    assertThat(status(rawClient.delete(path)), is(HttpStatus.NO_CONTENT));
-
-    assertThat("content should be deleted", status(rawClient.get(path)), is(HttpStatus.NOT_FOUND));
+    assertThat(status(index), is(HttpStatus.OK));
+    assertThat(asString(index), containsString("About testproject"));
   }
 }

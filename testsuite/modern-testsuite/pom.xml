@@ -81,7 +81,6 @@
       <artifactId>nexus-repository-raw</artifactId>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
@@ -114,32 +113,32 @@
   </build>
 
   <!--<profiles>-->
-  <!--<profile>-->
-  <!--<id>testsuite-genshards</id>-->
-  <!--<build>-->
-  <!--<plugins>-->
-  <!--<plugin>-->
-  <!--<groupId>org.codehaus.gmaven</groupId>-->
-  <!--<artifactId>gmaven-plugin</artifactId>-->
-  <!--<executions>-->
-  <!--<execution>-->
-  <!--<id>default</id>-->
-  <!--<phase>process-test-sources</phase>-->
-  <!--<goals>-->
-  <!--<goal>execute</goal>-->
-  <!--</goals>-->
-  <!--<configuration>-->
-  <!--<properties>-->
-  <!--<autoshard.mode>normal</autoshard.mode>-->
-  <!--<autoshard.count>1</autoshard.count>-->
-  <!--</properties>-->
-  <!--</configuration>-->
-  <!--</execution>-->
-  <!--</executions>-->
-  <!--</plugin>-->
-  <!--</plugins>-->
-  <!--</build>-->
-  <!--</profile>-->
+    <!--<profile>-->
+      <!--<id>testsuite-genshards</id>-->
+      <!--<build>-->
+        <!--<plugins>-->
+          <!--<plugin>-->
+            <!--<groupId>org.codehaus.gmaven</groupId>-->
+            <!--<artifactId>gmaven-plugin</artifactId>-->
+            <!--<executions>-->
+              <!--<execution>-->
+                <!--<id>default</id>-->
+                <!--<phase>process-test-sources</phase>-->
+                <!--<goals>-->
+                  <!--<goal>execute</goal>-->
+                <!--</goals>-->
+                <!--<configuration>-->
+                  <!--<properties>-->
+                    <!--<autoshard.mode>normal</autoshard.mode>-->
+                    <!--<autoshard.count>1</autoshard.count>-->
+                  <!--</properties>-->
+                <!--</configuration>-->
+              <!--</execution>-->
+            <!--</executions>-->
+          <!--</plugin>-->
+        <!--</plugins>-->
+      <!--</build>-->
+    <!--</profile>-->
   <!--</profiles>-->
 
 </project>
