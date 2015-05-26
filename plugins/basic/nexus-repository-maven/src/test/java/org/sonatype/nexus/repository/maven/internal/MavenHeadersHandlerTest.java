@@ -18,10 +18,10 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
-import org.sonatype.sisu.goodies.common.Iso8601Date;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.net.HttpHeaders;
+import org.apache.http.client.utils.DateUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,7 +66,7 @@ public class MavenHeadersHandlerTest
     when(context.proceed()).thenReturn(HttpResponses.ok(content));
     final Response r = subject.handle(context);
     assertThat(r.getStatus().isSuccessful(), is(true));
-    assertThat(r.getHeaders().get(HttpHeaders.LAST_MODIFIED), equalTo(Iso8601Date.format(now.toDate())));
+    assertThat(r.getHeaders().get(HttpHeaders.LAST_MODIFIED), equalTo(DateUtils.formatDate(now.toDate())));
     assertThat(r.getHeaders().get(HttpHeaders.ETAG), equalTo("\"etag\""));
   }
 
