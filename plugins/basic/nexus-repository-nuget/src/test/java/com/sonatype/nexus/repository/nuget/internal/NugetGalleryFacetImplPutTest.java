@@ -70,7 +70,7 @@ public class NugetGalleryFacetImplPutTest
   private SearchFacet searchFacet;
 
   @Before
-  public void wireSearchFacet(){
+  public void wireSearchFacet() {
     when(repository.facet(SearchFacet.class)).thenReturn(searchFacet);
   }
 
@@ -163,9 +163,9 @@ public class NugetGalleryFacetImplPutTest
     verify(storedAttributes).set(eq(P_CREATED), eq(clock.dateTime().toDate()));
     verify(storedAttributes).set(eq(P_PUBLISHED), eq(clock.dateTime().toDate()));
   }
-  
+
   @Test
-  public void derivedAttributesSetForProxyNewComponents(){
+  public void derivedAttributesSetForProxyNewComponents() {
     final NugetGalleryFacetImpl galleryFacet = buildSpy(false);
     final Clock clock = new TestableClock();
     galleryFacet.clock = clock;

@@ -115,7 +115,8 @@ public class NugetPushHandlerTest
   private void checkResponse(Response response,
                              int expectedCode,
                              String expectedContentType,
-                             String expectedSubstring) throws Exception {
+                             String expectedSubstring) throws Exception
+  {
     assertThat(response.getStatus().getCode(), is(expectedCode));
     assertThat(response instanceof PayloadResponse, is(true));
     Payload responsePayload = ((PayloadResponse) response).getPayload();

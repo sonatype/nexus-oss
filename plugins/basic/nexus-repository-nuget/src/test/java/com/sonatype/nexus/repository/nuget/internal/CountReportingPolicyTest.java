@@ -18,7 +18,7 @@ import static com.sonatype.nexus.repository.nuget.internal.proxy.CountReportingP
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class CountReportingPolicyTest
 {

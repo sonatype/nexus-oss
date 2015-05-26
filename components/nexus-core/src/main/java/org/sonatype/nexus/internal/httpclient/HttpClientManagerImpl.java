@@ -30,6 +30,7 @@ import org.sonatype.nexus.httpclient.GlobalHttpClientConfigurationChanged;
 import org.sonatype.nexus.httpclient.HttpClientConfigurationStore;
 import org.sonatype.nexus.httpclient.HttpClientManager;
 import org.sonatype.nexus.httpclient.HttpClientPlan;
+import org.sonatype.nexus.httpclient.HttpClientPlan.Customizer;
 import org.sonatype.nexus.httpclient.config.ConfigurationCustomizer;
 import org.sonatype.nexus.httpclient.config.HttpClientConfiguration;
 import org.sonatype.sisu.goodies.common.Mutex;
@@ -187,6 +188,19 @@ public class HttpClientManagerImpl
   @Override
   @Guarded(by = STARTED)
   public CloseableHttpClient create(final @Nullable HttpClientPlan.Customizer customizer) {
+    return prepare(customizer).build();
+  }
+
+  @Override
+  @Guarded(by = STARTED)
+  public CloseableHttpClient create() {
+    // create with defaults only
+    return create(null);
+  }
+
+  @Override
+  @Guarded(by = STARTED)
+  public HttpClientBuilder prepare(final @Nullable Customizer customizer) {
     final HttpClientPlan plan = new HttpClientPlan();
 
     // attach connection manager early, so customizer has chance to replace it if needed
@@ -228,14 +242,6 @@ public class HttpClientManagerImpl
       }
     });
 
-    // build instance
-    return builder.build();
-  }
-
-  @Override
-  @Guarded(by = STARTED)
-  public CloseableHttpClient create() {
-    // create with defaults only
-    return create(null);
+    return builder;
   }
 }

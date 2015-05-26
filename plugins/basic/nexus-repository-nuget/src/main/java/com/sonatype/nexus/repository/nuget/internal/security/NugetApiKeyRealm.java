@@ -16,6 +16,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.sonatype.nexus.repository.nuget.security.NugetApiKey;
+import com.sonatype.nexus.repository.nuget.security.NugetApiKeyStore;
+
 import org.sonatype.nexus.security.UserPrincipalsHelper;
 import org.sonatype.nexus.security.authc.NexusApiKeyAuthenticationToken;
 import org.sonatype.nexus.security.user.UserNotFoundException;

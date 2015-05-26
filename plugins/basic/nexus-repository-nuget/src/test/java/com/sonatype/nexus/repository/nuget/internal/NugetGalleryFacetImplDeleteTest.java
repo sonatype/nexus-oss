@@ -24,16 +24,11 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +38,7 @@ import static org.mockito.Mockito.when;
 public class NugetGalleryFacetImplDeleteTest
     extends TestSupport
 {
-  
+
   @Test
   public void deleteRemovesComponentAssetAndBlob() throws Exception {
     final String packageId = "screwdriver";

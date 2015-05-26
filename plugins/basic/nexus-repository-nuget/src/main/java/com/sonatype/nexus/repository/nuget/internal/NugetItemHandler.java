@@ -51,7 +51,7 @@ public class NugetItemHandler
         case HttpMethods.DELETE:
           return deleteItem(id, version, context);
         default:
-          return HttpResponses.methodNotAllowed(action, HttpMethods.GET ,HttpMethods.DELETE);
+          return HttpResponses.methodNotAllowed(action, HttpMethods.GET, HttpMethods.DELETE);
       }
     }
     catch (Exception e) {
