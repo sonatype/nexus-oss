@@ -63,10 +63,14 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
   /**
    * @private
    */
-  onSelection: function(list, model) {
+  onSelection: function(grid, model) {
     var me = this,
         searchResultDetails = me.getSearchResultDetails(),
         info3 = {};
+
+    if (!grid['healthCheckColumns']) {
+      return;
+    }
 
     info3[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(model);
     searchResultDetails.down('#info3').showInfo(info3);
@@ -78,7 +82,12 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
    */
   setHealthCheckSearchResultFields: function() {
     var me = this,
-        components = [];
+        components = [],
+        searchResult = me.getSearchResult();
+
+    if (!searchResult['healthCheckColumns']) {
+      return;
+    }
 
     me.getSearchResultStore().each(function(model) {
       model.beginEdit();
@@ -93,8 +102,8 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       });
     });
 
-    if (me.getSearchResult()) {
-      me.getSearchResult().getView().refresh();
+    if (searchResult) {
+      searchResult.getView().refresh();
     }
 
     NX.direct.healthcheck_Search.read(components, function(response) {
@@ -117,8 +126,8 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
           }
         });
       }
-      if (me.getSearchResult()) {
-        me.getSearchResult().getView().refresh();
+      if (searchResult) {
+        searchResult.getView().refresh();
       }
     });
   },

@@ -30,7 +30,6 @@
     <module>nexus-kenai-plugin</module>
     <module>nexus-ldap-plugin</module>
     <module>nexus-rutauth-plugin</module>
-    <module>nexus-ssl-model</module>
     <module>nexus-ssl-plugin</module>
   </modules>
 

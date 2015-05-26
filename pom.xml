@@ -603,7 +603,6 @@
               <id>paranamer</id>
               <id>httpcore</id>
               <id>httpclient</id>
-              <id>shiro-guice</id>
             </excludedArtifactIds>
           </configuration>
         </plugin>
