@@ -23,6 +23,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import com.sonatype.nexus.repository.nuget.security.NugetApiKeyStore;
+
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.orient.DatabaseInstance;

@@ -16,8 +16,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sonatype.nexus.repository.nuget.odata.NuspecSplicer;
-
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.codehaus.plexus.util.ReaderFactory;

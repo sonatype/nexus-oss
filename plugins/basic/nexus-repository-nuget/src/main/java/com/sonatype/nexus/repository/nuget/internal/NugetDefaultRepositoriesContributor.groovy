@@ -12,15 +12,14 @@
  */
 package com.sonatype.nexus.repository.nuget.internal
 
-import javax.inject.Named
-import javax.inject.Singleton
-
 import com.sonatype.nexus.repository.nuget.internal.proxy.NugetGroupRecipe
 import com.sonatype.nexus.repository.nuget.internal.proxy.NugetProxyRecipe
-
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
 import org.sonatype.nexus.repository.storage.WritePolicy
+
+import javax.inject.Named
+import javax.inject.Singleton
 
 /**
  * Provide default hosted and proxy repositories for NuGet.
@@ -43,27 +42,30 @@ class NugetDefaultRepositoriesContributor
   @Override
   List<Configuration> getRepositoryConfigurations() {
     return [
-        new Configuration(repositoryName: DEFAULT_HOSTED_NAME, recipeName: NugetHostedRecipe.NAME, online: true, attributes:
-            [
-                storage: [
-                    writePolicy: WritePolicy.ALLOW.toString()
+        new Configuration(repositoryName: DEFAULT_HOSTED_NAME, recipeName: NugetHostedRecipe.NAME, online: true,
+            attributes:
+                [
+                    storage: [
+                        writePolicy: WritePolicy.ALLOW.toString()
+                    ]
                 ]
-            ]
         ),
-        new Configuration(repositoryName: DEFAULT_PROXIED_NAME, recipeName: NugetProxyRecipe.NAME, online: true, attributes:
-            [
-                proxy     : [
-                    remoteUrl     : 'http://www.nuget.org/api/v2/',
-                    artifactMaxAge: 5
+        new Configuration(repositoryName: DEFAULT_PROXIED_NAME, recipeName: NugetProxyRecipe.NAME, online: true,
+            attributes:
+                [
+                    proxy: [
+                        remoteUrl     : 'http://www.nuget.org/api/v2/',
+                        artifactMaxAge: 5
+                    ]
                 ]
-            ]
         ),
-        new Configuration(repositoryName: DEFAULT_GROUP_NAME, recipeName: NugetGroupRecipe.NAME, online: true, attributes:
-            [
-                group: [
-                    memberNames: [DEFAULT_HOSTED_NAME, DEFAULT_PROXIED_NAME]
+        new Configuration(repositoryName: DEFAULT_GROUP_NAME, recipeName: NugetGroupRecipe.NAME, online: true,
+            attributes:
+                [
+                    group: [
+                        memberNames: [DEFAULT_HOSTED_NAME, DEFAULT_PROXIED_NAME]
+                    ]
                 ]
-            ]
         )
     ]
   }

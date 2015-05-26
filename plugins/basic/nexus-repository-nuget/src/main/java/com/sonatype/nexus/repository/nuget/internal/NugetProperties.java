@@ -35,7 +35,7 @@ public interface NugetProperties
   String DESCRIPTION = "DESCRIPTION";
 
   String DOWNLOAD_COUNT = "DOWNLOADCOUNT";
-  
+
   String GALLERY_DETAILS_URL = "GALLERYDETAILSURL";
 
   String ICON_URL = "ICONURL";

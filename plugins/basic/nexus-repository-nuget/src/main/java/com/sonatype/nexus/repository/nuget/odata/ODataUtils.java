@@ -70,7 +70,7 @@ public final class ODataUtils
    * Converts the given OData query and select clause into an SQL expression.
    *
    * @param originalQuery OData parameters
-   * @param count True if the intention is to merely count the items rather than itemizing them
+   * @param count         True if the intention is to merely count the items rather than itemizing them
    */
   public static ComponentQuery query(final Map<String, String> originalQuery, final boolean count) {
     final Map<String, String> query = applyQueryDefaults(originalQuery);
@@ -175,7 +175,7 @@ public final class ODataUtils
 
   @NotNull
   private static Map<String, String> applyQueryDefaults(final Map<String, String> originalQuery) {
-    final Map<String,String> query = new HashMap<>(originalQuery);
+    final Map<String, String> query = new HashMap<>(originalQuery);
 
     // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
     if (!query.containsKey("$orderby")) {

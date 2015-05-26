@@ -17,8 +17,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.annotation.Nullable;
+
+import com.sonatype.nexus.repository.nuget.security.NugetApiKey;
+
 import org.sonatype.nexus.testsuite.repository.FormatClientSupport;
 
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -27,6 +32,7 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.message.BasicHeader;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,11 +47,25 @@ public class NugetClient
 
   public static final String VS_SEARCH_FEED_TEMPLATE = "Search()?$filter=IsAbsoluteLatestVersion&$skip=0&$top=30&searchTerm='%s'&targetFramework='net45'&includePrerelease=true";
 
+  private final HttpClient httpClient;
+
+  private final HttpClientContext httpClientContext;
+
+  private final URI repositoryBaseUri;
+
+  private final String apiKey;
+
   public NugetClient(final HttpClient httpClient,
                      final HttpClientContext httpClientContext,
-                     final URI repositoryBaseUri)
+                     final URI repositoryBaseUri,
+                     @Nullable final String apiKey)
   {
     super(httpClient, httpClientContext, repositoryBaseUri);
+
+    this.httpClient = checkNotNull(httpClient);
+    this.httpClientContext = checkNotNull(httpClientContext);
+    this.repositoryBaseUri = checkNotNull(repositoryBaseUri);
+    this.apiKey = apiKey;
 
     checkArgument(repositoryBaseUri.toString().endsWith("/"));
   }
@@ -69,7 +89,14 @@ public class NugetClient
 
     put.setEntity(reqEntity.build());
 
+    addNugetApiKey(put);
     return status(httpClient.execute(put, httpClientContext));
+  }
+
+  private void addNugetApiKey(final HttpRequest request) {
+    if (apiKey != null) {
+      request.setHeader(new BasicHeader(NugetApiKey.NAME, apiKey));
+    }
   }
 
   public String feedXml(final String query) throws IOException {
@@ -102,7 +129,9 @@ public class NugetClient
    */
   public HttpResponse delete(final String packageId, final String version) throws IOException {
     final URI deleteURI = repositoryBaseUri.resolve(String.format("%s/%s", packageId, version));
+
     final HttpDelete delete = new HttpDelete(deleteURI);
+    addNugetApiKey(delete);
     return execute(delete);
   }
 }

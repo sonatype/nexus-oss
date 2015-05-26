@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.util.Map;
 
 import com.sonatype.nexus.repository.nuget.internal.NugetPackageException;
-import com.sonatype.nexus.repository.nuget.odata.NugetPackageUtils;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -54,7 +53,8 @@ public class NugetPackageUtilsTest
 
     // Package metrics
     assertThat(metadata.get(PACKAGE_SIZE), is(equalTo("2165")));
-    assertThat(metadata.get(PACKAGE_HASH), is(equalTo("Hy5FP+mjtRqJmQfOqO19QLR+W71NGufkmOhQxcPomQMG1HOTILCnTpdMXJD4u9716DO7a0LzMI1qR7paZiDE9A==")));
+    assertThat(metadata.get(PACKAGE_HASH),
+        is(equalTo("Hy5FP+mjtRqJmQfOqO19QLR+W71NGufkmOhQxcPomQMG1HOTILCnTpdMXJD4u9716DO7a0LzMI1qR7paZiDE9A==")));
     assertThat(metadata.get(PACKAGE_HASH_ALGORITHM), is(equalTo("SHA512")));
   }
 
