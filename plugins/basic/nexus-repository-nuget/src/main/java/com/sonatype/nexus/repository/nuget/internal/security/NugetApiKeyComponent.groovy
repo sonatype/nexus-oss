@@ -12,6 +12,8 @@
  */
 package com.sonatype.nexus.repository.nuget.internal.security
 
+import com.sonatype.nexus.repository.nuget.security.NugetApiKeyStore
+
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider

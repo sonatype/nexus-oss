@@ -16,6 +16,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.sonatype.nexus.repository.nuget.security.NugetApiKeyStore;
+
 import org.sonatype.nexus.common.event.EventSubscriber;
 import org.sonatype.nexus.security.UserPrincipalsExpired;
 

@@ -13,6 +13,8 @@
 package com.sonatype.nexus.repository.nuget.internal.security
 
 import com.google.inject.util.Providers
+import com.sonatype.nexus.repository.nuget.internal.security.NugetApiKeyEntityAdapter
+import com.sonatype.nexus.repository.nuget.internal.security.NugetApiKeyStoreImpl
 import org.apache.shiro.subject.PrincipalCollection
 import org.apache.shiro.subject.SimplePrincipalCollection
 import org.hamcrest.MatcherAssert
