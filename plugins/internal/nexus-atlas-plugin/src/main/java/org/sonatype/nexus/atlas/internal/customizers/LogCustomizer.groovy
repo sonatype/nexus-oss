@@ -85,6 +85,6 @@ class LogCustomizer
     }
 
     // include request.log
-    maybeIncludeFile new File(applicationDirectories.workDirectory, 'logs/request.log'), 'log', LOW
+    maybeIncludeFile new File(applicationDirectories.workDirectory, 'log/request.log'), 'log', LOW
   }
 }

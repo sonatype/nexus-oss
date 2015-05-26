@@ -22,13 +22,10 @@
     <bundle>wrap:${mvn:paranamer}$overwrite=merge&amp;Fragment-Host=org.hibernate.validator</bundle>
     <bundle>wrap:${mvn:httpcore}$Bundle-SymbolicName=httpcore</bundle>
     <bundle>wrap:${mvn:httpclient}$Bundle-SymbolicName=httpclient&amp;Fragment-Host=httpcore</bundle>
-    <bundle>wrap:${mvn:xmlpull}$Bundle-SymbolicName=xmlpull</bundle>
-    <bundle>wrap:${mvn:xpp3_min}$Bundle-SymbolicName=xpp3_min&amp;Fragment-Host=xmlpull</bundle>
     <!--
     Re-wrap these bundles to fix exports/imports
     -->
     <bundle>wrap:${mvn:shiro-guice}$overwrite=merge&amp;Import-Package=*</bundle>
-    <bundle>wrap:${mvn:xstream}$overwrite=merge&amp;-exportcontents=*&amp;DynamicImport-Package=*</bundle>
     <!--
     Give our extender bundle its own start level (distinct from the boot start-level)
     -->
