@@ -23,10 +23,6 @@
     <bundle>wrap:${mvn:httpcore}$Bundle-SymbolicName=httpcore</bundle>
     <bundle>wrap:${mvn:httpclient}$Bundle-SymbolicName=httpclient&amp;Fragment-Host=httpcore</bundle>
     <!--
-    Re-wrap these bundles to fix exports/imports
-    -->
-    <bundle>wrap:${mvn:shiro-guice}$overwrite=merge&amp;Import-Package=*</bundle>
-    <!--
     Give our extender bundle its own start level (distinct from the boot start-level)
     -->
     <bundle start-level="100">${mvn:nexus-extender}</bundle>
