@@ -45,7 +45,7 @@ import javax.inject.Singleton
 class RawGroupRecipe
     extends RecipeSupport
 {
-  static final String NAME = "raw-group"
+  public static final String NAME = "raw-group"
 
   @Inject
   Provider<RawSecurityFacet> securityFacet
