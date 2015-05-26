@@ -45,19 +45,4 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <!-- attach default/failsafe configuration to the ehcache bundle -->
-            <Fragment-Host>org.apache.servicemix.bundles.ehcache</Fragment-Host>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

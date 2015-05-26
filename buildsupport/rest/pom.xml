@@ -54,18 +54,22 @@
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
         <version>1.4.7</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xmlpull</groupId>
+            <artifactId>xmlpull</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>xpp3</groupId>
+            <artifactId>xpp3_min</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.nexus.xstream</groupId>
-        <artifactId>xstream</artifactId>
-        <version>1.4.6-SONATYPE-03</version>
-      </dependency>
-
-      <dependency>
-        <groupId>xpp3</groupId>
-        <artifactId>xpp3_min</artifactId>
-        <version>1.1.4c</version>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.xpp3</artifactId>
+        <version>1.1.4c_7</version>
       </dependency>
 
       <dependency>

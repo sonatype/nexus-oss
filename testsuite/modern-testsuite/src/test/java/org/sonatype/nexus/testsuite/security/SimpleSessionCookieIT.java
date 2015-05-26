@@ -17,7 +17,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.common.text.Strings2;
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.storage.StorageFacetImpl;
+import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
 
 import org.apache.http.Header;
@@ -43,6 +50,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.cookie.DefaultCookieSpecProvider;
 import org.apache.http.message.BasicNameValuePair;
+import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
@@ -72,12 +80,29 @@ public class SimpleSessionCookieIT
 
   private static final String TYPICAL_BROWSER_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36";
 
-  // FIXME: This relies on the default 'maven-releases' repository to function, this test should instead
-  // FIXME: ... setup a repository to test with
+  private static final String TEST_REPOSITORY_NAME = "test-repository";
+
+  @Inject
+  private RepositoryManager repositoryManager;
+
+  private Repository testRepository;
+
+  @Before
+  public void prepare() throws Exception {
+    if (repositoryManager.get(TEST_REPOSITORY_NAME) == null) {
+      final Configuration testRepositoryConfig = new Configuration();
+      testRepositoryConfig.setRecipeName("raw-hosted"); // using name here to not complicate importing of internal class
+      testRepositoryConfig.setRepositoryName(TEST_REPOSITORY_NAME);
+      testRepositoryConfig.setOnline(true);
+      testRepositoryConfig.attributes("storage").set("writePolicy", WritePolicy.ALLOW.toString());
+      testRepository = repositoryManager.create(testRepositoryConfig);
+    }
+  }
 
   @Test
   public void authenticatedContentCRUDActionsShouldNotCreateSession() throws Exception {
-    final String target = resolveUrl(nexusUrl, "repository/maven-releases/foo/bar/1/bar-1.txt").toExternalForm();
+    final String target = resolveUrl(nexusUrl, "repository/" + testRepository.getName() + "/foo/bar/1/bar-1.txt")
+        .toExternalForm();
 
     final HttpPut put = new HttpPut(target);
     put.setEntity(new StringEntity("text content"));
@@ -184,7 +209,8 @@ public class SimpleSessionCookieIT
         assertThat("login cookie should NOT look like deleteMe cookie", loginCookie.getValue(),
             not(containsString("deleteMe")));
         assertThat("login cookie should not have an expiry date - the UA deletes the session cookie when "
-            + "replaced by a new one by same name from the server OR when the UA decides", loginCookie.isPersistent(),
+                + "replaced by a new one by same name from the server OR when the UA decides",
+            loginCookie.isPersistent(),
             is(false));
 
         assertThat("login session cookie with valid session id should always be marked HttpOnly", headerText,

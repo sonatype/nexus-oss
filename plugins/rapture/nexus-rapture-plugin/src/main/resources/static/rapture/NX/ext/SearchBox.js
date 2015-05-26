@@ -130,6 +130,7 @@ Ext.define('NX.ext.SearchBox', {
     else {
       me.clearSearch();
     }
+    me.resetOriginalValue();
   },
 
   /**
