@@ -52,6 +52,10 @@ public interface HttpClientManager
 
   /**
    * Create customized HTTP-client builder.
+   *
+   * @deprecated method is only present to be able to implement http client to access CLM data and should be removed
+   * once the api will be changed to allow direct usage of an http client instance
    */
+  @Deprecated
   HttpClientBuilder prepare(final @Nullable Customizer customizer);
 }
