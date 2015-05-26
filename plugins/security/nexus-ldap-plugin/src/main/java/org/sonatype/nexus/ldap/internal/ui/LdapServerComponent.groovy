@@ -42,9 +42,7 @@ import org.sonatype.nexus.ldap.internal.realms.LdapConnectionUtils
 import org.sonatype.nexus.ldap.internal.ssl.SSLLdapContextFactory
 import org.sonatype.nexus.ldap.internal.templates.LdapSchemaTemplate
 import org.sonatype.nexus.ldap.internal.templates.LdapSchemaTemplateManager
-import org.sonatype.nexus.ldap.model.LdapTrustStoreKey
 import org.sonatype.nexus.rapture.PasswordPlaceholder
-import org.sonatype.nexus.rapture.TrustStoreKeys
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
@@ -83,10 +81,6 @@ extends DirectComponentSupport
 
   @Inject
   TrustStore trustStore
-
-  @Inject
-  @Nullable
-  TrustStoreKeys trustStoreKeys
 
   @Inject
   Validator validator
@@ -128,7 +122,6 @@ extends DirectComponentSupport
   @Validate(groups = [Create, Default])
   LdapServerXO create(final @NotNull @Valid LdapServerXO ldapServerXO) {
     def id = ldapConfigurationManager.addLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), null))
-    trustStoreKeys?.setEnabled(LdapTrustStoreKey.TYPE, id, ldapServerXO.useTrustStore)
     return asLdapServerXO(ldapConfigurationManager.getLdapServerConfiguration(id))
   }
 
@@ -140,7 +133,6 @@ extends DirectComponentSupport
     LdapConfiguration existing = ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id)
     if (existing) {
       ldapConfigurationManager.updateLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), existing.connection.systemPassword))
-      trustStoreKeys?.setEnabled(LdapTrustStoreKey.TYPE, ldapServerXO.id, ldapServerXO.useTrustStore)
       return asLdapServerXO(ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id))
     }
     throw new IllegalArgumentException('LDAP server with id "' + ldapServerXO.id + '" not found')
@@ -251,7 +243,7 @@ extends DirectComponentSupport
         name: ldapServer.name,
         url: asLdapServerUrl(connectionInfo),
         protocol: connectionInfo.host.protocol.name(),
-        useTrustStore: trustStoreKeys?.isEnabled(LdapTrustStoreKey.TYPE, ldapServer.id),
+        useTrustStore: connectionInfo.useTrustStore,
         host: connectionInfo.host.hostName,
         port: connectionInfo.host.port,
         searchBase: connectionInfo.searchBase,
@@ -330,6 +322,7 @@ extends DirectComponentSupport
         name: ldapServerXO.name,
         connection: new Connection(
             host: new Host(Protocol.valueOf(ldapServerXO.protocol.name()), ldapServerXO.host, ldapServerXO.port),
+            useTrustStore: Boolean.TRUE.equals(ldapServerXO.useTrustStore),
             searchBase: ldapServerXO.searchBase,
 
             authScheme: ldapServerXO.authScheme,

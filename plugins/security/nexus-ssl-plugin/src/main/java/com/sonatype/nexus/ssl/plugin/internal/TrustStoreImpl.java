@@ -21,7 +21,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,7 +32,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import com.sonatype.nexus.ssl.model.TrustStoreKey;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -42,7 +40,6 @@ import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManager;
 import org.sonatype.sisu.goodies.ssl.keystore.KeystoreException;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Sets;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -65,8 +62,6 @@ public class TrustStoreImpl
 
   private final TrustManager[] trustManagers;
 
-  private final Set<TrustStoreKey> enabledKeys;
-
   private final KeyStoreManager keyStoreManager;
 
   private volatile SSLContext sslcontext;
@@ -79,7 +74,6 @@ public class TrustStoreImpl
     this.keyStoreManager = checkNotNull(keyStoreManager);
     keyManagers = getSystemKeyManagers();
     trustManagers = getTrustManagers(keyStoreManager);
-    enabledKeys = Sets.newCopyOnWriteArraySet();
   }
 
   @Override
@@ -122,18 +116,6 @@ public class TrustStoreImpl
   }
 
   @Override
-  public void enableFor(final TrustStoreKey key) {
-    enabledKeys.add(key);
-    log.info("Nexus SSL Trust Store enabled for {}", key);
-  }
-
-  @Override
-  public void disableFor(final TrustStoreKey key) {
-    enabledKeys.remove(key);
-    log.info("Nexus SSL Trust Store disabled for {}", key);
-  }
-
-  @Override
   public SSLContext getSSLContext() {
     SSLContext _sslcontext = this.sslcontext; // local variable allows concurrent removeTrustCertificate
     if (_sslcontext == null) {
@@ -148,14 +130,6 @@ public class TrustStoreImpl
       }
     }
     return _sslcontext;
-  }
-
-  @Override
-  public SSLContext getSSLContextFor(final TrustStoreKey key) {
-    if (enabledKeys.contains(key)) {
-      return getSSLContext();
-    }
-    return null;
   }
 
   private static TrustManager[] getTrustManagers(final KeyStoreManager keyStoreManager)

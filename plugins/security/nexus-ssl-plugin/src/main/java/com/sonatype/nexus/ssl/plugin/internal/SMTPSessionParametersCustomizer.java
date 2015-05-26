@@ -10,12 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.nexus.ssl.plugin.internal.smtp;
+package com.sonatype.nexus.ssl.plugin.internal;
 
 import java.util.Properties;
 
 import javax.inject.Inject;
-import javax.net.ssl.SSLContext;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
@@ -23,12 +22,11 @@ import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sonatype.nexus.ssl.model.SMTPTrustStoreKey.smtpTrustStoreKey;
 
 // FIXME: Need to sort out changes to sisu-mailer or replacement
 
 /**
- * An {@link SmtpSessionParametersCustomizer} that will configure SMTP parameters to use Nexus SSL Trust Store in case
+ * An {@link SMTPSessionParametersCustomizer} that will configure SMTP parameters to use Nexus SSL Trust Store in case
  * that is enabled.
  *
  * @since ssl 1.0
@@ -53,15 +51,15 @@ public class SMTPSessionParametersCustomizer
 
   //@Override
   public Properties customize(final Properties params) {
-    final SSLContext sslContext = trustStore.getSSLContextFor(smtpTrustStoreKey());
     final String host = params.getProperty("mail.smtp.host");
     final String port = params.getProperty("mail.smtp.port");
-    if (sslContext != null && params.remove("mail.smtp.socketFactory.class") != null) {
+    if (Boolean.valueOf(params.getProperty("mail.smtp.ssl.useTrustStore"))
+        && params.remove("mail.smtp.socketFactory.class") != null) {
       log.debug("SMTP is using a Nexus SSL Trust Store for accessing {}:{}", host, port);
 
       params.put("mail.smtp.ssl.enable", Boolean.TRUE);
       params.put("mail.smtp.ssl.checkserveridentity", checkServerIdentity);
-      params.put("mail.smtp.ssl.socketFactory", sslContext.getSocketFactory());
+      params.put("mail.smtp.ssl.socketFactory", trustStore.getSSLContext().getSocketFactory());
 
       log.debug("SMTP parameters: {}", params);
       return params;

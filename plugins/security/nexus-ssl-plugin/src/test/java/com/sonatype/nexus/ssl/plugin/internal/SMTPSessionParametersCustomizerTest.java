@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.nexus.ssl.plugin.internal.smtp;
+package com.sonatype.nexus.ssl.plugin.internal;
 
 import java.util.Properties;
 
@@ -22,7 +22,6 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
 
-import static com.sonatype.nexus.ssl.model.SMTPTrustStoreKey.smtpTrustStoreKey;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
@@ -47,11 +46,12 @@ public class SMTPSessionParametersCustomizerTest
       throws Exception
   {
     final TrustStore trustStore = mock(TrustStore.class);
-    when(trustStore.getSSLContextFor(smtpTrustStoreKey())).thenReturn(SSLContext.getDefault());
+    when(trustStore.getSSLContext()).thenReturn(SSLContext.getDefault());
 
     final SMTPSessionParametersCustomizer underTest = new SMTPSessionParametersCustomizer(trustStore);
     final Properties properties = new Properties();
     properties.setProperty("mail.smtp.socketFactory.class", "Foo.class");
+    properties.setProperty("mail.smtp.ssl.useTrustStore", Boolean.TRUE.toString());
     underTest.customize(properties);
 
     assertThat(properties.keySet(), hasItem((Object) "mail.smtp.ssl.enable"));
@@ -67,11 +67,12 @@ public class SMTPSessionParametersCustomizerTest
       throws Exception
   {
     final TrustStore trustStore = mock(TrustStore.class);
-    when(trustStore.getSSLContextFor(smtpTrustStoreKey())).thenReturn(null);
+    when(trustStore.getSSLContext()).thenReturn(SSLContext.getDefault());
 
     final SMTPSessionParametersCustomizer underTest = new SMTPSessionParametersCustomizer(trustStore);
     final Properties properties = new Properties();
     properties.setProperty("mail.smtp.socketFactory.class", "Foo.class");
+    properties.setProperty("mail.smtp.ssl.useTrustStore", Boolean.FALSE.toString());
     underTest.customize(properties);
 
     assertThat(properties.keySet(), not(hasItem((Object) "mail.smtp.ssl.enable")));
@@ -88,7 +89,7 @@ public class SMTPSessionParametersCustomizerTest
       throws Exception
   {
     final TrustStore trustStore = mock(TrustStore.class);
-    when(trustStore.getSSLContextFor(smtpTrustStoreKey())).thenReturn(SSLContext.getDefault());
+    when(trustStore.getSSLContext()).thenReturn(SSLContext.getDefault());
 
     final SMTPSessionParametersCustomizer underTest = new SMTPSessionParametersCustomizer(trustStore);
     final Properties properties = new Properties();

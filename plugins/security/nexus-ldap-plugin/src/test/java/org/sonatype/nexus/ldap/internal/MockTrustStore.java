@@ -20,7 +20,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 
-import com.sonatype.nexus.ssl.model.TrustStoreKey;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
 import org.sonatype.sisu.goodies.ssl.keystore.KeystoreException;
@@ -72,22 +71,7 @@ public class MockTrustStore
   }
 
   @Override
-  public void enableFor(final TrustStoreKey key) {
-    throw new IllegalStateException("Call not expected");
-  }
-
-  @Override
-  public void disableFor(final TrustStoreKey key) {
-    throw new IllegalStateException("Call not expected");
-  }
-
-  @Override
   public SSLContext getSSLContext() {
-    return null;
-  }
-
-  @Override
-  public SSLContext getSSLContextFor(final TrustStoreKey key) {
     return null;
   }
 
