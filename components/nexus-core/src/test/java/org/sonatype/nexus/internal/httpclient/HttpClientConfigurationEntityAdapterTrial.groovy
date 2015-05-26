@@ -16,6 +16,7 @@ import org.sonatype.nexus.httpclient.config.ConnectionConfiguration
 import org.sonatype.nexus.httpclient.config.HttpClientConfiguration
 import org.sonatype.nexus.httpclient.config.UsernameAuthenticationConfiguration
 import org.sonatype.nexus.orient.DatabaseInstanceRule
+import org.sonatype.sisu.goodies.common.Time
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import org.junit.Before
@@ -45,7 +46,7 @@ class HttpClientConfigurationEntityAdapterTrial
 
       def config = new HttpClientConfiguration(
           connection: new ConnectionConfiguration(
-              timeout: 1234
+              timeout: Time.seconds(1234)
           ),
           authentication: new UsernameAuthenticationConfiguration(
               username: 'admin',
