@@ -20,6 +20,8 @@ import org.apache.http.HttpResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -32,19 +34,13 @@ import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status
 /**
  * Tests deployment of a maven site to a raw hosted repository.
  */
+@ExamReactorStrategy(PerClass.class)
 public class RawMavenSiteIT
     extends MavenSiteTestSupport
 {
   private Repository repository;
 
   private RawClient client;
-
-  @org.ops4j.pax.exam.Configuration
-  public static Option[] configureNexus() {
-    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
-        wrappedBundle(maven("org.apache.maven.shared", "maven-verifier").versionAsInProject()),
-        wrappedBundle(maven("org.apache.maven.shared", "maven-shared-utils").versionAsInProject()));
-  }
 
   @Before
   public void createHostedRepository() throws Exception {
@@ -55,6 +51,7 @@ public class RawMavenSiteIT
 
   @Test
   public void deploySimpleSite() throws Exception {
+    log.info("deploySimpleSite() starting");
     mvn("testproject", "version", repository.getName(), "clean", "site:site", "site:deploy");
 
     final HttpResponse index = client.get("index.html");

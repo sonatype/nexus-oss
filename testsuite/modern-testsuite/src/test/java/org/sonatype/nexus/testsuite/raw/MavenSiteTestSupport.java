@@ -25,18 +25,26 @@ import com.google.common.io.Files;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.jetbrains.annotations.NotNull;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerClass;
+import org.ops4j.pax.exam.Option;
 
 import static java.util.Arrays.asList;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 
 /**
  * Deploys a maven site to a raw repository.
  */
-@ExamReactorStrategy(PerClass.class)
-public class MavenSiteTestSupport
+public abstract class MavenSiteTestSupport
     extends RawITSupport
 {
+  @org.ops4j.pax.exam.Configuration
+  public static Option[] configureNexus() {
+    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
+        withHttps(),
+        wrappedBundle(maven("org.apache.maven.shared", "maven-verifier").versionAsInProject()),
+        wrappedBundle(maven("org.apache.maven.shared", "maven-shared-utils").versionAsInProject()));
+  }
+
   protected void mvn(final String project, final String projectVersion, final String repositoryName,
                      final String... goals) throws IOException, VerificationException
   {
@@ -57,6 +65,8 @@ public class MavenSiteTestSupport
     writePom(mavenBaseDir, projectDir, replacements);
 
     Verifier verifier = buildMavenVerifier(repositoryName, mavenBaseDir, mavenSettings);
+
+    log.info("Executing maven goals {}", goals);
     verifier.executeGoals(asList(goals));
     verifier.verifyErrorFreeLog();
   }
@@ -64,8 +74,10 @@ public class MavenSiteTestSupport
   private void writePom(final File mavenBaseDir, final File projectDir, final ImmutableMap<String, String> replacements)
       throws IOException
   {
+    final File output = new File(mavenBaseDir, "pom.xml").getAbsoluteFile();
+    log.info("Creating test project pom.xml in {}", output);
     writeModifiedFile(new File(projectDir, "pom.xml"),
-        new File(mavenBaseDir, "pom.xml").getAbsoluteFile(),
+        output,
         replacements);
   }
 
@@ -77,8 +89,10 @@ public class MavenSiteTestSupport
   private File createMavenSettings(final File mavenBaseDir, final ImmutableMap<String, String> replacements)
       throws IOException
   {
+    final File output = new File(mavenBaseDir, "settings.xml").getAbsoluteFile();
+    log.info("Creating maven settings file in {}", output);
     return writeModifiedFile(resolveTestFile("settings.xml"),
-        new File(mavenBaseDir, "settings.xml").getAbsoluteFile(),
+        output,
         replacements);
   }
 
@@ -100,6 +114,7 @@ public class MavenSiteTestSupport
   private Verifier buildMavenVerifier(final String repositoryName, final File mavenBaseDir,
                                       final File mavenSettings) throws VerificationException
   {
+    log.info("Building mvn verifier");
     Verifier verifier = new Verifier(mavenBaseDir.getAbsolutePath());
     verifier.addCliOption("-s " + mavenSettings.getAbsolutePath());
     verifier.addCliOption(

@@ -55,7 +55,6 @@ public class RawProxyOfHostedIT
     URL hostedRepoUrl = repositoryBaseUrl(hostedRepo);
     final Configuration proxyConfig = proxyConfig("raw-test-proxy", hostedRepoUrl.toExternalForm());
     proxyClient = client(createRepository(proxyConfig));
-    Repository proxyRepo = createRepository(proxyConfig);
   }
 
   @Test
