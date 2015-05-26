@@ -29,6 +29,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
  * Tests NuGet hosted repositories.
@@ -80,8 +81,7 @@ public class NugetHostedIT
     assertThat("entry count", entries.size(), is(1));
     assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
 
-    final int delete = nuget.delete("SONATYPE.TEST", "1.0");
-    assertThat(delete, is(HttpStatus.NO_CONTENT));
+    assertThat(status(nuget.delete("SONATYPE.TEST", "1.0")), is(HttpStatus.NO_CONTENT));
 
     // Now ensure that the item has been deleted
     assertThat("count after deletion", nuget.count(VISUAL_STUDIO_INITIAL_COUNT_QUERY), is(0));
@@ -112,7 +112,7 @@ public class NugetHostedIT
   @Test
   public void entryForMissingPackageReturns404() throws Exception {
     final HttpResponse response = nuget.entry("no-such-package", "1.0");
-    assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NOT_FOUND));
+    assertThat(status(response), is(HttpStatus.NOT_FOUND));
   }
 
   /**
@@ -120,7 +120,7 @@ public class NugetHostedIT
    */
   @Test
   public void deleteMissingPackageReturns404() throws Exception {
-    final int delete = nuget.delete("no-such-package", "1.0");
+    final int delete = status(nuget.delete("no-such-package", "1.0"));
     assertThat(delete, is(HttpStatus.NOT_FOUND));
   }
 
