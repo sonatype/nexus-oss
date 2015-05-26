@@ -15,7 +15,6 @@ package org.sonatype.nexus.testsuite.repository;
 import java.io.IOException;
 import java.net.URI;
 
-import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.http.HttpResponse;

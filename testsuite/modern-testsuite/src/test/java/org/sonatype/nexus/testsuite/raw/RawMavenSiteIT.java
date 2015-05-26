@@ -19,15 +19,12 @@ import org.sonatype.nexus.repository.http.HttpStatus;
 import org.apache.http.HttpResponse;
 import org.junit.Before;
 import org.junit.Test;
-import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.asString;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
