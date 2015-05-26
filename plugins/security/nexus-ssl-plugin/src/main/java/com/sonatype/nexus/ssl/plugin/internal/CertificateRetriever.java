@@ -33,8 +33,8 @@ import org.sonatype.nexus.httpclient.HttpSchemes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.config.Registry;
@@ -115,10 +115,10 @@ public class CertificateRetriever
           plan.getClient().setConnectionManager(connectionManager);
 
           // add interceptor to grab peer-certificates
-          plan.getClient().addInterceptorFirst(new HttpRequestInterceptor()
+          plan.getClient().addInterceptorFirst(new HttpResponseInterceptor()
           {
             @Override
-            public void process(final HttpRequest request, final HttpContext context)
+            public void process(final HttpResponse response, final HttpContext context)
                 throws HttpException, IOException
             {
               ManagedHttpClientConnection connection =

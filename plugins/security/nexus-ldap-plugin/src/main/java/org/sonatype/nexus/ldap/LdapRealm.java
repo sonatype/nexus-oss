@@ -21,6 +21,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.naming.NamingException;
 
+import org.sonatype.nexus.ldap.internal.LdapConstants;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
 import org.sonatype.nexus.ldap.internal.events.LdapClearCacheEvent;
@@ -48,7 +49,7 @@ import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Named(LdapPlugin.REALM_NAME)
+@Named(LdapConstants.REALM_NAME)
 @Singleton
 @Description("LDAP Realm")
 public class LdapRealm
@@ -61,7 +62,7 @@ public class LdapRealm
   @Inject
   public LdapRealm(final EventBus eventBus, final LdapManager ldapManager) {
     this.ldapManager = checkNotNull(ldapManager);
-    setName(LdapPlugin.REALM_NAME);
+    setName(LdapConstants.REALM_NAME);
     setAuthenticationCachingEnabled(true);
     setAuthorizationCachingEnabled(true);
     // using simple credentials matcher

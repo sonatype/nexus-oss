@@ -39,7 +39,7 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
     var me = this;
 
     me.editableCondition = me.editableCondition || NX.Conditions.and(
-        NX.Conditions.isPermitted('security:users', 'update'),
+        NX.Conditions.isPermitted('nexus:users:update'),
         NX.Conditions.formHasRecord('nx-coreui-user-settings-external-form', function(model) {
           return model.get('external');
         })

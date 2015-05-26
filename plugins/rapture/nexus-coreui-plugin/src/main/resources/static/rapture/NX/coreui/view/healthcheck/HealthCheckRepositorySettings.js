@@ -44,7 +44,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
           submit: 'NX.direct.healthcheck_Status.update'
         },
         settingsFormSuccessMessage: 'Health Check Repository Settings $action',
-        editableCondition: NX.Conditions.isPermitted('nexus:healthcheck', 'update'),
+        editableCondition: NX.Conditions.isPermitted('nexus:healthcheck:update'),
         editableMarker: 'You do not have permission to update health check repository settings',
 
         items: [

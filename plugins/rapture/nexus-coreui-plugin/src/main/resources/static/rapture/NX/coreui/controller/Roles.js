@@ -73,11 +73,11 @@ Ext.define('NX.coreui.controller.Roles', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('security:roles', 'read');
+      return NX.Permissions.check('nexus:roles:read');
     },
     weight: 20
   },
-  permission: 'security:roles',
+  permission: 'nexus:roles',
 
   /**
    * @override
@@ -221,7 +221,7 @@ Ext.define('NX.coreui.controller.Roles', {
     var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission, 'delete'),
+            NX.Conditions.isPermitted(me.permission + ':delete'),
             NX.Conditions.gridHasSelection(me.masters[0], function(model) {
               return !model.get('readOnly');
             })

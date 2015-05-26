@@ -13,7 +13,6 @@
 package com.sonatype.nexus.ssl.plugin.internal.ui
 
 import java.security.cert.Certificate
-import java.security.cert.CertificateParsingException
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -22,18 +21,17 @@ import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
+import com.sonatype.nexus.ssl.plugin.PemCertificate
 import com.sonatype.nexus.ssl.plugin.TrustStore
 import com.sonatype.nexus.ssl.plugin.internal.CertificateRetriever
 
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.validation.Validate
-import org.sonatype.nexus.validation.ValidationMessage
-import org.sonatype.nexus.validation.ValidationResponse
-import org.sonatype.nexus.validation.ValidationResponseException
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
 
 import static com.sonatype.nexus.ssl.plugin.internal.ui.TrustStoreComponent.asCertificateXO
@@ -51,7 +49,6 @@ import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.decodePEMFo
 class CertificateComponent
 extends DirectComponentSupport
 {
-
   @Inject
   TrustStore trustStore
 
@@ -91,28 +88,21 @@ extends DirectComponentSupport
 
   /**
    * Retrieves certificate given a certificate pem.
-   * @param pem to get details from
+   * @param pem certificate in PEM format
    * @return certificate
    */
   @DirectMethod
   @Validate
-  CertificateXO details(final @NotNull @Valid CertificatePemXO pem) {
-    try {
-      Certificate certificate = decodePEMFormattedCertificate(pem.getValue())
-      return asCertificateXO(certificate, isInTrustStore(certificate))
-    }
-    catch (CertificateParsingException e) {
-      ValidationResponse validations = new ValidationResponse()
-      validations.addError(new ValidationMessage('pem', 'Invalid PEM formatted certificate'))
-      throw new ValidationResponseException(validations)
-    }
+  CertificateXO details(final @NotBlank @PemCertificate String pem) {
+    Certificate certificate = decodePEMFormattedCertificate(pem)
+    return asCertificateXO(certificate, isInTrustStore(certificate))
   }
 
   Certificate[] retrieveCertificates(final String host,
                                      final int port,
                                      final String protocolHint)
   {
-    if (protocolHint) {
+    if (!protocolHint) {
       try {
         return certificateRetriever.retrieveCertificates(host, port)
       }
@@ -135,5 +125,4 @@ extends DirectComponentSupport
       return false
     }
   }
-
 }

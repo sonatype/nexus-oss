@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus.validation.constraint;
 
-import java.util.Locale;
-
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import org.sonatype.nexus.common.text.Strings2;
+import org.sonatype.nexus.validation.ConstraintValidatorSupport;
 
 /**
  * {@link Case} validator.
@@ -23,7 +23,7 @@ import javax.validation.ConstraintValidatorContext;
  * @since 3.0
  */
 public class CaseValidator
-  implements ConstraintValidator<Case,String>
+    extends ConstraintValidatorSupport<Case, String>
 {
   private CaseType type;
 
@@ -39,10 +39,10 @@ public class CaseValidator
     }
 
     if (type == CaseType.UPPER) {
-      return value.equals(value.toUpperCase(Locale.US));
+      return value.equals(Strings2.upper(value));
     }
     else {
-      return value.equals(value.toLowerCase(Locale.US));
+      return value.equals(Strings2.lower(value));
     }
   }
 }

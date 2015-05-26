@@ -25,7 +25,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.sonatype.nexus.log.LogManager;
-import org.sonatype.nexus.logging.LoggingPlugin;
 import org.sonatype.siesta.Resource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -47,7 +46,7 @@ public class LogResource
     extends ComponentSupport
     implements Resource
 {
-  public static final String RESOURCE_URI = LoggingPlugin.REST_PREFIX + "/log";
+  public static final String RESOURCE_URI = "/logging/log";
 
   private final LogManager logManager;
 
@@ -67,7 +66,7 @@ public class LogResource
    */
   @GET
   @Produces({TEXT_PLAIN})
-  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOG + "read")
+  @RequiresPermissions("nexus:logging:read")
   public Response get(final @QueryParam("fromByte") Long fromByte,
                       final @QueryParam("bytesCount") Long bytesCount)
       throws Exception

@@ -39,7 +39,7 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
           load: 'NX.direct.coreui_Email.read',
           submit: 'NX.direct.coreui_Email.update'
         },
-        editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
+        editableCondition: NX.Conditions.isPermitted('nexus:settings:update'),
         editableMarker: NX.I18n.get('ADMIN_SMTP_UPDATE_ERROR'),
 
         items: [

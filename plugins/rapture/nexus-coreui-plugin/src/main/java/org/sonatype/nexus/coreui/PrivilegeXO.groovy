@@ -14,6 +14,8 @@ package org.sonatype.nexus.coreui
 
 import javax.validation.constraints.NotNull
 
+import org.sonatype.nexus.security.privilege.UniquePrivilegeId
+import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
 
 import groovy.transform.ToString
@@ -29,6 +31,7 @@ import org.hibernate.validator.constraints.NotEmpty
 class PrivilegeXO
 {
   @NotBlank
+  @UniquePrivilegeId(groups = Create)
   String id
 
   @NotBlank(groups = Update)
@@ -46,7 +49,8 @@ class PrivilegeXO
   @NotNull
   Boolean readOnly
 
-  Map<String,String> properties
+  @NotEmpty
+  Map<String, String> properties
 
   @NotBlank
   String permission

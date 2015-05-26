@@ -21,7 +21,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.common.property.SystemPropertiesHelper;
-import org.sonatype.nexus.wonderland.WonderlandPlugin;
+import org.sonatype.nexus.wonderland.internal.WonderlandConstants;
 import org.sonatype.nexus.wonderland.model.PropertyXO;
 import org.sonatype.siesta.Resource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -45,7 +45,7 @@ public class SettingsResource
     implements Resource
 {
   @NonNls
-  public static final String RESOURCE_URI = WonderlandPlugin.REST_PREFIX + "/settings";
+  public static final String RESOURCE_URI = WonderlandConstants.REST_PREFIX + "/settings";
 
   @GET
   @Produces({APPLICATION_JSON, APPLICATION_XML})

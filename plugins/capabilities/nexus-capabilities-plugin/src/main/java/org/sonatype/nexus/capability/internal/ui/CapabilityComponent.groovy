@@ -83,7 +83,7 @@ extends DirectComponentSupport
    * @return a list of capability types
    */
   @DirectMethod
-  @RequiresPermissions('nexus:capabilityTypes:read')
+  @RequiresPermissions('nexus:capabilities:read')
   List<CapabilityTypeXO> readTypes() {
     return capabilityDescriptorRegistry.all.findAll { it.exposed }.collect { descriptor ->
       new CapabilityTypeXO(

@@ -19,6 +19,7 @@ import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
+import org.sonatype.nexus.common.text.Strings2
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.httpclient.HttpClientManager
@@ -31,6 +32,7 @@ import org.sonatype.nexus.httpclient.config.ProxyServerConfiguration
 import org.sonatype.nexus.httpclient.config.UsernameAuthenticationConfiguration
 import org.sonatype.nexus.rapture.PasswordPlaceholder
 import org.sonatype.nexus.validation.Validate
+import org.sonatype.sisu.goodies.common.Time
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
@@ -70,7 +72,8 @@ class HttpSettingsComponent
     HttpSettingsXO result = new HttpSettingsXO()
 
     value.connection?.with {
-      result.timeout = timeout
+      result.userAgentSuffix = userAgentSuffix
+      result.timeout = timeout ? timeout.toSecondsI() : null
       result.retries = maximumRetries
     }
 
@@ -150,8 +153,12 @@ class HttpSettingsComponent
       return result.connection
     }
 
+    if (!Strings2.isBlank(value.userAgentSuffix)) {
+      connection().userAgentSuffix = value.userAgentSuffix
+    }
+
     if (value.timeout != null) {
-      connection().timeout = value.timeout
+      connection().timeout = Time.seconds(value.timeout)
     }
     if (value.retries != null) {
       connection().maximumRetries = value.retries

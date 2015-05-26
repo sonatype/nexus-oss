@@ -23,12 +23,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 
-import com.sonatype.nexus.ssl.model.TrustStoreKey;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
 import org.sonatype.nexus.common.app.NexusStoppedEvent;
 import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.ldap.internal.connector.DefaultLdapConnector;
+import org.sonatype.nexus.ldap.internal.connector.FailoverLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.LdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapAuthConfiguration;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
@@ -41,6 +41,7 @@ import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapUserException;
 import org.sonatype.nexus.ldap.internal.events.LdapClearCacheEvent;
 import org.sonatype.nexus.ldap.internal.persist.LdapConfigurationManager;
 import org.sonatype.nexus.ldap.internal.persist.LdapServerNotFoundException;
+import org.sonatype.nexus.ldap.internal.persist.entity.Connection;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Protocol;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.ssl.SSLLdapContextFactory;
@@ -54,7 +55,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.ldap.model.LdapTrustStoreKey.ldapTrustStoreKey;
 
 // TODO: this really should be threaded so we make multiple parallel requests
 
@@ -307,6 +307,12 @@ public class EnterpriseLdapManager
             new DefaultLdapConnector(ldapServer.getId(), ldapUserManager, ldapGroupManager,
                 getLdapContextFactory(ldapServer),
                 getLdapAuthConfiguration(ldapServer));
+
+        ldapConnectors.add(new FailoverLdapConnector(
+            originalLdapConnector,
+            null,
+            ldapServer.getConnection().getConnectionRetryDelay(),
+            ldapServer.getConnection().getMaxIncidentsCount()));
       }
     }
     return this.ldapConnectors;
@@ -316,20 +322,19 @@ public class EnterpriseLdapManager
       throws LdapDAOException
   {
     final DefaultLdapContextFactory ldapContextFactory = LdapConnectionUtils.getLdapContextFactory(ldapServer);
-    final TrustStoreKey key = ldapTrustStoreKey(ldapServer.getId() == null ? "<unknown>" : ldapServer.getId());
-    if (Protocol.ldaps == ldapServer.getConnection().getHost().getProtocol()) {
-      final SSLContext sslContext = trustStore.getSSLContextFor(key);
-      if (sslContext != null) {
-        log.debug(
-            "{} is using a Nexus SSL Trust Store for accessing {}",
-            key, ldapServer.getConnection().getHost().getHostName()
-        );
-        return new SSLLdapContextFactory(sslContext, ldapContextFactory);
-      }
+    final String serverId = ldapServer.getId() == null ? "<unknown>" : ldapServer.getId();
+    Connection connection = ldapServer.getConnection();
+    if (Protocol.ldaps == connection.getHost().getProtocol() && connection.getUseTrustStore()) {
+      final SSLContext sslContext = trustStore.getSSLContext();
+      log.debug(
+          "{} is using a Nexus SSL Trust Store for accessing {}",
+          serverId, connection.getHost().getHostName()
+      );
+      return new SSLLdapContextFactory(sslContext, ldapContextFactory);
     }
     log.debug(
         "{} is using a JVM Trust Store for accessing {}",
-        key, ldapServer.getConnection().getHost().getHostName()
+        serverId, connection.getHost().getHostName()
     );
     return ldapContextFactory;
   }

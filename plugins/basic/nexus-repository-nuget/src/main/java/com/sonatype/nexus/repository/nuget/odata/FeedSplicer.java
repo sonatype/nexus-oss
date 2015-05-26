@@ -33,7 +33,7 @@ public final class FeedSplicer
 {
   // ----------------------------------------------------------------------
 
-  private final Map<String, String> data = new HashMap<String, String>();
+  private Map<String, String> data = new HashMap<String, String>();
 
   private final ODataConsumer consumer;
 
@@ -91,7 +91,7 @@ public final class FeedSplicer
       );
     }
     if ("entry".equals(name)) {
-      data.clear();
+      data = new HashMap<>();
     }
     else if ("content".equals(name)) {
       data.put("LOCATION", getAttribute("src"));

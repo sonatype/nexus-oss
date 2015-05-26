@@ -17,6 +17,7 @@ import java.util.Map;
 
 import com.sonatype.nexus.repository.nuget.odata.ODataTemplates;
 
+import org.sonatype.nexus.repository.IllegalOperationException;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -48,8 +49,12 @@ abstract class AbstractNugetHandler
       log.debug("Invalid package being uploaded", e);
       return xmlErrorMessage(HttpStatus.BAD_REQUEST, e.getMessage());
     }
-    if (e instanceof IllegalArgumentException) {
+    else if (e instanceof IllegalArgumentException) {
       log.debug("Bad argument", e);
+      return xmlErrorMessage(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+    else if (e instanceof IllegalOperationException) {
+      log.warn("Illegal operation", e);
       return xmlErrorMessage(HttpStatus.BAD_REQUEST, e.getMessage());
     }
     else if (e instanceof IOException) {

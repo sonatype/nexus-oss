@@ -51,8 +51,7 @@ Ext.define('NX.coreui.controller.Bundles', {
       variants: ['x16', 'x32']
     },
     visible: function () {
-      // FIXME: Update permission
-      return NX.Permissions.check('nexus:*', 'read');
+      return NX.Permissions.check('nexus:bundles:read');
     }
   },
 

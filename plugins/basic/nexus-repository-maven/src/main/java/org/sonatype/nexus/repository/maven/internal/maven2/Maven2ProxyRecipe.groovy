@@ -29,6 +29,7 @@ import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
 import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.maven.MavenPathParser
 import org.sonatype.nexus.repository.maven.internal.MavenProxyFacet
+import org.sonatype.nexus.repository.maven.internal.MavenRecipeSupport
 import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
 import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler
@@ -54,18 +55,9 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 @Named(Maven2ProxyRecipe.NAME)
 @Singleton
 class Maven2ProxyRecipe
-    extends RecipeSupport
+extends MavenRecipeSupport
 {
   static final String NAME = 'maven2-proxy'
-
-  @Inject
-  Provider<Maven2SecurityFacet> securityFacet
-
-  @Inject
-  Provider<ConfigurableViewFacet> viewFacet
-
-  @Inject
-  Provider<StorageFacetImpl> storageFacet
 
   @Inject
   Provider<SearchFacet> searchFacet
@@ -77,18 +69,6 @@ class Maven2ProxyRecipe
   Provider<NegativeCacheFacet> negativeCacheFacet
 
   @Inject
-  TimingHandler timingHandler
-
-  @Inject
-  SecurityHandler securityHandler
-
-  @Inject
-  PartialFetchHandler partialFetchHandler
-
-  @Inject
-  Provider<MavenFacetImpl> mavenFacet
-
-  @Inject
   Provider<MavenProxyFacet> mavenProxyFacet
 
   @Inject
@@ -98,20 +78,15 @@ class Maven2ProxyRecipe
   VersionPolicyHandler versionPolicyHandler
 
   @Inject
-  MavenHeadersHandler mavenHeadersHandler
-
-  @Inject
   ProxyHandler proxyHandler
 
   @Inject
-  @Named(Maven2Format.NAME)
-  MavenPathParser mavenPathParser
-
-  @Inject
   Maven2ProxyRecipe(@Named(ProxyType.NAME) final Type type,
-                    @Named(Maven2Format.NAME) final Format format)
+                    @Named(Maven2Format.NAME) final Format format,
+                    @Named(Maven2Format.NAME) MavenPathParser mavenPathParser,
+                    Provider<Maven2SecurityFacet> securityFacet)
   {
-    super(type, format)
+    super(type, format, mavenPathParser, securityFacet)
   }
 
   @Override
@@ -129,10 +104,7 @@ class Maven2ProxyRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    builder.route(new Route.Builder()
-        .matcher(new MavenArtifactMatcher(mavenPathParser))
-        .handler(timingHandler)
-        .handler(securityHandler)
+    builder.route(newArtifactRouteBuilder()
         .handler(negativeCacheHandler)
         .handler(partialFetchHandler)
         .handler(versionPolicyHandler)
@@ -141,10 +113,7 @@ class Maven2ProxyRecipe
         .create())
 
     // Note: partialFetchHandler NOT added for Maven metadata
-    builder.route(new Route.Builder()
-        .matcher(new MavenMetadataMatcher(mavenPathParser))
-        .handler(timingHandler)
-        .handler(securityHandler)
+    builder.route(newMetadataRouteBuilder()
         .handler(negativeCacheHandler)
         .handler(mavenHeadersHandler)
         .handler(proxyHandler)

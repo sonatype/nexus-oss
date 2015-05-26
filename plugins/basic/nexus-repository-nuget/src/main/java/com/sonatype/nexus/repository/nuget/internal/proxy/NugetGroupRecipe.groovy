@@ -91,6 +91,7 @@ class NugetGroupRecipe
         .matcher(new TokenMatcher("/{id}/{version}"))
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(exceptionHandler)
         .handler(groupHandler)
         .handler(notFound())
         .create())

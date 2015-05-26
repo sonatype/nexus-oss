@@ -104,7 +104,10 @@ Ext.define('NX.controller.UiSessionTimeout', {
 
     me.cancelTimeout();
     if ((user &&  NX.State.isReceiving()) && sessionTimeout > 0) {
+      //<if debug>
       me.logDebug('Session expiration enabled for ' + sessionTimeout + ' minutes');
+      //</if>
+
       me.activityMonitor = Ext.create('Ext.ux.ActivityMonitor', {
         interval: 1000, // check every second,
         maxInactive: ((sessionTimeout * 60) - me.SECONDS_TO_EXPIRE) * 1000,
@@ -129,13 +132,19 @@ Ext.define('NX.controller.UiSessionTimeout', {
     if (me.activityMonitor) {
       me.activityMonitor.stop();
       delete me.activityMonitor;
+
+      //<if debug>
       me.logDebug('Activity monitor disabled');
+      //</if>
     }
 
     if (me.expirationTicker) {
       me.expirationTicker.destroy();
       delete me.expirationTicker;
+
+      //<if debug>
       me.logDebug('Session expiration disabled');
+      //</if>
     }
   },
 

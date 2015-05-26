@@ -79,7 +79,10 @@ Ext.define('NX.controller.Permissions', {
   fetchPermissions: function () {
     var me = this;
 
+    //<if debug>
     me.logDebug('Fetching permissions...');
+    //</if>
+
     NX.Permissions.resetPermissions();
     me.getPermissionStore().load();
   },
@@ -91,12 +94,17 @@ Ext.define('NX.controller.Permissions', {
     var me = this;
 
     NX.Permissions.setPermissions(me.getPermissions());
+
+    //<if debug>
     me.logDebug('Permissions changed. Firing event');
+    //</if>
+
     me.fireEvent('changed', NX.Permissions);
   },
 
   /**
    * @private
+   * @return {object} permissions
    */
   getPermissions: function () {
     var me = this,

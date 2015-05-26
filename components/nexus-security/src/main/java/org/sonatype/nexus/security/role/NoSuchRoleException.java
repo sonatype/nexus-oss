@@ -21,7 +21,7 @@ public class NoSuchRoleException
   private static final long serialVersionUID = -3551757972830003397L;
 
   public NoSuchRoleException(final String roleId, Throwable cause) {
-    super("Role '" + roleId + "' not found", cause);
+    super("Role not found: " + roleId, cause);
   }
 
   public NoSuchRoleException(final String role) {

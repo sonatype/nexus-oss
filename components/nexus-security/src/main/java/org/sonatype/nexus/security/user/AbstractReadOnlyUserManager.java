@@ -30,26 +30,21 @@ public abstract class AbstractReadOnlyUserManager
 
   @Override
   public User addUser(final User user, final String password) {
-    throw unsupported();
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public void changePassword(final String userId, final String newPassword) throws UserNotFoundException {
-    throw unsupported();
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public void deleteUser(final String userId) throws UserNotFoundException {
-    throw unsupported();
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public User updateUser(final User user) throws UserNotFoundException {
-    throw unsupported();
-  }
-
-  private IllegalStateException unsupported() {
-    // TODO: Should probably use UnsupportedOperationException
-    throw new IllegalStateException("UserManager: '" + getSource() + "' does not support write operations.");
+    throw new UnsupportedOperationException();
   }
 }

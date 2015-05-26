@@ -308,7 +308,7 @@ public class NugetProxyGalleryFacet
       {
         @Override
         public Integer call() throws Exception {
-          return firstNonNull(fetcher.cachePackageFeed(remote, nugetQuery, 2, true, new ODataConsumer()
+          return firstNonNull(fetcher.cachePackageFeed(remote, nugetQuery, 2, false, new ODataConsumer()
           {
             @Override
             public void consume(final Map<String, String> data) {

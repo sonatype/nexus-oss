@@ -129,12 +129,12 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
 
   /**
    * @private
-   * Enable 'Access API Key' when user has 'apikey:access:read' permission.
+   * Enable 'Access API Key' when user has 'nexus:apikey:read' permission.
    * @param {Ext.Button} button access API Key button
    */
   bindAccessApiKeyButton: function(button) {
     button.mon(
-        NX.Conditions.isPermitted('apikey:access', 'read'),
+        NX.Conditions.isPermitted('nexus:apikey:read'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -145,12 +145,12 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
 
   /**
    * @private
-   * Enable 'Reset API Key' when user has 'apikey:access:delete' permission.
+   * Enable 'Reset API Key' when user has 'nexus:apikey:delete' permission.
    * @param {Ext.Button} button reset API Key button
    */
   bindResetApiKeyButton: function(button) {
     button.mon(
-        NX.Conditions.isPermitted('apikey:access', 'delete'),
+        NX.Conditions.isPermitted('nexus:apikey:delete'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,

@@ -74,10 +74,10 @@ Ext.define('NX.coreui.controller.SslCertificates', {
       variants: ['x16', 'x32']
     },
     visible: function () {
-      return NX.Permissions.check('nexus:ssl:truststore', 'read');
+      return NX.Permissions.check('nexus:ssl-truststore:read');
     }
   },
-  permission: 'nexus:ssl:truststore',
+  permission: 'nexus:ssl-truststore',
 
   /**
    * @override
@@ -206,7 +206,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         pem = basicForm.getFieldValues()['pem'];
 
     me.getContent().getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
-    NX.direct.ssl_Certificate.details({ value: pem }, function(response) {
+    NX.direct.ssl_Certificate.details(pem, function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
@@ -275,7 +275,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         model = form.getRecord(),
         description = me.getDescription(model);
 
-    NX.direct.ssl_TrustStore.create({ value: model.get('pem') }, function (response) {
+    NX.direct.ssl_TrustStore.create(model.get('pem'), function (response) {
       if (Ext.isObject(response) && response.success) {
         if (win) {
           win.close();
@@ -349,7 +349,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
             });
             button = tbar.down('button[action=remove]');
             me.mon(
-                NX.Conditions.isPermitted('nexus:ssl:truststore', 'delete'),
+                NX.Conditions.isPermitted('nexus:ssl-truststore:delete'),
                 {
                   satisfied: button.enable,
                   unsatisfied: button.disable,
@@ -368,7 +368,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
             });
             button = tbar.down('button[action=add]');
             me.mon(
-                NX.Conditions.isPermitted('nexus:ssl:truststore', 'create'),
+                NX.Conditions.isPermitted('nexus:ssl-truststore:create'),
                 {
                   satisfied: button.enable,
                   unsatisfied: button.disable,

@@ -13,6 +13,7 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.URL
 
 /**
  * General System Settings exchange object.
@@ -22,5 +23,6 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class GeneralSettingsXO
 {
+  @URL
   String baseUrl
 }

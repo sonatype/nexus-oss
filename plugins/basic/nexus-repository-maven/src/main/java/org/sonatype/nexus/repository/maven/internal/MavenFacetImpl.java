@@ -517,10 +517,10 @@ public class MavenFacetImpl
       try (InputStream is = inputStreamSupplier.get()) {
         final List<String> types = mimeSupport.detectMimeTypes(is, mavenPath.getPath());
         if (!types.isEmpty() && !types.contains(contentType)) {
-          log.debug("Discovered content type {} ", types.get(0));
+          log.debug("Discovered content type {} ", types);
           if (config.strictContentTypeValidation) {
             throw new InvalidContentException(
-                String.format("Declared content type %s, but declared %s.", contentType, types.get(0)));
+                String.format("Declared content type %s, but discovered %s.", contentType, types));
           }
         }
       }

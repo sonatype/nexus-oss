@@ -19,7 +19,6 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.wonderland.WonderlandPlugin;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.Mutex;
 import org.sonatype.sisu.goodies.common.TestAccessible;
@@ -41,7 +40,7 @@ public class AuthTicketCache
     extends ComponentSupport
 {
   @NonNls
-  private static final String CPREFIX = WonderlandPlugin.CONFIG_PREFIX + ".authTicketCache";
+  private static final String CPREFIX = WonderlandConstants.CONFIG_PREFIX + ".authTicketCache";
 
   private final Mutex lock = new Mutex();
 

@@ -44,7 +44,6 @@ Ext.define('NX.coreui.view.logging.LogMark', {
       settingsFormSuccessMessage: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_SUCCESS'),
       settingsFormSubmitOnEnter: true,
       editableMarker: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_ERROR'),
-      editableCondition: NX.Conditions.isPermitted('nexus:logconfig', 'update'),
       items: [
         {
           xtype: 'textfield',
@@ -55,15 +54,6 @@ Ext.define('NX.coreui.view.logging.LogMark', {
         }
       ]
     };
-
-    me.items.buttons = [
-      { text: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary', bindToEnter: me.items.settingsFormSubmitOnEnter },
-      { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler:
-        function() {
-          me.close();
-        }
-      }
-    ];
 
     me.callParent(arguments);
   }

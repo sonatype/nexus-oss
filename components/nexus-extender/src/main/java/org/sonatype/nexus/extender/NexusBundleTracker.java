@@ -110,8 +110,7 @@ public class NexusBundleTracker
   }
 
   private static boolean hasComponents(final Bundle bundle) {
-    return bundle.getResource("META-INF/sisu/javax.inject.Named") != null
-        || bundle.getResource("META-INF/plexus/components.xml") != null;
+    return bundle.getResource("META-INF/sisu/javax.inject.Named") != null;
   }
 
   private static boolean live(final Bundle bundle) {

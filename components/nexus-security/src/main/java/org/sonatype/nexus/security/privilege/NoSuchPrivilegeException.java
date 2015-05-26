@@ -21,6 +21,6 @@ public class NoSuchPrivilegeException
   private static final long serialVersionUID = 820651866330926246L;
 
   public NoSuchPrivilegeException(final String privilegeId) {
-    super("Privilege '" + privilegeId + "' not found");
+    super("Privilege not found: " + privilegeId);
   }
 }

@@ -42,9 +42,7 @@ import org.sonatype.nexus.ldap.internal.realms.LdapConnectionUtils
 import org.sonatype.nexus.ldap.internal.ssl.SSLLdapContextFactory
 import org.sonatype.nexus.ldap.internal.templates.LdapSchemaTemplate
 import org.sonatype.nexus.ldap.internal.templates.LdapSchemaTemplateManager
-import org.sonatype.nexus.ldap.model.LdapTrustStoreKey
 import org.sonatype.nexus.rapture.PasswordPlaceholder
-import org.sonatype.nexus.rapture.TrustStoreKeys
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
@@ -85,14 +83,10 @@ extends DirectComponentSupport
   TrustStore trustStore
 
   @Inject
-  @Nullable
-  TrustStoreKeys trustStoreKeys
-
-  @Inject
   Validator validator
 
   @DirectMethod
-  @RequiresPermissions('security:ldapconfig:read')
+  @RequiresPermissions('nexus:ldap:read')
   List<LdapServerXO> read() {
     def counter = 1
     return ldapConfigurationManager.listLdapServerConfigurations().collect { input ->
@@ -104,7 +98,7 @@ extends DirectComponentSupport
   }
 
   @DirectMethod
-  @RequiresPermissions('security:ldapconfig:read')
+  @RequiresPermissions('nexus:ldap:read')
   List<ReferenceXO> readReferences() {
     return ldapConfigurationManager.listLdapServerConfigurations().collect { input ->
       new ReferenceXO(
@@ -115,7 +109,7 @@ extends DirectComponentSupport
   }
 
   @DirectMethod
-  @RequiresPermissions('security:ldapconfig:read')
+  @RequiresPermissions('nexus:ldap:read')
   List<LdapSchemaTemplateXO> readTemplates() {
     return templateManager.schemaTemplates.collect { template ->
       asLdapSchemaTemplateXO(template)
@@ -124,23 +118,21 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:create')
+  @RequiresPermissions('nexus:ldap:create')
   @Validate(groups = [Create, Default])
   LdapServerXO create(final @NotNull @Valid LdapServerXO ldapServerXO) {
     def id = ldapConfigurationManager.addLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), null))
-    trustStoreKeys?.setEnabled(LdapTrustStoreKey.TYPE, id, ldapServerXO.useTrustStore)
     return asLdapServerXO(ldapConfigurationManager.getLdapServerConfiguration(id))
   }
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:update')
+  @RequiresPermissions('nexus:ldap:update')
   @Validate(groups = [Update, Default])
   LdapServerXO update(final @NotNull @Valid LdapServerXO ldapServerXO) {
     LdapConfiguration existing = ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id)
     if (existing) {
       ldapConfigurationManager.updateLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), existing.connection.systemPassword))
-      trustStoreKeys?.setEnabled(LdapTrustStoreKey.TYPE, ldapServerXO.id, ldapServerXO.useTrustStore)
       return asLdapServerXO(ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id))
     }
     throw new IllegalArgumentException('LDAP server with id "' + ldapServerXO.id + '" not found')
@@ -148,7 +140,7 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:delete')
+  @RequiresPermissions('nexus:ldap:delete')
   @Validate
   void remove(final @NotEmpty String id) {
     ldapConfigurationManager.deleteLdapServerConfiguration(id)
@@ -156,21 +148,21 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:update')
+  @RequiresPermissions('nexus:ldap:update')
   void changeOrder(final List<String> orderedServerIds) {
     ldapConfigurationManager.setServerOrder(orderedServerIds)
   }
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:delete')
+  @RequiresPermissions('nexus:ldap:delete')
   void clearCache() {
     ldapConfigurationManager.clearCache()
   }
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:update')
+  @RequiresPermissions('nexus:ldap:update')
   @Validate
   void verifyConnection(final @NotNull @Valid LdapServerConnectionXO ldapServerConnectionXO) {
     String authPassword = null
@@ -191,7 +183,7 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:update')
+  @RequiresPermissions('nexus:ldap:update')
   @Validate
   Collection<LdapUser> verifyUserMapping(final @NotNull @Valid LdapServerXO ldapServerXO) {
     String authPassword = null
@@ -216,7 +208,7 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:ldapconfig:update')
+  @RequiresPermissions('nexus:ldap:update')
   @Validate
   void verifyLogin(final @NotNull @Valid LdapServerXO ldapServerXO,
                    final @NotEmpty String base64Username,
@@ -251,7 +243,7 @@ extends DirectComponentSupport
         name: ldapServer.name,
         url: asLdapServerUrl(connectionInfo),
         protocol: connectionInfo.host.protocol.name(),
-        useTrustStore: trustStoreKeys?.isEnabled(LdapTrustStoreKey.TYPE, ldapServer.id),
+        useTrustStore: connectionInfo.useTrustStore,
         host: connectionInfo.host.hostName,
         port: connectionInfo.host.port,
         searchBase: connectionInfo.searchBase,
@@ -330,6 +322,7 @@ extends DirectComponentSupport
         name: ldapServerXO.name,
         connection: new Connection(
             host: new Host(Protocol.valueOf(ldapServerXO.protocol.name()), ldapServerXO.host, ldapServerXO.port),
+            useTrustStore: Boolean.TRUE.equals(ldapServerXO.useTrustStore),
             searchBase: ldapServerXO.searchBase,
 
             authScheme: ldapServerXO.authScheme,

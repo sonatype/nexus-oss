@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.ldap.internal.realms;
 
-import org.sonatype.nexus.ldap.LdapPlugin;
+import org.sonatype.nexus.ldap.internal.LdapConstants;
 import org.sonatype.nexus.ldap.internal.LdapTestSupport;
 
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -28,7 +28,7 @@ public class EnterpriseLdapRealmTest
   public void testSuccessfulAuthentication()
       throws Exception
   {
-    final Realm realm = this.lookup(Realm.class, LdapPlugin.REALM_NAME);
+    final Realm realm = this.lookup(Realm.class, LdapConstants.REALM_NAME);
     final UsernamePasswordToken upToken = new UsernamePasswordToken("brianf", "brianf123");
     final AuthenticationInfo ai = realm.getAuthenticationInfo(upToken);
     assertEquals("brianf123".toCharArray(), ai.getCredentials());

@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.wonderland.AuthTicketService;
-import org.sonatype.nexus.wonderland.WonderlandPlugin;
+import org.sonatype.nexus.wonderland.internal.WonderlandConstants;
 import org.sonatype.nexus.wonderland.model.AuthTicketXO;
 import org.sonatype.nexus.wonderland.model.AuthTokenXO;
 import org.sonatype.siesta.Resource;
@@ -52,7 +52,7 @@ public class AuthenticateResource
     implements Resource
 {
   @NonNls
-  public static final String RESOURCE_URI = WonderlandPlugin.REST_PREFIX + "/authenticate";
+  public static final String RESOURCE_URI = WonderlandConstants.REST_PREFIX + "/authenticate";
 
   private final AuthTicketService authTickets;
 

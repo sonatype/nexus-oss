@@ -12,19 +12,15 @@
  */
 package org.sonatype.nexus.validation;
 
-import java.lang.annotation.ElementType;
-
 import javax.inject.Singleton;
 import javax.validation.ConstraintValidatorFactory;
-import javax.validation.Path;
-import javax.validation.Path.Node;
-import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 
+import org.sonatype.nexus.validation.internal.AlwaysTraversableResolver;
 import org.sonatype.nexus.validation.internal.AopAwareParanamerParameterNameProvider;
 import org.sonatype.nexus.validation.internal.GuiceConstraintValidatorFactory;
 import org.sonatype.nexus.validation.internal.ValidationInterceptor;
@@ -61,8 +57,10 @@ public class ValidationModule
       ValidatorFactory factory = Validation.byDefaultProvider().configure()
           .constraintValidatorFactory(constraintValidatorFactory)
           .parameterNameProvider(new AopAwareParanamerParameterNameProvider())
-          .traversableResolver(new AlwaysTraversableResolver()) // disable JPA reachability
+          .traversableResolver(new AlwaysTraversableResolver())
           .buildValidatorFactory();
+
+      // FIXME: Install custom MessageInterpolator that can properly find/merge ValidationMessages.properties for bundles
 
       // exercise interpolator to preload elements (avoids issues later when TCCL might be different)
       factory.getValidator().validate(new Object()
@@ -89,21 +87,5 @@ public class ValidationModule
   @Singleton
   ExecutableValidator executableValidator(final Validator validator) {
     return validator.forExecutables();
-  }
-
-  static class AlwaysTraversableResolver
-      implements TraversableResolver
-  {
-    public boolean isCascadable(final Object traversableObject, final Node traversableProperty,
-        final Class<?> rootBeanType, final Path pathToTraversableObject, final ElementType elementType)
-    {
-      return true;
-    }
-
-    public boolean isReachable(final Object traversableObject, final Node traversableProperty,
-        final Class<?> rootBeanType, final Path pathToTraversableObject, final ElementType elementType)
-    {
-      return true;
-    }
   }
 }

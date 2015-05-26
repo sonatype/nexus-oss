@@ -20,7 +20,6 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpStatus;
 
 import org.apache.http.HttpResponse;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -30,6 +29,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
  * Tests NuGet hosted repositories.
@@ -40,12 +40,6 @@ public class NugetHostedIT
 {
 
   private static final String HOSTED_REPO = "nuget-test-hosted";
-
-  public static final String VISUAL_STUDIO_INITIAL_COUNT_QUERY =
-      "Search()/$count?$filter=IsLatestVersion&searchTerm=''&targetFramework='net45'&includePrerelease=false";
-
-  public static final String VISUAL_STUDIO_INITIAL_FEED_QUERY =
-      "Search()?$filter=IsLatestVersion&$orderby=DownloadCount%20desc,Id&$skip=0&$top=30&searchTerm=''&targetFramework='net45'&includePrerelease=false";
 
   private NugetClient nuget;
 
@@ -58,15 +52,10 @@ public class NugetHostedIT
     nuget = nugetClient(repository);
   }
 
-  @After
-  public void deleteHostedRepository() throws Exception {
-    deleteRepository(HOSTED_REPO);
-  }
-
   /**
    * Simple smoke test to ensure a hosted repo is actually reachable.
    */
-    @Test
+  @Test
   public void hostedRepositoryIsAvailable() throws Exception {
     final String repositoryMetadata = nuget.getRepositoryMetadata();
     assertThat(repositoryMetadata, is(notNullValue()));
@@ -92,8 +81,7 @@ public class NugetHostedIT
     assertThat("entry count", entries.size(), is(1));
     assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
 
-    final int delete = nuget.delete("SONATYPE.TEST", "1.0");
-    assertThat(delete, is(HttpStatus.NO_CONTENT));
+    assertThat(status(nuget.delete("SONATYPE.TEST", "1.0")), is(HttpStatus.NO_CONTENT));
 
     // Now ensure that the item has been deleted
     assertThat("count after deletion", nuget.count(VISUAL_STUDIO_INITIAL_COUNT_QUERY), is(0));
@@ -118,14 +106,13 @@ public class NugetHostedIT
     assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
   }
 
-
   /**
    * Requesting the entry for a nonexistent package should return 404.
    */
   @Test
   public void entryForMissingPackageReturns404() throws Exception {
     final HttpResponse response = nuget.entry("no-such-package", "1.0");
-    assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NOT_FOUND));
+    assertThat(status(response), is(HttpStatus.NOT_FOUND));
   }
 
   /**
@@ -133,7 +120,7 @@ public class NugetHostedIT
    */
   @Test
   public void deleteMissingPackageReturns404() throws Exception {
-    final int delete = nuget.delete("no-such-package", "1.0");
+    final int delete = status(nuget.delete("no-such-package", "1.0"));
     assertThat(delete, is(HttpStatus.NOT_FOUND));
   }
 
@@ -144,19 +131,17 @@ public class NugetHostedIT
   public void searchForPackage() throws Exception {
     nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
 
-    final int count = nuget.count(
-        "Search()/$count?$filter=IsAbsoluteLatestVersion&searchTerm='SONATYPE.TEST'&targetFramework='net45'&includePrerelease=true");
+    final String searchTerm = "SONATYPE.TEST";
+    final int count = nuget.vsSearchCount(searchTerm);
 
     assertThat("count", count, is(1));
 
-    final String feedXml = nuget.feedXml(
-        "Search()?$filter=IsAbsoluteLatestVersion&$skip=0&$top=30&searchTerm='SONATYPE.TEST'&targetFramework='net45'&includePrerelease=true");
+    final String feedXml = nuget.vsSearchFeedXml(searchTerm);
 
     final List<Map<String, String>> entries = parseFeedXml(feedXml);
     assertThat("entry count", entries.size(), is(1));
-    assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
+    assertThat("entry ID", entries.get(0).get("ID"), is(searchTerm));
   }
-
 
   /**
    * Ensure that Visual Studio's 'specific packages'-style ODATA queries can find an uploaded test package.

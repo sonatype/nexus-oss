@@ -28,9 +28,11 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 /**
  * Default {@link SecurityConfigurationCleaner}.
  *
- * Removes dead references to roles and permissions in the security model. When a permission is removed all roles will
- * be updated so the permission reference can removed. When a Role is removed references are removed from other roles
- * and users.
+ * Removes dead references to roles and permissions in the security model.
+ *
+ * When a permission is removed all roles will be updated so the permission reference can removed.
+ *
+ * When a Role is removed references are removed from other roles and users.
  */
 @Named
 @Singleton

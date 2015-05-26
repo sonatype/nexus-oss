@@ -78,7 +78,10 @@ Ext.define('NX.controller.Main', {
         viewport = me.getViewport();
 
     if (viewport) {
+      //<if debug>
       me.logDebug('Showing main view');
+      //</if>
+
       viewport.add({ xtype: 'nx-main' });
     }
   },
@@ -92,7 +95,10 @@ Ext.define('NX.controller.Main', {
         viewport = me.getViewport();
 
     if (viewport) {
+      //<if debug>
       me.logDebug('Removing main view');
+      //</if>
+
       viewport.remove(me.getMain());
     }
   }

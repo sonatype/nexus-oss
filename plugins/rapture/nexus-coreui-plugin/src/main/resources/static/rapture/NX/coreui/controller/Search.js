@@ -95,7 +95,7 @@ Ext.define('NX.coreui.controller.Search', {
       iconName: 'search-folder',
       weight: 500,
       visible: function() {
-        return NX.Permissions.check('nexus:repositories', 'read');
+        return NX.Permissions.check('nexus:search:read');
       }
     }, me);
 
@@ -209,7 +209,7 @@ Ext.define('NX.coreui.controller.Search', {
         weight: 20,
         expanded: false,
         visible: function() {
-          return NX.Permissions.check('nexus:repositories', 'read');
+          return NX.Permissions.check('nexus:search:read');
         }
       }, owner);
     }
@@ -223,7 +223,7 @@ Ext.define('NX.coreui.controller.Search', {
         description: model.get('description'),
         authenticationRequired: false,
         visible: function() {
-          return NX.Permissions.check('nexus:repositories', 'read');
+          return NX.Permissions.check('nexus:search:read');
         }
       }, owner);
     }
@@ -239,11 +239,11 @@ Ext.define('NX.coreui.controller.Search', {
 
   /**
    * @private
-   * Show quick search when user has 'nexus:repositories:read' permission.
+   * Show quick search when user has 'nexus:search:read' permission.
    */
   bindQuickSearch: function(quickSearch) {
     quickSearch.up('panel').mon(
-        NX.Conditions.isPermitted('nexus:repositories', 'read'),
+        NX.Conditions.isPermitted('nexus:search:read'),
         {
           satisfied: quickSearch.show,
           unsatisfied: quickSearch.hide,

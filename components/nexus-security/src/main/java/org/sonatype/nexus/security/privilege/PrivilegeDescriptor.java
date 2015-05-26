@@ -13,17 +13,15 @@
 package org.sonatype.nexus.security.privilege;
 
 import org.sonatype.nexus.security.config.CPrivilege;
-import org.sonatype.nexus.security.config.SecurityConfigurationValidationContext;
-import org.sonatype.nexus.validation.ValidationResponse;
 
 import org.apache.shiro.authz.Permission;
 
+/**
+ * Privilege descriptor.
+ */
 public interface PrivilegeDescriptor
 {
   String getType();
 
   Permission createPermission(CPrivilege privilege);
-
-  // TODO: Sort out validation
-  ValidationResponse validatePrivilege(CPrivilege privilege, SecurityConfigurationValidationContext ctx, boolean update);
 }

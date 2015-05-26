@@ -43,19 +43,19 @@ Ext.define('NX.coreui.controller.Privileges', {
   ],
   icons: {
     'privilege-default': {
-      file: 'medal_gold_1.png',
+      file: 'medal_gold_red.png',
       variants: ['x16', 'x32']
     },
-    'privilege-method': {
-      file: 'medal_gold_1.png',
+    'privilege-application': {
+      file: 'medal_gold_green.png',
+      variants: ['x16', 'x32']
+    },
+    'privilege-wildcard': {
+      file: 'medal_gold_blue.png',
       variants: ['x16', 'x32']
     },
     'privilege-repository': {
       file: 'database.png',
-      variants: ['x16', 'x32']
-    },
-    'privilege-target': {
-      file: 'target.png',
       variants: ['x16', 'x32']
     },
     'privilege-repository-admin': {
@@ -74,16 +74,16 @@ Ext.define('NX.coreui.controller.Privileges', {
     description: NX.I18n.get('ADMIN_PRIVILEGES_SUBTITLE'),
     view: {xtype: 'nx-coreui-privilege-feature'},
     iconConfig: {
-      file: 'medal_gold_1.png',
+      file: 'medal_gold_green.png',
       variants: ['x16', 'x32']
     },
     visible: function () {
-      return NX.Permissions.check('security:privileges', 'read');
+      return NX.Permissions.check('nexus:privileges:read');
     },
     weight: 10
   },
 
-  permission: 'security:privileges',
+  permission: 'nexus:privileges',
 
   /**
    * @override
@@ -122,7 +122,7 @@ Ext.define('NX.coreui.controller.Privileges', {
 
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission, 'delete'),
+            NX.Conditions.isPermitted(me.permission + ':delete'),
             NX.Conditions.gridHasSelection(me.masters[0], function (model) {
               return !model.get('readOnly');
             })

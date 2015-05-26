@@ -106,7 +106,9 @@ Ext.define('NX.coreui.controller.Outreach', {
                 }
                 else {
                   // else complain and leave it hidden
+                  //<if debug>
                   me.logDebug('Outreach iframe did not load: ' + url);
+                  //</if>
                 }
               }
             }

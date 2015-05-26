@@ -15,7 +15,6 @@ package org.sonatype.nexus.security.internal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,17 +36,12 @@ import org.sonatype.nexus.security.config.SecurityConfigurationCleaner;
 import org.sonatype.nexus.security.config.SecurityConfigurationManager;
 import org.sonatype.nexus.security.config.SecurityConfigurationModifier;
 import org.sonatype.nexus.security.config.SecurityConfigurationSource;
-import org.sonatype.nexus.security.config.SecurityConfigurationValidationContext;
-import org.sonatype.nexus.security.config.SecurityConfigurationValidator;
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource;
 import org.sonatype.nexus.security.privilege.NoSuchPrivilegeException;
 import org.sonatype.nexus.security.role.NoSuchRoleException;
 import org.sonatype.nexus.security.user.NoSuchRoleMappingException;
 import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.nexus.security.user.UserNotFoundException;
-import org.sonatype.nexus.validation.ValidationMessage;
-import org.sonatype.nexus.validation.ValidationResponse;
-import org.sonatype.nexus.validation.ValidationResponseException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -67,8 +61,6 @@ public class SecurityConfigurationManagerImpl
     implements SecurityConfigurationManager
 {
   private final SecurityConfigurationSource configurationSource;
-
-  private final SecurityConfigurationValidator validator;
 
   private final SecurityConfigurationCleaner configCleaner;
 
@@ -92,7 +84,6 @@ public class SecurityConfigurationManagerImpl
                                           final List<DynamicSecurityConfigurationResource> dynamicResources,
                                           final List<SecurityConfigurationModifier> configurationModifiers,
                                           final SecurityConfigurationCleaner configCleaner,
-                                          final SecurityConfigurationValidator validator,
                                           final PasswordService passwordService,
                                           final EventBus eventBus)
   {
@@ -102,7 +93,6 @@ public class SecurityConfigurationManagerImpl
     this.eventBus = eventBus;
     this.configurationModifiers = configurationModifiers;
     this.configCleaner = configCleaner;
-    this.validator = validator;
     this.passwordService = passwordService;
   }
 
@@ -134,75 +124,25 @@ public class SecurityConfigurationManagerImpl
 
   @Override
   public void createPrivilege(CPrivilege privilege) {
-    createPrivilege(privilege, initializeContext());
-  }
-
-  private void createPrivilege(CPrivilege privilege, SecurityConfigurationValidationContext context) {
-    if (context == null) {
-      context = initializeContext();
-    }
-
-    ValidationResponse vr = validator.validatePrivilege(context, privilege, false);
-
-    if (vr.isValid()) {
-      getDefaultConfiguration().addPrivilege(privilege);
-      logValidationWarnings(vr);
-    }
-    else {
-      throw new ValidationResponseException(vr);
-    }
+    getDefaultConfiguration().addPrivilege(privilege);
   }
 
   @Override
   public void createRole(CRole role) {
-    createRole(role, initializeContext());
-  }
-
-  private void createRole(CRole role, SecurityConfigurationValidationContext context) {
-    if (context == null) {
-      context = initializeContext();
-    }
-
-    ValidationResponse vr = validator.validateRole(context, role, false);
-
-    if (vr.isValid()) {
-      getDefaultConfiguration().addRole(role);
-      logValidationWarnings(vr);
-    }
-    else {
-      throw new ValidationResponseException(vr);
-    }
+    getDefaultConfiguration().addRole(role);
   }
 
   @Override
   public void createUser(CUser user, Set<String> roles) {
-    createUser(user, null, roles, initializeContext());
+    createUser(user, null, roles);
   }
 
   @Override
   public void createUser(CUser user, String password, Set<String> roles) {
-    createUser(user, password, roles, initializeContext());
-  }
-
-  private void createUser(CUser user, String password, Set<String> roles, SecurityConfigurationValidationContext context) {
-    if (context == null) {
-      context = initializeContext();
+    if (!Strings2.isBlank(password)) {
+      user.setPassword(passwordService.encryptPassword(password));
     }
-
-    // set the password if its not null
-    if (password != null && password.trim().length() > 0) {
-      user.setPassword(this.passwordService.encryptPassword(password));
-    }
-
-    ValidationResponse vr = validator.validateUser(context, user, roles, false);
-
-    if (vr.isValid()) {
-      getDefaultConfiguration().addUser(user, roles);
-      logValidationWarnings(vr);
-    }
-    else {
-      throw new ValidationResponseException(vr);
-    }
+    getDefaultConfiguration().addUser(user, roles);
   }
 
   @Override
@@ -274,46 +214,12 @@ public class SecurityConfigurationManagerImpl
 
   @Override
   public void updatePrivilege(CPrivilege privilege) throws NoSuchPrivilegeException {
-    updatePrivilege(privilege, initializeContext());
-  }
-
-  private void updatePrivilege(CPrivilege privilege, SecurityConfigurationValidationContext context)
-      throws NoSuchPrivilegeException
-  {
-    if (context == null) {
-      context = initializeContext();
-    }
-
-    ValidationResponse vr = validator.validatePrivilege(context, privilege, true);
-
-    if (vr.isValid()) {
-      getDefaultConfiguration().updatePrivilege(privilege);
-      logValidationWarnings(vr);
-    }
-    else {
-      throw new ValidationResponseException(vr);
-    }
+    getDefaultConfiguration().updatePrivilege(privilege);
   }
 
   @Override
   public void updateRole(CRole role) throws NoSuchRoleException {
-    updateRole(role, initializeContext());
-  }
-
-  private void updateRole(CRole role, SecurityConfigurationValidationContext context) throws NoSuchRoleException {
-    if (context == null) {
-      context = initializeContext();
-    }
-
-    ValidationResponse vr = validator.validateRole(context, role, true);
-
-    if (vr.isValid()) {
-      getDefaultConfiguration().updateRole(role);
-      logValidationWarnings(vr);
-    }
-    else {
-      throw new ValidationResponseException(vr);
-    }
+    getDefaultConfiguration().updateRole(role);
   }
 
   @Override
@@ -330,76 +236,16 @@ public class SecurityConfigurationManagerImpl
 
   @Override
   public void updateUser(CUser user, Set<String> roles) throws UserNotFoundException {
-    updateUser(user, roles, initializeContext());
-  }
-
-  private void updateUser(CUser user, Set<String> roles, SecurityConfigurationValidationContext context)
-      throws UserNotFoundException
-  {
-    if (context == null) {
-      context = initializeContext();
-    }
-
-    ValidationResponse vr = validator.validateUser(context, user, roles, true);
-
-    if (vr.isValid()) {
-      getDefaultConfiguration().updateUser(user, roles);
-      logValidationWarnings(vr);
-    }
-    else {
-      throw new ValidationResponseException(vr);
-    }
+    getDefaultConfiguration().updateUser(user, roles);
   }
 
   @Override
   public void createUserRoleMapping(CUserRoleMapping userRoleMapping) {
-    createUserRoleMapping(userRoleMapping, initializeContext());
-  }
-
-  private void createUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityConfigurationValidationContext context) {
-    if (context == null) {
-      context = this.initializeContext();
-    }
-
-    try {
-      // this will throw a NoSuchRoleMappingException, if there isn't one
-      readUserRoleMapping(userRoleMapping.getUserId(), userRoleMapping.getSource());
-
-      ValidationResponse vr = new ValidationResponse();
-      vr.addError(new ValidationMessage("*", "User Role Mapping for user '"
-          + userRoleMapping.getUserId() + "' already exists."));
-
-      throw new ValidationResponseException(vr);
-    }
-    catch (NoSuchRoleMappingException e) {
-      // expected
-    }
-
-    ValidationResponse vr = validator.validateUserRoleMapping(context, userRoleMapping, false);
-
-    if (vr.getErrors().size() > 0) {
-      throw new ValidationResponseException(vr);
-    }
-
     getDefaultConfiguration().addUserRoleMapping(userRoleMapping);
-    logValidationWarnings(vr);
   }
 
-  private void logValidationWarnings(final ValidationResponse vr) {
-    final List<ValidationMessage> validationWarnings = vr.getWarnings();
-    if (validationWarnings.size() > 0) {
-      final StringBuilder buff = new StringBuilder();
-      for (ValidationMessage msg : validationWarnings) {
-        if (buff.length() >= 0) {
-          buff.append(",");
-        }
-        buff.append(" ").append(msg.toString());
-      }
-      log.warn("Security configuration has validation warnings: {}", buff);
-    }
-  }
-
-  private CUserRoleMapping readCUserRoleMapping(String userId, String source) throws NoSuchRoleMappingException {
+  @Override
+  public CUserRoleMapping readUserRoleMapping(String userId, String source) throws NoSuchRoleMappingException {
     CUserRoleMapping mapping = getDefaultConfiguration().getUserRoleMapping(userId, source);
 
     if (mapping != null) {
@@ -411,36 +257,7 @@ public class SecurityConfigurationManagerImpl
   }
 
   @Override
-  public CUserRoleMapping readUserRoleMapping(String userId, String source) throws NoSuchRoleMappingException {
-    return readCUserRoleMapping(userId, source);
-  }
-
-  @Override
   public void updateUserRoleMapping(CUserRoleMapping userRoleMapping) throws NoSuchRoleMappingException {
-    updateUserRoleMapping(userRoleMapping, initializeContext());
-  }
-
-  private void updateUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityConfigurationValidationContext context)
-      throws NoSuchRoleMappingException
-  {
-    if (context == null) {
-      context = initializeContext();
-    }
-
-    if (readUserRoleMapping(userRoleMapping.getUserId(), userRoleMapping.getSource()) == null) {
-      ValidationResponse vr = new ValidationResponse();
-      vr.addError(new ValidationMessage("*", "No User Role Mapping found for user '"
-          + userRoleMapping.getUserId() + "'."));
-
-      throw new ValidationResponseException(vr);
-    }
-
-    ValidationResponse vr = validator.validateUserRoleMapping(context, userRoleMapping, true);
-
-    if (vr.getErrors().size() > 0) {
-      throw new ValidationResponseException(vr);
-    }
-
     getDefaultConfiguration().updateUserRoleMapping(userRoleMapping);
   }
 
@@ -451,30 +268,6 @@ public class SecurityConfigurationManagerImpl
     if (!found) {
       throw new NoSuchRoleMappingException(userId);
     }
-  }
-
-  private SecurityConfigurationValidationContext initializeContext() {
-    SecurityConfigurationValidationContext context = new SecurityConfigurationValidationContext();
-
-    context.addExistingUserIds();
-    context.addExistingRoleIds();
-    context.addExistingPrivilegeIds();
-
-    for (CUser user : listUsers()) {
-      context.getExistingUserIds().add(user.getId());
-    }
-
-    for (CRole role : listRoles()) {
-      context.getExistingRoleIds().add(role.getId());
-      context.getRoleContainmentMap().put(role.getId(), Lists.newArrayList(role.getRoles()));
-      context.getExistingRoleNameMap().put(role.getId(), role.getName());
-    }
-
-    for (CPrivilege privilege : listPrivileges()) {
-      context.getExistingPrivilegeIds().add(privilege.getId());
-    }
-
-    return context;
   }
 
   @Override
@@ -594,9 +387,7 @@ public class SecurityConfigurationManagerImpl
       roles.put(role.getId(), role);
     }
 
-    for (Iterator<CRole> iterator = from.getRoles().iterator(); iterator.hasNext(); ) {
-      CRole role = iterator.next();
-
+    for (CRole role : from.getRoles()) {
       // need to check if we need to merge the static config
       CRole eachRole = roles.get(role.getId());
       if (eachRole != null) {
@@ -613,8 +404,7 @@ public class SecurityConfigurationManagerImpl
   }
 
   private CRole mergeRolesContents(CRole roleA, CRole roleB) {
-    // ROLES
-    Set<String> roles = new HashSet<String>();
+    Set<String> roles = new HashSet<>();
     // make sure they are not empty
     if (roleA.getRoles() != null) {
       roles.addAll(roleA.getRoles());
@@ -623,8 +413,7 @@ public class SecurityConfigurationManagerImpl
       roles.addAll(roleB.getRoles());
     }
 
-    // PRIVS
-    Set<String> privs = new HashSet<String>();
+    Set<String> privs = new HashSet<>();
     // make sure they are not empty
     if (roleA.getPrivileges() != null) {
       privs.addAll(roleA.getPrivileges());
@@ -639,14 +428,14 @@ public class SecurityConfigurationManagerImpl
     newRole.setPrivileges(Sets.newHashSet(privs));
 
     // now for the name and description
-    if (Strings2.isNotBlank(roleA.getName())) {
+    if (!Strings2.isBlank(roleA.getName())) {
       newRole.setName(roleA.getName());
     }
     else {
       newRole.setName(roleB.getName());
     }
 
-    if (Strings2.isNotBlank(roleA.getDescription())) {
+    if (!Strings2.isBlank(roleA.getDescription())) {
       newRole.setDescription(roleA.getDescription());
     }
     else {

@@ -14,6 +14,10 @@ package org.sonatype.nexus.httpclient.config;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.sisu.goodies.common.Time;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /**
  * Connection configuration.
  *
@@ -23,22 +27,26 @@ public class ConnectionConfiguration
     implements Cloneable
 {
   @Nullable
-  private Integer timeout;
+  @JsonDeserialize(using = SecondsDeserializer.class)
+  private Time timeout;
 
   @Nullable
   private Integer maximumRetries;
 
-  // TODO: user-agent, query-string
+  @Nullable
+  private String userAgentSuffix;
+
+  // TODO: query-string
 
   @Nullable
   private Boolean useTrustStore;
 
   @Nullable
-  public Integer getTimeout() {
+  public Time getTimeout() {
     return timeout;
   }
 
-  public void setTimeout(@Nullable final Integer timeout) {
+  public void setTimeout(@Nullable final Time timeout) {
     this.timeout = timeout;
   }
 
@@ -52,6 +60,11 @@ public class ConnectionConfiguration
   }
 
   @Nullable
+  public String getUserAgentSuffix() { return userAgentSuffix; }
+
+  public void setUserAgentSuffix(@Nullable final String userAgentSuffix) { this.userAgentSuffix = userAgentSuffix; }
+
+  @Nullable
   public Boolean getUseTrustStore() { return useTrustStore; }
 
   public void setUseTrustStore(@Nullable final Boolean useTrustStore) { this.useTrustStore = useTrustStore; }
@@ -61,6 +74,8 @@ public class ConnectionConfiguration
     return getClass().getSimpleName() + "{" +
         "timeout=" + timeout +
         ", maximumRetries=" + maximumRetries +
+        ", userAgentSuffix=" + userAgentSuffix +
+        ", useTrustStore=" + useTrustStore +
         '}';
   }
 }

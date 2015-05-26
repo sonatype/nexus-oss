@@ -21,8 +21,6 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.security.SecuritySystem
 import org.sonatype.nexus.security.authz.AuthorizationManager
 import org.sonatype.nexus.security.privilege.Privilege
-import org.sonatype.nexus.security.privilege.PrivilegeDescriptor
-import org.sonatype.nexus.security.user.UserManager
 import org.sonatype.nexus.validation.Validate
 
 import com.google.common.collect.Maps
@@ -32,6 +30,8 @@ import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
+
+import static org.sonatype.nexus.security.user.UserManager.DEFAULT_SOURCE
 
 /**
  * Privilege {@link DirectComponent}.
@@ -44,23 +44,18 @@ import org.hibernate.validator.constraints.NotEmpty
 class PrivilegeComponent
     extends DirectComponentSupport
 {
-  public static final String DEFAULT_SOURCE = UserManager.DEFAULT_SOURCE
-
   @Inject
   SecuritySystem securitySystem
-
-  @Inject
-  List<PrivilegeDescriptor> privilegeDescriptors
 
   /**
    * Retrieves privileges.
    * @return a list of privileges
    */
   @DirectMethod
-  @RequiresPermissions('security:privileges:read')
+  @RequiresPermissions('nexus:privileges:read')
   List<PrivilegeXO> read() {
-    return securitySystem.listPrivileges().collect {input ->
-      return asPrivilegeXO(input)
+    return securitySystem.listPrivileges().collect { input ->
+      return convert(input)
     }
   }
 
@@ -70,11 +65,11 @@ class PrivilegeComponent
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:privileges:delete')
+  @RequiresPermissions('nexus:privileges:delete')
   @Validate
-  void remove(final @NotEmpty String id) {
+  void remove(@NotEmpty final String id) {
     AuthorizationManager authorizationManager = securitySystem.getAuthorizationManager(DEFAULT_SOURCE)
-    if (authorizationManager.getPrivilege(id)?.isReadOnly()) {
+    if (authorizationManager.getPrivilege(id)?.readOnly) {
       throw new IllegalAccessException("Privilege [${id}] is readonly and cannot be deleted")
     }
     authorizationManager.deletePrivilege(id)
@@ -84,12 +79,12 @@ class PrivilegeComponent
    * Convert privilege to XO.
    */
   @PackageScope
-  PrivilegeXO asPrivilegeXO(Privilege input) {
+  PrivilegeXO convert(final Privilege input) {
     return new PrivilegeXO(
         id: input.id,
         version: input.version,
-        name: input.name,
-        description: input.description,
+        name: input.name != null ? input.name : input.id,
+        description: input.description != null ? input.description : input.id,
         type: input.type,
         readOnly: input.readOnly,
         properties: Maps.newHashMap(input.properties),

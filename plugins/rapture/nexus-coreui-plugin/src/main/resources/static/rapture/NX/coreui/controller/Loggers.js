@@ -66,7 +66,7 @@ Ext.define('NX.coreui.controller.Loggers', {
         variants: ['x16', 'x32']
       },
       visible: function () {
-        return NX.Permissions.check('nexus:logconfig', 'read');
+        return NX.Permissions.check('nexus:logging:read');
       }
     }, me);
 
@@ -151,7 +151,7 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Cancels edit when user does not have 'update' permission.
    */
   onBeforeEdit: function () {
-    return NX.Permissions.check('nexus:logconfig', 'update');
+    return NX.Permissions.check('nexus:logging:update');
   },
 
   /**
@@ -227,7 +227,7 @@ Ext.define('NX.coreui.controller.Loggers', {
    */
   bindNewButton: function (button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:logconfig', 'update'),
+        NX.Conditions.isPermitted('nexus:logging:update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -243,7 +243,7 @@ Ext.define('NX.coreui.controller.Loggers', {
   bindDeleteButton: function (button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('nexus:logconfig', 'update'),
+            NX.Conditions.isPermitted('nexus:logging:update'),
             NX.Conditions.gridHasSelection('nx-coreui-logger-list', function (model) {
               return model.get('name') !== 'ROOT';
             })
@@ -262,7 +262,7 @@ Ext.define('NX.coreui.controller.Loggers', {
    */
   bindResetButton: function (button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:logconfig', 'update'),
+        NX.Conditions.isPermitted('nexus:logging:update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,

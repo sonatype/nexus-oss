@@ -14,6 +14,8 @@ package org.sonatype.nexus.rapture.internal;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.rapture.internal.security.SessionAuthenticationFilter;
+import org.sonatype.nexus.rapture.internal.security.SessionServlet;
 import org.sonatype.nexus.security.CookieFilter;
 import org.sonatype.nexus.security.FilterChainModule;
 import org.sonatype.nexus.security.SecurityFilter;

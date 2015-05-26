@@ -17,9 +17,11 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.inject.Provider;
+import javax.validation.Validator;
 
 import org.sonatype.nexus.capability.Capability;
 import org.sonatype.nexus.capability.CapabilityDescriptor;
+import org.sonatype.nexus.capability.CapabilityDescriptor.ValidationMode;
 import org.sonatype.nexus.capability.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.capability.CapabilityEvent;
 import org.sonatype.nexus.capability.CapabilityFactory;
@@ -28,7 +30,6 @@ import org.sonatype.nexus.capability.CapabilityIdentity;
 import org.sonatype.nexus.capability.CapabilityNotFoundException;
 import org.sonatype.nexus.capability.CapabilityReference;
 import org.sonatype.nexus.capability.CapabilityType;
-import org.sonatype.nexus.capability.ValidatorRegistry;
 import org.sonatype.nexus.capability.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.capability.internal.storage.CapabilityStorageItem;
 import org.sonatype.nexus.formfields.Encrypted;
@@ -98,10 +99,6 @@ public class DefaultCapabilityRegistryTest
 
   @Before
   public final void setUpCapabilityRegistry() throws Exception {
-    final ValidatorRegistryProvider validatorRegistryProvider = mock(ValidatorRegistryProvider.class);
-    final ValidatorRegistry validatorRegistry = mock(ValidatorRegistry.class);
-    when(validatorRegistryProvider.get()).thenReturn(validatorRegistry);
-
     final CapabilityFactory factory = mock(CapabilityFactory.class);
     when(factory.create()).thenAnswer(new Answer<Capability>()
     {
@@ -138,15 +135,19 @@ public class DefaultCapabilityRegistryTest
         }
     );
 
+    ValidatorProvider validatorProvider = mock(ValidatorProvider.class);
+    when(validatorProvider.get()).thenReturn(mock(Validator.class));
+
     underTest = new DefaultCapabilityRegistry(
         capabilityStorage,
-        validatorRegistryProvider,
         capabilityFactoryRegistry,
+
         capabilityDescriptorRegistry,
         eventBus,
         achf,
         vchf,
-        passwordHelper = new PasswordHelper(new CryptoHelperImpl())
+        passwordHelper = new PasswordHelper(new CryptoHelperImpl()),
+        validatorProvider
     );
 
     rec = ArgumentCaptor.forClass(CapabilityEvent.class);
@@ -251,8 +252,8 @@ public class DefaultCapabilityRegistryTest
     assertThat(references, hasSize(2));
   }
 
-  private interface ValidatorRegistryProvider
-      extends Provider<ValidatorRegistry>
+  private interface ValidatorProvider
+      extends Provider<Validator>
   {
 
   }
@@ -284,6 +285,7 @@ public class DefaultCapabilityRegistryTest
     verify(capabilityStorage).getAll();
     verify(descriptor).version();
     verify(descriptor).formFields();
+    verify(descriptor).validate(oldProps, ValidationMode.LOAD);
     verifyNoMoreInteractions(descriptor, capabilityStorage);
   }
 

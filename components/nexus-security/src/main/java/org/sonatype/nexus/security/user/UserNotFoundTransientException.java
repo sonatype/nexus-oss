@@ -13,7 +13,9 @@
 package org.sonatype.nexus.security.user;
 
 /**
- * Thrown when a user could not be found due to a temporary condition, for example when an LDAP server is unavailable.
+ * Thrown when a user could not be found due to a temporary condition.
+ *
+ * For example when an LDAP server is unavailable.
  * Repeating the operation may succeed in the future without any intervention by the application.
  */
 public class UserNotFoundTransientException

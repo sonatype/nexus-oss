@@ -12,15 +12,21 @@
  */
 package org.sonatype.nexus.capability.support;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.groups.Default;
 
 import org.sonatype.nexus.capability.CapabilityDescriptor;
-import org.sonatype.nexus.capability.CapabilityIdentity;
-import org.sonatype.nexus.capability.Validator;
-import org.sonatype.nexus.capability.support.validator.Validators;
+import org.sonatype.nexus.validation.ConstraintViolations;
+import org.sonatype.nexus.validation.group.Create;
+import org.sonatype.nexus.validation.group.Update;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
@@ -36,7 +42,7 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 2.7
  */
-public abstract class CapabilityDescriptorSupport
+public abstract class CapabilityDescriptorSupport<ConfigT>
     extends ComponentSupport
     implements CapabilityDescriptor
 {
@@ -91,32 +97,41 @@ public abstract class CapabilityDescriptorSupport
     return properties;
   }
 
-  //
-  // Validation support
-  //
-
-  private Validators validators;
+  private Provider<Validator> validatorProvider;
 
   @Inject
-  public void installValidationComponents(final Validators validators) {
-    checkState(this.validators == null);
-    this.validators = checkNotNull(validators);
-  }
-
-  protected Validators validators() {
-    checkState(validators != null);
-    return validators;
+  public void installValidationComponents(final Provider<Validator> validatorProvider) {
+    checkState(this.validatorProvider == null);
+    this.validatorProvider = checkNotNull(validatorProvider);
   }
 
   @Override
-  public Validator validator() {
-    return null;
+  public void validate(final Map<String, String> properties, final ValidationMode validationMode) {
+    ConfigT config = createConfig(properties);
+    if (config != null) {
+      if (validationMode == ValidationMode.CREATE) {
+        validate(config, Create.class, Default.class);
+      }
+      else {
+        validate(config, Update.class, Default.class);
+      }
+    }
   }
 
-  @Override
-  public Validator validator(final CapabilityIdentity id) {
-    return null;
+  protected void validate(final Object value, final Class<?>... groups) {
+    checkNotNull(value);
+    checkNotNull(groups);
+
+    if (log.isTraceEnabled()) {
+      log.trace("Validating: {} in groups: {}", value, Arrays.asList(groups));
+    }
+
+    Validator validator = validatorProvider.get();
+    Set<ConstraintViolation<Object>> violations = validator.validate(value, groups);
+    ConstraintViolations.maybePropagate(violations, log);
   }
+
+  protected ConfigT createConfig(final Map<String, String> properties) { return null; }
 
   //
   // Template support

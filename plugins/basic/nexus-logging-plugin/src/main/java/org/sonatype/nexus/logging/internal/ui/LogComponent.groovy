@@ -50,7 +50,7 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('nexus:logs:update')
+  @RequiresPermissions('nexus:logging:mark')
   @Validate
   void mark(final @NotNull @Valid MarkerXO markerXO) {
     // ensure that level for marking logger is enabled

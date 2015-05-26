@@ -12,16 +12,17 @@
  */
 package org.sonatype.nexus.atlas.ui
 
-import com.softwarementors.extjs.djn.config.annotations.DirectAction
-import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.shiro.authz.annotation.RequiresPermissions
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+
 import org.sonatype.nexus.atlas.SystemInformationGenerator
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
+import com.softwarementors.extjs.djn.config.annotations.DirectAction
+import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.shiro.authz.annotation.RequiresPermissions
 
 /**
  * System Information {@link DirectComponent}.
@@ -43,7 +44,7 @@ extends DirectComponentSupport
    * @return a tree-structured report of critical system information details
    */
   @DirectMethod
-  @RequiresPermissions('nexus:atlas')
+  @RequiresPermissions('nexus:atlas:read')
   Map read() {
     return systemInformationGenerator.report()
   }

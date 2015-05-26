@@ -19,8 +19,10 @@ import javax.validation.ConstraintValidatorFactory;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Allow ConstraintValidators to be enhanced by Guice.
+ * Allow {@link ConstraintValidator validators} to be enhanced by Guice.
  * 
  * @since 3.0
  */
@@ -28,21 +30,19 @@ import com.google.inject.Injector;
 public final class GuiceConstraintValidatorFactory
     implements ConstraintValidatorFactory
 {
-
   private final Injector injector;
 
   @Inject
   public GuiceConstraintValidatorFactory(final Injector injector) {
-    this.injector = injector;
+    this.injector = checkNotNull(injector);
   }
 
-  public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
-    return this.injector.getInstance(key);
+  public <T extends ConstraintValidator<?, ?>> T getInstance(final Class<T> key) {
+    return injector.getInstance(key);
   }
 
   @Override
   public void releaseInstance(final ConstraintValidator<?, ?> instance) {
-    //noop
+    // empty
   }
-
 }

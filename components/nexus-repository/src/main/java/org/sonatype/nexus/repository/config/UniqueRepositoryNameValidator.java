@@ -14,11 +14,11 @@ package org.sonatype.nexus.repository.config;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.validation.ConstraintValidatorSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,18 +29,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class UniqueRepositoryNameValidator
-    implements ConstraintValidator<UniqueRepositoryName, String>
+    extends ConstraintValidatorSupport<UniqueRepositoryName, String>
 {
   private final RepositoryManager repositoryManager;
 
   @Inject
   public UniqueRepositoryNameValidator(final RepositoryManager repositoryManager) {
     this.repositoryManager = checkNotNull(repositoryManager);
-  }
-
-  @Override
-  public void initialize(final UniqueRepositoryName constraintAnnotation) {
-    // do nothing
   }
 
   @Override

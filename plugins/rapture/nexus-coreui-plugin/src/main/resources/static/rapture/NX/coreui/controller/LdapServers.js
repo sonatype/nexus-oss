@@ -79,10 +79,10 @@ Ext.define('NX.coreui.controller.LdapServers', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('security:ldapconfig', 'read');
+      return NX.Permissions.check('nexus:ldap:read');
     }
   },
-  permission: 'security:ldapconfig',
+  permission: 'nexus:ldap',
 
   /**
    * @override
@@ -326,7 +326,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
     var me = this;
 
     button.mon(
-        NX.Conditions.isPermitted(me.permission, 'update'),
+        NX.Conditions.isPermitted(me.permission + ':update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -343,7 +343,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
     var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission, 'delete'),
+            NX.Conditions.isPermitted(me.permission + ':delete'),
             NX.Conditions.storeHasRecords('LdapServer')
         ),
         {
@@ -425,9 +425,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    * Verify LDAP user mapping.
    */
-  verifyUserMapping: function(button) {
-    var form = button.up('form'),
-        values = form.getForm().getFieldValues(),
+  verifyUserMapping: function() {
+    var me = this,
+        values = me.getValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
     me.getMain().getEl().mask(NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_MAPPING_MASK', url));
@@ -435,8 +435,8 @@ Ext.define('NX.coreui.controller.LdapServers', {
     NX.direct.ldap_LdapServer.verifyUserMapping(values, function(response) {
       me.getMain().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_MAPPING_SUCCESS', url), type: 'success' });
-        Ext.widget('nx-coreui-ldapserver-userandgroup-testresults', { mappedUsers: response.data });
+        NX.Messages.add({text: NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_MAPPING_SUCCESS', url), type: 'success'});
+        Ext.widget('nx-coreui-ldapserver-userandgroup-testresults', {mappedUsers: response.data});
       }
     });
   },
@@ -445,10 +445,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    */
   showLoginCredentialsWindow: function(button) {
-    var form = button.up('form'),
-        values = form.getForm().getFieldValues();
-
-    Ext.widget('nx-coreui-ldapserver-userandgroup-login-credentials', { values: values });
+    Ext.widget('nx-coreui-ldapserver-userandgroup-login-credentials');
   },
 
   /**
@@ -456,12 +453,13 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Verify LDAP login.
    */
   verifyLogin: function(button) {
-    var win = button.up('window'),
+    var me = this,
+        win = button.up('window'),
         form = button.up('form'),
         loginValues = form.getForm().getFieldValues(),
         userName = NX.util.Base64.encode(loginValues.username),
         userPass = NX.util.Base64.encode(loginValues.password),
-        values = win.values,
+        values = me.getValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
     form.getEl().mask(NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_LOGIN_MASK', url));
@@ -473,6 +471,35 @@ Ext.define('NX.coreui.controller.LdapServers', {
         NX.Messages.add({ text: NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_LOGIN_SUCCESS', url), type: 'success' });
       }
     });
+  },
+
+  /**
+   * @private
+   * Get form values from connection adn user/group form.
+   */
+  getValues: function() {
+    var me = this,
+        feature = me.getFeature(),
+        values = {}, url, connectionForm, userGroupForm;
+
+    if (feature.down('nx-coreui-ldapserver-connection-add')) {
+      connectionForm = feature.down('nx-coreui-ldapserver-connection-add').down('nx-coreui-ldapserver-connection-form');
+    }
+    else {
+      connectionForm = feature.down('nx-coreui-ldapserver-connection').down('nx-coreui-ldapserver-connection-form');
+    }
+    if (feature.down('nx-coreui-ldapserver-userandgroup-add')) {
+      userGroupForm = feature.down('nx-coreui-ldapserver-userandgroup-add').down('nx-coreui-ldapserver-userandgroup-form');
+    }
+    else {
+      userGroupForm = feature.down('nx-coreui-ldapserver-userandgroup').down('nx-coreui-ldapserver-userandgroup-form');
+    }
+
+    // Get fields from all relevant forms
+    Ext.apply(values, connectionForm.getForm().getFieldValues());
+    Ext.apply(values, userGroupForm.getForm().getFieldValues());
+
+    return values;
   }
 
 });

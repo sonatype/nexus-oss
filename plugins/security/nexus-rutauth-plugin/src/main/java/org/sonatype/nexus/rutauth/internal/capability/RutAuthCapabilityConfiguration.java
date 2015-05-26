@@ -14,10 +14,13 @@ package org.sonatype.nexus.rutauth.internal.capability;
 
 import java.util.Map;
 
+import org.sonatype.nexus.capability.UniquePerCapabilityType;
 import org.sonatype.nexus.capability.support.CapabilityConfigurationSupport;
+import org.sonatype.nexus.validation.group.Create;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.hibernate.validator.constraints.NotBlank;
 import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -28,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.7
  */
+@UniquePerCapabilityType(value = RutAuthCapabilityDescriptor.TYPE_ID, groups = Create.class)
 public class RutAuthCapabilityConfiguration
     extends CapabilityConfigurationSupport
 {
@@ -38,6 +42,7 @@ public class RutAuthCapabilityConfiguration
   @NonNls
   public static final String DEFAULT_HTTP_HEADER = "REMOTE_USER";
 
+  @NotBlank
   private String httpHeader;
 
   public RutAuthCapabilityConfiguration(final Map<String, String> properties) {

@@ -13,7 +13,6 @@
 package com.sonatype.nexus.ssl.plugin.internal.ui
 
 import java.security.cert.Certificate
-import java.security.cert.CertificateParsingException
 import java.security.cert.X509Certificate
 
 import javax.inject.Inject
@@ -25,14 +24,12 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
 
+import com.sonatype.nexus.ssl.plugin.PemCertificate
 import com.sonatype.nexus.ssl.plugin.TrustStore
 
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.validation.Validate
-import org.sonatype.nexus.validation.ValidationMessage
-import org.sonatype.nexus.validation.ValidationResponse
-import org.sonatype.nexus.validation.ValidationResponseException
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil
 
@@ -41,6 +38,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotBlank
 import org.hibernate.validator.constraints.NotEmpty
 
 import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.calculateFingerprint
@@ -56,7 +54,6 @@ import static org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil.calculateFi
 class TrustStoreComponent
 extends DirectComponentSupport
 {
-
   @Inject
   TrustStore trustStore
 
@@ -65,7 +62,7 @@ extends DirectComponentSupport
    * @return a list of certificates
    */
   @DirectMethod
-  @RequiresPermissions('nexus:ssl:truststore:read')
+  @RequiresPermissions('nexus:ssl-truststore:read')
   List<CertificateXO> read() {
     return trustStore.trustedCertificates?.collect { certificate ->
       asCertificateXO(certificate, true)
@@ -74,24 +71,17 @@ extends DirectComponentSupport
 
   /**
    * Creates a certificate.
-   * @param pem to be created
+   * @param pem certificate in PEM format
    * @return created certificate
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('nexus:ssl:truststore:create')
-  @Validate(groups = [Create.class, Default.class])
-  CertificateXO create(final @NotNull @Valid CertificatePemXO pem) {
-    try {
-      Certificate certificate = CertificateUtil.decodePEMFormattedCertificate(pem.value)
-      trustStore.importTrustCertificate(certificate, calculateFingerprint(certificate))
-      return asCertificateXO(certificate, true)
-    }
-    catch (CertificateParsingException e) {
-      ValidationResponse validations = new ValidationResponse()
-      validations.addError(new ValidationMessage('pem', 'Invalid PEM formatted certificate'))
-      throw new ValidationResponseException(validations)
-    }
+  @RequiresPermissions('nexus:ssl-truststore:create')
+  @Validate
+  CertificateXO create(final @NotBlank @PemCertificate String pem) {
+    Certificate certificate = CertificateUtil.decodePEMFormattedCertificate(pem)
+    trustStore.importTrustCertificate(certificate, calculateFingerprint(certificate))
+    return asCertificateXO(certificate, true);
   }
 
   /**
@@ -100,7 +90,7 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('nexus:ssl:truststore:delete')
+  @RequiresPermissions('nexus:ssl-truststore:delete')
   @Validate
   void remove(final @NotEmpty String id) {
     trustStore.removeTrustCertificate(id)
@@ -149,5 +139,4 @@ extends DirectComponentSupport
     }
     return rdns
   }
-
 }

@@ -13,6 +13,7 @@
 package org.sonatype.nexus.rutauth.internal.capability;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -21,11 +22,10 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
-import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
-import org.sonatype.nexus.rutauth.RutAuthPlugin;
+import org.sonatype.nexus.rutauth.internal.RutAuthConstants;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
@@ -44,15 +44,15 @@ import static org.sonatype.nexus.capability.Tag.tags;
 @Named(RutAuthCapabilityDescriptor.TYPE_ID)
 @Singleton
 public class RutAuthCapabilityDescriptor
-    extends CapabilityDescriptorSupport
+    extends CapabilityDescriptorSupport<RutAuthCapabilityConfiguration>
     implements Taggable
 {
   @NonNls
-  public static final String TYPE_ID = RutAuthPlugin.ID_PREFIX;
+  public static final String TYPE_ID = RutAuthConstants.ID_PREFIX;
 
   public static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
-  private static interface Messages
+  private interface Messages
       extends MessageBundle
   {
     @DefaultMessage("Rut Auth")
@@ -96,9 +96,8 @@ public class RutAuthCapabilityDescriptor
   }
 
   @Override
-  public Validator validator() {
-    // Allow only one capability of this type
-    return validators().capability().uniquePer(RutAuthCapabilityDescriptor.TYPE);
+  protected RutAuthCapabilityConfiguration createConfig(final Map<String, String> properties) {
+    return new RutAuthCapabilityConfiguration(properties);
   }
 
   @Override

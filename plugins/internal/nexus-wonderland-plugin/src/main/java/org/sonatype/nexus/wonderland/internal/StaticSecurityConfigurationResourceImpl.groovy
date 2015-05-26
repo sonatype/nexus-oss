@@ -13,13 +13,12 @@
 
 package org.sonatype.nexus.wonderland.internal
 
-import org.sonatype.nexus.security.config.CPrivilege
-import org.sonatype.nexus.security.config.CRole
-import org.sonatype.nexus.security.config.MemorySecurityConfiguration
-import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
-
 import javax.inject.Named
 import javax.inject.Singleton
+
+import org.sonatype.nexus.security.config.CPrivilege
+import org.sonatype.nexus.security.config.MemorySecurityConfiguration
+import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
 
 /**
  * Wonderland plugin static security resource.
@@ -37,21 +36,11 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'wonderland-all',
-                type: 'method',
-                name: 'Wonderland',
-                description: 'Give permission use Wonderland',
+                type: 'application',
                 properties: [
-                    'method'    : '*',
-                    'permission': 'nexus:wonderland'
+                    domain: 'wonderland',
+                    actions: '*'
                 ]
-            )
-        ],
-        roles: [
-            new CRole(
-                id: 'wonderland',
-                name: 'Wonderland',
-                description: 'Gives access to Wonderland',
-                privileges: ['wonderland-all']
             )
         ]
     )

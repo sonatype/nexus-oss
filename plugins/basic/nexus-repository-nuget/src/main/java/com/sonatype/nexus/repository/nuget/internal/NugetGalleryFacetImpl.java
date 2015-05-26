@@ -59,6 +59,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.xml.XmlEscapers;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -212,16 +213,29 @@ public class NugetGalleryFacetImpl
     }
 
     if (result.getSkipLinkEntry() != null) {
-      xml.append("  <link rel=\"next\" href=\"").append(result.getBase()).append('/').append(result.getOperation());
-      xml.append("()?").append(ODataFeedUtils.skipLink(result.getSkipLinkEntry(), result.getQuery())).append("\"/>\n");
+      final String skipLink = odataLink(result.getBase(),
+          result.getOperation(),
+          ODataFeedUtils.skipLinkQueryString(result.getQuery()));
+
+      xml.append("  <link rel=\"next\" href=\"")
+          .append(XmlEscapers.xmlAttributeEscaper().escape(skipLink))
+          .append("\"/>\n");
     }
     return xml.append("</feed>").toString();
+  }
+
+  public String odataLink(final String base, final String operation, final String queryString) {
+    return String.format("%s/%s()?%s", base, operation, queryString);
   }
 
   @Override
   public void putMetadata(final Map<String, String> metadata) {
     try (StorageTx tx = openStorageTx()) {
       final Component component = createOrUpdatePackage(tx, metadata);
+      tx.commit();
+    }
+    // Separate tx is necessary for the meantime, since the re-querying orient doesn't pick up uncommitted state
+    try (StorageTx tx = openStorageTx()) {
       maintainAggregateInfo(tx, metadata.get(ID));
       tx.commit();
     }

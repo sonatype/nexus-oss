@@ -24,7 +24,6 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.security.SecuritySystem
 import org.sonatype.nexus.security.authz.AuthorizationManager
 import org.sonatype.nexus.security.role.Role
-import org.sonatype.nexus.security.user.UserManager
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.group.Create
 import org.sonatype.nexus.validation.group.Update
@@ -36,6 +35,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
 
+import static org.sonatype.nexus.security.user.UserManager.DEFAULT_SOURCE
+
 /**
  * Role {@link DirectComponent}.
  *
@@ -45,11 +46,8 @@ import org.hibernate.validator.constraints.NotEmpty
 @Singleton
 @DirectAction(action = 'coreui_Role')
 class RoleComponent
-extends DirectComponentSupport
+    extends DirectComponentSupport
 {
-
-  public static final String DEFAULT_SOURCE = UserManager.DEFAULT_SOURCE
-
   @Inject
   SecuritySystem securitySystem
 
@@ -61,10 +59,10 @@ extends DirectComponentSupport
    * @return a list of roles
    */
   @DirectMethod
-  @RequiresPermissions('security:roles:read')
+  @RequiresPermissions('nexus:roles:read')
   List<RoleXO> read() {
-    return securitySystem.listRoles(DEFAULT_SOURCE).collect { input ->
-      return asRoleXO(input)
+    return securitySystem.listRoles(DEFAULT_SOURCE).collect {input ->
+      return convert(input)
     }
   }
 
@@ -73,9 +71,9 @@ extends DirectComponentSupport
    * @return a list of role references
    */
   @DirectMethod
-  @RequiresPermissions('security:roles:read')
+  @RequiresPermissions('nexus:roles:read')
   List<ReferenceXO> readReferences() {
-    return securitySystem.listRoles(DEFAULT_SOURCE).collect { input ->
+    return securitySystem.listRoles(DEFAULT_SOURCE).collect {input ->
       return new ReferenceXO(
           id: input.roleId,
           name: input.name
@@ -89,9 +87,9 @@ extends DirectComponentSupport
    */
   @DirectMethod
   List<ReferenceXO> readSources() {
-    return authorizationManagers.findResults { manager ->
+    return authorizationManagers.findResults {manager ->
       return manager.source == DEFAULT_SOURCE ? null : manager
-    }.collect { manager ->
+    }.collect {manager ->
       return new ReferenceXO(
           id: manager.source,
           name: manager.source
@@ -105,11 +103,11 @@ extends DirectComponentSupport
    * @return a list of roles
    */
   @DirectMethod
-  @RequiresPermissions('security:roles:read')
+  @RequiresPermissions('nexus:roles:read')
   @Validate
-  List<RoleXO> readFromSource(final @NotEmpty String source) {
-    return securitySystem.listRoles(source).collect { input ->
-      return asRoleXO(input)
+  List<RoleXO> readFromSource(@NotEmpty final String source) {
+    return securitySystem.listRoles(source).collect {input ->
+      return convert(input)
     }
   }
 
@@ -120,10 +118,10 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:roles:create')
+  @RequiresPermissions('nexus:roles:create')
   @Validate(groups = [Create.class, Default.class])
-  RoleXO create(final @NotNull @Valid RoleXO roleXO) {
-    return asRoleXO(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).addRole(
+  RoleXO create(@NotNull @Valid final RoleXO roleXO) {
+    return convert(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).addRole(
         new Role(
             roleId: roleXO.id,
             source: roleXO.source,
@@ -143,10 +141,10 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:roles:update')
+  @RequiresPermissions('nexus:roles:update')
   @Validate(groups = [Update.class, Default.class])
-  RoleXO update(final @NotNull @Valid RoleXO roleXO) {
-    return asRoleXO(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).updateRole(
+  RoleXO update(@NotNull @Valid final RoleXO roleXO) {
+    return convert(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).updateRole(
         new Role(
             roleId: roleXO.id,
             version: roleXO.version,
@@ -166,24 +164,26 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:roles:delete')
+  @RequiresPermissions('nexus:roles:delete')
   @Validate
-  void remove(final @NotEmpty String id) {
+  void remove(@NotEmpty final String id) {
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deleteRole(id)
   }
 
+  /**
+   * Convert role to XO.
+   */
   @PackageScope
-  RoleXO asRoleXO(Role input) {
+  RoleXO convert(final Role input) {
     return new RoleXO(
         id: input.roleId,
         version: input.version,
         source: (input.source == DEFAULT_SOURCE || !input.source) ? 'Nexus' : input.source,
-        name: input.name,
-        description: input.description,
+        name: input.name != null ? input.name : input.roleId,
+        description: input.description != null ? input.description : input.roleId,
         readOnly: input.readOnly,
         privileges: input.privileges,
         roles: input.roles
     )
   }
-
 }

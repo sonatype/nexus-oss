@@ -179,12 +179,7 @@ public final class ODataUtils
 
     // NEXUS-6822 Visual Studio doesn't send a sort order by default, leading to unusable results
     if (!query.containsKey("$orderby")) {
-
-      // TODO: Restore this once the orientdb regression has been fixed
-      // OrientDB can't currently ORDER BY attributes.nuget.download_count
-
-
-      //query.put("$orderby", DOWNLOAD_COUNT + " desc");
+      query.put("$orderby", DOWNLOAD_COUNT + " desc");
     }
     else {
       // OrientDB only supports ordering by identifiers, not by functions

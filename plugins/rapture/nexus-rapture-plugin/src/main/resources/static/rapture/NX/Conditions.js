@@ -31,12 +31,11 @@ Ext.define('NX.Conditions', {
   ],
 
   /**
-   * @param {String} name permission name
-   * @param {String} right permission right
+   * @param {String} permission permission
    * @returns {NX.util.condition.IsPermitted}
    */
-  isPermitted: function (name, right) {
-    return Ext.create('NX.util.condition.IsPermitted', { name: name, right: right });
+  isPermitted: function (permission) {
+    return Ext.create('NX.util.condition.IsPermitted', { permission: permission });
   },
 
   /**

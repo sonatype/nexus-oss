@@ -74,7 +74,7 @@ Ext.define('NX.coreui.controller.Feeds', {
         variants: ['x16', 'x32']
       },
       visible: function () {
-        return NX.Permissions.check('nexus:feeds', 'read');
+        return NX.Permissions.check('nexus:feeds:read');
       }
     }, me);
 

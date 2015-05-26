@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.user.UserAdd', {
       settingsFormSuccessMessage: function(data) {
         return NX.I18n.get('ADMIN_USERS_CREATE_SUCCESS') + data['userId'];
       },
-      editableCondition: NX.Conditions.isPermitted('security:users', 'create'),
+      editableCondition: NX.Conditions.isPermitted('nexus:users:create'),
       editableMarker: NX.I18n.get('ADMIN_USERS_CREATE_ERROR'),
 
       buttons: [

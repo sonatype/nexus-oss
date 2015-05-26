@@ -12,11 +12,6 @@
  */
 package org.sonatype.nexus.atlas.rest
 
-import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.sonatype.nexus.atlas.SystemInformationGenerator
-import org.sonatype.sisu.goodies.common.ComponentSupport
-import org.sonatype.siesta.Resource
-
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -25,6 +20,12 @@ import javax.ws.rs.Path
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
+
+import org.sonatype.nexus.atlas.SystemInformationGenerator
+import org.sonatype.siesta.Resource
+import org.sonatype.sisu.goodies.common.ComponentSupport
+
+import org.apache.shiro.authz.annotation.RequiresPermissions
 
 import static com.google.common.base.Preconditions.checkNotNull
 
@@ -53,7 +54,7 @@ class SystemInformationResource
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @RequiresPermissions('nexus:atlas')
+  @RequiresPermissions('nexus:atlas:read')
   Response report() {
     def report = systemInformationGenerator.report()
 

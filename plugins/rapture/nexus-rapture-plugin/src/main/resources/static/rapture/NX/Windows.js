@@ -41,7 +41,9 @@ Ext.define('NX.Windows', {
       specs = 'menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes'
     }
 
+    //<if debug>
     me.logDebug('Opening window: url=' + url + ', name=' + name + ', specs=' + specs + ', replace=' + replace);
+    //</if>
 
     win = NX.global.open(url, name, specs, replace);
     if (win === null) {

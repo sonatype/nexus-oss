@@ -26,11 +26,9 @@ import org.sonatype.nexus.security.authz.AuthorizationManager;
 import org.sonatype.nexus.security.config.CPrivilege;
 import org.sonatype.nexus.security.config.CRole;
 import org.sonatype.nexus.security.config.SecurityConfigurationManager;
-import org.sonatype.nexus.security.privilege.MethodPrivilegeDescriptor;
 import org.sonatype.nexus.security.privilege.NoSuchPrivilegeException;
 import org.sonatype.nexus.security.privilege.Privilege;
 import org.sonatype.nexus.security.privilege.PrivilegeDescriptor;
-import org.sonatype.nexus.security.privilege.PrivilegeInheritanceManager;
 import org.sonatype.nexus.security.role.NoSuchRoleException;
 import org.sonatype.nexus.security.role.Role;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -52,20 +50,16 @@ public class AuthorizationManagerImpl
 
   private final SecurityConfigurationManager configuration;
 
-  private final PrivilegeInheritanceManager privInheritance;
-
   private final EventBus eventBus;
 
   private final List<PrivilegeDescriptor> privilegeDescriptors;
 
   @Inject
   public AuthorizationManagerImpl(final SecurityConfigurationManager configuration,
-                                  final PrivilegeInheritanceManager privInheritance,
                                   final EventBus eventBus,
                                   final List<PrivilegeDescriptor> privilegeDescriptors)
   {
     this.configuration = configuration;
-    this.privInheritance = privInheritance;
     this.eventBus = eventBus;
     this.privilegeDescriptors = checkNotNull(privilegeDescriptors);
   }
@@ -236,9 +230,6 @@ public class AuthorizationManagerImpl
   @Override
   public Privilege addPrivilege(Privilege privilege) {
     final CPrivilege secPriv = this.convert(privilege);
-    // create implies read, so we need to add logic for that
-    addInheritedPrivileges(secPriv);
-
     configuration.createPrivilege(secPriv);
 
     // notify any listeners that the config changed
@@ -270,25 +261,6 @@ public class AuthorizationManagerImpl
   @Override
   public boolean supportsWrite() {
     return true;
-  }
-
-  private void addInheritedPrivileges(final CPrivilege privilege) {
-    String methodProperty = privilege.getProperty(MethodPrivilegeDescriptor.P_METHOD);
-
-    if (methodProperty != null) {
-      List<String> inheritedMethods = privInheritance.getInheritedMethods(methodProperty);
-
-      StringBuffer buf = new StringBuffer();
-      for (String method : inheritedMethods) {
-        buf.append(method);
-        buf.append(",");
-      }
-
-      if (buf.length() > 0) {
-        buf.setLength(buf.length() - 1);
-        privilege.setProperty(MethodPrivilegeDescriptor.P_METHOD, buf.toString());
-      }
-    }
   }
 
   private void fireAuthorizationChangedEvent() {

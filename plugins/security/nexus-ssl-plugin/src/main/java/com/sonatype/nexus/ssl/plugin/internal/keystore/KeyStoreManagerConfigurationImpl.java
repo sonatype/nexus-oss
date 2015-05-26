@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.sonatype.nexus.ssl.plugin.SSLPlugin;
+import com.sonatype.nexus.ssl.plugin.internal.SSLConstants;
 
 import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.sisu.goodies.common.Time;
@@ -29,7 +29,7 @@ import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManagerConfigurationSuppor
  *
  * @since ssl 1.0
  */
-@Named(SSLPlugin.ID_PREFIX)
+@Named(SSLConstants.ID_PREFIX)
 @Singleton
 public class KeyStoreManagerConfigurationImpl
     extends KeyStoreManagerConfigurationSupport
@@ -43,7 +43,7 @@ public class KeyStoreManagerConfigurationImpl
   /**
    * Sisu injected configuration prefix.
    */
-  private static final String CPREFIX = SSLPlugin.CONFIG_PREFIX + ".keyStoreManager";
+  private static final String CPREFIX = SSLConstants.CONFIG_PREFIX + ".keyStoreManager";
 
   // Using terse names for password constants for a little more security by obscurity
 

@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
+import org.sonatype.nexus.repository.view.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
@@ -45,7 +46,7 @@ import javax.inject.Singleton
 class RawHostedRecipe
     extends RecipeSupport
 {
-  static final String NAME = "raw-hosted"
+  public static final String NAME = "raw-hosted"
 
   @Inject
   Provider<RawSecurityFacet> securityFacet
@@ -61,6 +62,9 @@ class RawHostedRecipe
 
   @Inject
   Provider<SearchFacet> searchFacet
+
+  @Inject
+  ExceptionHandler exceptionHandler
 
   @Inject
   TimingHandler timingHandler
@@ -98,9 +102,10 @@ class RawHostedRecipe
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
-        .handler(partialFetchHandler)
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(exceptionHandler)
+        .handler(partialFetchHandler)
         .handler(rawContentHandler)
         .create())
 

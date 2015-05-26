@@ -13,23 +13,21 @@
 package org.sonatype.nexus.kenai.internal;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.capability.CapabilityIdentity;
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
-import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.ComboboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.kenai.KenaiConfiguration;
-import org.sonatype.nexus.kenai.KenaiPlugin;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
@@ -48,21 +46,21 @@ import static org.sonatype.nexus.formfields.FormField.MANDATORY;
 @Named(KenaiCapabilityDescriptor.TYPE_ID)
 @Singleton
 public class KenaiCapabilityDescriptor
-    extends CapabilityDescriptorSupport
+    extends CapabilityDescriptorSupport<KenaiConfiguration>
     implements Taggable
 {
 
   /**
    * {@link KenaiCapability} type ID (kenai)
    */
-  public static final String TYPE_ID = KenaiPlugin.ID_PREFIX;
+  public static final String TYPE_ID = KenaiConstants.ID_PREFIX;
 
   /**
    * {@link KenaiCapability} type
    */
   public static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
-  private static interface Messages
+  private interface Messages
       extends MessageBundle
   {
 
@@ -120,19 +118,8 @@ public class KenaiCapabilityDescriptor
   }
 
   @Override
-  public Validator validator() {
-    return validators().logical().and(
-        validators().capability().uniquePer(TYPE),
-        validators().value().validUrl(TYPE, KenaiConfiguration.BASE_URL)
-    );
-  }
-
-  @Override
-  public Validator validator(final CapabilityIdentity id) {
-    return validators().logical().and(
-        validators().capability().uniquePerExcluding(id, TYPE),
-        validators().value().validUrl(TYPE, KenaiConfiguration.BASE_URL)
-    );
+  protected KenaiConfiguration createConfig(final Map<String, String> properties) {
+    return new KenaiConfiguration(properties);
   }
 
   @Override

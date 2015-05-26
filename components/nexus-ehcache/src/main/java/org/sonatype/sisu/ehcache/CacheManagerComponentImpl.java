@@ -23,6 +23,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.management.MBeanServer;
 
+import org.sonatype.nexus.common.app.ApplicationDirectories;
+
 import com.google.common.annotations.VisibleForTesting;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.Configuration;
@@ -48,8 +50,8 @@ public class CacheManagerComponentImpl
   private CacheManager cacheManager;
 
   @Inject
-  public CacheManagerComponentImpl() throws IOException {
-    this(null);
+  public CacheManagerComponentImpl(final ApplicationDirectories directories) throws IOException {
+    this(new File(directories.getAppDirectory("etc"), "ehcache.xml"));
   }
 
   @VisibleForTesting
@@ -91,7 +93,7 @@ public class CacheManagerComponentImpl
 
   private CacheManager createCacheManager(final @Nullable File file) throws IOException {
     URL url;
-    if (file != null) {
+    if (file != null && file.exists()) {
       url = file.toURI().toURL();
     }
     else {

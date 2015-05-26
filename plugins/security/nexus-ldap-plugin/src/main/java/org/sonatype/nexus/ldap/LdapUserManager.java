@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.ldap.internal.LdapConstants;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapUserException;
@@ -35,7 +36,7 @@ import org.sonatype.nexus.security.user.UserStatus;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
-@Named(LdapPlugin.USER_SOURCE)
+@Named(LdapConstants.USER_SOURCE)
 public class LdapUserManager
     extends AbstractReadOnlyUserManager
 {
@@ -101,12 +102,12 @@ public class LdapUserManager
 
     user.setName(ldapUser.getRealName());
     user.setUserId(ldapUser.getUsername());
-    user.setSource(LdapPlugin.USER_SOURCE);
+    user.setSource(LdapConstants.USER_SOURCE);
     user.setStatus(UserStatus.active);
 
 
     for (String roleId : ldapUser.getMembership()) {
-      RoleIdentifier role = new RoleIdentifier(LdapPlugin.USER_SOURCE, roleId);
+      RoleIdentifier role = new RoleIdentifier(LdapConstants.USER_SOURCE, roleId);
       user.addRole(role);
     }
 
@@ -119,7 +120,7 @@ public class LdapUserManager
 
   @Override
   public String getSource() {
-    return LdapPlugin.USER_SOURCE;
+    return LdapConstants.USER_SOURCE;
   }
 
   @Override
@@ -149,6 +150,6 @@ public class LdapUserManager
 
   @Override
   public String getAuthenticationRealmName() {
-    return LdapPlugin.REALM_NAME;
+    return LdapConstants.REALM_NAME;
   }
 }
