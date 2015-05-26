@@ -10,11 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.nexus.repository.nuget.security
+package com.sonatype.nexus.repository.nuget.internal.security
 
 import com.google.inject.util.Providers
-import com.sonatype.nexus.repository.nuget.security.NugetApiKeyEntityAdapter
-import com.sonatype.nexus.repository.nuget.security.NugetApiKeyStoreImpl
+import com.sonatype.nexus.repository.nuget.internal.security.NugetApiKeyEntityAdapter
+import com.sonatype.nexus.repository.nuget.internal.security.NugetApiKeyStoreImpl
 import org.apache.shiro.subject.PrincipalCollection
 import org.apache.shiro.subject.SimplePrincipalCollection
 import org.hamcrest.MatcherAssert
@@ -31,7 +31,7 @@ import static org.hamcrest.Matchers.equalTo
 import static org.mockito.Mockito.mock
 
 /**
- * Tests {@link com.sonatype.nexus.repository.nuget.security.NugetApiKeyStoreImpl}
+ * Tests {@link NugetApiKeyStoreImpl}
  */
 class NugetApiKeyStoreImplTest
     extends TestSupport

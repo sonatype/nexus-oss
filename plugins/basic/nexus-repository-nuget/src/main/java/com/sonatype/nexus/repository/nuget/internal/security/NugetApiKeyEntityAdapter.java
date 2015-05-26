@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package com.sonatype.nexus.repository.nuget.security;
+package com.sonatype.nexus.repository.nuget.internal.security;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
