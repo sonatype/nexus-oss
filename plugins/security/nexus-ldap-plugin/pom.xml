@@ -68,6 +68,18 @@
     </dependency>
 
     <!--
+    FIXME: Replace usage of xstream with groovy recipes.
+    -->
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.xpp3</artifactId>
+    </dependency>
+
+    <!--
     FIXME: Replace usage with guava or nexus-common helpers.  Here only for org.codehaus.plexus.util.StringUtils.replace()
     -->
     <dependency>
