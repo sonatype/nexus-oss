@@ -18,8 +18,6 @@ import java.util.Collection;
 
 import javax.net.ssl.SSLContext;
 
-import com.sonatype.nexus.ssl.model.TrustStoreKey;
-
 import org.sonatype.sisu.goodies.ssl.keystore.KeystoreException;
 
 /**
@@ -83,33 +81,11 @@ public interface TrustStore
       throws KeystoreException;
 
   /**
-   * Enable the trust store for usage.
-   *
-   * @param key to enable the trust store for
-   */
-  void enableFor(TrustStoreKey key);
-
-  /**
-   * Disable the trust store for usage.
-   *
-   * @param key to disable the trust store for
-   */
-  void disableFor(TrustStoreKey key);
-
-  /**
    * Get the {@link SSLContext}.
    *
    * @return SSL context
    * @since 3.0
    */
   SSLContext getSSLContext();
-
-  /**
-   * Get the {@link SSLContext}, if truststore is enabled for specified key.
-   *
-   * @param key to get the SSL context for
-   * @return SSL context for specified key or {@code null} if trust store is not enabled for specified key
-   */
-  SSLContext getSSLContextFor(TrustStoreKey key);
 
 }

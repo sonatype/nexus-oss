@@ -203,6 +203,7 @@ public class LdapConfigurationEntityAdapter
         hostDocument.<Integer>field("port", OType.INTEGER)
     );
     connection.setHost(host);
+    connection.setUseTrustStore(document.<Boolean>field("useTrustStore", OType.BOOLEAN));
     connection.setSaslRealm(document.<String>field("saslRealm", OType.STRING));
     connection.setConnectionTimeout(document.<Integer>field("connectionTimeout", OType.INTEGER));
     connection.setConnectionRetryDelay(document.<Integer>field("connectionRetryDelay", OType.INTEGER));
@@ -223,6 +224,7 @@ public class LdapConfigurationEntityAdapter
     hostDocument.field("hostName", connection.getHost().getHostName());
     hostDocument.field("port", connection.getHost().getPort());
     document.field("host", hostDocument);
+    document.field("useTrustStore", connection.getUseTrustStore());
     document.field("saslRealm", connection.getSaslRealm());
     document.field("connectionTimeout", connection.getConnectionTimeout());
     document.field("connectionRetryDelay", connection.getConnectionRetryDelay());
