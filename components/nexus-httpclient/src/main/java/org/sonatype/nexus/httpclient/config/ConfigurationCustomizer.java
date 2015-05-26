@@ -80,7 +80,7 @@ public class ConfigurationCustomizer
    */
   private void apply(final ConnectionConfiguration connection, final HttpClientPlan plan) {
     if (connection.getTimeout() != null) {
-      int timeout = connection.getTimeout();
+      int timeout = connection.getTimeout().toMillisI();
       plan.getSocket().setSoTimeout(timeout);
       plan.getRequest().setConnectTimeout(timeout);
       plan.getRequest().setSocketTimeout(timeout);
