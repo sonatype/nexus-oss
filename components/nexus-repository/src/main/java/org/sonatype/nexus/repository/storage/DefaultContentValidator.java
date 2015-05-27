@@ -66,7 +66,7 @@ public class DefaultContentValidator
       try (InputStream is = contentSupplier.get()) {
         contentType = mimeSupport.detectMimeType(is, contentNameHint);
       }
-      log.trace("Mime support implies content type {}", contentType);
+      log.debug("Mime support implies content type {}", contentType);
 
       if (contentType == null && strictContentTypeValidation) {
         throw new InvalidContentException("Content type could not be determined.");
@@ -76,7 +76,7 @@ public class DefaultContentValidator
       try (InputStream is = contentSupplier.get()) {
         final List<String> types = mimeSupport.detectMimeTypes(is, contentNameHint);
         if (!types.isEmpty() && !types.contains(contentType)) {
-          log.debug("Discovered content type {} ", types);
+          log.debug("Declared content type {}, discovered types {}", declaredContentType, types);
           if (strictContentTypeValidation) {
             throw new InvalidContentException(
                 String.format("Declared content type %s, but discovered %s.", contentType, types));
