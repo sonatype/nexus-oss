@@ -65,7 +65,7 @@ public class StorageTxImpl
 {
   private static final long DELETE_BATCH_SIZE = 100L;
 
-  private final String txPrincipalName;
+  private final String createdBy;
 
   private final BlobTx blobTx;
 
@@ -93,7 +93,7 @@ public class StorageTxImpl
 
   private final StorageTxHook hook;
 
-  public StorageTxImpl(final String txPrincipalName,
+  public StorageTxImpl(final String createdBy,
                        final BlobTx blobTx,
                        final ODatabaseDocumentTx db,
                        final boolean userManagedDb,
@@ -107,7 +107,7 @@ public class StorageTxImpl
                        final ContentValidator contentValidator,
                        final StorageTxHook hook)
   {
-    this.txPrincipalName = checkNotNull(txPrincipalName);
+    this.createdBy = checkNotNull(createdBy);
     this.blobTx = checkNotNull(blobTx);
     this.db = checkNotNull(db);
     this.userManagedDb = userManagedDb;
@@ -444,7 +444,7 @@ public class StorageTxImpl
       ImmutableMap.Builder<String, String> storageHeaders = ImmutableMap.builder();
       storageHeaders.put(Bucket.REPO_NAME_HEADER, bucket.repositoryName());
       storageHeaders.put(BlobStore.BLOB_NAME_HEADER, blobName);
-      storageHeaders.put(BlobStore.CREATED_BY_HEADER, txPrincipalName);
+      storageHeaders.put(BlobStore.CREATED_BY_HEADER, createdBy);
       storageHeaders.put(BlobStore.CONTENT_TYPE_HEADER, contentType);
       if (headers != null) {
         storageHeaders.putAll(headers);

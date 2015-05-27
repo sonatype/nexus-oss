@@ -213,7 +213,7 @@ public class StorageFacetImpl
    * Returns the "principal name" to be used with current instance of {@link StorageTx}.
    */
   @Nonnull
-  private String txPrincipalName() {
+  private String createdBy() {
     ClientInfo clientInfo = clientInfoProvider.getCurrentThreadClientInfo();
     if (clientInfo == null || clientInfo.getUserid() == null) {
       return "system";
@@ -230,7 +230,7 @@ public class StorageFacetImpl
     BlobStore blobStore = blobStoreManager.get(config.blobStoreName);
     return StateGuardAspect.around(
         new StorageTxImpl(
-            txPrincipalName(),
+            createdBy(),
             new BlobTx(blobStore),
             db,
             isUserManagedDb,
