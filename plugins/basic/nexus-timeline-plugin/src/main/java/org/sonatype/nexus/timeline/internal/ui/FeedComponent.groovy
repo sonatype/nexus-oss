@@ -75,7 +75,7 @@ extends DirectComponentSupport
       if (feedSource) {
         return new PagedResponse<FeedEntryXO>(
             feedSource.getFeed(0, Integer.MAX_VALUE, Collections.emptyMap()).size(),
-            feedSource.getFeed(parameters.start, parameters.limit - parameters.start, Collections.emptyMap()).collect { entry ->
+            feedSource.getFeed(parameters.start, parameters.limit, Collections.emptyMap()).collect { entry ->
               new FeedEntryXO(
                   title: feedContentRenderer.getTitle(entry),
                   published: entry.getPublished(),
