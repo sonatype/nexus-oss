@@ -13,9 +13,9 @@
 package org.sonatype.nexus.repository.storage
 
 import org.sonatype.nexus.blobstore.api.BlobStore
-import org.sonatype.nexus.mime.internal.DefaultMimeSupport
 import org.sonatype.nexus.repository.view.ContentTypes
 
+import com.google.common.base.Supplier
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx
 import com.orientechnologies.orient.core.tx.OTransaction
 import org.junit.Before
@@ -30,6 +30,7 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport
 import static java.util.Collections.emptyList
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.mockito.Matchers.any
+import static org.mockito.Matchers.anyBoolean
 import static org.mockito.Matchers.anyString
 import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.mock
@@ -64,13 +65,14 @@ extends TestSupport
   private InputStream inputStream = new ByteArrayInputStream('testContent'.bytes)
   private StorageTxHooks hooks = new StorageTxHooks(emptyList())
 
-  private DefaultContentValidator defaultContentValidator = new DefaultContentValidator(new DefaultMimeSupport())
+  private DefaultContentValidator defaultContentValidator = mock(DefaultContentValidator)
   private Map<String, String> headers = [:]
   private Map<String, String> expectedHeaders = [(Bucket.REPO_NAME_HEADER) : 'testRepo', (BlobStore.BLOB_NAME_HEADER) : 'testBlob.txt', (BlobStore.CREATED_BY_HEADER) : 'test', (BlobStore.CONTENT_TYPE_HEADER) : 'text/plain']
   private Iterable<HashAlgorithm> hashAlgorithms = []
 
   @Before
   void prepare() {
+    when(defaultContentValidator.determineContentType(anyBoolean(), any(Supplier), anyString(), anyString())).thenReturn("text/plain")
     when(db.getTransaction()).thenReturn(tx)
   }
 
