@@ -314,14 +314,11 @@ public class NexusHttpAuthenticationFilter
                                    final ServletResponse response)
   {
     // Prefer the subject principal over the token's, as these could be different for token-based authentication
-    final Object principal;
-    if (subject.getPrincipal() != null) {
-      principal = subject.getPrincipal();
-    }
-    else {
+    Object principal = subject.getPrincipal();
+    if (principal == null) {
       principal = token.getPrincipal();
     }
-    final String userId = principal.toString();
+    String userId = principal.toString();
     if (request instanceof HttpServletRequest) {
       // Attach principal+userId to request so we can use that in the request-log
       ((HttpServletRequest) request).setAttribute(ATTR_USER_PRINCIPAL, principal);
