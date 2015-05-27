@@ -65,7 +65,7 @@ public class AssetBlob
   }
 
   /**
-   * Set's the attached state or this instance. Only can be invoked once, while this instance is not attached.
+   * Sets the attached state or this instance. Only can be invoked once, while this instance is not attached.
    */
   void setAttached(final boolean attached) {
     checkArgument(!this.attached, "Already attached");
