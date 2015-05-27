@@ -184,7 +184,13 @@ extends DirectComponentSupport
       String format = parameters.getFilter('format')
       if (format) {
         repositories = repositories.findResults { Repository repository ->
-          repository.format == format ? repository : null
+          repository.format.value == format ? repository : null
+        }
+      }
+      String type = parameters.getFilter('type')
+      if (type) {
+        repositories = repositories.findResults { Repository repository ->
+          repository.type.value == type ? repository : null
         }
       }
     }
