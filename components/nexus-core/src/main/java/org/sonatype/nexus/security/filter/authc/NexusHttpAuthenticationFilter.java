@@ -49,6 +49,8 @@ import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 
+import static org.sonatype.nexus.web.internal.SecurityFilter.ATTR_USER_ID;
+
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
 {
@@ -317,6 +319,10 @@ public class NexusHttpAuthenticationFilter
     }
     else {
       userId = token.getPrincipal().toString();
+    }
+    if (request instanceof HttpServletRequest) {
+      // Attach userId to request so we can use that in the request-log
+      ((HttpServletRequest) request).setAttribute(ATTR_USER_ID, userId);
     }
     postAuthcEvent(request, userId, getUserAgent(request), true);
     return true;
