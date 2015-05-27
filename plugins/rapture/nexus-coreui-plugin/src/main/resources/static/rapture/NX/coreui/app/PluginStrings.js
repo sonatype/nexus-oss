@@ -215,7 +215,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES: 'Connection retries',
     ADMIN_REPOSITORIES_SETTINGS_CONNECTION_RETRIES_HELP: 'How many times to try to connect before giving up',
     ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT: 'Connection timeout',
-    ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT_HELP: 'How long (in seconds) to wait before timing out connections',
+    ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT_HELP: 'Seconds to wait for activity before stopping and retrying the connection. Leave blank to use the globally defined HTTP timeout.',
     ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION: 'Strict Content Type Validation',
     ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_ENABLED: 'Not found cache enabled',
     ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL: 'Not found cache TTL',
@@ -906,8 +906,8 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // HTTP Request section
     ADMIN_HTTP_USER_AGENT_SUFFIX: 'User-agent customization',
     ADMIN_HTTP_USER_AGENT_SUFFIX_HELP: 'Custom fragment to append to "User-Agent" header in HTTP requests.',
-    ADMIN_HTTP_TIMEOUT: 'Timeout',
-    ADMIN_HTTP_TIMEOUT_HELP: 'Seconds before retry',
+    ADMIN_HTTP_TIMEOUT: 'Connection/Socket timeout',
+    ADMIN_HTTP_TIMEOUT_HELP: 'Seconds to wait for activity before stopping and retrying the connection.',
     ADMIN_HTTP_ATTEMPTS: 'Max retry attempts',
 
     // User -> Account
