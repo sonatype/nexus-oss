@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.entity.EntityVersion;
+import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
 import org.sonatype.nexus.orient.HexRecordIdObfuscator;
 import org.sonatype.nexus.orient.PersistentDatabaseInstanceRule;
 import org.sonatype.nexus.repository.Format;
@@ -28,6 +30,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.search.SearchFacet;
+import org.sonatype.nexus.security.ClientInfoProvider;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -46,6 +49,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -99,10 +103,15 @@ public class StorageFacetImplIT
     componentEntityAdapter.installDependencies(recordIdObfuscator);
     assetEntityAdapter = new AssetEntityAdapter(bucketEntityAdapter, componentEntityAdapter);
     assetEntityAdapter.installDependencies(recordIdObfuscator);
+    ContentValidatorSelector contentValidatorSelector = new ContentValidatorSelector(Collections.<String, ContentValidator>emptyMap(), new DefaultContentValidator(new DefaultMimeSupport()));
     underTest = new StorageFacetImpl(
         mockBlobStoreManager,
         Providers.of(database.getInstance()),
-        bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter
+        bucketEntityAdapter,
+        componentEntityAdapter,
+        assetEntityAdapter,
+        mock(ClientInfoProvider.class),
+        contentValidatorSelector
     );
     underTest.installDependencies(mock(EventBus.class));
 
@@ -115,10 +124,12 @@ public class StorageFacetImplIT
         .thenReturn(config);
 
     when(testRepository1.getName()).thenReturn("test-repository-1");
+    when(testRepository1.getFormat()).thenReturn(testFormat);
     when(testRepository1.facet(ConfigurationFacet.class)).thenReturn(configurationFacet);
     when(testRepository1.facet(SearchFacet.class)).thenReturn(mock(SearchFacet.class));
 
     when(testRepository2.getName()).thenReturn("test-repository-2");
+    when(testRepository2.getFormat()).thenReturn(testFormat);
     when(testRepository2.facet(ConfigurationFacet.class)).thenReturn(configurationFacet);
     when(testRepository2.facet(SearchFacet.class)).thenReturn(mock(SearchFacet.class));
 

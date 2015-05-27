@@ -36,6 +36,7 @@ import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.MavenPathParser;
 import org.sonatype.nexus.repository.maven.internal.DigestExtractor;
+import org.sonatype.nexus.repository.maven.internal.maven2.Constants;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2Format;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.BucketEntityAdapter;
@@ -347,7 +348,7 @@ public class MetadataRebuilder
       }
       // we need to generate/write it
       try {
-        final StringPayload mavenChecksum = new StringPayload(assetChecksum, Maven2Format.CHECKSUM_CONTENT_TYPE);
+        final StringPayload mavenChecksum = new StringPayload(assetChecksum, Constants.CHECKSUM_CONTENT_TYPE);
         mavenFacet.put(tx, checksumPath, mavenChecksum);
       }
       catch (IOException e) {
@@ -371,7 +372,7 @@ public class MetadataRebuilder
           sb.append("/").append(baseVersion);
         }
       }
-      sb.append("/").append(Maven2Format.METADATA_FILENAME);
+      sb.append("/").append(Constants.METADATA_FILENAME);
       return mavenPathParser.parsePath(sb.toString());
     }
 

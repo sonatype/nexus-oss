@@ -471,7 +471,7 @@ public class NugetGalleryFacetImpl
   }
 
   private String blobName(Component component) {
-    return component.name() + " " + component.requireVersion() + "@" + getRepository().getName();
+    return component.name() + "-" + component.requireVersion() + ".nupkg";
   }
 
   /**
@@ -539,9 +539,7 @@ public class NugetGalleryFacetImpl
 
   private void attachBlob(final StorageTx storageTx, final Component component, final Asset asset, final InputStream in)
   {
-    final ImmutableMap<String, String> headers = ImmutableMap
-        .of(BlobStore.BLOB_NAME_HEADER, blobName(component), BlobStore.CREATED_BY_HEADER, "unknown");
-    storageTx.setBlob(in, headers, asset, singletonList(HashAlgorithm.SHA512), "application/zip");
+    storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
   }
 
   private String checkVersion(String stringValue) {
