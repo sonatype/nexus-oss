@@ -55,16 +55,16 @@ public class DefaultContentValidator
   @Override
   public String determineContentType(boolean strictContentTypeValidation,
                                      Supplier<InputStream> contentSupplier,
-                                     String contentNameHint,
+                                     String contentName,
                                      @Nullable String declaredContentType) throws IOException
   {
     checkNotNull(contentSupplier);
     String contentType = declaredContentType;
 
     if (contentType == null) {
-      log.trace("Content {} has no declared content type.", contentNameHint);
+      log.trace("Content {} has no declared content type.", contentName);
       try (InputStream is = contentSupplier.get()) {
-        contentType = mimeSupport.detectMimeType(is, contentNameHint);
+        contentType = mimeSupport.detectMimeType(is, contentName);
       }
       log.debug("Mime support implies content type {}", contentType);
 
@@ -74,7 +74,7 @@ public class DefaultContentValidator
     }
     else {
       try (InputStream is = contentSupplier.get()) {
-        final List<String> types = mimeSupport.detectMimeTypes(is, contentNameHint);
+        final List<String> types = mimeSupport.detectMimeTypes(is, contentName);
         if (!types.isEmpty() && !types.contains(contentType)) {
           log.debug("Declared content type {}, discovered types {}", declaredContentType, types);
           if (strictContentTypeValidation) {

@@ -54,27 +54,27 @@ public class Maven2ContentValidator
   @Override
   public String determineContentType(boolean strictContentTypeValidation,
                                      Supplier<InputStream> contentSupplier,
-                                     String contentNameHint,
+                                     String contentName,
                                      @Nullable String declaredContentType) throws IOException
   {
-    if (contentNameHint.endsWith(".pom")) {
+    if (contentName.endsWith(".pom")) {
       // hint to MimeSupport it's actually XML file
       return defaultContentValidator
-          .determineContentType(strictContentTypeValidation, contentSupplier, contentNameHint + ".xml",
+          .determineContentType(strictContentTypeValidation, contentSupplier, contentName + ".xml",
               declaredContentType);
     }
-    else if (contentNameHint.endsWith(".sha1") || contentNameHint.endsWith(".md5")) {
+    else if (contentName.endsWith(".sha1") || contentName.endsWith(".md5")) {
       // hashes are small/simple, do it directly
       try (InputStream is = contentSupplier.get()) {
         final String digestCandidate = DigestExtractor.extract(is);
         if (strictContentTypeValidation && (digestCandidate == null || !DigestExtractor.isDigest(digestCandidate))) {
-          throw new InvalidContentException("Not a Maven2 digest: " + contentNameHint);
+          throw new InvalidContentException("Not a Maven2 digest: " + contentName);
         }
       }
     }
     // everything else goes to default for now
     return defaultContentValidator.determineContentType(
-        strictContentTypeValidation, contentSupplier, contentNameHint, declaredContentType
+        strictContentTypeValidation, contentSupplier, contentName, declaredContentType
     );
   }
 }

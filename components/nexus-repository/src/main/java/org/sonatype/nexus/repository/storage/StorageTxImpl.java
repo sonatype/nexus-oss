@@ -424,13 +424,13 @@ public class StorageTxImpl
 
   @Override
   @Guarded(by = OPEN)
-  public AssetBlob createBlob(final String blobNameHint,
+  public AssetBlob createBlob(final String blobName,
                               final InputStream inputStream,
                               final Iterable<HashAlgorithm> hashAlgorithms,
                               @Nullable final Map<String, String> headers,
                               @Nullable final String declaredContentType) throws IOException
   {
-    checkNotNull(blobNameHint);
+    checkNotNull(blobName);
     checkNotNull(inputStream);
     checkNotNull(hashAlgorithms);
 
@@ -439,11 +439,11 @@ public class StorageTxImpl
     }
 
     try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
-      final String contentType = determineContentType(supplier, blobNameHint, declaredContentType);
+      final String contentType = determineContentType(supplier, blobName, declaredContentType);
 
       ImmutableMap.Builder<String, String> storageHeaders = ImmutableMap.builder();
       storageHeaders.put(Bucket.REPO_NAME_HEADER, bucket.repositoryName());
-      storageHeaders.put(BlobStore.BLOB_NAME_HEADER, blobNameHint);
+      storageHeaders.put(BlobStore.BLOB_NAME_HEADER, blobName);
       storageHeaders.put(BlobStore.CREATED_BY_HEADER, txPrincipalName);
       storageHeaders.put(BlobStore.CONTENT_TYPE_HEADER, contentType);
       if (headers != null) {
@@ -491,7 +491,7 @@ public class StorageTxImpl
 
   @Override
   public BlobRef setBlob(final Asset asset,
-                         final String blobNameHint,
+                         final String blobName,
                          final InputStream inputStream,
                          final Iterable<HashAlgorithm> hashAlgorithms,
                          @Nullable final Map<String, String> headers,
@@ -507,7 +507,7 @@ public class StorageTxImpl
       }
     }
     try {
-      final AssetBlob assetBlob = createBlob(blobNameHint, inputStream, hashAlgorithms, headers, declaredContentType);
+      final AssetBlob assetBlob = createBlob(blobName, inputStream, hashAlgorithms, headers, declaredContentType);
       attachBlob(asset, assetBlob);
       return assetBlob.getBlobRef();
     }
