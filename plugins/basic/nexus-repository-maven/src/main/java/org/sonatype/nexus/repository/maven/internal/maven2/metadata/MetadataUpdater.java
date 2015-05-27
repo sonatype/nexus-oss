@@ -26,7 +26,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
-import org.sonatype.nexus.repository.maven.internal.maven2.Maven2Format;
+import org.sonatype.nexus.repository.maven.internal.maven2.Constants;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.MetadataEnvelope;
 import org.sonatype.nexus.repository.maven.internal.maven2.metadata.Maven2Metadata.Plugin;
@@ -189,13 +189,13 @@ public class MetadataUpdater
       versioning.setLatest(maven2Metadata.getBaseVersions().getLatest());
       versioning.setRelease(maven2Metadata.getBaseVersions().getRelease());
       versioning.setVersions(maven2Metadata.getBaseVersions().getVersions());
-      versioning.setLastUpdated(Maven2Format.METADATA_DOTLESS_TIMESTAMP.print(maven2Metadata.getLastUpdated()));
+      versioning.setLastUpdated(Constants.METADATA_DOTLESS_TIMESTAMP.print(maven2Metadata.getLastUpdated()));
       result.setVersioning(versioning);
     }
     if (maven2Metadata.getSnapshots() != null) {
       final Versioning versioning = result.getVersioning() != null ? result.getVersioning() : new Versioning();
       final org.apache.maven.artifact.repository.metadata.Snapshot snapshot = new org.apache.maven.artifact.repository.metadata.Snapshot();
-      snapshot.setTimestamp(Maven2Format.METADATA_DOTTED_TIMESTAMP.print(
+      snapshot.setTimestamp(Constants.METADATA_DOTTED_TIMESTAMP.print(
           new DateTime(maven2Metadata.getSnapshots().getSnapshotTimestamp())));
       snapshot.setBuildNumber(maven2Metadata.getSnapshots().getSnapshotBuildNumber());
       versioning.setSnapshot(snapshot);
@@ -206,11 +206,11 @@ public class MetadataUpdater
         snapshotVersion.setExtension(snap.getExtension());
         snapshotVersion.setClassifier(snap.getClassifier());
         snapshotVersion.setVersion(snap.getVersion());
-        snapshotVersion.setUpdated(Maven2Format.METADATA_DOTLESS_TIMESTAMP.print(snap.getLastUpdated()));
+        snapshotVersion.setUpdated(Constants.METADATA_DOTLESS_TIMESTAMP.print(snap.getLastUpdated()));
         snapshotVersions.add(snapshotVersion);
       }
       versioning.setSnapshotVersions(snapshotVersions);
-      versioning.setLastUpdated(Maven2Format.METADATA_DOTLESS_TIMESTAMP.print(maven2Metadata.getLastUpdated()));
+      versioning.setLastUpdated(Constants.METADATA_DOTLESS_TIMESTAMP.print(maven2Metadata.getLastUpdated()));
       result.setVersioning(versioning);
     }
     return result;
@@ -247,7 +247,7 @@ public class MetadataUpdater
     final Content mainContent = mavenFacet.put(
         tx,
         mavenPath,
-        new BytesPayload(byteArrayOutputStream.toByteArray(), Maven2Format.METADATA_CONTENT_TYPE)
+        new BytesPayload(byteArrayOutputStream.toByteArray(), Constants.METADATA_CONTENT_TYPE)
     );
     final Map<HashAlgorithm, HashCode> hashCodes = mainContent.getAttributes().require(
         Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
@@ -256,7 +256,7 @@ public class MetadataUpdater
       final MavenPath checksumPath = mavenPath.hash(hashType);
       final HashCode hashCode = hashCodes.get(hashType.getHashAlgorithm());
       checkState(hashCode != null, "hashCode: type=%s", hashType);
-      mavenFacet.put(tx, checksumPath, new StringPayload(hashCode.toString(), Maven2Format.CHECKSUM_CONTENT_TYPE));
+      mavenFacet.put(tx, checksumPath, new StringPayload(hashCode.toString(), Constants.CHECKSUM_CONTENT_TYPE));
     }
   }
 }

@@ -40,7 +40,7 @@ public class Maven2MavenPathParser
 
   @Override
   public boolean isRepositoryMetadata(final MavenPath path) {
-    return path.main().getFileName().equals(Maven2Format.METADATA_FILENAME);
+    return path.main().getFileName().equals(Constants.METADATA_FILENAME);
   }
 
   /**
@@ -92,7 +92,7 @@ public class Maven2MavenPathParser
         }
       }
 
-      if (str.endsWith(Maven2Format.METADATA_FILENAME)) {
+      if (str.endsWith(Constants.METADATA_FILENAME)) {
         return null;
       }
 
@@ -115,7 +115,7 @@ public class Maven2MavenPathParser
           );
 
           try {
-            timestamp = Maven2Format.METADATA_DOTTED_TIMESTAMP.parseDateTime(
+            timestamp = Constants.METADATA_DOTTED_TIMESTAMP.parseDateTime(
                 snapshotTimestampedVersion.toString()).getMillis();
           }
           catch (IllegalArgumentException e) {
