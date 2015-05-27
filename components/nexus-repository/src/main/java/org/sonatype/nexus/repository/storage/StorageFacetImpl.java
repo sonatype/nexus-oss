@@ -15,7 +15,6 @@ package org.sonatype.nexus.repository.storage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -67,9 +66,7 @@ public class StorageFacetImpl
 
   private final ClientInfoProvider clientInfoProvider;
 
-  private final Map<String, ContentValidator> contentValidators;
-
-  private final DefaultContentValidator defaultContentValidator;
+  private final ContentValidatorSelector contentValidatorSelector;
 
   private final List<Supplier<StorageTxHook>> hookSuppliers;
 
@@ -110,8 +107,7 @@ public class StorageFacetImpl
                           final ComponentEntityAdapter componentEntityAdapter,
                           final AssetEntityAdapter assetEntityAdapter,
                           final ClientInfoProvider clientInfoProvider,
-                          final Map<String, ContentValidator> contentValidators,
-                          final DefaultContentValidator defaultContentValidator)
+                          final ContentValidatorSelector contentValidatorSelector)
   {
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
@@ -120,8 +116,7 @@ public class StorageFacetImpl
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.clientInfoProvider = checkNotNull(clientInfoProvider);
-    this.contentValidators = checkNotNull(contentValidators);
-    this.defaultContentValidator = checkNotNull(defaultContentValidator);
+    this.contentValidatorSelector = checkNotNull(contentValidatorSelector);
 
     this.hookSuppliers = new ArrayList<>();
     this.hookSuppliers.add(new Supplier<StorageTxHook>()
@@ -215,22 +210,6 @@ public class StorageFacetImpl
   }
 
   /**
-   * Find content validator for repository format.
-   *
-   * If no format-specific validator is configured, the default is used.
-   */
-  @Nonnull
-  private ContentValidator validator() {
-    String format = getRepository().getFormat().getValue();
-    log.debug("Looking for content validator: {}", format);
-    ContentValidator contentValidator = contentValidators.get(format);
-    if (contentValidator == null) {
-      return defaultContentValidator;
-    }
-    return contentValidator;
-  }
-
-  /**
    * Returns the "principal name" to be used with current instance of {@link StorageTx}.
    */
   @Nonnull
@@ -261,7 +240,7 @@ public class StorageFacetImpl
             componentEntityAdapter,
             assetEntityAdapter,
             config.strictContentTypeValidation,
-            validator(),
+            contentValidatorSelector.validator(getRepository()),
             new StorageTxHooks(hooks)
         )
     );

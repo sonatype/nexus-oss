@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -101,7 +103,7 @@ public class StorageFacetImplIT
     componentEntityAdapter.installDependencies(recordIdObfuscator);
     assetEntityAdapter = new AssetEntityAdapter(bucketEntityAdapter, componentEntityAdapter);
     assetEntityAdapter.installDependencies(recordIdObfuscator);
-    DefaultContentValidator defaultContentValidator = new DefaultContentValidator(new DefaultMimeSupport());
+    ContentValidatorSelector contentValidatorSelector = new ContentValidatorSelector(Collections.<String, ContentValidator>emptyMap(), new DefaultContentValidator(new DefaultMimeSupport()));
     underTest = new StorageFacetImpl(
         mockBlobStoreManager,
         Providers.of(database.getInstance()),
@@ -109,8 +111,7 @@ public class StorageFacetImplIT
         componentEntityAdapter,
         assetEntityAdapter,
         mock(ClientInfoProvider.class),
-        ImmutableMap.<String, ContentValidator>of(DefaultContentValidator.NAME, defaultContentValidator),
-        defaultContentValidator
+        contentValidatorSelector
     );
     underTest.installDependencies(mock(EventBus.class));
 
