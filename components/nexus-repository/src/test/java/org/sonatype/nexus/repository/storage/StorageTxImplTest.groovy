@@ -118,21 +118,6 @@ extends TestSupport
   /**
    * Given:
    * - an asset with a blob
-   * - no (NULL) write policy
-   * When:
-   * - asset is removed
-   * Then:
-   * - blob is removed from db
-   * - asset is removed from db
-   */
-  @Test
-  void 'deleting assets pass when NULL write policy'() {
-    deleteAssetWhenWritePolicy(null)
-  }
-
-  /**
-   * Given:
-   * - an asset with a blob
    * - ALLOW write policy
    * When:
    * - asset is removed
