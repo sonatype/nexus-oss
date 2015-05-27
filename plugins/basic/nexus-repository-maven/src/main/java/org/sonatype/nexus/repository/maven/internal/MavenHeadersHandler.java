@@ -24,9 +24,9 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-import org.sonatype.sisu.goodies.common.Iso8601Date;
 
 import com.google.common.net.HttpHeaders;
+import org.apache.http.client.utils.DateUtils;
 import org.joda.time.DateTime;
 
 /**
@@ -50,7 +50,7 @@ public class MavenHeadersHandler
         final Content content = (Content) payload;
         final DateTime lastModified = content.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
         if (lastModified != null) {
-          response.getHeaders().set(HttpHeaders.LAST_MODIFIED, Iso8601Date.format(lastModified.toDate()));
+          response.getHeaders().set(HttpHeaders.LAST_MODIFIED, DateUtils.formatDate(lastModified.toDate()));
         }
         if (response.getStatus().getCode() == HttpStatus.OK) {
           final String etag = content.getAttributes().get(Content.CONTENT_ETAG, String.class);

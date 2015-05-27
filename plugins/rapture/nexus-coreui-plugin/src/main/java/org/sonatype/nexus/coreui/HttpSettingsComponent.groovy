@@ -32,6 +32,7 @@ import org.sonatype.nexus.httpclient.config.ProxyServerConfiguration
 import org.sonatype.nexus.httpclient.config.UsernameAuthenticationConfiguration
 import org.sonatype.nexus.rapture.PasswordPlaceholder
 import org.sonatype.nexus.validation.Validate
+import org.sonatype.sisu.goodies.common.Time
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
@@ -72,7 +73,7 @@ class HttpSettingsComponent
 
     value.connection?.with {
       result.userAgentSuffix = userAgentSuffix
-      result.timeout = timeout
+      result.timeout = timeout ? timeout.toSecondsI() : null
       result.retries = maximumRetries
     }
 
@@ -157,7 +158,7 @@ class HttpSettingsComponent
     }
 
     if (value.timeout != null) {
-      connection().timeout = value.timeout
+      connection().timeout = Time.seconds(value.timeout)
     }
     if (value.retries != null) {
       connection().maximumRetries = value.retries

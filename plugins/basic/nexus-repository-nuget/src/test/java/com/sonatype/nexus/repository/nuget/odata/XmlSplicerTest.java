@@ -14,8 +14,6 @@ package com.sonatype.nexus.repository.nuget.odata;
 
 import java.io.StringReader;
 
-import com.sonatype.nexus.repository.nuget.odata.XmlSplicer;
-
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

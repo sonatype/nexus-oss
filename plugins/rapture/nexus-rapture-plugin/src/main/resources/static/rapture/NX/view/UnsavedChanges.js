@@ -13,7 +13,7 @@
 /*global Ext*/
 
 /**
- * Expire session window.
+ * Unsaved changes window.
  *
  * @since 3.0
  */

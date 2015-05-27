@@ -16,6 +16,7 @@ package org.sonatype.nexus.repository.storage;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -31,6 +32,8 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.types.HostedType;
+import org.sonatype.nexus.security.ClientInfo;
+import org.sonatype.nexus.security.ClientInfoProvider;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
@@ -61,6 +64,10 @@ public class StorageFacetImpl
 
   private final AssetEntityAdapter assetEntityAdapter;
 
+  private final ClientInfoProvider clientInfoProvider;
+
+  private final ContentValidatorSelector contentValidatorSelector;
+
   private final List<Supplier<StorageTxHook>> hookSuppliers;
 
   @VisibleForTesting
@@ -75,11 +82,14 @@ public class StorageFacetImpl
     @NotNull(groups = HostedType.ValidationGroup.class)
     public WritePolicy writePolicy;
 
+    public boolean strictContentTypeValidation = false;
+
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
           "blobStoreName='" + blobStoreName + '\'' +
           ", writePolicy=" + writePolicy +
+          ", strictContentTypeValidation=" + strictContentTypeValidation +
           '}';
     }
   }
@@ -95,7 +105,9 @@ public class StorageFacetImpl
                           final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
                           final BucketEntityAdapter bucketEntityAdapter,
                           final ComponentEntityAdapter componentEntityAdapter,
-                          final AssetEntityAdapter assetEntityAdapter)
+                          final AssetEntityAdapter assetEntityAdapter,
+                          final ClientInfoProvider clientInfoProvider,
+                          final ContentValidatorSelector contentValidatorSelector)
   {
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
@@ -103,6 +115,8 @@ public class StorageFacetImpl
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
+    this.clientInfoProvider = checkNotNull(clientInfoProvider);
+    this.contentValidatorSelector = checkNotNull(contentValidatorSelector);
 
     this.hookSuppliers = new ArrayList<>();
     this.hookSuppliers.add(new Supplier<StorageTxHook>()
@@ -163,7 +177,7 @@ public class StorageFacetImpl
   @Override
   protected void doDelete() throws Exception {
     // TODO: Make this a soft delete and cleanup later so it doesn't block for large repos.
-    try (StorageTx tx = openStorageTx(null)) {
+    try (StorageTx tx = openStorageTx(databaseInstanceProvider.get().acquire(), false)) {
       tx.deleteBucket(tx.getBucket());
     }
   }
@@ -185,21 +199,30 @@ public class StorageFacetImpl
   @Override
   @Guarded(by = STARTED)
   public StorageTx openTx() {
-    return openStorageTx(null);
+    return openStorageTx(databaseInstanceProvider.get().acquire(), false);
   }
 
   @Override
   @Guarded(by = STARTED)
   public StorageTx openTx(final ODatabaseDocumentTx db) {
     checkNotNull(db);
-    return openStorageTx(db);
+    return openStorageTx(db, true);
   }
 
-  private StorageTx openStorageTx(final ODatabaseDocumentTx db) {
-    ODatabaseDocumentTx database = db;
-    if (database == null) {
-      database = databaseInstanceProvider.get().acquire();
+  /**
+   * Returns the "principal name" to be used with current instance of {@link StorageTx}.
+   */
+  @Nonnull
+  private String createdBy() {
+    ClientInfo clientInfo = clientInfoProvider.getCurrentThreadClientInfo();
+    if (clientInfo == null || clientInfo.getUserid() == null) {
+      return "system";
     }
+    return clientInfo.getUserid();
+  }
+
+  @Nonnull
+  private StorageTx openStorageTx(final ODatabaseDocumentTx db, final boolean isUserManagedDb) {
     final List<StorageTxHook> hooks = new ArrayList<>(hookSuppliers.size());
     for (Supplier<StorageTxHook> hookSupplier : hookSuppliers) {
       hooks.add(hookSupplier.get());
@@ -207,15 +230,18 @@ public class StorageFacetImpl
     BlobStore blobStore = blobStoreManager.get(config.blobStoreName);
     return StateGuardAspect.around(
         new StorageTxImpl(
+            createdBy(),
             new BlobTx(blobStore),
-            database,
-            db != null, // userManagedDb
+            db,
+            isUserManagedDb,
             bucket,
-            config.writePolicy,
+            config.writePolicy == null ? WritePolicy.ALLOW : config.writePolicy,
             writePolicySelector,
             bucketEntityAdapter,
             componentEntityAdapter,
             assetEntityAdapter,
+            config.strictContentTypeValidation,
+            contentValidatorSelector.validator(getRepository()),
             new StorageTxHooks(hooks)
         )
     );

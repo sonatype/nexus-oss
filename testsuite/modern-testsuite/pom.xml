@@ -66,13 +66,13 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-repository-nuget</artifactId>
+      <artifactId>nexus-repository-maven</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-repository-maven</artifactId>
+      <artifactId>nexus-repository-nuget</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -81,7 +81,6 @@
       <artifactId>nexus-repository-raw</artifactId>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>

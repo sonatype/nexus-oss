@@ -121,6 +121,6 @@ public class NugetProxyFacet
 
   private static String[] coords(Context context) {
     Map<String, String> tokens = context.getAttributes().require(TokenMatcher.State.class).getTokens();
-    return new String[] { tokens.get("id"), tokens.get("version") };
+    return new String[]{tokens.get("id"), tokens.get("version")};
   }
 }

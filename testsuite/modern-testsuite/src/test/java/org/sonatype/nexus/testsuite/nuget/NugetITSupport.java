@@ -24,17 +24,23 @@ import javax.inject.Inject;
 import com.sonatype.nexus.repository.nuget.internal.NugetHostedRecipe;
 import com.sonatype.nexus.repository.nuget.odata.FeedSplicer;
 import com.sonatype.nexus.repository.nuget.odata.ODataConsumer;
+import com.sonatype.nexus.repository.nuget.security.NugetApiKey;
+import com.sonatype.nexus.repository.nuget.security.NugetApiKeyStore;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.storage.WritePolicy;
-import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
+import org.sonatype.nexus.security.realm.RealmConfiguration;
+import org.sonatype.nexus.security.realm.RealmManager;
+import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.jetbrains.annotations.NotNull;
-import org.junit.After;
+import org.junit.Before;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.WrappedUrlProvisionOption.OverwriteMode;
 
@@ -45,7 +51,7 @@ import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
  * Support for Nuget ITs
  */
 public abstract class NugetITSupport
-    extends NexusHttpsITSupport
+    extends RepositoryTestSupport
 {
   public static final String VISUAL_STUDIO_INITIAL_COUNT_QUERY =
       "Search()/$count?$filter=IsLatestVersion&searchTerm=''&targetFramework='net45'&includePrerelease=false";
@@ -55,10 +61,11 @@ public abstract class NugetITSupport
 
   public static final int VS_DEFAULT_PAGE_REQUEST_SIZE = 30;
 
-  private List<Repository> repositories = new ArrayList<>();
+  @Inject
+  private NugetApiKeyStore keyStore;
 
   @Inject
-  private RepositoryManager repositoryManager;
+  private RealmManager realmManager;
 
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
@@ -84,28 +91,53 @@ public abstract class NugetITSupport
     return config;
   }
 
-  /**
-   * Creates a repository, first removing an existing one if necessary.
-   */
-  protected Repository createRepository(final Configuration config) throws Exception {
-    waitFor(responseFrom(nexusUrl));
-    final Repository repository = repositoryManager.create(config);
-    repositories.add(repository);
-    return repository;
-  }
+  @NotNull
+  protected NugetClient nugetClient(final Repository repository) throws Exception {
+    final URL url = repositoryBaseUrl(repository);
+    waitFor(responseFrom(url));
 
-  @After
-  public void deleteRepositories() throws Exception {
-    for (Repository repository : repositories) {
-      repositoryManager.delete(repository.getName());
-    }
+    final String apiKey = prepareApiKey(new SimplePrincipalCollection("admin", "NexusAuthenticatingRealm"));
+
+    return new NugetClient(clientBuilder().build(), clientContext(), url.toURI(), apiKey);
   }
 
   @NotNull
-  protected NugetClient nugetClient(final Repository repository) throws Exception {
-    final URL url = resolveUrl(nexusUrl, "/repository/" + repository.getName() + "/");
-    waitFor(responseFrom(url));
-    return new NugetClient(clientBuilder().build(), clientContext(), url.toURI());
+  private String prepareApiKey(final PrincipalCollection admin) {
+    char[] apiKey = keyStore.getApiKey(admin);
+    log.info("Existing nuget api key for {} is {}", admin, apiKey);
+    if (apiKey == null) {
+      log.info("Creating new API key for {}", admin);
+      apiKey = keyStore.createApiKey(admin);
+    }
+    return new String(apiKey);
+  }
+
+  @Override
+  protected void doUseCredentials(final HttpClientBuilder builder) {
+    // Do nothing, don't use basic auth credentials
+  }
+
+  @Before
+  public void enableNugetRealm() {
+    log.info("Realm configuration {}", realmManager.getConfiguration());
+
+    //final String realmName = NugetApiKeyRealm.class.getName();
+    //final String nugetRealmName = NugetApiKeyRealm.ID;
+    final String nugetRealmName = NugetApiKey.NAME;
+
+    final RealmConfiguration config = realmManager.getConfiguration();
+
+    if (!config.getRealmNames().contains(nugetRealmName)) {
+
+      log.info("Adding Nuget realm.");
+
+      config.getRealmNames().add(nugetRealmName);
+      realmManager.setConfiguration(config);
+      calmPeriod();
+    }
+    else {
+      log.info("Nuget realm already configured.");
+    }
   }
 
   protected ParsedFeed parse(final String feedXml) throws Exception {

@@ -78,9 +78,14 @@ public abstract class NexusHttpsITSupport
   protected HttpClientBuilder clientBuilder() throws Exception {
     HttpClientBuilder builder = HttpClients.custom();
     builder.setDefaultRequestConfig(requestConfig());
-    builder.setDefaultCredentialsProvider(credentialsProvider());
+    doUseCredentials(builder);
     builder.setSSLSocketFactory(sslSocketFactory());
     return builder;
+  }
+
+  protected void doUseCredentials(final HttpClientBuilder builder)
+  {
+    builder.setDefaultCredentialsProvider(credentialsProvider());
   }
 
   /**

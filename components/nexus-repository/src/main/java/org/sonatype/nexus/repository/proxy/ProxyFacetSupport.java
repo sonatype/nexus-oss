@@ -212,7 +212,7 @@ public abstract class ProxyFacetSupport
 
       Payload payload = new HttpEntityPayload(response, entity);
       final Content result = new Content(payload);
-      result.getAttributes().set(Content.CONTENT_LAST_MODIFIED, extractLastModified(response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
+      result.getAttributes().set(Content.CONTENT_LAST_MODIFIED, extractLastModified(request, response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
       result.getAttributes().set(Content.CONTENT_ETAG, extractETag(response.getLastHeader(HttpHeaders.ETAG)));
       return result;
     }
@@ -228,13 +228,14 @@ public abstract class ProxyFacetSupport
    * Extract Last-Modified date from response if possible, or {@code null}.
    */
   @Nullable
-  private DateTime extractLastModified(final Header lastModifiedHeader) {
+  private DateTime extractLastModified(final HttpGet request, final Header lastModifiedHeader) {
     if (lastModifiedHeader != null) {
       try {
         return new DateTime(DateUtils.parseDate(lastModifiedHeader.getValue()).getTime());
       }
       catch (Exception ex) {
-        log.warn("Could not parse date '{}'; using system current time as item creation time", lastModifiedHeader, ex);
+        log.warn("Could not parse date '{}' received from {}; using system current time as item creation time",
+            lastModifiedHeader, request.getURI());
       }
     }
     return null;

@@ -37,6 +37,11 @@ public interface BlobStore
   String BLOB_NAME_HEADER = "BlobStore.blob-name";
 
   /**
+   * An informational header for disaster recovery purposes (describes what blob contains)
+   */
+  String CONTENT_TYPE_HEADER = "BlobStore.content-type";
+
+  /**
    * Audit information (e.g. the name of a principal that created the blob)
    */
   String CREATED_BY_HEADER = "BlobStore.created-by";

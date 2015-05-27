@@ -48,45 +48,51 @@ class MavenDefaultRepositoriesContributor
         new Configuration(repositoryName: DEFAULT_RELEASE_REPO, recipeName: Maven2HostedRecipe.NAME, online: true, attributes:
             [
                 maven  : [
-                    versionPolicy              : VersionPolicy.RELEASE.toString(),
-                    strictContentTypeValidation: false
+                    versionPolicy              : VersionPolicy.RELEASE.toString()
                 ],
                 storage: [
-                    writePolicy: WritePolicy.ALLOW_ONCE.toString()
+                    writePolicy: WritePolicy.ALLOW_ONCE.toString(),
+                    strictContentTypeValidation: false
                 ]
             ]
         ),
         new Configuration(repositoryName: DEFAULT_SNAPSHOT_REPO, recipeName: Maven2HostedRecipe.NAME, online: true, attributes:
             [
                 maven  : [
-                    versionPolicy              : VersionPolicy.SNAPSHOT.toString(),
-                    strictContentTypeValidation: false
+                    versionPolicy              : VersionPolicy.SNAPSHOT.toString()
                 ],
                 storage: [
-                    writePolicy: WritePolicy.ALLOW.toString()
+                    writePolicy: WritePolicy.ALLOW.toString(),
+                    strictContentTypeValidation: false
                 ]
             ]
         ),
         new Configuration(repositoryName: DEFAULT_CENTRAL_REPO, recipeName: Maven2ProxyRecipe.NAME, online: true, attributes:
             [
                 maven     : [
-                    versionPolicy              : VersionPolicy.RELEASE.toString(),
-                    strictContentTypeValidation: false
+                    versionPolicy              : VersionPolicy.RELEASE.toString()
                 ],
                 proxy     : [
                     remoteUrl     : 'https://repo1.maven.org/maven2/',
                     artifactMaxAge: 3600
+                ],
+                storage: [
+                    writePolicy: WritePolicy.ALLOW.toString(),
+                    strictContentTypeValidation: false
                 ]
             ]
         ),
         new Configuration(repositoryName: DEFAULT_PUBLIC_REPO, recipeName: Maven2GroupRecipe.NAME, online: true, attributes:
             [
                 maven  : [
-                    versionPolicy              : VersionPolicy.MIXED.toString(),
-                    strictContentTypeValidation: false
+                    versionPolicy              : VersionPolicy.MIXED.toString()
                 ],
                 group  : [
                     memberNames: [DEFAULT_RELEASE_REPO, DEFAULT_SNAPSHOT_REPO, DEFAULT_CENTRAL_REPO]
+                ],
+                storage: [
+                    writePolicy: WritePolicy.ALLOW.toString(),
+                    strictContentTypeValidation: false
                 ]
             ]
         )

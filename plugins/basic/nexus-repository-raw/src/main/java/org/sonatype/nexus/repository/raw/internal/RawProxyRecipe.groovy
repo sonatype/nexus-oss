@@ -51,7 +51,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 class RawProxyRecipe
     extends RecipeSupport
 {
-  static final String NAME = "raw-proxy"
+  public static final String NAME = "raw-proxy"
 
   @Inject
   Provider<RawSecurityFacet> securityFacet
