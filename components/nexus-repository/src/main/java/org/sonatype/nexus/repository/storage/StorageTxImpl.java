@@ -112,7 +112,7 @@ public class StorageTxImpl
     this.db = checkNotNull(db);
     this.userManagedDb = userManagedDb;
     this.bucket = checkNotNull(bucket);
-    this.writePolicy = writePolicy;
+    this.writePolicy = checkNotNull(writePolicy);
     this.writePolicySelector = checkNotNull(writePolicySelector);
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
     this.componentEntityAdapter = checkNotNull(componentEntityAdapter);

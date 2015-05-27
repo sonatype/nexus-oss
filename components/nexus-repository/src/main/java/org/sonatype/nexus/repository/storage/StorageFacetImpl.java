@@ -235,7 +235,7 @@ public class StorageFacetImpl
             db,
             isUserManagedDb,
             bucket,
-            config.writePolicy,
+            config.writePolicy == null ? WritePolicy.ALLOW : config.writePolicy,
             writePolicySelector,
             bucketEntityAdapter,
             componentEntityAdapter,
