@@ -30,6 +30,12 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacetHosted', {
   },
 
   /**
+   * @cfg String
+   * Set the write policy of storage, defaults to ALLOW_ONCE.
+   */
+  writePolicy: 'ALLOW_ONCE',
+
+  /**
    * @override
    */
   initComponent: function() {
@@ -54,7 +60,7 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacetHosted', {
               ['ALLOW_ONCE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_DISABLE_ITEM')],
               ['DENY', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_RO_ITEM')]
             ],
-            value: 'ALLOW_ONCE',
+            value: me.writePolicy,
             queryMode: 'local'
           }
         ]
