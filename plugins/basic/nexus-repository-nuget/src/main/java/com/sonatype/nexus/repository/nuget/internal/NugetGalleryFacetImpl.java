@@ -471,7 +471,7 @@ public class NugetGalleryFacetImpl
   }
 
   private String blobName(Component component) {
-    return component.name() + " " + component.requireVersion() + ".nupkg";
+    return component.name() + "-" + component.requireVersion() + ".nupkg";
   }
 
   /**
