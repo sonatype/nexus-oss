@@ -29,32 +29,23 @@ Ext.define('NX.coreui.view.logging.LogMark', {
   title: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_TITLE'),
   defaultFocus: 'message',
 
-  /**
-   * @override
-   */
-  initComponent: function () {
-    var me = this;
-
-    me.items = {
-      xtype: 'nx-settingsform',
-      frame: false,
-      defaults: {
-        anchor: '100%'
-      },
-      settingsFormSuccessMessage: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_SUCCESS'),
-      settingsFormSubmitOnEnter: true,
-      editableMarker: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_ERROR'),
-      items: [
-        {
-          xtype: 'textfield',
-          name: 'message',
-          itemId: 'message',
-          fieldLabel: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE'),
-          allowBlank: false
-        }
-      ]
-    };
-
-    me.callParent(arguments);
+  items: {
+    xtype: 'nx-settingsform',
+    frame: false,
+    defaults: {
+      anchor: '100%'
+    },
+    settingsFormSuccessMessage: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_SUCCESS'),
+    settingsFormSubmitOnEnter: true,
+    editableMarker: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_ERROR'),
+    items: [
+      {
+        xtype: 'textfield',
+        name: 'message',
+        itemId: 'message',
+        fieldLabel: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE'),
+        allowBlank: false
+      }
+    ]
   }
 });
