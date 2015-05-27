@@ -220,7 +220,7 @@ public interface StorageTx
                   @Nullable String declaredContentType);
 
   /**
-   * Creates a new Blob and returns it's {@link AssetBlob}. Blobs created but not attached in a scope of a TX to any
+   * Creates a new Blob and returns its {@link AssetBlob}. Blobs created but not attached in a scope of a TX to any
    * asset are considered as "orphans", and they will be deleted from blob store at the end of a TX.
    */
   AssetBlob createBlob(String blobNameHint,
