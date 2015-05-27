@@ -32,8 +32,8 @@ import com.google.common.base.Supplier;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Maven 2 specific {@link ContentValidator}, that differs from {@link DefaultContentValidator} only by how XML files
- * are validated.
+ * Maven 2 specific {@link ContentValidator} that "hints" default content validator for some Maven specific file
+ * extensions and format specific files.
  *
  * @since 3.0
  */
@@ -64,6 +64,7 @@ public class Maven2ContentValidator
               declaredContentType);
     }
     else if (contentNameHint.endsWith(".sha1") || contentNameHint.endsWith(".md5")) {
+      // hashes are small/simple, do it directly
       try (InputStream is = contentSupplier.get()) {
         final String digestCandidate = DigestExtractor.extract(is);
         if (digestCandidate == null || !DigestExtractor.isDigest(digestCandidate)) {
@@ -71,6 +72,7 @@ public class Maven2ContentValidator
         }
       }
     }
+    // everything else goes to default for now
     return defaultContentValidator.determineContentType(
         strictContentTypeValidation, contentSupplier, contentNameHint, declaredContentType
     );
