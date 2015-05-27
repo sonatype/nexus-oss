@@ -41,7 +41,9 @@ public abstract class RepositoryTestSupport
    * Creates a repository, first removing an existing one if necessary.
    */
   protected Repository createRepository(final Configuration config) throws Exception {
+    log.debug("Waiting for Nexus");
     waitFor(responseFrom(nexusUrl));
+    log.info("Creating repository {}", config.getRepositoryName());
     final Repository repository = repositoryManager.create(config);
     repositories.add(repository);
     calmPeriod();
@@ -50,14 +52,18 @@ public abstract class RepositoryTestSupport
 
   public void deleteRepository(Repository repository) throws Exception {
     repositories.remove(repository);
+    log.info("Deleting repository {}", repository.getName());
     repositoryManager.delete(repository.getName());
+    calmPeriod();
   }
 
   @After
   public void deleteRepositories() throws Exception {
     for (Repository repository : repositories) {
+      log.info("Deleting repository {}", repository.getName());
       repositoryManager.delete(repository.getName());
     }
+    calmPeriod();
   }
 
   @NotNull

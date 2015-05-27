@@ -17,11 +17,8 @@ import java.io.File;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpStatus;
-import org.sonatype.nexus.repository.raw.internal.RawHostedRecipe;
-import org.sonatype.nexus.repository.storage.WritePolicy;
 
 import com.google.common.io.Files;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 

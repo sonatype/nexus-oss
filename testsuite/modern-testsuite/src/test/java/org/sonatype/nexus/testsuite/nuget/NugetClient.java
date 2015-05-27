@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.testsuite.nuget;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -47,13 +46,7 @@ public class NugetClient
 
   public static final String VS_SEARCH_FEED_TEMPLATE = "Search()?$filter=IsAbsoluteLatestVersion&$skip=0&$top=30&searchTerm='%s'&targetFramework='net45'&includePrerelease=true";
 
-  private final HttpClient httpClient;
-
-  private final HttpClientContext httpClientContext;
-
-  private final URI repositoryBaseUri;
-
-  private final String apiKey;
+  private String apiKey;
 
   public NugetClient(final HttpClient httpClient,
                      final HttpClientContext httpClientContext,
@@ -61,10 +54,6 @@ public class NugetClient
                      @Nullable final String apiKey)
   {
     super(httpClient, httpClientContext, repositoryBaseUri);
-
-    this.httpClient = checkNotNull(httpClient);
-    this.httpClientContext = checkNotNull(httpClientContext);
-    this.repositoryBaseUri = checkNotNull(repositoryBaseUri);
     this.apiKey = apiKey;
 
     checkArgument(repositoryBaseUri.toString().endsWith("/"));
@@ -93,14 +82,14 @@ public class NugetClient
     return status(httpClient.execute(put, httpClientContext));
   }
 
+  public String feedXml(final String query) throws IOException {
+    return asString(get(query));
+  }
+
   private void addNugetApiKey(final HttpRequest request) {
     if (apiKey != null) {
       request.setHeader(new BasicHeader(NugetApiKey.NAME, apiKey));
     }
-  }
-
-  public String feedXml(final String query) throws IOException {
-    return asString(get(query));
   }
 
   public int count(final String query) throws IOException {
@@ -128,7 +117,7 @@ public class NugetClient
    * Issues a delete request to the NuGet repository.
    */
   public HttpResponse delete(final String packageId, final String version) throws IOException {
-    final URI deleteURI = repositoryBaseUri.resolve(String.format("%s/%s", packageId, version));
+    final URI deleteURI = resolve(String.format("%s/%s", packageId, version));
 
     final HttpDelete delete = new HttpDelete(deleteURI);
     addNugetApiKey(delete);

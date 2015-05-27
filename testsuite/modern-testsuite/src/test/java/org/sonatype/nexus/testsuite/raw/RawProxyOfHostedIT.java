@@ -20,7 +20,6 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpStatus;
 
 import com.google.common.io.Files;
-import org.apache.http.HttpResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;

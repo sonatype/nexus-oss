@@ -29,7 +29,6 @@ import com.sonatype.nexus.repository.nuget.security.NugetApiKeyStore;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmManager;
@@ -65,12 +64,6 @@ public abstract class NugetITSupport
       "Search()?$filter=IsLatestVersion&$orderby=DownloadCount%20desc,Id&$skip=0&$top=30&searchTerm=''&targetFramework='net45'&includePrerelease=false";
 
   public static final int VS_DEFAULT_PAGE_REQUEST_SIZE = 30;
-
-
-  private List<Repository> repositories = new ArrayList<>();
-
-  @Inject
-  private RepositoryManager repositoryManager;
 
   @Inject
   private NugetApiKeyStore keyStore;

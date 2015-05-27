@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.testsuite.raw;
 
-import java.util.HashSet;
-
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;

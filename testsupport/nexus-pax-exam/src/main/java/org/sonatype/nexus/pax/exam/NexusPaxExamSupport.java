@@ -31,13 +31,16 @@ import javax.net.ssl.SSLSession;
 import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.nexus.common.event.EventSubscriberHost;
 import org.sonatype.nexus.scheduling.TaskScheduler;
+import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import org.sonatype.sisu.litmus.testsupport.port.PortRegistry;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.Uninterruptibles;
+import org.jetbrains.annotations.NonNls;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,6 +54,7 @@ import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionConfigurationFileExtendOption;
 import org.ops4j.pax.exam.options.MavenUrlReference;
+import org.slf4j.Logger;
 
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.maven;
@@ -119,6 +123,14 @@ public abstract class NexusPaxExamSupport
 
   @Inject
   protected TaskScheduler taskScheduler;
+
+  @NonNls
+  protected final Logger log = (Logger) Preconditions.checkNotNull(this.createLogger());
+
+  protected Logger createLogger() {
+    return Loggers.getLogger(this);
+  }
+
 
   // -------------------------------------------------------------------------
 
