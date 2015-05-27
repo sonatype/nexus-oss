@@ -38,8 +38,9 @@ Ext.define('NX.coreui.view.system.HttpRequestSettings', {
       helpText: NX.I18n.get('ADMIN_HTTP_TIMEOUT_HELP'),
       allowDecimals: false,
       allowExponential: false,
-      minValue: 0,
-      maxValue: 3600
+      minValue: 1,
+      maxValue: 3600,
+      emptyText: '20'
     },
     {
       xtype: 'numberfield',
