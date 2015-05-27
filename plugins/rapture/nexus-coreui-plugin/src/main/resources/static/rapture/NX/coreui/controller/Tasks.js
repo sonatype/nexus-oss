@@ -239,8 +239,7 @@ Ext.define('NX.coreui.controller.Tasks', {
         }
       ]
     }));
-    var m = me.getTaskModel().create({ typeId: model.getId() });
-    panel.down('nx-settingsform').loadRecord(m);
+    panel.down('nx-settingsform').loadRecord(me.getTaskModel().create({typeId: model.getId(), enabled: true}));
   },
 
   /**
