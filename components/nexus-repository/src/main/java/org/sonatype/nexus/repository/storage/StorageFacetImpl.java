@@ -221,7 +221,8 @@ public class StorageFacetImpl
     return clientInfo.getUserid();
   }
 
-  private StorageTx openStorageTx(final ODatabaseDocumentTx db, final boolean userManagedDb) {
+  @Nonnull
+  private StorageTx openStorageTx(final ODatabaseDocumentTx db, final boolean isUserManagedDb) {
     final List<StorageTxHook> hooks = new ArrayList<>(hookSuppliers.size());
     for (Supplier<StorageTxHook> hookSupplier : hookSuppliers) {
       hooks.add(hookSupplier.get());
@@ -232,7 +233,7 @@ public class StorageFacetImpl
             txPrincipalName(),
             new BlobTx(blobStore),
             db,
-            userManagedDb,
+            isUserManagedDb,
             bucket,
             config.writePolicy,
             writePolicySelector,
