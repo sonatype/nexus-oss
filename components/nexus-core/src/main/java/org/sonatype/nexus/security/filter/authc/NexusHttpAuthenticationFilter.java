@@ -49,6 +49,9 @@ import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 
+import static org.sonatype.nexus.web.internal.SecurityFilter.ATTR_USER_ID;
+import static org.sonatype.nexus.web.internal.SecurityFilter.ATTR_USER_PRINCIPAL;
+
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
 {
@@ -311,12 +314,15 @@ public class NexusHttpAuthenticationFilter
                                    final ServletResponse response)
   {
     // Prefer the subject principal over the token's, as these could be different for token-based authentication
-    String userId;
-    if (subject.getPrincipal() != null) {
-      userId = subject.getPrincipal().toString();
+    Object principal = subject.getPrincipal();
+    if (principal == null) {
+      principal = token.getPrincipal();
     }
-    else {
-      userId = token.getPrincipal().toString();
+    String userId = principal.toString();
+    if (request instanceof HttpServletRequest) {
+      // Attach principal+userId to request so we can use that in the request-log
+      ((HttpServletRequest) request).setAttribute(ATTR_USER_PRINCIPAL, principal);
+      ((HttpServletRequest) request).setAttribute(ATTR_USER_ID, userId);
     }
     postAuthcEvent(request, userId, getUserAgent(request), true);
     return true;
