@@ -35,16 +35,16 @@ public class LdapConnectionUtils
 {
   private static Logger logger = LoggerFactory.getLogger(LdapConnectionUtils.class);
 
-  public static DefaultLdapContextFactory getLdapContextFactory(LdapConfiguration ldapServer)
+  public static DefaultLdapContextFactory getLdapContextFactory(final LdapConfiguration configuration)
       throws LdapDAOException
   {
-    DefaultLdapContextFactory defaultLdapContextFactory = new DefaultLdapContextFactory();
-
-    if (ldapServer == null) {
+    if (configuration == null) {
       throw new LdapDAOException("Ldap connection is not configured.");
     }
 
-    Connection connInfo = ldapServer.getConnection();
+    DefaultLdapContextFactory defaultLdapContextFactory = new DefaultLdapContextFactory();
+
+    Connection connInfo = configuration.getConnection();
 
     String url;
     try {
@@ -66,9 +66,9 @@ public class LdapConnectionUtils
     defaultLdapContextFactory.setAuthentication(connInfo.getAuthScheme());
 
     // get the timeout
-    Map<String, String> connectionProperties = new HashMap<String, String>();
+    Map<String, String> connectionProperties = new HashMap<>();
     connectionProperties.put("com.sun.jndi.ldap.connect.timeout",
-        Integer.toString(ldapServer.getConnection().getConnectionTimeout() * 1000));
+        Integer.toString(connInfo.getConnectionTimeout() * 1000));
 
     // and the realm
     if (connInfo.getSaslRealm() != null) {
