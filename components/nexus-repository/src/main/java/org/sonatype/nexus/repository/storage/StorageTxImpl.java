@@ -434,7 +434,7 @@ public class StorageTxImpl
     checkNotNull(inputStream);
     checkNotNull(hashAlgorithms);
 
-    if (writePolicy == WritePolicy.DENY) {
+    if (!writePolicy.checkCreateAllowed()) {
       throw new IllegalOperationException("Repository is read only: " + getBucket().repositoryName());
     }
 
@@ -462,14 +462,14 @@ public class StorageTxImpl
     checkArgument(!assetBlob.isAttached(), "Blob is already attached to an asset");
 
     final WritePolicy effectiveWritePolicy = writePolicySelector.select(asset, writePolicy);
-    if (effectiveWritePolicy == WritePolicy.DENY) {
+    if (!effectiveWritePolicy.checkCreateAllowed()) {
       throw new IllegalOperationException("Repository is read only: " + getBucket().repositoryName());
     }
 
     // Delete old blob if necessary
     BlobRef oldBlobRef = asset.blobRef();
     if (oldBlobRef != null) {
-      if (effectiveWritePolicy == WritePolicy.ALLOW_ONCE) {
+      if (!effectiveWritePolicy.checkUpdateAllowed()) {
         throw new IllegalOperationException(
             "Repository does not allow updating assets: " + getBucket().repositoryName());
       }
@@ -502,8 +502,8 @@ public class StorageTxImpl
     // Enforce write policy ahead, as we have asset here
     BlobRef oldBlobRef = asset.blobRef();
     if (oldBlobRef != null) {
-      if (writePolicySelector.select(asset, writePolicy) == WritePolicy.ALLOW_ONCE) {
-        throw new IllegalOperationException("Repository does not allow updating assets.");
+      if (!writePolicySelector.select(asset, writePolicy).checkUpdateAllowed()) {
+        throw new IllegalOperationException("Repository does not allow updating assets: " + getBucket().repositoryName());
       }
     }
     try {
@@ -552,8 +552,8 @@ public class StorageTxImpl
    */
   private void deleteBlob(final BlobRef blobRef, @Nullable WritePolicy effectiveWritePolicy) {
     checkNotNull(blobRef);
-    if (effectiveWritePolicy != null && effectiveWritePolicy == WritePolicy.DENY) {
-      throw new IllegalOperationException("Repository is read only: " + getBucket().repositoryName());
+    if (effectiveWritePolicy != null && !effectiveWritePolicy.checkDeleteAllowed()) {
+      throw new IllegalOperationException("Repository does not allow deleting assets: " + getBucket().repositoryName());
     }
     blobTx.delete(blobRef);
   }
