@@ -220,15 +220,15 @@ public interface StorageTx
    *                            in {@link Asset} attributes.
    * @param headers             optional, custom headers for blob, if any.
    * @param declaredContentType optional, the declared MIME type of the blob. See {@link ContentValidator}.
-   * @return {@link BlobRef} to the newly created blob. As side effect, passed in {@link Asset} is modified too, but is
-   * unsaved. Caller must ensure {@link #saveAsset(Asset)} is invoked before this TX ends.
+   * @return Attached instance of {@link AssetBlob} of the newly created blob. As side effect, passed in {@link Asset}
+   * is modified too, but is unsaved. Caller must ensure {@link #saveAsset(Asset)} is invoked before this TX ends.
    */
-  BlobRef setBlob(Asset asset,
-                  String blobName,
-                  InputStream inputStream,
-                  Iterable<HashAlgorithm> hashAlgorithms,
-                  @Nullable Map<String, String> headers,
-                  @Nullable String declaredContentType);
+  AssetBlob setBlob(Asset asset,
+                    String blobName,
+                    InputStream inputStream,
+                    Iterable<HashAlgorithm> hashAlgorithms,
+                    @Nullable Map<String, String> headers,
+                    @Nullable String declaredContentType) throws IOException;
 
   /**
    * Creates a new Blob and returns its {@link AssetBlob}. Blobs created but not attached in a scope of a TX to any

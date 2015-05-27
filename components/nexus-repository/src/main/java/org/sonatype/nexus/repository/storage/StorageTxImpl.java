@@ -38,7 +38,6 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Supplier;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -490,12 +489,12 @@ public class StorageTxImpl
   }
 
   @Override
-  public BlobRef setBlob(final Asset asset,
-                         final String blobName,
-                         final InputStream inputStream,
-                         final Iterable<HashAlgorithm> hashAlgorithms,
-                         @Nullable final Map<String, String> headers,
-                         @Nullable final String declaredContentType)
+  public AssetBlob setBlob(final Asset asset,
+                           final String blobName,
+                           final InputStream inputStream,
+                           final Iterable<HashAlgorithm> hashAlgorithms,
+                           @Nullable final Map<String, String> headers,
+                           @Nullable final String declaredContentType) throws IOException
   {
     checkNotNull(asset);
 
@@ -503,17 +502,13 @@ public class StorageTxImpl
     BlobRef oldBlobRef = asset.blobRef();
     if (oldBlobRef != null) {
       if (!writePolicySelector.select(asset, writePolicy).checkUpdateAllowed()) {
-        throw new IllegalOperationException("Repository does not allow updating assets: " + getBucket().repositoryName());
+        throw new IllegalOperationException(
+            "Repository does not allow updating assets: " + getBucket().repositoryName());
       }
     }
-    try {
-      final AssetBlob assetBlob = createBlob(blobName, inputStream, hashAlgorithms, headers, declaredContentType);
-      attachBlob(asset, assetBlob);
-      return assetBlob.getBlobRef();
-    }
-    catch (IOException e) {
-      throw Throwables.propagate(e);
-    }
+    final AssetBlob assetBlob = createBlob(blobName, inputStream, hashAlgorithms, headers, declaredContentType);
+    attachBlob(asset, assetBlob);
+    return assetBlob;
   }
 
   @Nullable

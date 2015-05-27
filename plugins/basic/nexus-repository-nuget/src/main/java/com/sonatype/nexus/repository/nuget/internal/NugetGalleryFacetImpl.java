@@ -30,7 +30,6 @@ import com.sonatype.nexus.repository.nuget.odata.ODataTemplates;
 import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
@@ -531,15 +530,15 @@ public class NugetGalleryFacetImpl
                                               final Component component, final InputStream in,
                                               final Map<String, String> data)
   {
-    Asset asset = findOrCreateAsset(storageTx, component);
-    updateAssetMetadata(asset, data, component.isNew());
-    attachBlob(storageTx, component, asset, in);
-    storageTx.saveAsset(asset);
-  }
-
-  private void attachBlob(final StorageTx storageTx, final Component component, final Asset asset, final InputStream in)
-  {
-    storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
+    try {
+      Asset asset = findOrCreateAsset(storageTx, component);
+      updateAssetMetadata(asset, data, component.isNew());
+      storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
+      storageTx.saveAsset(asset);
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   private String checkVersion(String stringValue) {
