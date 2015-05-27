@@ -471,7 +471,7 @@ public class NugetGalleryFacetImpl
   }
 
   private String blobName(Component component) {
-    return component.name() + " " + component.requireVersion() + "@" + getRepository().getName();
+    return component.name() + " " + component.requireVersion() + ".nupkg";
   }
 
   /**
@@ -539,7 +539,7 @@ public class NugetGalleryFacetImpl
 
   private void attachBlob(final StorageTx storageTx, final Component component, final Asset asset, final InputStream in)
   {
-    storageTx.setBlob(asset, asset.name(), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
+    storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
   }
 
   private String checkVersion(String stringValue) {
