@@ -54,21 +54,23 @@ public class Maven2ContentValidator
   @Override
   public String determineContentType(boolean strictContentTypeValidation,
                                      Supplier<InputStream> contentSupplier,
-                                     String contentName,
+                                     @Nullable String contentName,
                                      @Nullable String declaredContentType) throws IOException
   {
-    if (contentName.endsWith(".pom")) {
-      // hint to MimeSupport it's actually XML file
-      return defaultContentValidator
-          .determineContentType(strictContentTypeValidation, contentSupplier, contentName + ".xml",
-              declaredContentType);
-    }
-    else if (contentName.endsWith(".sha1") || contentName.endsWith(".md5")) {
-      // hashes are small/simple, do it directly
-      try (InputStream is = contentSupplier.get()) {
-        final String digestCandidate = DigestExtractor.extract(is);
-        if (strictContentTypeValidation && (digestCandidate == null || !DigestExtractor.isDigest(digestCandidate))) {
-          throw new InvalidContentException("Not a Maven2 digest: " + contentName);
+    if (contentName != null) {
+      if (contentName.endsWith(".pom")) {
+        // hint to MimeSupport it's actually XML file
+        return defaultContentValidator
+            .determineContentType(strictContentTypeValidation, contentSupplier, contentName + ".xml",
+                declaredContentType);
+      }
+      else if (contentName.endsWith(".sha1") || contentName.endsWith(".md5")) {
+        // hashes are small/simple, do it directly
+        try (InputStream is = contentSupplier.get()) {
+          final String digestCandidate = DigestExtractor.extract(is);
+          if (strictContentTypeValidation && (digestCandidate == null || !DigestExtractor.isDigest(digestCandidate))) {
+            throw new InvalidContentException("Not a Maven2 digest: " + contentName);
+          }
         }
       }
     }

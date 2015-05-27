@@ -55,7 +55,7 @@ public class DefaultContentValidator
   @Override
   public String determineContentType(boolean strictContentTypeValidation,
                                      Supplier<InputStream> contentSupplier,
-                                     String contentName,
+                                     @Nullable String contentName,
                                      @Nullable String declaredContentType) throws IOException
   {
     checkNotNull(contentSupplier);
