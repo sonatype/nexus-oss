@@ -77,6 +77,19 @@ public class SystemFeedSource
     else if (FeedRecorder.SYSTEM_CONFIG.equals(evt.getEventSubType())) {
       return "Configuration change";
     }
+    else if (FeedRecorder.FAMILY_REPO.equals(evt.getEventType())) {
+      if (FeedRecorder.REPO_CREATED.equals(evt.getEventSubType())) {
+        return "Repository created";
+      }
+      else if (FeedRecorder.REPO_UPDATED.equals(evt.getEventSubType())) {
+        return "Repository updated";
+      }
+      else if (FeedRecorder.REPO_DELETED.equals(evt.getEventSubType())) {
+        return "Repository deleted";
+      } else {
+        return evt.getEventType() + ":" + evt.getEventSubType();
+      }
+    }
     else {
       // TODO: Some human-readable fallback?
       return evt.getEventType() + ":" + evt.getEventSubType();

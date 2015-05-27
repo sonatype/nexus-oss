@@ -57,10 +57,6 @@ public interface FeedRecorder
 
   String REPO_UPDATED = "updated";
 
-  String REPO_LSTATUS = "local";
-
-  String REPO_PSTATUS = "proxy";
-
   // ==
 
   String FAMILY_ASSET = "asset";
