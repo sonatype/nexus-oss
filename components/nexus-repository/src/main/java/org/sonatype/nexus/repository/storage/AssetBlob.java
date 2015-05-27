@@ -25,7 +25,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Blob handle, that holds properties of newly created Blob that is about to be assigned to an {@link Asset}.
+ * Blob handle, that holds properties and reference of newly created blob that is about to be attached to an {@link
+ * Asset}. If this instance is not attached to any {@link Asset} during transaction, it is considered "orphan" and
+ * will be cleaned up (deleted).
  *
  * @since 3.0
  */
@@ -71,7 +73,7 @@ public class AssetBlob
   }
 
   /**
-   * The BLOB reference this instance is pointing to.
+   * The blob reference this instance is pointing to.
    */
   @Nonnull
   public BlobRef getBlobRef() {
@@ -79,14 +81,14 @@ public class AssetBlob
   }
 
   /**
-   * The BLOB size in bytes.
+   * The blob size in bytes.
    */
   public long getSize() {
     return size;
   }
 
   /**
-   * The content-type that BLOB contains.
+   * The content-type that blob contains.
    */
   @Nonnull
   public String getContentType() {
@@ -94,8 +96,7 @@ public class AssetBlob
   }
 
   /**
-   * Exact hashes calculated by storage subsystem, while blob got saved into blob store ("exact", as they were just
-   * calculated during streaming operations).
+   * Exact hashes calculated by storage subsystem while blob was getting saved.
    */
   @Nonnull
   public Map<HashAlgorithm, HashCode> getHashes() {

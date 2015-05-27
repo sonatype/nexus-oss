@@ -20,7 +20,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 /**
- * Maven 2 comstants.
+ * Maven 2 constants.
  *
  * @since 3.0
  */
