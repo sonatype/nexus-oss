@@ -67,8 +67,8 @@ public class Maven2ContentValidator
       // hashes are small/simple, do it directly
       try (InputStream is = contentSupplier.get()) {
         final String digestCandidate = DigestExtractor.extract(is);
-        if (digestCandidate == null || !DigestExtractor.isDigest(digestCandidate)) {
-          throw new InvalidContentException("Not a Maven digest");
+        if (strictContentTypeValidation && (digestCandidate == null || !DigestExtractor.isDigest(digestCandidate))) {
+          throw new InvalidContentException("Not a Maven2 digest: " + contentNameHint);
         }
       }
     }
