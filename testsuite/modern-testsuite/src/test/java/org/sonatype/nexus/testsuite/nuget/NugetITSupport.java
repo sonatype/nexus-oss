@@ -33,20 +33,16 @@ import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport;
-import org.sonatype.sisu.goodies.common.Loggers;
 
-import com.google.common.base.Preconditions;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.WrappedUrlProvisionOption.OverwriteMode;
-import org.slf4j.Logger;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
@@ -70,13 +66,6 @@ public abstract class NugetITSupport
 
   @Inject
   private RealmManager realmManager;
-
-  @NonNls
-  protected final Logger log = (Logger) Preconditions.checkNotNull(this.createLogger());
-
-  protected Logger createLogger() {
-    return Loggers.getLogger(this);
-  }
 
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
