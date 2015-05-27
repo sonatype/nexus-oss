@@ -284,10 +284,14 @@ Ext.define('NX.coreui.controller.Users', {
             { property: 'userId', value: me.getUserSearchBox().getValue() }
           ]
         },
-        callback: cb
+        callback: function(records, operation, success) {
+          if (Ext.isFunction(cb)) {
+            cb(records, operation, success);
+          }
+          me.reselect();
+        }
       });
     }
-    me.callParent();  // triggers transition between list/detail view
   },
 
   /**
