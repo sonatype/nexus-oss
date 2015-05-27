@@ -211,6 +211,17 @@ public interface StorageTx
   /**
    * Creates a new Blob and updates the given asset with a reference to it, hash metadata, size, and content type.
    * The old blob, if any, will be deleted.
+   *
+   * @param asset               the {@link Asset} that should reference newly created Blob.
+   * @param blobNameHint        blob name (must not be unique), but it will be used in content validation. See {@link
+   *                            ContentValidator}.
+   * @param inputStream         the content to be streamed into blob store
+   * @param hashAlgorithms      {@link HashAlgorithm}s to be applied while streaming to blob store, will be set
+   *                            in {@link Asset} attributes.
+   * @param headers             optional, custom headers for blob, if any.
+   * @param declaredContentType optional, the declared MIME type of the blob. See {@link ContentValidator}.
+   * @return {@link BlobRef} to the newly created Blob. As side effect, passed in {@link Asset} is modified too, but is
+   * unsaved. Caller must ensure {@link #saveAsset(Asset)} is invoked before this TX ends.
    */
   BlobRef setBlob(Asset asset,
                   String blobNameHint,
@@ -222,6 +233,16 @@ public interface StorageTx
   /**
    * Creates a new Blob and returns its {@link AssetBlob}. Blobs created but not attached in a scope of a TX to any
    * asset are considered as "orphans", and they will be deleted from blob store at the end of a TX.
+   *
+   * @param blobNameHint        blob name (must not be unique), but it will be used in content validation. See {@link
+   *                            ContentValidator}.
+   * @param inputStream         the content to be streamed into blob store
+   * @param hashAlgorithms      {@link HashAlgorithm}s to be applied while streaming to blob store, returned in {@link
+   *                            AssetBlob}
+   * @param headers             optional, custom headers for blob, if any.
+   * @param declaredContentType optional, the declared MIME type of the blob. See {@link ContentValidator}.
+   * @return Unattached instance of {@link AssetBlob} that should be attached to some {@link Asset} during this
+   * transaction.
    */
   AssetBlob createBlob(String blobNameHint,
                        InputStream inputStream,

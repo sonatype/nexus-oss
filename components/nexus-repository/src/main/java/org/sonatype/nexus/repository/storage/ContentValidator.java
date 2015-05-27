@@ -36,7 +36,8 @@ public interface ContentValidator
    * @param strictContentTypeValidation whether the check should be strict or not.
    * @param contentSupplier             the supplier of the content to determine or confirm content type.
    * @param contentNameHint             a "hint" for content name, usually a file path or file name or just extension
-   *                                    (file extension is used).
+   *                                    (file extension is used to determine content type along with "magic" detection
+   *                                    where actual content bits are used, like file headers or magic bytes).
    * @param declaredContentType         if non-null, the declared content type will be confirmed, if null, this method
    *                                    will attempt to determine the content type.
    * @return the content type of the content.
