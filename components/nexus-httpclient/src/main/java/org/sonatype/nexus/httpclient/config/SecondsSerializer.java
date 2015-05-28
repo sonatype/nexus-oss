@@ -10,20 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.view;
+package org.sonatype.nexus.httpclient.config;
+
+import java.io.IOException;
+
+import org.sonatype.sisu.goodies.common.Time;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
- * Common content-type values.
+ * {@link Time} in seconds serializer.
  *
  * @since 3.0
  */
-public class ContentTypes
+public class SecondsSerializer
+    extends StdSerializer<Time>
 {
-  public static final String OCTET_STREAM = "application/octet-stream";
 
-  public static final String TEXT_PLAIN = "text/plain";
+  public SecondsSerializer() {
+    super(Time.class);
+  }
 
-  public static final String TEXT_HTML = "text/html";
-
-  public static final String TEXT_XML = "text/xml";
+  @Override
+  public void serialize(final Time value, final JsonGenerator jgen, final SerializerProvider provider)
+      throws IOException
+  {
+    jgen.writeNumber(value.toSecondsI());
+  }
 }

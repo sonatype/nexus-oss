@@ -16,19 +16,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.common.io.TempStreamSupplier;
-import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.InvalidContentException;
+import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -36,12 +31,9 @@ import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
@@ -52,52 +44,19 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
  *
  * @since 3.0
  */
+@Named
 public class RawContentFacetImpl
     extends FacetSupport
     implements RawContentFacet
 {
   private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(MD5, SHA1);
 
-  private final MimeSupport mimeSupport;
-
-  @VisibleForTesting
-  static final String CONFIG_KEY = "rawContent";
-
-  @VisibleForTesting
-  static class Config
-  {
-    public boolean strictContentTypeValidation = false;
-
-    @Override
-    public String toString() {
-      return getClass().getSimpleName() + "{" +
-          "strictContentTypeValidation=" + strictContentTypeValidation +
-          '}';
-    }
-  }
-
-  private Config config;
-
-  @Inject
-  public RawContentFacetImpl(final MimeSupport mimeSupport)
-  {
-    this.mimeSupport = checkNotNull(mimeSupport);
-  }
-
+  // TODO: raw does not have config, this method is here only to have this bundle do Import-Package org.sonatype.nexus.repository.config
+  // TODO: as FacetSupport subclass depends on it. Actually, this facet does not need any kind of configuration
+  // TODO: it's here only to circumvent this OSGi/maven-bundle-plugin issue.
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
-    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
-  }
-
-  @Override
-  protected void doConfigure(final Configuration configuration) throws Exception {
-    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
-    log.debug("Config: {}", config);
-  }
-
-  @Override
-  protected void doDestroy() throws Exception {
-    config = null;
+    super.doValidate(configuration);
   }
 
   @Nullable
@@ -140,49 +99,10 @@ public class RawContentFacetImpl
         asset = tx.firstAsset(component);
       }
 
-      // TODO: Figure out created-by header
-      final ImmutableMap<String, String> headers = ImmutableMap
-          .of(BlobStore.BLOB_NAME_HEADER, path, BlobStore.CREATED_BY_HEADER, "unknown");
-
-      try (TempStreamSupplier supplier = new TempStreamSupplier(content.openInputStream())) {
-        try (InputStream is1 = supplier.get(); InputStream is2 = supplier.get()) {
-          tx.setBlob(is1, headers, asset, hashAlgorithms, determineContentType(path, is2, content.getContentType()));
-        }
-      }
-
+      tx.setBlob(asset, path, content.openInputStream(), hashAlgorithms, null, content.getContentType());
       tx.saveAsset(asset);
       tx.commit();
     }
-  }
-
-  /**
-   * Determines or confirms the content type for the content, or throws {@link InvalidContentException} if it cannot.
-   */
-  @Nonnull
-  private String determineContentType(final String path, final InputStream is, final String declaredContentType)
-      throws IOException {
-    String contentType = declaredContentType;
-
-    if (contentType == null) {
-      log.trace("Content PUT to {} has no content type", path);
-      contentType = mimeSupport.detectMimeType(is, path);
-      log.trace("Mime support implies content type {}", contentType);
-
-      if (contentType == null && config.strictContentTypeValidation) {
-        throw new InvalidContentException("Content type could not be determined.");
-      }
-    }
-    else {
-      final List<String> types = mimeSupport.detectMimeTypes(is, path);
-      if (!types.isEmpty() && !types.contains(contentType)) {
-        log.debug("Discovered content type {} ", types.get(0));
-        if (config.strictContentTypeValidation) {
-          throw new InvalidContentException(
-              String.format("Declared content type %s, but declared %s.", contentType, types.get(0)));
-        }
-      }
-    }
-    return contentType;
   }
 
   private String getGroup(String path) {

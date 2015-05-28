@@ -58,12 +58,6 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
             ],
             value: 'RELEASE',
             readOnlyOnUpdate: true
-          },
-          {
-            xtype: 'checkbox',
-            name: 'attributes.maven.strictContentTypeValidation',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION'),
-            value: true
           }
         ]
       }

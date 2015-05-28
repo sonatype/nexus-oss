@@ -12,12 +12,14 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
+import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.Description;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionHelper;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionRenderer;
@@ -79,8 +81,7 @@ public class ViewServletDescribeTest
     when(descriptionRenderer.renderJson(any(Description.class))).thenReturn("JSON");
 
     underTest = spy(new ViewServlet(mock(RepositoryManager.class),
-        mock(Map.class),
-        defaultResponseSender,
+        new HttpResponseSenderSelector(Collections.<String, HttpResponseSender>emptyMap(), defaultResponseSender),
         mock(DescriptionHelper.class),
         descriptionRenderer
     ));

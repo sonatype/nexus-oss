@@ -37,12 +37,6 @@ Ext.define('NX.coreui.view.repository.facet.RawContentFacet', {
         title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_RAW_FACET'),
 
         items: [
-          {
-            xtype: 'checkbox',
-            name: 'attributes.rawContent.strictContentTypeValidation',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION'),
-            value: true
-          }
         ]
       }
     ];
