@@ -80,6 +80,8 @@ public class DefaultFeedRecorder
   @Override
   public List<FeedEvent> getEvents(@Nullable final Set<String> types,
                                    @Nullable final Set<String> subTypes,
+                                   @Nullable final String whereClause,
+                                   @Nullable final Map<String, Object> parameters,
                                    final int from,
                                    final int count,
                                    @Nullable final Function<FeedEvent, FeedEvent> function)
@@ -112,7 +114,7 @@ public class DefaultFeedRecorder
         return true;
       }
     };
-    timeline.retrieve(from, count, types, subTypes, callback);
+    timeline.retrieve(from, count, types, subTypes, whereClause, parameters, callback);
     return result;
   }
 }

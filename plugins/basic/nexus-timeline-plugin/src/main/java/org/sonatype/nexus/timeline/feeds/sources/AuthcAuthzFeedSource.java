@@ -49,13 +49,15 @@ public class AuthcAuthzFeedSource
 
   @Override
   protected void fillInEntries(final List<FeedEvent> feed, final int from, final int count,
-                               final Map<String, String> params)
+                               final Map<String, Object> params)
       throws IOException
   {
     feed.addAll(
         getFeedRecorder().getEvents(
             ImmutableSet.of(FeedRecorder.FAMILY_AUTH),
             null,
+            toWhere(params),
+            params,
             from,
             count,
             new Function<FeedEvent, FeedEvent>()

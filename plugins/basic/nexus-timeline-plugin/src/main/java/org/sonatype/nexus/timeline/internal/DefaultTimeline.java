@@ -38,8 +38,6 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -247,33 +245,18 @@ public class DefaultTimeline
                        final int count,
                        @Nullable final Set<String> types,
                        @Nullable final Set<String> subTypes,
+                       @Nullable final String whereClause,
+                       @Nullable final Map<String, Object> parameters,
                        final TimelineCallback callback)
   {
     if (!isStarted() || count == 0) {
       return;
     }
     try (ODatabaseDocumentTx db = openDb()) {
-      final StringBuilder sb = new StringBuilder();
-      sb.append("SELECT FROM ").append(DB_CLASS);
-      if (!isEmpty(types) || !isEmpty(subTypes)) {
-        sb.append(" WHERE ");
-      }
-      if (!isEmpty(types)) {
-        sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] ");
-      }
-      if (!isEmpty(subTypes)) {
-        if (!isEmpty(types)) {
-          sb.append(" AND ");
-        }
-        sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] ");
-      }
-      sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
-
-      log.debug("Query: {}", sb);
-
-      final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(sb.toString());
-
-      final OResultSet<ODocument> results = db.query(query);
+      final String sql = buildSql(fromItem, count, types, subTypes, whereClause);
+      log.debug("Query: {} params: {}", sql, parameters);
+      final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(sql);
+      final OResultSet<ODocument> results = db.query(query, parameters);
       if (results.isEmpty()) {
         return;
       }
@@ -290,6 +273,41 @@ public class DefaultTimeline
     catch (IOException e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  /**
+   * Builds the Orient SQL SELECT command.
+   */
+  private String buildSql(final int fromItem,
+                          final int count,
+                          @Nullable final Set<String> types,
+                          @Nullable final Set<String> subTypes,
+                          @Nullable final String whereClause) {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("SELECT FROM ").append(DB_CLASS);
+    if (!isEmpty(types) || !isEmpty(subTypes)) {
+      sb.append(" WHERE ");
+    }
+    if (!isEmpty(types)) {
+      sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] ");
+    }
+    if (!isEmpty(subTypes)) {
+      if (!isEmpty(types)) {
+        sb.append(" AND ");
+      }
+      sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] ");
+    }
+    if (whereClause != null) {
+      if (sb.toString().endsWith(DB_CLASS)) {
+        sb.append(" WHERE ");
+      }
+      else {
+        sb.append(" AND ");
+      }
+      sb.append(whereClause);
+    }
+    sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
+    return sb.toString();
   }
 
   /**

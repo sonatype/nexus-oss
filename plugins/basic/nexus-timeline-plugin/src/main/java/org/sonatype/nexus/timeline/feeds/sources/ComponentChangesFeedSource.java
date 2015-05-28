@@ -46,7 +46,7 @@ public class ComponentChangesFeedSource
   public void fillInEntries(final List<FeedEvent> entries,
                             final int from,
                             final int count,
-                            final Map<String, String> params)
+                            final Map<String, Object> params)
   {
     entries.addAll(
         getFeedRecorder().getEvents(
@@ -58,6 +58,8 @@ public class ComponentChangesFeedSource
                 FeedRecorder.COMPONENT_DEPLOYED_UPDATE,
                 FeedRecorder.COMPONENT_DELETED
             ),
+            toWhere(params),
+            params,
             from,
             count,
             new Function<FeedEvent, FeedEvent>()

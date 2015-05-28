@@ -104,7 +104,7 @@ public class FeedResource
     }
 
     try {
-      final Map<String, String> params = getParameters(uriInfo);
+      final Map<String, Object> params = getParameters(uriInfo);
       final List<FeedEvent> feedEvents = feedSource.getFeed(from, count, params);
 
       final SyndFeed feed = new SyndFeedImpl();
@@ -153,8 +153,8 @@ public class FeedResource
   /**
    * Just repack into simple KV map, using only the first values.
    */
-  private Map<String, String> getParameters(final UriInfo uriInfo) {
-    final Map<String, String> result = Maps.newHashMap();
+  private Map<String, Object> getParameters(final UriInfo uriInfo) {
+    final Map<String, Object> result = Maps.newHashMap();
     for (String key : uriInfo.getQueryParameters().keySet()) {
       result.put(key, uriInfo.getQueryParameters().getFirst(key));
     }

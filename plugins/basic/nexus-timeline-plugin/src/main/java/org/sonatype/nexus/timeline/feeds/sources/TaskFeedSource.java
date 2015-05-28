@@ -42,12 +42,14 @@ public class TaskFeedSource
 
   @Override
   public void fillInEntries(final List<FeedEvent> entries, final int from, final int count,
-                            final Map<String, String> params)
+                            final Map<String, Object> params)
   {
     entries.addAll(
         getFeedRecorder().getEvents(
             ImmutableSet.of(FeedRecorder.FAMILY_TASK),
             null,
+            toWhere(params),
+            params,
             from,
             count,
             new Function<FeedEvent, FeedEvent>()

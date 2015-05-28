@@ -44,7 +44,7 @@ public class AssetChangesFeedSource
   public void fillInEntries(final List<FeedEvent> entries,
                             final int from,
                             final int count,
-                            final Map<String, String> params)
+                            final Map<String, Object> params)
   {
     entries.addAll(
         getFeedRecorder().getEvents(
@@ -56,6 +56,8 @@ public class AssetChangesFeedSource
                 FeedRecorder.ASSET_DEPLOYED_UPDATE,
                 FeedRecorder.ASSET_DELETED
             ),
+            toWhere(params),
+            params,
             from,
             count,
             new Function<FeedEvent, FeedEvent>()

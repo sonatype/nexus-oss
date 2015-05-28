@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.nexus.timeline.feeds.FeedSource;
@@ -74,7 +76,7 @@ public abstract class AbstractFeedSource
   }
 
   @Override
-  public List<FeedEvent> getFeed(int from, int count, Map<String, String> params)
+  public List<FeedEvent> getFeed(int from, int count, Map<String, Object> params)
       throws IOException
   {
     final List<FeedEvent> events = Lists.newArrayList();
@@ -83,6 +85,25 @@ public abstract class AbstractFeedSource
   }
 
   protected abstract void fillInEntries(final List<FeedEvent> feed, final int from, final int count,
-                                        final Map<String, String> params)
+                                        final Map<String, Object> params)
       throws IOException;
+
+  /**
+   * Helper method that converts params map into SQL WHERE.
+   */
+  @Nullable
+  protected String toWhere(final Map<String, Object> params) {
+    if (params == null || params.isEmpty()) {
+      return null;
+    }
+    final StringBuilder sb = new StringBuilder();
+    for (String key : params.keySet()) {
+      if (sb.length() > 0) {
+        sb.append(" AND ");
+      }
+      // key=:key
+      sb.append(key).append("=").append(":").append(key);
+    }
+    return sb.toString();
+  }
 }

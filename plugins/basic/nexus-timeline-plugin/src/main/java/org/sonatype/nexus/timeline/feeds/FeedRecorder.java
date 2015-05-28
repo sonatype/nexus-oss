@@ -13,6 +13,7 @@
 package org.sonatype.nexus.timeline.feeds;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -107,15 +108,19 @@ public interface FeedRecorder
   /**
    * Retrieves feed events from timeline.
    *
-   * @param types    to filter for types or {@code null}.
-   * @param subtypes to filter for subtypes or {@code null}.
-   * @param from     paging, from
-   * @param count    paging, to
-   * @param function custom transormation or {@code null}. Useful to fill in parts of data NOT stored in timeline (or
-   *                 composed from data present), like generated content, event title etc.
+   * @param types       to filter for types or {@code null}.
+   * @param subtypes    to filter for subtypes or {@code null}.
+   * @param whereClause custom where clause (optional).
+   * @param parameters  parameters for whereClause (optional).
+   * @param from        paging, from
+   * @param count       paging, to
+   * @param function    custom transormation or {@code null}. Useful to fill in parts of data NOT stored in timeline
+   *                    (or composed from data present), like generated content, event title etc.
    */
   List<FeedEvent> getEvents(@Nullable Set<String> types,
                             @Nullable Set<String> subtypes,
+                            @Nullable String whereClause,
+                            @Nullable Map<String, Object> parameters,
                             int from,
                             int count,
                             @Nullable Function<FeedEvent, FeedEvent> function);

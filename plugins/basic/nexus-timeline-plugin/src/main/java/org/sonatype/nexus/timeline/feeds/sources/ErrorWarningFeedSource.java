@@ -68,7 +68,7 @@ public class ErrorWarningFeedSource
 
   @Override
   protected void fillInEntries(final List<FeedEvent> feed, final int from, final int count,
-                               final Map<String, String> params)
+                               final Map<String, Object> params)
       throws IOException
   {
     final Iterable<String> logFilenamesToScan = getLogFilenamesToScan(params);
@@ -99,10 +99,10 @@ public class ErrorWarningFeedSource
    *
    * @param params the map containing feed query parameters.
    */
-  private Iterable<String> getLogFilenamesToScan(final Map<String, String> params) {
+  private Iterable<String> getLogFilenamesToScan(final Map<String, Object> params) {
     // 'fts' is a comma delimited list of filenames (example: "nexus.log,nexus.log.1")
     if (params.containsKey("fts")) {
-      final String files = params.get("fts");
+      final String files = String.valueOf(params.get("fts"));
       if (!Strings.isNullOrEmpty(files)) {
         return Splitter.on(',').omitEmptyStrings().split(files);
       }

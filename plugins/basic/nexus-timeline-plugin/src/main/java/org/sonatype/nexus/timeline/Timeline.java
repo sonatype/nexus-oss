@@ -51,12 +51,16 @@ public interface Timeline
    * @param count       the max count of records you want to fetch.
    * @param types       the types you want to fetch or null if "all" (do not filter by types).
    * @param subtypes    the subtypes you want to fetch or null if "all" (do not filter by subtypes).
+   * @param whereClause custom where clause (optional).
+   * @param parameters  parameters for whereClause (optional).
    * @param cb          the callback.
    */
   void retrieve(int fromItem,
                 int count,
                 @Nullable Set<String> types,
                 @Nullable Set<String> subtypes,
+                @Nullable String whereClause,
+                @Nullable Map<String, Object> parameters,
                 TimelineCallback cb);
 
   /**

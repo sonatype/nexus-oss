@@ -192,7 +192,7 @@ public class DefaultTimelineTest
 
     underTest.purgeOlderThan(2);
     // ensure 1st returned entry is the latest (and still exists on timeline)
-    underTest.retrieve(0, 1, null, null, new TimelineCallback()
+    underTest.retrieve(0, 1, null, null, null, null, new TimelineCallback()
     {
       public boolean processNext(final Entry rec) throws IOException {
         assertThat(rec.getType(), equalTo("TEST"));
@@ -215,7 +215,7 @@ public class DefaultTimelineTest
 
     underTest.purgeOlderThan(1);
     // ensure 1st returned entry is the latest (and still exists on timeline)
-    underTest.retrieve(0, 1, null, null,new TimelineCallback()
+    underTest.retrieve(0, 1, null, null, null, null, new TimelineCallback()
     {
       public boolean processNext(final Entry rec) throws IOException {
         assertThat(rec.getType(), equalTo("TEST"));
@@ -238,7 +238,7 @@ public class DefaultTimelineTest
 
     underTest.purgeOlderThan(0);
     // ensure that timeline is empty, callback should not be called
-    underTest.retrieve(0, 1, null, null, new TimelineCallback()
+    underTest.retrieve(0, 1, null, null, null, null, new TimelineCallback()
     {
       public boolean processNext(final Entry rec) throws IOException {
         assertThat("Timeline should be empty. callback should not be invoked!", false);
@@ -272,7 +272,7 @@ public class DefaultTimelineTest
       throws Exception
   {
     final EntryListCallback result = new EntryListCallback();
-    underTest.retrieve(fromItem, count, types, subTypes, result);
+    underTest.retrieve(fromItem, count, types, subTypes, null, null, result);
     return result.getEntries();
   }
 }
