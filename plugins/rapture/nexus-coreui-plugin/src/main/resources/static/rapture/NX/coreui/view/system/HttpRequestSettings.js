@@ -49,7 +49,8 @@ Ext.define('NX.coreui.view.system.HttpRequestSettings', {
       allowDecimals: false,
       allowExponential: false,
       minValue: 0,
-      maxValue: 10
+      maxValue: 10,
+      emptyText: '2'
     }
   ]
 
