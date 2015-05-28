@@ -15,6 +15,7 @@ package org.sonatype.nexus.timeline.feeds.subscribers;
 import java.util.Date;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -48,12 +49,9 @@ public class ComponentSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
-  private final ClientInfoProvider clientInfoProvider;
-
   @Inject
-  public ComponentSubscriber(final FeedRecorder feedRecorder, final ClientInfoProvider clientInfoProvider) {
+  public ComponentSubscriber(final FeedRecorder feedRecorder) {
     super(feedRecorder);
-    this.clientInfoProvider = checkNotNull(clientInfoProvider);
   }
 
   @Subscribe
@@ -83,9 +81,7 @@ public class ComponentSubscriber
       return;
     }
 
-    // TODO: this is no-good: this is async subscriber, hence the client info should come in an event (this thread is no user thread)
-    // TODO: but, do we really want to mix-in this into events we do want to create feeds from?
-    final ClientInfo clientInfo = clientInfoProvider.getCurrentThreadClientInfo();
+    final ClientInfo clientInfo = e.getClientInfo();
 
     final Map<String, String> data = Maps.newHashMap();
     // map is for display/templating purposes
@@ -93,7 +89,7 @@ public class ComponentSubscriber
     putIfNotNull(data, "componentGroup", e.getComponent().group());
     putIfNotNull(data, "componentName", e.getComponent().name());
     putIfNotNull(data, "componentVersion", e.getComponent().version());
-    putIfNotNull(data, "userId", clientInfo == null ? "n/a" : clientInfo.getUserid());
+    putIfNotNull(data, "userId", getUserId(clientInfo, "n/a"));
     putIfNotNull(data, "userIp", clientInfo == null ? "n/a" : clientInfo.getRemoteIP());
     putIfNotNull(data, "userUa", clientInfo == null ? "n/a" : clientInfo.getUserAgent());
     // feed event is persisted, is searchable/filterable by these properties
@@ -101,10 +97,21 @@ public class ComponentSubscriber
         FeedRecorder.FAMILY_COMPONENT,
         action,
         new Date(),
-        clientInfo == null ? "SYSTEM" : (clientInfo.getUserid() == null ? "unknown" : clientInfo.getUserid()),
-        "/repository/" + e.getRepository().getName() + e.getComponent().name(),
+        getUserId(clientInfo, null),
+        "/repository/" + e.getRepository().getName() + e.getComponent().name(), // TODO: where to point?
         data
     );
     getFeedRecorder().addEvent(fe);
+  }
+
+  @Nullable
+  private String getUserId(@Nullable final ClientInfo clientInfo, @Nullable final String defaultValue) {
+    if (clientInfo == null) {
+      return defaultValue;
+    }
+    if (clientInfo.getUserid() == null) {
+      return defaultValue;
+    }
+    return clientInfo.getUserid();
   }
 }

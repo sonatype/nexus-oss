@@ -15,6 +15,7 @@ package org.sonatype.nexus.timeline.feeds.subscribers;
 import java.util.Date;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,15 +28,12 @@ import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.AssetUpdatedEvent;
 import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.security.ClientInfo;
-import org.sonatype.nexus.security.ClientInfoProvider;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Subscriber listening for asset events.
@@ -48,12 +46,9 @@ public class AssetSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
-  private final ClientInfoProvider clientInfoProvider;
-
   @Inject
-  public AssetSubscriber(final FeedRecorder feedRecorder, final ClientInfoProvider clientInfoProvider) {
+  public AssetSubscriber(final FeedRecorder feedRecorder) {
     super(feedRecorder);
-    this.clientInfoProvider = checkNotNull(clientInfoProvider);
   }
 
   @Subscribe
@@ -83,15 +78,13 @@ public class AssetSubscriber
       return;
     }
 
-    // TODO: this is no-good: this is async subscriber, hence the client info should come in an event (this thread is no user thread)
-    // TODO: but, do we really want to mix-in this into events we do want to create feeds from?
-    final ClientInfo clientInfo = clientInfoProvider.getCurrentThreadClientInfo();
+    final ClientInfo clientInfo = e.getClientInfo();
 
     final Map<String, String> data = Maps.newHashMap();
     // map is for display/templating purposes
     putIfNotNull(data, "repoName", e.getRepository().getName());
     putIfNotNull(data, "assetName", e.getAsset().name());
-    putIfNotNull(data, "userId", clientInfo == null ? "n/a" : clientInfo.getUserid());
+    putIfNotNull(data, "userId", getUserId(clientInfo, "n/a"));
     putIfNotNull(data, "userIp", clientInfo == null ? "n/a" : clientInfo.getRemoteIP());
     putIfNotNull(data, "userUa", clientInfo == null ? "n/a" : clientInfo.getUserAgent());
     // feed event is persisted, is searchable/filterable by these properties
@@ -99,10 +92,21 @@ public class AssetSubscriber
         FeedRecorder.FAMILY_ASSET,
         action,
         new Date(),
-        clientInfo == null ? "SYSTEM" : (clientInfo.getUserid() == null ? "unknown" : clientInfo.getUserid()),
-        "/repository/" + e.getRepository().getName() + e.getAsset().name(),
+        getUserId(clientInfo, null),
+        "/repository/" + e.getRepository().getName() + e.getAsset().name(), // TODO: this is true for Maven only!
         data
     );
     getFeedRecorder().addEvent(fe);
+  }
+
+  @Nullable
+  private String getUserId(@Nullable final ClientInfo clientInfo, @Nullable final String defaultValue) {
+    if (clientInfo == null) {
+      return defaultValue;
+    }
+    if (clientInfo.getUserid() == null) {
+      return defaultValue;
+    }
+    return clientInfo.getUserid();
   }
 }
