@@ -14,7 +14,9 @@ package org.sonatype.nexus.repository.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,6 +31,7 @@ import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.Sets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -61,34 +64,67 @@ public class DefaultContentValidator
                                      @Nullable String declaredContentType) throws IOException
   {
     checkNotNull(contentSupplier);
-    String contentType = declaredContentType;
 
-    if (contentType == null) {
-      log.trace("Content {} has no declared content type.", contentName);
-      try (InputStream is = contentSupplier.get()) {
-        contentType = mimeSupport.detectMimeType(is, contentName);
-      }
-      log.debug("Mime support implies content type {}", contentType);
+    final List<String> contentDetectedMimeTypes = new ArrayList<>();
+    try (InputStream is = contentSupplier.get()) {
+      contentDetectedMimeTypes.addAll(mimeSupport.detectMimeTypes(is, contentName));
+    }
+    log.debug("Mime support detected content types {}", contentDetectedMimeTypes);
 
-      if (contentType == null && strictContentTypeValidation) {
-        throw new InvalidContentException("Content type could not be determined.");
+    if (strictContentTypeValidation && isUnknown(contentDetectedMimeTypes)) {
+      throw new InvalidContentException("Content type could not be determined.");
+    }
+
+    final List<String> nameAssumedMimeTypes = new ArrayList<>();
+    if (contentName != null) {
+      nameAssumedMimeTypes.addAll(mimeSupport.guessMimeTypesListFromPath(mimeRulesSource, contentName));
+      Set<String> intersection = Sets.intersection(
+          Sets.newHashSet(contentDetectedMimeTypes),
+          Sets.newHashSet(nameAssumedMimeTypes)
+      );
+      if (strictContentTypeValidation && intersection.isEmpty()) {
+        throw new InvalidContentException(
+            String.format("Detected content type %s, but by name %s expected %s.",
+                contentDetectedMimeTypes, contentName, nameAssumedMimeTypes)
+        );
       }
     }
-    else {
-      try (InputStream is = contentSupplier.get()) {
-        final List<String> types = mimeSupport.detectMimeTypes(is, contentName);
-        if (!types.isEmpty() && !types.contains(contentType)) {
-          log.debug("Declared content type {}, discovered types {}", declaredContentType, types);
-          if (strictContentTypeValidation) {
-            throw new InvalidContentException(
-                String.format("Declared content type %s, but discovered %s.", contentType, types));
-          }
+
+    if (declaredContentType != null) {
+      Set<String> union = Sets.union(
+          Sets.newHashSet(contentDetectedMimeTypes),
+          Sets.newHashSet(nameAssumedMimeTypes)
+      );
+      if (!union.contains(declaredContentType)) {
+        log.debug("Declared content type {}, discovered types {}/{}",
+            declaredContentType, contentDetectedMimeTypes, nameAssumedMimeTypes);
+        if (strictContentTypeValidation) {
+          throw new InvalidContentException(
+              String.format("Declared content type %s, but discovered %s.", declaredContentType, union));
         }
       }
     }
-    if (contentType == null) {
-      contentType = ContentTypes.OCTET_STREAM;
+
+    String finalContentType;
+    if (declaredContentType != null) {
+      finalContentType = declaredContentType;
     }
-    return contentType;
+    else if (!nameAssumedMimeTypes.isEmpty()) {
+      finalContentType = nameAssumedMimeTypes.get(0);
+    }
+    else {
+      finalContentType = contentDetectedMimeTypes.get(0);
+    }
+
+    log.info("Content {} declared as {}, determined as {}", contentName, declaredContentType, finalContentType);
+
+    return finalContentType;
+  }
+
+  /**
+   * Returns {@code true} if list of mimeTypes is actually saying "unkown" content.
+   */
+  private boolean isUnknown(final List<String> mimeTypes) {
+    return mimeTypes.size() == 1 && mimeTypes.contains(ContentTypes.OCTET_STREAM);
   }
 }
