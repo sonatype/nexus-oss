@@ -62,7 +62,7 @@ public class RebuildMaven2MetadataTaskDescriptor
         ),
         new StringTextFormField(
             BASEVERSION_FIELD_ID,
-            "Base Version",
+            "Base Version (only if ArtifactId given)",
             "Maven base version to narrow operation (limit to given groupId:artifactId:baseVersion, used if groupId and artifactId set!)",
             false
         )
