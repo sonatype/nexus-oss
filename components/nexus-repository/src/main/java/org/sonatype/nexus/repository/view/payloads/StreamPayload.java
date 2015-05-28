@@ -38,8 +38,7 @@ public class StreamPayload
 
   private boolean opened = false;
 
-  public StreamPayload(final InputStream stream, final long size, final @Nullable String contentType)
-  {
+  public StreamPayload(final InputStream stream, final long size, @Nullable final String contentType) {
     this.stream = checkNotNull(stream);
     this.size = size;
     this.contentType = contentType;
