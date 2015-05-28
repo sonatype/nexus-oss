@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.view.ContentTypes;
@@ -55,6 +56,7 @@ public class DefaultContentValidator
   @Override
   public String determineContentType(boolean strictContentTypeValidation,
                                      Supplier<InputStream> contentSupplier,
+                                     @Nullable MimeRulesSource mimeRulesSource,
                                      @Nullable String contentName,
                                      @Nullable String declaredContentType) throws IOException
   {

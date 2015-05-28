@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.mime;
 
+import javax.annotation.Nullable;
+
 /**
  * Interface to provide "hints" what a given source thinks about MIME type of some items.
  *
@@ -21,8 +23,9 @@ public interface MimeRulesSource
 {
   MimeRulesSource NOOP = new MimeRulesSource()
   {
+    @Nullable
     @Override
-    public String getRuleForPath(final String path) {
+    public NexusMimeType getRuleForPath(final String path) {
       return null;
     }
   };
@@ -31,5 +34,6 @@ public interface MimeRulesSource
    * Returns the forced MIME type that corresponds (should correspond) to given path in the context of given rule
    * source. Returns {@code null} if no rules found.
    */
-  String getRuleForPath(String path);
+  @Nullable
+  NexusMimeType getRuleForPath(String path);
 }

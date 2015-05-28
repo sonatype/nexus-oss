@@ -14,11 +14,9 @@ package org.sonatype.nexus.mime;
 
 import java.util.Properties;
 
-import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Joiner;
-import com.google.common.io.Files;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,7 +49,6 @@ public class NexusMimeTypesTest
   public void addMimeType() {
     underTest.initMimeTypes(addMimeType(new Properties(), "test", "application/octet-stream"));
     assertThat(underTest.getMimeTypes("test"), is(notNullValue()));
-    assertThat(underTest.getMimeTypes("test"), hasProperty("extension", is("test")));
     assertThat(underTest.getMimeTypes("test"), hasProperty("override", is(false)));
     assertThat(underTest.getMimeTypes("test").getMimetypes(), contains("application/octet-stream"));
   }
@@ -61,7 +58,6 @@ public class NexusMimeTypesTest
     Properties properties = new Properties();
     underTest.initMimeTypes(addMimeType(properties, "override.test", "application/octet-stream"));
     assertThat(underTest.getMimeTypes("test"), is(notNullValue()));
-    assertThat(underTest.getMimeTypes("test"), hasProperty("extension", is("test")));
     assertThat(underTest.getMimeTypes("test"), hasProperty("override", is(true)));
     assertThat(underTest.getMimeTypes("test").getMimetypes(), contains("application/octet-stream"));
   }
@@ -75,7 +71,6 @@ public class NexusMimeTypesTest
 
     underTest.initMimeTypes(types);
     assertThat(underTest.getMimeTypes("test"), is(notNullValue()));
-    assertThat(underTest.getMimeTypes("test"), hasProperty("extension", is("test")));
     assertThat(underTest.getMimeTypes("test"), hasProperty("override", is(true)));
     assertThat(underTest.getMimeTypes("test").getMimetypes(), hasItems("application/octet-stream", "text/plain"));
   }

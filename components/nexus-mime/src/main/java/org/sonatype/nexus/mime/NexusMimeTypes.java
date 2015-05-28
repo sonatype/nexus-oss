@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -108,12 +106,12 @@ public class NexusMimeTypes
         mimetypes.addAll(additional.get(extension));
         additional.remove(extension);
       }
-      this.extensions.put(extension, new NexusMimeType(true, extension, mimetypes));
+      this.extensions.put(extension, new NexusMimeType(true, mimetypes));
     }
 
     for (String extension : additional.keySet()) {
       final List<String> mimetypes = additional.get(extension);
-      this.extensions.put(extension, new NexusMimeType(false, extension, mimetypes));
+      this.extensions.put(extension, new NexusMimeType(false, mimetypes));
     }
   }
 
@@ -134,32 +132,5 @@ public class NexusMimeTypes
       extension = Files.getFileExtension(extension);
     }
     return null;
-  }
-
-  public class NexusMimeType
-  {
-    private boolean override;
-
-    private String extension;
-
-    private List<String> mimetypes;
-
-    private NexusMimeType(final boolean override, final String extension, final List<String> mimetypes) {
-      this.override = override;
-      this.extension = extension;
-      this.mimetypes = mimetypes;
-    }
-
-    public String getExtension() {
-      return extension;
-    }
-
-    public List<String> getMimetypes() {
-      return mimetypes;
-    }
-
-    public boolean isOverride() {
-      return override;
-    }
   }
 }

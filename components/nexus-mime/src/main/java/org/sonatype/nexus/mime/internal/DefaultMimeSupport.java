@@ -14,9 +14,11 @@ package org.sonatype.nexus.mime.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,10 +26,10 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
+import org.sonatype.nexus.mime.NexusMimeType;
 import org.sonatype.nexus.mime.NexusMimeTypes;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -84,7 +86,7 @@ public class DefaultMimeSupport
               throws Exception
           {
             final List<String> detected = Lists.newArrayList();
-            final NexusMimeTypes.NexusMimeType mimeType = nexusMimeTypes.getMimeTypes(key);
+            final NexusMimeType mimeType = nexusMimeTypes.getMimeTypes(key);
             if (mimeType != null) {
               // add Nexus matches first
               detected.addAll(mimeType.getMimetypes());
@@ -106,40 +108,59 @@ public class DefaultMimeSupport
         });
   }
 
+  @Nonnull
   @Override
   public String guessMimeTypeFromPath(final MimeRulesSource mimeRulesSource, final String path) {
+    return guessMimeTypesListFromPath(mimeRulesSource, path).get(0);
+  }
+
+  @Nonnull
+  @Override
+  public List<String> guessMimeTypesListFromPath(final MimeRulesSource mimeRulesSource, final String path) {
+    checkNotNull(mimeRulesSource);
+    checkNotNull(path);
+    List<String> mimeTypes = new ArrayList<>();
     if (mimeRulesSource != null) {
-      final String hardRule = mimeRulesSource.getRuleForPath(path);
-      if (!Strings.isNullOrEmpty(hardRule)) {
-        return hardRule;
+      final NexusMimeType hardRule = mimeRulesSource.getRuleForPath(path);
+      if (hardRule.isOverride()) {
+        return hardRule.getMimetypes();
+      }
+      else {
+        mimeTypes.addAll(hardRule.getMimetypes());
       }
     }
-    return guessMimeTypeFromPath(path);
+    mimeTypes.addAll(guessMimeTypesListFromPath(path));
+    return mimeTypes;
   }
 
+  @Nonnull
   @Override
   public String guessMimeTypeFromPath(final String path) {
-    final List<String> mimeTypes = guessMimeTypesListFromPath(path);
-    if (mimeTypes.isEmpty()) {
-      // what here?
-      return MimeTypes.OCTET_STREAM;
-    }
-    else {
-      return mimeTypes.get(0);
-    }
+    return guessMimeTypesListFromPath(path).get(0);
   }
 
+  @Nonnull
   @Override
   public List<String> guessMimeTypesListFromPath(final String path) {
+    checkNotNull(path);
     final String pathExtension = Files.getFileExtension(path);
     try {
-      return extensionToMimeTypeCache.get(pathExtension);
+      final List<String> mimeTypes = new ArrayList<>();
+      List<String> extBasedTypes = extensionToMimeTypeCache.get(pathExtension);
+      if (extBasedTypes != null && !extBasedTypes.isEmpty()) {
+        mimeTypes.addAll(extBasedTypes);
+      }
+      if (mimeTypes.isEmpty()) {
+        mimeTypes.add(MimeTypes.OCTET_STREAM);
+      }
+      return mimeTypes;
     }
     catch (ExecutionException e) {
       throw Throwables.propagate(e);
     }
   }
 
+  @Nonnull
   @Override
   public List<String> detectMimeTypes(final InputStream input, @Nullable final String fileName) throws IOException {
     checkNotNull(input);
@@ -161,17 +182,16 @@ public class DefaultMimeSupport
       mediaType = tikaConfig.getMediaTypeRegistry().getSupertype(mediaType);
     }
 
+    if (detected.isEmpty()) {
+      detected.add(MimeTypes.OCTET_STREAM);
+    }
+
     return detected;
   }
 
+  @Nonnull
   @Override
   public String detectMimeType(final InputStream input, @Nullable final String fileName) throws IOException {
-    List<String> detected = detectMimeTypes(input, fileName);
-    if (detected.isEmpty()) {
-      return MimeTypes.OCTET_STREAM;
-    }
-    else {
-      return detected.get(0);
-    }
+    return detectMimeTypes(input, fileName).get(0);
   }
 }

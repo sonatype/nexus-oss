@@ -29,19 +29,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RegexpMimeRulesSource
     implements MimeRulesSource
 {
-  private final LinkedHashMap<Pattern, String> rules = Maps.newLinkedHashMap();
+  private final LinkedHashMap<Pattern, NexusMimeType> rules = Maps.newLinkedHashMap();
 
   public void addRule(final String pattern, final String mimeType) {
     addRule(Pattern.compile(pattern), mimeType);
   }
 
   public void addRule(final Pattern pattern, final String mimeType) {
-    rules.put(checkNotNull(pattern), checkNotNull(mimeType));
+    rules.put(checkNotNull(pattern), new NexusMimeType(false, mimeType));
   }
 
   @Override
-  public String getRuleForPath(final String path) {
-    for (Map.Entry<Pattern, String> entry : rules.entrySet()) {
+  public NexusMimeType getRuleForPath(final String path) {
+    for (Map.Entry<Pattern, NexusMimeType> entry : rules.entrySet()) {
       if (entry.getKey().matcher(path).matches()) {
         return entry.getValue();
       }

@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.storage
 
+import org.sonatype.nexus.mime.MimeRulesSource
 import org.sonatype.nexus.mime.internal.DefaultMimeSupport
 import org.sonatype.nexus.repository.InvalidContentException
 import org.sonatype.nexus.repository.view.ContentTypes
@@ -48,6 +49,7 @@ class DefaultContentValidatorTest
     def type = testSubject.determineContentType(
         false,
         supplier('simple text'.bytes),
+        MimeRulesSource.NOOP,
         'test.txt',
         ContentTypes.TEXT_PLAIN
     )
@@ -59,6 +61,7 @@ class DefaultContentValidatorTest
     def type = testSubject.determineContentType(
         false,
         supplier('simple text'.bytes),
+        MimeRulesSource.NOOP,
         'test.txt',
         null
     )
@@ -70,6 +73,7 @@ class DefaultContentValidatorTest
     def type = testSubject.determineContentType(
         false,
         supplier('simple text'.bytes),
+        MimeRulesSource.NOOP,
         'test.txt',
         'application/zip'
     )
@@ -81,6 +85,7 @@ class DefaultContentValidatorTest
     testSubject.determineContentType(
         true,
         supplier('simple text'.bytes),
+        MimeRulesSource.NOOP,
         'test.txt',
         'application/zip'
     )
@@ -91,6 +96,7 @@ class DefaultContentValidatorTest
     def type = testSubject.determineContentType(
         false,
         supplier(emptyZip),
+        MimeRulesSource.NOOP,
         'test.zip',
         null
     )
@@ -102,6 +108,7 @@ class DefaultContentValidatorTest
     def type = testSubject.determineContentType(
         false,
         supplier(emptyZip),
+        MimeRulesSource.NOOP,
         'test.zip',
         'application/zip'
     )
@@ -113,6 +120,7 @@ class DefaultContentValidatorTest
     def type = testSubject.determineContentType(
         true,
         supplier(emptyZip),
+        MimeRulesSource.NOOP,
         'test.zip',
         'application/zip'
     )
@@ -124,6 +132,7 @@ class DefaultContentValidatorTest
     testSubject.determineContentType(
         true,
         supplier(emptyZip),
+        MimeRulesSource.NOOP,
         'test.zip',
         ContentTypes.TEXT_PLAIN
     )
