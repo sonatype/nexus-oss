@@ -20,8 +20,10 @@ import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
@@ -29,6 +31,9 @@ import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.sonatype.nexus.security.SecurityFilter.ATTR_USER_ID;
+import static org.sonatype.nexus.security.SecurityFilter.ATTR_USER_PRINCIPAL;
 
 /**
  * Nexus security filter providing HTTP BASIC authentication support.
@@ -112,5 +117,24 @@ public class NexusBasicHttpAuthenticationFilter
     }
 
     super.cleanup(request, response, failure);
+  }
+
+  @Override
+  protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
+      ServletResponse response) throws Exception
+  {
+    if (request instanceof HttpServletRequest) {
+      // Prefer the subject principal over the token's, as these could be different for token-based auth
+      Object principal = subject.getPrincipal();
+      if (principal == null) {
+        principal = token.getPrincipal();
+      }
+      String userId = principal.toString();
+
+      // Attach principal+userId to request so we can use that in the request-log
+      ((HttpServletRequest) request).setAttribute(ATTR_USER_PRINCIPAL, principal);
+      ((HttpServletRequest) request).setAttribute(ATTR_USER_ID, userId);
+    }
+    return super.onLoginSuccess(token, subject, request, response);
   }
 }
