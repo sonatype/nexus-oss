@@ -45,6 +45,7 @@ Ext.define('NX.coreui.view.system.HttpRequestSettings', {
       xtype: 'numberfield',
       name: 'retries',
       fieldLabel: NX.I18n.get('ADMIN_HTTP_ATTEMPTS'),
+      helpText: NX.I18n.get('ADMIN_HTTP_ATTEMPTS_HELP'),
       allowDecimals: false,
       allowExponential: false,
       minValue: 0,

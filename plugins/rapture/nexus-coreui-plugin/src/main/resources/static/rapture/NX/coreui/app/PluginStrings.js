@@ -908,7 +908,8 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_HTTP_USER_AGENT_SUFFIX_HELP: 'Custom fragment to append to "User-Agent" header in HTTP requests.',
     ADMIN_HTTP_TIMEOUT: 'Timeout',
     ADMIN_HTTP_TIMEOUT_HELP: 'Seconds before retry',
-    ADMIN_HTTP_ATTEMPTS: 'Max retry attempts',
+    ADMIN_HTTP_ATTEMPTS: 'Connection/Socket retry attempts',
+    ADMIN_HTTP_ATTEMPTS_HELP: 'Total retries if the initial connection attempt suffers a timeout',
 
     // User -> Account
     USER_ACCOUNT_TITLE: 'Account',
