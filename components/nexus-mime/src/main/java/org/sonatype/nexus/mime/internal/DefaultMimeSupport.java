@@ -110,23 +110,22 @@ public class DefaultMimeSupport
 
   @Nonnull
   @Override
-  public String guessMimeTypeFromPath(final MimeRulesSource mimeRulesSource, final String path) {
+  public String guessMimeTypeFromPath(@Nullable final MimeRulesSource mimeRulesSource, final String path) {
     return guessMimeTypesListFromPath(mimeRulesSource, path).get(0);
   }
 
   @Nonnull
   @Override
-  public List<String> guessMimeTypesListFromPath(final MimeRulesSource mimeRulesSource, final String path) {
-    checkNotNull(mimeRulesSource);
+  public List<String> guessMimeTypesListFromPath(@Nullable final MimeRulesSource mimeRulesSource, final String path) {
     checkNotNull(path);
     List<String> mimeTypes = new ArrayList<>();
     if (mimeRulesSource != null) {
       final NexusMimeType hardRule = mimeRulesSource.getRuleForPath(path);
-      if (hardRule.isOverride()) {
-        return hardRule.getMimetypes();
-      }
-      else {
+      if (hardRule != null) {
         mimeTypes.addAll(hardRule.getMimetypes());
+        if (hardRule.isOverride()) {
+          return mimeTypes;
+        }
       }
     }
     mimeTypes.addAll(guessMimeTypesListFromPath(path));

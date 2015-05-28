@@ -35,12 +35,12 @@ public interface MimeSupport
    * but not so precise as detection, where content is needed. This method should be used whenever a MIME type of a
    * file item that is contained <b>within</b> given context that has MimeRulesSource is about to be guessed.
    *
-   * @param mimeRulesSource the mimeRulesSource to apply/mixin into results.
+   * @param mimeRulesSource optionally, the mimeRulesSource to apply/mixin into results.
    * @param path to guess for.
    * @return the most applicable MIME type as String.
    */
   @Nonnull
-  String guessMimeTypeFromPath(MimeRulesSource mimeRulesSource, String path);
+  String guessMimeTypeFromPath(@Nullable MimeRulesSource mimeRulesSource, String path);
 
   /**
    * Makes a "guess" (usually based on file extension) about the MIME type that is most applicable to the given path
@@ -50,13 +50,13 @@ public interface MimeSupport
    * file item that is contained <b>within</b> given context that has MimeRulesSource is about to be guessed. The list
    * of mime types are in descending order (most specific 1st, least specific last).
    *
-   * @param mimeRulesSource the mimeRulesSource to apply/mixin into results.
+   * @param mimeRulesSource optionally, the mimeRulesSource to apply/mixin into results.
    * @param path to guess for.
    * @return the list of applicable mime types.
    * @since 3.0
    */
   @Nonnull
-  List<String> guessMimeTypesListFromPath(MimeRulesSource mimeRulesSource, String path);
+  List<String> guessMimeTypesListFromPath(@Nullable MimeRulesSource mimeRulesSource, String path);
 
   /**
    * Makes a "guess" (usually based on file extension) about the MIME type that is most applicable to the given path.
