@@ -12,7 +12,11 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.security.ClientInfo;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -27,16 +31,24 @@ public abstract class ComponentEvent
 
   private final Repository repository;
 
-  public ComponentEvent(final Component component, final Repository repository) {
+  private final ClientInfo clientInfo;
+
+  public ComponentEvent(final Component component, final Repository repository, @Nullable final ClientInfo clientInfo) {
     this.component = checkNotNull(component);
     this.repository = checkNotNull(repository);
+    this.clientInfo = clientInfo;
   }
 
+  @Nonnull
   public Component getComponent() {
     return component;
   }
 
+  @Nonnull
   public Repository getRepository() {
     return repository;
   }
+
+  @Nullable
+  public ClientInfo getClientInfo() { return clientInfo; }
 }

@@ -12,7 +12,10 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.security.ClientInfo;
 
 /**
  * Component created event.
@@ -22,7 +25,7 @@ import org.sonatype.nexus.repository.Repository;
 public class ComponentCreatedEvent
     extends ComponentEvent
 {
-  public ComponentCreatedEvent(final Component component, final Repository repository) {
-    super(component, repository);
+  public ComponentCreatedEvent(final Component component, final Repository repository, @Nullable final ClientInfo clientInfo) {
+    super(component, repository, clientInfo);
   }
 }

@@ -12,7 +12,10 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.security.ClientInfo;
 
 /**
  * Component deleted event.
@@ -22,7 +25,7 @@ import org.sonatype.nexus.repository.Repository;
 public class ComponentDeletedEvent
   extends ComponentEvent
 {
-  public ComponentDeletedEvent(final Component component, final Repository repository) {
-    super(component, repository);
+  public ComponentDeletedEvent(final Component component, final Repository repository, @Nullable final ClientInfo clientInfo) {
+    super(component, repository, clientInfo);
   }
 }

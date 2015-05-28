@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.security.ClientInfoProvider;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -30,12 +31,15 @@ public class EventsHook
 {
   private final EventBus eventBus;
 
+  private final ClientInfoProvider clientInfoProvider;
+
   private final Repository repository;
 
   private final List<Object> events;
 
-  public EventsHook(final EventBus eventBus, final Repository repository) {
+  public EventsHook(final EventBus eventBus, final ClientInfoProvider clientInfoProvider, final Repository repository) {
     this.eventBus = checkNotNull(eventBus);
+    this.clientInfoProvider = checkNotNull(clientInfoProvider);
     this.repository = checkNotNull(repository);
     this.events = new ArrayList<>();
   }
@@ -43,42 +47,42 @@ public class EventsHook
   @Override
   public void createComponent(final Component... components) {
     for (Component component : components) {
-      events.add(new ComponentCreatedEvent(component, repository));
+      events.add(new ComponentCreatedEvent(component, repository, clientInfoProvider.getCurrentThreadClientInfo()));
     }
   }
 
   @Override
   public void updateComponent(final Component... components) {
     for (Component component : components) {
-      events.add(new ComponentUpdatedEvent(component, repository));
+      events.add(new ComponentUpdatedEvent(component, repository, clientInfoProvider.getCurrentThreadClientInfo()));
     }
   }
 
   @Override
   public void deleteComponent(final Component... components) {
     for (Component component : components) {
-      events.add(new ComponentDeletedEvent(component, repository));
+      events.add(new ComponentDeletedEvent(component, repository, clientInfoProvider.getCurrentThreadClientInfo()));
     }
   }
 
   @Override
   public void createAsset(final Asset... assets) {
     for (Asset asset : assets) {
-      events.add(new AssetCreatedEvent(asset, repository));
+      events.add(new AssetCreatedEvent(asset, repository, clientInfoProvider.getCurrentThreadClientInfo()));
     }
   }
 
   @Override
   public void updateAsset(final Asset... assets) {
     for (Asset asset : assets) {
-      events.add(new AssetUpdatedEvent(asset, repository));
+      events.add(new AssetUpdatedEvent(asset, repository, clientInfoProvider.getCurrentThreadClientInfo()));
     }
   }
 
   @Override
   public void deleteAsset(final Asset... assets) {
     for (Asset asset : assets) {
-      events.add(new AssetDeletedEvent(asset, repository));
+      events.add(new AssetDeletedEvent(asset, repository, clientInfoProvider.getCurrentThreadClientInfo()));
     }
   }
 

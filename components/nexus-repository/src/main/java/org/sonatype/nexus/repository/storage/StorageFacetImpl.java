@@ -123,7 +123,7 @@ public class StorageFacetImpl
     {
       @Override
       public StorageTxHook get() {
-        return new EventsHook(getEventBus(), getRepository());
+        return new EventsHook(getEventBus(), clientInfoProvider, getRepository());
       }
     });
   }

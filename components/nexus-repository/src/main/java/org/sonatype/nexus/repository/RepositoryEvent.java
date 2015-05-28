@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository;
 
+import javax.annotation.Nonnull;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -27,6 +29,7 @@ public abstract class RepositoryEvent
     this.repository = checkNotNull(repository);
   }
 
+  @Nonnull
   public Repository getRepository() {
     return repository;
   }
