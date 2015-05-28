@@ -104,7 +104,7 @@ public class EnterpriseLdapManager
       // first build the connector
       LdapConnector testLdapConnector =
           new DefaultLdapConnector(ldapServer.getId(), this.ldapUserManager, this.ldapGroupManager,
-              this.getLdapContextFactory(ldapServer),
+              LdapConnectionUtils.getLdapContextFactory(ldapServer, trustStore),
               this.getLdapAuthConfiguration(ldapServer));
 
       LdapUser user = testLdapConnector.getUser(userId);
@@ -300,12 +300,11 @@ public class EnterpriseLdapManager
       throws LdapDAOException
   {
     if (this.ldapConnectors.isEmpty()) {
-
       for (LdapConfiguration ldapServer : ldapConfigurationManager.listLdapServerConfigurations()) {
         // first get the connector for the server
         LdapConnector originalLdapConnector =
             new DefaultLdapConnector(ldapServer.getId(), ldapUserManager, ldapGroupManager,
-                getLdapContextFactory(ldapServer),
+                LdapConnectionUtils.getLdapContextFactory(ldapServer, trustStore),
                 getLdapAuthConfiguration(ldapServer));
 
         ldapConnectors.add(new FailoverLdapConnector(
@@ -316,27 +315,6 @@ public class EnterpriseLdapManager
       }
     }
     return this.ldapConnectors;
-  }
-
-  private LdapContextFactory getLdapContextFactory(LdapConfiguration ldapServer)
-      throws LdapDAOException
-  {
-    final DefaultLdapContextFactory ldapContextFactory = LdapConnectionUtils.getLdapContextFactory(ldapServer);
-    final String serverId = ldapServer.getId() == null ? "<unknown>" : ldapServer.getId();
-    Connection connection = ldapServer.getConnection();
-    if (Protocol.ldaps == connection.getHost().getProtocol() && connection.getUseTrustStore()) {
-      final SSLContext sslContext = trustStore.getSSLContext();
-      log.debug(
-          "{} is using a Nexus SSL Trust Store for accessing {}",
-          serverId, connection.getHost().getHostName()
-      );
-      return new SSLLdapContextFactory(sslContext, ldapContextFactory);
-    }
-    log.debug(
-        "{} is using a JVM Trust Store for accessing {}",
-        serverId, connection.getHost().getHostName()
-    );
-    return ldapContextFactory;
   }
 
   private LdapAuthConfiguration getLdapAuthConfiguration(LdapConfiguration ldapServer) {
