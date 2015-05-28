@@ -50,20 +50,20 @@ public class RebuildMaven2MetadataTaskDescriptor
         ).includingAnyOfFormats(Maven2Format.NAME).includingAnyOfTypes(HostedType.NAME),
         new StringTextFormField(
             GROUPID_FIELD_ID,
-            "Group Id",
-            "Maven groupId to narrow operation",
+            "GroupId",
+            "Maven groupId to narrow operation (limit to given groupId only)",
             false
         ),
         new StringTextFormField(
             ARTIFACTID_FIELD_ID,
-            "Artifact Id",
-            "Maven artifactId to narrow operation (only if groupId set)",
+            "ArtifactId (only if GroupId given)",
+            "Maven artifactId to narrow operation (limit to given groupId:artifactId, only used if groupId set)",
             false
         ),
         new StringTextFormField(
             BASEVERSION_FIELD_ID,
             "Base Version",
-            "Maven base version to narrow operation (only if artifactId set!)",
+            "Maven base version to narrow operation (limit to given groupId:artifactId:baseVersion, used if groupId and artifactId set!)",
             false
         )
     );

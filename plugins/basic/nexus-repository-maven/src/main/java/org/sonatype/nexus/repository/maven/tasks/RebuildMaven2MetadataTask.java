@@ -21,6 +21,10 @@ import org.sonatype.nexus.repository.maven.MavenHostedFacet;
 import org.sonatype.nexus.scheduling.TaskSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.maven.tasks.RebuildMaven2MetadataTaskDescriptor.ARTIFACTID_FIELD_ID;
+import static org.sonatype.nexus.repository.maven.tasks.RebuildMaven2MetadataTaskDescriptor.BASEVERSION_FIELD_ID;
+import static org.sonatype.nexus.repository.maven.tasks.RebuildMaven2MetadataTaskDescriptor.GROUPID_FIELD_ID;
+import static org.sonatype.nexus.repository.maven.tasks.RebuildMaven2MetadataTaskDescriptor.REPOSITORY_NAME_FIELD_ID;
 
 /**
  * Maven 2 metadata rebuild task.
@@ -44,9 +48,9 @@ public class RebuildMaven2MetadataTask
     checkNotNull(repository);
     MavenHostedFacet mavenHostedFacet = repository.facet(MavenHostedFacet.class);
     mavenHostedFacet.rebuildMetadata(
-        getConfiguration().getString(RebuildMaven2MetadataTaskDescriptor.GROUPID_FIELD_ID),
-        getConfiguration().getString(RebuildMaven2MetadataTaskDescriptor.ARTIFACTID_FIELD_ID),
-        getConfiguration().getString(RebuildMaven2MetadataTaskDescriptor.BASEVERSION_FIELD_ID)
+        getConfiguration().getString(GROUPID_FIELD_ID),
+        getConfiguration().getString(ARTIFACTID_FIELD_ID),
+        getConfiguration().getString(BASEVERSION_FIELD_ID)
     );
     return null;
   }
@@ -57,6 +61,6 @@ public class RebuildMaven2MetadataTask
   }
 
   private String repositoryName() {
-    return getConfiguration().getString(RebuildMaven2MetadataTaskDescriptor.REPOSITORY_NAME_FIELD_ID);
+    return getConfiguration().getString(REPOSITORY_NAME_FIELD_ID);
   }
 }
