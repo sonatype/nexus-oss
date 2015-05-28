@@ -106,7 +106,7 @@ public class NugetClient
   }
 
   public HttpResponse packageContent(final String packageId, final String version) throws IOException {
-    return get(String.format("/{}/{}", packageId, version));
+    return get(String.format("%s/%s", packageId, version));
   }
 
   public String vsSearchFeedXml(final String searchTerm) throws IOException {
