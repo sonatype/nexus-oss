@@ -42,9 +42,9 @@ public class SecurityFilter
 {
   private static final Logger log = LoggerFactory.getLogger(SecurityFilter.class);
 
-  private static final String ATTR_USER_PRINCIPAL = "nexus.user.principal";
+  public static final String ATTR_USER_PRINCIPAL = "nexus.user.principal";
 
-  private static final String ATTR_USER_ID = "nexus.user.id";
+  public static final String ATTR_USER_ID = "nexus.user.id";
 
   @Inject
   public SecurityFilter(final WebSecurityManager webSecurityManager,

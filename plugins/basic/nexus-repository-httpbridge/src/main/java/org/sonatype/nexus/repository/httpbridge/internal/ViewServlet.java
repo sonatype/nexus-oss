@@ -68,27 +68,23 @@ public class ViewServlet
 
   private final RepositoryManager repositoryManager;
 
-  private final Map<String, HttpResponseSender> responseSenders;
+  private final HttpResponseSenderSelector httpResponseSenderSelector;
 
   private final DescriptionHelper descriptionHelper;
 
   private final DescriptionRenderer descriptionRenderer;
 
-  private final DefaultHttpResponseSender defaultHttpResponseSender;
-
   @Inject
   public ViewServlet(final RepositoryManager repositoryManager,
-                     final Map<String, HttpResponseSender> responseSenders,
-                     final DefaultHttpResponseSender defaultHttpResponseSender,
+                     final HttpResponseSenderSelector httpResponseSenderSelector,
                      final DescriptionHelper descriptionHelper,
                      final DescriptionRenderer descriptionRenderer)
   {
 
     this.repositoryManager = checkNotNull(repositoryManager);
-    this.responseSenders = checkNotNull(responseSenders);
+    this.httpResponseSenderSelector = checkNotNull(httpResponseSenderSelector);
     this.descriptionHelper = checkNotNull(descriptionHelper);
     this.descriptionRenderer = checkNotNull(descriptionRenderer);
-    this.defaultHttpResponseSender = checkNotNull(defaultHttpResponseSender);
   }
 
   @Override
@@ -161,7 +157,7 @@ public class ViewServlet
 
     // Dispatch the request
     final HttpRequestAdapter request = new HttpRequestAdapter(httpRequest, path.getRemainingPath());
-    dispatchAndSend(request, facet, sender(repo), httpResponse);
+    dispatchAndSend(request, facet, httpResponseSenderSelector.sender(repo), httpResponse);
   }
 
   @VisibleForTesting
@@ -233,7 +229,7 @@ public class ViewServlet
   void send(final @Nullable Request request, final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
-    defaultHttpResponseSender.send(request, response, httpResponse);
+    httpResponseSenderSelector.defaultSender().send(request, response, httpResponse);
   }
 
   /**
@@ -256,20 +252,5 @@ public class ViewServlet
   private Repository repository(final String name) {
     log.debug("Looking for repository: {}", name);
     return repositoryManager.get(name);
-  }
-
-  /**
-   * Find sender for repository format.
-   *
-   * If no format-specific sender is configured, the default is used.
-   */
-  private HttpResponseSender sender(final Repository repository) {
-    String format = repository.getFormat().getValue();
-    log.debug("Looking for HTTP response sender: {}", format);
-    HttpResponseSender sender = responseSenders.get(format);
-    if (sender == null) {
-      return defaultHttpResponseSender;
-    }
-    return sender;
   }
 }
