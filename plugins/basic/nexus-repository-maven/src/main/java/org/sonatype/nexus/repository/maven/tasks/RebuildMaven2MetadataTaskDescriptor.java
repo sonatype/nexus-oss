@@ -41,11 +41,11 @@ public class RebuildMaven2MetadataTaskDescriptor
 
   public RebuildMaven2MetadataTaskDescriptor() {
     super(RebuildMaven2MetadataTask.class,
-        "Rebuild Maven2 Metadata",
+        "Rebuild Maven Repository Metadata",
         new RepositoryCombobox(
             REPOSITORY_NAME_FIELD_ID,
             "Repository",
-            "Select the hosted Maven2 repository to rebuild metadata",
+            "Select the hosted Maven repository to rebuild metadata",
             true
         ).includingAnyOfFormats(Maven2Format.NAME).includingAnyOfTypes(HostedType.NAME),
         new StringTextFormField(

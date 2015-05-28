@@ -57,7 +57,7 @@ public class RebuildMaven2MetadataTask
 
   @Override
   public String getMessage() {
-    return "Rebuilding Maven2 Metadata of " + repositoryName();
+    return "Rebuilding Maven Metadata of " + repositoryName();
   }
 
   private String repositoryName() {
