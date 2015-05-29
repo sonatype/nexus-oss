@@ -24,7 +24,6 @@ import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Headers;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Request;
@@ -37,8 +36,8 @@ import com.google.common.net.HttpHeaders;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Implements partial-fetch semantics (as per RFC 2616) for {@link Status#isSuccessful() successful} {@link
- * PayloadResponse}s.
+ * Implements partial-fetch semantics (as per RFC 2616) for {@link Status#isSuccessful() successful}
+ * {@link PayloadResponse}s.
  *
  * @since 3.0
  */
@@ -69,12 +68,10 @@ public class PartialFetchHandler
       return response;
     }
 
-    if (!(response instanceof PayloadResponse)) {
+    final Payload payload = response.getPayload();
+    if (payload == null) {
       return response;
     }
-
-    final PayloadResponse payloadResponse = (PayloadResponse) response;
-    final Payload payload = payloadResponse.getPayload();
 
     if (payload.getSize() == Payload.UNKNOWN_SIZE) {
       // We can't do much if we don't know how big the payload is
@@ -102,37 +99,37 @@ public class PartialFetchHandler
       return HttpResponses.notImplemented("Multiple ranges not supported.");
     }
 
-    Range requestedRange = ranges.get(0);
+    Range<Long> requestedRange = ranges.get(0);
 
     // Mutate the response
-    return partialResponse(payloadResponse, payload, requestedRange);
+    return partialResponse(response, payload, requestedRange);
   }
 
   /**
    * Mutate the response into one that returns part of the payload.
    */
-  private PayloadResponse partialResponse(final PayloadResponse response, final Payload payload,
-                                          final Range requestedRange)
+  private Response partialResponse(final Response response,
+                                   final Payload payload,
+                                   final Range<Long> requestedRange)
   {
-    response.setStatus(Status.success(HttpStatus.PARTIAL_CONTENT));
+    Response.Builder builder = new Response.Builder()
+        .copy(response)
+        .status(Status.success(HttpStatus.PARTIAL_CONTENT));
+
+    // FIXME: Remove pointless local
     final Range<Long> rangeToSend = requestedRange;
-
     Payload partialPayload = new PartialPayload(payload, rangeToSend);
+    builder.payload(partialPayload);
 
-    response.setPayload(partialPayload);
-
-    final Headers responseHeaders = response.getHeaders();
     // ResponseSender takes care of Content-Length header, via payload.size
-    responseHeaders.set(HttpHeaders.CONTENT_RANGE,
+    builder.header(HttpHeaders.CONTENT_RANGE,
         rangeToSend.lowerEndpoint() + "-" + rangeToSend.upperEndpoint() + "/" + payload.getSize());
 
-    return response;
+    return builder.build();
   }
 
   private String getRangeHeader(final Context context) {
     final Request request = context.getRequest();
     return request.getHeaders().get(HttpHeaders.RANGE);
   }
-
-
 }
