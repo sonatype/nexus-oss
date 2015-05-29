@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
@@ -109,6 +110,7 @@ public class Response
       return this;
     }
 
+    @Nonnull
     public AttributesMap attributes() {
       if (attributes == null) {
         attributes = new Attributes();
@@ -126,6 +128,7 @@ public class Response
       return this;
     }
 
+    @Nonnull
     public Headers headers() {
       if (headers == null) {
         headers = new Headers();

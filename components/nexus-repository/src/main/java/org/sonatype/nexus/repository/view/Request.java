@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
@@ -153,6 +154,7 @@ public class Request
       return this;
     }
 
+    @Nonnull
     public AttributesMap attributes() {
       if (attributes == null) {
         attributes = new Attributes();
@@ -170,6 +172,7 @@ public class Request
       return this;
     }
 
+    @Nonnull
     public Headers headers() {
       if (headers == null) {
         headers = new Headers();
@@ -197,6 +200,7 @@ public class Request
       return this;
     }
 
+    @Nonnull
     public Parameters parameters() {
       if (parameters == null) {
         parameters = new Parameters();
