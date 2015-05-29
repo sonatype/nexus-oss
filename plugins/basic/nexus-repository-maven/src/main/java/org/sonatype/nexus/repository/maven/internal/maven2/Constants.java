@@ -16,6 +16,7 @@ import java.util.Locale;
 
 import org.sonatype.nexus.repository.view.ContentTypes;
 
+import org.apache.tika.mime.MediaType;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -34,7 +35,7 @@ public class Constants
   /**
    * Content type of Maven2 repository metadata files.
    */
-  public static final String METADATA_CONTENT_TYPE = ContentTypes.TEXT_XML;
+  public static final String METADATA_CONTENT_TYPE = MediaType.APPLICATION_XML.toString();
 
   /**
    * {@link DateTimeFormatter} for dotted timestamps used in Maven2 repository metadata.
