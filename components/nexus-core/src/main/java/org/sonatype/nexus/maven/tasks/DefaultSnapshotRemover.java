@@ -430,40 +430,52 @@ public class DefaultSnapshotRemover
 
             item.getItemContext().put(Gav.class.getName(), gav);
 
-            log.debug(item.getPath());
+            // do not check timestamp of signature or hash files, only rely on the main storage item
+            if(gav.isHash() || gav.isSignature()) {
 
-            if (gav.getSnapshotTimeStamp() != null) {
-              long itemTimestamp = gav.getSnapshotTimeStamp().longValue();
+              if(log.isTraceEnabled()){
+                log.trace("Skipping lastRequested for: {}", item.getPath());
+              }
+
+            } else {
 
               if (log.isDebugEnabled()) {
-                log.debug(
-                    "itemTimestamp={} ({}), dateThreshold={} ({})",
-                    itemTimestamp, itemTimestamp > 0 ? new Date(itemTimestamp) : "",
-                    dateThreshold, dateThreshold > 0 ? new Date(dateThreshold) : ""
-                );
+                log.debug(item.getPath());
               }
 
-              // If this timestamp is already marked to be removed, junk it
-              if (versionsToRemove.contains(new Long(itemTimestamp))) {
-                addStorageFileItemToMap(deletableSnapshotsAndFiles, gav, (StorageFileItem) item);
-              }
-              else {
-                if (snapshotShouldBeRemoved(coll, item, gav, itemTimestamp)) {
-                  versionsToRemove.add(new Long(itemTimestamp));
+              if (gav.getSnapshotTimeStamp() != null) {
+                long itemTimestamp = gav.getSnapshotTimeStamp().longValue();
+
+                if (log.isDebugEnabled()) {
+                  log.debug(
+                      "itemTimestamp={} ({}), dateThreshold={} ({})",
+                      itemTimestamp, itemTimestamp > 0 ? new Date(itemTimestamp) : "",
+                      dateThreshold, dateThreshold > 0 ? new Date(dateThreshold) : ""
+                  );
+                }
+
+                // If this timestamp is already marked to be removed, junk it
+                if (versionsToRemove.contains(new Long(itemTimestamp))) {
                   addStorageFileItemToMap(deletableSnapshotsAndFiles, gav, (StorageFileItem) item);
                 }
                 else {
-                  //do not delete if dateThreshold not met
-                  addStorageFileItemToMap(remainingSnapshotsAndFiles, gav, (StorageFileItem) item);
+                  if (snapshotShouldBeRemoved(coll, item, gav, itemTimestamp)) {
+                    versionsToRemove.add(new Long(itemTimestamp));
+                    addStorageFileItemToMap(deletableSnapshotsAndFiles, gav, (StorageFileItem) item);
+                  }
+                  else {
+                    //do not delete if dateThreshold not met
+                    addStorageFileItemToMap(remainingSnapshotsAndFiles, gav, (StorageFileItem) item);
+                  }
                 }
               }
-            }
-            else {
-              // If no timestamp on gav, then it is a non-unique snapshot
-              // and should _not_ be removed
-              log.debug("GAV Snapshot timestamp not available, skipping non-unique snapshot");
+              else {
+                // If no timestamp on gav, then it is a non-unique snapshot
+                // and should _not_ be removed
+                log.debug("GAV Snapshot timestamp not available, skipping non-unique snapshot");
 
-              addStorageFileItemToMap(remainingSnapshotsAndFiles, gav, (StorageFileItem) item);
+                addStorageFileItemToMap(remainingSnapshotsAndFiles, gav, (StorageFileItem) item);
+              }
             }
           }
         }
