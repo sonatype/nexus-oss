@@ -47,7 +47,6 @@ public class DescriptionHelper
 
     desc.addTable("Details", ImmutableMap.<String, Object>builder()
             .put("Action", request.getAction())
-            .put("URL", request.getRequestUrl())
             .put("path", request.getPath()).build()
     );
 

@@ -15,9 +15,12 @@ package org.sonatype.nexus.repository.view;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * View request.
@@ -37,47 +40,51 @@ public class Request
     }
   }
 
-  private final Attributes attributes = new Attributes();
+  private final AttributesMap attributes;
 
-  protected String action;
+  private final Headers headers;
 
-  protected String requestUrl;
+  private final String action;
 
-  protected String path;
+  private final String path;
 
-  protected Parameters parameters;
+  private final Parameters parameters;
 
-  protected Headers headers;
+  private final Payload payload;
 
-  protected Payload payload;
+  private final boolean multipart;
 
-  protected boolean multipart;
+  private final Iterable<Payload> multiPayloads;
 
-  protected Iterable<Payload> multiPayloads;
-
-  protected Request() {
-    // empty
-  }
-
-  @VisibleForTesting
-  public Request(final String path) {
-    this.path = path;
+  private Request(final AttributesMap attributes,
+                  final Headers headers,
+                  final String action,
+                  final String path,
+                  final Parameters parameters,
+                  @Nullable final Payload payload,
+                  final boolean multipart,
+                  @Nullable final Iterable<Payload> multiPayloads)
+  {
+    this.attributes = checkNotNull(attributes);
+    this.headers = checkNotNull(headers);
+    this.action = checkNotNull(action);
+    this.path = checkNotNull(path);
+    this.parameters = checkNotNull(parameters);
+    this.payload = payload;
+    this.multipart = multipart;
+    this.multiPayloads = multiPayloads;
   }
 
   public AttributesMap getAttributes() {
     return attributes;
   }
 
-  // TODO: Add setters and sanity conditions, and/or introduce a builder to be used for direct api usage?
-
-  // FIXME: Sort out 'action' or 'method'
+  public Headers getHeaders() {
+    return headers;
+  }
 
   public String getAction() {
     return action;
-  }
-
-  public String getRequestUrl() {
-    return requestUrl;
   }
 
   public String getPath() {
@@ -86,10 +93,6 @@ public class Request
 
   public Parameters getParameters() {
     return parameters;
-  }
-
-  public Headers getHeaders() {
-    return headers;
   }
 
   @Nullable
@@ -111,10 +114,110 @@ public class Request
     // Excluding some members which could lead to very verbose logging
     return getClass().getSimpleName() + "{" +
         "action='" + action + '\'' +
-        ", requestUrl='" + requestUrl + '\'' +
         ", path='" + path + '\'' +
         ", parameters=" + parameters +
         ", payload=" + payload +
+        ", multipart=" + multipart +
         '}';
+  }
+
+  //
+  // Builder
+  //
+
+  /**
+   * {@link Request} builder.
+   */
+  public static class Builder
+    extends ComponentSupport
+  {
+    private AttributesMap attributes;
+
+    private Headers headers;
+
+    private String action;
+
+    private String path;
+
+    private Parameters parameters;
+
+    private Payload payload;
+
+    private boolean multipart;
+
+    private Iterable<Payload> multiparts;
+
+    public Builder attributes(final AttributesMap attributes) {
+      this.attributes = attributes;
+      return this;
+    }
+
+    public Builder headers(final Headers headers) {
+      this.headers = headers;
+      return this;
+    }
+
+    public Builder action(final String action) {
+      this.action = action;
+      return this;
+    }
+
+    public Builder path(final String path) {
+      this.path = path;
+      return this;
+    }
+
+    public Builder parameters(final Parameters parameters) {
+      this.parameters = parameters;
+      return this;
+    }
+
+    public Builder payload(final Payload payload) {
+      this.payload = payload;
+      return this;
+    }
+
+    public Builder multipart(final boolean multipart) {
+      this.multipart = multipart;
+      return this;
+    }
+
+    public Builder multiparts(final Iterable<Payload> multiparts) {
+      this.multiparts = multiparts;
+      return this;
+    }
+
+    public Builder copy(final Request request) {
+      checkNotNull(request);
+      attributes = request.getAttributes();
+      headers = request.getHeaders();
+      action = request.getAction();
+      path = request.getPath();
+      parameters = request.getParameters();
+      payload = request.getPayload();
+      multipart = request.isMultipart();
+      multiparts = request.getMultiparts();
+      return this;
+    }
+
+    /**
+     * Requires {@link #action} and {@link #path}.
+     */
+    public Request build() {
+      checkState(action != null, "Missing: action");
+      checkState(path != null, "Missing: path");
+
+      if (attributes == null) {
+        attributes = new Attributes();
+      }
+      if (headers == null) {
+        headers = new Headers();
+      }
+      if (parameters == null) {
+        parameters = new Parameters();
+      }
+
+      return new Request(attributes, headers, action, path, parameters, payload, multipart, multiparts);
+    }
   }
 }
