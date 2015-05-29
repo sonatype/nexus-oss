@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.maven.internal.maven2.metadata;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -25,8 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.orient.DatabaseInstance;
@@ -37,7 +36,6 @@ import org.sonatype.nexus.repository.maven.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.MavenPathParser;
 import org.sonatype.nexus.repository.maven.internal.DigestExtractor;
 import org.sonatype.nexus.repository.maven.internal.maven2.Constants;
-import org.sonatype.nexus.repository.maven.internal.maven2.Maven2Format;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.BucketEntityAdapter;
 import org.sonatype.nexus.repository.storage.Component;
@@ -48,6 +46,7 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
@@ -59,10 +58,9 @@ import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLAsynchQuery;
-import com.orientechnologies.orient.core.tx.OTransaction.TXTYPE;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -175,8 +173,6 @@ public class MetadataRebuilder
 
     private final MetadataUpdater metadataUpdater;
 
-    private final DocumentBuilderFactory documentBuilderFactory;
-
     public Worker(final ODatabaseDocumentTx db,
                   final Repository repository,
                   final boolean update,
@@ -192,7 +188,6 @@ public class MetadataRebuilder
       this.mavenPathParser = mavenFacet.getMavenPathParser();
       this.metadataBuilder = new MetadataBuilder();
       this.metadataUpdater = new MetadataUpdater(update, repository);
-      this.documentBuilderFactory = DocumentBuilderFactory.newInstance();
     }
 
     /**
@@ -287,7 +282,7 @@ public class MetadataRebuilder
               mayUpdateChecksum(tx, asset, mavenPath, HashType.SHA1);
               mayUpdateChecksum(tx, asset, mavenPath, HashType.MD5);
               if (mavenPath.isPom()) {
-                final Document pom = getModel(tx, mavenPath);
+                final Xpp3Dom pom = getModel(tx, mavenPath);
                 if (pom != null) {
                   final String packaging = getChildValue(pom, "packaging", "jar");
                   log.debug("POM packaging: {}", packaging);
@@ -380,22 +375,34 @@ public class MetadataRebuilder
      * Reads and parses Maven POM.
      */
     @Nullable
-    private Document getModel(final StorageTx tx, final MavenPath mavenPath) {
+    private Xpp3Dom getModel(final StorageTx tx, final MavenPath mavenPath) {
       // sanity checks: is artifact and extension is "pom", only possibility for maven POM currently
       checkArgument(mavenPath.isPom(), "Not a pom path: %s", mavenPath);
       try {
         final Content pomContent = mavenFacet.get(tx, mavenPath);
         if (pomContent != null) {
-          try (InputStream is = pomContent.openInputStream()) {
-            final DocumentBuilder db = documentBuilderFactory.newDocumentBuilder();
-            return db.parse(is);
-          }
+          return parse(mavenPath, pomContent.openInputStream());
         }
       }
-      catch (SAXException e) {
-        log.debug("Could not parse POM: {}", mavenPath, e);
+      catch (Exception e) {
+        throw Throwables.propagate(e);
+      }
+      return null;
+    }
+
+    /**
+     * Parses the DOM of a XML.
+     */
+    private Xpp3Dom parse(final MavenPath mavenPath, final InputStream is) {
+      try (InputStreamReader reader = new InputStreamReader(is, Charsets.UTF_8)) {
+        Xpp3Dom dom = Xpp3DomBuilder.build(reader);
+        return dom;
+      }
+      catch (XmlPullParserException e) {
+        log.debug("Could not parse POM: {}", mavenPath.getPath(), e);
       }
       catch (Exception e) {
+        log.debug("Could not parse POM: {}", mavenPath.getPath(), e);
         throw Throwables.propagate(e);
       }
       return null;
@@ -418,9 +425,8 @@ public class MetadataRebuilder
             ZipEntry entry;
             while ((entry = zip.getNextEntry()) != null) {
               if (!entry.isDirectory() && entry.getName().equals("META-INF/maven/plugin.xml")) {
-                final DocumentBuilder db = documentBuilderFactory.newDocumentBuilder();
-                final Document document = db.parse(zip);
-                prefix = getChildValue(document, "goalPrefix", null);
+                final Xpp3Dom dom = parse(mavenPath, zip);
+                prefix = getChildValue(dom, "goalPrefix", null);
                 break;
               }
               zip.closeEntry();
@@ -445,12 +451,12 @@ public class MetadataRebuilder
     /**
      * Helper method to get node's immediate child or default.
      */
-    private String getChildValue(final Document doc, final String childName, final String defaultValue) {
-      NodeList nl = doc.getDocumentElement().getElementsByTagName(childName);
-      if (nl.getLength() == 0) {
+    private String getChildValue(final Xpp3Dom doc, final String childName, final String defaultValue) {
+      Xpp3Dom child = doc.getChild(childName);
+      if (child == null) {
         return defaultValue;
       }
-      return nl.item(0).getTextContent();
+      return child.getValue();
     }
   }
 }
