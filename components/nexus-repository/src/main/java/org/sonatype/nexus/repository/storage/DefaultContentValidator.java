@@ -86,6 +86,7 @@ public class DefaultContentValidator
           Sets.newHashSet(contentDetectedMimeTypes),
           Sets.newHashSet(nameAssumedMimeTypes)
       );
+      log.debug("content/name types intersection {}", intersection);
       if (strictContentTypeValidation && intersection.isEmpty()) {
         throw new InvalidContentException(
             String.format("Detected content type %s, but by name %s expected %s",
@@ -99,6 +100,7 @@ public class DefaultContentValidator
           Sets.newHashSet(contentDetectedMimeTypes),
           Sets.newHashSet(nameAssumedMimeTypes)
       );
+      log.debug("content/name types union {}", union);
       if (!union.contains(declaredContentType)) {
         log.debug("Declared content type {}, discovered types {}", declaredContentType, union);
         if (strictContentTypeValidation) {
