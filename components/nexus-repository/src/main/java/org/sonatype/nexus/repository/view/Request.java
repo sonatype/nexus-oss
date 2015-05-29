@@ -15,7 +15,6 @@ package org.sonatype.nexus.repository.view;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
 
@@ -29,17 +28,6 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class Request
 {
-  /**
-   * Custom attributes to configure backing and logging.
-   */
-  private static class Attributes
-      extends AttributesMap
-  {
-    public Attributes() {
-      super(Maps.<String, Object>newHashMap());
-    }
-  }
-
   private final AttributesMap attributes;
 
   private final Headers headers;
@@ -122,6 +110,21 @@ public class Request
   }
 
   //
+  // Attributes
+  //
+
+  /**
+   * Custom attributes to configure backing and logging.
+   */
+  public static class Attributes
+      extends AttributesMap
+  {
+    public Attributes() {
+      super(Maps.<String, Object>newHashMap());
+    }
+  }
+
+  //
   // Builder
   //
 
@@ -129,7 +132,6 @@ public class Request
    * {@link Request} builder.
    */
   public static class Builder
-    extends ComponentSupport
   {
     private AttributesMap attributes;
 
@@ -149,6 +151,14 @@ public class Request
 
     public Builder attributes(final AttributesMap attributes) {
       this.attributes = attributes;
+      return this;
+    }
+
+    public Builder attribute(final String name, final Object value) {
+      if (attributes == null) {
+        attributes = new Attributes();
+      }
+      attributes.set(name, value);
       return this;
     }
 

@@ -24,8 +24,10 @@ import org.sonatype.nexus.repository.view.Payload;
 import com.google.common.base.Throwables;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.servlet.ServletRequestContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -122,5 +124,13 @@ class HttpPartIteratorAdapter
     public void remove() {
       throw new UnsupportedOperationException();
     }
+  }
+
+  /**
+   * Determine if given request is multipart.
+   */
+  public static boolean isMultipart(final HttpServletRequest httpRequest) {
+    // We're circumventing ServletFileUpload.isMultipartContent as some clients (nuget) use PUT for multipart uploads
+    return FileUploadBase.isMultipartContent(new ServletRequestContext(httpRequest));
   }
 }
