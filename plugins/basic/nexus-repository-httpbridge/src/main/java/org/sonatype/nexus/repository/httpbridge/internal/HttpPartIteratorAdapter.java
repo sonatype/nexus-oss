@@ -39,16 +39,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 class HttpPartIteratorAdapter
     implements Iterable<Payload>
 {
-  private final HttpServletRequest servletRequest;
+  private final HttpServletRequest httpRequest;
 
-  public HttpPartIteratorAdapter(final HttpServletRequest servletRequest) {
-    this.servletRequest = checkNotNull(servletRequest);
+  public HttpPartIteratorAdapter(final HttpServletRequest httpRequest) {
+    this.httpRequest = checkNotNull(httpRequest);
   }
 
   @Override
   public Iterator<Payload> iterator() {
     try {
-      final FileItemIterator itemIterator = new ServletFileUpload().getItemIterator(servletRequest);
+      final FileItemIterator itemIterator = new ServletFileUpload().getItemIterator(httpRequest);
       return new PayloadIterator(itemIterator);
     }
     catch (FileUploadException | IOException e) {
