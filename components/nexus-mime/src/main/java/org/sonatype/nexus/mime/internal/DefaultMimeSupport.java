@@ -99,10 +99,7 @@ public class DefaultMimeSupport
             metadata.set(Metadata.RESOURCE_NAME_KEY, "dummy." + key);
             MediaType mediaType = detector.detect(null, metadata);
             // unravel to least specific
-            while (mediaType != null) {
-              detected.add(mediaType.getBaseType().toString());
-              mediaType = tikaConfig.getMediaTypeRegistry().getSupertype(mediaType);
-            }
+            unravel(detected, mediaType);
             return detected;
           }
         });
@@ -176,10 +173,7 @@ public class DefaultMimeSupport
     }
 
     // unravel to least specific
-    while (mediaType != null) {
-      detected.add(mediaType.getBaseType().toString());
-      mediaType = tikaConfig.getMediaTypeRegistry().getSupertype(mediaType);
-    }
+    unravel(detected, mediaType);
 
     if (detected.isEmpty()) {
       detected.add(MimeTypes.OCTET_STREAM);
@@ -192,5 +186,20 @@ public class DefaultMimeSupport
   @Override
   public String detectMimeType(final InputStream input, @Nullable final String fileName) throws IOException {
     return detectMimeTypes(input, fileName).get(0);
+  }
+
+  /**
+   * Unravels media type by aliases and supertype recursively.
+   */
+  private void unravel(final List<String> detected, final MediaType mediaType) {
+    MediaType mt = mediaType;
+    while (mt != null) {
+      detected.add(mt.getBaseType().toString());
+      // add aliases, for example "application/xml" type has "text/xml" alias
+      for (MediaType alias : tikaConfig.getMediaTypeRegistry().getAliases(mediaType)) {
+        detected.add(alias.getBaseType().toString());
+      }
+      mt = tikaConfig.getMediaTypeRegistry().getSupertype(mt);
+    }
   }
 }

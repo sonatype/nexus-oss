@@ -41,7 +41,7 @@ public class Maven2MimeRulesSource
   /**
    * Maven POMs.
    */
-  private static final NexusMimeType POM_TYPE = new NexusMimeType(true, "application/xml", "text/xml");
+  private static final NexusMimeType POM_TYPE = new NexusMimeType(true, "application/xml");
 
   /**
    * SHA1 and MD5 hashes.
@@ -51,7 +51,7 @@ public class Maven2MimeRulesSource
   /**
    * Maven Repository Metadata.
    */
-  private static final NexusMimeType METADATA_TYPE = new NexusMimeType(true, "application/xml", "text/xml");
+  private static final NexusMimeType METADATA_TYPE = new NexusMimeType(true, "application/xml");
 
   /**
    * Maven PGP signature.
