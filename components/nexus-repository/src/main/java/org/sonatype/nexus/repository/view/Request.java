@@ -99,7 +99,6 @@ public class Request
 
   @Override
   public String toString() {
-    // Excluding some members which could lead to very verbose logging
     return getClass().getSimpleName() + "{" +
         "action='" + action + '\'' +
         ", path='" + path + '\'' +
@@ -154,16 +153,32 @@ public class Request
       return this;
     }
 
-    public Builder attribute(final String name, final Object value) {
+    public AttributesMap attributes() {
       if (attributes == null) {
         attributes = new Attributes();
       }
-      attributes.set(name, value);
+      return attributes;
+    }
+
+    public Builder attribute(final String name, final Object value) {
+      attributes().set(name, value);
       return this;
     }
 
     public Builder headers(final Headers headers) {
       this.headers = headers;
+      return this;
+    }
+
+    public Headers headers() {
+      if (headers == null) {
+        headers = new Headers();
+      }
+      return headers;
+    }
+
+    public Builder header(final String name, final String... values) {
+      headers().set(name, values);
       return this;
     }
 
@@ -179,6 +194,18 @@ public class Request
 
     public Builder parameters(final Parameters parameters) {
       this.parameters = parameters;
+      return this;
+    }
+
+    public Parameters parameters() {
+      if (parameters == null) {
+        parameters = new Parameters();
+      }
+      return parameters;
+    }
+
+    public Builder parameter(final String name, final String... values) {
+      parameters().set(name, values);
       return this;
     }
 
@@ -217,17 +244,7 @@ public class Request
       checkState(action != null, "Missing: action");
       checkState(path != null, "Missing: path");
 
-      if (attributes == null) {
-        attributes = new Attributes();
-      }
-      if (headers == null) {
-        headers = new Headers();
-      }
-      if (parameters == null) {
-        parameters = new Parameters();
-      }
-
-      return new Request(attributes, headers, action, path, parameters, payload, multipart, multiparts);
+      return new Request(attributes(), headers(), action, path, parameters(), payload, multipart, multiparts);
     }
   }
 }
