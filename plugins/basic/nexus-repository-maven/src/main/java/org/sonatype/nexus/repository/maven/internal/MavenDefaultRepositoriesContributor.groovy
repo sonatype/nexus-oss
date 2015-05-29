@@ -52,7 +52,7 @@ class MavenDefaultRepositoriesContributor
                 ],
                 storage: [
                     writePolicy: WritePolicy.ALLOW_ONCE.toString(),
-                    strictContentTypeValidation: false
+                    strictContentTypeValidation: true
                 ]
             ]
         ),
@@ -63,7 +63,7 @@ class MavenDefaultRepositoriesContributor
                 ],
                 storage: [
                     writePolicy: WritePolicy.ALLOW.toString(),
-                    strictContentTypeValidation: false
+                    strictContentTypeValidation: true
                 ]
             ]
         ),
@@ -78,7 +78,7 @@ class MavenDefaultRepositoriesContributor
                 ],
                 storage: [
                     writePolicy: WritePolicy.ALLOW.toString(),
-                    strictContentTypeValidation: false
+                    strictContentTypeValidation: true
                 ]
             ]
         ),
@@ -92,7 +92,7 @@ class MavenDefaultRepositoriesContributor
                 ],
                 storage: [
                     writePolicy: WritePolicy.ALLOW.toString(),
-                    strictContentTypeValidation: false
+                    strictContentTypeValidation: true
                 ]
             ]
         )
