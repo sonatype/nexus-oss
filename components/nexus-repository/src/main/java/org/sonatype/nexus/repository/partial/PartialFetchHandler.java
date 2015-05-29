@@ -25,7 +25,6 @@ import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
@@ -37,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Implements partial-fetch semantics (as per RFC 2616) for {@link Status#isSuccessful() successful}
- * {@link PayloadResponse}s.
+ * responses with payloads.
  *
  * @since 3.0
  */
