@@ -400,23 +400,30 @@ public class DefaultSnapshotRemover
       }
       removeWholeGAV = false;
       final HashSet<Long> versionsToRemove = Sets.newHashSet();
+      boolean checkIfReleaseExists = request.isRemoveIfReleaseExists();
+
       // gathering the facts
       for (StorageItem item : items) {
         if (!item.isVirtual() && !StorageCollectionItem.class.isAssignableFrom(item.getClass())) {
+
           final Gav gav =
               ((MavenRepository) coll.getRepositoryItemUid().getRepository()).getGavCalculator().pathToGav(
                   item.getPath());
 
           if (gav != null) {
-            // if we find a pom, check for delete on release
-            if (!gav.isHash() && !gav.isSignature() && gav.getExtension().equals("pom")) {
-              if (request.isRemoveIfReleaseExists()
-                  && releaseExistsForSnapshot(gav, item.getItemContext())) {
-                log.debug("Found POM and release exists, removing whole gav.");
+
+            // when requested, remove all snapshots if release exists for first detected pom
+            if (checkIfReleaseExists && !gav.isHash() && !gav.isSignature() && gav.getExtension().equals("pom")) {
+
+              // only check release once per _all_ timestamped GAV pom since it is expensive
+              checkIfReleaseExists = false;
+
+              if (releaseExistsForSnapshot(gav, item.getItemContext())) {
+                log.debug("release detected, entire GAV snapshot flagged for removal");
 
                 removeWholeGAV = true;
 
-                // Will break out and junk whole gav
+                // break out and junk whole gav
                 break;
               }
             }
