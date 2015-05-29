@@ -89,8 +89,6 @@ public class NugetGalleryFacetImpl
     extends FacetSupport
     implements NugetGalleryFacet
 {
-  public static final String NUGET = "nuget";
-
   public static final String WITH_NAMESPACES =
       " xmlns:d=\"http://schemas.microsoft.com/ado/2007/08/dataservices\" " +
           "xmlns:m=\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\" xmlns=\"http://www.w3.org/2005/Atom\"";
@@ -303,7 +301,7 @@ public class NugetGalleryFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void put(final InputStream inputStream) throws IOException, NugetPackageException {
-    String componentId = null;
+    String componentId;
 
     try (StorageTx storageTx = openStorageTx();
          TempStreamSupplier tempStream = new TempStreamSupplier(inputStream)) {
@@ -323,9 +321,8 @@ public class NugetGalleryFacetImpl
       recordMetadata.put(CREATED, creationTime);
       recordMetadata.put(LAST_UPDATED, creationTime);
       recordMetadata.put(PUBLISHED, creationTime);
-      Component component;
       try (InputStream in = tempStream.get()) {
-        component = createOrUpdatePackageAndContents(storageTx, recordMetadata, in);
+        createOrUpdatePackageAndContents(storageTx, recordMetadata, in);
       }
 
       componentId = recordMetadata.get(ID);
@@ -533,7 +530,11 @@ public class NugetGalleryFacetImpl
     try {
       Asset asset = findOrCreateAsset(storageTx, component);
       updateAssetMetadata(asset, data, component.isNew());
+
+
+      // TODO: Here, record information about the blob itself
       storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
+
       storageTx.saveAsset(asset);
     }
     catch (IOException e) {
@@ -604,6 +605,9 @@ public class NugetGalleryFacetImpl
       storedMetadata.set(P_CREATED, ODataUtils.toDate(incomingMetadata.get(CREATED)));
       storedMetadata.set(P_PUBLISHED, ODataUtils.toDate(incomingMetadata.get(PUBLISHED)));
     }
+
+    // TODO: Sort this out, this isn't quite right
+    storedMetadata.set(P_LAST_UPDATED, ODataUtils.toDate(incomingMetadata.get(LAST_UPDATED)));
 
     // Populate keywords for case-insensitive search
     Joiner joiner = Joiner.on(" ").skipNulls();
