@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
@@ -57,10 +56,11 @@ public class DefaultHttpResponseSender
 
     // add status followed by payload if we have one
     Status status = response.getStatus();
-    if (status.isSuccessful() || response instanceof PayloadResponse) {
+    Payload payload = response.getPayload();
+    if (status.isSuccessful() || payload != null) {
       httpResponse.setStatus(status.getCode());
-      if (response instanceof PayloadResponse) {
-        Payload payload = ((PayloadResponse) response).getPayload();
+
+      if (payload != null) {
         log.trace("Attaching payload: {}", payload);
 
         if (payload.getContentType() != null) {
