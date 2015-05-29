@@ -55,7 +55,7 @@ public class NegativeCacheHandler
       }
     }
     else {
-      response = new Response(status);
+      response = new Response.Builder().status(status).build();
       log.debug("Found {} in negative cache, returning {}", key, response);
     }
     return response;
