@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Request;
@@ -70,7 +71,7 @@ public class NugetPushHandlerTest
     when(requestPayload.openInputStream()).thenReturn(inputStream);
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.CREATED, "text/html", "<html><body></body></html>");
+    checkResponse(response, HttpStatus.CREATED, ContentTypes.TEXT_HTML, "<html><body></body></html>");
 
     verify(nugetGalleryFacet).put(inputStream);
     verifyNoMoreInteractions(nugetGalleryFacet);
@@ -87,7 +88,7 @@ public class NugetPushHandlerTest
     when(requestPayload.openInputStream()).thenReturn(inputStream);
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.CREATED, "text/html", "<html><body></body></html>");
+    checkResponse(response, HttpStatus.CREATED, ContentTypes.TEXT_HTML, "<html><body></body></html>");
 
     verify(nugetGalleryFacet, times(2)).put(inputStream);
     verifyNoMoreInteractions(nugetGalleryFacet);
@@ -100,7 +101,7 @@ public class NugetPushHandlerTest
     when(request.getMultiparts()).thenReturn(new ArrayList<Payload>());
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.BAD_REQUEST, "application/xml", "No content was provided");
+    checkResponse(response, HttpStatus.BAD_REQUEST, ContentTypes.APPLICATION_XML, "No content was provided");
   }
 
   @Test
@@ -109,7 +110,7 @@ public class NugetPushHandlerTest
     when(request.isMultipart()).thenReturn(false);
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.BAD_REQUEST, "application/xml", "Multipart request required");
+    checkResponse(response, HttpStatus.BAD_REQUEST, ContentTypes.APPLICATION_XML, "Multipart request required");
   }
 
   private void checkResponse(final Response response,
