@@ -24,9 +24,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.mime.MimeRule;
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.mime.MimeRule;
 import org.sonatype.nexus.mime.NexusMimeTypes;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -191,15 +191,11 @@ public class DefaultMimeSupport
   /**
    * Unravels media type by aliases and supertype recursively.
    */
-  private void unravel(final List<String> detected, final MediaType mediaType) {
-    MediaType mt = mediaType;
-    while (mt != null) {
-      detected.add(mt.getBaseType().toString());
-      // add aliases, for example "application/xml" type has "text/xml" alias
-      for (MediaType alias : tikaConfig.getMediaTypeRegistry().getAliases(mediaType)) {
-        detected.add(alias.getBaseType().toString());
-      }
-      mt = tikaConfig.getMediaTypeRegistry().getSupertype(mt);
+  private void unravel(final List<String> detected, final MediaType mt) {
+    detected.add(mt.getBaseType().toString());
+    // add aliases, for example "application/xml" type has "text/xml" alias
+    for (MediaType alias : tikaConfig.getMediaTypeRegistry().getAliases(mt)) {
+      detected.add(alias.getBaseType().toString());
     }
   }
 }

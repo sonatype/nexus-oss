@@ -17,19 +17,18 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 
-import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeRule;
+import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
@@ -40,23 +39,13 @@ import static org.mockito.Mockito.when;
 public class DefaultMimeSupportTest
     extends TestSupport
 {
-  private DefaultMimeSupport underTest;
+  private DefaultMimeSupport underTest = new DefaultMimeSupport();
 
   @Mock
   private NexusMimeTypes mimeTypes;
 
   @Mock
   private MimeRule mimeType;
-
-  @Before
-  public void setUp() throws Exception {
-    underTest = new DefaultMimeSupport();
-  }
-
-  // FIXME: This is pretty stupid, remove this
-  private void mock() {
-    this.underTest = new DefaultMimeSupport(mimeTypes);
-  }
 
   /**
    * Tests the simple "guessing" against some known paths.
@@ -111,8 +100,7 @@ public class DefaultMimeSupportTest
 
   @Test
   public void useNexusMimeTypes() {
-    mock();
-
+    this.underTest = new DefaultMimeSupport(mimeTypes);
     when(mimeTypes.getMimeRuleForExtension("test")).thenReturn(mimeType);
     when(mimeType.getMimetypes()).thenReturn(Lists.newArrayList("fake/mimetype"));
 
@@ -121,29 +109,28 @@ public class DefaultMimeSupportTest
 
   @Test
   public void retainDefaultMimeTypes() {
-    mock();
+    this.underTest = new DefaultMimeSupport(mimeTypes);
 
     assertThat(underTest.guessMimeTypeFromPath("foo.doc"), is("application/msword"));
   }
 
   @Test
   public void preferDefaultMimeType() {
-    mock();
+    this.underTest = new DefaultMimeSupport(mimeTypes);
 
     when(mimeTypes.getMimeRuleForExtension("zip")).thenReturn(mimeType);
     when(mimeType.getMimetypes()).thenReturn(Lists.newArrayList("fake/mimetype"));
 
     final List<String> mimeTypes = underTest.guessMimeTypesListFromPath("foo.zip");
     assertThat(mimeTypes, hasSize(3));
-    assertThat(mimeTypes, hasItem("application/zip"));
-    assertThat(mimeTypes, hasItem("fake/mimetype"));
-    assertThat(mimeTypes, hasItem("application/octet-stream"));
+    assertThat(mimeTypes, hasItems("fake/mimetype", "application/zip", "application/x-zip-compressed"));
+
     assertThat(underTest.guessMimeTypeFromPath("foo.zip"), is("fake/mimetype"));
   }
 
   @Test
   public void overrideDefaultMimeType() {
-    mock();
+    this.underTest = new DefaultMimeSupport(mimeTypes);
 
     when(mimeTypes.getMimeRuleForExtension("zip")).thenReturn(mimeType);
     when(mimeType.isOverride()).thenReturn(true);

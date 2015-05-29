@@ -74,7 +74,6 @@ public class DefaultContentValidator
     if (strictContentTypeValidation && isUnknown(contentDetectedMimeTypes)) {
       throw new InvalidContentException("Content type could not be determined");
     }
-    contentDetectedMimeTypes.remove(ContentTypes.OCTET_STREAM);
 
     final List<String> nameAssumedMimeTypes = new ArrayList<>();
     if (contentName != null) {
@@ -82,7 +81,6 @@ public class DefaultContentValidator
       if (strictContentTypeValidation && isUnknown(nameAssumedMimeTypes)) {
         throw new InvalidContentException("Content type could not be guessed");
       }
-      nameAssumedMimeTypes.remove(ContentTypes.OCTET_STREAM);
 
       Set<String> intersection = Sets.intersection(
           Sets.newHashSet(contentDetectedMimeTypes),
@@ -125,7 +123,7 @@ public class DefaultContentValidator
       finalContentType = contentDetectedMimeTypes.get(0);
     }
 
-    log.info("Content {} declared as {}, determined as {}", contentName, declaredContentType, finalContentType);
+    log.debug("Content {} declared as {}, determined as {}", contentName, declaredContentType, finalContentType);
 
     return finalContentType;
   }
