@@ -225,6 +225,7 @@ public class Request
 
     public Builder multiparts(final Iterable<Payload> multiparts) {
       this.multiparts = multiparts;
+      this.multipart = multiparts != null ? true : false;
       return this;
     }
 

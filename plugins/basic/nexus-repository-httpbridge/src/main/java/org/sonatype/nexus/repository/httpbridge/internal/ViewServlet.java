@@ -171,9 +171,7 @@ public class ViewServlet
         .parameters(new HttpParametersAdapter(httpRequest))
         .payload(new HttpRequestPayloadAdapter(httpRequest));
 
-    boolean multipart = HttpPartIteratorAdapter.isMultipart(httpRequest);
-    builder.multipart(multipart);
-    if (multipart) {
+    if (HttpPartIteratorAdapter.isMultipart(httpRequest)) {
       builder.multiparts(new HttpPartIteratorAdapter(httpRequest));
     }
 
