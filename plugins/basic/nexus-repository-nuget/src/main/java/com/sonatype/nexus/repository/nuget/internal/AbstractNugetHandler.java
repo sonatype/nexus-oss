@@ -83,8 +83,6 @@ abstract class AbstractNugetHandler
   }
 
   protected String getRepositoryBase(final Context context) {
-    final String path = context.getRequest().getPath();
-    final String requestUrl = context.getRequest().getRequestUrl();
-    return requestUrl.substring(0, requestUrl.length() - path.length());
+    return context.getRepository().getUrl();
   }
 }
