@@ -253,7 +253,7 @@ public class ViewServlet
    * Needed in a few places _before_ we have a repository instance to determine its specific sender.
    */
   @VisibleForTesting
-  void send(final @Nullable Request request, final Response response, final HttpServletResponse httpResponse)
+  void send(@Nullable final Request request, final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
     httpResponseSenderSelector.defaultSender().send(request, response, httpResponse);

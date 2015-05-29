@@ -45,7 +45,7 @@ public class DefaultHttpResponseSender
     implements HttpResponseSender
 {
   @Override
-  public void send(final @Nullable Request request, final Response response, final HttpServletResponse httpResponse)
+  public void send(@Nullable final Request request, final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
     log.trace("Sending response: {}", response);
