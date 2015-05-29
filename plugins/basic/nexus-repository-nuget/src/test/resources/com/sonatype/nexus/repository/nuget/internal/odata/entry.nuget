@@ -1,5 +1,5 @@
   <entry${NAMESPACES}>
-    <id>${BASEURI}/Packages(Id='${ID}',Version='${VERSION}')</id>
+    <id>${BASEURI}Packages(Id='${ID}',Version='${VERSION}')</id>
     <title type="text">${ID}</title>
     <summary type="text">${SUMMARY}</summary>
     <updated>${LASTUPDATED}</updated>
@@ -9,7 +9,7 @@
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='${ID}',Version='${VERSION}')/$value" />
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='${ID}',Version='${VERSION}')" />
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme" />
-    <content type="application/zip" src="${BASEURI}/${ID}/${VERSION}" />
+    <content type="application/zip" src="${BASEURI}${ID}/${VERSION}" />
     <m:properties>
       <d:Version>${VERSION}</d:Version>
       <d:Copyright>${COPYRIGHT}</d:Copyright>

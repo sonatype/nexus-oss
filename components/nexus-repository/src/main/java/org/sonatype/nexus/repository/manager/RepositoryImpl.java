@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuard;
 import org.sonatype.nexus.common.stateguard.StateGuardAware;
@@ -322,5 +323,10 @@ public class RepositoryImpl
     }
 
     return facet;
+  }
+
+  @Override
+  public String getUrl() {
+    return BaseUrlHolder.get() + "/repository/" + getName() + "/";
   }
 }

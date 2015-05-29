@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.repository;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.annotation.Nonnull;
 
 import org.sonatype.nexus.repository.config.Configuration;
@@ -108,4 +111,9 @@ public interface Repository
    */
   @Nonnull
   <T extends Facet> T facet(Class<T> type) throws MissingFacetException;
+
+  /**
+  * Returns the URI for the root of the repository, with a final slash.
+   */
+  String getUrl();
 }
