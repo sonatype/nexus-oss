@@ -60,7 +60,13 @@ public class Maven2ContentValidator
                                      @Nullable String declaredContentType) throws IOException
   {
     if (contentName != null) {
-      if (contentName.endsWith(".sha1") || contentName.endsWith(".md5")) {
+      if (contentName.endsWith(".pom")) {
+        // TODO: this is due fact that Tika has glob "*.pom" extension enlisted at text/plain, and some non-clean
+        // TODO: POMs will get recognized as text/plain without "hint" that adds xml extension
+        // TODO: Ask Tika project why is there and what represents ".pom" extension at "text/plain"
+        contentName = contentName + ".xml";
+      }
+      else if (contentName.endsWith(".sha1") || contentName.endsWith(".md5")) {
         // hashes are small/simple, do it directly
         try (InputStream is = contentSupplier.get()) {
           final String digestCandidate = DigestExtractor.extract(is);

@@ -81,15 +81,6 @@ public interface MimeSupport
   List<String> guessMimeTypesListFromPath(final String path);
 
   /**
-   * Returns all the detected MIME types of given input. Providing {@code fileName} just improves detection, but is
-   * not mandatory. The list of mime types are in descending order (most specific 1st, least specific last).
-   *
-   * @since 3.0
-   */
-  @Nonnull
-  List<String> detectMimeTypes(InputStream input, @Nullable String fileName) throws IOException;
-
-  /**
    * Returns the most specific MIME type from result got from {@link #detectMimeType(InputStream, String)}.
    *
    * @see #detectMimeTypes(InputStream, String)
@@ -97,4 +88,13 @@ public interface MimeSupport
    */
   @Nonnull
   String detectMimeType(InputStream input, @Nullable String fileName) throws IOException;
+
+  /**
+   * Returns all the detected MIME types of given input. Providing {@code fileName} just improves detection, but is
+   * not mandatory. The list of mime types are in descending order (most specific 1st, least specific last).
+   *
+   * @since 3.0
+   */
+  @Nonnull
+  List<String> detectMimeTypes(InputStream input, @Nullable String fileName) throws IOException;
 }

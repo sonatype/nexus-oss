@@ -158,6 +158,12 @@ public class DefaultMimeSupport
 
   @Nonnull
   @Override
+  public String detectMimeType(final InputStream input, @Nullable final String fileName) throws IOException {
+    return detectMimeTypes(input, fileName).get(0);
+  }
+
+  @Nonnull
+  @Override
   public List<String> detectMimeTypes(final InputStream input, @Nullable final String fileName) throws IOException {
     checkNotNull(input);
 
@@ -180,12 +186,6 @@ public class DefaultMimeSupport
     }
 
     return detected;
-  }
-
-  @Nonnull
-  @Override
-  public String detectMimeType(final InputStream input, @Nullable final String fileName) throws IOException {
-    return detectMimeTypes(input, fileName).get(0);
   }
 
   /**

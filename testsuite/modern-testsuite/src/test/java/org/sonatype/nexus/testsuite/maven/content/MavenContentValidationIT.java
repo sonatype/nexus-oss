@@ -14,6 +14,7 @@ package org.sonatype.nexus.testsuite.maven.content;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
@@ -22,6 +23,7 @@ import org.sonatype.nexus.testsuite.repository.FormatClientSupport;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
+import com.google.common.net.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.HttpClients;
@@ -64,6 +66,13 @@ public class MavenContentValidationIT
 
   private Server upstream;
 
+  private FormatClientSupport client;
+
+  @Before
+  public void debugLoggingStorage() {
+    logManager.setLoggerLevel("org.sonatype.nexus.repository.storage", LoggerLevel.DEBUG);
+  }
+
   @Before
   public void prepare() throws Exception {
     upstream = Server.withPort(0)
@@ -75,6 +84,12 @@ public class MavenContentValidationIT
                 "  <name>Abbot</name>\n" +
                 "  <version>0.13.0</version>\n" +
                 "</project>", "text/xml"))
+        .serve("/abbot/abbot/0.13.0/abbot-0.13.0.pom.sha1").withBehaviours(Behaviours.content(
+            "deb955763d21951b4ac9fc462c8104c15c86e1ee  /home/projects/maven/repository-staging/to-ibiblio/maven2/abbot/abbot/0.13.0/abbot-0.13.0.pom",
+            "text/plain"))
+        .serve("/abbot/abbot/0.13.0/abbot-0.13.0.pom.md5").withBehaviours(Behaviours.content(
+            "b4a3754bf13bb87475c0dbf45860e049  /home/projects/maven/repository-staging/to-ibiblio/maven2/abbot/abbot/0.13.0/abbot-0.13.0.pom",
+            "text/plain"))
         .start();
 
     Repository repo = repositoryManager.get("maven-central");
@@ -82,6 +97,9 @@ public class MavenContentValidationIT
     Configuration mavenCentralConfiguration = repo.getConfiguration();
     mavenCentralConfiguration.attributes("proxy").set("remoteUrl", "http://localhost:" + upstream.getPort() + "/");
     mavenCentral = repositoryManager.update(mavenCentralConfiguration);
+
+    client = new FormatClientSupport(HttpClients.custom().build(), HttpClientContext.create(),
+        resolveUrl(nexusUrl, "/repository/" + mavenCentral.getName() + "/").toURI());
   }
 
   @After
@@ -95,13 +113,24 @@ public class MavenContentValidationIT
 
   @Test
   public void fetchPomVia() throws Exception {
-    final FormatClientSupport client = new FormatClientSupport(HttpClients.custom().build(), HttpClientContext.create(),
-        resolveUrl(nexusUrl, "/repository/" + mavenCentral.getName() + "/").toURI());
-
-    HttpResponse response = client.get("abbot/abbot/0.13.0/abbot-0.13.0.pom");
-    assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+    get("abbot/abbot/0.13.0/abbot-0.13.0.pom", "application/xml");
+    get("abbot/abbot/0.13.0/abbot-0.13.0.pom.sha1", "text/plain");
+    // get("abbot/abbot/0.13.0/abbot-0.13.0.pom.md5", "text/plain");
+    // get("abbot/abbot/0.13.0/abbot-0.13.0.jar", "application/java-archive");
+    // get("abbot/abbot/0.13.0/abbot-0.13.0.jar.asc", "application/pgp-signature");
+    // get("abbot/abbot/0.13.0/abbot-0.13.0.jar.sha1", "text/plain");
+    // get("abbot/abbot/0.13.0/abbot-0.13.0.jar.md5", "text/plain");
+    // get("abbot/abbot/0.13.0/maven-metadata.xml", "application/xml");
+    // get("abbot/abbot/0.13.0/maven-metadata.xml.sha1", "text/plain");
+    // get("abbot/abbot/0.13.0/maven-metadata.xml.md5", "text/plain");
     // TODO: nexus log should contain in DEBUG:
     // "Content /abbot/abbot/0.13.0/abbot-0.13.0.pom declared as text/xml, determined as application/xml"
     // Confirming Maven Format override upstream server preference
+  }
+
+  private void get(final String path, final String contentType) throws Exception {
+    HttpResponse response = client.get(path);
+    assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+    assertThat(response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue(), equalTo(contentType));
   }
 }
