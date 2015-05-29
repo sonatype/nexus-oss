@@ -64,10 +64,6 @@ public class Response
     return payload;
   }
 
-  public boolean hasPayload() {
-    return getPayload() != null;
-  }
-
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
