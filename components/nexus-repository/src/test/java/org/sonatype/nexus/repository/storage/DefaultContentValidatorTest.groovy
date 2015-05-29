@@ -77,7 +77,7 @@ class DefaultContentValidatorTest
         'test.txt',
         'application/zip'
     )
-    assertThat(type, equalTo('application/zip'))
+    assertThat(type, equalTo('text/plain'))
   }
 
   @Test(expected = InvalidContentException)
