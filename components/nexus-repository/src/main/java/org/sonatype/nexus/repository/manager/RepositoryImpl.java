@@ -327,6 +327,6 @@ public class RepositoryImpl
 
   @Override
   public String getUrl() {
-    return BaseUrlHolder.get() + "/repository/" + getName() + "/";
+    return BaseUrlHolder.get() + "/repository/" + getName();
   }
 }
