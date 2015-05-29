@@ -39,13 +39,13 @@ public class StringPayload
 
   private final String contentType;
 
-  public StringPayload(final String content, final Charset charset, final @Nullable String contentType) {
+  public StringPayload(final String content, final Charset charset, @Nullable final String contentType) {
     this.contentBytes = checkNotNull(content).getBytes(charset);
     this.charset = checkNotNull(charset);
     this.contentType = contentType;
   }
 
-  public StringPayload(final String content, final @Nullable String contentType) {
+  public StringPayload(final String content, @Nullable final String contentType) {
     this(content, Charsets.UTF_8, contentType);
   }
 
