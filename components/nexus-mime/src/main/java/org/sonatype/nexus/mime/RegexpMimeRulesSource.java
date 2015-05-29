@@ -39,13 +39,12 @@ public class RegexpMimeRulesSource
   }
 
   @Override
-  public MimeRule getRuleForName(final String path) {
+  public MimeRule getRuleForName(final String name) {
     for (Map.Entry<Pattern, MimeRule> entry : rules.entrySet()) {
-      if (entry.getKey().matcher(path).matches()) {
+      if (entry.getKey().matcher(name).matches()) {
         return entry.getValue();
       }
     }
-
     return null;
   }
 }

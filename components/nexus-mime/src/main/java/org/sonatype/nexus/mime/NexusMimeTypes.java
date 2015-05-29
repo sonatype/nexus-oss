@@ -129,8 +129,6 @@ public class NexusMimeTypes
   /**
    * Method returning {@link MimeRule} for given extension (it must not contain leading dot!). If no rule exists, {@code
    * null} is returned.
-   *
-   * @param extension the file extension, without leading dot.
    */
   @Nullable
   public MimeRule getMimeRuleForExtension(String extension) {

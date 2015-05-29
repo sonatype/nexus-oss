@@ -25,7 +25,7 @@ public interface MimeRulesSource
   {
     @Nullable
     @Override
-    public MimeRule getRuleForName(final String path) {
+    public MimeRule getRuleForName(final String name) {
       return null;
     }
   };
