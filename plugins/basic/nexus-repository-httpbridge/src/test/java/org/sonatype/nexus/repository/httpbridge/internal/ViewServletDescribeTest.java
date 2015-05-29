@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.httpbridge.internal.describe.Description;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionHelper;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionRenderer;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.Parameters;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
@@ -129,7 +130,7 @@ public class ViewServletDescribeTest
 
     verify(underTest).describe(request, facetResponse, null, "HTML");
     verify(underTest).send(eq(request), any(Response.class), eq(servletResponse));
-    verify(servletResponse).setContentType("text/html");
+    verify(servletResponse).setContentType(ContentTypes.TEXT_HTML);
   }
 
   @Test
@@ -141,7 +142,7 @@ public class ViewServletDescribeTest
 
     verify(underTest).describe(request, facetResponse, null, "JSON");
     verify(underTest).send(eq(request), any(Response.class), eq(servletResponse));
-    verify(servletResponse).setContentType("application/json");
+    verify(servletResponse).setContentType(ContentTypes.APPLICATION_JSON);
   }
 
   @Test(expected = RuntimeException.class)
