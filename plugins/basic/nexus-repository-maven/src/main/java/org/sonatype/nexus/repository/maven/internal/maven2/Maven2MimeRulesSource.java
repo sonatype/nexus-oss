@@ -17,13 +17,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.io.FileSupport;
 import org.sonatype.nexus.mime.MimeRulesSource;
-import org.sonatype.nexus.mime.NexusMimeType;
+import org.sonatype.nexus.mime.MimeRule;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import com.google.common.io.Files;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -41,22 +38,22 @@ public class Maven2MimeRulesSource
   /**
    * Maven POMs.
    */
-  private static final NexusMimeType POM_TYPE = new NexusMimeType(true, "application/xml");
+  private static final MimeRule POM_TYPE = new MimeRule(true, "application/xml");
 
   /**
    * SHA1 and MD5 hashes.
    */
-  private static final NexusMimeType HASH_TYPE = new NexusMimeType(true, "text/plain");
+  private static final MimeRule HASH_TYPE = new MimeRule(true, "text/plain");
 
   /**
    * Maven Repository Metadata.
    */
-  private static final NexusMimeType METADATA_TYPE = new NexusMimeType(true, "application/xml");
+  private static final MimeRule METADATA_TYPE = new MimeRule(true, "application/xml");
 
   /**
    * Maven PGP signature.
    */
-  private static final NexusMimeType SIGNATURE_TYPE = new NexusMimeType(true, "application/pgp-signature", "text/plain");
+  private static final MimeRule SIGNATURE_TYPE = new MimeRule(true, "application/pgp-signature", "text/plain");
 
   private final Maven2MavenPathParser mavenPathParser;
 
@@ -67,8 +64,8 @@ public class Maven2MimeRulesSource
 
   @Nullable
   @Override
-  public NexusMimeType getRuleForPath(final String path) {
-    MavenPath mavenPath = mavenPathParser.parsePath(path);
+  public MimeRule getRuleForName(final String name) {
+    MavenPath mavenPath = mavenPathParser.parsePath(name);
     if (mavenPath.isPom()) {
       return POM_TYPE;
     }

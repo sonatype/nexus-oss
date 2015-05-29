@@ -14,13 +14,11 @@ package org.sonatype.nexus.mime.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 import org.sonatype.nexus.mime.MimeRulesSource;
-import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.mime.NexusMimeType;
+import org.sonatype.nexus.mime.MimeRule;
 import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -48,7 +46,7 @@ public class DefaultMimeSupportTest
   private NexusMimeTypes mimeTypes;
 
   @Mock
-  private NexusMimeType mimeType;
+  private MimeRule mimeType;
 
   @Before
   public void setUp() throws Exception {
@@ -88,8 +86,8 @@ public class DefaultMimeSupportTest
     MimeRulesSource source = new MimeRulesSource()
     {
       @Override
-      public NexusMimeType getRuleForPath(String path) {
-        return new NexusMimeType(false, "foo/bar");
+      public MimeRule getRuleForName(String path) {
+        return new MimeRule(false, "foo/bar");
       }
     };
 
@@ -115,7 +113,7 @@ public class DefaultMimeSupportTest
   public void useNexusMimeTypes() {
     mock();
 
-    when(mimeTypes.getMimeTypes("test")).thenReturn(mimeType);
+    when(mimeTypes.getMimeRuleForExtension("test")).thenReturn(mimeType);
     when(mimeType.getMimetypes()).thenReturn(Lists.newArrayList("fake/mimetype"));
 
     assertThat(underTest.guessMimeTypeFromPath("foo.test"), is("fake/mimetype"));
@@ -132,7 +130,7 @@ public class DefaultMimeSupportTest
   public void preferDefaultMimeType() {
     mock();
 
-    when(mimeTypes.getMimeTypes("zip")).thenReturn(mimeType);
+    when(mimeTypes.getMimeRuleForExtension("zip")).thenReturn(mimeType);
     when(mimeType.getMimetypes()).thenReturn(Lists.newArrayList("fake/mimetype"));
 
     final List<String> mimeTypes = underTest.guessMimeTypesListFromPath("foo.zip");
@@ -147,7 +145,7 @@ public class DefaultMimeSupportTest
   public void overrideDefaultMimeType() {
     mock();
 
-    when(mimeTypes.getMimeTypes("zip")).thenReturn(mimeType);
+    when(mimeTypes.getMimeRuleForExtension("zip")).thenReturn(mimeType);
     when(mimeType.isOverride()).thenReturn(true);
     when(mimeType.getMimetypes()).thenReturn(Lists.newArrayList("fake/mimetype"));
 

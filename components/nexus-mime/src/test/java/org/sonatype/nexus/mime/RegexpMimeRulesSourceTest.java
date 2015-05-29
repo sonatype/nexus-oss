@@ -57,7 +57,7 @@ public class RegexpMimeRulesSourceTest
   }
 
   private void assertValues(final MimeRulesSource mimeRulesSource, final String path, final Matcher<? super String> matcher) {
-    NexusMimeType nexusMimeType = mimeRulesSource.getRuleForPath(path);
+    MimeRule nexusMimeType = mimeRulesSource.getRuleForName(path);
     if (matcher.getClass().equals(nullValue().getClass())) {
       assertThat(nexusMimeType, nullValue());
       return;

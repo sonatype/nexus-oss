@@ -26,7 +26,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.mime.NexusMimeType;
+import org.sonatype.nexus.mime.MimeRule;
 import org.sonatype.nexus.mime.NexusMimeTypes;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -86,7 +86,7 @@ public class DefaultMimeSupport
               throws Exception
           {
             final List<String> detected = Lists.newArrayList();
-            final NexusMimeType mimeType = nexusMimeTypes.getMimeTypes(key);
+            final MimeRule mimeType = nexusMimeTypes.getMimeRuleForExtension(key);
             if (mimeType != null) {
               // add Nexus matches first
               detected.addAll(mimeType.getMimetypes());
@@ -117,7 +117,7 @@ public class DefaultMimeSupport
     checkNotNull(path);
     List<String> mimeTypes = new ArrayList<>();
     if (mimeRulesSource != null) {
-      final NexusMimeType hardRule = mimeRulesSource.getRuleForPath(path);
+      final MimeRule hardRule = mimeRulesSource.getRuleForName(path);
       if (hardRule != null) {
         mimeTypes.addAll(hardRule.getMimetypes());
         if (hardRule.isOverride()) {

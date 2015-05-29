@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -58,7 +60,7 @@ public class NexusMimeTypes
 
   public static final String MIMETYPES_FILENAME = "nexus.mimetypes";
 
-  private Map<String, NexusMimeType> extensions = Maps.newHashMap();
+  private Map<String, MimeRule> extensions = Maps.newHashMap();
 
   public NexusMimeTypes() {
     load(BUILTIN_MIMETYPES_FILENAME);
@@ -106,12 +108,12 @@ public class NexusMimeTypes
         mimetypes.addAll(additional.get(extension));
         additional.remove(extension);
       }
-      this.extensions.put(extension, new NexusMimeType(true, mimetypes));
+      this.extensions.put(extension, new MimeRule(true, mimetypes));
     }
 
     for (String extension : additional.keySet()) {
       final List<String> mimetypes = additional.get(extension);
-      this.extensions.put(extension, new NexusMimeType(false, mimetypes));
+      this.extensions.put(extension, new MimeRule(false, mimetypes));
     }
   }
 
@@ -124,7 +126,14 @@ public class NexusMimeTypes
     }
   }
 
-  public NexusMimeType getMimeTypes(String extension) {
+  /**
+   * Method returning {@link MimeRule} for given extension (it must not contain leading dot!). If no rule exists, {@code
+   * null} is returned.
+   *
+   * @param extension the file extension, without leading dot.
+   */
+  @Nullable
+  public MimeRule getMimeRuleForExtension(String extension) {
     while (!extension.isEmpty()) {
       if (extensions.containsKey(extension)) {
         return extensions.get(extension);

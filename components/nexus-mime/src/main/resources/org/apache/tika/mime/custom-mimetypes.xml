@@ -15,18 +15,4 @@
 -->
 <mime-info>
 
-  <!-- ASF Maven POM subtype -->
-  <mime-type type="application/x-apache-maven-pom-400">
-    <_comment>Apache Maven POM v4.0.0</_comment>
-    <tika:link>http://maven.apache.org/</tika:link>
-    <sub-class-of type="application/xml"/>
-    <magic priority="50">
-      <match value="&lt;project" type="string" offset="0"/>
-      <match value="&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;" type="string" offset="0"/>
-      <match value="&lt;groupId" type="string" offset="0"/>
-      <match value="&lt;artifactId" type="string" offset="0"/>
-    </magic>
-    <glob pattern="*.pom"/>
-  </mime-type>
-
 </mime-info>

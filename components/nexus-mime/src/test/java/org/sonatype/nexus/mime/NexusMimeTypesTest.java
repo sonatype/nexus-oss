@@ -42,24 +42,24 @@ public class NexusMimeTypesTest
 
   @Test
   public void unconfigured() {
-    assertThat(underTest.getMimeTypes("test"), is(nullValue()));
+    assertThat(underTest.getMimeRuleForExtension("test"), is(nullValue()));
   }
 
   @Test
   public void addMimeType() {
     underTest.initMimeTypes(addMimeType(new Properties(), "test", "application/octet-stream"));
-    assertThat(underTest.getMimeTypes("test"), is(notNullValue()));
-    assertThat(underTest.getMimeTypes("test"), hasProperty("override", is(false)));
-    assertThat(underTest.getMimeTypes("test").getMimetypes(), contains("application/octet-stream"));
+    assertThat(underTest.getMimeRuleForExtension("test"), is(notNullValue()));
+    assertThat(underTest.getMimeRuleForExtension("test"), hasProperty("override", is(false)));
+    assertThat(underTest.getMimeRuleForExtension("test").getMimetypes(), contains("application/octet-stream"));
   }
 
   @Test
   public void overrideMimeType() {
     Properties properties = new Properties();
     underTest.initMimeTypes(addMimeType(properties, "override.test", "application/octet-stream"));
-    assertThat(underTest.getMimeTypes("test"), is(notNullValue()));
-    assertThat(underTest.getMimeTypes("test"), hasProperty("override", is(true)));
-    assertThat(underTest.getMimeTypes("test").getMimetypes(), contains("application/octet-stream"));
+    assertThat(underTest.getMimeRuleForExtension("test"), is(notNullValue()));
+    assertThat(underTest.getMimeRuleForExtension("test"), hasProperty("override", is(true)));
+    assertThat(underTest.getMimeRuleForExtension("test").getMimetypes(), contains("application/octet-stream"));
   }
 
   @Test
@@ -70,8 +70,8 @@ public class NexusMimeTypesTest
     addMimeType(types, "test", "text/plain");
 
     underTest.initMimeTypes(types);
-    assertThat(underTest.getMimeTypes("test"), is(notNullValue()));
-    assertThat(underTest.getMimeTypes("test"), hasProperty("override", is(true)));
-    assertThat(underTest.getMimeTypes("test").getMimetypes(), hasItems("application/octet-stream", "text/plain"));
+    assertThat(underTest.getMimeRuleForExtension("test"), is(notNullValue()));
+    assertThat(underTest.getMimeRuleForExtension("test"), hasProperty("override", is(true)));
+    assertThat(underTest.getMimeRuleForExtension("test").getMimetypes(), hasItems("application/octet-stream", "text/plain"));
   }
 }

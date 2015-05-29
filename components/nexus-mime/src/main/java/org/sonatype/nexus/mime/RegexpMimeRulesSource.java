@@ -16,7 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,19 +28,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RegexpMimeRulesSource
     implements MimeRulesSource
 {
-  private final LinkedHashMap<Pattern, NexusMimeType> rules = Maps.newLinkedHashMap();
+  private final LinkedHashMap<Pattern, MimeRule> rules = Maps.newLinkedHashMap();
 
   public void addRule(final String pattern, final String mimeType) {
     addRule(Pattern.compile(pattern), mimeType);
   }
 
   public void addRule(final Pattern pattern, final String mimeType) {
-    rules.put(checkNotNull(pattern), new NexusMimeType(false, mimeType));
+    rules.put(checkNotNull(pattern), new MimeRule(false, mimeType));
   }
 
   @Override
-  public NexusMimeType getRuleForPath(final String path) {
-    for (Map.Entry<Pattern, NexusMimeType> entry : rules.entrySet()) {
+  public MimeRule getRuleForName(final String path) {
+    for (Map.Entry<Pattern, MimeRule> entry : rules.entrySet()) {
       if (entry.getKey().matcher(path).matches()) {
         return entry.getValue();
       }

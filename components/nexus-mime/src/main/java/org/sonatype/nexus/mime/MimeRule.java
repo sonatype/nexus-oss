@@ -24,30 +24,30 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Nexus MIME type mapping.
+ * Nexus MIME type rule.
  *
  * @since 3.0
  */
-public class NexusMimeType
+public class MimeRule
 {
   private final boolean override;
 
   private final List<String> mimetypes;
 
-  public NexusMimeType(final boolean override,
-                       final String mimetype)
+  public MimeRule(final boolean override,
+                  final String mimetype)
   {
     this(override, Collections.singletonList(checkNotNull(mimetype)));
   }
 
-  public NexusMimeType(final boolean override,
-                       final String... mimetypes)
+  public MimeRule(final boolean override,
+                  final String... mimetypes)
   {
     this(override, Arrays.asList(mimetypes));
   }
 
-  public NexusMimeType(final boolean override,
-                       final List<String> mimetypes)
+  public MimeRule(final boolean override,
+                  final List<String> mimetypes)
   {
     checkNotNull(mimetypes, "mimetypes");
     checkArgument(!mimetypes.isEmpty(), "mimetypes");
