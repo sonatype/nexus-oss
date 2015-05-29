@@ -21,7 +21,6 @@ import org.sonatype.nexus.repository.IllegalOperationException;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
@@ -74,7 +73,10 @@ abstract class AbstractNugetHandler
   protected Response xmlPayload(final int code, final String content) {
     final StringPayload stringPayload = new StringPayload(content, Charsets.UTF_8, XML_CONTENT_TYPE);
     final Status status = code < 300 ? Status.success(code) : Status.failure(code);
-    return new PayloadResponse(status, stringPayload);
+    return new Response.Builder()
+        .status(status)
+        .payload(stringPayload)
+        .build();
   }
 
   public String populateErrorTemplate(final int code, final String message) {

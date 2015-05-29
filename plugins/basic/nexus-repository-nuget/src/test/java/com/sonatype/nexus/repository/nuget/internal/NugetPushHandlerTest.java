@@ -20,7 +20,6 @@ import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -31,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -112,14 +112,15 @@ public class NugetPushHandlerTest
     checkResponse(response, HttpStatus.BAD_REQUEST, "application/xml", "Multipart request required");
   }
 
-  private void checkResponse(Response response,
-                             int expectedCode,
-                             String expectedContentType,
-                             String expectedSubstring) throws Exception
+  private void checkResponse(final Response response,
+                             final int expectedCode,
+                             final String expectedContentType,
+                             final String expectedSubstring)
+      throws Exception
   {
     assertThat(response.getStatus().getCode(), is(expectedCode));
-    assertThat(response instanceof PayloadResponse, is(true));
-    Payload responsePayload = ((PayloadResponse) response).getPayload();
+    assertThat(response.getPayload(), notNullValue());
+    Payload responsePayload = response.getPayload();
     assertThat(responsePayload.getContentType(), is(expectedContentType));
     String responseBody = Streams.asString(responsePayload.openInputStream());
     assertThat(responseBody.contains(expectedSubstring), is(true));

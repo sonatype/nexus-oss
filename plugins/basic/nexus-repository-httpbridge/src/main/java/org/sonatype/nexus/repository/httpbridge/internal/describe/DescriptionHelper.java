@@ -20,7 +20,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.util.StringMultimap;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
@@ -80,9 +79,8 @@ public class DescriptionHelper
     desc.addTable("Headers", toMap(response.getHeaders()));
     desc.addTable("Attributes", toMap(response.getAttributes()));
 
-    if (response instanceof PayloadResponse) {
-      final PayloadResponse payloadResponse = (PayloadResponse) response;
-      final Payload payload = payloadResponse.getPayload();
+    Payload payload = response.getPayload();
+    if (payload != null) {
       desc.addTable("Payload", toMap(payload));
     }
   }
