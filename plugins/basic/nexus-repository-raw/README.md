@@ -15,7 +15,7 @@
 # Configure Repositories
 
     orient:connect plocal:../sonatype-work/nexus/db/config admin admin
-    orient:insert 'into repository_configuration SET repository_name="rawhosted1", recipe_name="raw-hosted", attributes={"rawContent":{"strictContentTypeValidation":true}}'
+    orient:insert 'into repository_configuration SET repository_name="rawhosted1", recipe_name="raw-hosted", online=true, attributes={"storage":{"writePolicy":"ALLOW"}}'
     orient:insert 'into repository_configuration SET repository_name="rawhosted2", recipe_name="raw-hosted", attributes={"rawContent":{"strictContentTypeValidation":true}}'
     orient:insert 'into repository_configuration SET repository_name="rawproxy1", recipe_name="raw-proxy", attributes={"rawContent":{"strictContentTypeValidation":false},"proxy":{"remoteUrl":"http://repo1.maven.org/maven2/junit/junit/","artifactMaxAge":120}, "httpclient":{"connection":{"timeout":20000, "retries":2}},"negativeCache":{"enabled":true}}'
     orient:insert 'into repository_configuration SET repository_name="rawgroup1", recipe_name="raw-group", attributes={"group": { "memberNames": ["rawhosted1", "rawhosted1", "rawproxy1"] }}'
