@@ -26,7 +26,9 @@ import org.sonatype.nexus.repository.view.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
+import org.sonatype.nexus.repository.view.handlers.IndexHtmlForwardHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
+import org.sonatype.nexus.repository.view.matchers.SuffixMatcher
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
 import javax.annotation.Nonnull
@@ -63,6 +65,9 @@ class RawGroupRecipe
   TimingHandler timingHandler
 
   @Inject
+  IndexHtmlForwardHandler indexHtmlForwardHandler
+
+  @Inject
   SecurityHandler securityHandler
 
   @Inject
@@ -87,6 +92,13 @@ class RawGroupRecipe
    */
   private ViewFacet configure(final ConfigurableViewFacet viewFacet) {
     Router.Builder builder = new Router.Builder()
+
+    builder.route(new Route.Builder()
+        .matcher(new SuffixMatcher('/'))
+        .handler(timingHandler)
+        .handler(indexHtmlForwardHandler)
+        .create()
+    )
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
