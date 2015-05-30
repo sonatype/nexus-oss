@@ -47,7 +47,7 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 class RawGroupRecipe
     extends RecipeSupport
 {
-  public static final String NAME = "raw-group"
+  public static final String NAME = 'raw-group'
 
   @Inject
   Provider<RawSecurityFacet> securityFacet
@@ -101,7 +101,7 @@ class RawGroupRecipe
     )
 
     builder.route(new Route.Builder()
-        .matcher(new TokenMatcher("/{name:.+}"))
+        .matcher(new TokenMatcher('/{name:.+}'))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)

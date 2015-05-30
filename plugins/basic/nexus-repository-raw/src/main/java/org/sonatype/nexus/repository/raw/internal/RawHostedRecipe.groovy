@@ -48,7 +48,7 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 class RawHostedRecipe
     extends RecipeSupport
 {
-  public static final String NAME = "raw-hosted"
+  public static final String NAME = 'raw-hosted'
 
   @Inject
   Provider<RawSecurityFacet> securityFacet
@@ -113,7 +113,7 @@ class RawHostedRecipe
     )
 
     builder.route(new Route.Builder()
-        .matcher(new TokenMatcher("/{name:.+}"))
+        .matcher(new TokenMatcher('/{name:.+}'))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)

@@ -53,7 +53,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 class RawProxyRecipe
     extends RecipeSupport
 {
-  public static final String NAME = "raw-proxy"
+  public static final String NAME = 'raw-proxy'
 
   @Inject
   Provider<RawSecurityFacet> securityFacet
@@ -133,7 +133,7 @@ class RawProxyRecipe
     )
 
     builder.route(new Route.Builder()
-        .matcher(new TokenMatcher("/{name:.+}"))
+        .matcher(new TokenMatcher('/{name:.+}'))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)
