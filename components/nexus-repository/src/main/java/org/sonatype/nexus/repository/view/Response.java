@@ -25,6 +25,7 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * View response.
  *
+ * @see Response.Builder
  * @since 3.0
  */
 public class Response
