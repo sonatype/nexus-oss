@@ -40,6 +40,8 @@ public class IndexHtmlForwardHandler
     Request original = context.getRequest();
 
     String path = original.getPath();
+
+    // sanity, to ensure we don't corrupt the path
     if (!path.endsWith("/")) {
       path = path + "/";
     }
