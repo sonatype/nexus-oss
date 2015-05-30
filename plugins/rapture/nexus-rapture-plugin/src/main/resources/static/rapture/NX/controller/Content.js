@@ -66,6 +66,8 @@ Ext.define('NX.controller.Content', {
         description = feature.get('description'),
         cmp;
 
+    content.suspendEvents(true);
+
     // create new view and replace any current view
     if (Ext.isString(view)) {
       cmp = me.getView(view).create({});
@@ -104,8 +106,10 @@ Ext.define('NX.controller.Content', {
     // install new feature view
     content.add(cmp);
 
-    // fire activate event to view component
-    cmp.fireEvent('activate', cmp);
+    // Hack: fixes misaligned header icon bug in NEXUS-8644
+    setTimeout(function() {
+      content.resumeEvents();
+    }, 0);
 
     //<if debug>
     me.logDebug('Content changed to: ' + text + ' (' + cmp.self.getName() + ')');

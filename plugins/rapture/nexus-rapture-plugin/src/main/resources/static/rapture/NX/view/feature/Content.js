@@ -119,13 +119,6 @@ Ext.define('NX.view.feature.Content', {
   },
 
   /**
-   * The currently set iconCls, so we can remove it when changed.
-   *
-   * @private
-   */
-  currentIconCls: undefined,
-
-  /**
    * @public
    * Reset the discardUnsavedChanges flag (false by default)
    */
