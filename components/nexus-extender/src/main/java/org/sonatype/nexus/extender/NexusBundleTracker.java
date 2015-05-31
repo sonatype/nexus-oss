@@ -41,11 +41,10 @@ public class NexusBundleTracker
 
   private final Set<String> visited = new HashSet<>();
 
-  private final Bundle systemBundle;
+  private boolean stopping = false;
 
   public NexusBundleTracker(final BundleContext context, final MutableBeanLocator locator) {
     super(context, Bundle.STARTING | Bundle.ACTIVE, locator);
-    systemBundle = context.getBundle(0);
   }
 
   @Override
@@ -80,9 +79,20 @@ public class NexusBundleTracker
   }
 
   @Override
+  public void close() {
+    try {
+      stopping = true;
+      super.close();
+    }
+    finally {
+      stopping = false;
+      visited.clear();
+    }
+  }
+
+  @Override
   protected boolean evictBundle(final Bundle bundle) {
-    // when system is shutting down we disable eviction of bundles to keep things stable
-    return super.evictBundle(bundle) && (systemBundle.getState() & Bundle.STOPPING) == 0;
+    return stopping || super.evictBundle(bundle);
   }
 
   private void prepareDependencies(final Bundle bundle) {
