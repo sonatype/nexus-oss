@@ -19,15 +19,15 @@ import javax.inject.Named;
 import javax.validation.ConstraintValidatorContext;
 
 import org.sonatype.nexus.capability.CapabilityReference;
+import org.sonatype.nexus.capability.CapabilityReferenceFilterBuilder.CapabilityReferenceFilter;
 import org.sonatype.nexus.capability.CapabilityRegistry;
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.UniquePerCapabilityType;
-import org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder.CapabilityReferenceFilter;
 import org.sonatype.nexus.validation.ConstraintValidatorSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.capability.CapabilityReferenceFilterBuilder.capabilities;
 import static org.sonatype.nexus.capability.CapabilityType.capabilityType;
-import static org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder.capabilities;
 
 /**
  * {@link UniquePerCapabilityType} validator.

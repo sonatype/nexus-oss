@@ -10,16 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.support.condition;
+package org.sonatype.nexus.capability.condition;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.Condition;
-import org.sonatype.nexus.capability.condition.CipherKeyHighStrengthCondition;
-import org.sonatype.nexus.capability.condition.CipherKeyUnlimitedStrengthCondition;
-import org.sonatype.nexus.capability.condition.CipherRequiredCondition;
 import org.sonatype.sisu.goodies.crypto.CryptoHelper;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

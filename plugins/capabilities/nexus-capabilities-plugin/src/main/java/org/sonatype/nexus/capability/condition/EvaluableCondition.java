@@ -17,7 +17,6 @@ import org.sonatype.nexus.capability.CapabilityContextAware;
 import org.sonatype.nexus.capability.CapabilityEvent;
 import org.sonatype.nexus.capability.CapabilityIdentity;
 import org.sonatype.nexus.capability.Evaluable;
-import org.sonatype.nexus.capability.support.condition.ConditionSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;

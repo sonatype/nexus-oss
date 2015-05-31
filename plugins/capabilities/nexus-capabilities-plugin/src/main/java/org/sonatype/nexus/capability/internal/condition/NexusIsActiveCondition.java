@@ -17,7 +17,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.sonatype.nexus.capability.Condition;
-import org.sonatype.nexus.capability.support.condition.ConditionSupport;
+import org.sonatype.nexus.capability.condition.ConditionSupport;
 import org.sonatype.nexus.common.app.NexusStartedEvent;
 import org.sonatype.nexus.common.app.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;

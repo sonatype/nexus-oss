@@ -13,7 +13,6 @@
 package org.sonatype.nexus.capability.condition;
 
 import org.sonatype.nexus.capability.Condition;
-import org.sonatype.nexus.capability.support.condition.ConditionSupport;
 import org.sonatype.sisu.goodies.crypto.CryptoHelper;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.i18n.I18N;

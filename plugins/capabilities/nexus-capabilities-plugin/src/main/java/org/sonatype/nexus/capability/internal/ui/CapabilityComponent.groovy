@@ -23,10 +23,10 @@ import org.sonatype.nexus.capability.Capability
 import org.sonatype.nexus.capability.CapabilityDescriptor
 import org.sonatype.nexus.capability.CapabilityDescriptorRegistry
 import org.sonatype.nexus.capability.CapabilityReference
+import org.sonatype.nexus.capability.CapabilityReferenceFilterBuilder
 import org.sonatype.nexus.capability.CapabilityRegistry
 import org.sonatype.nexus.capability.Tag
 import org.sonatype.nexus.capability.Taggable
-import org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable

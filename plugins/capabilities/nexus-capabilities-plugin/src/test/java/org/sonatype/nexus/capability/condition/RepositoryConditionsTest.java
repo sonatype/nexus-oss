@@ -10,13 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.support.condition;
+package org.sonatype.nexus.capability.condition;
 
 import org.sonatype.nexus.capability.Condition;
-import org.sonatype.nexus.capability.internal.condition.NexusIsActiveCondition;
+import org.sonatype.nexus.capability.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,25 +27,41 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
 /**
- * {@link NexusConditions} UTs.
+ * {@link RepositoryConditions} UTs.
  *
  * @since capabilities 2.0
  */
-public class NexusConditionsTest
+public class RepositoryConditionsTest
     extends TestSupport
 {
 
+  private RepositoryConditions underTest;
+
+  @Before
+  public void setUpRepositoryConditions() {
+    final EventBus eventBus = mock(EventBus.class);
+    underTest = new RepositoryConditions(eventBus, mock(RepositoryManager.class));
+  }
+
   /**
-   * active() factory method returns expected condition.
+   * repositoryIsInService() factory method returns expected condition.
    */
   @Test
-  public void active() {
-    final NexusIsActiveCondition nexusIsActiveCondition = mock(NexusIsActiveCondition.class);
-    final NexusConditions underTest = new NexusConditions(nexusIsActiveCondition);
-
+  public void repositoryIsInService() {
     assertThat(
-        underTest.active(),
-        is(Matchers.<Condition>instanceOf(NexusIsActiveCondition.class))
+        underTest.repositoryIsOnline(mock(RepositoryName.class)),
+        is(Matchers.<Condition>instanceOf(RepositoryOnlineCondition.class))
+    );
+  }
+
+  /**
+   * repositoryExists() factory method returns expected condition.
+   */
+  @Test
+  public void repositoryExists() {
+    assertThat(
+        underTest.repositoryExists(mock(RepositoryName.class)),
+        is(Matchers.<Condition>instanceOf(RepositoryExistsCondition.class))
     );
   }
 

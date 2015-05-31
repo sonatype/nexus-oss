@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.support.condition;
+package org.sonatype.nexus.capability.condition;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -21,11 +21,6 @@ import org.sonatype.nexus.capability.CapabilityRegistry;
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.Evaluable;
-import org.sonatype.nexus.capability.condition.CapabilityHasNoFailures;
-import org.sonatype.nexus.capability.condition.CapabilityOfTypeActiveCondition;
-import org.sonatype.nexus.capability.condition.CapabilityOfTypeExistsCondition;
-import org.sonatype.nexus.capability.condition.EvaluableCondition;
-import org.sonatype.nexus.capability.condition.PassivateCapabilityDuringUpdateCondition;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;

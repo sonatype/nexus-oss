@@ -10,30 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.internal;
+package org.sonatype.nexus.capability.condition;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.log.LogConfigurationCustomizer;
-import org.sonatype.nexus.log.LoggerLevel;
+import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.internal.condition.NexusIsActiveCondition;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Capabilities {@link LogConfigurationCustomizer}.
+ * Factory of {@link Condition}s related to Nexus.
  *
- * @since 2.7
+ * @since capabilities 2.0
  */
-@Singleton
 @Named
-public class CapabilitiesLogConfigurationCustomizer
-    implements LogConfigurationCustomizer
+@Singleton
+public class NexusConditions
 {
 
-  @Override
-  public void customize(final Configuration configuration) {
-    // Useful loggers (level will be calculated as effective level)
-    configuration.setLoggerLevel("org.sonatype.nexus.capability", LoggerLevel.DEFAULT);
-    configuration.setLoggerLevel("org.sonatype.nexus.plugins.capabilities", LoggerLevel.DEFAULT);
+  private NexusIsActiveCondition nexusIsActiveCondition;
+
+  @Inject
+  public NexusConditions(final NexusIsActiveCondition nexusIsActiveCondition) {
+    this.nexusIsActiveCondition = checkNotNull(nexusIsActiveCondition);
+  }
+
+  /**
+   * Creates a new condition that is satisfied when Nexus is active (started but not stopped).
+   *
+   * @return created condition
+   */
+  public Condition active() {
+    return nexusIsActiveCondition;
   }
 
 }

@@ -21,8 +21,8 @@ import org.sonatype.nexus.capability.Capability;
 import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
-import org.sonatype.nexus.capability.support.condition.Conditions;
-import org.sonatype.nexus.capability.support.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.capability.condition.Conditions;
+import org.sonatype.nexus.capability.condition.RepositoryConditions.RepositoryName;
 
 import static org.sonatype.nexus.capability.Tag.repositoryTag;
 import static org.sonatype.nexus.capability.Tag.tags;

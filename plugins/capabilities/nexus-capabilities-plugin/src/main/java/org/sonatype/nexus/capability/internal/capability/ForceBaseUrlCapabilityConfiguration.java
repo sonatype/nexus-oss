@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.capability.internal.capability;
 
+import org.sonatype.nexus.capability.CapabilityConfigurationSupport;
 import org.sonatype.nexus.capability.UniquePerCapabilityType;
-import org.sonatype.nexus.capability.support.CapabilityConfigurationSupport;
 import org.sonatype.nexus.validation.group.Create;
 
 /**

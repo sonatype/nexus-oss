@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.capability.condition;
 
-import org.sonatype.nexus.capability.support.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.capability.condition.RepositoryConditions.RepositoryName;
 import org.sonatype.nexus.repository.manager.RepositoryCreatedEvent;
 import org.sonatype.nexus.repository.manager.RepositoryDeletedEvent;
 import org.sonatype.nexus.repository.manager.RepositoryManager;

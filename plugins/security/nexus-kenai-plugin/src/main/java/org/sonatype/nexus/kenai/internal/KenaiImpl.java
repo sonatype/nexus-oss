@@ -20,8 +20,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.CapabilityReference;
+import org.sonatype.nexus.capability.CapabilityReferenceFilterBuilder;
 import org.sonatype.nexus.capability.CapabilityRegistry;
-import org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder;
 import org.sonatype.nexus.kenai.Kenai;
 import org.sonatype.nexus.kenai.KenaiConfiguration;
 import org.sonatype.nexus.security.realm.RealmManager;

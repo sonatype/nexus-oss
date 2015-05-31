@@ -13,7 +13,6 @@
 package org.sonatype.nexus.capability.condition;
 
 import org.sonatype.nexus.capability.Condition;
-import org.sonatype.nexus.capability.support.condition.CompositeConditionSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**

@@ -15,7 +15,7 @@ package org.sonatype.nexus.capability.condition;
 import java.util.Collections;
 
 import org.sonatype.nexus.capability.EventBusTestSupport;
-import org.sonatype.nexus.capability.support.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.capability.condition.RepositoryConditions.RepositoryName;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryCreatedEvent;

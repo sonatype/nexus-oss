@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
-import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
+import org.sonatype.nexus.capability.CapabilityDescriptorSupport;
 
 /**
  * @since 2.7

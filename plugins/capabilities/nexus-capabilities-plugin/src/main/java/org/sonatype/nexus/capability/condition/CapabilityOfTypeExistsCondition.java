@@ -20,7 +20,6 @@ import org.sonatype.nexus.capability.CapabilityEvent;
 import org.sonatype.nexus.capability.CapabilityReference;
 import org.sonatype.nexus.capability.CapabilityRegistry;
 import org.sonatype.nexus.capability.CapabilityType;
-import org.sonatype.nexus.capability.support.condition.ConditionSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;

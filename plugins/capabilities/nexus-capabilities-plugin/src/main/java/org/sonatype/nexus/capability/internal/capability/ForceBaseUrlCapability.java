@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.sonatype.nexus.capability.support.CapabilitySupport;
+import org.sonatype.nexus.capability.CapabilitySupport;
 import org.sonatype.nexus.common.app.BaseUrlManager;
 import org.sonatype.nexus.common.app.SystemState;
 import org.sonatype.nexus.common.app.SystemStatus;

@@ -16,7 +16,6 @@ import org.sonatype.nexus.capability.CapabilityContext;
 import org.sonatype.nexus.capability.CapabilityContextAware;
 import org.sonatype.nexus.capability.CapabilityEvent.CallbackFailure;
 import org.sonatype.nexus.capability.CapabilityEvent.CallbackFailureCleared;
-import org.sonatype.nexus.capability.support.condition.ConditionSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;

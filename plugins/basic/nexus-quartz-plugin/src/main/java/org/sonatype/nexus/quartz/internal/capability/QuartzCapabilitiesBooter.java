@@ -14,8 +14,8 @@ package org.sonatype.nexus.quartz.internal.capability;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.capability.CapabilityBooterSupport;
 import org.sonatype.nexus.capability.CapabilityRegistry;
-import org.sonatype.nexus.capability.support.CapabilityBooterSupport;
 
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.sisu.EagerSingleton;
