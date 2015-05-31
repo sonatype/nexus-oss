@@ -13,7 +13,6 @@
 package org.sonatype.nexus.capability.condition;
 
 import org.sonatype.nexus.capability.Condition;
-import org.sonatype.nexus.capability.internal.condition.NexusIsActiveCondition;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.hamcrest.Matchers;

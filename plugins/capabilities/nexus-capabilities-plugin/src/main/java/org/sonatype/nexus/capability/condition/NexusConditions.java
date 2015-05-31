@@ -17,7 +17,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.Condition;
-import org.sonatype.nexus.capability.internal.condition.NexusIsActiveCondition;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
