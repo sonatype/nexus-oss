@@ -19,6 +19,8 @@ import org.sonatype.nexus.security.config.CPrivilege
 import org.sonatype.nexus.security.config.MemorySecurityConfiguration
 import org.sonatype.nexus.security.config.StaticSecurityConfigurationResource
 
+// FIXME: normalize names to use capability instead of capabilities
+
 /**
  * Capabilities security configuration.
  *

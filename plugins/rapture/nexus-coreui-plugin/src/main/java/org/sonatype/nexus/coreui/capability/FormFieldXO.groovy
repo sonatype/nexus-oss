@@ -10,53 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.internal.ui
-
-import javax.validation.constraints.NotNull
-
-import org.sonatype.nexus.capability.CapabilityTypeExists
-import org.sonatype.nexus.validation.group.Create
-import org.sonatype.nexus.validation.group.Update
+package org.sonatype.nexus.coreui.capability
 
 import groovy.transform.ToString
-import org.hibernate.validator.constraints.NotBlank
-import org.hibernate.validator.constraints.NotEmpty
 
 /**
- * Capability exchange object.
+ * Form field exchange object.
  *
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-class CapabilityXO
+class FormFieldXO
 {
-  @NotEmpty(groups = Update)
   String id
+  String type
+  String label
+  String helpText
+  Boolean required
+  String regexValidation
+  String initialValue
 
-  @NotBlank(groups = Create)
-  @CapabilityTypeExists(groups = Create)
-  String typeId
-
-  @NotNull
-  Boolean enabled
-
-  String notes
-
-  Map<String, String> properties
-
-  Boolean active
-
-  Boolean error
-
-  String description
-
-  String state
-
-  String stateDescription
-
-  String status
-
-  String typeName
-
-  Map<String, String> tags
+  String storeApi
+  Map<String, String> storeFilters
+  String idMapping
+  String nameMapping
 }

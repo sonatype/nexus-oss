@@ -46,12 +46,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-extdirect-plugin</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-testsupport</artifactId>
       <scope>test</scope>

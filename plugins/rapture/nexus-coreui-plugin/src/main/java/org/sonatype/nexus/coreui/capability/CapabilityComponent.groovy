@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.internal.ui
+package org.sonatype.nexus.coreui.capability
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -45,6 +45,8 @@ import org.slf4j.LoggerFactory
 
 import static org.sonatype.nexus.capability.CapabilityIdentity.capabilityIdentity
 import static org.sonatype.nexus.capability.CapabilityType.capabilityType
+
+// FIXME: update action name after refactor to use coreui_*
 
 /**
  * Capabilities {@link DirectComponent}.
