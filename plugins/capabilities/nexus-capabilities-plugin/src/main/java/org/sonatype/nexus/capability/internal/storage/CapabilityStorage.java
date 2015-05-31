@@ -18,17 +18,19 @@ import java.util.Map;
 import org.sonatype.nexus.capability.CapabilityIdentity;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
-public interface CapabilityStorage extends Lifecycle
+/**
+ * Capability storage.
+ */
+public interface CapabilityStorage
+    extends Lifecycle
 {
-
   /**
    * Adds a capability
    *
    * @param item to be added
    * @throws IOException IOException If any problem encountered while read/store of capabilities storage
    */
-  public CapabilityIdentity add(CapabilityStorageItem item)
-      throws IOException;
+  CapabilityIdentity add(CapabilityStorageItem item) throws IOException;
 
   // FIXME: update() and remove() return values are never used, probably should return void instead
 
@@ -39,8 +41,7 @@ public interface CapabilityStorage extends Lifecycle
    * @return false if capability to be updated does not exist in storage, true otherwise
    * @throws IOException If any problem encountered while read/store of capabilities storage
    */
-  public boolean update(CapabilityIdentity id, CapabilityStorageItem item)
-      throws IOException;
+  boolean update(CapabilityIdentity id, CapabilityStorageItem item) throws IOException;
 
   /**
    * Deletes stored capability if exists.
@@ -49,8 +50,7 @@ public interface CapabilityStorage extends Lifecycle
    * @return false if capability to be deleted does not exist in storage, true otherwise
    * @throws IOException If any problem encountered while read/store of capabilities storage
    */
-  public boolean remove(CapabilityIdentity id)
-      throws IOException;
+  boolean remove(CapabilityIdentity id) throws IOException;
 
   /**
    * Retrieves stored capabilities.
@@ -58,7 +58,5 @@ public interface CapabilityStorage extends Lifecycle
    * @return capabilities (never null)
    * @throws IOException If any problem encountered while read/store of capabilities storage
    */
-  public Map<CapabilityIdentity, CapabilityStorageItem> getAll()
-      throws IOException;
-
+  Map<CapabilityIdentity, CapabilityStorageItem> getAll() throws IOException;
 }
