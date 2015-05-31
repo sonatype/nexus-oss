@@ -10,16 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.internal;
+package org.sonatype.nexus.capability;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.ConstraintValidatorContext;
 
-import org.sonatype.nexus.capability.CapabilityDescriptorRegistry;
-import org.sonatype.nexus.capability.CapabilityFactoryRegistry;
-import org.sonatype.nexus.capability.CapabilityType;
-import org.sonatype.nexus.capability.CapabilityTypeExists;
 import org.sonatype.nexus.validation.ConstraintValidatorSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
