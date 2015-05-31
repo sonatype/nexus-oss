@@ -25,7 +25,7 @@ public class CapabilityIdentity
   private final String value;
 
   public CapabilityIdentity(final String value) {
-    this.value = checkNotNull(value, "Capability identity value cannot be null");
+    this.value = checkNotNull(value);
   }
 
   @Override

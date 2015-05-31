@@ -29,7 +29,7 @@ public class CapabilityType
   private final String typeId;
 
   public CapabilityType(final String typeId) {
-    this.typeId = checkNotNull(typeId, "Capability type value cannot be null");
+    this.typeId = checkNotNull(typeId);
   }
 
   @Override

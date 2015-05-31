@@ -41,8 +41,8 @@ public class Tag
   private final String value;
 
   public Tag(final String key, final String value) {
-    this.key = checkNotNull(key, "key");
-    this.value = checkNotNull(value, "value");
+    this.key = checkNotNull(key);
+    this.value = checkNotNull(value);
   }
 
   public String key() {
@@ -80,7 +80,7 @@ public class Tag
    * Convenience method for creating a set of tags
    */
   public static Set<Tag> tags(final Tag... tags) {
-    return Sets.newHashSet(checkNotNull(tags, "tags"));
+    return Sets.newHashSet(checkNotNull(tags));
   }
 
   /**

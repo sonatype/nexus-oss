@@ -228,8 +228,8 @@ public class CapabilityEvent
                            final Exception failure)
     {
       super(capabilityRegistry, reference);
-      this.failingAction = checkNotNull(failingAction, "failingAction");
-      this.failure = checkNotNull(failure, "failure");
+      this.failingAction = checkNotNull(failingAction);
+      this.failure = checkNotNull(failure);
     }
 
     @Override
