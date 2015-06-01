@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repository.httpbridge.internal;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.Enumeration;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -28,13 +28,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescribeType;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.Description;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionHelper;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionRenderer;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.ViewFacet;
@@ -156,8 +156,33 @@ public class ViewServlet
     log.debug("Dispatching to view facet: {}", facet);
 
     // Dispatch the request
-    final HttpRequestAdapter request = new HttpRequestAdapter(httpRequest, path.getRemainingPath());
+    Request request = buildRequest(httpRequest, path.getRemainingPath());
     dispatchAndSend(request, facet, httpResponseSenderSelector.sender(repo), httpResponse);
+  }
+
+  /**
+   * Build view request from {@link HttpServletRequest}.
+   */
+  private Request buildRequest(final HttpServletRequest httpRequest, final String path) {
+    Request.Builder builder = new Request.Builder()
+        .headers(new HttpHeadersAdapter(httpRequest))
+        .action(httpRequest.getMethod())
+        .path(path)
+        .parameters(new HttpParametersAdapter(httpRequest))
+        .payload(new HttpRequestPayloadAdapter(httpRequest));
+
+    if (HttpPartIteratorAdapter.isMultipart(httpRequest)) {
+      builder.multiparts(new HttpPartIteratorAdapter(httpRequest));
+    }
+
+    // copy http-servlet-request attributes
+    Enumeration<String> attributes = httpRequest.getAttributeNames();
+    while (attributes.hasMoreElements()) {
+      String name = attributes.nextElement();
+      builder.attribute(name, httpRequest.getAttribute(name));
+    }
+
+    return builder.build();
   }
 
   @VisibleForTesting
@@ -209,11 +234,11 @@ public class ViewServlet
     switch (type) {
       case HTML: {
         String html = descriptionRenderer.renderHtml(description);
-        return HttpResponses.ok(new StringPayload(html, Charsets.UTF_8, "text/html"));
+        return HttpResponses.ok(new StringPayload(html, Charsets.UTF_8, ContentTypes.TEXT_HTML));
       }
       case JSON: {
         String json = descriptionRenderer.renderJson(description);
-        return HttpResponses.ok(new StringPayload(json, Charsets.UTF_8, "application/json"));
+        return HttpResponses.ok(new StringPayload(json, Charsets.UTF_8, ContentTypes.APPLICATION_JSON));
       }
       default:
         throw new RuntimeException("Invalid describe-type: " + type);
@@ -226,7 +251,7 @@ public class ViewServlet
    * Needed in a few places _before_ we have a repository instance to determine its specific sender.
    */
   @VisibleForTesting
-  void send(final @Nullable Request request, final Response response, final HttpServletResponse httpResponse)
+  void send(@Nullable final Request request, final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
     httpResponseSenderSelector.defaultSender().send(request, response, httpResponse);

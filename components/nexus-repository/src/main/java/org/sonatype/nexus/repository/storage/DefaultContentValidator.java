@@ -85,7 +85,7 @@ public class DefaultContentValidator
       }
     }
     if (contentType == null) {
-      contentType = ContentTypes.OCTET_STREAM;
+      contentType = ContentTypes.APPLICATION_OCTET_STREAM;
     }
     return contentType;
   }

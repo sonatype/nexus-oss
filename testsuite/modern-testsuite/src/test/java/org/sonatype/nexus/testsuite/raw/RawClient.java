@@ -24,10 +24,8 @@ import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.util.EntityUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A simple test client for Raw repositories.
@@ -53,10 +51,7 @@ public class RawClient
   }
 
   public byte[] getBytes(final String path) throws Exception {
-    final HttpResponse httpResponse = get(path);
-    checkState(httpResponse.getEntity() != null);
-
-    return EntityUtils.toByteArray(httpResponse.getEntity());
+    return bytes(get(path));
   }
 
   public HttpResponse delete(final String path) throws Exception {

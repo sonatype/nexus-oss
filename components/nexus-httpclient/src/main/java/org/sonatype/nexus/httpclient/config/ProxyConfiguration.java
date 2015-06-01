@@ -17,6 +17,8 @@ import java.util.Arrays;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 
+import com.google.common.base.Throwables;
+
 /**
  * Proxy configuration.
  *
@@ -61,6 +63,25 @@ public class ProxyConfiguration
 
   public void setNonProxyHosts(@Nullable final String[] nonProxyHosts) {
     this.nonProxyHosts = nonProxyHosts;
+  }
+
+  public ProxyConfiguration copy() {
+    try {
+      ProxyConfiguration copy = (ProxyConfiguration)clone();
+      if (http != null) {
+        copy.http = http.copy();
+      }
+      if (https != null) {
+        copy.https = https.copy();
+      }
+      if (nonProxyHosts != null) {
+        copy.nonProxyHosts = nonProxyHosts.clone();
+      }
+      return copy;
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override
