@@ -42,6 +42,7 @@ public class RawMavenSiteIT
   @Before
   public void createHostedRepository() throws Exception {
     final Configuration configuration = hostedConfig("test-raw-repo");
+    configuration.attributes("storage").set("strictContentChecking", Boolean.FALSE.toString());
     repository = createRepository(configuration);
     client = client(repository);
   }
