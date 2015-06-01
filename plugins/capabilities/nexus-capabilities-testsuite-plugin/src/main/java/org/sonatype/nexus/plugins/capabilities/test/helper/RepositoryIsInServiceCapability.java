@@ -64,13 +64,12 @@ public class RepositoryIsInServiceCapability
   @Override
   public Condition validityCondition() {
     return repositoryConditions.repositoryExists(new RepositoryName()
-                                                 {
-                                                   @Override
-                                                   public String get() {
-                                                     return context().properties().get(REPOSITORY);
-                                                   }
-                                                 }
-    );
+    {
+      @Override
+      public String get() {
+        return context().properties().get(REPOSITORY);
+      }
+    });
   }
 
   @Override
