@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.internal;
+package org.sonatype.nexus.internal.capability;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -39,10 +39,10 @@ import org.sonatype.nexus.capability.CapabilityReference;
 import org.sonatype.nexus.capability.CapabilityRegistry;
 import org.sonatype.nexus.capability.CapabilityRegistryEvent.AfterLoad;
 import org.sonatype.nexus.capability.CapabilityType;
-import org.sonatype.nexus.capability.internal.storage.CapabilityStorage;
-import org.sonatype.nexus.capability.internal.storage.CapabilityStorageItem;
 import org.sonatype.nexus.formfields.Encrypted;
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.internal.capability.storage.CapabilityStorage;
+import org.sonatype.nexus.internal.capability.storage.CapabilityStorageItem;
 import org.sonatype.nexus.security.PasswordHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;

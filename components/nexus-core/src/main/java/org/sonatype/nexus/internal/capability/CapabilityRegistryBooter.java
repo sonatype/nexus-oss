@@ -10,17 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.internal;
+package org.sonatype.nexus.internal.capability;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.CapabilityRegistryEvent.Ready;
-import org.sonatype.nexus.capability.internal.storage.OrientCapabilityStorage;
 import org.sonatype.nexus.common.app.NexusInitializedEvent;
 import org.sonatype.nexus.common.app.NexusStoppingEvent;
 import org.sonatype.nexus.common.event.EventSubscriber;
+import org.sonatype.nexus.internal.capability.storage.OrientCapabilityStorage;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;

@@ -10,16 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.internal;
+package org.sonatype.nexus.internal.capability;
 
 /**
- * Factory of {@link ValidityConditionHandler}.
+ * Factory of {@link ActivationConditionHandler}.
  *
  * @since capabilities 2.0
  */
-public interface ValidityConditionHandlerFactory
+public interface ActivationConditionHandlerFactory
 {
 
-  ValidityConditionHandler create(final DefaultCapabilityReference reference);
+  ActivationConditionHandler create(final DefaultCapabilityReference reference);
 
 }

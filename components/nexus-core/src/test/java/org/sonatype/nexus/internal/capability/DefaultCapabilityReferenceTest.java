@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.internal;
+package org.sonatype.nexus.internal.capability;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,7 +27,6 @@ import org.sonatype.nexus.capability.condition.Conditions;
 import org.sonatype.nexus.capability.condition.LogicalConditions;
 import org.sonatype.nexus.capability.condition.NexusConditions;
 import org.sonatype.nexus.capability.condition.NexusIsActiveCondition;
-import org.sonatype.nexus.capability.condition.RepositoryConditions;
 import org.sonatype.nexus.capability.condition.crypto.CryptoConditions;
 import org.sonatype.nexus.common.app.NexusStartedEvent;
 import org.sonatype.nexus.common.app.NexusStoppedEvent;
@@ -51,7 +50,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.capability.CapabilityIdentity.capabilityIdentity;
 import static org.sonatype.nexus.capability.CapabilityType.capabilityType;
-import static org.sonatype.nexus.capability.internal.DefaultCapabilityReference.sameProperties;
+import static org.sonatype.nexus.internal.capability.DefaultCapabilityReference.sameProperties;
 
 /**
  * {@link DefaultCapabilityReference} UTs.
@@ -95,7 +94,7 @@ public class DefaultCapabilityReferenceTest
     final Conditions conditions = new Conditions(
         new LogicalConditions(eventBus),
         new CapabilityConditions(eventBus, mock(CapabilityDescriptorRegistry.class), mock(CapabilityRegistry.class)),
-        mock(RepositoryConditions.class),
+        //mock(RepositoryConditions.class),
         new NexusConditions(new NexusIsActiveCondition(eventBus)),
         mock(CryptoConditions.class)
     );
