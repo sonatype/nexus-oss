@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 
+import javax.annotation.Nonnull;
 import javax.inject.Named;
 
 import com.sonatype.nexus.repository.nuget.internal.ComponentQuery.Builder;
@@ -49,6 +50,7 @@ import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
+import org.sonatype.nexus.repository.view.payloads.StreamPayload.InputStreamSupplier;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
@@ -342,7 +344,7 @@ public class NugetGalleryFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public Payload get(String id, String version) throws IOException {
+  public Payload get(final String id, final String version) throws IOException {
     checkNotNull(id);
     checkNotNull(version);
 
@@ -353,10 +355,20 @@ public class NugetGalleryFacetImpl
       }
       Asset asset = tx.firstAsset(component);
 
-      Blob blob = tx.requireBlob(asset.requireBlobRef());
+      final Blob blob = tx.requireBlob(asset.requireBlobRef());
       String contentType = asset.contentType();
 
-      return new StreamPayload(blob.getInputStream(), blob.getMetrics().getContentSize(), contentType);
+      return new StreamPayload(
+          new InputStreamSupplier() {
+            @Nonnull
+            @Override
+            public InputStream get() throws IOException {
+              return blob.getInputStream();
+            }
+          },
+          blob.getMetrics().getContentSize(),
+          contentType
+      );
     }
   }
 

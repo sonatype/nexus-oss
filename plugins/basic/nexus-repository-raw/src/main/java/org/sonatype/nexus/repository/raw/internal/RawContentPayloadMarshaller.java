@@ -15,9 +15,12 @@ package org.sonatype.nexus.repository.raw.internal;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nonnull;
+
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
+import org.sonatype.nexus.repository.view.payloads.StreamPayload.InputStreamSupplier;
 
 import org.joda.time.DateTime;
 
@@ -57,10 +60,18 @@ public class RawContentPayloadMarshaller
     };
   }
 
-  public static Payload toPayload(RawContent content) throws IOException {
+  public static Payload toPayload(final RawContent content) throws IOException {
     checkNotNull(content);
-    return new StreamPayload(content.openInputStream(),
+    return new StreamPayload(
+        new InputStreamSupplier() {
+          @Nonnull
+          @Override
+          public InputStream get() throws IOException {
+            return content.openInputStream();
+          }
+        },
         content.getSize(),
-        content.getContentType());
+        content.getContentType()
+    );
   }
 }
