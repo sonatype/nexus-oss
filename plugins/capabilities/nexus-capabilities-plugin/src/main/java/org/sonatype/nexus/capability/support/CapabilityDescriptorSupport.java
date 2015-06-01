@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -30,9 +31,7 @@ import org.sonatype.nexus.validation.group.Update;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
-
 import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;

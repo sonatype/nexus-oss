@@ -15,6 +15,7 @@ package org.sonatype.nexus.capability.support;
 import java.net.URL;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -28,9 +29,7 @@ import org.sonatype.sisu.goodies.i18n.MessageBundle;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 import org.sonatype.sisu.goodies.template.TemplateThrowableAdapter;
-
 import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
