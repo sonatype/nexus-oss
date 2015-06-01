@@ -27,6 +27,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
@@ -73,8 +74,7 @@ public class RawProxyOfHostedIT
     final File testFile = resolveTestFile(TEST_CONTENT);
     hostedClient.put(TEST_PATH, testFile);
 
-    final byte[] bytes = proxyClient.getBytes(TEST_PATH);
-    assertThat(bytes, is(Files.toByteArray(testFile)));
+    assertThat(bytes(proxyClient.get(TEST_PATH)), is(Files.toByteArray(testFile)));
   }
 
   @Test
