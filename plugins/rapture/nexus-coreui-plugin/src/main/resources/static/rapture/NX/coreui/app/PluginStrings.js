@@ -147,7 +147,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_TITLE: 'Repositories',
     ADMIN_REPOSITORIES_SUBTITLE: 'Manage repositories',
     ADMIN_REPOSITORIES_CREATE_TITLE: 'Create Repository: {0}',
-    ADMIN_REPOSITORIES_SELECT_TITLE: 'Select Provider',
+    ADMIN_REPOSITORIES_SELECT_TITLE: 'Select Recipe',
     ADMIN_REPOSITORIES_CREATE_SUCCESS: 'Repository created: ',
     ADMIN_REPOSITORIES_CREATE_ERROR: 'You do not have permission to create repositories',
     ADMIN_REPOSITORIES_UPDATE_SUCCESS: 'Repository updated: ',
