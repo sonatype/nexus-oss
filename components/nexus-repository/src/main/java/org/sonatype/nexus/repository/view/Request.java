@@ -76,6 +76,7 @@ public class Request
     return action;
   }
 
+  @Deprecated
   public String getRequestUrl() {
     return requestUrl;
   }

@@ -104,8 +104,13 @@ public interface Repository
   /**
    * Returns a facet instance for the given type.
    *
-   * @throws MissingFacetException  Request facet type was not previously attached.
+   * @throws MissingFacetException Request facet type was not previously attached.
    */
   @Nonnull
   <T extends Facet> T facet(Class<T> type) throws MissingFacetException;
+
+  /**
+   * Returns the URL for the root of the repository, without its trailing slash.
+   */
+  String getUrl();
 }
