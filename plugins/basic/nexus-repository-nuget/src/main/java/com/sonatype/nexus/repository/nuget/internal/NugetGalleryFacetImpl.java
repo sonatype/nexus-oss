@@ -314,13 +314,12 @@ public class NugetGalleryFacetImpl
 
       recordMetadata.putAll(packageMetadata);
 
-      // TODO: Do something cleaner with this derived data, as well as the derived stuff inside createOrUpdateComponent
-      // Note: These are defaults that hold for locally-published packages,
-      // but should be overridden for remotely fetched content
+      // Add time-related metadata, not present in the .nuspec
       final String creationTime = ODataFeedUtils.datetime(clock.millis());
       recordMetadata.put(CREATED, creationTime);
       recordMetadata.put(LAST_UPDATED, creationTime);
       recordMetadata.put(PUBLISHED, creationTime);
+
       try (InputStream in = tempStream.get()) {
         createOrUpdatePackageAndContents(storageTx, recordMetadata, in);
       }
@@ -367,8 +366,9 @@ public class NugetGalleryFacetImpl
       if (component == null) {
         return null;
       }
+      Asset asset = tx.firstAsset(component);
 
-      final NestedAttributesMap nugetAttributes = component.formatAttributes();
+      final NestedAttributesMap nugetAttributes = asset.formatAttributes();
       Date date = nugetAttributes.get(P_LAST_UPDATED, Date.class);
       return new DateTime(checkNotNull(date));
     }
@@ -531,8 +531,6 @@ public class NugetGalleryFacetImpl
       Asset asset = findOrCreateAsset(storageTx, component);
       updateAssetMetadata(asset, data, component.isNew());
 
-
-      // TODO: Here, record information about the blob itself
       storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
 
       storageTx.saveAsset(asset);
@@ -598,6 +596,7 @@ public class NugetGalleryFacetImpl
 
     final Date now = new Date(clock.millis());
     if (!republishing && isRepoAuthoritative()) {
+      // This is the first insertion into a hosted repository
       storedMetadata.set(P_CREATED, now);
       storedMetadata.set(P_PUBLISHED, now);
     }
@@ -606,8 +605,8 @@ public class NugetGalleryFacetImpl
       storedMetadata.set(P_PUBLISHED, ODataUtils.toDate(incomingMetadata.get(PUBLISHED)));
     }
 
-    // TODO: Sort this out, this isn't quite right
-    storedMetadata.set(P_LAST_UPDATED, ODataUtils.toDate(incomingMetadata.get(LAST_UPDATED)));
+    final String lastUpdated = incomingMetadata.get(LAST_UPDATED);
+    storedMetadata.set(P_LAST_UPDATED, lastUpdated == null ? new Date() : ODataUtils.toDate(lastUpdated));
 
     // Populate keywords for case-insensitive search
     Joiner joiner = Joiner.on(" ").skipNulls();
