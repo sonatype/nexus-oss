@@ -10,12 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.orient;
+package org.sonatype.nexus.test.orient;
 
 import java.util.List;
 
+import org.sonatype.nexus.orient.DatabaseInstance;
+import org.sonatype.nexus.orient.MemoryDatabaseManager;
+import org.sonatype.nexus.orient.MinimalDatabaseServer;
+
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
+
 import org.junit.rules.ExternalResource;
 import org.junit.runners.model.MultipleFailureException;
 import org.slf4j.Logger;
