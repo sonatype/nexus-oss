@@ -91,8 +91,6 @@ public class NugetGalleryFacetImpl
     extends FacetSupport
     implements NugetGalleryFacet
 {
-  public static final String NUGET = "nuget";
-
   public static final String WITH_NAMESPACES =
       " xmlns:d=\"http://schemas.microsoft.com/ado/2007/08/dataservices\" " +
           "xmlns:m=\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\" xmlns=\"http://www.w3.org/2005/Atom\"";
@@ -305,7 +303,7 @@ public class NugetGalleryFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void put(final InputStream inputStream) throws IOException, NugetPackageException {
-    String componentId = null;
+    String componentId;
 
     try (StorageTx storageTx = openStorageTx();
          TempStreamSupplier tempStream = new TempStreamSupplier(inputStream)) {
@@ -318,16 +316,14 @@ public class NugetGalleryFacetImpl
 
       recordMetadata.putAll(packageMetadata);
 
-      // TODO: Do something cleaner with this derived data, as well as the derived stuff inside createOrUpdateComponent
-      // Note: These are defaults that hold for locally-published packages,
-      // but should be overridden for remotely fetched content
+      // Add time-related metadata, not present in the .nuspec
       final String creationTime = ODataFeedUtils.datetime(clock.millis());
       recordMetadata.put(CREATED, creationTime);
       recordMetadata.put(LAST_UPDATED, creationTime);
       recordMetadata.put(PUBLISHED, creationTime);
-      Component component;
+
       try (InputStream in = tempStream.get()) {
-        component = createOrUpdatePackageAndContents(storageTx, recordMetadata, in);
+        createOrUpdatePackageAndContents(storageTx, recordMetadata, in);
       }
 
       componentId = recordMetadata.get(ID);
@@ -382,8 +378,9 @@ public class NugetGalleryFacetImpl
       if (component == null) {
         return null;
       }
+      Asset asset = tx.firstAsset(component);
 
-      final NestedAttributesMap nugetAttributes = component.formatAttributes();
+      final NestedAttributesMap nugetAttributes = asset.formatAttributes();
       Date date = nugetAttributes.get(P_LAST_UPDATED, Date.class);
       return new DateTime(checkNotNull(date));
     }
@@ -545,7 +542,9 @@ public class NugetGalleryFacetImpl
     try {
       Asset asset = findOrCreateAsset(storageTx, component);
       updateAssetMetadata(asset, data, component.isNew());
+
       storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
+
       storageTx.saveAsset(asset);
     }
     catch (IOException e) {
@@ -609,6 +608,7 @@ public class NugetGalleryFacetImpl
 
     final Date now = new Date(clock.millis());
     if (!republishing && isRepoAuthoritative()) {
+      // This is the first insertion into a hosted repository
       storedMetadata.set(P_CREATED, now);
       storedMetadata.set(P_PUBLISHED, now);
     }
@@ -616,6 +616,9 @@ public class NugetGalleryFacetImpl
       storedMetadata.set(P_CREATED, ODataUtils.toDate(incomingMetadata.get(CREATED)));
       storedMetadata.set(P_PUBLISHED, ODataUtils.toDate(incomingMetadata.get(PUBLISHED)));
     }
+
+    final String lastUpdated = incomingMetadata.get(LAST_UPDATED);
+    storedMetadata.set(P_LAST_UPDATED, lastUpdated == null ? new Date() : ODataUtils.toDate(lastUpdated));
 
     // Populate keywords for case-insensitive search
     Joiner joiner = Joiner.on(" ").skipNulls();

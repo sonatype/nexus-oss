@@ -19,6 +19,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpStatus;
 
+import com.google.common.io.Files;
 import org.apache.http.HttpResponse;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +30,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
@@ -122,6 +124,18 @@ public class NugetHostedIT
   public void deleteMissingPackageReturns404() throws Exception {
     final int delete = status(nuget.delete("no-such-package", "1.0"));
     assertThat(delete, is(HttpStatus.NOT_FOUND));
+  }
+
+  @Test
+  public void downloadPackage() throws Exception {
+    final int publish = nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
+    assertThat(publish, is(HttpStatus.CREATED));
+    waitFor(calmPeriod());
+
+    final HttpResponse response = nuget.packageContent("SONATYPE.TEST", "1.0");
+
+    assertThat(status(response), is(HttpStatus.OK));
+    assertThat(bytes(response), is(Files.toByteArray(resolveTestFile("SONATYPE.TEST.1.0.nupkg"))));
   }
 
   /**
