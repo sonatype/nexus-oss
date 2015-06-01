@@ -33,17 +33,6 @@ import static com.google.common.base.Preconditions.checkState;
 public class Context
     extends ComponentSupport
 {
-  /**
-   * Custom attributes to configure backing and logging.
-   */
-  private static class Attributes
-    extends AttributesMap
-  {
-    public Attributes() {
-      super(Maps.<String, Object>newHashMap());
-    }
-  }
-
   private final Attributes attributes = new Attributes();
 
   private final Repository repository;
@@ -93,6 +82,21 @@ public class Context
       if (handlers.hasPrevious()) {
         handlers.previous();
       }
+    }
+  }
+
+  //
+  // Attributes
+  //
+
+  /**
+   * Custom attributes to configure backing and logging.
+   */
+  public static class Attributes
+      extends AttributesMap
+  {
+    public Attributes() {
+      super(Maps.<String, Object>newHashMap());
     }
   }
 

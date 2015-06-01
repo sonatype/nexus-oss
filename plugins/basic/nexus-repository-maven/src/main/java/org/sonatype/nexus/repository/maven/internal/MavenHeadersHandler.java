@@ -21,7 +21,6 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -44,8 +43,9 @@ public class MavenHeadersHandler
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
     final Response response = context.proceed();
-    if (response.getStatus().isSuccessful() && response instanceof PayloadResponse) {
-      final Payload payload = ((PayloadResponse) response).getPayload();
+    Payload payload = response.getPayload();
+
+    if (response.getStatus().isSuccessful() && payload != null) {
       if (payload instanceof Content) {
         final Content content = (Content) payload;
         final DateTime lastModified = content.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
