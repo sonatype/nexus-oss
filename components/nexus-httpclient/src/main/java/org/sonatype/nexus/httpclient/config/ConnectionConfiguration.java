@@ -18,6 +18,7 @@ import org.sonatype.sisu.goodies.common.Time;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.base.Throwables;
 
 /**
  * Connection configuration.
@@ -37,8 +38,6 @@ public class ConnectionConfiguration
 
   @Nullable
   private String userAgentSuffix;
-
-  // TODO: query-string
 
   @Nullable
   private Boolean useTrustStore;
@@ -70,6 +69,15 @@ public class ConnectionConfiguration
   public Boolean getUseTrustStore() { return useTrustStore; }
 
   public void setUseTrustStore(@Nullable final Boolean useTrustStore) { this.useTrustStore = useTrustStore; }
+
+  public ConnectionConfiguration copy() {
+    try {
+      return (ConnectionConfiguration)clone();
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
+  }
 
   @Override
   public String toString() {

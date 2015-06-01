@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.httpclient.config;
 
+import com.google.common.base.Throwables;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -33,4 +35,13 @@ public abstract class AuthenticationConfiguration
   }
 
   // TODO: preemptive?
+
+  public AuthenticationConfiguration copy() {
+    try {
+      return (AuthenticationConfiguration)clone();
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
+  }
 }
