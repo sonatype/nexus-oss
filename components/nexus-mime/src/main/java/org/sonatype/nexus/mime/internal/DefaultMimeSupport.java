@@ -197,5 +197,10 @@ public class DefaultMimeSupport
     for (MediaType alias : tikaConfig.getMediaTypeRegistry().getAliases(mt)) {
       detected.add(alias.getBaseType().toString());
     }
+    // add super types if augmented with "+suffix"
+    // TODO: Tika supports +xml and +zip only for now
+    if (mt.getSubtype().endsWith("+xml") || mt.getSubtype().endsWith("+zip")) {
+      detected.add(tikaConfig.getMediaTypeRegistry().getSupertype(mt).toString());
+    }
   }
 }

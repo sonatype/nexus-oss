@@ -14,8 +14,7 @@ package org.sonatype.nexus.repository.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -30,8 +29,10 @@ import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Sets;
+import com.google.common.net.MediaType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -64,28 +65,35 @@ public class DefaultContentValidator
                                      @Nullable String declaredContentType) throws IOException
   {
     checkNotNull(contentSupplier);
+    String declaredBaseContentType = mediaTypeWithoutParameters(declaredContentType);
 
-    final List<String> contentDetectedMimeTypes = new ArrayList<>();
+    final LinkedHashSet<String> contentDetectedMimeTypes = new LinkedHashSet<>();
     try (InputStream is = contentSupplier.get()) {
       contentDetectedMimeTypes.addAll(mimeSupport.detectMimeTypes(is, contentName));
     }
-    log.debug("Mime support detected content types {}", contentDetectedMimeTypes);
+    if (isHtml(contentDetectedMimeTypes)) {
+      // to circumvent on xhtml vs html, we will treat both as text/html which is okay for content validation purposes
+      contentDetectedMimeTypes.add(MediaType.HTML_UTF_8.withoutParameters().toString());
+    }
+    log.debug("Mime support detects {} as {}", contentName, contentDetectedMimeTypes);
 
     if (strictContentTypeValidation && isUnknown(contentDetectedMimeTypes)) {
       throw new InvalidContentException("Content type could not be determined");
     }
 
-    final List<String> nameAssumedMimeTypes = new ArrayList<>();
+    final LinkedHashSet<String> nameAssumedMimeTypes = new LinkedHashSet<>();
     if (contentName != null) {
       nameAssumedMimeTypes.addAll(mimeSupport.guessMimeTypesListFromPath(mimeRulesSource, contentName));
+      if (isHtml(nameAssumedMimeTypes)) {
+        // to circumvent on xhtml vs html, we will treat both as text/html which is okay for content validation purposes
+        nameAssumedMimeTypes.add(MediaType.HTML_UTF_8.withoutParameters().toString());
+      }
+      log.debug("Mime support assumes {} as {}", contentName, nameAssumedMimeTypes);
       if (strictContentTypeValidation && isUnknown(nameAssumedMimeTypes)) {
         throw new InvalidContentException("Content type could not be guessed");
       }
 
-      Set<String> intersection = Sets.intersection(
-          Sets.newHashSet(contentDetectedMimeTypes),
-          Sets.newHashSet(nameAssumedMimeTypes)
-      );
+      Set<String> intersection = Sets.intersection(contentDetectedMimeTypes, nameAssumedMimeTypes);
       log.debug("content/name types intersection {}", intersection);
       if (strictContentTypeValidation && intersection.isEmpty()) {
         throw new InvalidContentException(
@@ -95,13 +103,10 @@ public class DefaultContentValidator
       }
     }
 
-    if (declaredContentType != null) {
-      Set<String> union = Sets.union(
-          Sets.newHashSet(contentDetectedMimeTypes),
-          Sets.newHashSet(nameAssumedMimeTypes)
-      );
+    if (declaredBaseContentType != null) {
+      Set<String> union = Sets.union(contentDetectedMimeTypes, nameAssumedMimeTypes);
       log.debug("content/name types union {}", union);
-      if (!union.contains(declaredContentType)) {
+      if (!union.contains(declaredBaseContentType)) {
         log.debug("Declared content type {}, discovered types {}", declaredContentType, union);
         if (strictContentTypeValidation) {
           throw new InvalidContentException(
@@ -113,16 +118,16 @@ public class DefaultContentValidator
     String finalContentType;
     if (mimeRulesSource != null && contentName != null) {
       // format implied contentType
-      finalContentType = nameAssumedMimeTypes.get(0);
+      finalContentType = nameAssumedMimeTypes.iterator().next();
     }
     else if (declaredContentType != null) {
       finalContentType = declaredContentType;
     }
     else if (!nameAssumedMimeTypes.isEmpty()) {
-      finalContentType = nameAssumedMimeTypes.get(0);
+      finalContentType = nameAssumedMimeTypes.iterator().next();
     }
     else {
-      finalContentType = contentDetectedMimeTypes.get(0);
+      finalContentType = contentDetectedMimeTypes.iterator().next();
     }
 
     log.debug("Content {} declared as {}, determined as {}", contentName, declaredContentType, finalContentType);
@@ -131,9 +136,36 @@ public class DefaultContentValidator
   }
 
   /**
+   * Removes any parameter (like charset) for simpler matching.
+   */
+  @Nullable
+  private String mediaTypeWithoutParameters(final String declaredMediaType) {
+    if (Strings.isNullOrEmpty(declaredMediaType)) {
+      return null;
+    }
+    try {
+      MediaType mediaType = MediaType.parse(declaredMediaType);
+      return mediaType.withoutParameters().toString();
+    }
+    catch (IllegalArgumentException e) {
+      throw new InvalidContentException("Invalid declared contentType: " + declaredMediaType, e);
+    }
+  }
+
+  /**
    * Returns {@code true} if list of mimeTypes is actually saying "unkown" content.
    */
-  private boolean isUnknown(final List<String> mimeTypes) {
+  private boolean isUnknown(final Set<String> mimeTypes) {
     return mimeTypes.isEmpty() || (mimeTypes.size() == 1 && mimeTypes.contains(ContentTypes.OCTET_STREAM));
+  }
+
+  /**
+   * Returns {@code true} if mime type is HTML. Reason for exceptional handling "html" is due to CF with Mime types
+   * of XHTML (augmented with +xml, basically subtype of XML) and "plain" HTML. They are not related in any way in
+   * registry but still both represent "html" (as general term).
+   */
+  private boolean isHtml(final Set<String> mimeTypes) {
+    return mimeTypes.contains(MediaType.HTML_UTF_8.withoutParameters().toString()) ||
+        mimeTypes.contains(MediaType.XHTML_UTF_8.withoutParameters().toString());
   }
 }
