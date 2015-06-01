@@ -75,7 +75,7 @@ public class ProxyConfiguration
         copy.https = https.copy();
       }
       if (nonProxyHosts != null) {
-        copy.nonProxyHosts = Arrays.copyOf(nonProxyHosts, nonProxyHosts.length);
+        copy.nonProxyHosts = nonProxyHosts.clone();
       }
       return copy;
     }
