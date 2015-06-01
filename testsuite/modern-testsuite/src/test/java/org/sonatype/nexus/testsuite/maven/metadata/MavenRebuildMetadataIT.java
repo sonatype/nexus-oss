@@ -19,6 +19,7 @@ import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.MavenHostedFacet;
 import org.sonatype.nexus.repository.maven.internal.maven2.Constants;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2Format;
+import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MimeRulesSource;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
 
@@ -69,7 +70,7 @@ public class MavenRebuildMetadataIT
     final String vMetadataPath = "/org/sonatype/nexus/testsuite/testproject/1.0-SNAPSHOT/maven-metadata.xml";
 
     // mvnDeploy did happen, let's corrupt some of those
-    write(mavenSnapshots, gMetadataPath, new StringPayload("rubbish", Constants.METADATA_CONTENT_TYPE));
+    write(mavenSnapshots, gMetadataPath, new StringPayload("rubbish", Maven2MimeRulesSource.METADATA_TYPE));
 
     mavenHostedFacet.rebuildMetadata(null, null, null);
 
@@ -97,7 +98,7 @@ public class MavenRebuildMetadataIT
     final String vMetadataPath = "/org/sonatype/nexus/testsuite/testproject/1.0-SNAPSHOT/maven-metadata.xml";
 
     // mvnDeploy did happen, let's corrupt some of those
-    write(mavenSnapshots, gMetadataPath, new StringPayload("rubbish", Constants.METADATA_CONTENT_TYPE));
+    write(mavenSnapshots, gMetadataPath, new StringPayload("rubbish", Maven2MimeRulesSource.METADATA_TYPE));
 
     mavenHostedFacet.rebuildMetadata("org.sonatype.nexus.testsuite", null, null); // testproject groupId!
 

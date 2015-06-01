@@ -29,6 +29,7 @@ import org.sonatype.nexus.repository.maven.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.internal.maven2.Constants;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MetadataMerger.MetadataEnvelope;
+import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MimeRulesSource;
 import org.sonatype.nexus.repository.maven.internal.maven2.metadata.Maven2Metadata.Plugin;
 import org.sonatype.nexus.repository.maven.internal.maven2.metadata.Maven2Metadata.Snapshot;
 import org.sonatype.nexus.repository.storage.StorageTx;
@@ -247,7 +248,7 @@ public class MetadataUpdater
     final Content mainContent = mavenFacet.put(
         tx,
         mavenPath,
-        new BytesPayload(byteArrayOutputStream.toByteArray(), Constants.METADATA_CONTENT_TYPE)
+        new BytesPayload(byteArrayOutputStream.toByteArray(), Maven2MimeRulesSource.METADATA_TYPE)
     );
     final Map<HashAlgorithm, HashCode> hashCodes = mainContent.getAttributes().require(
         Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);

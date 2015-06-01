@@ -33,11 +33,6 @@ public class Constants
   public static final String METADATA_FILENAME = "maven-metadata.xml";
 
   /**
-   * Content type of Maven2 repository metadata files.
-   */
-  public static final String METADATA_CONTENT_TYPE = MediaType.APPLICATION_XML.toString();
-
-  /**
    * {@link DateTimeFormatter} for dotted timestamps used in Maven2 repository metadata.
    */
   public static final DateTimeFormatter METADATA_DOTTED_TIMESTAMP = DateTimeFormat.forPattern("YYYYMMdd.HHmmss")

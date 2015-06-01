@@ -17,8 +17,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeRule;
+import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -38,22 +38,42 @@ public class Maven2MimeRulesSource
   /**
    * Maven POMs.
    */
-  private static final MimeRule POM_TYPE = new MimeRule(true, "application/xml");
+  public static final String POM_TYPE = "application/xml";
+
+  /**
+   * Maven POMs.
+   */
+  private static final MimeRule POM_RULE = new MimeRule(true, POM_TYPE);
 
   /**
    * SHA1 and MD5 hashes.
    */
-  private static final MimeRule HASH_TYPE = new MimeRule(true, "text/plain");
+  public static final String HASH_TYPE = "text/plain";
+
+  /**
+   * SHA1 and MD5 hashes.
+   */
+  private static final MimeRule HASH_RULE = new MimeRule(true, HASH_TYPE);
 
   /**
    * Maven Repository Metadata.
    */
-  private static final MimeRule METADATA_TYPE = new MimeRule(true, "application/xml");
+  public static final String METADATA_TYPE = "application/xml";
+
+  /**
+   * Maven Repository Metadata.
+   */
+  private static final MimeRule METADATA_RULE = new MimeRule(true, METADATA_TYPE);
 
   /**
    * Maven PGP signature.
    */
-  private static final MimeRule SIGNATURE_TYPE = new MimeRule(true, "application/pgp-signature", "text/plain");
+  public static final String SIGNATURE_TYPE = "application/pgp-signature";
+
+  /**
+   * Maven PGP signature.
+   */
+  private static final MimeRule SIGNATURE_RULE = new MimeRule(true, SIGNATURE_TYPE, "text/plain");
 
   private final Maven2MavenPathParser mavenPathParser;
 
@@ -67,16 +87,16 @@ public class Maven2MimeRulesSource
   public MimeRule getRuleForName(final String name) {
     MavenPath mavenPath = mavenPathParser.parsePath(name);
     if (mavenPath.isPom()) {
-      return POM_TYPE;
+      return POM_RULE;
     }
     else if (mavenPath.isHash()) {
-      return HASH_TYPE;
+      return HASH_RULE;
     }
     else if (mavenPath.isSignature()) {
-      return SIGNATURE_TYPE;
+      return SIGNATURE_RULE;
     }
     else if (Constants.METADATA_FILENAME.equals(mavenPath.getFileName())) {
-      return METADATA_TYPE;
+      return METADATA_RULE;
     }
     // otherwise no format-specific rule, use common rules
     return null;
