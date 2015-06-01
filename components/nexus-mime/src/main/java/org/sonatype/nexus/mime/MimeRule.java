@@ -35,12 +35,6 @@ public class MimeRule
   private final List<String> mimetypes;
 
   public MimeRule(final boolean override,
-                  final String mimetype)
-  {
-    this(override, Collections.singletonList(checkNotNull(mimetype)));
-  }
-
-  public MimeRule(final boolean override,
                   final String... mimetypes)
   {
     this(override, Arrays.asList(mimetypes));

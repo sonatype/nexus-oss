@@ -20,6 +20,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.mime.MimeRule;
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -48,7 +49,7 @@ public class Maven2MimeRulesSource
   /**
    * SHA1 and MD5 hashes.
    */
-  public static final String HASH_TYPE = "text/plain";
+  public static final String HASH_TYPE = ContentTypes.TEXT_PLAIN;
 
   /**
    * SHA1 and MD5 hashes.
@@ -73,7 +74,7 @@ public class Maven2MimeRulesSource
   /**
    * Maven PGP signature.
    */
-  private static final MimeRule SIGNATURE_RULE = new MimeRule(true, SIGNATURE_TYPE, "text/plain");
+  private static final MimeRule SIGNATURE_RULE = new MimeRule(true, SIGNATURE_TYPE, ContentTypes.TEXT_PLAIN);
 
   private final Maven2MavenPathParser mavenPathParser;
 
