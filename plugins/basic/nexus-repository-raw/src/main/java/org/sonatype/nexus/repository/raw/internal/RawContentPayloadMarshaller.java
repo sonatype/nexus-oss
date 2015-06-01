@@ -15,12 +15,13 @@ package org.sonatype.nexus.repository.raw.internal;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nonnull;
+
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload.InputStreamSupplier;
 
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -63,7 +64,7 @@ public class RawContentPayloadMarshaller
     checkNotNull(content);
     return new StreamPayload(
         new InputStreamSupplier() {
-          @NotNull
+          @Nonnull
           @Override
           public InputStream get() throws IOException {
             return content.openInputStream();
