@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.condition;
+package org.sonatype.nexus.repository.capability;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -18,8 +18,9 @@ import org.sonatype.nexus.capability.CapabilityContext;
 import org.sonatype.nexus.capability.CapabilityContextAware;
 import org.sonatype.nexus.capability.CapabilityEvent;
 import org.sonatype.nexus.capability.CapabilityIdentity;
-import org.sonatype.nexus.capability.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.capability.condition.ConditionSupport;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.capability.RepositoryConditions.RepositoryName;
 import org.sonatype.nexus.repository.manager.RepositoryCreatedEvent;
 import org.sonatype.nexus.repository.manager.RepositoryLoadedEvent;
 import org.sonatype.nexus.repository.manager.RepositoryManager;

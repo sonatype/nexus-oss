@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.capability.condition;
 
-import org.sonatype.nexus.capability.EventBusTestSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.junit.Before;

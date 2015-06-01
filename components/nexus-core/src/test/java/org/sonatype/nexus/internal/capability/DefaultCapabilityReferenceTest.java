@@ -94,7 +94,6 @@ public class DefaultCapabilityReferenceTest
     final Conditions conditions = new Conditions(
         new LogicalConditions(eventBus),
         new CapabilityConditions(eventBus, mock(CapabilityDescriptorRegistry.class), mock(CapabilityRegistry.class)),
-        //mock(RepositoryConditions.class),
         new NexusConditions(new NexusIsActiveCondition(eventBus)),
         mock(CryptoConditions.class)
     );

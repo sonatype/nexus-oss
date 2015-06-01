@@ -17,7 +17,6 @@ import org.sonatype.nexus.capability.CapabilityEvent;
 import org.sonatype.nexus.capability.CapabilityIdentity;
 import org.sonatype.nexus.capability.CapabilityReference;
 import org.sonatype.nexus.capability.CapabilityRegistry;
-import org.sonatype.nexus.capability.EventBusTestSupport;
 
 import com.google.common.collect.Maps;
 import org.junit.Before;

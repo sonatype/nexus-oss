@@ -22,7 +22,6 @@ import org.sonatype.nexus.capability.CapabilityEvent;
 import org.sonatype.nexus.capability.CapabilityReference;
 import org.sonatype.nexus.capability.CapabilityRegistry;
 import org.sonatype.nexus.capability.CapabilityType;
-import org.sonatype.nexus.capability.EventBusTestSupport;
 
 import org.junit.Before;
 import org.junit.Test;

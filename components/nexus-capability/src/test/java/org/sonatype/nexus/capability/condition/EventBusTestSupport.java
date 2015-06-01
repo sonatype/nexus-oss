@@ -10,11 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability;
+package org.sonatype.nexus.capability.condition;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.ConditionEvent.Satisfied;
+import org.sonatype.nexus.capability.ConditionEvent.Unsatisfied;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -77,12 +80,12 @@ public class EventBusTestSupport
 
   protected static Matcher<Object> satisfied(final Condition condition) {
     return allOf(
-        instanceOf(ConditionEvent.Satisfied.class),
+        instanceOf(Satisfied.class),
         new ArgumentMatcher<Object>()
         {
           @Override
           public boolean matches(final Object argument) {
-            return ((ConditionEvent.Satisfied) argument).getCondition() == condition;
+            return ((Satisfied) argument).getCondition() == condition;
           }
         }
     );
@@ -90,12 +93,12 @@ public class EventBusTestSupport
 
   protected static Matcher<Object> unsatisfied(final Condition condition) {
     return allOf(
-        instanceOf(ConditionEvent.Unsatisfied.class),
+        instanceOf(Unsatisfied.class),
         new ArgumentMatcher<Object>()
         {
           @Override
           public boolean matches(final Object argument) {
-            return ((ConditionEvent.Unsatisfied) argument).getCondition() == condition;
+            return ((Unsatisfied) argument).getCondition() == condition;
           }
         }
     );

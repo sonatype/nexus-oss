@@ -38,15 +38,13 @@ public class ConditionsTest
   public void and01() {
     final LogicalConditions logicalConditions = mock(LogicalConditions.class);
     final CapabilityConditions capabilityConditions = mock(CapabilityConditions.class);
-    //final RepositoryConditions repositoryConditions = mock(RepositoryConditions.class);
     final NexusConditions nexusConditions = mock(NexusConditions.class);
     CryptoConditions cryptoConditions = mock(CryptoConditions.class);
     final Conditions underTest = new Conditions(
-        logicalConditions, capabilityConditions, /*repositoryConditions,*/ nexusConditions, cryptoConditions
+        logicalConditions, capabilityConditions, nexusConditions, cryptoConditions
     );
     assertThat(underTest.logical(), is(equalTo(logicalConditions)));
     assertThat(underTest.capabilities(), is(equalTo(capabilityConditions)));
-    //assertThat(underTest.repository(), is(equalTo(repositoryConditions)));
     assertThat(underTest.nexus(), is(equalTo(nexusConditions)));
   }
 

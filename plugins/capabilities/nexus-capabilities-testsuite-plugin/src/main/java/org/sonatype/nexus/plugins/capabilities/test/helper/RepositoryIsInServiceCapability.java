@@ -22,8 +22,8 @@ import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
 import org.sonatype.nexus.capability.condition.Conditions;
-import org.sonatype.nexus.capability.condition.RepositoryConditions;
-import org.sonatype.nexus.capability.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.repository.capability.RepositoryConditions;
+import org.sonatype.nexus.repository.capability.RepositoryConditions.RepositoryName;
 
 import static org.sonatype.nexus.capability.Tag.repositoryTag;
 import static org.sonatype.nexus.capability.Tag.tags;
@@ -64,12 +64,12 @@ public class RepositoryIsInServiceCapability
   @Override
   public Condition validityCondition() {
     return repositoryConditions.repositoryExists(new RepositoryName()
-    {
-      @Override
-      public String get() {
-        return context().properties().get(REPOSITORY);
-      }
-    }
+                                                 {
+                                                   @Override
+                                                   public String get() {
+                                                     return context().properties().get(REPOSITORY);
+                                                   }
+                                                 }
     );
   }
 

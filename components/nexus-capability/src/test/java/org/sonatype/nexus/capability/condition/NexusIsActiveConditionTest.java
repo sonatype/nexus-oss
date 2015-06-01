@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.capability.condition;
 
-import org.sonatype.nexus.capability.EventBusTestSupport;
 import org.sonatype.nexus.common.app.NexusStartedEvent;
 import org.sonatype.nexus.common.app.NexusStoppedEvent;
 
