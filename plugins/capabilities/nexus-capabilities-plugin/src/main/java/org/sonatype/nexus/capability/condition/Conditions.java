@@ -17,6 +17,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.condition.crypto.CryptoConditions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

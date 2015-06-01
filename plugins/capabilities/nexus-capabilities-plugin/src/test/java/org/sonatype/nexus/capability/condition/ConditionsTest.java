@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.capability.condition;
 
+import org.sonatype.nexus.capability.condition.crypto.CryptoConditions;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;

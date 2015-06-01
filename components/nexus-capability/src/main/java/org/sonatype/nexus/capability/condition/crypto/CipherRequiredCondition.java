@@ -10,11 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.condition;
-
-import java.security.NoSuchAlgorithmException;
+package org.sonatype.nexus.capability.condition.crypto;
 
 import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.condition.ConditionSupport;
 import org.sonatype.sisu.goodies.crypto.CryptoHelper;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.i18n.I18N;
@@ -25,26 +24,21 @@ import org.jetbrains.annotations.NonNls;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A condition that is satisfied if the JVM supports unlimited-strength keys for a specific cipher algorithm.
+ * A condition that is satisfied if the JVM supports a specific cipher algorithm.
  *
  * @since 2.7
  */
-public class CipherKeyUnlimitedStrengthCondition
+public class CipherRequiredCondition
     extends ConditionSupport
     implements Condition
 {
-  /**
-   * The minimum bit-length that is considered "unlimited-strength".
-   */
-  public static final int MIN_BITS = Integer.MAX_VALUE;
-
   private static interface Messages
       extends MessageBundle
   {
-    @DefaultMessage("JVM supports unlimited-strength '%s' cipher keys")
+    @DefaultMessage("JVM supports '%s' cipher")
     String satisfied(String transformation);
 
-    @DefaultMessage("JVM does NOT support unlimited-strength '%s' cipher keys")
+    @DefaultMessage("JVM does NOT support '%s' cipher")
     String unsatisfied(String transformation);
   }
 
@@ -54,9 +48,9 @@ public class CipherKeyUnlimitedStrengthCondition
 
   private final String transformation;
 
-  public CipherKeyUnlimitedStrengthCondition(final EventBus eventBus,
-                                             final CryptoHelper crypto,
-                                             final @NonNls String transformation)
+  public CipherRequiredCondition(final EventBus eventBus,
+                                 final CryptoHelper crypto,
+                                 final @NonNls String transformation)
   {
     super(eventBus, false);
     this.crypto = checkNotNull(crypto);
@@ -91,15 +85,10 @@ public class CipherKeyUnlimitedStrengthCondition
 
   private void verify() {
     try {
-      int max = crypto.getCipherMaxAllowedKeyLength(transformation);
-      if (max >= MIN_BITS) {
-        setSatisfied(true);
-      }
-      else {
-        setSatisfied(false);
-      }
+      crypto.createCipher(transformation);
+      setSatisfied(true);
     }
-    catch (NoSuchAlgorithmException e) {
+    catch (Exception e) {
       setSatisfied(false);
     }
   }

@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.condition;
+package org.sonatype.nexus.capability.condition.crypto;
 
 import java.security.NoSuchAlgorithmException;
 
 import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.condition.ConditionSupport;
 import org.sonatype.sisu.goodies.crypto.CryptoHelper;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.i18n.I18N;
@@ -25,26 +26,26 @@ import org.jetbrains.annotations.NonNls;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A condition that is satisfied if the JVM supports high-strength keys for a specific cipher algorithm.
+ * A condition that is satisfied if the JVM supports unlimited-strength keys for a specific cipher algorithm.
  *
  * @since 2.7
  */
-public class CipherKeyHighStrengthCondition
+public class CipherKeyUnlimitedStrengthCondition
     extends ConditionSupport
     implements Condition
 {
   /**
-   * The minimum bit-length that is considered "high-strength".
+   * The minimum bit-length that is considered "unlimited-strength".
    */
-  public static final int MIN_BITS = 4096;
+  public static final int MIN_BITS = Integer.MAX_VALUE;
 
   private static interface Messages
       extends MessageBundle
   {
-    @DefaultMessage("JVM supports high-strength '%s' cipher keys")
+    @DefaultMessage("JVM supports unlimited-strength '%s' cipher keys")
     String satisfied(String transformation);
 
-    @DefaultMessage("JVM does NOT support high-strength '%s' cipher keys")
+    @DefaultMessage("JVM does NOT support unlimited-strength '%s' cipher keys")
     String unsatisfied(String transformation);
   }
 
@@ -54,9 +55,9 @@ public class CipherKeyHighStrengthCondition
 
   private final String transformation;
 
-  public CipherKeyHighStrengthCondition(final EventBus eventBus,
-                                        final CryptoHelper crypto,
-                                        final @NonNls String transformation)
+  public CipherKeyUnlimitedStrengthCondition(final EventBus eventBus,
+                                             final CryptoHelper crypto,
+                                             final @NonNls String transformation)
   {
     super(eventBus, false);
     this.crypto = checkNotNull(crypto);

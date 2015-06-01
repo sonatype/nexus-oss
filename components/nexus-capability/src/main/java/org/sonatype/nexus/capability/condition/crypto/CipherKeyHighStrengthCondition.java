@@ -10,9 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.condition;
+package org.sonatype.nexus.capability.condition.crypto;
+
+import java.security.NoSuchAlgorithmException;
 
 import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.condition.ConditionSupport;
 import org.sonatype.sisu.goodies.crypto.CryptoHelper;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.i18n.I18N;
@@ -23,21 +26,26 @@ import org.jetbrains.annotations.NonNls;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A condition that is satisfied if the JVM supports a specific cipher algorithm.
+ * A condition that is satisfied if the JVM supports high-strength keys for a specific cipher algorithm.
  *
  * @since 2.7
  */
-public class CipherRequiredCondition
+public class CipherKeyHighStrengthCondition
     extends ConditionSupport
     implements Condition
 {
+  /**
+   * The minimum bit-length that is considered "high-strength".
+   */
+  public static final int MIN_BITS = 4096;
+
   private static interface Messages
       extends MessageBundle
   {
-    @DefaultMessage("JVM supports '%s' cipher")
+    @DefaultMessage("JVM supports high-strength '%s' cipher keys")
     String satisfied(String transformation);
 
-    @DefaultMessage("JVM does NOT support '%s' cipher")
+    @DefaultMessage("JVM does NOT support high-strength '%s' cipher keys")
     String unsatisfied(String transformation);
   }
 
@@ -47,9 +55,9 @@ public class CipherRequiredCondition
 
   private final String transformation;
 
-  public CipherRequiredCondition(final EventBus eventBus,
-                                 final CryptoHelper crypto,
-                                 final @NonNls String transformation)
+  public CipherKeyHighStrengthCondition(final EventBus eventBus,
+                                        final CryptoHelper crypto,
+                                        final @NonNls String transformation)
   {
     super(eventBus, false);
     this.crypto = checkNotNull(crypto);
@@ -84,10 +92,15 @@ public class CipherRequiredCondition
 
   private void verify() {
     try {
-      crypto.createCipher(transformation);
-      setSatisfied(true);
+      int max = crypto.getCipherMaxAllowedKeyLength(transformation);
+      if (max >= MIN_BITS) {
+        setSatisfied(true);
+      }
+      else {
+        setSatisfied(false);
+      }
     }
-    catch (Exception e) {
+    catch (NoSuchAlgorithmException e) {
       setSatisfied(false);
     }
   }
