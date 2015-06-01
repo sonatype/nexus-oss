@@ -20,8 +20,6 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.view.Payload;
 
-import org.jetbrains.annotations.NotNull;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -48,7 +46,7 @@ public class StreamPayload
    * Returnes opened stream from configured supplier.
    */
   @Override
-  public synchronized InputStream openInputStream() throws IOException {
+  public InputStream openInputStream() throws IOException {
     return stream.get();
   }
 
@@ -81,9 +79,8 @@ public class StreamPayload
   /**
    * Supplies an {@link InputStream}.
    */
-  public static interface InputStreamSupplier
+  public interface InputStreamSupplier
   {
-    @NotNull
     @Nonnull
     InputStream get() throws IOException;
   }
