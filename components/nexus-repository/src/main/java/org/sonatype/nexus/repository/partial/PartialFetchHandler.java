@@ -115,14 +115,12 @@ public class PartialFetchHandler
         .copy(response)
         .status(Status.success(HttpStatus.PARTIAL_CONTENT));
 
-    // FIXME: Remove pointless local
-    final Range<Long> rangeToSend = requestedRange;
-    Payload partialPayload = new PartialPayload(payload, rangeToSend);
+    Payload partialPayload = new PartialPayload(payload, requestedRange);
     builder.payload(partialPayload);
 
     // ResponseSender takes care of Content-Length header, via payload.size
     builder.header(HttpHeaders.CONTENT_RANGE,
-        rangeToSend.lowerEndpoint() + "-" + rangeToSend.upperEndpoint() + "/" + payload.getSize());
+        requestedRange.lowerEndpoint() + "-" + requestedRange.upperEndpoint() + "/" + payload.getSize());
 
     return builder.build();
   }
