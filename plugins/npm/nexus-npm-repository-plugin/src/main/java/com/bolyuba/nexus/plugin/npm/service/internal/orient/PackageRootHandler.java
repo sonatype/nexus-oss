@@ -25,6 +25,7 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 
@@ -69,7 +70,15 @@ public class PackageRootHandler
       doc.field("name", entity.getName());
       doc.field("description", entity.getDescription());
       doc.field("properties", entity.getProperties());
-      doc.field("raw", new ORecordBytes(objectMapper.writeValueAsBytes(entity.getRaw())));
+      ORecord rawBytes = doc.field("raw");
+      final byte[] buf = objectMapper.writeValueAsBytes(entity.getRaw());
+      if (rawBytes == null) {
+        rawBytes = new ORecordBytes(buf);
+      }
+      else {
+        rawBytes.clear().fromStream(buf);
+      }
+      doc.field("raw", rawBytes);
       return doc;
     }
     catch (Exception e) {
