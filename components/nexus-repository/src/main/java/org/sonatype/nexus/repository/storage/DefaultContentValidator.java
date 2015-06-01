@@ -71,10 +71,7 @@ public class DefaultContentValidator
     try (InputStream is = contentSupplier.get()) {
       contentDetectedMimeTypes.addAll(mimeSupport.detectMimeTypes(is, contentName));
     }
-    if (isHtml(contentDetectedMimeTypes)) {
-      // to circumvent on xhtml vs html, we will treat both as text/html which is okay for content validation purposes
-      contentDetectedMimeTypes.add(MediaType.HTML_UTF_8.withoutParameters().toString());
-    }
+    adjustIfHtml(contentDetectedMimeTypes);
     log.debug("Mime support detects {} as {}", contentName, contentDetectedMimeTypes);
 
     if (strictContentTypeValidation && isUnknown(contentDetectedMimeTypes)) {
@@ -84,10 +81,7 @@ public class DefaultContentValidator
     final LinkedHashSet<String> nameAssumedMimeTypes = new LinkedHashSet<>();
     if (contentName != null) {
       nameAssumedMimeTypes.addAll(mimeSupport.guessMimeTypesListFromPath(mimeRulesSource, contentName));
-      if (isHtml(nameAssumedMimeTypes)) {
-        // to circumvent on xhtml vs html, we will treat both as text/html which is okay for content validation purposes
-        nameAssumedMimeTypes.add(MediaType.HTML_UTF_8.withoutParameters().toString());
-      }
+      adjustIfHtml(nameAssumedMimeTypes);
       log.debug("Mime support assumes {} as {}", contentName, nameAssumedMimeTypes);
       if (strictContentTypeValidation && isUnknown(nameAssumedMimeTypes)) {
         throw new InvalidContentException("Content type could not be guessed");
@@ -160,12 +154,15 @@ public class DefaultContentValidator
   }
 
   /**
-   * Returns {@code true} if mime type is HTML. Reason for exceptional handling "html" is due to CF with Mime types
-   * of XHTML (augmented with +xml, basically subtype of XML) and "plain" HTML. They are not related in any way in
-   * registry but still both represent "html" (as general term).
+   * Circumvention if mime type covers HTML: Reason for exceptional handling HTML is due to XHTML (augmented with +xml,
+   * basically subtype of XML) and "plain" HTML. They are not related in any way (supertype or alias) in registry but
+   * still both represent "html" (as general term) in what we are interested to perform validation.
    */
-  private boolean isHtml(final Set<String> mimeTypes) {
-    return mimeTypes.contains(MediaType.HTML_UTF_8.withoutParameters().toString()) ||
-        mimeTypes.contains(MediaType.XHTML_UTF_8.withoutParameters().toString());
+  private void adjustIfHtml(final Set<String> mimeTypes) {
+    if (mimeTypes.contains(MediaType.HTML_UTF_8.withoutParameters().toString()) ||
+        mimeTypes.contains(MediaType.XHTML_UTF_8.withoutParameters().toString())) {
+      // to circumvent on xhtml vs html, we will treat both as text/html which is okay for content validation purposes
+      mimeTypes.add(MediaType.HTML_UTF_8.withoutParameters().toString());
+    }
   }
 }
