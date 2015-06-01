@@ -23,8 +23,6 @@ import org.sonatype.nexus.capability.condition.CipherRequiredCondition;
 import org.sonatype.sisu.goodies.crypto.CryptoHelper;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.jetbrains.annotations.NonNls;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -48,15 +46,15 @@ public class CryptoConditions
     this.crypto = checkNotNull(crypto);
   }
 
-  public Condition requireCipher(final @NonNls String algorithm) {
+  public Condition requireCipher(final String algorithm) {
     return new CipherRequiredCondition(eventBus, crypto, algorithm);
   }
 
-  public Condition highStrengthCipherKey(final @NonNls String algorithm) {
+  public Condition highStrengthCipherKey(final String algorithm) {
     return new CipherKeyHighStrengthCondition(eventBus, crypto, algorithm);
   }
 
-  public Condition unlimitedStrengthCipherKey(final @NonNls String algorithm) {
+  public Condition unlimitedStrengthCipherKey(final String algorithm) {
     return new CipherKeyUnlimitedStrengthCondition(eventBus, crypto, algorithm);
   }
 }

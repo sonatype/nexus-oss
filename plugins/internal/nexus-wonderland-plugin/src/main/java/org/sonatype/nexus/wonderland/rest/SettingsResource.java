@@ -27,7 +27,6 @@ import org.sonatype.siesta.Resource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
-import org.jetbrains.annotations.NonNls;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
@@ -44,7 +43,6 @@ public class SettingsResource
     extends ComponentSupport
     implements Resource
 {
-  @NonNls
   public static final String RESOURCE_URI = WonderlandConstants.REST_PREFIX + "/settings";
 
   @GET

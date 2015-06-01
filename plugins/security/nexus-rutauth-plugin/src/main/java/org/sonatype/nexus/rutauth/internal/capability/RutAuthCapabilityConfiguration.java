@@ -21,7 +21,6 @@ import org.sonatype.nexus.validation.group.Create;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.hibernate.validator.constraints.NotBlank;
-import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,10 +35,8 @@ public class RutAuthCapabilityConfiguration
     extends CapabilityConfigurationSupport
 {
 
-  @NonNls
   public static final String HTTP_HEADER = "httpHeader";
 
-  @NonNls
   public static final String DEFAULT_HTTP_HEADER = "REMOTE_USER";
 
   @NotBlank

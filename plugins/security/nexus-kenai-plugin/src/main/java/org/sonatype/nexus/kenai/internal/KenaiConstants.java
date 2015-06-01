@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.kenai.internal;
 
-import org.jetbrains.annotations.NonNls;
-
 /**
  * Kenai constants.
  *
@@ -24,6 +22,5 @@ public class KenaiConstants
   /**
    * Prefix for ID-like things.
    */
-  @NonNls
   public static final String ID_PREFIX = "kenai";
 }
