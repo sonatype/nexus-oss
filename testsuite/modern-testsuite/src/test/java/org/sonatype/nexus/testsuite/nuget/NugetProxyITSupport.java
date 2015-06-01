@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
+
 import com.sonatype.nexus.repository.nuget.internal.proxy.NugetProxyRecipe;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
@@ -29,8 +31,8 @@ import org.sonatype.tests.http.server.jetty.behaviour.Content;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+
 import org.eclipse.jetty.http.PathMap;
-import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 
@@ -52,7 +54,7 @@ public abstract class NugetProxyITSupport
 
   private File tempDirectory;
 
-  @NotNull
+  @Nonnull
   protected Configuration proxyConfig(final String name, final String remoteUrl) {
     final Configuration config = new Configuration();
     config.setRepositoryName(name);
@@ -105,7 +107,7 @@ public abstract class NugetProxyITSupport
    * Takes a test file representing a nuget XML response of some sort, and adapts it to the specific URL of the test
    * proxy server.
    */
-  @NotNull
+  @Nonnull
   protected Content remoteFeed(final String path) throws Exception {
     return file(createNugetXml(resolveTestFile(path)));
   }

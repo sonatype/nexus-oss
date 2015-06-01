@@ -15,15 +15,15 @@ package org.sonatype.nexus.testsuite.repository;
 import java.io.IOException;
 import java.net.URI;
 
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import javax.annotation.Nonnull;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.util.EntityUtils;
-import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -70,7 +70,7 @@ public class FormatClientSupport
     return response;
   }
 
-  @NotNull
+  @Nonnull
   protected URI resolve(final String path) {
     return repositoryBaseUri.resolve(path);
   }
