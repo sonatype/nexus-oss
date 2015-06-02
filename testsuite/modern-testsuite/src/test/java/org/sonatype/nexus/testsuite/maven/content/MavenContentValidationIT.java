@@ -27,6 +27,7 @@ import com.google.common.net.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +60,10 @@ public class MavenContentValidationIT
     );
   }
 
+  private static final byte[] EMPTY_ZIP = {
+      80, 75, 05, 06, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+  };
+
   @Inject
   private RepositoryManager repositoryManager;
 
@@ -90,6 +95,38 @@ public class MavenContentValidationIT
         .serve("/abbot/abbot/0.13.0/abbot-0.13.0.pom.md5").withBehaviours(Behaviours.content(
             "b4a3754bf13bb87475c0dbf45860e049  /home/projects/maven/repository-staging/to-ibiblio/maven2/abbot/abbot/0.13.0/abbot-0.13.0.pom",
             "text/plain"))
+
+        .serve("/abbot/abbot/0.13.0/abbot-0.13.0.jar").withBehaviours(Behaviours.content(
+            EMPTY_ZIP, "application/zip"))
+        .serve("/abbot/abbot/0.13.0/abbot-0.13.0.jar.asc").withBehaviours(Behaviours.content(
+            "-----BEGIN PGP SIGNATURE-----\n" +
+                "Version: GnuPG v1\n" +
+                "\n" +
+                "iQEcBAABAgAGBQJUrEJtAAoJECx7EvKlEeMlJSQH/Rl5iK33P+stWYLoYAbThMDZ\n" +
+                "NMfY4Ga3m8o6WqLLUBrzNFEiVlski9XyIgHS+oWxKneL9oTH4zvhhc+3GcDO/Xsk\n" +
+                "VX4mB3r7efn91152X47Xg8aqp8syhKuBL1sPIIJNvWrfKJ4FbiZzh5/1ZQJF1wJz\n" +
+                "8lATmpcVhi8ji3/TxOOVa2A1CorEAJph5C34FNQzVXE6WH5gQSCnoYFh+xTgvQj/\n" +
+                "NiNBvM5/8RWqjP5TPWilDu6pq2qSpMeB6EAMsle4vi5I4Jlcuih4Fjyd3okWVP1w\n" +
+                "bmyVZKaOAGqY0eXFc4u6SKfID783CRG0tWqhkB5Vi0LFuJp1TC9rqz7oyqwxjUs=\n" +
+                "=RNoG\n" +
+                "-----END PGP SIGNATURE-----", "text/plain"))
+        .serve("/abbot/abbot/0.13.0/abbot-0.13.0.jar.sha1").withBehaviours(Behaviours.content(
+            "596d91e67631b0deb05fb685d8d1b6735f3e4f60", "text/plain"))
+        .serve("/abbot/abbot/0.13.0/abbot-0.13.0.jar.md5").withBehaviours(Behaviours.content(
+            "28bed71e03d65aeea000333f421f9304", "text/plain"))
+
+
+        .serve("/abbot/abbot/0.13.0/maven-metadata.xml").withBehaviours(Behaviours.content(
+            "<metadata>\n" +
+                "<groupId>abbot</groupId>\n" +
+                "<artifactId>abbot</artifactId>\n" +
+                "<version>0.13.0</version>\n" +
+                "</metadata>", "text/xml"))
+        .serve("/abbot/abbot/0.13.0/maven-metadata.xml.sha1").withBehaviours(Behaviours.content(
+            "018086a59b3ba83fb60cdf583b662d33961d1883  /home/maven/repository-staging/to-ibiblio/maven2/abbot/abbot/0.13.0/maven-metadata.xml",
+            "text/plain"))
+        .serve("/abbot/abbot/0.13.0/maven-metadata.xml.md5").withBehaviours(Behaviours.content(
+            "a07b6cf5ab281542eee0425117a79234  ./abbot/abbot/0.13.0/maven-metadata.xml", "text/plain"))
         .start();
 
     Repository repo = repositoryManager.get("maven-central");
@@ -113,24 +150,26 @@ public class MavenContentValidationIT
 
   @Test
   public void fetchPomVia() throws Exception {
+    // Note: upstream server uses different MIME types. but Maven repo after validation enforces layout types!
     get("abbot/abbot/0.13.0/abbot-0.13.0.pom", "application/xml");
     get("abbot/abbot/0.13.0/abbot-0.13.0.pom.sha1", "text/plain");
-    // get("abbot/abbot/0.13.0/abbot-0.13.0.pom.md5", "text/plain");
-    // get("abbot/abbot/0.13.0/abbot-0.13.0.jar", "application/java-archive");
-    // get("abbot/abbot/0.13.0/abbot-0.13.0.jar.asc", "application/pgp-signature");
-    // get("abbot/abbot/0.13.0/abbot-0.13.0.jar.sha1", "text/plain");
-    // get("abbot/abbot/0.13.0/abbot-0.13.0.jar.md5", "text/plain");
-    // get("abbot/abbot/0.13.0/maven-metadata.xml", "application/xml");
-    // get("abbot/abbot/0.13.0/maven-metadata.xml.sha1", "text/plain");
-    // get("abbot/abbot/0.13.0/maven-metadata.xml.md5", "text/plain");
+    get("abbot/abbot/0.13.0/abbot-0.13.0.pom.md5", "text/plain");
+    get("abbot/abbot/0.13.0/abbot-0.13.0.jar", "application/java-archive");
+    get("abbot/abbot/0.13.0/abbot-0.13.0.jar.asc", "application/pgp-signature");
+    get("abbot/abbot/0.13.0/abbot-0.13.0.jar.sha1", "text/plain");
+    get("abbot/abbot/0.13.0/abbot-0.13.0.jar.md5", "text/plain");
+    get("abbot/abbot/0.13.0/maven-metadata.xml", "application/xml");
+    get("abbot/abbot/0.13.0/maven-metadata.xml.sha1", "text/plain");
+    get("abbot/abbot/0.13.0/maven-metadata.xml.md5", "text/plain");
     // TODO: nexus log should contain in DEBUG:
     // "Content /abbot/abbot/0.13.0/abbot-0.13.0.pom declared as text/xml, determined as application/xml"
-    // Confirming Maven Format override upstream server preference
+    // Confirming Maven Format overrode upstream server preference
   }
 
   private void get(final String path, final String contentType) throws Exception {
     HttpResponse response = client.get(path);
     assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
     assertThat(response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue(), equalTo(contentType));
+    EntityUtils.consume(response.getEntity());
   }
 }
