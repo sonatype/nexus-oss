@@ -15,12 +15,13 @@ package org.sonatype.nexus.capability.internal.storage;
 import java.util.Map;
 
 import org.sonatype.nexus.capability.CapabilityIdentity;
-import org.sonatype.nexus.orient.DatabaseInstanceRule;
 import org.sonatype.nexus.orient.HexRecordIdObfuscator;
+import org.sonatype.nexus.test.orient.DatabaseInstanceRule;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;
 import com.google.inject.util.Providers;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

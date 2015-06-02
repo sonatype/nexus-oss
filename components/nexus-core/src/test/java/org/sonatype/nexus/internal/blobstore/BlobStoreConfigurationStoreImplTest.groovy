@@ -19,7 +19,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.sonatype.nexus.blobstore.api.BlobStoreConfiguration
-import org.sonatype.nexus.orient.DatabaseInstanceRule
+import org.sonatype.nexus.test.orient.DatabaseInstanceRule
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.junit.Assert.fail

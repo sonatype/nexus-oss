@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.config
 
-import org.sonatype.nexus.orient.DatabaseInstanceRule
+import org.sonatype.nexus.test.orient.DatabaseInstanceRule
 import org.sonatype.nexus.orient.HexRecordIdObfuscator
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 

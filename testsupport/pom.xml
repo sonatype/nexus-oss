@@ -29,6 +29,7 @@
 
   <modules>
     <module>nexus-test-common</module>
+    <module>nexus-test-db</module>
     <module>nexus-pax-exam</module>
   </modules>
 

@@ -19,7 +19,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.sonatype.nexus.orient.DatabaseInstanceRule
+import org.sonatype.nexus.test.orient.DatabaseInstanceRule
 import org.sonatype.nexus.orient.HexRecordIdObfuscator
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 

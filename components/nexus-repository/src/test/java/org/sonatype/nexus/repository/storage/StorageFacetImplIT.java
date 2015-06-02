@@ -24,13 +24,13 @@ import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.entity.EntityVersion;
 import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
 import org.sonatype.nexus.orient.HexRecordIdObfuscator;
-import org.sonatype.nexus.orient.PersistentDatabaseInstanceRule;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.security.ClientInfoProvider;
+import org.sonatype.nexus.test.orient.PersistentDatabaseInstanceRule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -43,6 +43,7 @@ import com.orientechnologies.orient.core.exception.OConcurrentModificationExcept
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

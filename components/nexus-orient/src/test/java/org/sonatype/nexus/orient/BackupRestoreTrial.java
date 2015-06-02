@@ -24,7 +24,6 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Trials of using OrientDB backup and restore functions.
@@ -32,10 +31,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class BackupRestoreTrial
     extends TestSupport
 {
-  static {
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
-  }
 
   private File basedir;
 

@@ -22,7 +22,6 @@ import com.orientechnologies.orient.core.metadata.schema.clusterselection.ODefau
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.junit.After;
 import org.junit.Test;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Trials of using OrientDB using clusters.
@@ -30,10 +29,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class OrientDbClusterTrial
     extends TestSupport
 {
-  static {
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
-  }
 
   private ODatabaseDocumentTx createDatabase() {
     return new ODatabaseDocumentTx("memory:testdb").create();

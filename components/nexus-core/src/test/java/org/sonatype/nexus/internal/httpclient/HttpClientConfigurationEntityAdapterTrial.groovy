@@ -15,7 +15,7 @@ package org.sonatype.nexus.internal.httpclient
 import org.sonatype.nexus.httpclient.config.ConnectionConfiguration
 import org.sonatype.nexus.httpclient.config.HttpClientConfiguration
 import org.sonatype.nexus.httpclient.config.UsernameAuthenticationConfiguration
-import org.sonatype.nexus.orient.DatabaseInstanceRule
+import org.sonatype.nexus.test.orient.DatabaseInstanceRule
 import org.sonatype.sisu.goodies.common.Time
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
