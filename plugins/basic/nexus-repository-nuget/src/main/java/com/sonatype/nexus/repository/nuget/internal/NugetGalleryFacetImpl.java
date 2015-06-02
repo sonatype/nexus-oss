@@ -31,6 +31,7 @@ import com.sonatype.nexus.repository.nuget.odata.ODataTemplates;
 import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 
 import org.sonatype.nexus.blobstore.api.Blob;
+import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
@@ -351,11 +352,17 @@ public class NugetGalleryFacetImpl
       }
       Asset asset = tx.firstAsset(component);
 
-      final Blob blob = tx.requireBlob(asset.requireBlobRef());
+      final BlobRef blobRef = asset.blobRef();
+      if (blobRef == null) {
+        return null;
+      }
+
+      final Blob blob = tx.requireBlob(blobRef);
       String contentType = asset.contentType();
 
       return new StreamPayload(
-          new InputStreamSupplier() {
+          new InputStreamSupplier()
+          {
             @Nonnull
             @Override
             public InputStream get() throws IOException {
