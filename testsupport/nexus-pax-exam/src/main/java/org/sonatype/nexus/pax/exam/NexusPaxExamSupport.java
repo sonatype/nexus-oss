@@ -40,7 +40,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.Uninterruptibles;
-import org.jetbrains.annotations.NonNls;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -71,7 +70,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
  * Provides support for testing Nexus with Pax-Exam, test-cases can inject any component from the distribution. <br>
  * <br>
  * Extend this class and choose the base distribution (and any optional plugins) that you want to test against:
- * 
+ *
  * <pre>
  * &#064;Configuration
  * public static Option[] config() {
@@ -81,7 +80,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
  *   );
  * }
  * </pre>
- * 
+ *
  * @since 3.0
  */
 @RunWith(PaxExam.class)
@@ -124,7 +123,6 @@ public abstract class NexusPaxExamSupport
   @Inject
   protected TaskScheduler taskScheduler;
 
-  @NonNls
   protected final Logger log = (Logger) Preconditions.checkNotNull(this.createLogger());
 
   protected Logger createLogger() {
@@ -143,7 +141,7 @@ public abstract class NexusPaxExamSupport
 
   /**
    * Resolves path by searching the it-resources of the Maven project.
-   * 
+   *
    * @see TestDataRule#resolveFile(String)
    */
   public File resolveTestFile(final String path) {
@@ -187,7 +185,7 @@ public abstract class NexusPaxExamSupport
 
   /**
    * Periodically polls function until it returns {@code true} or 30 seconds have elapsed.
-   * 
+   *
    * @throws InterruptedException if the thread is interrupted or the timeout exceeded
    */
   public static void waitFor(final Callable<Boolean> function) throws InterruptedException {
@@ -196,7 +194,7 @@ public abstract class NexusPaxExamSupport
 
   /**
    * Periodically polls function until it returns {@code true} or the timeout has elapsed.
-   * 
+   *
    * @throws InterruptedException if the thread is interrupted or the timeout exceeded
    */
   public static void waitFor(final Callable<Boolean> function, final long millis) throws InterruptedException {

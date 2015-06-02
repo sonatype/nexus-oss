@@ -31,7 +31,6 @@ import org.sonatype.siesta.Resource
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.jetbrains.annotations.NonNls
 
 import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION
 import static com.google.common.net.HttpHeaders.CONTENT_LENGTH
@@ -52,7 +51,6 @@ class DownloadResource
     extends ComponentSupport
     implements Resource
 {
-  @NonNls
   static final String RESOURCE_URI = /* WonderlandPlugin.REST_PREFIX */ '/wonderland/download'
 
   private final DownloadService downloadService

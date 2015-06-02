@@ -16,14 +16,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
-
-import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 
 /**
@@ -66,7 +65,7 @@ public abstract class RepositoryTestSupport
     calmPeriod();
   }
 
-  @NotNull
+  @Nonnull
   protected URL repositoryBaseUrl(final Repository repository) {
     return resolveUrl(nexusUrl, "/repository/" + repository.getName() + "/");
   }

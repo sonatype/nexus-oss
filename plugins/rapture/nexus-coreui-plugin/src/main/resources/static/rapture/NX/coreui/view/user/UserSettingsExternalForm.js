@@ -89,6 +89,7 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
         queryMode: 'local',
         allowBlank: true,
         readOnly: true,
+        cls: 'nx-combo-disabled',
         submitValue: false
       },
       {

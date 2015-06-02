@@ -50,8 +50,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-plugin</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-capability</artifactId>
       <scope>provided</scope>
     </dependency>
 

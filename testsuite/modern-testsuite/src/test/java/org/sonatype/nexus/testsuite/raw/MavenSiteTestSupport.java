@@ -17,14 +17,16 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nonnull;
+
 import org.sonatype.nexus.common.io.DirSupport;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
+
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.jetbrains.annotations.NotNull;
 import org.ops4j.pax.exam.Option;
 
 import static java.util.Arrays.asList;
@@ -85,7 +87,7 @@ public abstract class MavenSiteTestSupport
   /**
    * Produces a maven settings file, pointing to the test Nexus instance.
    */
-  @NotNull
+  @Nonnull
   private File createMavenSettings(final File mavenBaseDir, final ImmutableMap<String, String> replacements)
       throws IOException
   {
@@ -96,7 +98,7 @@ public abstract class MavenSiteTestSupport
         replacements);
   }
 
-  @NotNull
+  @Nonnull
   private File writeModifiedFile(final File source, final File target, final Map<String, String> replacements)
       throws IOException
   {
@@ -110,7 +112,7 @@ public abstract class MavenSiteTestSupport
     return target;
   }
 
-  @NotNull
+  @Nonnull
   private Verifier buildMavenVerifier(final String repositoryName, final File mavenBaseDir,
                                       final File mavenSettings) throws VerificationException
   {

@@ -62,16 +62,9 @@
       <version>1.7R4</version>
     </dependency>
 
-    <!--<dependency>-->
-      <!--<groupId>com.google.javascript</groupId>-->
-      <!--<artifactId>closure-compiler</artifactId>-->
-      <!--<version>v20140730</version>-->
-    <!--</dependency>-->
-
     <dependency>
-      <groupId>org.sonatype.sisu.litmus</groupId>
-      <artifactId>litmus-testsupport</artifactId>
-      <version>1.9</version>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

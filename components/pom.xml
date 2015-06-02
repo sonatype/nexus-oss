@@ -28,13 +28,14 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>nexus-common</module>
     <module>nexus-analytics-api</module>
     <module>nexus-blobstore-api</module>
     <module>nexus-blobstore-file</module>
     <module>nexus-bootstrap</module>
+    <module>nexus-capability</module>
     <module>nexus-client</module>
     <module>nexus-commands</module>
+    <module>nexus-common</module>
     <module>nexus-core</module>
     <module>nexus-ehcache</module>
     <module>nexus-elasticsearch</module>
