@@ -31,54 +31,32 @@ public interface MimeSupport
   /**
    * Makes a "guess" (usually based on file extension) about the MIME type that is most applicable to the given path
    * taking into consideration the requester MimeRulesSource MIME rules. When no "hard rule" present from
-   * {@link MimeRulesSource}, this method falls back to {@link #guessMimeTypeFromPath(String)}. The "guess" is fast,
+   * {@link MimeRulesSource}, this method falls back to Tika mime types defined in system. The "guess" is fast,
    * but not so precise as detection, where content is needed. This method should be used whenever a MIME type of a
    * file item that is contained <b>within</b> given context that has MimeRulesSource is about to be guessed.
    *
-   * @param mimeRulesSource optionally, the mimeRulesSource to apply/mixin into results.
-   * @param path to guess for.
+   * @param path             to guess for.
+   * @param mimeRulesSources optionally, the mimeRulesSource to apply/mixin into results.
    * @return the most applicable MIME type as String.
    */
   @Nonnull
-  String guessMimeTypeFromPath(@Nullable MimeRulesSource mimeRulesSource, String path);
+  String guessMimeTypeFromPath(String path, MimeRulesSource... mimeRulesSources);
 
   /**
    * Makes a "guess" (usually based on file extension) about the MIME type that is most applicable to the given path
    * taking into consideration the requester MimeRulesSource MIME rules. When no "hard rule" present from
-   * {@link MimeRulesSource}, this method falls back to {@link #guessMimeTypeFromPath(String)}. The "guess" is fast,
+   * {@link MimeRulesSource}, this method falls back to Tika mime types defined in system. The "guess" is fast,
    * but not so precise as detection, where content is needed. This method should be used whenever a MIME type of a
    * file item that is contained <b>within</b> given context that has MimeRulesSource is about to be guessed. The list
    * of mime types are in descending order (most specific 1st, least specific last).
    *
-   * @param mimeRulesSource optionally, the mimeRulesSource to apply/mixin into results.
-   * @param path to guess for.
+   * @param path             to guess for.
+   * @param mimeRulesSources optionally, the mimeRulesSource to apply/mixin into results.
    * @return the list of applicable mime types.
    * @since 3.0
    */
   @Nonnull
-  List<String> guessMimeTypesListFromPath(@Nullable MimeRulesSource mimeRulesSource, String path);
-
-  /**
-   * Makes a "guess" (usually based on file extension) about the MIME type that is most applicable to the given path.
-   * The "guess" is fast, but not so precise as detection, where content is needed.
-   *
-   * @param path to guess for.
-   * @return the most applicable MIME type as String.
-   */
-  @Nonnull
-  String guessMimeTypeFromPath(String path);
-
-  /**
-   * Makes a "guess" (based on file name and/or extension) about all the applicable MIME types for the given path. The
-   * "guess" is fast, but not so precise as detection, where content is needed. The list of mime types are in
-   * descending order (most specific 1st, least specific last).
-   *
-   * @param path to guess for.
-   * @return the list of applicable mime types.
-   * @since 2.8
-   */
-  @Nonnull
-  List<String> guessMimeTypesListFromPath(final String path);
+  List<String> guessMimeTypesListFromPath(String path, MimeRulesSource... mimeRulesSources);
 
   /**
    * Returns the most specific MIME type from result got from {@link #detectMimeType(InputStream, String)}.

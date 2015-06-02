@@ -107,53 +107,26 @@ public class DefaultMimeSupport
 
   @Nonnull
   @Override
-  public String guessMimeTypeFromPath(@Nullable final MimeRulesSource mimeRulesSource, final String path) {
-    return guessMimeTypesListFromPath(mimeRulesSource, path).get(0);
+  public String guessMimeTypeFromPath(final String path, final MimeRulesSource... mimeRulesSources) {
+    return guessMimeTypesListFromPath(path, mimeRulesSources).get(0);
   }
 
   @Nonnull
   @Override
-  public List<String> guessMimeTypesListFromPath(@Nullable final MimeRulesSource mimeRulesSource, final String path) {
+  public List<String> guessMimeTypesListFromPath(final String path, final MimeRulesSource... mimeRulesSources) {
     checkNotNull(path);
     List<String> mimeTypes = new ArrayList<>();
-    if (mimeRulesSource != null) {
-      final MimeRule hardRule = mimeRulesSource.getRuleForName(path);
-      if (hardRule != null) {
-        mimeTypes.addAll(hardRule.getMimetypes());
-        if (hardRule.isOverride()) {
+    for (MimeRulesSource mimeRulesSource : mimeRulesSources) {
+      final MimeRule mimeRule = mimeRulesSource.getRuleForName(path);
+      if (mimeRule != null) {
+        mimeTypes.addAll(mimeRule.getMimetypes());
+        if (mimeRule.isOverride()) {
           return mimeTypes;
         }
       }
     }
     mimeTypes.addAll(guessMimeTypesListFromPath(path));
     return mimeTypes;
-  }
-
-  @Nonnull
-  @Override
-  public String guessMimeTypeFromPath(final String path) {
-    return guessMimeTypesListFromPath(path).get(0);
-  }
-
-  @Nonnull
-  @Override
-  public List<String> guessMimeTypesListFromPath(final String path) {
-    checkNotNull(path);
-    final String pathExtension = Files.getFileExtension(path);
-    try {
-      final List<String> mimeTypes = new ArrayList<>();
-      List<String> extBasedTypes = extensionToMimeTypeCache.get(pathExtension);
-      if (extBasedTypes != null && !extBasedTypes.isEmpty()) {
-        mimeTypes.addAll(extBasedTypes);
-      }
-      if (mimeTypes.isEmpty()) {
-        mimeTypes.add(MimeTypes.OCTET_STREAM);
-      }
-      return mimeTypes;
-    }
-    catch (ExecutionException e) {
-      throw Throwables.propagate(e);
-    }
   }
 
   @Nonnull
@@ -186,6 +159,29 @@ public class DefaultMimeSupport
     }
 
     return detected;
+  }
+
+  /**
+   * Uses extension to mime types cache backed by {@link NexusMimeTypes} and Tika registry.
+   */
+  @Nonnull
+  private List<String> guessMimeTypesListFromPath(final String path) {
+    checkNotNull(path);
+    final String pathExtension = Files.getFileExtension(path);
+    try {
+      final List<String> mimeTypes = new ArrayList<>();
+      List<String> extBasedTypes = extensionToMimeTypeCache.get(pathExtension);
+      if (extBasedTypes != null && !extBasedTypes.isEmpty()) {
+        mimeTypes.addAll(extBasedTypes);
+      }
+      if (mimeTypes.isEmpty()) {
+        mimeTypes.add(MimeTypes.OCTET_STREAM);
+      }
+      return mimeTypes;
+    }
+    catch (ExecutionException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   /**

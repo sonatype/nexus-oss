@@ -80,7 +80,11 @@ public class DefaultContentValidator
 
     final LinkedHashSet<String> nameAssumedMimeTypes = new LinkedHashSet<>();
     if (contentName != null) {
-      nameAssumedMimeTypes.addAll(mimeSupport.guessMimeTypesListFromPath(mimeRulesSource, contentName));
+      nameAssumedMimeTypes.addAll(
+          mimeSupport.guessMimeTypesListFromPath(
+              contentName,
+              mimeRulesSource != null ? mimeRulesSource : MimeRulesSource.NOOP)
+      );
       adjustIfHtml(nameAssumedMimeTypes);
       log.debug("Mime support assumes {} as {}", contentName, nameAssumedMimeTypes);
       if (strictContentTypeValidation && isUnknown(nameAssumedMimeTypes)) {

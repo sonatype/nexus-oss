@@ -80,22 +80,22 @@ public class DefaultMimeSupportTest
       }
     };
 
-    assertThat(underTest.guessMimeTypeFromPath(source, "/some/path/artifact.pom"), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath(source, "/some/path/artifact.jar"), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath(source, "/some/path/artifact-sources.jar"), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath(source, "/some/path/maven-metadata.xml"), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath(source, "/some/path/some.xml"), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath(source, "/some/path/some.tar.gz"), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath(source, "/some/path/some.tar.bz2"), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath(source, "/some/path/some.zip"), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath(source, "/some/path/some.war"), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath(source, "/some/path/some.ear"), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath(source, "/some/path/some.ejb"), equalTo("foo/bar"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/artifact.pom", source), equalTo("foo/bar"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/artifact.jar", source), equalTo("foo/bar"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/artifact-sources.jar", source), equalTo("foo/bar"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/maven-metadata.xml", source), equalTo("foo/bar"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.xml", source), equalTo("foo/bar"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.tar.gz", source), equalTo("foo/bar"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.tar.bz2", source), equalTo("foo/bar"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.zip", source), equalTo("foo/bar"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.war", source), equalTo("foo/bar"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.ear", source), equalTo("foo/bar"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.ejb", source), equalTo("foo/bar"));
   }
 
   @Test
   public void testGuessNullMimeRulesSourceMimeTypeFromPath() {
-    assertThat(underTest.guessMimeTypeFromPath(null, "/some/path/artifact.pom"), equalTo("application/xml"));
+    assertThat(underTest.guessMimeTypeFromPath("/some/path/artifact.pom"), equalTo("application/xml"));
   }
 
   @Test
