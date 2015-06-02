@@ -43,6 +43,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.FacetSupport.State.INITIALISED;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
+import static org.sonatype.nexus.repository.FacetSupport.State.STOPPED;
 
 /**
  * Default {@link StorageFacet} implementation.
@@ -207,6 +208,13 @@ public class StorageFacetImpl
   public StorageTx openTx(final ODatabaseDocumentTx db) {
     checkNotNull(db);
     return openStorageTx(db, true);
+  }
+
+  @Override
+  @Guarded(by = STOPPED)
+  public void unregisterHookSupplier(final Supplier<StorageTxHook> hookSupplier) {
+    checkNotNull(hookSupplier);
+    hookSuppliers.remove(hookSupplier);
   }
 
   /**

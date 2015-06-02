@@ -58,6 +58,14 @@ public class SearchFacetImpl
 
   private final Map<String, ComponentMetadataProducer> componentMetadataProducers;
 
+  private final Supplier<StorageTxHook> searchHook = new Supplier<StorageTxHook>()
+  {
+    @Override
+    public StorageTxHook get() {
+      return new SearchHook(SearchFacetImpl.this);
+    }
+  };
+
   @Inject
   public SearchFacetImpl(final SearchService searchService,
                          final Map<String, ComponentMetadataProducer> componentMetadataProducers)
@@ -69,13 +77,7 @@ public class SearchFacetImpl
   @Override
   protected void doInit(final Configuration configuration) throws Exception {
     super.doInit(configuration);
-    facet(StorageFacet.class).registerHookSupplier(new Supplier<StorageTxHook>()
-    {
-      @Override
-      public StorageTxHook get() {
-        return new SearchHook(SearchFacetImpl.this);
-      }
-    });
+    facet(StorageFacet.class).registerHookSupplier(searchHook);
   }
 
   /**
@@ -119,6 +121,7 @@ public class SearchFacetImpl
 
   @Override
   protected void doDelete() {
+    facet(StorageFacet.class).unregisterHookSupplier(searchHook);
     searchService.deleteIndex(getRepository());
   }
 
