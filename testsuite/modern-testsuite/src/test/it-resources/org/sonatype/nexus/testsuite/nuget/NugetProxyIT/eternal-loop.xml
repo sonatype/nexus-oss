@@ -2,12 +2,12 @@
 <feed xml:base="https://www.nuget.org/api/v2/" xmlns="http://www.w3.org/2005/Atom"
       xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"
       xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata">
-  <id>https://www.nuget.org/api/v2/Packages</id>
+  <id>http://www.nuget.org/api/v2/Packages</id>
   <title type="text">Packages</title>
   <updated>2015-05-13T20:14:02Z</updated>
   <link rel="self" title="Packages" href="Packages"/>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='endless',Version='6.0.8')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='endless',Version='6.0.8')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='endless',Version='6.0.8')"/>
     <title type="text">endless</title>
@@ -17,7 +17,7 @@
       <name>James Newton-King</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='endless',Version='6.0.8')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/endless/6.0.8"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/endless/6.0.8"/>
     <m:properties>
       <d:Version>6.0.8</d:Version>
       <d:NormalizedVersion>6.0.8</d:NormalizedVersion>
@@ -53,5 +53,5 @@
     </m:properties>
   </entry>
   <link rel="next"
-        href="https://www.nuget.org/api/v2/Search"/>
+        href="http://${host}:${port}//${repository}/Search"/>
 </feed>

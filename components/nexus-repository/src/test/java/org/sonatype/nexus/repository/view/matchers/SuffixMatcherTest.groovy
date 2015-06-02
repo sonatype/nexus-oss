@@ -10,42 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.view;
+package org.sonatype.nexus.repository.view.matchers
 
-import javax.annotation.Nonnull;
+import org.sonatype.nexus.repository.Repository
+import org.sonatype.nexus.repository.view.Context
+import org.sonatype.nexus.repository.view.Request
+import org.sonatype.sisu.litmus.testsupport.TestSupport
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.junit.Test
+
+import static org.mockito.Mockito.mock
 
 /**
- * Payload response.
- *
- * @since 3.0
+ * Tests for {@link SuffixMatcher}.
  */
-public class PayloadResponse
-    extends Response
+class SuffixMatcherTest
+  extends TestSupport
 {
-  private Payload payload;
-
-  public PayloadResponse(final Status status, final Payload payload) {
-    super(status);
-    setPayload(payload);
+  private Context context(String path) {
+    return new Context(mock(Repository.class), new Request.Builder().action('GET').path(path).build())
   }
 
-  @Nonnull
-  public Payload getPayload() {
-    return payload;
+  @Test
+  void 'basic'() {
+    def underTest = new SuffixMatcher('/')
+    assert underTest.matches(context('foo/'))
+    assert !underTest.matches(context('foo/index.html'))
   }
-
-  public void setPayload(final Payload payload) {
-    this.payload = checkNotNull(payload);
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "status=" + getStatus() +
-        ", payload=" + payload +
-        '}';
-  }
-
 }

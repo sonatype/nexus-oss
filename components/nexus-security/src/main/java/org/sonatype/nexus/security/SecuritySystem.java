@@ -25,6 +25,7 @@ import org.sonatype.nexus.security.role.RoleIdentifier;
 import org.sonatype.nexus.security.user.InvalidCredentialsException;
 import org.sonatype.nexus.security.user.NoSuchUserManagerException;
 import org.sonatype.nexus.security.user.User;
+import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.nexus.security.user.UserNotFoundException;
 import org.sonatype.nexus.security.user.UserSearchCriteria;
 
@@ -249,6 +250,11 @@ public interface SecuritySystem
   Set<Privilege> listPrivileges();
 
   AuthorizationManager getAuthorizationManager(String source) throws NoSuchAuthorizationManagerException;
+
+  /**
+   * @since 3.0
+   */
+  UserManager getUserManager(final String source) throws NoSuchUserManagerException;
 
   // //
   // Application configuration, TODO: I don't think all of these need to be exposed, but they currently are

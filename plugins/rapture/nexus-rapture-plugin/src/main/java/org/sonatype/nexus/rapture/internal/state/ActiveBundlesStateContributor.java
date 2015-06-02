@@ -57,9 +57,10 @@ public class ActiveBundlesStateContributor
       @Override
       public String addingBundle(final Bundle bundle, final BundleEvent event) {
         String name = bundle.getSymbolicName();
+        String location = bundle.getLocation();
 
         // ignore wrap bundles, and stop tracking them
-        if (name.startsWith("wrap_mvn")) {
+        if (location.startsWith("wrap:mvn")) {
           return null;
         }
 

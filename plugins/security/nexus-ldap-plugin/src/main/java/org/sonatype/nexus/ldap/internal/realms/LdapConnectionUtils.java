@@ -16,6 +16,10 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+
+import com.sonatype.nexus.ssl.plugin.TrustStore;
+
 import org.sonatype.nexus.ldap.internal.LdapURL;
 import org.sonatype.nexus.ldap.internal.connector.DefaultLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapAuthConfiguration;
@@ -23,8 +27,10 @@ import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapGroupDAO;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapUserDAO;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection;
+import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Host;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping;
+import org.sonatype.nexus.ldap.internal.ssl.SSLLdapContextFactory;
 
 import com.google.common.base.Strings;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
@@ -33,28 +39,33 @@ import org.slf4j.LoggerFactory;
 
 public class LdapConnectionUtils
 {
-  private static Logger logger = LoggerFactory.getLogger(LdapConnectionUtils.class);
+  private static Logger log = LoggerFactory.getLogger(LdapConnectionUtils.class);
 
-  public static DefaultLdapContextFactory getLdapContextFactory(LdapConfiguration ldapServer)
+  public static LdapContextFactory getLdapContextFactory(final LdapConfiguration configuration,
+                                                         final TrustStore trustStore)
       throws LdapDAOException
   {
-    DefaultLdapContextFactory defaultLdapContextFactory = new DefaultLdapContextFactory();
-
-    if (ldapServer == null) {
+    if (configuration == null) {
       throw new LdapDAOException("Ldap connection is not configured.");
     }
 
-    Connection connInfo = ldapServer.getConnection();
+    DefaultLdapContextFactory defaultLdapContextFactory = new DefaultLdapContextFactory();
+
+    Connection connInfo = configuration.getConnection();
+    Host host = connInfo.getHost();
 
     String url;
     try {
-      url = new LdapURL(connInfo.getHost().getProtocol().name(), connInfo.getHost().getHostName(),
-          connInfo.getHost().getPort(), connInfo
-          .getSearchBase()).toString();
+      url = new LdapURL(
+          host.getProtocol().name(),
+          host.getHostName(),
+          host.getPort(),
+          connInfo.getSearchBase()
+      ).toString();
     }
     catch (MalformedURLException e) {
       // log an error, because the user could still log in and fix the config.
-      logger.error("LDAP Configuration is Invalid.");
+      log.error("LDAP Configuration is Invalid.");
       throw new LdapDAOException("Invalid LDAP URL: " + e.getMessage());
     }
 
@@ -66,9 +77,9 @@ public class LdapConnectionUtils
     defaultLdapContextFactory.setAuthentication(connInfo.getAuthScheme());
 
     // get the timeout
-    Map<String, String> connectionProperties = new HashMap<String, String>();
+    Map<String, String> connectionProperties = new HashMap<>();
     connectionProperties.put("com.sun.jndi.ldap.connect.timeout",
-        Integer.toString(ldapServer.getConnection().getConnectionTimeout() * 1000));
+        Integer.toString(connInfo.getConnectionTimeout() * 1000));
 
     // and the realm
     if (connInfo.getSaslRealm() != null) {
@@ -76,6 +87,12 @@ public class LdapConnectionUtils
     }
     defaultLdapContextFactory.setAdditionalEnvironment(connectionProperties);
 
+    if (host.getProtocol() == Connection.Protocol.ldaps && connInfo.getUseTrustStore()) {
+      SSLContext sslContext = trustStore.getSSLContext();
+      log.debug("Using Nexus SSL Trust Store for accessing {}:{}", host.getHostName(), host.getPort());
+      return new SSLLdapContextFactory(sslContext, defaultLdapContextFactory);
+    }
+    log.debug("Using JVM Trust Store for accessing {}:{}", host.getHostName(), host.getPort());
     return defaultLdapContextFactory;
   }
 
@@ -101,16 +118,6 @@ public class LdapConnectionUtils
     authConfig.setLdapGroupsAsRoles(userAndGroupsConf.isLdapGroupsAsRoles());
     authConfig.setLdapFilter(userAndGroupsConf.getLdapFilter());
     return authConfig;
-  }
-
-  public static void testUserAuthentication(LdapConfiguration ldapServer, LdapUserDAO ldapUserDAO,
-                                            LdapGroupDAO ldapGroupDAO) throws LdapDAOException
-  {
-    LdapContextFactory contextFactory = getLdapContextFactory(ldapServer);
-    LdapAuthConfiguration authConfig = getLdapAuthConfiguration(ldapServer);
-
-    new DefaultLdapConnector("test", ldapUserDAO, ldapGroupDAO, contextFactory, authConfig);
-
   }
 
 }

@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -70,7 +71,7 @@ public class NugetPushHandlerTest
     when(requestPayload.openInputStream()).thenReturn(inputStream);
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.CREATED, "text/html", "<html><body></body></html>");
+    checkResponse(response, HttpStatus.CREATED, ContentTypes.TEXT_HTML, "<html><body></body></html>");
 
     verify(nugetGalleryFacet).put(inputStream);
     verifyNoMoreInteractions(nugetGalleryFacet);
@@ -87,7 +88,7 @@ public class NugetPushHandlerTest
     when(requestPayload.openInputStream()).thenReturn(inputStream);
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.CREATED, "text/html", "<html><body></body></html>");
+    checkResponse(response, HttpStatus.CREATED, ContentTypes.TEXT_HTML, "<html><body></body></html>");
 
     verify(nugetGalleryFacet, times(2)).put(inputStream);
     verifyNoMoreInteractions(nugetGalleryFacet);
@@ -100,7 +101,7 @@ public class NugetPushHandlerTest
     when(request.getMultiparts()).thenReturn(new ArrayList<Payload>());
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.BAD_REQUEST, "application/xml", "No content was provided");
+    checkResponse(response, HttpStatus.BAD_REQUEST, ContentTypes.APPLICATION_XML, "No content was provided");
   }
 
   @Test
@@ -109,17 +110,18 @@ public class NugetPushHandlerTest
     when(request.isMultipart()).thenReturn(false);
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.BAD_REQUEST, "application/xml", "Multipart request required");
+    checkResponse(response, HttpStatus.BAD_REQUEST, ContentTypes.APPLICATION_XML, "Multipart request required");
   }
 
-  private void checkResponse(Response response,
-                             int expectedCode,
-                             String expectedContentType,
-                             String expectedSubstring) throws Exception
+  private void checkResponse(final Response response,
+                             final int expectedCode,
+                             final String expectedContentType,
+                             final String expectedSubstring)
+      throws Exception
   {
     assertThat(response.getStatus().getCode(), is(expectedCode));
-    assertThat(response instanceof PayloadResponse, is(true));
-    Payload responsePayload = ((PayloadResponse) response).getPayload();
+    assertThat(response.getPayload(), notNullValue());
+    Payload responsePayload = response.getPayload();
     assertThat(responsePayload.getContentType(), is(expectedContentType));
     String responseBody = Streams.asString(responsePayload.openInputStream());
     assertThat(responseBody.contains(expectedSubstring), is(true));

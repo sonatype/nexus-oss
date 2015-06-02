@@ -1,0 +1,39 @@
+<entry xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://www.w3.org/2005/Atom">
+  <id>http://${host}:${port}//${repository}/Packages(Id='SONATYPE.TEST',Version='1.0')</id>
+  <title type="text">SONATYPE.TEST</title>
+  <summary type="text">Example.</summary>
+  <updated m:null="true"></updated>
+  <author>
+    <name>Sonatype, Inc.</name>
+  </author>
+  <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='SONATYPE.TEST',Version='1.0')/$value" />
+  <link rel="edit" title="V2FeedPackage" href="Packages(Id='SONATYPE.TEST',Version='1.0')" />
+  <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme" />
+  <content type="application/zip" src="http://${host}:${port}//${repository}/SONATYPE.TEST/1.0" />
+  <m:properties>
+    <d:Version>1.0</d:Version>
+    <d:Copyright m:null="true"></d:Copyright>
+    <d:Created m:type="Edm.DateTime">2015-05-28T20:21:14.304Z</d:Created>
+    <d:Dependencies m:null="true"></d:Dependencies>
+    <d:Description>Example NuGet package.</d:Description>
+    <d:DownloadCount m:type="Edm.Int32">0</d:DownloadCount>
+    <d:GalleryDetailsUrl m:null="true"></d:GalleryDetailsUrl>
+    <d:IconUrl m:null="true"></d:IconUrl>
+    <d:IsLatestVersion m:type="Edm.Boolean">true</d:IsLatestVersion>
+    <d:IsAbsoluteLatestVersion m:type="Edm.Boolean">true</d:IsAbsoluteLatestVersion>
+    <d:IsPrerelease m:type="Edm.Boolean">false</d:IsPrerelease>
+    <d:Published m:type="Edm.DateTime">2015-05-28T20:21:14.304Z</d:Published>
+    <d:Language>en-US</d:Language>
+    <d:LicenseUrl>http://www.eclipse.org/legal/epl-v10.html</d:LicenseUrl>
+    <d:PackageHash>Hy5FP+mjtRqJmQfOqO19QLR+W71NGufkmOhQxcPomQMG1HOTILCnTpdMXJD4u9716DO7a0LzMI1qR7paZiDE9A==</d:PackageHash>
+    <d:PackageHashAlgorithm>SHA512</d:PackageHashAlgorithm>
+    <d:PackageSize m:type="Edm.Int64">2165</d:PackageSize>
+    <d:ProjectUrl>http://www.sonatype.com/</d:ProjectUrl>
+    <d:ReportAbuseUrl m:null="true"></d:ReportAbuseUrl>
+    <d:ReleaseNotes m:null="true"></d:ReleaseNotes>
+    <d:RequireLicenseAcceptance m:type="Edm.Boolean">false</d:RequireLicenseAcceptance>
+    <d:Tags>sonatype example</d:Tags>
+    <d:Title>SONATYPE.TEST</d:Title>
+    <d:VersionDownloadCount m:type="Edm.Int32">0</d:VersionDownloadCount>
+  </m:properties>
+</entry>

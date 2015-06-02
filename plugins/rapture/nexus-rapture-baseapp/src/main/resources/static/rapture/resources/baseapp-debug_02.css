@@ -4568,15 +4568,15 @@
 
 /* line 582, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-nx-feature-content .x-panel-header-icon {
-  width: 32;
-  height: 32;
+  width: 32px;
+  height: 32px;
   background-position: center center;
 }
 /* line 587, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-nx-feature-content .x-panel-header-glyph {
   color: white;
-  font-size: 32;
-  line-height: 32;
+  font-size: 32px;
+  line-height: 32px;
   opacity: 0.5;
 }
 /* line 604, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
