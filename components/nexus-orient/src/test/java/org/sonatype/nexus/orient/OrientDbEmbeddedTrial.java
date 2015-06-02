@@ -34,7 +34,6 @@ import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProto
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Trials of using OrientDB embedded.
@@ -43,10 +42,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class OrientDbEmbeddedTrial
     extends TestSupport
 {
-  static {
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
-  }
 
   /**
    * Tests configuring the server w/o xml but configuring the JAXB objects directly.

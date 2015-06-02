@@ -26,7 +26,6 @@ import com.orientechnologies.orient.core.db.tool.ODatabaseImport;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Trials of using OrientDB export and import functions.
@@ -34,10 +33,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class ExportImportTrial
     extends TestSupport
 {
-  static {
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
-  }
 
   private File basedir;
 
