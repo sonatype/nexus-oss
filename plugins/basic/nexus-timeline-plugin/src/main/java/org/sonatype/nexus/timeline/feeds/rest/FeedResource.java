@@ -118,7 +118,7 @@ public class FeedResource
       final List<SyndEntry> entries = Lists.newArrayListWithCapacity(feedEvents.size());
       for (FeedEvent event : feedEvents) {
         final SyndEntry entry = new SyndEntryImpl();
-        entry.setTitle(feedContentRenderer.getTitle(event));
+        entry.setTitle(event.getTitle());
         entry.setPublishedDate(event.getPublished());
         if (event.getAuthor() != null) {
           entry.setAuthor(event.getAuthor());

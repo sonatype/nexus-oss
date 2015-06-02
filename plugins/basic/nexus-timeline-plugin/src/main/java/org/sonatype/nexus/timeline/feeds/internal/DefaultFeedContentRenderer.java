@@ -47,18 +47,6 @@ public class DefaultFeedContentRenderer
   }
 
   @Override
-  public String getTitle(final FeedEvent evt) {
-    // allow override, like when event is not coming from timeline
-    // but is parsed from Nexus Log, see ErrorWarningFeedSource
-    final String title = evt.getTitle();
-    if (title != null) {
-      return title;
-    }
-    // TODO: Some human-readable fallback?
-    return evt.getEventType() + ":" + evt.getEventSubType();
-  }
-
-  @Override
   public String getContent(final FeedEvent evt) {
     // allow override, like when event is not coming from timeline
     // but is parsed from Nexus Log, see ErrorWarningFeedSource
