@@ -40,7 +40,6 @@ import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
@@ -107,8 +106,8 @@ public class Maven2GroupFacet
     for (Map.Entry<Repository, Response> entry : responses.entrySet()) {
       if (entry.getValue().getStatus().getCode() == HttpStatus.OK) {
         final Response response = entry.getValue();
-        if (response instanceof PayloadResponse && ((PayloadResponse) response).getPayload() instanceof Content) {
-          metadataContents.put(entry.getKey(), (Content) ((PayloadResponse) response).getPayload());
+        if (response.getPayload() instanceof Content) {
+          metadataContents.put(entry.getKey(), (Content) response.getPayload());
         }
       }
     }

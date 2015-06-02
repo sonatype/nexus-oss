@@ -14,20 +14,11 @@ package org.sonatype.nexus.repository.view.payloads;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
-import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.view.Payload;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.google.common.hash.HashCode;
-import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,9 +34,7 @@ public class BlobPayload
 
   private final String contentType;
 
-  public BlobPayload(final Blob blob,
-                     final @Nullable String contentType)
-  {
+  public BlobPayload(final Blob blob, @Nullable final String contentType) {
     this.blob = checkNotNull(blob);
     this.contentType = contentType;
   }

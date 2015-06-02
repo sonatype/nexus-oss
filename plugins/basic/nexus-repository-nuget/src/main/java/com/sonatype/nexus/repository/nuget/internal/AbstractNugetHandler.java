@@ -19,9 +19,9 @@ import com.sonatype.nexus.repository.nuget.odata.ODataTemplates;
 
 import org.sonatype.nexus.repository.IllegalOperationException;
 import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
@@ -41,9 +41,6 @@ abstract class AbstractNugetHandler
     extends ComponentSupport
     implements Handler
 {
-
-  public static final String XML_CONTENT_TYPE = "application/xml";
-
   protected Response convertToXmlError(final Exception e) {
     if (e instanceof NugetPackageException) {
       log.debug("Invalid package being uploaded", e);
@@ -72,9 +69,12 @@ abstract class AbstractNugetHandler
   }
 
   protected Response xmlPayload(final int code, final String content) {
-    final StringPayload stringPayload = new StringPayload(content, Charsets.UTF_8, XML_CONTENT_TYPE);
+    final StringPayload stringPayload = new StringPayload(content, Charsets.UTF_8, ContentTypes.APPLICATION_XML);
     final Status status = code < 300 ? Status.success(code) : Status.failure(code);
-    return new PayloadResponse(status, stringPayload);
+    return new Response.Builder()
+        .status(status)
+        .payload(stringPayload)
+        .build();
   }
 
   public String populateErrorTemplate(final int code, final String message) {
@@ -83,8 +83,6 @@ abstract class AbstractNugetHandler
   }
 
   protected String getRepositoryBase(final Context context) {
-    final String path = context.getRequest().getPath();
-    final String requestUrl = context.getRequest().getRequestUrl();
-    return requestUrl.substring(0, requestUrl.length() - path.length());
+    return context.getRepository().getUrl();
   }
 }

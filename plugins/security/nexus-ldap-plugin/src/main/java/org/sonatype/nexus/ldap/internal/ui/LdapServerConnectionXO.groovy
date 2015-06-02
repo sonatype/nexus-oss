@@ -64,7 +64,8 @@ class LdapServerConnectionXO
   @NotNull(groups = AuthScheme)
   String authPassword
 
-  @Min(0L)
+  @Min(1L)
+  @Max(3600L) // 1 hour
   Integer connectionTimeout
 
   @Min(0L)

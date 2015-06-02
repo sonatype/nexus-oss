@@ -10,38 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, NX*/
+package org.sonatype.nexus.httpclient.config;
+
+import java.io.IOException;
+
+import org.sonatype.sisu.goodies.common.Time;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
- * Configuration for content type validation of Repository content.
+ * {@link Time} in seconds serializer.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.facet.RawContentFacet', {
-  extend: 'Ext.form.FieldContainer',
-  alias: 'widget.nx-coreui-repository-content-rawcontent-facet',
-  requires: [
-    'NX.I18n'
-  ],
+public class SecondsSerializer
+    extends StdSerializer<Time>
+{
 
-  /**
-   * @override
-   */
-  initComponent: function() {
-    var me = this;
-
-    me.items = [
-      {
-        xtype: 'fieldset',
-        cls: 'nx-form-section',
-        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_RAW_FACET'),
-
-        items: [
-        ]
-      }
-    ];
-
-    me.callParent(arguments);
+  public SecondsSerializer() {
+    super(Time.class);
   }
 
-});
+  @Override
+  public void serialize(final Time value, final JsonGenerator jgen, final SerializerProvider provider)
+      throws IOException
+  {
+    jgen.writeNumber(value.toSecondsI());
+  }
+}

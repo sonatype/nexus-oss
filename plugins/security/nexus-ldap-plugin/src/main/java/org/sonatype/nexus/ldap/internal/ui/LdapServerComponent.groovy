@@ -12,11 +12,9 @@
  */
 package org.sonatype.nexus.ldap.internal.ui
 
-import javax.annotation.Nullable
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
-import javax.net.ssl.SSLContext
 import javax.validation.Valid
 import javax.validation.Validator
 import javax.validation.constraints.NotNull
@@ -36,10 +34,8 @@ import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Host
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Protocol
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration
 import org.sonatype.nexus.ldap.internal.persist.entity.Mapping
-import org.sonatype.nexus.ldap.internal.realms.DefaultLdapContextFactory
 import org.sonatype.nexus.ldap.internal.realms.EnterpriseLdapManager
 import org.sonatype.nexus.ldap.internal.realms.LdapConnectionUtils
-import org.sonatype.nexus.ldap.internal.ssl.SSLLdapContextFactory
 import org.sonatype.nexus.ldap.internal.templates.LdapSchemaTemplate
 import org.sonatype.nexus.ldap.internal.templates.LdapSchemaTemplateManager
 import org.sonatype.nexus.rapture.PasswordPlaceholder
@@ -64,7 +60,7 @@ import org.hibernate.validator.constraints.NotEmpty
 @Singleton
 @DirectAction(action = 'ldap_LdapServer')
 class LdapServerComponent
-extends DirectComponentSupport
+    extends DirectComponentSupport
 {
 
   @Inject
@@ -121,7 +117,9 @@ extends DirectComponentSupport
   @RequiresPermissions('nexus:ldap:create')
   @Validate(groups = [Create, Default])
   LdapServerXO create(final @NotNull @Valid LdapServerXO ldapServerXO) {
-    def id = ldapConfigurationManager.addLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), null))
+    def id = ldapConfigurationManager.addLdapServerConfiguration(
+        asCLdapServerConfiguration(validate(ldapServerXO), null)
+    )
     return asLdapServerXO(ldapConfigurationManager.getLdapServerConfiguration(id))
   }
 
@@ -132,7 +130,9 @@ extends DirectComponentSupport
   LdapServerXO update(final @NotNull @Valid LdapServerXO ldapServerXO) {
     LdapConfiguration existing = ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id)
     if (existing) {
-      ldapConfigurationManager.updateLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), existing.connection.systemPassword))
+      ldapConfigurationManager.updateLdapServerConfiguration(
+          asCLdapServerConfiguration(validate(ldapServerXO), existing.connection.systemPassword)
+      )
       return asLdapServerXO(ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id))
     }
     throw new IllegalArgumentException('LDAP server with id "' + ldapServerXO.id + '" not found')
@@ -320,20 +320,7 @@ extends DirectComponentSupport
     return new LdapConfiguration(
         id: ldapServerXO.id,
         name: ldapServerXO.name,
-        connection: new Connection(
-            host: new Host(Protocol.valueOf(ldapServerXO.protocol.name()), ldapServerXO.host, ldapServerXO.port),
-            useTrustStore: Boolean.TRUE.equals(ldapServerXO.useTrustStore),
-            searchBase: ldapServerXO.searchBase,
-
-            authScheme: ldapServerXO.authScheme,
-            saslRealm: ldapServerXO.authRealm,
-            systemUsername: ldapServerXO.authUsername,
-            systemPassword: PasswordPlaceholder.is(ldapServerXO.authPassword) ? authPassword : ldapServerXO.authPassword,
-
-            connectionTimeout: ldapServerXO.connectionTimeout,
-            connectionRetryDelay: ldapServerXO.connectionRetryDelay,
-            maxIncidentsCount: ldapServerXO.maxIncidentsCount,
-        ),
+        connection: asConnection(ldapServerXO, authPassword),
         mapping: new Mapping(
             userBaseDn: ldapServerXO.userBaseDn,
             userSubtree: ldapServerXO.userSubtree ?: false,
@@ -357,6 +344,24 @@ extends DirectComponentSupport
   }
 
   @PackageScope
+  Connection asConnection(final LdapServerConnectionXO connectionXO, final String authPassword) {
+    return new Connection(
+        host: new Host(Protocol.valueOf(connectionXO.protocol.name()), connectionXO.host, connectionXO.port),
+        useTrustStore: Boolean.TRUE.equals(connectionXO.useTrustStore),
+        searchBase: connectionXO.searchBase,
+
+        authScheme: connectionXO.authScheme,
+        saslRealm: connectionXO.authRealm,
+        systemUsername: connectionXO.authUsername,
+        systemPassword: PasswordPlaceholder.is(connectionXO.authPassword) ? authPassword : connectionXO.authPassword,
+
+        connectionTimeout: connectionXO.connectionTimeout,
+        connectionRetryDelay: connectionXO.connectionRetryDelay,
+        maxIncidentsCount: connectionXO.maxIncidentsCount,
+    )
+  }
+
+  @PackageScope
   LdapServerConnectionXO validate(final LdapServerConnectionXO ldapServerConnectionXO) {
     if (ldapServerConnectionXO.authScheme != 'none') {
       validator.validate(ldapServerConnectionXO, LdapServerConnectionXO.AuthScheme)
@@ -368,26 +373,21 @@ extends DirectComponentSupport
   LdapServerXO validate(final LdapServerXO ldapServerXO) {
     validate(ldapServerXO as LdapServerConnectionXO)
     if (ldapServerXO.ldapGroupsAsRoles) {
-      validator.validate(ldapServerXO, ldapServerXO.groupType == 'static' ? LdapServerXO.GroupStatic : LdapServerXO.GroupDynamic)
+      validator.validate(
+          ldapServerXO,
+          ldapServerXO.groupType == 'static' ? LdapServerXO.GroupStatic : LdapServerXO.GroupDynamic
+      )
     }
     return ldapServerXO
   }
 
-  private LdapContextFactory buildLdapContextFactory(final LdapServerConnectionXO ldapServerConnectionXO, final String authPassword) {
-    DefaultLdapContextFactory ldapContextFactory = new DefaultLdapContextFactory(
-        authentication: ldapServerConnectionXO.authScheme,
-        searchBase: ldapServerConnectionXO.searchBase,
-        systemUsername: ldapServerConnectionXO.authUsername,
-        systemPassword: PasswordPlaceholder.is(ldapServerConnectionXO.authPassword) ? authPassword : ldapServerConnectionXO.authPassword,
-        url: new LdapURL(ldapServerConnectionXO.protocol.toString(), ldapServerConnectionXO.host, ldapServerConnectionXO.port, ldapServerConnectionXO.searchBase)
+  private LdapContextFactory buildLdapContextFactory(final LdapServerConnectionXO connectionXO,
+                                                     final String authPassword)
+  {
+    return LdapConnectionUtils.getLdapContextFactory(
+        new LdapConfiguration(connection: asConnection(connectionXO, authPassword)),
+        trustStore
     )
-    if (ldapServerConnectionXO.protocol == LdapServerConnectionXO.Protocol.ldaps && ldapServerConnectionXO.useTrustStore) {
-      final SSLContext sslContext = trustStore.getSSLContext()
-      log.debug "Using Nexus SSL Trust Store for accessing ${ldapServerConnectionXO.host}:${ldapServerConnectionXO.port}"
-      return new SSLLdapContextFactory(sslContext, ldapContextFactory)
-    }
-    log.debug "Using JVM Trust Store for accessing ${ldapServerConnectionXO.host}:${ldapServerConnectionXO.port}"
-    return ldapContextFactory
   }
 
   @PackageScope

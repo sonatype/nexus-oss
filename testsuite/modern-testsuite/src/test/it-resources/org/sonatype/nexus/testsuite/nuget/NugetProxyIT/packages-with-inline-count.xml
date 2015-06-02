@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xml:base="https://www.nuget.org/api/v2/" xmlns="http://www.w3.org/2005/Atom"
+<feed xml:base="http://${host}:${port}//${repository}/" xmlns="http://www.w3.org/2005/Atom"
       xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"
       xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata">
   <m:count>34098</m:count>
-  <id>https://www.nuget.org/api/v2/Packages</id>
+  <id>http://${host}:${port}//${repository}/Packages</id>
   <title type="text">Packages</title>
   <updated>2015-05-13T20:14:02Z</updated>
   <link rel="self" title="Packages" href="Packages"/>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Newtonsoft.Json',Version='6.0.8')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Newtonsoft.Json',Version='6.0.8')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Newtonsoft.Json',Version='6.0.8')"/>
     <title type="text">Newtonsoft.Json</title>
@@ -18,7 +18,7 @@
       <name>James Newton-King</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Newtonsoft.Json',Version='6.0.8')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Newtonsoft.Json/6.0.8"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Newtonsoft.Json/6.0.8"/>
     <m:properties>
       <d:Version>6.0.8</d:Version>
       <d:NormalizedVersion>6.0.8</d:NormalizedVersion>
@@ -54,7 +54,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery',Version='2.1.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='jQuery',Version='2.1.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery',Version='2.1.3')"/>
     <title type="text">jQuery</title>
@@ -64,7 +64,7 @@
       <name>jQuery Foundation, Inc.</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery',Version='2.1.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery/2.1.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/jQuery/2.1.3"/>
     <m:properties>
       <d:Version>2.1.3</d:Version>
       <d:NormalizedVersion>2.1.3</d:NormalizedVersion>
@@ -106,7 +106,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='EntityFramework',Version='6.1.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='EntityFramework',Version='6.1.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='EntityFramework',Version='6.1.3')"/>
     <title type="text">EntityFramework</title>
@@ -117,7 +117,7 @@
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='EntityFramework',Version='6.1.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/EntityFramework/6.1.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/EntityFramework/6.1.3"/>
     <m:properties>
       <d:Version>6.1.3</d:Version>
       <d:NormalizedVersion>6.1.3</d:NormalizedVersion>
@@ -153,7 +153,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.WebPages',Version='3.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.WebPages',Version='3.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebPages',Version='3.2.3')"/>
     <title type="text">Microsoft.AspNet.WebPages</title>
@@ -166,7 +166,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.WebPages',Version='3.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.WebPages/3.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.WebPages/3.2.3"/>
     <m:properties>
       <d:Version>3.2.3</d:Version>
       <d:NormalizedVersion>3.2.3</d:NormalizedVersion>
@@ -203,7 +203,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.Mvc',Version='5.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.Mvc',Version='5.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.Mvc',Version='5.2.3')"/>
     <title type="text">Microsoft.AspNet.Mvc</title>
@@ -213,7 +213,7 @@
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.Mvc',Version='5.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.Mvc/5.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.Mvc/5.2.3"/>
     <m:properties>
       <d:Version>5.2.3</d:Version>
       <d:NormalizedVersion>5.2.3</d:NormalizedVersion>
@@ -252,7 +252,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.Razor',Version='3.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.Razor',Version='3.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.Razor',Version='3.2.3')"/>
     <title type="text">Microsoft.AspNet.Razor</title>
@@ -262,7 +262,7 @@
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.Razor',Version='3.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.Razor/3.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.Razor/3.2.3"/>
     <m:properties>
       <d:Version>3.2.3</d:Version>
       <d:NormalizedVersion>3.2.3</d:NormalizedVersion>
@@ -301,7 +301,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.WebApi.Client',Version='5.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.WebApi.Client',Version='5.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebApi.Client',Version='5.2.3')"/>
     <title type="text">Microsoft.AspNet.WebApi.Client</title>
@@ -312,7 +312,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.WebApi.Client',Version='5.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.WebApi.Client/5.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.WebApi.Client/5.2.3"/>
     <m:properties>
       <d:Version>5.2.3</d:Version>
       <d:NormalizedVersion>5.2.3</d:NormalizedVersion>
@@ -353,7 +353,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.WebApi.Core',Version='5.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.WebApi.Core',Version='5.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebApi.Core',Version='5.2.3')"/>
     <title type="text">Microsoft.AspNet.WebApi.Core</title>
@@ -364,7 +364,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.WebApi.Core',Version='5.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.WebApi.Core/5.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.WebApi.Core/5.2.3"/>
     <m:properties>
       <d:Version>5.2.3</d:Version>
       <d:NormalizedVersion>5.2.3</d:NormalizedVersion>
@@ -403,7 +403,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Net.Http',Version='2.2.29')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Net.Http',Version='2.2.29')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Net.Http',Version='2.2.29')"/>
     <title type="text">Microsoft.Net.Http</title>
@@ -414,7 +414,7 @@
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.Net.Http',Version='2.2.29')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Net.Http/2.2.29"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Net.Http/2.2.29"/>
     <m:properties>
       <d:Version>2.2.29</d:Version>
       <d:NormalizedVersion>2.2.29</d:NormalizedVersion>
@@ -462,7 +462,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.Validation',Version='1.13.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='jQuery.Validation',Version='1.13.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.Validation',Version='1.13.1')"/>
     <title type="text">jQuery.Validation</title>
@@ -472,7 +472,7 @@
       <name>Jörn Zaefferer</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.Validation',Version='1.13.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.Validation/1.13.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/jQuery.Validation/1.13.1"/>
     <m:properties>
       <d:Version>1.13.1</d:Version>
       <d:NormalizedVersion>1.13.1</d:NormalizedVersion>
@@ -515,7 +515,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.WebApi.WebHost',Version='5.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.WebApi.WebHost',Version='5.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebApi.WebHost',Version='5.2.3')"/>
     <title type="text">Microsoft.AspNet.WebApi.WebHost</title>
@@ -526,7 +526,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.WebApi.WebHost',Version='5.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.WebApi.WebHost/5.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.WebApi.WebHost/5.2.3"/>
     <m:properties>
       <d:Version>5.2.3</d:Version>
       <d:NormalizedVersion>5.2.3</d:NormalizedVersion>
@@ -566,7 +566,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Combined',Version='1.11.4')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='jQuery.UI.Combined',Version='1.11.4')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Combined',Version='1.11.4')"/>
     <title type="text">jQuery.UI.Combined</title>
@@ -576,7 +576,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Combined',Version='1.11.4')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Combined/1.11.4"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/jQuery.UI.Combined/1.11.4"/>
     <m:properties>
       <d:Version>1.11.4</d:Version>
       <d:NormalizedVersion>1.11.4</d:NormalizedVersion>
@@ -617,7 +617,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.WebApi',Version='5.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.WebApi',Version='5.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebApi',Version='5.2.3')"/>
     <title type="text">Microsoft.AspNet.WebApi</title>
@@ -627,7 +627,7 @@
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebApi',Version='5.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.WebApi/5.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.WebApi/5.2.3"/>
     <m:properties>
       <d:Version>5.2.3</d:Version>
       <d:NormalizedVersion>5.2.3</d:NormalizedVersion>
@@ -666,7 +666,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='WebGrease',Version='1.6.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='WebGrease',Version='1.6.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='WebGrease',Version='1.6.0')"/>
     <title type="text">WebGrease</title>
@@ -676,7 +676,7 @@
       <name>webgrease@microsoft.com</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='WebGrease',Version='1.6.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/WebGrease/1.6.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/WebGrease/1.6.0"/>
     <m:properties>
       <d:Version>1.6.0</d:Version>
       <d:NormalizedVersion>1.6.0</d:NormalizedVersion>
@@ -712,7 +712,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Web.Infrastructure',Version='1.0.0.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Web.Infrastructure',Version='1.0.0.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Web.Infrastructure',Version='1.0.0.0')"/>
     <title type="text">Microsoft.Web.Infrastructure</title>
@@ -725,7 +725,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.Web.Infrastructure',Version='1.0.0.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Web.Infrastructure/1.0.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Web.Infrastructure/1.0.0"/>
     <m:properties>
       <d:Version>1.0.0.0</d:Version>
       <d:NormalizedVersion>1.0.0</d:NormalizedVersion>
@@ -763,7 +763,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.Web.Optimization',Version='1.1.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.Web.Optimization',Version='1.1.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.Web.Optimization',Version='1.1.3')"/>
     <title type="text">Microsoft.AspNet.Web.Optimization</title>
@@ -775,7 +775,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.Web.Optimization',Version='1.1.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.Web.Optimization/1.1.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.Web.Optimization/1.1.3"/>
     <m:properties>
       <d:Version>1.1.3</d:Version>
       <d:NormalizedVersion>1.1.3</d:NormalizedVersion>
@@ -812,7 +812,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Modernizr',Version='2.8.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Modernizr',Version='2.8.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Modernizr',Version='2.8.3')"/>
     <title type="text">Modernizr</title>
@@ -825,7 +825,7 @@
       <name>Faruk Ateş, Paul Irish, Alex Sexton</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Modernizr',Version='2.8.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Modernizr/2.8.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Modernizr/2.8.3"/>
     <m:properties>
       <d:Version>2.8.3</d:Version>
       <d:NormalizedVersion>2.8.3</d:NormalizedVersion>
@@ -867,7 +867,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.jQuery.Unobtrusive.Validation',Version='3.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.jQuery.Unobtrusive.Validation',Version='3.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage"
           href="Packages(Id='Microsoft.jQuery.Unobtrusive.Validation',Version='3.2.3')"/>
@@ -880,7 +880,7 @@
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.jQuery.Unobtrusive.Validation',Version='3.2.3')/$value"/>
     <content type="application/zip"
-             src="https://www.nuget.org/api/v2/package/Microsoft.jQuery.Unobtrusive.Validation/3.2.3"/>
+             src="http://${host}:${port}//${repository}/package/Microsoft.jQuery.Unobtrusive.Validation/3.2.3"/>
     <m:properties>
       <d:Version>3.2.3</d:Version>
       <d:NormalizedVersion>3.2.3</d:NormalizedVersion>
@@ -918,7 +918,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Data.OData',Version='5.6.4')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Data.OData',Version='5.6.4')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Data.OData',Version='5.6.4')"/>
     <title type="text">Microsoft.Data.OData</title>
@@ -928,7 +928,7 @@
       <name>Microsoft Corporation</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.Data.OData',Version='5.6.4')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Data.OData/5.6.4"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Data.OData/5.6.4"/>
     <m:properties>
       <d:Version>5.6.4</d:Version>
       <d:NormalizedVersion>5.6.4</d:NormalizedVersion>
@@ -973,7 +973,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Data.Edm',Version='5.6.4')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Data.Edm',Version='5.6.4')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Data.Edm',Version='5.6.4')"/>
     <title type="text">Microsoft.Data.Edm</title>
@@ -983,7 +983,7 @@ Bug fixes&#xD;
       <name>Microsoft Corporation</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.Data.Edm',Version='5.6.4')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Data.Edm/5.6.4"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Data.Edm/5.6.4"/>
     <m:properties>
       <d:Version>5.6.4</d:Version>
       <d:NormalizedVersion>5.6.4</d:NormalizedVersion>
@@ -1029,7 +1029,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='System.Spatial',Version='5.6.4')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='System.Spatial',Version='5.6.4')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='System.Spatial',Version='5.6.4')"/>
     <title type="text">System.Spatial</title>
@@ -1039,7 +1039,7 @@ Bug fixes&#xD;
       <name>Microsoft Corporation</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='System.Spatial',Version='5.6.4')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/System.Spatial/5.6.4"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/System.Spatial/5.6.4"/>
     <m:properties>
       <d:Version>5.6.4</d:Version>
       <d:NormalizedVersion>5.6.4</d:NormalizedVersion>
@@ -1085,7 +1085,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Bcl',Version='1.1.10')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Bcl',Version='1.1.10')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Bcl',Version='1.1.10')"/>
     <title type="text">Microsoft.Bcl</title>
@@ -1096,7 +1096,7 @@ Bug fixes&#xD;
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.Bcl',Version='1.1.10')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Bcl/1.1.10"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Bcl/1.1.10"/>
     <m:properties>
       <d:Version>1.1.10</d:Version>
       <d:NormalizedVersion>1.1.10</d:NormalizedVersion>
@@ -1157,7 +1157,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Bcl.Build',Version='1.0.21')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Bcl.Build',Version='1.0.21')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Bcl.Build',Version='1.0.21')"/>
     <title type="text">Microsoft.Bcl.Build</title>
@@ -1167,7 +1167,7 @@ Bug fixes&#xD;
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.Bcl.Build',Version='1.0.21')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Bcl.Build/1.0.21"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Bcl.Build/1.0.21"/>
     <m:properties>
       <d:Version>1.0.21</d:Version>
       <d:NormalizedVersion>1.0.21</d:NormalizedVersion>
@@ -1206,7 +1206,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Moq',Version='4.2.1502.0911')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Moq',Version='4.2.1502.0911')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Moq',Version='4.2.1502.0911')"/>
     <title type="text">Moq</title>
@@ -1216,7 +1216,7 @@ Bug fixes&#xD;
       <name>Daniel Cazzulino, kzu</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Moq',Version='4.2.1502.0911')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Moq/4.2.1502.911"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Moq/4.2.1502.911"/>
     <m:properties>
       <d:Version>4.2.1502.0911</d:Version>
       <d:NormalizedVersion>4.2.1502.911</d:NormalizedVersion>
@@ -1429,7 +1429,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.jQuery.Unobtrusive.Ajax',Version='3.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.jQuery.Unobtrusive.Ajax',Version='3.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.jQuery.Unobtrusive.Ajax',Version='3.2.3')"/>
     <title type="text">Microsoft.jQuery.Unobtrusive.Ajax</title>
@@ -1440,7 +1440,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.jQuery.Unobtrusive.Ajax',Version='3.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.jQuery.Unobtrusive.Ajax/3.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.jQuery.Unobtrusive.Ajax/3.2.3"/>
     <m:properties>
       <d:Version>3.2.3</d:Version>
       <d:NormalizedVersion>3.2.3</d:NormalizedVersion>
@@ -1477,7 +1477,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='knockoutjs',Version='3.3.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='knockoutjs',Version='3.3.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='knockoutjs',Version='3.3.0')"/>
     <title type="text">knockoutjs</title>
@@ -1487,7 +1487,7 @@ Bug fixes&#xD;
       <name>Steven Sanderson</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='knockoutjs',Version='3.3.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/knockoutjs/3.3.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/knockoutjs/3.3.0"/>
     <m:properties>
       <d:Version>3.3.0</d:Version>
       <d:NormalizedVersion>3.3.0</d:NormalizedVersion>
@@ -1525,7 +1525,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Antlr',Version='3.5.0.2')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Antlr',Version='3.5.0.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Antlr',Version='3.5.0.2')"/>
     <title type="text">Antlr</title>
@@ -1538,7 +1538,7 @@ Bug fixes&#xD;
       <name>Sam Harwell, Terence Parr</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Antlr',Version='3.5.0.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Antlr/3.5.0.2"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Antlr/3.5.0.2"/>
     <m:properties>
       <d:Version>3.5.0.2</d:Version>
       <d:NormalizedVersion>3.5.0.2</d:NormalizedVersion>
@@ -1576,7 +1576,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='WindowsAzure.Storage',Version='4.3.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='WindowsAzure.Storage',Version='4.3.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='WindowsAzure.Storage',Version='4.3.0')"/>
     <title type="text">WindowsAzure.Storage</title>
@@ -1588,7 +1588,7 @@ Bug fixes&#xD;
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='WindowsAzure.Storage',Version='4.3.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/WindowsAzure.Storage/4.3.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/WindowsAzure.Storage/4.3.0"/>
     <m:properties>
       <d:Version>4.3.0</d:Version>
       <d:NormalizedVersion>4.3.0</d:NormalizedVersion>
@@ -1631,7 +1631,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='NUnit',Version='2.6.4')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='NUnit',Version='2.6.4')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='NUnit',Version='2.6.4')"/>
     <title type="text">NUnit</title>
@@ -1641,7 +1641,7 @@ Bug fixes&#xD;
       <name>Charlie Poole</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='NUnit',Version='2.6.4')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/NUnit/2.6.4"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/NUnit/2.6.4"/>
     <m:properties>
       <d:Version>2.6.4</d:Version>
       <d:NormalizedVersion>2.6.4</d:NormalizedVersion>
@@ -1691,7 +1691,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='log4net',Version='2.0.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='log4net',Version='2.0.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='log4net',Version='2.0.3')"/>
     <title type="text">log4net</title>
@@ -1703,7 +1703,7 @@ Bug fixes&#xD;
       <name>Apache Software Foundation</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='log4net',Version='2.0.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/log4net/2.0.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/log4net/2.0.3"/>
     <m:properties>
       <d:Version>2.0.3</d:Version>
       <d:NormalizedVersion>2.0.3</d:NormalizedVersion>
@@ -1749,7 +1749,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='NuGet.CommandLine',Version='2.8.5')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='NuGet.CommandLine',Version='2.8.5')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='NuGet.CommandLine',Version='2.8.5')"/>
     <title type="text">NuGet.CommandLine</title>
@@ -1759,7 +1759,7 @@ Bug fixes&#xD;
       <name>Outercurve Foundation</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='NuGet.CommandLine',Version='2.8.5')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/NuGet.CommandLine/2.8.5"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/NuGet.CommandLine/2.8.5"/>
     <m:properties>
       <d:Version>2.8.5</d:Version>
       <d:NormalizedVersion>2.8.5</d:NormalizedVersion>
@@ -1797,7 +1797,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Owin',Version='3.0.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Owin',Version='3.0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Owin',Version='3.0.1')"/>
     <title type="text">Microsoft.Owin</title>
@@ -1807,7 +1807,7 @@ Bug fixes&#xD;
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.Owin',Version='3.0.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Owin/3.0.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Owin/3.0.1"/>
     <m:properties>
       <d:Version>3.0.1</d:Version>
       <d:NormalizedVersion>3.0.1</d:NormalizedVersion>
@@ -1844,7 +1844,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='bootstrap',Version='3.3.4')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='bootstrap',Version='3.3.4')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='bootstrap',Version='3.3.4')"/>
     <title type="text">bootstrap</title>
@@ -1854,7 +1854,7 @@ Bug fixes&#xD;
       <name>Mark Otto, Jacob Thornton</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='bootstrap',Version='3.3.4')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/bootstrap/3.3.4"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/bootstrap/3.3.4"/>
     <m:properties>
       <d:Version>3.3.4</d:Version>
       <d:NormalizedVersion>3.3.4</d:NormalizedVersion>
@@ -1892,7 +1892,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Ninject',Version='3.2.2.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Ninject',Version='3.2.2.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Ninject',Version='3.2.2.0')"/>
     <title type="text">Ninject</title>
@@ -1902,7 +1902,7 @@ Bug fixes&#xD;
       <name>Ninject Project Contributors</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Ninject',Version='3.2.2.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Ninject/3.2.2"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Ninject/3.2.2"/>
     <m:properties>
       <d:Version>3.2.2.0</d:Version>
       <d:NormalizedVersion>3.2.2</d:NormalizedVersion>
@@ -1940,7 +1940,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Owin.Host.SystemWeb',Version='3.0.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Owin.Host.SystemWeb',Version='3.0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Owin.Host.SystemWeb',Version='3.0.1')"/>
     <title type="text">Microsoft.Owin.Host.SystemWeb</title>
@@ -1951,7 +1951,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.Owin.Host.SystemWeb',Version='3.0.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Owin.Host.SystemWeb/3.0.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Owin.Host.SystemWeb/3.0.1"/>
     <m:properties>
       <d:Version>3.0.1</d:Version>
       <d:NormalizedVersion>3.0.1</d:NormalizedVersion>
@@ -1989,7 +1989,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='AutoMapper',Version='3.3.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='AutoMapper',Version='3.3.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='AutoMapper',Version='3.3.1')"/>
     <title type="text">AutoMapper</title>
@@ -1999,7 +1999,7 @@ Bug fixes&#xD;
       <name>Jimmy Bogard</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='AutoMapper',Version='3.3.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/AutoMapper/3.3.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/AutoMapper/3.3.1"/>
     <m:properties>
       <d:Version>3.3.1</d:Version>
       <d:NormalizedVersion>3.3.1</d:NormalizedVersion>
@@ -2039,7 +2039,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Owin.Security',Version='3.0.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Owin.Security',Version='3.0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Owin.Security',Version='3.0.1')"/>
     <title type="text">Microsoft.Owin.Security</title>
@@ -2049,7 +2049,7 @@ Bug fixes&#xD;
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.Owin.Security',Version='3.0.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Owin.Security/3.0.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Owin.Security/3.0.1"/>
     <m:properties>
       <d:Version>3.0.1</d:Version>
       <d:NormalizedVersion>3.0.1</d:NormalizedVersion>
@@ -2085,7 +2085,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.WindowsAzure.ConfigurationManager',Version='3.1.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.WindowsAzure.ConfigurationManager',Version='3.1.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage"
           href="Packages(Id='Microsoft.WindowsAzure.ConfigurationManager',Version='3.1.0')"/>
@@ -2100,7 +2100,7 @@ Bug fixes&#xD;
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.WindowsAzure.ConfigurationManager',Version='3.1.0')/$value"/>
     <content type="application/zip"
-             src="https://www.nuget.org/api/v2/package/Microsoft.WindowsAzure.ConfigurationManager/3.1.0"/>
+             src="http://${host}:${port}//${repository}/package/Microsoft.WindowsAzure.ConfigurationManager/3.1.0"/>
     <m:properties>
       <d:Version>3.1.0</d:Version>
       <d:NormalizedVersion>3.1.0</d:NormalizedVersion>
@@ -2141,7 +2141,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='DotNetOpenAuth.OpenId.Core',Version='4.3.4.13329')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='DotNetOpenAuth.OpenId.Core',Version='4.3.4.13329')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='DotNetOpenAuth.OpenId.Core',Version='4.3.4.13329')"/>
     <title type="text">DotNetOpenAuth.OpenId.Core</title>
@@ -2152,7 +2152,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='DotNetOpenAuth.OpenId.Core',Version='4.3.4.13329')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/DotNetOpenAuth.OpenId.Core/4.3.4.13329"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/DotNetOpenAuth.OpenId.Core/4.3.4.13329"/>
     <m:properties>
       <d:Version>4.3.4.13329</d:Version>
       <d:NormalizedVersion>4.3.4.13329</d:NormalizedVersion>
@@ -2190,7 +2190,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.WebPages.WebData',Version='3.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.WebPages.WebData',Version='3.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebPages.WebData',Version='3.2.3')"/>
     <title type="text">Microsoft.AspNet.WebPages.WebData</title>
@@ -2201,7 +2201,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.WebPages.WebData',Version='3.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.WebPages.WebData/3.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.WebPages.WebData/3.2.3"/>
     <m:properties>
       <d:Version>3.2.3</d:Version>
       <d:NormalizedVersion>3.2.3</d:NormalizedVersion>
@@ -2241,7 +2241,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='NuGet.Build',Version='2.8.5')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='NuGet.Build',Version='2.8.5')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='NuGet.Build',Version='2.8.5')"/>
     <title type="text">NuGet.Build</title>
@@ -2251,7 +2251,7 @@ Bug fixes&#xD;
       <name>Outercurve Foundation</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='NuGet.Build',Version='2.8.5')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/NuGet.Build/2.8.5"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/NuGet.Build/2.8.5"/>
     <m:properties>
       <d:Version>2.8.5</d:Version>
       <d:NormalizedVersion>2.8.5</d:NormalizedVersion>
@@ -2289,7 +2289,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='DotNetOpenAuth.OpenId.RelyingParty',Version='4.3.4.13329')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='DotNetOpenAuth.OpenId.RelyingParty',Version='4.3.4.13329')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage"
           href="Packages(Id='DotNetOpenAuth.OpenId.RelyingParty',Version='4.3.4.13329')"/>
@@ -2304,7 +2304,7 @@ Bug fixes&#xD;
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='DotNetOpenAuth.OpenId.RelyingParty',Version='4.3.4.13329')/$value"/>
     <content type="application/zip"
-             src="https://www.nuget.org/api/v2/package/DotNetOpenAuth.OpenId.RelyingParty/4.3.4.13329"/>
+             src="http://${host}:${port}//${repository}/package/DotNetOpenAuth.OpenId.RelyingParty/4.3.4.13329"/>
     <m:properties>
       <d:Version>4.3.4.13329</d:Version>
       <d:NormalizedVersion>4.3.4.13329</d:NormalizedVersion>
@@ -2343,7 +2343,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.WebApi.OData',Version='5.5.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.WebApi.OData',Version='5.5.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebApi.OData',Version='5.5.1')"/>
     <title type="text">Microsoft.AspNet.WebApi.OData</title>
@@ -2355,7 +2355,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.WebApi.OData',Version='5.5.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.WebApi.OData/5.5.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.WebApi.OData/5.5.1"/>
     <m:properties>
       <d:Version>5.5.1</d:Version>
       <d:NormalizedVersion>5.5.1</d:NormalizedVersion>
@@ -2394,7 +2394,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='DotNetOpenAuth.Core',Version='4.3.4.13329')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='DotNetOpenAuth.Core',Version='4.3.4.13329')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='DotNetOpenAuth.Core',Version='4.3.4.13329')"/>
     <title type="text">DotNetOpenAuth.Core</title>
@@ -2407,7 +2407,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='DotNetOpenAuth.Core',Version='4.3.4.13329')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/DotNetOpenAuth.Core/4.3.4.13329"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/DotNetOpenAuth.Core/4.3.4.13329"/>
     <m:properties>
       <d:Version>4.3.4.13329</d:Version>
       <d:NormalizedVersion>4.3.4.13329</d:NormalizedVersion>
@@ -2444,7 +2444,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='DotNetOpenAuth.AspNet',Version='4.3.4.13329')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='DotNetOpenAuth.AspNet',Version='4.3.4.13329')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='DotNetOpenAuth.AspNet',Version='4.3.4.13329')"/>
     <title type="text">DotNetOpenAuth.AspNet</title>
@@ -2457,7 +2457,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='DotNetOpenAuth.AspNet',Version='4.3.4.13329')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/DotNetOpenAuth.AspNet/4.3.4.13329"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/DotNetOpenAuth.AspNet/4.3.4.13329"/>
     <m:properties>
       <d:Version>4.3.4.13329</d:Version>
       <d:NormalizedVersion>4.3.4.13329</d:NormalizedVersion>
@@ -2495,7 +2495,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.WebPages.Data',Version='3.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.WebPages.Data',Version='3.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebPages.Data',Version='3.2.3')"/>
     <title type="text">Microsoft.AspNet.WebPages.Data</title>
@@ -2506,7 +2506,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.WebPages.Data',Version='3.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.WebPages.Data/3.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.WebPages.Data/3.2.3"/>
     <m:properties>
       <d:Version>3.2.3</d:Version>
       <d:NormalizedVersion>3.2.3</d:NormalizedVersion>
@@ -2546,7 +2546,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='elmah.corelibrary',Version='1.2.2')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='elmah.corelibrary',Version='1.2.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='elmah.corelibrary',Version='1.2.2')"/>
     <title type="text">elmah.corelibrary</title>
@@ -2557,7 +2557,7 @@ Bug fixes&#xD;
       <name>Atif Aziz</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='elmah.corelibrary',Version='1.2.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/elmah.corelibrary/1.2.2"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/elmah.corelibrary/1.2.2"/>
     <m:properties>
       <d:Version>1.2.2</d:Version>
       <d:NormalizedVersion>1.2.2</d:NormalizedVersion>
@@ -2595,7 +2595,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='DotNetOpenAuth.OAuth.Consumer',Version='4.3.4.13329')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='DotNetOpenAuth.OAuth.Consumer',Version='4.3.4.13329')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='DotNetOpenAuth.OAuth.Consumer',Version='4.3.4.13329')"/>
     <title type="text">DotNetOpenAuth.OAuth.Consumer</title>
@@ -2607,7 +2607,7 @@ Bug fixes&#xD;
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='DotNetOpenAuth.OAuth.Consumer',Version='4.3.4.13329')/$value"/>
     <content type="application/zip"
-             src="https://www.nuget.org/api/v2/package/DotNetOpenAuth.OAuth.Consumer/4.3.4.13329"/>
+             src="http://${host}:${port}//${repository}/package/DotNetOpenAuth.OAuth.Consumer/4.3.4.13329"/>
     <m:properties>
       <d:Version>4.3.4.13329</d:Version>
       <d:NormalizedVersion>4.3.4.13329</d:NormalizedVersion>
@@ -2647,7 +2647,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='DotNetOpenAuth.OAuth.Core',Version='4.3.4.13329')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='DotNetOpenAuth.OAuth.Core',Version='4.3.4.13329')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='DotNetOpenAuth.OAuth.Core',Version='4.3.4.13329')"/>
     <title type="text">DotNetOpenAuth.OAuth.Core</title>
@@ -2658,7 +2658,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='DotNetOpenAuth.OAuth.Core',Version='4.3.4.13329')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/DotNetOpenAuth.OAuth.Core/4.3.4.13329"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/DotNetOpenAuth.OAuth.Core/4.3.4.13329"/>
     <m:properties>
       <d:Version>4.3.4.13329</d:Version>
       <d:NormalizedVersion>4.3.4.13329</d:NormalizedVersion>
@@ -2696,7 +2696,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Unity',Version='3.5.1404.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Unity',Version='3.5.1404.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Unity',Version='3.5.1404.0')"/>
     <title type="text">Unity</title>
@@ -2708,7 +2708,7 @@ Bug fixes&#xD;
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Unity',Version='3.5.1404.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Unity/3.5.1404"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Unity/3.5.1404"/>
     <m:properties>
       <d:Version>3.5.1404.0</d:Version>
       <d:NormalizedVersion>3.5.1404</d:NormalizedVersion>
@@ -2749,7 +2749,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='elmah',Version='1.2.2')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='elmah',Version='1.2.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='elmah',Version='1.2.2')"/>
     <title type="text">elmah</title>
@@ -2763,7 +2763,7 @@ Bug fixes&#xD;
       <name>Atif Aziz</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='elmah',Version='1.2.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/elmah/1.2.2"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/elmah/1.2.2"/>
     <m:properties>
       <d:Version>1.2.2</d:Version>
       <d:NormalizedVersion>1.2.2</d:NormalizedVersion>
@@ -2805,7 +2805,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='CommonServiceLocator',Version='1.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='CommonServiceLocator',Version='1.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='CommonServiceLocator',Version='1.3')"/>
     <title type="text">CommonServiceLocator</title>
@@ -2820,7 +2820,7 @@ Bug fixes&#xD;
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='CommonServiceLocator',Version='1.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/CommonServiceLocator/1.3.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/CommonServiceLocator/1.3.0"/>
     <m:properties>
       <d:Version>1.3</d:Version>
       <d:NormalizedVersion>1.3.0</d:NormalizedVersion>
@@ -2862,7 +2862,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Owin',Version='1.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Owin',Version='1.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Owin',Version='1.0')"/>
     <title type="text">Owin</title>
@@ -2872,7 +2872,7 @@ Bug fixes&#xD;
       <name>OWIN startup components contributors</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Owin',Version='1.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Owin/1.0.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Owin/1.0.0"/>
     <m:properties>
       <d:Version>1.0</d:Version>
       <d:NormalizedVersion>1.0.0</d:NormalizedVersion>
@@ -2908,7 +2908,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.Providers.Core',Version='2.0.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.Providers.Core',Version='2.0.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.Providers.Core',Version='2.0.0')"/>
     <title type="text">Microsoft.AspNet.Providers.Core</title>
@@ -2921,7 +2921,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.Providers.Core',Version='2.0.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.Providers.Core/2.0.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.Providers.Core/2.0.0"/>
     <m:properties>
       <d:Version>2.0.0</d:Version>
       <d:NormalizedVersion>2.0.0</d:NormalizedVersion>
@@ -2962,7 +2962,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.Mvc.FixedDisplayModes',Version='5.0.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.Mvc.FixedDisplayModes',Version='5.0.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.Mvc.FixedDisplayModes',Version='5.0.0')"/>
@@ -2975,7 +2975,7 @@ Bug fixes&#xD;
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.Mvc.FixedDisplayModes',Version='5.0.0')/$value"/>
     <content type="application/zip"
-             src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.Mvc.FixedDisplayModes/5.0.0"/>
+             src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.Mvc.FixedDisplayModes/5.0.0"/>
     <m:properties>
       <d:Version>5.0.0</d:Version>
       <d:NormalizedVersion>5.0.0</d:NormalizedVersion>
@@ -3016,7 +3016,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='NLog',Version='3.2.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='NLog',Version='3.2.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='NLog',Version='3.2.1')"/>
     <title type="text">NLog</title>
@@ -3026,7 +3026,7 @@ Bug fixes&#xD;
       <name>Kim Christensen</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='NLog',Version='3.2.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/NLog/3.2.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/NLog/3.2.1"/>
     <m:properties>
       <d:Version>3.2.1</d:Version>
       <d:NormalizedVersion>3.2.1</d:NormalizedVersion>
@@ -3065,7 +3065,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Nuget.Core',Version='2.8.5')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Nuget.Core',Version='2.8.5')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Nuget.Core',Version='2.8.5')"/>
     <title type="text">Nuget.Core</title>
@@ -3075,7 +3075,7 @@ Bug fixes&#xD;
       <name>Outercurve Foundation</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Nuget.Core',Version='2.8.5')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Nuget.Core/2.8.5"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Nuget.Core/2.8.5"/>
     <m:properties>
       <d:Version>2.8.5</d:Version>
       <d:NormalizedVersion>2.8.5</d:NormalizedVersion>
@@ -3114,7 +3114,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Castle.Core',Version='3.3.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Castle.Core',Version='3.3.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Castle.Core',Version='3.3.3')"/>
     <title type="text">Castle.Core</title>
@@ -3125,7 +3125,7 @@ Bug fixes&#xD;
       <name>Castle Project Contributors</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Castle.Core',Version='3.3.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Castle.Core/3.3.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Castle.Core/3.3.3"/>
     <m:properties>
       <d:Version>3.3.3</d:Version>
       <d:NormalizedVersion>3.3.3</d:NormalizedVersion>
@@ -3161,7 +3161,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='HtmlAgilityPack',Version='1.4.9')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='HtmlAgilityPack',Version='1.4.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='HtmlAgilityPack',Version='1.4.9')"/>
     <title type="text">HtmlAgilityPack</title>
@@ -3175,7 +3175,7 @@ Bug fixes&#xD;
       <name>Simon Mourrier, Jeff Klawiter</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='HtmlAgilityPack',Version='1.4.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/HtmlAgilityPack/1.4.9"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/HtmlAgilityPack/1.4.9"/>
     <m:properties>
       <d:Version>1.4.9</d:Version>
       <d:NormalizedVersion>1.4.9</d:NormalizedVersion>
@@ -3214,7 +3214,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='WebActivatorEx',Version='2.0.6')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='WebActivatorEx',Version='2.0.6')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='WebActivatorEx',Version='2.0.6')"/>
     <title type="text">WebActivatorEx</title>
@@ -3224,7 +3224,7 @@ Bug fixes&#xD;
       <name>David Ebbo</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='WebActivatorEx',Version='2.0.6')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/WebActivatorEx/2.0.6"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/WebActivatorEx/2.0.6"/>
     <m:properties>
       <d:Version>2.0.6</d:Version>
       <d:NormalizedVersion>2.0.6</d:NormalizedVersion>
@@ -3262,7 +3262,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.Identity.Core',Version='2.2.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.Identity.Core',Version='2.2.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.Identity.Core',Version='2.2.1')"/>
     <title type="text">Microsoft.AspNet.Identity.Core</title>
@@ -3273,7 +3273,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.Identity.Core',Version='2.2.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.Identity.Core/2.2.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.Identity.Core/2.2.1"/>
     <m:properties>
       <d:Version>2.2.1</d:Version>
       <d:NormalizedVersion>2.2.1</d:NormalizedVersion>
@@ -3309,7 +3309,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Owin.Security.OAuth',Version='3.0.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Owin.Security.OAuth',Version='3.0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Owin.Security.OAuth',Version='3.0.1')"/>
     <title type="text">Microsoft.Owin.Security.OAuth</title>
@@ -3320,7 +3320,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.Owin.Security.OAuth',Version='3.0.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Owin.Security.OAuth/3.0.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Owin.Security.OAuth/3.0.1"/>
     <m:properties>
       <d:Version>3.0.1</d:Version>
       <d:NormalizedVersion>3.0.1</d:NormalizedVersion>
@@ -3358,7 +3358,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Owin.Security.Cookies',Version='3.0.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Owin.Security.Cookies',Version='3.0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Owin.Security.Cookies',Version='3.0.1')"/>
     <title type="text">Microsoft.Owin.Security.Cookies</title>
@@ -3369,7 +3369,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.Owin.Security.Cookies',Version='3.0.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Owin.Security.Cookies/3.0.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Owin.Security.Cookies/3.0.1"/>
     <m:properties>
       <d:Version>3.0.1</d:Version>
       <d:NormalizedVersion>3.0.1</d:NormalizedVersion>
@@ -3408,7 +3408,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Respond',Version='1.4.2')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Respond',Version='1.4.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Respond',Version='1.4.2')"/>
     <title type="text">Respond</title>
@@ -3419,7 +3419,7 @@ Bug fixes&#xD;
       <name>Scott Jehl, Paul Irish, Nicholas Zakas</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Respond',Version='1.4.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Respond/1.4.2"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Respond/1.4.2"/>
     <m:properties>
       <d:Version>1.4.2</d:Version>
       <d:NormalizedVersion>1.4.2</d:NormalizedVersion>
@@ -3458,7 +3458,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Data.Services.Client',Version='5.6.4')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Data.Services.Client',Version='5.6.4')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Data.Services.Client',Version='5.6.4')"/>
     <title type="text">Microsoft.Data.Services.Client</title>
@@ -3469,7 +3469,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.Data.Services.Client',Version='5.6.4')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Data.Services.Client/5.6.4"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Data.Services.Client/5.6.4"/>
     <m:properties>
       <d:Version>5.6.4</d:Version>
       <d:NormalizedVersion>5.6.4</d:NormalizedVersion>
@@ -3516,7 +3516,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.WebPages.OAuth',Version='3.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.WebPages.OAuth',Version='3.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebPages.OAuth',Version='3.2.3')"/>
     <title type="text">Microsoft.AspNet.WebPages.OAuth</title>
@@ -3527,7 +3527,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.WebPages.OAuth',Version='3.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.WebPages.OAuth/3.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.WebPages.OAuth/3.2.3"/>
     <m:properties>
       <d:Version>3.2.3</d:Version>
       <d:NormalizedVersion>3.2.3</d:NormalizedVersion>
@@ -3568,7 +3568,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Autofac',Version='3.5.2')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Autofac',Version='3.5.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Autofac',Version='3.5.2')"/>
     <title type="text">Autofac</title>
@@ -3580,7 +3580,7 @@ Bug fixes&#xD;
       <name>Autofac Contributors</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Autofac',Version='3.5.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Autofac/3.5.2"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Autofac/3.5.2"/>
     <m:properties>
       <d:Version>3.5.2</d:Version>
       <d:NormalizedVersion>3.5.2</d:NormalizedVersion>
@@ -3615,7 +3615,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.WebApi.HelpPage',Version='5.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.WebApi.HelpPage',Version='5.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebApi.HelpPage',Version='5.2.3')"/>
     <title type="text">Microsoft.AspNet.WebApi.HelpPage</title>
@@ -3628,7 +3628,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.WebApi.HelpPage',Version='5.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.WebApi.HelpPage/5.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.WebApi.HelpPage/5.2.3"/>
     <m:properties>
       <d:Version>5.2.3</d:Version>
       <d:NormalizedVersion>5.2.3</d:NormalizedVersion>
@@ -3671,7 +3671,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Bcl.Async',Version='1.0.168')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Bcl.Async',Version='1.0.168')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Bcl.Async',Version='1.0.168')"/>
     <title type="text">Microsoft.Bcl.Async</title>
@@ -3683,7 +3683,7 @@ Bug fixes&#xD;
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.Bcl.Async',Version='1.0.168')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Bcl.Async/1.0.168"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Bcl.Async/1.0.168"/>
     <m:properties>
       <d:Version>1.0.168</d:Version>
       <d:NormalizedVersion>1.0.168</d:NormalizedVersion>
@@ -3737,7 +3737,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.Identity.Owin',Version='2.2.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.Identity.Owin',Version='2.2.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.Identity.Owin',Version='2.2.1')"/>
     <title type="text">Microsoft.AspNet.Identity.Owin</title>
@@ -3748,7 +3748,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.Identity.Owin',Version='2.2.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.Identity.Owin/2.2.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.Identity.Owin/2.2.1"/>
     <m:properties>
       <d:Version>2.2.1</d:Version>
       <d:NormalizedVersion>2.2.1</d:NormalizedVersion>
@@ -3786,7 +3786,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.SignalR.Core',Version='2.2.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.SignalR.Core',Version='2.2.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.SignalR.Core',Version='2.2.0')"/>
     <title type="text">Microsoft.AspNet.SignalR.Core</title>
@@ -3797,7 +3797,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.SignalR.Core',Version='2.2.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.SignalR.Core/2.2.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.SignalR.Core/2.2.0"/>
     <m:properties>
       <d:Version>2.2.0</d:Version>
       <d:NormalizedVersion>2.2.0</d:NormalizedVersion>
@@ -3834,7 +3834,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.Identity.EntityFramework',Version='2.2.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.Identity.EntityFramework',Version='2.2.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.Identity.EntityFramework',Version='2.2.1')"/>
@@ -3847,7 +3847,7 @@ Bug fixes&#xD;
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.Identity.EntityFramework',Version='2.2.1')/$value"/>
     <content type="application/zip"
-             src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.Identity.EntityFramework/2.2.1"/>
+             src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.Identity.EntityFramework/2.2.1"/>
     <m:properties>
       <d:Version>2.2.1</d:Version>
       <d:NormalizedVersion>2.2.1</d:NormalizedVersion>
@@ -3884,7 +3884,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='elmah.sqlserver',Version='1.2')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='elmah.sqlserver',Version='1.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='elmah.sqlserver',Version='1.2')"/>
     <title type="text">elmah.sqlserver</title>
@@ -3896,7 +3896,7 @@ Bug fixes&#xD;
       <name>Atif Aziz</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='elmah.sqlserver',Version='1.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/elmah.sqlserver/1.2.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/elmah.sqlserver/1.2.0"/>
     <m:properties>
       <d:Version>1.2</d:Version>
       <d:NormalizedVersion>1.2.0</d:NormalizedVersion>
@@ -3933,7 +3933,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='MiniProfiler',Version='3.1.1.140')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='MiniProfiler',Version='3.1.1.140')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='MiniProfiler',Version='3.1.1.140')"/>
     <title type="text">MiniProfiler</title>
@@ -3943,7 +3943,7 @@ Bug fixes&#xD;
       <name>Marc Gravell, Jarrod Dixon, Yaakov Ellis, Nick Craver</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='MiniProfiler',Version='3.1.1.140')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/MiniProfiler/3.1.1.140"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/MiniProfiler/3.1.1.140"/>
     <m:properties>
       <d:Version>3.1.1.140</d:Version>
       <d:NormalizedVersion>3.1.1.140</d:NormalizedVersion>
@@ -3979,7 +3979,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='RestSharp',Version='105.1.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='RestSharp',Version='105.1.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='RestSharp',Version='105.1.0')"/>
     <title type="text">RestSharp</title>
@@ -3989,7 +3989,7 @@ Bug fixes&#xD;
       <name>John Sheehan, RestSharp Community</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='RestSharp',Version='105.1.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/RestSharp/105.1.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/RestSharp/105.1.0"/>
     <m:properties>
       <d:Version>105.1.0</d:Version>
       <d:NormalizedVersion>105.1.0</d:NormalizedVersion>
@@ -4027,7 +4027,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='microsoft-web-helpers',Version='2.1.20710.2')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='microsoft-web-helpers',Version='2.1.20710.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='microsoft-web-helpers',Version='2.1.20710.2')"/>
     <title type="text">microsoft-web-helpers</title>
@@ -4038,7 +4038,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='microsoft-web-helpers',Version='2.1.20710.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/microsoft-web-helpers/2.1.20710.2"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/microsoft-web-helpers/2.1.20710.2"/>
     <m:properties>
       <d:Version>2.1.20710.2</d:Version>
       <d:NormalizedVersion>2.1.20710.2</d:NormalizedVersion>
@@ -4079,7 +4079,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.SignalR.JS',Version='2.2.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.SignalR.JS',Version='2.2.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.SignalR.JS',Version='2.2.0')"/>
     <title type="text">Microsoft.AspNet.SignalR.JS</title>
@@ -4090,7 +4090,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.SignalR.JS',Version='2.2.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.SignalR.JS/2.2.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.SignalR.JS/2.2.0"/>
     <m:properties>
       <d:Version>2.2.0</d:Version>
       <d:NormalizedVersion>2.2.0</d:NormalizedVersion>
@@ -4126,7 +4126,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Twitter.Bootstrap',Version='3.0.1.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Twitter.Bootstrap',Version='3.0.1.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Twitter.Bootstrap',Version='3.0.1.1')"/>
     <title type="text">Twitter.Bootstrap</title>
@@ -4140,7 +4140,7 @@ Bug fixes&#xD;
       <name>Jacob Thornton, Mark Otto</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Twitter.Bootstrap',Version='3.0.1.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Twitter.Bootstrap/3.0.1.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Twitter.Bootstrap/3.0.1.1"/>
     <m:properties>
       <d:Version>3.0.1.1</d:Version>
       <d:NormalizedVersion>3.0.1.1</d:NormalizedVersion>
@@ -4179,7 +4179,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='xunit',Version='2.0.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='xunit',Version='2.0.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='xunit',Version='2.0.0')"/>
     <title type="text">xunit</title>
@@ -4189,7 +4189,7 @@ Bug fixes&#xD;
       <name>James Newkirk, Brad Wilson</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='xunit',Version='2.0.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/xunit/2.0.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/xunit/2.0.0"/>
     <m:properties>
       <d:Version>2.0.0</d:Version>
       <d:NormalizedVersion>2.0.0</d:NormalizedVersion>
@@ -4228,7 +4228,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Ninject.MVC3',Version='3.2.1.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Ninject.MVC3',Version='3.2.1.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Ninject.MVC3',Version='3.2.1.0')"/>
     <title type="text">Ninject.MVC3</title>
@@ -4238,7 +4238,7 @@ Bug fixes&#xD;
       <name>Remo Gloor, Ian Davis</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Ninject.MVC3',Version='3.2.1.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Ninject.MVC3/3.2.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Ninject.MVC3/3.2.1"/>
     <m:properties>
       <d:Version>3.2.1.0</d:Version>
       <d:NormalizedVersion>3.2.1</d:NormalizedVersion>
@@ -4273,7 +4273,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='ServiceStack.Text',Version='4.0.40')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='ServiceStack.Text',Version='4.0.40')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='ServiceStack.Text',Version='4.0.40')"/>
     <title type="text">ServiceStack.Text</title>
@@ -4283,7 +4283,7 @@ Bug fixes&#xD;
       <name>Service Stack</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='ServiceStack.Text',Version='4.0.40')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/ServiceStack.Text/4.0.40"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/ServiceStack.Text/4.0.40"/>
     <m:properties>
       <d:Version>4.0.40</d:Version>
       <d:NormalizedVersion>4.0.40</d:NormalizedVersion>
@@ -4325,7 +4325,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Common.Logging',Version='3.1.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Common.Logging',Version='3.1.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Common.Logging',Version='3.1.0')"/>
     <title type="text">Common.Logging</title>
@@ -4335,7 +4335,7 @@ Bug fixes&#xD;
       <name>Aleksandar Seovic, Mark Pollack, Erich Eichinger, Stephen Bohlen</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Common.Logging',Version='3.1.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Common.Logging/3.1.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Common.Logging/3.1.0"/>
     <m:properties>
       <d:Version>3.1.0</d:Version>
       <d:NormalizedVersion>3.1.0</d:NormalizedVersion>
@@ -4375,7 +4375,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.Providers.LocalDb',Version='2.0.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.Providers.LocalDb',Version='2.0.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.Providers.LocalDb',Version='2.0.0')"/>
     <title type="text">Microsoft.AspNet.Providers.LocalDb</title>
@@ -4389,7 +4389,7 @@ Bug fixes&#xD;
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.Providers.LocalDb',Version='2.0.0')/$value"/>
     <content type="application/zip"
-             src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.Providers.LocalDb/2.0.0"/>
+             src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.Providers.LocalDb/2.0.0"/>
     <m:properties>
       <d:Version>2.0.0</d:Version>
       <d:NormalizedVersion>2.0.0</d:NormalizedVersion>
@@ -4430,7 +4430,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='NHibernate',Version='4.0.3.4000')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='NHibernate',Version='4.0.3.4000')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='NHibernate',Version='4.0.3.4000')"/>
     <title type="text">NHibernate</title>
@@ -4442,7 +4442,7 @@ Bug fixes&#xD;
       <name>NHibernate community, Hibernate community</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='NHibernate',Version='4.0.3.4000')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/NHibernate/4.0.3.4000"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/NHibernate/4.0.3.4000"/>
     <m:properties>
       <d:Version>4.0.3.4000</d:Version>
       <d:NormalizedVersion>4.0.3.4000</d:NormalizedVersion>
@@ -4479,7 +4479,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='AjaxControlToolkit',Version='8.0.0.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='AjaxControlToolkit',Version='8.0.0.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='AjaxControlToolkit',Version='8.0.0.0')"/>
     <title type="text">AjaxControlToolkit</title>
@@ -4491,7 +4491,7 @@ Bug fixes&#xD;
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='AjaxControlToolkit',Version='8.0.0.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/AjaxControlToolkit/8.0.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/AjaxControlToolkit/8.0.0"/>
     <m:properties>
       <d:Version>8.0.0.0</d:Version>
       <d:NormalizedVersion>8.0.0</d:NormalizedVersion>
@@ -4529,7 +4529,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.SignalR',Version='2.2.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.SignalR',Version='2.2.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.SignalR',Version='2.2.0')"/>
     <title type="text">Microsoft.AspNet.SignalR</title>
@@ -4539,7 +4539,7 @@ Bug fixes&#xD;
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.SignalR',Version='2.2.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.SignalR/2.2.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.SignalR/2.2.0"/>
     <m:properties>
       <d:Version>2.2.0</d:Version>
       <d:NormalizedVersion>2.2.0</d:NormalizedVersion>
@@ -4578,7 +4578,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='T4MVC',Version='3.15.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='T4MVC',Version='3.15.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='T4MVC',Version='3.15.3')"/>
     <title type="text">T4MVC</title>
@@ -4588,7 +4588,7 @@ Bug fixes&#xD;
       <name>David Ebbo</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='T4MVC',Version='3.15.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/T4MVC/3.15.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/T4MVC/3.15.3"/>
     <m:properties>
       <d:Version>3.15.3</d:Version>
       <d:NormalizedVersion>3.15.3</d:NormalizedVersion>
@@ -4623,7 +4623,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Iesi.Collections',Version='4.0.1.4000')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Iesi.Collections',Version='4.0.1.4000')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Iesi.Collections',Version='4.0.1.4000')"/>
     <title type="text">Iesi.Collections</title>
@@ -4633,7 +4633,7 @@ Bug fixes&#xD;
       <name>Aidant Systems, Jason Smith, NHibernate community</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Iesi.Collections',Version='4.0.1.4000')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Iesi.Collections/4.0.1.4000"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Iesi.Collections/4.0.1.4000"/>
     <m:properties>
       <d:Version>4.0.1.4000</d:Version>
       <d:NormalizedVersion>4.0.1.4000</d:NormalizedVersion>
@@ -4672,7 +4672,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Owin.Security.Google',Version='3.0.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Owin.Security.Google',Version='3.0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Owin.Security.Google',Version='3.0.1')"/>
     <title type="text">Microsoft.Owin.Security.Google</title>
@@ -4683,7 +4683,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.Owin.Security.Google',Version='3.0.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Owin.Security.Google/3.0.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Owin.Security.Google/3.0.1"/>
     <m:properties>
       <d:Version>3.0.1</d:Version>
       <d:NormalizedVersion>3.0.1</d:NormalizedVersion>
@@ -4722,7 +4722,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='WindowsAzure.ServiceBus',Version='2.6.6')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='WindowsAzure.ServiceBus',Version='2.6.6')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='WindowsAzure.ServiceBus',Version='2.6.6')"/>
     <title type="text">WindowsAzure.ServiceBus</title>
@@ -4734,7 +4734,7 @@ Bug fixes&#xD;
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='WindowsAzure.ServiceBus',Version='2.6.6')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/WindowsAzure.ServiceBus/2.6.6"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/WindowsAzure.ServiceBus/2.6.6"/>
     <m:properties>
       <d:Version>2.6.6</d:Version>
       <d:NormalizedVersion>2.6.6</d:NormalizedVersion>
@@ -4788,7 +4788,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Owin.Security.Facebook',Version='3.0.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Owin.Security.Facebook',Version='3.0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Owin.Security.Facebook',Version='3.0.1')"/>
     <title type="text">Microsoft.Owin.Security.Facebook</title>
@@ -4799,7 +4799,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.Owin.Security.Facebook',Version='3.0.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Owin.Security.Facebook/3.0.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Owin.Security.Facebook/3.0.1"/>
     <m:properties>
       <d:Version>3.0.1</d:Version>
       <d:NormalizedVersion>3.0.1</d:NormalizedVersion>
@@ -4838,7 +4838,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.SignalR.SystemWeb',Version='2.2.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.SignalR.SystemWeb',Version='2.2.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.SignalR.SystemWeb',Version='2.2.0')"/>
     <title type="text">Microsoft.AspNet.SignalR.SystemWeb</title>
@@ -4850,7 +4850,7 @@ Bug fixes&#xD;
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.SignalR.SystemWeb',Version='2.2.0')/$value"/>
     <content type="application/zip"
-             src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.SignalR.SystemWeb/2.2.0"/>
+             src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.SignalR.SystemWeb/2.2.0"/>
     <m:properties>
       <d:Version>2.2.0</d:Version>
       <d:NormalizedVersion>2.2.0</d:NormalizedVersion>
@@ -4889,7 +4889,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Owin.Security.MicrosoftAccount',Version='3.0.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Owin.Security.MicrosoftAccount',Version='3.0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage"
           href="Packages(Id='Microsoft.Owin.Security.MicrosoftAccount',Version='3.0.1')"/>
@@ -4902,7 +4902,7 @@ Bug fixes&#xD;
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.Owin.Security.MicrosoftAccount',Version='3.0.1')/$value"/>
     <content type="application/zip"
-             src="https://www.nuget.org/api/v2/package/Microsoft.Owin.Security.MicrosoftAccount/3.0.1"/>
+             src="http://${host}:${port}//${repository}/package/Microsoft.Owin.Security.MicrosoftAccount/3.0.1"/>
     <m:properties>
       <d:Version>3.0.1</d:Version>
       <d:NormalizedVersion>3.0.1</d:NormalizedVersion>
@@ -4942,7 +4942,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.Owin.Security.Twitter',Version='3.0.1')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.Owin.Security.Twitter',Version='3.0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.Owin.Security.Twitter',Version='3.0.1')"/>
     <title type="text">Microsoft.Owin.Security.Twitter</title>
@@ -4953,7 +4953,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.Owin.Security.Twitter',Version='3.0.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.Owin.Security.Twitter/3.0.1"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.Owin.Security.Twitter/3.0.1"/>
     <m:properties>
       <d:Version>3.0.1</d:Version>
       <d:NormalizedVersion>3.0.1</d:NormalizedVersion>
@@ -4992,7 +4992,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Lucene.Net',Version='3.0.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Lucene.Net',Version='3.0.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Lucene.Net',Version='3.0.3')"/>
     <title type="text">Lucene.Net</title>
@@ -5004,7 +5004,7 @@ Bug fixes&#xD;
       <name>Lucene.Net Community</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Lucene.Net',Version='3.0.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Lucene.Net/3.0.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Lucene.Net/3.0.3"/>
     <m:properties>
       <d:Version>3.0.3</d:Version>
       <d:NormalizedVersion>3.0.3</d:NormalizedVersion>
@@ -5042,7 +5042,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jquery.mobile',Version='1.4.5')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='jquery.mobile',Version='1.4.5')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jquery.mobile',Version='1.4.5')"/>
     <title type="text">jquery.mobile</title>
@@ -5054,7 +5054,7 @@ Bug fixes&#xD;
       <name>The jQuery Project</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jquery.mobile',Version='1.4.5')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jquery.mobile/1.4.5"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/jquery.mobile/1.4.5"/>
     <m:properties>
       <d:Version>1.4.5</d:Version>
       <d:NormalizedVersion>1.4.5</d:NormalizedVersion>
@@ -5094,7 +5094,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='RouteMagic',Version='1.2')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='RouteMagic',Version='1.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='RouteMagic',Version='1.2')"/>
     <title type="text">RouteMagic</title>
@@ -5106,7 +5106,7 @@ Bug fixes&#xD;
       <name>Phil Haack</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='RouteMagic',Version='1.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/RouteMagic/1.2.0"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/RouteMagic/1.2.0"/>
     <m:properties>
       <d:Version>1.2</d:Version>
       <d:NormalizedVersion>1.2.0</d:NormalizedVersion>
@@ -5145,7 +5145,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.AspNet.WebApi.Owin',Version='5.2.3')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Microsoft.AspNet.WebApi.Owin',Version='5.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.AspNet.WebApi.Owin',Version='5.2.3')"/>
     <title type="text">Microsoft.AspNet.WebApi.Owin</title>
@@ -5158,7 +5158,7 @@ Bug fixes&#xD;
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.AspNet.WebApi.Owin',Version='5.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.AspNet.WebApi.Owin/5.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Microsoft.AspNet.WebApi.Owin/5.2.3"/>
     <m:properties>
       <d:Version>5.2.3</d:Version>
       <d:NormalizedVersion>5.2.3</d:NormalizedVersion>
@@ -5196,7 +5196,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Ninject.Web.Common',Version='3.2.3.0')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='Ninject.Web.Common',Version='3.2.3.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Ninject.Web.Common',Version='3.2.3.0')"/>
     <title type="text">Ninject.Web.Common</title>
@@ -5206,7 +5206,7 @@ Bug fixes&#xD;
       <name>Ninject Project Contributors</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Ninject.Web.Common',Version='3.2.3.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Ninject.Web.Common/3.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/Ninject.Web.Common/3.2.3"/>
     <m:properties>
       <d:Version>3.2.3.0</d:Version>
       <d:NormalizedVersion>3.2.3</d:NormalizedVersion>
@@ -5242,7 +5242,7 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='AjaxMin',Version='5.14.5506.26202')</id>
+    <id>http://${host}:${port}//${repository}/Packages(Id='AjaxMin',Version='5.14.5506.26202')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='AjaxMin',Version='5.14.5506.26202')"/>
     <title type="text">AjaxMin</title>
@@ -5252,7 +5252,7 @@ Bug fixes&#xD;
       <name>Microsoft Corporation, Ron Logan</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='AjaxMin',Version='5.14.5506.26202')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/AjaxMin/5.14.5506.26202"/>
+    <content type="application/zip" src="http://${host}:${port}//${repository}/package/AjaxMin/5.14.5506.26202"/>
     <m:properties>
       <d:Version>5.14.5506.26202</d:Version>
       <d:NormalizedVersion>5.14.5506.26202</d:NormalizedVersion>
@@ -5290,5 +5290,5 @@ Bug fixes&#xD;
     </m:properties>
   </entry>
   <link rel="next"
-        href="https://www.nuget.org/api/v2/Packages?$filter=IsLatestVersion&amp;$orderby=DownloadCount%20desc,Id&amp;$inlinecount=allpages&amp;$skiptoken=642197,'AjaxMin','AjaxMin','5.14.5506.26202'"/>
+        href="http://${host}:${port}//${repository}/Packages?$filter=IsLatestVersion&amp;$orderby=DownloadCount%20desc,Id&amp;$inlinecount=allpages&amp;$skiptoken=642197,'AjaxMin','AjaxMin','5.14.5506.26202'"/>
 </feed>

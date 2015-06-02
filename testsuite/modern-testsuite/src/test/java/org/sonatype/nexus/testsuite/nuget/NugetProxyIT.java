@@ -22,16 +22,15 @@ import com.sonatype.nexus.repository.nuget.internal.NugetProperties;
 import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.testsuite.nuget.dispatch.FineGrainedDispatch;
-import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.nexus.repository.http.HttpStatus;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.eclipse.jetty.http.PathMap;
+import com.google.common.io.Files;
+import org.apache.http.HttpResponse;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -43,7 +42,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.testsuite.nuget.dispatch.ChainedRequestMatcher.forOperation;
-import static org.sonatype.tests.http.server.fluent.Behaviours.error;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.bytes;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 import static org.sonatype.tests.http.server.fluent.Behaviours.file;
 
 /**
@@ -61,50 +61,37 @@ public class NugetProxyIT
   public static final String TOP_100_RESULTS =
       "Search()?$filter=IsLatestVersion&$skip=0&$top=100&searchTerm=''&targetFramework='net45'&includePrerelease=false";
 
-  protected Server proxyServer;
-
   protected NugetClient nuget;
-
-  protected FineGrainedDispatch dispatch;
 
   @Before
   public void createProxyRepo()
       throws Exception
   {
-    PathMap.setPathSpecSeparators(":");
-
-    proxyServer = Server.withPort(0)
-        .serve("/*").withBehaviours(error(200))
-        .start();
-
-    dispatch = new FineGrainedDispatch(proxyServer, "nuget/*");
 
     // Package counts return the full number of items available on the server
-    dispatch.serve(forOperation("Packages/$count"), file(resolveTestFile("all-packages-count.txt")));
-    dispatch.serve(forOperation("Packages()/$count"), file(resolveTestFile("all-packages-count.txt")));
+    dispatch.serve(forOperation("Packages/$count"), remoteFeed("all-packages-count.txt"));
+    dispatch.serve(forOperation("Packages()/$count"), remoteFeed("all-packages-count.txt"));
 
     // So do searches on nuget.org
-    dispatch.serve(forOperation("Search/$count"), file(resolveTestFile("all-packages-count.txt")));
-    dispatch.serve(forOperation("Search()/$count"), file(resolveTestFile("all-packages-count.txt")));
+    dispatch.serve(forOperation("Search/$count"), remoteFeed("all-packages-count.txt"));
+    dispatch.serve(forOperation("Search()/$count"), remoteFeed("all-packages-count.txt"));
 
     dispatch.serve(forOperation("Search").hasParam("$top", "80"),
-        file(resolveTestFile("proxy-search-jquery-top-80.xml")));
+        remoteFeed("proxy-search-jquery-top-80.xml"));
 
-    final String remoteStorageUrl = proxyServer.getUrl().toExternalForm() + "/nuget";
+    dispatch.serve(forOperation("Packages(Id='SONATYPE.TEST',Version='1.0')"),
+        remoteFeed("sonatype-test-entry.xml"));
+
+    dispatch.serve(forOperation("/SONATYPE.TEST/1.0"),
+        file(resolveTestFile("SONATYPE.TEST.1.0.nupkg")));
+
+    final String remoteStorageUrl = proxyServer.getUrl().toExternalForm() + "/" + REMOTE_NUGET_REPO_PATH;
 
     final Repository proxyRepo = createRepository(proxyConfig(PROXY_REPO_NAME, remoteStorageUrl));
 
     nuget = nugetClient(proxyRepo);
   }
 
-  @After
-  public void stopProxyServer()
-      throws Exception
-  {
-    if (proxyServer != null) {
-      proxyServer.stop();
-    }
-  }
 
   /**
    * Simple smoke test to ensure a proxy repo is actually reachable.
@@ -220,6 +207,37 @@ public class NugetProxyIT
     final List<Map<String, String>> entries = parseFeedXml(endless);
 
     assertThat(entries.size(), is(1));
+  }
+
+  @Test
+  public void downloadEntryThenPackage() throws Exception {
+    final String packageName = "SONATYPE.TEST";
+    final String version = "1.0";
+
+    final HttpResponse entry = nuget.entry(packageName, version);
+
+    assertThat(status(entry),is(HttpStatus.OK));
+
+    final HttpResponse response = nuget.packageContent(packageName, version);
+
+    assertThat(status(response), is(HttpStatus.OK));
+    assertThat(bytes(response), is(Files.toByteArray(resolveTestFile("SONATYPE.TEST.1.0.nupkg"))));
+  }
+
+  @Test
+  public void downloadPackageBeforeEntry() throws Exception {
+    final HttpResponse response = nuget.packageContent("SONATYPE.TEST", "1.0");
+
+    assertThat(status(response), is(HttpStatus.OK));
+    assertThat(bytes(response), is(Files.toByteArray(resolveTestFile("SONATYPE.TEST.1.0.nupkg"))));
+  }
+
+  @Test
+  public void downloadCachedPackage() throws Exception {
+    // Ensure a package is in the cache
+    assertThat(status(nuget.packageContent("SONATYPE.TEST", "1.0")), is(HttpStatus.OK));
+    // Download it a second time. This failed in NEXUS-8714
+    assertThat(status(nuget.packageContent("SONATYPE.TEST", "1.0")), is(HttpStatus.OK));
   }
 
   @NotNull

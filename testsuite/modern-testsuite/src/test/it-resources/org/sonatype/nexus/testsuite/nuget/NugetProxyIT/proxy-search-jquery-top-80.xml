@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xml:base="https://www.nuget.org/api/v2/" xmlns="http://www.w3.org/2005/Atom"
+<feed xml:base="http://${host}:${port}/${repository}/" xmlns="http://www.w3.org/2005/Atom"
       xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"
       xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata">
-  <id>https://www.nuget.org/api/v2/Search</id>
+  <id>http://${host}:${port}/${repository}/Search</id>
   <title type="text">Search</title>
   <updated>2015-05-12T17:26:26Z</updated>
   <link rel="self" title="Search" href="Search"/>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery',Version='2.1.3')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery',Version='2.1.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery',Version='2.1.3')"/>
     <title type="text">jQuery</title>
@@ -17,7 +17,7 @@
       <name>jQuery Foundation, Inc.</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery',Version='2.1.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery/2.1.3"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery/2.1.3"/>
     <m:properties>
       <d:Version>2.1.3</d:Version>
       <d:NormalizedVersion>2.1.3</d:NormalizedVersion>
@@ -59,7 +59,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Combined',Version='1.11.4')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Combined',Version='1.11.4')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Combined',Version='1.11.4')"/>
     <title type="text">jQuery.UI.Combined</title>
@@ -69,7 +69,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Combined',Version='1.11.4')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Combined/1.11.4"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Combined/1.11.4"/>
     <m:properties>
       <d:Version>1.11.4</d:Version>
       <d:NormalizedVersion>1.11.4</d:NormalizedVersion>
@@ -110,7 +110,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.jQuery.Unobtrusive.Validation',Version='3.2.3')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='Microsoft.jQuery.Unobtrusive.Validation',Version='3.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage"
           href="Packages(Id='Microsoft.jQuery.Unobtrusive.Validation',Version='3.2.3')"/>
@@ -123,7 +123,7 @@
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.jQuery.Unobtrusive.Validation',Version='3.2.3')/$value"/>
     <content type="application/zip"
-             src="https://www.nuget.org/api/v2/package/Microsoft.jQuery.Unobtrusive.Validation/3.2.3"/>
+             src="http://${host}:${port}/${repository}/package/Microsoft.jQuery.Unobtrusive.Validation/3.2.3"/>
     <m:properties>
       <d:Version>3.2.3</d:Version>
       <d:NormalizedVersion>3.2.3</d:NormalizedVersion>
@@ -161,7 +161,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.Validation',Version='1.13.1')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.Validation',Version='1.13.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.Validation',Version='1.13.1')"/>
     <title type="text">jQuery.Validation</title>
@@ -171,7 +171,7 @@
       <name>Jörn Zaefferer</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.Validation',Version='1.13.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.Validation/1.13.1"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.Validation/1.13.1"/>
     <m:properties>
       <d:Version>1.13.1</d:Version>
       <d:NormalizedVersion>1.13.1</d:NormalizedVersion>
@@ -214,7 +214,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Microsoft.jQuery.Unobtrusive.Ajax',Version='3.2.3')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='Microsoft.jQuery.Unobtrusive.Ajax',Version='3.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Microsoft.jQuery.Unobtrusive.Ajax',Version='3.2.3')"/>
     <title type="text">Microsoft.jQuery.Unobtrusive.Ajax</title>
@@ -225,7 +225,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Microsoft.jQuery.Unobtrusive.Ajax',Version='3.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Microsoft.jQuery.Unobtrusive.Ajax/3.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/Microsoft.jQuery.Unobtrusive.Ajax/3.2.3"/>
     <m:properties>
       <d:Version>3.2.3</d:Version>
       <d:NormalizedVersion>3.2.3</d:NormalizedVersion>
@@ -262,7 +262,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='AspNet.ScriptManager.jQuery',Version='2.1.3')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='AspNet.ScriptManager.jQuery',Version='2.1.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='AspNet.ScriptManager.jQuery',Version='2.1.3')"/>
     <title type="text">AspNet.ScriptManager.jQuery</title>
@@ -273,7 +273,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='AspNet.ScriptManager.jQuery',Version='2.1.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/AspNet.ScriptManager.jQuery/2.1.3"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/AspNet.ScriptManager.jQuery/2.1.3"/>
     <m:properties>
       <d:Version>2.1.3</d:Version>
       <d:NormalizedVersion>2.1.3</d:NormalizedVersion>
@@ -311,7 +311,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jquery.mobile',Version='1.4.5')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jquery.mobile',Version='1.4.5')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jquery.mobile',Version='1.4.5')"/>
     <title type="text">jquery.mobile</title>
@@ -323,7 +323,7 @@
       <name>The jQuery Project</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jquery.mobile',Version='1.4.5')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jquery.mobile/1.4.5"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jquery.mobile/1.4.5"/>
     <m:properties>
       <d:Version>1.4.5</d:Version>
       <d:NormalizedVersion>1.4.5</d:NormalizedVersion>
@@ -363,7 +363,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.Color',Version='2.1.2')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.Color',Version='2.1.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.Color',Version='2.1.2')"/>
     <title type="text">jQuery.Color</title>
@@ -373,7 +373,7 @@
       <name>jQuery Foundation</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.Color',Version='2.1.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.Color/2.1.2"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.Color/2.1.2"/>
     <m:properties>
       <d:Version>2.1.2</d:Version>
       <d:NormalizedVersion>2.1.2</d:NormalizedVersion>
@@ -412,7 +412,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.Migrate',Version='1.2.1')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.Migrate',Version='1.2.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.Migrate',Version='1.2.1')"/>
     <title type="text">jQuery.Migrate</title>
@@ -422,7 +422,7 @@
       <name>jQuery Foundation</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.Migrate',Version='1.2.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.Migrate/1.2.1"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.Migrate/1.2.1"/>
     <m:properties>
       <d:Version>1.2.1</d:Version>
       <d:NormalizedVersion>1.2.1</d:NormalizedVersion>
@@ -461,7 +461,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Theme.Redmond',Version='1.10.3')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Theme.Redmond',Version='1.10.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Theme.Redmond',Version='1.10.3')"/>
     <title type="text">jQuery.UI.Theme.Redmond</title>
@@ -471,7 +471,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Theme.Redmond',Version='1.10.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Theme.Redmond/1.10.3"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Theme.Redmond/1.10.3"/>
     <m:properties>
       <d:Version>1.10.3</d:Version>
       <d:NormalizedVersion>1.10.3</d:NormalizedVersion>
@@ -506,7 +506,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.i18n',Version='1.10.2')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.i18n',Version='1.10.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.i18n',Version='1.10.2')"/>
     <title type="text">jQuery.UI.i18n</title>
@@ -516,7 +516,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.i18n',Version='1.10.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.i18n/1.10.2"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.i18n/1.10.2"/>
     <m:properties>
       <d:Version>1.10.2</d:Version>
       <d:NormalizedVersion>1.10.2</d:NormalizedVersion>
@@ -558,7 +558,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Widgets.All',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Widgets.All',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.All',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Widgets.All</title>
@@ -568,7 +568,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.All',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Widgets.All/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Widgets.All/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -609,7 +609,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Core.Position',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Core.Position',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Core.Position',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Core.Position</title>
@@ -620,7 +620,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Core.Position',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Core.Position/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Core.Position/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -659,7 +659,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Core.Widget',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Core.Widget',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Core.Widget',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Core.Widget</title>
@@ -669,7 +669,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Core.Widget',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Core.Widget/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Core.Widget/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -708,7 +708,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Widgets.Autocomplete',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Widgets.Autocomplete',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Autocomplete',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Widgets.Autocomplete</title>
@@ -719,7 +719,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Widgets.Autocomplete',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Widgets.Autocomplete/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Widgets.Autocomplete/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -760,7 +760,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.All',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.All',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.All',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.All</title>
@@ -770,7 +770,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.All',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.All/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.All/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -811,7 +811,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Blind',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Blind',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Blind',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Blind</title>
@@ -821,7 +821,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Blind',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Blind/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Blind/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -860,7 +860,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Bounce',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Bounce',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Bounce',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Bounce</title>
@@ -870,7 +870,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Bounce',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Bounce/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Bounce/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -909,7 +909,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Clip',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Clip',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Clip',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Clip</title>
@@ -919,7 +919,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Clip',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Clip/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Clip/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -958,7 +958,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Core',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Core',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Core',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Core</title>
@@ -970,7 +970,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Core',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Core/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Core/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1009,7 +1009,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Drop',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Drop',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Drop',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Drop</title>
@@ -1021,7 +1021,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Drop',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Drop/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Drop/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1060,7 +1060,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Explode',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Explode',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Explode',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Explode</title>
@@ -1073,7 +1073,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Effects.Explode',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Explode/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Explode/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1112,7 +1112,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Fade',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Fade',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Fade',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Fade</title>
@@ -1122,7 +1122,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Fade',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Fade/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Fade/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1161,7 +1161,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Highlight',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Highlight',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Highlight',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Highlight</title>
@@ -1174,7 +1174,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Effects.Highlight',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Highlight/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Highlight/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1213,7 +1213,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Pulsate',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Pulsate',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Pulsate',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Pulsate</title>
@@ -1226,7 +1226,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Effects.Pulsate',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Pulsate/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Pulsate/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1265,7 +1265,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.All',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.All',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.All',Version='1.8.9')"/>
     <title type="text">jQuery.UI.All</title>
@@ -1275,7 +1275,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.All',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.All/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.All/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1316,7 +1316,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Scale',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Scale',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Scale',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Scale</title>
@@ -1327,7 +1327,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Scale',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Scale/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Scale/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1366,7 +1366,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Widgets.Button',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Widgets.Button',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Button',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Widgets.Button</title>
@@ -1376,7 +1376,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Button',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Widgets.Button/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Widgets.Button/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1415,7 +1415,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Shake',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Shake',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Shake',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Shake</title>
@@ -1425,7 +1425,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Shake',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Shake/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Shake/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1464,7 +1464,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Widgets.Datepicker',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Widgets.Datepicker',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Datepicker',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Widgets.Datepicker</title>
@@ -1476,7 +1476,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Widgets.Datepicker',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Widgets.Datepicker/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Widgets.Datepicker/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1515,7 +1515,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Slide',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Slide',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Slide',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Slide</title>
@@ -1525,7 +1525,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Slide',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Slide/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Slide/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1564,7 +1564,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Widgets.Dialog',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Widgets.Dialog',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Dialog',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Widgets.Dialog</title>
@@ -1574,7 +1574,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Dialog',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Widgets.Dialog/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Widgets.Dialog/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1614,7 +1614,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Effects.Transfer',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Effects.Transfer',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Effects.Transfer',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Effects.Transfer</title>
@@ -1625,7 +1625,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Effects.Transfer',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Effects.Transfer/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Effects.Transfer/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1664,7 +1664,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Widgets.Progressbar',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Widgets.Progressbar',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Progressbar',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Widgets.Progressbar</title>
@@ -1677,7 +1677,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Widgets.Progressbar',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Widgets.Progressbar/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Widgets.Progressbar/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1716,7 +1716,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Widgets.Slider',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Widgets.Slider',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Slider',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Widgets.Slider</title>
@@ -1727,7 +1727,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Slider',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Widgets.Slider/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Widgets.Slider/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1766,7 +1766,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Widgets.Tabs',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Widgets.Tabs',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Tabs',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Widgets.Tabs</title>
@@ -1777,7 +1777,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Tabs',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Widgets.Tabs/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Widgets.Tabs/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1816,7 +1816,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Interactions.Draggable',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Interactions.Draggable',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Interactions.Draggable',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Interactions.Draggable</title>
@@ -1827,7 +1827,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Interactions.Draggable',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Interactions.Draggable/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Interactions.Draggable/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1867,7 +1867,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Interactions.Droppable',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Interactions.Droppable',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Interactions.Droppable',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Interactions.Droppable</title>
@@ -1878,7 +1878,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Interactions.Droppable',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Interactions.Droppable/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Interactions.Droppable/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1918,7 +1918,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Core',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Core',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Core',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Core</title>
@@ -1929,7 +1929,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Core',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Core/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Core/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -1968,7 +1968,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Interactions.Resizable',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Interactions.Resizable',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Interactions.Resizable',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Interactions.Resizable</title>
@@ -1979,7 +1979,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Interactions.Resizable',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Interactions.Resizable/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Interactions.Resizable/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -2019,7 +2019,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Interactions.Selectable',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Interactions.Selectable',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Interactions.Selectable',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Interactions.Selectable</title>
@@ -2032,7 +2032,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Interactions.Selectable',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Interactions.Selectable/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Interactions.Selectable/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -2072,7 +2072,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Core.All',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Core.All',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Core.All',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Core.All</title>
@@ -2082,7 +2082,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Core.All',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Core.All/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Core.All/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -2123,7 +2123,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Interactions.Sortable',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Interactions.Sortable',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Interactions.Sortable',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Interactions.Sortable</title>
@@ -2134,7 +2134,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Interactions.Sortable',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Interactions.Sortable/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Interactions.Sortable/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -2174,7 +2174,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Core.Mouse',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Core.Mouse',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Core.Mouse',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Core.Mouse</title>
@@ -2186,7 +2186,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Core.Mouse',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Core.Mouse/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Core.Mouse/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -2225,7 +2225,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Themes.base',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Themes.base',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Themes.base',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Themes.base</title>
@@ -2235,7 +2235,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Themes.base',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Themes.base/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Themes.base/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -2274,7 +2274,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Themes.redmond',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Themes.redmond',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Themes.redmond',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Themes.redmond</title>
@@ -2284,7 +2284,7 @@
       <name>jQuery UI Team</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Themes.redmond',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Themes.redmond/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Themes.redmond/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -2323,7 +2323,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Themes.smoothness',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Themes.smoothness',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Themes.smoothness',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Themes.smoothness</title>
@@ -2334,7 +2334,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Themes.smoothness',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Themes.smoothness/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Themes.smoothness/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -2373,7 +2373,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Widgets.Accordion',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Widgets.Accordion',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Widgets.Accordion',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Widgets.Accordion</title>
@@ -2384,7 +2384,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Widgets.Accordion',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Widgets.Accordion/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Widgets.Accordion/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -2423,7 +2423,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Themes.south-street',Version='1.8.23.3')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Themes.south-street',Version='1.8.23.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Themes.south-street',Version='1.8.23.3')"/>
     <title type="text">jQuery.UI.Themes.south-street</title>
@@ -2434,7 +2434,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Themes.south-street',Version='1.8.23.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Themes.south-street/1.8.23.3"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Themes.south-street/1.8.23.3"/>
     <m:properties>
       <d:Version>1.8.23.3</d:Version>
       <d:NormalizedVersion>1.8.23.3</d:NormalizedVersion>
@@ -2474,7 +2474,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Interactions.All',Version='1.8.9')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Interactions.All',Version='1.8.9')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Interactions.All',Version='1.8.9')"/>
     <title type="text">jQuery.UI.Interactions.All</title>
@@ -2485,7 +2485,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Interactions.All',Version='1.8.9')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Interactions.All/1.8.9"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Interactions.All/1.8.9"/>
     <m:properties>
       <d:Version>1.8.9</d:Version>
       <d:NormalizedVersion>1.8.9</d:NormalizedVersion>
@@ -2526,7 +2526,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.Mobile.Message',Version='1.10.2')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.Mobile.Message',Version='1.10.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.Mobile.Message',Version='1.10.2')"/>
     <title type="text">jQuery.Mobile.Message</title>
@@ -2536,7 +2536,7 @@
       <name>John Rummell</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.Mobile.Message',Version='1.10.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.Mobile.Message/1.10.2"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.Mobile.Message/1.10.2"/>
     <m:properties>
       <d:Version>1.10.2</d:Version>
       <d:NormalizedVersion>1.10.2</d:NormalizedVersion>
@@ -2573,7 +2573,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.fluentPaging',Version='0.1.0')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.fluentPaging',Version='0.1.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.fluentPaging',Version='0.1.0')"/>
     <title type="text">jQuery.fluentPaging</title>
@@ -2583,7 +2583,7 @@
       <name>Boaz den Besten</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.fluentPaging',Version='0.1.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.fluentPaging/0.1.0"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.fluentPaging/0.1.0"/>
     <m:properties>
       <d:Version>0.1.0</d:Version>
       <d:NormalizedVersion>0.1.0</d:NormalizedVersion>
@@ -2622,7 +2622,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Message',Version='1.10.2')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Message',Version='1.10.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Message',Version='1.10.2')"/>
     <title type="text">jQuery.UI.Message</title>
@@ -2632,7 +2632,7 @@
       <name>John Rummell</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Message',Version='1.10.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Message/1.10.2"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Message/1.10.2"/>
     <m:properties>
       <d:Version>1.10.2</d:Version>
       <d:NormalizedVersion>1.10.2</d:NormalizedVersion>
@@ -2670,7 +2670,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.Meow',Version='1.0.1')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.Meow',Version='1.0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.Meow',Version='1.0.1')"/>
     <title type="text">jQuery.Meow</title>
@@ -2680,7 +2680,7 @@
       <name>Zachary Stewart</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.Meow',Version='1.0.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.Meow/1.0.1"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.Meow/1.0.1"/>
     <m:properties>
       <d:Version>1.0.1</d:Version>
       <d:NormalizedVersion>1.0.1</d:NormalizedVersion>
@@ -2715,7 +2715,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='linq.js-jQuery',Version='3.0.4-beta5')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='linq.js-jQuery',Version='3.0.4-beta5')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='linq.js-jQuery',Version='3.0.4-beta5')"/>
     <title type="text">linq.js-jQuery</title>
@@ -2725,7 +2725,7 @@
       <name>neuecc</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='linq.js-jQuery',Version='3.0.4-beta5')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/linq.js-jQuery/3.0.4-beta5"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/linq.js-jQuery/3.0.4-beta5"/>
     <m:properties>
       <d:Version>3.0.4-beta5</d:Version>
       <d:NormalizedVersion>3.0.4-beta5</d:NormalizedVersion>
@@ -2761,7 +2761,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Mobiscroll-jQuery-Mobile',Version='2.13.2')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='Mobiscroll-jQuery-Mobile',Version='2.13.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Mobiscroll-jQuery-Mobile',Version='2.13.2')"/>
     <title type="text">Mobiscroll-jQuery-Mobile</title>
@@ -2774,7 +2774,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='Mobiscroll-jQuery-Mobile',Version='2.13.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Mobiscroll-jQuery-Mobile/2.13.2"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/Mobiscroll-jQuery-Mobile/2.13.2"/>
     <m:properties>
       <d:Version>2.13.2</d:Version>
       <d:NormalizedVersion>2.13.2</d:NormalizedVersion>
@@ -2833,7 +2833,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.CRUD',Version='1.0')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.CRUD',Version='1.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.CRUD',Version='1.0')"/>
     <title type="text">jQuery.CRUD</title>
@@ -2845,7 +2845,7 @@
       <name>Johan Leino</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.CRUD',Version='1.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.CRUD/1.0.0"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.CRUD/1.0.0"/>
     <m:properties>
       <d:Version>1.0</d:Version>
       <d:NormalizedVersion>1.0.0</d:NormalizedVersion>
@@ -2882,7 +2882,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='ScriptSharp.Lib.jQuery',Version='0.7.5.0')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='ScriptSharp.Lib.jQuery',Version='0.7.5.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='ScriptSharp.Lib.jQuery',Version='0.7.5.0')"/>
     <title type="text">ScriptSharp.Lib.jQuery</title>
@@ -2892,7 +2892,7 @@
       <name>Nikhil Kothari</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='ScriptSharp.Lib.jQuery',Version='0.7.5.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/ScriptSharp.Lib.jQuery/0.7.5"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/ScriptSharp.Lib.jQuery/0.7.5"/>
     <m:properties>
       <d:Version>0.7.5.0</d:Version>
       <d:NormalizedVersion>0.7.5</d:NormalizedVersion>
@@ -2929,7 +2929,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='ScriptSharp.Lib.jQuery.History',Version='0.7.5.0')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='ScriptSharp.Lib.jQuery.History',Version='0.7.5.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='ScriptSharp.Lib.jQuery.History',Version='0.7.5.0')"/>
     <title type="text">ScriptSharp.Lib.jQuery.History</title>
@@ -2940,7 +2940,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='ScriptSharp.Lib.jQuery.History',Version='0.7.5.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/ScriptSharp.Lib.jQuery.History/0.7.5"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/ScriptSharp.Lib.jQuery.History/0.7.5"/>
     <m:properties>
       <d:Version>0.7.5.0</d:Version>
       <d:NormalizedVersion>0.7.5</d:NormalizedVersion>
@@ -2979,7 +2979,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='ScriptSharp.Lib.jQuery.Templating',Version='0.7.5.0')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='ScriptSharp.Lib.jQuery.Templating',Version='0.7.5.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='ScriptSharp.Lib.jQuery.Templating',Version='0.7.5.0')"/>
     <title type="text">ScriptSharp.Lib.jQuery.Templating</title>
@@ -2990,7 +2990,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='ScriptSharp.Lib.jQuery.Templating',Version='0.7.5.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/ScriptSharp.Lib.jQuery.Templating/0.7.5"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/ScriptSharp.Lib.jQuery.Templating/0.7.5"/>
     <m:properties>
       <d:Version>0.7.5.0</d:Version>
       <d:NormalizedVersion>0.7.5</d:NormalizedVersion>
@@ -3029,7 +3029,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='ScriptSharp.Lib.jQuery.UI',Version='0.7.5.0')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='ScriptSharp.Lib.jQuery.UI',Version='0.7.5.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='ScriptSharp.Lib.jQuery.UI',Version='0.7.5.0')"/>
     <title type="text">ScriptSharp.Lib.jQuery.UI</title>
@@ -3040,7 +3040,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='ScriptSharp.Lib.jQuery.UI',Version='0.7.5.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/ScriptSharp.Lib.jQuery.UI/0.7.5"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/ScriptSharp.Lib.jQuery.UI/0.7.5"/>
     <m:properties>
       <d:Version>0.7.5.0</d:Version>
       <d:NormalizedVersion>0.7.5</d:NormalizedVersion>
@@ -3078,7 +3078,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='ScriptSharp.Lib.jQuery.Validation',Version='0.7.5.0')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='ScriptSharp.Lib.jQuery.Validation',Version='0.7.5.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='ScriptSharp.Lib.jQuery.Validation',Version='0.7.5.0')"/>
     <title type="text">ScriptSharp.Lib.jQuery.Validation</title>
@@ -3089,7 +3089,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='ScriptSharp.Lib.jQuery.Validation',Version='0.7.5.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/ScriptSharp.Lib.jQuery.Validation/0.7.5"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/ScriptSharp.Lib.jQuery.Validation/0.7.5"/>
     <m:properties>
       <d:Version>0.7.5.0</d:Version>
       <d:NormalizedVersion>0.7.5</d:NormalizedVersion>
@@ -3128,7 +3128,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery-UI.Touch-Punch',Version='0.2.3')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery-UI.Touch-Punch',Version='0.2.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery-UI.Touch-Punch',Version='0.2.3')"/>
     <title type="text">jQuery-UI.Touch-Punch</title>
@@ -3140,7 +3140,7 @@
       <name>Dave Furfero</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery-UI.Touch-Punch',Version='0.2.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery-UI.Touch-Punch/0.2.3"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery-UI.Touch-Punch/0.2.3"/>
     <m:properties>
       <d:Version>0.2.3</d:Version>
       <d:NormalizedVersion>0.2.3</d:NormalizedVersion>
@@ -3177,7 +3177,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.Watermark',Version='3.2.0')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.Watermark',Version='3.2.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.Watermark',Version='3.2.0')"/>
     <title type="text">jQuery.Watermark</title>
@@ -3193,7 +3193,7 @@
       <name>Todd Northrop</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.Watermark',Version='3.2.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.Watermark/3.2.0"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.Watermark/3.2.0"/>
     <m:properties>
       <d:Version>3.2.0</d:Version>
       <d:NormalizedVersion>3.2.0</d:NormalizedVersion>
@@ -3252,7 +3252,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.Easing',Version='1.3.0.1')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.Easing',Version='1.3.0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.Easing',Version='1.3.0.1')"/>
     <title type="text">jQuery.Easing</title>
@@ -3262,7 +3262,7 @@
       <name>George McGinley Smith</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.Easing',Version='1.3.0.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.Easing/1.3.0.1"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.Easing/1.3.0.1"/>
     <m:properties>
       <d:Version>1.3.0.1</d:Version>
       <d:NormalizedVersion>1.3.0.1</d:NormalizedVersion>
@@ -3297,7 +3297,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='RIAServices.jQuery',Version='4.1.60914.2')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='RIAServices.jQuery',Version='4.1.60914.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='RIAServices.jQuery',Version='4.1.60914.2')"/>
     <title type="text">RIAServices.jQuery</title>
@@ -3307,7 +3307,7 @@
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='RIAServices.jQuery',Version='4.1.60914.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/RIAServices.jQuery/4.1.60914.2"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/RIAServices.jQuery/4.1.60914.2"/>
     <m:properties>
       <d:Version>4.1.60914.2</d:Version>
       <d:NormalizedVersion>4.1.60914.2</d:NormalizedVersion>
@@ -3342,7 +3342,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.timePicker',Version='0.9.3-beta')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.timePicker',Version='0.9.3-beta')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.timePicker',Version='0.9.3-beta')"/>
     <title type="text">jQuery.timePicker</title>
@@ -3352,7 +3352,7 @@
       <name>anders@perifer.se</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.timePicker',Version='0.9.3-beta')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.timePicker/0.9.3-beta"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.timePicker/0.9.3-beta"/>
     <m:properties>
       <d:Version>0.9.3-beta</d:Version>
       <d:NormalizedVersion>0.9.3-beta</d:NormalizedVersion>
@@ -3390,7 +3390,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery-W8',Version='1.8.2.0')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery-W8',Version='1.8.2.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery-W8',Version='1.8.2.0')"/>
     <title type="text">jQuery-W8</title>
@@ -3400,7 +3400,7 @@
       <name>pH-minamo</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery-W8',Version='1.8.2.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery-W8/1.8.2"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery-W8/1.8.2"/>
     <m:properties>
       <d:Version>1.8.2.0</d:Version>
       <d:NormalizedVersion>1.8.2</d:NormalizedVersion>
@@ -3436,7 +3436,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.Notify',Version='0.4.4.2')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.Notify',Version='0.4.4.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.Notify',Version='0.4.4.2')"/>
     <title type="text">jQuery.Notify</title>
@@ -3446,7 +3446,7 @@
       <name>Vincent Keizer</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.Notify',Version='0.4.4.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.Notify/0.4.4.2"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.Notify/0.4.4.2"/>
     <m:properties>
       <d:Version>0.4.4.2</d:Version>
       <d:NormalizedVersion>0.4.4.2</d:NormalizedVersion>
@@ -3481,7 +3481,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.w8n',Version='0.0.1.1')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.w8n',Version='0.0.1.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.w8n',Version='0.0.1.1')"/>
     <title type="text">jQuery.w8n</title>
@@ -3491,7 +3491,7 @@
       <name>Sergio Marrero</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.w8n',Version='0.0.1.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.w8n/0.0.1.1"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.w8n/0.0.1.1"/>
     <m:properties>
       <d:Version>0.0.1.1</d:Version>
       <d:NormalizedVersion>0.0.1.1</d:NormalizedVersion>
@@ -3531,7 +3531,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery-vsdoc',Version='2.1.0')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery-vsdoc',Version='2.1.0')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery-vsdoc',Version='2.1.0')"/>
     <title type="text">jQuery-vsdoc</title>
@@ -3541,7 +3541,7 @@
       <name>kiarash soleimanzadeh</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery-vsdoc',Version='2.1.0')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery-vsdoc/2.1.0"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery-vsdoc/2.1.0"/>
     <m:properties>
       <d:Version>2.1.0</d:Version>
       <d:NormalizedVersion>2.1.0</d:NormalizedVersion>
@@ -3577,7 +3577,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Saltarelle.jQuery.UI',Version='1.10.1')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='Saltarelle.jQuery.UI',Version='1.10.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Saltarelle.jQuery.UI',Version='1.10.1')"/>
     <title type="text">Saltarelle.jQuery.UI</title>
@@ -3587,7 +3587,7 @@
       <name>Ivaylo Gochkov, Erik KÃ¤llÃ©n</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Saltarelle.jQuery.UI',Version='1.10.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Saltarelle.jQuery.UI/1.10.1"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/Saltarelle.jQuery.UI/1.10.1"/>
     <m:properties>
       <d:Version>1.10.1</d:Version>
       <d:NormalizedVersion>1.10.1</d:NormalizedVersion>
@@ -3626,7 +3626,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery-win8',Version='1.8.2')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery-win8',Version='1.8.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery-win8',Version='1.8.2')"/>
     <title type="text">jQuery-win8</title>
@@ -3638,7 +3638,7 @@
       <name>appendTo, LLC</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery-win8',Version='1.8.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery-win8/1.8.2"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery-win8/1.8.2"/>
     <m:properties>
       <d:Version>1.8.2</d:Version>
       <d:NormalizedVersion>1.8.2</d:NormalizedVersion>
@@ -3678,7 +3678,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='Saltarelle.jQuery',Version='1.10.1')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='Saltarelle.jQuery',Version='1.10.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='Saltarelle.jQuery',Version='1.10.1')"/>
     <title type="text">Saltarelle.jQuery</title>
@@ -3688,7 +3688,7 @@
       <name>Nikhil Kothari, Erik Källén</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='Saltarelle.jQuery',Version='1.10.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/Saltarelle.jQuery/1.10.1"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/Saltarelle.jQuery/1.10.1"/>
     <m:properties>
       <d:Version>1.10.1</d:Version>
       <d:NormalizedVersion>1.10.1</d:NormalizedVersion>
@@ -3727,7 +3727,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.ie9ify',Version='1.3')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.ie9ify',Version='1.3')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.ie9ify',Version='1.3')"/>
     <title type="text">jQuery.ie9ify</title>
@@ -3738,7 +3738,7 @@
       <name>Brandon Satrom, Clark Sell</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.ie9ify',Version='1.3')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.ie9ify/1.3.0"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.ie9ify/1.3.0"/>
     <m:properties>
       <d:Version>1.3</d:Version>
       <d:NormalizedVersion>1.3.0</d:NormalizedVersion>
@@ -3775,7 +3775,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.Templates',Version='0.1')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.Templates',Version='0.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.Templates',Version='0.1')"/>
     <title type="text">jQuery.Templates</title>
@@ -3787,7 +3787,7 @@
       <name>Microsoft</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.Templates',Version='0.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.Templates/0.1.0"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.Templates/0.1.0"/>
     <m:properties>
       <d:Version>0.1</d:Version>
       <d:NormalizedVersion>0.1.0</d:NormalizedVersion>
@@ -3824,7 +3824,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery-progressBar',Version='0.1.2')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery-progressBar',Version='0.1.2')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery-progressBar',Version='0.1.2')"/>
     <title type="text">jQuery-progressBar</title>
@@ -3834,7 +3834,7 @@
       <name>Andrew Kovalenko</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery-progressBar',Version='0.1.2')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery-progressBar/0.1.2"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery-progressBar/0.1.2"/>
     <m:properties>
       <d:Version>0.1.2</d:Version>
       <d:NormalizedVersion>0.1.2</d:NormalizedVersion>
@@ -3871,7 +3871,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Themes.Blitzer',Version='1.11.1')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Themes.Blitzer',Version='1.11.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Themes.Blitzer',Version='1.11.1')"/>
     <title type="text">jQuery.UI.Themes.Blitzer</title>
@@ -3882,7 +3882,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Themes.Blitzer',Version='1.11.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Themes.Blitzer/1.11.1"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Themes.Blitzer/1.11.1"/>
     <m:properties>
       <d:Version>1.11.1</d:Version>
       <d:NormalizedVersion>1.11.1</d:NormalizedVersion>
@@ -3922,7 +3922,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Themes.Cupertino',Version='1.11.1')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Themes.Cupertino',Version='1.11.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Themes.Cupertino',Version='1.11.1')"/>
     <title type="text">jQuery.UI.Themes.Cupertino</title>
@@ -3933,7 +3933,7 @@
     </author>
     <link rel="edit-media" title="V2FeedPackage"
           href="Packages(Id='jQuery.UI.Themes.Cupertino',Version='1.11.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Themes.Cupertino/1.11.1"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Themes.Cupertino/1.11.1"/>
     <m:properties>
       <d:Version>1.11.1</d:Version>
       <d:NormalizedVersion>1.11.1</d:NormalizedVersion>
@@ -3973,7 +3973,7 @@
     </m:properties>
   </entry>
   <entry>
-    <id>https://www.nuget.org/api/v2/Packages(Id='jQuery.UI.Themes.DotLuv',Version='1.11.1')</id>
+    <id>http://${host}:${port}/${repository}/Packages(Id='jQuery.UI.Themes.DotLuv',Version='1.11.1')</id>
     <category term="NuGetGallery.V2FeedPackage" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
     <link rel="edit" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Themes.DotLuv',Version='1.11.1')"/>
     <title type="text">jQuery.UI.Themes.DotLuv</title>
@@ -3983,7 +3983,7 @@
       <name>Meysam Khoshbakht, Ali Kouroshfar</name>
     </author>
     <link rel="edit-media" title="V2FeedPackage" href="Packages(Id='jQuery.UI.Themes.DotLuv',Version='1.11.1')/$value"/>
-    <content type="application/zip" src="https://www.nuget.org/api/v2/package/jQuery.UI.Themes.DotLuv/1.11.1"/>
+    <content type="application/zip" src="http://${host}:${port}/${repository}/package/jQuery.UI.Themes.DotLuv/1.11.1"/>
     <m:properties>
       <d:Version>1.11.1</d:Version>
       <d:NormalizedVersion>1.11.1</d:NormalizedVersion>
