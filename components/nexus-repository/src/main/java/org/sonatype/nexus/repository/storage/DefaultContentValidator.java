@@ -150,7 +150,7 @@ public class DefaultContentValidator
    * Returns {@code true} if list of mimeTypes is actually saying "unkown" content.
    */
   private boolean isUnknown(final Set<String> mimeTypes) {
-    return mimeTypes.isEmpty() || (mimeTypes.size() == 1 && mimeTypes.contains(ContentTypes.OCTET_STREAM));
+    return mimeTypes.isEmpty() || (mimeTypes.size() == 1 && mimeTypes.contains(ContentTypes.APPLICATION_OCTET_STREAM));
   }
 
   /**

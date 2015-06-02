@@ -40,6 +40,7 @@ Ext.define('NX.app.Application', {
   uses: [
     // framework patches
     'Ext.patch.Ticket_15227',
+    'Ext.patch.Ticket_17866',
     'Ext.patch.Ticket_18960',
     'Ext.patch.Ticket_18964',
     'Ext.patch.Ticket_21425',

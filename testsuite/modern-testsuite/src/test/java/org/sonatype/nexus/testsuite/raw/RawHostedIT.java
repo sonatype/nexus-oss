@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
@@ -52,9 +53,7 @@ public class RawHostedIT
     final int response = rawClient.put(path, ContentType.TEXT_PLAIN, testFile);
     assertThat(response, is(HttpStatus.CREATED));
 
-    final byte[] bytes = rawClient.getBytes(path);
-
-    assertThat(bytes, is(Files.toByteArray(testFile)));
+    assertThat(bytes(rawClient.get(path)), is(Files.toByteArray(testFile)));
 
     assertThat(status(rawClient.delete(path)), is(HttpStatus.NO_CONTENT));
 

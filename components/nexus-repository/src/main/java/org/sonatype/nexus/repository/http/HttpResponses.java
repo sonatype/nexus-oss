@@ -16,7 +16,6 @@ package org.sonatype.nexus.repository.http;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
 
@@ -39,7 +38,9 @@ public class HttpResponses
   // Ok: 200
 
   public static Response ok(final @Nullable String message) {
-    return new Response(Status.success(OK, message));
+    return new Response.Builder()
+        .status(Status.success(OK, message))
+        .build();
   }
 
   public static Response ok() {
@@ -47,13 +48,18 @@ public class HttpResponses
   }
 
   public static Response ok(final Payload payload) {
-    return new PayloadResponse(Status.success(OK), payload);
+    return new Response.Builder()
+        .status(Status.success(OK))
+        .payload(payload)
+        .build();
   }
 
   // Created: 201
 
   public static Response created(final @Nullable String message) {
-    return new Response(Status.success(CREATED, message));
+    return new Response.Builder()
+        .status(Status.success(CREATED, message))
+        .build();
   }
 
   public static Response created() {
@@ -61,13 +67,18 @@ public class HttpResponses
   }
 
   public static Response created(final Payload payload) {
-    return new PayloadResponse(Status.success(CREATED), payload);
+    return new Response.Builder()
+        .status(Status.success(CREATED))
+        .payload(payload)
+        .build();
   }
 
   // No Content: 204
 
   public static Response noContent(final @Nullable String message) {
-    return new Response(Status.success(NO_CONTENT, message));
+    return new Response.Builder()
+        .status(Status.success(NO_CONTENT, message))
+        .build();
   }
 
   public static Response noContent() {
@@ -77,7 +88,9 @@ public class HttpResponses
   // Not Found: 404
 
   public static Response notFound(final @Nullable String message) {
-    return new Response(Status.failure(NOT_FOUND, message));
+    return new Response.Builder()
+        .status(Status.failure(NOT_FOUND, message))
+        .build();
   }
 
   public static Response notFound() {
@@ -87,7 +100,9 @@ public class HttpResponses
   // Bad request: 400
 
   public static Response badRequest(final @Nullable String message) {
-    return new Response(Status.failure(BAD_REQUEST, message));
+    return new Response.Builder()
+        .status(Status.failure(BAD_REQUEST, message))
+        .build();
   }
 
   public static Response badRequest() {
@@ -97,7 +112,9 @@ public class HttpResponses
   // Unauthorized: 401
 
   public static Response unauthorized(final @Nullable String message) {
-    return new Response(Status.failure(UNAUTHORIZED, message));
+    return new Response.Builder()
+        .status(Status.failure(UNAUTHORIZED, message))
+        .build();
   }
 
   public static Response unauthorized() {
@@ -107,7 +124,9 @@ public class HttpResponses
   // Forbidden: 403
 
   public static Response forbidden(final @Nullable String message) {
-    return new Response(Status.failure(FORBIDDEN, message));
+    return new Response.Builder()
+        .status(Status.failure(FORBIDDEN, message))
+        .build();
   }
 
   public static Response forbidden() {
@@ -120,14 +139,16 @@ public class HttpResponses
     checkNotNull(methodName);
     checkNotNull(allowedMethods);
     checkArgument(allowedMethods.length != 0);
-    Response response = new Response(Status.failure(METHOD_NOT_ALLOWED, methodName));
-    String allow = Joiner.on(',').join(allowedMethods);
-    response.getHeaders().set(HttpHeaders.ALLOW, allow);
-    return response;
+    return new Response.Builder()
+        .status(Status.failure(METHOD_NOT_ALLOWED, methodName))
+        .header(HttpHeaders.ALLOW, Joiner.on(',').join(allowedMethods))
+        .build();
   }
 
   public static Response serviceUnavailable(final @Nullable String message) {
-    return new Response(Status.failure(SERVICE_UNAVAILABLE, message));
+    return new Response.Builder()
+        .status(Status.failure(SERVICE_UNAVAILABLE, message))
+        .build();
   }
 
   public static Response serviceUnavailable() {
@@ -135,13 +156,16 @@ public class HttpResponses
   }
 
   public static Response notImplemented(final @Nullable String message) {
-    return new Response(Status.failure(NOT_IMPLEMENTED, message));
+    return new Response.Builder()
+        .status(Status.failure(NOT_IMPLEMENTED, message))
+        .build();
   }
 
   public static Response rangeNotSatisfiable(final long contentSize) {
-    final Response response = new Response(Status.failure(REQUESTED_RANGE_NOT_SATISFIABLE));
-    response.getHeaders().set(HttpHeaders.CONTENT_LENGTH, "0");
-    response.getHeaders().set(HttpHeaders.CONTENT_RANGE, "bytes */" + contentSize);
-    return response;
+    return new Response.Builder()
+        .status(Status.failure(REQUESTED_RANGE_NOT_SATISFIABLE))
+        .header(HttpHeaders.CONTENT_LENGTH, "0")
+        .header(HttpHeaders.CONTENT_RANGE, "bytes */" + contentSize)
+        .build();
   }
 }

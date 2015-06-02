@@ -16,29 +16,34 @@ import javax.inject.Singleton;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 import com.google.inject.Inject;
-import com.google.inject.Injector;
+import com.google.inject.Key;
+import org.eclipse.sisu.inject.BeanLocator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Allow {@link ConstraintValidator validators} to be enhanced by Guice.
- * 
+ *
  * @since 3.0
  */
 @Singleton
 public final class GuiceConstraintValidatorFactory
+    extends ComponentSupport
     implements ConstraintValidatorFactory
 {
-  private final Injector injector;
+  private final BeanLocator beanLocator;
 
   @Inject
-  public GuiceConstraintValidatorFactory(final Injector injector) {
-    this.injector = checkNotNull(injector);
+  public GuiceConstraintValidatorFactory(final BeanLocator beanLocator) {
+    this.beanLocator = checkNotNull(beanLocator);
   }
 
   public <T extends ConstraintValidator<?, ?>> T getInstance(final Class<T> key) {
-    return injector.getInstance(key);
+    log.trace("Resolving validator instance for type: {}", key);
+    return beanLocator.locate(Key.get(key)).iterator().next().getValue();
   }
 
   @Override
