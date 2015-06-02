@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -33,13 +34,11 @@ import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.WrappedUrlProvisionOption.OverwriteMode;
@@ -81,7 +80,7 @@ public abstract class NugetITSupport
     );
   }
 
-  @NotNull
+  @Nonnull
   protected Configuration hostedConfig(final String name) {
     final Configuration config = new Configuration();
     config.setRepositoryName(name);
@@ -91,7 +90,7 @@ public abstract class NugetITSupport
     return config;
   }
 
-  @NotNull
+  @Nonnull
   protected NugetClient nugetClient(final Repository repository) throws Exception {
     final URL url = repositoryBaseUrl(repository);
     waitFor(responseFrom(url));
@@ -101,7 +100,7 @@ public abstract class NugetITSupport
     return new NugetClient(clientBuilder().build(), clientContext(), url.toURI(), apiKey);
   }
 
-  @NotNull
+  @Nonnull
   private String prepareApiKey(final PrincipalCollection admin) {
     char[] apiKey = keyStore.getApiKey(admin);
     log.info("Existing nuget api key for {} is {}", admin, apiKey);

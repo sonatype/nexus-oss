@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.wonderland.internal;
 
-import org.jetbrains.annotations.NonNls;
-
 /**
  * Wonderland constants.
  *
@@ -24,7 +22,6 @@ public class WonderlandConstants
   /**
    * Prefix for ID-like things.
    */
-  @NonNls
   public static final String ID_PREFIX = "wonderland";
 
   /**

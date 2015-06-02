@@ -19,8 +19,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.ImmutableMap;
-import org.jetbrains.annotations.NotNull;
+
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -46,7 +48,7 @@ public class ODataFeedUtils
 
   }
 
-  @NotNull
+  @Nonnull
   private static String toQueryString(final Map<String, String> nextPageQuery) {
     final StringBuilder link = new StringBuilder();
 
@@ -60,7 +62,7 @@ public class ODataFeedUtils
     return link.toString();
   }
 
-  @NotNull
+  @Nonnull
   private static Map<String, String> queryForNextPage(final Map<String, String> query) {
     Map<String, String> nextPageQuery = new HashMap<>(query);
 

@@ -21,7 +21,6 @@ import org.sonatype.nexus.validation.group.Create;
 import com.google.common.collect.Maps;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
-import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -34,10 +33,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class KenaiConfiguration
 {
 
-  @NonNls
   public static final String BASE_URL = "baseUrl";
 
-  @NonNls
   public static final String DEFAULT_ROLE = "defaultRole";
 
   /**

@@ -169,7 +169,7 @@ Ext.define('NX.app.PluginStrings', {
     BROWSE_WELCOME_SUBTITLE: 'Welcome to Sonatype Nexus!',
 
     // Field validation messages
-    NAME_VALIDATION_MESSAGE: 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed'
+    NAME_VALIDATION_MESSAGE: 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed and may not start with underscore or dot.'
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);

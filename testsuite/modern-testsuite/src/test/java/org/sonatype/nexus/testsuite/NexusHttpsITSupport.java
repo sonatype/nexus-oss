@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.net.URL;
 import java.security.KeyStore;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
 
@@ -41,7 +42,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
@@ -171,7 +171,7 @@ public abstract class NexusHttpsITSupport
    * @return the header containing our session cookie; {@code null} if it doesn't exist
    */
   @Nullable
-  protected Header getSessionCookieHeader(@NotNull Header[] headers) {
+  protected Header getSessionCookieHeader(@Nonnull Header[] headers) {
     for (Header header : headers) {
       if (header.getValue().startsWith(DEFAULT_SESSION_COOKIE_NAME + "=")) {
         return header;
