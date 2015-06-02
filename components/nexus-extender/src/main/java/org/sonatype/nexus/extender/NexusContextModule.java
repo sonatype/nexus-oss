@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.sonatype.nexus.common.stateguard.StateGuardModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.security.WebSecurityModule;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
@@ -72,6 +73,7 @@ public class NexusContextModule
     bind(ServletContext.class).toInstance(servletContext);
     bind(ParameterKeys.PROPERTIES).toInstance(nexusProperties);
 
+    install(new StateGuardModule());
     install(new WebSecurityModule(servletContext));
 
     // enable OSGi service lookup of Karaf components

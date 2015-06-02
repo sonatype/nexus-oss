@@ -41,8 +41,8 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.NEW;
-import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
+import static org.sonatype.nexus.repository.FacetSupport.State.INITIALISED;
+import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 
 /**
  * Default {@link StorageFacet} implementation.
@@ -183,14 +183,14 @@ public class StorageFacetImpl
   }
 
   @Override
-  @Guarded(by = NEW)
+  @Guarded(by = INITIALISED)
   public void registerHookSupplier(final Supplier<StorageTxHook> hookSupplier) {
     checkNotNull(hookSupplier);
     hookSuppliers.add(hookSupplier);
   }
 
   @Override
-  @Guarded(by = NEW)
+  @Guarded(by = INITIALISED)
   public void registerWritePolicySelector(final WritePolicySelector writePolicySelector) {
     checkNotNull(writePolicySelector);
     this.writePolicySelector = writePolicySelector;

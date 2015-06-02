@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 @Named
-class ContentValidatorSelector
+public class ContentValidatorSelector
     extends ComponentSupport
 {
   private final Map<String, ContentValidator> contentValidators;
