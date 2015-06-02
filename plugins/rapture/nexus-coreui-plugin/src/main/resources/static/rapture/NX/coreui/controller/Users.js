@@ -263,8 +263,8 @@ Ext.define('NX.coreui.controller.Users', {
   },
 
   /**
-   * @private
-   * Load store for selected source.
+   * @override
+   * Override in order to filter users by selected source (user manager) and user id.
    */
   loadStore: function(cb) {
     var me = this,
