@@ -16,7 +16,7 @@ import java.util.Map;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.capability.support.CapabilitySupport;
+import org.sonatype.nexus.capability.CapabilitySupport;
 import org.sonatype.nexus.kenai.KenaiConfiguration;
 
 /**

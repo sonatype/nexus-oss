@@ -17,7 +17,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.capability.Capability;
 import org.sonatype.nexus.capability.Condition;
-import org.sonatype.nexus.capability.support.condition.Conditions;
+import org.sonatype.nexus.capability.condition.Conditions;
 
 @Named(CapabilityOfTypeActiveCapabilityDescriptor.TYPE_ID)
 public class CapabilityOfTypeActiveCapability
