@@ -17,11 +17,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.HashingInputStream;
-import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -58,7 +59,7 @@ public class MultiHashingInputStream
   }
 
   @Override
-  public int read(@NotNull byte[] bytes, int off, int len) throws IOException {
+  public int read(@Nonnull byte[] bytes, int off, int len) throws IOException {
     int numRead = in.read(bytes, off, len);
     if (numRead != -1) {
       for (Hasher hasher : hashers.values()) {

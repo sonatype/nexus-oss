@@ -37,7 +37,7 @@ Ext.define('NX.util.Validator', {
   /**
    * @private
    */
-  nxNameRegex : /^[a-zA-Z0-9\-\.]{1}[a-zA-Z0-9_\-\.]*$/,
+  nxNameRegex : /^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$/,
 
   /**
    * @private
