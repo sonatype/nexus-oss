@@ -166,7 +166,7 @@ public class DefaultContentValidator
     if (mimeTypes.contains(MediaType.HTML_UTF_8.withoutParameters().toString()) ||
         mimeTypes.contains(MediaType.XHTML_UTF_8.withoutParameters().toString())) {
       // to circumvent on xhtml vs html, we will treat both as text/html which is okay for content validation purposes
-      mimeTypes.add(MediaType.HTML_UTF_8.withoutParameters().toString());
+      mimeTypes.add(ContentTypes.TEXT_HTML);
     }
   }
 }

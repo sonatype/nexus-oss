@@ -64,7 +64,9 @@ public class Maven2ContentValidator
         // TODO: this is due fact that Tika has glob "*.pom" extension enlisted at text/plain, and some non-clean
         // TODO: POMs will get recognized as text/plain without "hint" that adds xml extension
         // TODO: Ask Tika project why is there and what represents ".pom" extension at "text/plain"
-        contentName = contentName + ".xml";
+        return defaultContentValidator.determineContentType(
+            strictContentTypeValidation, contentSupplier, mimeRulesSource, contentName + ".xml", declaredContentType
+        );
       }
       else if (contentName.endsWith(".sha1") || contentName.endsWith(".md5")) {
         // hashes are small/simple, do it directly

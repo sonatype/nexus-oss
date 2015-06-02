@@ -19,15 +19,28 @@ package org.sonatype.nexus.repository.view;
  */
 public class ContentTypes
 {
+  /**
+   * Plain text.
+   */
   public static final String TEXT_PLAIN = "text/plain";
 
+  /**
+   * Generic HTML content type.
+   */
   public static final String TEXT_HTML = "text/html";
 
-  public static final String TEXT_XML = "text/xml";
-
+  /**
+   * JSON.
+   */
   public static final String APPLICATION_JSON = "application/json";
 
+  /**
+   * XML type, preferred over "text/xml" that is basically alias for this one.
+   */
   public static final String APPLICATION_XML = "application/xml";
 
+  /**
+   * Unknown, basically "anything".
+   */
   public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 }

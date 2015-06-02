@@ -39,7 +39,7 @@ public class Maven2MimeRulesSource
   /**
    * Maven POMs.
    */
-  public static final String POM_TYPE = "application/xml";
+  public static final String POM_TYPE = ContentTypes.APPLICATION_XML;
 
   /**
    * Maven POMs.
@@ -59,7 +59,7 @@ public class Maven2MimeRulesSource
   /**
    * Maven Repository Metadata.
    */
-  public static final String METADATA_TYPE = "application/xml";
+  public static final String METADATA_TYPE = ContentTypes.APPLICATION_XML;
 
   /**
    * Maven Repository Metadata.

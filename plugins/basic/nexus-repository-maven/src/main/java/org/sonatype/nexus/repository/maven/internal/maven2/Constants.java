@@ -16,7 +16,6 @@ import java.util.Locale;
 
 import org.sonatype.nexus.repository.view.ContentTypes;
 
-import org.apache.tika.mime.MediaType;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
