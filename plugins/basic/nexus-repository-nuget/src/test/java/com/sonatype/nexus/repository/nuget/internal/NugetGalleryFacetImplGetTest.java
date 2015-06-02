@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -39,6 +40,22 @@ import static org.mockito.Mockito.when;
  */
 public class NugetGalleryFacetImplGetTest
 {
+  @Test
+  public void testGetNonexistentPackage() throws Exception {
+    final String version = "2.1.1";
+    final String packageId = "jQuery";
+
+    final NugetGalleryFacetImpl galleryFacet = spy(new NugetGalleryFacetImpl());
+
+    final StorageTx tx = mock(StorageTx.class);
+    doReturn(tx).when(galleryFacet).openStorageTx();
+    doReturn(null).when(galleryFacet).findComponent(tx, packageId, version);
+
+    final Payload payload = galleryFacet.get(packageId, version);
+
+    assertThat(payload, is(nullValue()));
+  }
+
   @Test
   public void testPayloadMadeFromBlob() throws Exception {
     final NugetGalleryFacetImpl galleryFacet = spy(new NugetGalleryFacetImpl());

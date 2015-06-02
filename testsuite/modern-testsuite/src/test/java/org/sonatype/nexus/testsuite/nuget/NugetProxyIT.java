@@ -210,6 +210,21 @@ public class NugetProxyIT
   }
 
   @Test
+  public void downloadEntryThenPackage() throws Exception {
+    final String packageName = "SONATYPE.TEST";
+    final String version = "1.0";
+
+    final HttpResponse entry = nuget.entry(packageName, version);
+
+    assertThat(status(entry),is(HttpStatus.OK));
+
+    final HttpResponse response = nuget.packageContent(packageName, version);
+
+    assertThat(status(response), is(HttpStatus.OK));
+    assertThat(bytes(response), is(Files.toByteArray(resolveTestFile("SONATYPE.TEST.1.0.nupkg"))));
+  }
+
+  @Test
   public void downloadPackageBeforeEntry() throws Exception {
     final HttpResponse response = nuget.packageContent("SONATYPE.TEST", "1.0");
 
