@@ -35,7 +35,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -51,7 +50,6 @@ public class AuthenticateResource
     extends ComponentSupport
     implements Resource
 {
-  @NonNls
   public static final String RESOURCE_URI = WonderlandConstants.REST_PREFIX + "/authenticate";
 
   private final AuthTicketService authTickets;

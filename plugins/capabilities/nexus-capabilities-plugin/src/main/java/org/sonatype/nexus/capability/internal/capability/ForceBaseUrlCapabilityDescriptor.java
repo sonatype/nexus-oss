@@ -24,8 +24,6 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
-import org.jetbrains.annotations.NonNls;
-
 /**
  * {@link ForceBaseUrlCapability} descriptor.
  *
@@ -36,7 +34,6 @@ import org.jetbrains.annotations.NonNls;
 public class ForceBaseUrlCapabilityDescriptor
     extends CapabilityDescriptorSupport<ForceBaseUrlCapabilityConfiguration>
 {
-  @NonNls
   public static final String TYPE_ID = "forceBaseUrl";
 
   public static final CapabilityType TYPE = CapabilityType.capabilityType(TYPE_ID);

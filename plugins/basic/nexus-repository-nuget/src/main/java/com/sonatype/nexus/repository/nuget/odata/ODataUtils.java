@@ -17,11 +17,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import com.sonatype.nexus.repository.nuget.internal.ComponentQuery;
+import javax.annotation.Nonnull;
 
+import com.sonatype.nexus.repository.nuget.internal.ComponentQuery;
 import com.google.common.collect.Maps;
+
 import org.codehaus.plexus.util.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.odata4j.expression.OrderByExpression;
@@ -173,7 +174,7 @@ public final class ODataUtils
     return q.build();
   }
 
-  @NotNull
+  @Nonnull
   private static Map<String, String> applyQueryDefaults(final Map<String, String> originalQuery) {
     final Map<String, String> query = new HashMap<>(originalQuery);
 

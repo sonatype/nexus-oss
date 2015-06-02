@@ -19,7 +19,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.crypto.RandomBytesGenerator;
 
 import com.google.common.io.BaseEncoding;
-import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,7 +31,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class AuthTicketGenerator
     extends ComponentSupport
 {
-  @NonNls
   private static final String CPREFIX = WonderlandConstants.CONFIG_PREFIX + ".authTicketGenerator";
 
   private final RandomBytesGenerator randomBytes;
