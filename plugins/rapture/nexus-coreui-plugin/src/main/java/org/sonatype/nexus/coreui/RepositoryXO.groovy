@@ -31,8 +31,8 @@ import org.hibernate.validator.constraints.NotEmpty
 class RepositoryXO
 {
   @Pattern(
-      regexp = /^[a-zA-Z0-9\-\.]{1}[a-zA-Z0-9_\-\.]*$/,
-      message = 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed'
+      regexp = /^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$/,
+      message = 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed and may not start with underscore or dot.'
   )
   @NotEmpty
   @UniqueRepositoryName(groups = Create)
