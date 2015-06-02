@@ -14,6 +14,7 @@ package org.sonatype.nexus.timeline.feeds.sources;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -22,7 +23,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 
 @Named(TaskFeedSource.CHANNEL_KEY)
@@ -31,6 +31,8 @@ public class TaskFeedSource
     extends AbstractFeedSource
 {
   public static final String CHANNEL_KEY = "taskChanges";
+
+  private static final Set<String> TYPE_SET = ImmutableSet.of(FeedRecorder.FAMILY_TASK);
 
   @Inject
   public TaskFeedSource(final FeedRecorder feedRecorder) {
@@ -41,30 +43,23 @@ public class TaskFeedSource
   }
 
   @Override
-  public void fillInEntries(final List<FeedEvent> entries, final int from, final int count,
-                            final Map<String, Object> params)
+  protected List<FeedEvent> getEntries(final int from,
+                                       final int count,
+                                       final Map<String, Object> params)
   {
-    entries.addAll(
-        getFeedRecorder().getEvents(
-            ImmutableSet.of(FeedRecorder.FAMILY_TASK),
-            null,
-            toWhere(params),
-            params,
-            from,
-            count,
-            new Function<FeedEvent, FeedEvent>()
-            {
-              @Override
-              public FeedEvent apply(final FeedEvent input) {
-                input.setTitle(title(input));
-                return input;
-              }
-            }
-        )
+    return getFeedRecorder().getEvents(
+        TYPE_SET,
+        null,
+        toWhere(params),
+        params,
+        from,
+        count,
+        null
     );
   }
 
-  private String title(final FeedEvent evt) {
+  @Override
+  protected String title(final FeedEvent evt) {
     if (FeedRecorder.TASK_STARTED.equals(evt.getEventSubType())) {
       return "Started: " + evt.getData().get("taskName");
     }
@@ -77,9 +72,6 @@ public class TaskFeedSource
     else if (FeedRecorder.TASK_FAILED.equals(evt.getEventSubType())) {
       return "Failed: " + evt.getData().get("taskName");
     }
-    else {
-      // TODO: Some human-readable fallback?
-      return evt.getEventType() + ":" + evt.getEventSubType();
-    }
+    return super.title(evt);
   }
 }

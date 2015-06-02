@@ -14,6 +14,7 @@ package org.sonatype.nexus.timeline.feeds.sources;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -23,7 +24,6 @@ import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.sisu.goodies.common.SimpleFormat;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 
 @Named(ComponentChangesFeedSource.CHANNEL_KEY)
@@ -32,6 +32,16 @@ public class ComponentChangesFeedSource
     extends AbstractFeedSource
 {
   public static final String CHANNEL_KEY = "componentChanges";
+
+  private static final Set<String> TYPE_SET = ImmutableSet.of(FeedRecorder.FAMILY_COMPONENT);
+
+  private static final Set<String> SUBTYPE_SET = ImmutableSet.of(
+      FeedRecorder.COMPONENT_CACHED,
+      FeedRecorder.COMPONENT_DEPLOYED,
+      FeedRecorder.COMPONENT_CACHED_UPDATE,
+      FeedRecorder.COMPONENT_DEPLOYED_UPDATE,
+      FeedRecorder.COMPONENT_DELETED
+  );
 
   @Inject
   public ComponentChangesFeedSource(final FeedRecorder feedRecorder) {
@@ -43,40 +53,26 @@ public class ComponentChangesFeedSource
 
 
   @Override
-  public void fillInEntries(final List<FeedEvent> entries,
-                            final int from,
-                            final int count,
-                            final Map<String, Object> params)
+  protected List<FeedEvent> getEntries(final int from,
+                                    final int count,
+                                    final Map<String, Object> params)
   {
-    entries.addAll(
-        getFeedRecorder().getEvents(
-            ImmutableSet.of(FeedRecorder.FAMILY_COMPONENT),
-            ImmutableSet.of(
-                FeedRecorder.COMPONENT_CACHED,
-                FeedRecorder.COMPONENT_DEPLOYED,
-                FeedRecorder.COMPONENT_CACHED_UPDATE,
-                FeedRecorder.COMPONENT_DEPLOYED_UPDATE,
-                FeedRecorder.COMPONENT_DELETED
-            ),
-            toWhere(params),
-            params,
-            from,
-            count,
-            new Function<FeedEvent, FeedEvent>()
-            {
-              @Override
-              public FeedEvent apply(final FeedEvent input) {
-                input.setTitle(title(input));
-                return input;
-              }
-            }
-        ));
+    return getFeedRecorder().getEvents(
+        TYPE_SET,
+        SUBTYPE_SET,
+        toWhere(params),
+        params,
+        from,
+        count,
+        null
+    );
   }
 
   /**
    * Formats entry title for event.
    */
-  private String title(FeedEvent evt) {
+  @Override
+  protected String title(FeedEvent evt) {
     final String componentName = SimpleFormat.format(
         "%s:%s:%s",
         evt.getData().get("componentGroup"),
@@ -97,9 +93,6 @@ public class ComponentChangesFeedSource
     else if (FeedRecorder.COMPONENT_DELETED.equals(evt.getEventSubType())) {
       return "Deleted: " + componentName;
     }
-    else {
-      // TODO: Some human-readable fallback?
-      return evt.getEventType() + ":" + evt.getEventSubType();
-    }
+    return super.title(evt);
   }
 }

@@ -14,6 +14,7 @@ package org.sonatype.nexus.timeline.feeds.sources;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -22,7 +23,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 
 @Named(AssetChangesFeedSource.CHANNEL_KEY)
@@ -31,6 +31,16 @@ public class AssetChangesFeedSource
     extends AbstractFeedSource
 {
   public static final String CHANNEL_KEY = "assetChanges";
+
+  private static final Set<String> TYPE_SET = ImmutableSet.of(FeedRecorder.FAMILY_ASSET);
+
+  private static final Set<String> SUBTYPE_SET = ImmutableSet.of(
+      FeedRecorder.ASSET_CACHED,
+      FeedRecorder.ASSET_DEPLOYED,
+      FeedRecorder.ASSET_CACHED_UPDATE,
+      FeedRecorder.ASSET_DEPLOYED_UPDATE,
+      FeedRecorder.ASSET_DELETED
+  );
 
   @Inject
   public AssetChangesFeedSource(final FeedRecorder feedRecorder) {
@@ -41,41 +51,26 @@ public class AssetChangesFeedSource
   }
 
   @Override
-  public void fillInEntries(final List<FeedEvent> entries,
-                            final int from,
-                            final int count,
-                            final Map<String, Object> params)
+  protected List<FeedEvent> getEntries(final int from,
+                                       final int count,
+                                       final Map<String, Object> params)
   {
-    entries.addAll(
-        getFeedRecorder().getEvents(
-            ImmutableSet.of(FeedRecorder.FAMILY_ASSET),
-            ImmutableSet.of(
-                FeedRecorder.ASSET_CACHED,
-                FeedRecorder.ASSET_DEPLOYED,
-                FeedRecorder.ASSET_CACHED_UPDATE,
-                FeedRecorder.ASSET_DEPLOYED_UPDATE,
-                FeedRecorder.ASSET_DELETED
-            ),
-            toWhere(params),
-            params,
-            from,
-            count,
-            new Function<FeedEvent, FeedEvent>()
-            {
-              @Override
-              public FeedEvent apply(final FeedEvent input) {
-                input.setTitle(title(input));
-                return input;
-              }
-            }
-        )
+    return getFeedRecorder().getEvents(
+        TYPE_SET,
+        SUBTYPE_SET,
+        toWhere(params),
+        params,
+        from,
+        count,
+        null
     );
   }
 
   /**
    * Formats entry title for event.
    */
-  private String title(FeedEvent evt) {
+  @Override
+  protected String title(FeedEvent evt) {
     final String assetName = evt.getData().get("assetName");
     if (FeedRecorder.ASSET_CACHED.equals(evt.getEventSubType())) {
       return "Cached: " + assetName;
@@ -92,9 +87,6 @@ public class AssetChangesFeedSource
     else if (FeedRecorder.ASSET_DELETED.equals(evt.getEventSubType())) {
       return "Deleted: " + assetName;
     }
-    else {
-      // TODO: Some human-readable fallback?
-      return evt.getEventType() + ":" + evt.getEventSubType();
-    }
+    return super.title(evt);
   }
 }

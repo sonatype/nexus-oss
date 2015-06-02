@@ -15,6 +15,7 @@ package org.sonatype.nexus.timeline.feeds.sources;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -23,7 +24,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -38,6 +38,8 @@ public class AuthcAuthzFeedSource
 {
   public static final String CHANNEL_KEY = "authcAuthz";
 
+  private static final Set<String> TYPE_SET = ImmutableSet.of(FeedRecorder.FAMILY_AUTH);
+
   @Inject
   public AuthcAuthzFeedSource(final FeedRecorder feedRecorder) {
     super(
@@ -48,43 +50,33 @@ public class AuthcAuthzFeedSource
   }
 
   @Override
-  protected void fillInEntries(final List<FeedEvent> feed, final int from, final int count,
-                               final Map<String, Object> params)
+  protected List<FeedEvent> getEntries(final int from,
+                                       final int count,
+                                       final Map<String, Object> params)
       throws IOException
   {
-    feed.addAll(
-        getFeedRecorder().getEvents(
-            ImmutableSet.of(FeedRecorder.FAMILY_AUTH),
-            null,
-            toWhere(params),
-            params,
-            from,
-            count,
-            new Function<FeedEvent, FeedEvent>()
-            {
-              @Override
-              public FeedEvent apply(final FeedEvent input) {
-                input.setTitle(title(input));
-                return input;
-              }
-            }
-        )
+    return getFeedRecorder().getEvents(
+        TYPE_SET,
+        null,
+        toWhere(params),
+        params,
+        from,
+        count,
+        null
     );
   }
 
   /**
    * Formats entry title for event.
    */
-  private String title(FeedEvent evt) {
+  @Override
+  protected String title(FeedEvent evt) {
     if (FeedRecorder.AUTH_AUTHC.equals(evt.getEventSubType())) {
       return "Authentication";
     }
     else if (FeedRecorder.AUTH_AUTHZ.equals(evt.getEventSubType())) {
       return "Authorization";
     }
-    else {
-      // TODO: Some human-readable fallback?
-      return evt.getEventType() + ":" + evt.getEventSubType();
-    }
+    return super.title(evt);
   }
 }

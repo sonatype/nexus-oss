@@ -78,8 +78,8 @@ public class RepositorySubscriber
         FeedRecorder.FAMILY_REPO,
         subType,
         new Date(),
-        "TODO", // TODO
-        "http://localhost:8081/#admin/repository/repositories", // TODO
+        "unknown", // TODO: Async EventSubscriber cannot get clientInfo of originating thread
+        "http://localhost:8081/#admin/repository/repositories",
         data
     );
     getFeedRecorder().addEvent(feedEvent);

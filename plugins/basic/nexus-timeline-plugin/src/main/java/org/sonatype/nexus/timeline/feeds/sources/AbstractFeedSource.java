@@ -23,7 +23,7 @@ import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.nexus.timeline.feeds.FeedSource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.collect.Lists;
+import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -79,14 +79,28 @@ public abstract class AbstractFeedSource
   public List<FeedEvent> getFeed(int from, int count, Map<String, Object> params)
       throws IOException
   {
-    final List<FeedEvent> events = Lists.newArrayList();
-    fillInEntries(events, from, count, params);
+    final List<FeedEvent> events = getEntries(from, count, params);
+    for (FeedEvent event : events) {
+      if (Strings.isNullOrEmpty(event.getTitle())) {
+        event.setTitle(title(event));
+      }
+    }
     return events;
   }
 
-  protected abstract void fillInEntries(final List<FeedEvent> feed, final int from, final int count,
-                                        final Map<String, Object> params)
+  /**
+   * Override to actually fill in entries in the passed in feed.
+   */
+  protected abstract List<FeedEvent> getEntries(final int from, final int count,
+                                                final Map<String, Object> params)
       throws IOException;
+
+  /**
+   * Method to be overridden to provide human readable entry title.
+   */
+  protected String title(FeedEvent evt) {
+    return evt.getEventType() + ":" + evt.getEventSubType();
+  }
 
   /**
    * Helper method that converts params map into SQL WHERE.

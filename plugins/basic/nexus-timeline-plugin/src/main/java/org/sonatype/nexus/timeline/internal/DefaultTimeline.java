@@ -314,10 +314,7 @@ public class DefaultTimeline
    * Shortcut method to check nullable sets. Considers null set as empty.
    */
   private boolean isEmpty(@Nullable Set<?> set) {
-    if (set == null) {
-      return true;
-    }
-    return set.isEmpty();
+    return set == null || set.isEmpty();
   }
 
   /**
