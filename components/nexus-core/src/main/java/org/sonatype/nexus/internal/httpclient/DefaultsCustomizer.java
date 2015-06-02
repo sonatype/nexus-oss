@@ -23,6 +23,7 @@ import org.sonatype.sisu.goodies.common.Time;
 
 import com.google.common.net.HttpHeaders;
 import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -79,6 +80,7 @@ public class DefaultsCustomizer
     plan.getHeaders().put(HttpHeaders.USER_AGENT, plan.getUserAgent());
 
     plan.getClient().setKeepAliveStrategy(new NexusConnectionKeepAliveStrategy(keepAliveDuration.toMillis()));
+    plan.getClient().setRetryHandler(new StandardHttpRequestRetryHandler(2, false));
 
     plan.getConnection().setBufferSize(bufferSize.toBytesI());
 
