@@ -30,7 +30,6 @@ import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
 import com.google.common.collect.Lists;
-import org.jetbrains.annotations.NonNls;
 
 /**
  * {@link BrandingCapability} descriptor.
@@ -43,7 +42,6 @@ public class BrandingCapabilityDescriptor
     extends CapabilityDescriptorSupport<BrandingCapabilityConfiguration>
     implements Taggable
 {
-  @NonNls
   public static final String TYPE_ID = "rapture.branding";
 
   public static final CapabilityType TYPE = CapabilityType.capabilityType(TYPE_ID);

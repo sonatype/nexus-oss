@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import javax.annotation.Nonnull;
+
 import com.sonatype.nexus.repository.nuget.internal.NugetProperties;
 import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 
@@ -28,9 +30,9 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
+
 import org.apache.http.HttpResponse;
 import org.hamcrest.Matchers;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -210,6 +212,21 @@ public class NugetProxyIT
   }
 
   @Test
+  public void downloadEntryThenPackage() throws Exception {
+    final String packageName = "SONATYPE.TEST";
+    final String version = "1.0";
+
+    final HttpResponse entry = nuget.entry(packageName, version);
+
+    assertThat(status(entry),is(HttpStatus.OK));
+
+    final HttpResponse response = nuget.packageContent(packageName, version);
+
+    assertThat(status(response), is(HttpStatus.OK));
+    assertThat(bytes(response), is(Files.toByteArray(resolveTestFile("SONATYPE.TEST.1.0.nupkg"))));
+  }
+
+  @Test
   public void downloadPackageBeforeEntry() throws Exception {
     final HttpResponse response = nuget.packageContent("SONATYPE.TEST", "1.0");
 
@@ -225,7 +242,7 @@ public class NugetProxyIT
     assertThat(status(nuget.packageContent("SONATYPE.TEST", "1.0")), is(HttpStatus.OK));
   }
 
-  @NotNull
+  @Nonnull
   private List<String> extractPackageHashes(final List<Map<String, String>> entries) {
     return transform(entries, new Function<Map<String, String>, String>()
     {
@@ -235,7 +252,7 @@ public class NugetProxyIT
     });
   }
 
-  @NotNull
+  @Nonnull
   private List<Integer> extractDownloadCounts(final List<Map<String, String>> entries) {
     return transform(entries, new Function<Map<String, String>, Integer>()
     {
@@ -258,14 +275,14 @@ public class NugetProxyIT
     return null;
   }
 
-  @NotNull
+  @Nonnull
   private List<Integer> sortAscending(final List<Integer> downloadCounts) {
     final List<Integer> sorted = sorted(downloadCounts);
     Collections.reverse(sorted);
     return sorted;
   }
 
-  @NotNull
+  @Nonnull
   private <T> List<T> sorted(final List<T> unsorted)
   {
     return new ArrayList<T>(new TreeSet<T>(unsorted));

@@ -15,6 +15,7 @@ package org.sonatype.nexus.capability;
 import java.net.URL;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -25,9 +26,6 @@ import org.sonatype.sisu.goodies.i18n.MessageBundle;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 import org.sonatype.sisu.goodies.template.TemplateThrowableAdapter;
-
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -121,7 +119,7 @@ public abstract class CapabilitySupport<ConfigT>
     // nop
   }
 
-  private void logLifecycle(final @NonNls String msg, final ConfigT config) {
+  private void logLifecycle(final String msg, final ConfigT config) {
     if (log.isTraceEnabled()) {
       log.trace("{}: {}", msg, config);
     }
@@ -256,15 +254,15 @@ public abstract class CapabilitySupport<ConfigT>
     this.templateEngine = checkNotNull(templateEngine);
   }
 
-  protected String render(final @NonNls String template, @Nullable final Map<String, Object> params) {
+  protected String render(final String template, @Nullable final Map<String, Object> params) {
     return getTemplateEngine().render(this, template, params);
   }
 
-  protected String render(final @NonNls String template, final TemplateParameters params) {
+  protected String render(final String template, final TemplateParameters params) {
     return getTemplateEngine().render(this, template, params);
   }
 
-  protected String render(final @NonNls String template) {
+  protected String render(final String template) {
     return getTemplateEngine().render(this, template, (Map<String, Object>) null);
   }
 

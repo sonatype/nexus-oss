@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.testsuite.raw;
 
+import javax.annotation.Nonnull;
+
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -20,8 +22,6 @@ import org.sonatype.nexus.repository.raw.internal.RawHostedRecipe;
 import org.sonatype.nexus.repository.raw.internal.RawProxyRecipe;
 import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport;
-
-import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
@@ -32,7 +32,7 @@ import static java.util.Arrays.asList;
 public class RawITSupport
     extends RepositoryTestSupport
 {
-  @NotNull
+  @Nonnull
   protected Configuration hostedConfig(final String name) {
     final Configuration config = new Configuration();
     config.setRepositoryName(name);
@@ -42,7 +42,7 @@ public class RawITSupport
     return config;
   }
 
-  @NotNull
+  @Nonnull
   protected Configuration proxyConfig(final String name, final String remoteUrl) {
     final Configuration config = new Configuration();
     config.setRepositoryName(name);
@@ -60,7 +60,7 @@ public class RawITSupport
     return config;
   }
 
-  @NotNull
+  @Nonnull
   protected Configuration groupConfig(final String name, final String... memberNames) {
     final Configuration config = new Configuration();
     config.setRepositoryName(name);
@@ -73,7 +73,7 @@ public class RawITSupport
     return config;
   }
 
-  @NotNull
+  @Nonnull
   protected RawClient client(final Repository repository) throws Exception {
     checkNotNull(repository);
     return new RawClient(clientBuilder().build(),

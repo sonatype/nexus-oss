@@ -15,11 +15,12 @@ package org.sonatype.nexus.capability;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.annotation.Nullable;
+import org.sonatype.nexus.capability.Capability;
 import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Support for {@link Capability} configuration implementations.

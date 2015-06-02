@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.quartz.internal;
 
-import org.jetbrains.annotations.NonNls;
-
 /**
  * Quartz constants.
  *
@@ -24,7 +22,6 @@ public class QuartzConstants
   /**
    * Prefix for ID-like things.
    */
-  @NonNls
   public static final String ID_PREFIX = "quartz";
 
   /**

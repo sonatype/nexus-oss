@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.wonderland;
 
-import org.jetbrains.annotations.NonNls;
-
 /**
  * Authentication ticket service.
  *
@@ -24,7 +22,6 @@ public interface AuthTicketService
   /**
    * Header for passing authentication tickets in via web requests.
    */
-  @NonNls
   String AUTH_TICKET_HEADER = "X-NX-AuthTicket";
 
   /**

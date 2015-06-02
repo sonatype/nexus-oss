@@ -21,8 +21,6 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
-import org.jetbrains.annotations.NonNls;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -57,7 +55,7 @@ public class CipherKeyHighStrengthCondition
 
   public CipherKeyHighStrengthCondition(final EventBus eventBus,
                                         final CryptoHelper crypto,
-                                        final @NonNls String transformation)
+                                        final String transformation)
   {
     super(eventBus, false);
     this.crypto = checkNotNull(crypto);

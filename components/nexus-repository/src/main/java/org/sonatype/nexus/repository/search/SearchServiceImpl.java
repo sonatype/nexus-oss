@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -42,6 +43,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
+
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.client.Client;
@@ -50,7 +52,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.internal.InternalSearchResponse;
-import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
@@ -286,7 +287,7 @@ public class SearchServiceImpl
   /**
    * Sanitize repository name in a consistent fashion to ensure that the name used for an index is safe.
    */
-  @NotNull
+  @Nonnull
   private String safeIndexName(final Repository repository) {
     return repository.getName().toLowerCase(Locale.ENGLISH);
   }
