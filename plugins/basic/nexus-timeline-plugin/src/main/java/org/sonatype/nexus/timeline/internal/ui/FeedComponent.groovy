@@ -77,7 +77,7 @@ extends DirectComponentSupport
             feedSource.getFeed(0, Integer.MAX_VALUE, Collections.emptyMap()).size(),
             feedSource.getFeed(parameters.start, parameters.limit, Collections.emptyMap()).collect { entry ->
               new FeedEntryXO(
-                  title: feedContentRenderer.getTitle(entry),
+                  title: entry.title,
                   published: entry.getPublished(),
                   content: feedContentRenderer.getContent(entry)
               )

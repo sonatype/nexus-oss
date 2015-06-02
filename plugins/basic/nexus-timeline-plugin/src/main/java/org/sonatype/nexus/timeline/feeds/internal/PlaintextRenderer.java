@@ -46,15 +46,12 @@ public class PlaintextRenderer
 
   public String getContent(final FeedEvent evt) {
     final URL templateURL = getTemplateFor(evt);
-    if (templateURL != null) {
-      final TemplateParameters templateParameters = new TemplateParameters();
-      for (Map.Entry<String, String> d : evt.getData().entrySet()) {
-        templateParameters.set(d.getKey(), d.getValue());
-      }
-      return templateEngineProvider.get().render(this, templateURL, templateParameters);
+    checkNotNull(templateURL);
+    final TemplateParameters templateParameters = new TemplateParameters();
+    for (Map.Entry<String, String> d : evt.getData().entrySet()) {
+      templateParameters.set(d.getKey(), d.getValue());
     }
-    // TODO: Some human-readable fallback?
-    return evt.getData().toString();
+    return templateEngineProvider.get().render(this, templateURL, templateParameters);
   }
 
   // ==

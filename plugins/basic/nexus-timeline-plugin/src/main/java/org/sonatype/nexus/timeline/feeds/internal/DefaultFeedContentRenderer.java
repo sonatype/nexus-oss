@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.rest.FeedContentRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -43,13 +44,11 @@ public class DefaultFeedContentRenderer
 
   @Override
   public String getContentType(final FeedEvent evt) {
-    return "text/plain";
+    return ContentTypes.TEXT_PLAIN;
   }
 
   @Override
   public String getContent(final FeedEvent evt) {
-    // allow override, like when event is not coming from timeline
-    // but is parsed from Nexus Log, see ErrorWarningFeedSource
     final String content = evt.getContent();
     if (content != null) {
       return content;
