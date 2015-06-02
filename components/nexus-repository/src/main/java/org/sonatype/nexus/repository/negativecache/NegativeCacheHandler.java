@@ -24,6 +24,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * Handler that caches 404 responses.
+ *
  * When context invocation returns 404, it caches the 404 status to avoid future invocations (if cached status is
  * present).
  *
@@ -55,7 +56,10 @@ public class NegativeCacheHandler
       }
     }
     else {
-      response = new Response(status);
+      response = new Response.Builder()
+          .status(status)
+          .build();
+
       log.debug("Found {} in negative cache, returning {}", key, response);
     }
     return response;

@@ -30,22 +30,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class UniqueUserIdValidator
     extends ConstraintValidatorSupport<UniqueUserId, String>
 {
-  private final SecuritySystem securitySystem;
+  private final UserManager userManager;
 
   @Inject
-  public UniqueUserIdValidator(final SecuritySystem securitySystem) {
-    this.securitySystem = checkNotNull(securitySystem);
+  public UniqueUserIdValidator(final SecuritySystem securitySystem) throws NoSuchUserManagerException {
+    this.userManager = checkNotNull(securitySystem).getUserManager(UserManager.DEFAULT_SOURCE);
   }
 
   @Override
   public boolean isValid(final String value, final ConstraintValidatorContext context) {
-    log.trace("Validating unique role-id: {}", value);
-    // TODO: sort out if we should limit to DEFAULT_SOURCE?
-    for (User user : securitySystem.listUsers()) {
-      if (value.equals(user.getUserId())) {
-        return false;
-      }
+    log.trace("Validating unique user-id: {}", value);
+    try {
+      userManager.getUser(value);
+      return false;
     }
-    return true;
+    catch (UserNotFoundException e) {
+      return true;
+    }
   }
 }

@@ -29,8 +29,6 @@ public class ConfigurableViewFacet
     extends FacetSupport
     implements ViewFacet
 {
-  public static final String CONFIG_KEY = "view";
-
   private Router router;
 
   public void configure(final Router router) {

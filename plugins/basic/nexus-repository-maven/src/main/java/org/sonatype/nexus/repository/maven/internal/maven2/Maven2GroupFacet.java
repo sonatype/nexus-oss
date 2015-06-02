@@ -40,7 +40,6 @@ import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
@@ -107,8 +106,8 @@ public class Maven2GroupFacet
     for (Map.Entry<Repository, Response> entry : responses.entrySet()) {
       if (entry.getValue().getStatus().getCode() == HttpStatus.OK) {
         final Response response = entry.getValue();
-        if (response instanceof PayloadResponse && ((PayloadResponse) response).getPayload() instanceof Content) {
-          metadataContents.put(entry.getKey(), (Content) ((PayloadResponse) response).getPayload());
+        if (response.getPayload() instanceof Content) {
+          metadataContents.put(entry.getKey(), (Content) response.getPayload());
         }
       }
     }
@@ -156,7 +155,7 @@ public class Maven2GroupFacet
     final Content content = new Content(
         new BytesPayload(
             byteArray,
-            Maven2Format.METADATA_CONTENT_TYPE
+            Constants.METADATA_CONTENT_TYPE
         ));
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
     content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}");
@@ -174,7 +173,7 @@ public class Maven2GroupFacet
       final HashCode hashCode = hashCodes.get(hashType.getHashAlgorithm());
       if (hashCode != null) {
         final Content hashContent = new Content(
-            new StringPayload(hashCode.toString(), Maven2Format.CHECKSUM_CONTENT_TYPE));
+            new StringPayload(hashCode.toString(), Constants.CHECKSUM_CONTENT_TYPE));
         hashContent.getAttributes().set(Content.CONTENT_LAST_MODIFIED, now);
         mavenFacet.put(mavenPath.hash(hashType), hashContent);
       }

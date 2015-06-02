@@ -26,6 +26,7 @@ import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Support class for HTTP-based repository test clients.
@@ -77,5 +78,10 @@ public class FormatClientSupport
   public static int status(HttpResponse response) {
     checkNotNull(response);
     return response.getStatusLine().getStatusCode();
+  }
+
+  public static byte[] bytes(HttpResponse response) throws IOException {
+    checkState(response.getEntity() != null);
+    return EntityUtils.toByteArray(response.getEntity());
   }
 }

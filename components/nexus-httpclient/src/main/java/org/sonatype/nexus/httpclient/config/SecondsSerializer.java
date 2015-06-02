@@ -10,28 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.capability.internal.rest;
+package org.sonatype.nexus.httpclient.config;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.ws.rs.core.Response.Status;
+import java.io.IOException;
 
-import org.sonatype.nexus.capability.CapabilityNotFoundException;
-import org.sonatype.siesta.FaultExceptionMapperSupport;
-import org.sonatype.siesta.FaultXO;
+import org.sonatype.sisu.goodies.common.Time;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
- * Maps {@link CapabilityNotFoundException} to {@link Status#NOT_FOUND} with {@link FaultXO} body.
+ * {@link Time} in seconds serializer.
  *
- * @since 2.7
+ * @since 3.0
  */
-@Named
-@Singleton
-public class CapabilityNotFoundExceptionMapper
-    extends FaultExceptionMapperSupport<CapabilityNotFoundException>
+public class SecondsSerializer
+    extends StdSerializer<Time>
 {
+
+  public SecondsSerializer() {
+    super(Time.class);
+  }
+
   @Override
-  protected Status getStatus(final CapabilityNotFoundException exception) {
-    return Status.NOT_FOUND;
+  public void serialize(final Time value, final JsonGenerator jgen, final SerializerProvider provider)
+      throws IOException
+  {
+    jgen.writeNumber(value.toSecondsI());
   }
 }

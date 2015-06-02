@@ -597,7 +597,8 @@ public class DefaultSecuritySystem
     return userManagers.values();
   }
 
-  private UserManager getUserManager(final String source) throws NoSuchUserManagerException {
+  @Override
+  public UserManager getUserManager(final String source) throws NoSuchUserManagerException {
     if (!userManagers.containsKey(source)) {
       throw new NoSuchUserManagerException(source);
     }

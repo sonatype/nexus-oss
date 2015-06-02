@@ -71,8 +71,17 @@ public class HttpClientConfiguration
 
   public HttpClientConfiguration copy() {
     try {
-      // FIXME: Address deep clone
-      return (HttpClientConfiguration) clone();
+      HttpClientConfiguration copy = (HttpClientConfiguration) clone();
+      if (connection != null) {
+        copy.connection = connection.copy();
+      }
+      if (proxy != null) {
+        copy.proxy = proxy.copy();
+      }
+      if (authentication != null) {
+        copy.authentication = authentication.copy();
+      }
+      return copy;
     }
     catch (CloneNotSupportedException e) {
       throw Throwables.propagate(e);

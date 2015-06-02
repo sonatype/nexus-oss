@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 
+import javax.annotation.Nonnull;
 import javax.inject.Named;
 
 import com.sonatype.nexus.repository.nuget.internal.ComponentQuery.Builder;
@@ -30,7 +31,6 @@ import com.sonatype.nexus.repository.nuget.odata.ODataTemplates;
 import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
@@ -50,6 +50,7 @@ import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
+import org.sonatype.nexus.repository.view.payloads.StreamPayload.InputStreamSupplier;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
@@ -90,8 +91,6 @@ public class NugetGalleryFacetImpl
     extends FacetSupport
     implements NugetGalleryFacet
 {
-  public static final String NUGET = "nuget";
-
   public static final String WITH_NAMESPACES =
       " xmlns:d=\"http://schemas.microsoft.com/ado/2007/08/dataservices\" " +
           "xmlns:m=\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\" xmlns=\"http://www.w3.org/2005/Atom\"";
@@ -304,7 +303,7 @@ public class NugetGalleryFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void put(final InputStream inputStream) throws IOException, NugetPackageException {
-    String componentId = null;
+    String componentId;
 
     try (StorageTx storageTx = openStorageTx();
          TempStreamSupplier tempStream = new TempStreamSupplier(inputStream)) {
@@ -317,16 +316,14 @@ public class NugetGalleryFacetImpl
 
       recordMetadata.putAll(packageMetadata);
 
-      // TODO: Do something cleaner with this derived data, as well as the derived stuff inside createOrUpdateComponent
-      // Note: These are defaults that hold for locally-published packages,
-      // but should be overridden for remotely fetched content
+      // Add time-related metadata, not present in the .nuspec
       final String creationTime = ODataFeedUtils.datetime(clock.millis());
       recordMetadata.put(CREATED, creationTime);
       recordMetadata.put(LAST_UPDATED, creationTime);
       recordMetadata.put(PUBLISHED, creationTime);
-      Component component;
+
       try (InputStream in = tempStream.get()) {
-        component = createOrUpdatePackageAndContents(storageTx, recordMetadata, in);
+        createOrUpdatePackageAndContents(storageTx, recordMetadata, in);
       }
 
       componentId = recordMetadata.get(ID);
@@ -343,7 +340,7 @@ public class NugetGalleryFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public Payload get(String id, String version) throws IOException {
+  public Payload get(final String id, final String version) throws IOException {
     checkNotNull(id);
     checkNotNull(version);
 
@@ -354,10 +351,20 @@ public class NugetGalleryFacetImpl
       }
       Asset asset = tx.firstAsset(component);
 
-      Blob blob = tx.requireBlob(asset.requireBlobRef());
+      final Blob blob = tx.requireBlob(asset.requireBlobRef());
       String contentType = asset.contentType();
 
-      return new StreamPayload(blob.getInputStream(), blob.getMetrics().getContentSize(), contentType);
+      return new StreamPayload(
+          new InputStreamSupplier() {
+            @Nonnull
+            @Override
+            public InputStream get() throws IOException {
+              return blob.getInputStream();
+            }
+          },
+          blob.getMetrics().getContentSize(),
+          contentType
+      );
     }
   }
 
@@ -371,8 +378,9 @@ public class NugetGalleryFacetImpl
       if (component == null) {
         return null;
       }
+      Asset asset = tx.firstAsset(component);
 
-      final NestedAttributesMap nugetAttributes = component.formatAttributes();
+      final NestedAttributesMap nugetAttributes = asset.formatAttributes();
       Date date = nugetAttributes.get(P_LAST_UPDATED, Date.class);
       return new DateTime(checkNotNull(date));
     }
@@ -471,7 +479,7 @@ public class NugetGalleryFacetImpl
   }
 
   private String blobName(Component component) {
-    return component.name() + " " + component.requireVersion() + "@" + getRepository().getName();
+    return component.name() + "-" + component.requireVersion() + ".nupkg";
   }
 
   /**
@@ -531,17 +539,17 @@ public class NugetGalleryFacetImpl
                                               final Component component, final InputStream in,
                                               final Map<String, String> data)
   {
-    Asset asset = findOrCreateAsset(storageTx, component);
-    updateAssetMetadata(asset, data, component.isNew());
-    attachBlob(storageTx, component, asset, in);
-    storageTx.saveAsset(asset);
-  }
+    try {
+      Asset asset = findOrCreateAsset(storageTx, component);
+      updateAssetMetadata(asset, data, component.isNew());
 
-  private void attachBlob(final StorageTx storageTx, final Component component, final Asset asset, final InputStream in)
-  {
-    final ImmutableMap<String, String> headers = ImmutableMap
-        .of(BlobStore.BLOB_NAME_HEADER, blobName(component), BlobStore.CREATED_BY_HEADER, "unknown");
-    storageTx.setBlob(in, headers, asset, singletonList(HashAlgorithm.SHA512), "application/zip");
+      storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
+
+      storageTx.saveAsset(asset);
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   private String checkVersion(String stringValue) {
@@ -600,6 +608,7 @@ public class NugetGalleryFacetImpl
 
     final Date now = new Date(clock.millis());
     if (!republishing && isRepoAuthoritative()) {
+      // This is the first insertion into a hosted repository
       storedMetadata.set(P_CREATED, now);
       storedMetadata.set(P_PUBLISHED, now);
     }
@@ -607,6 +616,9 @@ public class NugetGalleryFacetImpl
       storedMetadata.set(P_CREATED, ODataUtils.toDate(incomingMetadata.get(CREATED)));
       storedMetadata.set(P_PUBLISHED, ODataUtils.toDate(incomingMetadata.get(PUBLISHED)));
     }
+
+    final String lastUpdated = incomingMetadata.get(LAST_UPDATED);
+    storedMetadata.set(P_LAST_UPDATED, lastUpdated == null ? new Date() : ODataUtils.toDate(lastUpdated));
 
     // Populate keywords for case-insensitive search
     Joiner joiner = Joiner.on(" ").skipNulls();

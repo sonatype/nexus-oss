@@ -17,6 +17,7 @@ import javax.validation.Valid;
 
 import org.sonatype.nexus.validation.constraint.PortNumber;
 
+import com.google.common.base.Throwables;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
@@ -70,6 +71,19 @@ public class ProxyServerConfiguration
 
   public void setAuthentication(@Nullable final AuthenticationConfiguration authentication) {
     this.authentication = authentication;
+  }
+
+  public ProxyServerConfiguration copy() {
+    try {
+      ProxyServerConfiguration copy = (ProxyServerConfiguration)clone();
+      if (authentication != null) {
+        copy.authentication = authentication.copy();
+      }
+      return copy;
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override

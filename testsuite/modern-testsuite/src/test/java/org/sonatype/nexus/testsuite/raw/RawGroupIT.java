@@ -25,6 +25,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
@@ -71,7 +72,7 @@ public class RawGroupIT
     File testFile = resolveTestFile(TEST_CONTENT);
     hosted1.put(TEST_PATH, testFile);
 
-    assertThat(groupClient.getBytes(TEST_PATH), is(Files.toByteArray(testFile)));
+    assertThat(bytes(groupClient.get(TEST_PATH)), is(Files.toByteArray(testFile)));
   }
 
   /**
@@ -83,7 +84,7 @@ public class RawGroupIT
     hosted1.put(TEST_PATH, testFile);
     hosted2.put(TEST_PATH, resolveTestFile(TEST_CONTENT2));
 
-    assertThat(groupClient.getBytes(TEST_PATH), is(Files.toByteArray(testFile)));
+    assertThat(bytes(groupClient.get(TEST_PATH)), is(Files.toByteArray(testFile)));
   }
 
   /**
@@ -96,6 +97,6 @@ public class RawGroupIT
     // Only the second repository has any content
     hosted2.put(TEST_PATH, resolveTestFile(TEST_CONTENT));
 
-    assertThat(groupClient.getBytes(TEST_PATH), is(Files.toByteArray(testFile)));
+    assertThat(bytes(groupClient.get(TEST_PATH)), is(Files.toByteArray(testFile)));
   }
 }

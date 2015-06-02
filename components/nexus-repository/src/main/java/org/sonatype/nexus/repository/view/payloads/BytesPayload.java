@@ -34,7 +34,7 @@ public class BytesPayload
 
   private final String contentType;
 
-  public BytesPayload(final byte[] content, final @Nullable String contentType) {
+  public BytesPayload(final byte[] content, @Nullable final String contentType) {
     this.content = checkNotNull(content);
     this.contentType = contentType;
   }

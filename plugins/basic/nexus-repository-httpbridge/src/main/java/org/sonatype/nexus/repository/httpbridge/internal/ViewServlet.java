@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repository.httpbridge.internal;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.Enumeration;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -28,13 +28,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescribeType;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.Description;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionHelper;
 import org.sonatype.nexus.repository.httpbridge.internal.describe.DescriptionRenderer;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.ViewFacet;
@@ -68,27 +68,23 @@ public class ViewServlet
 
   private final RepositoryManager repositoryManager;
 
-  private final Map<String, HttpResponseSender> responseSenders;
+  private final HttpResponseSenderSelector httpResponseSenderSelector;
 
   private final DescriptionHelper descriptionHelper;
 
   private final DescriptionRenderer descriptionRenderer;
 
-  private final DefaultHttpResponseSender defaultHttpResponseSender;
-
   @Inject
   public ViewServlet(final RepositoryManager repositoryManager,
-                     final Map<String, HttpResponseSender> responseSenders,
-                     final DefaultHttpResponseSender defaultHttpResponseSender,
+                     final HttpResponseSenderSelector httpResponseSenderSelector,
                      final DescriptionHelper descriptionHelper,
                      final DescriptionRenderer descriptionRenderer)
   {
 
     this.repositoryManager = checkNotNull(repositoryManager);
-    this.responseSenders = checkNotNull(responseSenders);
+    this.httpResponseSenderSelector = checkNotNull(httpResponseSenderSelector);
     this.descriptionHelper = checkNotNull(descriptionHelper);
     this.descriptionRenderer = checkNotNull(descriptionRenderer);
-    this.defaultHttpResponseSender = checkNotNull(defaultHttpResponseSender);
   }
 
   @Override
@@ -160,8 +156,33 @@ public class ViewServlet
     log.debug("Dispatching to view facet: {}", facet);
 
     // Dispatch the request
-    final HttpRequestAdapter request = new HttpRequestAdapter(httpRequest, path.getRemainingPath());
-    dispatchAndSend(request, facet, sender(repo), httpResponse);
+    Request request = buildRequest(httpRequest, path.getRemainingPath());
+    dispatchAndSend(request, facet, httpResponseSenderSelector.sender(repo), httpResponse);
+  }
+
+  /**
+   * Build view request from {@link HttpServletRequest}.
+   */
+  private Request buildRequest(final HttpServletRequest httpRequest, final String path) {
+    Request.Builder builder = new Request.Builder()
+        .headers(new HttpHeadersAdapter(httpRequest))
+        .action(httpRequest.getMethod())
+        .path(path)
+        .parameters(new HttpParametersAdapter(httpRequest))
+        .payload(new HttpRequestPayloadAdapter(httpRequest));
+
+    if (HttpPartIteratorAdapter.isMultipart(httpRequest)) {
+      builder.multiparts(new HttpPartIteratorAdapter(httpRequest));
+    }
+
+    // copy http-servlet-request attributes
+    Enumeration<String> attributes = httpRequest.getAttributeNames();
+    while (attributes.hasMoreElements()) {
+      String name = attributes.nextElement();
+      builder.attribute(name, httpRequest.getAttribute(name));
+    }
+
+    return builder.build();
   }
 
   @VisibleForTesting
@@ -213,11 +234,11 @@ public class ViewServlet
     switch (type) {
       case HTML: {
         String html = descriptionRenderer.renderHtml(description);
-        return HttpResponses.ok(new StringPayload(html, Charsets.UTF_8, "text/html"));
+        return HttpResponses.ok(new StringPayload(html, Charsets.UTF_8, ContentTypes.TEXT_HTML));
       }
       case JSON: {
         String json = descriptionRenderer.renderJson(description);
-        return HttpResponses.ok(new StringPayload(json, Charsets.UTF_8, "application/json"));
+        return HttpResponses.ok(new StringPayload(json, Charsets.UTF_8, ContentTypes.APPLICATION_JSON));
       }
       default:
         throw new RuntimeException("Invalid describe-type: " + type);
@@ -230,10 +251,10 @@ public class ViewServlet
    * Needed in a few places _before_ we have a repository instance to determine its specific sender.
    */
   @VisibleForTesting
-  void send(final @Nullable Request request, final Response response, final HttpServletResponse httpResponse)
+  void send(@Nullable final Request request, final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
-    defaultHttpResponseSender.send(request, response, httpResponse);
+    httpResponseSenderSelector.defaultSender().send(request, response, httpResponse);
   }
 
   /**
@@ -256,20 +277,5 @@ public class ViewServlet
   private Repository repository(final String name) {
     log.debug("Looking for repository: {}", name);
     return repositoryManager.get(name);
-  }
-
-  /**
-   * Find sender for repository format.
-   *
-   * If no format-specific sender is configured, the default is used.
-   */
-  private HttpResponseSender sender(final Repository repository) {
-    String format = repository.getFormat().getValue();
-    log.debug("Looking for HTTP response sender: {}", format);
-    HttpResponseSender sender = responseSenders.get(format);
-    if (sender == null) {
-      return defaultHttpResponseSender;
-    }
-    return sender;
   }
 }
