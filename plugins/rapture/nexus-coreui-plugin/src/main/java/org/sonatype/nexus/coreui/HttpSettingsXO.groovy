@@ -30,10 +30,8 @@ class HttpSettingsXO
   /**
    * Timeout seconds.
    */
-
-  @Min(0L)
-  @Max(3600L)
-  // 1 hour
+  @Min(1L)
+  @Max(3600L) // 1 hour
   Integer timeout
 
   @Min(0L)
