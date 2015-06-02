@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Request;
@@ -24,7 +25,7 @@ import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
- * Handler which will forward current request to {@code <request.path>/index.html}.
+ * Handler which will forward current request to {@code <request.path>/index.html} or {@code <request.path>/index.htm}.
  *
  * @since 3.0
  */
@@ -34,24 +35,41 @@ public class IndexHtmlForwardHandler
     extends ComponentSupport
     implements Handler
 {
+  private static final String[] INDEX_FILES = {
+      "index.html",
+      "index.htm"
+  };
+
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
-    Request original = context.getRequest();
-
-    String path = original.getPath();
+    String path = context.getRequest().getPath();
 
     // sanity, to ensure we don't corrupt the path
     if (!path.endsWith("/")) {
       path = path + "/";
     }
-    path = path + "index.html";
+
+    for (String file : INDEX_FILES) {
+      Response response = forward(context, path + file);
+      if (response.getStatus().isSuccessful()) {
+        return response;
+      }
+    }
+
+    return HttpResponses.notFound();
+  }
+
+  private Response forward(final Context context, final String path) throws Exception {
+    log.trace("Forwarding request to path: {}", path);
 
     Request request = new Request.Builder()
-        .copy(original)
+        .copy(context.getRequest())
         .path(path)
         .build();
 
-    return context.getRepository().facet(ViewFacet.class).dispatch(request);
+    return context.getRepository()
+        .facet(ViewFacet.class)
+        .dispatch(request);
   }
 }

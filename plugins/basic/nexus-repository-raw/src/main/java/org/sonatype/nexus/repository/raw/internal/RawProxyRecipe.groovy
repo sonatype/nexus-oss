@@ -36,9 +36,7 @@ import org.sonatype.nexus.repository.view.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
-import org.sonatype.nexus.repository.view.handlers.IndexHtmlForwardHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
-import org.sonatype.nexus.repository.view.matchers.SuffixMatcher
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
@@ -86,9 +84,6 @@ class RawProxyRecipe
   TimingHandler timingHandler
 
   @Inject
-  IndexHtmlForwardHandler indexHtmlForwardHandler
-
-  @Inject
   SecurityHandler securityHandler
 
   @Inject
@@ -124,13 +119,6 @@ class RawProxyRecipe
    */
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
-
-    builder.route(new Route.Builder()
-        .matcher(new SuffixMatcher('/', false))
-        .handler(timingHandler)
-        .handler(indexHtmlForwardHandler)
-        .create()
-    )
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher('/{name:.+}'))
