@@ -81,7 +81,7 @@ public class NugetGalleryFacetImplGetTest
     doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
     when(tx.firstAsset(component)).thenReturn(asset);
     when(asset.contentType()).thenReturn(contentType);
-    when(asset.requireBlobRef()).thenReturn(blobRef);
+    when(asset.blobRef()).thenReturn(blobRef);
     when(tx.requireBlob(eq(blobRef))).thenReturn(blob);
     when(blob.getInputStream()).thenReturn(blobStream);
 
