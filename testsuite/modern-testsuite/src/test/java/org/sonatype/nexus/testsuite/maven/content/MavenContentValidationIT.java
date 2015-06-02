@@ -28,6 +28,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +37,8 @@ import org.ops4j.pax.exam.options.WrappedUrlProvisionOption.OverwriteMode;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -81,6 +84,7 @@ public class MavenContentValidationIT
   @Before
   public void prepare() throws Exception {
     upstream = Server.withPort(0)
+        // Abbot
         .serve("/abbot/abbot/0.13.0/abbot-0.13.0.pom").withBehaviours(Behaviours.content(
             "<project>\n" +
                 "  <modelVersion>4.0.0</modelVersion>\n" +
@@ -97,7 +101,7 @@ public class MavenContentValidationIT
             "text/plain"))
 
         .serve("/abbot/abbot/0.13.0/abbot-0.13.0.jar").withBehaviours(Behaviours.content(
-            EMPTY_ZIP, "application/zip"))
+            EMPTY_ZIP, "application/java-archive"))
         .serve("/abbot/abbot/0.13.0/abbot-0.13.0.jar.asc").withBehaviours(Behaviours.content(
             "-----BEGIN PGP SIGNATURE-----\n" +
                 "Version: GnuPG v1\n" +
@@ -127,11 +131,40 @@ public class MavenContentValidationIT
             "text/plain"))
         .serve("/abbot/abbot/0.13.0/maven-metadata.xml.md5").withBehaviours(Behaviours.content(
             "a07b6cf5ab281542eee0425117a79234  ./abbot/abbot/0.13.0/maven-metadata.xml", "text/plain"))
+
+            // Bad Abbot
+        .serve("/badabbot/abbot/0.13.0/abbot-0.13.0.pom").withBehaviours(Behaviours.content(
+            EMPTY_ZIP, "text/xml"))
+        .serve("/badabbot/abbot/0.13.0/abbot-0.13.0.jar").withBehaviours(Behaviours.content(
+            "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head>\n" +
+                "  <title>Hi there</title>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "  This is a page\n" +
+                "  a simple page\n" +
+                "</body>\n" +
+                "</html>", "application/java-archive"))
+        .serve("/badabbot/abbot/0.13.0/maven-metadata.xml").withBehaviours(Behaviours.content(
+            "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head>\n" +
+                "  <title>Hi there</title>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "  This is a page\n" +
+                "  a simple page\n" +
+                "</body>\n" +
+                "</html>", "text/xml"))
+        .serve("/badabbot/abbot/0.13.0/maven-metadata.xml.sha1").withBehaviours(Behaviours.content(
+            "This is not a hash, this is rubbish declared as XML", "text/xml"))
         .start();
 
     Repository repo = repositoryManager.get("maven-central");
     assertThat(repo, notNullValue());
     Configuration mavenCentralConfiguration = repo.getConfiguration();
+    mavenCentralConfiguration.attributes("storage").set("strictContentTypeValidation", Boolean.TRUE.toString());
     mavenCentralConfiguration.attributes("proxy").set("remoteUrl", "http://localhost:" + upstream.getPort() + "/");
     mavenCentral = repositoryManager.update(mavenCentralConfiguration);
 
@@ -149,27 +182,43 @@ public class MavenContentValidationIT
   }
 
   @Test
-  public void fetchPomVia() throws Exception {
-    // Note: upstream server uses different MIME types. but Maven repo after validation enforces layout types!
-    get("abbot/abbot/0.13.0/abbot-0.13.0.pom", "application/xml");
-    get("abbot/abbot/0.13.0/abbot-0.13.0.pom.sha1", "text/plain");
-    get("abbot/abbot/0.13.0/abbot-0.13.0.pom.md5", "text/plain");
-    get("abbot/abbot/0.13.0/abbot-0.13.0.jar", "application/java-archive");
-    get("abbot/abbot/0.13.0/abbot-0.13.0.jar.asc", "application/pgp-signature");
-    get("abbot/abbot/0.13.0/abbot-0.13.0.jar.sha1", "text/plain");
-    get("abbot/abbot/0.13.0/abbot-0.13.0.jar.md5", "text/plain");
-    get("abbot/abbot/0.13.0/maven-metadata.xml", "application/xml");
-    get("abbot/abbot/0.13.0/maven-metadata.xml.sha1", "text/plain");
-    get("abbot/abbot/0.13.0/maven-metadata.xml.md5", "text/plain");
+  public void positiveTestWithLayoutOverrides() throws Exception {
+    // Note: upstream server uses different MIME types (imitates Central), but Maven repo after validation enforces layout types!
+    get200("abbot/abbot/0.13.0/abbot-0.13.0.pom", "application/xml");
+    get200("abbot/abbot/0.13.0/abbot-0.13.0.pom.sha1", "text/plain");
+    get200("abbot/abbot/0.13.0/abbot-0.13.0.pom.md5", "text/plain");
+    get200("abbot/abbot/0.13.0/abbot-0.13.0.jar", "application/java-archive");
+    get200("abbot/abbot/0.13.0/abbot-0.13.0.jar.asc", "application/pgp-signature");
+    get200("abbot/abbot/0.13.0/abbot-0.13.0.jar.sha1", "text/plain");
+    get200("abbot/abbot/0.13.0/abbot-0.13.0.jar.md5", "text/plain");
+    get200("abbot/abbot/0.13.0/maven-metadata.xml", "application/xml");
+    get200("abbot/abbot/0.13.0/maven-metadata.xml.sha1", "text/plain");
+    get200("abbot/abbot/0.13.0/maven-metadata.xml.md5", "text/plain");
     // TODO: nexus log should contain in DEBUG:
     // "Content /abbot/abbot/0.13.0/abbot-0.13.0.pom declared as text/xml, determined as application/xml"
     // Confirming Maven Format overrode upstream server preference
   }
 
-  private void get(final String path, final String contentType) throws Exception {
+  @Test
+  public void negativeTest() throws Exception {
+    // Note: upstream server uses different MIME types (imitates Central), but Maven repo after validation enforces layout types!
+    get404("badabbot/abbot/0.13.0/abbot-0.13.0.pom", allOf(containsString("Detected content type"), containsString("expected [application/xml")));
+    get404("badabbot/abbot/0.13.0/abbot-0.13.0.jar", allOf(containsString("Detected content type"), containsString("expected [application/java-archive")));
+    get404("badabbot/abbot/0.13.0/maven-metadata.xml", allOf(containsString("Detected content type"), containsString("expected [application/xml")));
+    get404("badabbot/abbot/0.13.0/maven-metadata.xml.sha1", containsString("Not a Maven2 digest"));
+  }
+
+  private void get200(final String path, final String contentType) throws Exception {
     HttpResponse response = client.get(path);
     assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
     assertThat(response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue(), equalTo(contentType));
     EntityUtils.consume(response.getEntity());
+  }
+
+  private void get404(final String path, final Matcher<String> errorPageMatcher) throws Exception {
+    HttpResponse response = client.get(path);
+    assertThat(response.getStatusLine().getStatusCode(), equalTo(404));
+    String errorPage = EntityUtils.toString(response.getEntity());
+    assertThat(errorPage, errorPageMatcher);
   }
 }
