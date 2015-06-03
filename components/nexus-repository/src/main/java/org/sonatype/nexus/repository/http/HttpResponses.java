@@ -155,6 +155,16 @@ public class HttpResponses
     return serviceUnavailable(null);
   }
 
+  public static Response badGateway(final @Nullable String message) {
+    return new Response.Builder()
+        .status(Status.failure(BAD_GATEWAY, message))
+        .build();
+  }
+
+  public static Response badGateway() {
+    return badGateway(null);
+  }
+
   public static Response notImplemented(final @Nullable String message) {
     return new Response.Builder()
         .status(Status.failure(NOT_IMPLEMENTED, message))

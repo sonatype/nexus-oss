@@ -273,7 +273,7 @@ public abstract class ProxyFacetSupport
   protected abstract void indicateUpToDate(final Context context) throws IOException;
 
   /**
-   * Provide the relative URL to the
+   * Provide the relative URL of the content to the repository root.
    */
   protected abstract String getUrl(final @Nonnull Context context);
 
