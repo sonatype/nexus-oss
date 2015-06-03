@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.maven.internal.DigestExtractor;
 import org.sonatype.nexus.repository.storage.ContentValidator;
@@ -54,15 +55,16 @@ public class Maven2ContentValidator
   @Override
   public String determineContentType(boolean strictContentTypeValidation,
                                      Supplier<InputStream> contentSupplier,
+                                     @Nullable MimeRulesSource mimeRulesSource,
                                      @Nullable String contentName,
                                      @Nullable String declaredContentType) throws IOException
   {
     if (contentName != null) {
       if (contentName.endsWith(".pom")) {
-        // hint to MimeSupport it's actually XML file
-        return defaultContentValidator
-            .determineContentType(strictContentTypeValidation, contentSupplier, contentName + ".xml",
-                declaredContentType);
+        // Note: this is due fact that Tika has glob "*.pom" extension enlisted at text/plain
+        return defaultContentValidator.determineContentType(
+            strictContentTypeValidation, contentSupplier, mimeRulesSource, contentName + ".xml", declaredContentType
+        );
       }
       else if (contentName.endsWith(".sha1") || contentName.endsWith(".md5")) {
         // hashes are small/simple, do it directly
@@ -76,7 +78,7 @@ public class Maven2ContentValidator
     }
     // everything else goes to default for now
     return defaultContentValidator.determineContentType(
-        strictContentTypeValidation, contentSupplier, contentName, declaredContentType
+        strictContentTypeValidation, contentSupplier, mimeRulesSource, contentName, declaredContentType
     );
   }
 }

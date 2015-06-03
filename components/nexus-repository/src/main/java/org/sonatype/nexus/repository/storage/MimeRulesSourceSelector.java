@@ -19,48 +19,46 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Content validator selector component.
+ * MIME rules source selector component.
  *
  * @since 3.0
  */
 @Singleton
 @Named
-public class ContentValidatorSelector
+public class MimeRulesSourceSelector
     extends ComponentSupport
 {
-  private final Map<String, ContentValidator> contentValidators;
-
-  private final DefaultContentValidator defaultContentValidator;
+  private final Map<String, MimeRulesSource> mimeRulesSources;
 
   @Inject
-  public ContentValidatorSelector(final Map<String, ContentValidator> contentValidators,
-                                  final DefaultContentValidator defaultContentValidator)
+  public MimeRulesSourceSelector(final Map<String, MimeRulesSource> mimeRulesSources)
   {
-    this.contentValidators = checkNotNull(contentValidators);
-    this.defaultContentValidator = checkNotNull(defaultContentValidator);
+    this.mimeRulesSources = checkNotNull(mimeRulesSources);
   }
 
   /**
-   * Find content validator for given repository. If no format-specific validator is configured, the default is used.
+   * Find MIME rule source for given repository. If no format-specific source is configured, {@link
+   * MimeRulesSource#NOOP} is returned.
    *
-   * @param repository The repository for content validator is looked up.
-   * @return the repository specific content validator to be used, or the default content validator, never {@code null}.
+   * @param repository The repository for MIME rule source is looked up.
+   * @return the repository specific MIME rule source, or noop rule selector.
    */
   @Nonnull
-  public ContentValidator validator(final Repository repository) {
+  public MimeRulesSource ruleSource(final Repository repository) {
     checkNotNull(repository);
     String format = repository.getFormat().getValue();
-    log.trace("Looking for content validator for format: {}", format);
-    ContentValidator contentValidator = contentValidators.get(format);
-    if (contentValidator == null) {
-      return defaultContentValidator;
+    log.trace("Looking for MIME rule source for format: {}", format);
+    MimeRulesSource mimeRulesSource = mimeRulesSources.get(format);
+    if (mimeRulesSource != null) {
+      return mimeRulesSource;
     }
-    return contentValidator;
+    return MimeRulesSource.NOOP;
   }
 }

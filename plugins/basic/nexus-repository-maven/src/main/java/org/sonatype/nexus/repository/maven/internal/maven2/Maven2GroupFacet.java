@@ -155,7 +155,7 @@ public class Maven2GroupFacet
     final Content content = new Content(
         new BytesPayload(
             byteArray,
-            Constants.METADATA_CONTENT_TYPE
+            Maven2MimeRulesSource.METADATA_TYPE
         ));
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
     content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}");

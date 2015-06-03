@@ -14,20 +14,22 @@ package org.sonatype.nexus.mime.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.mime.MimeRule;
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.mime.NexusMimeTypes;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -84,7 +86,7 @@ public class DefaultMimeSupport
               throws Exception
           {
             final List<String> detected = Lists.newArrayList();
-            final NexusMimeTypes.NexusMimeType mimeType = nexusMimeTypes.getMimeTypes(key);
+            final MimeRule mimeType = nexusMimeTypes.getMimeRuleForExtension(key);
             if (mimeType != null) {
               // add Nexus matches first
               detected.addAll(mimeType.getMimetypes());
@@ -97,49 +99,43 @@ public class DefaultMimeSupport
             metadata.set(Metadata.RESOURCE_NAME_KEY, "dummy." + key);
             MediaType mediaType = detector.detect(null, metadata);
             // unravel to least specific
-            while (mediaType != null) {
-              detected.add(mediaType.getBaseType().toString());
-              mediaType = tikaConfig.getMediaTypeRegistry().getSupertype(mediaType);
-            }
+            unravel(detected, mediaType);
             return detected;
           }
         });
   }
 
+  @Nonnull
   @Override
-  public String guessMimeTypeFromPath(final MimeRulesSource mimeRulesSource, final String path) {
-    if (mimeRulesSource != null) {
-      final String hardRule = mimeRulesSource.getRuleForPath(path);
-      if (!Strings.isNullOrEmpty(hardRule)) {
-        return hardRule;
+  public String guessMimeTypeFromPath(final String path, final MimeRulesSource... mimeRulesSources) {
+    return guessMimeTypesListFromPath(path, mimeRulesSources).get(0);
+  }
+
+  @Nonnull
+  @Override
+  public List<String> guessMimeTypesListFromPath(final String path, final MimeRulesSource... mimeRulesSources) {
+    checkNotNull(path);
+    List<String> mimeTypes = new ArrayList<>();
+    for (MimeRulesSource mimeRulesSource : mimeRulesSources) {
+      final MimeRule mimeRule = mimeRulesSource.getRuleForName(path);
+      if (mimeRule != null) {
+        mimeTypes.addAll(mimeRule.getMimetypes());
+        if (mimeRule.isOverride()) {
+          return mimeTypes;
+        }
       }
     }
-    return guessMimeTypeFromPath(path);
+    mimeTypes.addAll(guessMimeTypesListFromPath(path));
+    return mimeTypes;
   }
 
+  @Nonnull
   @Override
-  public String guessMimeTypeFromPath(final String path) {
-    final List<String> mimeTypes = guessMimeTypesListFromPath(path);
-    if (mimeTypes.isEmpty()) {
-      // what here?
-      return MimeTypes.OCTET_STREAM;
-    }
-    else {
-      return mimeTypes.get(0);
-    }
+  public String detectMimeType(final InputStream input, @Nullable final String fileName) throws IOException {
+    return detectMimeTypes(input, fileName).get(0);
   }
 
-  @Override
-  public List<String> guessMimeTypesListFromPath(final String path) {
-    final String pathExtension = Files.getFileExtension(path);
-    try {
-      return extensionToMimeTypeCache.get(pathExtension);
-    }
-    catch (ExecutionException e) {
-      throw Throwables.propagate(e);
-    }
-  }
-
+  @Nonnull
   @Override
   public List<String> detectMimeTypes(final InputStream input, @Nullable final String fileName) throws IOException {
     checkNotNull(input);
@@ -156,22 +152,51 @@ public class DefaultMimeSupport
     }
 
     // unravel to least specific
-    while (mediaType != null) {
-      detected.add(mediaType.getBaseType().toString());
-      mediaType = tikaConfig.getMediaTypeRegistry().getSupertype(mediaType);
+    unravel(detected, mediaType);
+
+    if (detected.isEmpty()) {
+      detected.add(MimeTypes.OCTET_STREAM);
     }
 
     return detected;
   }
 
-  @Override
-  public String detectMimeType(final InputStream input, @Nullable final String fileName) throws IOException {
-    List<String> detected = detectMimeTypes(input, fileName);
-    if (detected.isEmpty()) {
-      return MimeTypes.OCTET_STREAM;
+  /**
+   * Uses extension to mime types cache backed by {@link NexusMimeTypes} and Tika registry.
+   */
+  @Nonnull
+  private List<String> guessMimeTypesListFromPath(final String path) {
+    checkNotNull(path);
+    final String pathExtension = Files.getFileExtension(path);
+    try {
+      final List<String> mimeTypes = new ArrayList<>();
+      List<String> extBasedTypes = extensionToMimeTypeCache.get(pathExtension);
+      if (extBasedTypes != null && !extBasedTypes.isEmpty()) {
+        mimeTypes.addAll(extBasedTypes);
+      }
+      if (mimeTypes.isEmpty()) {
+        mimeTypes.add(MimeTypes.OCTET_STREAM);
+      }
+      return mimeTypes;
     }
-    else {
-      return detected.get(0);
+    catch (ExecutionException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  /**
+   * Unravels media type by aliases and supertype recursively.
+   */
+  private void unravel(final List<String> detected, final MediaType mt) {
+    detected.add(mt.getBaseType().toString());
+    // add aliases, for example "application/xml" type has "text/xml" alias
+    for (MediaType alias : tikaConfig.getMediaTypeRegistry().getAliases(mt)) {
+      detected.add(alias.getBaseType().toString());
+    }
+    // add super types if augmented with "+suffix"
+    // Note: Tika supports +xml and +zip only
+    if (mt.getSubtype().endsWith("+xml") || mt.getSubtype().endsWith("+zip")) {
+      detected.add(tikaConfig.getMediaTypeRegistry().getSupertype(mt).toString());
     }
   }
 }

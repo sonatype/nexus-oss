@@ -69,6 +69,8 @@ public class StorageFacetImpl
 
   private final ContentValidatorSelector contentValidatorSelector;
 
+  private final MimeRulesSourceSelector mimeRulesSourceSelector;
+
   private final List<Supplier<StorageTxHook>> hookSuppliers;
 
   @VisibleForTesting
@@ -108,7 +110,8 @@ public class StorageFacetImpl
                           final ComponentEntityAdapter componentEntityAdapter,
                           final AssetEntityAdapter assetEntityAdapter,
                           final ClientInfoProvider clientInfoProvider,
-                          final ContentValidatorSelector contentValidatorSelector)
+                          final ContentValidatorSelector contentValidatorSelector,
+                          final MimeRulesSourceSelector mimeRulesSourceSelector)
   {
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
@@ -118,6 +121,7 @@ public class StorageFacetImpl
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.clientInfoProvider = checkNotNull(clientInfoProvider);
     this.contentValidatorSelector = checkNotNull(contentValidatorSelector);
+    this.mimeRulesSourceSelector = checkNotNull(mimeRulesSourceSelector);
 
     this.hookSuppliers = new ArrayList<>();
     this.hookSuppliers.add(new Supplier<StorageTxHook>()
@@ -250,6 +254,7 @@ public class StorageFacetImpl
             assetEntityAdapter,
             config.strictContentTypeValidation,
             contentValidatorSelector.validator(getRepository()),
+            mimeRulesSourceSelector.ruleSource(getRepository()),
             new StorageTxHooks(hooks)
         )
     );

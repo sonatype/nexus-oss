@@ -32,6 +32,7 @@ import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuard;
 import org.sonatype.nexus.common.stateguard.StateGuardAware;
 import org.sonatype.nexus.common.stateguard.Transitions;
+import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.IllegalOperationException;
 import org.sonatype.nexus.repository.Repository;
@@ -90,6 +91,8 @@ public class StorageTxImpl
 
   private final ContentValidator contentValidator;
 
+  private final MimeRulesSource mimeRulesSource;
+
   private final StorageTxHook hook;
 
   public StorageTxImpl(final String createdBy,
@@ -104,6 +107,7 @@ public class StorageTxImpl
                        final AssetEntityAdapter assetEntityAdapter,
                        final boolean strictContentValidation,
                        final ContentValidator contentValidator,
+                       final MimeRulesSource mimeRulesSource,
                        final StorageTxHook hook)
   {
     this.createdBy = checkNotNull(createdBy);
@@ -118,6 +122,7 @@ public class StorageTxImpl
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.strictContentValidation = strictContentValidation;
     this.contentValidator = checkNotNull(contentValidator);
+    this.mimeRulesSource = checkNotNull(mimeRulesSource);
     this.hook = checkNotNull(hook);
 
     // This is only here for now to yell in case of nested TX
@@ -537,6 +542,7 @@ public class StorageTxImpl
     return contentValidator.determineContentType(
         strictContentValidation,
         inputStreamSupplier,
+        mimeRulesSource,
         blobName,
         declaredContentType
     );

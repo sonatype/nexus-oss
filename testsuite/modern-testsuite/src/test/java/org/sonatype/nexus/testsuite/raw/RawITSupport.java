@@ -12,9 +12,12 @@
  */
 package org.sonatype.nexus.testsuite.raw;
 
+import javax.inject.Inject;
 import javax.annotation.Nonnull;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.raw.internal.RawGroupRecipe;
@@ -22,6 +25,8 @@ import org.sonatype.nexus.repository.raw.internal.RawHostedRecipe;
 import org.sonatype.nexus.repository.raw.internal.RawProxyRecipe;
 import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport;
+
+import org.junit.Before;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
@@ -32,6 +37,14 @@ import static java.util.Arrays.asList;
 public class RawITSupport
     extends RepositoryTestSupport
 {
+  @Inject
+  protected LogManager logManager;
+
+  @Before
+  public void debugLoggingStorage() {
+    logManager.setLoggerLevel("org.sonatype.nexus.repository.storage", LoggerLevel.DEBUG);
+  }
+
   @Nonnull
   protected Configuration hostedConfig(final String name) {
     final Configuration config = new Configuration();
