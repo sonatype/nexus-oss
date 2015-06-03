@@ -111,8 +111,10 @@ public class NugetProxyFacet
 
   @Override
   protected String getUrl(final @Nonnull Context context) {
-    // Unnecessary to implement this, as we override fetch in a way that doesn't use it
-    throw new UnsupportedOperationException();
+    // This is only implemented for error-reporting purposes. It returns the Nexus
+    // URL for the content, rather than the remote one, as these can differ.
+    final String[] coords = coords(context);
+    return coords[0] + "/" + coords[1];
   }
 
   private NugetGalleryFacet gallery() {
