@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-@Named(ForceBaseUrlCapabilityDescriptor.TYPE_ID)
+@Named(BaseUrlCapabilityDescriptor.TYPE_ID)
 public class BaseUrlCapability
     extends CapabilitySupport<BaseUrlCapabilityConfiguration>
 {
