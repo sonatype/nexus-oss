@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 @Named
-class ContentValidatorSelector
+public class ContentValidatorSelector
     extends ComponentSupport
 {
   private final Map<String, ContentValidator> contentValidators;
@@ -56,7 +56,7 @@ class ContentValidatorSelector
   public ContentValidator validator(final Repository repository) {
     checkNotNull(repository);
     String format = repository.getFormat().getValue();
-    log.debug("Looking for content validator: {}", format);
+    log.trace("Looking for content validator for format: {}", format);
     ContentValidator contentValidator = contentValidators.get(format);
     if (contentValidator == null) {
       return defaultContentValidator;

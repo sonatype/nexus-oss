@@ -19,6 +19,7 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpStatus;
 
 import com.google.common.io.Files;
+import org.apache.http.entity.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,7 +50,7 @@ public class RawHostedIT
     final String path = "alphabet.txt";
 
     final File testFile = resolveTestFile(path);
-    final int response = rawClient.put(path, testFile);
+    final int response = rawClient.put(path, ContentType.TEXT_PLAIN, testFile);
     assertThat(response, is(HttpStatus.CREATED));
 
     assertThat(bytes(rawClient.get(path)), is(Files.toByteArray(testFile)));

@@ -41,8 +41,9 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.NEW;
-import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
+import static org.sonatype.nexus.repository.FacetSupport.State.INITIALISED;
+import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
+import static org.sonatype.nexus.repository.FacetSupport.State.STOPPED;
 
 /**
  * Default {@link StorageFacet} implementation.
@@ -68,6 +69,8 @@ public class StorageFacetImpl
 
   private final ContentValidatorSelector contentValidatorSelector;
 
+  private final MimeRulesSourceSelector mimeRulesSourceSelector;
+
   private final List<Supplier<StorageTxHook>> hookSuppliers;
 
   @VisibleForTesting
@@ -82,7 +85,7 @@ public class StorageFacetImpl
     @NotNull(groups = HostedType.ValidationGroup.class)
     public WritePolicy writePolicy;
 
-    public boolean strictContentTypeValidation = false;
+    public boolean strictContentTypeValidation = true;
 
     @Override
     public String toString() {
@@ -107,7 +110,8 @@ public class StorageFacetImpl
                           final ComponentEntityAdapter componentEntityAdapter,
                           final AssetEntityAdapter assetEntityAdapter,
                           final ClientInfoProvider clientInfoProvider,
-                          final ContentValidatorSelector contentValidatorSelector)
+                          final ContentValidatorSelector contentValidatorSelector,
+                          final MimeRulesSourceSelector mimeRulesSourceSelector)
   {
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
@@ -117,6 +121,7 @@ public class StorageFacetImpl
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.clientInfoProvider = checkNotNull(clientInfoProvider);
     this.contentValidatorSelector = checkNotNull(contentValidatorSelector);
+    this.mimeRulesSourceSelector = checkNotNull(mimeRulesSourceSelector);
 
     this.hookSuppliers = new ArrayList<>();
     this.hookSuppliers.add(new Supplier<StorageTxHook>()
@@ -183,14 +188,14 @@ public class StorageFacetImpl
   }
 
   @Override
-  @Guarded(by = NEW)
+  @Guarded(by = INITIALISED)
   public void registerHookSupplier(final Supplier<StorageTxHook> hookSupplier) {
     checkNotNull(hookSupplier);
     hookSuppliers.add(hookSupplier);
   }
 
   @Override
-  @Guarded(by = NEW)
+  @Guarded(by = INITIALISED)
   public void registerWritePolicySelector(final WritePolicySelector writePolicySelector) {
     checkNotNull(writePolicySelector);
     this.writePolicySelector = writePolicySelector;
@@ -207,6 +212,13 @@ public class StorageFacetImpl
   public StorageTx openTx(final ODatabaseDocumentTx db) {
     checkNotNull(db);
     return openStorageTx(db, true);
+  }
+
+  @Override
+  @Guarded(by = STOPPED)
+  public void unregisterHookSupplier(final Supplier<StorageTxHook> hookSupplier) {
+    checkNotNull(hookSupplier);
+    hookSuppliers.remove(hookSupplier);
   }
 
   /**
@@ -242,6 +254,7 @@ public class StorageFacetImpl
             assetEntityAdapter,
             config.strictContentTypeValidation,
             contentValidatorSelector.validator(getRepository()),
+            mimeRulesSourceSelector.ruleSource(getRepository()),
             new StorageTxHooks(hooks)
         )
     );

@@ -24,6 +24,7 @@ import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.ContentType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -40,12 +41,12 @@ public class RawClient
     super(httpClient, httpClientContext, repositoryBaseUri);
   }
 
-  public int put(final String path, final File file) throws Exception {
+  public int put(final String path, final ContentType contentType, final File file) throws Exception {
     checkNotNull(path);
     checkNotNull(file);
 
     HttpPut put = new HttpPut(repositoryBaseUri.resolve(path));
-    put.setEntity(EntityBuilder.create().setFile(file).build());
+    put.setEntity(EntityBuilder.create().setContentType(contentType).setFile(file).build());
 
     return status(execute(put));
   }

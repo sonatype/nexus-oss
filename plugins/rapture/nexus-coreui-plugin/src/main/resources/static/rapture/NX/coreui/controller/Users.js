@@ -263,8 +263,8 @@ Ext.define('NX.coreui.controller.Users', {
   },
 
   /**
-   * @private
-   * Load store for selected source.
+   * @override
+   * Override in order to filter users by selected source (user manager) and user id.
    */
   loadStore: function(cb) {
     var me = this,
@@ -284,10 +284,14 @@ Ext.define('NX.coreui.controller.Users', {
             { property: 'userId', value: me.getUserSearchBox().getValue() }
           ]
         },
-        callback: cb
+        callback: function(records, operation, success) {
+          if (Ext.isFunction(cb)) {
+            cb(records, operation, success);
+          }
+          me.reselect();
+        }
       });
     }
-    me.callParent();  // triggers transition between list/detail view
   },
 
   /**

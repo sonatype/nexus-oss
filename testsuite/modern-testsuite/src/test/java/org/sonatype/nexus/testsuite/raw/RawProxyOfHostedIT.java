@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpStatus;
 
 import com.google.common.io.Files;
+import org.apache.http.entity.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -72,7 +73,7 @@ public class RawProxyOfHostedIT
   @Test
   public void fetchFromRemote() throws Exception {
     final File testFile = resolveTestFile(TEST_CONTENT);
-    hostedClient.put(TEST_PATH, testFile);
+    hostedClient.put(TEST_PATH, ContentType.TEXT_PLAIN, testFile);
 
     assertThat(bytes(proxyClient.get(TEST_PATH)), is(Files.toByteArray(testFile)));
   }
@@ -83,7 +84,7 @@ public class RawProxyOfHostedIT
     proxyClient.get(TEST_PATH);
 
     // Put the file in the hosted repo
-    hostedClient.put(TEST_PATH, resolveTestFile(TEST_CONTENT));
+    hostedClient.put(TEST_PATH, ContentType.TEXT_PLAIN, resolveTestFile(TEST_CONTENT));
 
     // The NFC should ensure we still see the 404
     assertThat(status(proxyClient.get(TEST_PATH)), is(HttpStatus.NOT_FOUND));

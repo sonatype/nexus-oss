@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
+import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
@@ -60,7 +60,7 @@ public class NexusMimeTypes
 
   public static final String MIMETYPES_FILENAME = "nexus.mimetypes";
 
-  private Map<String, NexusMimeType> extensions = Maps.newHashMap();
+  private Map<String, MimeRule> extensions = Maps.newHashMap();
 
   public NexusMimeTypes() {
     load(BUILTIN_MIMETYPES_FILENAME);
@@ -108,12 +108,12 @@ public class NexusMimeTypes
         mimetypes.addAll(additional.get(extension));
         additional.remove(extension);
       }
-      this.extensions.put(extension, new NexusMimeType(true, extension, mimetypes));
+      this.extensions.put(extension, new MimeRule(true, mimetypes));
     }
 
     for (String extension : additional.keySet()) {
       final List<String> mimetypes = additional.get(extension);
-      this.extensions.put(extension, new NexusMimeType(false, extension, mimetypes));
+      this.extensions.put(extension, new MimeRule(false, mimetypes));
     }
   }
 
@@ -126,7 +126,12 @@ public class NexusMimeTypes
     }
   }
 
-  public NexusMimeType getMimeTypes(String extension) {
+  /**
+   * Method returning {@link MimeRule} for given extension (it must not contain leading dot!). If no rule exists, {@code
+   * null} is returned.
+   */
+  @Nullable
+  public MimeRule getMimeRuleForExtension(String extension) {
     while (!extension.isEmpty()) {
       if (extensions.containsKey(extension)) {
         return extensions.get(extension);
@@ -134,32 +139,5 @@ public class NexusMimeTypes
       extension = Files.getFileExtension(extension);
     }
     return null;
-  }
-
-  public class NexusMimeType
-  {
-    private boolean override;
-
-    private String extension;
-
-    private List<String> mimetypes;
-
-    private NexusMimeType(final boolean override, final String extension, final List<String> mimetypes) {
-      this.override = override;
-      this.extension = extension;
-      this.mimetypes = mimetypes;
-    }
-
-    public String getExtension() {
-      return extension;
-    }
-
-    public List<String> getMimetypes() {
-      return mimetypes;
-    }
-
-    public boolean isOverride() {
-      return override;
-    }
   }
 }
