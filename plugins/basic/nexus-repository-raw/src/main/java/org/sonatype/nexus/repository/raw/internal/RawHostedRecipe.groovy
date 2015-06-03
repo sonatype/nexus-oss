@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
+import org.sonatype.nexus.repository.http.HttpMethods
 import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -35,8 +36,11 @@ import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.IndexHtmlForwardHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
+import org.sonatype.nexus.repository.view.matchers.ActionMatcher
 import org.sonatype.nexus.repository.view.matchers.SuffixMatcher
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
+
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.and
 
 /**
  * Raw hosted repository recipe.
@@ -105,8 +109,9 @@ class RawHostedRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
+    // handle GET / forwards to /index.html
     builder.route(new Route.Builder()
-        .matcher(new SuffixMatcher('/', false))
+        .matcher(and(new ActionMatcher(HttpMethods.GET), new SuffixMatcher('/')))
         .handler(timingHandler)
         .handler(indexHtmlForwardHandler)
         .create()

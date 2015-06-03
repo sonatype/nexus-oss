@@ -38,7 +38,11 @@ public class SuffixMatcher
   }
 
   public SuffixMatcher(final String suffix) {
-    this(suffix, true);
+    this(suffix, false);
+  }
+
+  public SuffixMatcher ignoreCase(final boolean ignoreCase) {
+    return new SuffixMatcher(suffix, ignoreCase);
   }
 
   @Override
