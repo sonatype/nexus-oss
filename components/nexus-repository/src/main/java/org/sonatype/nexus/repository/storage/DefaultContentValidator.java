@@ -65,7 +65,7 @@ public class DefaultContentValidator
                                      @Nullable String declaredContentType) throws IOException
   {
     checkNotNull(contentSupplier);
-    String declaredBaseContentType = mediaTypeWithoutParameters(declaredContentType);
+    final String declaredBaseContentType = mediaTypeWithoutParameters(declaredContentType);
 
     final LinkedHashSet<String> contentDetectedMimeTypes = new LinkedHashSet<>();
     try (InputStream is = contentSupplier.get()) {
@@ -87,46 +87,35 @@ public class DefaultContentValidator
       );
       adjustIfHtml(nameAssumedMimeTypes);
       log.debug("Mime support assumes {} as {}", contentName, nameAssumedMimeTypes);
-      if (strictContentTypeValidation && isUnknown(nameAssumedMimeTypes)) {
-        throw new InvalidContentException("Content type could not be guessed: " + contentName);
-      }
 
-      Set<String> intersection = Sets.intersection(contentDetectedMimeTypes, nameAssumedMimeTypes);
-      log.debug("content/name types intersection {}", intersection);
-      if (strictContentTypeValidation && intersection.isEmpty()) {
-        throw new InvalidContentException(
-            String.format("Detected content type %s, but expected %s: %s",
-                contentDetectedMimeTypes, nameAssumedMimeTypes, contentName)
-        );
-      }
-    }
-
-    if (declaredBaseContentType != null) {
-      Set<String> union = Sets.union(contentDetectedMimeTypes, nameAssumedMimeTypes);
-      log.debug("content/name types union {}", union);
-      if (!union.contains(declaredBaseContentType)) {
-        log.debug("Declared content type {}, discovered types {}", declaredContentType, union);
-        if (strictContentTypeValidation) {
+      if (!isUnknown(nameAssumedMimeTypes)) {
+        Set<String> intersection = Sets.intersection(contentDetectedMimeTypes, nameAssumedMimeTypes);
+        log.debug("content/name types intersection {}", intersection);
+        if (strictContentTypeValidation && intersection.isEmpty()) {
           throw new InvalidContentException(
-              String.format("Declared content type %s not among discovered types %s: %s",
-                  declaredContentType, union, contentName));
+              String.format("Detected content type %s, but expected %s: %s",
+                  contentDetectedMimeTypes, nameAssumedMimeTypes, contentName)
+          );
         }
       }
     }
 
     String finalContentType;
-    if (mimeRulesSource != null && contentName != null) {
-      // format implied contentType
+    if (!isUnknown(nameAssumedMimeTypes)) {
+      // format implied type or known extension
       finalContentType = nameAssumedMimeTypes.iterator().next();
     }
-    else if (declaredContentType != null) {
-      finalContentType = declaredContentType;
+    else if (!isUnknown(contentDetectedMimeTypes)) {
+      // use the content based one
+      finalContentType = contentDetectedMimeTypes.iterator().next();
     }
-    else if (!nameAssumedMimeTypes.isEmpty()) {
-      finalContentType = nameAssumedMimeTypes.iterator().next();
+    else if (!Strings.isNullOrEmpty(declaredBaseContentType)) {
+      // use the declared if declared at all
+      finalContentType = declaredBaseContentType;
     }
     else {
-      finalContentType = contentDetectedMimeTypes.iterator().next();
+      // give up
+      finalContentType = ContentTypes.APPLICATION_OCTET_STREAM;
     }
 
     log.debug("Content {} declared as {}, determined as {}", contentName, declaredContentType, finalContentType);

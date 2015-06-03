@@ -32,7 +32,7 @@ class DefaultContentValidatorTest
 {
   private DefaultContentValidator testSubject = new DefaultContentValidator(new DefaultMimeSupport())
 
-  private byte[] emptyZip = [ 80, 75, 05, 06, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 ]
+  private byte[] emptyZip = [80, 75, 05, 06, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00]
 
   Supplier<InputStream> supplier(byte[] bytes) {
     ByteArrayInputStream bis = new ByteArrayInputStream(bytes)
@@ -80,15 +80,16 @@ class DefaultContentValidatorTest
     assertThat(type, equalTo(ContentTypes.TEXT_PLAIN))
   }
 
-  @Test(expected = InvalidContentException)
+  @Test
   void 'simple text strict with wrong declared'() {
-    testSubject.determineContentType(
+    def type = testSubject.determineContentType(
         true,
         supplier('simple text'.bytes),
         MimeRulesSource.NOOP,
         'test.txt',
         'application/zip'
     )
+    assertThat(type, equalTo(ContentTypes.TEXT_PLAIN))
   }
 
   @Test
@@ -127,14 +128,107 @@ class DefaultContentValidatorTest
     assertThat(type, equalTo('application/zip'))
   }
 
-  @Test(expected = InvalidContentException)
+  @Test
   void 'simple zip strict with wrong declared'() {
-    testSubject.determineContentType(
+    def type = testSubject.determineContentType(
         true,
         supplier(emptyZip),
         MimeRulesSource.NOOP,
         'test.zip',
         ContentTypes.TEXT_PLAIN
     )
+    assertThat(type, equalTo('application/zip'))
+  }
+
+  @Test(expected = InvalidContentException)
+  void 'strict wrong zip content as text'() {
+    testSubject.determineContentType(
+        true,
+        supplier(emptyZip),
+        MimeRulesSource.NOOP,
+        'test.txt',
+        ContentTypes.TEXT_PLAIN
+    )
+  }
+
+  @Test(expected = InvalidContentException)
+  void 'strict wrong text content as zip'() {
+    testSubject.determineContentType(
+        true,
+        supplier('simple text'.bytes),
+        MimeRulesSource.NOOP,
+        'test.zip',
+        'application/zip'
+    )
+  }
+
+  @Test
+  void 'non-strict wrong zip content as text'() {
+    def type = testSubject.determineContentType(
+        false,
+        supplier(emptyZip),
+        MimeRulesSource.NOOP,
+        'test.txt',
+        ContentTypes.TEXT_PLAIN
+    )
+    assertThat(type, equalTo(ContentTypes.TEXT_PLAIN))
+  }
+
+  @Test
+  void 'non-strict wrong text content as zip'() {
+    def type = testSubject.determineContentType(
+        false,
+        supplier('simple text'.bytes),
+        MimeRulesSource.NOOP,
+        'test.zip',
+        'application/zip'
+    )
+    assertThat(type, equalTo('application/zip'))
+  }
+
+  @Test(expected = InvalidContentException)
+  void 'strict wrong zip content as text undeclared'() {
+    testSubject.determineContentType(
+        true,
+        supplier(emptyZip),
+        MimeRulesSource.NOOP,
+        'test.txt',
+        null
+    )
+  }
+
+  @Test(expected = InvalidContentException)
+  void 'strict wrong text content as zip undeclared'() {
+    testSubject.determineContentType(
+        true,
+        supplier('simple text'.bytes),
+        MimeRulesSource.NOOP,
+        'test.zip',
+        null
+    )
+  }
+
+  @Test
+  void 'non-strict wrong zip content as text undeclared'() {
+    def type = testSubject.determineContentType(
+        false,
+        supplier(emptyZip),
+        MimeRulesSource.NOOP,
+        'test.txt',
+        null
+    )
+    assertThat(type, equalTo(ContentTypes.TEXT_PLAIN))
+  }
+
+  @Test
+  void 'non-strict wrong text content as zip undeclared'() {
+    def type = testSubject.determineContentType(
+        false,
+        supplier('simple text'.bytes),
+        MimeRulesSource.NOOP,
+        'test.zip',
+        null
+    )
+    assertThat(type, equalTo('application/zip'))
   }
 }
