@@ -56,7 +56,7 @@ public class RawContentFacetImpl
   // TODO: it's here only to circumvent this OSGi/maven-bundle-plugin issue.
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
-    super.doValidate(configuration);
+    // empty
   }
 
   @Nullable

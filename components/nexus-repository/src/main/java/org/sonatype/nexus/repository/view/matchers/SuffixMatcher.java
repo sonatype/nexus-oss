@@ -17,6 +17,8 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -32,13 +34,18 @@ public class SuffixMatcher
 
   private final boolean ignoreCase;
 
+  @VisibleForTesting
   public SuffixMatcher(final String suffix, final boolean ignoreCase) {
     this.suffix = checkNotNull(suffix);
     this.ignoreCase = ignoreCase;
   }
 
   public SuffixMatcher(final String suffix) {
-    this(suffix, true);
+    this(suffix, false);
+  }
+
+  public SuffixMatcher ignoreCase(final boolean ignoreCase) {
+    return new SuffixMatcher(suffix, ignoreCase);
   }
 
   @Override

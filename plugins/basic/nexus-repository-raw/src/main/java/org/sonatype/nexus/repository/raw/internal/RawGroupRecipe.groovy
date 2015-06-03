@@ -12,6 +12,12 @@
  */
 package org.sonatype.nexus.repository.raw.internal
 
+import javax.annotation.Nonnull
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
+import javax.inject.Singleton
+
 import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
@@ -29,12 +35,6 @@ import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
-import javax.annotation.Nonnull
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Provider
-import javax.inject.Singleton
-
 /**
  * Raw group repository recipe.
  *
@@ -45,7 +45,7 @@ import javax.inject.Singleton
 class RawGroupRecipe
     extends RecipeSupport
 {
-  public static final String NAME = "raw-group"
+  public static final String NAME = 'raw-group'
 
   @Inject
   Provider<RawSecurityFacet> securityFacet
@@ -89,7 +89,7 @@ class RawGroupRecipe
     Router.Builder builder = new Router.Builder()
 
     builder.route(new Route.Builder()
-        .matcher(new TokenMatcher("/{name:.+}"))
+        .matcher(new TokenMatcher('/{name:.+}'))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)
