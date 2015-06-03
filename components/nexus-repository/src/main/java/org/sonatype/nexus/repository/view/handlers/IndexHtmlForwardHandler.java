@@ -26,7 +26,7 @@ import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
- * Handler which will forward current request to {@code <request.path>/index.html} or {@code <request.path>/index.htm}.
+ * Handler which will forward current request to {@code {request.path}/index.html} or {@code {request.path}/index.htm}.
  *
  * @since 3.0
  */
