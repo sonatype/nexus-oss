@@ -164,7 +164,9 @@ public class StorageFacetImpl
       String repositoryName = getRepository().getName();
       bucket = bucketEntityAdapter.getByRepositoryName(db, repositoryName);
       if (bucket == null) {
-        bucketEntityAdapter.add(db, bucket = new Bucket().repositoryName(repositoryName));
+        bucket = new Bucket();
+        bucket.setRepositoryName(repositoryName);
+        bucketEntityAdapter.add(db, bucket);
         db.commit();
       }
     }

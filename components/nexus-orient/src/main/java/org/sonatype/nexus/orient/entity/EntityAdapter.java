@@ -12,13 +12,11 @@
  */
 package org.sonatype.nexus.orient.entity;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import org.sonatype.nexus.common.entity.DetachedEntityId;
 import org.sonatype.nexus.common.entity.Entity;
 import org.sonatype.nexus.common.entity.EntityId;
-import org.sonatype.nexus.common.entity.EntityMetadata;
-import org.sonatype.nexus.common.entity.EntityVersion;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -28,12 +26,10 @@ import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.version.ORecordVersion;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.common.entity.EntityHelper.id;
-import static org.sonatype.nexus.common.entity.EntityHelper.metadata;
 
 /**
  * Support for entity-adapter implementations.
@@ -138,7 +134,7 @@ public abstract class EntityAdapter<T extends Entity>
     catch (Exception e) {
       throw Throwables.propagate(e);
     }
-    setMetadata(entity, document);
+    attachMetadata(entity, document);
 
     return entity;
   }
@@ -158,7 +154,7 @@ public abstract class EntityAdapter<T extends Entity>
     catch (Exception e) {
       throw Throwables.propagate(e);
     }
-    setMetadata(entity, document);
+    attachMetadata(entity, document);
 
     return document.save();
   }
@@ -185,7 +181,7 @@ public abstract class EntityAdapter<T extends Entity>
     checkNotNull(entity);
 
     // new entity must not already have metadata
-    checkState(!entity.isPersisted());
+    checkState(entity.getEntityMetadata() == null);
 
     ODocument doc = db.newInstance(typeName);
     return writeEntity(doc, entity);
@@ -211,106 +207,14 @@ public abstract class EntityAdapter<T extends Entity>
   //
 
   /**
-   * Attached {@link EntityMetadata} captures native details to simplify resolution w/o encoding.
+   * Attach metadata to entity.
    */
-  protected static class AttachedEntityMetadata
-      implements EntityMetadata
-  {
-    private final EntityAdapter owner;
-
-    private ODocument document;
-
-    private EntityId id;
-
-    private EntityVersion version;
-
-    public AttachedEntityMetadata(final EntityAdapter owner, final ODocument document) {
-      this.owner = checkNotNull(owner);
-      this.document = checkNotNull(document);
-      checkNotNull(document);
-    }
-
-    @Override
-    public EntityId getId() {
-      if (id == null) {
-        id = new AttachedEntityId(document, owner);
-      }
-      return id;
-    }
-
-    protected ORecordVersion getRecordVersion() {
-      return document.getRecordVersion();
-    }
-
-    @Override
-    public EntityVersion getVersion() {
-      if (version == null) {
-        version = new EntityVersion(getRecordVersion().toString());
-      }
-      return version;
-    }
-
-    @Override
-    public String toString() {
-      return getClass().getSimpleName() + "{" +
-          "id=" + id +
-          ", version=" + version +
-          '}';
-    }
-  }
-
-  /**
-   * An {@link EntityId} that remains connected to the underlying ODocument. This is necessary with OrientDb
-   * transactions mode, as ODocument ids change when the transaction is committed.
-   */
-  protected static class AttachedEntityId
-      extends EntityId
-  {
-    private final EntityAdapter owner;
-
-    private ODocument document;
-
-    private String cachedValue;
-
-    public AttachedEntityId(final ODocument document, final EntityAdapter owner) {
-      super("");
-      this.owner = checkNotNull(owner);
-      this.document = checkNotNull(document);
-    }
-
-    @Nonnull
-    @Override
-    public String getValue() {
-      if (cachedValue == null) {
-        final ORID identity = document.getIdentity();
-        checkState(!identity.isTemporary(), "attempted use of temporary/uncommitted document id");
-        cachedValue = owner.getRecordIdObfuscator().encode(owner.getType(), identity);
-      }
-      return cachedValue;
-    }
-
-    protected ORID recordIdentity() {
-      return document.getIdentity();
-    }
-  }
-
-  /**
-   * Set metadata on entity.
-   */
-  protected void setMetadata(final T entity, final ODocument doc) {
-    checkNotNull(entity);
+  protected void attachMetadata(final T entity, final ODocument doc) {
     entity.setEntityMetadata(new AttachedEntityMetadata(this, doc));
   }
 
-  /**
-   * Get metadata from entity.
-   */
-  protected EntityMetadata getMetadata(final T entity) {
-    return metadata(entity);
-  }
-
   public EntityId encode(final ORID id) {
-    return new EntityId(getRecordIdObfuscator().encode(getType(), id));
+    return new DetachedEntityId(getRecordIdObfuscator().encode(getType(), id));
   }
 
   /**
@@ -321,8 +225,9 @@ public abstract class EntityAdapter<T extends Entity>
   }
 
   public ORID recordIdentity(final EntityId id) {
-    if (checkNotNull(id) instanceof AttachedEntityId) {
-      return ((AttachedEntityId) id).recordIdentity();
+    checkNotNull(id);
+    if (id instanceof AttachedEntityId) {
+      return ((AttachedEntityId) id).getIdentity();
     }
     return getRecordIdObfuscator().decode(getType(), id.toString());
   }

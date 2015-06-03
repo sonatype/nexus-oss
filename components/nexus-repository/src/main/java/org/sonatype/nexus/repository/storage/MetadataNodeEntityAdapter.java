@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 import org.sonatype.nexus.repository.Repository;
@@ -96,8 +97,7 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode>
   }
 
   Iterable<T> browseByBucket(final ODatabaseDocumentTx db, final Bucket bucket) {
-    checkNotNull(bucket);
-    checkState(bucket.isPersisted());
+    checkState(EntityHelper.hasMetadata(bucket));
 
     Map<String, Object> parameters = ImmutableMap.<String, Object>of(
         "bucket", bucketEntityAdapter.recordIdentity(bucket)

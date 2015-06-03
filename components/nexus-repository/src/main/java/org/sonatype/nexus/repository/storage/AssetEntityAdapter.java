@@ -20,6 +20,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.api.BlobRef;
+import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.nexus.orient.OIndexNameBuilder;
@@ -33,7 +34,6 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_BUCKET;
@@ -136,8 +136,7 @@ public class AssetEntityAdapter
   }
 
   Iterable<Asset> browseByComponent(final ODatabaseDocumentTx db, final Component component) {
-    checkNotNull(component, "component");
-    checkState(component.isPersisted(), "component must be persisted");
+    checkState(EntityHelper.hasMetadata(component));
 
     Map<String, Object> parameters = ImmutableMap.<String, Object>of(
         "component", componentEntityAdapter.recordIdentity(component)

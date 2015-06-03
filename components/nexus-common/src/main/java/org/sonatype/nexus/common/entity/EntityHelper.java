@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Entity helpers.
+ * {@link Entity} helpers.
  *
  * @since 3.0
  */
@@ -26,6 +26,17 @@ public class EntityHelper
 {
   private EntityHelper() {}
 
+  /**
+   * Check if given entity has metadata.
+   */
+  public static boolean hasMetadata(final Entity entity) {
+    checkNotNull(entity);
+    return entity.getEntityMetadata() != null;
+  }
+
+  /**
+   * Returns metadata for entity.
+   */
   @Nonnull
   public static EntityMetadata metadata(final Entity entity) {
     checkNotNull(entity);
@@ -35,6 +46,9 @@ public class EntityHelper
     return metadata;
   }
 
+  /**
+   * Returns id of entity.
+   */
   @Nonnull
   public static EntityId id(final Entity entity) {
     EntityId id = metadata(entity).getId();
@@ -44,6 +58,9 @@ public class EntityHelper
     return id;
   }
 
+  /**
+   * Returns version of entity.
+   */
   @Nonnull
   public static EntityVersion version(final Entity entity) {
     EntityVersion version = metadata(entity).getVersion();

@@ -14,6 +14,8 @@ package org.sonatype.nexus.common.entity;
 
 import javax.annotation.Nullable;
 
+// NOTE: Keep this class free from bloat, should only contain metadata.  Use EntityHelper or other to enrich api.
+
 /**
  * Entity.
  *
@@ -21,16 +23,7 @@ import javax.annotation.Nullable;
  */
 public abstract class Entity
 {
-  private EntityMetadata metadata;
-
-  /**
-   * Does the Entity correspond to a database record?
-   *
-   * This is not a dirtiness check.
-   */
-  public boolean isPersisted() {
-    return metadata != null;
-  }
+  private volatile EntityMetadata metadata;
 
   @Nullable
   public EntityMetadata getEntityMetadata() {

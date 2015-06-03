@@ -32,15 +32,14 @@ public class Bucket
   /**
    * Gets the repository name.
    */
-  public String repositoryName() {
+  public String getRepositoryName() {
     return repositoryName;
   }
 
   /**
    * Sets the repository name.
    */
-  public Bucket repositoryName(String repositoryName) {
+  public void setRepositoryName(String repositoryName) {
     this.repositoryName = repositoryName;
-    return this;
   }
 }

@@ -12,8 +12,13 @@
  */
 package org.sonatype.nexus.repository.storage
 
+import org.sonatype.nexus.blobstore.api.BlobRef
 import org.sonatype.nexus.blobstore.api.BlobStore
+import org.sonatype.nexus.common.collect.NestedAttributesMap
+import org.sonatype.nexus.common.hash.HashAlgorithm
+import org.sonatype.nexus.repository.IllegalOperationException
 import org.sonatype.nexus.repository.view.ContentTypes
+import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import com.google.common.base.Supplier
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx
@@ -21,11 +26,6 @@ import com.orientechnologies.orient.core.tx.OTransaction
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.sonatype.nexus.blobstore.api.BlobRef
-import org.sonatype.nexus.common.collect.NestedAttributesMap
-import org.sonatype.nexus.common.hash.HashAlgorithm
-import org.sonatype.nexus.repository.IllegalOperationException
-import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static java.util.Collections.emptyList
 import static org.hamcrest.MatcherAssert.assertThat
@@ -224,7 +224,7 @@ extends TestSupport
     def assetBlob = mock(AssetBlob)
     when(assetBlob.getBlobRef()).thenReturn(blobRef)
     when(asset.blobRef()).thenReturn(blobRef)
-    when(bucket.repositoryName()).thenReturn('testRepo')
+    when(bucket.getRepositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), any(Map), any(Iterable), anyString())).thenReturn(assetBlob)
     def underTest = new StorageTxImpl('test', blobTx, db, false, bucket, WritePolicy.ALLOW_ONCE, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, false, defaultContentValidator, hooks)
     try {
@@ -253,7 +253,7 @@ extends TestSupport
     def newBlobRef = mock(BlobRef)
     def assetBlob = mock(AssetBlob)
     when(assetBlob.getBlobRef()).thenReturn(newBlobRef)
-    when(bucket.repositoryName()).thenReturn('testRepo')
+    when(bucket.getRepositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), any(Map), any(Iterable), anyString())).thenReturn(assetBlob)
     def underTest = new StorageTxImpl('test', blobTx, db, false, bucket, WritePolicy.ALLOW_ONCE, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, false, defaultContentValidator, hooks)
     underTest.setBlob(asset, 'testBlob.txt', inputStream, hashAlgorithms, headers, "text/plain")
@@ -282,7 +282,7 @@ extends TestSupport
     def newBlobRef = mock(BlobRef)
     def newAssetBlob = mock(AssetBlob)
     when(newAssetBlob.getBlobRef()).thenReturn(newBlobRef)
-    when(bucket.repositoryName()).thenReturn('testRepo')
+    when(bucket.getRepositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), any(Map), any(Iterable), eq(ContentTypes.TEXT_PLAIN))).thenReturn(newAssetBlob)
     def underTest = new StorageTxImpl('test', blobTx, db, false, bucket, WritePolicy.ALLOW, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, false, defaultContentValidator, hooks)
     underTest.setBlob(asset, 'testBlob.txt', inputStream, hashAlgorithms, headers, 'text/plain')
@@ -307,7 +307,7 @@ extends TestSupport
     def newBlobRef = mock(BlobRef)
     def assetBlob = mock(AssetBlob)
     when(assetBlob.getBlobRef()).thenReturn(newBlobRef)
-    when(bucket.repositoryName()).thenReturn('testRepo')
+    when(bucket.getRepositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), any(Map), any(Iterable), anyString())).thenReturn(assetBlob)
     def underTest = new StorageTxImpl('test', blobTx, db, false, bucket, WritePolicy.ALLOW, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, false, defaultContentValidator, hooks)
     underTest.setBlob(asset, 'testBlob.txt', inputStream, hashAlgorithms, headers, 'text/plain')

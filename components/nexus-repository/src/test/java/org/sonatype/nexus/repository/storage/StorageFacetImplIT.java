@@ -20,6 +20,7 @@ import java.util.Map;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.entity.EntityVersion;
 import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
@@ -49,7 +50,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -516,10 +516,10 @@ public class StorageFacetImplIT
       Asset asset = checkNotNull(tx.findAsset(assetId, bucket));
 
       String name = asset.name();
-      EntityVersion finalVersion = asset.getEntityMetadata().getVersion();
+      EntityVersion finalVersion = EntityHelper.version(asset);
 
       assertThat(name, is("secondValue"));
-      assertThat(finalVersion, is(new EntityVersion(String.valueOf(Integer.valueOf(firstVersion.toString()) + 2))));
+      assertThat(finalVersion.getValue(), is(String.valueOf(Integer.valueOf(firstVersion.getValue()) + 2)));
     }
   }
 

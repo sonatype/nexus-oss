@@ -17,7 +17,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 import javax.validation.constraints.NotNull
 
-import org.sonatype.nexus.common.entity.EntityId
+import org.sonatype.nexus.common.entity.DetachedEntityId
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
@@ -67,7 +67,7 @@ class ComponentComponent
     }
     StorageTx storageTx = repository.facet(StorageFacet).openTx()
     try {
-      Component component = storageTx.findComponent(new EntityId(componentId), storageTx.getBucket())
+      Component component = storageTx.findComponent(new DetachedEntityId(componentId), storageTx.getBucket())
       if (component == null) {
         return null
       }

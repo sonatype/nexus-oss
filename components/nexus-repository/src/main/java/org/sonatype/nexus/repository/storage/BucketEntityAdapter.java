@@ -21,6 +21,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.orient.entity.CollectionEntityAdapter;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -46,7 +47,10 @@ public class BucketEntityAdapter
       .type(Bucket.class)
       .build();
 
-  private static final String I_REPOSITORY_NAME = DB_CLASS + ".repository_name_idx";
+  private static final String I_REPOSITORY_NAME = new OIndexNameBuilder()
+      .type(DB_CLASS)
+      .property(P_REPOSITORY_NAME)
+      .build();
 
   @Inject
   public BucketEntityAdapter() {
@@ -69,12 +73,12 @@ public class BucketEntityAdapter
   protected void readFields(final ODocument document, final Bucket entity) {
     String repositoryName = document.field(P_REPOSITORY_NAME, OType.STRING);
 
-    entity.repositoryName(repositoryName);
+    entity.setRepositoryName(repositoryName);
   }
 
   @Override
   protected void writeFields(final ODocument document, final Bucket entity) {
-    document.field(P_REPOSITORY_NAME, entity.repositoryName());
+    document.field(P_REPOSITORY_NAME, entity.getRepositoryName());
   }
 
   @Nullable
@@ -88,5 +92,4 @@ public class BucketEntityAdapter
     }
     return readEntity(results.get(0));
   }
-
 }

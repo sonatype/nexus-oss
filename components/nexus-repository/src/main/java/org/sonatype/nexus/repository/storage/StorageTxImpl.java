@@ -25,6 +25,7 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
@@ -333,7 +334,7 @@ public class StorageTxImpl
 
   @Override
   public void saveComponent(final Component component) {
-    if (component.isPersisted()) {
+    if (EntityHelper.hasMetadata(component)) {
       componentEntityAdapter.edit(db, component);
       hook.updateComponent(component);
     }
@@ -345,7 +346,7 @@ public class StorageTxImpl
 
   @Override
   public void saveAsset(final Asset asset) {
-    if (asset.isPersisted()) {
+    if (EntityHelper.hasMetadata(asset)) {
       assetEntityAdapter.edit(db, asset);
       hook.updateAsset(asset);
     }
@@ -434,14 +435,14 @@ public class StorageTxImpl
     checkNotNull(hashAlgorithms);
 
     if (!writePolicy.checkCreateAllowed()) {
-      throw new IllegalOperationException("Repository is read only: " + getBucket().repositoryName());
+      throw new IllegalOperationException("Repository is read only: " + getBucket().getRepositoryName());
     }
 
     try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
       final String contentType = determineContentType(supplier, blobName, declaredContentType);
 
       ImmutableMap.Builder<String, String> storageHeaders = ImmutableMap.builder();
-      storageHeaders.put(Bucket.REPO_NAME_HEADER, bucket.repositoryName());
+      storageHeaders.put(Bucket.REPO_NAME_HEADER, bucket.getRepositoryName());
       storageHeaders.put(BlobStore.BLOB_NAME_HEADER, blobName);
       storageHeaders.put(BlobStore.CREATED_BY_HEADER, createdBy);
       storageHeaders.put(BlobStore.CONTENT_TYPE_HEADER, contentType);
@@ -462,7 +463,7 @@ public class StorageTxImpl
 
     final WritePolicy effectiveWritePolicy = writePolicySelector.select(asset, writePolicy);
     if (!effectiveWritePolicy.checkCreateAllowed()) {
-      throw new IllegalOperationException("Repository is read only: " + getBucket().repositoryName());
+      throw new IllegalOperationException("Repository is read only: " + getBucket().getRepositoryName());
     }
 
     // Delete old blob if necessary
@@ -470,7 +471,7 @@ public class StorageTxImpl
     if (oldBlobRef != null) {
       if (!effectiveWritePolicy.checkUpdateAllowed()) {
         throw new IllegalOperationException(
-            "Repository does not allow updating assets: " + getBucket().repositoryName());
+            "Repository does not allow updating assets: " + getBucket().getRepositoryName());
       }
       deleteBlob(oldBlobRef, effectiveWritePolicy);
     }
@@ -503,7 +504,7 @@ public class StorageTxImpl
     if (oldBlobRef != null) {
       if (!writePolicySelector.select(asset, writePolicy).checkUpdateAllowed()) {
         throw new IllegalOperationException(
-            "Repository does not allow updating assets: " + getBucket().repositoryName());
+            "Repository does not allow updating assets: " + getBucket().getRepositoryName());
       }
     }
     final AssetBlob assetBlob = createBlob(blobName, inputStream, hashAlgorithms, headers, declaredContentType);
@@ -548,7 +549,7 @@ public class StorageTxImpl
   private void deleteBlob(final BlobRef blobRef, @Nullable WritePolicy effectiveWritePolicy) {
     checkNotNull(blobRef);
     if (effectiveWritePolicy != null && !effectiveWritePolicy.checkDeleteAllowed()) {
-      throw new IllegalOperationException("Repository does not allow deleting assets: " + getBucket().repositoryName());
+      throw new IllegalOperationException("Repository does not allow deleting assets: " + getBucket().getRepositoryName());
     }
     blobTx.delete(blobRef);
   }

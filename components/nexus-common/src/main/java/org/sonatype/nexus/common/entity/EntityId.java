@@ -12,59 +12,15 @@
  */
 package org.sonatype.nexus.common.entity;
 
-import java.io.Serializable;
-
 import javax.annotation.Nonnull;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * Entity identifier.
+ * Entity identifier for external usage.
  *
  * @since 3.0
  */
-public class EntityId
-    implements Serializable
+public interface EntityId
 {
-  private static final long serialVersionUID = 1L;
-
-  private final String value;
-
-  public EntityId(final String value) {
-    this.value = checkNotNull(value);
-  }
-
   @Nonnull
-  public String getValue() {
-    return value;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-
-    if (!(o instanceof EntityId)) {
-      return false;
-    }
-    
-    EntityId entityId = (EntityId) o;
-
-    if (!getValue().equals(entityId.getValue())) {
-      return false;
-    }
-
-    return true;
-  }
-
-  @Override
-  public int hashCode() {
-    return getValue().hashCode();
-  }
-
-  @Override
-  public String toString() {
-    return getValue();
-  }
+  String getValue();
 }
