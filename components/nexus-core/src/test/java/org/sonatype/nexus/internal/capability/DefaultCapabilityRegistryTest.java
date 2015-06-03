@@ -15,6 +15,7 @@ package org.sonatype.nexus.internal.capability;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Random;
 
 import javax.inject.Provider;
 import javax.validation.Validator;
@@ -79,6 +80,8 @@ public class DefaultCapabilityRegistryTest
 
   static final CapabilityType CAPABILITY_TYPE = capabilityType("test");
 
+  private final Random random = new Random(System.currentTimeMillis());
+
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
@@ -130,7 +133,7 @@ public class DefaultCapabilityRegistryTest
         {
           @Override
           public CapabilityIdentity answer(final InvocationOnMock invocationOnMock) throws Throwable {
-            return capabilityIdentity(String.valueOf(System.currentTimeMillis()));
+            return capabilityIdentity(String.valueOf(random.nextLong()));
           }
         }
     );
