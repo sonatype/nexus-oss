@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 @Named
-class MimeRulesSourceSelector
+public class MimeRulesSourceSelector
     extends ComponentSupport
 {
   private final Map<String, MimeRulesSource> mimeRulesSources;

@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
@@ -79,22 +80,11 @@ public class DefaultMimeSupportTest
         return new MimeRule(false, "foo/bar");
       }
     };
-
     assertThat(underTest.guessMimeTypeFromPath("/some/path/artifact.pom", source), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath("/some/path/artifact.jar", source), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath("/some/path/artifact-sources.jar", source), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath("/some/path/maven-metadata.xml", source), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.xml", source), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.tar.gz", source), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.tar.bz2", source), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.zip", source), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.war", source), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.ear", source), equalTo("foo/bar"));
-    assertThat(underTest.guessMimeTypeFromPath("/some/path/some.ejb", source), equalTo("foo/bar"));
   }
 
   @Test
-  public void testGuessNullMimeRulesSourceMimeTypeFromPath() {
+  public void testGuessWithoutMimeRulesSourceMimeTypeFromPath() {
     assertThat(underTest.guessMimeTypeFromPath("/some/path/artifact.pom"), equalTo("application/xml"));
   }
 
@@ -122,8 +112,7 @@ public class DefaultMimeSupportTest
     when(mimeType.getMimetypes()).thenReturn(Lists.newArrayList("fake/mimetype"));
 
     final List<String> mimeTypes = underTest.guessMimeTypesListFromPath("foo.zip");
-    assertThat(mimeTypes, hasSize(3));
-    assertThat(mimeTypes, hasItems("fake/mimetype", "application/zip", "application/x-zip-compressed"));
+    assertThat(mimeTypes, contains("fake/mimetype", "application/zip", "application/x-zip-compressed"));
 
     assertThat(underTest.guessMimeTypeFromPath("foo.zip"), is("fake/mimetype"));
   }

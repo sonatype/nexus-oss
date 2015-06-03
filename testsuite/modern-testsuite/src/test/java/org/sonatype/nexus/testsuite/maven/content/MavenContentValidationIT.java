@@ -12,14 +12,18 @@
  */
 package org.sonatype.nexus.testsuite.maven.content;
 
+import java.io.File;
+
 import javax.inject.Inject;
 
+import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
 import org.sonatype.nexus.testsuite.repository.FormatClientSupport;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
@@ -44,6 +48,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.contains;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 /**
  * Metadata content validation IT.
@@ -70,6 +76,9 @@ public class MavenContentValidationIT
   @Inject
   private RepositoryManager repositoryManager;
 
+  @Inject
+  private LogManager logManager;
+
   private Repository mavenCentral;
 
   private Server upstream;
@@ -77,7 +86,7 @@ public class MavenContentValidationIT
   private FormatClientSupport client;
 
   @Before
-  public void debugLoggingStorage() {
+  public void setupMavenDebugStorage() {
     logManager.setLoggerLevel("org.sonatype.nexus.repository.storage", LoggerLevel.DEBUG);
   }
 
@@ -194,9 +203,11 @@ public class MavenContentValidationIT
     get200("abbot/abbot/0.13.0/maven-metadata.xml", "application/xml");
     get200("abbot/abbot/0.13.0/maven-metadata.xml.sha1", "text/plain");
     get200("abbot/abbot/0.13.0/maven-metadata.xml.md5", "text/plain");
-    // TODO: nexus log should contain in DEBUG:
-    // "Content /abbot/abbot/0.13.0/abbot-0.13.0.pom declared as text/xml, determined as application/xml"
-    // Confirming Maven Format overrode upstream server preference
+
+    // verify log contains traces of format overrides
+    final File logfile = logManager.getLogFile("nexus.log");
+    assertThat(logfile, exists());
+    assertThat(logfile, contains("Content /abbot/abbot/0.13.0/abbot-0.13.0.pom.xml declared as text/xml, determined as application/xml"));
   }
 
   @Test
