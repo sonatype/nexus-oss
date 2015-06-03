@@ -75,7 +75,7 @@ public class DefaultContentValidator
     log.debug("Mime support detects {} as {}", contentName, contentDetectedMimeTypes);
 
     if (strictContentTypeValidation && isUnknown(contentDetectedMimeTypes)) {
-      throw new InvalidContentException("Content type could not be determined");
+      throw new InvalidContentException("Content type could not be determined: " + contentName);
     }
 
     final LinkedHashSet<String> nameAssumedMimeTypes = new LinkedHashSet<>();
@@ -88,15 +88,15 @@ public class DefaultContentValidator
       adjustIfHtml(nameAssumedMimeTypes);
       log.debug("Mime support assumes {} as {}", contentName, nameAssumedMimeTypes);
       if (strictContentTypeValidation && isUnknown(nameAssumedMimeTypes)) {
-        throw new InvalidContentException("Content type could not be guessed");
+        throw new InvalidContentException("Content type could not be guessed: " + contentName);
       }
 
       Set<String> intersection = Sets.intersection(contentDetectedMimeTypes, nameAssumedMimeTypes);
       log.debug("content/name types intersection {}", intersection);
       if (strictContentTypeValidation && intersection.isEmpty()) {
         throw new InvalidContentException(
-            String.format("Detected content type %s, but by name %s expected %s",
-                contentDetectedMimeTypes, contentName, nameAssumedMimeTypes)
+            String.format("Detected content type %s, but expected %s: %s",
+                contentDetectedMimeTypes, nameAssumedMimeTypes, contentName)
         );
       }
     }
@@ -108,7 +108,8 @@ public class DefaultContentValidator
         log.debug("Declared content type {}, discovered types {}", declaredContentType, union);
         if (strictContentTypeValidation) {
           throw new InvalidContentException(
-              String.format("Declared content type %s not among discovered types %s", declaredContentType, union));
+              String.format("Declared content type %s not among discovered types %s: %s",
+                  declaredContentType, union, contentName));
         }
       }
     }
@@ -151,7 +152,7 @@ public class DefaultContentValidator
   }
 
   /**
-   * Returns {@code true} if list of mimeTypes is actually saying "unkown" content.
+   * Returns {@code true} if list of mimeTypes is actually saying "unknown" content.
    */
   private boolean isUnknown(final Set<String> mimeTypes) {
     return mimeTypes.isEmpty() || (mimeTypes.size() == 1 && mimeTypes.contains(ContentTypes.APPLICATION_OCTET_STREAM));

@@ -54,7 +54,7 @@ class MimeRulesSourceSelector
   public MimeRulesSource ruleSource(final Repository repository) {
     checkNotNull(repository);
     String format = repository.getFormat().getValue();
-    log.debug("Looking for MIME rule source: {}", format);
+    log.trace("Looking for MIME rule source for format: {}", format);
     MimeRulesSource mimeRulesSource = mimeRulesSources.get(format);
     if (mimeRulesSource != null) {
       return mimeRulesSource;
