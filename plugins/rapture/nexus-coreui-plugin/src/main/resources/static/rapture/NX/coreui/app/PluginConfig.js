@@ -60,12 +60,13 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     'NX.coreui.controller.FeatureGroups',
-    {
-      id: 'NX.coreui.controller.Feeds',
-      active: function () {
-        return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
-      }
-    },
+    // HACK: Disabling 'Feeds' feature for now until its purpose/use in NX3 can be better understood
+    //{
+    //  id: 'NX.coreui.controller.Feeds',
+    //  active: function () {
+    //    return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
+    //  }
+    //},
     {
       id: 'NX.coreui.controller.HttpSettings',
       active: function () {
