@@ -61,7 +61,7 @@ public class IndexHtmlForwardHandler
     }
 
     // or there is no such file, give up not found
-    return HttpResponses.notFound();
+    return HttpResponses.notFound(context.getRequest().getPath());
   }
 
   private Response forward(final Context context, final String path) throws Exception {
