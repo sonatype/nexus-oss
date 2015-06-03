@@ -85,7 +85,7 @@ public class StorageFacetImpl
     @NotNull(groups = HostedType.ValidationGroup.class)
     public WritePolicy writePolicy;
 
-    public boolean strictContentTypeValidation = false;
+    public boolean strictContentTypeValidation = true;
 
     @Override
     public String toString() {
