@@ -20,10 +20,10 @@ import java.util.Set;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.capability.CapabilityDescriptorSupport;
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
-import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.quartz.internal.QuartzConstants;

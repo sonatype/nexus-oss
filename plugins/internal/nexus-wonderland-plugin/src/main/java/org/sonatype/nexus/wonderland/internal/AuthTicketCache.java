@@ -25,7 +25,6 @@ import org.sonatype.sisu.goodies.common.TestAccessible;
 import org.sonatype.sisu.goodies.common.Time;
 
 import com.google.common.collect.Maps;
-import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -39,7 +38,6 @@ import static com.google.common.base.Preconditions.checkState;
 public class AuthTicketCache
     extends ComponentSupport
 {
-  @NonNls
   private static final String CPREFIX = WonderlandConstants.CONFIG_PREFIX + ".authTicketCache";
 
   private final Mutex lock = new Mutex();

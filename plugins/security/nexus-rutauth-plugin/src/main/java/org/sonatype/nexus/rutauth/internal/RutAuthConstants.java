@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.rutauth.internal;
 
-import org.jetbrains.annotations.NonNls;
-
 /**
  * Rut-Auth constants.
  *
@@ -24,6 +22,5 @@ public class RutAuthConstants
   /**
    * Prefix for ID-like things.
    */
-  @NonNls
   public static final String ID_PREFIX = "rutauth";
 }

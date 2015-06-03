@@ -19,7 +19,6 @@ import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.validation.group.Create;
 
 import com.google.common.collect.Maps;
-import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -33,19 +32,14 @@ public class SettingsCapabilityConfiguration
     extends RaptureSettings
 {
 
-  @NonNls
   public static final String DEBUG_ALLOWED = "debugAllowed";
 
-  @NonNls
   public static final String STATUS_INTERVAL_AUTHENTICATED = "statusIntervalAuthenticated";
 
-  @NonNls
   public static final String STATUS_INTERVAL_ANONYMOUS = "statusIntervalAnonymous";
 
-  @NonNls
   public static final String SESSION_TIMEOUT = "sessionTimeout";
 
-  @NonNls
   public static final String TITLE = "title";
 
   public SettingsCapabilityConfiguration() {

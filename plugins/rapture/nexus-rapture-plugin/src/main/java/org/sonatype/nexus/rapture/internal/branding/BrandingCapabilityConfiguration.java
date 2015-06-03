@@ -18,8 +18,6 @@ import org.sonatype.nexus.capability.UniquePerCapabilityType;
 import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.validation.group.Create;
 
-import org.jetbrains.annotations.NonNls;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -32,16 +30,12 @@ public class BrandingCapabilityConfiguration
     extends BrandingXO
 {
 
-  @NonNls
   public static final String HEADER_ENABLED = "headerEnabled";
 
-  @NonNls
   public static final String HEADER_HTML = "headerHtml";
 
-  @NonNls
   public static final String FOOTER_ENABLED = "footerEnabled";
 
-  @NonNls
   public static final String FOOTER_HTML = "footerHtml";
 
   public BrandingCapabilityConfiguration(final Map<String, String> properties) {

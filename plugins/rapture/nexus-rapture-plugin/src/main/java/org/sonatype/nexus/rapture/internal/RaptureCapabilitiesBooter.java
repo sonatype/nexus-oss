@@ -15,8 +15,8 @@ package org.sonatype.nexus.rapture.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.capability.CapabilityBooterSupport;
 import org.sonatype.nexus.capability.CapabilityRegistry;
-import org.sonatype.nexus.capability.support.CapabilityBooterSupport;
 import org.sonatype.nexus.rapture.internal.settings.SettingsCapabilityConfiguration;
 import org.sonatype.nexus.rapture.internal.settings.SettingsCapabilityDescriptor;
 

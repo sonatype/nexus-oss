@@ -17,7 +17,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.capability.support.CapabilitySupport;
+import org.sonatype.nexus.capability.CapabilitySupport;
 import org.sonatype.nexus.quartz.internal.QuartzSupportImpl;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;

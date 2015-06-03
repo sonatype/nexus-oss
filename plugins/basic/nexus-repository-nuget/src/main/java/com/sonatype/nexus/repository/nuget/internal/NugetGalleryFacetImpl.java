@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import com.sonatype.nexus.repository.nuget.internal.ComponentQuery.Builder;
@@ -62,11 +63,11 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.xml.XmlEscapers;
+
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
-import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.odata4j.producer.InlineCount;
 
