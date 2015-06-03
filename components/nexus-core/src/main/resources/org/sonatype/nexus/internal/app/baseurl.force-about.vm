@@ -10,5 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
-Allows forcing the base URL which will be used by all server responses.
-<p>This is an advanced feature and only is applicable to rare cases.  Improper usage of this setting could negatively impact users of the system.</p>
+Force the base URL to be used in all cases.
+<p>
+  This is an advanced feature and only is applicable to rare cases.
+  Improper usage of this setting could negatively impact users of the system.
+</p>

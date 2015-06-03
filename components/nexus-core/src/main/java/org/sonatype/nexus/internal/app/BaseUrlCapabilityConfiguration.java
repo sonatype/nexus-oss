@@ -12,18 +12,49 @@
  */
 package org.sonatype.nexus.internal.app;
 
+import java.util.Map;
+
 import org.sonatype.nexus.capability.CapabilityConfigurationSupport;
 import org.sonatype.nexus.capability.UniquePerCapabilityType;
 import org.sonatype.nexus.validation.group.Create;
 
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.URL;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * {@link ForceBaseUrlCapability} configuration.
+ * {@link BaseUrlCapability} configuration.
  *
  * @since 3.0
  */
-@UniquePerCapabilityType(value = ForceBaseUrlCapabilityDescriptor.TYPE_ID, groups = Create.class)
-public class ForceBaseUrlCapabilityConfiguration
+@UniquePerCapabilityType(value = BaseUrlCapabilityDescriptor.TYPE_ID, groups = Create.class)
+public class BaseUrlCapabilityConfiguration
     extends CapabilityConfigurationSupport
 {
-  // empty
+  public static final String URL = "url";
+
+  @NotBlank
+  @URL
+  private String url;
+
+  public BaseUrlCapabilityConfiguration(final Map<String,String> properties) {
+    checkNotNull(properties);
+    this.url = properties.get(URL);
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(final String url) {
+    this.url = url;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "url='" + url + '\'' +
+        '}';
+  }
 }

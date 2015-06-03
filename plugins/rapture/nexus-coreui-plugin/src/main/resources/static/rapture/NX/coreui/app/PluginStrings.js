@@ -765,14 +765,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_SMTP_VERIFY_MASK: 'Checking email server {0}',
     ADMIN_SMTP_VERIFY_SUCCESS: 'Email server verification email sent successfully',
 
-    // Admin -> System -> General
-    ADMIN_GENERAL_TITLE: 'General',
-    ADMIN_GENERAL_SUBTITLE: 'Manage general configuration',
-    ADMIN_GENERAL_UPDATE_ERROR: 'You do not have permission to configure general settings',
-    ADMIN_GENERAL_UPDATE_SUCCESS: 'General system settings $action',
-    ADMIN_GENERAL_URL: 'Base URL',
-    ADMIN_GENERAL_URL_HELP: 'This is where the Nexus web application lives',
-
     // Admin -> System -> HTTP
     ADMIN_HTTP_TITLE: 'HTTP',
     ADMIN_HTTP_SUBTITLE: 'Manage outbound HTTP/HTTPS configuration',

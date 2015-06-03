@@ -25,8 +25,10 @@ import org.sonatype.nexus.common.app.SystemStatus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// NOTE: Could simplify this to be a checkbox on the baseurl capability, but need to find a way to let folks know this is edge-case only
+
 /**
- * Force Base URL capability.
+ * Force Base-URL capability.
  *
  * @since 3.0
  */

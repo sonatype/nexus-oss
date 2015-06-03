@@ -24,35 +24,57 @@ import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
+
+import com.google.common.collect.ImmutableList;
 
 import static org.sonatype.nexus.capability.Tag.categoryTag;
 import static org.sonatype.nexus.capability.Tag.tags;
 
 /**
- * {@link ForceBaseUrlCapability} descriptor.
+ * {@link BaseUrlCapabilityDescriptor} descriptor.
  *
  * @since 3.0
  */
-@Named(ForceBaseUrlCapabilityDescriptor.TYPE_ID)
+@Named(BaseUrlCapabilityDescriptor.TYPE_ID)
 @Singleton
-public class ForceBaseUrlCapabilityDescriptor
-    extends CapabilityDescriptorSupport<ForceBaseUrlCapabilityConfiguration>
+public class BaseUrlCapabilityDescriptor
+    extends CapabilityDescriptorSupport<BaseUrlCapabilityConfiguration>
     implements Taggable
 {
-  public static final String TYPE_ID = "baseurl.force";
+  public static final String TYPE_ID = "baseurl";
 
   public static final CapabilityType TYPE = CapabilityType.capabilityType(TYPE_ID);
 
-  private static interface Messages
+  private interface Messages
       extends MessageBundle
   {
-    @DefaultMessage("Base URL: Force")
+    @DefaultMessage("Base URL")
     String name();
+
+    @DefaultMessage("URL")
+    String urlLabel();
+
+    @DefaultMessage("Base URL of the application server")
+    String urlHelp();
   }
 
   private static final Messages messages = I18N.create(Messages.class);
+
+  private final List<FormField> formFields;
+
+  public BaseUrlCapabilityDescriptor() {
+    this.formFields = ImmutableList.of(
+        (FormField)new StringTextFormField(
+            BaseUrlCapabilityConfiguration.URL,
+            messages.urlLabel(),
+            messages.urlHelp(),
+            FormField.MANDATORY
+        )
+    );
+  }
 
   @Override
   public CapabilityType type() {
@@ -66,7 +88,7 @@ public class ForceBaseUrlCapabilityDescriptor
 
   @Override
   public List<FormField> formFields() {
-    return null;
+    return formFields;
   }
 
   @Override
@@ -75,8 +97,8 @@ public class ForceBaseUrlCapabilityDescriptor
   }
 
   @Override
-  protected ForceBaseUrlCapabilityConfiguration createConfig(final Map<String, String> properties) {
-    return new ForceBaseUrlCapabilityConfiguration();
+  protected BaseUrlCapabilityConfiguration createConfig(final Map<String, String> properties) {
+    return new BaseUrlCapabilityConfiguration(properties);
   }
 
   @Override

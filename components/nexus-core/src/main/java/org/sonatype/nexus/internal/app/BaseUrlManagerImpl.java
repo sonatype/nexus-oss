@@ -45,11 +45,9 @@ public class BaseUrlManagerImpl
     this.requestProvider = checkNotNull(requestProvider);
   }
 
-  // FIXME: Sort out persistence and synchronization
+  private volatile String url;
 
-  private String url;
-
-  private boolean force;
+  private volatile boolean force;
 
   @Override
   public void setUrl(final String url) {
