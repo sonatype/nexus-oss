@@ -57,7 +57,7 @@ public class IndexHtmlForwardHandler
       if (response.getStatus().isSuccessful() || response.getStatus().getCode() != HttpStatus.NOT_FOUND) {
         return response;
       }
-      // otherwise try nexus index file
+      // otherwise try next index file
     }
 
     // or there is no such file, give up not found
