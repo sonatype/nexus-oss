@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.plugin.internal;
 
-// FIXME: Remove, ATM bundle packaging complaining about no classes
+// FIXME: Remove, ATM bundle packaging complaining about no classes, sort out why release is unhappy?
 
 /**
  * Dummy class.
