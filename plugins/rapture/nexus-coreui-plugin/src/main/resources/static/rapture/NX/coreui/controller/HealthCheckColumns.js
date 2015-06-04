@@ -109,7 +109,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
       resultList.getView().refresh();
     }
 
-    NX.direct.healthcheck_Search.read(components, function(response) {
+    NX.direct.healthcheck_Info.read(components, function(response) {
       var success = Ext.isObject(response) && response.success;
       Ext.Array.each(records, function(model) {
         model.beginEdit();
