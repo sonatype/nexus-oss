@@ -15,6 +15,7 @@ package org.sonatype.nexus.timeline.feeds.sources;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +38,8 @@ public class AuthcAuthzFeedSource
 {
   public static final String CHANNEL_KEY = "authcAuthz";
 
+  private static final Set<String> TYPE_SET = ImmutableSet.of(FeedRecorder.FAMILY_AUTH);
+
   @Inject
   public AuthcAuthzFeedSource(final FeedRecorder feedRecorder) {
     super(
@@ -47,12 +50,33 @@ public class AuthcAuthzFeedSource
   }
 
   @Override
-  protected void fillInEntries(final List<FeedEvent> feed, final int from, final int count,
-                               final Map<String, String> params)
+  protected List<FeedEvent> getEntries(final int from,
+                                       final int count,
+                                       final Map<String, Object> params)
       throws IOException
   {
-    feed.addAll(
-        getFeedRecorder().getEvents(ImmutableSet.of(FeedRecorder.FAMILY_AUTH), null, from, count, filters(params)));
+    return getFeedRecorder().getEvents(
+        TYPE_SET,
+        null,
+        toWhere(params),
+        params,
+        from,
+        count,
+        null
+    );
   }
 
+  /**
+   * Formats entry title for event.
+   */
+  @Override
+  protected String title(FeedEvent evt) {
+    if (FeedRecorder.AUTH_AUTHC.equals(evt.getEventSubType())) {
+      return "Authentication";
+    }
+    else if (FeedRecorder.AUTH_AUTHZ.equals(evt.getEventSubType())) {
+      return "Authorization";
+    }
+    return super.title(evt);
+  }
 }

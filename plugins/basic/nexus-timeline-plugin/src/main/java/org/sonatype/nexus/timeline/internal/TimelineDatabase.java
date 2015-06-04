@@ -10,37 +10,45 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timeline.feeds;
+package org.sonatype.nexus.timeline.internal;
 
-import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.timeline.Entry;
-
-import com.google.common.base.Predicate;
+import org.sonatype.nexus.orient.DatabaseInstance;
+import org.sonatype.nexus.orient.DatabaseManager;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Predicate for {@link Entry} filtering that implements "key" associated value is in set of. When the values set has
- * one value, it's basically reduces to "equals" predicate.
+ * Shared {@code timeline} database.
  *
  * @since 3.0
  */
-public class AnyOfFilter
-    implements Predicate<Entry>
+public class TimelineDatabase
 {
-  private final String key;
+  public static final String NAME = "timeline";
 
-  private final Set<String> values;
+  /**
+   * Shared {@code timeline} database instance provider.
+   */
+  @Named(NAME)
+  @Singleton
+  public static class ProviderImpl
+      implements Provider<DatabaseInstance>
+  {
+    private final DatabaseManager databaseManager;
 
-  public AnyOfFilter(final String key, final Set<String> values) {
-    this.key = checkNotNull(key);
-    this.values = checkNotNull(values);
-  }
+    @Inject
+    public ProviderImpl(final DatabaseManager databaseManager) {
+      this.databaseManager = checkNotNull(databaseManager);
+    }
 
-  @Override
-  public boolean apply(final Entry hit) {
-    return (hit.getData().containsKey(key)
-        && values.contains(hit.getData().get(key)));
+    @Override
+    public DatabaseInstance get() {
+      return databaseManager.instance(NAME);
+    }
   }
 }

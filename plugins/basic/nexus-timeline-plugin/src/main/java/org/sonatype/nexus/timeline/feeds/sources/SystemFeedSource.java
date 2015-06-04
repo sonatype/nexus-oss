@@ -14,6 +14,7 @@ package org.sonatype.nexus.timeline.feeds.sources;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,6 +37,8 @@ public class SystemFeedSource
 {
   public static final String CHANNEL_KEY = "systemChanges";
 
+  private static final Set<String> TYPE_SET = ImmutableSet.of(FeedRecorder.FAMILY_SYSTEM, FeedRecorder.FAMILY_REPO);
+
   @Inject
   public SystemFeedSource(final FeedRecorder feedRecorder) {
     super(feedRecorder,
@@ -45,12 +48,43 @@ public class SystemFeedSource
   }
 
   @Override
-  public void fillInEntries(final List<FeedEvent> entries, final int from, final int count,
-                            final Map<String, String> params)
+  protected List<FeedEvent> getEntries(final int from,
+                                       final int count,
+                                       final Map<String, Object> params)
   {
-    entries.addAll(getFeedRecorder()
-        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_SYSTEM, FeedRecorder.FAMILY_REPO), null, from, count,
-            filters(params)
-        ));
+    return getFeedRecorder().getEvents(
+        TYPE_SET,
+        null,
+        toWhere(params),
+        params,
+        from,
+        count,
+        null
+    );
+  }
+
+  /**
+   * Formats entry title for event.
+   */
+  @Override
+  protected String title(final FeedEvent evt) {
+    if (FeedRecorder.SYSTEM_BOOT.equals(evt.getEventSubType())) {
+      return "Nexus " + evt.getData().get("bootAction");
+    }
+    else if (FeedRecorder.SYSTEM_CONFIG.equals(evt.getEventSubType())) {
+      return "Configuration change";
+    }
+    else if (FeedRecorder.FAMILY_REPO.equals(evt.getEventType())) {
+      if (FeedRecorder.REPO_CREATED.equals(evt.getEventSubType())) {
+        return "Repository created";
+      }
+      else if (FeedRecorder.REPO_UPDATED.equals(evt.getEventSubType())) {
+        return "Repository updated";
+      }
+      else if (FeedRecorder.REPO_DELETED.equals(evt.getEventSubType())) {
+        return "Repository deleted";
+      }
+    }
+    return super.title(evt);
   }
 }

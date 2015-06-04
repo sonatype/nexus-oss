@@ -83,30 +83,4 @@ public class SystemSubscriber
     );
     getFeedRecorder().addEvent(fe);
   }
-  //
-  //@Subscribe
-  //@AllowConcurrentEvents
-  //public void on(final ConfigurationChangeEvent event) {
-  //  if (event.getChanges().isEmpty()) {
-  //    return;
-  //  }
-  //  // keep list unique, one component might be reported multiple times
-  //  final HashSet<String> changes = Sets.newHashSet();
-  //  for (Configurable changed : event.getChanges()) {
-  //    changes.add(changed.getName());
-  //  }
-  //  final Map<String, String> data = Maps.newHashMap();
-  //  putIfNotNull(data, "changes", changes.toString());
-  //  putIfNotNull(data, "userId", event.getUserId());
-  //  final FeedEvent fe = new FeedEvent(
-  //      FeedRecorder.FAMILY_SYSTEM,
-  //      FeedRecorder.SYSTEM_CONFIG,
-  //      event.getEventDate(),
-  //      event.getUserId(),
-  //      "/", // link to UI
-  //      data
-  //  );
-  //  getFeedRecorder().addEvent(fe);
-  //}
-
 }

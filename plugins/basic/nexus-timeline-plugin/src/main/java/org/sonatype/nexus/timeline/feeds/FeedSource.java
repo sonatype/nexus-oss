@@ -48,8 +48,8 @@ public interface FeedSource
    *
    * @param from   Record number to start with. Newest record is 0.
    * @param count  Count of the entries to generate.
-   * @param params A map of all the client made parameters.
+   * @param params A map of all the caller made parameters.
    */
-  List<FeedEvent> getFeed(int from, int count, Map<String, String> params)
+  List<FeedEvent> getFeed(int from, int count, Map<String, Object> params)
       throws IOException;
 }

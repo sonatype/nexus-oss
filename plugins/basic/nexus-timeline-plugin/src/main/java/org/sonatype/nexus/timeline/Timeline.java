@@ -15,7 +15,7 @@ package org.sonatype.nexus.timeline;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.base.Predicate;
+import javax.annotation.Nullable;
 
 /**
  * Timeline is a journaling database of entries.
@@ -44,17 +44,23 @@ public interface Timeline
 
   /**
    * Retrieves the timeline records that are timestamped in between of fromTs, in descending order (newest 1st,
-   * oldest
-   * last).
+   * oldest last).
+   * TODO: storageTx query filtering (whereClause + params)
    *
-   * @param fromItem the count of items you want to "skip" (paging). 0 if none, "from beginning".
-   * @param count    the max count of records you want to fetch.
-   * @param types    the types you want to fetch or null if "all" (do not filter by types).
-   * @param subtypes the subtypes you want to fetch or null if "all" (do not filter by subtypes).
-   * @param filter   filter, may be null.
-   * @param cb       the callback.
+   * @param fromItem    the count of items you want to "skip" (paging). 0 if none, "from beginning".
+   * @param count       the max count of records you want to fetch.
+   * @param types       the types you want to fetch or null if "all" (do not filter by types).
+   * @param subtypes    the subtypes you want to fetch or null if "all" (do not filter by subtypes).
+   * @param whereClause custom where clause (optional).
+   * @param parameters  parameters for whereClause (optional).
+   * @param cb          the callback.
    */
-  void retrieve(int fromItem, int count, Set<String> types, Set<String> subtypes, Predicate<Entry> filter,
+  void retrieve(int fromItem,
+                int count,
+                @Nullable Set<String> types,
+                @Nullable Set<String> subtypes,
+                @Nullable String whereClause,
+                @Nullable Map<String, Object> parameters,
                 TimelineCallback cb);
 
   /**

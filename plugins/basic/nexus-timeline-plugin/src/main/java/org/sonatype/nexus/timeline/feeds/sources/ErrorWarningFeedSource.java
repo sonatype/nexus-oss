@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -67,13 +68,14 @@ public class ErrorWarningFeedSource
   }
 
   @Override
-  protected void fillInEntries(final List<FeedEvent> feed, final int from, final int count,
-                               final Map<String, String> params)
+  protected List<FeedEvent> getEntries(final int from,
+                                       final int count,
+                                       final Map<String, Object> params)
       throws IOException
   {
     final Iterable<String> logFilenamesToScan = getLogFilenamesToScan(params);
     int remainingCount = count;
-    final List<FeedEvent> entries = Lists.newArrayList();
+    final List<FeedEvent> entries = new ArrayList<>();
     for (String logFileName : logFilenamesToScan) {
       final File logFile = logManager.getLogFile(logFileName);
       if (logFile == null) {
@@ -88,7 +90,7 @@ public class ErrorWarningFeedSource
       remainingCount -= logFileEntries.size();
       entries.addAll(logFileEntries);
     }
-    feed.addAll(entries);
+    return entries;
   }
 
   // ==
@@ -99,10 +101,10 @@ public class ErrorWarningFeedSource
    *
    * @param params the map containing feed query parameters.
    */
-  private Iterable<String> getLogFilenamesToScan(final Map<String, String> params) {
+  private Iterable<String> getLogFilenamesToScan(final Map<String, Object> params) {
     // 'fts' is a comma delimited list of filenames (example: "nexus.log,nexus.log.1")
     if (params.containsKey("fts")) {
-      final String files = params.get("fts");
+      final String files = String.valueOf(params.get("fts"));
       if (!Strings.isNullOrEmpty(files)) {
         return Splitter.on(',').omitEmptyStrings().split(files);
       }

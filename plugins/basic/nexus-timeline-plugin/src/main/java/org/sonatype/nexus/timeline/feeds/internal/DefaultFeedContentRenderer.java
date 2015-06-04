@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.rest.FeedContentRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -25,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * The default {@link FeedContentRenderer} honors overrides, and if needed, dispatches to some rendered (for now
  * "plaintext" only).
- * 
+ *
  * @since 3.0
  */
 @Singleton
@@ -43,24 +44,11 @@ public class DefaultFeedContentRenderer
 
   @Override
   public String getContentType(final FeedEvent evt) {
-    return "text/plain";
-  }
-
-  @Override
-  public String getTitle(final FeedEvent evt) {
-    // allow override, like when event is not coming from timeline
-    // but is parsed from Nexus Log, see ErrorWarningFeedSource
-    final String title = evt.getTitle();
-    if (title != null) {
-      return title;
-    }
-    return plainTextRenderer.getTitle(evt);
+    return ContentTypes.TEXT_PLAIN;
   }
 
   @Override
   public String getContent(final FeedEvent evt) {
-    // allow override, like when event is not coming from timeline
-    // but is parsed from Nexus Log, see ErrorWarningFeedSource
     final String content = evt.getContent();
     if (content != null) {
       return content;

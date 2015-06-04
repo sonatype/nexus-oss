@@ -20,14 +20,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.app.NexusInitializedEvent;
 import org.sonatype.nexus.common.app.NexusStoppedEvent;
-import org.sonatype.nexus.orient.DatabaseManager;
-import org.sonatype.nexus.orient.DatabasePool;
+import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.OIndexNameBuilder;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.Timeline;
@@ -37,7 +38,6 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -67,8 +67,6 @@ public class DefaultTimeline
     extends LifecycleSupport
     implements Timeline
 {
-  private static final String DB_NAME = "timeline";
-
   @VisibleForTesting
   static final String DB_CLASS = "entryrecord";
 
@@ -93,13 +91,13 @@ public class DefaultTimeline
       .property(P_SUBTYPE)
       .build();
 
-  private final DatabaseManager databaseManager;
-
-  private DatabasePool pool;
+  private final Provider<DatabaseInstance> databaseInstanceProvider;
 
   @Inject
-  public DefaultTimeline(final EventBus eventBus, final DatabaseManager databaseManager) {
-    this.databaseManager = checkNotNull(databaseManager);
+  public DefaultTimeline(final EventBus eventBus,
+                         final @Named(TimelineDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider)
+  {
+    this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
     eventBus.register(this);
   }
 
@@ -129,8 +127,7 @@ public class DefaultTimeline
 
   @Override
   public void doStart() throws Exception {
-    try (ODatabaseDocumentTx db = databaseManager.connect(DB_NAME, true)) {
-
+    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().connect()) {
       // entities
       final OSchema schema = db.getMetadata().getSchema();
       if (!schema.existsClass(DB_CLASS)) {
@@ -145,20 +142,12 @@ public class DefaultTimeline
         log.info("Created schema: {}, properties: {}", type, type.properties());
       }
     }
-
-    this.pool = databaseManager.newPool(DB_NAME);
-  }
-
-  @Override
-  public void doStop() throws Exception {
-    pool.close();
-    pool = null;
   }
 
   @VisibleForTesting
   ODatabaseDocumentTx openDb() {
     ensureStarted();
-    return pool.acquire();
+    return databaseInstanceProvider.get().acquire();
   }
 
   // API
@@ -252,56 +241,80 @@ public class DefaultTimeline
   }
 
   @Override
-  public void retrieve(final int fromItem, final int count, final Set<String> types, final Set<String> subTypes,
-                       final Predicate<Entry> filter, final TimelineCallback callback)
+  public void retrieve(final int fromItem,
+                       final int count,
+                       @Nullable final Set<String> types,
+                       @Nullable final Set<String> subTypes,
+                       @Nullable final String whereClause,
+                       @Nullable final Map<String, Object> parameters,
+                       final TimelineCallback callback)
   {
     if (!isStarted() || count == 0) {
       return;
     }
     try (ODatabaseDocumentTx db = openDb()) {
-      db.begin();
-      try {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("SELECT FROM ").append(DB_CLASS);
-        if ((types != null && !types.isEmpty()) || (subTypes != null && !subTypes.isEmpty())) {
-          sb.append(" WHERE ");
-        }
-        if ((types != null && !types.isEmpty())) {
-          sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] ");
-        }
-        if (subTypes != null && !subTypes.isEmpty()) {
-          if ((types != null && !types.isEmpty())) {
-            sb.append(" AND ");
-          }
-          sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] ");
-        }
-        sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
-
-        log.debug("Query: {}", sb);
-
-        final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(sb.toString());
-
-        final OResultSet<ODocument> results = db.query(query);
-        if (results.isEmpty()) {
-          return;
-        }
-        for (ODocument doc : results) {
-          final EntryRecord record = new EntryRecord((Long) doc.field(P_TIMESTAMP, OType.LONG), (String) doc.field(
-              P_TYPE, OType.STRING), (String) doc.field(P_SUBTYPE, OType.STRING), null);
-          final Map<String, String> attributes = doc.field(P_DATA, OType.EMBEDDEDMAP);
-          record.getData().putAll(attributes);
-          if (!callback.processNext(record)) {
-            break;
-          }
-        }
+      final String sql = buildSql(fromItem, count, types, subTypes, whereClause);
+      log.debug("Query: {} params: {}", sql, parameters);
+      final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(sql);
+      final OResultSet<ODocument> results = db.query(query, parameters);
+      if (results.isEmpty()) {
+        return;
       }
-      finally {
-        db.commit();
+      for (ODocument doc : results) {
+        final EntryRecord record = new EntryRecord((Long) doc.field(P_TIMESTAMP, OType.LONG), (String) doc.field(
+            P_TYPE, OType.STRING), (String) doc.field(P_SUBTYPE, OType.STRING), null);
+        final Map<String, String> attributes = doc.field(P_DATA, OType.EMBEDDEDMAP);
+        record.getData().putAll(attributes);
+        if (!callback.processNext(record)) {
+          break;
+        }
       }
     }
     catch (IOException e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  /**
+   * Builds the Orient SQL SELECT command.
+   */
+  private String buildSql(final int fromItem,
+                          final int count,
+                          @Nullable final Set<String> types,
+                          @Nullable final Set<String> subTypes,
+                          @Nullable final String whereClause) {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("SELECT FROM ").append(DB_CLASS);
+    if (!isEmpty(types) || !isEmpty(subTypes)) {
+      sb.append(" WHERE ");
+    }
+    if (!isEmpty(types)) {
+      sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] ");
+    }
+    if (!isEmpty(subTypes)) {
+      if (!isEmpty(types)) {
+        sb.append(" AND ");
+      }
+      sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] ");
+    }
+    if (whereClause != null) {
+      if (sb.toString().endsWith(DB_CLASS)) {
+        sb.append(" WHERE ");
+      }
+      else {
+        sb.append(" AND ");
+      }
+      sb.append(whereClause);
+    }
+    sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
+    return sb.toString();
+  }
+
+  /**
+   * Shortcut method to check nullable sets. Considers null set as empty.
+   */
+  private boolean isEmpty(@Nullable Set<?> set) {
+    return set == null || set.isEmpty();
   }
 
   /**

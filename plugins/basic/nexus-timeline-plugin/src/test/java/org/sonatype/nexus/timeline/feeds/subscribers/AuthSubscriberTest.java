@@ -16,14 +16,20 @@ import org.sonatype.nexus.security.ClientInfo;
 import org.sonatype.nexus.security.anonymous.AnonymousConfiguration;
 import org.sonatype.nexus.security.anonymous.AnonymousManager;
 import org.sonatype.nexus.security.authc.NexusAuthenticationEvent;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
+import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -36,7 +42,8 @@ public class AuthSubscriberTest
 
   private AuthSubscriber underTest;
 
-  private DummyFeedRecorder feedRecorder = new DummyFeedRecorder();
+  @Mock
+  private FeedRecorder feedRecorder;
 
   @Mock
   private AnonymousManager anonymousManager;
@@ -74,7 +81,7 @@ public class AuthSubscriberTest
     underTest.on(naeFailed);
 
     // total 11 events "fired", but 3 recorded due to "similarity filtering"
-    assertThat(feedRecorder.getReceivedEventCount(), is(expected));
+    verify(feedRecorder, times(expected)).addEvent(any(FeedEvent.class));
   }
 
   @Test

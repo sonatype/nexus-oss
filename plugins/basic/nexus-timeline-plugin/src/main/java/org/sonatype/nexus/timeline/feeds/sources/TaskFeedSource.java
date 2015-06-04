@@ -14,6 +14,7 @@ package org.sonatype.nexus.timeline.feeds.sources;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +32,8 @@ public class TaskFeedSource
 {
   public static final String CHANNEL_KEY = "taskChanges";
 
+  private static final Set<String> TYPE_SET = ImmutableSet.of(FeedRecorder.FAMILY_TASK);
+
   @Inject
   public TaskFeedSource(final FeedRecorder feedRecorder) {
     super(feedRecorder,
@@ -40,12 +43,35 @@ public class TaskFeedSource
   }
 
   @Override
-  public void fillInEntries(final List<FeedEvent> entries, final int from, final int count,
-                            final Map<String, String> params)
+  protected List<FeedEvent> getEntries(final int from,
+                                       final int count,
+                                       final Map<String, Object> params)
   {
-    entries.addAll(getFeedRecorder()
-        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_TASK), null, from, count,
-            filters(params)
-        ));
+    return getFeedRecorder().getEvents(
+        TYPE_SET,
+        null,
+        toWhere(params),
+        params,
+        from,
+        count,
+        null
+    );
+  }
+
+  @Override
+  protected String title(final FeedEvent evt) {
+    if (FeedRecorder.TASK_STARTED.equals(evt.getEventSubType())) {
+      return "Started: " + evt.getData().get("taskName");
+    }
+    else if (FeedRecorder.TASK_FINISHED.equals(evt.getEventSubType())) {
+      return "Finished: " + evt.getData().get("taskName");
+    }
+    else if (FeedRecorder.TASK_CANCELED.equals(evt.getEventSubType())) {
+      return "Canceled: " + evt.getData().get("taskName");
+    }
+    else if (FeedRecorder.TASK_FAILED.equals(evt.getEventSubType())) {
+      return "Failed: " + evt.getData().get("taskName");
+    }
+    return super.title(evt);
   }
 }

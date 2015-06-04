@@ -13,8 +13,10 @@
 package org.sonatype.nexus.repository.storage;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.security.ClientInfo;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,9 +31,12 @@ public abstract class AssetEvent
 
   private final Repository repository;
 
-  public AssetEvent(final Asset asset, final Repository repository) {
+  private final ClientInfo clientInfo;
+
+  public AssetEvent(final Asset asset, final Repository repository, @Nullable final ClientInfo clientInfo) {
     this.asset = checkNotNull(asset);
     this.repository = checkNotNull(repository);
+    this.clientInfo = clientInfo;
   }
 
   @Nonnull
@@ -43,4 +48,7 @@ public abstract class AssetEvent
   public Repository getRepository() {
     return repository;
   }
+
+  @Nullable
+  public ClientInfo getClientInfo() { return clientInfo; }
 }

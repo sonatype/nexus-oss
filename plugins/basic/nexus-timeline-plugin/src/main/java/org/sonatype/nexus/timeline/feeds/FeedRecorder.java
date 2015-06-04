@@ -13,12 +13,14 @@
 package org.sonatype.nexus.timeline.feeds;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.nexus.timeline.Entry;
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.timeline.Timeline;
 
-import com.google.common.base.Predicate;
+import com.google.common.base.Function;
 
 /**
  * A recorder for events and their retrieval. The Actions are "generic" Nexus event related. This component
@@ -52,35 +54,37 @@ public interface FeedRecorder
 
   String REPO_CREATED = "created";
 
-  String REPO_DROPPED = "dropped";
+  String REPO_DELETED = "deleted";
 
   String REPO_UPDATED = "updated";
 
-  String REPO_LSTATUS = "local";
+  // ==
 
-  String REPO_PSTATUS = "proxy";
+  String FAMILY_ASSET = "asset";
+
+  String ASSET_CACHED = "cached";
+
+  String ASSET_CACHED_UPDATE = "cachedU";
+
+  String ASSET_DEPLOYED = "deployed";
+
+  String ASSET_DEPLOYED_UPDATE = "deployedU";
+
+  String ASSET_DELETED = "deleted";
 
   // ==
 
-  String FAMILY_ITEM = "item";
+  String FAMILY_COMPONENT = "component";
 
-  String ITEM_CACHED = "cached";
+  String COMPONENT_CACHED = "cached";
 
-  String ITEM_CACHED_UPDATE = "cachedU";
+  String COMPONENT_CACHED_UPDATE = "cachedU";
 
-  String ITEM_DEPLOYED = "deployed";
+  String COMPONENT_DEPLOYED = "deployed";
 
-  String ITEM_DEPLOYED_UPDATE = "deployedU";
+  String COMPONENT_DEPLOYED_UPDATE = "deployedU";
 
-  String ITEM_DELETED = "deleted";
-
-  String ITEM_RETRIEVED = "retrieved";
-
-  String ITEM_BROKEN = "broken";
-
-  String ITEM_BROKEN_WRONG_REMOTE_CHECKSUM = "brokenWRC";
-
-  String ITEM_BROKEN_INVALID_CONTENT = "brokenIC";
+  String COMPONENT_DELETED = "deleted";
 
   // ==
 
@@ -96,8 +100,28 @@ public interface FeedRecorder
 
   // creating
 
+  /**
+   * Adds feed event to timeline.
+   */
   void addEvent(FeedEvent entry);
 
-  List<FeedEvent> getEvents(Set<String> types, Set<String> subtypes, int from, int count,
-                            Predicate<Entry> filter);
+  /**
+   * Retrieves feed events from timeline.
+   *
+   * @param types       to filter for types or {@code null}.
+   * @param subtypes    to filter for subtypes or {@code null}.
+   * @param whereClause custom where clause (optional).
+   * @param parameters  parameters for whereClause (optional).
+   * @param from        paging, from
+   * @param count       paging, to
+   * @param function    custom transormation or {@code null}. Useful to fill in parts of data NOT stored in timeline
+   *                    (or composed from data present), like generated content, event title etc.
+   */
+  List<FeedEvent> getEvents(@Nullable Set<String> types,
+                            @Nullable Set<String> subtypes,
+                            @Nullable String whereClause,
+                            @Nullable Map<String, Object> parameters,
+                            int from,
+                            int count,
+                            @Nullable Function<FeedEvent, FeedEvent> function);
 }
