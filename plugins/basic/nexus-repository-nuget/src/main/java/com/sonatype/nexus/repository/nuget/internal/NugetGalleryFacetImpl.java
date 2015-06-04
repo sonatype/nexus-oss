@@ -233,15 +233,23 @@ public class NugetGalleryFacetImpl
 
   @Override
   public void putMetadata(final Map<String, String> metadata) {
-    try (StorageTx tx = openStorageTx()) {
-      final Component component = createOrUpdatePackage(tx, metadata);
-      tx.commit();
-    }
+    storage.perform(new Operation<Object>()
+    {
+      @Override
+      public Object execute(final StorageTx tx) {
+        final Component component = createOrUpdatePackage(tx, metadata);
+        return null;
+      }
+    });
+
     // Separate tx is necessary for the meantime, since the re-querying orient doesn't pick up uncommitted state
-    try (StorageTx tx = openStorageTx()) {
-      maintainAggregateInfo(tx, metadata.get(ID));
-      tx.commit();
-    }
+    storage.perform(new Operation<Object>(){
+      @Override
+      public Object execute(final StorageTx tx) {
+        maintainAggregateInfo(tx, metadata.get(ID));
+        return null;
+      }
+    });
   }
 
   @Override
