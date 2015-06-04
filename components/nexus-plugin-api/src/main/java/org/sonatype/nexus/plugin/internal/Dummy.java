@@ -17,6 +17,6 @@ package org.sonatype.nexus.plugin.internal;
 /**
  * Dummy class.
  */
-class Dummy
+public class Dummy
 {
 }
