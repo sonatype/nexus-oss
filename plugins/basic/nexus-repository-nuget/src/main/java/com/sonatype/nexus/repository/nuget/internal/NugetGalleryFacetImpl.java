@@ -402,7 +402,7 @@ public class NugetGalleryFacetImpl
 
       Date date = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
 
-      log.info("Content for {} {} last verified as of {}", id, version, date);
+      log.debug("Content for {} {} last verified as of {}", id, version, date);
       return new DateTime(checkNotNull(date));
     }
   }
@@ -423,7 +423,7 @@ public class NugetGalleryFacetImpl
         return priorDate;
       }
     });
-    log.info("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
+    log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
   }
 
   @Override
