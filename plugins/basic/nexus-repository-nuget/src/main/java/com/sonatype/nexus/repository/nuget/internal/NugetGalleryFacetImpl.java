@@ -349,11 +349,10 @@ public class NugetGalleryFacetImpl
     checkNotNull(version);
 
     try (StorageTx tx = openStorageTx()) {
-      Component component = findComponent(tx, id, version);
-      if (component == null) {
+      Asset asset = findAsset(tx, id, version);
+      if (asset == null) {
         return null;
       }
-      Asset asset = tx.firstAsset(component);
 
       final BlobRef blobRef = asset.blobRef();
       if (blobRef == null) {
@@ -400,11 +399,8 @@ public class NugetGalleryFacetImpl
     {
       @Override
       public Date execute(final StorageTx tx) {
-        final Component component = findComponent(tx, id, version);
-        if (component == null) {
-          return null;
-        }
-        Asset asset = tx.firstAsset(component);
+        Asset asset = findAsset(tx, id, version);
+        checkState(asset != null);
 
         final Date priorDate = asset.formatAttributes().get(P_LAST_KNOWN_FRESH_DATE, Date.class);
         asset.formatAttributes().set(P_LAST_KNOWN_FRESH_DATE, date.toDate());
@@ -507,6 +503,15 @@ public class NugetGalleryFacetImpl
     return null;
   }
 
+  @Nullable
+  private Asset findAsset(final StorageTx tx, final String id, final String version) {
+    Component component = findComponent(tx, id, version);
+    if (component == null) {
+      return null;
+    }
+    return tx.firstAsset(component);
+  }
+
   private String blobName(Component component) {
     return component.name() + "-" + component.requireVersion() + ".nupkg";
   }
@@ -572,6 +577,7 @@ public class NugetGalleryFacetImpl
       Asset asset = findOrCreateAsset(storageTx, component);
       updateAssetMetadata(asset, data, component.isNew());
 
+      asset.formatAttributes().set(P_LAST_KNOWN_FRESH_DATE, new Date());
       storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
 
       storageTx.saveAsset(asset);
@@ -608,14 +614,6 @@ public class NugetGalleryFacetImpl
 
     storageTx.saveComponent(component);
     return component;
-  }
-
-  private Asset findAsset(final StorageTx tx, final String id, final String version) {
-    Component component = findComponent(tx, id, version);
-    if (component == null) {
-      return null;
-    }
-    return tx.firstAsset(component);
   }
 
   /**
