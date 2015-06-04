@@ -84,7 +84,10 @@ public interface StorageFacet
   StorageTx openTx(ODatabaseDocumentTx db);
 
   /**
-   * Operation that should be retried in case of concurrent update signaled by underlying database.
+   * Operation that should be retried in case of Orient MVCC detected conflict. Usually these are "update" related
+   * operations. Implementation should be immutable/stateless, and implemented with caution that the execute method
+   * might be invoked multiple times. Operation must save any updated entity, but must NOT commit as {@link StorageTx}
+   * is not reusable after commit currently.
    */
   interface Operation<T>
   {
@@ -92,7 +95,8 @@ public interface StorageFacet
   }
 
   /**
-   * Method that handles retries of operation if needed.
+   * Handles retries of passed in {@link Operation}, if needed. Operation will receive newly opened {@link StorageTx}
+   * and on clean return from this method it is guaramteed that operation did succeed and change is commited.
    */
   <T> T perform(Operation<T> operation);
 }

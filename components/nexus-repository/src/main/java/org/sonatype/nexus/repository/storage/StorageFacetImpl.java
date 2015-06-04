@@ -222,24 +222,26 @@ public class StorageFacetImpl
     hookSuppliers.remove(hookSupplier);
   }
 
-  private static final int MAX_CONCURRENCY_ATTEMPTS = 3;
+  private static final int MAX_CONCURRENT_MODIFICATION_ATTEMPTS = 3;
 
   @Override
   public <T> T perform(final Operation<T> operation) {
     checkNotNull(operation);
     OConcurrentModificationException lastConcurrentException = null;
-    try (final StorageTx tx = openTx()) {
-      for (int attempt = 0; attempt < MAX_CONCURRENCY_ATTEMPTS; attempt++) {
+    try (StorageTx tx = openTx()) {
+      for (int attempt = 0; attempt < MAX_CONCURRENT_MODIFICATION_ATTEMPTS; attempt++) {
         try {
-          return operation.execute(tx);
+          T result = operation.execute(tx);
+          tx.commit();
+          return result;
         }
         catch (OConcurrentModificationException e) {
           lastConcurrentException = e;
           log.debug("Operation {} attempt failed, retrying: {}", attempt + 1, operation, e);
         }
       }
+      throw lastConcurrentException;
     }
-    throw lastConcurrentException;
   }
 
   /**

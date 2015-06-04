@@ -187,35 +187,43 @@ public class MavenFacetImpl
   @Override
   public Content get(final StorageTx tx, final MavenPath path) throws IOException {
     log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    final Asset asset = findAsset(tx, tx.getBucket(), path);
-    if (asset == null) {
-      return null;
-    }
-    return toContent(tx, asset);
+    return toContent(tx, path);
   }
 
   /**
    * Creates {@link Content} from passed in {@link Asset}.
    */
-  private Content toContent(final StorageTx tx, final Asset asset) throws IOException {
-    final Blob blob = tx.requireBlob(asset.requireBlobRef());
-    final String contentType = asset.contentType();
+  private Content toContent(final StorageTx tx, final MavenPath mavenPath) throws IOException {
+    for (int attempt = 0; attempt < 3; attempt++) {
+      try {
+        final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
+        if (asset == null) {
+          return null;
+        }
+        final Blob blob = tx.requireBlob(asset.requireBlobRef());
+        final String contentType = asset.contentType();
 
-    final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
-    final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
-    for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
-      final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
-      hashCodes.put(algorithm, hashCode);
+        final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
+        final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
+        for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
+          final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
+          hashCodes.put(algorithm, hashCode);
+        }
+        final NestedAttributesMap attributesMap = asset.formatAttributes();
+        final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
+        final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
+        final Content result = new Content(new BlobPayload(blob, contentType));
+        result.getAttributes()
+            .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
+        result.getAttributes().set(Content.CONTENT_ETAG, eTag);
+        result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
+        return result;
+      }
+      catch (IllegalStateException e) {
+        // backing blob changed, retry by reloading all again
+      }
     }
-    final NestedAttributesMap attributesMap = asset.formatAttributes();
-    final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-    final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
-    final Content result = new Content(new BlobPayload(blob, contentType));
-    result.getAttributes()
-        .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
-    result.getAttributes().set(Content.CONTENT_ETAG, eTag);
-    result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
-    return result;
+    return null;
   }
 
   @Override
@@ -297,7 +305,7 @@ public class MavenFacetImpl
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
-    return toContent(tx, asset);
+    return toContent(tx, path);
   }
 
   private Content putFile(final StorageTx tx,
@@ -318,7 +326,7 @@ public class MavenFacetImpl
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
-    return toContent(tx, asset);
+    return toContent(tx, path);
   }
 
   private void putAssetPayload(final StorageTx tx,
@@ -420,7 +428,6 @@ public class MavenFacetImpl
         final NestedAttributesMap attributes = asset.formatAttributes();
         attributes.set(P_LAST_VERIFIED, verified.toDate());
         tx.saveAsset(asset);
-        tx.commit();
         return true;
       }
     });
