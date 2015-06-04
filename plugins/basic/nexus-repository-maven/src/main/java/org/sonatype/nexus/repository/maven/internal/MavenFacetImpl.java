@@ -194,6 +194,7 @@ public class MavenFacetImpl
    * Creates {@link Content} from passed in {@link Asset}.
    */
   private Content toContent(final StorageTx tx, final MavenPath mavenPath) throws IOException {
+    IllegalStateException lastIllegalStateException = null;
     for (int attempt = 0; attempt < 3; attempt++) {
       try {
         final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
@@ -221,9 +222,10 @@ public class MavenFacetImpl
       }
       catch (IllegalStateException e) {
         // backing blob changed, retry by reloading all again
+        lastIllegalStateException = e;
       }
     }
-    return null;
+    throw lastIllegalStateException;
   }
 
   @Override
