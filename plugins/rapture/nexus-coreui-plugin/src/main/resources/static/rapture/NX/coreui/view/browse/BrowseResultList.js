@@ -36,7 +36,7 @@ Ext.define('NX.coreui.view.browse.BrowseResultList', {
   },
 
   viewConfig: {
-    emptyText: NX.I18n.get('Browse_BrowseResultList_EmptyText_View'),
+    emptyText: NX.I18n.get('View_Browse_BrowseResultList_EmptyText_View'),
     deferEmptyText: false
   },
 
@@ -53,16 +53,16 @@ Ext.define('NX.coreui.view.browse.BrowseResultList', {
         return 'browse-component';
       }
     },
-    { header: NX.I18n.get('Browse_BrowseResultList_Name_Column'), dataIndex: 'name', stateId: 'name', flex: 3,
+    { header: NX.I18n.get('View_Browse_BrowseResultList_Name_Column'), dataIndex: 'name', stateId: 'name', flex: 3,
       renderer: function (value) {
         if(!value) {
-          return NX.I18n.get('Browse_BrowseResultList_Name_Column_Unattached');
+          return NX.I18n.get('View_Browse_BrowseResultList_Name_Column_Unattached');
         }
         return value;
       }
     },
-    { header: NX.I18n.get('Browse_BrowseResultList_Group_Column'), dataIndex: 'group', stateId: 'group', flex: 4 },
-    { header: NX.I18n.get('Browse_BrowseResultList_Version_Column'), dataIndex: 'version', stateId: 'version', flex: 1 },
+    { header: NX.I18n.get('View_Browse_BrowseResultList_Group_Column'), dataIndex: 'group', stateId: 'group', flex: 4 },
+    { header: NX.I18n.get('View_Browse_BrowseResultList_Version_Column'), dataIndex: 'version', stateId: 'version', flex: 1 },
   ]
 
 });

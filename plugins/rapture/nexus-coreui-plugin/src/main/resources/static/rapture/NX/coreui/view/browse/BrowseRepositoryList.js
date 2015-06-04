@@ -39,19 +39,19 @@ Ext.define('NX.coreui.view.browse.BrowseRepositoryList', {
       iconNamePrefix: 'repository-',
       dataIndex: 'type'
     },
-    {header: NX.I18n.get('Browse_BrowseRepositoryList_Name_Column'), dataIndex: 'name', stateId: 'name', flex: 1},
-    {header: NX.I18n.get('Browse_BrowseRepositoryList_Type_Column'), dataIndex: 'type', stateId: 'type'},
-    {header: NX.I18n.get('Browse_BrowseRepositoryList_Format_Column'), dataIndex: 'format', stateId: 'format'}
+    {header: NX.I18n.get('View_Browse_BrowseRepositoryList_Name_Column'), dataIndex: 'name', stateId: 'name', flex: 1},
+    {header: NX.I18n.get('View_Browse_BrowseRepositoryList_Type_Column'), dataIndex: 'type', stateId: 'type'},
+    {header: NX.I18n.get('View_Browse_BrowseRepositoryList_Format_Column'), dataIndex: 'format', stateId: 'format'}
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('Browse_BrowseRepositoryList_EmptyText_View'),
+    emptyText: NX.I18n.get('View_Browse_BrowseRepositoryList_EmptyText_View'),
     deferEmptyText: false,
     markDirty: false
   },
 
   plugins: [
-    {ptype: 'gridfilterbox', emptyText: NX.I18n.get('Browse_BrowseRepositoryList_EmptyText_Filter')}
+    {ptype: 'gridfilterbox', emptyText: NX.I18n.get('View_Browse_BrowseRepositoryList_EmptyText_Filter')}
   ]
 
 });
