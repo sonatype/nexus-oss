@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
@@ -100,7 +99,7 @@ public class SearchServiceImpl
     checkNotNull(repository);
     // TODO we should calculate the checksum of index settings and compare it with a value stored in index _meta tags
     // in case that they not match (settings changed) we should drop the index, recreate it and re-index all components
-    if (!client.get().admin().indices().prepareExists(Strings2.lower(repository.getName())).execute().actionGet()
+    if (!client.get().admin().indices().prepareExists(safeIndexName(repository)).execute().actionGet()
         .isExists()) {
       // determine list of mapping configuration urls
       List<URL> urls = Lists.newArrayListWithExpectedSize(indexSettingsContributors.size() + 1);
@@ -290,7 +289,7 @@ public class SearchServiceImpl
    */
   @Nonnull
   private String safeIndexName(final Repository repository) {
-    return repository.getName().toLowerCase(Locale.ENGLISH);
+    return Strings2.lower(repository.getName());
   }
 
 }
