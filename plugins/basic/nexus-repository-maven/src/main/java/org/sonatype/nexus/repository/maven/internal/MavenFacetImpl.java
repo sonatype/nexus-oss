@@ -42,6 +42,7 @@ import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.types.ProxyType;
@@ -408,17 +409,21 @@ public class MavenFacetImpl
 
   @Override
   public boolean setLastVerified(final MavenPath path, final DateTime verified) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      final Asset asset = findAsset(tx, tx.getBucket(), path);
-      if (asset == null) {
-        return false;
+    return storageFacet.perform(new Operation<Boolean>()
+    {
+      @Override
+      public Boolean execute(final StorageTx tx) {
+        final Asset asset = findAsset(tx, tx.getBucket(), path);
+        if (asset == null) {
+          return false;
+        }
+        final NestedAttributesMap attributes = asset.formatAttributes();
+        attributes.set(P_LAST_VERIFIED, verified.toDate());
+        tx.saveAsset(asset);
+        tx.commit();
+        return true;
       }
-      final NestedAttributesMap attributes = asset.formatAttributes();
-      attributes.set(P_LAST_VERIFIED, verified.toDate());
-      tx.saveAsset(asset);
-      tx.commit();
-      return true;
-    }
+    });
   }
 
   /**

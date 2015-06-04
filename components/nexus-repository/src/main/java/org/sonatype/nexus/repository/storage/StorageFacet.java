@@ -82,4 +82,17 @@ public interface StorageFacet
    * Opens a transaction with given OrientDB connection.
    */
   StorageTx openTx(ODatabaseDocumentTx db);
+
+  /**
+   * Operation that should be retried in case of concurrent update signaled by underlying database.
+   */
+  interface Operation<T>
+  {
+    T execute(StorageTx tx);
+  }
+
+  /**
+   * Method that handles retries of operation if needed.
+   */
+  <T> T perform(Operation<T> operation);
 }

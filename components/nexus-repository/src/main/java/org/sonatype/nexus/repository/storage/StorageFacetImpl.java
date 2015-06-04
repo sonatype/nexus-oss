@@ -38,6 +38,7 @@ import org.sonatype.nexus.security.ClientInfoProvider;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -219,6 +220,26 @@ public class StorageFacetImpl
   public void unregisterHookSupplier(final Supplier<StorageTxHook> hookSupplier) {
     checkNotNull(hookSupplier);
     hookSuppliers.remove(hookSupplier);
+  }
+
+  private static final int MAX_CONCURRENCY_ATTEMPTS = 3;
+
+  @Override
+  public <T> T perform(final Operation<T> operation) {
+    checkNotNull(operation);
+    OConcurrentModificationException lastConcurrentException = null;
+    try (final StorageTx tx = openTx()) {
+      for (int attempt = 0; attempt < MAX_CONCURRENCY_ATTEMPTS; attempt++) {
+        try {
+          return operation.execute(tx);
+        }
+        catch (OConcurrentModificationException e) {
+          lastConcurrentException = e;
+          log.debug("Operation {} attempt failed, retrying: {}", attempt + 1, operation, e);
+        }
+      }
+    }
+    throw lastConcurrentException;
   }
 
   /**
