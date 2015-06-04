@@ -228,8 +228,8 @@ public class StorageFacetImpl
   public <T> T perform(final Operation<T> operation) {
     checkNotNull(operation);
     OConcurrentModificationException lastConcurrentException = null;
-    try (StorageTx tx = openTx()) {
-      for (int attempt = 0; attempt < MAX_CONCURRENT_MODIFICATION_ATTEMPTS; attempt++) {
+    for (int attempt = 0; attempt < MAX_CONCURRENT_MODIFICATION_ATTEMPTS; attempt++) {
+      try (StorageTx tx = openTx()) {
         try {
           T result = operation.execute(tx);
           tx.commit();
