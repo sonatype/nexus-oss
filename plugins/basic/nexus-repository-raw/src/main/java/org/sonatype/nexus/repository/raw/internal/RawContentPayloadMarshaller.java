@@ -35,7 +35,7 @@ public class RawContentPayloadMarshaller
 {
   private RawContentPayloadMarshaller() { }
 
-  public static RawContent toContent(final Payload payload, final DateTime updatedDate) {
+  public static RawContent toContent(final Payload payload, final DateTime lastVerified) {
     return new RawContent()
     {
       @Override
@@ -54,8 +54,8 @@ public class RawContentPayloadMarshaller
       }
 
       @Override
-      public DateTime getLastUpdated() {
-        return updatedDate;
+      public DateTime getLastVerified() {
+        return lastVerified;
       }
     };
   }

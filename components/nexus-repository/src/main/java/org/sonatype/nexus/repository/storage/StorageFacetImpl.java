@@ -38,6 +38,7 @@ import org.sonatype.nexus.security.ClientInfoProvider;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -220,6 +221,35 @@ public class StorageFacetImpl
     checkNotNull(hookSupplier);
     hookSuppliers.remove(hookSupplier);
   }
+
+  private static final int MAX_CONCURRENT_MODIFICATION_ATTEMPTS = 3;
+
+  @Override
+  public <T> T perform(final Operation<T> operation) {
+    return perform(databaseInstanceProvider.get().acquire(), operation);
+  }
+
+  @Override
+  public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) {
+    checkNotNull(db);
+    checkNotNull(operation);
+    OConcurrentModificationException lastConcurrentException = null;
+    for (int attempt = 0; attempt < MAX_CONCURRENT_MODIFICATION_ATTEMPTS; attempt++) {
+      try (StorageTx tx = openTx(db)) {
+        try {
+          T result = operation.execute(tx);
+          tx.commit();
+          return result;
+        }
+        catch (OConcurrentModificationException e) {
+          lastConcurrentException = e;
+          log.debug("Failed operation {} on {}:", operation, getRepository(), e);
+        }
+      }
+    }
+    throw lastConcurrentException;
+  }
+
 
   /**
    * Returns the "principal name" to be used with current instance of {@link StorageTx}.

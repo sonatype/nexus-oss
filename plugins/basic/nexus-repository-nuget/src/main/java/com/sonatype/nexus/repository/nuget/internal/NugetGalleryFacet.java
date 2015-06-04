@@ -45,7 +45,7 @@ public interface NugetGalleryFacet
   /**
    * Attach content to pre-existing metadata.
    */
-  void putContent(String id, String version, InputStream content);
+  void putContent(String id, String version, InputStream content) throws IOException;
 
   /**
    * Get a package, or {@code null} if not found.
@@ -54,9 +54,15 @@ public interface NugetGalleryFacet
   Payload get(String id, String version) throws IOException;
 
   /**
-   * Gets the last updated date of a package, or {@code null} if not found.
+   * Gets when we last checked that the content was up to date relative to the remote server, or {@code null} if not
+   * found.
    */
-  DateTime getLastUpdatedDate(String id, String version);
+  DateTime getLastVerified(String id, String version);
+
+  /**
+   * Sets when we last checked that the content was up to date relative to the remote server.
+   */
+  void setLastVerified(String id, String version, DateTime date);
 
   /**
    * Delete a package and return whether it existed.

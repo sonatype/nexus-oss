@@ -20,10 +20,10 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
-import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet;
 import org.sonatype.nexus.repository.view.Content;
@@ -34,6 +34,7 @@ import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.net.HttpHeaders;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -154,7 +155,17 @@ public abstract class ProxyFacetSupport
 
           // TODO: Introduce content validation.. perhaps content's type not matching path's implied type.
 
-          store(context, remote);
+          try {
+            store(context, remote);
+          }
+          catch (ORecordDuplicatedException e) {
+            log.debug("Failed proxy caching in {}, ignoring it", getRepository(), e);
+            // FIXME: just for experimenting purposes, handling this exception here as it was simplest
+            // note: this is incorrect solution as it leaks Orient in here
+            // but this happens on parallel remote fetches, and as such, should be simply
+            // neglected (the failed store attempt), as it means that cache does have the record
+            // and get below should succeed.
+          }
 
           content = getCachedPayload(context);
         }
@@ -212,12 +223,13 @@ public abstract class ProxyFacetSupport
 
       Payload payload = new HttpEntityPayload(response, entity);
       final Content result = new Content(payload);
-      result.getAttributes().set(Content.CONTENT_LAST_MODIFIED, extractLastModified(request, response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
+      result.getAttributes().set(Content.CONTENT_LAST_MODIFIED,
+          extractLastModified(request, response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
       result.getAttributes().set(Content.CONTENT_ETAG, extractETag(response.getLastHeader(HttpHeaders.ETAG)));
       return result;
     }
     if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
-      indicateUpToDate(context);
+      indicateVerified(context);
     }
     HttpClientUtils.closeQuietly(response);
 
@@ -261,16 +273,16 @@ public abstract class ProxyFacetSupport
   }
 
   /**
-   * For whatever component/asset is implied by the Context, return the date it was last deemed up to date, or {@code
+   * For whatever component/asset is implied by the Context, return the date it was last verified up to date, or {@code
    * null} if it isn't present.
    */
   @Nullable
-  protected abstract DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException;
+  protected abstract DateTime getCachedPayloadLastVerified(final Context context) throws IOException;
 
   /**
    * For whatever component/asset
    */
-  protected abstract void indicateUpToDate(final Context context) throws IOException;
+  protected abstract void indicateVerified(final Context context) throws IOException;
 
   /**
    * Provide the URL of the content relative to the repository root.
@@ -283,7 +295,7 @@ public abstract class ProxyFacetSupport
       return false;
     }
 
-    final DateTime lastUpdated = getCachedPayloadLastUpdatedDate(context);
+    final DateTime lastUpdated = getCachedPayloadLastVerified(context);
 
     if (lastUpdated == null) {
       log.debug("Artifact last modified date unknown");
