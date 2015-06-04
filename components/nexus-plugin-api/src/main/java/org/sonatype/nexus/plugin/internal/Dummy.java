@@ -12,11 +12,12 @@
  */
 package org.sonatype.nexus.plugin.internal;
 
-// FIXME: Remove, ATM bundle packaging complaining about no classes, sort out why release is unhappy?
+// FIXME: Remove, ATM bundle packaging complaining about no classes.  Public to keep javadoc plugin happy.
 
 /**
  * Dummy class.
  */
 public class Dummy
 {
+  private Dummy() {}
 }
