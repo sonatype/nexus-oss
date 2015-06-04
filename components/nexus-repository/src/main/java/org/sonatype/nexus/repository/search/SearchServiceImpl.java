@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
@@ -43,7 +44,6 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
-
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.client.Client;
@@ -100,7 +100,8 @@ public class SearchServiceImpl
     checkNotNull(repository);
     // TODO we should calculate the checksum of index settings and compare it with a value stored in index _meta tags
     // in case that they not match (settings changed) we should drop the index, recreate it and re-index all components
-    if (!client.get().admin().indices().prepareExists(repository.getName()).execute().actionGet().isExists()) {
+    if (!client.get().admin().indices().prepareExists(Strings2.lower(repository.getName())).execute().actionGet()
+        .isExists()) {
       // determine list of mapping configuration urls
       List<URL> urls = Lists.newArrayListWithExpectedSize(indexSettingsContributors.size() + 1);
       urls.add(Resources.getResource(getClass(), MAPPING_JSON)); // core mapping
