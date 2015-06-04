@@ -378,7 +378,7 @@ public class NugetGalleryFacetImpl
   }
 
   @Override
-  public DateTime getLastKnownFreshDate(final String id, final String version) {
+  public DateTime getLastVerified(final String id, final String version) {
     checkNotNull(id);
     checkNotNull(version);
 
@@ -393,7 +393,7 @@ public class NugetGalleryFacetImpl
   }
 
   @Override
-  public void setLastKnownFreshDate(final String id, final String version, final DateTime date) {
+  public void setLastVerified(final String id, final String version, final DateTime date) {
     checkNotNull(date);
     final Date priorDate = storage.perform(new Operation<Date>()
     {

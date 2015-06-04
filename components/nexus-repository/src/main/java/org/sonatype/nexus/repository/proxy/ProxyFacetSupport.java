@@ -223,12 +223,13 @@ public abstract class ProxyFacetSupport
 
       Payload payload = new HttpEntityPayload(response, entity);
       final Content result = new Content(payload);
-      result.getAttributes().set(Content.CONTENT_LAST_MODIFIED, extractLastModified(request, response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
+      result.getAttributes().set(Content.CONTENT_LAST_MODIFIED,
+          extractLastModified(request, response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
       result.getAttributes().set(Content.CONTENT_ETAG, extractETag(response.getLastHeader(HttpHeaders.ETAG)));
       return result;
     }
     if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
-      indicateUpToDate(context);
+      indicateVerified(context);
     }
     HttpClientUtils.closeQuietly(response);
 
@@ -272,16 +273,16 @@ public abstract class ProxyFacetSupport
   }
 
   /**
-   * For whatever component/asset is implied by the Context, return the date it was last deemed up to date, or {@code
+   * For whatever component/asset is implied by the Context, return the date it was last verified up to date, or {@code
    * null} if it isn't present.
    */
   @Nullable
-  protected abstract DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException;
+  protected abstract DateTime getCachedPayloadLastVerified(final Context context) throws IOException;
 
   /**
    * For whatever component/asset
    */
-  protected abstract void indicateUpToDate(final Context context) throws IOException;
+  protected abstract void indicateVerified(final Context context) throws IOException;
 
   /**
    * Provide the URL of the content relative to the repository root.
@@ -294,7 +295,7 @@ public abstract class ProxyFacetSupport
       return false;
     }
 
-    final DateTime lastUpdated = getCachedPayloadLastUpdatedDate(context);
+    final DateTime lastUpdated = getCachedPayloadLastVerified(context);
 
     if (lastUpdated == null) {
       log.debug("Artifact last modified date unknown");

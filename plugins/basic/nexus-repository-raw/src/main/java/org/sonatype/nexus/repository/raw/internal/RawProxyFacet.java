@@ -49,13 +49,13 @@ public class RawProxyFacet
   }
 
   @Override
-  protected DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException {
+  protected DateTime getCachedPayloadLastVerified(final Context context) throws IOException {
     final RawContent rawContent = storage().get(componentPath(context));
     return rawContent != null ? rawContent.getLastUpdated() : null;
   }
 
   @Override
-  protected void indicateUpToDate(final Context context) throws IOException {
+  protected void indicateVerified(final Context context) throws IOException {
     storage().updateLastUpdated(componentPath(context), new DateTime());
   }
 
