@@ -226,10 +226,16 @@ public class StorageFacetImpl
 
   @Override
   public <T> T perform(final Operation<T> operation) {
+    return perform(databaseInstanceProvider.get().acquire(), operation);
+  }
+
+  @Override
+  public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) {
+    checkNotNull(db);
     checkNotNull(operation);
     OConcurrentModificationException lastConcurrentException = null;
     for (int attempt = 0; attempt < MAX_CONCURRENT_MODIFICATION_ATTEMPTS; attempt++) {
-      try (StorageTx tx = openTx()) {
+      try (StorageTx tx = openTx(db)) {
         try {
           T result = operation.execute(tx);
           tx.commit();
@@ -243,6 +249,7 @@ public class StorageFacetImpl
     }
     throw lastConcurrentException;
   }
+
 
   /**
    * Returns the "principal name" to be used with current instance of {@link StorageTx}.

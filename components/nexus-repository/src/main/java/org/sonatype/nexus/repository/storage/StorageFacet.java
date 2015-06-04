@@ -99,4 +99,11 @@ public interface StorageFacet
    * and on clean return from this method it is guaranteed that operation did succeed and change is commited.
    */
   <T> T perform(Operation<T> operation);
+
+  /**
+   * Handles retries of passed in {@link Operation}, if needed. Operation will receive newly opened {@link StorageTx}
+   * and on clean return from this method it is guaranteed that operation did succeed and change is commited. This
+   * method will use given OrientDB connection.
+   */
+  <T> T perform(ODatabaseDocumentTx db, Operation<T> operation);
 }
