@@ -28,5 +28,5 @@ public interface RawContent
 
   InputStream openInputStream() throws IOException;
 
-  DateTime getLastUpdated();
+  DateTime getLastVerified();
 }

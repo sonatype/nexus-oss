@@ -36,7 +36,7 @@ public interface RawContentFacet
 
   void put(String path, RawContent content) throws IOException, InvalidContentException;
 
-  void updateLastUpdated(String path, final DateTime lastUpdated) throws IOException;
+  void updateLastVerified(String path, final DateTime lastUpdated) throws IOException;
 
   boolean delete(String path) throws IOException;
 }

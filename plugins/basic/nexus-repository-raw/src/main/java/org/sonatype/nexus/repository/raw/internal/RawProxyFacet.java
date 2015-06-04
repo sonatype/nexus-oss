@@ -40,7 +40,7 @@ public class RawProxyFacet
   protected Content getCachedPayload(final Context context) throws IOException {
     final String path = componentPath(context);
 
-    final RawContent rawContent = storage().get(path);
+    final RawContent rawContent = content().get(path);
     if (rawContent == null) {
       return null;
     }
@@ -50,20 +50,19 @@ public class RawProxyFacet
 
   @Override
   protected DateTime getCachedPayloadLastVerified(final Context context) throws IOException {
-    final RawContent rawContent = storage().get(componentPath(context));
-    return rawContent != null ? rawContent.getLastUpdated() : null;
+    final RawContent rawContent = content().get(componentPath(context));
+    return rawContent != null ? rawContent.getLastVerified() : null;
   }
 
   @Override
   protected void indicateVerified(final Context context) throws IOException {
-    storage().updateLastUpdated(componentPath(context), new DateTime());
+    content().updateLastVerified(componentPath(context), new DateTime());
   }
 
   @Override
   protected void store(final Context context, final Content payload) throws IOException, InvalidContentException {
     final String path = componentPath(context);
-    // TODO: this is NOT last-modified!
-    storage().put(path, toContent(payload, new DateTime()));
+    content().put(path, toContent(payload, new DateTime()));
   }
 
   @Override
@@ -79,7 +78,7 @@ public class RawProxyFacet
     return tokenMatcherState.getTokens().get("name");
   }
 
-  private RawContentFacet storage() {
+  private RawContentFacet content() {
     return getRepository().facet(RawContentFacet.class);
   }
 }

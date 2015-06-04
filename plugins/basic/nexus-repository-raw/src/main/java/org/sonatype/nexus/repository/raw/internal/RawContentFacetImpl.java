@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.raw.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -29,6 +30,7 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
 
 import com.google.common.collect.Lists;
@@ -50,6 +52,8 @@ public class RawContentFacetImpl
     implements RawContentFacet
 {
   private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(MD5, SHA1);
+
+  private static final String P_LAST_VERIFIED_DATE = "last_verified";
 
   // TODO: raw does not have config, this method is here only to have this bundle do Import-Package org.sonatype.nexus.repository.config
   // TODO: as FacetSupport subclass depends on it. Actually, this facet does not need any kind of configuration
@@ -99,6 +103,7 @@ public class RawContentFacetImpl
         asset = tx.firstAsset(component);
       }
 
+      asset.formatAttributes().set(P_LAST_VERIFIED_DATE, new Date());
       tx.setBlob(asset, path, content.openInputStream(), hashAlgorithms, null, content.getContentType());
       tx.saveAsset(asset);
       tx.commit();
@@ -142,19 +147,27 @@ public class RawContentFacetImpl
   }
 
   @Override
-  public void updateLastUpdated(final String path, final DateTime lastUpdated) throws IOException {
-    try (StorageTx tx = getStorage().openTx()) {
-      Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
+  public void updateLastVerified(final String path, final DateTime lastUpdated) throws IOException {
+    getStorage().perform(new Operation<Date>()
+    {
+      @Override
+      public Date execute(final StorageTx tx) {
+        Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
 
-      if (component == null) {
-        log.debug("Updating lastUpdated time for non-existent raw component {}", path);
-        return;
+        if (component == null) {
+          log.debug("Attempting to set last verified date for non-existent raw component {}", path);
+          return null;
+        }
+
+        final Asset asset = tx.firstAsset(component);
+
+        final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+        asset.formatAttributes().set(P_LAST_VERIFIED_DATE, lastUpdated.toDate());
+        tx.saveAsset(tx.firstAsset(component));
+
+        return priorDate;
       }
-
-      // last updated will be automatically set on update
-      tx.saveAsset(tx.firstAsset(component));
-      tx.commit();
-    }
+    });
   }
 
   private StorageFacet getStorage() {
@@ -169,7 +182,7 @@ public class RawContentFacetImpl
 
   private RawContent marshall(final Asset asset, final Blob blob) {
     final String contentType = asset.requireContentType();
-    final DateTime lastUpdated = asset.requireLastUpdated();
+    final DateTime lastVerified = new DateTime(asset.formatAttributes().require(P_LAST_VERIFIED_DATE, Date.class));
 
     return new RawContent()
     {
@@ -189,8 +202,8 @@ public class RawContentFacetImpl
       }
 
       @Override
-      public DateTime getLastUpdated() {
-        return lastUpdated;
+      public DateTime getLastVerified() {
+        return lastVerified;
       }
     };
   }

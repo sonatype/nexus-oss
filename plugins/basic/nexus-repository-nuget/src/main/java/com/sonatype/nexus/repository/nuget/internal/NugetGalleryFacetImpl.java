@@ -105,7 +105,7 @@ public class NugetGalleryFacetImpl
 
   private static final VersionScheme SCHEME = new GenericVersionScheme();
 
-  private static final String P_LAST_VERIFIED_DATE = "lastVerified";
+  private static final String P_LAST_VERIFIED_DATE = "last_verified";
 
   @Override
   protected void doInit(final Configuration configuration) throws Exception {
