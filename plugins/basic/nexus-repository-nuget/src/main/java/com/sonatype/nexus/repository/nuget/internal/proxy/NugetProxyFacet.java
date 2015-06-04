@@ -101,12 +101,13 @@ public class NugetProxyFacet
   @Override
   protected DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException {
     String[] coords = coords(context);
-    return gallery().getLastUpdatedDate(coords[0], coords[1]);
+    return gallery().getLastKnownFreshDate(coords[0], coords[1]);
   }
 
   @Override
   protected void indicateUpToDate(final Context context) throws IOException {
-    // TODO: this will never happen; super.fetch's http GET request isn't conditional.
+    String[] coords = coords(context);
+    gallery().setLastKnownFreshDate(coords[0], coords[1], new DateTime());
   }
 
   @Override

@@ -48,6 +48,7 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.Payload;
@@ -63,7 +64,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.xml.XmlEscapers;
-
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -104,6 +104,8 @@ public class NugetGalleryFacetImpl
   private StorageFacet storage;
 
   private static final VersionScheme SCHEME = new GenericVersionScheme();
+
+  private static final String P_LAST_KNOWN_FRESH_DATE = "lastKnownFresh";
 
   @Override
   protected void doInit(final Configuration configuration) throws Exception {
@@ -377,21 +379,40 @@ public class NugetGalleryFacetImpl
   }
 
   @Override
-  public DateTime getLastUpdatedDate(final String id, final String version) {
+  public DateTime getLastKnownFreshDate(final String id, final String version) {
     checkNotNull(id);
     checkNotNull(version);
 
     try (StorageTx tx = openStorageTx()) {
-      Component component = findComponent(tx, id, version);
-      if (component == null) {
-        return null;
-      }
-      Asset asset = tx.firstAsset(component);
+      final Asset asset = findAsset(tx, id, version);
 
-      final NestedAttributesMap nugetAttributes = asset.formatAttributes();
-      Date date = nugetAttributes.get(P_LAST_UPDATED, Date.class);
+      Date date = asset.formatAttributes().get(P_LAST_KNOWN_FRESH_DATE, Date.class);
+
+      log.info("Content for {} {} last known fresh as of {}", id, version, date);
       return new DateTime(checkNotNull(date));
     }
+  }
+
+  @Override
+  public void setLastKnownFreshDate(final String id, final String version, final DateTime date) {
+    checkNotNull(date);
+    final Date priorDate = storage.perform(new Operation<Date>()
+    {
+      @Override
+      public Date execute(final StorageTx tx) {
+        final Component component = findComponent(tx, id, version);
+        if (component == null) {
+          return null;
+        }
+        Asset asset = tx.firstAsset(component);
+
+        final Date priorDate = asset.formatAttributes().get(P_LAST_KNOWN_FRESH_DATE, Date.class);
+        asset.formatAttributes().set(P_LAST_KNOWN_FRESH_DATE, date.toDate());
+
+        return priorDate;
+      }
+    });
+    log.info("Updating last known fresh date of {} {} from {} to {}", id, version, priorDate, date);
   }
 
   @Override
@@ -587,6 +608,14 @@ public class NugetGalleryFacetImpl
 
     storageTx.saveComponent(component);
     return component;
+  }
+
+  private Asset findAsset(final StorageTx tx, final String id, final String version) {
+    Component component = findComponent(tx, id, version);
+    if (component == null) {
+      return null;
+    }
+    return tx.firstAsset(component);
   }
 
   /**

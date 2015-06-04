@@ -54,9 +54,15 @@ public interface NugetGalleryFacet
   Payload get(String id, String version) throws IOException;
 
   /**
-   * Gets the last updated date of a package, or {@code null} if not found.
+   * Gets the last known fresh date of a package/version, the last time the package content was known to be up to
+   * date with the remote repository's copy, or {@code null} if not found.
    */
-  DateTime getLastUpdatedDate(String id, String version);
+  DateTime getLastKnownFreshDate(String id, String version);
+
+  /**
+   * Sets the 'last known fresh' date of a package/version.
+   */
+  void setLastKnownFreshDate(String id, String version, DateTime date);
 
   /**
    * Delete a package and return whether it existed.
