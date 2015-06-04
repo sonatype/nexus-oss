@@ -105,7 +105,7 @@ public class NugetGalleryFacetImpl
 
   private static final VersionScheme SCHEME = new GenericVersionScheme();
 
-  private static final String P_LAST_KNOWN_FRESH_DATE = "lastKnownFresh";
+  private static final String P_LAST_VERIFIED_DATE = "lastVerified";
 
   @Override
   protected void doInit(final Configuration configuration) throws Exception {
@@ -385,9 +385,9 @@ public class NugetGalleryFacetImpl
     try (StorageTx tx = openStorageTx()) {
       final Asset asset = findAsset(tx, id, version);
 
-      Date date = asset.formatAttributes().get(P_LAST_KNOWN_FRESH_DATE, Date.class);
+      Date date = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
 
-      log.info("Content for {} {} last known fresh as of {}", id, version, date);
+      log.info("Content for {} {} last verified as of {}", id, version, date);
       return new DateTime(checkNotNull(date));
     }
   }
@@ -402,13 +402,13 @@ public class NugetGalleryFacetImpl
         Asset asset = findAsset(tx, id, version);
         checkState(asset != null);
 
-        final Date priorDate = asset.formatAttributes().get(P_LAST_KNOWN_FRESH_DATE, Date.class);
-        asset.formatAttributes().set(P_LAST_KNOWN_FRESH_DATE, date.toDate());
+        final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+        asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
 
         return priorDate;
       }
     });
-    log.info("Updating last known fresh date of {} {} from {} to {}", id, version, priorDate, date);
+    log.info("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
   }
 
   @Override
@@ -577,7 +577,7 @@ public class NugetGalleryFacetImpl
       Asset asset = findOrCreateAsset(storageTx, component);
       updateAssetMetadata(asset, data, component.isNew());
 
-      asset.formatAttributes().set(P_LAST_KNOWN_FRESH_DATE, new Date());
+      asset.formatAttributes().set(P_LAST_VERIFIED_DATE, new Date());
       storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
 
       storageTx.saveAsset(asset);
