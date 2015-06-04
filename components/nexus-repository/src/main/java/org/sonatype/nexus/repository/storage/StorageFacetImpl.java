@@ -240,8 +240,8 @@ public class StorageFacetImpl
           log.debug("Operation {} attempt failed, retrying: {}", attempt + 1, operation, e);
         }
       }
-      throw lastConcurrentException;
     }
+    throw lastConcurrentException;
   }
 
   /**
