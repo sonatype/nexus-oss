@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import javax.annotation.Nonnull;
 
-import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -53,7 +52,7 @@ public class ProxyHandler
       return HttpResponses.notFound();
     }
     catch (IOException e) {
-      return HttpResponses.serviceUnavailable();
+      return HttpResponses.badGateway();
     }
   }
 
