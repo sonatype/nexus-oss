@@ -30,7 +30,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-
 import org.apache.http.HttpResponse;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -218,12 +217,27 @@ public class NugetProxyIT
 
     final HttpResponse entry = nuget.entry(packageName, version);
 
-    assertThat(status(entry),is(HttpStatus.OK));
+    assertThat(status(entry), is(HttpStatus.OK));
 
     final HttpResponse response = nuget.packageContent(packageName, version);
 
     assertThat(status(response), is(HttpStatus.OK));
     assertThat(bytes(response), is(Files.toByteArray(resolveTestFile("SONATYPE.TEST.1.0.nupkg"))));
+  }
+
+  @Test
+  public void downloadingPackageFromDeadRemoteServerTurnsInto404() throws Exception {
+    final String packageName = "SONATYPE.TEST";
+    final String version = "1.0";
+
+    final HttpResponse entry = nuget.entry(packageName, version);
+
+    assertThat(status(entry), is(HttpStatus.OK));
+
+    proxyServer.stop();
+
+    // Nexus has not yet cached the actual package content, so this should return 502
+    assertThat(status(nuget.packageContent(packageName, version)), is(HttpStatus.BAD_GATEWAY));
   }
 
   @Test

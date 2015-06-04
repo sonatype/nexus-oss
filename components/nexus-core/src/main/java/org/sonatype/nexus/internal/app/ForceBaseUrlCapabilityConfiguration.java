@@ -25,8 +25,5 @@ import org.sonatype.nexus.validation.group.Create;
 public class ForceBaseUrlCapabilityConfiguration
     extends CapabilityConfigurationSupport
 {
-  @Override
-  public String toString() {
-    return "ForceBaseUrlCapabilityConfiguration{}";
-  }
+  // empty
 }

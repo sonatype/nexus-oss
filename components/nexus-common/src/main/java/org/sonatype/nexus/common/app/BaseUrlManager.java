@@ -21,8 +21,6 @@ import javax.annotation.Nullable;
  */
 public interface BaseUrlManager
 {
-  // TODO: Consider if we want/need to follow configuration entity model here?
-
   void setUrl(String url);
 
   String getUrl();

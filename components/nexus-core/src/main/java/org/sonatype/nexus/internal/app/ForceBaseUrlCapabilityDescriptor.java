@@ -14,15 +14,21 @@ package org.sonatype.nexus.internal.app;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.CapabilityDescriptorSupport;
 import org.sonatype.nexus.capability.CapabilityType;
+import org.sonatype.nexus.capability.Tag;
+import org.sonatype.nexus.capability.Taggable;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
+
+import static org.sonatype.nexus.capability.Tag.categoryTag;
+import static org.sonatype.nexus.capability.Tag.tags;
 
 /**
  * {@link ForceBaseUrlCapability} descriptor.
@@ -33,15 +39,16 @@ import org.sonatype.sisu.goodies.i18n.MessageBundle;
 @Singleton
 public class ForceBaseUrlCapabilityDescriptor
     extends CapabilityDescriptorSupport<ForceBaseUrlCapabilityConfiguration>
+    implements Taggable
 {
-  public static final String TYPE_ID = "forceBaseUrl";
+  public static final String TYPE_ID = "baseurl.force";
 
   public static final CapabilityType TYPE = CapabilityType.capabilityType(TYPE_ID);
 
   private static interface Messages
       extends MessageBundle
   {
-    @DefaultMessage("Force Base URL")
+    @DefaultMessage("Base URL: Force")
     String name();
   }
 
@@ -63,6 +70,11 @@ public class ForceBaseUrlCapabilityDescriptor
   }
 
   @Override
+  public Set<Tag> getTags() {
+    return tags(categoryTag("Core"));
+  }
+
+  @Override
   protected ForceBaseUrlCapabilityConfiguration createConfig(final Map<String, String> properties) {
     return new ForceBaseUrlCapabilityConfiguration();
   }
@@ -71,5 +83,4 @@ public class ForceBaseUrlCapabilityDescriptor
   protected String renderAbout() throws Exception {
     return render(TYPE_ID + "-about.vm");
   }
-
 }

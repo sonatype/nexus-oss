@@ -56,7 +56,7 @@ public class ContentValidatorSelector
   public ContentValidator validator(final Repository repository) {
     checkNotNull(repository);
     String format = repository.getFormat().getValue();
-    log.debug("Looking for content validator: {}", format);
+    log.trace("Looking for content validator for format: {}", format);
     ContentValidator contentValidator = contentValidators.get(format);
     if (contentValidator == null) {
       return defaultContentValidator;

@@ -58,7 +58,7 @@ public abstract class MavenITSupport
     extends NexusCoreITSupport
 {
   @Inject
-  private LogManager logManager;
+  protected LogManager logManager;
 
   private final MetadataXpp3Reader reader = new MetadataXpp3Reader();
 
@@ -70,7 +70,7 @@ public abstract class MavenITSupport
   }
 
   @Before
-  public void debugLogging() {
+  public void setupMavenDebugLogging() {
     logManager.setLoggerLevel("org.sonatype.nexus.repository.maven", LoggerLevel.DEBUG);
   }
 

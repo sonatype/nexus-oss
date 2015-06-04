@@ -12,11 +12,18 @@
  */
 package org.sonatype.nexus.repository.raw.internal
 
+import javax.annotation.Nonnull
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
+import javax.inject.Singleton
+
 import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
+import org.sonatype.nexus.repository.http.HttpMethods
 import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -27,14 +34,13 @@ import org.sonatype.nexus.repository.view.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
+import org.sonatype.nexus.repository.view.handlers.IndexHtmlForwardHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
+import org.sonatype.nexus.repository.view.matchers.ActionMatcher
+import org.sonatype.nexus.repository.view.matchers.SuffixMatcher
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
-import javax.annotation.Nonnull
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Provider
-import javax.inject.Singleton
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.and
 
 /**
  * Raw hosted repository recipe.
@@ -46,7 +52,7 @@ import javax.inject.Singleton
 class RawHostedRecipe
     extends RecipeSupport
 {
-  public static final String NAME = "raw-hosted"
+  public static final String NAME = 'raw-hosted'
 
   @Inject
   Provider<RawSecurityFacet> securityFacet
@@ -68,6 +74,9 @@ class RawHostedRecipe
 
   @Inject
   TimingHandler timingHandler
+
+  @Inject
+  IndexHtmlForwardHandler indexHtmlForwardHandler
 
   @Inject
   SecurityHandler securityHandler
@@ -100,8 +109,16 @@ class RawHostedRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
+    // handle GET / forwards to /index.html
     builder.route(new Route.Builder()
-        .matcher(new TokenMatcher("/{name:.+}"))
+        .matcher(and(new ActionMatcher(HttpMethods.GET), new SuffixMatcher('/')))
+        .handler(timingHandler)
+        .handler(indexHtmlForwardHandler)
+        .create()
+    )
+
+    builder.route(new Route.Builder()
+        .matcher(new TokenMatcher('/{name:.+}'))
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)
