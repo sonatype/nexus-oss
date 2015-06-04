@@ -101,6 +101,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
           {
             xtype: 'checkbox',
             name: 'online',
+            itemId: 'online',
             labelAlign: 'left',
             fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ONLINE'),
             helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ONLINE_HELP'),
