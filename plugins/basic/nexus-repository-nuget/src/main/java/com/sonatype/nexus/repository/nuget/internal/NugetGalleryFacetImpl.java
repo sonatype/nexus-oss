@@ -243,7 +243,8 @@ public class NugetGalleryFacetImpl
     });
 
     // Separate tx is necessary for the meantime, since the re-querying orient doesn't pick up uncommitted state
-    storage.perform(new Operation<Object>(){
+    storage.perform(new Operation<Object>()
+    {
       @Override
       public Object execute(final StorageTx tx) {
         maintainAggregateInfo(tx, metadata.get(ID));
@@ -253,16 +254,22 @@ public class NugetGalleryFacetImpl
   }
 
   @Override
-  public void putContent(String id, String version, InputStream content) {
-    try (StorageTx tx = openStorageTx()) {
-      final Bucket bucket = tx.getBucket();
-      Component component = findComponent(tx, id, version);
-      checkState(
-          component != null && tx.browseAssets(component).iterator().hasNext(),
-          "Component metadata does not exist yet"
-      );
-      createOrUpdateAssetAndContents(tx, bucket, component, content, null);
-      tx.commit();
+  public void putContent(final String id, final String version, final InputStream content) throws IOException {
+    try (TempStreamSupplier t = new TempStreamSupplier(content)) {
+      storage.perform(new Operation<Object>()
+      {
+        @Override
+        public Object execute(final StorageTx tx) {
+          final Bucket bucket = tx.getBucket();
+          Component component = findComponent(tx, id, version);
+          checkState(
+              component != null && tx.browseAssets(component).iterator().hasNext(),
+              "Component metadata does not exist yet"
+          );
+          createOrUpdateAssetAndContents(tx, bucket, component, t.get(), null);
+          return null;
+        }
+      });
     }
   }
 
