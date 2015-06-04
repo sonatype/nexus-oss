@@ -106,7 +106,7 @@ class ComponentComponent
             format: component.format()
         )
       }
-      if (parameters.start == 0 && readUnattachedAssets(storageTx, repository).size()) {
+      if (parameters.start == 0 && readUnattachedAssets(storageTx, repositories).size()) {
         results = new ArrayList<>(results)
         results.add(0, new ComponentXO(
             id: UNATTACHED,
@@ -139,7 +139,7 @@ class ComponentComponent
     StorageTx storageTx = repository.facet(StorageFacet).openTx()
     try {
       if (componentId == UNATTACHED) {
-        return readUnattachedAssets(storageTx, repository)
+        return readUnattachedAssets(storageTx, ImmutableList.of(repository))
       }
       else {
         Component component = storageTx.findComponent(new EntityId(componentId), storageTx.getBucket())
@@ -161,8 +161,7 @@ class ComponentComponent
     }
   }
 
-  private List<AssetXO> readUnattachedAssets(final StorageTx storageTx, final Repository repository) {
-    ImmutableList<Repository> repositories = ImmutableList.of(repository)
+  private List<AssetXO> readUnattachedAssets(final StorageTx storageTx, final Iterable<Repository> repositories) {
     return storageTx.findAssets("${StorageFacet.P_COMPONENT} IS NULL", null, repositories, null).collect { asset ->
       new AssetXO(
           id: asset.entityMetadata.id,
