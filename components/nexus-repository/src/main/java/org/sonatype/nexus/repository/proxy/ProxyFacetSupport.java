@@ -159,6 +159,7 @@ public abstract class ProxyFacetSupport
             store(context, remote);
           }
           catch (ORecordDuplicatedException e) {
+            log.debug("Failed proxy caching in {}, ignoring it", getRepository(), e);
             // FIXME: just for experimenting purposes, handling this exception here as it was simplest
             // note: this is incorrect solution as it leaks Orient in here
             // but this happens on parallel remote fetches, and as such, should be simply

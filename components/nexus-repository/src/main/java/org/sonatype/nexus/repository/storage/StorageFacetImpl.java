@@ -237,7 +237,7 @@ public class StorageFacetImpl
         }
         catch (OConcurrentModificationException e) {
           lastConcurrentException = e;
-          log.debug("Operation {} attempt failed, retrying: {}", attempt + 1, operation, e);
+          log.debug("Failed operation {} on {}:", operation, getRepository(), e);
         }
       }
     }

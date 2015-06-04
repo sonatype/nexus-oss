@@ -96,7 +96,7 @@ public interface StorageFacet
 
   /**
    * Handles retries of passed in {@link Operation}, if needed. Operation will receive newly opened {@link StorageTx}
-   * and on clean return from this method it is guaramteed that operation did succeed and change is commited.
+   * and on clean return from this method it is guaranteed that operation did succeed and change is commited.
    */
   <T> T perform(Operation<T> operation);
 }

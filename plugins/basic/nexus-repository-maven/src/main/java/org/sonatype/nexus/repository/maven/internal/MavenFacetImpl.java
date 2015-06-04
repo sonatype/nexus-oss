@@ -79,6 +79,12 @@ public class MavenFacetImpl
     extends FacetSupport
     implements MavenFacet
 {
+  /**
+   * How many times should method {@link #toContent(StorageTx, MavenPath)} attempt to create {@link Content}. Retries
+   * might happen due to changed backing BLOBs for example, in case of an asset update.
+   */
+  private static final int MAX_ASSET_TO_CONTENT_ATTEMPTS = 3;
+
   // artifact shared properties of both, artifact component and artifact asset
 
   private static final String P_GROUP_ID = "groupId";
@@ -195,7 +201,7 @@ public class MavenFacetImpl
    */
   private Content toContent(final StorageTx tx, final MavenPath mavenPath) throws IOException {
     IllegalStateException lastIllegalStateException = null;
-    for (int attempt = 0; attempt < 3; attempt++) {
+    for (int attempt = 0; attempt < MAX_ASSET_TO_CONTENT_ATTEMPTS; attempt++) {
       try {
         final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
         if (asset == null) {
@@ -222,6 +228,7 @@ public class MavenFacetImpl
       }
       catch (IllegalStateException e) {
         // backing blob changed, retry by reloading all again
+        log.debug("Failed attempt to create content for asset: {}", mavenPath.getPath(), e);
         lastIllegalStateException = e;
       }
     }
@@ -431,6 +438,11 @@ public class MavenFacetImpl
         attributes.set(P_LAST_VERIFIED, verified.toDate());
         tx.saveAsset(asset);
         return true;
+      }
+
+      @Override
+      public String toString() {
+        return "setLastVerified(" + path.getPath() + ", " + verified + ")";
       }
     });
   }
