@@ -65,7 +65,7 @@ Ext.define('NX.coreui.controller.Assets', {
 
   /**
    * @private
-   * Shows information about selected asset.
+   * Shows information about selected component/asset.
    */
   showAssetInfo: function(container, componentModel, assetModel) {
     var panel = container.down('nx-coreui-component-assetinfo'),
@@ -96,6 +96,14 @@ Ext.define('NX.coreui.controller.Assets', {
     }
   },
 
+  /**
+   * @private
+   *
+   * Filter asset store based on component model.
+   *
+   * @param {NX.coreui.view.component.AssetList} grid assets grid
+   * @param {NX.coreui.model.Component} componentModel component owning the assets to be loaded
+   */
   loadAssets: function(grid, componentModel) {
     var assetStore = grid.getStore(),
         filters;
@@ -132,6 +140,11 @@ Ext.define('NX.coreui.controller.Assets', {
     }
   },
 
+  /**
+   * @private
+   *
+   * Update asset shown in asset container.
+   */
   updateAssetContainer: function(gridView, td, cellIndex, assetModel) {
     var me = this,
         assetContainer = me.getAssetContainer();
@@ -141,6 +154,8 @@ Ext.define('NX.coreui.controller.Assets', {
 
   /**
    * @private
+   *
+   * Show size in kb/mb/gb.
    */
   toSizeString: function(v) {
     if (typeof v !== 'number') {

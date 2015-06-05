@@ -70,6 +70,9 @@ Ext.define('NX.coreui.view.browse.BrowseFeature', {
     ]
   },
 
+  /**
+   * @override
+   */
   initComponent: function() {
     var me = this;
     me.callParent(arguments);

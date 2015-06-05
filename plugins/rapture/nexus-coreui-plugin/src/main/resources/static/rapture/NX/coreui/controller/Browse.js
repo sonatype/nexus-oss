@@ -116,6 +116,10 @@ Ext.define('NX.coreui.controller.Browse', {
 
   /**
    * @private
+   *
+   * Load browse results for selected repository.
+   *
+   * @param {NX.coreui.model.Repository} model selected repository
    */
   onRepositorySelection: function(model) {
     var me = this,
@@ -134,6 +138,10 @@ Ext.define('NX.coreui.controller.Browse', {
 
   /**
    * @private
+   *
+   * Show component details and load assets for selected component.
+   *
+   * @param {NX.coreui.model.Component} model selected component
    */
   onComponentSelection: function(model) {
     var me = this;

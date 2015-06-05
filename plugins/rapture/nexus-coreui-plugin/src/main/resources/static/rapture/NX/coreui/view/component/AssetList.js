@@ -62,6 +62,12 @@ Ext.define('NX.coreui.view.component.AssetList', {
     }
   ],
 
+  /**
+   * @public
+   *
+   * Sets owning component.
+   * @param {NX.coreui.model.Component} componentModel owning component
+   */
   setComponentModel: function(componentModel) {
     var me = this;
 

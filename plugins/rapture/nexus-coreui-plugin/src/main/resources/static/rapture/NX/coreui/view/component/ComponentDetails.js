@@ -54,6 +54,12 @@ Ext.define('NX.coreui.view.component.ComponentDetails', {
     me.callParent();
   },
 
+  /**
+   * @public
+   *
+   * Sets component.
+   * @param {NX.coreui.model.Component} componentModel component
+   */
   setComponentModel: function(componentModel) {
     var me = this;
 
