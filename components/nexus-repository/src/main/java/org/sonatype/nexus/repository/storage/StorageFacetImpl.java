@@ -225,11 +225,15 @@ public class StorageFacetImpl
   private static final int MAX_CONCURRENT_MODIFICATION_ATTEMPTS = 3;
 
   @Override
+  @Guarded(by = STARTED)
   public <T> T perform(final Operation<T> operation) {
-    return perform(databaseInstanceProvider.get().acquire(), operation);
+    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
+      return perform(db, operation);
+    }
   }
 
   @Override
+  @Guarded(by = STARTED)
   public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) {
     checkNotNull(db);
     checkNotNull(operation);
