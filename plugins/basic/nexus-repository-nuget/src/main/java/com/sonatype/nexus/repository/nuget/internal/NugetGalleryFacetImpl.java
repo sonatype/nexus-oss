@@ -54,6 +54,7 @@ import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload.InputStreamSupplier;
+import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
@@ -240,6 +241,11 @@ public class NugetGalleryFacetImpl
         final Component component = createOrUpdatePackage(tx, metadata);
         return null;
       }
+
+      @Override
+      public String toString() {
+        return SimpleFormat.format("putMetadata(%s)", metadata);
+      }
     });
 
     // Separate tx is necessary for the meantime, since the re-querying orient doesn't pick up uncommitted state
@@ -268,6 +274,11 @@ public class NugetGalleryFacetImpl
           );
           createOrUpdateAssetAndContents(tx, bucket, component, t.get(), null);
           return null;
+        }
+
+        @Override
+        public String toString() {
+          return SimpleFormat.format("putContent(%s, %s)", id, version);
         }
       });
     }
@@ -421,6 +432,11 @@ public class NugetGalleryFacetImpl
         asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
 
         return priorDate;
+      }
+
+      @Override
+      public String toString() {
+        return SimpleFormat.format("setLastVerified(%s, %s, %s)", id, version, date);
       }
     });
     log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
