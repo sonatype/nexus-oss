@@ -43,8 +43,8 @@ Ext.define('NX.coreui.controller.Bundles', {
   features: {
     mode: 'admin',
     path: '/System/Bundles',
-    text: NX.I18n.get('ADMIN_BUNDLES_TITLE'),
-    description: NX.I18n.get('ADMIN_BUNDLES_SUBTITLE'),
+    text: NX.I18n.get('Coreui_Controller_Bundles_Text'),
+    description: NX.I18n.get('Coreui_Controller_Bundles_Description'),
     view: 'NX.coreui.view.system.Bundles',
     iconConfig: {
       file: 'plugin.png',
@@ -78,22 +78,22 @@ Ext.define('NX.coreui.controller.Bundles', {
 
     if (Ext.isDefined(model)) {
       info = {};
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_ID')] = model.get('id');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_NAME')] = model.get('name');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_SYMBOLIC_NAME')] = model.get('symbolicName');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_VERSION')] = model.get('version');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_STATE')] = model.get('state');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_LOCATION')] = model.get('location');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_START_LEVEL')] = model.get('startLevel');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_LAST_MODIFIED')] = model.get('lastModified');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_FRAGMENT')] = model.get('fragment');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_FRAGMENTS')] = model.get('fragments');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_FRAGMENT_HOSTS')] = model.get('fragmentHosts');
+      info[NX.I18n.get('Coreui_Controller_Bundles_ID_Info')] = model.get('id');
+      info[NX.I18n.get('Coreui_Controller_Bundles_Name_Info')] = model.get('name');
+      info[NX.I18n.get('Coreui_Controller_Bundles_SymbolicName_Info')] = model.get('symbolicName');
+      info[NX.I18n.get('Coreui_Controller_Bundles_Version_Info')] = model.get('version');
+      info[NX.I18n.get('Coreui_Controller_Bundles_State_Info')] = model.get('state');
+      info[NX.I18n.get('Coreui_Controller_Bundles_Location_Info')] = model.get('location');
+      info[NX.I18n.get('Coreui_Controller_Bundles_StartLevel_Info')] = model.get('startLevel');
+      info[NX.I18n.get('Coreui_Controller_Bundles_LastModified_Info')] = model.get('lastModified');
+      info[NX.I18n.get('Coreui_Controller_Bundles_Fragment_Info')] = model.get('fragment');
+      info[NX.I18n.get('Coreui_Controller_Bundles_Fragments_Info')] = model.get('fragments');
+      info[NX.I18n.get('Coreui_Controller_Bundles_FragmentHosts_Info')] = model.get('fragmentHosts');
 
       headers = model.get('headers');
       if (headers) {
         Ext.iterate(headers, function (key, value) {
-          info[NX.I18n.format('ADMIN_BUNDLES_SUMMARY_HEADER', key)] = value;
+          info[NX.I18n.format('Coreui_Controller_Bundles_Summary_Info', key)] = value;
         });
       }
 

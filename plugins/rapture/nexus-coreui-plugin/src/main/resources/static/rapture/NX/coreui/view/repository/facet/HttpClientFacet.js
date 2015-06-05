@@ -72,14 +72,14 @@ Ext.define('NX.coreui.view.repository.facet.HttpClientFacet', {
               {
                 xtype:'textfield',
                 name: 'attributes.httpclient.authentication.username',
-                fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_USERNAME'),
+                fieldLabel: NX.I18n.get('Coreui_View_System_AuthenticationSettings_Username_FieldLabel'),
                 allowBlank: false
               },
               {
                 xtype: 'textfield',
                 inputType: 'password',
                 name: 'attributes.httpclient.authentication.password',
-                fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_PASSWORD'),
+                fieldLabel: NX.I18n.get('Coreui_View_System_AuthenticationSettings_Password_FieldLabel'),
                 allowBlank: false
               },
               {
@@ -90,12 +90,12 @@ Ext.define('NX.coreui.view.repository.facet.HttpClientFacet', {
                   {
                     xtype:'textfield',
                     name: 'attributes.httpclient.authentication.ntlmHost',
-                    fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_HOST')
+                    fieldLabel: NX.I18n.get('Coreui_View_System_AuthenticationSettings_WindowsNtlmHostname_FieldLabel')
                   },
                   {
                     xtype:'textfield',
                     name: 'attributes.httpclient.authentication.ntlmDomain',
-                    fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_DOMAIN')
+                    fieldLabel: NX.I18n.get('Coreui_View_System_AuthenticationSettings_WindowsNtlmDomain_FieldLabel')
                   }
                 ]
               }
@@ -111,8 +111,8 @@ Ext.define('NX.coreui.view.repository.facet.HttpClientFacet', {
               {
                 xtype: 'textfield',
                 name: 'attributes.httpclient.connection.userAgentSuffix',
-                fieldLabel: NX.I18n.get('ADMIN_HTTP_USER_AGENT_SUFFIX'),
-                helpText: NX.I18n.get('ADMIN_HTTP_USER_AGENT_SUFFIX_HELP')
+                fieldLabel: NX.I18n.get('Coreui_View_System_HttpRequestSettings_UserAgentCustomization_FieldLabel'),
+                helpText: NX.I18n.get('Coreui_View_System_HttpRequestSettings_UserAgentCustomization_HelpText')
               },
               {
                 xtype: 'numberfield',

@@ -28,7 +28,7 @@ Ext.define('NX.app.PluginStrings', {
 
   /*
    * Note: Symbols follow the following naming convention:
-   * <Plugin>_<Class>_<Name>_<COMPONENT>
+   * <Plugin>_<Class>_<Name>_<Component or Attribute>
    */
 
   keys: {

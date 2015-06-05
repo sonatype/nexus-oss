@@ -57,8 +57,8 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/Support',
-        text: NX.I18n.get('ADMIN_SUPPORT_TITLE'),
-        description: NX.I18n.get('ADMIN_SUPPORT_SUBTITLE'),
+        text: NX.I18n.get('Coreui_Controller_FeatureGroups_Support_Text'),
+        description: NX.I18n.get('Coreui_Controller_FeatureGroups_Support_Description'),
         group: true,
         iconConfig: {
           file: 'support.png',
@@ -68,8 +68,8 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/System',
-        text: NX.I18n.get('ADMIN_SYSTEM_TITLE'),
-        description: NX.I18n.get('ADMIN_SYSTEM_SUBTITLE'),
+        text: NX.I18n.get('Coreui_Controller_FeatureGroups_System_Text'),
+        description: NX.I18n.get('Coreui_Controller_FeatureGroups_System_Description'),
         group: true,
         weight: 1000,
         iconConfig: {

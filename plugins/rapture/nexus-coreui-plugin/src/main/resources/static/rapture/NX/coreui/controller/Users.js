@@ -94,8 +94,8 @@ Ext.define('NX.coreui.controller.Users', {
     {
       mode: 'user',
       path: '/Account',
-      text: NX.I18n.get('USER_ACCOUNT_TITLE'),
-      description: NX.I18n.get('USER_ACCOUNT_SUBTITLE'),
+      text: NX.I18n.get('Coreui_Controller_Users_Text'),
+      description: NX.I18n.get('Coreui_Controller_Users_Description'),
       view: { xtype: 'nx-coreui-user-account' },
       iconConfig: {
         file: 'user.png',
