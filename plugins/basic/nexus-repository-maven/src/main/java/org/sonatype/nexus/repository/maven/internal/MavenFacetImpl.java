@@ -269,7 +269,6 @@ public class MavenFacetImpl
   public Content put(final StorageTx tx, final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
-    log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
     return put(tx, path, payload, new InputStreamSupplier()
     {
       @Override
