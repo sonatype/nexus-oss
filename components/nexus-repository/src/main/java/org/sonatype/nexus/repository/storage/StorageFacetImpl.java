@@ -225,21 +225,21 @@ public class StorageFacetImpl
   private static final int MAX_CONCURRENT_MODIFICATION_ATTEMPTS = 3;
 
   @Override
+  @Guarded(by = STARTED)
   public <T> T perform(final Operation<T> operation) {
-    return perform(databaseInstanceProvider.get().acquire(), false, operation);
+    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
+      return perform(db, operation);
+    }
   }
 
   @Override
+  @Guarded(by = STARTED)
   public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) {
-    return perform(db, true, operation);
-  }
-
-  private <T> T perform(final ODatabaseDocumentTx db, final boolean isUserManagedDb, final Operation<T> operation) {
     checkNotNull(db);
     checkNotNull(operation);
     OConcurrentModificationException lastConcurrentException = null;
     for (int attempt = 0; attempt < MAX_CONCURRENT_MODIFICATION_ATTEMPTS; attempt++) {
-      try (StorageTx tx = openStorageTx(db, isUserManagedDb)) {
+      try (StorageTx tx = openTx(db)) {
         try {
           T result = operation.execute(tx);
           tx.commit();
