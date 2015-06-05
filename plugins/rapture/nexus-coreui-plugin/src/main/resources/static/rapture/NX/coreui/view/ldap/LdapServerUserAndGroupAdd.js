@@ -37,8 +37,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupAdd', {
       xtype: 'nx-coreui-ldapserver-userandgroup-form',
 
       buttons: [
-        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_SUBMIT_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
-        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+        { text: NX.I18n.get('View_Add_Submit_Button'), action: 'add', formBind: true, ui: 'nx-primary' },
+        { text: NX.I18n.get('View_Add_Cancel_Button'), handler: function () {
           this.up('nx-drilldown').showChild(0, true);
         }}
       ]

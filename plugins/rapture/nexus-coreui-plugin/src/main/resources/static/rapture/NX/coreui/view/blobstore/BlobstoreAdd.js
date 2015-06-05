@@ -46,7 +46,7 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreAdd', {
 
       buttons: [
         { text: NX.I18n.get('ADMIN_BLOBSTORES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
-        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function() {
+        { text: NX.I18n.get('View_Add_Cancel_Button'), handler: function() {
           this.up('nx-drilldown').showChild(0, true);
         }}
       ]
