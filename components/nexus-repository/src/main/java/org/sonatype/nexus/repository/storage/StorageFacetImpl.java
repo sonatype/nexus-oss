@@ -231,7 +231,7 @@ public class StorageFacetImpl
 
   @Override
   public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) {
-    return perform(databaseInstanceProvider.get().acquire(), true, operation);
+    return perform(db, true, operation);
   }
 
   private <T> T perform(final ODatabaseDocumentTx db, final boolean isUserManagedDb, final Operation<T> operation) {
