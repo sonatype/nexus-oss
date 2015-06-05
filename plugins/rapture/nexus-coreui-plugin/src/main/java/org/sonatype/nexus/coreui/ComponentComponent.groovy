@@ -15,7 +15,6 @@ package org.sonatype.nexus.coreui
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
-import javax.validation.constraints.NotNull
 
 import org.sonatype.nexus.common.entity.EntityId
 import org.sonatype.nexus.extdirect.DirectComponent
@@ -31,7 +30,6 @@ import org.sonatype.nexus.repository.storage.Component
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageTx
 import org.sonatype.nexus.security.SecurityHelper
-import org.sonatype.nexus.validation.Validate
 
 import com.google.common.collect.ImmutableList
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -125,23 +123,29 @@ class ComponentComponent
 
   @DirectMethod
   List<AssetXO> readAssets(final StoreLoadParameters parameters) {
-    return readAssets(parameters.getFilter('repositoryName'), parameters.getFilter('componentId'))
-  }
-
-  @Validate
-  List<AssetXO> readAssets(final @NotNull String repositoryName, final @NotNull String componentId) {
-    Repository repository = repositoryManager.get(repositoryName)
+    Repository repository = repositoryManager.get(parameters.getFilter('repositoryName'))
     securityHelper.ensurePermitted(new RepositoryViewPermission(repository, READ))
 
     if (!repository.configuration.online) {
       return null
     }
+
+    def componentId = parameters.getFilter('componentId')
+
     StorageTx storageTx = repository.facet(StorageFacet).openTx()
     try {
-      if (componentId == UNATTACHED) {
-        return readUnattachedAssets(storageTx, ImmutableList.of(repository))
+      def repositories
+      try {
+        repositories = repository.facet(GroupFacet).leafMembers()
       }
-      else {
+      catch (MissingFacetException e) {
+        repositories = ImmutableList.of(repository)
+      }
+
+      if (componentId == UNATTACHED) {
+        return readUnattachedAssets(storageTx, repositories)
+      }
+      else if (repositories.size() == 1) {
         Component component = storageTx.findComponent(new EntityId(componentId), storageTx.getBucket())
         if (component == null) {
           return null
@@ -153,6 +157,32 @@ class ComponentComponent
               name: asset.name() ?: component.name(),
               contentType: asset.contentType()
           )
+        }
+      }
+      else {
+        def componentGroup = parameters.getFilter('componentGroup')
+        def componentName = parameters.getFilter('componentName')
+        def componentVersion = parameters.getFilter('componentVersion')
+
+        if (componentName) {
+          def whereClause = "${StorageFacet.P_COMPONENT}.${StorageFacet.P_NAME} = :name"
+          def params = ['name': componentName]
+          if (componentGroup) {
+            whereClause += " AND ${StorageFacet.P_COMPONENT}.${StorageFacet.P_GROUP} = :group"
+            params << ['group': componentGroup]
+          }
+          if (componentVersion) {
+            whereClause += " AND ${StorageFacet.P_COMPONENT}.${StorageFacet.P_VERSION} = :version"
+            params << ['version': componentVersion]
+          }
+          def groupBy = " GROUP BY ${StorageFacet.P_NAME}"
+          return storageTx.findAssets(whereClause, params, repositories, groupBy).collect { asset ->
+            new AssetXO(
+                id: asset.entityMetadata.id,
+                name: asset.name() ?: componentName,
+                contentType: asset.contentType()
+            )
+          }
         }
       }
     }

@@ -97,11 +97,12 @@ Ext.define('NX.coreui.controller.Assets', {
   },
 
   loadAssets: function(grid, componentModel) {
-    var assetStore = grid.getStore();
+    var assetStore = grid.getStore(),
+        filters;
 
     if (componentModel) {
       assetStore.clearFilter(true);
-      assetStore.addFilter([
+      filters = [
         {
           property: 'repositoryName',
           value: componentModel.get('repositoryName')
@@ -109,8 +110,25 @@ Ext.define('NX.coreui.controller.Assets', {
         {
           property: 'componentId',
           value: componentModel.getId()
+        },
+        {
+          property: 'componentName',
+          value: componentModel.get('name')
         }
-      ]);
+      ];
+      if (componentModel.get('group')) {
+        filters.push({
+          property: 'componentGroup',
+          value: componentModel.get('group')
+        });
+      }
+      if (componentModel.get('version')) {
+        filters.push({
+          property: 'componentVersion',
+          value: componentModel.get('version')
+        });
+      }
+      assetStore.addFilter(filters);
     }
   },
 
