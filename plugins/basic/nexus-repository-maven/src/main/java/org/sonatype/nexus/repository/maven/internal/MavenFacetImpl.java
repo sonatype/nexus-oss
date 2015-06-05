@@ -251,7 +251,6 @@ public class MavenFacetImpl
           try {
             return put(tx, path, payload, new InputStreamSupplier()
             {
-              @Nonnull
               @Override
               public InputStream get() throws IOException {
                 return streamSupplier.get();
@@ -305,7 +304,6 @@ public class MavenFacetImpl
       return putFile(tx, path, assetBlob, contentAttributes);
     }
   }
-
 
   private Content putArtifact(final StorageTx tx,
                               final MavenPath path,
