@@ -167,14 +167,16 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
           dataIndex: 'healthCheckAge',
           groupable: false,
           width: 60,
-          renderer: Ext.bind(me.renderAgeColumn, me)
+          renderer: Ext.bind(me.renderAgeColumn, me),
+          hidden: true
         }),
         Ext.create('Ext.grid.column.Column', {
           header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULARITY_COLUMN'),
           dataIndex: 'healthCheckPopularity',
           groupable: false,
           width: 90,
-          renderer: Ext.bind(me.renderPopularityColumn, me)
+          renderer: Ext.bind(me.renderPopularityColumn, me),
+          hidden: true
         })
       ];
       grid.headerCt.add(grid.healthCheckColumns);
