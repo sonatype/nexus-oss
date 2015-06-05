@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -49,8 +51,10 @@ import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
+import org.sonatype.nexus.repository.view.payloads.StreamPayload.InputStreamSupplier;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
@@ -239,10 +243,26 @@ public class MavenFacetImpl
   public Content put(final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
-    try (StorageTx tx = storageFacet.openTx()) {
-      Content content = put(tx, path, payload);
-      tx.commit();
-      return content;
+    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
+      return storageFacet.perform(new Operation<Content>()
+      {
+        @Override
+        public Content execute(final StorageTx tx) {
+          try {
+            return put(tx, path, payload, new InputStreamSupplier()
+            {
+              @Nonnull
+              @Override
+              public InputStream get() throws IOException {
+                return streamSupplier.get();
+              }
+            });
+          }
+          catch (IOException e) {
+            throw Throwables.propagate(e);
+          }
+        }
+      });
     }
   }
 
@@ -251,9 +271,25 @@ public class MavenFacetImpl
       throws IOException, InvalidContentException
   {
     log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
+    return put(tx, path, payload, new InputStreamSupplier()
+    {
+      @Override
+      public InputStream get() throws IOException {
+        return payload.openInputStream();
+      }
+    });
+  }
+
+  private Content put(final StorageTx tx,
+                      final MavenPath path,
+                      final Payload payload,
+                      final InputStreamSupplier inputStreamSupplier)
+      throws IOException, InvalidContentException
+  {
+    log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
     final AssetBlob assetBlob = tx.createBlob(
         path.getPath(),
-        payload.openInputStream(),
+        inputStreamSupplier.get(),
         HashType.ALGORITHMS,
         null,
         payload.getContentType()
@@ -269,6 +305,7 @@ public class MavenFacetImpl
       return putFile(tx, path, assetBlob, contentAttributes);
     }
   }
+
 
   private Content putArtifact(final StorageTx tx,
                               final MavenPath path,
