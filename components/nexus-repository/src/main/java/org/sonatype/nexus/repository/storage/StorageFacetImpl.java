@@ -226,16 +226,20 @@ public class StorageFacetImpl
 
   @Override
   public <T> T perform(final Operation<T> operation) {
-    return perform(databaseInstanceProvider.get().acquire(), operation);
+    return perform(databaseInstanceProvider.get().acquire(), false, operation);
   }
 
   @Override
   public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) {
+    return perform(databaseInstanceProvider.get().acquire(), true, operation);
+  }
+
+  private <T> T perform(final ODatabaseDocumentTx db, final boolean isUserManagedDb, final Operation<T> operation) {
     checkNotNull(db);
     checkNotNull(operation);
     OConcurrentModificationException lastConcurrentException = null;
     for (int attempt = 0; attempt < MAX_CONCURRENT_MODIFICATION_ATTEMPTS; attempt++) {
-      try (StorageTx tx = openTx(db)) {
+      try (StorageTx tx = openStorageTx(db, isUserManagedDb)) {
         try {
           T result = operation.execute(tx);
           tx.commit();
