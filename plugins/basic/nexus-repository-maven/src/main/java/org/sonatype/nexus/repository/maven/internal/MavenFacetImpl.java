@@ -51,9 +51,9 @@ import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
-import org.sonatype.nexus.repository.view.payloads.StreamPayload.InputStreamSupplier;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
@@ -249,10 +249,10 @@ public class MavenFacetImpl
         @Override
         public Content execute(final StorageTx tx) {
           try {
-            return put(tx, path, payload, new InputStreamSupplier()
+            return put(tx, path, payload, new Supplier<InputStream>()
             {
               @Override
-              public InputStream get() throws IOException {
+              public InputStream get() {
                 return streamSupplier.get();
               }
             });
@@ -269,11 +269,16 @@ public class MavenFacetImpl
   public Content put(final StorageTx tx, final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
-    return put(tx, path, payload, new InputStreamSupplier()
+    return put(tx, path, payload, new Supplier<InputStream>()
     {
       @Override
-      public InputStream get() throws IOException {
-        return payload.openInputStream();
+      public InputStream get() {
+        try {
+          return payload.openInputStream();
+        }
+        catch (IOException e) {
+          throw Throwables.propagate(e);
+        }
       }
     });
   }
@@ -281,7 +286,7 @@ public class MavenFacetImpl
   private Content put(final StorageTx tx,
                       final MavenPath path,
                       final Payload payload,
-                      final InputStreamSupplier inputStreamSupplier)
+                      final Supplier<InputStream> inputStreamSupplier)
       throws IOException, InvalidContentException
   {
     log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
