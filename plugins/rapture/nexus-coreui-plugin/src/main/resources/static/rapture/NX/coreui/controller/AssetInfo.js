@@ -55,8 +55,8 @@ Ext.define('NX.coreui.controller.AssetInfo', {
       panel = container.add({ xtype: 'nx-coreui-component-assetinfo', weight: 10 });
     }
 
-    info[NX.I18n.get('BROWSE_ASSET_INFO_NAME')] = assetModel.get('name');
-    info[NX.I18n.get('BROWSE_ASSET_INFO_CONTENT_TYPE')] = assetModel.get('contentType');
+    info[NX.I18n.get('Coreui_Controller_AssetInfo_Name_Text')] = assetModel.get('name');
+    info[NX.I18n.get('Coreui_Controller_AssetInfo_ContentType_Text')] = assetModel.get('contentType');
 
     panel.showInfo(info);
   },

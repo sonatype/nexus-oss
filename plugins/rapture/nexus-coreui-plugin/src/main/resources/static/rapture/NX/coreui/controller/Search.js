@@ -113,8 +113,8 @@ Ext.define('NX.coreui.controller.Search', {
       {
         id: 'custom',
         name: 'Custom',
-        text: NX.I18n.get('BROWSE_SEARCH_CUSTOM_TITLE'),
-        description: NX.I18n.get('BROWSE_SEARCH_CUSTOM_SUBTITLE'),
+        text: NX.I18n.get('Coreui_Controller_Search_Custom_Text'),
+        description: NX.I18n.get('Coreui_Controller_Search_Custom_Description'),
         readOnly: true
       }
     ], me);
@@ -201,8 +201,8 @@ Ext.define('NX.coreui.controller.Search', {
       me.getApplication().getFeaturesController().registerFeature({
         mode: 'browse',
         path: '/Search',
-        text: NX.I18n.get('BROWSE_SEARCH_TITLE'),
-        description: NX.I18n.get('BROWSE_SEARCH_SUBTITLE'),
+        text: NX.I18n.get('Coreui_Controller_Search_Text'),
+        description: NX.I18n.get('Coreui_Controller_Search_Description'),
         group: true,
         view: { xtype: 'nx-coreui-searchfeature', searchFilter: model, bookmarkEnding: '' },
         iconName: 'search-default',
@@ -349,7 +349,7 @@ Ext.define('NX.coreui.controller.Search', {
       xtype: 'button',
       itemId: 'addButton',
       margin: '36px 0 0 0',
-      text: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_MORE_BUTTON'),
+      text: NX.I18n.get('Coreui_Controller_Search_More_Text'),
       glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
       menu: addCriteriaMenu
     });
@@ -502,11 +502,11 @@ Ext.define('NX.coreui.controller.Search', {
     me.onSearchResultAssetSelection(null);
 
     if (model) {
-      info1[NX.I18n.get('BROWSE_SEARCH_ASSETS_REPOSITORY')] = model.get('repositoryName');
-      info1[NX.I18n.get('BROWSE_SEARCH_ASSETS_FORMAT')] = model.get('format');
-      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_GROUP')] = model.get('group');
-      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME')] = model.get('name');
-      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_VERSION')] = model.get('version');
+      info1[NX.I18n.get('Coreui_Controller_Search_Assets_Repository')] = model.get('repositoryName');
+      info1[NX.I18n.get('Coreui_Controller_Search_Assets_Format')] = model.get('format');
+      info2[NX.I18n.get('Coreui_Controller_Search_Assets_Group')] = model.get('group');
+      info2[NX.I18n.get('Coreui_Controller_Search_Assets_Name')] = model.get('name');
+      info2[NX.I18n.get('Coreui_Controller_Search_Assets_Version')] = model.get('version');
 
       searchResultDetails.down('#info1').showInfo(info1);
       searchResultDetails.down('#info2').showInfo(info2);

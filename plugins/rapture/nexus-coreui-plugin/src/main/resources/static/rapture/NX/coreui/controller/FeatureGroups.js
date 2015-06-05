@@ -33,8 +33,8 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/Repository',
-        text: NX.I18n.get('ADMIN_REPOSITORY_TITLE'),
-        description: NX.I18n.get('ADMIN_REPOSITORY_SUBTITLE'),
+        text: NX.I18n.get('Coreui_Controller_FeatureGroups_Repository_Text'),
+        description: NX.I18n.get('Coreui_Controller_FeatureGroups_Repository_Description'),
         group: true,
         weight: 50,
         iconConfig: {
@@ -45,8 +45,8 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/Security',
-        text: NX.I18n.get('ADMIN_SECURITY_TITLE'),
-        description: NX.I18n.get('ADMIN_SECURITY_SUBTITLE'),
+        text: NX.I18n.get('Coreui_Controller_FeatureGroups_Security_Title'),
+        description: NX.I18n.get('Coreui_Controller_FeatureGroups_Security_Description'),
         group: true,
         weight: 90,
         iconConfig: {
@@ -80,8 +80,8 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'browse',
         path: '/Upload',
-        text: NX.I18n.get('BROWSE_UPLOAD_TITLE'),
-        description: NX.I18n.get('BROWSE_UPLOAD_SUBTITLE'),
+        text: NX.I18n.get('Coreui_Controller_FeatureGroups_Upload_Text'),
+        description: NX.I18n.get('Coreui_Controller_FeatureGroups_Upload_Description'),
         group: true,
         iconConfig: {
           file: 'upload.png',

@@ -47,7 +47,7 @@ Ext.define('NX.coreui.view.search.SearchResultAssetList', {
         return 'default';
       }
     },
-    { header: NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME_COLUMN'), dataIndex: 'name', flex: 2.5 }
+    { header: NX.I18n.get('Coreui_View_SearchResultAssetList_Name_Header'), dataIndex: 'name', flex: 2.5 }
   ],
 
   features: [

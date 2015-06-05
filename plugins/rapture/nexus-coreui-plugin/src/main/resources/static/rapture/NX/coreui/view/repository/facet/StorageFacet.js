@@ -39,13 +39,13 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
       {
         xtype: 'fieldset',
         cls: 'nx-form-section',
-        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_STORAGE_FACET'),
+        title: NX.I18n.get('Coreui_View_Repository_Facet_StorageFacet_Title'),
 
         items: [
           {
             xtype: 'checkbox',
             name: 'attributes.storage.strictContentTypeValidation',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION'),
+            fieldLabel: NX.I18n.get('Coreui_View_Repository_Facet_StorageFacet_ContentTypeValidation_FieldLabel'),
             value: true
           }
           // TODO add blob store selection

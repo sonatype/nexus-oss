@@ -29,12 +29,12 @@ Ext.define('NX.coreui.view.role.RoleFeature', {
   masters: { xtype: 'nx-coreui-role-list' },
 
   tabs: [
-    { xtype: 'nx-coreui-role-settings', title: NX.I18n.get('ADMIN_ROLES_DETAILS_SETTINGS_TAB'), weight: 10 },
-    { xtype: 'nx-coreui-privilege-trace', title: NX.I18n.get('ADMIN_ROLES_DETAILS_TRACE_TAB'), weight: 20 },
-    { xtype: 'nx-coreui-role-tree', title: NX.I18n.get('ADMIN_ROLES_DETAILS_ROLE_TAB'), weight: 30 }
+    { xtype: 'nx-coreui-role-settings', title: NX.I18n.get('Coreui_View_Role_RoleFeature_Settings_Title'), weight: 10 },
+    { xtype: 'nx-coreui-privilege-trace', title: NX.I18n.get('Coreui_View_Role_RoleFeature_Trace_Title'), weight: 20 },
+    { xtype: 'nx-coreui-role-tree', title: NX.I18n.get('Coreui_View_Role_RoleFeature_Role_Title'), weight: 30 }
   ],
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_ROLES_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('Coreui_View_Role_RoleFeature_Delete_Button'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ]
 });
