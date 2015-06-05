@@ -53,7 +53,6 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
@@ -249,13 +248,7 @@ public class MavenFacetImpl
         @Override
         public Content execute(final StorageTx tx) {
           try {
-            return put(tx, path, payload, new Supplier<InputStream>()
-            {
-              @Override
-              public InputStream get() {
-                return streamSupplier.get();
-              }
-            });
+            return put(tx, path, payload, streamSupplier.get());
           }
           catch (IOException e) {
             throw Throwables.propagate(e);
@@ -263,36 +256,31 @@ public class MavenFacetImpl
         }
       });
     }
+    catch (RuntimeException e) {
+      if (e.getCause() instanceof IOException) {
+        throw (IOException) e.getCause();
+      }
+      throw e;
+    }
   }
 
   @Override
   public Content put(final StorageTx tx, final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
-    return put(tx, path, payload, new Supplier<InputStream>()
-    {
-      @Override
-      public InputStream get() {
-        try {
-          return payload.openInputStream();
-        }
-        catch (IOException e) {
-          throw Throwables.propagate(e);
-        }
-      }
-    });
+    return put(tx, path, payload, payload.openInputStream());
   }
 
   private Content put(final StorageTx tx,
                       final MavenPath path,
                       final Payload payload,
-                      final Supplier<InputStream> inputStreamSupplier)
+                      final InputStream inputStream)
       throws IOException, InvalidContentException
   {
     log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
     final AssetBlob assetBlob = tx.createBlob(
         path.getPath(),
-        inputStreamSupplier.get(),
+        inputStream,
         HashType.ALGORITHMS,
         null,
         payload.getContentType()
