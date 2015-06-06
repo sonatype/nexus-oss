@@ -246,21 +246,10 @@ public class MavenFacetImpl
       return storageFacet.perform(new Operation<Content>()
       {
         @Override
-        public Content execute(final StorageTx tx) {
-          try {
-            return put(tx, path, payload, streamSupplier.get());
-          }
-          catch (IOException e) {
-            throw Throwables.propagate(e);
-          }
+        public Content execute(final StorageTx tx) throws IOException {
+          return put(tx, path, payload, streamSupplier.get());
         }
       });
-    }
-    catch (RuntimeException e) {
-      if (e.getCause() instanceof IOException) {
-        throw (IOException) e.getCause();
-      }
-      throw e;
     }
   }
 

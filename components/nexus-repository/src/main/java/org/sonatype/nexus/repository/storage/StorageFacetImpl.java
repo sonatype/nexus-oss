@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -226,7 +227,7 @@ public class StorageFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public <T> T perform(final Operation<T> operation) {
+  public <T> T perform(final Operation<T> operation) throws IOException {
     try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
       return perform(db, operation);
     }
@@ -234,7 +235,7 @@ public class StorageFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) {
+  public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) throws IOException {
     checkNotNull(db);
     checkNotNull(operation);
     OConcurrentModificationException lastConcurrentException = null;

@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import java.io.IOException;
+
 import org.sonatype.nexus.repository.Facet;
 
 import com.google.common.base.Supplier;
@@ -84,26 +86,28 @@ public interface StorageFacet
   StorageTx openTx(ODatabaseDocumentTx db);
 
   /**
-   * Operation that should be retried in case of Orient MVCC detected conflict. Usually these are "update" related
-   * operations. Implementation should be immutable/stateless, and implemented with caution that the execute method
-   * might be invoked multiple times. Operation must save any updated entity, but must NOT commit as {@link StorageTx}
-   * is not reusable after commit currently.
+   * Update operation that should be retried in case of Orient MVCC detected conflict. Usually these are "update"
+   * related operations. Implementation should be immutable/stateless, and implemented with caution that the execute
+   * method might be invoked multiple times. Operation must save any updated entity, but must NOT commit as {@link
+   * StorageTx} is not reusable after commit currently.
+   *
+   * @throws IOException that will stop the attempts to perform this operation.
    */
   interface Operation<T>
   {
-    T execute(StorageTx tx);
+    T execute(StorageTx tx) throws IOException;
   }
 
   /**
    * Handles retries of passed in {@link Operation}, if needed. Operation will receive newly opened {@link StorageTx}
    * and on clean return from this method it is guaranteed that operation did succeed and change is commited.
    */
-  <T> T perform(Operation<T> operation);
+  <T> T perform(Operation<T> operation) throws IOException;
 
   /**
    * Handles retries of passed in {@link Operation}, if needed. Operation will receive newly opened {@link StorageTx}
    * and on clean return from this method it is guaranteed that operation did succeed and change is commited. This
    * method will use given OrientDB connection.
    */
-  <T> T perform(ODatabaseDocumentTx db, Operation<T> operation);
+  <T> T perform(ODatabaseDocumentTx db, Operation<T> operation) throws IOException;
 }

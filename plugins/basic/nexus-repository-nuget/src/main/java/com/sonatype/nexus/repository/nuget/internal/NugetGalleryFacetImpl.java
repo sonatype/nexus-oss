@@ -233,24 +233,34 @@ public class NugetGalleryFacetImpl
 
   @Override
   public void putMetadata(final Map<String, String> metadata) {
-    storage.perform(new Operation<Object>()
-    {
-      @Override
-      public Object execute(final StorageTx tx) {
-        final Component component = createOrUpdatePackage(tx, metadata);
-        return null;
-      }
-    });
+    try {
+      storage.perform(new Operation<Object>()
+      {
+        @Override
+        public Object execute(final StorageTx tx) {
+          final Component component = createOrUpdatePackage(tx, metadata);
+          return null;
+        }
+      });
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
 
-    // Separate tx is necessary for the meantime, since the re-querying orient doesn't pick up uncommitted state
-    storage.perform(new Operation<Object>()
-    {
-      @Override
-      public Object execute(final StorageTx tx) {
-        maintainAggregateInfo(tx, metadata.get(ID));
-        return null;
-      }
-    });
+    try {
+      // Separate tx is necessary for the meantime, since the re-querying orient doesn't pick up uncommitted state
+      storage.perform(new Operation<Object>()
+      {
+        @Override
+        public Object execute(final StorageTx tx) {
+          maintainAggregateInfo(tx, metadata.get(ID));
+          return null;
+        }
+      });
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override
@@ -410,20 +420,25 @@ public class NugetGalleryFacetImpl
   @Override
   public void setLastVerified(final String id, final String version, final DateTime date) {
     checkNotNull(date);
-    final Date priorDate = storage.perform(new Operation<Date>()
-    {
-      @Override
-      public Date execute(final StorageTx tx) {
-        Asset asset = findAsset(tx, id, version);
-        checkState(asset != null);
+    try {
+      final Date priorDate = storage.perform(new Operation<Date>()
+      {
+        @Override
+        public Date execute(final StorageTx tx) {
+          Asset asset = findAsset(tx, id, version);
+          checkState(asset != null);
 
-        final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
-        asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
+          final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+          asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
 
-        return priorDate;
-      }
-    });
-    log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
+          return priorDate;
+        }
+      });
+      log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override
