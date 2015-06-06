@@ -42,8 +42,7 @@ Ext.define('NX.coreui.controller.Roles', {
     'role.RoleFeature',
     'role.RoleList',
     'role.RoleSettings',
-    'role.RoleSettingsForm',
-    'role.RoleTree'
+    'role.RoleSettingsForm'
   ],
   refs: [
     { ref: 'feature', selector: 'nx-coreui-role-feature' },
