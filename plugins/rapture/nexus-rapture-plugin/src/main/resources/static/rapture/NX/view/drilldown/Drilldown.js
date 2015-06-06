@@ -64,7 +64,8 @@ Ext.define('NX.view.drilldown.Drilldown', {
     if (me.detail) {
       // Use a custom detail panel
       me.masters.push(me.detail);
-    } else {
+    }
+    else {
       // Use the default tab panel
       me.masters.push(
         {
@@ -79,6 +80,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
             pack: 'start'
           },
 
+          // FIXME: This probably can/should use Ext.clone()
           tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs),
           autoHideTabHeader: me.autoHideTabHeader,
           actions: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : me.actions
@@ -561,15 +563,14 @@ Ext.define('NX.view.drilldown.Drilldown', {
 
           // Exit the algorithm
           break;
-
-        } else {
-
+        }
+        else {
           // No. Set the width of this button to that of the next button, and re-run the algorithm.
           buttons[i].setWidth(buttons[i+1].getWidth());
           me.reduceButtonWidth(buttons, width, minPerButton);
         }
-      } else {
-
+      }
+      else {
         // All buttons are the same length, shorten all by the same length
         setToWidth = Math.floor(width / buttons.length);
         for (var j = 0; j < buttons.length; ++j) {
