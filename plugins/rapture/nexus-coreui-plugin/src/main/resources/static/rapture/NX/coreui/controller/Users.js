@@ -57,8 +57,7 @@ Ext.define('NX.coreui.controller.Users', {
     { ref: 'list', selector: 'nx-coreui-user-list' },
     { ref: 'userSearchBox', selector: 'nx-coreui-user-list nx-coreui-user-searchbox' },
     { ref: 'settings', selector: 'nx-coreui-user-feature nx-coreui-user-settings' },
-    { ref: 'externalSettings', selector: 'nx-coreui-user-feature nx-coreui-user-settings-external' },
-    { ref: 'roleTree', selector: 'nx-coreui-user-feature nx-coreui-role-tree' }
+    { ref: 'externalSettings', selector: 'nx-coreui-user-feature nx-coreui-user-settings-external' }
   ],
   icons: {
     'user-default': {
@@ -158,9 +157,6 @@ Ext.define('NX.coreui.controller.Users', {
         },
         'nx-coreui-user-changepassword button[action=changepassword]': {
           click: me.changePassword
-        },
-        'nx-coreui-user-feature nx-coreui-role-tree': {
-          activate: me.onRoleTreeActivate
         }
       }
     });
@@ -207,7 +203,6 @@ Ext.define('NX.coreui.controller.Users', {
           me.getFeature().removeTab(externalSettingsPanel);
         }
       }
-      me.getRoleTree().loadRecord(model.data);
     }
   },
 
@@ -406,24 +401,6 @@ Ext.define('NX.coreui.controller.Users', {
     emptyText += '</div>';
 
     list.getView().emptyText = emptyText;
-  },
-
-  /**
-   * @private
-   */
-  onRoleTreeActivate: function(panel) {
-    var me = this,
-        settingPanel = me.getSettings();
-
-    if (!settingPanel) {
-      settingPanel = me.getExternalSettings();
-    }
-
-    if (settingPanel) {
-      panel.loadRecord({
-        roles: settingPanel.down('#roles').getValue()
-      });
-    }
   },
 
   /**
