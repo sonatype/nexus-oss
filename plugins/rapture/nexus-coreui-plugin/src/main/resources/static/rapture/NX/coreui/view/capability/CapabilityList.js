@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-capability-list',
   requires: [
-    'NX.I18n'
+    'NX.I18n',
+    'NX.ext.grid.column.Renderers'
   ],
 
   store: 'Capability',
@@ -35,9 +36,24 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
       dataIndex: 'state',
       hideable: false
     },
-    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_TYPE_COLUMN'), dataIndex: 'typeName', flex: 1 },
-    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', flex: 1, groupable: false },
-    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NOTES_COLUMN'), dataIndex: 'notes', flex: 1 }
+    {
+      text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_TYPE_COLUMN'),
+      dataIndex: 'typeName',
+      flex: 1
+    },
+    {
+      text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_DESCRIPTION_COLUMN'),
+      dataIndex: 'description',
+      flex: 1,
+      groupable: false,
+      renderer: NX.ext.grid.column.Renderers.emptyData
+    },
+    {
+      text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NOTES_COLUMN'),
+      dataIndex: 'notes',
+      flex: 1,
+      renderer: NX.ext.grid.column.Renderers.emptyData
+    }
   ],
 
   viewConfig: {
