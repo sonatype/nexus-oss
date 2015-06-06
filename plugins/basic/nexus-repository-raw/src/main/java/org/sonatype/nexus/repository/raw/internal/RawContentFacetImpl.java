@@ -32,7 +32,6 @@ import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
-import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
@@ -171,7 +170,7 @@ public class RawContentFacetImpl
 
       @Override
       public String toString() {
-        return SimpleFormat.format("updateLastVerified(%s, %s)", path, lastUpdated);
+        return String.format("updateLastVerified(%s, %s)", path, lastUpdated);
       }
     });
   }

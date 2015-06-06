@@ -51,7 +51,6 @@ import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
-import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
@@ -258,7 +257,7 @@ public class MavenFacetImpl
 
         @Override
         public String toString() {
-          return SimpleFormat.format("put(%s)", path.getPath());
+          return String.format("put(%s)", path.getPath());
         }
       });
     }
@@ -475,7 +474,7 @@ public class MavenFacetImpl
 
       @Override
       public String toString() {
-        return SimpleFormat.format("setLastVerified(%s)", path.getPath(), verified);
+        return String.format("setLastVerified(%s, %s)", path.getPath(), verified);
       }
     });
   }

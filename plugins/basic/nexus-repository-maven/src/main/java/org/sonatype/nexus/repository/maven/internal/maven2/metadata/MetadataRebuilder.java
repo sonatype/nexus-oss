@@ -252,7 +252,7 @@ public class MetadataRebuilder
 
         @Override
         public String toString() {
-          return "processMetadata(" + currentGroupId + ")";
+          return String.format("processMetadata(%s)", currentGroupId);
         }
       });
     }
@@ -317,7 +317,7 @@ public class MetadataRebuilder
 
           @Override
           public String toString() {
-            return "rebuildMetadataInner(" + groupId + ", " + artifactId + ", " + baseVersion + ")";
+            return String.format("rebuildMetadataInner(%s, %s, %s)", groupId, artifactId, baseVersion);
           }
         });
       }
@@ -335,7 +335,7 @@ public class MetadataRebuilder
 
         @Override
         public String toString() {
-          return "processMetadata(" + groupId + "," + artifactId + ")";
+          return String.format("processMetadata(%s, %s)", groupId,  artifactId);
         }
       });
     }

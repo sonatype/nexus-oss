@@ -54,7 +54,6 @@ import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload.InputStreamSupplier;
-import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
@@ -244,7 +243,7 @@ public class NugetGalleryFacetImpl
 
       @Override
       public String toString() {
-        return SimpleFormat.format("putMetadata(%s)", metadata);
+        return String.format("putMetadata(%s)", metadata);
       }
     });
 
@@ -255,6 +254,11 @@ public class NugetGalleryFacetImpl
       public Object execute(final StorageTx tx) {
         maintainAggregateInfo(tx, metadata.get(ID));
         return null;
+      }
+
+      @Override
+      public String toString() {
+        return String.format("maintainAggregateInfo(%s)", metadata);
       }
     });
   }
@@ -278,7 +282,7 @@ public class NugetGalleryFacetImpl
 
         @Override
         public String toString() {
-          return SimpleFormat.format("putContent(%s, %s)", id, version);
+          return String.format("putContent(%s, %s)", id, version);
         }
       });
     }
@@ -436,7 +440,7 @@ public class NugetGalleryFacetImpl
 
       @Override
       public String toString() {
-        return SimpleFormat.format("setLastVerified(%s, %s, %s)", id, version, date);
+        return String.format("setLastVerified(%s, %s, %s)", id, version, date);
       }
     });
     log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
