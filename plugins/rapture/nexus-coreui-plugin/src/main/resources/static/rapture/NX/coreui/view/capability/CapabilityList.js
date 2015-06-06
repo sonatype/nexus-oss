@@ -77,6 +77,13 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   ],
 
   /**
+   * Copy of original column configuration, to support adding dynamic tag columns.
+   *
+   * @public
+   */
+  originalColumns: undefined,
+
+  /**
    * @override
    */
   initComponent: function (config) {
