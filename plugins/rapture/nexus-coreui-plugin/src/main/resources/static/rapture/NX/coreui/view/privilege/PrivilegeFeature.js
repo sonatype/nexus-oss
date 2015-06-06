@@ -30,7 +30,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeFeature', {
 
   tabs: {
     xtype: 'nx-info-panel',
-    title: 'Summary' // TODO: i18n
+    title: NX.I18n.get('ADMIN_PRIVILEGES_DETAILS_SUMMARY')
   },
 
   actions: [
