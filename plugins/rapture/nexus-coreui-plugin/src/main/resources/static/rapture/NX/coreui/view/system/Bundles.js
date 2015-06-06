@@ -27,6 +27,6 @@ Ext.define('NX.coreui.view.system.Bundles', {
 
   tabs: {
     xtype: 'nx-info-panel',
-    title: 'Summary'
+    title: 'Summary' // TODO: i18n
   }
 });
