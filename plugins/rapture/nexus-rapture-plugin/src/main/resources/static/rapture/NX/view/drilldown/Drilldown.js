@@ -26,15 +26,6 @@ Ext.define('NX.view.drilldown.Drilldown', {
     'NX.Icons'
   ],
 
-  /**
-   * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab
-   */
-  autoHideTabHeader: true,
-
-  tabs: {
-    xtype: 'nx-info-panel'
-  },
-
   // List of masters to use (xtype objects)
   masters: null,
 
@@ -80,9 +71,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
             pack: 'start'
           },
 
-          // FIXME: This probably can/should use Ext.clone()
-          tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs),
-          autoHideTabHeader: me.autoHideTabHeader,
+          tabs: Ext.clone(me.tabs),
           actions: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : me.actions
         }
       );

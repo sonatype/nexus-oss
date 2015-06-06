@@ -21,6 +21,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetails', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-sslcertificate-details',
 
+  title: 'Summary',
   settingsForm: { xtype: 'nx-coreui-sslcertificate-details-form' },
 
   dockedItems: null
