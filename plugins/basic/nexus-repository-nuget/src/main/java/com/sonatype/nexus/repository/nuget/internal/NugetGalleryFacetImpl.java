@@ -233,34 +233,44 @@ public class NugetGalleryFacetImpl
 
   @Override
   public void putMetadata(final Map<String, String> metadata) {
-    storage.perform(new Operation<Object>()
-    {
-      @Override
-      public Object execute(final StorageTx tx) {
-        final Component component = createOrUpdatePackage(tx, metadata);
-        return null;
-      }
+    try {
+      storage.perform(new Operation<Object>()
+      {
+        @Override
+        public Object execute(final StorageTx tx) {
+          final Component component = createOrUpdatePackage(tx, metadata);
+          return null;
+        }
 
-      @Override
-      public String toString() {
-        return String.format("putMetadata(%s)", metadata);
-      }
-    });
+        @Override
+        public String toString() {
+          return String.format("putMetadata(%s)", metadata);
+        }
+      });
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
 
-    // Separate tx is necessary for the meantime, since the re-querying orient doesn't pick up uncommitted state
-    storage.perform(new Operation<Object>()
-    {
-      @Override
-      public Object execute(final StorageTx tx) {
-        maintainAggregateInfo(tx, metadata.get(ID));
-        return null;
-      }
+    try {
+      // Separate tx is necessary for the meantime, since the re-querying orient doesn't pick up uncommitted state
+      storage.perform(new Operation<Object>()
+      {
+        @Override
+        public Object execute(final StorageTx tx) {
+          maintainAggregateInfo(tx, metadata.get(ID));
+          return null;
+        }
 
-      @Override
-      public String toString() {
-        return String.format("maintainAggregateInfo(%s)", metadata);
-      }
-    });
+        @Override
+        public String toString() {
+          return String.format("maintainAggregateInfo(%s)", metadata);
+        }
+      });
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override
@@ -423,7 +433,7 @@ public class NugetGalleryFacetImpl
   }
 
   @Override
-  public void setLastVerified(final String id, final String version, final DateTime date) {
+  public void setLastVerified(final String id, final String version, final DateTime date) throws IOException {
     checkNotNull(date);
     final Date priorDate = storage.perform(new Operation<Date>()
     {

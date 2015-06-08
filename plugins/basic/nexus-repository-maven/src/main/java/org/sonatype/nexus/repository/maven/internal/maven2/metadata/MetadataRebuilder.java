@@ -206,27 +206,37 @@ public class MetadataRebuilder
 
                 @Override
                 public boolean result(Object iRecord) {
-                  final ODocument doc = (ODocument) iRecord;
-                  final String groupId = doc.field("groupId", OType.STRING);
-                  final String artifactId = doc.field("artifactId", OType.STRING);
-                  final Set<String> baseVersions = doc.field("baseVersions", OType.EMBEDDEDSET);
+                  try {
+                    final ODocument doc = (ODocument) iRecord;
+                    final String groupId = doc.field("groupId", OType.STRING);
+                    final String artifactId = doc.field("artifactId", OType.STRING);
+                    final Set<String> baseVersions = doc.field("baseVersions", OType.EMBEDDEDSET);
 
-                  final boolean groupChange = !Objects.equals(currentGroupId, groupId);
-                  if (groupChange) {
-                    if (currentGroupId != null) {
-                      rebuildMetadataExitGroup(currentGroupId);
+                    final boolean groupChange = !Objects.equals(currentGroupId, groupId);
+                    if (groupChange) {
+                      if (currentGroupId != null) {
+                        rebuildMetadataExitGroup(currentGroupId);
+                      }
+                      currentGroupId = groupId;
+                      metadataBuilder.onEnterGroupId(groupId);
                     }
-                    currentGroupId = groupId;
-                    metadataBuilder.onEnterGroupId(groupId);
+                    rebuildMetadataInner(groupId, artifactId, baseVersions);
+                    return true;
                   }
-                  rebuildMetadataInner(groupId, artifactId, baseVersions);
-                  return true;
+                  catch (IOException e) {
+                    throw Throwables.propagate(e);
+                  }
                 }
 
                 @Override
                 public void end() {
                   if (currentGroupId != null) {
-                    rebuildMetadataExitGroup(currentGroupId);
+                    try {
+                      rebuildMetadataExitGroup(currentGroupId);
+                    }
+                    catch (IOException e) {
+                      throw Throwables.propagate(e);
+                    }
                   }
                 }
               }
@@ -237,7 +247,7 @@ public class MetadataRebuilder
     /**
      * Process exits from group level, executed in isolation.
      */
-    private void rebuildMetadataExitGroup(final String currentGroupId) {
+    private void rebuildMetadataExitGroup(final String currentGroupId) throws IOException {
       storageFacet.perform(db, new Operation<Void>()
       {
         @Override
@@ -264,7 +274,7 @@ public class MetadataRebuilder
      */
     private void rebuildMetadataInner(final String groupId,
                                       final String artifactId,
-                                      final Set<String> baseVersions)
+                                      final Set<String> baseVersions) throws IOException
     {
       metadataBuilder.onEnterArtifactId(artifactId);
       for (final String baseVersion : baseVersions) {

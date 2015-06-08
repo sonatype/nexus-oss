@@ -202,7 +202,7 @@ public class MavenFacetImpl
   /**
    * Creates {@link Content} from passed in {@link Asset}.
    */
-  private Content toContent(final StorageTx tx, final MavenPath mavenPath) throws IOException {
+  private Content toContent(final StorageTx tx, final MavenPath mavenPath) {
     IllegalStateException lastIllegalStateException = null;
     for (int attempt = 0; attempt < MAX_ASSET_TO_CONTENT_ATTEMPTS; attempt++) {
       try {
@@ -246,13 +246,8 @@ public class MavenFacetImpl
       return storageFacet.perform(new Operation<Content>()
       {
         @Override
-        public Content execute(final StorageTx tx) {
-          try {
-            return put(tx, path, payload, streamSupplier.get());
-          }
-          catch (IOException e) {
-            throw Throwables.propagate(e);
-          }
+        public Content execute(final StorageTx tx) throws IOException {
+          return put(tx, path, payload, streamSupplier.get());
         }
 
         @Override
@@ -260,12 +255,6 @@ public class MavenFacetImpl
           return String.format("put(%s)", path.getPath());
         }
       });
-    }
-    catch (RuntimeException e) {
-      if (e.getCause() instanceof IOException) {
-        throw (IOException) e.getCause();
-      }
-      throw e;
     }
   }
 
@@ -306,7 +295,7 @@ public class MavenFacetImpl
                               final MavenPath path,
                               final AssetBlob assetBlob,
                               @Nullable final AttributesMap contentAttributes)
-      throws IOException, InvalidContentException
+      throws InvalidContentException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
     Component component = findComponent(tx, tx.getBucket(), path);
@@ -353,7 +342,7 @@ public class MavenFacetImpl
                           final MavenPath path,
                           final AssetBlob assetBlob,
                           @Nullable final AttributesMap contentAttributes)
-      throws IOException, InvalidContentException
+      throws InvalidContentException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
@@ -374,7 +363,6 @@ public class MavenFacetImpl
                                final Asset asset,
                                final AssetBlob assetBlob,
                                @Nullable final AttributesMap contentAttributes)
-      throws IOException
   {
     tx.attachBlob(asset, assetBlob);
 
