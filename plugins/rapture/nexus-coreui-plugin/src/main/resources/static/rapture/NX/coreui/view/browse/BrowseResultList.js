@@ -76,7 +76,22 @@ Ext.define('NX.coreui.view.browse.BrowseResultList', {
       dataIndex: 'version',
       stateId: 'version',
       flex: 1
-    },
-  ]
+    }
+  ],
+
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless',
+    items: [
+      '->',
+      {
+        xtype: 'nx-searchbox',
+        itemId: 'filter',
+        emptyText: NX.I18n.get('GLOBAL_FILTER_PLACEHOLDER'),
+        width: 200
+      }
+    ]
+  }]
 
 });

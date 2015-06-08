@@ -44,6 +44,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Coreui_View_Browse_BrowseResultList_Group_Column: 'Group',
     Coreui_View_Browse_BrowseResultList_Version_Column: 'Version',
     Coreui_View_Browse_BrowseResultList_EmptyText_View: 'No components found in repository',
+    Coreui_View_Browse_BrowseResultList_EmptyText_Filter: 'No components matched "$filter"',
 
     BROWSE_ASSET_INFO_NAME: 'Name',
     BROWSE_ASSET_INFO_CONTENT_TYPE: 'Content Type',

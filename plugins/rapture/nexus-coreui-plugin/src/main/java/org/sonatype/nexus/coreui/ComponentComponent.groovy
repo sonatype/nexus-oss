@@ -94,7 +94,16 @@ class ComponentComponent
         repositories = ImmutableList.of(repository)
       }
 
-      List<ComponentXO> results = storageTx.findComponents(null, null, repositories, querySuffix).collect { component ->
+      def whereClause = null
+      def queryParams = null
+      def filter = parameters.getFilter('filter')
+      if (filter) {
+        whereClause = "${StorageFacet.P_NAME} LIKE :filter OR ${StorageFacet.P_GROUP} LIKE :filter OR ${StorageFacet.P_VERSION} LIKE :filter"
+        queryParams = ['filter': "%${filter}%"]
+      }
+
+      List<ComponentXO> results = storageTx.findComponents(whereClause, queryParams, repositories, querySuffix)
+          .collect { component ->
         new ComponentXO(
             id: component.entityMetadata.id,
             repositoryName: repository.name,
@@ -104,7 +113,7 @@ class ComponentComponent
             format: component.format()
         )
       }
-      if (parameters.start == 0 && readUnattachedAssets(storageTx, repositories).size()) {
+      if (parameters.start == 0 && !filter && readUnattachedAssets(storageTx, repositories).size()) {
         results = new ArrayList<>(results)
         results.add(0, new ComponentXO(
             id: UNATTACHED,

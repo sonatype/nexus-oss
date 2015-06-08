@@ -46,7 +46,8 @@ Ext.define('NX.coreui.controller.Browse', {
     {ref: 'feature', selector: 'nx-coreui-browsefeature'},
     {ref: 'results', selector: 'nx-coreui-browsefeature nx-coreui-browse-result-list'},
     {ref: 'componentDetails', selector: 'nx-coreui-browsefeature nx-coreui-component-details'},
-    {ref: 'assets', selector: 'nx-coreui-browsefeature nx-coreui-component-asset-list'}
+    {ref: 'assets', selector: 'nx-coreui-browsefeature nx-coreui-component-asset-list'},
+    {ref: 'componentFilter', selector: 'nx-coreui-browsefeature nx-coreui-browse-result-list #filter'}
   ],
 
   features: {
@@ -83,6 +84,10 @@ Ext.define('NX.coreui.controller.Browse', {
       component: {
         'nx-coreui-browsefeature nx-coreui-component-assetcontainer': {
           updated: me.setAssetIcon
+        },
+        'nx-coreui-browsefeature nx-coreui-browse-result-list #filter': {
+          search: me.onSearch,
+          searchcleared: me.onSearchCleared
         }
       }
     });
@@ -124,8 +129,11 @@ Ext.define('NX.coreui.controller.Browse', {
   onRepositorySelection: function(model) {
     var me = this,
         browseResultStore = me.getBrowseResultStore(),
-        results = me.getResults();
+        results = me.getResults(),
+        componentFilter = me.getComponentFilter();
 
+    browseResultStore.filters.removeAtKey('filter');
+    componentFilter.clearSearch();
     results.getSelectionModel().deselectAll();
     browseResultStore.addFilter([
       {
@@ -148,6 +156,51 @@ Ext.define('NX.coreui.controller.Browse', {
 
     me.getComponentDetails().setComponentModel(model);
     me.getAssets().setComponentModel(model);
+  },
+
+  /**
+   * @private
+   * Filter grid.
+   */
+  onSearch: function(searchbox, value) {
+    var me = this,
+        browseResultStore = me.getBrowseResultStore(),
+        results = me.getResults(),
+        emptyText = NX.I18n.get('Coreui_View_Browse_BrowseResultList_EmptyText_Filter');
+
+    if (!browseResultStore.emptyText) {
+      browseResultStore.emptyText = results.getView().emptyText;
+    }
+    results.getView().emptyText = '<div class="x-grid-empty">' + emptyText.replace(/\$filter/, value) + '</div>';
+    results.getSelectionModel().deselectAll();
+    browseResultStore.addFilter([
+      {
+        id: 'filter',
+        property: 'filter',
+        value: value
+      }
+    ]);
+  },
+
+  /**
+   * @private
+   * Clear filtering on grid.
+   */
+  onSearchCleared: function() {
+    var me = this,
+        browseResultStore = me.getBrowseResultStore(),
+        results = me.getResults();
+
+    results.getView().emptyText = browseResultStore.emptyText;
+    results.getSelectionModel().deselectAll();
+    if (browseResultStore.filters.removeAtKey('filter')) {
+      if (browseResultStore.filters.length) {
+        browseResultStore.filter();
+      }
+      else {
+        browseResultStore.clearFilter();
+      }
+    }
   },
 
   /**
