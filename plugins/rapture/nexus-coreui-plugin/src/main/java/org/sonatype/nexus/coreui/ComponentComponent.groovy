@@ -98,8 +98,12 @@ class ComponentComponent
       def queryParams = null
       def filter = parameters.getFilter('filter')
       if (filter) {
-        whereClause = "${StorageFacet.P_NAME} LIKE :filter OR ${StorageFacet.P_GROUP} LIKE :filter OR ${StorageFacet.P_VERSION} LIKE :filter"
-        queryParams = ['filter': "%${filter}%"]
+        whereClause = "${StorageFacet.P_NAME} LIKE :nameFilter OR ${StorageFacet.P_GROUP} LIKE :groupFilter OR ${StorageFacet.P_VERSION} LIKE :versionFilter"
+        queryParams = [
+            'nameFilter': "%${filter}%",
+            'groupFilter': "%${filter}%",
+            'versionFilter': "%${filter}%"
+        ]
       }
 
       List<ComponentXO> results = storageTx.findComponents(whereClause, queryParams, repositories, querySuffix)
