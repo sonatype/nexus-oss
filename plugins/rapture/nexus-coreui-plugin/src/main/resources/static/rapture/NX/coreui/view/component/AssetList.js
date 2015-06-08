@@ -55,13 +55,6 @@ Ext.define('NX.coreui.view.component.AssetList', {
     {header: NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME_COLUMN'), dataIndex: 'name', flex: 2.5}
   ],
 
-  features: [
-    {
-      ftype: 'grouping',
-      groupHeaderTpl: '{columnName}: {name}'
-    }
-  ],
-
   /**
    * @public
    *
