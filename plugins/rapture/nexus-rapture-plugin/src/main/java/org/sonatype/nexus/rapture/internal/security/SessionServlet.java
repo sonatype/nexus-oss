@@ -74,6 +74,7 @@ public class SessionServlet
 
     // sanity check
     checkState(!subject.isAuthenticated());
+    checkState(!subject.isRemembered());
     checkState(subject.getSession(false) == null);
 
     response.setStatus(SC_NO_CONTENT);
