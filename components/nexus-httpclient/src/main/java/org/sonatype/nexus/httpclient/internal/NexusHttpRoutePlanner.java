@@ -13,7 +13,6 @@
 package org.sonatype.nexus.httpclient.internal;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.http.HttpException;
@@ -38,9 +37,9 @@ public class NexusHttpRoutePlanner
     extends DefaultRoutePlanner
 {
   /**
-   * Set of patterns for matching hosts names against. Never null.
+   * Single regexp pattern covering non-proxy-hosts, never {@code null}
    */
-  private final Set<Pattern> patterns;
+  private final Pattern nonProxyHostPattern;
 
   /**
    * Mapping between protocol scheme and proxy to be used
@@ -51,11 +50,11 @@ public class NexusHttpRoutePlanner
    * @since 2.5
    */
   public NexusHttpRoutePlanner(final Map<String, HttpHost> proxies,
-                               final Set<Pattern> patterns)
+                               final Pattern nonProxyHostsPattern)
   {
     super(DefaultSchemePortResolver.INSTANCE);
     this.proxies = checkNotNull(proxies);
-    this.patterns = checkNotNull(patterns);
+    this.nonProxyHostPattern = checkNotNull(nonProxyHostsPattern);
   }
 
   @Override
@@ -78,11 +77,6 @@ public class NexusHttpRoutePlanner
    * @return true if no proxy should be configured.
    */
   private boolean noProxyFor(final String hostName) {
-    for (Pattern pattern : patterns) {
-      if (pattern.matcher(hostName).matches()) {
-        return true;
-      }
-    }
-    return false;
+    return nonProxyHostPattern.matcher(hostName).matches();
   }
 }

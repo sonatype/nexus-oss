@@ -12,11 +12,12 @@
  */
 package org.sonatype.nexus.httpclient.config;
 
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -27,7 +28,10 @@ import org.sonatype.nexus.httpclient.SSLContextSelector;
 import org.sonatype.nexus.httpclient.internal.NexusHttpRoutePlanner;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.net.HttpHeaders;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -54,6 +58,35 @@ public class ConfigurationCustomizer
     extends ComponentSupport
     implements HttpClientPlan.Customizer
 {
+  /**
+   * Default non-proxyHosts value, used by Java7 too. Always appended to the user given list, if any.
+   */
+  private static final String[] DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS = {
+      "localhost", " 127.*", "[::1]", "0.0.0.0", "[::0]"
+  };
+
+  /**
+   * Simple reusable function that convers "glob-like" expressions to regexp.
+   */
+  private static final Function<String, String> GLOB_STRING_TO_REGEXP_STRING = new Function<String, String>()
+  {
+    @Override
+    public String apply(final String input) {
+      return "(" +
+          input.toLowerCase(Locale.US).replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*?").replaceAll("\\[", "\\\\[")
+              .replaceAll("\\]", "\\\\]") + ")";
+    }
+  };
+
+  /**
+   * Regexp pattern used as default or as fallback when user pattern cannot be converted to regexp. Built from
+   * {@link #DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS}.
+   */
+  private static final Pattern DEFAULT_NO_PROXY_HOSTS_PATTERN =
+      Pattern.compile(Joiner.on("|").join(
+          Iterables.transform(Arrays.asList(DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS), GLOB_STRING_TO_REGEXP_STRING))
+      );
+
   private final HttpClientConfiguration configuration;
 
   public ConfigurationCustomizer(final HttpClientConfiguration configuration) {
@@ -127,19 +160,22 @@ public class ConfigurationCustomizer
       proxies.put(HTTPS, host);
     }
 
-    // Non-proxy hosts (nexus-specific regular expression implementation)
-    Set<Pattern> patterns = new HashSet<>();
+    // Non-proxy hosts (Java http.nonProxyHosts formatted glob-like patterns converted to single Regexp expression)
+    LinkedHashSet<String> patterns = new LinkedHashSet<>();
     if (proxy.getNonProxyHosts() != null) {
-      for (String regex : proxy.getNonProxyHosts()) {
-        try {
-          patterns.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
-        }
-        catch (PatternSyntaxException e) {
-          log.warn("Invalid non-proxy host regex: {}", regex, e);
-        }
-      }
+      patterns.addAll(Arrays.asList(proxy.getNonProxyHosts()));
     }
-    plan.getClient().setRoutePlanner(new NexusHttpRoutePlanner(proxies, patterns));
+    patterns.addAll(Arrays.asList(DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS));
+    String nonProxyPatternString = Joiner.on("|").join(Iterables.transform(patterns, GLOB_STRING_TO_REGEXP_STRING));
+    Pattern nonProxyPattern;
+    try {
+      nonProxyPattern = Pattern.compile(nonProxyPatternString);
+    }
+    catch (PatternSyntaxException e) {
+      log.warn("Invalid non-proxy host regex: {}, using defaults", nonProxyPatternString, e);
+      nonProxyPattern = DEFAULT_NO_PROXY_HOSTS_PATTERN;
+    }
+    plan.getClient().setRoutePlanner(new NexusHttpRoutePlanner(proxies, nonProxyPattern));
   }
 
   /**
