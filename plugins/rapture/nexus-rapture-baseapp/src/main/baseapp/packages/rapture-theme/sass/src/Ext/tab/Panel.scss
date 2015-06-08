@@ -56,14 +56,8 @@
 @include extjs-tab-bar-ui(
   $ui: 'nx-light',
 
-  // 2px so we can color border top and bottom, less than 2x will show background of header
-  $ui-strip-height: 2px,
-  $ui-strip-border-width: 1px,
-  $ui-strip-plain-border-width: 1px,
-  $ui-strip-border-color: $color-light-gray,
-  $ui-strip-background-color: $color-light-smoke,
-
-  $ui-padding: 5px 0 2px 0,
+  $ui-strip-height: 1px,
+  $ui-padding: 5px 0 3px 0,
   $ui-background-color: $color-light-smoke,
   $ui-background-gradient: $tabbar-background-gradient
 );
@@ -77,7 +71,7 @@
 
 // Set bottom border of tab-strip
 .x-tab-bar-strip-nx-light-top {
-  border-bottom: 1px solid $color-white;
+  border-bottom: 1px solid $color-gainsboro;
 }
 
 // Override default treatment of the bottom borders
