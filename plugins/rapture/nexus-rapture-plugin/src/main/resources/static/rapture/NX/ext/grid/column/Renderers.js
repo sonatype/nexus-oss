@@ -24,6 +24,6 @@ Ext.define('NX.ext.grid.column.Renderers', {
    * Renderer which will use no-data glyph.
    */
   emptyData: function(value) {
-    return value ? value : '<span class="fa fa-ban" style="opacity: 0.25;"/>';
+    return value ? value : '<span class="fa fa-ban" style="opacity: 0.33;"/>';
   }
 });
