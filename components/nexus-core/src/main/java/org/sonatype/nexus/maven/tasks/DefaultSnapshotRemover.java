@@ -220,12 +220,9 @@ public class DefaultSnapshotRemover
     result.setDeletedSnapshots(snapshotRemoveProcessor.getDeletedSnapshots());
     result.setDeletedFiles(snapshotRemoveProcessor.getDeletedFiles());
 
-    if (log.isDebugEnabled()) {
-      log.debug(
-          "Collected and deleted " + snapshotRemoveProcessor.getDeletedSnapshots()
-              + " snapshots with alltogether " + snapshotRemoveProcessor.getDeletedFiles()
-              + " files on repository " + repository.getId()
-      );
+    if (log.isInfoEnabled()) {
+      log.info("deleted {} snapshot builds containing {} files on repository {}",
+          snapshotRemoveProcessor.getDeletedSnapshots(), snapshotRemoveProcessor.getDeletedFiles(), repository.getId());
     }
 
     // if we are processing a hosted-snapshot repository, we need to rebuild maven metadata
@@ -237,7 +234,12 @@ public class DefaultSnapshotRemover
       RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor =
           new RecreateMavenMetadataWalkerProcessor(log, getDeleteOperation(request));
 
-      for (String path : parentOMatic.getMarkedPaths()) {
+      final List<String> markedPaths = parentOMatic.getMarkedPaths();
+      if(log.isInfoEnabled()){
+        log.info("rebuilding metadata for {} paths on repository {}", markedPaths != null ? markedPaths.size() : 0,
+            repository.getId());
+      }
+      for (String path : markedPaths) {
         TaskUtil.checkInterruption();
 
         DefaultWalkerContext ctxMd =
@@ -246,6 +248,10 @@ public class DefaultSnapshotRemover
 
         ctxMd.getProcessors().add(metadataRebuildProcessor);
 
+        if(log.isTraceEnabled()){
+          log.trace("rebuilding metadata for {} on repository {}", path,
+              repository.getId());
+        }
         try {
           walker.walk(ctxMd);
         }
