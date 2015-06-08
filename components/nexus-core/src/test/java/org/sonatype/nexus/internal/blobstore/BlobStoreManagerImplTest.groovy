@@ -27,6 +27,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.mockito.Mock
 
+import static org.junit.Assert.fail
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.doReturn
@@ -143,6 +144,27 @@ class BlobStoreManagerImplTest
     underTest.stop()
     
     verify(blobStore).stop()
+  }
+
+  @Test
+  void 'Invalid configuration is rolled back'() {
+    BlobStore blobStore = mock(BlobStore)
+    when(provider.get()).thenThrow(new IllegalArgumentException())
+
+    BlobStoreConfiguration configuration = createConfig('test')
+
+    try {
+      underTest.create(configuration)
+      fail()
+    }
+    catch (Exception e) {
+      // expected
+    }
+
+    verify(store).create(configuration)
+    verify(store).delete(configuration)
+
+    assert underTest.browse().toList() == []
   }
 
   private BlobStoreConfiguration createConfig(name = 'foo', attributes = [file:[path:'baz']]) {

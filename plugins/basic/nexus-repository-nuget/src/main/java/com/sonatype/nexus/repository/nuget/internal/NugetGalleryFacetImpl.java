@@ -48,6 +48,7 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.Payload;
@@ -63,7 +64,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.xml.XmlEscapers;
-
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -104,6 +104,8 @@ public class NugetGalleryFacetImpl
   private StorageFacet storage;
 
   private static final VersionScheme SCHEME = new GenericVersionScheme();
+
+  private static final String P_LAST_VERIFIED_DATE = "last_verified";
 
   @Override
   protected void doInit(final Configuration configuration) throws Exception {
@@ -231,28 +233,43 @@ public class NugetGalleryFacetImpl
 
   @Override
   public void putMetadata(final Map<String, String> metadata) {
-    try (StorageTx tx = openStorageTx()) {
-      final Component component = createOrUpdatePackage(tx, metadata);
-      tx.commit();
-    }
+    storage.perform(new Operation<Object>()
+    {
+      @Override
+      public Object execute(final StorageTx tx) {
+        final Component component = createOrUpdatePackage(tx, metadata);
+        return null;
+      }
+    });
+
     // Separate tx is necessary for the meantime, since the re-querying orient doesn't pick up uncommitted state
-    try (StorageTx tx = openStorageTx()) {
-      maintainAggregateInfo(tx, metadata.get(ID));
-      tx.commit();
-    }
+    storage.perform(new Operation<Object>()
+    {
+      @Override
+      public Object execute(final StorageTx tx) {
+        maintainAggregateInfo(tx, metadata.get(ID));
+        return null;
+      }
+    });
   }
 
   @Override
-  public void putContent(String id, String version, InputStream content) {
-    try (StorageTx tx = openStorageTx()) {
-      final Bucket bucket = tx.getBucket();
-      Component component = findComponent(tx, id, version);
-      checkState(
-          component != null && tx.browseAssets(component).iterator().hasNext(),
-          "Component metadata does not exist yet"
-      );
-      createOrUpdateAssetAndContents(tx, bucket, component, content, null);
-      tx.commit();
+  public void putContent(final String id, final String version, final InputStream content) throws IOException {
+    try (TempStreamSupplier t = new TempStreamSupplier(content)) {
+      storage.perform(new Operation<Object>()
+      {
+        @Override
+        public Object execute(final StorageTx tx) {
+          final Bucket bucket = tx.getBucket();
+          Component component = findComponent(tx, id, version);
+          checkState(
+              component != null && tx.browseAssets(component).iterator().hasNext(),
+              "Component metadata does not exist yet"
+          );
+          createOrUpdateAssetAndContents(tx, bucket, component, t.get(), null);
+          return null;
+        }
+      });
     }
   }
 
@@ -347,11 +364,10 @@ public class NugetGalleryFacetImpl
     checkNotNull(version);
 
     try (StorageTx tx = openStorageTx()) {
-      Component component = findComponent(tx, id, version);
-      if (component == null) {
+      Asset asset = findAsset(tx, id, version);
+      if (asset == null) {
         return null;
       }
-      Asset asset = tx.firstAsset(component);
 
       final BlobRef blobRef = asset.blobRef();
       if (blobRef == null) {
@@ -377,21 +393,37 @@ public class NugetGalleryFacetImpl
   }
 
   @Override
-  public DateTime getLastUpdatedDate(final String id, final String version) {
+  public DateTime getLastVerified(final String id, final String version) {
     checkNotNull(id);
     checkNotNull(version);
 
     try (StorageTx tx = openStorageTx()) {
-      Component component = findComponent(tx, id, version);
-      if (component == null) {
-        return null;
-      }
-      Asset asset = tx.firstAsset(component);
+      final Asset asset = findAsset(tx, id, version);
 
-      final NestedAttributesMap nugetAttributes = asset.formatAttributes();
-      Date date = nugetAttributes.get(P_LAST_UPDATED, Date.class);
+      Date date = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+
+      log.debug("Content for {} {} last verified as of {}", id, version, date);
       return new DateTime(checkNotNull(date));
     }
+  }
+
+  @Override
+  public void setLastVerified(final String id, final String version, final DateTime date) {
+    checkNotNull(date);
+    final Date priorDate = storage.perform(new Operation<Date>()
+    {
+      @Override
+      public Date execute(final StorageTx tx) {
+        Asset asset = findAsset(tx, id, version);
+        checkState(asset != null);
+
+        final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+        asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
+
+        return priorDate;
+      }
+    });
+    log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
   }
 
   @Override
@@ -486,6 +518,15 @@ public class NugetGalleryFacetImpl
     return null;
   }
 
+  @Nullable
+  private Asset findAsset(final StorageTx tx, final String id, final String version) {
+    Component component = findComponent(tx, id, version);
+    if (component == null) {
+      return null;
+    }
+    return tx.firstAsset(component);
+  }
+
   private String blobName(Component component) {
     return component.name() + "-" + component.requireVersion() + ".nupkg";
   }
@@ -551,6 +592,7 @@ public class NugetGalleryFacetImpl
       Asset asset = findOrCreateAsset(storageTx, component);
       updateAssetMetadata(asset, data, component.isNew());
 
+      asset.formatAttributes().set(P_LAST_VERIFIED_DATE, new Date());
       storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
 
       storageTx.saveAsset(asset);
