@@ -202,7 +202,7 @@ public class MavenFacetImpl
   /**
    * Creates {@link Content} from passed in {@link Asset}.
    */
-  private Content toContent(final StorageTx tx, final MavenPath mavenPath) throws IOException {
+  private Content toContent(final StorageTx tx, final MavenPath mavenPath) {
     IllegalStateException lastIllegalStateException = null;
     for (int attempt = 0; attempt < MAX_ASSET_TO_CONTENT_ATTEMPTS; attempt++) {
       try {
@@ -295,7 +295,7 @@ public class MavenFacetImpl
                               final MavenPath path,
                               final AssetBlob assetBlob,
                               @Nullable final AttributesMap contentAttributes)
-      throws IOException, InvalidContentException
+      throws InvalidContentException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
     Component component = findComponent(tx, tx.getBucket(), path);
@@ -342,7 +342,7 @@ public class MavenFacetImpl
                           final MavenPath path,
                           final AssetBlob assetBlob,
                           @Nullable final AttributesMap contentAttributes)
-      throws IOException, InvalidContentException
+      throws InvalidContentException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
@@ -363,7 +363,6 @@ public class MavenFacetImpl
                                final Asset asset,
                                final AssetBlob assetBlob,
                                @Nullable final AttributesMap contentAttributes)
-      throws IOException
   {
     tx.attachBlob(asset, assetBlob);
 
