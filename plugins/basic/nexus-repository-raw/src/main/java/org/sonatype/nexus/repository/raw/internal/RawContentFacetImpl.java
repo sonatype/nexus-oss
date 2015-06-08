@@ -167,6 +167,11 @@ public class RawContentFacetImpl
 
         return priorDate;
       }
+
+      @Override
+      public String toString() {
+        return String.format("updateLastVerified(%s, %s)", path, lastUpdated);
+      }
     });
   }
 
