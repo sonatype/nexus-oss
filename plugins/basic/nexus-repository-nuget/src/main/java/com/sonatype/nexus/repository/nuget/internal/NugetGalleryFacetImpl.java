@@ -433,32 +433,27 @@ public class NugetGalleryFacetImpl
   }
 
   @Override
-  public void setLastVerified(final String id, final String version, final DateTime date) {
+  public void setLastVerified(final String id, final String version, final DateTime date) throws IOException {
     checkNotNull(date);
-    try {
-      final Date priorDate = storage.perform(new Operation<Date>()
-      {
-        @Override
-        public Date execute(final StorageTx tx) {
-          Asset asset = findAsset(tx, id, version);
-          checkState(asset != null);
+    final Date priorDate = storage.perform(new Operation<Date>()
+    {
+      @Override
+      public Date execute(final StorageTx tx) {
+        Asset asset = findAsset(tx, id, version);
+        checkState(asset != null);
 
-          final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
-          asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
+        final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+        asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
 
-          return priorDate;
-        }
+        return priorDate;
+      }
 
-        @Override
-        public String toString() {
-          return String.format("setLastVerified(%s, %s, %s)", id, version, date);
-        }
-      });
-      log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
-    }
-    catch (IOException e) {
-      throw Throwables.propagate(e);
-    }
+      @Override
+      public String toString() {
+        return String.format("setLastVerified(%s, %s, %s)", id, version, date);
+      }
+    });
+    log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
   }
 
   @Override

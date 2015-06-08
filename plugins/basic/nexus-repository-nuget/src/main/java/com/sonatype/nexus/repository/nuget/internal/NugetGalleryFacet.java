@@ -62,7 +62,7 @@ public interface NugetGalleryFacet
   /**
    * Sets when we last checked that the content was up to date relative to the remote server.
    */
-  void setLastVerified(String id, String version, DateTime date);
+  void setLastVerified(String id, String version, DateTime date) throws IOException;
 
   /**
    * Delete a package and return whether it existed.
