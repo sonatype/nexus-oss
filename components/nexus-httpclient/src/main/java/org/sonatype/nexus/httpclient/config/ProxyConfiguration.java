@@ -36,6 +36,7 @@ public class ProxyConfiguration
   private ProxyServerConfiguration https;
 
   @Nullable
+  @NonProxyHost
   private String[] nonProxyHosts;
 
   @Nullable

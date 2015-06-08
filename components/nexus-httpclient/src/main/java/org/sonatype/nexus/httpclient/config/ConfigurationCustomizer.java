@@ -61,12 +61,12 @@ public class ConfigurationCustomizer
   /**
    * Default non-proxyHosts value, used by Java7 too. Always appended to the user given list, if any.
    */
-  private static final String[] DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS = {
+  private static final List<String> DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS = ImmutableList.of(
       "localhost", " 127.*", "[::1]", "0.0.0.0", "[::0]"
-  };
+  );
 
   /**
-   * Simple reusable function that convers "glob-like" expressions to regexp.
+   * Simple reusable function that converts "glob-like" expressions to regexp.
    */
   private static final Function<String, String> GLOB_STRING_TO_REGEXP_STRING = new Function<String, String>()
   {
@@ -84,7 +84,8 @@ public class ConfigurationCustomizer
    */
   private static final Pattern DEFAULT_NO_PROXY_HOSTS_PATTERN =
       Pattern.compile(Joiner.on("|").join(
-          Iterables.transform(Arrays.asList(DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS), GLOB_STRING_TO_REGEXP_STRING))
+              Iterables.transform(DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS, GLOB_STRING_TO_REGEXP_STRING)
+          )
       );
 
   private final HttpClientConfiguration configuration;
@@ -165,7 +166,7 @@ public class ConfigurationCustomizer
     if (proxy.getNonProxyHosts() != null) {
       patterns.addAll(Arrays.asList(proxy.getNonProxyHosts()));
     }
-    patterns.addAll(Arrays.asList(DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS));
+    patterns.addAll(DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS);
     String nonProxyPatternString = Joiner.on("|").join(Iterables.transform(patterns, GLOB_STRING_TO_REGEXP_STRING));
     Pattern nonProxyPattern;
     try {
