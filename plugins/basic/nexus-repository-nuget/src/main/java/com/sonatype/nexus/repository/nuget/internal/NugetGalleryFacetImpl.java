@@ -241,6 +241,11 @@ public class NugetGalleryFacetImpl
           final Component component = createOrUpdatePackage(tx, metadata);
           return null;
         }
+
+        @Override
+        public String toString() {
+          return String.format("putMetadata(%s)", metadata);
+        }
       });
     }
     catch (IOException e) {
@@ -255,6 +260,11 @@ public class NugetGalleryFacetImpl
         public Object execute(final StorageTx tx) {
           maintainAggregateInfo(tx, metadata.get(ID));
           return null;
+        }
+
+        @Override
+        public String toString() {
+          return String.format("maintainAggregateInfo(%s)", metadata);
         }
       });
     }
@@ -278,6 +288,11 @@ public class NugetGalleryFacetImpl
           );
           createOrUpdateAssetAndContents(tx, bucket, component, t.get(), null);
           return null;
+        }
+
+        @Override
+        public String toString() {
+          return String.format("putContent(%s, %s)", id, version);
         }
       });
     }
@@ -432,6 +447,11 @@ public class NugetGalleryFacetImpl
           asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
 
           return priorDate;
+        }
+
+        @Override
+        public String toString() {
+          return String.format("setLastVerified(%s, %s, %s)", id, version, date);
         }
       });
       log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);

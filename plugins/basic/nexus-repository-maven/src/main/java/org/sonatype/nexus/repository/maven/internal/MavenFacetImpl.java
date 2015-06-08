@@ -249,6 +249,11 @@ public class MavenFacetImpl
         public Content execute(final StorageTx tx) throws IOException {
           return put(tx, path, payload, streamSupplier.get());
         }
+
+        @Override
+        public String toString() {
+          return String.format("put(%s)", path.getPath());
+        }
       });
     }
   }
@@ -458,7 +463,7 @@ public class MavenFacetImpl
 
       @Override
       public String toString() {
-        return "setLastVerified(" + path.getPath() + ", " + verified + ")";
+        return String.format("setLastVerified(%s, %s)", path.getPath(), verified);
       }
     });
   }
