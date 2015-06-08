@@ -170,7 +170,7 @@ public class ConfigurationCustomizer
     String nonProxyPatternString = Joiner.on("|").join(Iterables.transform(patterns, GLOB_STRING_TO_REGEXP_STRING));
     Pattern nonProxyPattern;
     try {
-      nonProxyPattern = Pattern.compile(nonProxyPatternString);
+      nonProxyPattern = Pattern.compile(nonProxyPatternString, Pattern.CASE_INSENSITIVE);
     }
     catch (PatternSyntaxException e) {
       log.warn("Invalid non-proxy host regex: {}, using defaults", nonProxyPatternString, e);
