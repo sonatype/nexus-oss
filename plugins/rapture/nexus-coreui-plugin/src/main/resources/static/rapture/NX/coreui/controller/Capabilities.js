@@ -638,7 +638,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         text: entry,
         dataIndex: 'tag$' + entry,
         flex: 1,
-        renderer: NX.ext.grid.column.Renderers.emptyData
+        renderer: NX.ext.grid.column.Renderers.optionalData
       });
     });
 

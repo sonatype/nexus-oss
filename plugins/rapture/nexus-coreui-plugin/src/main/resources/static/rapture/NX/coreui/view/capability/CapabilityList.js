@@ -46,13 +46,13 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
       dataIndex: 'description',
       flex: 1,
       groupable: false,
-      renderer: NX.ext.grid.column.Renderers.emptyData
+      renderer: NX.ext.grid.column.Renderers.optionalData
     },
     {
       text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NOTES_COLUMN'),
       dataIndex: 'notes',
       flex: 1,
-      renderer: NX.ext.grid.column.Renderers.emptyData
+      renderer: NX.ext.grid.column.Renderers.optionalData
     }
   ],
 
