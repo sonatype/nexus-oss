@@ -36,8 +36,24 @@ public class NonProxyHostValidator
     return true;
   }
 
+  /**
+   * Returns {@code true} if value is considered as valid nonProxyHost expression. This is NOT validating the
+   * single-string used to set system property (where expressions are delimited with "|")!
+   */
   private boolean isValid(final String value) {
-    // TODO: a plain string optionally prefixed or suffixed with an asterisk
-    return !Strings.isNullOrEmpty(value);
+    // A value should be a non-empty string optionally prefixed or suffixed with an asterisk
+    if (Strings.isNullOrEmpty(value)) {
+      // must be non-empty
+      return false;
+    }
+    if (value.contains("|")) {
+      // must not contain | separator (used to separate multiple values in system properties)
+      return false;
+    }
+    if (value.contains("*") && !(value.startsWith("*") || value.endsWith("*"))) {
+      // if contains asterisk, it must be at beginning or end only
+      return false;
+    }
+    return true;
   }
 }
