@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.junit.Before;
+
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Mockito.when;
@@ -30,9 +32,13 @@ public class BaseUrlManagerImplTest
 
   BaseUrlManagerImpl underTest;
 
+  @Before
+  public void setUp() {
+    underTest = new BaseUrlManagerImpl(requestProvider);
+  }
+
   @Test
   public void forceUrl() {
-    underTest = new BaseUrlManagerImpl(requestProvider);
     underTest.setForce(true);
     underTest.setUrl(FAKE_URL);
     assertThat(underTest.detectUrl(), equalTo(FAKE_URL));
@@ -40,7 +46,6 @@ public class BaseUrlManagerImplTest
 
   @Test
   public void noRequest() {
-    underTest = new BaseUrlManagerImpl(requestProvider);
     underTest.setUrl(FAKE_URL);
 
     when(requestProvider.get()).thenReturn(null);
@@ -50,8 +55,6 @@ public class BaseUrlManagerImplTest
 
   @Test
   public void noBaseUrl() {
-    underTest = new BaseUrlManagerImpl(requestProvider);
-
     when(requestProvider.get()).thenReturn(null);
 
     assertThat(underTest.detectUrl(), nullValue());
@@ -74,8 +77,6 @@ public class BaseUrlManagerImplTest
 
   void testNuGetQuery(String protocolHostPort, String context) {
     String expectedBaseUrl = protocolHostPort + context;
-
-    underTest = new BaseUrlManagerImpl(requestProvider);
 
     when(requestProvider.get()).thenReturn(request);
     when(request.getRequestURL()).thenReturn(new StringBuffer(expectedBaseUrl + ENCODED_NUGET_QUERY));
