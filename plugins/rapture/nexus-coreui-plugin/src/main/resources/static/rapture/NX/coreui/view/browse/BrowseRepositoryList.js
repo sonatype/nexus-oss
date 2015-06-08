@@ -39,9 +39,22 @@ Ext.define('NX.coreui.view.browse.BrowseRepositoryList', {
       iconNamePrefix: 'repository-',
       dataIndex: 'type'
     },
-    {header: NX.I18n.get('View_Browse_BrowseRepositoryList_Name_Column'), dataIndex: 'name', stateId: 'name', flex: 1},
-    {header: NX.I18n.get('View_Browse_BrowseRepositoryList_Type_Column'), dataIndex: 'type', stateId: 'type'},
-    {header: NX.I18n.get('View_Browse_BrowseRepositoryList_Format_Column'), dataIndex: 'format', stateId: 'format'}
+    {
+      text: NX.I18n.get('View_Browse_BrowseRepositoryList_Name_Column'),
+      dataIndex: 'name',
+      stateId: 'name',
+      flex: 1
+    },
+    {
+      text: NX.I18n.get('View_Browse_BrowseRepositoryList_Type_Column'),
+      dataIndex: 'type',
+      stateId: 'type'
+    },
+    {
+      text: NX.I18n.get('View_Browse_BrowseRepositoryList_Format_Column'),
+      dataIndex: 'format',
+      stateId: 'format'
+    }
   ],
 
   viewConfig: {
@@ -51,7 +64,10 @@ Ext.define('NX.coreui.view.browse.BrowseRepositoryList', {
   },
 
   plugins: [
-    {ptype: 'gridfilterbox', emptyText: NX.I18n.get('View_Browse_BrowseRepositoryList_EmptyText_Filter')}
+    {
+      ptype: 'gridfilterbox',
+      emptyText: NX.I18n.get('View_Browse_BrowseRepositoryList_EmptyText_Filter')
+    }
   ]
 
 });

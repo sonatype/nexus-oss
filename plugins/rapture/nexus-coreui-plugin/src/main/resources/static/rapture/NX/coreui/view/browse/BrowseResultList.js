@@ -46,23 +46,37 @@ Ext.define('NX.coreui.view.browse.BrowseResultList', {
       dataIndex: 'id',
       width: 36,
       iconVariant: 'x16',
-      iconName: function (value) {
+      iconName: function(value) {
         if (value === 'unattached') {
           return 'browse-unattached';
         }
         return 'browse-component';
       }
     },
-    { header: NX.I18n.get('View_Browse_BrowseResultList_Name_Column'), dataIndex: 'name', stateId: 'name', flex: 3,
-      renderer: function (value) {
-        if(!value) {
+    {
+      text: NX.I18n.get('View_Browse_BrowseResultList_Name_Column'),
+      dataIndex: 'name',
+      stateId: 'name',
+      flex: 3,
+      renderer: function(value) {
+        if (!value) {
           return NX.I18n.get('View_Browse_BrowseResultList_Name_Column_Unattached');
         }
         return value;
       }
     },
-    { header: NX.I18n.get('View_Browse_BrowseResultList_Group_Column'), dataIndex: 'group', stateId: 'group', flex: 4 },
-    { header: NX.I18n.get('View_Browse_BrowseResultList_Version_Column'), dataIndex: 'version', stateId: 'version', flex: 1 },
+    {
+      text: NX.I18n.get('View_Browse_BrowseResultList_Group_Column'),
+      dataIndex: 'group',
+      stateId: 'group',
+      flex: 4
+    },
+    {
+      text: NX.I18n.get('View_Browse_BrowseResultList_Version_Column'),
+      dataIndex: 'version',
+      stateId: 'version',
+      flex: 1
+    },
   ]
 
 });
