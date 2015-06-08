@@ -776,7 +776,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_HTTP_PROXY_PORT: 'HTTP proxy port',
     ADMIN_HTTP_PROXY_AUTHENTICATION: 'Authentication',
     ADMIN_NON_PROXY_HOSTS: 'Hosts to exclude from HTTP/HTTPS proxy',
-    ADMIN_NON_PROXY_HOSTS_HELP: 'Regular expressions are supported (e.g. \'.*\\.example\\.com\')',
+    ADMIN_NON_PROXY_HOSTS_HELP: 'Java http.nonProxyHosts glob-like expressions are supported (do not use "|" delimiter)',
     ADMIN_HTTPS_PROXY: 'HTTPS proxy',
     ADMIN_HTTPS_PROXY_HOST: 'HTTPS proxy host',
     ADMIN_HTTPS_PROXY_HOST_HELP: 'No https:// required (e.g. "proxy-host" or "192.168.1.101")',
