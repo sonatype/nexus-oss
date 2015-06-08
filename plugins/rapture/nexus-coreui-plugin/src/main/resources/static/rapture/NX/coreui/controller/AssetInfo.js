@@ -66,21 +66,21 @@ Ext.define('NX.coreui.controller.AssetInfo', {
    */
   toSizeString: function(v) {
     if (typeof v !== 'number') {
-      return NX.I18n.get('BROWSE_STANDARD_INFO_SIZE_UNKNOWN');
+      return NX.I18n.get('Coreui_Controller_AssetInfo_SizeUnknown_Info');
     }
     if (v < 0) {
-      return NX.I18n.get('BROWSE_STANDARD_INFO_SIZE_UNKNOWN');
+      return NX.I18n.get('Coreui_Controller_AssetInfo_SizeUnknown_Info');
     }
     if (v < 1024) {
-      return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_BYTES', v);
+      return NX.I18n.format('Coreui_Controller_AssetInfo_SizeBytes_Info', v);
     }
     if (v < 1048576) {
-      return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_KB', (v / 1024).toFixed(2));
+      return NX.I18n.format('Coreui_Controller_AssetInfo_SizeKB_Info', (v / 1024).toFixed(2));
     }
     if (v < 1073741824) {
-      return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_MB', (v / 1048576).toFixed(2));
+      return NX.I18n.format('Coreui_Controller_AssetInfo_SizeMB_Info', (v / 1048576).toFixed(2));
     }
-    return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_GB', (v / 1073741824).toFixed(2));
+    return NX.I18n.format('Coreui_Controller_AssetInfo_SizeGB_Info', (v / 1073741824).toFixed(2));
   }
 
 });

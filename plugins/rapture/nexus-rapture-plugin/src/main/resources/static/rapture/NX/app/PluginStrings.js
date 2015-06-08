@@ -129,7 +129,7 @@ Ext.define('NX.app.PluginStrings', {
 
     // Expiry modal
     View_ExpireSession_Title: 'Session',
-    View_Controller_UiSessionTimeout_Expire_Text: 'Session is about to expire',
+    View_ExpireSession_Help_Text: 'Session is about to expire',
     Controller_UiSessionTimeout_Expire_Text: 'Session will expire in {0} seconds',
     Controller_SignedOut_Text: 'Your session has expired. Please sign in.',
     View_ExpireSession_Cancel_Button: 'Cancel',

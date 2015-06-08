@@ -33,6 +33,11 @@ Ext.define('NX.coreui.app.PluginStrings', {
   keys: {
     Coreui_Controller_AssetInfo_Name_Text: 'Name',
     Coreui_Controller_AssetInfo_ContentType_Text: 'Content Type',
+    Coreui_Controller_AssetInfo_SizeUnknown_Info: 'Size unknown',
+    Coreui_Controller_AssetInfo_SizeBytes_Info: 'Bytes',
+    Coreui_Controller_AssetInfo_SizeKB_Info: 'KB',
+    Coreui_Controller_AssetInfo_SizeMB_Info: 'MB',
+    Coreui_Controller_AssetInfo_SizeGB_Info: 'GB',
 
     // Browse -> Search
     Coreui_Controller_Search_Text: 'Search',
@@ -868,7 +873,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Coreui_View_Nuget_NuGetApiKeyDetails_Register_Value: 'nuget setapikey {0} -source {1}',
     Coreui_View_Nuget_NuGetApiKeyDetails_AutoClose_Html: 'This window will automatically close after one minute.',
     Coreui_View_Nuget_NuGetApiKeyDetails_AutoClose_Message: 'Automatically closing NuGet API Key details due to timeout',
-    NUGET_APIKEY_INSTRUCTIONS : 'A new API Key will be created the first time it is accessed. Resetting your API Key will invalidate the current key.',
+    Coreui_View_Nuget_NuGetApiKey_Instructions_Text: 'A new API Key will be created the first time it is accessed. Resetting your API Key will invalidate the current key.',
     Coreui_View_Nuget_NuGetApiKey_Access_Button: 'Access API Key',
     Coreui_View_Nuget_NuGetApiKey_Access_HelpText: 'Accessing NuGet API Key requires validation of your credentials.',
     Coreui_View_Nuget_NuGetApiKey_Reset_Button: 'Reset API Key',
