@@ -52,8 +52,8 @@ Ext.define('NX.coreui.controller.Browse', {
   features: {
     mode: 'browse',
     path: '/Browse',
-    text: NX.I18n.get('Controller_Browse_Title_Feature'),
-    description: NX.I18n.get('Controller_Browse_Description_Feature'),
+    text: NX.I18n.get('Coreui_Controller_Browse_Title_Feature'),
+    description: NX.I18n.get('Coreui_Controller_Browse_Description_Feature'),
     view: 'NX.coreui.view.browse.BrowseFeature',
     iconConfig: {
       file: 'plugin.png',
