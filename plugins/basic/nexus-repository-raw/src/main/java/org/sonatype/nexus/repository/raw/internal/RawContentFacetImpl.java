@@ -113,7 +113,6 @@ public class RawContentFacetImpl
             asset.formatAttributes().set(P_LAST_VERIFIED_DATE, new Date());
             tx.setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, content.getContentType());
             tx.saveAsset(asset);
-            tx.commit();
 
             return null;
           }
