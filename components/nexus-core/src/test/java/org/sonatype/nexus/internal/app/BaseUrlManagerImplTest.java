@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.mockito.InjectMocks;
+import org.junit.Before;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -30,8 +30,12 @@ public class BaseUrlManagerImplTest
   @Mock
   HttpServletRequest request;
 
-  @InjectMocks
   BaseUrlManagerImpl underTest;
+
+  @Before
+  public void setUp() {
+    underTest = new BaseUrlManagerImpl(requestProvider);
+  }
 
   @Test
   public void forceUrl() {
