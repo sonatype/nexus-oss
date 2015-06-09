@@ -28,6 +28,7 @@ import org.sonatype.nexus.httpclient.SSLContextSelector;
 import org.sonatype.nexus.httpclient.internal.NexusHttpRoutePlanner;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -62,7 +63,7 @@ public class ConfigurationCustomizer
    * Default non-proxyHosts value, used by Java7 too. Always appended to the user given list, if any.
    */
   private static final List<String> DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS = ImmutableList.of(
-      "localhost", " 127.*", "[::1]", "0.0.0.0", "[::0]"
+      "localhost", "127.*", "[::1]", "0.0.0.0", "[::0]"
   );
 
   /**
@@ -138,8 +139,6 @@ public class ConfigurationCustomizer
    * Apply proxy-server configuration to plan.
    */
   private void apply(final ProxyConfiguration proxy, final HttpClientPlan plan) {
-    Map<String, HttpHost> proxies = new HashMap<>(2);
-
     // HTTP proxy
     ProxyServerConfiguration http = proxy.getHttp();
     if (http != null && http.isEnabled()) {
@@ -147,8 +146,6 @@ public class ConfigurationCustomizer
       if (http.getAuthentication() != null) {
         apply(http.getAuthentication(), plan, host);
       }
-      proxies.put(HTTP, host);
-      proxies.put(HTTPS, host);
     }
 
     // HTTPS proxy
@@ -158,6 +155,29 @@ public class ConfigurationCustomizer
       if (https.getAuthentication() != null) {
         apply(https.getAuthentication(), plan, host);
       }
+    }
+    plan.getClient().setRoutePlanner(createRoutePlanner(proxy));
+  }
+
+  /**
+   * Creates instance of {@link NexusHttpRoutePlanner} from passed in configuration, never {@code null}.
+   */
+  @VisibleForTesting
+  NexusHttpRoutePlanner createRoutePlanner(final ProxyConfiguration proxy) {
+    Map<String, HttpHost> proxies = new HashMap<>(2);
+
+    // HTTP proxy
+    ProxyServerConfiguration http = proxy.getHttp();
+    if (http != null && http.isEnabled()) {
+      HttpHost host = new HttpHost(http.getHost(), http.getPort());
+      proxies.put(HTTP, host);
+      proxies.put(HTTPS, host);
+    }
+
+    // HTTPS proxy
+    ProxyServerConfiguration https = proxy.getHttps();
+    if (https != null && https.isEnabled()) {
+      HttpHost host = new HttpHost(https.getHost(), https.getPort());
       proxies.put(HTTPS, host);
     }
 
@@ -176,7 +196,7 @@ public class ConfigurationCustomizer
       log.warn("Invalid non-proxy host regex: {}, using defaults", nonProxyPatternString, e);
       nonProxyPattern = DEFAULT_NO_PROXY_HOSTS_PATTERN;
     }
-    plan.getClient().setRoutePlanner(new NexusHttpRoutePlanner(proxies, nonProxyPattern));
+    return new NexusHttpRoutePlanner(proxies, nonProxyPattern);
   }
 
   /**
