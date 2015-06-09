@@ -58,6 +58,10 @@ public interface StorageTx
    */
   void close();
 
+  /**
+   * Flushes caches of current transaction (same effect of SQL NOCACHE but affects whole transaction). To be used
+   * sparingly, only when reload is needed as part of retry, and you must ensure you have up to date data.
+   */
   void flushCaches();
 
   /**
