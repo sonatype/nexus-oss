@@ -849,6 +849,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_TASKS_SUMMARY_NEXT_RUN: 'Next run',
     ADMIN_TASKS_SUMMARY_LAST_RUN: 'Last run',
     ADMIN_TASKS_SUMMARY_LAST_RESULT: 'Last result',
+    ADMIN_TASKS_SETTINGS_UPDATE_ERROR: 'You do not have permission to update tasks or task is readonly',
     ADMIN_TASKS_SETTINGS_UPDATE_SUCCESS: 'Task updated: {0}',
     ADMIN_TASKS_SETTINGS_ENABLED: 'Task enabled',
     ADMIN_TASKS_SETTINGS_NAME: 'Task name',
