@@ -19,6 +19,9 @@
  */
 Ext.define('NX.util.condition.IsPermitted', {
   extend: 'NX.util.condition.Condition',
+  requires: [
+    'NX.Permissions'
+  ],
 
   permission: undefined,
 

@@ -19,6 +19,9 @@
  */
 Ext.define('NX.util.condition.IsPermittedAny', {
   extend: 'NX.util.condition.Condition',
+  requires: [
+    'NX.Permissions'
+  ],
 
   /**
    * @private
