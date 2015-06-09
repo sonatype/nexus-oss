@@ -34,7 +34,6 @@ import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.net.HttpHeaders;
-import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -155,17 +154,7 @@ public abstract class ProxyFacetSupport
 
           // TODO: Introduce content validation.. perhaps content's type not matching path's implied type.
 
-          try {
-            store(context, remote);
-          }
-          catch (ORecordDuplicatedException e) {
-            log.debug("Failed proxy caching in {}, ignoring it", getRepository(), e);
-            // FIXME: just for experimenting purposes, handling this exception here as it was simplest
-            // note: this is incorrect solution as it leaks Orient in here
-            // but this happens on parallel remote fetches, and as such, should be simply
-            // neglected (the failed store attempt), as it means that cache does have the record
-            // and get below should succeed.
-          }
+          store(context, remote);
 
           content = getCachedPayload(context);
         }
