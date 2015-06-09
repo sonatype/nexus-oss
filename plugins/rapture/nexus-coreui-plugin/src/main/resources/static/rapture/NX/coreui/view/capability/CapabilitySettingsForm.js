@@ -50,6 +50,18 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
 
   /**
    * @override
+   */
+  initComponent: function() {
+    var me = this;
+
+    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:capabilities:update');
+    me.editableMarker = me.editableMarker || NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_ERROR');
+
+    me.callParent(arguments);
+  },
+
+  /**
+   * @override
    * Imports capability into settings field set.
    * @param {NX.model.Capability} model capability model
    */

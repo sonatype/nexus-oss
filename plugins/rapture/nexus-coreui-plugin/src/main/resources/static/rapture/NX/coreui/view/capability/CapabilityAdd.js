@@ -32,6 +32,8 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
 
     me.settingsForm = {
       xtype: 'nx-coreui-capability-settings-form',
+      editableCondition: NX.Conditions.isPermitted('nexus:capabilities:create'),
+      editableMarker: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_ERROR'),
 
       buttons: [
         { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
