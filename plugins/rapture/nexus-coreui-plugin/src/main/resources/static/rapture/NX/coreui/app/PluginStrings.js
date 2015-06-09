@@ -817,6 +817,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_TASKS_UPDATE_MASK: 'Updating task',
     ADMIN_TASKS_RUN_MASK: 'Running task',
     ADMIN_TASKS_STOP_MASK: 'Stopping task',
+    ADMIN_TASKS_CREATE_ERROR: 'You do not have permission to create tasks',
     ADMIN_TASKS_CREATE_TITLE: 'Create {0} Task',
     ADMIN_TASKS_CREATE_SUCCESS: 'Task created: {0}',
     ADMIN_TASKS_LIST_NEW_BUTTON: 'Create task',
