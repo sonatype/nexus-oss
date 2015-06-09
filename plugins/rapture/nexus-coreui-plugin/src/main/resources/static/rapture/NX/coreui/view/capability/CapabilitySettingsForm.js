@@ -48,6 +48,8 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
     { xtype: 'nx-coreui-formfield-settingsfieldset' }
   ],
 
+  editableMarker: NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_ERROR'),
+
   /**
    * @override
    */
@@ -55,7 +57,6 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
     var me = this;
 
     me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:capabilities:update');
-    me.editableMarker = me.editableMarker || NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_ERROR');
 
     me.callParent(arguments);
   },
