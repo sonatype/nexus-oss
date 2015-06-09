@@ -24,8 +24,7 @@ Ext.define('NX.util.condition.IsPermittedAny', {
   ],
 
   /**
-   * @private
-   * @property {String[]}
+   * @cfg {String[]} permissions to check
    */
   permissions: undefined,
 
