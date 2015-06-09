@@ -63,7 +63,6 @@ Ext.define('NX.Conditions', {
     return Ext.create('NX.util.condition.IsPermittedAll', { permissions: permissions });
   },
 
-
   /**
    * @param {String} store id of store that should have records
    * @returns {NX.util.condition.StoreHasRecords}
