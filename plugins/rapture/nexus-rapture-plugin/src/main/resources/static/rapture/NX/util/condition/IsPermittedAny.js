@@ -13,7 +13,7 @@
 /*global Ext, NX*/
 
 /**
- * A {@link NX.util.condition.Condition} that is satisfied when user has *any* of the specified permissions.
+ * A {@link NX.util.condition.Condition} that is satisfied when user has ANY of the specified permissions.
  *
  * @since 3.0
  */
@@ -55,15 +55,13 @@ Ext.define('NX.util.condition.IsPermittedAny', {
     var me = this;
 
     if (me.bounded) {
-      // check if user has each permission, if any is allowed we are satisfied
+      // check if user has ANY of the given permissions
       Ext.Array.each(me.permissions, function(permission) {
-        // if user has given permission, the condition is satisfied
         if (NX.Permissions.check(permission)) {
           me.setSatisfied(true);
           return false; // break
         }
       });
-      return true; // continue
     }
   },
 
@@ -75,5 +73,4 @@ Ext.define('NX.util.condition.IsPermittedAny', {
     var me = this;
     return me.self.getName() + '{ permissions=' + me.permissions + ' }';
   }
-
 });
