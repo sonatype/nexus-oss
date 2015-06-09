@@ -236,7 +236,9 @@ public class MavenFacetImpl
         tx.flushCaches();
       }
     }
-    throw lastIllegalStateException;
+    throw new IllegalStateException(
+        "Cannot read blob of " + mavenPath.getPath() + " after " + MAX_ASSET_TO_CONTENT_ATTEMPTS + " attempts",
+        lastIllegalStateException);
   }
 
   @Override
