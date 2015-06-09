@@ -33,6 +33,8 @@ Ext.define('NX.Conditions', {
   ],
 
   /**
+   * Condition to match if current user has given permission.
+   *
    * @public
    * @param {String} permission permission
    * @returns {NX.util.condition.IsPermitted}
