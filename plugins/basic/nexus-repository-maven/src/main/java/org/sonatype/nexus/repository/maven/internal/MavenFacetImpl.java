@@ -233,6 +233,7 @@ public class MavenFacetImpl
         // backing blob changed, retry by reloading all again
         log.debug("Failed attempt to create content for asset: {}", mavenPath.getPath(), e);
         lastIllegalStateException = e;
+        tx.flushCaches();
       }
     }
     throw lastIllegalStateException;

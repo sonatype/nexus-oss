@@ -58,6 +58,8 @@ public interface StorageTx
    */
   void close();
 
+  void flushCaches();
+
   /**
    * Gets the bucket for the current repository.
    */
