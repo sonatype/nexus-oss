@@ -23,6 +23,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
 
 /**
  * Renders an InputStream re-readable by saving it to a temporary file that is removed when the supplier is closed.
@@ -39,6 +40,9 @@ public class TempStreamSupplier
     tempFile = Files.createTempFile("", "");
     try (OutputStream outputStream = Files.newOutputStream(tempFile)) {
       ByteStreams.copy(inputStream, outputStream);
+    }
+    finally {
+      Closeables.closeQuietly(inputStream);
     }
   }
 
