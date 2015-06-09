@@ -254,6 +254,11 @@ public class MavenFacetImpl
             throw Throwables.propagate(e);
           }
         }
+
+        @Override
+        public String toString() {
+          return String.format("put(%s)", path.getPath());
+        }
       });
     }
     catch (RuntimeException e) {
@@ -469,7 +474,7 @@ public class MavenFacetImpl
 
       @Override
       public String toString() {
-        return "setLastVerified(" + path.getPath() + ", " + verified + ")";
+        return String.format("setLastVerified(%s, %s)", path.getPath(), verified);
       }
     });
   }

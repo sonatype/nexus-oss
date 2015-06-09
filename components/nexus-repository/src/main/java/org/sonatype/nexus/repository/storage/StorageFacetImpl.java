@@ -251,7 +251,9 @@ public class StorageFacetImpl
         }
       }
     }
-    throw lastConcurrentException;
+    throw new IllegalStateException(
+        "Cannot apply " + operation + " after " + MAX_CONCURRENT_MODIFICATION_ATTEMPTS + " attempts",
+        lastConcurrentException);
   }
 
 
