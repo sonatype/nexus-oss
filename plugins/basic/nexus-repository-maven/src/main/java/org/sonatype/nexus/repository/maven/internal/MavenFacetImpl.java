@@ -233,9 +233,12 @@ public class MavenFacetImpl
         // backing blob changed, retry by reloading all again
         log.debug("Failed attempt to create content for asset: {}", mavenPath.getPath(), e);
         lastIllegalStateException = e;
+        tx.flushCaches();
       }
     }
-    throw lastIllegalStateException;
+    throw new IllegalStateException(
+        "Cannot read blob of " + mavenPath.getPath() + " after " + MAX_ASSET_TO_CONTENT_ATTEMPTS + " attempts",
+        lastIllegalStateException);
   }
 
   @Override

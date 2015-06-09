@@ -186,6 +186,12 @@ public class StorageTxImpl
 
   @Override
   @Guarded(by = OPEN)
+  public void flushCaches() {
+    db.getLocalCache().clear();
+  }
+
+  @Override
+  @Guarded(by = OPEN)
   public Bucket getBucket() {
     return bucket;
   }
