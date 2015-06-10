@@ -42,13 +42,17 @@
               "properties": {
                 "nuget": {
                   "properties": {
+                    "authors": {
+                      "type": "string",
+                      "index": "analyzed"
+                    },
                     "description": {
                       "type": "string",
                       "index": "analyzed"
                     },
                     "keywords": {
                       "type": "string",
-                      "index": "analyzed"
+                      "index": "no"
                     },
                     "tags": {
                       "type": "string",
