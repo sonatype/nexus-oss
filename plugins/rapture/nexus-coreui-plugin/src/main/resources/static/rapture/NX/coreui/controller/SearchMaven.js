@@ -32,7 +32,7 @@ Ext.define('NX.coreui.controller.SearchMaven', {
 
     search.registerCriteria([
       {
-        id: 'attributes.maven.groupId',
+        id: 'attributes.maven2.groupId',
         group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
         config: {
           fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_GROUP_ID'),
@@ -40,7 +40,7 @@ Ext.define('NX.coreui.controller.SearchMaven', {
         }
       },
       {
-        id: 'attributes.maven.artifactId',
+        id: 'attributes.maven2.artifactId',
         group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
         config: {
           fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_ARTIFACT_ID'),
@@ -48,14 +48,14 @@ Ext.define('NX.coreui.controller.SearchMaven', {
         }
       },
       {
-        id: 'attributes.maven.classifier',
+        id: 'attributes.maven2.classifier',
         group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
         config: {
           fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_CLASSIFIER')
         }
       },
       {
-        id: 'attributes.maven.packaging',
+        id: 'attributes.maven2.packaging',
         group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
         config: {
           fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_PACKAGING')
@@ -71,11 +71,11 @@ Ext.define('NX.coreui.controller.SearchMaven', {
       readOnly: true,
       criterias: [
         { id: 'format', value: 'maven2', hidden: true },
-        { id: 'attributes.maven.groupId' },
-        { id: 'attributes.maven.artifactId' },
+        { id: 'attributes.maven2.groupId' },
+        { id: 'attributes.maven2.artifactId' },
         { id: 'version' },
-        { id: 'attributes.maven.classifier'},
-        { id: 'attributes.maven.packaging' }
+        { id: 'attributes.maven2.classifier'},
+        { id: 'attributes.maven2.packaging' }
       ]
     }, me);
   }
