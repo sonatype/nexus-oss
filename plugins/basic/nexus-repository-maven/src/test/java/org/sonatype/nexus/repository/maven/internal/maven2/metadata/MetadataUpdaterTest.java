@@ -89,9 +89,10 @@ public class MetadataUpdaterTest
 
   @Test
   public void updateWithNonExisting() throws IOException {
+    when(mavenFacet.get(tx, mavenPath)).thenReturn(null, content);
     testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
     verify(tx, times(0)).commit();
-    verify(mavenFacet, times(1)).get(eq(tx), eq(mavenPath));
+    verify(mavenFacet, times(2)).get(eq(tx), eq(mavenPath));
     verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
   }
 
@@ -100,28 +101,29 @@ public class MetadataUpdaterTest
     when(mavenFacet.get(tx, mavenPath)).thenReturn(
         new Content(
             new StringPayload("<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadata><groupId>group</groupId></metadata>",
-                "text/xml")));
+                "text/xml")), content);
     testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
     verify(tx, times(0)).commit();
-    verify(mavenFacet, times(1)).get(eq(tx), eq(mavenPath));
+    verify(mavenFacet, times(2)).get(eq(tx), eq(mavenPath));
     verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
   }
 
   @Test
   public void updateWithExistingCorrupted() throws IOException {
     when(mavenFacet.get(tx, mavenPath)).thenReturn(
-        new Content(new StringPayload("ThisIsNotAnXml", "text/xml")));
+        new Content(new StringPayload("ThisIsNotAnXml", "text/xml")), content);
     testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
     verify(tx, times(0)).commit();
-    verify(mavenFacet, times(1)).get(eq(tx), eq(mavenPath));
+    verify(mavenFacet, times(2)).get(eq(tx), eq(mavenPath));
     verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
   }
 
   @Test
   public void replace() throws IOException {
+    when(mavenFacet.get(tx, mavenPath)).thenReturn(content);
     testSubject.replace(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
     verify(tx, times(0)).commit();
-    verify(mavenFacet, times(0)).get(eq(tx), eq(mavenPath));
+    verify(mavenFacet, times(1)).get(eq(tx), eq(mavenPath));
     verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
   }
 
