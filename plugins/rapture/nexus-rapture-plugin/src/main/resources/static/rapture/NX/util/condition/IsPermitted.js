@@ -50,6 +50,20 @@ Ext.define('NX.util.condition.IsPermitted', {
   toString: function () {
     var me = this;
     return me.self.getName() + '{ permission=' + me.permission + ' }';
+  },
+
+  /**
+   * @public
+   *
+   * Sets permission and re-evaluate.
+   *
+   * @param {String} permission permission
+   */
+  setPermission: function(permission) {
+    var me = this;
+
+    me.permission = permission;
+    me.evaluate();
   }
 
 });

@@ -42,9 +42,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
       me.editableCondition = NX.Conditions.and(
           permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*:edit'),
           NX.Conditions.formHasRecord('nx-coreui-repository-settings-form', function(model) {
-            var permission = 'nexus:repository-admin:' + model.get('format') + ':' + model.get('name');
-            permittedCondition.name = permission;
-            permittedCondition.evaluate();
+            permittedCondition.setPermission(
+                'nexus:repository-admin:' + model.get('format') + ':' + model.get('name') + ':edit'
+            );
             return true;
           })
       );
