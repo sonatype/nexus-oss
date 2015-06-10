@@ -232,16 +232,17 @@ public class MavenFacetImpl
   }
 
   @Override
-  public Content put(final MavenPath path, final Payload payload)
+  public void put(final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
-      return storageFacet.perform(new Operation<Content>()
+      storageFacet.perform(new Operation<Void>()
       {
         @Override
-        public Content execute(final StorageTx tx) {
+        public Void execute(final StorageTx tx) {
           try {
-            return put(tx, path, payload, streamSupplier.get());
+            put(tx, path, payload, streamSupplier.get());
+            return null;
           }
           catch (IOException e) {
             throw Throwables.propagate(e);
@@ -263,16 +264,16 @@ public class MavenFacetImpl
   }
 
   @Override
-  public Content put(final StorageTx tx, final MavenPath path, final Payload payload)
+  public void put(final StorageTx tx, final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
-    return put(tx, path, payload, payload.openInputStream());
+    put(tx, path, payload, payload.openInputStream());
   }
 
-  private Content put(final StorageTx tx,
-                      final MavenPath path,
-                      final Payload payload,
-                      final InputStream inputStream)
+  private void put(final StorageTx tx,
+                   final MavenPath path,
+                   final Payload payload,
+                   final InputStream inputStream)
       throws IOException, InvalidContentException
   {
     log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
@@ -288,17 +289,17 @@ public class MavenFacetImpl
       contentAttributes = ((Content) payload).getAttributes();
     }
     if (path.getCoordinates() != null) {
-      return putArtifact(tx, path, assetBlob, contentAttributes);
+      putArtifact(tx, path, assetBlob, contentAttributes);
     }
     else {
-      return putFile(tx, path, assetBlob, contentAttributes);
+      putFile(tx, path, assetBlob, contentAttributes);
     }
   }
 
-  private Content putArtifact(final StorageTx tx,
-                              final MavenPath path,
-                              final AssetBlob assetBlob,
-                              @Nullable final AttributesMap contentAttributes)
+  private void putArtifact(final StorageTx tx,
+                           final MavenPath path,
+                           final AssetBlob assetBlob,
+                           @Nullable final AttributesMap contentAttributes)
       throws IOException, InvalidContentException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
@@ -339,13 +340,12 @@ public class MavenFacetImpl
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
-    return toContent(tx, path);
   }
 
-  private Content putFile(final StorageTx tx,
-                          final MavenPath path,
-                          final AssetBlob assetBlob,
-                          @Nullable final AttributesMap contentAttributes)
+  private void putFile(final StorageTx tx,
+                       final MavenPath path,
+                       final AssetBlob assetBlob,
+                       @Nullable final AttributesMap contentAttributes)
       throws IOException, InvalidContentException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
@@ -360,7 +360,6 @@ public class MavenFacetImpl
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
-    return toContent(tx, path);
   }
 
   private void putAssetPayload(final StorageTx tx,

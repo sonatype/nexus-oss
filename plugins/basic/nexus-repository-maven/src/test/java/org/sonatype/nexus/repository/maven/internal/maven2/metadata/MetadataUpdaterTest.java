@@ -41,7 +41,6 @@ import org.mockito.Mock;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -82,7 +81,6 @@ public class MetadataUpdaterTest
   public void prepare() throws IOException {
     when(contentAttributes.require(Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP)).thenReturn(hashes);
     when(content.getAttributes()).thenReturn(contentAttributes);
-    when(mavenFacet.put(eq(tx), any(MavenPath.class), any(Payload.class))).thenReturn(content);
 
     when(repository.getName()).thenReturn("name");
     when(repository.facet(eq(MavenFacet.class))).thenReturn(mavenFacet);
