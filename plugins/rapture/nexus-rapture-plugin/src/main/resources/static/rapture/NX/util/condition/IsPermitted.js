@@ -19,7 +19,13 @@
  */
 Ext.define('NX.util.condition.IsPermitted', {
   extend: 'NX.util.condition.Condition',
+  requires: [
+    'NX.Permissions'
+  ],
 
+  /**
+   * @cfg {String} permission to check
+   */
   permission: undefined,
 
   bind: function () {

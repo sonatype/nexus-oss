@@ -25,17 +25,42 @@ Ext.define('NX.Conditions', {
     'NX.util.condition.FormHasRecord',
     'NX.util.condition.GridHasSelection',
     'NX.util.condition.IsPermitted',
+    'NX.util.condition.IsPermittedAny',
+    'NX.util.condition.IsPermittedAll',
     'NX.util.condition.StoreHasRecords',
     'NX.util.condition.WatchState',
     'NX.util.condition.NeverSatisfied'
   ],
 
   /**
+   * Condition to match if current user has given permission.
+   *
+   * @public
    * @param {String} permission permission
    * @returns {NX.util.condition.IsPermitted}
    */
   isPermitted: function (permission) {
     return Ext.create('NX.util.condition.IsPermitted', { permission: permission });
+  },
+
+  /**
+   * Condition to match if current user has ANY of the given permissions.
+   *
+   * @public
+   * @param {String[]} permissions
+   */
+  isPermittedAny: function (permissions) {
+    return Ext.create('NX.util.condition.IsPermittedAny', { permissions: permissions });
+  },
+
+  /**
+   * Condition to match if current user has ALL of the given permissions.
+   *
+   * @public
+   * @param {String[]} permissions
+   */
+  isPermittedAll: function (permissions) {
+    return Ext.create('NX.util.condition.IsPermittedAll', { permissions: permissions });
   },
 
   /**

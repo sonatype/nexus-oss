@@ -62,8 +62,9 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
   initComponent: function() {
     var me = this;
 
+    // editable if user has create or update permission and the schedule is not internal
     me.editableCondition = me.editableCondition || NX.Conditions.and(
-      NX.Conditions.isPermitted('nexus:tasks:update'),
+      NX.Conditions.isPermittedAny(['nexus:tasks:create', 'nexus:tasks:update']),
       NX.Conditions.formHasRecord('nx-coreui-task-settings-form', function (model) {
         return model.get('schedule') !== 'internal';
       })
