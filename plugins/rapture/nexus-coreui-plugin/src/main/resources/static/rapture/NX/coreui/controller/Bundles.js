@@ -20,6 +20,8 @@
 Ext.define('NX.coreui.controller.Bundles', {
   extend: 'NX.controller.Drilldown',
   requires: [
+    'NX.view.info.Panel',
+    'NX.view.info.Entry',
     'NX.util.Url',
     'NX.Permissions',
     'NX.I18n'

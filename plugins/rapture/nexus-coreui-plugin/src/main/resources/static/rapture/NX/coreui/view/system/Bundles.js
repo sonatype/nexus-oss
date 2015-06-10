@@ -20,8 +20,18 @@
 Ext.define('NX.coreui.view.system.Bundles', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-system-bundles',
+  requires: [
+    'NX.I18n'
+  ],
 
   iconName: 'bundle-default',
 
-  masters: { xtype: 'nx-coreui-system-bundlelist' }
+  masters: {
+    xtype: 'nx-coreui-system-bundlelist'
+  },
+
+  tabs: {
+    xtype: 'nx-info-panel',
+    title: NX.I18n.get('ADMIN_BUNDLES_DETAILS_SUMMARY')
+  }
 });

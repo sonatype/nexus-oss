@@ -20,6 +20,8 @@
 Ext.define('NX.coreui.controller.Search', {
   extend: 'NX.controller.Drilldown',
   requires: [
+    'NX.view.info.Panel',
+    'NX.view.info.Entry',
     'NX.Bookmarks',
     'NX.Conditions',
     'NX.Permissions',

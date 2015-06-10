@@ -20,9 +20,6 @@
 Ext.define('NX.controller.Drilldown', {
   extend: 'Ext.app.Controller',
   requires: [
-    // many impls use this
-    'NX.view.info.Panel',
-    'NX.view.info.Entry',
     'NX.Conditions',
     'NX.Dialogs',
     'NX.Bookmarks',

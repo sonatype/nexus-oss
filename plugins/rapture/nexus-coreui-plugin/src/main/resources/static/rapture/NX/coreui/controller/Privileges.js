@@ -20,6 +20,8 @@
 Ext.define('NX.coreui.controller.Privileges', {
   extend: 'NX.controller.Drilldown',
   requires: [
+    'NX.view.info.Panel',
+    'NX.view.info.Entry',
     'NX.Conditions',
     'NX.Messages',
     'NX.Permissions',
@@ -33,8 +35,7 @@ Ext.define('NX.coreui.controller.Privileges', {
   ],
   views: [
     'privilege.PrivilegeFeature',
-    'privilege.PrivilegeList',
-    'privilege.PrivilegeTrace'
+    'privilege.PrivilegeList'
   ],
   refs: [
     {ref: 'feature', selector: 'nx-coreui-privilege-feature'},

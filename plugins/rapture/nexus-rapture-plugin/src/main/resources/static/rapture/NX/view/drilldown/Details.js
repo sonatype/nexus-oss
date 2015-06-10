@@ -28,11 +28,6 @@ Ext.define('NX.view.drilldown.Details', {
   ],
 
   /**
-   * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab
-   */
-  autoHideTabHeader: true,
-
-  /**
    * @override
    */
   initComponent: function() {
@@ -66,8 +61,7 @@ Ext.define('NX.view.drilldown.Details', {
         activeTab: 0,
         layoutOnTabChange: true,
         flex: 1,
-        items: me.tabs,
-        autoHideTabHeader: me.autoHideTabHeader
+        items: me.tabs
       }
     ];
 

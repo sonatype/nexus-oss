@@ -28,6 +28,11 @@ Ext.define('NX.coreui.view.privilege.PrivilegeFeature', {
 
   masters: { xtype: 'nx-coreui-privilege-list' },
 
+  tabs: {
+    xtype: 'nx-info-panel',
+    title: NX.I18n.get('ADMIN_PRIVILEGES_DETAILS_SUMMARY')
+  },
+
   actions: [
     { xtype: 'button', text: NX.I18n.get('ADMIN_PRIVILEGES_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ]
