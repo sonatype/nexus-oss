@@ -56,6 +56,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
+import com.orientechnologies.orient.core.exception.OFastConcurrentModificationException;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -206,18 +207,14 @@ public class MavenFacetImpl
   @Override
   public Content get(final StorageTx tx, final MavenPath path) throws IOException {
     log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    IllegalStateException lastIllegalStateException = null;
-    for (int attempt = 0; attempt < MAX_ASSET_TO_CONTENT_ATTEMPTS; attempt++) {
-      try {
-        return toContent(tx, path);
-      }
-      catch (IllegalStateException e) {
-        // backing blob changed, retry by reloading all again
-        log.debug("Failed attempt to get content for asset: {}", path.getPath(), e);
-        lastIllegalStateException = e;
-      }
+    try {
+      return toContent(tx, path);
     }
-    throw lastIllegalStateException;
+    catch (IllegalStateException e) {
+      // backing blob changed, retry by restarting surrounding transaction
+      log.debug("Failed attempt to get content for asset: {}", path.getPath(), e);
+      throw new OFastConcurrentModificationException();
+    }
   }
 
   /**
