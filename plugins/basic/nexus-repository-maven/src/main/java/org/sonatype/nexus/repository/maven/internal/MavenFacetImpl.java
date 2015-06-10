@@ -53,7 +53,6 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
@@ -181,19 +180,9 @@ public class MavenFacetImpl
   @Nullable
   @Override
   public Content get(final MavenPath path) throws IOException {
-    log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    return storageFacet.perform(new Operation<Content>()
-    {
-      @Override
-      public Content execute(final StorageTx tx) {
-        return toContent(tx, path);
-      }
-
-      @Override
-      public String toString() {
-        return String.format("get(%s)", path.getPath());
-      }
-    });
+    try (StorageTx tx = storageFacet.openTx()) {
+      return toContent(tx, path);
+    }
   }
 
   @Nullable
@@ -204,49 +193,63 @@ public class MavenFacetImpl
   }
 
   /**
-   * Creates {@link Content} from passed in {@link Asset}.
+   * Creates {@link Content} from {@link Asset} selected by given {@link MavenPath}.
    */
-  private Content toContent(final StorageTx tx, final MavenPath mavenPath) {
-    final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
-    if (asset == null) {
-      return null;
-    }
-    final Blob blob = tx.requireBlob(asset.requireBlobRef());
-    final String contentType = asset.contentType();
+  private Content toContent(final StorageTx tx, final MavenPath mavenPath) throws IOException {
+    return storageFacet.perform(tx, new Operation<Content>()
+    {
+      @Override
+      public Content execute(final StorageTx tx) {
+        final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
+        if (asset == null) {
+          return null;
+        }
+        final Blob blob = tx.requireBlob(asset.requireBlobRef());
+        final String contentType = asset.contentType();
 
-    final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
-    final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
-    for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
-      final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
-      hashCodes.put(algorithm, hashCode);
-    }
-    final NestedAttributesMap attributesMap = asset.formatAttributes();
-    final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-    final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
-    final Content result = new Content(new BlobPayload(blob, contentType));
-    result.getAttributes()
-        .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
-    result.getAttributes().set(Content.CONTENT_ETAG, eTag);
-    result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
-    return result;
+        final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
+        final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
+        for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
+          final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
+          hashCodes.put(algorithm, hashCode);
+        }
+        final NestedAttributesMap attributesMap = asset.formatAttributes();
+        final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
+        final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
+        final Content result = new Content(new BlobPayload(blob, contentType));
+        result.getAttributes()
+            .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
+        result.getAttributes().set(Content.CONTENT_ETAG, eTag);
+        result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
+        return result;
+      }
+    });
   }
 
+  @Nullable
   @Override
   public void put(final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
+    try (StorageTx tx = storageFacet.openTx()) {
+      put(tx, path, payload);
+      tx.commit();
+    }
+  }
+
+  @Nullable
+  @Override
+  public void put(final StorageTx tx, final MavenPath path, final Payload payload)
+      throws IOException, InvalidContentException
+  {
+    log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
-      storageFacet.perform(new Operation<Void>()
+      storageFacet.perform(tx, new Operation<Void>()
       {
         @Override
-        public Void execute(final StorageTx tx) {
-          try {
-            put(tx, path, payload, streamSupplier.get());
-            return null;
-          }
-          catch (IOException e) {
-            throw Throwables.propagate(e);
-          }
+        public Void execute(final StorageTx tx) throws IOException {
+          put(tx, path, payload, streamSupplier.get());
+          return null;
         }
 
         @Override
@@ -255,19 +258,6 @@ public class MavenFacetImpl
         }
       });
     }
-    catch (RuntimeException e) {
-      if (e.getCause() instanceof IOException) {
-        throw (IOException) e.getCause();
-      }
-      throw e;
-    }
-  }
-
-  @Override
-  public void put(final StorageTx tx, final MavenPath path, final Payload payload)
-      throws IOException, InvalidContentException
-  {
-    put(tx, path, payload, payload.openInputStream());
   }
 
   private void put(final StorageTx tx,
@@ -276,7 +266,6 @@ public class MavenFacetImpl
                    final InputStream inputStream)
       throws IOException, InvalidContentException
   {
-    log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
     final AssetBlob assetBlob = tx.createBlob(
         path.getPath(),
         inputStream,
@@ -395,13 +384,23 @@ public class MavenFacetImpl
   @Override
   public boolean delete(final StorageTx tx, final MavenPath... paths) throws IOException {
     boolean result = false;
-    for (MavenPath path : paths) {
+    for (final MavenPath path : paths) {
       log.debug("DELETE {} : {}", getRepository().getName(), path.getPath());
       if (path.getCoordinates() != null) {
-        result = deleteArtifact(path, tx) || result;
+        result = storageFacet.perform(tx, new Operation<Boolean>() {
+          @Override
+          public Boolean execute(final StorageTx tx) throws IOException {
+            return deleteArtifact(path, tx);
+          }
+        }) || result;
       }
       else {
-        result = deleteFile(path, tx) || result;
+        result = storageFacet.perform(tx, new Operation<Boolean>() {
+          @Override
+          public Boolean execute(final StorageTx tx) throws IOException {
+            return deleteFile(path, tx);
+          }
+        }) || result;
       }
     }
     return result;
@@ -433,6 +432,7 @@ public class MavenFacetImpl
   }
 
   @Override
+  @Nullable
   public DateTime getLastVerified(final MavenPath path) throws IOException {
     try (StorageTx tx = storageFacet.openTx()) {
       final Asset asset = findAsset(tx, tx.getBucket(), path);

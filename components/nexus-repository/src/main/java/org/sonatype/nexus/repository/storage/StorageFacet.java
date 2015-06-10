@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import java.io.IOException;
+
 import org.sonatype.nexus.repository.Facet;
 
 import com.google.common.base.Supplier;
@@ -91,19 +93,26 @@ public interface StorageFacet
    */
   interface Operation<T>
   {
-    T execute(StorageTx tx);
+    T execute(StorageTx tx) throws IOException;
   }
 
   /**
    * Handles retries of passed in {@link Operation}, if needed. Operation will receive newly opened {@link StorageTx}
    * and on clean return from this method it is guaranteed that operation did succeed and change is commited.
    */
-  <T> T perform(Operation<T> operation);
+  <T> T perform(Operation<T> operation) throws IOException;
 
   /**
    * Handles retries of passed in {@link Operation}, if needed. Operation will receive newly opened {@link StorageTx}
    * and on clean return from this method it is guaranteed that operation did succeed and change is commited. This
-   * method will use given OrientDB connection.
+   * method will use given OrientDB connection, but may flush connection cache if retry happened.
    */
-  <T> T perform(ODatabaseDocumentTx db, Operation<T> operation);
+  <T> T perform(ODatabaseDocumentTx db, Operation<T> operation) throws IOException;
+
+  /**
+   * Handles retries of passed in {@link Operation}, if needed. Operation will receive passed in {@link StorageTx}
+   * and on clean return from this method it is guaranteed that operation did succeed and change is commited. This
+   * method will use given {@link StorageTx} connection, but may flush Orient connection cache if retry happened.
+   */
+  <T> T perform(StorageTx tx, Operation<T> operation) throws IOException;
 }
