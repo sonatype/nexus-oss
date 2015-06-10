@@ -55,14 +55,15 @@ public class SessionAuthenticationFilter
   public static final String DELETE_METHOD = "DELETE";
 
   /**
-   * Allow access, by default rules, and also if this is a request to logout.
+   * Allow if authenticated or if logout request.
    */
   @Override
   protected boolean isAccessAllowed(final ServletRequest request,
                                     final ServletResponse response,
                                     final Object mappedValue)
   {
-    return super.isAccessAllowed(request, response, mappedValue) || isLogoutRequest(request, response);
+    Subject subject = getSubject(request, response);
+    return subject.isAuthenticated() || isLogoutRequest(request, response);
   }
 
   /**
