@@ -82,12 +82,6 @@ public class MavenFacetImpl
     extends FacetSupport
     implements MavenFacet
 {
-  /**
-   * How many times should method {@link #toContent(StorageTx, MavenPath)} attempt to create {@link Content}. Retries
-   * might happen due to changed backing BLOBs for example, in case of an asset update.
-   */
-  private static final int MAX_ASSET_TO_CONTENT_ATTEMPTS = 3;
-
   // artifact shared properties of both, artifact component and artifact asset
 
   private static final String P_GROUP_ID = "groupId";
@@ -187,9 +181,19 @@ public class MavenFacetImpl
   @Nullable
   @Override
   public Content get(final MavenPath path) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      return get(tx, path);
-    }
+    log.debug("GET {} : {}", getRepository().getName(), path.getPath());
+    return storageFacet.perform(new Operation<Content>()
+    {
+      @Override
+      public Content execute(final StorageTx tx) {
+        return toContent(tx, path);
+      }
+
+      @Override
+      public String toString() {
+        return String.format("get(%s)", path.getPath());
+      }
+    });
   }
 
   @Nullable
@@ -202,53 +206,43 @@ public class MavenFacetImpl
   /**
    * Creates {@link Content} from passed in {@link Asset}.
    */
-  private Content toContent(final StorageTx tx, final MavenPath mavenPath) throws IOException {
-    IllegalStateException lastIllegalStateException = null;
-    for (int attempt = 0; attempt < MAX_ASSET_TO_CONTENT_ATTEMPTS; attempt++) {
-      try {
-        final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
-        if (asset == null) {
-          return null;
-        }
-        final Blob blob = tx.requireBlob(asset.requireBlobRef());
-        final String contentType = asset.contentType();
-
-        final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
-        final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
-        for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
-          final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
-          hashCodes.put(algorithm, hashCode);
-        }
-        final NestedAttributesMap attributesMap = asset.formatAttributes();
-        final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-        final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
-        final Content result = new Content(new BlobPayload(blob, contentType));
-        result.getAttributes()
-            .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
-        result.getAttributes().set(Content.CONTENT_ETAG, eTag);
-        result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
-        return result;
-      }
-      catch (IllegalStateException e) {
-        // backing blob changed, retry by reloading all again
-        log.debug("Failed attempt to create content for asset: {}", mavenPath.getPath(), e);
-        lastIllegalStateException = e;
-      }
+  private Content toContent(final StorageTx tx, final MavenPath mavenPath) {
+    final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
+    if (asset == null) {
+      return null;
     }
-    throw lastIllegalStateException;
+    final Blob blob = tx.requireBlob(asset.requireBlobRef());
+    final String contentType = asset.contentType();
+
+    final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
+    final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
+    for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
+      final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
+      hashCodes.put(algorithm, hashCode);
+    }
+    final NestedAttributesMap attributesMap = asset.formatAttributes();
+    final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
+    final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
+    final Content result = new Content(new BlobPayload(blob, contentType));
+    result.getAttributes()
+        .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
+    result.getAttributes().set(Content.CONTENT_ETAG, eTag);
+    result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
+    return result;
   }
 
   @Override
-  public Content put(final MavenPath path, final Payload payload)
+  public void put(final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
-      return storageFacet.perform(new Operation<Content>()
+      storageFacet.perform(new Operation<Void>()
       {
         @Override
-        public Content execute(final StorageTx tx) {
+        public Void execute(final StorageTx tx) {
           try {
-            return put(tx, path, payload, streamSupplier.get());
+            put(tx, path, payload, streamSupplier.get());
+            return null;
           }
           catch (IOException e) {
             throw Throwables.propagate(e);
@@ -270,16 +264,16 @@ public class MavenFacetImpl
   }
 
   @Override
-  public Content put(final StorageTx tx, final MavenPath path, final Payload payload)
+  public void put(final StorageTx tx, final MavenPath path, final Payload payload)
       throws IOException, InvalidContentException
   {
-    return put(tx, path, payload, payload.openInputStream());
+    put(tx, path, payload, payload.openInputStream());
   }
 
-  private Content put(final StorageTx tx,
-                      final MavenPath path,
-                      final Payload payload,
-                      final InputStream inputStream)
+  private void put(final StorageTx tx,
+                   final MavenPath path,
+                   final Payload payload,
+                   final InputStream inputStream)
       throws IOException, InvalidContentException
   {
     log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
@@ -295,17 +289,17 @@ public class MavenFacetImpl
       contentAttributes = ((Content) payload).getAttributes();
     }
     if (path.getCoordinates() != null) {
-      return putArtifact(tx, path, assetBlob, contentAttributes);
+      putArtifact(tx, path, assetBlob, contentAttributes);
     }
     else {
-      return putFile(tx, path, assetBlob, contentAttributes);
+      putFile(tx, path, assetBlob, contentAttributes);
     }
   }
 
-  private Content putArtifact(final StorageTx tx,
-                              final MavenPath path,
-                              final AssetBlob assetBlob,
-                              @Nullable final AttributesMap contentAttributes)
+  private void putArtifact(final StorageTx tx,
+                           final MavenPath path,
+                           final AssetBlob assetBlob,
+                           @Nullable final AttributesMap contentAttributes)
       throws IOException, InvalidContentException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
@@ -346,13 +340,12 @@ public class MavenFacetImpl
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
-    return toContent(tx, path);
   }
 
-  private Content putFile(final StorageTx tx,
-                          final MavenPath path,
-                          final AssetBlob assetBlob,
-                          @Nullable final AttributesMap contentAttributes)
+  private void putFile(final StorageTx tx,
+                       final MavenPath path,
+                       final AssetBlob assetBlob,
+                       @Nullable final AttributesMap contentAttributes)
       throws IOException, InvalidContentException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
@@ -367,7 +360,6 @@ public class MavenFacetImpl
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
-    return toContent(tx, path);
   }
 
   private void putAssetPayload(final StorageTx tx,

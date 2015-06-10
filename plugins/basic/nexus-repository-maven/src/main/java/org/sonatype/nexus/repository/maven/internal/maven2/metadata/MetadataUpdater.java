@@ -245,13 +245,10 @@ public class MetadataUpdater
   {
     final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     metadataWriter.write(byteArrayOutputStream, metadata);
-    final Content mainContent = mavenFacet.put(
-        tx,
-        mavenPath,
-        new BytesPayload(byteArrayOutputStream.toByteArray(), Maven2MimeRulesSource.METADATA_TYPE)
-    );
-    final Map<HashAlgorithm, HashCode> hashCodes = mainContent.getAttributes().require(
-        Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
+    mavenFacet.put(tx, mavenPath, new BytesPayload(byteArrayOutputStream.toByteArray(),
+        Maven2MimeRulesSource.METADATA_TYPE));
+    final Map<HashAlgorithm, HashCode> hashCodes = mavenFacet.get(tx, mavenPath).getAttributes()
+        .require(Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
     checkState(hashCodes != null, "hashCodes");
     for (HashType hashType : HashType.values()) {
       final MavenPath checksumPath = mavenPath.hash(hashType);
