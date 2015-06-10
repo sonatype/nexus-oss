@@ -56,7 +56,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
-import com.orientechnologies.orient.core.exception.OFastConcurrentModificationException;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -83,12 +82,6 @@ public class MavenFacetImpl
     extends FacetSupport
     implements MavenFacet
 {
-  /**
-   * How many times should method {@link #toContent(StorageTx, MavenPath)} attempt to create {@link Content}. Retries
-   * might happen due to changed backing BLOBs for example, in case of an asset update.
-   */
-  private static final int MAX_ASSET_TO_CONTENT_ATTEMPTS = 3;
-
   // artifact shared properties of both, artifact component and artifact asset
 
   private static final String P_GROUP_ID = "groupId";
@@ -189,38 +182,31 @@ public class MavenFacetImpl
   @Override
   public Content get(final MavenPath path) throws IOException {
     log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    IllegalStateException lastIllegalStateException = null;
-    for (int attempt = 0; attempt < MAX_ASSET_TO_CONTENT_ATTEMPTS; attempt++) {
-      try (StorageTx tx = storageFacet.openTx()) {
+    return storageFacet.perform(new Operation<Content>()
+    {
+      @Override
+      public Content execute(final StorageTx tx) {
         return toContent(tx, path);
       }
-      catch (IllegalStateException e) {
-        // backing blob changed, retry by reloading all again
-        log.debug("Failed attempt to get content for asset: {}", path.getPath(), e);
-        lastIllegalStateException = e;
+
+      @Override
+      public String toString() {
+        return String.format("get(%s)", path.getPath());
       }
-    }
-    throw lastIllegalStateException;
+    });
   }
 
   @Nullable
   @Override
   public Content get(final StorageTx tx, final MavenPath path) throws IOException {
     log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    try {
-      return toContent(tx, path);
-    }
-    catch (IllegalStateException e) {
-      // backing blob changed, retry by restarting surrounding transaction
-      log.debug("Failed attempt to get content for asset: {}", path.getPath(), e);
-      throw new OFastConcurrentModificationException();
-    }
+    return toContent(tx, path);
   }
 
   /**
    * Creates {@link Content} from passed in {@link Asset}.
    */
-  private Content toContent(final StorageTx tx, final MavenPath mavenPath) throws IOException {
+  private Content toContent(final StorageTx tx, final MavenPath mavenPath) {
     final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
     if (asset == null) {
       return null;

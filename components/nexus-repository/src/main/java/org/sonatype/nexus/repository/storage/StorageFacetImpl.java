@@ -37,7 +37,6 @@ import org.sonatype.nexus.security.ClientInfoProvider;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
-import com.orientechnologies.common.exception.OException;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
@@ -239,7 +238,7 @@ public class StorageFacetImpl
   public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) {
     checkNotNull(db);
     checkNotNull(operation);
-    OException lastException = null;
+    RuntimeException lastException = null;
     for (int attempt = 0; attempt < MAX_CONCURRENT_MODIFICATION_ATTEMPTS; attempt++) {
       try (StorageTx tx = openTx(db)) {
         try {
@@ -247,7 +246,7 @@ public class StorageFacetImpl
           tx.commit();
           return result;
         }
-        catch (OConcurrentModificationException | ORecordDuplicatedException e) {
+        catch (IllegalStateException | OConcurrentModificationException | ORecordDuplicatedException e) {
           lastException = e;
           log.debug("Failed operation {} on {}:", operation, getRepository(), e);
         }
