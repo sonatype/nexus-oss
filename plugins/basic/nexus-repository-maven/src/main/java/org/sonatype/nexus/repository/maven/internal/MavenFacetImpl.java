@@ -187,55 +187,65 @@ public class MavenFacetImpl
   @Nullable
   @Override
   public Content get(final MavenPath path) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      return get(tx, path);
+    log.debug("GET {} : {}", getRepository().getName(), path.getPath());
+    IllegalStateException lastIllegalStateException = null;
+    for (int attempt = 0; attempt < MAX_ASSET_TO_CONTENT_ATTEMPTS; attempt++) {
+      try (StorageTx tx = storageFacet.openTx()) {
+        return toContent(tx, path);
+      }
+      catch (IllegalStateException e) {
+        // backing blob changed, retry by reloading all again
+        log.debug("Failed attempt to get content for asset: {}", path.getPath(), e);
+        lastIllegalStateException = e;
+      }
     }
+    throw lastIllegalStateException;
   }
 
   @Nullable
   @Override
   public Content get(final StorageTx tx, final MavenPath path) throws IOException {
     log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    return toContent(tx, path);
+    IllegalStateException lastIllegalStateException = null;
+    for (int attempt = 0; attempt < MAX_ASSET_TO_CONTENT_ATTEMPTS; attempt++) {
+      try {
+        return toContent(tx, path);
+      }
+      catch (IllegalStateException e) {
+        // backing blob changed, retry by reloading all again
+        log.debug("Failed attempt to get content for asset: {}", path.getPath(), e);
+        lastIllegalStateException = e;
+      }
+    }
+    throw lastIllegalStateException;
   }
 
   /**
    * Creates {@link Content} from passed in {@link Asset}.
    */
   private Content toContent(final StorageTx tx, final MavenPath mavenPath) throws IOException {
-    IllegalStateException lastIllegalStateException = null;
-    for (int attempt = 0; attempt < MAX_ASSET_TO_CONTENT_ATTEMPTS; attempt++) {
-      try {
-        final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
-        if (asset == null) {
-          return null;
-        }
-        final Blob blob = tx.requireBlob(asset.requireBlobRef());
-        final String contentType = asset.contentType();
-
-        final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
-        final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
-        for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
-          final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
-          hashCodes.put(algorithm, hashCode);
-        }
-        final NestedAttributesMap attributesMap = asset.formatAttributes();
-        final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-        final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
-        final Content result = new Content(new BlobPayload(blob, contentType));
-        result.getAttributes()
-            .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
-        result.getAttributes().set(Content.CONTENT_ETAG, eTag);
-        result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
-        return result;
-      }
-      catch (IllegalStateException e) {
-        // backing blob changed, retry by reloading all again
-        log.debug("Failed attempt to create content for asset: {}", mavenPath.getPath(), e);
-        lastIllegalStateException = e;
-      }
+    final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
+    if (asset == null) {
+      return null;
     }
-    throw lastIllegalStateException;
+    final Blob blob = tx.requireBlob(asset.requireBlobRef());
+    final String contentType = asset.contentType();
+
+    final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
+    final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
+    for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
+      final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
+      hashCodes.put(algorithm, hashCode);
+    }
+    final NestedAttributesMap attributesMap = asset.formatAttributes();
+    final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
+    final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
+    final Content result = new Content(new BlobPayload(blob, contentType));
+    result.getAttributes()
+        .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
+    result.getAttributes().set(Content.CONTENT_ETAG, eTag);
+    result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
+    return result;
   }
 
   @Override
