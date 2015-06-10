@@ -33,6 +33,8 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
 
     me.settingsForm = {
       xtype: 'nx-coreui-task-settings-form',
+      editableCondition: NX.Conditions.isPermitted('nexus:tasks:create'),
+      editableMarker: NX.I18n.get('ADMIN_TASKS_CREATE_ERROR'),
 
       buttons: [
         { text: NX.I18n.get('ADMIN_TASKS_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },

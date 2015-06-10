@@ -20,6 +20,8 @@
 Ext.define('NX.coreui.controller.Tasks', {
   extend: 'NX.controller.Drilldown',
   requires: [
+    'NX.view.info.Panel',
+    'NX.view.info.Entry',
     'NX.Conditions',
     'NX.Dialogs',
     'NX.Messages',
