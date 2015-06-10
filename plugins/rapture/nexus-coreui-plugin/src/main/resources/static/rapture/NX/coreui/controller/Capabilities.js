@@ -24,7 +24,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
     'NX.Dialogs',
     'NX.Messages',
     'NX.Permissions',
-    'NX.I18n'
+    'NX.I18n',
+    'NX.ext.grid.column.Renderers'
   ],
 
   masters: 'nx-coreui-capability-list',
@@ -309,55 +310,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
   },
 
   /**
-   * @private
-   * Synchronize tags from loaded capabilities with capability/model and grid columns.
-   * @param {NX.coreui.store.Capability} store capability store
-   */
-  onCapabilityLoad: function(store) {
-    var me = this,
-        list = me.getList(),
-        tagTypes = [],
-        capabilityModel = me.getCapabilityModel(),
-        fields = capabilityModel.prototype.fields.getRange(),
-        columns = Ext.Array.clone(list.originalColumns),
-        tagColumns = [];
-
-    if (list) {
-      store.each(function(model) {
-        Ext.Object.each(model.get('tags'), function(key) {
-          if (tagTypes.indexOf(key) === -1) {
-            tagTypes.push(key);
-          }
-        });
-      });
-      Ext.Array.sort(tagTypes);
-      if (!Ext.Array.equals(tagTypes, capabilityModel.tagTypes || [])) {
-        Ext.Array.each(tagTypes, function(entry) {
-          fields.push({
-            name: 'tag$' + entry
-          });
-          tagColumns.push({
-            text: entry,
-            dataIndex: 'tag$' + entry,
-            flex: 1
-          });
-        });
-        capabilityModel.setFields(fields);
-        capabilityModel.tagTypes = tagTypes;
-        Ext.Array.insert(columns, 2, tagColumns);
-        list.reconfigure(store, columns);
-      }
-      store.each(function(model) {
-        Ext.Array.each(tagTypes, function(entry) {
-          var tags = model.get('tags') || {};
-          model.set('tag$' + entry, tags[entry] || '');
-        });
-      });
-      store.commitChanges();
-    }
-  },
-
-  /**
    * @override
    * @protected
    * Enable 'New' button when user has 'create' permission and there is at least one capability type.
@@ -541,5 +493,162 @@ Ext.define('NX.coreui.controller.Capabilities', {
         });
       }
     });
+  },
+
+  //
+  // Dynamic Tags
+  //
+
+  /**
+   * Cached dynamic tag names.
+   *
+   * @private
+   * @property {String[]}
+   */
+  dynamicTags: [],
+
+  /**
+   * Synchronize tags from loaded capabilities with capability/model and grid columns.
+   *
+   * @private
+   * @param {NX.coreui.store.Capability} store
+   */
+  onCapabilityLoad: function(store) {
+    var me = this,
+        list,
+        tags;
+
+    // discover dynamic capability tags
+    tags = me.discoverDynamicTags(store);
+
+    // mutate model if tags have changed
+    if (!Ext.Array.equals(tags, me.dynamicTags)) {
+      me.addDynamicTagFieldsToModel(tags);
+      // remember the current set of tags since they changed
+      me.dynamicTags = tags;
+    }
+
+    // apply tag data to data in store
+    me.addDynamicTagDataToStoreRecords(store, tags);
+
+    // add columns for tags if the list is ready
+    list = me.getList();
+    if (list && list.originalColumns) {
+      me.addDynamicTagsToGrid(list, tags);
+    }
+    else {
+      //<if debug>
+      me.logDebug('List not ready yet to mutate grid columns');
+      //</if>
+    }
+  },
+
+  /**
+   * Discover the full set of dynamic tags.
+   *
+   * @private
+   * @param {NX.coreui.store.Capability} store
+   * @return {String[]} Sorted list of dynamic capability tag names.
+   */
+  discoverDynamicTags: function(store) {
+    var me = this,
+        tags = [];
+
+    store.each(function(model) {
+      Ext.Object.each(model.get('tags'), function(key) {
+        if (tags.indexOf(key) === -1) {
+          tags.push(key);
+        }
+      });
+    });
+    Ext.Array.sort(tags);
+
+    //<if debug>
+    me.logDebug('Discovered dynamic tags: ', tags);
+    //</if>
+
+    return tags;
+  },
+
+  /**
+   * Mutates the Capability model adding dynamic 'tag$' fields.
+   *
+   * @private
+   * @param {String[]} tags
+   */
+  addDynamicTagFieldsToModel: function(tags) {
+    var me = this,
+        model = me.getCapabilityModel(),
+        fields = model.prototype.fields.getRange();
+
+    Ext.Array.each(tags, function(entry) {
+      fields.push({
+        name: 'tag$' + entry,
+        type: 'string'
+      });
+    });
+    model.setFields(fields);
+
+    //<if debug>
+    me.logDebug('Dynamic tag fields added to Capability model');
+    //</if>
+  },
+
+  /**
+   * Adds data to Capability store records for dynamic 'tag$' fields.
+   *
+   * @private
+   * @param {NX.coreui.store.Capability} store
+   * @param {String[]} tags
+   */
+  addDynamicTagDataToStoreRecords: function(store, tags) {
+    var me = this;
+
+    store.each(function(model) {
+      // apply dynamic tag data to 'tag$' fields if the record has any tag data
+      var data = model.get('tags');
+      if (data) {
+        Ext.Array.each(tags, function (entry) {
+          model.set('tag$' + entry, data[entry]);
+        });
+      }
+    });
+    store.commitChanges();
+
+    //<if debug>
+    me.logDebug('Dynamic tag data applied Capability store records');
+    //</if>
+  },
+
+  /**
+   * Adds dynamic tag columns to CapabilityList panel.
+   *
+   * @private
+   * @param {NX.coreui.view.capability.CapabilityList} panel
+   * @param {String[]} tags
+   */
+  addDynamicTagsToGrid: function(panel, tags) {
+    var me = this,
+        columns = Ext.Array.clone(panel.originalColumns),
+        tagColumns = [];
+
+    // create new colums for each dynamic tag
+    Ext.Array.each(tags, function(entry) {
+      tagColumns.push({
+        text: entry,
+        dataIndex: 'tag$' + entry,
+        flex: 1,
+        renderer: NX.ext.grid.column.Renderers.optionalData
+      });
+    });
+
+    // FIXME: insert after icon and category; this may not behave as desired if user rearranges columns
+    Ext.Array.insert(columns, 2, tagColumns);
+    panel.reconfigure(null, columns);
+
+    //<if debug>
+    me.logDebug('Dynamic tag columns added to grid');
+    //</if>
   }
+
 });
