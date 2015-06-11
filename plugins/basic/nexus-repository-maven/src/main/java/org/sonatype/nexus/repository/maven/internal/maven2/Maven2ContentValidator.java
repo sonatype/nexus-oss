@@ -66,11 +66,11 @@ public class Maven2ContentValidator
             strictContentTypeValidation, contentSupplier, mimeRulesSource, contentName + ".xml", declaredContentType
         );
       }
-      else if (contentName.endsWith(".sha1") || contentName.endsWith(".md5")) {
+      else if (strictContentTypeValidation && (contentName.endsWith(".sha1") || contentName.endsWith(".md5"))) {
         // hashes are small/simple, do it directly
         try (InputStream is = contentSupplier.get()) {
           final String digestCandidate = DigestExtractor.extract(is);
-          if (strictContentTypeValidation && (digestCandidate == null || !DigestExtractor.isDigest(digestCandidate))) {
+          if (!DigestExtractor.isDigest(digestCandidate)) {
             throw new InvalidContentException("Not a Maven2 digest: " + contentName);
           }
         }

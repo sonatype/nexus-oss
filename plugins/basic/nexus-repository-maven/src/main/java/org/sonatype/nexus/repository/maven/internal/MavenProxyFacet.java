@@ -65,12 +65,12 @@ public class MavenProxyFacet
   }
 
   @Override
-  protected String getUrl(final @Nonnull Context context) {
+  protected String getUrl(@Nonnull final Context context) {
     return context.getRequest().getPath().substring(1); // omit leading slash
   }
 
   @Nonnull
-  private MavenPath mavenPath(final @Nonnull Context context) {
+  private MavenPath mavenPath(@Nonnull final Context context) {
     return context.getAttributes().require(MavenPath.class);
   }
 }

@@ -12,11 +12,12 @@
  */
 package org.sonatype.nexus.repository.maven.internal;
 
+import java.io.IOException;
+
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
@@ -44,40 +45,49 @@ public class HostedHandler
 {
   @Nonnull
   @Override
-  public Response handle(final @Nonnull Context context) throws Exception {
+  public Response handle(@Nonnull final Context context) throws Exception {
     final MavenPath path = context.getAttributes().require(MavenPath.class);
     final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
     final String action = context.getRequest().getAction();
     switch (action) {
       case GET:
       case HEAD: {
-        final Content content = mavenFacet.get(path);
-        if (content == null) {
-          return HttpResponses.notFound(path.getPath());
-        }
-        return HttpResponses.ok(content);
+        return doGet(path, mavenFacet);
       }
 
       case PUT: {
-        try {
-          mavenFacet.put(path, context.getRequest().getPayload());
-          return HttpResponses.created();
-        }
-        catch (InvalidContentException e) {
-          return HttpResponses.badRequest(e.getMessage());
-        }
+        return doPut(context, path, mavenFacet);
       }
 
       case DELETE: {
-        final boolean deleted = mavenFacet.delete(path);
-        if (!deleted) {
-          return HttpResponses.notFound(path.getPath());
-        }
-        return HttpResponses.noContent();
+        return doDelete(path, mavenFacet);
       }
 
       default:
         return HttpResponses.methodNotAllowed(context.getRequest().getAction(), GET, HEAD, PUT, DELETE);
     }
+  }
+
+  private Response doGet(final MavenPath path, final MavenFacet mavenFacet) throws IOException {
+    final Content content = mavenFacet.get(path);
+    if (content == null) {
+      return HttpResponses.notFound(path.getPath());
+    }
+    return HttpResponses.ok(content);
+  }
+
+  private Response doPut(final @Nonnull Context context, final MavenPath path, final MavenFacet mavenFacet)
+      throws IOException
+  {
+    mavenFacet.put(path, context.getRequest().getPayload());
+    return HttpResponses.created();
+  }
+
+  private Response doDelete(final MavenPath path, final MavenFacet mavenFacet) throws IOException {
+    final boolean deleted = mavenFacet.delete(path);
+    if (!deleted) {
+      return HttpResponses.notFound(path.getPath());
+    }
+    return HttpResponses.noContent();
   }
 }
