@@ -27,6 +27,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
 
   items: { xtype: 'nx-coreui-ldapserver-userandgroup-fieldset' },
 
+  editableMarker: NX.I18n.get('ADMIN_LDAP_UPDATE_ERROR'),
+
   /**
    * @override
    */

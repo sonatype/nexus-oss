@@ -356,9 +356,9 @@ Ext.define('NX.coreui.controller.Repositories', {
         NX.Conditions.and(
             permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*:delete'),
             NX.Conditions.gridHasSelection('nx-coreui-repository-list', function(model) {
-              var permission = 'nexus:repository-admin:' + model.get('format') + ':' + model.get('name');
-              permittedCondition.name = permission;
-              permittedCondition.evaluate();
+              permittedCondition.setPermission(
+                  'nexus:repository-admin:' + model.get('format') + ':' + model.get('name') + ':delete'
+              );
               return true;
             })
         ),

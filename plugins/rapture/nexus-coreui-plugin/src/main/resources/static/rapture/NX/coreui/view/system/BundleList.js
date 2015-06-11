@@ -40,7 +40,13 @@ Ext.define('NX.coreui.view.system.BundleList', {
         return 'bundle-default';
       }
     },
-    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_ID_COLUMN'), dataIndex: 'id', stateId: 'id', width: 60, resizable: false},
+    {
+      header: NX.I18n.get('ADMIN_BUNDLES_LIST_ID_COLUMN'),
+      dataIndex: 'id',
+      stateId: 'id',
+      width: 60,
+      resizable: false
+    },
     {
       header: NX.I18n.get('ADMIN_BUNDLES_LIST_STATE_COLUMN'),
       dataIndex: 'state',
@@ -55,7 +61,12 @@ Ext.define('NX.coreui.view.system.BundleList', {
       width: 60,
       resizable: false
     },
-    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 2},
+    {
+      header: NX.I18n.get('ADMIN_BUNDLES_LIST_NAME_COLUMN'),
+      dataIndex: 'name',
+      stateId: 'name',
+      flex: 2
+    },
     {
       header: NX.I18n.get('ADMIN_BUNDLES_LIST_SYMBOLIC_NAME_COLUMN'),
       dataIndex: 'symbolicName',
@@ -63,7 +74,12 @@ Ext.define('NX.coreui.view.system.BundleList', {
       flex: 2,
       hidden: true
     },
-    {header: NX.I18n.get('ADMIN_BUNDLES_LIST_VERSION_COLUMN'), dataIndex: 'version', stateId: 'version', flex: 1},
+    {
+      header: NX.I18n.get('ADMIN_BUNDLES_LIST_VERSION_COLUMN'),
+      dataIndex: 'version',
+      stateId: 'version',
+      flex: 1
+    },
     {
       header: NX.I18n.get('ADMIN_BUNDLES_LIST_LOCATION_COLUMN'),
       dataIndex: 'location',
@@ -78,11 +94,13 @@ Ext.define('NX.coreui.view.system.BundleList', {
     }
   ],
 
-  dockedItems: [{
-    xtype: 'toolbar',
-    dock: 'top',
-    cls: 'nx-actions nx-borderless'
-  }],
+  dockedItems: [
+    {
+      xtype: 'toolbar',
+      dock: 'top',
+      cls: 'nx-actions nx-borderless'
+    }
+  ],
 
   plugins: [
     {ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_BUNDLES_LIST_FILTER_ERROR')}

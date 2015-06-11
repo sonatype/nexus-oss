@@ -42,9 +42,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
       me.editableCondition = NX.Conditions.and(
           permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*:edit'),
           NX.Conditions.formHasRecord('nx-coreui-repository-settings-form', function(model) {
-            var permission = 'nexus:repository-admin:' + model.get('format') + ':' + model.get('name');
-            permittedCondition.name = permission;
-            permittedCondition.evaluate();
+            permittedCondition.setPermission(
+                'nexus:repository-admin:' + model.get('format') + ':' + model.get('name') + ':edit'
+            );
             return true;
           })
       );
@@ -101,6 +101,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
           {
             xtype: 'checkbox',
             name: 'online',
+            itemId: 'online',
             labelAlign: 'left',
             fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ONLINE'),
             helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ONLINE_HELP'),
