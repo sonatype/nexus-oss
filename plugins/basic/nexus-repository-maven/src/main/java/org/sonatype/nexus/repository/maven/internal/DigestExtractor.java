@@ -117,9 +117,10 @@ public class DigestExtractor
   }
 
   /**
-   * Returns {@code true} if the input string "looks like" digest hex (md5 or sha1).
+   * Returns {@code true} if the input string "looks like" digest hex (md5 or sha1). Method is safe to accept even
+   * {@code null}s, naturally that will result with {@code false} result.
    */
-  public static boolean isDigest(final String digest) {
+  public static boolean isDigest(@Nullable final String digest) {
     if (Strings.isNullOrEmpty(digest)) {
       return false;
     }
