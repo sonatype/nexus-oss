@@ -20,6 +20,9 @@
 Ext.define('NX.util.condition.IsPermitted', {
   extend: 'NX.util.condition.Condition',
 
+  /**
+   * @private
+   */
   permission: undefined,
 
   bind: function () {
