@@ -96,7 +96,7 @@ public class AuthenticateResource
     log.debug("payload username: {}, payload password: {}, principal: {}", username, Tokens.mask(password), principalName);
 
     if (!principalName.equals(username)) {
-      log.warn("access token request denied - authenticated user {} does not match payload user {}",
+      log.warn("auth token request denied - authenticated user {} does not match payload user {}",
           principalName, username);
       throw new WebApplicationMessageException(Status.BAD_REQUEST, "Username mismatch");
     }
