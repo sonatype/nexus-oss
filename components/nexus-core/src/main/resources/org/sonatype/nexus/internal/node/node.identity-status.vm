@@ -10,32 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
-<h2>Node ID</h2>
-<br/>
+<h4>Node ID</h4>
 <div>
     <pre>${nodeId}</pre>
 </div>
 
-<br/>
-
-<h2>Fingerprint</h2>
-<br/>
+<h4>Fingerprint</h4>
 <div>
     <pre>$fingerprint</pre>
 </div>
 
-<br/>
-
-<h2>Certificate</h2>
-<br/>
+<h4>Certificate</h4>
 <div>
     <pre>$pem</pre>
 </div>
 
-<br/>
-
-<h2>Detail</h2>
-<br/>
+<h4>Detail</h4>
 <div>
     <pre>$detail</pre>
 </div>
