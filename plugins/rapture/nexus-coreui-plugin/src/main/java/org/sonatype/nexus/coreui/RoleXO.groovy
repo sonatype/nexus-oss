@@ -20,6 +20,7 @@ import org.sonatype.nexus.validation.group.Update
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
+import org.hibernate.validator.constraints.ScriptAssert
 
 /**
  * Role exchange object.
@@ -27,6 +28,7 @@ import org.hibernate.validator.constraints.NotEmpty
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
+@ScriptAssert(lang = 'groovy', script = '!_this.roles?.contains(_this.id)', message = 'A Role cannot contain itself')
 class RoleXO
 {
   @NotEmpty

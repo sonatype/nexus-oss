@@ -68,7 +68,7 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
         name: 'id',
         itemId: 'id',
         readOnly: true,
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID'),
+        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID')
       };
     }
 
@@ -118,7 +118,27 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
         store: roleStore,
         valueField: 'id',
         displayField: 'name',
-        delimiter: null
+        delimiter: null,
+        listeners: {
+          /**
+           * Ensure that the reference to the Role we're updating is not displayed.
+           */
+          change: function(roles) {
+            var form = roles.up('form'),
+                record = form.getRecord(),
+                store = roles.getStore();
+            if (record) {
+              store.clearFilter(true);
+              store.filter([
+                {
+                  filterFn: function(item) {
+                    return item.get('id') !== record.get('id'); 
+                  }
+                }
+              ]);
+            }
+          }
+        }
       }
     ];
 
