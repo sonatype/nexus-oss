@@ -63,6 +63,12 @@ Ext.define('NX.coreui.view.browse.BrowseRepositoryList', {
     markDirty: false
   },
 
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless'
+  }],
+
   plugins: [
     {
       ptype: 'gridfilterbox',
