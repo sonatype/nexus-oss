@@ -39,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class IdentityCapability
     extends CapabilitySupport<IdentityCapabilityConfiguration>
 {
-  private static interface Messages
+  private interface Messages
       extends MessageBundle
   {
     @DefaultMessage("%s")

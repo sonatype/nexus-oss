@@ -22,7 +22,6 @@ import static org.hamcrest.Matchers.equalTo;
 /**
  * Tests for {@link NodeIdEncoding}.
  */
-@SuppressWarnings("HardCodedStringLiteral")
 public class NodeIdEncodingTest
     extends TestSupport
 {

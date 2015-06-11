@@ -22,8 +22,6 @@ import com.google.common.hash.Hashing;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// TODO: move to nexus-common?
-
 /**
  * Node ID encoding helpers.
  *
