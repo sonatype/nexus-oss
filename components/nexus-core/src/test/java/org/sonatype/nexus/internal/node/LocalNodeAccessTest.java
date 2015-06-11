@@ -16,6 +16,7 @@ import java.io.File;
 import java.security.cert.Certificate;
 
 import org.sonatype.nexus.common.node.LocalNodeAccess;
+import org.sonatype.nexus.common.node.NodeIdEncoding;
 import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
 import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManager;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
