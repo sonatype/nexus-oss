@@ -10,11 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.node;
-
-import com.google.inject.ImplementedBy;
-
-// TODO: move to nexus-common
+package org.sonatype.nexus.common.node;
 
 /**
  * Provides access to the certificate-based node identifier.
@@ -26,7 +22,6 @@ import com.google.inject.ImplementedBy;
  *
  * @since 3.0
  */
-@ImplementedBy(LocalNodeAccessImpl.class)
 public interface LocalNodeAccess
 {
   String getId();

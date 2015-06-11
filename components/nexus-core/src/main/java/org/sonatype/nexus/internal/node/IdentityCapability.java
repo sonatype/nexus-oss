@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.capability.CapabilitySupport;
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 import org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil;

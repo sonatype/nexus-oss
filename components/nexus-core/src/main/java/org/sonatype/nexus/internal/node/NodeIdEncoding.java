@@ -20,7 +20,7 @@ import org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// TODO: move to nexus-common
+// TODO: move to nexus-common?  dep on CertificateUtil makes this not desirable
 
 /**
  * Node ID encoding helpers.
