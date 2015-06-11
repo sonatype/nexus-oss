@@ -97,20 +97,11 @@ public class BaseUrlManagerImpl
     // attempt to detect from HTTP request
     HttpServletRequest request = httpRequest();
     if (request != null) {
-      StringBuilder buff = new StringBuilder();
-      String requestUrl = request.getRequestURL().toString();
-      String pathInfo = request.getPathInfo();
-      if (!Strings.isNullOrEmpty(pathInfo)) {
-        requestUrl = requestUrl.substring(0, requestUrl.length() - pathInfo.length());
-      }
-
-      String servletPath = request.getServletPath();
-      if (!Strings.isNullOrEmpty(servletPath)) {
-        requestUrl = requestUrl.substring(0, requestUrl.length() - servletPath.length());
-      }
-      buff.append(requestUrl);
-
-      return buff.toString();
+      StringBuffer url = request.getRequestURL();
+      String uri = request.getRequestURI();
+      String ctx = request.getContextPath();
+      String base = url.substring(0, url.length() - uri.length() + ctx.length());
+      return base;
     }
 
     // no request in context, non-forced base-url
