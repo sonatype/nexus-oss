@@ -20,6 +20,7 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.io.LimitedInputStream;
+import org.sonatype.nexus.common.text.Strings2;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -131,6 +132,6 @@ public class DigestExtractor
    * Removes white space and lower cases the digest string.
    */
   private static String compress(final String digest) {
-    return digest.replaceAll(" ", "").toLowerCase(Locale.US);
+    return Strings2.lower(digest.replaceAll(" ", ""));
   }
 }
