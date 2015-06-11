@@ -277,7 +277,7 @@ public class NugetProxyGalleryFacet
   /**
    * A factory to create {@link Callable}s to populate the count cache.
    */
-  private static abstract class RemoteCallFactory
+  private abstract static class RemoteCallFactory
   {
     protected final NugetFeedFetcher fetcher;
 
