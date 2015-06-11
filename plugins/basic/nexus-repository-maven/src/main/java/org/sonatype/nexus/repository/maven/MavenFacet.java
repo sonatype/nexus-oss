@@ -67,6 +67,7 @@ public interface MavenFacet
 
   // proxy operations
 
+  @Nullable
   DateTime getLastVerified(MavenPath path) throws IOException;
 
   boolean setLastVerified(MavenPath path, DateTime verified) throws IOException;

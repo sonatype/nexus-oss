@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.storage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -227,7 +228,7 @@ public class StorageFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public <T> T perform(final Operation<T> operation) {
+  public <T> T perform(final Operation<T> operation) throws IOException {
     try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
       return perform(db, operation);
     }
@@ -235,21 +236,32 @@ public class StorageFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) {
+  public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) throws IOException {
     checkNotNull(db);
+    checkNotNull(operation);
+    try (StorageTx tx = openStorageTx(db, true)) {
+      T result = perform(tx, operation);
+      tx.commit();
+      return result;
+    }
+  }
+
+  @Override
+  @Guarded(by = STARTED)
+  public <T> T perform(final StorageTx tx, final Operation<T> operation) throws IOException {
+    checkNotNull(tx);
     checkNotNull(operation);
     RuntimeException lastException = null;
     for (int attempt = 0; attempt < MAX_CONCURRENT_MODIFICATION_ATTEMPTS; attempt++) {
-      try (StorageTx tx = openTx(db)) {
-        try {
-          T result = operation.execute(tx);
-          tx.commit();
-          return result;
-        }
-        catch (IllegalStateException | OConcurrentModificationException | ORecordDuplicatedException e) {
-          lastException = e;
-          log.debug("Failed operation {} on {}:", operation, getRepository(), e);
-        }
+      try {
+        T result = operation.execute(tx);
+        tx.getDb().commit();
+        return result;
+      }
+      catch (IllegalStateException | OConcurrentModificationException | ORecordDuplicatedException e) {
+        lastException = e;
+        tx.getDb().getLocalCache().clear();
+        log.debug("Failed operation {} on {}:", operation, getRepository(), e);
       }
     }
     throw new IllegalStateException(
