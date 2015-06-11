@@ -36,6 +36,7 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'wonderland-all',
+                description: 'All permissions for Wonderland',
                 type: 'application',
                 properties: [
                     domain: 'wonderland',

@@ -35,6 +35,7 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'feeds-read',
+                description: 'Read permissions for Feeds',
                 type: 'application',
                 properties: [
                     domain : 'feeds',
