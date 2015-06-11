@@ -14,13 +14,15 @@ package org.sonatype.nexus.internal.node;
 
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.util.Locale;
 
 import org.sonatype.nexus.common.text.Strings2;
-import org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil;
+
+import com.google.common.hash.Hashing;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// TODO: move to nexus-common?  dep on CertificateUtil makes this not desirable
+// TODO: move to nexus-common?
 
 /**
  * Node ID encoding helpers.
@@ -50,7 +52,7 @@ public class NodeIdEncoding
    */
   public static String nodeIdForCertificate(final Certificate cert) throws CertificateEncodingException {
     checkNotNull(cert);
-    String sha1 = CertificateUtil.calculateSha1(cert);
+    String sha1 = Hashing.sha1().hashBytes(cert.getEncoded()).toString().toUpperCase(Locale.US);
     return nodeIdForSha1(sha1);
   }
 

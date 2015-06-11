@@ -34,8 +34,6 @@ import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManagerConfigurationSuppor
 public class KeyStoreManagerConfigurationImpl
     extends KeyStoreManagerConfigurationSupport
 {
-  private static final String KEYSTORE_DIR_NAME = "keystore/node";
-
   private static final String CPREFIX = "${node.keyStoreManager";
 
   /**
@@ -64,7 +62,7 @@ public class KeyStoreManagerConfigurationImpl
       final @Named(CPREFIX + ".keyManagerAlgorithm:-DEFAULT}") String keyManagerAlgorithm,
       final @Named(CPREFIX + ".trustManagerAlgorithm:-DEFAULT}") String trustManagerAlgorithm)
   {
-    setBaseDir(new File(directories.getWorkDirectory("etc"), KEYSTORE_DIR_NAME));
+    setBaseDir(new File(directories.getWorkDirectory("keystores"), KeyStoreManagerImpl.NAME));
 
     setPrivateKeyStorePassword(PKSP);
     setTrustedKeyStorePassword(TKSP);
