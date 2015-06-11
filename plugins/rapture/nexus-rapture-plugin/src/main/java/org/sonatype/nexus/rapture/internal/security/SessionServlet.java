@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkState;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 
 /**
  * Session servlet, to expose end-point for configuration of Shiro authentication filter to
@@ -56,6 +57,8 @@ public class SessionServlet
     // sanity check
     checkState(subject.isAuthenticated());
     checkState(subject.getSession(false) != null);
+
+    response.setStatus(SC_NO_CONTENT);
   }
 
   /**
@@ -71,6 +74,9 @@ public class SessionServlet
 
     // sanity check
     checkState(!subject.isAuthenticated());
+    checkState(!subject.isRemembered());
     checkState(subject.getSession(false) == null);
+
+    response.setStatus(SC_NO_CONTENT);
   }
 }

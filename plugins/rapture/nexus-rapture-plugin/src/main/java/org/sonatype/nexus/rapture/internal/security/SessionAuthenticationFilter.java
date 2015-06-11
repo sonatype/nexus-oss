@@ -52,6 +52,20 @@ public class SessionAuthenticationFilter
 
   public static final String P_REMEMBER_ME = "rememberMe";
 
+  public static final String DELETE_METHOD = "DELETE";
+
+  /**
+   * Allow if authenticated or if logout request.
+   */
+  @Override
+  protected boolean isAccessAllowed(final ServletRequest request,
+                                    final ServletResponse response,
+                                    final Object mappedValue)
+  {
+    Subject subject = getSubject(request, response);
+    return subject.isAuthenticated() || isLogoutRequest(request, response);
+  }
+
   /**
    * Fill in denied response.
    */
@@ -82,6 +96,11 @@ public class SessionAuthenticationFilter
   protected boolean isLoginRequest(final ServletRequest request, final ServletResponse response) {
     return (request instanceof HttpServletRequest) &&
         WebUtils.toHttp(request).getMethod().equalsIgnoreCase(POST_METHOD);
+  }
+
+  private boolean isLogoutRequest(final ServletRequest request, final ServletResponse response) {
+    return (request instanceof HttpServletRequest) &&
+        WebUtils.toHttp(request).getMethod().equalsIgnoreCase(DELETE_METHOD);
   }
 
   @Override
