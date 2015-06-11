@@ -298,6 +298,7 @@ class StaticSecurityConfigurationResourceImpl
              */
             new CRole(
                 id: 'admin',
+                description: 'Administrator Role',
                 privileges: [
                     'all'
                 ]
@@ -308,7 +309,7 @@ class StaticSecurityConfigurationResourceImpl
              */
             new CRole(
                 id: 'anonymous',
-
+                description: 'Anonymous Role',
                 privileges: [
                     'search-read',
                     'repository-view-*-*-browse',
