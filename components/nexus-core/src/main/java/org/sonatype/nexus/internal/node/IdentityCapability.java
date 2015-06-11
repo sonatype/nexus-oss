@@ -19,8 +19,6 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.sonatype.nexus.plugins.smartproxy.SmartProxyPlugin;
-
 import org.sonatype.nexus.capability.CapabilitySupport;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
@@ -56,7 +54,7 @@ public class IdentityCapability
   private String fingerprint;
 
   @Inject
-  public IdentityCapability(final @Named(SmartProxyPlugin.ID_PREFIX) KeyStoreManager keyStoreManager,
+  public IdentityCapability(final @Named(KeyStoreManagerImpl.NAME) KeyStoreManager keyStoreManager,
                             final LocalNodeAccess localNode)
   {
     this.keyStoreManager = checkNotNull(keyStoreManager);
@@ -92,7 +90,6 @@ public class IdentityCapability
           cn.toString(),
           "Nexus",
           "Sonatype",
-          // FIXME: Update, to encorporation state details?
           "Silver Spring",
           "MD",
           "US");

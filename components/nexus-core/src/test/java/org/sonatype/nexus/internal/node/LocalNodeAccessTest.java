@@ -15,11 +15,8 @@ package org.sonatype.nexus.internal.node;
 import java.io.File;
 import java.security.cert.Certificate;
 
-import com.sonatype.nexus.plugins.smartproxy.internal.security.keystore.KeyStoreManagerConfigurationImpl;
-
 import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
 import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManager;
-import org.sonatype.sisu.goodies.ssl.keystore.internal.KeyStoreManagerImpl;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;

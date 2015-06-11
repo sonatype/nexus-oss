@@ -46,23 +46,14 @@ public class IdentityCapabilityDescriptor
 
   public static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
-  private static interface Messages
+  private interface Messages
       extends MessageBundle
   {
-    @DefaultMessage("Smart Proxy: Identity")
+    @DefaultMessage("Node: Identity")
     String name();
   }
 
   private static final Messages messages = I18N.create(Messages.class);
-
-  // FIXME: replace with annotation
-  ///**
-  // * Validate on creation that only one identity capability exists.
-  // */
-  //@Override
-  //public Validator validator() {
-  //  return validators().capability().uniquePer(IdentityCapabilityDescriptor.TYPE);
-  //}
 
   @Override
   public CapabilityType type() {
@@ -75,6 +66,11 @@ public class IdentityCapabilityDescriptor
   }
 
   @Override
+  public Set<Tag> getTags() {
+    return tags(categoryTag("Core"));
+  }
+
+  @Override
   public List<FormField> formFields() {
     return Collections.emptyList();
   }
@@ -83,10 +79,4 @@ public class IdentityCapabilityDescriptor
   protected String renderAbout() throws Exception {
     return render(TYPE_ID + "-about.vm");
   }
-
-  @Override
-  public Set<Tag> getTags() {
-    return tags(categoryTag("Core"));
-  }
-
 }

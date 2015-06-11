@@ -18,8 +18,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.sonatype.nexus.plugins.smartproxy.SmartProxyPlugin;
-
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.TestAccessible;
 import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManager;
@@ -44,7 +42,7 @@ public class LocalNodeAccessImpl
   private volatile String id;
 
   @Inject
-  public LocalNodeAccessImpl(final @Named(SmartProxyPlugin.ID_PREFIX) KeyStoreManager keyStoreManager) {
+  public LocalNodeAccessImpl(final @Named(KeyStoreManagerImpl.NAME) KeyStoreManager keyStoreManager) {
     this.keyStoreManager = checkNotNull(keyStoreManager);
   }
 
