@@ -86,7 +86,7 @@ public class IdentityCapabilityDescriptor
 
   @Override
   public Set<Tag> getTags() {
-    return tags(categoryTag("Smart Proxy"));
+    return tags(categoryTag("Core"));
   }
 
 }
