@@ -168,33 +168,6 @@ Ext.define('NX.controller.Drilldown', {
   loadStore: function (cb) {
     var me = this,
       bookmark = NX.Bookmarks.getBookmark().getSegments();
-
-    me.loadStoreAtIndex(0, bookmark, cb);
-  },
-
-  /**
-   * @public
-   * Load the list with the specified index
-   *
-   * @param index The index of the load to load
-   */
-  loadStoreAtIndex: function(index, bookmark, cb) {
-    var me = this,
-      lists = me.getLists();
-
-    try {
-      if (lists[index]) {
-        lists[index].getStore().load(function(records, operation, success) {
-          if (cb) {
-            cb(records, operation, success);
-          }
-        });
-      }
-    }
-    catch (e) {
-      // Ext.data.Store.load() returned an exception, log it here
-      me.logDebug(e);
-    }
   },
 
   /**
