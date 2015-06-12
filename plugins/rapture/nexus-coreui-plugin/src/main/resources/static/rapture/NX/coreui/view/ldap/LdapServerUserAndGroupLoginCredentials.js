@@ -26,7 +26,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
   ],
   ui: 'nx-inset',
 
-  title: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupLoginCredentials_Title'),
+  title: NX.I18n.get('Ldap_LdapServerUserAndGroupLoginCredentials_Title'),
 
   layout: 'fit',
   autoShow: true,
@@ -42,7 +42,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
     var me = this;
 
     if (!me.message) {
-      me.message = NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupLoginCredentials_Text');
+      me.message = NX.I18n.get('Ldap_LdapServerUserAndGroupLoginCredentials_Text');
     }
 
     Ext.apply(this, {
@@ -63,19 +63,19 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
             },
             items: [
               { xtype: 'component', html: NX.Icons.img('authenticate', 'x32') },
-              { xtype: 'component', html: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupLoginCredentials_Input_Text') }
+              { xtype: 'component', html: NX.I18n.get('Ldap_LdapServerUserAndGroupLoginCredentials_Input_Text') }
             ]
           },
           {
             name: 'username',
             itemId: 'username',
-            fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupLoginCredentials_Username_FieldLabel'),
+            fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupLoginCredentials_Username_FieldLabel'),
             allowBlank: false
           },
           {
             name: 'password',
             itemId: 'password',
-            fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupLoginCredentials_Password_FieldLabel'),
+            fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupLoginCredentials_Password_FieldLabel'),
             inputType: 'password',
             allowBlank: false,
             validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
@@ -84,8 +84,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
 
         buttonAlign: 'left',
         buttons: [
-          { text: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupLoginCredentials_Submit_Button'), action: 'verifylogin', formBind: true, bindToEnter: true, ui: 'nx-primary' },
-          { text: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupLoginCredentials_Cancel_Button'), handler: me.close, scope: me }
+          { text: NX.I18n.get('Ldap_LdapServerUserAndGroupLoginCredentials_Submit_Button'), action: 'verifylogin', formBind: true, bindToEnter: true, ui: 'nx-primary' },
+          { text: NX.I18n.get('Ldap_LdapServerUserAndGroupLoginCredentials_Cancel_Button'), handler: me.close, scope: me }
         ]
       }
     });

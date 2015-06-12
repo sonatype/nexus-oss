@@ -37,57 +37,57 @@ Ext.define('NX.coreui.store.SearchCriteria', {
     {
       id: 'format',
       config: {
-        fieldLabel: NX.I18n.get('Coreui_Store_SearchCriteria_Format_FieldLabel')
+        fieldLabel: NX.I18n.get('SearchCriteria_Format_FieldLabel')
       }
     },
     {
       id: 'keyword',
       config: {
-        fieldLabel: NX.I18n.get('Coreui_Store_SearchCriteria_Keyword_FieldLabel'),
+        fieldLabel: NX.I18n.get('SearchCriteria_Keyword_FieldLabel'),
         width: 250
       }
     },
     {
       id: 'version',
       config: {
-        fieldLabel: NX.I18n.get('Coreui_Store_SearchCriteria_Version_FieldLabel')
+        fieldLabel: NX.I18n.get('SearchCriteria_Version_FieldLabel')
       }
     },
     {
       id: 'group.raw',
       config: {
-        fieldLabel: NX.I18n.get('Coreui_Store_SearchCriteria_Group_FieldLabel'),
+        fieldLabel: NX.I18n.get('SearchCriteria_Group_FieldLabel'),
         width: 250
       }
     },
     {
       id: 'name.raw',
       config: {
-        fieldLabel: NX.I18n.get('Coreui_Store_SearchCriteria_Name_FieldLabel'),
+        fieldLabel: NX.I18n.get('SearchCriteria_Name_FieldLabel'),
         width: 200
       }
     },
     {
       id: 'assets.attributes.checksum.sha1',
-      group: NX.I18n.get('Coreui_Store_SearchCriteria_Checksum_Group'),
+      group: NX.I18n.get('SearchCriteria_Checksum_Group'),
       config: {
-        fieldLabel: NX.I18n.get('Coreui_Store_SearchCriteria_SHA1_FieldLabel'),
+        fieldLabel: NX.I18n.get('SearchCriteria_SHA1_FieldLabel'),
         width: 250
       }
     },
     {
       id: 'assets.attributes.checksum.sha512',
-      group: NX.I18n.get('Coreui_Store_SearchCriteria_Checksum_Group'),
+      group: NX.I18n.get('SearchCriteria_Checksum_Group'),
       config: {
-        fieldLabel: NX.I18n.get('Coreui_Store_SearchCriteria_SHA2_FieldLabel'),
+        fieldLabel: NX.I18n.get('SearchCriteria_SHA2_FieldLabel'),
         width: 250
       }
     },
     {
       id: 'assets.attributes.checksum.md5',
-      group: NX.I18n.get('Coreui_Store_SearchCriteria_Checksum_Group'),
+      group: NX.I18n.get('SearchCriteria_Checksum_Group'),
       config: {
-        fieldLabel: NX.I18n.get('Coreui_Store_SearchCriteria_MD5_FieldLabel'),
+        fieldLabel: NX.I18n.get('SearchCriteria_MD5_FieldLabel'),
         width: 250
       }
     }

@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
     cls: 'nx-log-viewer-field nx-monospace-field',
     readOnly: true,
     hideLabel: true,
-    emptyText: NX.I18n.get('Coreui_View_Logging_LogViewer_EmptyText'),
+    emptyText: NX.I18n.get('Logging_LogViewer_EmptyText'),
     inputAttrTpl: 'wrap="off"'
   },
 
@@ -42,14 +42,14 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('Coreui_View_Logging_LogViewer_Download_Button'),
+        text: NX.I18n.get('Logging_LogViewer_Download_Button'),
         glyph: 'xf019@FontAwesome' /* fa-download */,
         action: 'download'
       },
       '-',
       {
         xtype: 'button',
-        text: NX.I18n.get('Coreui_View_Logging_LogViewer_Mark_Button'),
+        text: NX.I18n.get('Logging_LogViewer_Mark_Button'),
         glyph: 'xf11e@FontAwesome' /* fa-flag-checkered */,
         action: 'mark',
         disabled: true
@@ -57,7 +57,7 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
       '->',
       {
         xtype: 'label',
-        text: NX.I18n.get('Coreui_View_Logging_LogViewer_Refresh_Text')
+        text: NX.I18n.get('Logging_LogViewer_Refresh_Text')
       },
       {
         xtype: 'combo',
@@ -66,11 +66,11 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
         editable: false,
         value: 0,
         store: [
-          [0, NX.I18n.get('Coreui_View_Logging_LogViewer_Refresh_ManualItem')],
-          [20, NX.I18n.get('Coreui_View_Logging_LogViewer_Refresh_20SecondsItem')],
-          [60, NX.I18n.get('Coreui_View_Logging_LogViewer_Refresh_MinuteItem')],
-          [120, NX.I18n.get('Coreui_View_Logging_LogViewer_Refresh_2MinutesItem')],
-          [300, NX.I18n.get('Coreui_View_Logging_LogViewer_Refresh_5MinutesItem')]
+          [0, NX.I18n.get('Logging_LogViewer_Refresh_ManualItem')],
+          [20, NX.I18n.get('Logging_LogViewer_Refresh_20SecondsItem')],
+          [60, NX.I18n.get('Logging_LogViewer_Refresh_MinuteItem')],
+          [120, NX.I18n.get('Logging_LogViewer_Refresh_2MinutesItem')],
+          [300, NX.I18n.get('Logging_LogViewer_Refresh_5MinutesItem')]
         ],
         queryMode: 'local'
       },
@@ -81,9 +81,9 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
         editable: false,
         value: 25,
         store: [
-          [25, NX.I18n.get('Coreui_View_Logging_LogViewer_Last25KBItem')],
-          [50, NX.I18n.get('Coreui_View_Logging_LogViewer_Last50KBItem')],
-          [100, NX.I18n.get('Coreui_View_Logging_LogViewer_Last100KBItem')]
+          [25, NX.I18n.get('Logging_LogViewer_Last25KBItem')],
+          [50, NX.I18n.get('Logging_LogViewer_Last50KBItem')],
+          [100, NX.I18n.get('Logging_LogViewer_Last100KBItem')]
         ],
         queryMode: 'local'
       }

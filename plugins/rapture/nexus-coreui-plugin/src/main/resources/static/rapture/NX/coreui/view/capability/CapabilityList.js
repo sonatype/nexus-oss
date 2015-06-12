@@ -35,13 +35,13 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
       dataIndex: 'state',
       hideable: false
     },
-    { text: NX.I18n.get('Coreui_View_Capability_CapabilityList_Type_Header'), dataIndex: 'typeName', flex: 1 },
-    { text: NX.I18n.get('Coreui_View_Capability_CapabilityList_Description_Header'), dataIndex: 'description', flex: 1, groupable: false },
-    { text: NX.I18n.get('Coreui_View_Capability_CapabilityList_Notes_Header'), dataIndex: 'notes', flex: 1 }
+    { text: NX.I18n.get('Capability_CapabilityList_Type_Header'), dataIndex: 'typeName', flex: 1 },
+    { text: NX.I18n.get('Capability_CapabilityList_Description_Header'), dataIndex: 'description', flex: 1, groupable: false },
+    { text: NX.I18n.get('Capability_CapabilityList_Notes_Header'), dataIndex: 'notes', flex: 1 }
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('Coreui_View_Capability_CapabilityList_EmptyText'),
+    emptyText: NX.I18n.get('Capability_CapabilityList_EmptyText'),
     deferEmptyText: false,
     getRowClass: function (record) {
       if (record.get('enabled') && !record.get('active')) {
@@ -57,7 +57,7 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('Coreui_View_Capability_CapabilityList_New_Button'),
+        text: NX.I18n.get('Capability_CapabilityList_New_Button'),
         action: 'new',
         disabled: true,
         glyph: 'xf055@FontAwesome' /* fa-plus-circle */
@@ -73,7 +73,7 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Coreui_View_Capability_CapabilityList_Filter_EmptyText') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Capability_CapabilityList_Filter_EmptyText') }
   ],
 
   /**

@@ -26,7 +26,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleManual', {
 
   items: {
     xtype: 'label',
-    text: NX.I18n.get('Coreui_View_Task_TaskScheduleManual_HelpText')
+    text: NX.I18n.get('Task_TaskScheduleManual_HelpText')
   }
 
 });

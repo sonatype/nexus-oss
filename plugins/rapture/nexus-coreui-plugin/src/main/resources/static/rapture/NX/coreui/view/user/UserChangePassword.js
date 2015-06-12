@@ -26,7 +26,7 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
   ],
   ui: 'nx-inset',
 
-  title: NX.I18n.get('Coreui_View_User_UserChangePassword_Title'),
+  title: NX.I18n.get('User_UserChangePassword_Title'),
   defaultFocus: 'password',
 
   layout: 'fit',
@@ -49,7 +49,7 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
     me.items = {
       xtype: 'form',
       editableCondition: NX.Conditions.isPermitted('nexus:userschangepw:create'),
-      editableMarker: NX.I18n.get('Coreui_View_User_UserChangePassword_NoPermission_Error'),
+      editableMarker: NX.I18n.get('User_UserChangePassword_NoPermission_Error'),
       defaults: {
         anchor: '100%',
         validateOnBlur: false // allow cancel to be clicked w/o validating field to be non-blank
@@ -59,25 +59,25 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
           xtype: 'nx-password',
           name: 'password',
           itemId: 'password',
-          fieldLabel: NX.I18n.get('Coreui_View_User_UserChangePassword_Password_FieldLabel'),
+          fieldLabel: NX.I18n.get('User_UserChangePassword_Password_FieldLabel'),
           allowBlank: false
         },
         {
           xtype: 'nx-password',
-          fieldLabel: NX.I18n.get('Coreui_View_User_UserChangePassword_PasswordConfirm_FieldLabel'),
+          fieldLabel: NX.I18n.get('User_UserChangePassword_PasswordConfirm_FieldLabel'),
           allowBlank: false,
           submitValue: false,
           validator: function () {
             var me = this;
-            return (me.up('form').down('#password').getValue() === me.getValue()) ? true : NX.I18n.get('Coreui_View_User_UserChangePassword_NoMatch_Error');
+            return (me.up('form').down('#password').getValue() === me.getValue()) ? true : NX.I18n.get('User_UserChangePassword_NoMatch_Error');
           }
         }
       ],
 
       buttonAlign: 'left',
       buttons: [
-        { text: NX.I18n.get('Coreui_View_User_UserChangePassword_Submit_Button'), action: 'changepassword', formBind: true, ui: 'nx-primary' },
-        { text: NX.I18n.get('Coreui_View_User_UserChangePassword_Cancel_Button'), handler: function () {
+        { text: NX.I18n.get('User_UserChangePassword_Submit_Button'), action: 'changepassword', formBind: true, ui: 'nx-primary' },
+        { text: NX.I18n.get('User_UserChangePassword_Cancel_Button'), handler: function () {
           this.up('window').close();
         }}
       ]

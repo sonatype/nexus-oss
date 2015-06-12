@@ -39,13 +39,13 @@ Ext.define('NX.coreui.view.user.UserAdd', {
         submit: 'NX.direct.coreui_User.create'
       },
       settingsFormSuccessMessage: function(data) {
-        return NX.I18n.get('Coreui_View_User_UserAdd_Create_Success') + data['userId'];
+        return NX.I18n.get('User_UserAdd_Create_Success') + data['userId'];
       },
       editableCondition: NX.Conditions.isPermitted('nexus:users:create'),
-      editableMarker: NX.I18n.get('Coreui_View_User_UserAdd_Create_Error'),
+      editableMarker: NX.I18n.get('User_UserAdd_Create_Error'),
 
       buttons: [
-        { text: NX.I18n.get('Coreui_View_User_UserList_New_Button'), action: 'add', formBind: true, ui: 'nx-primary' },
+        { text: NX.I18n.get('User_UserList_New_Button'), action: 'add', formBind: true, ui: 'nx-primary' },
         { text: NX.I18n.get('View_Add_Cancel_Button'), handler: function () {
           this.up('nx-drilldown').showChild(0, true);
         }}
@@ -61,16 +61,16 @@ Ext.define('NX.coreui.view.user.UserAdd', {
         xtype: 'nx-password',
         name: 'password',
         itemId: 'password',
-        fieldLabel: NX.I18n.get('Coreui_View_User_UserAdd_Password_FieldLabel')
+        fieldLabel: NX.I18n.get('User_UserAdd_Password_FieldLabel')
       },
       {
         xtype: 'nx-password',
         allowBlank: true,
-        fieldLabel: NX.I18n.get('Coreui_View_User_UserAdd_PasswordConfirm_FieldLabel'),
+        fieldLabel: NX.I18n.get('User_UserAdd_PasswordConfirm_FieldLabel'),
         submitValue: false,
         validator: function() {
           var me = this;
-          return (me.up('form').down('#password').getValue() === me.getValue()) ? true : NX.I18n.get('Coreui_View_User_UserChangePassword_NoMatch_Error');
+          return (me.up('form').down('#password').getValue() === me.getValue()) ? true : NX.I18n.get('User_UserChangePassword_NoMatch_Error');
         }
       }
     ]);

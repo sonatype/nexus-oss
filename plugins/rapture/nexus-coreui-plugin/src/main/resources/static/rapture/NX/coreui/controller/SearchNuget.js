@@ -33,17 +33,17 @@ Ext.define('NX.coreui.controller.SearchNuget', {
     search.registerCriteria([
       {
         id: 'attributes.nuget.id',
-        group: NX.I18n.get('Coreui_Controller_SearchNuget_Group'),
+        group: NX.I18n.get('SearchNuget_Group'),
         config: {
-          fieldLabel: NX.I18n.get('Coreui_Controller_SearchNuget_ID_FieldLabel'),
+          fieldLabel: NX.I18n.get('SearchNuget_ID_FieldLabel'),
           width: 300
         }
       },
       {
         id: 'attributes.nuget.tags',
-        group: NX.I18n.get('Coreui_Controller_SearchNuget_Group'),
+        group: NX.I18n.get('SearchNuget_Group'),
         config: {
-          fieldLabel: NX.I18n.get('Coreui_Controller_SearchNuget_Tags_FieldLabel'),
+          fieldLabel: NX.I18n.get('SearchNuget_Tags_FieldLabel'),
           width: 300
         }
       }
@@ -52,8 +52,8 @@ Ext.define('NX.coreui.controller.SearchNuget', {
     search.registerFilter({
       id: 'nuget',
       name: 'NuGet',
-      text: NX.I18n.get('Coreui_Controller_SearchNuget_Text'),
-      description: NX.I18n.get('Coreui_Controller_SearchNuget_Description'),
+      text: NX.I18n.get('SearchNuget_Text'),
+      description: NX.I18n.get('SearchNuget_Description'),
       readOnly: true,
       criterias: [
         { id: 'format', value: 'nuget', hidden: true },

@@ -39,7 +39,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
     },
     {
       xtype: 'checkbox',
-      fieldLabel: NX.I18n.get('Coreui_View_Capability_CapabilitySettingsForm_Enabled_FieldLabel'),
+      fieldLabel: NX.I18n.get('Capability_CapabilitySettingsForm_Enabled_FieldLabel'),
       name: 'enabled',
       allowBlank: false,
       checked: true,

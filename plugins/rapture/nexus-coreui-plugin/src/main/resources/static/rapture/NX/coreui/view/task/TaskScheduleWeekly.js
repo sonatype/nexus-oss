@@ -49,7 +49,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleWeekly', {
         xtype: 'datefield',
         name: 'startDate',
         itemId: 'startDate',
-        fieldLabel: NX.I18n.get('Coreui_View_Task_TaskScheduleDaily_StartDate_FieldLabel'),
+        fieldLabel: NX.I18n.get('Task_TaskScheduleDaily_StartDate_FieldLabel'),
         allowBlank: false,
         format: 'm/d/Y',
         value: new Date(),
@@ -59,7 +59,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleWeekly', {
         xtype: 'timefield',
         name: 'startTime',
         itemId: 'startTime',
-        fieldLabel: NX.I18n.get('Coreui_View_Task_TaskScheduleDaily_Recurring_FieldLabel'),
+        fieldLabel: NX.I18n.get('Task_TaskScheduleDaily_Recurring_FieldLabel'),
         helpText: 'The time this task should start on days it will run in your time zone ' +
             NX.util.DateFormat.getTimeZone() + '.',
         allowBlank: false,
@@ -68,9 +68,9 @@ Ext.define('NX.coreui.view.task.TaskScheduleWeekly', {
       },
       {
         xtype: 'checkboxgroup',
-        fieldLabel: NX.I18n.get('Coreui_View_Task_TaskScheduleMonthly_Days_FieldLabel'),
+        fieldLabel: NX.I18n.get('Task_TaskScheduleMonthly_Days_FieldLabel'),
         allowBlank: false,
-        blankText: NX.I18n.get('Coreui_View_Task_TaskScheduleMonthly_Days_BlankText'),
+        blankText: NX.I18n.get('Task_TaskScheduleMonthly_Days_BlankText'),
         vertical: true,
         columns: 1,
         items: days

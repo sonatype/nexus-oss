@@ -31,10 +31,10 @@ Ext.define('NX.coreui.view.task.TaskScheduleAdvanced', {
       {
         xtype: 'textfield',
         name: 'cronExpression',
-        fieldLabel: NX.I18n.get('Coreui_View_Task_TaskScheduleAdvanced_Cron_FieldLabel'),
-        helpText: NX.I18n.get('Coreui_View_Task_TaskScheduleAdvanced_Cron_HelpText'),
-        afterBodyEl: NX.I18n.get('Coreui_View_Task_TaskScheduleAdvanced_Cron_AfterBodyEl'),
-        emptyText: NX.I18n.get('Coreui_View_Task_TaskScheduleAdvanced_Cron_EmptyText'),
+        fieldLabel: NX.I18n.get('Task_TaskScheduleAdvanced_Cron_FieldLabel'),
+        helpText: NX.I18n.get('Task_TaskScheduleAdvanced_Cron_HelpText'),
+        afterBodyEl: NX.I18n.get('Task_TaskScheduleAdvanced_Cron_AfterBodyEl'),
+        emptyText: NX.I18n.get('Task_TaskScheduleAdvanced_Cron_EmptyText'),
         allowBlank: false
       }
     ];

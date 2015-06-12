@@ -38,7 +38,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionForm', {
     me.callParent(arguments);
 
     me.getDockedItems('toolbar[dock="bottom"]')[0].add(
-        { xtype: 'button', text: NX.I18n.get('Coreui_View_Ldap_LdapServerConnectionForm_VerifyConnection_Button'), formBind: true, action: 'verifyconnection' }
+        { xtype: 'button', text: NX.I18n.get('Ldap_LdapServerConnectionForm_VerifyConnection_Button'), formBind: true, action: 'verifyconnection' }
     );
   }
 

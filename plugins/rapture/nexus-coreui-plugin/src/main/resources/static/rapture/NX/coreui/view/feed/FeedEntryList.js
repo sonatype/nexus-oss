@@ -33,8 +33,8 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
   },
 
   columns: [
-    { header: NX.I18n.get('Coreui_View_Feed_FeedEntryList_Title_Header'), dataIndex: 'title', flex: 2 },
-    { header: NX.I18n.get('Coreui_View_Feed_FeedEntryList_Date_Header'), dataIndex: 'published', flex: 1 }
+    { header: NX.I18n.get('Feed_FeedEntryList_Title_Header'), dataIndex: 'title', flex: 2 },
+    { header: NX.I18n.get('Feed_FeedEntryList_Date_Header'), dataIndex: 'published', flex: 1 }
   ],
 
   dockedItems: [

@@ -34,7 +34,7 @@ Ext.define('NX.coreui.view.task.TaskSelectType', {
         return 'task-default';
       }
     },
-    { header: NX.I18n.get('Coreui_View_Task_TaskSelectType_Name_Header'), dataIndex: 'name', flex: 1 }
+    { header: NX.I18n.get('Task_TaskSelectType_Name_Header'), dataIndex: 'name', flex: 1 }
   ],
 
   dockedItems: [{
@@ -44,7 +44,7 @@ Ext.define('NX.coreui.view.task.TaskSelectType', {
   }],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Coreui_View_Task_TaskSelectType_Filter_EmptyText') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Task_TaskSelectType_Filter_EmptyText') }
   ]
 
 });

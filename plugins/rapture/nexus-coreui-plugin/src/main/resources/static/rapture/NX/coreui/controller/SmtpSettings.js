@@ -57,8 +57,8 @@ Ext.define('NX.coreui.controller.SmtpSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/System/Email Server',
-      text: NX.I18n.get('Coreui_Controller_SmtpSettings_Text'),
-      description: NX.I18n.get('Coreui_Controller_SmtpSettings_Description'),
+      text: NX.I18n.get('SmtpSettings_Text'),
+      description: NX.I18n.get('SmtpSettings_Description'),
       view: { xtype: 'nx-coreui-system-smtp-settings' },
       iconConfig: {
         file: 'email.png',
@@ -104,12 +104,12 @@ Ext.define('NX.coreui.controller.SmtpSettings', {
         smtpSettings = panel.down('form').getForm().getFieldValues();
 
     win.close();
-    me.getContent().mask(NX.I18n.format('Coreui_Controller_SmtpSettings_Verify_Mask', smtpSettings.host));
+    me.getContent().mask(NX.I18n.format('SmtpSettings_Verify_Mask', smtpSettings.host));
 
     NX.direct.coreui_Email.sendVerification(smtpSettings, email, function (response) {
       me.getContent().unmask();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: NX.I18n.get('Coreui_Controller_SmtpSettings_Verify_Success'), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.get('SmtpSettings_Verify_Success'), type: 'success' });
       }
     });
   }

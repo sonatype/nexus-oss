@@ -55,8 +55,8 @@ Ext.define('NX.coreui.controller.AssetInfo', {
       panel = container.add({ xtype: 'nx-coreui-component-assetinfo', weight: 10 });
     }
 
-    info[NX.I18n.get('Coreui_Controller_AssetInfo_Name_Text')] = assetModel.get('name');
-    info[NX.I18n.get('Coreui_Controller_AssetInfo_ContentType_Text')] = assetModel.get('contentType');
+    info[NX.I18n.get('AssetInfo_Name_Text')] = assetModel.get('name');
+    info[NX.I18n.get('AssetInfo_ContentType_Text')] = assetModel.get('contentType');
 
     panel.showInfo(info);
   },
@@ -66,21 +66,21 @@ Ext.define('NX.coreui.controller.AssetInfo', {
    */
   toSizeString: function(v) {
     if (typeof v !== 'number') {
-      return NX.I18n.get('Coreui_Controller_AssetInfo_SizeUnknown_Info');
+      return NX.I18n.get('AssetInfo_SizeUnknown_Info');
     }
     if (v < 0) {
-      return NX.I18n.get('Coreui_Controller_AssetInfo_SizeUnknown_Info');
+      return NX.I18n.get('AssetInfo_SizeUnknown_Info');
     }
     if (v < 1024) {
-      return NX.I18n.format('Coreui_Controller_AssetInfo_SizeBytes_Info', v);
+      return NX.I18n.format('AssetInfo_SizeBytes_Info', v);
     }
     if (v < 1048576) {
-      return NX.I18n.format('Coreui_Controller_AssetInfo_SizeKB_Info', (v / 1024).toFixed(2));
+      return NX.I18n.format('AssetInfo_SizeKB_Info', (v / 1024).toFixed(2));
     }
     if (v < 1073741824) {
-      return NX.I18n.format('Coreui_Controller_AssetInfo_SizeMB_Info', (v / 1048576).toFixed(2));
+      return NX.I18n.format('AssetInfo_SizeMB_Info', (v / 1048576).toFixed(2));
     }
-    return NX.I18n.format('Coreui_Controller_AssetInfo_SizeGB_Info', (v / 1073741824).toFixed(2));
+    return NX.I18n.format('AssetInfo_SizeGB_Info', (v / 1073741824).toFixed(2));
   }
 
 });

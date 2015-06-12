@@ -33,9 +33,9 @@ Ext.define('NX.coreui.controller.SearchRaw', {
     search.registerCriteria([
       {
         id: 'attributes.raw.path.tree',
-        group: NX.I18n.get('Coreui_Controller_SearchRaw_Group'),
+        group: NX.I18n.get('SearchRaw_Group'),
         config: {
-          fieldLabel: NX.I18n.get('Coreui_Controller_SearchRaw_Path_FieldLabel'),
+          fieldLabel: NX.I18n.get('SearchRaw_Path_FieldLabel'),
           width: 300
         }
       }
@@ -44,8 +44,8 @@ Ext.define('NX.coreui.controller.SearchRaw', {
     search.registerFilter({
       id: 'raw',
       name: 'Raw',
-      text: NX.I18n.get('Coreui_Controller_SearchRaw_Text'),
-      description: NX.I18n.get('Coreui_Controller_SearchRaw_Description'),
+      text: NX.I18n.get('SearchRaw_Text'),
+      description: NX.I18n.get('SearchRaw_Description'),
       readOnly: true,
       criterias: [
         { id: 'format', value: 'raw', hidden: true },

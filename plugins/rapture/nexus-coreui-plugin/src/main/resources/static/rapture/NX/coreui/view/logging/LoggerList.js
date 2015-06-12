@@ -40,9 +40,9 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
         return 'logger-default';
       }
     },
-    { header: NX.I18n.get('Coreui_View_Logging_LoggerList_Name_Header'), dataIndex: 'name', stateId: 'name', hideable: false, flex: 1 },
+    { header: NX.I18n.get('Logging_LoggerList_Name_Header'), dataIndex: 'name', stateId: 'name', hideable: false, flex: 1 },
     {
-      header: NX.I18n.get('Coreui_View_Logging_LoggerList_Level_Header'),
+      header: NX.I18n.get('Logging_LoggerList_Level_Header'),
       dataIndex: 'level',
       stateId: 'level',
       hideable: false,
@@ -50,13 +50,13 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
         xtype: 'combo',
         editable: false,
         store: [
-          ['TRACE', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_TraceItem')],
-          ['DEBUG', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_DebugItem')],
-          ['INFO', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_InfoItem')],
-          ['WARN', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_WarnItem')],
-          ['ERROR', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_ErrorItem')],
-          ['OFF', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_OffItem')],
-          ['DEFAULT', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_DefaultItem')]
+          ['TRACE', NX.I18n.get('Logging_LoggerList_Level_TraceItem')],
+          ['DEBUG', NX.I18n.get('Logging_LoggerList_Level_DebugItem')],
+          ['INFO', NX.I18n.get('Logging_LoggerList_Level_InfoItem')],
+          ['WARN', NX.I18n.get('Logging_LoggerList_Level_WarnItem')],
+          ['ERROR', NX.I18n.get('Logging_LoggerList_Level_ErrorItem')],
+          ['OFF', NX.I18n.get('Logging_LoggerList_Level_OffItem')],
+          ['DEFAULT', NX.I18n.get('Logging_LoggerList_Level_DefaultItem')]
         ],
         queryMode: 'local'
       }
@@ -64,7 +64,7 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('Coreui_View_Logging_LoggerList_EmptyText'),
+    emptyText: NX.I18n.get('Logging_LoggerList_EmptyText'),
     deferEmptyText: false
   },
 
@@ -75,14 +75,14 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('Coreui_View_Logging_LoggerList_New_Button'),
+        text: NX.I18n.get('Logging_LoggerList_New_Button'),
         glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
         action: 'new',
         disabled: true
       },
       {
         xtype: 'button',
-        text: NX.I18n.get('Coreui_View_Logging_LoggerList_Delete_Button'),
+        text: NX.I18n.get('Logging_LoggerList_Delete_Button'),
         glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
         action: 'delete',
         disabled: true
@@ -90,7 +90,7 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
       '-',
       {
         xtype: 'button',
-        text: NX.I18n.get('Coreui_View_Logging_LoggerList_Reset_Button'),
+        text: NX.I18n.get('Logging_LoggerList_Reset_Button'),
         glyph: 'xf0e2@FontAwesome' /* fa-undo */,
         action: 'reset',
         disabled: true
@@ -100,7 +100,7 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
 
   plugins: [
     { pluginId: 'editor', ptype: 'rowediting', clicksToEdit: 1, errorSummary: false },
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Coreui_View_Logging_LoggerList_Filter_EmptyText') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Logging_LoggerList_Filter_EmptyText') }
   ]
 
 });

@@ -29,10 +29,10 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
     submit: 'NX.direct.coreui_User.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return NX.I18n.get('Coreui_View_User_UserSettingsForm_Update_Success') + data['userId'];
+    return NX.I18n.get('User_UserSettingsForm_Update_Success') + data['userId'];
   },
 
-  editableMarker: NX.I18n.get('Coreui_View_User_UserSettingsForm_Update_Error'),
+  editableMarker: NX.I18n.get('User_UserSettingsForm_Update_Error'),
 
   initComponent: function() {
     var me = this;
@@ -49,34 +49,34 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
         name: 'userId',
         itemId: 'userId',
         readOnly: true,
-        fieldLabel: NX.I18n.get('Coreui_View_User_UserSettingsForm_ID_FieldLabel'),
-        helpText: NX.I18n.get('Coreui_View_User_UserSettingsForm_ID_HelpText')
+        fieldLabel: NX.I18n.get('User_UserSettingsForm_ID_FieldLabel'),
+        helpText: NX.I18n.get('User_UserSettingsForm_ID_HelpText')
       },
       { name: 'version', xtype: 'hiddenfield' },
       {
         name: 'firstName',
-        fieldLabel: NX.I18n.get('Coreui_View_User_UserSettingsForm_FirstName_FieldLabel')
+        fieldLabel: NX.I18n.get('User_UserSettingsForm_FirstName_FieldLabel')
       },
       {
         name: 'lastName',
-        fieldLabel: NX.I18n.get('Coreui_View_User_UserSettingsForm_LastName_FieldLabel')
+        fieldLabel: NX.I18n.get('User_UserSettingsForm_LastName_FieldLabel')
       },
       {
         xtype: 'nx-email',
         name: 'email',
-        fieldLabel: NX.I18n.get('Coreui_View_User_UserSettingsForm_Email_FieldLabel'),
-        helpText: NX.I18n.get('Coreui_View_User_UserSettingsForm_Email_HelpText')
+        fieldLabel: NX.I18n.get('User_UserSettingsForm_Email_FieldLabel'),
+        helpText: NX.I18n.get('User_UserSettingsForm_Email_HelpText')
       },
       {
         xtype: 'combo',
         name: 'status',
-        fieldLabel: NX.I18n.get('Coreui_View_User_UserSettingsForm_Status_FieldLabel'),
-        emptyText: NX.I18n.get('Coreui_View_User_UserSettingsForm_Status_EmptyText'),
+        fieldLabel: NX.I18n.get('User_UserSettingsForm_Status_FieldLabel'),
+        emptyText: NX.I18n.get('User_UserSettingsForm_Status_EmptyText'),
         allowBlank: false,
         editable: false,
         store: [
-          ['active', NX.I18n.get('Coreui_View_User_UserSettingsForm_Status_ActiveItem')],
-          ['disabled', NX.I18n.get('Coreui_View_User_UserSettingsForm_Status_DisabledItem')]
+          ['active', NX.I18n.get('User_UserSettingsForm_Status_ActiveItem')],
+          ['disabled', NX.I18n.get('User_UserSettingsForm_Status_DisabledItem')]
         ],
         queryMode: 'local'
       },
@@ -84,10 +84,10 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
         xtype: 'nx-itemselector',
         name: 'roles',
         itemId: 'roles',
-        fieldLabel: NX.I18n.get('Coreui_View_User_UserSettingsExternalForm_Roles_FieldLabel'),
+        fieldLabel: NX.I18n.get('User_UserSettingsExternalForm_Roles_FieldLabel'),
         buttons: ['add', 'remove'],
-        fromTitle: NX.I18n.get('Coreui_View_User_UserSettingsExternalForm_Roles_FromTitle'),
-        toTitle: NX.I18n.get('Coreui_View_User_UserSettingsExternalForm_Roles_ToTitle'),
+        fromTitle: NX.I18n.get('User_UserSettingsExternalForm_Roles_FromTitle'),
+        toTitle: NX.I18n.get('User_UserSettingsExternalForm_Roles_ToTitle'),
         store: 'Role',
         valueField: 'id',
         displayField: 'name',

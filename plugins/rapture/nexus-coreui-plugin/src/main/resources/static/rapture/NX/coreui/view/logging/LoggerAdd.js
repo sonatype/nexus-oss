@@ -33,28 +33,28 @@ Ext.define('NX.coreui.view.logging.LoggerAdd', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: NX.I18n.get('Coreui_View_Logging_LoggerAdd_Name_FieldLabel')
+        fieldLabel: NX.I18n.get('Logging_LoggerAdd_Name_FieldLabel')
       },
       {
         xtype: 'combo',
         name: 'level',
-        fieldLabel: NX.I18n.get('Coreui_View_Logging_LoggerAdd_Level_FieldLabel'),
+        fieldLabel: NX.I18n.get('Logging_LoggerAdd_Level_FieldLabel'),
         editable: false,
         value: 'INFO',
         store: [
-          ['TRACE', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_TraceItem')],
-          ['DEBUG', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_DebugItem')],
-          ['INFO', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_InfoItem')],
-          ['WARN', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_WarnItem')],
-          ['ERROR', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_ErrorItem')],
-          ['OFF', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_OffItem')],
-          ['DEFAULT', NX.I18n.get('Coreui_View_Logging_LoggerList_Level_DefaultItem')]
+          ['TRACE', NX.I18n.get('Logging_LoggerList_Level_TraceItem')],
+          ['DEBUG', NX.I18n.get('Logging_LoggerList_Level_DebugItem')],
+          ['INFO', NX.I18n.get('Logging_LoggerList_Level_InfoItem')],
+          ['WARN', NX.I18n.get('Logging_LoggerList_Level_WarnItem')],
+          ['ERROR', NX.I18n.get('Logging_LoggerList_Level_ErrorItem')],
+          ['OFF', NX.I18n.get('Logging_LoggerList_Level_OffItem')],
+          ['DEFAULT', NX.I18n.get('Logging_LoggerList_Level_DefaultItem')]
         ],
         queryMode: 'local'
       }
     ],
     buttons: [
-      { text: NX.I18n.get('Coreui_View_Logging_LoggerList_New_Button'), action: 'add', formBind: true, ui: 'nx-primary' },
+      { text: NX.I18n.get('Logging_LoggerList_New_Button'), action: 'add', formBind: true, ui: 'nx-primary' },
       { text: NX.I18n.get('View_Add_Cancel_Button'), handler: function () {
         this.up('nx-drilldown').showChild(0, true);
       }}

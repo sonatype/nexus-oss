@@ -40,21 +40,21 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
       {
         xtype: 'fieldset',
         cls: 'nx-form-section',
-        title: NX.I18n.get('Coreui_View_Repository_Facet_Maven2Facet_Title'),
+        title: NX.I18n.get('Repository_Facet_Maven2Facet_Title'),
 
         items: [
           {
             xtype: 'combo',
             name: 'attributes.maven.versionPolicy',
             itemId: 'versionPolicy',
-            fieldLabel: NX.I18n.get('Coreui_View_Maven2Facet_VersionPolicy_FieldLabel'),
-            helpText: NX.I18n.get('Coreui_View_Maven2Facet_VersionPolicy_HelpText'),
-            emptyText: NX.I18n.get('Coreui_View_Maven2Facet_VersionPolicy_EmptyText'),
+            fieldLabel: NX.I18n.get('Maven2Facet_VersionPolicy_FieldLabel'),
+            helpText: NX.I18n.get('Maven2Facet_VersionPolicy_HelpText'),
+            emptyText: NX.I18n.get('Maven2Facet_VersionPolicy_EmptyText'),
             editable: false,
             store: [
-              ['RELEASE', NX.I18n.get('Coreui_View_Maven2Facet_VersionPolicy_ReleaseItem')],
-              ['SNAPSHOT', NX.I18n.get('Coreui_View_Maven2Facet_VersionPolicy_SnapshotItem')],
-              ['MIXED', NX.I18n.get('Coreui_View_Maven2Facet_VersionPolicy_MixedItem')]
+              ['RELEASE', NX.I18n.get('Maven2Facet_VersionPolicy_ReleaseItem')],
+              ['SNAPSHOT', NX.I18n.get('Maven2Facet_VersionPolicy_SnapshotItem')],
+              ['MIXED', NX.I18n.get('Maven2Facet_VersionPolicy_MixedItem')]
             ],
             value: 'RELEASE',
             readOnlyOnUpdate: true

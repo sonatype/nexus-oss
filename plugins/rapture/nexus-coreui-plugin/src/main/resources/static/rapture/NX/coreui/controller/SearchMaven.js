@@ -33,32 +33,32 @@ Ext.define('NX.coreui.controller.SearchMaven', {
     search.registerCriteria([
       {
         id: 'attributes.maven.groupId',
-        group: NX.I18n.get('Coreui_Controller_SearchMaven_Group'),
+        group: NX.I18n.get('SearchMaven_Group'),
         config: {
-          fieldLabel: NX.I18n.get('Coreui_Controller_SearchMaven_GroupID_FieldLabel'),
+          fieldLabel: NX.I18n.get('SearchMaven_GroupID_FieldLabel'),
           width: 250
         }
       },
       {
         id: 'attributes.maven.artifactId',
-        group: NX.I18n.get('Coreui_Controller_SearchMaven_Group'),
+        group: NX.I18n.get('SearchMaven_Group'),
         config: {
-          fieldLabel: NX.I18n.get('Coreui_Controller_SearchMaven_ArtifactID_FieldLabel'),
+          fieldLabel: NX.I18n.get('SearchMaven_ArtifactID_FieldLabel'),
           width: 250
         }
       },
       {
         id: 'attributes.maven.classifier',
-        group: NX.I18n.get('Coreui_Controller_SearchMaven_Group'),
+        group: NX.I18n.get('SearchMaven_Group'),
         config: {
-          fieldLabel: NX.I18n.get('Coreui_Controller_SearchMaven_Classifier_FieldLabel')
+          fieldLabel: NX.I18n.get('SearchMaven_Classifier_FieldLabel')
         }
       },
       {
         id: 'attributes.maven.packaging',
-        group: NX.I18n.get('Coreui_Controller_SearchMaven_Group'),
+        group: NX.I18n.get('SearchMaven_Group'),
         config: {
-          fieldLabel: NX.I18n.get('Coreui_Controller_SearchMaven_Packaging_FieldLabel')
+          fieldLabel: NX.I18n.get('SearchMaven_Packaging_FieldLabel')
         }
       }
     ], me);
@@ -66,8 +66,8 @@ Ext.define('NX.coreui.controller.SearchMaven', {
     search.registerFilter({
       id: 'maven2',
       name: 'Maven',
-      text: NX.I18n.get('Coreui_Controller_SearchMaven_Text'),
-      description: NX.I18n.get('Coreui_Controller_SearchMaven_Description'),
+      text: NX.I18n.get('SearchMaven_Text'),
+      description: NX.I18n.get('SearchMaven_Description'),
       readOnly: true,
       criterias: [
         { id: 'format', value: 'maven2', hidden: true },

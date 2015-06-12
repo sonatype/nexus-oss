@@ -39,10 +39,10 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
       iconNamePrefix: 'repository-',
       dataIndex: 'type'
     },
-    { header: NX.I18n.get('Coreui_View_Repository_RepositoryList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 1 },
-    { header: NX.I18n.get('Coreui_View_Repository_RepositoryList_Type_Header'), dataIndex: 'type' , stateId: 'type' },
-    { header: NX.I18n.get('Coreui_View_Repository_RepositoryList_Format_Header'), dataIndex: 'format', stateId: 'format' },
-    { header: NX.I18n.get('Coreui_View_Repository_RepositoryList_Status_Header'), dataIndex: 'status', stateId: 'status', flex: 1, 
+    { header: NX.I18n.get('Repository_RepositoryList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 1 },
+    { header: NX.I18n.get('Repository_RepositoryList_Type_Header'), dataIndex: 'type' , stateId: 'type' },
+    { header: NX.I18n.get('Repository_RepositoryList_Format_Header'), dataIndex: 'format', stateId: 'format' },
+    { header: NX.I18n.get('Repository_RepositoryList_Status_Header'), dataIndex: 'status', stateId: 'status', flex: 1, 
       xtype: 'templatecolumn', 
       tpl: new Ext.XTemplate(
           '<tpl if="status.online">',
@@ -59,14 +59,14 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     },
     {
       xtype: 'nx-linkcolumn',
-      header: NX.I18n.get('Coreui_View_Repository_RepositoryList_URL_Header'),
+      header: NX.I18n.get('Repository_RepositoryList_URL_Header'),
       dataIndex: 'url',
       flex: 1
     }
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('Coreui_View_Repository_RepositoryList_EmptyText'),
+    emptyText: NX.I18n.get('Repository_RepositoryList_EmptyText'),
     deferEmptyText: false,
     markDirty:false
   },
@@ -78,7 +78,7 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('Coreui_View_Repository_RepositoryList_New_Button'),
+        text: NX.I18n.get('Repository_RepositoryList_New_Button'),
         glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
         action: 'new',
         disabled: true
@@ -87,7 +87,7 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
   }],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Coreui_View_Repository_RepositoryList_Filter_EmptyText') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Repository_RepositoryList_Filter_EmptyText') }
   ]
 
 });

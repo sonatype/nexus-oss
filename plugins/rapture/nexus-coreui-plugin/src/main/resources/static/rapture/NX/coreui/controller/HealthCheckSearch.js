@@ -72,7 +72,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       return;
     }
 
-    info3[NX.I18n.get('Coreui_Controller_HealthCheckSearch_Versions_Popular')] = me.renderMostPopularVersion(model);
+    info3[NX.I18n.get('HealthCheckSearch_Versions_Popular')] = me.renderMostPopularVersion(model);
     searchResultDetails.down('#info3').showInfo(info3);
   },
 
@@ -163,14 +163,14 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     if (!grid['healthCheckColumns']) {
       grid['healthCheckColumns'] = [
         Ext.create('Ext.grid.column.Column', {
-          header: NX.I18n.get('Coreui_Controller_HealthCheckSearch_Age_Header'),
+          header: NX.I18n.get('HealthCheckSearch_Age_Header'),
           dataIndex: 'healthCheckAge',
           groupable: false,
           width: 60,
           renderer: Ext.bind(me.renderAgeColumn, me)
         }),
         Ext.create('Ext.grid.column.Column', {
-          header: NX.I18n.get('Coreui_Controller_HealthCheckSearch_Popularity_Header'),
+          header: NX.I18n.get('HealthCheckSearch_Popularity_Header'),
           dataIndex: 'healthCheckPopularity',
           groupable: false,
           width: 90,
@@ -297,15 +297,15 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       return 'Loading...';
     }
     else if (model.get('healthCheckDisabled')) {
-      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('Coreui_Controller_HealthCheckSearch_Disabled_Tooltip') + '"';
+      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('HealthCheckSearch_Disabled_Tooltip') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('information.png') + '">';
     }
     else if (model.get('healthCheckError')) {
-      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('Coreui_Controller_HealthCheckSearch_Error_Tooltip') + '"';
+      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('HealthCheckSearch_Error_Tooltip') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('exclamation.gif') + '">';
     }
     else if (model.get('healthCheckCapped') || (model && model.get('capped'))) {
-      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('Coreui_Controller_HealthCheckSearch_Quota_Tooltip') + '"';
+      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('HealthCheckSearch_Quota_Tooltip') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('warning.gif') + '">';
     }
     return undefined;
@@ -318,7 +318,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
    * @returns {string} rendered value
    */
   renderNotAvailable: function(metadata) {
-    metadata.tdAttr = 'data-qtip="' + NX.I18n.get('Coreui_Controller_HealthCheckSearch_Unavailable_Tooltip') + '"';
+    metadata.tdAttr = 'data-qtip="' + NX.I18n.get('HealthCheckSearch_Unavailable_Tooltip') + '"';
     return '<span class="fa fa-ban"/>';
   },
 

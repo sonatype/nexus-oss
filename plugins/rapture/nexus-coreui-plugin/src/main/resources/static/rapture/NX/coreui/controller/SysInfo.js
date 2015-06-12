@@ -53,8 +53,8 @@ Ext.define('NX.coreui.controller.SysInfo', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/System Information',
-      text: NX.I18n.get('Coreui_Controller_SysInfo_Title'),
-      description: NX.I18n.get('Coreui_Controller_SysInfo_Description'),
+      text: NX.I18n.get('SysInfo_Title'),
+      description: NX.I18n.get('SysInfo_Description'),
       view: { xtype: 'nx-coreui-support-sysinfo' },
       iconConfig: {
         file: 'globe_place.png',
@@ -96,7 +96,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
       me.logDebug('Refreshing sysinfo');
       //</if>
 
-      me.getContent().getEl().mask(NX.I18n.get('Coreui_Controller_SysInfo_Load_Mask'));
+      me.getContent().getEl().mask(NX.I18n.get('SysInfo_Load_Mask'));
       NX.direct.atlas_SystemInformation.read(function (response) {
         me.getContent().getEl().unmask();
         if (Ext.isObject(response) && response.success) {

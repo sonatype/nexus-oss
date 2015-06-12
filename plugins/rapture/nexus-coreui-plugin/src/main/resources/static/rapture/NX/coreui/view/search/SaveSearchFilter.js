@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.search.SaveSearchFilter', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('Coreui_View_Search_SaveSearchFilter_Title'),
+  title: NX.I18n.get('Search_SaveSearchFilter_Title'),
   defaultFocus: 'name',
 
   settingsForm: {
@@ -34,12 +34,12 @@ Ext.define('NX.coreui.view.search.SaveSearchFilter', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: NX.I18n.get('Coreui_View_Search_SaveSearchFilter_Name_FieldLabel')
+        fieldLabel: NX.I18n.get('Search_SaveSearchFilter_Name_FieldLabel')
       },
       {
         xtype: 'textfield',
         name: 'description',
-        fieldLabel: NX.I18n.get('Coreui_View_Search_SaveSearchFilter_Description_FieldLabel'),
+        fieldLabel: NX.I18n.get('Search_SaveSearchFilter_Description_FieldLabel'),
         allowBlank: true
       }
     ]

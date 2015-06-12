@@ -41,18 +41,18 @@ Ext.define('NX.coreui.view.role.RoleList', {
         return 'role-default';
       }
     },
-    {header: NX.I18n.get('Coreui_View_Role_RoleList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 1},
-    {header: NX.I18n.get('Coreui_View_Role_RoleList_Source_Header'), dataIndex: 'source', stateId: 'source'},
-    {header: NX.I18n.get('Coreui_View_Role_RoleList_Description_Header'), dataIndex: 'description', stateId: 'description', flex: 1}
+    {header: NX.I18n.get('Role_RoleList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 1},
+    {header: NX.I18n.get('Role_RoleList_Source_Header'), dataIndex: 'source', stateId: 'source'},
+    {header: NX.I18n.get('Role_RoleList_Description_Header'), dataIndex: 'description', stateId: 'description', flex: 1}
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('Coreui_View_Role_RoleList_EmptyText'),
+    emptyText: NX.I18n.get('Role_RoleList_EmptyText'),
     deferEmptyText: false
   },
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Coreui_View_Role_RoleList_Filter_EmptyText') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Role_RoleList_Filter_EmptyText') }
   ],
 
   /**
@@ -66,9 +66,9 @@ Ext.define('NX.coreui.view.role.RoleList', {
       dock: 'top',
       cls: 'nx-actions nx-borderless',
       items: [
-        { xtype: 'button', text: NX.I18n.get('Coreui_View_Role_RoleList_New_Button'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
+        { xtype: 'button', text: NX.I18n.get('Role_RoleList_New_Button'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
           menu: [
-            { text: NX.I18n.get('Coreui_View_Role_RoleList_New_NexusRoleItem'), action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
+            { text: NX.I18n.get('Role_RoleList_New_NexusRoleItem'), action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
           ]
         }
       ]

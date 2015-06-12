@@ -42,25 +42,25 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
       }
     },
     {
-      header: NX.I18n.get('Coreui_View_Ssl_SslCertificateList_Name_Header'),
+      header: NX.I18n.get('Ssl_SslCertificateList_Name_Header'),
       dataIndex: 'subjectCommonName',
       stateId: 'subjectCommonName',
       flex: 1
     },
     {
-      header: NX.I18n.get('Coreui_View_Ssl_SslCertificateList_IssuedTo_Header'),
+      header: NX.I18n.get('Ssl_SslCertificateList_IssuedTo_Header'),
       dataIndex: 'subjectOrganization',
       stateId: 'subjectOrganization',
       flex: 1
     },
     {
-      header: NX.I18n.get('Coreui_View_Ssl_SslCertificateList_IssuedBy_Header'),
+      header: NX.I18n.get('Ssl_SslCertificateList_IssuedBy_Header'),
       dataIndex: 'issuerOrganization',
       stateId: 'issuerOrganization',
       flex: 1
     },
     {
-      header: NX.I18n.get('Coreui_View_Ssl_SslCertificateList_Fingerprint_Header'),
+      header: NX.I18n.get('Ssl_SslCertificateList_Fingerprint_Header'),
       dataIndex: 'fingerprint',
       stateId: 'fingerprint',
       flex: 1
@@ -68,12 +68,12 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('Coreui_View_Ssl_SslCertificateList_EmptyText'),
+    emptyText: NX.I18n.get('Ssl_SslCertificateList_EmptyText'),
     deferEmptyText: false
   },
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Coreui_View_Ssl_SslCertificateList_Filter_EmptyText') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Ssl_SslCertificateList_Filter_EmptyText') }
   ],
 
   /**
@@ -89,18 +89,18 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
       items: [
         {
           xtype: 'button',
-          text: NX.I18n.get('Coreui_View_Ssl_SslCertificateList_New_Button'),
+          text: NX.I18n.get('Ssl_SslCertificateList_New_Button'),
           glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
           action: 'new',
           disabled: true,
           menu: [
             {
-              text: NX.I18n.get('Coreui_View_Ssl_SslCertificateList_Load_Button'),
+              text: NX.I18n.get('Ssl_SslCertificateList_Load_Button'),
               action: 'newfromserver',
               iconCls: NX.Icons.cls('sslcertificate-add-by-server', 'x16')
             },
             {
-              text: NX.I18n.get('Coreui_View_Ssl_SslCertificateList_Paste_Button'),
+              text: NX.I18n.get('Ssl_SslCertificateList_Paste_Button'),
               action: 'newfrompem',
               iconCls: NX.Icons.cls('sslcertificate-add-by-pem', 'x16')
             }

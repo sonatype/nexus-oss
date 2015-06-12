@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.component.AssetInfo', {
 
     me.callParent(arguments);
 
-    me.setTitle(NX.I18n.get('Coreui_View_Component_AssetInfo_Info_Title'));
+    me.setTitle(NX.I18n.get('Component_AssetInfo_Info_Title'));
   }
 
 });

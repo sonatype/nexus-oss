@@ -40,21 +40,21 @@ Ext.define('NX.coreui.view.system.AuthenticationSettings', {
     me.items = [
       {
         name: namePrefix + 'uthUsername',
-        fieldLabel: NX.I18n.get('Coreui_View_System_AuthenticationSettings_Username_FieldLabel'),
+        fieldLabel: NX.I18n.get('System_AuthenticationSettings_Username_FieldLabel'),
         allowBlank: false
       },
       {
         xtype: 'nx-password',
         name: namePrefix + 'uthPassword',
-        fieldLabel: NX.I18n.get('Coreui_View_System_AuthenticationSettings_Password_FieldLabel')
+        fieldLabel: NX.I18n.get('System_AuthenticationSettings_Password_FieldLabel')
       },
       {
         name: namePrefix + 'uthNtlmHost',
-        fieldLabel: NX.I18n.get('Coreui_View_System_AuthenticationSettings_WindowsNtlmHostname_FieldLabel')
+        fieldLabel: NX.I18n.get('System_AuthenticationSettings_WindowsNtlmHostname_FieldLabel')
       },
       {
         name: namePrefix + 'uthNtlmDomain',
-        fieldLabel: NX.I18n.get('Coreui_View_System_AuthenticationSettings_WindowsNtlmDomain_FieldLabel')
+        fieldLabel: NX.I18n.get('System_AuthenticationSettings_WindowsNtlmDomain_FieldLabel')
       }
     ];
 

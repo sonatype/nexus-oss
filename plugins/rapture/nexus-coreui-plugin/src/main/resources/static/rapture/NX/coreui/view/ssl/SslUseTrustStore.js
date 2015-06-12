@@ -28,13 +28,13 @@ Ext.define('NX.coreui.view.ssl.SslUseTrustStore', {
     var me = this;
 
     if (!me.fieldLabel && !me.boxLabel) {
-      me.fieldLabel = NX.I18n.get('Coreui_View_Ssl_SslUseTrustStore_BoxLabel');
+      me.fieldLabel = NX.I18n.get('Ssl_SslUseTrustStore_BoxLabel');
     }
     if (me.fieldLabel === true) {
-      me.fieldLabel = NX.I18n.get('Coreui_View_Ssl_SslUseTrustStore_BoxLabel');
+      me.fieldLabel = NX.I18n.get('Ssl_SslUseTrustStore_BoxLabel');
     }
     if (me.boxLabel === true) {
-      me.boxLabel = NX.I18n.get('Coreui_View_Ssl_SslUseTrustStore_BoxLabel');
+      me.boxLabel = NX.I18n.get('Ssl_SslUseTrustStore_BoxLabel');
     }
 
     me.items = {
@@ -49,7 +49,7 @@ Ext.define('NX.coreui.view.ssl.SslUseTrustStore', {
         },
         {
           xtype: 'button',
-          text: NX.I18n.get('Coreui_View_Ssl_SslUseTrustStore_Certificate_Button'),
+          text: NX.I18n.get('Ssl_SslUseTrustStore_Certificate_Button'),
           ui: 'nx-plain',
           action: 'showcertificate',
           glyph: 'xf0a3@FontAwesome' /* fa-certificate */,

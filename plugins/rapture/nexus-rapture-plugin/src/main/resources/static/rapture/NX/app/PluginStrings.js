@@ -28,7 +28,7 @@ Ext.define('NX.app.PluginStrings', {
 
   /*
    * Note: Symbols follow the following naming convention:
-   * <Plugin>_<Class>_<Name>_<Component or Attribute>
+   * <Class>_<Name>_<Component or Attribute>
    */
 
   keys: {
@@ -155,7 +155,7 @@ Ext.define('NX.app.PluginStrings', {
     // Buttons
     View_SettingsForm_Save_Button: 'Save',
     View_SettingsForm_Discard_Button: 'Discard',
-    Coreui_View_Ldap_LdapServerConnectionAdd_Text: 'Next',
+    Ldap_LdapServerConnectionAdd_Text: 'Next',
 
     // Item selector
     Ext_Form_Field_ItemSelector_Empty: 'Filter',

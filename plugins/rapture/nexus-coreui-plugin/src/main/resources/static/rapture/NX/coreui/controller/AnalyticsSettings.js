@@ -38,8 +38,8 @@ Ext.define('NX.coreui.controller.AnalyticsSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Analytics',
-      text: NX.I18n.get('Coreui_Controller_AnalyticsSettings_Text'),
-      description: NX.I18n.get('Coreui_Controller_AnalyticsSettings_Description'),
+      text: NX.I18n.get('AnalyticsSettings_Text'),
+      description: NX.I18n.get('AnalyticsSettings_Description'),
       view: { xtype: 'nx-coreui-analytics-settings' },
       iconConfig: {
         file: 'system_monitor.png',

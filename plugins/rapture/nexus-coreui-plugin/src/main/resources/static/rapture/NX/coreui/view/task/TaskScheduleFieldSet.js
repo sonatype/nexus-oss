@@ -35,17 +35,17 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
       xtype: 'combo',
       name: 'schedule',
       itemId: 'schedule',
-      fieldLabel: NX.I18n.get('Coreui_View_Task_TaskScheduleFieldSet_Recurrence_FieldLabel'),
-      emptyText: NX.I18n.get('Coreui_View_Task_TaskScheduleFieldSet_Recurrence_EmptyText'),
+      fieldLabel: NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_FieldLabel'),
+      emptyText: NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_EmptyText'),
       editable: false,
       store: [
-        ['manual', NX.I18n.get('Coreui_View_Task_TaskScheduleFieldSet_Recurrence_ManualItem')],
-        ['once', NX.I18n.get('Coreui_View_Task_TaskScheduleFieldSet_Recurrence_OnceItem')],
-        ['hourly', NX.I18n.get('Coreui_View_Task_TaskScheduleFieldSet_Recurrence_HourlyItem')],
-        ['daily', NX.I18n.get('Coreui_View_Task_TaskScheduleFieldSet_Recurrence_DailyItem')],
-        ['weekly', NX.I18n.get('Coreui_View_Task_TaskScheduleFieldSet_Recurrence_WeeklyItem')],
-        ['monthly', NX.I18n.get('Coreui_View_Task_TaskScheduleFieldSet_Recurrence_MonthlyItem')],
-        ['advanced', NX.I18n.get('Coreui_View_Task_TaskScheduleFieldSet_Recurrence_AdvancedItem')]
+        ['manual', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_ManualItem')],
+        ['once', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_OnceItem')],
+        ['hourly', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_HourlyItem')],
+        ['daily', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_DailyItem')],
+        ['weekly', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_WeeklyItem')],
+        ['monthly', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_MonthlyItem')],
+        ['advanced', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_AdvancedItem')]
       ],
       queryMode: 'local',
       listeners: {

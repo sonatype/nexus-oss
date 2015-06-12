@@ -56,8 +56,8 @@ Ext.define('NX.coreui.controller.Blobstores', {
   features: {
     mode: 'admin',
     path: '/Repository/Blobstores',
-    text: NX.I18n.get('Coreui_Controller_Blobstores_Text'),
-    description: NX.I18n.get('Coreui_Controller_Blobstores_Description'),
+    text: NX.I18n.get('Blobstores_Text'),
+    description: NX.I18n.get('Blobstores_Description'),
     view: { xtype: 'nx-coreui-blobstore-feature' },
     iconConfig: {
       file: 'drive_network.png',
@@ -123,7 +123,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
         feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Coreui_Controller_Blobstores_Create_Title'));
+    feature.setItemName(1, NX.I18n.get('Blobstores_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-blobstore-add'));
   },
 

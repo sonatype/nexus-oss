@@ -37,8 +37,8 @@ Ext.define('NX.coreui.controller.HttpSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/System/HTTP',
-      text: NX.I18n.get('Coreui_Controller_HttpSettings_Text'),
-      description: NX.I18n.get('Coreui_Controller_HttpSettings_Description'),
+      text: NX.I18n.get('HttpSettings_Text'),
+      description: NX.I18n.get('HttpSettings_Description'),
       view: { xtype: 'nx-coreui-system-http-settings' },
       iconConfig: {
         file: 'lorry.png',

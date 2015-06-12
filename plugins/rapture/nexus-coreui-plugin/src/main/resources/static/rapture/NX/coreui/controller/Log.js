@@ -51,8 +51,8 @@ Ext.define('NX.coreui.controller.Log', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Logging/Log Viewer',
-      text: NX.I18n.get('Coreui_Controller_Log_Text'),
-      description: NX.I18n.get('Coreui_Controller_Log_Description'),
+      text: NX.I18n.get('Log_Text'),
+      description: NX.I18n.get('Log_Description'),
       view: { xtype: 'nx-coreui-log-feature' },
       iconConfig: {
         file: 'script_text.png',
@@ -112,7 +112,7 @@ Ext.define('NX.coreui.controller.Log', {
         values = form.getValues();
 
     win.hide();
-    me.getContent().getEl().mask(NX.I18n.get('Coreui_Controller_Log_LogMark_Mask'));
+    me.getContent().getEl().mask(NX.I18n.get('Log_LogMark_Mask'));
     NX.direct.logging_Log.mark(values, function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
@@ -211,7 +211,7 @@ Ext.define('NX.coreui.controller.Log', {
     if (logPanel) {
       size = logPanel.down('#refreshSize').getValue();
 
-      me.getContent().getEl().mask(NX.I18n.get('Coreui_Controller_Log_Loading_Mask'));
+      me.getContent().getEl().mask(NX.I18n.get('Log_Loading_Mask'));
 
       //<if debug>
       me.logDebug('Retrieving last ' + size + 'kb from log');
@@ -234,7 +234,7 @@ Ext.define('NX.coreui.controller.Log', {
         },
         failure: function (response) {
           me.getContent().getEl().unmask();
-          me.showLog(NX.I18n.format('Coreui_Controller_Log_Load_Failure', response.statusText));
+          me.showLog(NX.I18n.format('Log_Load_Failure', response.statusText));
         }
       });
     }

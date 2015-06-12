@@ -28,14 +28,14 @@ Ext.define('NX.coreui.view.system.HttpRequestSettings', {
     {
       xtype: 'textfield',
       name: 'userAgentSuffix',
-      fieldLabel: NX.I18n.get('Coreui_View_System_HttpRequestSettings_UserAgentCustomization_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_System_HttpRequestSettings_UserAgentCustomization_HelpText')
+      fieldLabel: NX.I18n.get('System_HttpRequestSettings_UserAgentCustomization_FieldLabel'),
+      helpText: NX.I18n.get('System_HttpRequestSettings_UserAgentCustomization_HelpText')
     },
     {
       xtype: 'numberfield',
       name: 'timeout',
-      fieldLabel: NX.I18n.get('Coreui_View_System_HttpRequestSettings_Timeout_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_System_HttpRequestSettings_Timeout_HelpText'),
+      fieldLabel: NX.I18n.get('System_HttpRequestSettings_Timeout_FieldLabel'),
+      helpText: NX.I18n.get('System_HttpRequestSettings_Timeout_HelpText'),
       allowDecimals: false,
       allowExponential: false,
       minValue: 1,
@@ -45,8 +45,8 @@ Ext.define('NX.coreui.view.system.HttpRequestSettings', {
     {
       xtype: 'numberfield',
       name: 'retries',
-      fieldLabel: NX.I18n.get('Coreui_View_System_HttpRequestSettings_Attempts_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_System_HttpRequestSettings_Attempts_HelpText'),
+      fieldLabel: NX.I18n.get('System_HttpRequestSettings_Attempts_FieldLabel'),
+      helpText: NX.I18n.get('System_HttpRequestSettings_Attempts_HelpText'),
       allowDecimals: false,
       allowExponential: false,
       minValue: 0,

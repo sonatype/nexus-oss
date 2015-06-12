@@ -39,8 +39,8 @@ Ext.define('NX.coreui.controller.SupportRequest', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Support Request',
-      text: NX.I18n.get('Coreui_Controller_SupportRequest_Text'),
-      description: NX.I18n.get('Coreui_Controller_SupportRequest_Description'),
+      text: NX.I18n.get('SupportRequest_Text'),
+      description: NX.I18n.get('SupportRequest_Description'),
       view: { xtype: 'nx-coreui-support-supportrequest' },
       iconConfig: {
         file: 'premium_support.png',

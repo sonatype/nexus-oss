@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
       {
         xtype: 'treepanel',
         itemId: 'privilegeTree',
-        title: NX.I18n.get('Coreui_View_Privilege_PrivilegeTrace_Title'),
+        title: NX.I18n.get('Privilege_PrivilegeTrace_Title'),
         ui: 'nx-treepanel',
         rootVisible: false,
         lines: false,
@@ -78,13 +78,13 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
       {
         xtype: 'treepanel',
         itemId: 'roleTree',
-        title: NX.I18n.get('Coreui_View_Privilege_PrivilegeTrace_RoleContainment_Title'),
+        title: NX.I18n.get('Privilege_PrivilegeTrace_RoleContainment_Title'),
         ui: 'nx-treepanel',
         tools: [
-          { type: 'collapse', tooltip: NX.I18n.get('Coreui_View_Privilege_PrivilegeTrace_TraceCollapse_Tooltip'), callback: function(panel) {
+          { type: 'collapse', tooltip: NX.I18n.get('Privilege_PrivilegeTrace_TraceCollapse_Tooltip'), callback: function(panel) {
             panel.collapseAll();
           }},
-          { type: 'expand', tooltip: NX.I18n.get('Coreui_View_Privilege_PrivilegeTrace_TraceExpand_Tooltip'), callback: function(panel) {
+          { type: 'expand', tooltip: NX.I18n.get('Privilege_PrivilegeTrace_TraceExpand_Tooltip'), callback: function(panel) {
             panel.expandAll();
           }}
         ],

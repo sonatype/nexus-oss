@@ -32,8 +32,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
   items: [
     {
       xtype: 'combo',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_Template_FieldLabel'),
-      emptyText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_Template_EmptyText'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_Template_FieldLabel'),
+      emptyText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_Template_EmptyText'),
       editable: false,
       store: 'LdapSchemaTemplate',
       displayField: 'name',
@@ -51,50 +51,50 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
     //user
     {
       name: 'userBaseDn',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_BaseDN_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_BaseDN_HelpText'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_BaseDN_FieldLabel'),
+      helpText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_BaseDN_HelpText'),
       allowBlank: true
     },
     {
       xtype: 'checkbox',
       name: 'userSubtree',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_UserSubtree_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_UserSubtree_HelpText')
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_UserSubtree_FieldLabel'),
+      helpText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_UserSubtree_HelpText')
     },
     {
       name: 'userObjectClass',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_ObjectClass_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_ObjectClass_HelpText')
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_ObjectClass_FieldLabel'),
+      helpText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_ObjectClass_HelpText')
     },
     {
       name: 'userLdapFilter',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_UserFilter_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_UserFilter_HelpText'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_UserFilter_FieldLabel'),
+      helpText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_UserFilter_HelpText'),
       allowBlank: true
     },
     {
       name: 'userIdAttribute',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_UserID_FieldLabel')
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_UserID_FieldLabel')
     },
     {
       name: 'userRealNameAttribute',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_RealName_FieldLabel')
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_RealName_FieldLabel')
     },
     {
       name: 'userEmailAddressAttribute',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_Email_FieldLabel')
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_Email_FieldLabel')
     },
     {
       name: 'userPasswordAttribute',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_Password_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_Password_HelpText'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_Password_FieldLabel'),
+      helpText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_Password_HelpText'),
       allowBlank: true
     },
     // group
     {
       xtype: 'checkbox',
       name: 'ldapGroupsAsRoles',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupMap_FieldLabel'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupMap_FieldLabel'),
       value: true,
       listeners: {
         change: function (checkbox, newValue) {
@@ -109,12 +109,12 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
       xtype: 'combo',
       name: 'groupType',
       itemId: 'groupType',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupType_FieldLabel'),
-      emptyText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupType_EmptyText'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupType_FieldLabel'),
+      emptyText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupType_EmptyText'),
       editable: false,
       store: [
-        ['dynamic', NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupType_DynamicItem')],
-        ['static', NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupType_StaticItem')]
+        ['dynamic', NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupType_DynamicItem')],
+        ['static', NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupType_StaticItem')]
       ],
       queryMode: 'local',
       listeners: {
@@ -126,45 +126,45 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
     },
     {
       name: 'groupBaseDn',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupBaseDN_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupBaseDN_HelpText'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupBaseDN_FieldLabel'),
+      helpText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupBaseDN_HelpText'),
       allowBlank: true,
       groupType: ['static']
     },
     {
       xtype: 'checkbox',
       name: 'groupSubtree',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupSubtree_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupSubtree_HelpText'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupSubtree_FieldLabel'),
+      helpText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupSubtree_HelpText'),
       groupType: ['static']
     },
     {
       name: 'groupObjectClass',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupObject_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupObject_HelpText'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupObject_FieldLabel'),
+      helpText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupObject_HelpText'),
       groupType: ['static']
     },
     {
       name: 'groupIdAttribute',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupID_FieldLabel'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupID_FieldLabel'),
       groupType: ['static']
     },
     {
       name: 'groupMemberAttribute',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupMember_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupMember_HelpText'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupMember_FieldLabel'),
+      helpText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupMember_HelpText'),
       groupType: ['static']
     },
     {
       name: 'groupMemberFormat',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupMemberFormat_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupMemberFormat_HelpText'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupMemberFormat_FieldLabel'),
+      helpText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupMemberFormat_HelpText'),
       groupType: ['static']
     },
     {
       name: 'userMemberOfAttribute',
-      fieldLabel: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupMemberOf_FieldLabel'),
-      helpText: NX.I18n.get('Coreui_View_Ldap_LdapServerUserAndGroupFieldSet_GroupMemberOf_HelpText'),
+      fieldLabel: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupMemberOf_FieldLabel'),
+      helpText: NX.I18n.get('Ldap_LdapServerUserAndGroupFieldSet_GroupMemberOf_HelpText'),
       groupType: ['dynamic']
     }
   ],

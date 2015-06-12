@@ -43,19 +43,19 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
 
     // NOTE: Not including ID here as for user-created privileges these are random strings
 
-    { header: NX.I18n.get('Coreui_View_Privilege_PrivilegeList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 2 },
+    { header: NX.I18n.get('Privilege_PrivilegeList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 2 },
 
     {
-      header: NX.I18n.get('Coreui_View_Privilege_PrivilegeList_Description_Header'),
+      header: NX.I18n.get('Privilege_PrivilegeList_Description_Header'),
       dataIndex: 'description',
       stateId: 'description',
       flex: 4
     },
 
-    { header: NX.I18n.get('Coreui_View_Privilege_PrivilegeList_Type_Header'), dataIndex: 'type', stateId: 'type', flex: 1 },
+    { header: NX.I18n.get('Privilege_PrivilegeList_Type_Header'), dataIndex: 'type', stateId: 'type', flex: 1 },
 
     {
-      header: NX.I18n.get('Coreui_View_Privilege_PrivilegeList_Permission_Header'),
+      header: NX.I18n.get('Privilege_PrivilegeList_Permission_Header'),
       dataIndex: 'permission',
       stateId: 'permission',
       flex: 2
@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('Coreui_View_Privilege_PrivilegeList_EmptyText'),
+    emptyText: NX.I18n.get('Privilege_PrivilegeList_EmptyText'),
     deferEmptyText: false
   },
 
@@ -74,6 +74,6 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
   }],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Coreui_View_Privilege_PrivilegeList_Filter_EmptyText') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Privilege_PrivilegeList_Filter_EmptyText') }
   ]
 });

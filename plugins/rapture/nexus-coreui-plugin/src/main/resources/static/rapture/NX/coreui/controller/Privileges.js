@@ -70,8 +70,8 @@ Ext.define('NX.coreui.controller.Privileges', {
   features: {
     mode: 'admin',
     path: '/Security/Privileges',
-    text: NX.I18n.get('Coreui_Controller_Privileges_Text'),
-    description: NX.I18n.get('Coreui_Controller_Privileges_Description'),
+    text: NX.I18n.get('Privileges_Text'),
+    description: NX.I18n.get('Privileges_Description'),
     view: {xtype: 'nx-coreui-privilege-feature'},
     iconConfig: {
       file: 'medal_gold_green.png',
@@ -99,14 +99,14 @@ Ext.define('NX.coreui.controller.Privileges', {
     if (Ext.isDefined(model)) {
       me.getFeature().setItemClass(1, NX.Icons.cls('privilege-' + model.get('type'), 'x16'));
 
-      info[NX.I18n.get('Coreui_Controller_Privileges_Summary_ID')] = model.getId();
-      info[NX.I18n.get('Coreui_Controller_Privileges_Summary_Type')] = model.get('type');
-      info[NX.I18n.get('Coreui_Controller_Privileges_Summary_Name')] = model.get('name');
-      info[NX.I18n.get('Coreui_Controller_Privileges_Summary_Description')] = model.get('description');
-      info[NX.I18n.get('Coreui_Controller_Privileges_Summary_Permission')] = model.get('permission');
+      info[NX.I18n.get('Privileges_Summary_ID')] = model.getId();
+      info[NX.I18n.get('Privileges_Summary_Type')] = model.get('type');
+      info[NX.I18n.get('Privileges_Summary_Name')] = model.get('name');
+      info[NX.I18n.get('Privileges_Summary_Description')] = model.get('description');
+      info[NX.I18n.get('Privileges_Summary_Permission')] = model.get('permission');
 
       Ext.iterate(model.get('properties'), function (key, value) {
-        info[NX.I18n.format('Coreui_Controller_Privileges_Summary_Property', key)] = value;
+        info[NX.I18n.format('Privileges_Summary_Property', key)] = value;
       });
 
       me.getInfo().showInfo(info);
@@ -148,7 +148,7 @@ Ext.define('NX.coreui.controller.Privileges', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: NX.I18n.format('Coreui_Controller_Privileges_Delete_Success', model.get('name')),
+          text: NX.I18n.format('Privileges_Delete_Success', model.get('name')),
           type: 'success'
         });
       }

@@ -36,13 +36,13 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
     me.settingsForm = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: NX.I18n.get('Coreui_View_System_HttpSettings_Update_Success'),
+        settingsFormSuccessMessage: NX.I18n.get('System_HttpSettings_Update_Success'),
         api: {
           load: 'NX.direct.coreui_HttpSettings.read',
           submit: 'NX.direct.coreui_HttpSettings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings:update'),
-        editableMarker: NX.I18n.get('Coreui_View_System_HttpSettings_Update_Error'),
+        editableMarker: NX.I18n.get('System_HttpSettings_Update_Error'),
         items: [
           // request settings
           {
@@ -50,21 +50,21 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
           },
           {
             xtype: 'nx-optionalfieldset',
-            title: NX.I18n.get('Coreui_View_System_HttpSettings_Proxy_Title'),
+            title: NX.I18n.get('System_HttpSettings_Proxy_Title'),
             checkboxToggle: true,
             checkboxName: 'httpEnabled',
             items: [
               {
                 xtype: 'textfield',
                 name: 'httpHost',
-                fieldLabel: NX.I18n.get('Coreui_View_System_HttpSettings_ProxyHost_FieldLabel'),
-                helpText: NX.I18n.get('Coreui_View_System_HttpSettings_ProxyHost_HelpText'),
+                fieldLabel: NX.I18n.get('System_HttpSettings_ProxyHost_FieldLabel'),
+                helpText: NX.I18n.get('System_HttpSettings_ProxyHost_HelpText'),
                 allowBlank: false
               },
               {
                 xtype: 'numberfield',
                 name: 'httpPort',
-                fieldLabel: NX.I18n.get('Coreui_View_System_HttpSettings_ProxyPort_FieldLabel'),
+                fieldLabel: NX.I18n.get('System_HttpSettings_ProxyPort_FieldLabel'),
                 minValue: 1,
                 maxValue: 65535,
                 allowDecimals: false,
@@ -73,7 +73,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
               },
               {
                 xtype: 'nx-optionalfieldset',
-                title: NX.I18n.get('Coreui_View_System_HttpSettings_Authentication_Title'),
+                title: NX.I18n.get('System_HttpSettings_Authentication_Title'),
                 checkboxToggle: true,
                 checkboxName: 'httpAuthEnabled',
                 collapsed: true,
@@ -87,7 +87,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
 
           {
             xtype: 'nx-optionalfieldset',
-            title: NX.I18n.get('Coreui_View_System_HttpSettings_HttpsProxy_Title'),
+            title: NX.I18n.get('System_HttpSettings_HttpsProxy_Title'),
             itemId: 'httpsProxy',
             checkboxToggle: true,
             checkboxName: 'httpsEnabled',
@@ -96,14 +96,14 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
               {
                 xtype: 'textfield',
                 name: 'httpsHost',
-                fieldLabel: NX.I18n.get('Coreui_View_System_HttpSettings_HttpsProxyHost_FieldLabel'),
-                helpText: NX.I18n.get('Coreui_View_System_HttpSettings_HttpsProxyHost_HelpText'),
+                fieldLabel: NX.I18n.get('System_HttpSettings_HttpsProxyHost_FieldLabel'),
+                helpText: NX.I18n.get('System_HttpSettings_HttpsProxyHost_HelpText'),
                 allowBlank: false
               },
               {
                 xtype: 'numberfield',
                 name: 'httpsPort',
-                fieldLabel: NX.I18n.get('Coreui_View_System_HttpSettings_HttpsProxyPort_FieldLabel'),
+                fieldLabel: NX.I18n.get('System_HttpSettings_HttpsProxyPort_FieldLabel'),
                 minValue: 1,
                 maxValue: 65535,
                 allowDecimals: false,
@@ -112,7 +112,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
               },
               {
                 xtype: 'nx-optionalfieldset',
-                title: NX.I18n.get('Coreui_View_System_HttpSettings_HttpsProxyAuthentication_Title'),
+                title: NX.I18n.get('System_HttpSettings_HttpsProxyAuthentication_Title'),
                 checkboxToggle: true,
                 checkboxName: 'httpsAuthEnabled',
                 collapsed: true,
@@ -127,8 +127,8 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
             xtype: 'nx-valueset',
             name: 'nonProxyHosts',
             itemId: 'nonProxyHosts',
-            fieldLabel: NX.I18n.get('Coreui_View_System_HttpSettings_ExcludeHosts_FieldLabel'),
-            helpText: NX.I18n.get('Coreui_View_System_HttpSettings_ExcludeHosts_HelpText'),
+            fieldLabel: NX.I18n.get('System_HttpSettings_ExcludeHosts_FieldLabel'),
+            helpText: NX.I18n.get('System_HttpSettings_ExcludeHosts_HelpText'),
             sorted: true,
             allowBlank: true
           }
