@@ -30,7 +30,6 @@ import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.maven.MavenFacet;
@@ -233,7 +232,7 @@ public class MavenFacetImpl
 
   @Override
   public void put(final MavenPath path, final Payload payload)
-      throws IOException, InvalidContentException
+      throws IOException
   {
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
       storageFacet.perform(new Operation<Void>()
@@ -265,7 +264,7 @@ public class MavenFacetImpl
 
   @Override
   public void put(final StorageTx tx, final MavenPath path, final Payload payload)
-      throws IOException, InvalidContentException
+      throws IOException
   {
     put(tx, path, payload, payload.openInputStream());
   }
@@ -274,7 +273,7 @@ public class MavenFacetImpl
                    final MavenPath path,
                    final Payload payload,
                    final InputStream inputStream)
-      throws IOException, InvalidContentException
+      throws IOException
   {
     log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
     final AssetBlob assetBlob = tx.createBlob(
@@ -300,7 +299,7 @@ public class MavenFacetImpl
                            final MavenPath path,
                            final AssetBlob assetBlob,
                            @Nullable final AttributesMap contentAttributes)
-      throws IOException, InvalidContentException
+      throws IOException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
     Component component = findComponent(tx, tx.getBucket(), path);
@@ -346,7 +345,7 @@ public class MavenFacetImpl
                        final MavenPath path,
                        final AssetBlob assetBlob,
                        @Nullable final AttributesMap contentAttributes)
-      throws IOException, InvalidContentException
+      throws IOException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
@@ -475,7 +474,6 @@ public class MavenFacetImpl
    * Returns component key based on passed in {@link Coordinates} G:A:V values.
    */
   private String getComponentKey(final Coordinates coordinates) {
-    // TODO: maybe sha1() the resulting string?
     return coordinates.getGroupId()
         + ":" + coordinates.getArtifactId()
         + ":" + coordinates.getVersion();
@@ -485,7 +483,6 @@ public class MavenFacetImpl
    * Returns asset key based on passed in {@link MavenPath} path value.
    */
   private String getAssetKey(final MavenPath mavenPath) {
-    // TODO: maybe sha1() the resulting string?
     return mavenPath.getPath();
   }
 
