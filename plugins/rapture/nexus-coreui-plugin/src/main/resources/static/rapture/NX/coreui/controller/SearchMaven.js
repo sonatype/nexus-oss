@@ -48,6 +48,14 @@ Ext.define('NX.coreui.controller.SearchMaven', {
         }
       },
       {
+        id: 'attributes.maven2.version',
+        group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
+        config: {
+          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_VERSION'),
+          width: 250
+        }
+      },
+      {
         id: 'attributes.maven2.classifier',
         group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
         config: {
