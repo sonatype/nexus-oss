@@ -35,7 +35,7 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'ldap-all',
-                description: 'All permissions for Ldap',
+                description: 'All permissions for LDAP',
                 type: 'application',
                 properties: [
                     domain : 'ldap',
@@ -44,7 +44,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ldap-create',
-                description: 'Create permission for Ldap',
+                description: 'Create permission for LDAP',
                 type: 'application',
                 properties: [
                     domain : 'ldap',
@@ -53,7 +53,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ldap-read',
-                description: 'Read permission for Ldap',
+                description: 'Read permission for LDAP',
                 type: 'application',
                 properties: [
                     domain : 'ldap',
@@ -62,7 +62,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ldap-update',
-                description: 'Update permission for Ldap',
+                description: 'Update permission for LDAP',
                 type: 'application',
                 properties: [
                     domain : 'ldap',
@@ -71,7 +71,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ldap-delete',
-                description: 'Delete permission for Ldap',
+                description: 'Delete permission for LDAP',
                 type: 'application',
                 properties: [
                     domain : 'ldap',
