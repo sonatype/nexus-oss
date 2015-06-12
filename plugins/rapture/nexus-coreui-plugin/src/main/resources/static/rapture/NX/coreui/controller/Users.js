@@ -29,9 +29,9 @@ Ext.define('NX.coreui.controller.Users', {
     'NX.Dialogs',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-user-list',
-
+  masters: [
+    'nx-coreui-user-list'
+  ],
   models: [
     'User'
   ],

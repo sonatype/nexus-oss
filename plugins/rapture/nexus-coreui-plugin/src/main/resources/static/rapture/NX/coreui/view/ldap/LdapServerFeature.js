@@ -26,7 +26,9 @@ Ext.define('NX.coreui.view.ldap.LdapServerFeature', {
 
   iconName: 'ldapserver-default',
 
-  masters: { xtype: 'nx-coreui-ldapserver-list' },
+  masters: [
+    { xtype: 'nx-coreui-ldapserver-list' }
+  ],
 
   tabs: [
     { xtype: 'nx-coreui-ldapserver-connection', title: NX.I18n.get('Ldap_LdapServerFeature_Connection_Title'), weight: 10 },

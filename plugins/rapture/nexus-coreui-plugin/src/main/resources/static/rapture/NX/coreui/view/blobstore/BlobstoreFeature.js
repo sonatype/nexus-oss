@@ -26,7 +26,9 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreFeature', {
 
   iconName: 'blobstore-default',
 
-  masters: { xtype: 'nx-coreui-blobstore-list' },
+  masters: [
+    { xtype: 'nx-coreui-blobstore-list' }
+  ],
 
   tabs: { xtype: 'nx-coreui-blobstore-settings' },
 

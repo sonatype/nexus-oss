@@ -25,9 +25,11 @@ Ext.define('NX.coreui.controller.Browse', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: ['nx-coreui-browse-repository-list', 'nx-coreui-browse-result-list', 'nx-coreui-component-asset-list'],
-
+  masters: [
+    'nx-coreui-browse-repository-list',
+    'nx-coreui-browse-result-list',
+    'nx-coreui-component-asset-list'
+  ],
   stores: [
     'Asset',
     'Component'

@@ -25,9 +25,9 @@ Ext.define('NX.coreui.controller.Blobstores', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-blobstore-list',
-
+  masters: [
+    'nx-coreui-blobstore-list'
+  ],
   models: [
     'Blobstore'
   ],

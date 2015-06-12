@@ -28,9 +28,9 @@ Ext.define('NX.coreui.controller.Tasks', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-task-list',
-
+  masters: [
+    'nx-coreui-task-list'
+  ],
   stores: [
     'Task',
     'TaskType'

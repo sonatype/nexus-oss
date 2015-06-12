@@ -26,8 +26,9 @@ Ext.define('NX.coreui.controller.Repositories', {
     'NX.I18n'
   ],
 
-  masters: 'nx-coreui-repository-list',
-
+  masters: [
+    'nx-coreui-repository-list'
+  ],
   models: [
     'NX.coreui.store.Repository'
   ],

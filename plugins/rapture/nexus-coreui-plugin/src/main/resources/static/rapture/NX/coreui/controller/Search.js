@@ -27,9 +27,10 @@ Ext.define('NX.coreui.controller.Search', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: ['nx-coreui-search-result-list', 'nx-coreui-component-asset-list'],
-
+  masters: [
+    'nx-coreui-search-result-list',
+    'nx-coreui-component-asset-list'
+  ],
   stores: [
     'Asset',
     'SearchFilter',

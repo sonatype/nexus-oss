@@ -25,9 +25,9 @@ Ext.define('NX.coreui.controller.Roles', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-role-list',
-
+  masters: [
+    'nx-coreui-role-list'
+  ],
   models: [
     'Role'
   ],

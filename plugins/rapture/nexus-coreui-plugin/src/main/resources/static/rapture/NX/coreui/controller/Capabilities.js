@@ -29,9 +29,9 @@ Ext.define('NX.coreui.controller.Capabilities', {
     'NX.I18n',
     'NX.ext.grid.column.Renderers'
   ],
-
-  masters: 'nx-coreui-capability-list',
-
+  masters: [
+    'nx-coreui-capability-list'
+  ],
   stores: [
     'Capability',
     'CapabilityType'

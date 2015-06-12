@@ -26,9 +26,9 @@ Ext.define('NX.coreui.controller.Bundles', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-system-bundlelist',
-
+  masters: [
+    'nx-coreui-system-bundlelist'
+  ],
   stores: [
     'Bundle'
   ],

@@ -27,9 +27,9 @@ Ext.define('NX.coreui.controller.Privileges', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-privilege-list',
-
+  masters: [
+    'nx-coreui-privilege-list'
+  ],
   stores: [
     'Privilege'
   ],

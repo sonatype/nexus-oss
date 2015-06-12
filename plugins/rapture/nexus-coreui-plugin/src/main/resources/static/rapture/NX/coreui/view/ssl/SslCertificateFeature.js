@@ -26,7 +26,9 @@ Ext.define('NX.coreui.view.ssl.SslCertificateFeature', {
 
   iconName: 'sslcertificate-default',
 
-  masters: { xtype: 'nx-coreui-sslcertificate-list' },
+  masters: [
+    { xtype: 'nx-coreui-sslcertificate-list' }
+  ],
 
   tabs: { xtype: 'nx-coreui-sslcertificate-details' },
 

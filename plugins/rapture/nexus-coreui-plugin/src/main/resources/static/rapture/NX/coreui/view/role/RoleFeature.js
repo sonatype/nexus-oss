@@ -26,7 +26,9 @@ Ext.define('NX.coreui.view.role.RoleFeature', {
 
   iconName: 'role-default',
 
-  masters: { xtype: 'nx-coreui-role-list' },
+  masters: [
+    { xtype: 'nx-coreui-role-list' }
+  ],
 
   tabs: [
     { xtype: 'nx-coreui-role-settings', title: NX.I18n.get('Role_RoleFeature_Settings_Title'), weight: 10 }

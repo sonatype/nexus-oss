@@ -78,8 +78,6 @@ Ext.define('NX.controller.Drilldown', {
     // Normalize lists into an array
     if (!me.masters) {
       me.masters = [];
-    } else if (!Ext.isArray(me.masters)) {
-      me.masters = [me.masters];
     }
 
     // Add event handlers to each list
@@ -90,36 +88,30 @@ Ext.define('NX.controller.Drilldown', {
       };
     }
 
-    // If there’s at least one list, add event handlers to buttons and tabs
-    if (me.masters.length > 0) {
+    // New button
+    componentListener['nx-drilldown button[action=new]'] = {
+      afterrender: me.bindNewButton
+    };
 
-      // New button
-      componentListener[me.masters[0] + ' ^ nx-drilldown button[action=new]'] = {
-        afterrender: me.bindNewButton
-      };
+    // Delete button
+    componentListener[me.masters[0] + ' ^ nx-drilldown button[action=delete]'] = {
+      afterrender: me.bindDeleteButton,
+      click: me.onDelete
+    };
 
-      // Detail tabs
-      componentListener[me.masters[0] + ' ^ nx-drilldown nx-drilldown-details > tabpanel'] = {
-        tabchange: function() {
-          // Get the model for the last master
-          var segments = NX.Bookmarks.getBookmark().getSegments().slice(1);
-          var lists = me.getFeature().query('nx-drilldown-master');
-          var modelId = segments[lists.length - 1];
-          var model = lists[lists.length - 1].getStore().getById(modelId);
+    // Detail tabs
+    componentListener['nx-drilldown nx-drilldown-details > tabpanel'] = {
+      tabchange: function() {
+        // Get the model for the last master
+        var segments = NX.Bookmarks.getBookmark().getSegments().slice(1);
+        var lists = me.getFeature().query('nx-drilldown-master');
+        var modelId = segments[lists.length - 1];
+        var model = lists[lists.length - 1].getStore().getById(modelId);
 
-          // Bookmark it. The tab (if selected) will be added automatically
-          me.bookmark(model);
-        }
-      };
-
-      // Delete button
-      if (me.deleteModel) {
-        componentListener[me.masters[0] + ' ^ nx-drilldown button[action=delete]'] = {
-          afterrender: me.bindDeleteButton,
-          click: me.onDelete
-        };
+        // Bookmark it. The tab (if selected) will be added automatically
+        me.bookmark(model);
       }
-    }
+    };
 
     me.listen({
       component: componentListener,
