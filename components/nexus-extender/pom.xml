@@ -49,8 +49,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-validation</artifactId>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-inject</artifactId>
     </dependency>
 
     <dependency>
@@ -84,8 +84,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.goodies</groupId>
-      <artifactId>goodies-inject</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-validation</artifactId>
     </dependency>
 
     <!--
