@@ -171,32 +171,6 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
-   * @public
-   * @param modelId The model to bookmark and/or navigate to
-   * @param navigate Navigate to the model, or just select it?
-   */
-  loadStoreAndSelect: function (modelId, navigate) {
-    var me = this,
-      lists = me.getLists(),
-      model;
-
-    me.loadStore(function(records, operations, success) {
-      // Find the model belonging to this id, and bookmark it
-      for (var i = 0; i < lists.length; ++i) {
-        model = lists[i].getStore().getById(modelId);
-        if (model) {
-          if (navigate) {
-            me.reselect();
-          } else {
-            me.onModelChanged(model);
-          }
-          break;
-        }
-      }
-    });
-  },
-
-  /**
    * @private
    * Once all lists have loaded, navigate to the current bookmark
    */

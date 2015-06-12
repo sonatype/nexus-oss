@@ -299,7 +299,6 @@ Ext.define('NX.coreui.controller.LdapServers', {
               me.getDescription(me.getLdapServerModel().create(response.data))),
             type: 'success'
           });
-          me.loadStoreAndSelect(response.data.id, true);
         }
       }
     });

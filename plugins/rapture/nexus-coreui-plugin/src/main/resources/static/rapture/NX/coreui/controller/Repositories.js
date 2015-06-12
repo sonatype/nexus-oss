@@ -230,12 +230,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     var me = this,
         win = form.up('nx-coreui-repository-add');
 
-    if (win) {
-      me.loadStoreAndSelect(action.result.data.id, true);
-    }
-    else {
-      me.loadStore(Ext.emptyFn);
-    }
+    me.loadStore(Ext.emptyFn);
   },
 
   /**

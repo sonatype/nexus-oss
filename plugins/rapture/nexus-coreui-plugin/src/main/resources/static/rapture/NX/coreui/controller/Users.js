@@ -410,11 +410,7 @@ Ext.define('NX.coreui.controller.Users', {
     var me = this,
         win = form.up('nx-coreui-user-add');
 
-    if (win) {
-      me.loadStoreAndSelect(action.result.data.userId, true);
-    } else {
-      me.loadStore(Ext.emptyFn);
-    }
+    me.loadStore(Ext.emptyFn);
   },
 
   /**

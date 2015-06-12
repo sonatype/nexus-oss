@@ -146,12 +146,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
     var me = this,
         win = form.up('nx-coreui-blobstore-add');
 
-    if (win) {
-      me.loadStoreAndSelect(action.result.data.id, true);
-    }
-    else {
-      me.loadStore(Ext.emptyFn);
-    }
+    me.loadStore(Ext.emptyFn);
   },
 
   /**

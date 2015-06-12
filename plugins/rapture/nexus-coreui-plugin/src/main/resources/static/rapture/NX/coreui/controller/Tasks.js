@@ -302,7 +302,6 @@ Ext.define('NX.coreui.controller.Tasks', {
               me.getDescription(me.getTaskModel().create(response.data))),
             type: 'success'
           });
-          me.loadStoreAndSelect(response.data.id, true);
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);
