@@ -39,7 +39,7 @@ public class VersionPolicyHandler
 {
   @Nonnull
   @Override
-  public Response handle(final @Nonnull Context context) throws Exception {
+  public Response handle(@Nonnull final Context context) throws Exception {
     final MavenPath path = context.getAttributes().require(MavenPath.class);
     final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
     final VersionPolicy versionPolicy = mavenFacet.getVersionPolicy();

@@ -81,7 +81,7 @@ public class MetadataRebuilder
   private final BucketEntityAdapter bucketEntityAdapter;
 
   @Inject
-  public MetadataRebuilder(final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
+  public MetadataRebuilder(@Named(ComponentDatabase.NAME) final Provider<DatabaseInstance> databaseInstanceProvider,
                            final BucketEntityAdapter bucketEntityAdapter)
   {
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
@@ -366,7 +366,6 @@ public class MetadataRebuilder
         }
       }
       catch (IOException e) {
-        // TODO: ignore that underlying storage puke on read?
         log.warn("Error reading {}", checksumPath, e);
       }
       // we need to generate/write it
@@ -423,8 +422,7 @@ public class MetadataRebuilder
      */
     private Xpp3Dom parse(final MavenPath mavenPath, final InputStream is) {
       try (InputStreamReader reader = new InputStreamReader(is, Charsets.UTF_8)) {
-        Xpp3Dom dom = Xpp3DomBuilder.build(reader);
-        return dom;
+        return Xpp3DomBuilder.build(reader);
       }
       catch (XmlPullParserException e) {
         log.debug("Could not parse POM: {}", mavenPath.getPath(), e);
@@ -452,7 +450,7 @@ public class MetadataRebuilder
           try (ZipInputStream zip = new ZipInputStream(jarFile.openInputStream())) {
             ZipEntry entry;
             while ((entry = zip.getNextEntry()) != null) {
-              if (!entry.isDirectory() && entry.getName().equals("META-INF/maven/plugin.xml")) {
+              if (!entry.isDirectory() && "META-INF/maven/plugin.xml".equals(entry.getName())) {
                 final Xpp3Dom dom = parse(mavenPath, zip);
                 prefix = getChildValue(dom, "goalPrefix", null);
                 break;

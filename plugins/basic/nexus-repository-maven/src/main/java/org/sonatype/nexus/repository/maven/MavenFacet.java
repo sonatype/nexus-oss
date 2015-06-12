@@ -52,7 +52,7 @@ public interface MavenFacet
   @Nullable
   Content get(MavenPath path) throws IOException;
 
-  void put(MavenPath path, Payload payload) throws IOException, InvalidContentException;
+  void put(MavenPath path, Payload payload) throws IOException;
 
   boolean delete(MavenPath... paths) throws IOException;
 
@@ -61,7 +61,7 @@ public interface MavenFacet
   @Nullable
   Content get(StorageTx tx, MavenPath path) throws IOException;
 
-  void put(StorageTx tx, MavenPath path, Payload payload) throws IOException, InvalidContentException;
+  void put(StorageTx tx, MavenPath path, Payload payload) throws IOException;
 
   boolean delete(StorageTx tx, MavenPath... paths) throws IOException;
 

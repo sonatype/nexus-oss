@@ -37,7 +37,7 @@ public class Maven2GroupMetadataHandler
     extends GroupHandler
 {
   @Override
-  protected Response doGet(final @Nonnull Context context, final @Nonnull DispatchedRepositories dispatched)
+  protected Response doGet(@Nonnull final Context context, @Nonnull final DispatchedRepositories dispatched)
       throws Exception
   {
     final MavenPath mavenPath = context.getAttributes().require(MavenPath.class);

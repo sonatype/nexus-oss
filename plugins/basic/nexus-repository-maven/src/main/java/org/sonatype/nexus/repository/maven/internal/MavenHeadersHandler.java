@@ -41,22 +41,20 @@ public class MavenHeadersHandler
 {
   @Nonnull
   @Override
-  public Response handle(final @Nonnull Context context) throws Exception {
+  public Response handle(@Nonnull final Context context) throws Exception {
     final Response response = context.proceed();
     Payload payload = response.getPayload();
 
-    if (response.getStatus().isSuccessful() && payload != null) {
-      if (payload instanceof Content) {
-        final Content content = (Content) payload;
-        final DateTime lastModified = content.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
-        if (lastModified != null) {
-          response.getHeaders().set(HttpHeaders.LAST_MODIFIED, DateUtils.formatDate(lastModified.toDate()));
-        }
-        if (response.getStatus().getCode() == HttpStatus.OK) {
-          final String etag = content.getAttributes().get(Content.CONTENT_ETAG, String.class);
-          if (etag != null) {
-            response.getHeaders().set(HttpHeaders.ETAG, "\"" + etag + "\"");
-          }
+    if (response.getStatus().isSuccessful() && payload instanceof Content) {
+      final Content content = (Content) payload;
+      final DateTime lastModified = content.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
+      if (lastModified != null) {
+        response.getHeaders().set(HttpHeaders.LAST_MODIFIED, DateUtils.formatDate(lastModified.toDate()));
+      }
+      if (response.getStatus().getCode() == HttpStatus.OK) {
+        final String etag = content.getAttributes().get(Content.CONTENT_ETAG, String.class);
+        if (etag != null) {
+          response.getHeaders().set(HttpHeaders.ETAG, "\"" + etag + "\"");
         }
       }
     }

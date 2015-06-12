@@ -31,7 +31,7 @@ public class Maven2IndexSettingsContributor
     extends IndexSettingsContributorSupport
 {
   @Inject
-  public Maven2IndexSettingsContributor(final @Named(Maven2Format.NAME) Format format) {
+  public Maven2IndexSettingsContributor(@Named(Maven2Format.NAME) final Format format) {
     super(format);
   }
 }

@@ -321,8 +321,8 @@ public class Maven2Metadata
   }
 
   public static Plugin newPlugin(final String artifactId, final String prefix, final String name) {
-    checkNotNull(artifactId, "artifactId");
-    checkNotNull(prefix, "prefix");
+    checkNotNull(artifactId);
+    checkNotNull(prefix);
     return new Plugin(artifactId, prefix, Strings.isNullOrEmpty(name) ? artifactId : name);
   }
 
@@ -357,9 +357,9 @@ public class Maven2Metadata
                                      @Nullable final String classifier,
                                      final String version)
   {
-    checkNotNull(lastUpdated, "lastUpdated");
-    checkNotNull(extension, "extension");
-    checkNotNull(version, "version");
+    checkNotNull(lastUpdated);
+    checkNotNull(extension);
+    checkNotNull(version);
     return new Snapshot(lastUpdated, extension, classifier, version);
   }
 
@@ -375,8 +375,8 @@ public class Maven2Metadata
     checkNotNull(groupId);
     checkNotNull(artifactId);
     checkNotNull(version);
-    checkArgument(snapshotTimestamp > 0, "snapshotTimestamp: %s", snapshotTimestamp);
-    checkArgument(snapshotBuildNumber > 0, "snapshotBuildNumber: %s", snapshotBuildNumber);
+    checkArgument(snapshotTimestamp > 0);
+    checkArgument(snapshotBuildNumber > 0);
     List<Snapshot> ss = new ArrayList<>();
     if (snapshots != null) {
       ss.addAll(snapshots);
