@@ -176,13 +176,14 @@ Ext.define('NX.controller.Drilldown', {
    * When a list item is clicked, display the new view and update the bookmark
    */
   onCellClick: function(list, td, cellIndex, model, tr, rowIndex, e) {
-    var me = this;
+    var me = this,
+      index = me.getLists().indexOf(list.up('grid'));
 
     //if the cell target is a link, let it do it's thing
     if(e.getTarget('a')) {
       return false;
     }
-    me.loadView(list, model, true);
+    me.loadView(index + 1, true, model);
   },
 
   /**
@@ -208,36 +209,31 @@ Ext.define('NX.controller.Drilldown', {
 
   /**
    * @public
-   * Make the detail view appear, update models and bookmarks
+   * Make the detail view appear
+   *
+   * @param index The zero-based view to load
+   * @param animate Whether to animate the panel into view
+   * @param model An optional record to select
    */
-  loadView: function (list, model, animate) {
+  loadView: function (index, animate, model) {
     var me = this,
       lists = me.getLists(),
       feature = me.getFeature();
 
-    // No model specified, go to the root view
-    if (!model) {
-      feature.showChild(0, animate);
-      me.bookmark(null);
+    // Model specified, select it in the previous list
+    if (model && index > 0) {
+      lists[index - 1].fireEvent('selection', lists[index - 1], model);
+      me.onModelChanged(model);
     }
 
-    // Model specified, find the associated list and show that
-    for (var i = 0; i < lists.length; ++i) {
-      if (list === lists[i].getView() && model) {
-        lists[i].fireEvent('selection', list.up('grid'), model);
-        me.onModelChanged(model);
-
-        // Set all child bookmarks
-        for (var j = 0; j <= i; ++j) {
-          feature.setItemBookmark(j, NX.Bookmarks.fromSegments(NX.Bookmarks.getBookmark().getSegments().slice(0, j + 1)), me);
-        }
-
-        // Show the next view in line
-        feature.showChild(i + 1, animate);
-        me.bookmark(model);
-        break;
-      }
+    // Set all child bookmarks
+    for (var i = 0; i <= index; ++i) {
+      feature.setItemBookmark(i, NX.Bookmarks.fromSegments(NX.Bookmarks.getBookmark().getSegments().slice(0, i + 1)), me);
     }
+
+    // Show the next view in line
+    feature.showChild(index, animate);
+    me.bookmark(model);
   },
 
   /**
@@ -344,10 +340,10 @@ Ext.define('NX.controller.Drilldown', {
             // If the data isn’t loaded yet, return here when it is
             if (!lists[index].getStore().getById(modelId)) {
               lists[index].getStore().load(function () {
-                me.dataLoadedCallback(lists[index], modelId, tab_id);
+                me.dataLoadedCallback(index, modelId, tab_id);
               });
             } else {
-              me.dataLoadedCallback(lists[index], modelId, tab_id);
+              me.dataLoadedCallback(index, modelId, tab_id);
             }
             break;
           }
@@ -355,7 +351,7 @@ Ext.define('NX.controller.Drilldown', {
       }
       else {
         lists[0].getSelectionModel().deselectAll();
-        me.loadView(lists[0].getView(), null, false);
+        me.loadView(0, false);
       }
     }
   },
@@ -364,9 +360,11 @@ Ext.define('NX.controller.Drilldown', {
    * @private
    * Once a model is loaded, call this to display the related view, selecting any tabs as needed
    */
-  dataLoadedCallback: function(list, modelId, tabId) {
+  dataLoadedCallback: function(index, modelId, tabId) {
     var me = this,
       feature = this.getFeature(),
+      lists = this.getLists(),
+      list = lists[index],
       model;
 
     if (list && list.isVisible() && !list.getStore().isLoading()) {
@@ -379,7 +377,7 @@ Ext.define('NX.controller.Drilldown', {
         feature.down('nx-drilldown-details').setActiveTabByBookmark(tabId);
       }
 
-      me.loadView(list.getView(), model, false);
+      me.loadView(index + 1, false, model);
     }
   },
 

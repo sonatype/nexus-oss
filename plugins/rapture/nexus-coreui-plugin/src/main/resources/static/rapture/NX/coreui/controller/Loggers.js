@@ -172,14 +172,14 @@ Ext.define('NX.coreui.controller.Loggers', {
           NX.I18n.format('Loggers_HelpText', values.name, values.level),
           function () {
             model.set('level', values.level);
-            me.loadView(null, null, true);
+            me.loadView(0, true);
           }
       );
     }
     else {
       model = me.getLoggerModel().create(values);
       store.addSorted(model);
-      me.loadView(null, null, true);
+      me.loadView(0, true);
     }
   },
 
