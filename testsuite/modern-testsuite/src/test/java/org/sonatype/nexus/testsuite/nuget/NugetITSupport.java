@@ -73,7 +73,7 @@ public abstract class NugetITSupport
         withHttps(),
         wrappedBundle(maven("org.apache.httpcomponents", "httpmime").versionAsInProject())
             .overwriteManifest(OverwriteMode.FULL).instructions("DynamicImport-Package=*"),
-        mavenBundle(maven("org.sonatype.http-testing-harness", "server-provider").versionAsInProject())
+        mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject()
     );
   }
 

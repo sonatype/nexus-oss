@@ -44,7 +44,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.contains;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
@@ -59,7 +58,7 @@ public class MavenContentValidationIT
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
     return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
-        mavenBundle(maven("org.sonatype.http-testing-harness", "server-provider").versionAsInProject())
+        mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject()
     );
   }
 
