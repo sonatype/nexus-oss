@@ -84,18 +84,10 @@ Ext.define('NX.controller.Drilldown', {
 
     // Add event handlers to each list
     for (var i = 0; i < me.masters.length; ++i) {
-      if (i == 0) {
-        componentListener[me.masters[i]] = {
-          afterrender: me.onAfterRender, // Force the first master to load on render
-          selection: me.onSelection,
-          cellclick: me.onCellClick
-        };
-      } else {
-        componentListener[me.masters[i]] = {
-          selection: me.onSelection,
-          cellclick: me.onCellClick
-        };
-      }
+      componentListener[me.masters[i]] = {
+        selection: me.onSelection,
+        cellclick: me.onCellClick
+      };
     }
 
     // If there’s at least one list, add event handlers to buttons and tabs
@@ -165,17 +157,6 @@ Ext.define('NX.controller.Drilldown', {
     }
 
     return lists;
-  },
-
-  /**
-   * @private
-   * Whenever the first list loads, trigger a navigation event
-   */
-  onAfterRender: function () {
-    var me = this;
-
-    // Start loading the lists
-    me.loadStore(Ext.emptyFn);
   },
 
   /**
