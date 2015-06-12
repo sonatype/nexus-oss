@@ -128,7 +128,7 @@ Ext.define('NX.controller.Drilldown', {
           navigate: me.navigateTo
         },
         '#Refresh': {
-          refresh: me.refreshList
+          //refresh: me.refreshList
         }
       }
     });
@@ -161,40 +161,6 @@ Ext.define('NX.controller.Drilldown', {
 
   /**
    * @public
-   * Prompts a reset/reload of the lists in the drilldown
-   *
-   * @param cb Call this once the store has loaded
-   */
-  loadStore: function (cb) {
-    var me = this,
-      bookmark = NX.Bookmarks.getBookmark().getSegments();
-  },
-
-  /**
-   * @private
-   * Once all lists have loaded, navigate to the current bookmark
-   */
-  onStoreLoad: function () {
-    var me = this,
-      lists = me.getLists();
-
-    // Return if no lists exist
-    if (!lists.length) {
-      return;
-    }
-
-    // Make sure all lists have loaded
-    for (var i = 0; i < lists.length; ++i) {
-      if (!lists[i]) {
-        return;
-      }
-    }
-
-    me.reselect();
-  },
-
-  /**
-   * @public
    */
   reselect: function () {
     var me = this,
@@ -202,18 +168,6 @@ Ext.define('NX.controller.Drilldown', {
 
     if (lists.length) {
       me.navigateTo(NX.Bookmarks.getBookmark());
-    }
-  },
-
-  /**
-   * @private
-   */
-  refreshList: function () {
-    var me = this,
-        lists = me.getLists();
-
-    if (lists.length) {
-      me.loadStore(Ext.emptyFn);
     }
   },
 

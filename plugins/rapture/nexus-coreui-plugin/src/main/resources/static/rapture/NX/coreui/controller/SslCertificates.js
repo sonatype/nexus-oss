@@ -301,7 +301,6 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         if (win) {
           win.close();
         }
-        me.loadStore(Ext.emptyFn);
         NX.Messages.add({ text: NX.I18n.format('SslCertificates_Delete_Success', description), type: 'success' });
       }
     });
@@ -318,7 +317,6 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         description = me.getDescription(model);
 
     NX.direct.ssl_TrustStore.remove(model.getId(), function (response) {
-      me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: NX.I18n.format('SslCertificates_Delete_Success', description), type: 'success' });
       }

@@ -136,9 +136,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
           afterrender: me.bindDisableButton
         },
         'nx-coreui-capability-summary nx-settingsform': {
-          submitted: function() {
-            me.loadStore(Ext.emptyFn)
-          }
+          //submitted: function() { }
         },
         'nx-coreui-capability-settings button[action=save]': {
           click: me.updateCapability
@@ -415,7 +413,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
                 me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
-          me.loadStore(Ext.emptyFn);
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);
@@ -434,7 +431,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
         description = me.getDescription(model);
 
     NX.direct.capability_Capability.remove(model.getId(), function(response) {
-      me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Capabilities_Delete_Success', description),
@@ -459,7 +455,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
     me.getContent().getEl().mask(NX.I18n.get('Capabilities_Enable_Mask'));
     NX.direct.capability_Capability.enable(model.getId(), function(response) {
-      me.loadStore();
       me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
@@ -485,7 +480,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
     me.getContent().getEl().mask(NX.I18n.get('Capabilities_Disable_Mask'));
     NX.direct.capability_Capability.disable(model.getId(), function(response) {
-      me.loadStore();
       me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({

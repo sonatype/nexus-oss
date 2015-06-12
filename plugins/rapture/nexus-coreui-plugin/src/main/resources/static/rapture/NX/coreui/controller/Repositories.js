@@ -116,7 +116,7 @@ Ext.define('NX.coreui.controller.Repositories', {
           click: me.showSelectRecipePanel
         },
         'nx-coreui-repository-settings-form': {
-          submitted: me.onSettingsSubmitted
+          //submitted: me.onSettingsSubmitted
         },
         'nx-coreui-repository-selectrecipe': {
           cellclick: me.showAddRepositoryPanel
@@ -226,22 +226,11 @@ Ext.define('NX.coreui.controller.Repositories', {
   /**
    * @private
    */
-  onSettingsSubmitted: function(form, action) {
-    var me = this,
-        win = form.up('nx-coreui-repository-add');
-
-    me.loadStore(Ext.emptyFn);
-  },
-
-  /**
-   * @private
-   */
   deleteModel: function(model) {
     var me = this,
         description = me.getDescription(model);
 
     NX.direct.coreui_Repository.remove(model.getId(), function(response) {
-      me.loadStore(Ext.emptyFn);
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Repository deleted: ' + description, type: 'success' });
       }

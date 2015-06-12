@@ -146,7 +146,6 @@ Ext.define('NX.coreui.controller.Privileges', {
     var me = this;
 
     NX.direct.coreui_Privilege.remove(model.getId(), function (response) {
-      me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Privileges_Delete_Success', model.get('name')),

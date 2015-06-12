@@ -106,7 +106,7 @@ Ext.define('NX.coreui.controller.Roles', {
           click: me.showAddWindowMapping
         },
         'nx-coreui-role-settings-form': {
-          submitted: me.onSettingsSubmitted
+          //submitted: me.onSettingsSubmitted
         }
       }
     });
@@ -225,16 +225,6 @@ Ext.define('NX.coreui.controller.Roles', {
 
   /**
    * @private
-   */
-  onSettingsSubmitted: function(form, action) {
-    var me = this,
-        win = form.up('nx-coreui-role-add');
-
-    me.loadStore(Ext.emptyFn);
-  },
-
-  /**
-   * @private
    * @override
    * Deletes a role.
    * @param model role to be deleted
@@ -244,7 +234,6 @@ Ext.define('NX.coreui.controller.Roles', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Role.remove(model.getId(), function(response) {
-      me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Roles_Delete_Message', description), type: 'success'
