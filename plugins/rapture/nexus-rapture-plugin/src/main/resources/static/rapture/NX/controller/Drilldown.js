@@ -103,7 +103,7 @@ Ext.define('NX.controller.Drilldown', {
         tabchange: function() {
           // Get the model for the last master
           var segments = NX.Bookmarks.getBookmark().getSegments().slice(1);
-          var lists = me.getLists();
+          var lists = me.getFeature().query('nx-drilldown-master');
           var modelId = segments[lists.length - 1];
           var model = lists[lists.length - 1].getStore().getById(modelId);
 
@@ -142,29 +142,11 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
-   * @private
-   * Return references to all of the master views
-   */
-  getLists: function() {
-    var me = this,
-      feature = me.getFeature(),
-      lists = [];
-
-    if (feature) {
-      for (var i = 0; i < me.masters.length; ++i) {
-        lists.push(feature.down(me.masters[i]));
-      }
-    }
-
-    return lists;
-  },
-
-  /**
    * @public
    */
   reselect: function () {
     var me = this,
-        lists = me.getLists();
+        lists = me.getFeature().query('nx-drilldown-master');
 
     if (lists.length) {
       me.navigateTo(NX.Bookmarks.getBookmark());
@@ -177,7 +159,7 @@ Ext.define('NX.controller.Drilldown', {
    */
   onCellClick: function(list, td, cellIndex, model, tr, rowIndex, e) {
     var me = this,
-      index = me.getLists().indexOf(list.up('grid'));
+      index = me.getFeature().query('nx-drilldown-master').indexOf(list.up('grid'));
 
     //if the cell target is a link, let it do it's thing
     if(e.getTarget('a')) {
@@ -190,21 +172,13 @@ Ext.define('NX.controller.Drilldown', {
    * @private
    * A model changed, focus on the new row and update the name of the related drilldown
    */
-  onModelChanged: function (model) {
+  onModelChanged: function (index, model) {
     var me = this,
-        lists = me.getLists(),
+        lists = me.getFeature().query('nx-drilldown-master'),
         feature = me.getFeature();
 
-    if (model) {
-      // Find the list to which this model belongs, and focus on it
-      for (var i = 0; i < lists.length; ++i) {
-        if (lists[i].getView().getNode(model)) {
-          lists[i].getSelectionModel().select([model], false, true);
-          feature.setItemName(i + 1, me.getDescription(model));
-          break;
-        }
-      }
-    }
+    lists[index].getSelectionModel().select([model], false, true);
+    feature.setItemName(index + 1, me.getDescription(model));
   },
 
   /**
@@ -217,15 +191,14 @@ Ext.define('NX.controller.Drilldown', {
    */
   loadView: function (index, animate, model) {
     var me = this,
-      lists = me.getLists(),
+      lists = me.getFeature().query('nx-drilldown-master'),
       feature = me.getFeature();
 
     // Model specified, select it in the previous list
     if (model && index > 0) {
       lists[index - 1].fireEvent('selection', lists[index - 1], model);
-      me.onModelChanged(model);
+      me.onModelChanged(index - 1, model);
     }
-
     // Set all child bookmarks
     for (var i = 0; i <= index; ++i) {
       feature.setItemBookmark(i, NX.Bookmarks.fromSegments(NX.Bookmarks.getBookmark().getSegments().slice(0, i + 1)), me);
@@ -263,7 +236,7 @@ Ext.define('NX.controller.Drilldown', {
    */
   bookmark: function (model) {
     var me = this,
-        lists = me.getLists(),
+        lists = me.getFeature().query('nx-drilldown-master'),
         feature = me.getFeature(),
         tabs = feature.down('nx-drilldown-details'),
         bookmark = NX.Bookmarks.getBookmark().getSegments(),
@@ -306,7 +279,7 @@ Ext.define('NX.controller.Drilldown', {
    */
   navigateTo: function (bookmark) {
     var me = this,
-        lists = me.getLists(),
+        lists = me.getFeature().query('nx-drilldown-master'),
         list_ids, tab_id = null, model, modelId, index;
 
     if (lists.length && bookmark) {
@@ -331,7 +304,7 @@ Ext.define('NX.controller.Drilldown', {
           model = lists[index].getStore().getById(modelId);
           if (model) {
             lists[index].fireEvent('selection', lists[index], model);
-            me.onModelChanged(model);
+            me.onModelChanged(index, model);
           }
 
           // If this is the last list, load its data and attach a callback (if necessary)
@@ -363,7 +336,7 @@ Ext.define('NX.controller.Drilldown', {
   dataLoadedCallback: function(index, modelId, tabId) {
     var me = this,
       feature = this.getFeature(),
-      lists = this.getLists(),
+      lists = me.getFeature().query('nx-drilldown-master'),
       list = lists[index],
       model;
 
@@ -388,7 +361,7 @@ Ext.define('NX.controller.Drilldown', {
    */
   onDelete: function () {
     var me = this,
-        selection = me.getLists()[0].getSelectionModel().getSelection(),
+        selection = me.getFeature().query('nx-drilldown-master')[0].getSelectionModel().getSelection(),
         description;
 
     if (Ext.isDefined(selection) && selection.length > 0) {
