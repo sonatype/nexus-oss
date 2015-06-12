@@ -25,7 +25,7 @@ Ext.define('NX.view.Authenticate', {
   ],
   ui: 'nx-inset',
 
-  title: NX.I18n.get('View_Authenticate_Title'),
+  title: NX.I18n.get('Authenticate_Title'),
 
   layout: 'fit',
   autoShow: true,
@@ -47,7 +47,7 @@ Ext.define('NX.view.Authenticate', {
     var me = this;
 
     if (!me.message) {
-      me.message = NX.I18n.get('View_Authenticate_Help_Text');
+      me.message = NX.I18n.get('Authenticate_Help_Text');
     }
 
     Ext.apply(this, {
@@ -72,7 +72,7 @@ Ext.define('NX.view.Authenticate', {
           {
             name: 'username',
             itemId: 'username',
-            emptyText: NX.I18n.get('View_SignIn_Username_Empty'),
+            emptyText: NX.I18n.get('SignIn_Username_Empty'),
             allowBlank: false,
             readOnly: true
           },
@@ -80,7 +80,7 @@ Ext.define('NX.view.Authenticate', {
             name: 'password',
             itemId: 'password',
             inputType: 'password',
-            emptyText: NX.I18n.get('View_SignIn_Password_Empty'),
+            emptyText: NX.I18n.get('SignIn_Password_Empty'),
             allowBlank: false,
             validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           }
@@ -89,7 +89,7 @@ Ext.define('NX.view.Authenticate', {
         buttonAlign: 'left',
         buttons: [
           { text: NX.I18n.get('User_View_Authenticate_Submit_Button'), action: 'authenticate', formBind: true, bindToEnter: true, ui: 'nx-primary' },
-          { text: NX.I18n.get('View_Authenticate_Cancel_Button'), handler: me.close, scope: me }
+          { text: NX.I18n.get('Authenticate_Cancel_Button'), handler: me.close, scope: me }
         ]
       }
     });

@@ -21,7 +21,7 @@ Ext.define('NX.view.ExpireSession', {
   extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-expire-session',
 
-  title: NX.I18n.get('View_ExpireSession_Title'),
+  title: NX.I18n.get('ExpireSession_Title'),
 
   /**
    * @protected
@@ -34,7 +34,7 @@ Ext.define('NX.view.ExpireSession', {
         {
           xtype: 'label',
           id: 'expire',
-          text: NX.I18n.get('View_ExpireSession_Help_Text'),
+          text: NX.I18n.get('ExpireSession_Help_Text'),
           style: {
             'color': 'red',
             'font-size': '20px',
@@ -44,9 +44,9 @@ Ext.define('NX.view.ExpireSession', {
       ],
       buttonAlign: 'left',
       buttons: [
-        { text: NX.I18n.get('View_ExpireSession_Cancel_Button'), action: 'cancel' },
+        { text: NX.I18n.get('ExpireSession_Cancel_Button'), action: 'cancel' },
         {
-          text: NX.I18n.get('View_ExpireSession_SignIn_Button'),
+          text: NX.I18n.get('ExpireSession_SignIn_Button'),
           action: 'signin',
           hidden: true,
           itemId: 'expiredSignIn',
@@ -56,7 +56,7 @@ Ext.define('NX.view.ExpireSession', {
           }
         },
         {
-          text: NX.I18n.get('View_ExpireSession_Close_Button'),
+          text: NX.I18n.get('ExpireSession_Close_Button'),
           action: 'close',
           hidden: true,
           handler: function() {

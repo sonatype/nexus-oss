@@ -24,8 +24,8 @@ Ext.define('NX.view.header.SignOut', {
     'NX.I18n'
   ],
 
-  text: NX.I18n.get('View_Header_SignOut_Text'),
-  tooltip: NX.I18n.get('View_Header_SignOut_Tooltip'),
+  text: NX.I18n.get('Header_SignOut_Text'),
+  tooltip: NX.I18n.get('Header_SignOut_Tooltip'),
   glyph: 'xf08b@FontAwesome', // fa-sign-out
   hidden: true
 

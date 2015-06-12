@@ -69,7 +69,7 @@ Ext.define('NX.controller.ExtDirect', {
       }
     }
     else {
-      message = NX.I18n.get('Controller_User_ConnectFailure_Message');
+      message = NX.I18n.get('User_ConnectFailure_Message');
     }
 
     if (message) {

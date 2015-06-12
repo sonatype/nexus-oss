@@ -40,7 +40,7 @@ Ext.define('NX.view.dev.styles.Modals', {
       {
         xtype: 'window',
 
-        title: NX.I18n.get('View_SignIn_Title'),
+        title: NX.I18n.get('SignIn_Title'),
 
         hidden: false,
         collapsible: false,
@@ -62,7 +62,7 @@ Ext.define('NX.view.dev.styles.Modals', {
             {
               name: 'username',
               itemId: 'username',
-              emptyText: NX.I18n.get('View_SignIn_Username_Empty'),
+              emptyText: NX.I18n.get('SignIn_Username_Empty'),
               allowBlank: false,
               validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
             },
@@ -70,21 +70,21 @@ Ext.define('NX.view.dev.styles.Modals', {
               name: 'password',
               itemId: 'password',
               inputType: 'password',
-              emptyText: NX.I18n.get('View_SignIn_Password_Empty'),
+              emptyText: NX.I18n.get('SignIn_Password_Empty'),
               allowBlank: false,
               validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
             },
             {
               xtype: 'checkbox',
-              boxLabel: NX.I18n.get('View_SignIn_RememberMe_BoxLabel'),
+              boxLabel: NX.I18n.get('SignIn_RememberMe_BoxLabel'),
               name: 'rememberMe'
             }
           ],
 
           buttonAlign: 'left',
           buttons: [
-            { text: NX.I18n.get('View_SignIn_Submit_Button'), formBind: true, bindToEnter: true, ui: 'nx-primary' },
-            { text: NX.I18n.get('View_SignIn_Cancel_Button') }
+            { text: NX.I18n.get('SignIn_Submit_Button'), formBind: true, bindToEnter: true, ui: 'nx-primary' },
+            { text: NX.I18n.get('SignIn_Cancel_Button') }
           ]
         }
       },

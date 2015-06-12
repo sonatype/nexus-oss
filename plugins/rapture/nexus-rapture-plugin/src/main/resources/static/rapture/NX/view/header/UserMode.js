@@ -35,7 +35,7 @@ Ext.define('NX.view.header.UserMode', {
   toggleGroup: 'mode',
   allowDepress: false,
 
-  title: NX.I18n.get('View_Header_UserMode_Title'),
+  title: NX.I18n.get('Header_UserMode_Title'),
   glyph: 'xf007@FontAwesome', // fa-user
 
   autoHide: false,

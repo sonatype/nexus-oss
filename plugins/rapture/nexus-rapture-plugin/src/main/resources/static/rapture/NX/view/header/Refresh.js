@@ -24,6 +24,6 @@ Ext.define('NX.view.header.Refresh', {
     'NX.I18n'
   ],
 
-  tooltip: NX.I18n.get('View_Header_Refresh_Tooltip'),
+  tooltip: NX.I18n.get('Header_Refresh_Tooltip'),
   glyph: 'xf021@FontAwesome' // fa-refresh
 });

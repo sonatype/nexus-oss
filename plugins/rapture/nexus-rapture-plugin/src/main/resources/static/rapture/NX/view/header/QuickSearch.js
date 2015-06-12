@@ -27,6 +27,6 @@ Ext.define('NX.view.header.QuickSearch', {
   itemId: 'quicksearch',
   cls: 'nx-quicksearch',
   width: 200,
-  emptyText: NX.I18n.get('View_Header_QuickSearch_Empty'),
-  inputAttrTpl: "data-qtip='" + NX.I18n.get('View_Header_QuickSearch_Tooltip') + "'" // field tooltip
+  emptyText: NX.I18n.get('Header_QuickSearch_Empty'),
+  inputAttrTpl: "data-qtip='" + NX.I18n.get('Header_QuickSearch_Tooltip') + "'" // field tooltip
 });

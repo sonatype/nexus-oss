@@ -38,7 +38,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionAdd', {
 
       buttons: [
         { text: NX.I18n.get('Ldap_LdapServerConnectionAdd_Text'), action: 'next', formBind: true, ui: 'nx-primary' },
-        { text: NX.I18n.get('View_Add_Cancel_Button'), handler: function () {
+        { text: NX.I18n.get('Add_Cancel_Button'), handler: function () {
           this.up('nx-drilldown').showChild(0, true);
         }}
       ]

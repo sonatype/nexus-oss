@@ -35,7 +35,7 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
 
       buttons: [
         { text: NX.I18n.get('Capability_CapabilityList_New_Button'), action: 'add', formBind: true, ui: 'nx-primary' },
-        { text: NX.I18n.get('View_Add_Cancel_Button'), handler: function () {
+        { text: NX.I18n.get('Add_Cancel_Button'), handler: function () {
           this.up('nx-drilldown').showChild(0, true);
         }}
       ]
