@@ -99,20 +99,6 @@ Ext.define('NX.controller.Drilldown', {
       click: me.onDelete
     };
 
-    // Detail tabs
-    componentListener['nx-drilldown nx-drilldown-details > tabpanel'] = {
-      tabchange: function() {
-        // Get the model for the last master
-        var segments = NX.Bookmarks.getBookmark().getSegments().slice(1);
-        var lists = me.getFeature().query('nx-drilldown-master');
-        var modelId = segments[lists.length - 1];
-        var model = lists[lists.length - 1].getStore().getById(modelId);
-
-        // Bookmark it. The tab (if selected) will be added automatically
-        me.bookmark(model);
-      }
-    };
-
     me.listen({
       component: componentListener,
       controller: {
@@ -138,7 +124,7 @@ Ext.define('NX.controller.Drilldown', {
    */
   reselect: function () {
     var me = this,
-        lists = me.getFeature().query('nx-drilldown-master');
+        lists = Ext.ComponentQuery.query('nx-drilldown-master');
 
     if (lists.length) {
       me.navigateTo(NX.Bookmarks.getBookmark());
@@ -151,7 +137,7 @@ Ext.define('NX.controller.Drilldown', {
    */
   onCellClick: function(list, td, cellIndex, model, tr, rowIndex, e) {
     var me = this,
-      index = me.getFeature().query('nx-drilldown-master').indexOf(list.up('grid'));
+      index = Ext.ComponentQuery.query('nx-drilldown-master').indexOf(list.up('grid'));
 
     //if the cell target is a link, let it do it's thing
     if(e.getTarget('a')) {
@@ -166,7 +152,7 @@ Ext.define('NX.controller.Drilldown', {
    */
   onModelChanged: function (index, model) {
     var me = this,
-        lists = me.getFeature().query('nx-drilldown-master'),
+        lists = Ext.ComponentQuery.query('nx-drilldown-master'),
         feature = me.getFeature();
 
     lists[index].getSelectionModel().select([model], false, true);
@@ -183,8 +169,13 @@ Ext.define('NX.controller.Drilldown', {
    */
   loadView: function (index, animate, model) {
     var me = this,
-      lists = me.getFeature().query('nx-drilldown-master'),
+      lists = Ext.ComponentQuery.query('nx-drilldown-master'),
       feature = me.getFeature();
+
+    // Don’t load the view if the feature is not ready
+    if (!feature) {
+      return;
+    }
 
     // Model specified, select it in the previous list
     if (model && index > 0) {
@@ -228,40 +219,26 @@ Ext.define('NX.controller.Drilldown', {
    */
   bookmark: function (model) {
     var me = this,
-        lists = me.getFeature().query('nx-drilldown-master'),
-        feature = me.getFeature(),
-        tabs = feature.down('nx-drilldown-details'),
+        lists = Ext.ComponentQuery.query('nx-drilldown-master'),
         bookmark = NX.Bookmarks.getBookmark().getSegments(),
         segments = [],
-        selectedTabBookmark,
-        index;
+        index = 0;
 
     // Add the root element of the bookmark
     segments.push(bookmark.shift());
 
     // Find all parent models and add them to the bookmark array
-    for (index = 0; index < lists.length; ++index) {
-      if (model && !lists[index].getView().getNode(model)) {
-        segments.push(bookmark.shift());
-      } else {
-        // All done adding parents
-        break;
-      }
+    while (index < lists.length && !lists[index].getView().getNode(model)) {
+      segments.push(bookmark.shift());
+      ++index;
     }
 
     // Add the currently selected model to the bookmark array
     if (model) {
       segments.push(encodeURIComponent(model.getId()));
-
-      // Is this the last list model? And is a tab selected? If so, add it.
-      if (tabs && index == lists.length - 1) {
-        selectedTabBookmark = tabs.getBookmarkOfSelectedTab();
-        if (selectedTabBookmark) {
-          segments.push(selectedTabBookmark);
-        }
-      }
     }
 
+    // Set the bookmark
     NX.Bookmarks.bookmark(NX.Bookmarks.fromSegments(segments), me);
   },
 
@@ -271,8 +248,8 @@ Ext.define('NX.controller.Drilldown', {
    */
   navigateTo: function (bookmark) {
     var me = this,
-        lists = me.getFeature().query('nx-drilldown-master'),
-        list_ids, tab_id = null, model, modelId, index;
+        lists = Ext.ComponentQuery.query('nx-drilldown-master'),
+        list, index, list_ids, model, modelId, index;
 
     if (lists.length && bookmark) {
       //<if debug>
@@ -281,37 +258,29 @@ Ext.define('NX.controller.Drilldown', {
 
       list_ids = bookmark.getSegments().slice(1);
 
+      // Does the last ID refer to a tab?
       if (list_ids.length > lists.length) {
-        // The last ID refers to a tab
-        tab_id = list_ids.pop();
+        list_ids.pop();
       }
 
-      if (list_ids.length || tab_id) {
+      if (list_ids.length) {
+        modelId = decodeURIComponent(list_ids.pop());
+        index = list_ids.length;
+        model = list.getStore().getById(modelId);
 
-        // Select rows in all parent lists
-        for (index = 0; index < list_ids.length; ++index) {
-          modelId = decodeURIComponent(list_ids[index]);
+        if (model) {
+          lists[index].fireEvent('selection', lists[index], model);
+          me.onModelChanged(index, model);
+        }
 
-          // Select rows
-          model = lists[index].getStore().getById(modelId);
-          if (model) {
-            lists[index].fireEvent('selection', lists[index], model);
-            me.onModelChanged(index, model);
-          }
-
-          // If this is the last list, load its data and attach a callback (if necessary)
-          if (index == list_ids.length - 1) {
-
-            // If the data isn’t loaded yet, return here when it is
-            if (!lists[index].getStore().getById(modelId)) {
-              lists[index].getStore().load(function () {
-                me.dataLoadedCallback(index, modelId, tab_id);
-              });
-            } else {
-              me.dataLoadedCallback(index, modelId, tab_id);
-            }
-            break;
-          }
+        if (lists[index].getStore().isLoading()) {
+          // The data isn’t loaded yet, load the view when it’s ready
+          me.mon(lists[index].getStore(), 'load', function() {
+            me.loadView(index + 1, false, lists[index].getStore().getById(modelId));
+            me.mun(lists[index].getStore(), 'load');
+          });
+        } else {
+          me.loadView(index + 1, false, lists[index].getStore().getById(modelId));
         }
       }
       else {
@@ -323,37 +292,12 @@ Ext.define('NX.controller.Drilldown', {
 
   /**
    * @private
-   * Once a model is loaded, call this to display the related view, selecting any tabs as needed
-   */
-  dataLoadedCallback: function(index, modelId, tabId) {
-    var me = this,
-      feature = this.getFeature(),
-      lists = me.getFeature().query('nx-drilldown-master'),
-      list = lists[index],
-      model;
-
-    if (list && list.isVisible() && !list.getStore().isLoading()) {
-      // Show the referenced view
-      modelId = decodeURIComponent(modelId);
-      model = list.getStore().getById(modelId);
-
-      // Is a tab specified?
-      if (tabId) {
-        feature.down('nx-drilldown-details').setActiveTabByBookmark(tabId);
-      }
-
-      me.loadView(index + 1, false, model);
-    }
-  },
-
-  /**
-   * @private
    *
    * FIXME: wire this to work with multiple list views
    */
   onDelete: function () {
     var me = this,
-        selection = me.getFeature().query('nx-drilldown-master')[0].getSelectionModel().getSelection(),
+        selection = Ext.ComponentQuery.query('nx-drilldown-master')[0].getSelectionModel().getSelection(),
         description;
 
     if (Ext.isDefined(selection) && selection.length > 0) {
