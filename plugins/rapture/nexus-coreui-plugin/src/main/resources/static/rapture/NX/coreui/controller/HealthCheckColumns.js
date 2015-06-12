@@ -105,10 +105,6 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
       });
     });
 
-    if (resultList) {
-      resultList.getView().refresh();
-    }
-
     NX.direct.healthcheck_Info.read(components, function(response) {
       var success = Ext.isObject(response) && response.success;
       Ext.Array.each(records, function(model) {
@@ -128,9 +124,6 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
             model.endEdit();
           }
         });
-      }
-      if (resultList) {
-        resultList.getView().refresh();
       }
     });
   },
