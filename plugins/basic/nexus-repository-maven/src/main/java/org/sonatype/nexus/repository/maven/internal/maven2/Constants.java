@@ -26,6 +26,9 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class Constants
 {
+  private Constants() {
+  }
+
   /**
    * File name of Maven2 repository metadata files.
    */
@@ -47,4 +50,9 @@ public class Constants
    * Content Type of Maven2 checksum files (sha1, md5).
    */
   public static final String CHECKSUM_CONTENT_TYPE = ContentTypes.TEXT_PLAIN;
+
+  /**
+   * The suffix of base version for snapshots.
+   */
+  public static final String SNAPSHOT_VERSION_SUFFIX = "SNAPSHOT";
 }
