@@ -228,7 +228,7 @@ Ext.define('NX.controller.Drilldown', {
     segments.push(bookmark.shift());
 
     // Find all parent models and add them to the bookmark array
-    while (index < lists.length && !lists[index].getView().getNode(model)) {
+    while (index < lists.length && model && !lists[index].getView().getNode(model)) {
       segments.push(bookmark.shift());
       ++index;
     }
@@ -249,45 +249,43 @@ Ext.define('NX.controller.Drilldown', {
   navigateTo: function (bookmark) {
     var me = this,
         lists = Ext.ComponentQuery.query('nx-drilldown-master'),
-        list, index, list_ids, model, modelId, index;
+        list_ids = bookmark.getSegments().slice(1),
+        index, list_ids, modelId, store;
 
-    if (lists.length && bookmark) {
+    if (lists.length && list_ids.length) {
       //<if debug>
       me.logDebug('Navigate to: ' + bookmark.getSegments().join(':'));
       //</if>
 
-      list_ids = bookmark.getSegments().slice(1);
+      modelId = decodeURIComponent(list_ids.pop());
+      index = list_ids.length;
+      store = lists[index].getStore();
 
-      // Does the last ID refer to a tab?
-      if (list_ids.length > lists.length) {
-        list_ids.pop();
-      }
-
-      if (list_ids.length) {
-        modelId = decodeURIComponent(list_ids.pop());
-        index = list_ids.length;
-        model = list.getStore().getById(modelId);
-
-        if (model) {
-          lists[index].fireEvent('selection', lists[index], model);
-          me.onModelChanged(index, model);
-        }
-
-        if (lists[index].getStore().isLoading()) {
-          // The data isn’t loaded yet, load the view when it’s ready
-          me.mon(lists[index].getStore(), 'load', function() {
-            me.loadView(index + 1, false, lists[index].getStore().getById(modelId));
-            me.mun(lists[index].getStore(), 'load');
-          });
-        } else {
-          me.loadView(index + 1, false, lists[index].getStore().getById(modelId));
-        }
-      }
-      else {
-        lists[0].getSelectionModel().deselectAll();
-        me.loadView(0, false);
+      if (store.isLoading()) {
+        // The store hasn’t yet loaded, load it when ready
+        me.mon(store, 'load', function() {
+          me.selectModel(index, modelId);
+          me.mun(store, 'load');
+        });
+      } else {
+        me.selectModel(index, modelId);
       }
     }
+  },
+
+  /**
+   * @private
+   * @param index of the list which owns the model
+   * @param model to select
+   */
+  selectModel: function (index, modelId) {
+    var me = this,
+        lists = Ext.ComponentQuery.query('nx-drilldown-master'),
+        model = lists[index].getStore().getById(modelId);
+
+    lists[index].fireEvent('selection', lists[index], model);
+    me.onModelChanged(index, model);
+    me.loadView(index + 1, false, model);
   },
 
   /**
