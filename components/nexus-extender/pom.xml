@@ -60,12 +60,17 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-log-api</artifactId>
+      <artifactId>nexus-guice-servlet</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-guice-servlet</artifactId>
+      <artifactId>nexus-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-log-api</artifactId>
     </dependency>
 
     <dependency>
