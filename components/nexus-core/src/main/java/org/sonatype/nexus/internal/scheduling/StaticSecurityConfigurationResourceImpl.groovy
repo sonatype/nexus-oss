@@ -36,6 +36,7 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'tasks-all',
+                description: 'All permissions for Scheduled Tasks',
                 type: 'application',
                 properties: [
                     domain : 'tasks',
@@ -44,6 +45,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'tasks-create',
+                description: 'Create permission for Scheduled Tasks',
                 type: 'application',
                 properties: [
                     domain : 'tasks',
@@ -52,6 +54,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'tasks-read',
+                description: 'Read permission for Scheduled Tasks',
                 type: 'application',
                 properties: [
                     domain : 'tasks',
@@ -60,6 +63,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'tasks-update',
+                description: 'Update permission for Scheduled Tasks',
                 type: 'application',
                 properties: [
                     domain : 'tasks',
@@ -68,6 +72,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'tasks-delete',
+                description: 'Delete permission for Scheduled Tasks',
                 type: 'application',
                 properties: [
                     domain : 'tasks',
@@ -77,6 +82,7 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'tasks-run',
+                description: 'Run permission for Scheduled Tasks',
                 type: 'application',
                 properties: [
                     domain : 'tasks',

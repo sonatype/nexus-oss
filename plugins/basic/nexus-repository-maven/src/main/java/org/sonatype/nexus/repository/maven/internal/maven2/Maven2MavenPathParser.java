@@ -70,7 +70,7 @@ public class Maven2MavenPathParser
       final String groupId = str.substring(0, gEndPos).replace('/', '.');
       final String artifactId = str.substring(gEndPos + 1, aEndPos);
       final String baseVersion = str.substring(aEndPos + 1, vEndPos);
-      final boolean snapshot = baseVersion.endsWith("SNAPSHOT");
+      final boolean snapshot = baseVersion.endsWith(Constants.SNAPSHOT_VERSION_SUFFIX);
       final String fileName = str.substring(vEndPos + 1);
       str = fileName;
 
@@ -103,7 +103,7 @@ public class Maven2MavenPathParser
       if (snapshot) {
         int vSnapshotStart = artifactId.length() + baseVersion.length() - 10 + 3;
         version = str.substring(vSnapshotStart, vSnapshotStart + 8);
-        if ("SNAPSHOT".equals(version)) {
+        if (Constants.SNAPSHOT_VERSION_SUFFIX.equals(version)) {
           version = baseVersion; // reset it
           int nTailPos = artifactId.length() + baseVersion.length() + 1;
           tail = str.substring(nTailPos);

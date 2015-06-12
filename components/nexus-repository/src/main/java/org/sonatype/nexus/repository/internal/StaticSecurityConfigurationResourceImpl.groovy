@@ -40,6 +40,7 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'repository-view-*-*-*',
+                description: 'All permissions for All Repositories',
                 type: 'repository-view',
                 properties: [
                     format: '*',
@@ -49,6 +50,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'repository-view-*-*-browse',
+                description: 'Browse permission for All Repositories',
                 type: 'repository-view',
                 properties: [
                     format: '*',
@@ -58,6 +60,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'repository-view-*-*-read',
+                description: 'Read permission for All Repositories',
                 type: 'repository-view',
                 properties: [
                     format: '*',
@@ -67,6 +70,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'repository-view-*-*-edit',
+                description: 'Edit permission for All Repositories',
                 type: 'repository-view',
                 properties: [
                     format: '*',
@@ -76,6 +80,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'repository-view-*-*-add',
+                description: 'Add permission for All Repositories',
                 type: 'repository-view',
                 properties: [
                     format: '*',
@@ -85,6 +90,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'repository-view-*-*-delete',
+                description: 'Delete permission for All Repositories',
                 type: 'repository-view',
                 properties: [
                     format: '*',

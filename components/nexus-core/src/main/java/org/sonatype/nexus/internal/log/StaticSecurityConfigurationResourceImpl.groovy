@@ -36,6 +36,7 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'logging-all',
+                description: 'All permissions for Logging',
                 type: 'application',
                 properties: [
                     domain: 'logging',
@@ -44,6 +45,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'logging-read',
+                description: 'Read permission for Logging',
                 type: 'application',
                 properties: [
                     domain: 'logging',
@@ -52,6 +54,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'logging-update',
+                description: 'Update permission for Logging',
                 type: 'application',
                 properties: [
                     domain: 'logging',
@@ -60,6 +63,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'logging-mark',
+                description: 'Mark permission for Logging',
                 type: 'application',
                 properties: [
                     domain: 'logging',
