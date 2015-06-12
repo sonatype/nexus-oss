@@ -35,6 +35,7 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'ssl-truststore-all',
+                description: 'All permissions for SSL Truststore',
                 type: 'application',
                 properties: [
                     domain : 'ssl-truststore',
@@ -43,6 +44,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ssl-truststore-read',
+                description: 'Read permission for SSL Truststore',
                 type: 'application',
                 properties: [
                     domain : 'ssl-truststore',
@@ -51,6 +53,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ssl-truststore-create',
+                description: 'Create permission for SSL Truststore',
                 type: 'application',
                 properties: [
                     domain : 'ssl-truststore',
@@ -59,6 +62,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ssl-truststore-update',
+                description: 'Update permission for SSL Truststore',
                 type: 'application',
                 properties: [
                     domain : 'ssl-truststore',
@@ -67,6 +71,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ssl-truststore-delete',
+                description: 'Delete permission for SSL Truststore',
                 type: 'application',
                 properties: [
                     domain : 'ssl-truststore',

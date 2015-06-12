@@ -70,6 +70,7 @@ public class RepositoryAdminPrivilegeDescriptor
     return new CPrivilegeBuilder()
         .type(TYPE)
         .id(id(format, name, actions))
+        .description(String.format("%s privilege for %s administration", actions, name))
         .property(P_FORMAT, format)
         .property(P_REPOSITORY, name)
         .property(P_ACTIONS, actions)

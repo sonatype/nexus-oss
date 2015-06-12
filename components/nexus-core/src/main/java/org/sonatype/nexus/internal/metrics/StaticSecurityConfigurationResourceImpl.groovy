@@ -36,6 +36,7 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'metrics-all',
+                description: 'All permissions for Metrics',
                 type: 'application',
                 properties: [
                     domain: 'metrics',

@@ -37,6 +37,7 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'capabilities-all',
+                description: 'All permissions for Capabilities',
                 type: 'application',
                 properties: [
                     domain : 'capabilities',
@@ -45,6 +46,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'capabilities-create',
+                description: 'Create permission for Capabilities',
                 type: 'application',
                 properties: [
                     domain : 'capabilities',
@@ -53,6 +55,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'capabilities-read',
+                description: 'Read permission for Capabilities',
                 type: 'application',
                 properties: [
                     domain : 'capabilities',
@@ -61,6 +64,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'capabilities-update',
+                description: 'Update permission for Capabilities',
                 type: 'application',
                 properties: [
                     domain : 'capabilities',
@@ -69,6 +73,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'capabilities-delete',
+                description: 'Delete permission for Capabilities',
                 type: 'application',
                 properties: [
                     domain : 'capabilities',

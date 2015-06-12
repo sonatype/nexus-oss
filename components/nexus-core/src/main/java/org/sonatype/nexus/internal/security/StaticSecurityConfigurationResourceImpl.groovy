@@ -41,6 +41,7 @@ class StaticSecurityConfigurationResourceImpl
             new CPrivilege(
                 id: 'all',
                 type: 'wildcard',
+                description: 'All permissions',
                 properties: [
                     pattern: 'nexus:*'
                 ]
@@ -52,6 +53,7 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'settings-all',
+                description: 'All permissions for Settings',
                 type: 'application',
                 properties: [
                     domain : 'settings',
@@ -60,6 +62,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'settings-read',
+                description: 'Read permission for Settings',
                 type: 'application',
                 properties: [
                     domain : 'settings',
@@ -68,6 +71,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'settings-update',
+                description: 'Update permission for Settings',
                 type: 'application',
                 properties: [
                     domain : 'settings',
@@ -81,6 +85,7 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'bundles-all',
+                description: 'All permissions for Bundles',
                 type: 'application',
                 properties: [
                     domain : 'bundles',
@@ -89,6 +94,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'bundles-read',
+                description: 'Read permission for Bundles',
                 type: 'application',
                 properties: [
                     domain : 'bundles',
@@ -102,6 +108,7 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'search-read',
+                description: 'Read permission for Search',
                 type: 'application',
                 properties: [
                     domain : 'search',
@@ -115,6 +122,7 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'apikey-all',
+                description: 'All permissions for APIKey',
                 type: 'application',
                 properties: [
                     domain : 'apikey',
@@ -128,6 +136,7 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'privileges-all',
+                description: 'All permissions for Privileges',
                 type: 'application',
                 properties: [
                     domain : 'privileges',
@@ -136,6 +145,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'privileges-create',
+                description: 'Create permission for Privileges',
                 type: 'application',
                 properties: [
                     domain : 'privileges',
@@ -144,6 +154,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'privileges-read',
+                description: 'Read permission for Privileges',
                 type: 'application',
                 properties: [
                     domain : 'privileges',
@@ -152,6 +163,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'privileges-update',
+                description: 'Update permission for Privileges',
                 type: 'application',
                 properties: [
                     domain : 'privileges',
@@ -160,6 +172,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'privileges-delete',
+                description: 'Delete permission for Privileges',
                 type: 'application',
                 properties: [
                     domain : 'privileges',
@@ -173,6 +186,7 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'roles-all',
+                description: 'All permissions for Roles',
                 type: 'application',
                 properties: [
                     domain : 'roles',
@@ -181,6 +195,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'roles-create',
+                description: 'Create permission for Roles',
                 type: 'application',
                 properties: [
                     domain : 'roles',
@@ -189,6 +204,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'roles-read',
+                description: 'Read permission for Roles',
                 type: 'application',
                 properties: [
                     domain : 'roles',
@@ -197,6 +213,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'roles-update',
+                description: 'Update permission for Roles',
                 type: 'application',
                 properties: [
                     domain : 'roles',
@@ -205,6 +222,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'roles-delete',
+                description: 'Delete permission for Roles',
                 type: 'application',
                 properties: [
                     domain : 'roles',
@@ -218,6 +236,7 @@ class StaticSecurityConfigurationResourceImpl
 
             new CPrivilege(
                 id: 'users-all',
+                description: 'All permissions for Users',
                 type: 'application',
                 properties: [
                     domain : 'users',
@@ -226,6 +245,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'users-create',
+                description: 'Create permission for Users',
                 type: 'application',
                 properties: [
                     domain : 'users',
@@ -234,6 +254,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'users-read',
+                description: 'Read permission for Users',
                 type: 'application',
                 properties: [
                     domain : 'users',
@@ -242,6 +263,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'users-update',
+                description: 'Update permission for Users',
                 type: 'application',
                 properties: [
                     domain : 'users',
@@ -250,6 +272,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'users-delete',
+                description: 'Delete permission for Users',
                 type: 'application',
                 properties: [
                     domain : 'users',
@@ -260,6 +283,7 @@ class StaticSecurityConfigurationResourceImpl
             // FIXME: Sort out what the use-case is for this distinct permission, consider nexus:users:change-password?
             new CPrivilege(
                 id: 'userschangepw',
+                description: 'Change password permission',
                 type: 'application',
                 properties: [
                     domain : 'userschangepw',
@@ -274,6 +298,7 @@ class StaticSecurityConfigurationResourceImpl
              */
             new CRole(
                 id: 'admin',
+                description: 'Administrator Role',
                 privileges: [
                     'all'
                 ]
@@ -284,7 +309,7 @@ class StaticSecurityConfigurationResourceImpl
              */
             new CRole(
                 id: 'anonymous',
-
+                description: 'Anonymous Role',
                 privileges: [
                     'search-read',
                     'repository-view-*-*-browse',

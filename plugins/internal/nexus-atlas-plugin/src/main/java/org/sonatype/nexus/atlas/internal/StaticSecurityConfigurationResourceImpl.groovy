@@ -35,6 +35,7 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'atlas-all',
+                description: 'All permissions for Support Tools',
                 type: 'application',
                 properties: [
                     domain : 'atlas',
