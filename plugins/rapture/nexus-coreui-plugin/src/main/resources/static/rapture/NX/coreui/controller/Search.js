@@ -28,23 +28,20 @@ Ext.define('NX.coreui.controller.Search', {
     'NX.I18n'
   ],
 
-  masters: ['nx-coreui-search-result-list', 'nx-coreui-search-result-asset-list'],
+  masters: ['nx-coreui-search-result-list', 'nx-coreui-component-asset-list'],
 
   stores: [
     'Asset',
     'SearchFilter',
     'SearchCriteria',
-    'SearchResult',
+    'SearchResult'
   ],
   models: [
     'SearchFilter'
   ],
 
   views: [
-    'component.AssetContainer',
     'search.SearchFeature',
-    'search.SearchResultAssetList',
-    'search.SearchResultDetails',
     'search.SearchResultList',
     'search.TextSearchCriteria',
     'search.SaveSearchFilter'
@@ -53,9 +50,8 @@ Ext.define('NX.coreui.controller.Search', {
   refs: [
     { ref: 'feature', selector: 'nx-coreui-searchfeature' },
     { ref: 'searchResult', selector: 'nx-coreui-search-result-list' },
-    { ref: 'searchResultDetails', selector: 'nx-coreui-searchfeature #searchResultDetails' },
-    { ref: 'searchResultAssets', selector: 'nx-coreui-search-result-asset-list' },
-    { ref: 'assetContainer', selector: 'nx-coreui-searchfeature nx-coreui-component-assetcontainer' },
+    { ref: 'componentDetails', selector: 'nx-coreui-searchfeature nx-coreui-component-details' },
+    { ref: 'assets', selector: 'nx-coreui-searchfeature nx-coreui-component-asset-list' },
     { ref: 'quickSearch', selector: 'nx-header-panel #quicksearch' }
   ],
 
@@ -153,6 +149,9 @@ Ext.define('NX.coreui.controller.Search', {
           afterrender: me.bindQuickSearch,
           search: me.onQuickSearch,
           searchcleared: me.onQuickSearch
+        },
+        'nx-coreui-searchfeature nx-coreui-component-assetcontainer': {
+          updated: me.setAssetIcon
         }
       }
     });
@@ -356,8 +355,6 @@ Ext.define('NX.coreui.controller.Search', {
       menu: addCriteriaMenu
     });
 
-    // HACK: fire a fake event to force paging toolbar to refresh
-    me.getSearchResultStore().fireEvent('load', me);
     me.getSearchResultStore().filter();
   },
 
@@ -484,9 +481,6 @@ Ext.define('NX.coreui.controller.Search', {
     if (modelType == "Component") {
       me.onSearchResultSelection(model);
     }
-    else if (modelType == "Asset") {
-      me.onSearchResultAssetSelection(model);
-    }
   },
 
   /**
@@ -495,57 +489,25 @@ Ext.define('NX.coreui.controller.Search', {
    * @param {NX.coreui.model.Component} model selected component
    */
   onSearchResultSelection: function(model) {
-    var me = this,
-        searchResultDetails = me.getSearchResultDetails(),
-        assetsStore = me.getAssetStore(),
-        info1 = {}, info2 = {};
+    var me = this;
 
-    me.getAssetContainer().componentModel = model;
-    me.onSearchResultAssetSelection(null);
-
-    if (model) {
-      info1[NX.I18n.get('BROWSE_SEARCH_ASSETS_REPOSITORY')] = model.get('repositoryName');
-      info1[NX.I18n.get('BROWSE_SEARCH_ASSETS_FORMAT')] = model.get('format');
-      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_GROUP')] = model.get('group');
-      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME')] = model.get('name');
-      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_VERSION')] = model.get('version');
-
-      searchResultDetails.down('#info1').showInfo(info1);
-      searchResultDetails.down('#info2').showInfo(info2);
-      assetsStore.clearFilter(true);
-      assetsStore.addFilter([
-        {
-          property: 'repositoryName',
-          value: model.get('repositoryName')
-        },
-        {
-          property: 'componentId',
-          value: model.getId()
-        }
-      ]);
-    }
+    me.getComponentDetails().setComponentModel(model);
+    me.getAssets().setComponentModel(model);
   },
 
   /**
    * @private
-   * Show asset.
-   * @param {NX.coreui.model.Asset} model selected asset
+   * Set the appropriate breadcrumb icon.
+   * @param {NX.coreui.model.Component} componentModel selected asset
+   * @param {NX.coreui.model.Asset} assetModel selected asset
    */
-  onSearchResultAssetSelection: function(model) {
+  setAssetIcon: function(container, componentModel, assetModel) {
     var me = this,
-        assetContainer = me.getAssetContainer(),
         feature = me.getFeature();
 
-    if (model) {
-      me.getAssetContainer().assetModel = model;
-      assetContainer.refreshInfo();
-      assetContainer.expand();
+    if (assetModel) {
       // Set the appropriate breadcrumb icon
-      feature.setItemClass(2, assetContainer.iconCls);
-      feature.setItemName(2, model.get('name'));
-    }
-    else {
-      assetContainer.refreshInfo();
+      feature.setItemClass(2, container.iconCls);
     }
   },
 

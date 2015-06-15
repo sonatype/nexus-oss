@@ -13,56 +13,19 @@
 /*global Ext, NX*/
 
 /**
- * Search feature.
+ * Browse feature.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.SearchFeature', {
+Ext.define('NX.coreui.view.browse.BrowseFeature', {
   extend: 'NX.view.drilldown.Drilldown',
-  alias: 'widget.nx-coreui-searchfeature',
+  alias: 'widget.nx-coreui-browsefeature',
 
-  // TODO: Needed?
-  itemId: 'searchfeature',
-
-  iconName: 'search-default',
+  iconName: 'browse-default',
 
   masters: [
-    {
-      xtype: 'panel',
-      layout: 'border',
-      items: [
-        {
-          xtype: 'panel',
-          itemId: 'criteria',
-
-          region: 'north',
-          header: false,
-
-          style: {
-            'border-bottom': '1px solid #DDDDDD',
-            'background-color': '#FFFFFF'
-          },
-
-          layout: 'column',
-          defaults: {
-            style: {
-              margin: '10px 0 0 0'
-            }
-          },
-          bodyPadding: '0 10px 10px 10px'
-
-          // disable saving for now
-          //tbar: [
-          //  { xtype: 'button', text: 'Save', glyph: 'xf0c7@FontAwesome', action: 'save' },
-          //],
-        },
-        {
-          xtype: 'nx-coreui-search-result-list',
-          region: 'center',
-          header: false
-        }
-      ]
-    },
+    {xtype: 'nx-coreui-browse-repository-list'},
+    {xtype: 'nx-coreui-browse-result-list'},
     {
       xtype: 'panel',
       region: 'center',
@@ -107,10 +70,14 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
     ]
   },
 
+  /**
+   * @override
+   */
   initComponent: function() {
     var me = this;
     me.callParent(arguments);
     // Set default icon for the component version list
-    me.down('nx-coreui-component-asset-list').up('nx-drilldown-item').setItemClass('nx-icon-search-component-detail-x16');
+    me.down('nx-coreui-component-asset-list').up('nx-drilldown-item').setItemClass('nx-icon-browse-component-detail-x16');
   }
+
 });

@@ -13,39 +13,34 @@
 /*global Ext, NX*/
 
 /**
- * Search result details panel.
+ * Browse result store.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.SearchResultDetails', {
-  extend: 'Ext.panel.Panel',
-  alias: 'widget.nx-coreui-search-result-details',
-  requires: [
-    'NX.Icons'
-  ],
-  ui: 'nx-inset',
+Ext.define('NX.coreui.store.Component', {
+  extend: 'Ext.data.Store',
+  model: 'NX.coreui.model.Component',
 
-  layout: {
-    type: 'hbox',
-    align: 'stretch'
+  proxy: {
+    type: 'direct',
+
+    api: {
+      read: 'NX.direct.coreui_Component.read'
+    },
+
+    reader: {
+      type: 'json',
+      root: 'data',
+      successProperty: 'success'
+    }
   },
 
-  style: {
-    'background-color': '#FFFFFF'
-  },
+  buffered: true,
+  pageSize: 50,
 
-  /**
-   * @override
-   */
-  initComponent: function () {
-    var me = this;
+  remoteFilter: true,
+  remoteSort: true,
 
-    me.items = [
-      { xtype: 'nx-info', itemId: 'info1' },
-      { xtype: 'nx-info', itemId: 'info2' },
-      { xtype: 'nx-info', itemId: 'info3' }
-    ];
+  sorters: { property: 'name', direction: 'ASC' }
 
-    me.callParent();
-  }
 });

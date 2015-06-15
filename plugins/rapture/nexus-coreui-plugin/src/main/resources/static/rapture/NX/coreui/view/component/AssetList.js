@@ -13,16 +13,21 @@
 /*global Ext, NX*/
 
 /**
- * Assets / search results grid.
+ * Assets grid.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.SearchResultAssetList', {
+Ext.define('NX.coreui.view.component.AssetList', {
   extend: 'NX.view.drilldown.Master',
-  alias: 'widget.nx-coreui-search-result-asset-list',
+  alias: 'widget.nx-coreui-component-asset-list',
   requires: [
     'NX.I18n'
   ],
+
+  /**
+   * Currently shown component model.
+   */
+  componentModel: undefined,
 
   store: 'Asset',
 
@@ -36,25 +41,40 @@ Ext.define('NX.coreui.view.search.SearchResultAssetList', {
   columns: [
     {
       xtype: 'nx-iconcolumn',
-      dataIndex: 'type',
+      dataIndex: 'contentType',
       width: 36,
       iconVariant: 'x16',
-      iconNamePrefix: 'repository-item-type-',
-      iconName: function (value) {
-        if (NX.getApplication().getIconController().findIcon('repository-item-type-' + value, 'x16')) {
-          return value;
+      iconNamePrefix: 'asset-type-',
+      iconName: function(value) {
+        var assetType;
+
+        if (value) {
+          assetType = value.replace('/', '-');
+          if (NX.getApplication().getIconController().findIcon('asset-type-' + assetType, 'x16')) {
+            return assetType;
+          }
         }
         return 'default';
       }
     },
-    { header: NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME_COLUMN'), dataIndex: 'name', flex: 2.5 }
+    {
+      text: NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME_COLUMN'),
+      dataIndex: 'name',
+      flex: 2.5
+    }
   ],
 
-  features: [
-    {
-      ftype: 'grouping',
-      groupHeaderTpl: '{columnName}: {name}'
-    }
-  ]
+  /**
+   * @public
+   *
+   * Sets owning component.
+   * @param {NX.coreui.model.Component} componentModel owning component
+   */
+  setComponentModel: function(componentModel) {
+    var me = this;
+
+    me.componentModel = componentModel;
+    me.fireEvent('updated', me, me.componentModel);
+  }
 
 });

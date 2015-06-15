@@ -388,7 +388,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
                 me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
-          me.loadStoreAndSelect(response.data.id, false);
+          me.loadStoreAndSelect(response.data.id, true);
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);

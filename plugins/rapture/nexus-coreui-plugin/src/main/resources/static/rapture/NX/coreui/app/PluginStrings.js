@@ -31,6 +31,21 @@ Ext.define('NX.coreui.app.PluginStrings', {
    */
 
   keys: {
+    Coreui_Controller_Browse_Title_Feature: 'Browse',
+    Coreui_Controller_Browse_Description_Feature: 'Browse components and assets',
+    Coreui_View_Browse_BrowseRepositoryList_Name_Column: 'Name',
+    Coreui_View_Browse_BrowseRepositoryList_Type_Column: 'Type',
+    Coreui_View_Browse_BrowseRepositoryList_Format_Column: 'Format',
+    Coreui_View_Browse_BrowseRepositoryList_EmptyText_View: 'No repositories defined',
+    Coreui_View_Browse_BrowseRepositoryList_EmptyText_Filter: 'No repositories matched "$filter"',
+
+    Coreui_View_Browse_BrowseResultList_Name_Column: 'Name',
+    Coreui_View_Browse_BrowseResultList_Name_Column_Unattached: '-- Unattached assets --',
+    Coreui_View_Browse_BrowseResultList_Group_Column: 'Group',
+    Coreui_View_Browse_BrowseResultList_Version_Column: 'Version',
+    Coreui_View_Browse_BrowseResultList_EmptyText_View: 'No components found in repository',
+    Coreui_View_Browse_BrowseResultList_EmptyText_Filter: 'No components matched "$filter"',
+
     BROWSE_ASSET_INFO_NAME: 'Name',
     BROWSE_ASSET_INFO_CONTENT_TYPE: 'Content Type',
 

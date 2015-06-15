@@ -238,6 +238,9 @@ Ext.define('NX.app.Application', {
 
     remotingProvider = Ext.direct.Manager.addProvider(NX.direct.api.REMOTING_API);
 
+    // disable buffering of method calls
+    remotingProvider.enableBuffer = false;
+
     // disable retry
     remotingProvider.maxRetries = 0;
 
