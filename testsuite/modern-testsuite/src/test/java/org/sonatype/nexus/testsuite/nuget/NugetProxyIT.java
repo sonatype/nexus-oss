@@ -12,11 +12,10 @@
  */
 package org.sonatype.nexus.testsuite.nuget;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.text.Collator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
 
@@ -29,6 +28,7 @@ import org.sonatype.nexus.repository.http.HttpStatus;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import com.google.common.io.Files;
 import org.apache.http.HttpResponse;
 import org.hamcrest.Matchers;
@@ -132,7 +132,8 @@ public class NugetProxyIT
 
     List<String> receivedHashes = extractPackageHashes(entries);
 
-    assertThat(receivedHashes, is(sorted(receivedHashes)));
+    Collator dictionaryOrder = Collator.getInstance(Locale.ENGLISH);
+    assertThat(receivedHashes, is(Ordering.from(dictionaryOrder).sortedCopy(receivedHashes)));
   }
 
 
@@ -149,8 +150,7 @@ public class NugetProxyIT
 
     List<Integer> downloadCounts = extractDownloadCounts(entries);
 
-    final List<Integer> sorted = sortAscending(downloadCounts);
-    assertThat(downloadCounts, is(sorted));
+    assertThat(downloadCounts, is(Ordering.natural().reverse().sortedCopy(downloadCounts)));
   }
 
   @Test
@@ -287,19 +287,6 @@ public class NugetProxyIT
       }
     }
     return null;
-  }
-
-  @Nonnull
-  private List<Integer> sortAscending(final List<Integer> downloadCounts) {
-    final List<Integer> sorted = sorted(downloadCounts);
-    Collections.reverse(sorted);
-    return sorted;
-  }
-
-  @Nonnull
-  private <T> List<T> sorted(final List<T> unsorted)
-  {
-    return new ArrayList<T>(new TreeSet<T>(unsorted));
   }
 }
 

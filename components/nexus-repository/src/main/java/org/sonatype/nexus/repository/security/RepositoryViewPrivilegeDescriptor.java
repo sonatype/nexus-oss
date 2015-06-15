@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.security;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Named;
@@ -70,7 +71,7 @@ public class RepositoryViewPrivilegeDescriptor
     return new CPrivilegeBuilder()
         .type(TYPE)
         .id(id(format, name, actions))
-        .description(String.format("%s privilege for %s view", actions, name))
+        .description(String.format("%s privilege for %s view", Arrays.toString(actions), name))
         .property(P_FORMAT, format)
         .property(P_REPOSITORY, name)
         .property(P_ACTIONS, actions)
