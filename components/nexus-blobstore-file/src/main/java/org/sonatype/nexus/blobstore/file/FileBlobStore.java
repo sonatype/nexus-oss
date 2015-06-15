@@ -321,12 +321,12 @@ public class FileBlobStore
   }
 
   @Override
-  public void incrementUsage() {
+  public void increaseUsage() {
     usage.incrementAndGet();
   }
 
   @Override
-  public void decrementUsage() {
+  public void decreaseUsage() {
     usage.decrementAndGet();
   }
 

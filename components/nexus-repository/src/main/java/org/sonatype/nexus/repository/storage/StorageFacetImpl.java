@@ -148,10 +148,10 @@ public class StorageFacetImpl
     config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
     log.debug("Config: {}", config);
     if (oldConfig != null) {
-      blobStoreManager.get(oldConfig.blobStoreName).decrementUsage();
+      blobStoreManager.get(oldConfig.blobStoreName).decreaseUsage();
     }
     if (config != null) {
-      blobStoreManager.get(config.blobStoreName).incrementUsage();
+      blobStoreManager.get(config.blobStoreName).increaseUsage();
     }
   }
 
@@ -195,7 +195,7 @@ public class StorageFacetImpl
       tx.deleteBucket(tx.getBucket());
     }
     if (config != null) {
-      blobStoreManager.get(config.blobStoreName).decrementUsage();
+      blobStoreManager.get(config.blobStoreName).decreaseUsage();
     }
   }
 
