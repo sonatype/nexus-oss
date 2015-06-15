@@ -46,8 +46,13 @@ Ext.define('NX.coreui.view.component.AssetList', {
       iconVariant: 'x16',
       iconNamePrefix: 'asset-type-',
       iconName: function(value) {
-        if (value && NX.getApplication().getIconController().findIcon('asset-type-' + value.replace('/', '-'), 'x16')) {
-          return value.replace('/', '-');
+        var assetType;
+
+        if (value) {
+          assetType = value.replace('/', '-');
+          if (NX.getApplication().getIconController().findIcon('asset-type-' + assetType, 'x16')) {
+            return assetType;
+          }
         }
         return 'default';
       }
