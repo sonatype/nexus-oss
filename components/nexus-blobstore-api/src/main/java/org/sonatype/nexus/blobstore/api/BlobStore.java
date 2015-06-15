@@ -127,12 +127,12 @@ public interface BlobStore
   boolean isInUse();
 
   /**
-   * Increases the usage of this blob store;
+   * Increments the usage counter of this blob store;
    */
-  void increaseUsage();
+  void incrementUsage();
 
   /**
-   * Decreases the usage of this blob store;
+   * Decrements the usage counter of this blob store;
    */
-  void decreaseUsage();
+  void decrementUsage();
 }
