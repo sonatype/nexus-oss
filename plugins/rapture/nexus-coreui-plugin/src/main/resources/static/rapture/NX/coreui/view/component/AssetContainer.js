@@ -45,6 +45,8 @@ Ext.define('NX.coreui.view.component.AssetContainer', {
   /**
    * @public
    * Shows an asset in container.
+   * @param {NX.coreui.model.Component} componentModel parent component of asset fo be shown
+   * @param {NX.coreui.model.Asset} assetModel asset to be shown
    */
   refreshInfo: function(componentModel, assetModel) {
     var me = this,
