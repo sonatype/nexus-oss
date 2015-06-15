@@ -121,6 +121,9 @@ Ext.define('NX.coreui.controller.Users', {
         }
       },
       store: {
+        '#User': {
+          load: me.reselect
+        },
         '#UserSource': {
           load: me.onUserSourceLoad
         }

@@ -107,6 +107,11 @@ Ext.define('NX.coreui.controller.Repositories', {
           receivingchanged: me.onStateReceivingChanged
         }
       },
+      store: {
+        '#NX.coreui.store.Repository': {
+          load: me.reselect
+        }
+      },
       component: {
         'nx-coreui-repository-list': {
           beforerender: me.loadRelatedStores,

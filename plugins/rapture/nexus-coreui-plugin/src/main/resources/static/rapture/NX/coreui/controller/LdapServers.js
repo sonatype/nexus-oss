@@ -98,6 +98,11 @@ Ext.define('NX.coreui.controller.LdapServers', {
           refresh: me.loadTemplates
         }
       },
+      store: {
+        '#LdapServer': {
+          load: me.reselect
+        }
+      },
       component: {
         'nx-coreui-ldapserver-list': {
           beforerender: me.loadTemplates

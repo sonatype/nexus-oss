@@ -91,6 +91,9 @@ Ext.define('NX.coreui.controller.Roles', {
         }
       },
       store: {
+        '#Role': {
+          load: me.reselect
+        },
         '#RoleSource': {
           load: me.onRoleSourceLoad
         }

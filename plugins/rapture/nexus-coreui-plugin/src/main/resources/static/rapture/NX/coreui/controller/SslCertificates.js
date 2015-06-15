@@ -88,6 +88,11 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     me.callParent();
 
     me.listen({
+      store: {
+        '#SslCertificate': {
+          load: me.reselect
+        }
+      },
       component: {
         'nx-coreui-sslcertificate-list menuitem[action=newfromserver]': {
           click: me.showAddWindowFromServer

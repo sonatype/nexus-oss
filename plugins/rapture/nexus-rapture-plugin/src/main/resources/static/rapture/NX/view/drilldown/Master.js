@@ -39,7 +39,7 @@ Ext.define('NX.view.drilldown.Master', {
   },
 
   loadStore: function() {
-    this.getStore().load()
+    this.getStore().load();
   },
 
   /**

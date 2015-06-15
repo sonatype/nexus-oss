@@ -106,7 +106,7 @@ Ext.define('NX.controller.Drilldown', {
           navigate: me.navigateTo
         },
         '#Refresh': {
-          //refresh: me.refreshList
+          //refresh: me.reselect
         }
       }
     });
@@ -248,11 +248,12 @@ Ext.define('NX.controller.Drilldown', {
    */
   navigateTo: function (bookmark) {
     var me = this,
+        feature = me.getFeature(),
         lists = Ext.ComponentQuery.query('nx-drilldown-master'),
         list_ids = bookmark.getSegments().slice(1),
         index, list_ids, modelId, store;
 
-    if (lists.length && list_ids.length) {
+    if (feature && lists.length && list_ids.length) {
       //<if debug>
       me.logDebug('Navigate to: ' + bookmark.getSegments().join(':'));
       //</if>

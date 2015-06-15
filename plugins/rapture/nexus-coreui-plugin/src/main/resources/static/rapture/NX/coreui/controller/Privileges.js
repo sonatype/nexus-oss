@@ -89,6 +89,23 @@ Ext.define('NX.coreui.controller.Privileges', {
   /**
    * @override
    */
+  init: function() {
+    var me = this;
+
+    me.callParent();
+
+    me.listen({
+      store: {
+        '#Privilege': {
+          load: me.reselect
+        }
+      }
+    });
+  },
+
+  /**
+   * @override
+   */
   getDescription: function (model) {
     return model.get('name');
   },

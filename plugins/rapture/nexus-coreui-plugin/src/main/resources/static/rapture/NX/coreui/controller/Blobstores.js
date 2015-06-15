@@ -83,6 +83,11 @@ Ext.define('NX.coreui.controller.Blobstores', {
           refresh: me.loadRecipe
         }
       },
+      store: {
+        '#NX.coreui.store.Blobstore': {
+          load: me.reselect
+        }
+      },
       component: {
         'nx-coreui-blobstore-list': {
           beforerender: me.loadRecipe
