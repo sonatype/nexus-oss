@@ -81,7 +81,7 @@ public final class ODataTemplates
       return new String(Resources.toByteArray(ODataTemplates.class.getResource(name)), "UTF-8");
     }
     catch (final IOException e) {
-      throw new IllegalArgumentException(e.getMessage());
+      throw new IllegalArgumentException(e.getMessage(), e);
     }
   }
 

@@ -71,7 +71,7 @@ public class NugetProxyFacet
 
     // Cache the metadata from the remote, grabbing the content location as we go
     final StringBuilder contentLocation = new StringBuilder();
-    fetcher.cachePackageFeed(getRepository(), remoteEntryUri, 2, false, new ODataConsumer()
+    fetcher.cachePackageFeed(getRepository(), remoteEntryUri, false, new ODataConsumer()
     {
       @Override
       public void consume(final Map<String, String> data) {
@@ -111,7 +111,7 @@ public class NugetProxyFacet
   }
 
   @Override
-  protected String getUrl(final @Nonnull Context context) {
+  protected String getUrl(@Nonnull final Context context) {
     // This is only implemented for error-reporting purposes. It returns the Nexus
     // URL for the content, rather than the remote one, as these can differ.
     final String[] coords = coords(context);

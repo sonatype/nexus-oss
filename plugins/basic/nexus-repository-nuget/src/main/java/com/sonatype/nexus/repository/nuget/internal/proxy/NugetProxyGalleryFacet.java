@@ -66,8 +66,6 @@ public class NugetProxyGalleryFacet
 {
   private static final int TWO_PAGES = 2 * ODataUtils.PAGE_SIZE;
 
-  private static final Pattern COUNT_REGEX = Pattern.compile("<m:count>(\\d*)</m:count>");
-
   private final NugetFeedFetcher fetcher;
 
   @VisibleForTesting
@@ -76,12 +74,17 @@ public class NugetProxyGalleryFacet
   @VisibleForTesting
   static class Config
   {
-    public int queryCacheSize = 300;
+    // By default, the query cache will hold up to 300 entries for an hour each
+    public static final int DEFAULT_QUERY_CACHE_SIZE = 300;
+
+    public static final int DEFAULT_QUERY_CACHE_ITEM_AGE = Time.minutes(60).toSecondsI();
+
+    public int queryCacheSize = DEFAULT_QUERY_CACHE_SIZE;
 
     /**
      * Query cache item-max-age seconds.
      */
-    public int queryCacheItemMaxAge = Time.minutes(60).toSecondsI();
+    public int queryCacheItemMaxAge = DEFAULT_QUERY_CACHE_ITEM_AGE;
 
     @Override
     public String toString() {
@@ -277,7 +280,7 @@ public class NugetProxyGalleryFacet
   /**
    * A factory to create {@link Callable}s to populate the count cache.
    */
-  private static abstract class RemoteCallFactory
+  private abstract static class RemoteCallFactory
   {
     protected final NugetFeedFetcher fetcher;
 
@@ -308,7 +311,7 @@ public class NugetProxyGalleryFacet
       {
         @Override
         public Integer call() throws Exception {
-          return firstNonNull(fetcher.cachePackageFeed(remote, nugetQuery, 2, false, new ODataConsumer()
+          return firstNonNull(fetcher.cachePackageFeed(remote, nugetQuery, false, new ODataConsumer()
           {
             @Override
             public void consume(final Map<String, String> data) {
