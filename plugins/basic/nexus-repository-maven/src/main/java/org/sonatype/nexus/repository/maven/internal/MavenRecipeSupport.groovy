@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.security.SecurityFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
+import org.sonatype.nexus.repository.view.ConditionalRequestHandler
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route.Builder
@@ -58,6 +59,9 @@ abstract class MavenRecipeSupport
   PartialFetchHandler partialFetchHandler
 
   @Inject
+  ConditionalRequestHandler conditionalRequestHandler
+
+  @Inject
   MavenHeadersHandler mavenHeadersHandler
 
   final MavenPathParser mavenPathParser
@@ -76,6 +80,7 @@ abstract class MavenRecipeSupport
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)
+        .handler(conditionalRequestHandler)
   }
 
   Builder newMetadataRouteBuilder() {
@@ -84,5 +89,6 @@ abstract class MavenRecipeSupport
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)
+        .handler(conditionalRequestHandler)
   }
 }

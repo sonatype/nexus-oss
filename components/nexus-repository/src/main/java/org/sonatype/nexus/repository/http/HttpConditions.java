@@ -12,7 +12,9 @@
  */
 package org.sonatype.nexus.repository.http;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -20,6 +22,7 @@ import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.net.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
@@ -33,6 +36,37 @@ import org.joda.time.DateTime;
 public class HttpConditions
 {
   private HttpConditions() {}
+
+  /**
+   * Builds a {@link Predicate<Response>} that contains conditions in passed in {@link Request} or {@code null} if
+   * request does not contains any condition. The predicate applies to {@link Response} if it meets all the conditions
+   * found (they all are logically AND bound).
+   */
+  @Nullable
+  public static Predicate<Response> requestPredicate(final Request request) {
+    final List<Predicate<Response>> predicates = new ArrayList<>();
+    final Predicate<Response> ifModifiedSince = ifModifiedSince(request);
+    if (ifModifiedSince != null) {
+      predicates.add(ifModifiedSince);
+    }
+    final Predicate<Response> ifUnmodifiedSince = ifUnmodifiedSince(request);
+    if (ifUnmodifiedSince != null) {
+      predicates.add(ifUnmodifiedSince);
+    }
+    final Predicate<Response> ifMatch = ifMatch(request);
+    if (ifMatch != null) {
+      predicates.add(ifMatch);
+    }
+    final Predicate<Response> ifNoneMatch = ifNoneMatch(request);
+    if (ifNoneMatch != null) {
+      predicates.add(ifNoneMatch);
+    }
+
+    if (!predicates.isEmpty()) {
+      return Predicates.and(predicates);
+    }
+    return null;
+  }
 
   @Nullable
   public static Predicate<Response> ifModifiedSince(final Request request) {

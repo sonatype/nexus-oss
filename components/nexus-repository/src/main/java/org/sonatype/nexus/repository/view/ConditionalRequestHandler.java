@@ -12,19 +12,15 @@
  */
 package org.sonatype.nexus.repository.view;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.http.HttpConditions;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
+import com.google.common.net.HttpHeaders;
 
+import static org.sonatype.nexus.repository.http.HttpConditions.requestPredicate;
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
@@ -45,72 +41,33 @@ public class ConditionalRequestHandler
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
-    final Predicate<Response> requestPredicate = buildPredicate(context.getRequest());
+    final Predicate<Response> requestPredicate = requestPredicate(context.getRequest());
     if (requestPredicate != null) {
       final String action = context.getRequest().getAction();
       switch (action) {
         case GET:
         case HEAD: {
           final Response response = context.proceed();
-          if (response.getStatus().isSuccessful() && requestPredicate.apply(response)) {
-            return response;
+          if (response.getStatus().isSuccessful()) {
+            if (!requestPredicate.apply(response)) {
+              return new Response.Builder().status(Status.failure(NOT_MODIFIED, "Not modified")).build();
+            }
           }
-          else {
-            return new Response.Builder()
-                .status(Status.failure(NOT_MODIFIED, "Not modified"))
-                .build();
-          }
+          return response;
         }
 
         case POST:
         case PUT:
         case DELETE: {
           final Response getResponse = performGet(context.getRepository(), context.getRequest());
-          if (getResponse.getStatus().isSuccessful()) {
-            if (requestPredicate.apply(getResponse)) {
-              return context.proceed();
-            }
-            else {
-              return new Response.Builder()
-                  .status(Status.failure(PRECONDITION_FAILED, "Precondition failed"))
-                  .build();
-            }
+          if (getResponse.getStatus().isSuccessful() && !requestPredicate.apply(getResponse)) {
+            return new Response.Builder().status(Status.failure(PRECONDITION_FAILED, "Precondition failed")).build();
           }
         }
       }
     }
+
     return context.proceed();
-  }
-
-  /**
-   * Builds a {@link Predicate} out of the "if-..." headers in {@link Request}.
-   */
-  @Nullable
-  private Predicate<Response> buildPredicate(final Request request) {
-    List<Predicate<Response>> predicates = new ArrayList<>();
-
-    final Predicate<Response> ifModifiedSince = HttpConditions.ifModifiedSince(request);
-    if (ifModifiedSince != null) {
-      predicates.add(ifModifiedSince);
-    }
-    final Predicate<Response> ifUnmodifiedSince = HttpConditions.ifUnmodifiedSince(request);
-    if (ifUnmodifiedSince != null) {
-      predicates.add(ifUnmodifiedSince);
-    }
-
-    final Predicate<Response> ifMatch = HttpConditions.ifMatch(request);
-    if (ifMatch != null) {
-      predicates.add(ifMatch);
-    }
-    final Predicate<Response> ifNoneMatch = HttpConditions.ifNoneMatch(request);
-    if (ifNoneMatch != null) {
-      predicates.add(ifNoneMatch);
-    }
-
-    if (!predicates.isEmpty()) {
-      return Predicates.and(predicates);
-    }
-    return null;
   }
 
   /**
@@ -118,8 +75,11 @@ public class ConditionalRequestHandler
    * request.
    */
   private Response performGet(final Repository repository, final Request request) throws Exception {
-    return repository.facet(ViewFacet.class).dispatch(
-        new Request.Builder().copy(request).action(GET).build()
-    );
+    final Request getRequest = new Request.Builder().copy(request).action(GET).build();
+    getRequest.getHeaders().remove(HttpHeaders.IF_MODIFIED_SINCE);
+    getRequest.getHeaders().remove(HttpHeaders.IF_UNMODIFIED_SINCE);
+    getRequest.getHeaders().remove(HttpHeaders.IF_MATCH);
+    getRequest.getHeaders().remove(HttpHeaders.IF_NONE_MATCH);
+    return repository.facet(ViewFacet.class).dispatch(getRequest);
   }
 }
