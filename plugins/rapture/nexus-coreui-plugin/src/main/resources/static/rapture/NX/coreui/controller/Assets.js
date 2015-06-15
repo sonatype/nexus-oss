@@ -150,30 +150,6 @@ Ext.define('NX.coreui.controller.Assets', {
         assetContainer = me.getAssetContainer();
 
     assetContainer.refreshInfo(gridView.up('grid').componentModel, assetModel);
-  },
-
-  /**
-   * @private
-   *
-   * Show size in kb/mb/gb.
-   */
-  toSizeString: function(v) {
-    if (typeof v !== 'number') {
-      return NX.I18n.get('BROWSE_STANDARD_INFO_SIZE_UNKNOWN');
-    }
-    if (v < 0) {
-      return NX.I18n.get('BROWSE_STANDARD_INFO_SIZE_UNKNOWN');
-    }
-    if (v < 1024) {
-      return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_BYTES', v);
-    }
-    if (v < 1048576) {
-      return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_KB', (v / 1024).toFixed(2));
-    }
-    if (v < 1073741824) {
-      return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_MB', (v / 1048576).toFixed(2));
-    }
-    return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_GB', (v / 1073741824).toFixed(2));
   }
 
 });
