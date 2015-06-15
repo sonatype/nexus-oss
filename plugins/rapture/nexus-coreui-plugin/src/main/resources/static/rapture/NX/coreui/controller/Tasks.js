@@ -301,6 +301,9 @@ Ext.define('NX.coreui.controller.Tasks', {
               me.getDescription(me.getTaskModel().create(response.data))),
             type: 'success'
           });
+          me.getTaskStore().load(function() {
+            me.reselect();
+          });
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);
@@ -380,7 +383,9 @@ Ext.define('NX.coreui.controller.Tasks', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Task.remove(model.getId(), function(response) {
-      me.loadStore();
+      me.getTaskStore().load(function() {
+        me.reselect();
+      });
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Tasks_Delete_Success', description), type: 'success'
@@ -399,7 +404,9 @@ Ext.define('NX.coreui.controller.Tasks', {
         model, modelId, description;
 
     // Reload the form
-    me.loadStore();
+    me.getTaskStore().load(function() {
+      me.reselect();
+    });
 
     modelId = decodeURIComponent(bookmark.getSegment(1));
     model = me.getList().getStore().getById(modelId);
@@ -411,7 +418,9 @@ Ext.define('NX.coreui.controller.Tasks', {
         NX.I18n.format('Tasks_RunConfirm_HelpText', description), function() {
         me.getContent().getEl().mask(NX.I18n.get('Tasks_Run_Mask'));
         NX.direct.coreui_Task.run(model.getId(), function(response) {
-          me.loadStore();
+          me.getTaskStore().load(function() {
+            me.reselect();
+          });
           me.getContent().getEl().unmask();
           if (Ext.isObject(response) && response.success) {
             NX.Messages.add({
@@ -433,7 +442,9 @@ Ext.define('NX.coreui.controller.Tasks', {
       model, modelId, description;
 
     // Reload the form
-    me.loadStore();
+    me.getTaskStore().load(function() {
+      me.reselect();
+    });
 
     modelId = decodeURIComponent(bookmark.getSegment(1));
     model = me.getList().getStore().getById(modelId);
@@ -445,7 +456,9 @@ Ext.define('NX.coreui.controller.Tasks', {
         NX.I18n.format('Tasks_StopConfirm_HelpText', description), function() {
         me.getContent().getEl().mask(NX.I18n.get('Tasks_Stop_Mask'));
         NX.direct.coreui_Task.stop(model.getId(), function(response) {
-          me.loadStore();
+          me.getTaskStore().load(function() {
+            me.reselect();
+          });
           me.getContent().getEl().unmask();
           if (Ext.isObject(response) && response.success) {
             NX.Messages.add({

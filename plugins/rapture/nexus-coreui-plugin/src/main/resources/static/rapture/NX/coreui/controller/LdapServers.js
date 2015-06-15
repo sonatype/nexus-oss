@@ -273,6 +273,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
               me.getDescription(me.getLdapServerModel().create(response.data))),
             type: 'success'
           });
+          me.getLdapServerStore().load();
         }
       }
     });
@@ -302,6 +303,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
             text: NX.I18n.format('LdapServers_Create_Success',
               me.getDescription(me.getLdapServerModel().create(response.data))),
             type: 'success'
+          });
+          me.getLdapServerStore().load(function() {
+            me.reselect();
           });
         }
       }
@@ -368,6 +372,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
         description = me.getDescription(model);
 
     NX.direct.ldap_LdapServer.remove(model.getId(), function(response) {
+      me.getLdapServerStore().load(function() {
+        me.reselect();
+      });
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: NX.I18n.format('LdapServers_Delete_Success', description), type: 'success' });
       }

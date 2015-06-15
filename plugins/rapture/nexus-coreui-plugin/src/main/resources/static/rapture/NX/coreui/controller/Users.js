@@ -411,9 +411,15 @@ Ext.define('NX.coreui.controller.Users', {
    */
   onSettingsSubmitted: function(form, action) {
     var me = this,
-        win = form.up('nx-coreui-user-add');
+        win = form.up('nx-coreui-user-add'),
+        func = Ext.emptyFn;
 
-    me.loadStore(Ext.emptyFn);
+    if (win) {
+      func = function() {
+        me.reselect();
+      }
+    }
+    me.getUserStore().load(func);
   },
 
   /**
@@ -451,7 +457,9 @@ Ext.define('NX.coreui.controller.Users', {
         description = me.getDescription(model);
 
     NX.direct.coreui_User.remove(model.getId(), model.get('realm'), function(response) {
-      me.loadStore();
+      me.getUserStore().load(function() {
+        me.reselect();
+      });
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Users_Delete_Success', description), type: 'success'

@@ -254,6 +254,7 @@ Ext.define('NX.controller.Drilldown', {
         index, list_ids, modelId, store;
 
     if (feature && lists.length && list_ids.length) {
+      console.log("TIME TO NAVIGATE!!!");
       //<if debug>
       me.logDebug('Navigate to: ' + bookmark.getSegments().join(':'));
       //</if>
@@ -271,6 +272,8 @@ Ext.define('NX.controller.Drilldown', {
       } else {
         me.selectModel(index, modelId);
       }
+    } else {
+      me.loadView(0, false);
     }
   },
 
@@ -291,8 +294,6 @@ Ext.define('NX.controller.Drilldown', {
 
   /**
    * @private
-   *
-   * FIXME: wire this to work with multiple list views
    */
   onDelete: function () {
     var me = this,

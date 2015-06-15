@@ -386,6 +386,9 @@ Ext.define('NX.coreui.controller.Capabilities', {
                 me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
+          me.getCapabilityStore().load(function() {
+            me.reselect();
+          });
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);
@@ -413,6 +416,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
                 me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
+          me.getCapabilityStore().load();
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);
@@ -431,6 +435,9 @@ Ext.define('NX.coreui.controller.Capabilities', {
         description = me.getDescription(model);
 
     NX.direct.capability_Capability.remove(model.getId(), function(response) {
+      me.getCapabilityStore().load(function() {
+        me.reselect();
+      });
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Capabilities_Delete_Success', description),
