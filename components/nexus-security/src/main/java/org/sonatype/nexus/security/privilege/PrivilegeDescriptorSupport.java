@@ -12,14 +12,21 @@
  */
 package org.sonatype.nexus.security.privilege;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.sonatype.nexus.security.config.CPrivilege;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import static com.google.common.base.CaseFormat.UPPER_CAMEL;
+import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -78,5 +85,38 @@ public abstract class PrivilegeDescriptorSupport
   protected List<String> readListProperty(final CPrivilege privilege, final String name, final String defaultValue) {
     String value = readProperty(privilege, name, defaultValue);
     return Lists.newArrayList(Splitter.on(',').omitEmptyStrings().trimResults().split(value));
+  }
+
+  protected static String humanizeName(final String name) {
+    if (ALL.equals(name)) {
+      return "all";
+    }
+    else {
+      return name;
+    }
+  }
+
+  protected static String humanizeActions(final String... actions) {
+    checkArgument(actions.length > 0);
+    final StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(Joiner.on(", ").join(Iterables.transform(Arrays.asList(actions), new Function<String, String>()
+    {
+      @Override
+      public String apply(final String action) {
+        if (ALL.equals(action)) {
+          return "All";
+        }
+        else {
+          return UPPER_UNDERSCORE.to(UPPER_CAMEL, action);
+        }
+      }
+    })));
+    if (actions.length > 1 || ALL.equals(actions[0])) {
+      stringBuilder.append(" privileges");
+    }
+    else {
+      stringBuilder.append(" privilege");
+    }
+    return stringBuilder.toString();
   }
 }
