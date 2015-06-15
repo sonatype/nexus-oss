@@ -233,7 +233,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT: 'Connection timeout',
     ADMIN_REPOSITORIES_SETTINGS_CONNECTION_TIMEOUT_HELP: 'Seconds to wait for activity before stopping and retrying the connection. Leave blank to use the globally defined HTTP timeout.',
     ADMIN_REPOSITORIES_SETTINGS_BLOBSTORE: 'Blobstore',
-    ADMIN_REPOSITORIES_SETTINGS_BLOBSTORE_HELP: 'Blobstore to be used to store the assets.',
+    ADMIN_REPOSITORIES_SETTINGS_BLOBSTORE_HELP: 'Blobstore to be used to store asset contents.',
     ADMIN_REPOSITORIES_SETTINGS_BLOBSTORE_PLACEHOLDER: 'Select a blobstore',
     ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION: 'Strict Content Type Validation',
     ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_ENABLED: 'Not found cache enabled',
