@@ -144,8 +144,15 @@ public class StorageFacetImpl
 
   @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
+    Config oldConfig = config;
     config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
     log.debug("Config: {}", config);
+    if (oldConfig != null) {
+      blobStoreManager.get(oldConfig.blobStoreName).decreaseUsage();
+    }
+    if (config != null) {
+      blobStoreManager.get(config.blobStoreName).increaseUsage();
+    }
   }
 
   @Override
@@ -186,6 +193,9 @@ public class StorageFacetImpl
     // TODO: Make this a soft delete and cleanup later so it doesn't block for large repos.
     try (StorageTx tx = openStorageTx(databaseInstanceProvider.get().acquire(), false)) {
       tx.deleteBucket(tx.getBucket());
+    }
+    if (config != null) {
+      blobStoreManager.get(config.blobStoreName).decreaseUsage();
     }
   }
 
