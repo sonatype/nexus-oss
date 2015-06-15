@@ -117,7 +117,7 @@ class ComponentComponent
             format: component.format()
         )
       }
-      if (parameters.start == 0 && !filter && readUnattachedAssets(storageTx, repositories).size()) {
+      if (parameters.start == 0 && !filter && readUnattachedAssets(storageTx, repositories)) {
         results = new ArrayList<>(results)
         results.add(0, new ComponentXO(
             id: UNATTACHED,
