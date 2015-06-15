@@ -193,6 +193,7 @@ Ext.define('NX.coreui.controller.Browse', {
 
     results.getView().emptyText = browseResultStore.emptyText;
     results.getSelectionModel().deselectAll();
+    // we have to remove filter directly as store#removeFilter() does not work when store#remoteFilter = true
     if (browseResultStore.filters.removeAtKey('filter')) {
       if (browseResultStore.filters.length) {
         browseResultStore.filter();
