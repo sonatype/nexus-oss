@@ -161,6 +161,7 @@ class ComponentComponent
       else if (repositories.size() == 1) {
         Component component = storageTx.findComponent(new EntityId(componentId), storageTx.getBucket())
         if (component == null) {
+          log.warn 'Component {} not found', componentId
           return null
         }
 
