@@ -48,6 +48,22 @@ Ext.define('NX.coreui.controller.SearchMaven', {
         }
       },
       {
+        id: 'attributes.maven2.baseVersion',
+        group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
+        config: {
+          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_BASE_VERSION'),
+          width: 250
+        }
+      },
+      {
+        id: 'attributes.maven2.version',
+        group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
+        config: {
+          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_VERSION'),
+          width: 250
+        }
+      },
+      {
         id: 'attributes.maven2.classifier',
         group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
         config: {
@@ -55,10 +71,10 @@ Ext.define('NX.coreui.controller.SearchMaven', {
         }
       },
       {
-        id: 'attributes.maven2.packaging',
+        id: 'attributes.maven2.extension',
         group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
         config: {
-          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_PACKAGING')
+          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_EXTENSION')
         }
       }
     ], me);
