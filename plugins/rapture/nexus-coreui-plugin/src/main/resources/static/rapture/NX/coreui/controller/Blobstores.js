@@ -155,27 +155,6 @@ Ext.define('NX.coreui.controller.Blobstores', {
   },
 
   /**
-   * @protected
-   * Enable 'Delete' when user has 'delete' permission, blob store is not in use and it does not have any blob.
-   */
-  bindDeleteButton: function(button) {
-    var me = this;
-    button.mon(
-        NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission + ':delete'),
-            NX.Conditions.gridHasSelection(me.masters[0], function(model) {
-              return !model.get('inUse') && model.get('blobCount') === 0;
-            })
-        ),
-        {
-          satisfied: button.enable,
-          unsatisfied: button.disable,
-          scope: button
-        }
-    );
-  },
-
-  /**
    * @private
    */
   deleteModel: function(model) {

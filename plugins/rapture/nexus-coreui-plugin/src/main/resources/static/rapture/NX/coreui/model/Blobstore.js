@@ -26,7 +26,6 @@ Ext.define('NX.coreui.model.Blobstore', {
     {name: 'attributes', type: 'string'},
     {name: 'blobCount', type: 'int'},
     {name: 'totalSize', type: 'int'},
-    {name: 'availableSpace', type: 'int'},
-    {name: 'inUse', type: 'boolean'}
+    {name: 'availableSpace', type: 'int'}
   ]
 });
