@@ -200,7 +200,6 @@ public class BlobStoreManagerImpl
   public void delete(final String name) throws Exception {
     checkNotNull(name);
     BlobStore blobStore = blobStore(name);
-    checkState(!blobStore.isInUse(), "BlobStore: %s is in use", name);
     blobStore.stop();
     //TODO cleanup blobStore?
     untrack(name);
