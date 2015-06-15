@@ -45,6 +45,7 @@ import com.orientechnologies.orient.server.config.OServerStorageConfiguration;
 import com.orientechnologies.orient.server.config.OServerUserConfiguration;
 import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProtocolBinary;
 import org.apache.commons.io.output.WriterOutputStream;
+import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -182,6 +183,7 @@ public class DatabaseServerImpl
   /**
    * Attempts to uninstall OrientDB's signal handlers to avoid dangling references when rebooting.
    */
+  @IgnoreJRERequirement
   @SuppressWarnings("restriction")
   private void uninstallOrientSignalHandlers() {
     try {
