@@ -17,7 +17,7 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.store.BrowseResult', {
+Ext.define('NX.coreui.store.Component', {
   extend: 'Ext.data.Store',
   model: 'NX.coreui.model.Component',
 

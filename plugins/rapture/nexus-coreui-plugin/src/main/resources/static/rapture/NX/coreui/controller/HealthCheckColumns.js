@@ -50,7 +50,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
         '#SearchResult': {
           prefetch: me.loadHealthCheckFields
         },
-        '#BrowseResult': {
+        '#Component': {
           prefetch: me.loadHealthCheckFields
         }
       },

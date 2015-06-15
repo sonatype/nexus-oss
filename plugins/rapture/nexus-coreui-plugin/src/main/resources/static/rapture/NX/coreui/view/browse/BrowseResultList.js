@@ -29,7 +29,7 @@ Ext.define('NX.coreui.view.browse.BrowseResultList', {
     stateId: 'nx-coreui-browse-result-list'
   },
 
-  store: 'BrowseResult',
+  store: 'Component',
 
   style: {
     'background-color': '#F4F4F4'

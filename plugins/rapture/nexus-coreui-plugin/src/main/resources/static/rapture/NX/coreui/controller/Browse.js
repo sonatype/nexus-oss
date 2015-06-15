@@ -30,7 +30,7 @@ Ext.define('NX.coreui.controller.Browse', {
 
   stores: [
     'Asset',
-    'BrowseResult'
+    'Component'
   ],
   models: [
     'Component'
@@ -128,14 +128,14 @@ Ext.define('NX.coreui.controller.Browse', {
    */
   onRepositorySelection: function(model) {
     var me = this,
-        browseResultStore = me.getBrowseResultStore(),
+        componentStore = me.getComponentStore(),
         results = me.getResults(),
         componentFilter = me.getComponentFilter();
 
-    browseResultStore.filters.removeAtKey('filter');
+    componentStore.filters.removeAtKey('filter');
     componentFilter.clearSearch();
     results.getSelectionModel().deselectAll();
-    browseResultStore.addFilter([
+    componentStore.addFilter([
       {
         id: 'repositoryName',
         property: 'repositoryName',
@@ -167,16 +167,16 @@ Ext.define('NX.coreui.controller.Browse', {
    */
   onSearch: function(searchBox, value) {
     var me = this,
-        browseResultStore = me.getBrowseResultStore(),
+        componentStore = me.getComponentStore(),
         results = me.getResults(),
         emptyText = NX.I18n.get('Coreui_View_Browse_BrowseResultList_EmptyText_Filter');
 
-    if (!browseResultStore.emptyText) {
-      browseResultStore.emptyText = results.getView().emptyText;
+    if (!componentStore.emptyText) {
+      componentStore.emptyText = results.getView().emptyText;
     }
     results.getView().emptyText = '<div class="x-grid-empty">' + emptyText.replace(/\$filter/, value) + '</div>';
     results.getSelectionModel().deselectAll();
-    browseResultStore.addFilter([
+    componentStore.addFilter([
       {
         id: 'filter',
         property: 'filter',
@@ -191,18 +191,18 @@ Ext.define('NX.coreui.controller.Browse', {
    */
   onSearchCleared: function() {
     var me = this,
-        browseResultStore = me.getBrowseResultStore(),
+        componentStore = me.getComponentStore(),
         results = me.getResults();
 
-    results.getView().emptyText = browseResultStore.emptyText;
+    results.getView().emptyText = componentStore.emptyText;
     results.getSelectionModel().deselectAll();
     // we have to remove filter directly as store#removeFilter() does not work when store#remoteFilter = true
-    if (browseResultStore.filters.removeAtKey('filter')) {
-      if (browseResultStore.filters.length) {
-        browseResultStore.filter();
+    if (componentStore.filters.removeAtKey('filter')) {
+      if (componentStore.filters.length) {
+        componentStore.filter();
       }
       else {
-        browseResultStore.clearFilter();
+        componentStore.clearFilter();
       }
     }
   },
