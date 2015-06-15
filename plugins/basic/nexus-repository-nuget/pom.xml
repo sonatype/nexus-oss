@@ -31,7 +31,14 @@
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-repository</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -44,11 +51,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-wonderland-plugin</artifactId>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-servlet</artifactId>
     </dependency>
 
     <dependency>
