@@ -82,17 +82,18 @@ Ext.define('NX.coreui.controller.Assets', {
   },
 
   showComponentDetails: function(container, componentModel) {
-    var info1 = {}, info2 = {};
+    var repositoryInfo = {},
+        componentInfo = {};
 
     if (componentModel) {
-      info1[NX.I18n.get('BROWSE_SEARCH_ASSETS_REPOSITORY')] = componentModel.get('repositoryName');
-      info1[NX.I18n.get('BROWSE_SEARCH_ASSETS_FORMAT')] = componentModel.get('format');
-      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_GROUP')] = componentModel.get('group');
-      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME')] = componentModel.get('name');
-      info2[NX.I18n.get('BROWSE_SEARCH_ASSETS_VERSION')] = componentModel.get('version');
+      repositoryInfo[NX.I18n.get('BROWSE_SEARCH_ASSETS_REPOSITORY')] = componentModel.get('repositoryName');
+      repositoryInfo[NX.I18n.get('BROWSE_SEARCH_ASSETS_FORMAT')] = componentModel.get('format');
+      componentInfo[NX.I18n.get('BROWSE_SEARCH_ASSETS_GROUP')] = componentModel.get('group');
+      componentInfo[NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME')] = componentModel.get('name');
+      componentInfo[NX.I18n.get('BROWSE_SEARCH_ASSETS_VERSION')] = componentModel.get('version');
 
-      container.down('#info1').showInfo(info1);
-      container.down('#info2').showInfo(info2);
+      container.down('#repositoryInfo').showInfo(repositoryInfo);
+      container.down('#componentInfo').showInfo(componentInfo);
     }
   },
 

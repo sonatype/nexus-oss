@@ -46,9 +46,9 @@ Ext.define('NX.coreui.view.component.ComponentDetails', {
     var me = this;
 
     me.items = [
-      {xtype: 'nx-info', itemId: 'info1'},
-      {xtype: 'nx-info', itemId: 'info2'},
-      {xtype: 'nx-info', itemId: 'info3'}
+      {xtype: 'nx-info', itemId: 'repositoryInfo'},
+      {xtype: 'nx-info', itemId: 'componentInfo'},
+      {xtype: 'nx-info', itemId: 'extraInfo'}
     ];
 
     me.callParent();

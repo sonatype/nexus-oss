@@ -69,14 +69,14 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
   showHealthCheckInfo: function(grid, model) {
     var me = this,
         componentDetails = me.getComponentDetails(),
-        info3 = {};
+        extraInfo = {};
 
     if (!grid['healthCheckColumns']) {
       return;
     }
 
-    info3[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(model);
-    componentDetails.down('#info3').showInfo(info3);
+    extraInfo[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(model);
+    componentDetails.down('#extraInfo').showInfo(extraInfo);
   },
 
   /**
