@@ -40,7 +40,13 @@ Ext.define('NX.coreui.view.system.BundleList', {
         return 'bundle-default';
       }
     },
-    {header: NX.I18n.get('System_BundleList_ID_Header'), dataIndex: 'id', stateId: 'id', width: 60, resizable: false},
+    {
+      header: NX.I18n.get('System_BundleList_ID_Header'),
+      dataIndex: 'id',
+      stateId: 'id',
+      width: 60,
+      resizable: false
+    },
     {
       header: NX.I18n.get('System_BundleList_State_Header'),
       dataIndex: 'state',
@@ -55,7 +61,12 @@ Ext.define('NX.coreui.view.system.BundleList', {
       width: 60,
       resizable: false
     },
-    {header: NX.I18n.get('System_BundleList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 2},
+    {
+      header: NX.I18n.get('System_BundleList_Name_Header'),
+      dataIndex: 'name',
+      stateId: 'name',
+      flex: 2
+    },
     {
       header: NX.I18n.get('System_BundleList_SymbolicName_Header'),
       dataIndex: 'symbolicName',
@@ -63,7 +74,12 @@ Ext.define('NX.coreui.view.system.BundleList', {
       flex: 2,
       hidden: true
     },
-    {header: NX.I18n.get('System_BundleList_Version_Header'), dataIndex: 'version', stateId: 'version', flex: 1},
+    {
+      header: NX.I18n.get('System_BundleList_Version_Header'),
+      dataIndex: 'version',
+      stateId: 'version',
+      flex: 1
+    },
     {
       header: NX.I18n.get('System_BundleList_Location_Header'),
       dataIndex: 'location',
@@ -78,11 +94,13 @@ Ext.define('NX.coreui.view.system.BundleList', {
     }
   ],
 
-  dockedItems: [{
-    xtype: 'toolbar',
-    dock: 'top',
-    cls: 'nx-actions nx-borderless'
-  }],
+  dockedItems: [
+    {
+      xtype: 'toolbar',
+      dock: 'top',
+      cls: 'nx-actions nx-borderless'
+    }
+  ],
 
   plugins: [
     {ptype: 'gridfilterbox', emptyText: NX.I18n.get('System_BundleList_Filter_EmptyText')}

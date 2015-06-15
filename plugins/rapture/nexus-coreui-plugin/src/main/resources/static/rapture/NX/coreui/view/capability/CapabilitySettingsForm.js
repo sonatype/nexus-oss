@@ -48,6 +48,19 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
     { xtype: 'nx-coreui-formfield-settingsfieldset' }
   ],
 
+  editableMarker: NX.I18n.get('Capability_CapabilityAdd_Create_Error'),
+
+  /**
+   * @override
+   */
+  initComponent: function() {
+    var me = this;
+
+    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:capabilities:update');
+
+    me.callParent(arguments);
+  },
+
   /**
    * @override
    * Imports capability into settings field set.

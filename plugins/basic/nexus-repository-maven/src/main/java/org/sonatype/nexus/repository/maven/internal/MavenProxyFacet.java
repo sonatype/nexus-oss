@@ -55,22 +55,22 @@ public class MavenProxyFacet
   }
 
   @Override
-  protected DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException {
+  protected DateTime getCachedPayloadLastVerified(final Context context) throws IOException {
     return mavenFacet.getLastVerified(mavenPath(context));
   }
 
   @Override
-  protected void indicateUpToDate(final Context context) throws IOException {
+  protected void indicateVerified(final Context context) throws IOException {
     mavenFacet.setLastVerified(mavenPath(context), new DateTime());
   }
 
   @Override
-  protected String getUrl(final @Nonnull Context context) {
+  protected String getUrl(@Nonnull final Context context) {
     return context.getRequest().getPath().substring(1); // omit leading slash
   }
 
   @Nonnull
-  private MavenPath mavenPath(final @Nonnull Context context) {
+  private MavenPath mavenPath(@Nonnull final Context context) {
     return context.getAttributes().require(MavenPath.class);
   }
 }

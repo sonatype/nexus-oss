@@ -28,7 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <siesta2.version>2.1.0</siesta2.version>
+    <siesta2.version>2.2.0-SNAPSHOT</siesta2.version>
     <jackson2.version>2.4.1</jackson2.version>
   </properties>
 

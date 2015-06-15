@@ -29,9 +29,7 @@ Ext.define('NX.coreui.view.role.RoleFeature', {
   masters: { xtype: 'nx-coreui-role-list' },
 
   tabs: [
-    { xtype: 'nx-coreui-role-settings', title: NX.I18n.get('Role_RoleFeature_Settings_Title'), weight: 10 },
-    { xtype: 'nx-coreui-privilege-trace', title: NX.I18n.get('Role_RoleFeature_Trace_Title'), weight: 20 },
-    { xtype: 'nx-coreui-role-tree', title: NX.I18n.get('Role_RoleFeature_Role_Title'), weight: 30 }
+    { xtype: 'nx-coreui-role-settings', title: NX.I18n.get('Role_RoleFeature_Settings_Title'), weight: 10 }
   ],
 
   actions: [

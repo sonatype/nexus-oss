@@ -41,6 +41,7 @@ import org.sonatype.nexus.repository.storage.BucketEntityAdapter;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentDatabase;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
@@ -58,7 +59,6 @@ import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLAsynchQuery;
-
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -81,7 +81,7 @@ public class MetadataRebuilder
   private final BucketEntityAdapter bucketEntityAdapter;
 
   @Inject
-  public MetadataRebuilder(final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
+  public MetadataRebuilder(@Named(ComponentDatabase.NAME) final Provider<DatabaseInstance> databaseInstanceProvider,
                            final BucketEntityAdapter bucketEntityAdapter)
   {
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
@@ -238,14 +238,23 @@ public class MetadataRebuilder
      * Process exits from group level, executed in isolation.
      */
     private void rebuildMetadataExitGroup(final String currentGroupId) {
-      try (StorageTx tx = storageFacet.openTx(db)) {
-        metadataUpdater.processMetadata(
-            tx,
-            metadataMavenPath(currentGroupId, null, null),
-            metadataBuilder.onExitGroupId()
-        );
-        tx.commit();
-      }
+      storageFacet.perform(db, new Operation<Void>()
+      {
+        @Override
+        public Void execute(final StorageTx tx) {
+          metadataUpdater.processMetadata(
+              tx,
+              metadataMavenPath(currentGroupId, null, null),
+              metadataBuilder.onExitGroupId()
+          );
+          return null;
+        }
+
+        @Override
+        public String toString() {
+          return String.format("processMetadata(%s)", currentGroupId);
+        }
+      });
     }
 
     /**
@@ -258,59 +267,77 @@ public class MetadataRebuilder
                                       final Set<String> baseVersions)
     {
       metadataBuilder.onEnterArtifactId(artifactId);
-      for (String baseVersion : baseVersions) {
+      for (final String baseVersion : baseVersions) {
         metadataBuilder.onEnterBaseVersion(baseVersion);
-        try (StorageTx tx = storageFacet.openTx(db)) {
-          final Iterable<Component> components = tx.findComponents(
-              "group = :groupId and name = :artifactId and attributes.maven2.baseVersion = :baseVersion",
-              ImmutableMap.<String, Object>of(
-                  "groupId", groupId,
-                  "artifactId", artifactId,
-                  "baseVersion", baseVersion
-              ),
-              ImmutableList.of(repository),
-              null // order by
-          );
-          for (Component component : components) {
-            for (Asset asset : tx.browseAssets(component)) {
-              final MavenPath mavenPath = mavenPathParser.parsePath(
-                  asset.formatAttributes().require(StorageFacet.P_PATH, String.class)
-              );
-              if (mavenPath.isSubordinate()) {
-                continue;
-              }
-              metadataBuilder.addArtifactVersion(mavenPath);
-              mayUpdateChecksum(tx, asset, mavenPath, HashType.SHA1);
-              mayUpdateChecksum(tx, asset, mavenPath, HashType.MD5);
-              if (mavenPath.isPom()) {
-                final Xpp3Dom pom = getModel(tx, mavenPath);
-                if (pom != null) {
-                  final String packaging = getChildValue(pom, "packaging", "jar");
-                  log.debug("POM packaging: {}", packaging);
-                  if ("maven-plugin".equals(packaging)) {
-                    metadataBuilder.addPlugin(getPluginPrefix(tx, mavenPath.locateMainArtifact("jar")), artifactId,
-                        getChildValue(pom, "name", null));
+        storageFacet.perform(db, new Operation<Void>()
+        {
+          @Override
+          public Void execute(final StorageTx tx) {
+            final Iterable<Component> components = tx.findComponents(
+                "group = :groupId and name = :artifactId and attributes.maven2.baseVersion = :baseVersion",
+                ImmutableMap.<String, Object>of(
+                    "groupId", groupId,
+                    "artifactId", artifactId,
+                    "baseVersion", baseVersion
+                ),
+                ImmutableList.of(repository),
+                null // order by
+            );
+            for (Component component : components) {
+              for (Asset asset : tx.browseAssets(component)) {
+                final MavenPath mavenPath = mavenPathParser.parsePath(
+                    asset.formatAttributes().require(StorageFacet.P_PATH, String.class)
+                );
+                if (mavenPath.isSubordinate()) {
+                  continue;
+                }
+                metadataBuilder.addArtifactVersion(mavenPath);
+                mayUpdateChecksum(tx, asset, mavenPath, HashType.SHA1);
+                mayUpdateChecksum(tx, asset, mavenPath, HashType.MD5);
+                if (mavenPath.isPom()) {
+                  final Xpp3Dom pom = getModel(tx, mavenPath);
+                  if (pom != null) {
+                    final String packaging = getChildValue(pom, "packaging", "jar");
+                    log.debug("POM packaging: {}", packaging);
+                    if ("maven-plugin".equals(packaging)) {
+                      metadataBuilder.addPlugin(getPluginPrefix(tx, mavenPath.locateMainArtifact("jar")), artifactId,
+                          getChildValue(pom, "name", null));
+                    }
                   }
                 }
               }
             }
+            metadataUpdater.processMetadata(
+                tx,
+                metadataMavenPath(groupId, artifactId, baseVersion),
+                metadataBuilder.onExitBaseVersion()
+            );
+            return null;
           }
+
+          @Override
+          public String toString() {
+            return String.format("rebuildMetadataInner(%s, %s, %s)", groupId, artifactId, baseVersion);
+          }
+        });
+      }
+      storageFacet.perform(db, new Operation<Void>()
+      {
+        @Override
+        public Void execute(final StorageTx tx) {
           metadataUpdater.processMetadata(
               tx,
-              metadataMavenPath(groupId, artifactId, baseVersion),
-              metadataBuilder.onExitBaseVersion()
+              metadataMavenPath(groupId, artifactId, null),
+              metadataBuilder.onExitArtifactId()
           );
-          tx.commit();
+          return null;
         }
-      }
-      try (StorageTx tx = storageFacet.openTx(db)) {
-        metadataUpdater.processMetadata(
-            tx,
-            metadataMavenPath(groupId, artifactId, null),
-            metadataBuilder.onExitArtifactId()
-        );
-        tx.commit();
-      }
+
+        @Override
+        public String toString() {
+          return String.format("processMetadata(%s, %s)", groupId,  artifactId);
+        }
+      });
     }
 
     /**
@@ -339,7 +366,6 @@ public class MetadataRebuilder
         }
       }
       catch (IOException e) {
-        // TODO: ignore that underlying storage puke on read?
         log.warn("Error reading {}", checksumPath, e);
       }
       // we need to generate/write it
@@ -396,8 +422,7 @@ public class MetadataRebuilder
      */
     private Xpp3Dom parse(final MavenPath mavenPath, final InputStream is) {
       try (InputStreamReader reader = new InputStreamReader(is, Charsets.UTF_8)) {
-        Xpp3Dom dom = Xpp3DomBuilder.build(reader);
-        return dom;
+        return Xpp3DomBuilder.build(reader);
       }
       catch (XmlPullParserException e) {
         log.debug("Could not parse POM: {}", mavenPath.getPath(), e);
@@ -425,7 +450,7 @@ public class MetadataRebuilder
           try (ZipInputStream zip = new ZipInputStream(jarFile.openInputStream())) {
             ZipEntry entry;
             while ((entry = zip.getNextEntry()) != null) {
-              if (!entry.isDirectory() && entry.getName().equals("META-INF/maven/plugin.xml")) {
+              if (!entry.isDirectory() && "META-INF/maven/plugin.xml".equals(entry.getName())) {
                 final Xpp3Dom dom = parse(mavenPath, zip);
                 prefix = getChildValue(dom, "goalPrefix", null);
                 break;

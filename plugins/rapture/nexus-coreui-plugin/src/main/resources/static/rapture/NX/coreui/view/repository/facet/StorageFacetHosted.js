@@ -51,6 +51,7 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacetHosted', {
           {
             xtype: 'combo',
             name: 'attributes.storage.writePolicy',
+            itemId: 'writePolicy',
             fieldLabel: NX.I18n.get('Repository_Facet_StorageFacetHosted_Deployment_FieldLabel'),
             helpText: NX.I18n.get('Repository_Facet_StorageFacetHosted_Deployment_HelpText'),
             emptyText: NX.I18n.get('Repository_Facet_StorageFacetHosted_Deployment_EmptyText'),

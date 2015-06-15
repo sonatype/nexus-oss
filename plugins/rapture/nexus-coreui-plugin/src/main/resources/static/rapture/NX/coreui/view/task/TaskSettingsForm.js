@@ -56,6 +56,8 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     { xtype: 'nx-coreui-task-schedulefieldset' }
   ],
 
+  editableMarker: NX.I18n.get('Task_TaskSettingsForm_Update_Error'),
+
   /**
    * @override
    */

@@ -36,6 +36,9 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionAdd', {
     me.settingsForm = {
       xtype: 'nx-coreui-ldapserver-connection-form',
 
+      editableCondition: NX.Conditions.isPermitted('nexus:ldap:create'),
+      editableMarker: NX.I18n.get('Ldap_LdapServerConnectionAdd_Create_Error'),
+
       buttons: [
         { text: NX.I18n.get('Ldap_LdapServerConnectionAdd_Text'), action: 'next', formBind: true, ui: 'nx-primary' },
         { text: NX.I18n.get('Add_Cancel_Button'), handler: function () {

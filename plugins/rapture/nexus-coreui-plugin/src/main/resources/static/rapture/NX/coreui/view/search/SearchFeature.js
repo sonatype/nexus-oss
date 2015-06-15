@@ -73,14 +73,13 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
       },
       items: [
         {
-          itemId: 'searchResultDetails',
-          xtype: 'nx-coreui-search-result-details'
+          xtype: 'nx-coreui-component-details'
         },
         {
           xtype: 'nx-actions'
         },
         {
-          xtype: 'nx-coreui-search-result-asset-list',
+          xtype: 'nx-coreui-component-asset-list',
           flex: 1
         }
       ]
@@ -110,11 +109,8 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
   initComponent: function() {
     var me = this;
-
     me.callParent(arguments);
-
     // Set default icon for the component version list
-    var item = me.down('nx-coreui-search-result-asset-list').up('nx-drilldown-item');
-    item.setItemClass('nx-icon-search-component-detail-x16');
+    me.down('nx-coreui-component-asset-list').up('nx-drilldown-item').setItemClass('nx-icon-search-component-detail-x16');
   }
 });

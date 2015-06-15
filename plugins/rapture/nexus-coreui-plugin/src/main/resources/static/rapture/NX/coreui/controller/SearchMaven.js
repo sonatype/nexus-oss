@@ -32,7 +32,7 @@ Ext.define('NX.coreui.controller.SearchMaven', {
 
     search.registerCriteria([
       {
-        id: 'attributes.maven.groupId',
+        id: 'attributes.maven2.groupId',
         group: NX.I18n.get('SearchMaven_Group'),
         config: {
           fieldLabel: NX.I18n.get('SearchMaven_GroupID_FieldLabel'),
@@ -40,7 +40,7 @@ Ext.define('NX.coreui.controller.SearchMaven', {
         }
       },
       {
-        id: 'attributes.maven.artifactId',
+        id: 'attributes.maven2.artifactId',
         group: NX.I18n.get('SearchMaven_Group'),
         config: {
           fieldLabel: NX.I18n.get('SearchMaven_ArtifactID_FieldLabel'),
@@ -48,14 +48,30 @@ Ext.define('NX.coreui.controller.SearchMaven', {
         }
       },
       {
-        id: 'attributes.maven.classifier',
+        id: 'attributes.maven2.baseVersion',
         group: NX.I18n.get('SearchMaven_Group'),
+        config: {
+          fieldLabel: NX.I18n.get('SearchMaven_BaseVersion_FieldLabel'),
+          width: 250
+        }
+      },
+      {
+        id: 'attributes.maven2.version',
+        group: NX.I18n.get('SearchMaven_Group_Criteria'),
+        config: {
+          fieldLabel: NX.I18n.get('SearchMaven_Version_FieldLabel'),
+          width: 250
+        }
+      },
+      {
+        id: 'attributes.maven2.classifier',
+        group: NX.I18n.get('SearchMaven_Group_Criteria'),
         config: {
           fieldLabel: NX.I18n.get('SearchMaven_Classifier_FieldLabel')
         }
       },
       {
-        id: 'attributes.maven.packaging',
+        id: 'attributes.maven2.extension',
         group: NX.I18n.get('SearchMaven_Group'),
         config: {
           fieldLabel: NX.I18n.get('SearchMaven_Packaging_FieldLabel')
@@ -71,11 +87,11 @@ Ext.define('NX.coreui.controller.SearchMaven', {
       readOnly: true,
       criterias: [
         { id: 'format', value: 'maven2', hidden: true },
-        { id: 'attributes.maven.groupId' },
-        { id: 'attributes.maven.artifactId' },
+        { id: 'attributes.maven2.groupId' },
+        { id: 'attributes.maven2.artifactId' },
         { id: 'version' },
-        { id: 'attributes.maven.classifier'},
-        { id: 'attributes.maven.packaging' }
+        { id: 'attributes.maven2.classifier'},
+        { id: 'attributes.maven2.packaging' }
       ]
     }, me);
   }

@@ -229,7 +229,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         win = form.up('nx-coreui-repository-add');
 
     if (win) {
-      me.loadStoreAndSelect(action.result.data.id, false);
+      me.loadStoreAndSelect(action.result.data.id, true);
     }
     else {
       me.loadStore(Ext.emptyFn);
@@ -356,9 +356,9 @@ Ext.define('NX.coreui.controller.Repositories', {
         NX.Conditions.and(
             permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*:delete'),
             NX.Conditions.gridHasSelection('nx-coreui-repository-list', function(model) {
-              var permission = 'nexus:repository-admin:' + model.get('format') + ':' + model.get('name');
-              permittedCondition.name = permission;
-              permittedCondition.evaluate();
+              permittedCondition.setPermission(
+                  'nexus:repository-admin:' + model.get('format') + ':' + model.get('name') + ':delete'
+              );
               return true;
             })
         ),

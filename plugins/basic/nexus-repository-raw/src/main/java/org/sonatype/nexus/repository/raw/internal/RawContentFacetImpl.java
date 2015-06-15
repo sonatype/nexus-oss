@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.raw.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -21,6 +22,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -29,8 +31,10 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 
@@ -50,6 +54,8 @@ public class RawContentFacetImpl
     implements RawContentFacet
 {
   private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(MD5, SHA1);
+
+  private static final String P_LAST_VERIFIED_DATE = "last_verified";
 
   // TODO: raw does not have config, this method is here only to have this bundle do Import-Package org.sonatype.nexus.repository.config
   // TODO: as FacetSupport subclass depends on it. Actually, this facet does not need any kind of configuration
@@ -77,31 +83,55 @@ public class RawContentFacetImpl
 
   @Override
   public void put(final String path, final RawContent content) throws IOException, InvalidContentException {
-    try (StorageTx tx = getStorage().openTx()) {
-      final Bucket bucket = tx.getBucket();
-      Component component = getComponent(tx, path, bucket);
-      Asset asset;
-      if (component == null) {
-        // CREATE
-        component = tx.createComponent(bucket, getRepository().getFormat())
-            .group(getGroup(path))
-            .name(getName(path));
+    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
+      getStorage().perform(new Operation<Void>()
+      {
+        @Override
+        public Void execute(final StorageTx tx) {
+          try {
+            final Bucket bucket = tx.getBucket();
+            Component component = getComponent(tx, path, bucket);
+            Asset asset;
+            if (component == null) {
+              // CREATE
+              component = tx.createComponent(bucket, getRepository().getFormat())
+                  .group(getGroup(path))
+                  .name(getName(path));
 
-        // Set attributes map to contain "raw" format-specific metadata (in this case, path)
-        component.formatAttributes().set(P_PATH, path);
-        tx.saveComponent(component);
+              // Set attributes map to contain "raw" format-specific metadata (in this case, path)
+              component.formatAttributes().set(P_PATH, path);
+              tx.saveComponent(component);
 
-        asset = tx.createAsset(bucket, component);
-        asset.name(component.name());
+              asset = tx.createAsset(bucket, component);
+              asset.name(component.name());
+            }
+            else {
+              // UPDATE
+              asset = tx.firstAsset(component);
+            }
+
+            asset.formatAttributes().set(P_LAST_VERIFIED_DATE, new Date());
+            tx.setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, content.getContentType());
+            tx.saveAsset(asset);
+
+            return null;
+          }
+          catch (IOException e) {
+            throw Throwables.propagate(e);
+          }
+        }
+
+        @Override
+        public String toString() {
+          return String.format("put(%s)", path);
+        }
+      });
+    }
+    catch (RuntimeException e) {
+      if (e.getCause() instanceof IOException) {
+        throw (IOException) e.getCause();
       }
-      else {
-        // UPDATE
-        asset = tx.firstAsset(component);
-      }
-
-      tx.setBlob(asset, path, content.openInputStream(), hashAlgorithms, null, content.getContentType());
-      tx.saveAsset(asset);
-      tx.commit();
+      throw e;
     }
   }
 
@@ -142,19 +172,32 @@ public class RawContentFacetImpl
   }
 
   @Override
-  public void updateLastUpdated(final String path, final DateTime lastUpdated) throws IOException {
-    try (StorageTx tx = getStorage().openTx()) {
-      Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
+  public void updateLastVerified(final String path, final DateTime lastUpdated) throws IOException {
+    getStorage().perform(new Operation<Date>()
+    {
+      @Override
+      public Date execute(final StorageTx tx) {
+        Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
 
-      if (component == null) {
-        log.debug("Updating lastUpdated time for non-existent raw component {}", path);
-        return;
+        if (component == null) {
+          log.debug("Attempting to set last verified date for non-existent raw component {}", path);
+          return null;
+        }
+
+        final Asset asset = tx.firstAsset(component);
+
+        final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+        asset.formatAttributes().set(P_LAST_VERIFIED_DATE, lastUpdated.toDate());
+        tx.saveAsset(tx.firstAsset(component));
+
+        return priorDate;
       }
 
-      // last updated will be automatically set on update
-      tx.saveAsset(tx.firstAsset(component));
-      tx.commit();
-    }
+      @Override
+      public String toString() {
+        return String.format("updateLastVerified(%s, %s)", path, lastUpdated);
+      }
+    });
   }
 
   private StorageFacet getStorage() {
@@ -169,7 +212,7 @@ public class RawContentFacetImpl
 
   private RawContent marshall(final Asset asset, final Blob blob) {
     final String contentType = asset.requireContentType();
-    final DateTime lastUpdated = asset.requireLastUpdated();
+    final DateTime lastVerified = new DateTime(asset.formatAttributes().require(P_LAST_VERIFIED_DATE, Date.class));
 
     return new RawContent()
     {
@@ -189,8 +232,8 @@ public class RawContentFacetImpl
       }
 
       @Override
-      public DateTime getLastUpdated() {
-        return lastUpdated;
+      public DateTime getLastVerified() {
+        return lastVerified;
       }
     };
   }

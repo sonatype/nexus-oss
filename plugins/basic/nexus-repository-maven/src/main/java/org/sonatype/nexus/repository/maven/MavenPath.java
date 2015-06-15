@@ -219,7 +219,9 @@ public class MavenPath
    * Returns the Maven coordinates if this path is an artifact path, otherwise {@code null}.
    */
   @Nullable
-  public Coordinates getCoordinates() { return coordinates; }
+  public Coordinates getCoordinates() {
+    return coordinates;
+  }
 
   /**
    * Returns {@code true} if this path is subordinate (is hash or signature) of another path.
@@ -378,7 +380,7 @@ public class MavenPath
     checkArgument(coordinates != null, "Only artifact paths may locate: %s", this);
 
     MavenPath origin = main();
-    Coordinates coordinates = new Coordinates(
+    Coordinates newCoordinates = new Coordinates(
         origin.coordinates.isSnapshot(),
         origin.coordinates.getGroupId(),
         origin.coordinates.getArtifactId(),
@@ -402,7 +404,7 @@ public class MavenPath
     newPath += "." + extension;
     return new MavenPath(
         newPath,
-        coordinates
+        newCoordinates
     );
   }
 

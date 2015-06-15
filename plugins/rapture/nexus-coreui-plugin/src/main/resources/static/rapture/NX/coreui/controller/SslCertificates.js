@@ -280,7 +280,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         if (win) {
           win.close();
         }
-        me.loadStoreAndSelect(model.internalId, false);
+        me.loadStoreAndSelect(model.internalId, true);
         NX.Messages.add({ text: NX.I18n.format('SslCertificates_Load_Success', description), type: 'success' });
       }
     });

@@ -29,9 +29,7 @@ Ext.define('NX.coreui.view.user.UserFeature', {
   masters: { xtype: 'nx-coreui-user-list' },
 
   tabs: [
-    { xtype: 'nx-coreui-user-settings', title: NX.I18n.get('User_UserFeature_Settings_Title'), weight: 10 },
-    { xtype: 'nx-coreui-privilege-trace', title: NX.I18n.get('User_UserFeature_PrivilegeTrace_Title'), weight: 20 },
-    { xtype: 'nx-coreui-role-tree', title: NX.I18n.get('User_UserFeature_RoleTree_Title'), weight: 30 }
+    { xtype: 'nx-coreui-user-settings', title: NX.I18n.get('User_UserFeature_Settings_Title'), weight: 10 }
   ],
 
   actions: [

@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Map;
 
@@ -27,8 +28,8 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.maven.MavenFacet;
@@ -42,6 +43,7 @@ import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.types.ProxyType;
@@ -50,6 +52,7 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
@@ -177,26 +180,36 @@ public class MavenFacetImpl
   @Nullable
   @Override
   public Content get(final MavenPath path) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      return get(tx, path);
-    }
+    log.debug("GET {} : {}", getRepository().getName(), path.getPath());
+    return storageFacet.perform(new Operation<Content>()
+    {
+      @Override
+      public Content execute(final StorageTx tx) {
+        return toContent(tx, path);
+      }
+
+      @Override
+      public String toString() {
+        return String.format("get(%s)", path.getPath());
+      }
+    });
   }
 
   @Nullable
   @Override
   public Content get(final StorageTx tx, final MavenPath path) throws IOException {
     log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    final Asset asset = findAsset(tx, tx.getBucket(), path);
-    if (asset == null) {
-      return null;
-    }
-    return toContent(tx, asset);
+    return toContent(tx, path);
   }
 
   /**
    * Creates {@link Content} from passed in {@link Asset}.
    */
-  private Content toContent(final StorageTx tx, final Asset asset) throws IOException {
+  private Content toContent(final StorageTx tx, final MavenPath mavenPath) {
+    final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
+    if (asset == null) {
+      return null;
+    }
     final Blob blob = tx.requireBlob(asset.requireBlobRef());
     final String contentType = asset.contentType();
 
@@ -218,24 +231,54 @@ public class MavenFacetImpl
   }
 
   @Override
-  public Content put(final MavenPath path, final Payload payload)
-      throws IOException, InvalidContentException
+  public void put(final MavenPath path, final Payload payload)
+      throws IOException
   {
-    try (StorageTx tx = storageFacet.openTx()) {
-      Content content = put(tx, path, payload);
-      tx.commit();
-      return content;
+    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
+      storageFacet.perform(new Operation<Void>()
+      {
+        @Override
+        public Void execute(final StorageTx tx) {
+          try {
+            put(tx, path, payload, streamSupplier.get());
+            return null;
+          }
+          catch (IOException e) {
+            throw Throwables.propagate(e);
+          }
+        }
+
+        @Override
+        public String toString() {
+          return String.format("put(%s)", path.getPath());
+        }
+      });
+    }
+    catch (RuntimeException e) {
+      if (e.getCause() instanceof IOException) {
+        throw (IOException) e.getCause();
+      }
+      throw e;
     }
   }
 
   @Override
-  public Content put(final StorageTx tx, final MavenPath path, final Payload payload)
-      throws IOException, InvalidContentException
+  public void put(final StorageTx tx, final MavenPath path, final Payload payload)
+      throws IOException
+  {
+    put(tx, path, payload, payload.openInputStream());
+  }
+
+  private void put(final StorageTx tx,
+                   final MavenPath path,
+                   final Payload payload,
+                   final InputStream inputStream)
+      throws IOException
   {
     log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
     final AssetBlob assetBlob = tx.createBlob(
         path.getPath(),
-        payload.openInputStream(),
+        inputStream,
         HashType.ALGORITHMS,
         null,
         payload.getContentType()
@@ -245,18 +288,18 @@ public class MavenFacetImpl
       contentAttributes = ((Content) payload).getAttributes();
     }
     if (path.getCoordinates() != null) {
-      return putArtifact(tx, path, assetBlob, contentAttributes);
+      putArtifact(tx, path, assetBlob, contentAttributes);
     }
     else {
-      return putFile(tx, path, assetBlob, contentAttributes);
+      putFile(tx, path, assetBlob, contentAttributes);
     }
   }
 
-  private Content putArtifact(final StorageTx tx,
-                              final MavenPath path,
-                              final AssetBlob assetBlob,
-                              @Nullable final AttributesMap contentAttributes)
-      throws IOException, InvalidContentException
+  private void putArtifact(final StorageTx tx,
+                           final MavenPath path,
+                           final AssetBlob assetBlob,
+                           @Nullable final AttributesMap contentAttributes)
+      throws IOException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
     Component component = findComponent(tx, tx.getBucket(), path);
@@ -296,14 +339,13 @@ public class MavenFacetImpl
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
-    return toContent(tx, asset);
   }
 
-  private Content putFile(final StorageTx tx,
-                          final MavenPath path,
-                          final AssetBlob assetBlob,
-                          @Nullable final AttributesMap contentAttributes)
-      throws IOException, InvalidContentException
+  private void putFile(final StorageTx tx,
+                       final MavenPath path,
+                       final AssetBlob assetBlob,
+                       @Nullable final AttributesMap contentAttributes)
+      throws IOException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
@@ -317,7 +359,6 @@ public class MavenFacetImpl
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
-    return toContent(tx, asset);
   }
 
   private void putAssetPayload(final StorageTx tx,
@@ -408,24 +449,31 @@ public class MavenFacetImpl
 
   @Override
   public boolean setLastVerified(final MavenPath path, final DateTime verified) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      final Asset asset = findAsset(tx, tx.getBucket(), path);
-      if (asset == null) {
-        return false;
+    return storageFacet.perform(new Operation<Boolean>()
+    {
+      @Override
+      public Boolean execute(final StorageTx tx) {
+        final Asset asset = findAsset(tx, tx.getBucket(), path);
+        if (asset == null) {
+          return false;
+        }
+        final NestedAttributesMap attributes = asset.formatAttributes();
+        attributes.set(P_LAST_VERIFIED, verified.toDate());
+        tx.saveAsset(asset);
+        return true;
       }
-      final NestedAttributesMap attributes = asset.formatAttributes();
-      attributes.set(P_LAST_VERIFIED, verified.toDate());
-      tx.saveAsset(asset);
-      tx.commit();
-      return true;
-    }
+
+      @Override
+      public String toString() {
+        return String.format("setLastVerified(%s, %s)", path.getPath(), verified);
+      }
+    });
   }
 
   /**
    * Returns component key based on passed in {@link Coordinates} G:A:V values.
    */
   private String getComponentKey(final Coordinates coordinates) {
-    // TODO: maybe sha1() the resulting string?
     return coordinates.getGroupId()
         + ":" + coordinates.getArtifactId()
         + ":" + coordinates.getVersion();
@@ -435,7 +483,6 @@ public class MavenFacetImpl
    * Returns asset key based on passed in {@link MavenPath} path value.
    */
   private String getAssetKey(final MavenPath mavenPath) {
-    // TODO: maybe sha1() the resulting string?
     return mavenPath.getPath();
   }
 

@@ -30,7 +30,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
 
   controllers: [
     {
-      id: 'NX.coreui.controller.AssetInfo',
+      id: 'NX.coreui.controller.Assets',
       active: function () {
         return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
       }
@@ -49,6 +49,12 @@ Ext.define('NX.coreui.app.PluginConfig', {
     },
     {
       id: 'NX.coreui.controller.AnonymousSettings',
+      active: function () {
+        return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.Browse',
       active: function () {
         return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
       }
@@ -74,7 +80,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
-      id: 'NX.coreui.controller.HealthCheckSearch',
+      id: 'NX.coreui.controller.HealthCheckColumns',
       active: function () {
         return NX.app.Application.bundleActive('com.sonatype.nexus.plugins.nexus-healthcheck-oss-plugin')
             || NX.app.Application.bundleActive('com.sonatype.nexus.plugins.nexus-clm-plugin');

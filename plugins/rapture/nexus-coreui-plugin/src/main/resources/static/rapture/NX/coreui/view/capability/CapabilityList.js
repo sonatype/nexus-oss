@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-capability-list',
   requires: [
-    'NX.I18n'
+    'NX.I18n',
+    'NX.ext.grid.column.Renderers'
   ],
 
   store: 'Capability',
@@ -35,9 +36,24 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
       dataIndex: 'state',
       hideable: false
     },
-    { text: NX.I18n.get('Capability_CapabilityList_Type_Header'), dataIndex: 'typeName', flex: 1 },
-    { text: NX.I18n.get('Capability_CapabilityList_Description_Header'), dataIndex: 'description', flex: 1, groupable: false },
-    { text: NX.I18n.get('Capability_CapabilityList_Notes_Header'), dataIndex: 'notes', flex: 1 }
+    {
+      text: NX.I18n.get('Capability_CapabilityList_Type_Header'),
+      dataIndex: 'typeName',
+      flex: 1
+    },
+    {
+      text: NX.I18n.get('Capability_CapabilityList_Description_Header'),
+      dataIndex: 'description',
+      flex: 1,
+      groupable: false,
+      renderer: NX.ext.grid.column.Renderers.optionalData
+    },
+    {
+      text: NX.I18n.get('Capability_CapabilityList_Notes_Header'),
+      dataIndex: 'notes',
+      flex: 1,
+      renderer: NX.ext.grid.column.Renderers.optionalData
+    }
   ],
 
   viewConfig: {
@@ -75,6 +91,13 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   plugins: [
     { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Capability_CapabilityList_Filter_EmptyText') }
   ],
+
+  /**
+   * Copy of original column configuration, to support adding dynamic tag columns.
+   *
+   * @public
+   */
+  originalColumns: undefined,
 
   /**
    * @override

@@ -117,8 +117,6 @@ public class MetadataUpdater
         write(tx, mavenPath, toMetadata(metadata));
       }
       else {
-        // TODO: compare? unsure is it worth it, as compare would also eat CPU maybe even more that writing would
-        // update old by merging them and write out
         final Metadata updated = metadataMerger.merge(
             ImmutableList.of(
                 new MetadataEnvelope(repository.getName() + ":" + mavenPath.getPath(), oldMetadata),
@@ -155,7 +153,7 @@ public class MetadataUpdater
   void delete(final StorageTx tx, final MavenPath mavenPath) {
     checkNotNull(mavenPath);
     try {
-      final ArrayList<MavenPath> paths = new ArrayList<>();
+      final List<MavenPath> paths = new ArrayList<>();
       paths.add(mavenPath);
       for (HashType hashType : HashType.values()) {
         paths.add(mavenPath.hash(hashType));
@@ -231,7 +229,7 @@ public class MetadataUpdater
         return metadataReader.read(is);
       }
       catch (XmlPullParserException e) {
-        // corrupted, nuke it
+        log.warn("Corrupted metadata {}", mavenPath.getPath(), e);
         return null;
       }
     }
@@ -245,13 +243,10 @@ public class MetadataUpdater
   {
     final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     metadataWriter.write(byteArrayOutputStream, metadata);
-    final Content mainContent = mavenFacet.put(
-        tx,
-        mavenPath,
-        new BytesPayload(byteArrayOutputStream.toByteArray(), Maven2MimeRulesSource.METADATA_TYPE)
-    );
-    final Map<HashAlgorithm, HashCode> hashCodes = mainContent.getAttributes().require(
-        Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
+    mavenFacet.put(tx, mavenPath, new BytesPayload(byteArrayOutputStream.toByteArray(),
+        Maven2MimeRulesSource.METADATA_TYPE));
+    final Map<HashAlgorithm, HashCode> hashCodes = mavenFacet.get(tx, mavenPath).getAttributes()
+        .require(Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
     checkState(hashCodes != null, "hashCodes");
     for (HashType hashType : HashType.values()) {
       final MavenPath checksumPath = mavenPath.hash(hashType);

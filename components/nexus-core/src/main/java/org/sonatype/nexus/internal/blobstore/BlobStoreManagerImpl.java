@@ -139,7 +139,14 @@ public class BlobStoreManagerImpl
 
     store.create(configuration);
 
-    BlobStore blobStore = newBlobStore(configuration);
+    BlobStore blobStore;
+    try {
+      blobStore = newBlobStore(configuration);
+    } catch (Exception e) {
+      store.delete(configuration);
+      throw e;
+    }
+
     track(configuration.getName(), blobStore);
 
     blobStore.start();

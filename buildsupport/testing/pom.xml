@@ -38,13 +38,13 @@
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>server-provider</artifactId>
-        <version>0.10</version>
+        <version>0.11</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>junit-runner</artifactId>
-        <version>0.10</version>
+        <version>0.11</version>
       </dependency>
 
       <dependency>

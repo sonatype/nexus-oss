@@ -42,15 +42,12 @@ Ext.define('NX.coreui.controller.Roles', {
     'role.RoleFeature',
     'role.RoleList',
     'role.RoleSettings',
-    'role.RoleSettingsForm',
-    'role.RoleTree'
+    'role.RoleSettingsForm'
   ],
   refs: [
     { ref: 'feature', selector: 'nx-coreui-role-feature' },
     { ref: 'list', selector: 'nx-coreui-role-list' },
-    { ref: 'settings', selector: 'nx-coreui-role-feature nx-coreui-role-settings' },
-    { ref: 'privilegeTrace', selector: 'nx-coreui-role-feature nx-coreui-privilege-trace' },
-    { ref: 'roleTree', selector: 'nx-coreui-role-feature nx-coreui-role-tree' }
+    { ref: 'settings', selector: 'nx-coreui-role-feature nx-coreui-role-settings' }
   ],
   icons: {
     'role-default': {
@@ -110,12 +107,6 @@ Ext.define('NX.coreui.controller.Roles', {
         },
         'nx-coreui-role-settings-form': {
           submitted: me.onSettingsSubmitted
-        },
-        'nx-coreui-role-feature nx-coreui-privilege-trace': {
-          activate: me.onPrivilegeTraceActivate
-        },
-        'nx-coreui-role-feature nx-coreui-role-tree': {
-          activate: me.onRoleTreeActivate
         }
       }
     });
@@ -133,8 +124,6 @@ Ext.define('NX.coreui.controller.Roles', {
 
     if (Ext.isDefined(model)) {
       me.getSettings().loadRecord(model);
-      me.getPrivilegeTrace().loadRecord(model.data);
-      me.getRoleTree().loadRecord(model.data);
     }
   },
 
@@ -237,36 +226,12 @@ Ext.define('NX.coreui.controller.Roles', {
   /**
    * @private
    */
-  onPrivilegeTraceActivate: function(panel) {
-    var me = this;
-
-    panel.loadRecord({
-      roles: me.getSettings().down('#roles').getValue(),
-      privileges: me.getSettings().down('#privileges').getValue()
-    });
-  },
-
-  /**
-   * @private
-   */
-  onRoleTreeActivate: function(panel) {
-    var me = this;
-
-    panel.loadRecord({
-      roles: me.getSettings().down('#roles').getValue(),
-      privileges: me.getSettings().down('#privileges').getValue()
-    });
-  },
-
-  /**
-   * @private
-   */
   onSettingsSubmitted: function(form, action) {
     var me = this,
         win = form.up('nx-coreui-role-add');
 
     if (win) {
-      me.loadStoreAndSelect(action.result.data.id, false);
+      me.loadStoreAndSelect(action.result.data.id, true);
     } else {
       me.loadStore(Ext.emptyFn);
     }

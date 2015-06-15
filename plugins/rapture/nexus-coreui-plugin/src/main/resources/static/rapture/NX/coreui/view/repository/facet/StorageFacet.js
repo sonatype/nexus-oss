@@ -45,6 +45,7 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
           {
             xtype: 'checkbox',
             name: 'attributes.storage.strictContentTypeValidation',
+            itemId: 'strictContentTypeValidation',
             fieldLabel: NX.I18n.get('Repository_Facet_StorageFacet_ContentTypeValidation_FieldLabel'),
             value: true
           }
