@@ -37,6 +37,4 @@ class BlobStoreXO
 
   @Range
   long availableSpace
-
-  boolean inUse
 }

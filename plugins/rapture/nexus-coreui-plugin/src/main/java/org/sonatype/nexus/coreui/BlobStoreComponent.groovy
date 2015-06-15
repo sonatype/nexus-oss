@@ -86,8 +86,7 @@ class BlobStoreComponent
         attributes: attributeConverter.asAttributes(blobStore.blobStoreConfiguration.attributes),
         blobCount: blobStore.metrics.blobCount,
         totalSize: blobStore.metrics.totalSize,
-        availableSpace: blobStore.metrics.availableSpace,
-        inUse: blobStore.inUse
+        availableSpace: blobStore.metrics.availableSpace
     )
   }
 }

@@ -120,19 +120,4 @@ public interface BlobStore
    * @return Iterable handle must be closed when finished using it.
    */
   AutoClosableIterable<BlobId> iterator();
-
-  /**
-   * @return true if this blob store is is in use
-   */
-  boolean isInUse();
-
-  /**
-   * Increases the usage of this blob store;
-   */
-  void increaseUsage();
-
-  /**
-   * Decreases the usage of this blob store;
-   */
-  void decreaseUsage();
 }

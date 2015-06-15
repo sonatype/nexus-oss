@@ -21,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -77,8 +76,6 @@ public class FileBlobStore
   private volatile BlobStoreListener listener;
 
   private BlobStoreConfiguration blobStoreConfiguration;
-
-  private final AtomicInteger usage = new AtomicInteger();
 
   @Inject
   public FileBlobStore(final LocationStrategy locationStrategy,
@@ -313,21 +310,6 @@ public class FileBlobStore
   @Override
   public AutoClosableIterable<BlobId> iterator() {
     return metadataStore.findWithState(BlobState.ALIVE);
-  }
-
-  @Override
-  public boolean isInUse() {
-    return usage.get() > 0;
-  }
-
-  @Override
-  public void increaseUsage() {
-    usage.incrementAndGet();
-  }
-
-  @Override
-  public void decreaseUsage() {
-    usage.decrementAndGet();
   }
 
   private void checkExists(final Path path, final BlobId blobId) throws IOException {
