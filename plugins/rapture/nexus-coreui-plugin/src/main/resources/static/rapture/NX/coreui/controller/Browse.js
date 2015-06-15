@@ -161,8 +161,11 @@ Ext.define('NX.coreui.controller.Browse', {
   /**
    * @private
    * Filter grid.
+   *
+   * @param {NX.ext.SearchBox} searchBox component
+   * @param {String} value to be searched
    */
-  onSearch: function(searchbox, value) {
+  onSearch: function(searchBox, value) {
     var me = this,
         browseResultStore = me.getBrowseResultStore(),
         results = me.getResults(),
