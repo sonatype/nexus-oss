@@ -84,11 +84,18 @@ Ext.define('NX.controller.Drilldown', {
 
     // Add event handlers to each list
     for (var i = 0; i < me.masters.length; ++i) {
-      componentListener[me.masters[i]] = {
-        afterrender: me.onAfterRender,
-        selection: me.onSelection,
-        cellclick: me.onCellClick
-      };
+      if (i == 0) {
+        componentListener[me.masters[i]] = {
+          afterrender: me.onAfterRender, // Force the first master to load on render
+          selection: me.onSelection,
+          cellclick: me.onCellClick
+        };
+      } else {
+        componentListener[me.masters[i]] = {
+          selection: me.onSelection,
+          cellclick: me.onCellClick
+        };
+      }
     }
 
     // If there’s at least one list, add event handlers to buttons and tabs
@@ -186,7 +193,7 @@ Ext.define('NX.controller.Drilldown', {
 
   /**
    * @public
-   * Load the list with the specified index, then load all child lists
+   * Load the list with the specified index
    *
    * @param index The index of the load to load
    */
@@ -196,19 +203,11 @@ Ext.define('NX.controller.Drilldown', {
 
     try {
       if (lists[index]) {
-        lists[index].getStore().clearFilter();
-        if (index < lists.length - 1 && bookmark.length) {
-          lists[index].getStore().load(function(records, operation, success) {
-            me.loadStoreAtIndex(index + 1, bookmark, cb);
-          });
-        } else {
-          lists[index].getStore().load(function(records, operation, success) {
-            if (cb) {
-              cb(records, operation, success);
-            }
-            me.onStoreLoad();
-          });
-        }
+        lists[index].getStore().load(function(records, operation, success) {
+          if (cb) {
+            cb(records, operation, success);
+          }
+        });
       }
     }
     catch (e) {
@@ -343,7 +342,7 @@ Ext.define('NX.controller.Drilldown', {
     // Model specified, find the associated list and show that
     for (var i = 0; i < lists.length; ++i) {
       if (list === lists[i].getView() && model) {
-        lists[i].fireEvent("selection", list, model);
+        lists[i].fireEvent('selection', list.up('grid'), model);
         me.onModelChanged(model);
 
         // Set all child bookmarks
@@ -430,7 +429,6 @@ Ext.define('NX.controller.Drilldown', {
   navigateTo: function (bookmark) {
     var me = this,
         lists = me.getLists(),
-        feature = me.getFeature(),
         list_ids, tab_id = null, model, modelId, index;
 
     if (lists.length && bookmark) {
@@ -454,7 +452,7 @@ Ext.define('NX.controller.Drilldown', {
           // Select rows
           model = lists[index].getStore().getById(modelId);
           if (model) {
-            lists[index].fireEvent("selection", lists[index], model);
+            lists[index].fireEvent('selection', lists[index], model);
             me.onModelChanged(model);
           }
 

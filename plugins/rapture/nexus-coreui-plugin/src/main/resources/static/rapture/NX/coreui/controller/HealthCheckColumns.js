@@ -13,11 +13,11 @@
 /*global Ext, NX*/
 
 /**
- * HealthCheck search contribution controller.
+ * HealthCheck columns contribution controller.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.controller.HealthCheckSearch', {
+Ext.define('NX.coreui.controller.HealthCheckColumns', {
   extend: 'Ext.app.Controller',
   requires: [
     'Ext.grid.column.Column',
@@ -35,8 +35,8 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     'SearchResult'
   ],
   refs: [
-    { ref: 'searchResult', selector: 'nx-coreui-search-result-list' },
-    { ref: 'searchResultDetails', selector: 'nx-coreui-search-result-details' }
+    { ref: 'healthcheckResult', selector: 'nx-coreui-healthcheck-result-list' },
+    { ref: 'componentDetails', selector: 'nx-coreui-component-details' }
   ],
 
   /**
@@ -48,13 +48,16 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     me.listen({
       store: {
         '#SearchResult': {
-          load: me.setHealthCheckSearchResultFields
+          prefetch: me.loadHealthCheckFields
+        },
+        '#Component': {
+          prefetch: me.loadHealthCheckFields
         }
       },
       component: {
-        'nx-coreui-search-result-list': {
+        'nx-coreui-healthcheck-result-list': {
           afterrender: me.bindHealthCheckColumns,
-          selection: me.onSelection
+          selection: me.showHealthCheckInfo
         }
       }
     });
@@ -63,33 +66,33 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
   /**
    * @private
    */
-  onSelection: function(grid, model) {
+  showHealthCheckInfo: function(grid, model) {
     var me = this,
-        searchResultDetails = me.getSearchResultDetails(),
-        info3 = {};
+        componentDetails = me.getComponentDetails(),
+        extraInfo = {};
 
     if (!grid['healthCheckColumns']) {
       return;
     }
 
-    info3[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(model);
-    searchResultDetails.down('#info3').showInfo(info3);
+    extraInfo[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(model);
+    componentDetails.down('#extraInfo').showInfo(extraInfo);
   },
 
   /**
    * @private
-   * Sets Health Check fields on search results.
+   * Loads/set Health Check fields on loaded records.
    */
-  setHealthCheckSearchResultFields: function() {
+  loadHealthCheckFields: function(store, records) {
     var me = this,
         components = [],
-        searchResult = me.getSearchResult();
+        resultList = me.getHealthcheckResult();
 
-    if (!searchResult['healthCheckColumns']) {
+    if (!resultList || !resultList['healthCheckColumns']) {
       return;
     }
 
-    me.getSearchResultStore().each(function(model) {
+    Ext.Array.each(records, function(model) {
       model.beginEdit();
       model.set('healthCheckLoading', true);
       model.endEdit();
@@ -102,13 +105,9 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       });
     });
 
-    if (searchResult) {
-      searchResult.getView().refresh();
-    }
-
-    NX.direct.healthcheck_Search.read(components, function(response) {
+    NX.direct.healthcheck_Info.read(components, function(response) {
       var success = Ext.isObject(response) && response.success;
-      me.getSearchResultStore().each(function(model) {
+      Ext.Array.each(records, function(model) {
         model.beginEdit();
         model.set('healthCheckLoading', false);
         model.set('healthCheckError', !success);
@@ -116,7 +115,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       });
       if (success) {
         Ext.Array.each(response.data, function(entry) {
-          var model = me.getSearchResultStore().getById(entry.id);
+          var model = store.getById(entry.id);
           if (model) {
             model.beginEdit();
             Ext.Object.each(entry['healthCheck'], function(key, value) {
@@ -126,16 +125,13 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
           }
         });
       }
-      if (searchResult) {
-        searchResult.getView().refresh();
-      }
     });
   },
 
   /**
    * @private
    * Add/Remove Health Check columns based on nexus:healthcheck:read permission.
-   * @param {NX.coreui.view.search.SearchResultList} grid search result grid
+   * @param {Ext.grid.Panel} grid to add health check columns to
    */
   bindHealthCheckColumns: function(grid) {
     var me = this;
@@ -153,8 +149,8 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
 
   /**
    * @private
-   * Add Health Check columns to search result grid.
-   * @param {NX.coreui.view.search.SearchResultList} grid search result grid
+   * Add Health Check columns to grid.
+   * @param {Ext.grid.Panel} grid to add health check columns to
    */
   addHealthCheckColumns: function(grid) {
     var me = this,
@@ -166,6 +162,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
           header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_AGE_COLUMN'),
           dataIndex: 'healthCheckAge',
           groupable: false,
+          sortable: false,
           width: 60,
           renderer: Ext.bind(me.renderAgeColumn, me)
         }),
@@ -173,6 +170,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
           header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULARITY_COLUMN'),
           dataIndex: 'healthCheckPopularity',
           groupable: false,
+          sortable: false,
           width: 90,
           renderer: Ext.bind(me.renderPopularityColumn, me)
         })
@@ -185,8 +183,8 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
 
   /**
    * @private
-   * Remove Health Check columns from search result grid.
-   * @param {NX.coreui.view.search.SearchResultList} grid search result grid
+   * Remove Health Check columns from grid.
+   * @param {Ext.grid.Panel} grid to remove health check columns from
    */
   removeHealthCheckColumns: function(grid) {
     if (grid['healthCheckColumns']) {
@@ -284,7 +282,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
   /**
    * @private
    * Render value based on preconditions.
-   * @param {NX.coreui.model.Component|NX.coreui.model.SearchResultVersion} model component / version model
+   * @param {NX.coreui.model.Component} model component model
    * @param metadata column metadata
    * @returns {*} rendered value
    */
