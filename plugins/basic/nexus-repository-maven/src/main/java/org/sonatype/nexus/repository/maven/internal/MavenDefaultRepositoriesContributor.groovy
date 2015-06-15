@@ -51,6 +51,7 @@ class MavenDefaultRepositoriesContributor
                     versionPolicy              : VersionPolicy.RELEASE.toString()
                 ],
                 storage: [
+                    blobStoreName: 'default',
                     writePolicy: WritePolicy.ALLOW_ONCE.toString()
                 ]
             ]
@@ -61,6 +62,7 @@ class MavenDefaultRepositoriesContributor
                     versionPolicy              : VersionPolicy.SNAPSHOT.toString()
                 ],
                 storage: [
+                    blobStoreName: 'default',
                     writePolicy: WritePolicy.ALLOW.toString()
                 ]
             ]
@@ -75,6 +77,7 @@ class MavenDefaultRepositoriesContributor
                     artifactMaxAge: 3600
                 ],
                 storage: [
+                    blobStoreName: 'default',
                     writePolicy: WritePolicy.ALLOW.toString()
                 ]
             ]
@@ -88,6 +91,7 @@ class MavenDefaultRepositoriesContributor
                     memberNames: [DEFAULT_RELEASE_REPO, DEFAULT_SNAPSHOT_REPO, DEFAULT_CENTRAL_REPO]
                 ],
                 storage: [
+                    blobStoreName: 'default',
                     writePolicy: WritePolicy.ALLOW.toString()
                 ]
             ]

@@ -46,6 +46,7 @@ class NugetDefaultRepositoriesContributor
             attributes:
                 [
                     storage: [
+                        blobStoreName: 'default',
                         writePolicy: WritePolicy.ALLOW.toString()
                     ]
                 ]
@@ -56,6 +57,9 @@ class NugetDefaultRepositoriesContributor
                     proxy: [
                         remoteUrl     : 'http://www.nuget.org/api/v2/',
                         artifactMaxAge: 5
+                    ],
+                    storage: [
+                        blobStoreName: 'default'
                     ]
                 ]
         ),
@@ -64,6 +68,9 @@ class NugetDefaultRepositoriesContributor
                 [
                     group: [
                         memberNames: [DEFAULT_HOSTED_NAME, DEFAULT_PROXIED_NAME]
+                    ],
+                    storage: [
+                        blobStoreName: 'default'
                     ]
                 ]
         )
