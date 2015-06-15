@@ -38,6 +38,7 @@ public class PrivilegeDescriptorSupportTest
   public void humanizeActionsTest() throws Exception {
     assertThat(humanizeActions(ALL), equalTo("All privileges"));
     assertThat(humanizeActions("FOO"), equalTo("Foo privilege"));
+    assertThat(humanizeActions("foo"), equalTo("Foo privilege"));
     assertThat(humanizeActions("FOO", "BAR", "BAZ"), equalTo("Foo, Bar, Baz privileges"));
     assertThat(humanizeActions("foo", "bar", "baz"), equalTo("Foo, Bar, Baz privileges"));
   }
