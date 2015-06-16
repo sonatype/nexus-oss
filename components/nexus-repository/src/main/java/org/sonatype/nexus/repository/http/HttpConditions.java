@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.view.Request;
@@ -28,6 +29,7 @@ import com.google.common.net.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
 import org.joda.time.DateTime;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 
 /**
@@ -40,11 +42,13 @@ public class HttpConditions
   private HttpConditions() {}
 
   /**
-   * Copies passed in {@link Request} and copies it but sets action to GET and removes all supported conditions
+   * Copies passed in {@link Request} and but sets action to GET and removes all supported conditions
    * making the GET request "unconditional". This method must be in sync with {@link #requestPredicate(Request)}
    * and process same conditions.
    */
-  public static Request copyAsUnconditionalGet(final Request request) {
+  @Nonnull
+  public static Request copyAsUnconditionalGet(@Nonnull final Request request) {
+    checkNotNull(request);
     final Request getRequest = new Request.Builder().copy(request).action(GET).build();
     getRequest.getHeaders().remove(HttpHeaders.IF_MODIFIED_SINCE);
     getRequest.getHeaders().remove(HttpHeaders.IF_UNMODIFIED_SINCE);
@@ -59,7 +63,8 @@ public class HttpConditions
    * found (they all are logically AND bound).
    */
   @Nullable
-  public static Predicate<Response> requestPredicate(final Request request) {
+  public static Predicate<Response> requestPredicate(@Nonnull final Request request) {
+    checkNotNull(request);
     final List<Predicate<Response>> predicates = new ArrayList<>();
     final Predicate<Response> ifModifiedSince = ifModifiedSince(request);
     if (ifModifiedSince != null) {
@@ -85,7 +90,7 @@ public class HttpConditions
   }
 
   @Nullable
-  public static Predicate<Response> ifModifiedSince(final Request request) {
+  private static Predicate<Response> ifModifiedSince(final Request request) {
     final DateTime date = parseDateHeader(request.getHeaders().get(HttpHeaders.IF_MODIFIED_SINCE));
     if (date != null) {
       return new Predicate<Response>()
@@ -98,13 +103,18 @@ public class HttpConditions
           }
           return true;
         }
+
+        @Override
+        public String toString() {
+          return HttpConditions.class.getSimpleName() + ".ifModifiedSince(" + date + ")";
+        }
       };
     }
     return null;
   }
 
   @Nullable
-  public static Predicate<Response> ifUnmodifiedSince(final Request request) {
+  private static Predicate<Response> ifUnmodifiedSince(final Request request) {
     final DateTime date = parseDateHeader(request.getHeaders().get(HttpHeaders.IF_UNMODIFIED_SINCE));
     if (date != null) {
       return new Predicate<Response>()
@@ -117,13 +127,18 @@ public class HttpConditions
           }
           return true;
         }
+
+        @Override
+        public String toString() {
+          return HttpConditions.class.getSimpleName() + ".ifUnmodifiedSince(" + date + ")";
+        }
       };
     }
     return null;
   }
 
   @Nullable
-  public static Predicate<Response> ifMatch(final Request request) {
+  private static Predicate<Response> ifMatch(final Request request) {
     final String match = request.getHeaders().get(HttpHeaders.IF_MATCH);
     if (match != null && !"*".equals(match)) {
       return new Predicate<Response>()
@@ -136,13 +151,18 @@ public class HttpConditions
           }
           return true;
         }
+
+        @Override
+        public String toString() {
+          return HttpConditions.class.getSimpleName() + ".ifMatch(" + match + ")";
+        }
       };
     }
     return null;
   }
 
   @Nullable
-  public static Predicate<Response> ifNoneMatch(final Request request) {
+  private static Predicate<Response> ifNoneMatch(final Request request) {
     final String match = request.getHeaders().get(HttpHeaders.IF_NONE_MATCH);
     if (match != null && !"*".equals(match)) {
       return new Predicate<Response>()
@@ -154,6 +174,11 @@ public class HttpConditions
             return !match.contains(etag);
           }
           return true;
+        }
+
+        @Override
+        public String toString() {
+          return HttpConditions.class.getSimpleName() + ".ifNoneMatch(" + match + ")";
         }
       };
     }

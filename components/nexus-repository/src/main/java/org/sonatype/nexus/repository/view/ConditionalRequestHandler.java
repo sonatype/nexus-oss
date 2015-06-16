@@ -14,7 +14,6 @@ package org.sonatype.nexus.repository.view;
 
 import javax.annotation.Nonnull;
 
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Predicate;
@@ -43,46 +42,58 @@ public class ConditionalRequestHandler
   public Response handle(@Nonnull final Context context) throws Exception {
     final Predicate<Response> requestPredicate = requestPredicate(context.getRequest());
     if (requestPredicate != null) {
-      final String action = context.getRequest().getAction();
-      switch (action) {
-        case GET:
-        case HEAD: {
-          final Response response = context.proceed();
-          if (response.getStatus().isSuccessful() && !requestPredicate.apply(response)) {
-            // keep all response headers like Last-Modified and ETag, etc
-            return new Response.Builder()
-                .copy(response)
-                .status(Status.failure(NOT_MODIFIED, "Not modified"))
-                .payload(null)
-                .build();
-          }
-          return response;
-        }
-
-        case POST:
-        case PUT:
-        case DELETE: {
-          final Response getResponse = performGet(context.getRepository(), context.getRequest());
-          if (getResponse.getStatus().isSuccessful() && !requestPredicate.apply(getResponse)) {
-            // keep all response headers like Last-Modified and ETag, etc
-            return new Response.Builder()
-                .copy(getResponse)
-                .status(Status.failure(PRECONDITION_FAILED, "Precondition failed"))
-                .payload(null)
-                .build();
-          }
-        }
-      }
+      return handleConditional(context, requestPredicate);
     }
 
     return context.proceed();
   }
 
-  /**
-   * Performs a GET request against targeted repository with same {@link Request} parameters as incoming
-   * request.
-   */
-  private Response performGet(final Repository repository, final Request request) throws Exception {
-    return repository.facet(ViewFacet.class).dispatch(copyAsUnconditionalGet(request));
+  @Nonnull
+  private Response handleConditional(@Nonnull final Context context,
+                                     @Nonnull final Predicate<Response> requestPredicate) throws Exception
+  {
+    final String action = context.getRequest().getAction();
+    log.debug("Conditional request: {} {}: {}",
+        action,
+        context.getRequest().getPath(),
+        requestPredicate);
+    switch (action) {
+      case GET:
+      case HEAD: {
+        final Response response = context.proceed();
+        // keep all response headers like Last-Modified and ETag, etc
+        if (response.getStatus().isSuccessful() && !requestPredicate.apply(response)) {
+          return new Response.Builder()
+              .copy(response)
+              .status(Status.failure(NOT_MODIFIED, "Not modified"))
+              .payload(null)
+              .build();
+        }
+        else {
+          return response;
+        }
+      }
+
+      case POST:
+      case PUT:
+      case DELETE: {
+        final Response response = context.getRepository().facet(ViewFacet.class).dispatch(
+            copyAsUnconditionalGet(context.getRequest()));
+        if (response.getStatus().isSuccessful() && !requestPredicate.apply(response)) {
+          // keep all response headers like Last-Modified and ETag, etc
+          return new Response.Builder()
+              .copy(response)
+              .status(Status.failure(PRECONDITION_FAILED, "Precondition failed"))
+              .payload(null)
+              .build();
+        }
+        else {
+          return context.proceed();
+        }
+      }
+
+      default:
+        return context.proceed();
+    }
   }
 }
