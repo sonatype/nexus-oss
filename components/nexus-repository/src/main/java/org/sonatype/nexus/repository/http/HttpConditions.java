@@ -28,6 +28,8 @@ import com.google.common.net.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
 import org.joda.time.DateTime;
 
+import static org.sonatype.nexus.repository.http.HttpMethods.GET;
+
 /**
  * Helper defining common HTTP conditions.
  *
@@ -36,6 +38,20 @@ import org.joda.time.DateTime;
 public class HttpConditions
 {
   private HttpConditions() {}
+
+  /**
+   * Copies passed in {@link Request} and copies it but sets action to GET and removes all supported conditions
+   * making the GET request "unconditional". This method must be in sync with {@link #requestPredicate(Request)}
+   * and process same conditions.
+   */
+  public static Request copyAsUnconditionalGet(final Request request) {
+    final Request getRequest = new Request.Builder().copy(request).action(GET).build();
+    getRequest.getHeaders().remove(HttpHeaders.IF_MODIFIED_SINCE);
+    getRequest.getHeaders().remove(HttpHeaders.IF_UNMODIFIED_SINCE);
+    getRequest.getHeaders().remove(HttpHeaders.IF_MATCH);
+    getRequest.getHeaders().remove(HttpHeaders.IF_NONE_MATCH);
+    return getRequest;
+  }
 
   /**
    * Builds a {@link Predicate<Response>} that contains conditions in passed in {@link Request} or {@code null} if

@@ -18,8 +18,8 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Predicate;
-import com.google.common.net.HttpHeaders;
 
+import static org.sonatype.nexus.repository.http.HttpConditions.copyAsUnconditionalGet;
 import static org.sonatype.nexus.repository.http.HttpConditions.requestPredicate;
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
@@ -48,10 +48,13 @@ public class ConditionalRequestHandler
         case GET:
         case HEAD: {
           final Response response = context.proceed();
-          if (response.getStatus().isSuccessful()) {
-            if (!requestPredicate.apply(response)) {
-              return new Response.Builder().status(Status.failure(NOT_MODIFIED, "Not modified")).build();
-            }
+          if (response.getStatus().isSuccessful() && !requestPredicate.apply(response)) {
+            // keep all response headers like Last-Modified and ETag, etc
+            return new Response.Builder()
+                .copy(response)
+                .status(Status.failure(NOT_MODIFIED, "Not modified"))
+                .payload(null)
+                .build();
           }
           return response;
         }
@@ -61,7 +64,12 @@ public class ConditionalRequestHandler
         case DELETE: {
           final Response getResponse = performGet(context.getRepository(), context.getRequest());
           if (getResponse.getStatus().isSuccessful() && !requestPredicate.apply(getResponse)) {
-            return new Response.Builder().status(Status.failure(PRECONDITION_FAILED, "Precondition failed")).build();
+            // keep all response headers like Last-Modified and ETag, etc
+            return new Response.Builder()
+                .copy(getResponse)
+                .status(Status.failure(PRECONDITION_FAILED, "Precondition failed"))
+                .payload(null)
+                .build();
           }
         }
       }
@@ -75,11 +83,6 @@ public class ConditionalRequestHandler
    * request.
    */
   private Response performGet(final Repository repository, final Request request) throws Exception {
-    final Request getRequest = new Request.Builder().copy(request).action(GET).build();
-    getRequest.getHeaders().remove(HttpHeaders.IF_MODIFIED_SINCE);
-    getRequest.getHeaders().remove(HttpHeaders.IF_UNMODIFIED_SINCE);
-    getRequest.getHeaders().remove(HttpHeaders.IF_MATCH);
-    getRequest.getHeaders().remove(HttpHeaders.IF_NONE_MATCH);
-    return repository.facet(ViewFacet.class).dispatch(getRequest);
+    return repository.facet(ViewFacet.class).dispatch(copyAsUnconditionalGet(request));
   }
 }
