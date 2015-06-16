@@ -86,7 +86,7 @@ public class RepositoryStatusesListPlexusResource
   {
     if (adminOnly) {
       Subject subject = ThreadContext.getSubject();
-      // block further access unless user can also update the repository status
+      // skip building reply unless user has admin access (ie. can update status)
       if (subject == null || !subject.isPermitted("nexus:repostatus:update")) {
         response.setStatus(Status.SUCCESS_NO_CONTENT);
         return null;
