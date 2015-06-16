@@ -45,7 +45,6 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
-import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
@@ -126,7 +125,8 @@ public class NugetGalleryFacetImpl
     return count(operation, query, getRepositories());
   }
 
-  protected int count(final String operation, final Map<String, String> query,
+  protected int count(@SuppressWarnings("unused") final String operation,
+                      final Map<String, String> query,
                       final Iterable<Repository> repositories)
   {
     final ComponentQuery componentQuery = ODataUtils.query(query, true);
@@ -237,7 +237,7 @@ public class NugetGalleryFacetImpl
     {
       @Override
       public Object execute(final StorageTx tx) {
-        final Component component = createOrUpdatePackage(tx, metadata);
+        createOrUpdatePackage(tx, metadata);
         return null;
       }
 
@@ -270,13 +270,12 @@ public class NugetGalleryFacetImpl
       {
         @Override
         public Object execute(final StorageTx tx) {
-          final Bucket bucket = tx.getBucket();
           Component component = findComponent(tx, id, version);
           checkState(
               component != null && tx.browseAssets(component).iterator().hasNext(),
               "Component metadata does not exist yet"
           );
-          createOrUpdateAssetAndContents(tx, bucket, component, t.get(), null);
+          createOrUpdateAssetAndContents(tx, component, t.get(), null);
           return null;
         }
 
@@ -289,15 +288,15 @@ public class NugetGalleryFacetImpl
   }
 
   @VisibleForTesting
-  Map<String, ?> toData(final NestedAttributesMap nugetAttributes, Map<String, String> extra) {
+  Map<String, ?> toData(final NestedAttributesMap nugetAttributes, Map<String, String> extras) {
     Map<String, Object> data = Maps.newHashMap();
 
     for (Entry<String, Object> attrib : nugetAttributes.entries()) {
       data.put(attrib.getKey(), attrib.getValue());
     }
 
-    for (String key : extra.keySet()) {
-      data.put(key, extra.get(key));
+    for (Entry<String, String> extra : extras.entrySet()) {
+      data.put(extra.getKey(), extra.getValue());
     }
 
     return data;
@@ -315,6 +314,7 @@ public class NugetGalleryFacetImpl
       }
 
       final Asset asset = findAsset(tx, component);
+      checkState(asset != null);
       final Map<String, ?> entryData = toData(asset.formatAttributes(), extra);
 
       final String nugetEntry = ODataTemplates.NUGET_ENTRY;
@@ -415,6 +415,8 @@ public class NugetGalleryFacetImpl
     try (StorageTx tx = openStorageTx()) {
       final Asset asset = findAsset(tx, id, version);
 
+      checkState(asset != null);
+
       Date date = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
 
       log.debug("Content for {} {} last verified as of {}", id, version, date);
@@ -471,17 +473,15 @@ public class NugetGalleryFacetImpl
   Component createOrUpdatePackageAndContents(final StorageTx storageTx, final Map<String, String> recordMetadata,
                                              final InputStream packageStream)
   {
-    final Bucket bucket = storageTx.getBucket();
-    final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
-    createOrUpdateAssetAndContents(storageTx, bucket, component, packageStream, recordMetadata);
+    final Component component = createOrUpdateComponent(storageTx, recordMetadata);
+    createOrUpdateAssetAndContents(storageTx, component, packageStream, recordMetadata);
     return component;
   }
 
   @VisibleForTesting
   Component createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata)
   {
-    final Bucket bucket = storageTx.getBucket();
-    final Component component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
+    final Component component = createOrUpdateComponent(storageTx, recordMetadata);
     Asset asset = findOrCreateAsset(storageTx, component);
     updateAssetMetadata(asset, recordMetadata, component.isNew());
     storageTx.saveAsset(asset);
@@ -604,8 +604,9 @@ public class NugetGalleryFacetImpl
     return storageTx.findComponents(whereClause, parameters, getRepositories(), null);
   }
 
-  private void createOrUpdateAssetAndContents(final StorageTx storageTx, final Bucket bucket,
-                                              final Component component, final InputStream in,
+  private void createOrUpdateAssetAndContents(final StorageTx storageTx,
+                                              final Component component,
+                                              final InputStream in,
                                               final Map<String, String> data)
   {
     try {
@@ -628,17 +629,17 @@ public class NugetGalleryFacetImpl
       return stringValue;
     }
     catch (InvalidVersionSpecificationException e) {
-      throw new IllegalArgumentException("Bad version syntax: " + stringValue);
+      throw new IllegalArgumentException("Bad version syntax: " + stringValue, e);
     }
   }
 
-  private Component createOrUpdateComponent(final StorageTx storageTx, final Bucket bucket,
+  private Component createOrUpdateComponent(final StorageTx storageTx,
                                             final Map<String, String> data)
   {
     final String id = checkNotNull(data.get(ID));
     final String version = checkVersion(data.get(VERSION));
 
-    final Component component = findOrCreateComponent(storageTx, bucket, id, version);
+    final Component component = findOrCreateComponent(storageTx, id, version);
 
     NestedAttributesMap nugetAttr = component.formatAttributes();
     nugetAttr.set(P_ID, data.get(ID));
@@ -714,7 +715,7 @@ public class NugetGalleryFacetImpl
     }
   }
 
-  private Component findOrCreateComponent(final StorageTx storageTx, final Bucket bucket, final String name,
+  private Component findOrCreateComponent(final StorageTx storageTx, final String name,
                                           final String version)
   {
     final Component found = findComponent(storageTx, name, version);
@@ -722,7 +723,7 @@ public class NugetGalleryFacetImpl
       return found;
     }
 
-    return createComponent(storageTx, bucket, name, version);
+    return createComponent(storageTx, name, version);
   }
 
   @VisibleForTesting
@@ -737,11 +738,12 @@ public class NugetGalleryFacetImpl
         getRepositories(), query.getQuerySuffix());
   }
 
-  private Component createComponent(final StorageTx storageTx, final Bucket bucket, final String name,
+  private Component createComponent(final StorageTx storageTx,
+                                    final String name,
                                     final String version)
   {
     log.debug("Creating NuGet component {} v. {}", name, version);
-    return storageTx.createComponent(bucket, getRepository().getFormat())
+    return storageTx.createComponent(storageTx.getBucket(), getRepository().getFormat())
         .name(name)
         .version(version); // Nuget components don't have a group
   }

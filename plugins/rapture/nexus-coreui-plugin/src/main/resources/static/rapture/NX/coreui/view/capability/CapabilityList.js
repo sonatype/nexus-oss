@@ -37,19 +37,19 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
       hideable: false
     },
     {
-      text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_TYPE_COLUMN'),
+      text: NX.I18n.get('Capability_CapabilityList_Type_Header'),
       dataIndex: 'typeName',
       flex: 1
     },
     {
-      text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_DESCRIPTION_COLUMN'),
+      text: NX.I18n.get('Capability_CapabilityList_Description_Header'),
       dataIndex: 'description',
       flex: 1,
       groupable: false,
       renderer: NX.ext.grid.column.Renderers.optionalData
     },
     {
-      text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NOTES_COLUMN'),
+      text: NX.I18n.get('Capability_CapabilityList_Notes_Header'),
       dataIndex: 'notes',
       flex: 1,
       renderer: NX.ext.grid.column.Renderers.optionalData
@@ -57,7 +57,7 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('ADMIN_CAPABILITIES_LIST_EMPTY_STATE'),
+    emptyText: NX.I18n.get('Capability_CapabilityList_EmptyText'),
     deferEmptyText: false,
     getRowClass: function (record) {
       if (record.get('enabled') && !record.get('active')) {
@@ -73,7 +73,7 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NEW_BUTTON'),
+        text: NX.I18n.get('Capability_CapabilityList_New_Button'),
         action: 'new',
         disabled: true,
         glyph: 'xf055@FontAwesome' /* fa-plus-circle */
@@ -89,7 +89,7 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_CAPABILITIES_LIST_FILTER_EMPTY') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Capability_CapabilityList_Filter_EmptyText') }
   ],
 
   /**

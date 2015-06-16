@@ -154,7 +154,7 @@ Ext.define('NX.controller.UiSessionTimeout', {
   showExpirationWindow: function () {
     var me = this;
 
-    NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_EXPIRE_WARNING'), type: 'warning' });
+    NX.Messages.add({text: NX.I18n.get('UiSessionTimeout_Expire_Message'), type: 'warning' });
     me.getExpireSessionView().create();
   },
 
@@ -166,14 +166,14 @@ Ext.define('NX.controller.UiSessionTimeout', {
 
     me.expirationTicker = Ext.util.TaskManager.newTask({
       run: function (count) {
-        win.down('label').setText(NX.I18n.format('GLOBAL_EXPIRE_SECONDS', me.SECONDS_TO_EXPIRE - count));
+        win.down('label').setText(NX.I18n.format('UiSessionTimeout_Expire_Text', me.SECONDS_TO_EXPIRE - count));
         if (count === me.SECONDS_TO_EXPIRE) {
-          win.down('label').setText(NX.I18n.get('GLOBAL_EXPIRE_SIGNED_OUT'));
+          win.down('label').setText(NX.I18n.get('SignedOut_Text'));
           win.down('button[action=close]').show();
           win.down('button[action=signin]').show();
           win.down('button[action=cancel]').hide();
           NX.Messages.add({
-            text: NX.I18n.format('GLOBAL_SERVER_EXPIRED_WARNING', NX.State.getValue('uiSettings')['sessionTimeout']),
+            text: NX.I18n.format('UiSessionTimeout_Expired_Message', NX.State.getValue('uiSettings')['sessionTimeout']),
             type: 'warning'
           });
           NX.Security.signOut();

@@ -29,11 +29,11 @@ Ext.define('NX.coreui.view.ldap.LdapServerFeature', {
   masters: { xtype: 'nx-coreui-ldapserver-list' },
 
   tabs: [
-    { xtype: 'nx-coreui-ldapserver-connection', title: NX.I18n.get('ADMIN_LDAP_DETAILS_CONNECTION_TAB'), weight: 10 },
-    { xtype: 'nx-coreui-ldapserver-userandgroup', title: NX.I18n.get('ADMIN_LDAP_DETAILS_GROUP_TAB'), weight: 20 }
+    { xtype: 'nx-coreui-ldapserver-connection', title: NX.I18n.get('Ldap_LdapServerFeature_Connection_Title'), weight: 10 },
+    { xtype: 'nx-coreui-ldapserver-userandgroup', title: NX.I18n.get('Ldap_LdapServerFeature_UserAndGroup_Title'), weight: 20 }
   ],
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('Ldap_LdapServerFeature_Delete_Button'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ]
 });

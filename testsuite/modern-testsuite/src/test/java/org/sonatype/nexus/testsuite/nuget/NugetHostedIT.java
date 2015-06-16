@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.nuget;
 
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -174,5 +175,24 @@ public class NugetHostedIT
     final List<Map<String, String>> entries = parseFeedXml(feedXml);
     assertThat("entry count", entries.size(), is(1));
     assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
+  }
+
+  /**
+   * Ensure that a url encoded ODATA query for an uploaded package's metadata
+   * returns an entry that contains a valid content link to the package.
+   */
+  @Test
+  public void encodedOdataQuery() throws Exception {
+    nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
+
+    final String entryXml = nuget.feedXml(URLEncoder.encode("Packages(Id='SONATYPE.TEST',Version='1.0')", "UTF-8"));
+    final List<Map<String, String>> entries = parseFeedXml(entryXml);
+
+    assertThat("entry count", entries.size(), is(1));
+    assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
+
+    final String contentSrc = entries.get(0).get("LOCATION");
+    final HttpResponse response = nuget.get(contentSrc);
+    assertThat(String.format("%n%s", contentSrc), status(response), is(HttpStatus.OK));
   }
 }

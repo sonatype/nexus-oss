@@ -31,7 +31,7 @@ public class NugetFormatSecurityConfigurationResource
     extends RepositoryFormatSecurityConfigurationResource
 {
   @Inject
-  public NugetFormatSecurityConfigurationResource(final @Named(NugetFormat.NAME) Format format) {
+  public NugetFormatSecurityConfigurationResource(@Named(NugetFormat.NAME) final Format format) {
     super(format);
   }
 }

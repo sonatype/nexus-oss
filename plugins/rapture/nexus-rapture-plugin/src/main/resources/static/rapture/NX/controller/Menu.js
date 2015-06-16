@@ -812,7 +812,7 @@ Ext.define('NX.controller.Menu', {
 
     window.onbeforeunload = function() {
       if (me.hasDirt()) {
-        return NX.I18n.get('GLOBAL_UNSAVED_BROWSER_TITLE');
+        return NX.I18n.get('Menu_Browser_Title');
       }
     };
   }

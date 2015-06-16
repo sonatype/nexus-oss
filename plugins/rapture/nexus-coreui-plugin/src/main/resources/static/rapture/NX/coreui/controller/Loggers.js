@@ -58,8 +58,8 @@ Ext.define('NX.coreui.controller.Loggers', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Logging',
-      text: NX.I18n.get('ADMIN_LOGGING_TITLE'),
-      description: NX.I18n.get('ADMIN_LOGGING_SUBTITLE'),
+      text: NX.I18n.get('Loggers_Text'),
+      description: NX.I18n.get('Loggers_Description'),
       view: { xtype: 'nx-coreui-logging-feature' },
       iconConfig: {
         file: 'book.png',
@@ -128,7 +128,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     me.loadStore();
     if (operation.success) {
       Ext.Array.each(operation.records, function (model) {
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_LOGGING_WRITE_SUCCESS', operation.action, model.get('name')), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('Loggers_Write_Success', operation.action, model.get('name')), type: 'success' });
       });
     }
   },
@@ -142,7 +142,7 @@ Ext.define('NX.coreui.controller.Loggers', {
       feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_LOGGING_CREATE_TITLE'));
+    feature.setItemName(1, NX.I18n.get('Loggers_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-logger-add'));
   },
 
@@ -168,8 +168,8 @@ Ext.define('NX.coreui.controller.Loggers', {
         model = store.getById(values.name);
 
     if (model) {
-      NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_LOGGING_UPDATE_TITLE'),
-          NX.I18n.format('ADMIN_LOGGING_UPDATE_HELP', values.name, values.level),
+      NX.Dialogs.askConfirmation(NX.I18n.get('Loggers_Update_Title'),
+          NX.I18n.format('Loggers_HelpText', values.name, values.level),
           function () {
             model.set('level', values.level);
             me.loadView(null, null, true);
@@ -193,11 +193,11 @@ Ext.define('NX.coreui.controller.Loggers', {
         selection = list.getSelectionModel().getSelection();
 
     if (selection.length) {
-      NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_LOGGING_DELETE_CONFIRM'), selection[0].get('name'), function () {
+      NX.Dialogs.askConfirmation(NX.I18n.get('Loggers_Delete_Title'), selection[0].get('name'), function () {
         NX.direct.logging_Loggers.remove(selection[0].getId(), function (response) {
           me.loadStore();
           if (Ext.isObject(response) && response.success) {
-            NX.Messages.add({ text: NX.I18n.format('ADMIN_LOGGING_DELETE_SUCCESS', selection[0].get('name')), type: 'success' });
+            NX.Messages.add({ text: NX.I18n.format('Loggers_Delete_Success', selection[0].get('name')), type: 'success' });
           }
         });
       });
@@ -211,11 +211,11 @@ Ext.define('NX.coreui.controller.Loggers', {
   resetLoggers: function () {
     var me = this;
 
-    NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_LOGGING_RESET_TITLE'), NX.I18n.get('ADMIN_LOGGING_RESET_HELP'), function () {
+    NX.Dialogs.askConfirmation(NX.I18n.get('Loggers_Reset_Title'), NX.I18n.get('Loggers_Reset_HelpText'), function () {
       NX.direct.logging_Loggers.reset(function (response) {
         me.loadStore();
         if (Ext.isObject(response) && response.success) {
-          NX.Messages.add({ text: NX.I18n.get('ADMIN_LOGGING_RESET_SUCCESS'), type: 'success' });
+          NX.Messages.add({ text: NX.I18n.get('Loggers_Reset_Success'), type: 'success' });
         }
       });
     });

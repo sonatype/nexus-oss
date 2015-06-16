@@ -32,6 +32,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     'NX.coreui.store.Repository'
   ],
   stores: [
+    'Blobstore',
     'NX.coreui.store.Repository',
     'RepositoryRecipe',
     'NX.coreui.store.RepositoryReference'
@@ -75,8 +76,8 @@ Ext.define('NX.coreui.controller.Repositories', {
   features: {
     mode: 'admin',
     path: '/Repository/Repositories',
-    text: NX.I18n.get('ADMIN_REPOSITORIES_TITLE'),
-    description: NX.I18n.get('ADMIN_REPOSITORIES_SUBTITLE'),
+    text: NX.I18n.get('Repositories_Text'),
+    description: NX.I18n.get('Repositories_Description'),
     view: { xtype: 'nx-coreui-repository-feature' },
     iconConfig: {
       file: 'database.png',
@@ -99,7 +100,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRecipe
+          refresh: me.loadRelatedStores
         },
         '#State': {
           receivingchanged: me.onStateReceivingChanged
@@ -107,7 +108,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       },
       component: {
         'nx-coreui-repository-list': {
-          beforerender: me.loadRecipe,
+          beforerender: me.loadRelatedStores,
           afterrender: me.startStatusPolling,
           beforedestroy: me.stopStatusPolling
         },
@@ -169,7 +170,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TITLE'));
+    feature.setItemName(1, NX.I18n.get('Repositories_SelectRecipe_Title'));
     feature.setItemClass(1, NX.Icons.cls('repository-hosted', 'x16'));
 
     // Show the panel
@@ -203,7 +204,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     }
     else {
       // Show the second panel in the create wizard, and set the breadcrumb
-      feature.setItemName(2, NX.I18n.format('ADMIN_REPOSITORIES_CREATE_TITLE', model.get('name')));
+      feature.setItemName(2, NX.I18n.format('Repositories_Create_Title', model.get('name')));
       feature.setItemClass(2, NX.Icons.cls('repository-hosted', 'x16'));
       me.loadCreateWizard(2, true, { xtype: 'nx-coreui-repository-add', recipe: model });
     }
@@ -212,11 +213,12 @@ Ext.define('NX.coreui.controller.Repositories', {
   /**
    * @private
    */
-  loadRecipe: function() {
+  loadRelatedStores: function() {
     var me = this,
         list = me.getList();
 
     if (list) {
+      me.getBlobstoreStore().load();
       me.getRepositoryRecipeStore().load();
     }
   },
@@ -229,7 +231,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         win = form.up('nx-coreui-repository-add');
 
     if (win) {
-      me.loadStoreAndSelect(action.result.data.id, false);
+      me.loadStoreAndSelect(action.result.data.id, true);
     }
     else {
       me.loadStore(Ext.emptyFn);
@@ -356,9 +358,9 @@ Ext.define('NX.coreui.controller.Repositories', {
         NX.Conditions.and(
             permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*:delete'),
             NX.Conditions.gridHasSelection('nx-coreui-repository-list', function(model) {
-              var permission = 'nexus:repository-admin:' + model.get('format') + ':' + model.get('name');
-              permittedCondition.name = permission;
-              permittedCondition.evaluate();
+              permittedCondition.setPermission(
+                  'nexus:repository-admin:' + model.get('format') + ':' + model.get('name') + ':delete'
+              );
               return true;
             })
         ),

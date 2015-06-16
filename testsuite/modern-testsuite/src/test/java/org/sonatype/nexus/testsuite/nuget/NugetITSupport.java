@@ -28,6 +28,8 @@ import com.sonatype.nexus.repository.nuget.odata.ODataConsumer;
 import com.sonatype.nexus.repository.nuget.security.NugetApiKey;
 import com.sonatype.nexus.repository.nuget.security.NugetApiKeyStore;
 
+import org.sonatype.nexus.blobstore.api.BlobStoreManager;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.storage.WritePolicy;
@@ -44,6 +46,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.WrappedUrlProvisionOption.OverwriteMode;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 
 /**
@@ -72,11 +75,7 @@ public abstract class NugetITSupport
         withHttps(),
         wrappedBundle(maven("org.apache.httpcomponents", "httpmime").versionAsInProject())
             .overwriteManifest(OverwriteMode.FULL).instructions("DynamicImport-Package=*"),
-        // TODO: This should be replaced with:
-        // mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject()
-        // ..once the http-testing-harness duplicate import of org.sonatype.tests.http.server.api is corrected.
-        wrappedBundle(maven("org.sonatype.http-testing-harness", "server-provider").versionAsInProject())
-            .overwriteManifest(OverwriteMode.FULL).instructions("DynamicImport-Package=*")
+        mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject()
     );
   }
 
@@ -86,7 +85,11 @@ public abstract class NugetITSupport
     config.setRepositoryName(name);
     config.setRecipeName(NugetHostedRecipe.NAME);
     config.setOnline(true);
-    config.attributes("storage").set("writePolicy", WritePolicy.ALLOW.toString());
+
+    NestedAttributesMap storage = config.attributes("storage");
+    storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
+    storage.set("writePolicy", WritePolicy.ALLOW.toString());
+
     return config;
   }
 

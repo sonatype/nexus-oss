@@ -82,7 +82,7 @@ public class StorageFacetImpl
   static class Config
   {
     @NotEmpty
-    public String blobStoreName = "default";
+    public String blobStoreName;
 
     @NotNull(groups = HostedType.ValidationGroup.class)
     public WritePolicy writePolicy;

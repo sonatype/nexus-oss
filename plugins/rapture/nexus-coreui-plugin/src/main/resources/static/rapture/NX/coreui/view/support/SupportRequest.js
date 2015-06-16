@@ -29,7 +29,7 @@ Ext.define('NX.coreui.view.support.SupportRequest', {
     items: [
       {
         xtype: 'label',
-        html: NX.I18n.get('ADMIN_SUPPORT_REQUEST_HELP')
+        html: NX.I18n.get('Support_SupportRequest_HelpText')
       }
     ],
 
@@ -37,7 +37,7 @@ Ext.define('NX.coreui.view.support.SupportRequest', {
 
     buttons: [
       {
-        text: NX.I18n.get('ADMIN_SUPPORT_REQUEST_BUTTON'),
+        text: NX.I18n.get('Support_SupportRequest_Submit_Button'),
         glyph: 'xf08e@FontAwesome' /* fa-external-link */,
         action: 'makerequest',
         ui: 'nx-primary'

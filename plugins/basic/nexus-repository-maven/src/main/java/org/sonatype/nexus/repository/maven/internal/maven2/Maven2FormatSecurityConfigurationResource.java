@@ -32,7 +32,7 @@ public class Maven2FormatSecurityConfigurationResource
     extends RepositoryFormatSecurityConfigurationResource
 {
   @Inject
-  public Maven2FormatSecurityConfigurationResource(final @Named(Maven2Format.NAME) Format format) {
+  public Maven2FormatSecurityConfigurationResource(@Named(Maven2Format.NAME) final Format format) {
     super(format);
   }
 }

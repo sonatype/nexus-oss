@@ -34,7 +34,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_DOWNLOAD_BUTTON'),
+        text: NX.I18n.get('Support_SysInfo_Download_Button'),
         glyph: 'xf019@FontAwesome' /* fa-download */,
         action: 'download'
       }
