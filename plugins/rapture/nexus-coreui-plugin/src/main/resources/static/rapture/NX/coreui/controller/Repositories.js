@@ -234,15 +234,9 @@ Ext.define('NX.coreui.controller.Repositories', {
    */
   onSettingsSubmitted: function(form, action) {
     var me = this,
-      win = form.up('nx-coreui-repository-add'),
-      func = Ext.emptyFn;
+      win = form.up('nx-coreui-repository-add');
 
-    if (win) {
-      func = function() {
-        me.reselect();
-      }
-    }
-    me.getStore('Repository').load(func);
+    me.getStore('NX.coreui.store.Repository').load();
   },
 
   /**
@@ -253,9 +247,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Repository.remove(model.getId(), function(response) {
-      me.getStore('Repository').load(function() {
-        me.reselect();
-      });
+      me.getStore('NX.coreui.store.Repository').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Repository deleted: ' + description, type: 'success' });
       }

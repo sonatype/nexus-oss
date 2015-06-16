@@ -149,15 +149,9 @@ Ext.define('NX.coreui.controller.Blobstores', {
    */
   onSettingsSubmitted: function(form, action) {
     var me = this,
-        win = form.up('nx-coreui-blobstore-add'),
-        func = Ext.emptyFn;
+        win = form.up('nx-coreui-blobstore-add');
 
-    if (win) {
-      func = function() {
-        me.reselect();
-      }
-    }
-    me.getStore('Blobstore').load(func);
+    me.getStore('NX.coreui.store.Blobstore').load();
   },
 
   /**
@@ -168,9 +162,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Blobstore.remove(model.getId(), function(response) {
-      me.getStore('Blobstore').load(function() {
-        me.reselect();
-      });
+      me.getStore('NX.coreui.store.Blobstore').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Blobstore deleted: ' + description, type: 'success' });
       }

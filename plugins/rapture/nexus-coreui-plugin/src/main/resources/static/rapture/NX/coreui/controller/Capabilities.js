@@ -464,6 +464,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     NX.direct.capability_Capability.enable(model.getId(), function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
+        me.getCapabilityStore().load();
         NX.Messages.add({
           text: NX.I18n.format('Capabilities_Enable_Text', description),
           type: 'success'
@@ -489,6 +490,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     NX.direct.capability_Capability.disable(model.getId(), function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
+        me.getCapabilityStore().load();
         NX.Messages.add({
           text: NX.I18n.format('Capabilities_Disable_Text', description),
           type: 'success'
@@ -543,6 +545,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
       me.logDebug('List not ready yet to mutate grid columns');
       //</if>
     }
+
+    me.reselect();
   },
 
   /**

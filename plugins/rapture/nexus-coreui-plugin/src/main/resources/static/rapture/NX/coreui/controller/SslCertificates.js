@@ -110,13 +110,13 @@ Ext.define('NX.coreui.controller.SslCertificates', {
           click: me.create
         },
         'nx-coreui-sslcertificate-details-panel button[action=remove]': {
-          click: me.remove
+          click: me.deleteModel
         },
         'nx-coreui-sslcertificate-details-window button[action=add]': {
           click: me.create
         },
         'nx-coreui-sslcertificate-details-window button[action=remove]': {
-          click: me.remove
+          click: me.deleteModel
         }
       }
     });
@@ -275,41 +275,14 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   create: function (button) {
     var me = this,
-        win = button.up('nx-coreui-sslcertificate-details-window'),
         form = button.up('form'),
         model = form.getRecord(),
         description = me.getDescription(model);
 
     NX.direct.ssl_TrustStore.create(model.get('pem'), function (response) {
+      me.getSslCertificateStore().load();
       if (Ext.isObject(response) && response.success) {
-        if (win) {
-          win.close();
-        }
-        me.getSslCertificateStore().load(function() {
-          me.reselect();
-        });
         NX.Messages.add({ text: NX.I18n.format('SslCertificates_Load_Success', description), type: 'success' });
-      }
-    });
-  },
-
-  /**
-   * @private
-   * Removes an SSL certificate.
-   */
-  remove: function (button) {
-    var me = this,
-        win = button.up('nx-coreui-sslcertificate-details-window'),
-        form = button.up('form'),
-        model = form.getRecord(),
-        description = me.getDescription(model);
-
-    NX.direct.ssl_TrustStore.remove(model.getId(), function (response) {
-      if (Ext.isObject(response) && response.success) {
-        if (win) {
-          win.close();
-        }
-        NX.Messages.add({ text: NX.I18n.format('SslCertificates_Delete_Success', description), type: 'success' });
       }
     });
   },
@@ -325,9 +298,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         description = me.getDescription(model);
 
     NX.direct.ssl_TrustStore.remove(model.getId(), function (response) {
-      me.getSslCertificateStore().load(function() {
-        me.reselect();
-      });
+      me.getSslCertificateStore().load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: NX.I18n.format('SslCertificates_Delete_Success', description), type: 'success' });
       }
