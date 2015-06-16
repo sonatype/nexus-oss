@@ -37,11 +37,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-repository</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-repository-httpbridge</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

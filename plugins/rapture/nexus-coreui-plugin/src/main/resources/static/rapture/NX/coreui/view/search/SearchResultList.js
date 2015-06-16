@@ -19,7 +19,7 @@
  */
 Ext.define('NX.coreui.view.search.SearchResultList', {
   extend: 'NX.view.drilldown.Master',
-  alias: 'widget.nx-coreui-search-result-list',
+  alias: ['widget.nx-coreui-search-result-list', 'widget.nx-coreui-healthcheck-result-list'],
   requires: [
     'NX.I18n'
   ],
@@ -58,15 +58,6 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
       dataIndex: 'repositoryName',
       stateId: 'repositoryName',
       hidden: true
-    }
-  ],
-
-  dockedItems: [
-    {
-      xtype: 'pagingtoolbar',
-      store: 'SearchResult',
-      dock: 'top',
-      displayInfo: false
     }
   ]
 

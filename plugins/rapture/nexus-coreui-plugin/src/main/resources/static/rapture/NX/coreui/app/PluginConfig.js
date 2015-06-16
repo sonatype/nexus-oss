@@ -30,7 +30,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
 
   controllers: [
     {
-      id: 'NX.coreui.controller.AssetInfo',
+      id: 'NX.coreui.controller.Assets',
       active: function () {
         return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
       }
@@ -49,6 +49,12 @@ Ext.define('NX.coreui.app.PluginConfig', {
     },
     {
       id: 'NX.coreui.controller.AnonymousSettings',
+      active: function () {
+        return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.Browse',
       active: function () {
         return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
       }
@@ -73,15 +79,13 @@ Ext.define('NX.coreui.app.PluginConfig', {
         return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
       }
     },
-    // HACK: Disabling 'HealthCheck' feature for now until it can be fully implmented for NX3
-    // https://issues.sonatype.org/browse/NEXUS-8773
-    //{
-    //  id: 'NX.coreui.controller.HealthCheckSearch',
-    //  active: function () {
-    //    return NX.app.Application.bundleActive('com.sonatype.nexus.plugins.nexus-healthcheck-oss-plugin')
-    //        || NX.app.Application.bundleActive('com.sonatype.nexus.plugins.nexus-clm-plugin');
-    //  }
-    //},
+    {
+      id: 'NX.coreui.controller.HealthCheckColumns',
+      active: function () {
+        return NX.app.Application.bundleActive('com.sonatype.nexus.plugins.nexus-healthcheck-oss-plugin')
+            || NX.app.Application.bundleActive('com.sonatype.nexus.plugins.nexus-clm-plugin');
+      }
+    },
     {
       id: 'NX.coreui.controller.LdapServers',
       active: function () {

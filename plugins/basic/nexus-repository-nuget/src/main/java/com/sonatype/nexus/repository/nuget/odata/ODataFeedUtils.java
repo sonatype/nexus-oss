@@ -21,8 +21,8 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
-
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -94,7 +94,7 @@ public class ODataFeedUtils
       return URLEncoder.encode(raw, "UTF-8");
     }
     catch (final UnsupportedEncodingException e) {
-      return raw; // this should never happen
+      throw Throwables.propagate(e); // This should never happen
     }
   }
 
