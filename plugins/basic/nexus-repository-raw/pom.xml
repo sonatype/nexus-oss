@@ -30,17 +30,14 @@
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-repository</artifactId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-elasticsearch</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-repository-httpbridge</artifactId>
+      <artifactId>nexus-repository</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

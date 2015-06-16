@@ -19,10 +19,14 @@ import javax.annotation.Nullable;
 import static java.util.Arrays.asList;
 
 /**
+ * Synthesizes a count from remote and hosted component counts.
+ *
  * @since 3.0
  */
 public class CountReportingPolicy
 {
+  private CountReportingPolicy() {}
+
   public static int determineReportedCount(final int remoteCount, final int localCount,
                                            @Nullable final Integer pageSize, @Nullable final Integer skip)
   {
