@@ -16,6 +16,7 @@ package org.sonatype.nexus.repository.maven.internal
 import javax.inject.Named
 import javax.inject.Singleton
 
+import org.sonatype.nexus.blobstore.api.BlobStoreManager
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2GroupRecipe
@@ -51,6 +52,7 @@ class MavenDefaultRepositoriesContributor
                     versionPolicy              : VersionPolicy.RELEASE.toString()
                 ],
                 storage: [
+                    blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME,
                     writePolicy: WritePolicy.ALLOW_ONCE.toString()
                 ]
             ]
@@ -61,6 +63,7 @@ class MavenDefaultRepositoriesContributor
                     versionPolicy              : VersionPolicy.SNAPSHOT.toString()
                 ],
                 storage: [
+                    blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME,
                     writePolicy: WritePolicy.ALLOW.toString()
                 ]
             ]
@@ -75,6 +78,7 @@ class MavenDefaultRepositoriesContributor
                     artifactMaxAge: 3600
                 ],
                 storage: [
+                    blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME,
                     writePolicy: WritePolicy.ALLOW.toString()
                 ]
             ]
@@ -88,6 +92,7 @@ class MavenDefaultRepositoriesContributor
                     memberNames: [DEFAULT_RELEASE_REPO, DEFAULT_SNAPSHOT_REPO, DEFAULT_CENTRAL_REPO]
                 ],
                 storage: [
+                    blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME,
                     writePolicy: WritePolicy.ALLOW.toString()
                 ]
             ]
