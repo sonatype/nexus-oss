@@ -38,11 +38,17 @@ public class ExceptionHandler
       return context.proceed();
     }
     catch (IllegalOperationException e) {
-      log.debug("Illegal operation: {} {}", context.getRequest().getAction(), context.getRequest().getPath(), e);
+      log.warn("Illegal operation: {} {}: {}",
+          context.getRequest().getAction(),
+          context.getRequest().getPath(),
+          e.toString());
       return HttpResponses.badRequest(e.getMessage());
     }
     catch (InvalidContentException e) {
-      log.debug("Invalid content: {} {}", context.getRequest().getAction(), context.getRequest().getPath(), e);
+      log.warn("Invalid content: {} {}: {}",
+          context.getRequest().getAction(),
+          context.getRequest().getPath(),
+          e.toString());
       if (PUT.equals(context.getRequest().getAction())) {
         return HttpResponses.badRequest(e.getMessage());
       }
