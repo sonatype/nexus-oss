@@ -36,7 +36,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleHourly', {
         xtype: 'datefield',
         name: 'startDate',
         itemId: 'startDate',
-        fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE'),
+        fieldLabel: NX.I18n.get('Task_TaskScheduleDaily_StartDate_FieldLabel'),
         allowBlank: false,
         format: 'm/d/Y',
         value: new Date(),
@@ -45,7 +45,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleHourly', {
       {
         xtype: 'timefield',
         name: 'startTime',
-        fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_TIME'),
+        fieldLabel: NX.I18n.get('Task_TaskScheduleHourly_EndDate_FieldLabel'),
         itemId: 'startTime',
         helpText: 'The time this task should start running in your time zone ' + NX.util.DateFormat.getTimeZone() + '.',
         allowBlank: false,

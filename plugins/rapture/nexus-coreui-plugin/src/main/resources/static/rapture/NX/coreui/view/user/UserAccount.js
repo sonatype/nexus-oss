@@ -30,7 +30,7 @@ Ext.define('NX.coreui.view.user.UserAccount', {
     me.settingsForm = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: NX.I18n.get('USER_ACCOUNT_UPDATE_SUCCESS'),
+        settingsFormSuccessMessage: NX.I18n.get('User_UserAccount_Update_Success'),
         api: {
           load: 'NX.direct.coreui_User.readAccount',
           submit: 'NX.direct.coreui_User.updateAccount'
@@ -40,21 +40,21 @@ Ext.define('NX.coreui.view.user.UserAccount', {
             name: 'userId',
             itemId: 'userId',
             readOnly: true,
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_ID'),
-            helpText: NX.I18n.get('USER_ACCOUNT_ID_HELP')
+            fieldLabel: NX.I18n.get('User_UserAccount_ID_FieldLabel'),
+            helpText: NX.I18n.get('User_UserAccount_ID_HelpText')
           },
           {
             name: 'firstName',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_FIRST')
+            fieldLabel: NX.I18n.get('User_UserAccount_First_FieldLabel')
           },
           {
             name: 'lastName',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_LAST')
+            fieldLabel: NX.I18n.get('User_UserAccount_Last_FieldLabel')
           },
           {
             xtype: 'nx-email',
             name: 'email',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_EMAIL')
+            fieldLabel: NX.I18n.get('User_UserAccount_Email_FieldLabel')
           }
         ]
       }
@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.user.UserAccount', {
     me.callParent(arguments);
 
     me.down('nx-settingsform').getDockedItems('toolbar[dock="bottom"]')[0].add({
-      xtype: 'button', text: NX.I18n.get('USER_ACCOUNT_PASSWORD_BUTTON'), action: 'changepassword', ui: 'nx-danger', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true
+      xtype: 'button', text: NX.I18n.get('User_UserAccount_Password_Button'), action: 'changepassword', ui: 'nx-danger', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true
     });
   }
 

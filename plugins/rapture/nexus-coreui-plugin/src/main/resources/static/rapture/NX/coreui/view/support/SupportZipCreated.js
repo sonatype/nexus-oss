@@ -49,7 +49,7 @@ Ext.define('NX.coreui.view.support.SupportZipCreated', {
       // TODO Style
       items: [
         { xtype: 'component', html: NX.Icons.img('supportzip-truncated', 'x32') },
-        { xtype: 'component', html: NX.I18n.get('ADMIN_SUPPORT_ZIP_TRUNCATED'),
+        { xtype: 'component', html: NX.I18n.get('Support_SupportZipCreated_Truncated_Text'),
           margin: '0 0 0 5'
         }
       ],

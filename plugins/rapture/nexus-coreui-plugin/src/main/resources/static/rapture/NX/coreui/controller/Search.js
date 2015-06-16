@@ -111,8 +111,8 @@ Ext.define('NX.coreui.controller.Search', {
       {
         id: 'custom',
         name: 'Custom',
-        text: NX.I18n.get('BROWSE_SEARCH_CUSTOM_TITLE'),
-        description: NX.I18n.get('BROWSE_SEARCH_CUSTOM_SUBTITLE'),
+        text: NX.I18n.get('Search_Custom_Text'),
+        description: NX.I18n.get('Search_Custom_Description'),
         readOnly: true
       }
     ], me);
@@ -202,8 +202,8 @@ Ext.define('NX.coreui.controller.Search', {
       me.getApplication().getFeaturesController().registerFeature({
         mode: 'browse',
         path: '/Search',
-        text: NX.I18n.get('BROWSE_SEARCH_TITLE'),
-        description: NX.I18n.get('BROWSE_SEARCH_SUBTITLE'),
+        text: NX.I18n.get('Search_Text'),
+        description: NX.I18n.get('Search_Description'),
         group: true,
         view: { xtype: 'nx-coreui-searchfeature', searchFilter: model, bookmarkEnding: '' },
         iconName: 'search-default',
@@ -350,7 +350,7 @@ Ext.define('NX.coreui.controller.Search', {
       xtype: 'button',
       itemId: 'addButton',
       margin: '36px 0 0 0',
-      text: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_MORE_BUTTON'),
+      text: NX.I18n.get('Search_More_Text'),
       glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
       menu: addCriteriaMenu
     });

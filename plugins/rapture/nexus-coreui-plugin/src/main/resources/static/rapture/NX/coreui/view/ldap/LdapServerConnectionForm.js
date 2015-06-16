@@ -27,7 +27,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionForm', {
 
   items: { xtype: 'nx-coreui-ldapserver-connection-fieldset' },
 
-  editableMarker: NX.I18n.get('ADMIN_LDAP_UPDATE_ERROR'),
+  editableMarker: NX.I18n.get('Ldap_LdapServerConnectionForm_Update_Error'),
 
   /**
    * @override
@@ -40,7 +40,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionForm', {
     me.callParent(arguments);
 
     me.getDockedItems('toolbar[dock="bottom"]')[0].add(
-        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_CONNECTION_VERIFY_BUTTON'), formBind: true, action: 'verifyconnection' }
+        { xtype: 'button', text: NX.I18n.get('Ldap_LdapServerConnectionForm_VerifyConnection_Button'), formBind: true, action: 'verifyconnection' }
     );
   }
 

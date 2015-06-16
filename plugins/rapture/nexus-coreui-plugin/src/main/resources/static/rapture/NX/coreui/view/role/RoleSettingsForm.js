@@ -30,10 +30,10 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
     submit: 'NX.direct.coreui_Role.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return NX.I18n.get('ADMIN_ROLES_UPDATE_SUCCESS') + data['name'];
+    return NX.I18n.get('Role_RoleSettingsForm_Update_Success') + data['name'];
   },
 
-  editableMarker: NX.I18n.get('ADMIN_ROLES_UPDATE_ERROR'),
+  editableMarker: NX.I18n.get('Role_RoleSettingsForm_Update_Error'),
 
   initComponent: function() {
     var me = this,
@@ -54,8 +54,8 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
         xtype: 'combo',
         name: 'id',
         itemId: 'id',
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_MAPPED'),
-        emptyText: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_MAPPED_PLACEHOLDER'),
+        fieldLabel: NX.I18n.get('Role_RoleSettingsForm_MappedRole_FieldLabel'),
+        emptyText: NX.I18n.get('Role_RoleSettingsForm_MappedRole_EmptyText'),
         editable: false,
         store: 'RoleBySource',
         queryMode: 'local',
@@ -68,7 +68,7 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
         name: 'id',
         itemId: 'id',
         readOnly: true,
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID')
+        fieldLabel: NX.I18n.get('Role_RoleSettingsForm_RoleID_FieldLabel')
       };
     }
 
@@ -85,22 +85,22 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
       idField,
       {
         name: 'name',
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_NAME')
+        fieldLabel: NX.I18n.get('Role_RoleSettingsForm_Name_FieldLabel')
       },
       {
         name: 'description',
         allowBlank: true,
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_DESCRIPTION')
+        fieldLabel: NX.I18n.get('Role_RoleSettingsForm_Description_FieldLabel')
       },
       {
         xtype: 'nx-itemselector',
         name: 'privileges',
         itemId: 'privileges',
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_PRIVILEGES'),
+        fieldLabel: NX.I18n.get('Role_RoleSettingsForm_Privileges_FieldLabel'),
         allowBlank: true,
         buttons: ['add', 'remove'],
-        fromTitle: NX.I18n.get('ADMIN_ROLES_SETTINGS_PRIVILEGES_PICKER'),
-        toTitle: NX.I18n.get('ADMIN_ROLES_SETTINGS_GIVEN_PICKER'),
+        fromTitle: NX.I18n.get('Role_RoleSettingsForm_Privileges_FromTitle'),
+        toTitle: NX.I18n.get('Role_RoleSettingsForm_Privileges_ToTitle'),
         store: 'Privilege',
         valueField: 'id',
         displayField: 'name',
@@ -110,11 +110,11 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
         xtype: 'nx-itemselector',
         name: 'roles',
         itemId: 'roles',
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_ROLES'),
+        fieldLabel: NX.I18n.get('Role_RoleSettingsForm_Roles_FieldLabel'),
         allowBlank: true,
         buttons: ['add', 'remove'],
-        fromTitle: NX.I18n.get('ADMIN_ROLES_SETTINGS_ROLES_PICKER'),
-        toTitle: NX.I18n.get('ADMIN_ROLES_SETTINGS_CONTAINED_PICKER'),
+        fromTitle: NX.I18n.get('Role_RoleSettingsForm_Roles_FromTitle'),
+        toTitle: NX.I18n.get('Role_RoleSettingsForm_Roles_ToTitle'),
         store: roleStore,
         valueField: 'id',
         displayField: 'name',

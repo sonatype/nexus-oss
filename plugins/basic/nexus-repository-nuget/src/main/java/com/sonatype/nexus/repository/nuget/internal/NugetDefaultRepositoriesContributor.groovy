@@ -14,6 +14,8 @@ package com.sonatype.nexus.repository.nuget.internal
 
 import com.sonatype.nexus.repository.nuget.internal.proxy.NugetGroupRecipe
 import com.sonatype.nexus.repository.nuget.internal.proxy.NugetProxyRecipe
+
+import org.sonatype.nexus.blobstore.api.BlobStoreManager
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
 import org.sonatype.nexus.repository.storage.WritePolicy
@@ -46,6 +48,7 @@ class NugetDefaultRepositoriesContributor
             attributes:
                 [
                     storage: [
+                        blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME,
                         writePolicy: WritePolicy.ALLOW.toString()
                     ]
                 ]
@@ -56,6 +59,9 @@ class NugetDefaultRepositoriesContributor
                     proxy: [
                         remoteUrl     : 'http://www.nuget.org/api/v2/',
                         artifactMaxAge: 5
+                    ],
+                    storage: [
+                        blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME
                     ]
                 ]
         ),
@@ -64,6 +70,9 @@ class NugetDefaultRepositoriesContributor
                 [
                     group: [
                         memberNames: [DEFAULT_HOSTED_NAME, DEFAULT_PROXIED_NAME]
+                    ],
+                    storage: [
+                        blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME
                     ]
                 ]
         )

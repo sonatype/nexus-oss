@@ -32,6 +32,6 @@ Ext.define('NX.coreui.view.system.Bundles', {
 
   tabs: {
     xtype: 'nx-info-panel',
-    title: NX.I18n.get('ADMIN_BUNDLES_DETAILS_SUMMARY')
+    title: NX.I18n.get('System_Bundles_Details_Tab')
   }
 });

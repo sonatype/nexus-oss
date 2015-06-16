@@ -21,7 +21,7 @@ Ext.define('NX.view.UnsavedChanges', {
   extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-unsaved-changes',
 
-  title: NX.I18n.get('GLOBAL_UNSAVED_TITLE'),
+  title: NX.I18n.get('UnsavedChanges_Title'),
   defaultFocus: 'nx-discard',
 
   /**
@@ -46,11 +46,11 @@ Ext.define('NX.view.UnsavedChanges', {
       items: {
         xtype: 'panel',
         ui: 'nx-inset',
-        html: NX.I18n.get('GLOBAL_UNSAVED_MESSAGE'),
+        html: NX.I18n.get('UnsavedChanges_Help_HTML'),
         buttonAlign: 'left',
         buttons: [
           {
-            text: NX.I18n.get('GLOBAL_UNSAVED_DISCARD_BUTTON'),
+            text: NX.I18n.get('UnsavedChanges_Discard_Button'),
             ui: 'nx-primary',
             itemId: 'nx-discard',
             handler: function () {
@@ -60,7 +60,7 @@ Ext.define('NX.view.UnsavedChanges', {
               me.close();
             }
           },
-          { text: NX.I18n.get('GLOBAL_UNSAVED_BACK_BUTTON'), handler: me.close, scope: me }
+          { text: NX.I18n.get('UnsavedChanges_Back_Button'), handler: me.close, scope: me }
         ]
       }
     });

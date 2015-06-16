@@ -39,15 +39,15 @@ Ext.define('NX.coreui.view.repository.facet.ProxyFacet', {
       {
         xtype: 'fieldset',
         cls: 'nx-form-section',
-        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_PROXY_FACET'),
+        title: NX.I18n.get('Repository_Facet_ProxyFacet_Title'),
 
         items: [
           {
             xtype: 'nx-url',
             name: 'attributes.proxy.remoteUrl',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE_HELP'),
-            emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE_PLACEHOLDER'),
+            fieldLabel: NX.I18n.get('Repository_Facet_ProxyFacet_Remote_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_ProxyFacet_Remote_HelpText'),
+            emptyText: NX.I18n.get('Repository_Facet_ProxyFacet_Remote_EmptyText'),
             useTrustStore: function (field) {
               if (Ext.String.startsWith(field.getValue(), 'https://')) {
                 return {
@@ -61,22 +61,22 @@ Ext.define('NX.coreui.view.repository.facet.ProxyFacet', {
           {
             xtype: 'checkbox',
             name: 'attributes.httpclient.connection.blocked',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BLOCKED'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BLOCKED_HELP'),
+            fieldLabel: NX.I18n.get('Repository_Facet_ProxyFacet_Blocked_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_ProxyFacet_Blocked_HelpText'),
             value: false
           },
           {
             xtype: 'checkbox',
             name: 'attributes.httpclient.connection.autoBlock',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_AUTOBLOCK'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_AUTOBLOCK_HELP'),
+            fieldLabel: NX.I18n.get('Repository_Facet_ProxyFacet_Autoblock_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_ProxyFacet_Autoblock_HelpText'),
             value: true
           },
           {
             xtype: 'numberfield',
             name: 'attributes.proxy.artifactMaxAge',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ARTIFACT_AGE'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ARTIFACT_AGE_HELP'),
+            fieldLabel: NX.I18n.get('Repository_Facet_ProxyFacet_ArtifactAge_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_ProxyFacet_ArtifactAge_HelpText'),
             minValue: -1,
             value: 3600
           }

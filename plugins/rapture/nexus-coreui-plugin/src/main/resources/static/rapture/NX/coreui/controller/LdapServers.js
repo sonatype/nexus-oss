@@ -71,8 +71,8 @@ Ext.define('NX.coreui.controller.LdapServers', {
   features: {
     mode: 'admin',
     path: '/Security/LDAP',
-    text: NX.I18n.get('ADMIN_LDAP_TITLE'),
-    description: NX.I18n.get('ADMIN_LDAP_SUBTITLE'),
+    text: NX.I18n.get('LdapServers_Text'),
+    description: NX.I18n.get('LdapServers_Description'),
     view: { xtype: 'nx-coreui-ldapserver-feature' },
     iconConfig: {
       file: 'book_addresses.png',
@@ -184,7 +184,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
       feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_LDAP_CREATE_CONNECTION'));
+    feature.setItemName(1, NX.I18n.get('LdapServers_CreateConnection_Title'));
     me.loadCreateWizard(1, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -210,7 +210,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
       feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(2, NX.I18n.get('ADMIN_LDAP_CREATE_GROUP'));
+    feature.setItemName(2, NX.I18n.get('LdapServers_CreateUsersAndGroups_Title'));
     me.loadCreateWizard(2, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -258,13 +258,13 @@ Ext.define('NX.coreui.controller.LdapServers', {
     Ext.apply(modelData, values);
 
     // Apply masks
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_LDAP_UPDATE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('LdapServers_Update_Mask'));
     NX.direct.ldap_LdapServer.update(modelData, function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: NX.I18n.format('ADMIN_LDAP_UPDATE_SUCCESS',
+            text: NX.I18n.format('LdapServers_Update_Success',
               me.getDescription(me.getLdapServerModel().create(response.data))),
             type: 'success'
           });
@@ -289,13 +289,13 @@ Ext.define('NX.coreui.controller.LdapServers', {
     Ext.apply(values, connectionForm.getForm().getFieldValues());
     Ext.apply(values, userGroupForm.getForm().getFieldValues());
 
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_LDAP_CREATE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('LdapServers_Create_Mask'));
     NX.direct.ldap_LdapServer.create(values, function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: NX.I18n.format('ADMIN_LDAP_CREATE_SUCCESS',
+            text: NX.I18n.format('LdapServers_Create_Success',
               me.getDescription(me.getLdapServerModel().create(response.data))),
             type: 'success'
           });
@@ -367,7 +367,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
     NX.direct.ldap_LdapServer.remove(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_LDAP_DELETE_SUCCESS', description), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('LdapServers_Delete_Success', description), type: 'success' });
       }
     });
   },
@@ -385,7 +385,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
       if (Ext.isObject(response) && response.success) {
         me.loadStore();
         win.close();
-        NX.Messages.add({ text: NX.I18n.get('ADMIN_LDAP_ORDER_SUCCESS'), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.get('LdapServers_ChangeOrder_Success'), type: 'success' });
       }
     });
   },
@@ -397,7 +397,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
   clearCache: function(button) {
     NX.direct.ldap_LdapServer.clearCache(function(response) {
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: NX.I18n.get('ADMIN_LDAP_DETAILS_CLEAR_CACHE_SUCCESS'), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.get('LdapServers_ClearCache_Success'), type: 'success' });
       }
     });
   },
@@ -411,12 +411,12 @@ Ext.define('NX.coreui.controller.LdapServers', {
         values = form.getForm().getFieldValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
-    form.getEl().mask(NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_CONNECTION_MASK', url));
+    form.getEl().mask(NX.I18n.format('LdapServers_VerifyConnection_Mask', url));
 
     NX.direct.ldap_LdapServer.verifyConnection(values, function(response) {
       form.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_CONNECTION_SUCCESS', url), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('LdapServers_VerifyConnection_Success', url), type: 'success' });
       }
     });
   },
@@ -430,12 +430,12 @@ Ext.define('NX.coreui.controller.LdapServers', {
         values = me.getValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
-    me.getMain().getEl().mask(NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_MAPPING_MASK', url));
+    me.getMain().getEl().mask(NX.I18n.format('LdapServers_VerifyMapping_Mask', url));
 
     NX.direct.ldap_LdapServer.verifyUserMapping(values, function(response) {
       me.getMain().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({text: NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_MAPPING_SUCCESS', url), type: 'success'});
+        NX.Messages.add({text: NX.I18n.format('LdapServers_VerifyMapping_Success', url), type: 'success'});
         Ext.widget('nx-coreui-ldapserver-userandgroup-testresults', {mappedUsers: response.data});
       }
     });
@@ -462,13 +462,13 @@ Ext.define('NX.coreui.controller.LdapServers', {
         values = me.getValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
-    form.getEl().mask(NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_LOGIN_MASK', url));
+    form.getEl().mask(NX.I18n.format('LdapServers_VerifyLogin_Mask', url));
 
     NX.direct.ldap_LdapServer.verifyLogin(values, userName, userPass, function(response) {
       form.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         win.close();
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_LOGIN_SUCCESS', url), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('LdapServers_VerifyLogin_Success', url), type: 'success' });
       }
     });
   },

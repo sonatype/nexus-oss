@@ -117,7 +117,7 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
         protocolHint = useTrustStoreConfig.url && Ext.String.startsWith(useTrustStoreConfig.url.getValue(), "https://") ? 'https' : undefined,
         sslCertificates = me.getController('NX.coreui.controller.SslCertificates');
 
-    me.getMain().getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
+    me.getMain().getEl().mask(NX.I18n.get('SslTrustStore_Load_Mask'));
     NX.direct.ssl_Certificate.retrieveFromHost(hostAndPort.host, hostAndPort.port, protocolHint, function(response) {
       me.getMain().getEl().unmask();
       if (Ext.isObject(response) && response.success) {

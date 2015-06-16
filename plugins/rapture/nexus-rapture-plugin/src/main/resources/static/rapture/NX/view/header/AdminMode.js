@@ -41,8 +41,8 @@ Ext.define('NX.view.header.AdminMode', {
    */
   autoHide: true,
 
-  title: NX.I18n.get('GLOBAL_HEADER_ADMIN_TITLE'),
-  tooltip: NX.I18n.get('GLOBAL_HEADER_ADMIN_TOOLTIP'),
+  title: NX.I18n.get('Header_AdminMode_Title'),
+  tooltip: NX.I18n.get('Header_AdminMode_Tooltip'),
   glyph: 'xf013@FontAwesome', /* fa-gear */
 
   collapseMenu: false

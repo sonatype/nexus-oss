@@ -39,7 +39,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
     },
     {
       xtype: 'checkbox',
-      fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SETTINGS_ENABLED'),
+      fieldLabel: NX.I18n.get('Capability_CapabilitySettingsForm_Enabled_FieldLabel'),
       name: 'enabled',
       allowBlank: false,
       checked: true,
@@ -48,7 +48,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
     { xtype: 'nx-coreui-formfield-settingsfieldset' }
   ],
 
-  editableMarker: NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_ERROR'),
+  editableMarker: NX.I18n.get('Capability_CapabilityAdd_Create_Error'),
 
   /**
    * @override
