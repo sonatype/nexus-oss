@@ -534,6 +534,18 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
               }
             }
           }
+          else
+          {
+            // no content, clear display statuses
+            this.dataStore.each(function(rec) {
+              if (rec.get('repoType') !== 'group') {
+                rec.beginEdit();
+                rec.set('displayStatus', '');
+                rec.commit(true);
+                rec.endEdit();
+              }
+            });
+          }
         }
         else
         {

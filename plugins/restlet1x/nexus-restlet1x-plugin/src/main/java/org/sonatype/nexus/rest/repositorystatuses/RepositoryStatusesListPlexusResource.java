@@ -28,12 +28,16 @@ import org.sonatype.nexus.rest.model.RepositoryStatusListResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
@@ -45,6 +49,10 @@ public class RepositoryStatusesListPlexusResource
     extends AbstractRepositoryPlexusResource
 {
   public static final String RESOURCE_URI = "/repository_statuses";
+
+  private static final String ADMIN_ONLY_KEY = "nexus.repositoryStatuses.adminOnly";
+
+  private final boolean adminOnly = SystemPropertiesHelper.getBoolean(ADMIN_ONLY_KEY, false);
 
   @Override
   public Object getPayloadInstance() {
@@ -76,6 +84,15 @@ public class RepositoryStatusesListPlexusResource
   public Object get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
+    if (adminOnly) {
+      Subject subject = ThreadContext.getSubject();
+      // skip building reply unless user has admin access (ie. can update status)
+      if (subject == null || !subject.isPermitted("nexus:repostatus:update")) {
+        response.setStatus(Status.SUCCESS_NO_CONTENT);
+        return null;
+      }
+    }
+
     RepositoryStatusListResourceResponse result = new RepositoryStatusListResourceResponse();
 
     RepositoryStatusListResource repoRes;
