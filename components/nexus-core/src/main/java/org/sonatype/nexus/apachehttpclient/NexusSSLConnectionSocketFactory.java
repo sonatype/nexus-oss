@@ -115,6 +115,9 @@ public class NexusSSLConnectionSocketFactory
       ((SSLSocketImpl) sock).setHost(host.getHostName());
     }
     try {
+      if (connectTimeout > 0 && sock.getSoTimeout() == 0) {
+        sock.setSoTimeout(connectTimeout);
+      }
       sock.connect(remoteAddress, connectTimeout);
     }
     catch (final IOException e) {
