@@ -31,6 +31,7 @@ import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
@@ -83,9 +84,12 @@ public class RepositoryStatusesListPlexusResource
   public Object get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
-    if (adminOnly && !ThreadContext.getSubject().isPermitted("nexus:repostatus:update")) {
-      response.setStatus(Status.SUCCESS_NO_CONTENT);
-      return null;
+    if (adminOnly) {
+      Subject subject = ThreadContext.getSubject();
+      if (subject == null || !subject.isPermitted("nexus:repostatus:update")) {
+        response.setStatus(Status.SUCCESS_NO_CONTENT);
+        return null;
+      }
     }
 
     RepositoryStatusListResourceResponse result = new RepositoryStatusListResourceResponse();
