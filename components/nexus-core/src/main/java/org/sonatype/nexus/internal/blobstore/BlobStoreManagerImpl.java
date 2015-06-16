@@ -84,8 +84,11 @@ public class BlobStoreManagerImpl
     store.start();
     List<BlobStoreConfiguration> configurations = store.list();
     if (configurations.isEmpty()) {
-      log.debug("No BlobStores configured");
-      return;
+      log.debug("No BlobStores configured; provisioning default BlobStore");
+      store.create(FileBlobStore.configure(
+          DEFAULT_BLOBSTORE_NAME, basedir.toAbsolutePath().resolve(DEFAULT_BLOBSTORE_NAME).toString()
+      ));
+      configurations = store.list();
     }
 
     log.debug("Restoring {} BlobStores", configurations.size());
