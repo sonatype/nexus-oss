@@ -32,7 +32,7 @@ import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 /**
- * Tests for {@link LiteralMatcher}.
+ * Tests for {@link ConditionalRequestHandler}.
  */
 class ConditionalRequestHandlerTest
     extends TestSupport
