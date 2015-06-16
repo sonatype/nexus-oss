@@ -65,7 +65,7 @@ public class ConditionalRequestHandler
         if (response.getStatus().isSuccessful() && !requestPredicate.apply(response)) {
           return new Response.Builder()
               .copy(response)
-              .status(Status.failure(NOT_MODIFIED, "Not modified"))
+              .status(Status.failure(NOT_MODIFIED))
               .payload(null)
               .build();
         }
@@ -83,7 +83,7 @@ public class ConditionalRequestHandler
           // keep all response headers like Last-Modified and ETag, etc
           return new Response.Builder()
               .copy(response)
-              .status(Status.failure(PRECONDITION_FAILED, "Precondition failed"))
+              .status(Status.failure(PRECONDITION_FAILED))
               .payload(null)
               .build();
         }
