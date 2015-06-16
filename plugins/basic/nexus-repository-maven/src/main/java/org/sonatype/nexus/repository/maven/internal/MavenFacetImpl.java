@@ -380,12 +380,12 @@ public class MavenFacetImpl
       if (!Strings.isNullOrEmpty(etag)) {
         formatAttributes.set(P_CONTENT_ETAG, etag);
       }
+      else {
+        formatAttributes.remove(P_CONTENT_ETAG);
+      }
     }
     if (formatAttributes.get(P_CONTENT_LAST_MODIFIED) == null) {
       formatAttributes.set(P_CONTENT_LAST_MODIFIED, DateTime.now().toDate());
-    }
-    if (formatAttributes.get(P_CONTENT_ETAG) == null) {
-      formatAttributes.set(P_CONTENT_ETAG, assetBlob.getHashes().get(HashAlgorithm.SHA1).toString());
     }
   }
 
