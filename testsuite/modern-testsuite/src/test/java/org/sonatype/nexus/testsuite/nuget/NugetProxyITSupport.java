@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 
 import com.sonatype.nexus.repository.nuget.internal.proxy.NugetProxyRecipe;
 
+import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -64,6 +65,9 @@ public abstract class NugetProxyITSupport
     final NestedAttributesMap proxy = config.attributes("proxy");
     proxy.set("remoteUrl", remoteUrl);
     proxy.set("artifactMaxAge", 5);
+
+    NestedAttributesMap storage = config.attributes("storage");
+    storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
 
     return config;
   }

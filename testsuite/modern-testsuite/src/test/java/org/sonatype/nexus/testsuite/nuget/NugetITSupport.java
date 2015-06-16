@@ -28,6 +28,8 @@ import com.sonatype.nexus.repository.nuget.odata.ODataConsumer;
 import com.sonatype.nexus.repository.nuget.security.NugetApiKey;
 import com.sonatype.nexus.repository.nuget.security.NugetApiKeyStore;
 
+import org.sonatype.nexus.blobstore.api.BlobStoreManager;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.storage.WritePolicy;
@@ -83,7 +85,11 @@ public abstract class NugetITSupport
     config.setRepositoryName(name);
     config.setRecipeName(NugetHostedRecipe.NAME);
     config.setOnline(true);
-    config.attributes("storage").set("writePolicy", WritePolicy.ALLOW.toString());
+
+    NestedAttributesMap storage = config.attributes("storage");
+    storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
+    storage.set("writePolicy", WritePolicy.ALLOW.toString());
+
     return config;
   }
 

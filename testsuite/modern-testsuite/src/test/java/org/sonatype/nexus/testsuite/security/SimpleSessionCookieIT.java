@@ -19,6 +19,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.blobstore.api.BlobStoreManager;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -94,7 +96,11 @@ public class SimpleSessionCookieIT
       testRepositoryConfig.setRecipeName("raw-hosted"); // using name here to not complicate importing of internal class
       testRepositoryConfig.setRepositoryName(TEST_REPOSITORY_NAME);
       testRepositoryConfig.setOnline(true);
-      testRepositoryConfig.attributes("storage").set("writePolicy", WritePolicy.ALLOW.toString());
+
+      NestedAttributesMap storage = testRepositoryConfig.attributes("storage");
+      storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
+      storage.set("writePolicy", WritePolicy.ALLOW.toString());
+
       testRepository = repositoryManager.create(testRepositoryConfig);
     }
   }
