@@ -14,7 +14,6 @@ package org.sonatype.nexus.repository.view
 
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.http.HttpMethods
-import org.sonatype.nexus.repository.view.matchers.LiteralMatcher
 import org.sonatype.nexus.repository.view.payloads.StringPayload
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
