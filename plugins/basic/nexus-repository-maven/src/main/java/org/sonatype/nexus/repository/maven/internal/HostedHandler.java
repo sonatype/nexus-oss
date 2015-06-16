@@ -79,7 +79,7 @@ public class HostedHandler
     if (content == null) {
       return HttpResponses.notFound(path.getPath());
     }
-    mayFormatETag(content);
+    mayAddETag(content);
     return HttpResponses.ok(content);
   }
 
@@ -100,9 +100,9 @@ public class HostedHandler
 
   /**
    * Adds {@link HttpHeaders#ETAG} header if not present. In case of hosted repositories, this is safe and even
-   * good thing to do, as the content is hosted here only.
+   * good thing to do, as the content is hosted here only and NX is content authority.
    */
-  private void mayFormatETag(final Content content) {
+  private void mayAddETag(final Content content) {
     if (content.getAttributes().get(Content.CONTENT_ETAG, String.class) != null) {
       return;
     }
