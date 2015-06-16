@@ -33,7 +33,7 @@ Ext.define('NX.coreui.view.capability.CapabilityStatus', {
    * @param {String} text status text
    */
   showStatus: function (text) {
-    this.html = text || NX.I18n.get('ADMIN_CAPABILITIES_STATUS_EMPTY_STATE');
+    this.html = text || NX.I18n.get('Capability_CapabilityStatus_EmptyText');
     if (this.body) {
       this.update(this.html);
     }

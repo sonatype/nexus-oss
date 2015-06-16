@@ -47,7 +47,7 @@ Ext.define('NX.Windows', {
 
     win = NX.global.open(url, name, specs, replace);
     if (win === null) {
-      NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_BLOCKED_POPUP_DANGER'), type: 'danger'});
+      NX.Messages.add({text: NX.I18n.get('Windows_Popup_Message'), type: 'danger'});
     }
     return win;
   }

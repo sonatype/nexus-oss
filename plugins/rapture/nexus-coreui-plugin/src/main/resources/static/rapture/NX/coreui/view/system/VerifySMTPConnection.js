@@ -26,7 +26,7 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
   ],
   ui: 'nx-inset',
 
-  title: NX.I18n.get('ADMIN_SMTP_VERIFY_TITLE'),
+  title: NX.I18n.get('System_VerifySmtpConnection_VerifyServer_Title'),
   defaultFocus: 'email',
 
   layout: 'fit',
@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
               { xtype: 'component', html: NX.Icons.img('verifysmtpconnection', 'x32') },
               {
                 xtype: 'label',
-                html: NX.I18n.get('ADMIN_SMTP_VERIFY_HELP'),
+                html: NX.I18n.get('System_VerifySmtpConnection_HelpText'),
                 margin: '0 0 0 5'
               }
             ]

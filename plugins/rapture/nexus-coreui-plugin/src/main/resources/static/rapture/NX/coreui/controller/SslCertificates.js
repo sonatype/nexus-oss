@@ -67,8 +67,8 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     mode: 'admin',
     path: '/Security/SSL Certificates',
     view: { xtype: 'nx-coreui-sslcertificate-feature' },
-    text: NX.I18n.get('ADMIN_SSL_TITLE'),
-    description: NX.I18n.get('ADMIN_SSL_SUBTITLE'),
+    text: NX.I18n.get('SslCertificates_Text'),
+    description: NX.I18n.get('SslCertificates_Description'),
     iconConfig: {
       file: 'ssl_certificates.png',
       variants: ['x16', 'x32']
@@ -143,7 +143,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
       feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_SSL_LOAD_TITLE'));
+    feature.setItemName(1, NX.I18n.get('SslCertificates_Load_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-sslcertificate-add-from-server'));
   },
 
@@ -155,7 +155,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
       feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_SSL_PASTE_TITLE'));
+    feature.setItemName(1, NX.I18n.get('SslCertificates_Paste_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-sslcertificate-add-from-pem'));
   },
 
@@ -176,7 +176,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     form.loadRecord(model);
 
     // Show the second panel in the create wiard, and set the breadcrumb
-    feature.setItemName(2, NX.I18n.get('ADMIN_SSL_DETAILS_TITLE'));
+    feature.setItemName(2, NX.I18n.get('Ssl_SslCertificateDetailsWindow_Title'));
     me.loadCreateWizard(2, true, panel);
   },
 
@@ -205,7 +205,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         basicForm = button.up('form').getForm(),
         pem = basicForm.getFieldValues()['pem'];
 
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('SslTrustStore_Load_Mask'));
     NX.direct.ssl_Certificate.details(pem, function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
@@ -229,7 +229,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         parsed = me.parseHostAndPort(server),
         protocolHint = server && Ext.String.startsWith(server, "https://") ? 'https' : undefined;
 
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('SslTrustStore_Load_Mask'));
     NX.direct.ssl_Certificate.retrieveFromHost(parsed[0], parsed[1], protocolHint, function (response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
@@ -281,7 +281,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
           win.close();
         }
         me.loadStoreAndSelect(model.internalId, true);
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_SSL_LOAD_SUCCESS', description), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('SslCertificates_Load_Success', description), type: 'success' });
       }
     });
   },
@@ -303,7 +303,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
           win.close();
         }
         me.loadStore(Ext.emptyFn);
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_SSL_DETAILS_DELETE_SUCCESS', description), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('SslCertificates_Delete_Success', description), type: 'success' });
       }
     });
   },
@@ -321,7 +321,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     NX.direct.ssl_TrustStore.remove(model.getId(), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_SSL_DETAILS_DELETE_SUCCESS', description), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('SslCertificates_Delete_Success', description), type: 'success' });
       }
     });
   },
@@ -340,7 +340,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         if (model) {
           if (model.get('inTrustStore')) {
             tbar.insert(0, {
-              text: NX.I18n.get('ADMIN_SSL_DETAILS_REMOVE'),
+              text: NX.I18n.get('SslCertificates_Remove_Button'),
               action: 'remove',
               formBind: true,
               disabled: true,
@@ -359,7 +359,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
           }
           else {
             tbar.insert(0, {
-              text: NX.I18n.get('ADMIN_SSL_DETAILS_ADD'),
+              text: NX.I18n.get('SslCertificates_Add_Button'),
               action: 'add',
               formBind: true,
               disabled: true,

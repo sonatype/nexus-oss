@@ -57,8 +57,8 @@ Ext.define('NX.coreui.controller.SupportZip', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Support ZIP',
-      text: NX.I18n.get('ADMIN_SUPPORT_ZIP_TITLE'),
-      description: NX.I18n.get('ADMIN_SUPPORT_ZIP_SUBTITLE'),
+      text: NX.I18n.get('SupportZip_Title'),
+      description: NX.I18n.get('SupportZip_Description'),
       view: { xtype: 'nx-coreui-support-supportzip' },
       iconConfig: {
         file: 'file_extension_zip.png',
@@ -97,7 +97,7 @@ Ext.define('NX.coreui.controller.SupportZip', {
         fileName = win.down('form').getValues().name;
 
     NX.Security.doWithAuthenticationToken(
-        NX.I18n.get('ADMIN_SUPPORT_ZIP_DOWNLOAD_AUTHENTICATE'),
+        NX.I18n.get('SupportZip_Authenticate_Text'),
         {
           success: function (authToken) {
             NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf(

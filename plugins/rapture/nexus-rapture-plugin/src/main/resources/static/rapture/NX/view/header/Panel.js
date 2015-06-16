@@ -62,7 +62,7 @@ Ext.define('NX.view.header.Panel', {
             items: [
               {
                 xtype: 'label',
-                text: NX.I18n.get('GLOBAL_HEADER_TITLE'),
+                text: NX.I18n.get('Header_Panel_Logo_Text'),
                 cls: 'nx-header-productname'
               },
               {

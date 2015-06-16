@@ -77,8 +77,8 @@ Ext.define('NX.coreui.controller.Users', {
     {
       mode: 'admin',
       path: '/Security/Users',
-      text: NX.I18n.get('ADMIN_USERS_TITLE'),
-      description: NX.I18n.get('ADMIN_USERS_SUBTITLE'),
+      text: NX.I18n.get('Users_Text'),
+      description: NX.I18n.get('Users_Description'),
       view: { xtype: 'nx-coreui-user-feature' },
       iconConfig: {
         file: 'group.png',
@@ -92,8 +92,8 @@ Ext.define('NX.coreui.controller.Users', {
     {
       mode: 'user',
       path: '/Account',
-      text: NX.I18n.get('USER_ACCOUNT_TITLE'),
-      description: NX.I18n.get('USER_ACCOUNT_SUBTITLE'),
+      text: NX.I18n.get('Users_Text'),
+      description: NX.I18n.get('Users_Description'),
       view: { xtype: 'nx-coreui-user-account' },
       iconConfig: {
         file: 'user.png',
@@ -214,7 +214,7 @@ Ext.define('NX.coreui.controller.Users', {
       feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_USERS_CREATE_TITLE'));
+    feature.setItemName(1, NX.I18n.get('Users_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-user-add'));
   },
 
@@ -455,7 +455,7 @@ Ext.define('NX.coreui.controller.Users', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: NX.I18n.format('ADMIN_USERS_DETAILS_DELETE_SUCCESS', description), type: 'success'
+          text: NX.I18n.format('Users_Delete_Success', description), type: 'success'
         });
       }
     });
@@ -521,7 +521,7 @@ Ext.define('NX.coreui.controller.Users', {
     NX.direct.coreui_User.changePassword(win.authToken, win.userId, password, function(response) {
       if (Ext.isObject(response) && response.success) {
         win.close();
-        NX.Messages.add({ text: NX.I18n.get('ADMIN_USERS_DETAILS_CHANGE_SUCCESS'), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.get('Users_Change_Success'), type: 'success' });
       }
     });
   }

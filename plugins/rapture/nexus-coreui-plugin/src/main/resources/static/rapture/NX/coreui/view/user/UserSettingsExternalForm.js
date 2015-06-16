@@ -33,7 +33,7 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
     return 'User role mappings updated: ' + data['userId'];
   },
 
-  editableMarker: NX.I18n.get('ADMIN_USERS_UPDATE_ERROR'),
+  editableMarker: NX.I18n.get('User_UserSettingsForm_Update_Error'),
 
   initComponent: function() {
     var me = this;
@@ -50,29 +50,29 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
         name: 'userId',
         itemId: 'userId',
         readOnly: true,
-        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_ID'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_ID_HELP'),
+        fieldLabel: NX.I18n.get('User_UserSettingsForm_ID_FieldLabel'),
+        helpText: NX.I18n.get('User_UserSettingsForm_ID_HelpText'),
         allowBlank: true
       },
       { name: 'realm', xtype: 'hiddenfield' },
       {
         name: 'firstName',
-        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST'),
+        fieldLabel: NX.I18n.get('User_UserSettingsForm_FirstName_FieldLabel'),
         allowBlank: true,
         readOnly: true,
         submitValue: false
       },
       {
         name: 'lastName',
-        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST'),
+        fieldLabel: NX.I18n.get('User_UserSettingsForm_LastName_FieldLabel'),
         allowBlank: true,
         readOnly: true,
         submitValue: false
       },
       {
         name: 'email',
-        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL_HELP'),
+        fieldLabel: NX.I18n.get('User_UserSettingsForm_Email_FieldLabel'),
+        helpText: NX.I18n.get('User_UserSettingsForm_Email_HelpText'),
         allowBlank: true,
         readOnly: true,
         submitValue: false
@@ -80,11 +80,11 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
       {
         xtype: 'combo',
         name: 'status',
-        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS'),
+        fieldLabel: NX.I18n.get('User_UserSettingsForm_Status_FieldLabel'),
         editable: false,
         store: [
-          ['active', NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_ACTIVE')],
-          ['disabled', NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_DISABLED')]
+          ['active', NX.I18n.get('User_UserSettingsForm_Status_ActiveItem')],
+          ['disabled', NX.I18n.get('User_UserSettingsForm_Status_DisabledItem')]
         ],
         queryMode: 'local',
         allowBlank: true,
@@ -96,10 +96,10 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
         xtype: 'nx-itemselector',
         name: 'roles',
         itemId: 'roles',
-        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES'),
+        fieldLabel: NX.I18n.get('User_UserSettingsExternalForm_Roles_FieldLabel'),
         buttons: ['add', 'remove'],
-        fromTitle: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES_PICKER'),
-        toTitle: NX.I18n.get('ADMIN_USERS_SETTINGS_GIVEN_PICKER'),
+        fromTitle: NX.I18n.get('User_UserSettingsExternalForm_Roles_FromTitle'),
+        toTitle: NX.I18n.get('User_UserSettingsExternalForm_Roles_ToTitle'),
         store: 'Role',
         valueField: 'id',
         displayField: 'name',
@@ -110,8 +110,8 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
         xtype: 'textarea',
         name: 'externalRoles',
         itemId: 'externalRoles',
-        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_EXTERNAL'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_EXTERNAL_HELP'),
+        fieldLabel: NX.I18n.get('User_UserSettingsExternalForm_ExternalRoles_FieldLabel'),
+        helpText: NX.I18n.get('User_UserSettingsExternalForm_ExternalRoles_HelpText'),
         allowBlank: true,
         readOnly: true,
         submitValue: false
@@ -148,7 +148,7 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
             if (Ext.Array.contains(externalRoles, roleModel.get('id'))) {
               canRemove = false;
               NX.Dialogs.showInfo(
-                  NX.I18n.get('ADMIN_USERS_REMOVE_ERROR'),
+                  NX.I18n.get('User_UserSettingsExternalForm_Remove_Error'),
                   'External mapped role "' + roleModel.get('name')
                       + '" cannot be removed because is assigned to user by external source'
               );

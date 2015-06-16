@@ -30,10 +30,10 @@ Ext.define('NX.coreui.view.privilege.PrivilegeFeature', {
 
   tabs: {
     xtype: 'nx-info-panel',
-    title: NX.I18n.get('ADMIN_PRIVILEGES_DETAILS_SUMMARY')
+    title: NX.I18n.get('Privilege_PrivilegeFeature_Details_Tab')
   },
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_PRIVILEGES_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('Privilege_PrivilegeFeature_Delete_Button'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ]
 });

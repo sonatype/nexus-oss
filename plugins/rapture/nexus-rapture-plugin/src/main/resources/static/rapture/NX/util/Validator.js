@@ -47,7 +47,7 @@ Ext.define('NX.util.Validator', {
       'nx-name': function(val) {
         return NX.util.Validator.nxNameRegex.test(val);
       },
-      'nx-nameText': NX.I18n.get('NAME_VALIDATION_MESSAGE')
+      'nx-nameText': NX.I18n.get('Util_Validator_Text')
     }
   ],
 

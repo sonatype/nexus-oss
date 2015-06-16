@@ -125,7 +125,7 @@ Ext.define('NX.controller.Help', {
 
     me.selectedFeature = feature;
 
-    featureHelp.setText(NX.I18n.get('GLOBAL_HEADER_HELP_FEATURE') + text);
+    featureHelp.setText(NX.I18n.get('Help_Feature_Text') + text);
     featureHelp.setIconCls(NX.Icons.cls(iconName, 'x16'));
   },
 

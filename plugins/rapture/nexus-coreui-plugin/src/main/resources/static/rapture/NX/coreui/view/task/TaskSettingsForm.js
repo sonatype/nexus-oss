@@ -36,7 +36,7 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     },
     {
       xtype: 'checkbox',
-      fieldLabel: NX.I18n.get('ADMIN_TASKS_SETTINGS_ENABLED'),
+      fieldLabel: NX.I18n.get('Task_TaskSettingsForm_Enabled_FieldLabel'),
       name: 'enabled',
       allowBlank: false,
       checked: true,
@@ -44,19 +44,19 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     },
     {
       name: 'name',
-      fieldLabel: NX.I18n.get('ADMIN_TASKS_SETTINGS_NAME')
+      fieldLabel: NX.I18n.get('Task_TaskSettingsForm_Name_FieldLabel')
     },
     {
       xtype: 'nx-email',
       name: 'alertEmail',
-      fieldLabel: NX.I18n.get('ADMIN_TASKS_SETTINGS_EMAIL'),
+      fieldLabel: NX.I18n.get('Task_TaskSettingsForm_Email_FieldLabel'),
       allowBlank: true
     },
     { xtype: 'nx-coreui-formfield-settingsfieldset' },
     { xtype: 'nx-coreui-task-schedulefieldset' }
   ],
 
-  editableMarker: NX.I18n.get('ADMIN_TASKS_SETTINGS_UPDATE_ERROR'),
+  editableMarker: NX.I18n.get('Task_TaskSettingsForm_Update_Error'),
 
   /**
    * @override

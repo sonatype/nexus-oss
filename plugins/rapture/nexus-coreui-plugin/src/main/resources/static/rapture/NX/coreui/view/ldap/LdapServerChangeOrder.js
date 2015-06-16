@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerChangeOrder', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_LDAP_ORDER_TITLE'),
+  title: NX.I18n.get('Ldap_LdapServerChangeOrder_Title'),
 
   /**
    * @override

@@ -39,14 +39,14 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreAdd', {
         submit: 'NX.direct.coreui_Blobstore.create'
       },
       settingsFormSuccessMessage: function(data) {
-        return NX.I18n.get('ADMIN_BLOBSTORES_CREATE_SUCCESS') + data['name'];
+        return NX.I18n.get('Blobstore_BlobstoreAdd_Create_Success') + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('nexus:blobstores:create'),
-      editableMarker: NX.I18n.get('ADMIN_BLOBSTORES_CREATE_ERROR'),
+      editableMarker: NX.I18n.get('Blobstore_BlobstoreAdd_Create_Error'),
 
       buttons: [
-        { text: NX.I18n.get('ADMIN_BLOBSTORES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
-        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function() {
+        { text: NX.I18n.get('Blobstore_BlobstoreList_New_Button'), action: 'add', formBind: true, ui: 'nx-primary' },
+        { text: NX.I18n.get('Add_Cancel_Button'), handler: function() {
           this.up('nx-drilldown').showChild(0, true);
         }}
       ]
@@ -59,8 +59,8 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreAdd', {
       xtype: 'combo',
       name: 'type',
       itemId: 'type',
-      fieldLabel: NX.I18n.get('ADMIN_BLOBSTORES_SETTINGS_TYPE'),
-      emptyText: NX.I18n.get('ADMIN_BLOBSTORES_SETTINGS_TYPE_PLACEHOLDER'),
+      fieldLabel: NX.I18n.get('Blobstore_BlobstoreAdd_Type_FieldLabel'),
+      emptyText: NX.I18n.get('Blobstore_BlobstoreAdd_Type_EmptyText'),
       editable: false,
       store: 'BlobstoreType',
       queryMode: 'local',

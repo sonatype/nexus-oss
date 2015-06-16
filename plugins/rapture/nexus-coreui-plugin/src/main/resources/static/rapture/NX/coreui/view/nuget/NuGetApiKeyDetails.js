@@ -55,7 +55,7 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
           items: [
             { xtype: 'component', html: NX.Icons.img('nuget-default', 'x32') },
             { xtype: 'label', margin: '0 0 0 5',
-              html: NX.I18n.get('NUGET_APIKEY_DETAIL_DESCRIPTION')
+              html: NX.I18n.get('Nuget_NuGetApiKeyDetails_Html')
             }
           ]
         },
@@ -68,7 +68,7 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
             {
               xtype: 'label',
               margin: '5 0 0 0',
-              text: NX.I18n.get('NUGET_APIKEY_DETAIL_APIKEY_LABEL')
+              text: NX.I18n.get('Nuget_NuGetApiKeyDetails_ApiKey_Text')
             },
             {
               xtype: 'textfield',
@@ -83,11 +83,11 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
             {
               xtype: 'label',
               margin: '5 0 0 0',
-              text: NX.I18n.get('NUGET_APIKEY_DETAIL_REGISTER_LABEL')
+              text: NX.I18n.get('Nuget_NuGetApiKeyDetails_Register_Text')
             },
             {
               xtype: 'textfield',
-              value: NX.I18n.format('NUGET_APIKEY_DETAIL_REGISTER_EXAMPLE', me.apiKey,
+              value: NX.I18n.format('Nuget_NuGetApiKeyDetails_Register_Value', me.apiKey,
                   NX.util.Url.urlOf('repository/{repository name}/')),
               readOnly: true,
               selectOnFocus: true,
@@ -101,7 +101,7 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
         {
           xtype: 'label',
           style: 'font-style: italic;',
-          html: NX.I18n.get('NUGET_APIKEY_DETAIL_AUTOCLOSE_LABEL')
+          html: NX.I18n.get('Nuget_NuGetApiKeyDetails_AutoClose_Html')
         }
       ],
       buttonAlign: 'left',
@@ -117,7 +117,7 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
     // Automatically close the window
     Ext.defer(function() {
       if (me.isVisible()) { // ignore if already closed
-        NX.Messages.add({ text: NX.I18n.get('NUGET_APIKEY_DETAIL_AUTOCLOSE_MESSAGE') });
+        NX.Messages.add({ text: NX.I18n.get('Nuget_NuGetApiKeyDetails_AutoClose_Message') });
         me.close();
       }
     }, 1 * 60 * 1000); // 1 minute

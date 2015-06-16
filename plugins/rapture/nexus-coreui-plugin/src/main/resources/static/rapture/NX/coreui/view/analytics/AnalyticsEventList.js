@@ -54,37 +54,37 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
       }
     },
     {
-      header: NX.I18n.get('ADMIN_EVENTS_TYPE_COLUMN'),
+      header: NX.I18n.get('Analytics_AnalyticsEventList_Type_Header'),
       dataIndex: 'type',
       stateId: 'type',
       flex: 1
     },
     {
-      header: NX.I18n.get('ADMIN_EVENTS_TIMESTAMP_COLUMN'),
+      header: NX.I18n.get('Analytics_AnalyticsEventList_Timestamp_Header'),
       dataIndex: 'timestamp',
       stateId: 'timestamp',
       flex: 1
     },
     {
-      header: NX.I18n.get('ADMIN_EVENTS_SEQUENCE_COLUMN'),
+      header: NX.I18n.get('Analytics_AnalyticsEventList_Sequence_Header'),
       dataIndex: 'sequence',
       stateId: 'sequence',
       flex: 1
     },
     {
-      header: NX.I18n.get('ADMIN_EVENTS_DURATION_COLUMN'),
+      header: NX.I18n.get('Analytics_AnalyticsEventList_Duration_Header'),
       dataIndex: 'duration',
       stateId: 'duration',
       flex: 1
     },
     {
-      header: NX.I18n.get('ADMIN_EVENTS_USER_COLUMN'),
+      header: NX.I18n.get('Analytics_AnalyticsEventList_User_Header'),
       dataIndex: 'userId',
       stateId: 'userId',
       flex: 1
     },
     {
-      header: NX.I18n.get('ADMIN_EVENTS_ATTRIBUTES_COLUMN'),
+      header: NX.I18n.get('Analytics_AnalyticsEventList_Attributes_Header'),
       dataIndex: 'attributes',
       stateId: 'attributes',
       flex: 3,
@@ -109,21 +109,21 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_EVENTS_CLEAR_BUTTON'),
+        text: NX.I18n.get('Analytics_AnalyticsEventList_Clear_Button'),
         glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
         action: 'clear',
         disabled: true
       },
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_EVENTS_EXPORT_BUTTON'),
+        text: NX.I18n.get('Analytics_AnalyticsEventsList_Export_Button'),
         glyph: 'xf019@FontAwesome' /* fa-download */,
         action: 'export'
       },
       '-',
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_EVENTS_SUBMIT_BUTTON'),
+        text: NX.I18n.get('Analytics_AnalyticsEventList_Submit_Button'),
         glyph: 'xf0ee@FontAwesome' /* fa-cloud-upload */,
         action: 'submit',
         disabled: true
@@ -164,7 +164,7 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
             }
           })
     },
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_EVENTS_FILTER_ERROR') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Analytics_AnalyticsEventList_Filter_EmptyText') }
   ]
 
 });

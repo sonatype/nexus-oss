@@ -62,8 +62,8 @@ Ext.define('NX.coreui.controller.Roles', {
   features: {
     mode: 'admin',
     path: '/Security/Roles',
-    text: NX.I18n.get('ADMIN_ROLES_TITLE'),
-    description: NX.I18n.get('ADMIN_ROLES_SUBTITLE'),
+    text: NX.I18n.get('Roles_Text'),
+    description: NX.I18n.get('Roles_Description'),
     view: { xtype: 'nx-coreui-role-feature' },
     iconConfig: {
       file: 'user_policeman.png',
@@ -135,7 +135,7 @@ Ext.define('NX.coreui.controller.Roles', {
       feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'));
+    feature.setItemName(1, NX.I18n.get('Roles_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-role-add'));
   },
 
@@ -153,7 +153,7 @@ Ext.define('NX.coreui.controller.Roles', {
     });
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'));
+    feature.setItemName(1, NX.I18n.get('Roles_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-role-add', { source: menuItem.source }));
   },
 
@@ -195,7 +195,7 @@ Ext.define('NX.coreui.controller.Roles', {
         });
       });
       newButton.menu.add({
-        text: NX.I18n.get('ADMIN_ROLES_LIST_EXTERNAL_ROLE_ITEM'),
+        text: NX.I18n.get('Roles_New_ExternalRoleItem'),
         menu: menuItems,
         iconCls: NX.Icons.cls('role-externalmapping', 'x16')
       });
@@ -251,7 +251,7 @@ Ext.define('NX.coreui.controller.Roles', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: NX.I18n.format('ADMIN_ROLES_DETAILS_DELETE_ROLE', description), type: 'success'
+          text: NX.I18n.format('Roles_Delete_Message', description), type: 'success'
         });
       }
     });

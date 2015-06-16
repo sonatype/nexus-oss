@@ -47,10 +47,10 @@ Ext.define('NX.coreui.view.feed.FeedList', {
           return 'feed-default';
         }
       },
-      { header: NX.I18n.get('BROWSE_FEEDS_LIST_FEED_COLUMN'), dataIndex: 'name', stateId: 'name',flex: 1 },
+      { header: NX.I18n.get('Feed_FeedList_Feed_Header'), dataIndex: 'name', stateId: 'name',flex: 1 },
       {
         xtype: 'nx-linkcolumn',
-        header: NX.I18n.get('BROWSE_FEEDS_LIST_URL_COLUMN'),
+        header: NX.I18n.get('Feed_FeedList_URL_Header'),
         dataIndex: 'url',
         flex: 2
       }
@@ -71,7 +71,7 @@ Ext.define('NX.coreui.view.feed.FeedList', {
   }],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('BROWSE_FEEDS_LIST_FILTER_ERROR') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Feed_FeedList_Filter_EmptyText') }
   ]
 
 });

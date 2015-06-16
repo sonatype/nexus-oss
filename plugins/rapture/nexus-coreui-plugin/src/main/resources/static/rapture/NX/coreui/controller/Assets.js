@@ -75,8 +75,8 @@ Ext.define('NX.coreui.controller.Assets', {
       panel = container.add({xtype: 'nx-coreui-component-assetinfo', weight: 10});
     }
 
-    info[NX.I18n.get('BROWSE_ASSET_INFO_NAME')] = assetModel.get('name');
-    info[NX.I18n.get('BROWSE_ASSET_INFO_CONTENT_TYPE')] = assetModel.get('contentType');
+    info[NX.I18n.get('Assets_Info_Name')] = assetModel.get('name');
+    info[NX.I18n.get('Assets_Info_ContentType')] = assetModel.get('contentType');
 
     panel.showInfo(info);
   },
@@ -86,11 +86,11 @@ Ext.define('NX.coreui.controller.Assets', {
         componentInfo = {};
 
     if (componentModel) {
-      repositoryInfo[NX.I18n.get('BROWSE_SEARCH_ASSETS_REPOSITORY')] = componentModel.get('repositoryName');
-      repositoryInfo[NX.I18n.get('BROWSE_SEARCH_ASSETS_FORMAT')] = componentModel.get('format');
-      componentInfo[NX.I18n.get('BROWSE_SEARCH_ASSETS_GROUP')] = componentModel.get('group');
-      componentInfo[NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME')] = componentModel.get('name');
-      componentInfo[NX.I18n.get('BROWSE_SEARCH_ASSETS_VERSION')] = componentModel.get('version');
+      repositoryInfo[NX.I18n.get('Search_Assets_Repository')] = componentModel.get('repositoryName');
+      repositoryInfo[NX.I18n.get('Search_Assets_Format')] = componentModel.get('format');
+      componentInfo[NX.I18n.get('Search_Assets_Group')] = componentModel.get('group');
+      componentInfo[NX.I18n.get('Search_Assets_Name')] = componentModel.get('name');
+      componentInfo[NX.I18n.get('Search_Assets_Version')] = componentModel.get('version');
 
       container.down('#repositoryInfo').showInfo(repositoryInfo);
       container.down('#componentInfo').showInfo(componentInfo);

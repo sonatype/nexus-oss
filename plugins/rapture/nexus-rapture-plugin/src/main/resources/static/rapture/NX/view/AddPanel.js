@@ -47,8 +47,8 @@ Ext.define('NX.view.AddPanel', {
     if (Ext.isDefined(me.settingsForm) && !Ext.isArray(me.settingsForm)) {
       if (!me.settingsForm.buttons) {
         me.settingsForm.buttons = [
-          { text: NX.I18n.get('GLOBAL_DIALOG_ADD_SUBMIT_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary', bindToEnter:  me.items.settingsFormSubmitOnEnter },
-          { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+          { text: NX.I18n.get('Add_Submit_Button'), action: 'add', formBind: true, ui: 'nx-primary', bindToEnter:  me.items.settingsFormSubmitOnEnter },
+          { text: NX.I18n.get('Add_Cancel_Button'), handler: function () {
             this.up('nx-drilldown').showChild(0, true);
           }}
         ];

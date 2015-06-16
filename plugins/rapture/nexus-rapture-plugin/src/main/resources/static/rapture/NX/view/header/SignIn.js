@@ -24,8 +24,8 @@ Ext.define('NX.view.header.SignIn', {
     'NX.I18n'
   ],
 
-  text: NX.I18n.get('GLOBAL_HEADER_SIGN_IN'),
-  tooltip: NX.I18n.get('GLOBAL_HEADER_SIGN_IN_TOOLTIP'),
+  text: NX.I18n.get('Header_SignIn_Text'),
+  tooltip: NX.I18n.get('Header_SignIn_Tooltip'),
   glyph: 'xf090@FontAwesome' // fa-sign-in
 
 });

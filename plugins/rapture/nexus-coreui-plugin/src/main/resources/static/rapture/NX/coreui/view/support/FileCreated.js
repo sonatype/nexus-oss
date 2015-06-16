@@ -77,7 +77,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
               // TODO Style
               xtype: 'textfield',
               name: 'name',
-              fieldLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED_NAME'),
+              fieldLabel: NX.I18n.get('Support_FileCreated_Name_FieldLabel'),
               helpText: me.fileType + ' file name',
               readOnly: true
             },
@@ -85,14 +85,14 @@ Ext.define('NX.coreui.view.support.FileCreated', {
               // TODO Style
               xtype: 'textfield',
               name: 'size',
-              fieldLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED_SIZE'),
+              fieldLabel: NX.I18n.get('Support_FileCreated_Size_FieldLabel'),
               helpText: 'Size of ' + me.fileType + ' file in bytes',  // FIXME: Would like to render in bytes/kilobytes/megabytes
               readOnly: true
             },
             {
               xtype: 'textfield',
               name: 'file',
-              fieldLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED_PATH'),
+              fieldLabel: NX.I18n.get('Support_FileCreated_Path_FieldLabel'),
               helpText: me.fileType + ' file location',
               readOnly: true,
               selectOnFocus: true
@@ -106,7 +106,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
           buttonAlign: 'left',
           buttons: [
             {
-              text: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED_DOWNLOAD_BUTTON'),
+              text: NX.I18n.get('Support_FileCreated_Download_Button'),
               action: 'download',
               formBind: true,
               bindToEnter: true,
@@ -114,7 +114,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
               glyph: 'xf023@FontAwesome' /* fa-lock */
             },
             {
-              text: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED_CANCEL_BUTTON'),
+              text: NX.I18n.get('Support_FileCreated_Cancel_Button'),
               handler: me.close,
               scope: me
             }

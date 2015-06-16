@@ -38,20 +38,20 @@ Ext.define('NX.coreui.view.repository.facet.NegativeCacheFacet', {
       {
         xtype: 'fieldset',
         cls: 'nx-form-section',
-        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_CACHE_FACET'),
+        title: NX.I18n.get('Repository_Facet_NegativeCacheFacet_Title'),
 
         items: [
           {
             xtype: 'checkbox',
             name: 'attributes.negativeCache.enabled',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_ENABLED'),
+            fieldLabel: NX.I18n.get('Repository_Facet_NegativeCacheFacet_Enabled_FieldLabel'),
             value: true
           },
           {
             xtype: 'numberfield',
             name: 'attributes.negativeCache.timeToLive',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL_HELP'),
+            fieldLabel: NX.I18n.get('Repository_Facet_NegativeCacheFacet_TTL_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_NegativeCacheFacet_TTL_HelpText'),
             minValue: -1,
             value: 1440
           }

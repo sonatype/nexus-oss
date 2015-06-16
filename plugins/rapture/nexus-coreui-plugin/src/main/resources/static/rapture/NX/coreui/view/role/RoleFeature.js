@@ -29,10 +29,10 @@ Ext.define('NX.coreui.view.role.RoleFeature', {
   masters: { xtype: 'nx-coreui-role-list' },
 
   tabs: [
-    { xtype: 'nx-coreui-role-settings', title: NX.I18n.get('ADMIN_ROLES_DETAILS_SETTINGS_TAB'), weight: 10 }
+    { xtype: 'nx-coreui-role-settings', title: NX.I18n.get('Role_RoleFeature_Settings_Title'), weight: 10 }
   ],
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_ROLES_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('Role_RoleFeature_Delete_Button'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ]
 });

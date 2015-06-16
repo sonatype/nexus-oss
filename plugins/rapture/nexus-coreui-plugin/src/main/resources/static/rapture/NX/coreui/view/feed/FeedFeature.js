@@ -29,10 +29,10 @@ Ext.define('NX.coreui.view.feed.FeedFeature', {
   masters: { xtype: 'nx-coreui-feed-list' },
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('BROWSE_FEEDS_LIST_SUBSCRIBE_BUTTON'), glyph: 'xf09e@FontAwesome' /* fa-rss */, action: 'subscribe', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('Feed_FeedFeature_Subscribe_Button'), glyph: 'xf09e@FontAwesome' /* fa-rss */, action: 'subscribe', disabled: true }
   ],
 
   tabs: [
-    { xtype: 'nx-coreui-feedentry-list', title: NX.I18n.get('BROWSE_FEEDS_DETAILS_EVENTS_TAB'), weight: 10 }
+    { xtype: 'nx-coreui-feedentry-list', title: NX.I18n.get('Feed_FeedFeature_List_Title'), weight: 10 }
   ]
 });

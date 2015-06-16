@@ -37,11 +37,11 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionAdd', {
       xtype: 'nx-coreui-ldapserver-connection-form',
 
       editableCondition: NX.Conditions.isPermitted('nexus:ldap:create'),
-      editableMarker: NX.I18n.get('ADMIN_LDAP_CREATE_ERROR'),
+      editableMarker: NX.I18n.get('Ldap_LdapServerConnectionAdd_Create_Error'),
 
       buttons: [
-        { text: NX.I18n.get('GLOBAL_BUTTON_NEXT'), action: 'next', formBind: true, ui: 'nx-primary' },
-        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+        { text: NX.I18n.get('Ldap_LdapServerConnectionAdd_Text'), action: 'next', formBind: true, ui: 'nx-primary' },
+        { text: NX.I18n.get('Add_Cancel_Button'), handler: function () {
           this.up('nx-drilldown').showChild(0, true);
         }}
       ]

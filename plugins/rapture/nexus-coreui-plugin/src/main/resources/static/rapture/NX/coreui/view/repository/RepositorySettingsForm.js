@@ -29,10 +29,10 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
     submit: 'NX.direct.coreui_Repository.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_SUCCESS') + data['name'];
+    return NX.I18n.get('Repository_RepositorySettingsForm_Update_Success') + data['name'];
   },
 
-  editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_ERROR'),
+  editableMarker: NX.I18n.get('Repository_RepositorySettingsForm_Update_Error'),
 
   initComponent: function() {
     var me = this,
@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
             name: 'name',
             itemId: 'name',
             labelAlign: 'left',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME'),
+            fieldLabel: NX.I18n.get('Repository_RepositorySettingsForm_Name_FieldLabel'),
             readOnly: true,
             vtype: 'nx-name'
           },
@@ -73,7 +73,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
             name: 'format',
             itemId: 'format',
             labelAlign: 'left',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FORMAT'),
+            fieldLabel: NX.I18n.get('Repository_RepositorySettingsForm_Format_FieldLabel'),
             allowBlank: true,
             readOnly: true
           },
@@ -83,7 +83,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
             name: 'type',
             itemId: 'type',
             labelAlign: 'left',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_TYPE'),
+            fieldLabel: NX.I18n.get('Repository_RepositorySettingsForm_Type_FieldLabel'),
             allowBlank: true,
             readOnly: true
           },
@@ -94,7 +94,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
             name: 'url',
             itemId: 'url',
             labelAlign: 'left',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_URL'),
+            fieldLabel: NX.I18n.get('Repository_RepositorySettingsForm_URL_FieldLabel'),
             allowBlank: true,
             readOnly: true
           },
@@ -103,8 +103,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
             name: 'online',
             itemId: 'online',
             labelAlign: 'left',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ONLINE'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ONLINE_HELP'),
+            fieldLabel: NX.I18n.get('Repository_RepositorySettingsForm_Online_FieldLabel'),
+            helpText: NX.I18n.get('Repository_RepositorySettingsForm_Online_HelpText'),
             value: true
           }
         ]

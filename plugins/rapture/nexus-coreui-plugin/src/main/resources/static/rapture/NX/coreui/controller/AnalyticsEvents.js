@@ -79,8 +79,8 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Analytics/Events',
-      text: NX.I18n.get('ADMIN_EVENTS_TITLE'),
-      description: NX.I18n.get('ADMIN_EVENTS_SUBTITLE'),
+      text: NX.I18n.get('AnalyticsEvents_Text'),
+      description: NX.I18n.get('AnalyticsEvents_Description'),
       view: { xtype: 'nx-coreui-analytics-event-list' },
       iconConfig: {
         file: 'transmit.png',
@@ -140,13 +140,13 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
   clear: function () {
     var me = this;
 
-    NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_EVENTS_CLEAR_TITLE'), NX.I18n.get('ADMIN_EVENTS_CLEAR_BODY'), function () {
-      me.getContent().getEl().mask(NX.I18n.get('ADMIN_EVENTS_CLEAR_MASK'));
+    NX.Dialogs.askConfirmation(NX.I18n.get('AnalyticsEvents_Clear_Title'), NX.I18n.get('AnalyticsEvents_Clear_Body'), function () {
+      me.getContent().getEl().mask(NX.I18n.get('AnalyticsEvents_Clear_Mask'));
       NX.direct.analytics_Events.clear(function (response) {
         me.getContent().getEl().unmask();
         me.load();
         if (Ext.isObject(response) && response.success) {
-          NX.Messages.add({ text: NX.I18n.get('ADMIN_EVENTS_CLEAR_SUCCESS'), type: 'success' });
+          NX.Messages.add({ text: NX.I18n.get('AnalyticsEvents_Clear_Success'), type: 'success' });
         }
       });
     });
@@ -159,8 +159,8 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
   exportEvents: function () {
     var me = this;
 
-    NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_EVENTS_EXPORT_TITLE'), NX.I18n.get('ADMIN_EVENTS_EXPORT_BODY'), function () {
-          me.getMain().getEl().mask(NX.I18n.get('ADMIN_EVENTS_EXPORT_MASK'));
+    NX.Dialogs.askConfirmation(NX.I18n.get('AnalyticsEvents_Export_Title'), NX.I18n.get('AnalyticsEvents_Export_Body'), function () {
+          me.getMain().getEl().mask(NX.I18n.get('AnalyticsEvents_Export_Mask'));
           NX.direct.analytics_Events.exportAll(function (response) {
             me.getMain().getEl().unmask();
             if (Ext.isObject(response) && response.success) {
@@ -178,7 +178,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
     var win = button.up('window'),
         fileName = win.down('form').getValues().name;
 
-    NX.Security.doWithAuthenticationToken(NX.I18n.get('ADMIN_EVENTS_DOWNLOAD_AUTHENTICATE'),
+    NX.Security.doWithAuthenticationToken(NX.I18n.get('AnalyticsEvents_Authenticate_Title'),
         {
           success: function (authToken) {
             NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf(
@@ -195,13 +195,13 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
    * Submit events to Sonatype.
    */
   submit: function () {
-    NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_EVENTS_SUBMIT_TITLE'), NX.I18n.get('ADMIN_EVENTS_SUBMIT_BODY'), function () {
-      NX.Security.doWithAuthenticationToken(NX.I18n.get('ADMIN_EVENTS_SUBMIT_AUTHENTICATE'),
+    NX.Dialogs.askConfirmation(NX.I18n.get('AnalyticsEvents_Submit_Title'), NX.I18n.get('AnalyticsEvents_Submit_Body'), function () {
+      NX.Security.doWithAuthenticationToken(NX.I18n.get('AnalyticsEvents_Submit_HelpText'),
           {
             success: function (authToken) {
               NX.direct.analytics_Events.submit(authToken, function (response) {
                 if (Ext.isObject(response) && response.success) {
-                  NX.Messages.add({ text: NX.I18n.get('ADMIN_EVENTS_SUBMIT_SUCCESS'), type: 'success' });
+                  NX.Messages.add({ text: NX.I18n.get('AnalyticsEvents_Submit_Success'), type: 'success' });
                 }
               });
             }

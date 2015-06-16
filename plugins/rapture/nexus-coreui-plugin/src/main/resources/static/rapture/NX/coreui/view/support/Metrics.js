@@ -35,16 +35,16 @@ Ext.define('NX.coreui.view.support.Metrics', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_METRICS_DOWNLOAD_BUTTON'),
-        tooltip: NX.I18n.get('ADMIN_METRICS_DOWNLOAD_TOOLTIP'),
+        text: NX.I18n.get('Support_Metrics_Download_Button'),
+        tooltip: NX.I18n.get('Metrics_Download_Tooltip'),
         glyph: 'xf019@FontAwesome' /* fa-download */,
         action: 'download'
       },
       '-',
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_METRICS_DUMP_BUTTON'),
-        tooltip: NX.I18n.get('ADMIN_METRICS_DUMP_TOOLTIP'),
+        text: NX.I18n.get('Support_Metrics_Dump_Button'),
+        tooltip: NX.I18n.get('Support_Metrics_Dump_Tooltip'),
         glyph: 'xf019@FontAwesome' /* fa-download */,
         action: 'threads'
       }
@@ -64,7 +64,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
     items: [
       {
         xtype: 'panel',
-        title: NX.I18n.get('ADMIN_METRICS_USAGE_SECTION'),
+        title: NX.I18n.get('Support_Metrics_MemoryUsage_Title'),
         frame: true,
         ui: 'nx-subsection',
         height: 240,
@@ -113,7 +113,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
       },
       {
         xtype: 'panel',
-        title: NX.I18n.get('ADMIN_METRICS_DISTRIBUTION_SECTION'),
+        title: NX.I18n.get('Support_Metrics_MemoryDistribution_Title'),
         frame: true,
         ui: 'nx-subsection',
         height: 240,
@@ -156,7 +156,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
       },
       {
         xtype: 'panel',
-        title: NX.I18n.get('ADMIN_METRICS_STATES_SECTION'),
+        title: NX.I18n.get('Support_Metrics_ThreadStates_Title'),
         frame: true,
         ui: 'nx-subsection',
         height: 240,

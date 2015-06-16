@@ -50,7 +50,7 @@ Ext.define('NX.view.UnsupportedBrowser', {
         items: [
           {
             xtype: 'label',
-            text: NX.I18n.get('GLOBAL_UNSUPPORTED_TITLE'),
+            text: NX.I18n.get('UnsupportedBrowser_Title'),
             // TODO replace style with UI
             style: {
               'color': '#000000',
@@ -62,7 +62,7 @@ Ext.define('NX.view.UnsupportedBrowser', {
           },
           {
             xtype: 'label',
-            text: NX.I18n.get('GLOBAL_UNSUPPORTED_ALTERNATIVES'),
+            text: NX.I18n.get('UnsupportedBrowser_Alternatives_Text'),
             // TODO replace style with UI
             style: {
               'font-size': '10px'
@@ -82,7 +82,7 @@ Ext.define('NX.view.UnsupportedBrowser', {
               { xtype: 'image', width: 72, height: 72, src: NX.Icons.url('safari', 'x72') }
             ]
           },
-          { xtype: 'button', text: NX.I18n.get('GLOBAL_UNSUPPORTED_CONTINUE_BUTTON'), action: 'continue' }
+          { xtype: 'button', text: NX.I18n.get('UnsupportedBrowser_Continue_Button'), action: 'continue' }
         ]
       },
       {

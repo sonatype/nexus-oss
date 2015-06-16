@@ -71,8 +71,8 @@ Ext.define('NX.coreui.controller.Tasks', {
   features: {
     mode: 'admin',
     path: '/System/Tasks',
-    text: NX.I18n.get('ADMIN_TASKS_TITLE'),
-    description: NX.I18n.get('ADMIN_TASKS_SUBTITLE'),
+    text: NX.I18n.get('Tasks_Text'),
+    description: NX.I18n.get('Tasks_Description'),
     view: { xtype: 'nx-coreui-task-feature' },
     iconConfig: {
       file: 'time.png',
@@ -151,7 +151,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       taskTypeModel = me.getTaskTypeStore().getById(model.get('typeId'));
       if (taskTypeModel) {
         if (!settings) {
-          me.getFeature().addTab({ xtype: 'nx-coreui-task-settings', title: NX.I18n.get('ADMIN_TASKS_DETAILS_SETTINGS_TAB'), weight: 20 });
+          me.getFeature().addTab({ xtype: 'nx-coreui-task-settings', title: NX.I18n.get('Tasks_Settings_Title'), weight: 20 });
         }
         me.showSettings(model);
       }
@@ -172,13 +172,13 @@ Ext.define('NX.coreui.controller.Tasks', {
     var me = this,
       info = {};
 
-    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_ID')] = model.getId();
-    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_NAME')] = model.get('name');
-    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_TYPE')] = model.get('typeName');
-    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_STATUS')] = model.get('statusDescription');
-    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_NEXT_RUN')] = model.get('nextRun');
-    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_LAST_RUN')] = model.get('lastRun');
-    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_LAST_RESULT')] = model.get('lastRunResult');
+    info[NX.I18n.get('Tasks_ID_Info')] = model.getId();
+    info[NX.I18n.get('Tasks_Name_Info')] = model.get('name');
+    info[NX.I18n.get('Tasks_Type_Info')] = model.get('typeName');
+    info[NX.I18n.get('Tasks_Status_Info')] = model.get('statusDescription');
+    info[NX.I18n.get('Tasks_NextRun_Info')] = model.get('nextRun');
+    info[NX.I18n.get('Tasks_LastRun_Info')] = model.get('lastRun');
+    info[NX.I18n.get('Tasks_LastResult_Info')] = model.get('lastRunResult');
 
     me.getInfo().showInfo(info);
   },
@@ -203,7 +203,7 @@ Ext.define('NX.coreui.controller.Tasks', {
     me.getTaskTypeStore().clearFilter();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_TASKS_SELECT_TITLE'));
+    feature.setItemName(1, NX.I18n.get('Tasks_Select_Title'));
     me.loadCreateWizard(1, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -226,7 +226,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       panel;
 
     // Show the second panel in the create wizard, and set the breadcrumb
-    feature.setItemName(2, NX.I18n.format('ADMIN_TASKS_CREATE_TITLE', model.get('name')));
+    feature.setItemName(2, NX.I18n.format('Tasks_Create_Title', model.get('name')));
     me.loadCreateWizard(2, true, panel = Ext.widget({
       xtype: 'panel',
       layout: {
@@ -267,13 +267,13 @@ Ext.define('NX.coreui.controller.Tasks', {
       form = button.up('form'),
       values = form.getValues();
 
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_TASKS_UPDATE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('Tasks_Update_Mask'));
     NX.direct.coreui_Task.update(values, function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: NX.I18n.format('ADMIN_TASKS_SETTINGS_UPDATE_SUCCESS',
+            text: NX.I18n.format('Tasks_Update_Success',
               me.getDescription(me.getTaskModel().create(response.data))),
             type: 'success'
           });
@@ -298,7 +298,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: NX.I18n.format('ADMIN_TASKS_CREATE_SUCCESS',
+            text: NX.I18n.format('Tasks_Create_Success',
               me.getDescription(me.getTaskModel().create(response.data))),
             type: 'success'
           });
@@ -385,7 +385,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: NX.I18n.format('ADMIN_TASKS_DETAILS_DELETE_SUCCESS', description), type: 'success'
+          text: NX.I18n.format('Tasks_Delete_Success', description), type: 'success'
         });
       }
     });
@@ -409,15 +409,15 @@ Ext.define('NX.coreui.controller.Tasks', {
 
     if (model) {
       description = me.getDescription(model);
-      NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_TASKS_DETAILS_RUN_CONFIRM'),
-        NX.I18n.format('ADMIN_TASKS_DETAILS_RUN_CONFIRM_HELP', description), function() {
-        me.getContent().getEl().mask(NX.I18n.get('ADMIN_TASKS_RUN_MASK'));
+      NX.Dialogs.askConfirmation(NX.I18n.get('Tasks_RunConfirm_Title'),
+        NX.I18n.format('Tasks_RunConfirm_HelpText', description), function() {
+        me.getContent().getEl().mask(NX.I18n.get('Tasks_Run_Mask'));
         NX.direct.coreui_Task.run(model.getId(), function(response) {
           me.loadStore();
           me.getContent().getEl().unmask();
           if (Ext.isObject(response) && response.success) {
             NX.Messages.add({
-              text: NX.I18n.format('ADMIN_TASKS_DETAILS_RUN_SUCCESS', description), type: 'success'
+              text: NX.I18n.format('Tasks_Run_Success', description), type: 'success'
             });
           }
         });
@@ -443,15 +443,15 @@ Ext.define('NX.coreui.controller.Tasks', {
 
     if (model) {
       description = me.getDescription(model);
-      NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_TASKS_DETAILS_STOP_CONFIRM'),
-        NX.I18n.format('ADMIN_TASKS_DETAILS_STOP_CONFIRM_HELP', description), function() {
-        me.getContent().getEl().mask(NX.I18n.get('ADMIN_TASKS_STOP_MASK'));
+      NX.Dialogs.askConfirmation(NX.I18n.get('Tasks_StopConfirm_Title'),
+        NX.I18n.format('Tasks_StopConfirm_HelpText', description), function() {
+        me.getContent().getEl().mask(NX.I18n.get('Tasks_Stop_Mask'));
         NX.direct.coreui_Task.stop(model.getId(), function(response) {
           me.loadStore();
           me.getContent().getEl().unmask();
           if (Ext.isObject(response) && response.success) {
             NX.Messages.add({
-              text: NX.I18n.format('ADMIN_TASKS_DETAILS_STOP_SUCCESS', description), type: 'success'
+              text: NX.I18n.format('Tasks_Stop_Success', description), type: 'success'
             });
           }
         });

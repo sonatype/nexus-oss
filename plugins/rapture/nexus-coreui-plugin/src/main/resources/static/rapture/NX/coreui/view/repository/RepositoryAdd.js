@@ -39,14 +39,14 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
         submit: 'NX.direct.coreui_Repository.create'
       },
       settingsFormSuccessMessage: function(data) {
-        return NX.I18n.get('ADMIN_REPOSITORIES_CREATE_SUCCESS') + data['name'];
+        return NX.I18n.get('Repository_RepositoryAdd_Create_Success') + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('nexus:repository-admin:*:*:add'),
-      editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_ERROR'),
+      editableMarker: NX.I18n.get('Repository_RepositoryAdd_Create_Error'),
 
       buttons: [
-        { text: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
-        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function() {
+        { text: NX.I18n.get('Repository_RepositoryList_New_Button'), action: 'add', formBind: true, ui: 'nx-primary' },
+        { text: NX.I18n.get('Add_Cancel_Button'), handler: function() {
           this.up('nx-drilldown').showChild(0, true);
         }}
       ]

@@ -33,29 +33,29 @@ Ext.define('NX.coreui.view.logging.LoggerAdd', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: NX.I18n.get('ADMIN_LOGGING_CREATE_NAME')
+        fieldLabel: NX.I18n.get('Logging_LoggerAdd_Name_FieldLabel')
       },
       {
         xtype: 'combo',
         name: 'level',
-        fieldLabel: NX.I18n.get('ADMIN_LOGGING_CREATE_LEVEL'),
+        fieldLabel: NX.I18n.get('Logging_LoggerAdd_Level_FieldLabel'),
         editable: false,
         value: 'INFO',
         store: [
-          ['TRACE', NX.I18n.get('ADMIN_LOGGING_TRACE_ITEM')],
-          ['DEBUG', NX.I18n.get('ADMIN_LOGGING_DEBUG_ITEM')],
-          ['INFO', NX.I18n.get('ADMIN_LOGGING_INFO_ITEM')],
-          ['WARN', NX.I18n.get('ADMIN_LOGGING_WARN_ITEM')],
-          ['ERROR', NX.I18n.get('ADMIN_LOGGING_ERROR_ITEM')],
-          ['OFF', NX.I18n.get('ADMIN_LOGGING_OFF_ITEM')],
-          ['DEFAULT', NX.I18n.get('ADMIN_LOGGING_DEFAULT_ITEM')]
+          ['TRACE', NX.I18n.get('Logging_LoggerList_Level_TraceItem')],
+          ['DEBUG', NX.I18n.get('Logging_LoggerList_Level_DebugItem')],
+          ['INFO', NX.I18n.get('Logging_LoggerList_Level_InfoItem')],
+          ['WARN', NX.I18n.get('Logging_LoggerList_Level_WarnItem')],
+          ['ERROR', NX.I18n.get('Logging_LoggerList_Level_ErrorItem')],
+          ['OFF', NX.I18n.get('Logging_LoggerList_Level_OffItem')],
+          ['DEFAULT', NX.I18n.get('Logging_LoggerList_Level_DefaultItem')]
         ],
         queryMode: 'local'
       }
     ],
     buttons: [
-      { text: NX.I18n.get('ADMIN_LOGGING_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
-      { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+      { text: NX.I18n.get('Logging_LoggerList_New_Button'), action: 'add', formBind: true, ui: 'nx-primary' },
+      { text: NX.I18n.get('Add_Cancel_Button'), handler: function () {
         this.up('nx-drilldown').showChild(0, true);
       }}
     ]

@@ -29,14 +29,14 @@ Ext.define('NX.coreui.view.user.UserFeature', {
   masters: { xtype: 'nx-coreui-user-list' },
 
   tabs: [
-    { xtype: 'nx-coreui-user-settings', title: NX.I18n.get('ADMIN_USERS_DETAILS_SETTINGS_TAB'), weight: 10 }
+    { xtype: 'nx-coreui-user-settings', title: NX.I18n.get('User_UserFeature_Settings_Title'), weight: 10 }
   ],
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
-    { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_DETAILS_MORE_BUTTON'), glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more', disabled: true,
+    { xtype: 'button', text: NX.I18n.get('User_UserFeature_Delete_Button'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
+    { xtype: 'button', text: NX.I18n.get('User_UserFeature_More_Button'), glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more', disabled: true,
       menu: [
-        { text: NX.I18n.get('ADMIN_USERS_DETAILS_CHANGE_ITEM'), glyph: 'xf084@FontAwesome' /* fa-key */, action: 'setpassword' }
+        { text: NX.I18n.get('User_UserFeature_ChangePasswordItem'), glyph: 'xf084@FontAwesome' /* fa-key */, action: 'setpassword' }
       ]
     }
   ]

@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.component.AssetInfo', {
 
     me.callParent(arguments);
 
-    me.setTitle(NX.I18n.get('BROWSE_SEARCH_DETAILS_INFO_TAB'));
+    me.setTitle(NX.I18n.get('Component_AssetInfo_Info_Title'));
   }
 
 });

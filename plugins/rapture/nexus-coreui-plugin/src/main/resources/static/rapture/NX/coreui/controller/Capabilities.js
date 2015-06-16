@@ -88,8 +88,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
   features: {
     mode: 'admin',
     path: '/System/Capabilities',
-    text: NX.I18n.get('ADMIN_CAPABILITIES_TITLE'),
-    description: NX.I18n.get('ADMIN_CAPABILITIES_SUBTITLE'),
+    text: NX.I18n.get('Capabilities_Text'),
+    description: NX.I18n.get('Capabilities_Description'),
     view: { xtype: 'nx-coreui-capability-feature' },
     iconConfig: {
       file: 'brick.png',
@@ -214,9 +214,9 @@ Ext.define('NX.coreui.controller.Capabilities', {
     var summary = this.getSummaryTab(),
         info = {};
 
-    info[NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_TYPE')] = model.get('typeName');
-    info[NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_DESCRIPTION')] = model.get('description');
-    info[NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_STATE')] = Ext.String.capitalize(model.get('state'));
+    info[NX.I18n.get('Capabilities_TypeName_Text')] = model.get('typeName');
+    info[NX.I18n.get('Capabilities_Description_Text')] = model.get('description');
+    info[NX.I18n.get('Capabilities_State_Text')] = Ext.String.capitalize(model.get('state'));
 
     if (Ext.isDefined(model.get('tags'))) {
       Ext.apply(info, model.get('tags'));
@@ -261,7 +261,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_CAPABILITIES_SELECT_TITLE'));
+    feature.setItemName(1, NX.I18n.get('Capabilities_Select_Title'));
     me.loadCreateWizard(1, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -288,7 +288,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         panel;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(2, NX.I18n.format('ADMIN_CAPABILITIES_CREATE_TITLE', model.get('name')));
+    feature.setItemName(2, NX.I18n.format('Capabilities_Create_Title', model.get('name')));
     me.loadCreateWizard(2, true, panel = Ext.create('widget.nx-coreui-capability-add'));
     var m = me.getCapabilityModel().create({ typeId: model.getId(), enabled: true });
     panel.down('nx-settingsform').loadRecord(m);
@@ -384,7 +384,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: NX.I18n.format('ADMIN_CAPABILITIES_CREATE_SUCCESS',
+            text: NX.I18n.format('Capabilities_Create_Success',
                 me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
@@ -406,13 +406,13 @@ Ext.define('NX.coreui.controller.Capabilities', {
         form = button.up('form'),
         values = form.getValues();
 
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('Capabilities_Update_Mask'));
     NX.direct.capability_Capability.update(values, function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: NX.I18n.format('ADMIN_CAPABILITIES_UPDATE_SUCCESS',
+            text: NX.I18n.format('Capabilities_Update_Success',
                 me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
@@ -438,7 +438,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: NX.I18n.format('ADMIN_CAPABILITIES_DELETE_SUCCESS', description),
+          text: NX.I18n.format('Capabilities_Delete_Success', description),
           type: 'success'
         });
       }
@@ -458,13 +458,13 @@ Ext.define('NX.coreui.controller.Capabilities', {
     model = me.getList().getStore().getById(modelId);
     description = me.getDescription(model);
 
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_ENABLE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('Capabilities_Enable_Mask'));
     NX.direct.capability_Capability.enable(model.getId(), function(response) {
       me.loadStore();
       me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: NX.I18n.format('ADMIN_CAPABILITIES_DETAILS_ENABLE_SUCCESS', description),
+          text: NX.I18n.format('Capabilities_Enable_Text', description),
           type: 'success'
         });
       }
@@ -484,13 +484,13 @@ Ext.define('NX.coreui.controller.Capabilities', {
     model = me.getList().getStore().getById(modelId);
     description = me.getDescription(model);
 
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_CAPABILITIES_DISABLE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('Capabilities_Disable_Mask'));
     NX.direct.capability_Capability.disable(model.getId(), function(response) {
       me.loadStore();
       me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: NX.I18n.format('ADMIN_CAPABILITIES_DETAILS_DISABLE_SUCCESS', description),
+          text: NX.I18n.format('Capabilities_Disable_Text', description),
           type: 'success'
         });
       }

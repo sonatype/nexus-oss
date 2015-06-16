@@ -27,7 +27,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
 
   items: { xtype: 'nx-coreui-ldapserver-userandgroup-fieldset' },
 
-  editableMarker: NX.I18n.get('ADMIN_LDAP_UPDATE_ERROR'),
+  editableMarker: NX.I18n.get('Ldap_LdapServerConnectionForm_Update_Error'),
 
   /**
    * @override
@@ -40,8 +40,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
     me.callParent(arguments);
 
     me.getDockedItems('toolbar[dock="bottom"]')[0].add(
-        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_MAPPING_BUTTON'), formBind: true, action: 'verifyusermapping' },
-        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_LOGIN_BUTTON'), formBind: true, action: 'verifylogin' }
+        { xtype: 'button', text: NX.I18n.get('Ldap_LdapServerUserAndGroupForm_VerifyGroupMapping_Button'), formBind: true, action: 'verifyusermapping' },
+        { xtype: 'button', text: NX.I18n.get('Ldap_LdapServerUserAndGroupForm_VerifyLogin_Button'), formBind: true, action: 'verifylogin' }
     );
   },
 
