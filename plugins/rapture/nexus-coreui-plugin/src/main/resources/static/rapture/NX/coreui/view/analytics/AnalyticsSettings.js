@@ -33,28 +33,28 @@ Ext.define('NX.coreui.view.analytics.AnalyticsSettings', {
 
     me.settingsForm = {
       xtype: 'nx-settingsform',
-      settingsFormSuccessMessage: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_SUCCESS'),
+      settingsFormSuccessMessage: NX.I18n.get('Analytics_AnalyticsSettings_Update_Success'),
       api: {
         load: 'NX.direct.analytics_Settings.read',
         submit: 'NX.direct.analytics_Settings.update'
       },
       editableCondition: NX.Conditions.isPermitted('nexus:analytics:update'),
-      editableMarker: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_ERROR'),
+      editableMarker: NX.I18n.get('Analytics_AnalyticsSettings_Update_Error'),
 
       items: [
         {
           xtype: 'container',
-          html: NX.I18n.get('ADMIN_ANALYTICS_HELP')
+          html: NX.I18n.get('Analytics_AnalyticsSettings_HelpText')
         },
         {
           xtype: 'checkbox',
           name: 'collection',
-          boxLabel: NX.I18n.get('ADMIN_ANALYTICS_COLLECTION')
+          boxLabel: NX.I18n.get('Analytics_AnalyticsSettings_Collection_BoxLabel')
         },
         {
           xtype: 'checkbox',
           name: 'autosubmit',
-          boxLabel: NX.I18n.get('ADMIN_ANALYTICS_SUBMISSION')
+          boxLabel: NX.I18n.get('Analytics_AnalyticsSettings_Submission_BoxLabel')
         }
       ]
     };

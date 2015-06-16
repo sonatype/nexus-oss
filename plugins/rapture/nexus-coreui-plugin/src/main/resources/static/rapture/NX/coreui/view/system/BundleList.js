@@ -41,53 +41,53 @@ Ext.define('NX.coreui.view.system.BundleList', {
       }
     },
     {
-      header: NX.I18n.get('ADMIN_BUNDLES_LIST_ID_COLUMN'),
+      header: NX.I18n.get('System_BundleList_ID_Header'),
       dataIndex: 'id',
       stateId: 'id',
       width: 60,
       resizable: false
     },
     {
-      header: NX.I18n.get('ADMIN_BUNDLES_LIST_STATE_COLUMN'),
+      header: NX.I18n.get('System_BundleList_State_Header'),
       dataIndex: 'state',
       stateId: 'state',
       width: 80,
       resizable: false
     },
     {
-      header: NX.I18n.get('ADMIN_BUNDLES_LIST_START_LEVEL_COLUMN'),
+      header: NX.I18n.get('System_BundleList_Level_Header'),
       dataIndex: 'startLevel',
       stateId: 'startLevel',
       width: 60,
       resizable: false
     },
     {
-      header: NX.I18n.get('ADMIN_BUNDLES_LIST_NAME_COLUMN'),
+      header: NX.I18n.get('System_BundleList_Name_Header'),
       dataIndex: 'name',
       stateId: 'name',
       flex: 2
     },
     {
-      header: NX.I18n.get('ADMIN_BUNDLES_LIST_SYMBOLIC_NAME_COLUMN'),
+      header: NX.I18n.get('System_BundleList_SymbolicName_Header'),
       dataIndex: 'symbolicName',
       stateId: 'symbolicName',
       flex: 2,
       hidden: true
     },
     {
-      header: NX.I18n.get('ADMIN_BUNDLES_LIST_VERSION_COLUMN'),
+      header: NX.I18n.get('System_BundleList_Version_Header'),
       dataIndex: 'version',
       stateId: 'version',
       flex: 1
     },
     {
-      header: NX.I18n.get('ADMIN_BUNDLES_LIST_LOCATION_COLUMN'),
+      header: NX.I18n.get('System_BundleList_Location_Header'),
       dataIndex: 'location',
       stateId: 'location',
       hidden: true
     },
     {
-      header: NX.I18n.get('ADMIN_BUNDLES_LIST_FRAGMENT_COLUMN'),
+      header: NX.I18n.get('System_BundleList_Fragment_Header'),
       dataIndex: 'fragment',
       stateId: 'fragment',
       hidden: true
@@ -103,6 +103,6 @@ Ext.define('NX.coreui.view.system.BundleList', {
   ],
 
   plugins: [
-    {ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_BUNDLES_LIST_FILTER_ERROR')}
+    {ptype: 'gridfilterbox', emptyText: NX.I18n.get('System_BundleList_Filter_EmptyText')}
   ]
 });

@@ -24,6 +24,11 @@ public interface BlobStoreManager
   extends Lifecycle
 {
   /**
+   * Default blob store name.
+   */
+  final String DEFAULT_BLOBSTORE_NAME = "default";
+
+  /**
    * @return all BlobStores
    */
   Iterable<BlobStore> browse();

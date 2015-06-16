@@ -22,5 +22,5 @@ Ext.define('NX.view.header.Messages', {
   alias: 'widget.nx-header-messages',
 
   glyph: 'xf0f3@FontAwesome', // fa-bell
-  tooltip: NX.I18n.get('GLOBAL_MESSAGES_TOOLTIP')
+  tooltip: NX.I18n.get('Header_Messages_Tooltip')
 });

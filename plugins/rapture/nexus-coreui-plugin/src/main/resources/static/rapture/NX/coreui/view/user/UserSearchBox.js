@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.user.UserSearchBox', {
     'NX.I18n'
   ],
 
-  emptyText: NX.I18n.get('ADMIN_USERS_LIST_FILTER_PLACEHOLDER'),
+  emptyText: NX.I18n.get('User_UserList_Filter_EmptyText'),
   width: 320,
   submitValue: false,
 

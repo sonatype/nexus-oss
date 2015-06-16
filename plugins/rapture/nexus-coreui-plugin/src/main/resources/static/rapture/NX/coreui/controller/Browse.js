@@ -53,8 +53,8 @@ Ext.define('NX.coreui.controller.Browse', {
   features: {
     mode: 'browse',
     path: '/Browse',
-    text: NX.I18n.get('Coreui_Controller_Browse_Title_Feature'),
-    description: NX.I18n.get('Coreui_Controller_Browse_Description_Feature'),
+    text: NX.I18n.get('Browse_Title_Feature'),
+    description: NX.I18n.get('Browse_Description_Feature'),
     view: 'NX.coreui.view.browse.BrowseFeature',
     iconConfig: {
       file: 'plugin.png',
@@ -169,10 +169,10 @@ Ext.define('NX.coreui.controller.Browse', {
     var me = this,
         componentStore = me.getComponentStore(),
         results = me.getResults(),
-        emptyText = NX.I18n.get('Coreui_View_Browse_BrowseResultList_EmptyText_Filter');
+        emptyText = NX.I18n.get('Browse_BrowseResultList_EmptyText_Filter');
 
-    if (!componentStore.emptyText) {
-      componentStore.emptyText = results.getView().emptyText;
+    if (!results.emptyText) {
+      results.emptyText = results.getView().emptyText;
     }
     results.getView().emptyText = '<div class="x-grid-empty">' + emptyText.replace(/\$filter/, value) + '</div>';
     results.getSelectionModel().deselectAll();
@@ -194,7 +194,9 @@ Ext.define('NX.coreui.controller.Browse', {
         componentStore = me.getComponentStore(),
         results = me.getResults();
 
-    results.getView().emptyText = componentStore.emptyText;
+    if (results.emptyText) {
+      results.getView().emptyText = results.emptyText;
+    }
     results.getSelectionModel().deselectAll();
     // we have to remove filter directly as store#removeFilter() does not work when store#remoteFilter = true
     if (componentStore.filters.removeAtKey('filter')) {

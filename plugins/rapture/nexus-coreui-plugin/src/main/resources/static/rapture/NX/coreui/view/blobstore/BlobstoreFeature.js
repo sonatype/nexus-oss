@@ -31,6 +31,6 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreFeature', {
   tabs: { xtype: 'nx-coreui-blobstore-settings' },
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_BLOBSTORES_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('Blobstore_BlobstoreFeature_Delete_Button'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ]
 });

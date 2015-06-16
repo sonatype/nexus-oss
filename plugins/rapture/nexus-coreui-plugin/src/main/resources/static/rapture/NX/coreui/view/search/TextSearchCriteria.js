@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
    */
   removable: false,
 
-  emptyText: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_FILTER_PLACEHOLDER'),
+  emptyText: NX.I18n.get('Search_TextSearchCriteria_Filter_EmptyText'),
 
   padding: '0 5 0 0',
   width: 100,

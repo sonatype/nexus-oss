@@ -58,7 +58,7 @@ Ext.define('NX.coreui.view.component.AssetList', {
       }
     },
     {
-      text: NX.I18n.get('BROWSE_SEARCH_ASSETS_NAME_COLUMN'),
+      text: NX.I18n.get('SearchResultAssetList_Name_Header'),
       dataIndex: 'name',
       flex: 2.5
     }

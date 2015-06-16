@@ -128,11 +128,11 @@ Ext.define('NX.controller.User', {
     var me = this;
 
     if (user && !oldUser) {
-      NX.Messages.add({text: NX.I18n.format('GLOBAL_SERVER_SIGNED_IN', user.id), type: 'default'});
+      NX.Messages.add({text: NX.I18n.format('User_SignedIn_Message', user.id), type: 'default'});
       me.fireEvent('signin', user);
     }
     else if (!user && oldUser) {
-      NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_SIGNED_OUT'), type: 'default'});
+      NX.Messages.add({text: NX.I18n.get('User_SignedOut_Message'), type: 'default'});
       me.fireEvent('signout');
     }
 
@@ -224,7 +224,7 @@ Ext.define('NX.controller.User', {
         b64username = NX.util.Base64.encode(values.username),
         b64password = NX.util.Base64.encode(values.password);
 
-    win.getEl().mask(NX.I18n.get('GLOBAL_SIGN_IN_MASK'));
+    win.getEl().mask(NX.I18n.get('User_SignIn_Mask'));
 
     //<if debug>
     me.logDebug('Sign-in user: "' + values.username + '" ...');
@@ -251,9 +251,9 @@ Ext.define('NX.controller.User', {
         }
       },
       failure: function(response) {
-        var message = NX.I18n.get('GLOBAL_SERVER_INCORRECT_CREDENTIALS_WARNING');
+        var message = NX.I18n.get('User_Credentials_Message');
         if(response.status === 0) {
-          message = NX.I18n.get('GLOBAL_SERVER_CONNECT_FAILURE');  
+          message = NX.I18n.get('User_ConnectFailure_Message');  
         }
         win.getEl().unmask();
         NX.Messages.add({
@@ -293,7 +293,7 @@ Ext.define('NX.controller.User', {
         b64username = NX.util.Base64.encode(values.username),
         b64password = NX.util.Base64.encode(values.password);
 
-    win.getEl().mask(NX.I18n.get('GLOBAL_AUTHENTICATE_MASK'));
+    win.getEl().mask(NX.I18n.get('User_Controller_Authenticate_Mask'));
 
     //<if debug>
     me.logDebug('Authenticating user "' + values.username + '" ...');
@@ -325,7 +325,7 @@ Ext.define('NX.controller.User', {
         b64username = NX.util.Base64.encode(values.username),
         b64password = NX.util.Base64.encode(values.password);
 
-    win.getEl().mask(NX.I18n.get('GLOBAL_AUTHENTICATE_RETRIEVING_MASK'));
+    win.getEl().mask(NX.I18n.get('User_Retrieving_Mask'));
 
     //<if debug>
     me.logDebug('Retrieving authentication token...');
@@ -388,7 +388,7 @@ Ext.define('NX.controller.User', {
         signInButton.hide();
         userButton.up('nx-header-mode').show();
         userButton.setText(user.id);
-        userButton.setTooltip(NX.I18n.format('GLOBAL_HEADER_USER_TOOLTIP', user.id));
+        userButton.setTooltip(NX.I18n.format('User_Tooltip', user.id));
         signOutButton.show();
       }
       else {

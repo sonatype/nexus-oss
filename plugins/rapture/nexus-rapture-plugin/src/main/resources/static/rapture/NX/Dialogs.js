@@ -31,7 +31,7 @@ Ext.define('NX.Dialogs', {
 
     // set default configuration
     Ext.applyIf(options, {
-      title: title || NX.I18n.get('GLOBAL_DIALOG_INFO_TITLE'),
+      title: title || NX.I18n.get('Dialogs_Info_Title'),
       msg: message,
       buttons: Ext.Msg.OK,
       icon: Ext.MessageBox.INFO,
@@ -49,8 +49,8 @@ Ext.define('NX.Dialogs', {
 
     // set default configuration
     Ext.applyIf(options, {
-      title: title || NX.I18n.get('GLOBAL_DIALOG_ERROR_TITLE'),
-      msg: message || NX.I18n.get('GLOBAL_DIALOG_ERROR_FAILED'),
+      title: title || NX.I18n.get('Dialogs_Error_Title'),
+      msg: message || NX.I18n.get('Dialogs_Error_Message'),
       buttons: Ext.Msg.OK,
       icon: Ext.MessageBox.ERROR,
       closable: false

@@ -75,7 +75,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
       return;
     }
 
-    extraInfo[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(model);
+    extraInfo[NX.I18n.get('HealthCheckSearch_Versions_Popular')] = me.renderMostPopularVersion(model);
     componentDetails.down('#extraInfo').showInfo(extraInfo);
   },
 
@@ -159,7 +159,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
     if (!grid['healthCheckColumns']) {
       grid['healthCheckColumns'] = [
         Ext.create('Ext.grid.column.Column', {
-          header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_AGE_COLUMN'),
+          header: NX.I18n.get('HealthCheckSearch_Age_Header'),
           dataIndex: 'healthCheckAge',
           groupable: false,
           sortable: false,
@@ -167,7 +167,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
           renderer: Ext.bind(me.renderAgeColumn, me)
         }),
         Ext.create('Ext.grid.column.Column', {
-          header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULARITY_COLUMN'),
+          header: NX.I18n.get('HealthCheckSearch_Popularity_Header'),
           dataIndex: 'healthCheckPopularity',
           groupable: false,
           sortable: false,
@@ -295,15 +295,15 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
       return 'Loading...';
     }
     else if (model.get('healthCheckDisabled')) {
-      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_DISABLED') + '"';
+      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('HealthCheckSearch_Disabled_Tooltip') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('information.png') + '">';
     }
     else if (model.get('healthCheckError')) {
-      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_ERROR') + '"';
+      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('HealthCheckSearch_Error_Tooltip') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('exclamation.gif') + '">';
     }
     else if (model.get('healthCheckCapped') || (model && model.get('capped'))) {
-      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_QUOTA_REACHED') + '"';
+      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('HealthCheckSearch_Quota_Tooltip') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('warning.gif') + '">';
     }
     return undefined;
@@ -316,7 +316,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
    * @returns {string} rendered value
    */
   renderNotAvailable: function(metadata) {
-    metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_NOT_AVAILABLE') + '"';
+    metadata.tdAttr = 'data-qtip="' + NX.I18n.get('HealthCheckSearch_Unavailable_Tooltip') + '"';
     return '<span class="fa fa-ban"/>';
   },
 
