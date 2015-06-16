@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.repository.security;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Named;
@@ -26,6 +25,8 @@ import org.sonatype.nexus.security.privilege.PrivilegeDescriptorSupport;
 
 import com.google.common.base.Joiner;
 import org.apache.shiro.authz.Permission;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Repository view {@link PrivilegeDescriptor}.
@@ -68,10 +69,11 @@ public class RepositoryViewPrivilegeDescriptor
   }
 
   public static CPrivilege privilege(final String format, final String name, final String... actions) {
+    checkArgument(actions.length > 0);
     return new CPrivilegeBuilder()
         .type(TYPE)
         .id(id(format, name, actions))
-        .description(String.format("%s privilege for %s view", Arrays.toString(actions), name))
+        .description(String.format("%s for %s repository view", humanizeActions(actions), humanizeName(name)))
         .property(P_FORMAT, format)
         .property(P_REPOSITORY, name)
         .property(P_ACTIONS, actions)
