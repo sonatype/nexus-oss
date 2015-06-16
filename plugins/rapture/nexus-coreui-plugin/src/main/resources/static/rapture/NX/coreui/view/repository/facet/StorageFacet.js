@@ -45,9 +45,9 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
           {
             xtype: 'combo',
             name: 'attributes.storage.blobStoreName',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BLOBSTORE'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BLOBSTORE_HELP'),
-            emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BLOBSTORE_PLACEHOLDER'),
+            fieldLabel: NX.I18n.get('Repository_Facet_StorageFacet_BlobStore_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_StorageFacet_BlobStore_HelpText'),
+            emptyText: NX.I18n.get('Repository_Facet_StorageFacet_BlobStore_EmptyText'),
             editable: false,
             store: 'Blobstore',
             queryMode: 'local',
