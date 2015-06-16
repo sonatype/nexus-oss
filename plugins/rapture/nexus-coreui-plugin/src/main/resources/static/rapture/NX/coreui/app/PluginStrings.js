@@ -880,7 +880,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // User -> NuGet Api Key
     NuGetApiKey_Text:'NuGet API Key',
     NuGetApiKey_Description: 'Configure credentials for NuGet repositories',
-    Nuget_NuGetApiKeyDetails_Html: 'You NuGet API Key enables pushing packages using NuGet.exe. ' +
+    Nuget_NuGetApiKeyDetails_Html: 'Your NuGet API Key enables pushing packages using NuGet.exe. ' +
     '<span style="font-weight: bold;">Keep this key secret!</span>',
     Nuget_NuGetApiKeyDetails_ApiKey_Text: 'Your NuGet API Key is:',
     Nuget_NuGetApiKeyDetails_Register_Text: 'You can register this key for a given repository with the following command:',
