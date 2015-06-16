@@ -53,8 +53,8 @@ Ext.define('NX.coreui.controller.Browse', {
   features: {
     mode: 'browse',
     path: '/Browse',
-    text: NX.I18n.get('Coreui_Controller_Browse_Title_Feature'),
-    description: NX.I18n.get('Coreui_Controller_Browse_Description_Feature'),
+    text: NX.I18n.get('Browse_Title_Feature'),
+    description: NX.I18n.get('Browse_Description_Feature'),
     view: 'NX.coreui.view.browse.BrowseFeature',
     iconConfig: {
       file: 'plugin.png',
@@ -169,7 +169,7 @@ Ext.define('NX.coreui.controller.Browse', {
     var me = this,
         componentStore = me.getComponentStore(),
         results = me.getResults(),
-        emptyText = NX.I18n.get('Coreui_View_Browse_BrowseResultList_EmptyText_Filter');
+        emptyText = NX.I18n.get('Browse_BrowseResultList_EmptyText_Filter');
 
     if (!results.emptyText) {
       results.emptyText = results.getView().emptyText;
