@@ -177,26 +177,7 @@ public class BlobStoreManagerImpl
   public BlobStore get(final String name) {
     checkNotNull(name);
 
-    synchronized (stores) {
-      BlobStore blobStore = stores.get(name);
-
-      // TODO - remove auto-create functionality?
-      // blob-store not defined, create
-      if (blobStore == null) {
-        // create and start
-        try {
-
-          BlobStoreConfiguration configuration = FileBlobStore
-              .configure(name, basedir.toAbsolutePath().toString() + "/" + name);
-          blobStore = create(configuration);
-        }
-        catch (Exception e) {
-          throw Throwables.propagate(e);
-        }
-      }
-
-      return blobStore;
-    }
+    return stores.get(name);
   }
 
   @Override

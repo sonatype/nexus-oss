@@ -107,18 +107,6 @@ class BlobStoreManagerImplTest
     verify(blobStore).stop();
     verify(store).delete(configuration);
   }
-  
-  @Test
-  void 'BlobStores will be eagerly created if not already configured'() {
-    BlobStore blobStore = mock(BlobStore)
-    when(provider.get()).thenReturn(blobStore)
-    
-    BlobStore autoCreatedBlobStore = underTest.get('test')
-    
-    verify(blobStore).start()
-    verify(store).create(any(BlobStoreConfiguration))
-    assert blobStore == autoCreatedBlobStore
-  }
 
   @Test
   void 'Can delete an existing BlobStore by name'() {
