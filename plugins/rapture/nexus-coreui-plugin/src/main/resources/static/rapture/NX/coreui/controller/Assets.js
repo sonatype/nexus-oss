@@ -76,15 +76,13 @@ Ext.define('NX.coreui.controller.Assets', {
       panel = container.add({xtype: 'nx-coreui-component-assetinfo', weight: 10});
     }
 
-    info[NX.I18n.get('BROWSE_ASSET_INFO_NAME')] = NX.util.Url.asRepositoryLink(assetModel.get('repositoryName'),
+    info[NX.I18n.get('Assets_Info_Path')] = NX.util.Url.asRepositoryLink(assetModel.get('repositoryName'),
         assetModel.get('name'));
-    info[NX.I18n.get('BROWSE_ASSET_INFO_CONTENT_TYPE')] = assetModel.get('contentType');
-    info[NX.I18n.get('BROWSE_ASSET_INFO_SIZE')] = Ext.util.Format.fileSize(assetModel.get('size'));
-    info[NX.I18n.get('BROWSE_ASSET_INFO_LAST_UPDATED')] = new Date(assetModel.get('lastUpdated')) ;
-    info[NX.I18n.get('BROWSE_ASSET_INFO_SHA1')] = assetModel.get('sha1');
-    info[NX.I18n.get('BROWSE_ASSET_INFO_MD5')] = assetModel.get('md5');
-    info[NX.I18n.get('Assets_Info_Name')] = assetModel.get('name');
     info[NX.I18n.get('Assets_Info_ContentType')] = assetModel.get('contentType');
+    info[NX.I18n.get('Assets_Info_FileSize')] = Ext.util.Format.fileSize(assetModel.get('size'));
+    info[NX.I18n.get('Assets_Info_Last_Updated')] = new Date(assetModel.get('lastUpdated')) ;
+    info[NX.I18n.get('Assets_Info_sha1')] = assetModel.get('sha1');
+    info[NX.I18n.get('Assets_Info_md5')] = assetModel.get('md5');
 
     panel.showInfo(info);
   },
