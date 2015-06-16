@@ -15,6 +15,7 @@ package org.sonatype.nexus.testsuite.raw;
 import javax.inject.Inject;
 import javax.annotation.Nonnull;
 
+import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
@@ -51,7 +52,11 @@ public class RawITSupport
     config.setRepositoryName(name);
     config.setRecipeName(RawHostedRecipe.NAME);
     config.setOnline(true);
-    config.attributes("storage").set("writePolicy", WritePolicy.ALLOW.toString());
+
+    NestedAttributesMap storage = config.attributes("storage");
+    storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
+    storage.set("writePolicy", WritePolicy.ALLOW.toString());
+
     return config;
   }
 
@@ -70,6 +75,9 @@ public class RawITSupport
     negativeCache.set("enabled", true);
     negativeCache.set("timeToLive", new Integer(100000));
 
+    NestedAttributesMap storage = config.attributes("storage");
+    storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
+
     return config;
   }
 
@@ -82,6 +90,9 @@ public class RawITSupport
 
     NestedAttributesMap group = config.attributes("group");
     group.set("memberNames", asList(memberNames));
+
+    NestedAttributesMap storage = config.attributes("storage");
+    storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
 
     return config;
   }

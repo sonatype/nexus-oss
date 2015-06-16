@@ -32,6 +32,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     'NX.coreui.store.Repository'
   ],
   stores: [
+    'Blobstore',
     'NX.coreui.store.Repository',
     'RepositoryRecipe',
     'NX.coreui.store.RepositoryReference'
@@ -99,7 +100,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRecipe
+          refresh: me.loadRelatedStores
         },
         '#State': {
           receivingchanged: me.onStateReceivingChanged
@@ -107,7 +108,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       },
       component: {
         'nx-coreui-repository-list': {
-          beforerender: me.loadRecipe,
+          beforerender: me.loadRelatedStores,
           afterrender: me.startStatusPolling,
           beforedestroy: me.stopStatusPolling
         },
@@ -212,11 +213,12 @@ Ext.define('NX.coreui.controller.Repositories', {
   /**
    * @private
    */
-  loadRecipe: function() {
+  loadRelatedStores: function() {
     var me = this,
         list = me.getList();
 
     if (list) {
+      me.getBlobstoreStore().load();
       me.getRepositoryRecipeStore().load();
     }
   },

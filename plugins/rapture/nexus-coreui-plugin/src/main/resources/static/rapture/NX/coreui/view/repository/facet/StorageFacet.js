@@ -24,11 +24,6 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
     'NX.I18n'
   ],
 
-  defaults: {
-    allowBlank: false,
-    itemCls: 'required-field'
-  },
-
   /**
    * @override
    */
@@ -41,7 +36,25 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
         cls: 'nx-form-section',
         title: NX.I18n.get('Repository_Facet_StorageFacet_Title'),
 
+        defaults: {
+          allowBlank: false,
+          itemCls: 'required-field'
+        },
+
         items: [
+          {
+            xtype: 'combo',
+            name: 'attributes.storage.blobStoreName',
+            fieldLabel: NX.I18n.get('Repository_Facet_StorageFacet_BlobStore_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_StorageFacet_BlobStore_HelpText'),
+            emptyText: NX.I18n.get('Repository_Facet_StorageFacet_BlobStore_EmptyText'),
+            editable: false,
+            store: 'Blobstore',
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'name',
+            readOnlyOnUpdate: true
+          },
           {
             xtype: 'checkbox',
             name: 'attributes.storage.strictContentTypeValidation',
@@ -49,7 +62,6 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
             fieldLabel: NX.I18n.get('Repository_Facet_StorageFacet_ContentTypeValidation_FieldLabel'),
             value: true
           }
-          // TODO add blob store selection
         ]
       }
     ];
