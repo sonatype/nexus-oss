@@ -19,12 +19,12 @@ import org.sonatype.nexus.validation.ConstraintValidatorSupport;
 import com.google.common.base.Strings;
 
 /**
- * {@link NonProxyHost} validator.
+ * {@link NonProxyHosts} validator.
  *
  * @since 3.0
  */
-public class NonProxyHostValidator
-    extends ConstraintValidatorSupport<NonProxyHost, String[]>
+public class NonProxyHostsValidator
+    extends ConstraintValidatorSupport<NonProxyHosts, String[]>
 {
   @Override
   public boolean isValid(final String[] values, final ConstraintValidatorContext context) {
@@ -37,7 +37,7 @@ public class NonProxyHostValidator
   }
 
   /**
-   * Returns {@code true} if value is considered as valid nonProxyHost expression. This is NOT validating the
+   * Returns {@code true} if value is considered as valid nonProxyHosts expression. This is NOT validating the
    * single-string used to set system property (where expressions are delimited with "|")!
    */
   private boolean isValid(final String value) {

@@ -33,11 +33,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
 @Retention(RUNTIME)
-@Constraint(validatedBy = NonProxyHostValidator.class)
+@Constraint(validatedBy = NonProxyHostsValidator.class)
 @Documented
-public @interface NonProxyHost
+public @interface NonProxyHosts
 {
-  String message() default "Invalid Java http.nonProxyHost expression";
+  String message() default "Invalid Java http.nonProxyHosts expression";
 
   Class<?>[] groups() default {};
 
