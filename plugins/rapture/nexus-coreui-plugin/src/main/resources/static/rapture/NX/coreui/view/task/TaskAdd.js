@@ -34,11 +34,11 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
     me.settingsForm = {
       xtype: 'nx-coreui-task-settings-form',
       editableCondition: NX.Conditions.isPermitted('nexus:tasks:create'),
-      editableMarker: NX.I18n.get('ADMIN_TASKS_CREATE_ERROR'),
+      editableMarker: NX.I18n.get('Task_TaskAdd_Create_Error'),
 
       buttons: [
-        { text: NX.I18n.get('ADMIN_TASKS_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
-        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+        { text: NX.I18n.get('Task_TaskList_New_Button'), action: 'add', formBind: true, ui: 'nx-primary' },
+        { text: NX.I18n.get('Add_Cancel_Button'), handler: function () {
           this.up('nx-drilldown').showChild(0, true);
         }}
       ]

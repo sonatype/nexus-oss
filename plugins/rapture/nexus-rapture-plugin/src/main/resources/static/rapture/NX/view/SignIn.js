@@ -25,7 +25,7 @@ Ext.define('NX.view.SignIn', {
   ],
   ui: 'nx-inset',
 
-  title: NX.I18n.get('GLOBAL_SIGN_IN_TITLE'),
+  title: NX.I18n.get('SignIn_Title'),
 
   layout: 'fit',
   autoShow: true,
@@ -52,7 +52,7 @@ Ext.define('NX.view.SignIn', {
           {
             name: 'username',
             itemId: 'username',
-            emptyText: NX.I18n.get('GLOBAL_SIGN_IN_USERNAME_PLACEHOLDER'),
+            emptyText: NX.I18n.get('SignIn_Username_Empty'),
             allowBlank: false,
             validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           },
@@ -60,21 +60,21 @@ Ext.define('NX.view.SignIn', {
             name: 'password',
             itemId: 'password',
             inputType: 'password',
-            emptyText: NX.I18n.get('GLOBAL_SIGN_IN_PASSWORD_PLACEHOLDER'),
+            emptyText: NX.I18n.get('SignIn_Password_Empty'),
             allowBlank: false,
             validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           },
           {
             xtype: 'checkbox',
-            boxLabel: NX.I18n.get('GLOBAL_SIGN_IN_REMEMBER_ME'),
+            boxLabel: NX.I18n.get('SignIn_RememberMe_BoxLabel'),
             name: 'rememberMe'
           }
         ],
 
         buttonAlign: 'left',
         buttons: [
-          { text: NX.I18n.get('GLOBAL_SIGN_IN_SUBMIT'), action: 'signin', formBind: true, bindToEnter: true, ui: 'nx-primary' },
-          { text: NX.I18n.get('GLOBAL_SIGN_IN_CANCEL'), handler: me.close, scope: me }
+          { text: NX.I18n.get('SignIn_Submit_Button'), action: 'signin', formBind: true, bindToEnter: true, ui: 'nx-primary' },
+          { text: NX.I18n.get('SignIn_Cancel_Button'), handler: me.close, scope: me }
         ]
       }
     });

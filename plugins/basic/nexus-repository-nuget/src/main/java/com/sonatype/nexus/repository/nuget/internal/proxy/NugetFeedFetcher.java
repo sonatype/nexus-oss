@@ -62,7 +62,7 @@ public class NugetFeedFetcher
    * @param proxy Proxy repository
    */
   @Nullable
-  public Integer cachePackageFeed(final Repository proxy, final URI nugetQuery, final int retries,
+  public Integer cachePackageFeed(final Repository proxy, final URI nugetQuery,
                                   final boolean followNextPageLinks, final ODataConsumer odataConsumer)
       throws IOException
   {
@@ -78,7 +78,7 @@ public class NugetFeedFetcher
 
     do {
       // download and cache results, following 'next' links if requested
-      final Payload payload = getPayload(proxy, remoteUrl, retries);
+      final Payload payload = getPayload(proxy, remoteUrl);
 
       remoteUrl = null;
       try (InputStream is = payload.openInputStream()) {
@@ -111,7 +111,7 @@ public class NugetFeedFetcher
    */
   @Nullable
   public Integer getCount(final Repository proxy, URI nugetQuery) throws IOException {
-    final Payload item = getPayload(proxy, absoluteURI(proxy, nugetQuery), 1);
+    final Payload item = getPayload(proxy, absoluteURI(proxy, nugetQuery));
     if (item == null) {
       return 0;
     }
@@ -127,7 +127,7 @@ public class NugetFeedFetcher
     return repoBaseUrl.resolve(nugetQuery);
   }
 
-  private Payload getPayload(final Repository proxy, final URI uri, final int tries) throws IOException
+  private Payload getPayload(final Repository proxy, final URI uri) throws IOException
   {
     final HttpClient client = proxy.facet(HttpClientFacet.class).getHttpClient();
 

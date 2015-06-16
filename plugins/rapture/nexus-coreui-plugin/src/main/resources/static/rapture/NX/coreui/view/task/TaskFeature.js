@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.task.TaskFeature', {
   tabs: [
     {
       xtype: 'nx-info-panel',
-      title: NX.I18n.get('ADMIN_TASKS_DETAILS_SUMMARY_TAB'),
+      title: NX.I18n.get('TaskFeature_Summary_Title'),
       weight: 10
     }
   ],
@@ -39,13 +39,13 @@ Ext.define('NX.coreui.view.task.TaskFeature', {
   actions: [
     {
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_TASKS_DETAILS_DELETE_BUTTON'),
+      text: NX.I18n.get('Task_TaskFeature_Delete_Button'),
       glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
       action: 'delete',disabled: true
     },
     {
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_TASKS_DETAILS_RUN_BUTTON'),
+      text: NX.I18n.get('Task_TaskFeature_Run_Button'),
       glyph: 'xf04b@FontAwesome' /* fa-play */,
       action: 'run',
       handler: function(button) { button.fireEvent('runaction') },
@@ -53,7 +53,7 @@ Ext.define('NX.coreui.view.task.TaskFeature', {
     },
     {
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_TASKS_DETAILS_STOP_BUTTON'),
+      text: NX.I18n.get('Task_TaskFeature_Stop_Button'),
       glyph: 'xf04d@FontAwesome' /* fa-stop */,
       action: 'stop',
       handler: function(button) { button.fireEvent('runaction') },

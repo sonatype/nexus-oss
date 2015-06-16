@@ -56,8 +56,8 @@ Ext.define('NX.coreui.controller.Metrics', {
       mode: 'admin',
       path: '/Support/Metrics',
       view: { xtype: 'nx-coreui-support-metrics' },
-      text: NX.I18n.get('ADMIN_METRICS_TITLE'),
-      description: NX.I18n.get('ADMIN_METRICS_SUBTITLE'),
+      text: NX.I18n.get('Metrics_Text'),
+      description: NX.I18n.get('Metrics_Description'),
       iconConfig: {
         file: 'chart_pie.png',
         variants: ['x16', 'x32']
@@ -100,7 +100,7 @@ Ext.define('NX.coreui.controller.Metrics', {
       return;
     }
 
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_METRICS_LOAD_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('Metrics_Load_Mask'));
 
     Ext.Ajax.request({
       url: NX.util.Url.urlOf('internal/metrics'),
@@ -116,7 +116,7 @@ Ext.define('NX.coreui.controller.Metrics', {
       },
 
       failure: function (response) {
-        NX.Messages.add({ type: 'warning', text: NX.I18n.get('ADMIN_METRICS_REFRESH_WARNING') });
+        NX.Messages.add({ type: 'warning', text: NX.I18n.get('Metrics_Refresh_Warning') });
       },
 
       success: function (response) {
@@ -132,19 +132,19 @@ Ext.define('NX.coreui.controller.Metrics', {
           { value: Math.round((gv('jvm.memory.total.used') / gv('jvm.memory.total.max')) * 100) }
         ]);
         panel.setMemoryDistData([
-          { name: NX.I18n.get('ADMIN_METRICS_HEAP'), data: gv('jvm.memory.heap.used') },
-          { name: NX.I18n.get('ADMIN_METRICS_NON_HEAP'), data: gv('jvm.memory.total.used') - gv('jvm.memory.heap.used') },
-          { name: NX.I18n.get('ADMIN_METRICS_AVAILABLE'), data: gv('jvm.memory.total.max') - gv('jvm.memory.total.used') }
+          { name: NX.I18n.get('Support_Metrics_Heap_Title'), data: gv('jvm.memory.heap.used') },
+          { name: NX.I18n.get('Metrics_Heap_NonHeapItem'), data: gv('jvm.memory.total.used') - gv('jvm.memory.heap.used') },
+          { name: NX.I18n.get('Metrics_Heap_Available'), data: gv('jvm.memory.total.max') - gv('jvm.memory.total.used') }
         ]);
 
         // update threads charts
         panel.setThreadStatesData([
-          { name: NX.I18n.get('ADMIN_METRICS_NEW'), data: gv('jvm.thread-states.new.count') },
-          { name: NX.I18n.get('ADMIN_METRICS_TERMINATED'), data: gv('jvm.thread-states.terminated.count') },
-          { name: NX.I18n.get('ADMIN_METRICS_BLOCKED'), data: gv('jvm.thread-states.blocked.count') },
-          { name: NX.I18n.get('ADMIN_METRICS_RUNNABLE'), data: gv('jvm.thread-states.runnable.count') },
-          { name: NX.I18n.get('ADMIN_METRICS_TIMED'), data: gv('jvm.thread-states.timed_waiting.count') },
-          { name: NX.I18n.get('ADMIN_METRICS_WAITING'), data: gv('jvm.thread-states.waiting.count') }
+          { name: NX.I18n.get('Metrics_ThreadStates_New'), data: gv('jvm.thread-states.new.count') },
+          { name: NX.I18n.get('Metrics_ThreadStates_Terminated'), data: gv('jvm.thread-states.terminated.count') },
+          { name: NX.I18n.get('Metrics_ThreadStates_Blocked'), data: gv('jvm.thread-states.blocked.count') },
+          { name: NX.I18n.get('Metrics_ThreadStates_Runnable'), data: gv('jvm.thread-states.runnable.count') },
+          { name: NX.I18n.get('Metrics_ThreadStates_TimedWaiting'), data: gv('jvm.thread-states.timed_waiting.count') },
+          { name: NX.I18n.get('Metrics_ThreadStates_Waiting'), data: gv('jvm.thread-states.waiting.count') }
         ]);
       }
     });

@@ -84,8 +84,11 @@ public class BlobStoreManagerImpl
     store.start();
     List<BlobStoreConfiguration> configurations = store.list();
     if (configurations.isEmpty()) {
-      log.debug("No BlobStores configured");
-      return;
+      log.debug("No BlobStores configured; provisioning default BlobStore");
+      store.create(FileBlobStore.configure(
+          DEFAULT_BLOBSTORE_NAME, basedir.toAbsolutePath().resolve(DEFAULT_BLOBSTORE_NAME).toString()
+      ));
+      configurations = store.list();
     }
 
     log.debug("Restoring {} BlobStores", configurations.size());
@@ -174,26 +177,7 @@ public class BlobStoreManagerImpl
   public BlobStore get(final String name) {
     checkNotNull(name);
 
-    synchronized (stores) {
-      BlobStore blobStore = stores.get(name);
-
-      // TODO - remove auto-create functionality?
-      // blob-store not defined, create
-      if (blobStore == null) {
-        // create and start
-        try {
-
-          BlobStoreConfiguration configuration = FileBlobStore
-              .configure(name, basedir.toAbsolutePath().toString() + "/" + name);
-          blobStore = create(configuration);
-        }
-        catch (Exception e) {
-          throw Throwables.propagate(e);
-        }
-      }
-
-      return blobStore;
-    }
+    return stores.get(name);
   }
 
   @Override

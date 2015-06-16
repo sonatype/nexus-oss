@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettings', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_TAB'),
+  title: NX.I18n.get('Repository_RepositorySettings_Title'),
 
   settingsForm: { xtype: 'nx-coreui-repository-settings-form' },
 

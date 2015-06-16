@@ -28,7 +28,7 @@ Ext.define('NX.app.PluginStrings', {
 
   /*
    * Note: Symbols follow the following naming convention:
-   * <MODE>_<FEATURE>_<VIEW>_<NAME>_<COMPONENT>
+   * <Class>_<Name>_<Component or Attribute>
    */
 
   keys: {
@@ -38,138 +38,138 @@ Ext.define('NX.app.PluginStrings', {
      */
 
     // Header
-    GLOBAL_HEADER_TITLE: 'Sonatype Nexus',
-    GLOBAL_HEADER_BROWSE_TITLE: 'Browse',
-    GLOBAL_HEADER_BROWSE_TOOLTIP: 'Browse server contents',
-    GLOBAL_HEADER_ADMIN_TITLE: 'Administration',
-    GLOBAL_HEADER_ADMIN_TOOLTIP: 'Server administration and configuration',
-    GLOBAL_HEADER_SEARCH_PLACEHOLDER: 'Search components',
-    GLOBAL_HEADER_SEARCH_TOOLTIP: 'Quick component keyword search',
-    GLOBAL_HEADER_REFRESH_TOOLTIP: 'Refresh current view and data',
-    GLOBAL_HEADER_REFRESH_DEFAULT: 'Refreshed',
-    GLOBAL_HEADER_USER: 'User',
-    GLOBAL_HEADER_USER_TOOLTIP: 'Hi, {0}. Manage your user account.',
-    GLOBAL_HEADER_SIGN_IN: 'Sign in',
-    GLOBAL_HEADER_SIGN_IN_TOOLTIP: 'Sign in',
-    GLOBAL_HEADER_SIGN_OUT: 'Sign out',
-    GLOBAL_HEADER_SIGN_OUT_TOOLTIP: 'Sign out',
-    GLOBAL_HEADER_HELP_TOOLTIP: 'Help',
-    GLOBAL_HEADER_HELP_FEATURE: 'Help for: ',
-    GLOBAL_HEADER_HELP_FEATURE_TOOLTIP: 'Help and documentation for the currently selected feature',
-    GLOBAL_HEADER_HELP_ABOUT: 'About',
-    GLOBAL_HEADER_HELP_ABOUT_TOOLTIP: 'About Sonatype Nexus',
-    GLOBAL_HEADER_HELP_DOCUMENTATION: 'Documentation',
-    GLOBAL_HEADER_HELP_DOCUMENTATION_TOOLTIP: 'Sonatype Nexus product documentation',
-    GLOBAL_HEADER_HELP_KB: 'Knowledge base',
-    GLOBAL_HEADER_HELP_KB_TOOLTIP: 'Sonatype Nexus knowledge base',
-    GLOBAL_HEADER_HELP_COMMUNITY: 'Community',
-    GLOBAL_HEADER_HELP_COMMUNITY_TOOLTIP: 'Sonatype Nexus community information',
-    GLOBAL_HEADER_HELP_ISSUES: 'Issue tracker',
-    GLOBAL_HEADER_HELP_ISSUES_TOOLTIP: 'Sonatype Nexus issue and bug tracker',
-    GLOBAL_HEADER_HELP_SUPPORT: 'Support',
-    GLOBAL_HEADER_HELP_SUPPORT_TOOLTIP: 'Sonatype Nexus product support',
+    Header_Panel_Logo_Text: 'Sonatype Nexus',
+    Header_BrowseMode_Title: 'Browse',
+    Header_BrowseMode_Tooltip: 'Browse server contents',
+    Header_AdminMode_Title: 'Administration',
+    Header_AdminMode_Tooltip: 'Server administration and configuration',
+    Header_QuickSearch_Empty: 'Search components',
+    Header_QuickSearch_Tooltip: 'Quick component keyword search',
+    Header_Refresh_Tooltip: 'Refresh current view and data',
+    Refresh_Message: 'Refreshed',
+    Header_UserMode_Title: 'User',
+    User_Tooltip: 'Hi, {0}. Manage your user account.',
+    Header_SignIn_Text: 'Sign in',
+    Header_SignIn_Tooltip: 'Sign in',
+    Header_SignOut_Text: 'Sign out',
+    Header_SignOut_Tooltip: 'Sign out',
+    Header_Help_Tooltip: 'Help',
+    Help_Feature_Text: 'Help for: ',
+    Header_Help_Feature_Tooltip: 'Help and documentation for the currently selected feature',
+    Header_Help_About_Text: 'About',
+    Header_Help_About_Tooltip: 'About Sonatype Nexus',
+    Header_Help_Documentation_Text: 'Documentation',
+    Header_Help_Documentation_Tooltip: 'Sonatype Nexus product documentation',
+    Header_Help_KB_Text: 'Knowledge base',
+    Header_Help_KB_Tooltip: 'Sonatype Nexus knowledge base',
+    Header_Help_Community_Text: 'Community',
+    Header_Help_Community_Tooltip: 'Sonatype Nexus community information',
+    Header_Help_Issues_Text: 'Issue tracker',
+    Header_Help_Issues_Tooltip: 'Sonatype Nexus issue and bug tracker',
+    Header_Help_Support_Text: 'Support',
+    Header_Help_Support_Tooltip: 'Sonatype Nexus product support',
 
     // Footer
-    GLOBAL_FOOTER_COPYRIGHT: 'Copyright &copy; 2008-2015, Sonatype Inc. All rights reserved.',
+    Footer_Panel_HTML: 'Copyright &copy; 2008-2015, Sonatype Inc. All rights reserved.',
 
     // Sign in
-    GLOBAL_SIGN_IN_TITLE: 'Sign In',
-    GLOBAL_SIGN_IN_MASK: 'Signing in&hellip;',
-    GLOBAL_SIGN_IN_USERNAME_PLACEHOLDER: 'Username',
-    GLOBAL_SIGN_IN_PASSWORD_PLACEHOLDER: 'Password',
-    GLOBAL_SIGN_IN_REMEMBER_ME: 'Remember me',
-    GLOBAL_SIGN_IN_SUBMIT: 'Sign in',
-    GLOBAL_SIGN_IN_CANCEL: 'Cancel',
+    SignIn_Title: 'Sign In',
+    User_SignIn_Mask: 'Signing in&hellip;',
+    SignIn_Username_Empty: 'Username',
+    SignIn_Password_Empty: 'Password',
+    SignIn_RememberMe_BoxLabel: 'Remember me',
+    SignIn_Submit_Button: 'Sign in',
+    SignIn_Cancel_Button: 'Cancel',
 
     // Filter box
-    GLOBAL_FILTER_PLACEHOLDER: 'Filter',
+    Grid_Plugin_FilterBox_Empty: 'Filter',
 
     // Dialogs
-    GLOBAL_DIALOG_INFO_TITLE: 'Information',
-    GLOBAL_DIALOG_ERROR_TITLE: 'Error',
-    GLOBAL_DIALOG_ERROR_FAILED: 'Operation failed',
-    GLOBAL_DIALOG_ADD_SUBMIT_BUTTON: 'Create',
-    GLOBAL_DIALOG_ADD_CANCEL_BUTTON: 'Cancel',
-    GLOBAL_DIALOG_ORDER_SUBMIT_BUTTON: 'Save',
-    GLOBAL_DIALOG_ORDER_CANCEL_BUTTON: 'Cancel',
+    Dialogs_Info_Title: 'Information',
+    Dialogs_Error_Title: 'Error',
+    Dialogs_Error_Message: 'Operation failed',
+    Add_Submit_Button: 'Create',
+    Add_Cancel_Button: 'Cancel',
+    ChangeOrderWindow_Submit_Button: 'Save',
+    ChangeOrderWindow_Cancel_Button: 'Cancel',
 
     // Messages
-    GLOBAL_MESSAGES_TOOLTIP: 'Toggle messages display',
-    GLOBAL_MESSAGES_EMPTY_STATE: 'No messages',
+    Header_Messages_Tooltip: 'Toggle messages display',
+    Message_Panel_Empty: 'No messages',
 
     // Server
-    GLOBAL_SERVER_CONNECT_FAILURE: 'Operation failed as server could not be contacted',
-    GLOBAL_SERVER_RECONNECTED_SUCCESS: 'Server reconnected',
-    GLOBAL_SERVER_DISCONNECTED: 'Server disconnected',
-    GLOBAL_SERVER_EXPIRE_WARNING: 'Session is about to expire',
-    GLOBAL_SERVER_EXPIRED_WARNING: 'Session expired after being inactive for {0} minutes',
-    GLOBAL_SERVER_SIGNED_IN: 'User signed in: {0}',
-    GLOBAL_SERVER_SIGNED_OUT: 'User signed out',
-    GLOBAL_SERVER_INCORRECT_CREDENTIALS_WARNING: 'Incorrect username and/or password or no permission to use the Nexus User Interface.',
-    GLOBAL_SERVER_DOWNLOAD_SUCCESS: 'Download initiated',
-    GLOBAL_SERVER_BLOCKED_POPUP_DANGER: 'Window pop-up was blocked!',
+    User_ConnectFailure_Message: 'Operation failed as server could not be contacted',
+    State_Reconnected_Message: 'Server reconnected',
+    State_Disconnected_Message: 'Server disconnected',
+    UiSessionTimeout_Expire_Message: 'Session is about to expire',
+    UiSessionTimeout_Expired_Message: 'Session expired after being inactive for {0} minutes',
+    User_SignedIn_Message: 'User signed in: {0}',
+    User_SignedOut_Message: 'User signed out',
+    User_Credentials_Message: 'Incorrect username and/or password or no permission to use the Nexus User Interface.',
+    Util_DownloadHelper_Download_Message: 'Download initiated',
+    Windows_Popup_Message: 'Window pop-up was blocked!',
 
     // License
-    GLOBAL_LICENSE_INSTALLED_SUCCESS: 'License installed',
-    GLOBAL_LICENSE_UNINSTALLED_WARNING: 'License uninstalled',
+    State_Installed_Message: 'License installed',
+    State_Uninstalled_Message: 'License uninstalled',
 
     // About modal
-    GLOBAL_ABOUT_TITLE: 'About Sonatype Nexus',
-    GLOBAL_ABOUT_CLOSE_BUTTON: 'Close',
-    GLOBAL_ABOUT_COPYRIGHT_TAB: 'Copyright',
-    GLOBAL_ABOUT_LICENSE_TAB: 'License',
+    AboutWindow_Title: 'About Sonatype Nexus',
+    AboutWindow_Close_Button: 'Close',
+    AboutWindow_About_Title: 'Copyright',
+    AboutWindow_License_Tab: 'License',
 
     // Authentication modal
-    GLOBAL_AUTHENTICATE_TITLE: 'Authenticate',
-    GLOBAL_AUTHENTICATE_HELP: 'You have requested an operation which requires validation of your credentials.',
-    GLOBAL_AUTHENTICATE_MASK: 'Authenticate&hellip;',
-    GLOBAL_AUTHENTICATE_SUBMIT_BUTTON: 'Authenticate',
-    GLOBAL_AUTHENTICATE_RETRIEVING_MASK: 'Retrieving authentication token&hellip;',
-    GLOBAL_AUTHENTICATE_CANCEL_BUTTON: 'Cancel',
+    Authenticate_Title: 'Authenticate',
+    Authenticate_Help_Text: 'You have requested an operation which requires validation of your credentials.',
+    User_Controller_Authenticate_Mask: 'Authenticate&hellip;',
+    User_View_Authenticate_Submit_Button: 'Authenticate',
+    User_Retrieving_Mask: 'Retrieving authentication token&hellip;',
+    Authenticate_Cancel_Button: 'Cancel',
 
     // Expiry modal
-    GLOBAL_EXPIRE_TITLE: 'Session',
-    GLOBAL_EXPIRE_HELP: 'Session is about to expire',
-    GLOBAL_EXPIRE_SECONDS: 'Session will expire in {0} seconds',
-    GLOBAL_EXPIRE_SIGNED_OUT: 'Your session has expired. Please sign in.',
-    GLOBAL_EXPIRE_CANCEL_BUTTON: 'Cancel',
-    GLOBAL_EXPIRE_SIGN_IN_BUTTON: 'Sign in',
-    GLOBAL_EXPIRE_CLOSE_BUTTON: 'Close',
+    ExpireSession_Title: 'Session',
+    ExpireSession_Help_Text: 'Session is about to expire',
+    UiSessionTimeout_Expire_Text: 'Session will expire in {0} seconds',
+    SignedOut_Text: 'Your session has expired. Please sign in.',
+    ExpireSession_Cancel_Button: 'Cancel',
+    ExpireSession_SignIn_Button: 'Sign in',
+    ExpireSession_Close_Button: 'Close',
 
     // Unsaved changes modal
-    GLOBAL_UNSAVED_TITLE: 'Unsaved changes',
-    GLOBAL_UNSAVED_MESSAGE: '<p>Do you want to discard your changes?</p>',
-    GLOBAL_UNSAVED_DISCARD_BUTTON: 'Discard changes',
-    GLOBAL_UNSAVED_BACK_BUTTON: 'Go back',
-    GLOBAL_UNSAVED_BROWSER_TITLE: 'You will lose your unsaved changes',
+    UnsavedChanges_Title: 'Unsaved changes',
+    UnsavedChanges_Help_HTML: '<p>Do you want to discard your changes?</p>',
+    UnsavedChanges_Discard_Button: 'Discard changes',
+    UnsavedChanges_Back_Button: 'Go back',
+    Menu_Browser_Title: 'You will lose your unsaved changes',
 
     // Unsupported browser
-    GLOBAL_UNSUPPORTED_TITLE: 'The browser you are using is not supported',
-    GLOBAL_UNSUPPORTED_ALTERNATIVES: 'Below is a list of alternatives that are supported by this web application',
-    GLOBAL_UNSUPPORTED_CONTINUE_BUTTON: 'Ignore and continue',
+    UnsupportedBrowser_Title: 'The browser you are using is not supported',
+    UnsupportedBrowser_Alternatives_Text: 'Below is a list of alternatives that are supported by this web application',
+    UnsupportedBrowser_Continue_Button: 'Ignore and continue',
 
     // 404
-    GLOBAL_404_PATH: 'Path "{0}" not found',
-    GLOBAL_404_NO_PATH: 'Path not found',
+    Feature_NotFoundPath_Text: 'Path "{0}" not found',
+    Feature_NotFound_Text: 'Path not found',
 
     // Buttons
-    GLOBAL_BUTTON_SAVE: 'Save',
-    GLOBAL_BUTTON_DISCARD: 'Discard',
-    GLOBAL_BUTTON_NEXT: 'Next',
+    SettingsForm_Save_Button: 'Save',
+    SettingsForm_Discard_Button: 'Discard',
+    Ldap_LdapServerConnectionAdd_Text: 'Next',
 
     // Item selector
-    GLOBAL_ITEM_SELECTOR_FILTER: 'Filter',
+    Form_Field_ItemSelector_Empty: 'Filter',
 
     // Settings form
-    GLOBAL_SETTINGS_LOADING: 'Loading',
-    GLOBAL_SETTINGS_SAVING: 'Saving',
+    SettingsForm_Load_Message: 'Loading',
+    SettingsForm_Submit_Message: 'Saving',
 
     // Browse -> Welcome
-    BROWSE_WELCOME_TITLE: 'Welcome',
-    BROWSE_WELCOME_SUBTITLE: 'Welcome to Sonatype Nexus!',
+    Dashboard_Title: 'Welcome',
+    Dashboard_Description: 'Welcome to Sonatype Nexus!',
 
     // Field validation messages
-    NAME_VALIDATION_MESSAGE: 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed and may not start with underscore or dot.'
+    Util_Validator_Text: 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed and may not start with underscore or dot.'
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);
