@@ -106,7 +106,7 @@ Ext.define('NX.controller.Drilldown', {
           navigate: me.navigateTo
         },
         '#Refresh': {
-          //refresh: me.reselect
+          refresh: me.reselect
         }
       }
     });
