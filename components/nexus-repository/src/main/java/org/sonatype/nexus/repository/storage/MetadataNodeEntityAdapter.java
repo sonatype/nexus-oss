@@ -161,7 +161,7 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode>
     }
     query.append(" from ").append(getTypeName());
     if (whereClause != null) {
-      query.append(" where ").append(whereClause);
+      query.append(" where (").append(whereClause).append(")");
     }
 
     if (repositories != null) {
