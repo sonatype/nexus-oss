@@ -22,6 +22,12 @@ Ext.define('NX.coreui.model.Asset', {
   fields: [
     {name: 'id', type: 'string', sortType: 'asUCText'},
     {name: 'name', type: 'string', sortType: 'asUCText'},
-    {name: 'contentType', type: 'string', sortType: 'asUCText'}
+    {name: 'contentType', type: 'string', sortType: 'asUCText'},
+    {name: 'size', type: 'int'},
+    {name: 'repositoryName', type: 'string', sortType: 'asUCText'},
+    {name: 'lastUpdated', type: 'int'},
+    {name: 'sha1', type: 'string', sortType: 'asUCText'},
+    {name: 'md5', type: 'string', sortType: 'asUCText'},
+    {name: 'attributes', type: 'auto' /*object*/}
   ]
 });

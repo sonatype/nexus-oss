@@ -14,6 +14,7 @@ package org.sonatype.nexus.coreui
 
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Asset exchange object.
@@ -24,7 +25,30 @@ import groovy.transform.ToString
 @EqualsAndHashCode(includes = ["id"])
 class AssetXO
 {
+  @NotEmpty
   String id
+
+  @NotEmpty
   String name
+
+  @NotEmpty
   String contentType
+
+  @NotEmpty
+  long size
+
+  @NotEmpty
+  String repositoryName
+
+  @NotEmpty
+  long lastUpdated
+
+  @NotEmpty
+  String sha1
+
+  @NotEmpty
+  String md5
+
+  @NotEmpty
+  Map<String, Map<String, Object>> attributes
 }

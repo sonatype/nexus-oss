@@ -64,6 +64,17 @@ Ext.define('NX.util.Url', {
       id = '';
     }
     return '<a href="' + url + '" target="' + target + '"' + id + '>' + text + '</a>';
+  },
+
+  /**
+   * @public
+   * Creates a link to an asset in a repository.
+   * @param {String} repositoryName the repository housing the asset
+   * @param {String} assetName name of the asset, expected to be the path within the repository
+   */
+  asRepositoryLink: function(repositoryName, assetName) {
+    var me = this; 
+    return me.asLink(me.baseUrl + '/repository/' + repositoryName  + assetName, assetName);
   }
 
 });
