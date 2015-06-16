@@ -295,8 +295,8 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Role_RoleSettingsForm_Roles_ToTitle: 'Contained',
 
     // Admin -> Security -> Users
-    Users_Text: 'Users',
-    Users_Description: 'Manage users',
+    User_Text: 'Users',
+    User_Description: 'Manage users',
     User_UserSettingsForm_Update_Error: 'You do not have permission to update users or is an external user',
     User_UserSettingsForm_Update_Success: 'User updated: ',
     User_UserSettingsExternalForm_Remove_Error: 'Cannot remove role',
