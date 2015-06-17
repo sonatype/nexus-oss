@@ -424,7 +424,7 @@ public class DefaultSnapshotRemover
         throws Exception
     {
       if (log.isDebugEnabled()) {
-        log.debug("onCollectionExit() :: " + coll.getRepositoryItemUid().toString());
+        log.debug("doOnCollectionExit() :: " + coll.getRepositoryItemUid().toString());
       }
       removeWholeGAV = false;
       final HashSet<Long> versionsToRemove = Sets.newHashSet();
@@ -440,6 +440,10 @@ public class DefaultSnapshotRemover
               ((MavenRepository) coll.getRepositoryItemUid().getRepository()).getGavCalculator().pathToGav(
                   item.getPath());
 
+          if(log.isDebugEnabled()){
+            log.debug(item.getPath());
+          }
+
           // if file does not obey layout, is metadata or other non-artifact, gav is null
           // we will not check these hanging files for removal
           if (gav != null) {
@@ -450,11 +454,19 @@ public class DefaultSnapshotRemover
               // only check release once per _all_ timestamped GAV pom since it is expensive
               checkIfReleaseExists = false;
               if (releaseExistsForSnapshot(gav, item.getItemContext())) {
-                log.debug("release detected for {}, entire GAV flagged for removal", item.getName());
+                if(log.isDebugEnabled()) {
+                  log.debug("release found");
+                }
+
                 removeWholeGAV = true;
 
                 // break out and junk whole gav
                 break;
+              }
+              else {
+                if(log.isDebugEnabled()){
+                  log.debug("release not found");
+                }
               }
             }
 
@@ -466,10 +478,6 @@ public class DefaultSnapshotRemover
                 log.trace("Skipping lastRequested for: {}", item.getPath());
               }
             } else {
-
-              if (log.isDebugEnabled()) {
-                log.debug(item.getPath());
-              }
 
               if (gav.getSnapshotTimeStamp() != null) {
 
