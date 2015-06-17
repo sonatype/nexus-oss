@@ -135,9 +135,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
           runaction: me.disableCapability,
           afterrender: me.bindDisableButton
         },
-        'nx-coreui-capability-summary nx-settingsform': {
-          //submitted: function() { }
-        },
         'nx-coreui-capability-settings button[action=save]': {
           click: me.updateCapability
         },
