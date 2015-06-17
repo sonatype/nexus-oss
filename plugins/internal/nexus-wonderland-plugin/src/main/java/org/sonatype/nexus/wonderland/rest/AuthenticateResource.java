@@ -91,11 +91,15 @@ public class AuthenticateResource
     final String password = Tokens.decodeBase64String(token.getP());
 
     // Require current user to be the requested user to authenticate
-    Subject subject = security.getSubject();
-    final String principalName =  subject.getPrincipal().toString();
-    log.debug("payload username: {}, payload password: {}, principal: {}", username, Tokens.mask(password), principalName);
+    final Subject subject = security.getSubject();
+    final Object principal =  subject.getPrincipal();
+    final String principalName = principal == null ? "" : principal.toString();
 
-    if (!principalName.equals(username)) {
+    if(log.isDebugEnabled()){
+      log.debug("payload username: {}, payload password: {}, principal: {}", username, Tokens.mask(password), principalName);
+    }
+
+    if(!principalName.equals(username)) {
       log.warn("auth token request denied - authenticated user {} does not match payload user {}",
           principalName, username);
       throw new WebApplicationMessageException(Status.BAD_REQUEST, "Username mismatch");
