@@ -52,6 +52,7 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
@@ -375,9 +376,15 @@ public class MavenFacetImpl
       if (lastModified != null) {
         formatAttributes.set(P_CONTENT_LAST_MODIFIED, lastModified.toDate());
       }
-      formatAttributes.set(P_CONTENT_ETAG, contentAttributes.get(Content.CONTENT_ETAG, String.class));
+      final String etag = contentAttributes.get(Content.CONTENT_ETAG, String.class);
+      if (!Strings.isNullOrEmpty(etag)) {
+        formatAttributes.set(P_CONTENT_ETAG, etag);
+      }
+      else {
+        formatAttributes.remove(P_CONTENT_ETAG);
+      }
     }
-    else {
+    if (formatAttributes.get(P_CONTENT_LAST_MODIFIED) == null) {
       formatAttributes.set(P_CONTENT_LAST_MODIFIED, DateTime.now().toDate());
     }
   }
