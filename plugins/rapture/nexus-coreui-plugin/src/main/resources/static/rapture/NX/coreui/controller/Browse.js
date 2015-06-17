@@ -84,7 +84,7 @@ Ext.define('NX.coreui.controller.Browse', {
 
     me.listen({
       store: {
-        '#NX.coreui.store.Repository': {
+        '#Repository': {
           load: me.reselect
         }
       },

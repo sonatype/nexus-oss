@@ -30,13 +30,13 @@ Ext.define('NX.coreui.controller.Repositories', {
     'nx-coreui-repository-list'
   ],
   models: [
-    'NX.coreui.store.Repository'
+    'Repository'
   ],
   stores: [
     'Blobstore',
-    'NX.coreui.store.Repository',
+    'Repository',
     'RepositoryRecipe',
-    'NX.coreui.store.RepositoryReference'
+    'RepositoryReference'
   ],
   views: [
     'repository.RepositoryAdd',
@@ -108,7 +108,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         }
       },
       store: {
-        '#NX.coreui.store.Repository': {
+        '#Repository': {
           load: me.reselect
         }
       },
@@ -236,7 +236,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     var me = this,
       win = form.up('nx-coreui-repository-add');
 
-    me.getStore('NX.coreui.store.Repository').load();
+    me.getStore('Repository').load();
   },
 
   /**
@@ -247,7 +247,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Repository.remove(model.getId(), function(response) {
-      me.getStore('NX.coreui.store.Repository').load();
+      me.getStore('Repository').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Repository deleted: ' + description, type: 'success' });
       }
@@ -310,7 +310,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     var me = this;
 
     Ext.Array.each(repositoryStatuses, function(repositoryStatus) {
-      var repositoryModel = me.getStore('NX.coreui.store.Repository').findRecord('name', repositoryStatus.repositoryName);
+      var repositoryModel = me.getStore('Repository').findRecord('name', repositoryStatus.repositoryName);
       if (repositoryModel) {
         repositoryModel.set('status', repositoryStatus);
         repositoryModel.commit(true);
