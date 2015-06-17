@@ -38,13 +38,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 class BlobTx
     extends ComponentSupport
 {
+  private final String nodeId;
+
   private final BlobStore blobStore;
 
   private final Set<AssetBlob> newlyCreatedBlobs = Sets.newHashSet();
 
   private final Set<BlobRef> deletionRequests = Sets.newHashSet();
 
-  public BlobTx(final BlobStore blobStore) {
+  public BlobTx(final String nodeId, final BlobStore blobStore) {
+    this.nodeId = checkNotNull(nodeId);
     this.blobStore = checkNotNull(blobStore);
   }
 
@@ -55,7 +58,7 @@ class BlobTx
   {
     final MultiHashingInputStream hashingStream = new MultiHashingInputStream(hashAlgorithms, inputStream);
     Blob blob = blobStore.create(hashingStream, headers);
-    BlobRef blobRef = new BlobRef("NODE", "STORE", blob.getId().asUniqueString());
+    BlobRef blobRef = new BlobRef(nodeId, blobStore.getBlobStoreConfiguration().getName(), blob.getId().asUniqueString());
     AssetBlob assetBlob = new AssetBlob(blobRef, hashingStream.count(), contentType, hashingStream.hashes());
     newlyCreatedBlobs.add(assetBlob);
     return assetBlob;
