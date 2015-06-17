@@ -74,8 +74,6 @@ Ext.define('NX.coreui.controller.Browse', {
     'browse-unattached': {file: 'file_extension_default.png', variants: ['x16', 'x32']}
   },
 
-  loadedStore: false,
-
   /**
    * @override
    */
@@ -87,12 +85,7 @@ Ext.define('NX.coreui.controller.Browse', {
     me.listen({
       store: {
         '#NX.coreui.store.Repository': {
-          load: function() {
-            if (!me.loadedStore) {
-              me.loadedStore = true;
-              me.reselect();
-            }
-          }
+          load: me.reselect
         }
       },
       component: {
