@@ -69,13 +69,15 @@ Ext.define('NX.coreui.view.browse.BrowseResultList', {
       text: NX.I18n.get('Browse_BrowseResultList_Group_Column'),
       dataIndex: 'group',
       stateId: 'group',
-      flex: 4
+      flex: 4,
+      renderer: NX.ext.grid.column.Renderers.optionalData
     },
     {
       text: NX.I18n.get('Browse_BrowseResultList_Version_Column'),
       dataIndex: 'version',
       stateId: 'version',
-      flex: 1
+      flex: 1,
+      renderer: NX.ext.grid.column.Renderers.optionalData
     }
   ],
 

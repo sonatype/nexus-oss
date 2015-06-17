@@ -30,8 +30,9 @@ public class PrivilegeDescriptorSupportTest
 {
   @Test
   public void humanizeNameTest() throws Exception {
-    assertThat(humanizeName(ALL), equalTo("all"));
-    assertThat(humanizeName("foo"), equalTo("foo"));
+    assertThat(humanizeName(ALL, ALL), equalTo("all"));
+    assertThat(humanizeName(ALL, "bar"), equalTo("all 'bar'-format"));
+    assertThat(humanizeName("foo", "bar"), equalTo("foo"));
   }
 
   @Test

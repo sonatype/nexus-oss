@@ -112,6 +112,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
         '<div class="x-panel x-panel-nx-inset">',
         // nexus details
         '{[ this.section("nexus-status", values) ]}',
+        '{[ this.section("nexus-node", values) ]}',
         '{[ this.section("nexus-configuration", values) ]}',
         '{[ this.section("nexus-properties", values) ]}',
         '{[ this.section("nexus-license", values) ]}',
