@@ -77,8 +77,8 @@ Ext.define('NX.coreui.controller.Users', {
     {
       mode: 'admin',
       path: '/Security/Users',
-      text: NX.I18n.get('Users_Text'),
-      description: NX.I18n.get('Users_Description'),
+      text: NX.I18n.get('User_Text'),
+      description: NX.I18n.get('User_Description'),
       view: { xtype: 'nx-coreui-user-feature' },
       iconConfig: {
         file: 'group.png',

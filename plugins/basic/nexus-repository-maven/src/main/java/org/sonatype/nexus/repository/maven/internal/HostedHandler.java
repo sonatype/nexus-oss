@@ -13,19 +13,25 @@
 package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.hash.HashCode;
+import com.google.common.net.HttpHeaders;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
@@ -73,6 +79,7 @@ public class HostedHandler
     if (content == null) {
       return HttpResponses.notFound(path.getPath());
     }
+    mayAddETag(content);
     return HttpResponses.ok(content);
   }
 
@@ -89,5 +96,21 @@ public class HostedHandler
       return HttpResponses.notFound(path.getPath());
     }
     return HttpResponses.noContent();
+  }
+
+  /**
+   * Adds {@link HttpHeaders#ETAG} header if not present. In case of hosted repositories, this is safe and even
+   * good thing to do, as the content is hosted here only and NX is content authority.
+   */
+  private void mayAddETag(final Content content) {
+    if (content.getAttributes().get(Content.CONTENT_ETAG, String.class) != null) {
+      return;
+    }
+    final Map<HashAlgorithm, HashCode> hashCodes = content.getAttributes()
+        .require(Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
+    final HashCode sha1HashCode = hashCodes.get(HashAlgorithm.SHA1);
+    if (sha1HashCode != null) {
+      content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + sha1HashCode.toString() + "}}");
+    }
   }
 }

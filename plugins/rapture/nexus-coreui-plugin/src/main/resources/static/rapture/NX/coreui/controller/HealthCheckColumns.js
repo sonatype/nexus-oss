@@ -317,7 +317,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
    */
   renderNotAvailable: function(metadata) {
     metadata.tdAttr = 'data-qtip="' + NX.I18n.get('HealthCheckSearch_Unavailable_Tooltip') + '"';
-    return '<span class="fa fa-ban"/>';
+    return '<span class="fa fa-ban" style="opacity: 0.33;"/>';
   },
 
   /**

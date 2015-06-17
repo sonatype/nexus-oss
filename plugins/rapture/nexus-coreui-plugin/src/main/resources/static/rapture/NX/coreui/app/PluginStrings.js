@@ -295,8 +295,8 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Role_RoleSettingsForm_Roles_ToTitle: 'Contained',
 
     // Admin -> Security -> Users
-    Users_Text: 'Users',
-    Users_Description: 'Manage users',
+    User_Text: 'Users',
+    User_Description: 'Manage users',
     User_UserSettingsForm_Update_Error: 'You do not have permission to update users or is an external user',
     User_UserSettingsForm_Update_Success: 'User updated: ',
     User_UserSettingsExternalForm_Remove_Error: 'Cannot remove role',
@@ -880,7 +880,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // User -> NuGet Api Key
     NuGetApiKey_Text:'NuGet API Key',
     NuGetApiKey_Description: 'Configure credentials for NuGet repositories',
-    Nuget_NuGetApiKeyDetails_Html: 'You NuGet API Key enables pushing packages using NuGet.exe. ' +
+    Nuget_NuGetApiKeyDetails_Html: 'Your NuGet API Key enables pushing packages using NuGet.exe. ' +
     '<span style="font-weight: bold;">Keep this key secret!</span>',
     Nuget_NuGetApiKeyDetails_ApiKey_Text: 'Your NuGet API Key is:',
     Nuget_NuGetApiKeyDetails_Register_Text: 'You can register this key for a given repository with the following command:',
