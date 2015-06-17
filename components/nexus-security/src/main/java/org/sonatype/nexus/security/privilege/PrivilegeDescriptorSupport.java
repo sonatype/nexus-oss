@@ -92,9 +92,14 @@ public abstract class PrivilegeDescriptorSupport
    * Returns {@code "all"} if passed in {@link #ALL} constant to denote all repositories, or the {@code name} parameter
    * as is.
    */
-  protected static String humanizeName(final String name) {
+  protected static String humanizeName(final String name, final String format) {
     if (ALL.equals(name)) {
-      return "all";
+      if (ALL.equals(format)) {
+        return "all";
+      }
+      else {
+        return "all '" + format + "'-format";
+      }
     }
     else {
       return name;

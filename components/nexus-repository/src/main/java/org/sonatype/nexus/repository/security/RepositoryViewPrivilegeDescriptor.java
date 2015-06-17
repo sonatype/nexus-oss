@@ -73,7 +73,7 @@ public class RepositoryViewPrivilegeDescriptor
     return new CPrivilegeBuilder()
         .type(TYPE)
         .id(id(format, name, actions))
-        .description(String.format("%s for %s repository view", humanizeActions(actions), humanizeName(name)))
+        .description(String.format("%s for %s repository view", humanizeActions(actions), humanizeName(name, format)))
         .property(P_FORMAT, format)
         .property(P_REPOSITORY, name)
         .property(P_ACTIONS, actions)
