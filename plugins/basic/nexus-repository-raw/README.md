@@ -51,4 +51,5 @@
     curl -v -X GET http://repo1.maven.org/maven2/junit/junit/maven-metadata.xml
 
 ## Partial Fetch Example
-   curl -v --user 'admin:admin123' -H 'Range: bytes=100-' -X GET http://localhost:8081/repository/rawproxy1/maven-metadata.xml
+
+    curl -v --user 'admin:admin123' -H 'Range: bytes=100-' -X GET http://localhost:8081/repository/rawproxy1/maven-metadata.xml
