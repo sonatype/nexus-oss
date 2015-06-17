@@ -273,7 +273,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
               me.getDescription(me.getLdapServerModel().create(response.data))),
             type: 'success'
           });
-          me.getLdapServerStore().load();
+          me.getStore('LdapServer').load();
         }
       }
     });
@@ -304,7 +304,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
               me.getDescription(me.getLdapServerModel().create(response.data))),
             type: 'success'
           });
-          me.getLdapServerStore().load();
+          me.getStore('LdapServer').load();
         }
       }
     });
@@ -319,7 +319,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         list = me.getList();
 
     if (list) {
-      me.getLdapSchemaTemplateStore().load();
+      me.getStore('LdapSchemaTemplate').load();
     }
   },
 
@@ -370,7 +370,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         description = me.getDescription(model);
 
     NX.direct.ldap_LdapServer.remove(model.getId(), function(response) {
-      me.getLdapServerStore().load();
+      me.getStore('LdapServer').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: NX.I18n.format('LdapServers_Delete_Success', description), type: 'success' });
       }

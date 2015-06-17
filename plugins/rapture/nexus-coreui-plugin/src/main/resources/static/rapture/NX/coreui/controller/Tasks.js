@@ -153,7 +153,7 @@ Ext.define('NX.coreui.controller.Tasks', {
 
     if (Ext.isDefined(model)) {
       me.showSummary(model);
-      taskTypeModel = me.getTaskTypeStore().getById(model.get('typeId'));
+      taskTypeModel = me.getStore('TaskType').getById(model.get('typeId'));
       if (taskTypeModel) {
         if (!settings) {
           me.getFeature().addTab({ xtype: 'nx-coreui-task-settings', title: NX.I18n.get('Tasks_Settings_Title'), weight: 20 });
@@ -205,7 +205,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       feature = me.getFeature();
 
     //clear any filters that may previously have been applied
-    me.getTaskTypeStore().clearFilter();
+    me.getStore('TaskType').clearFilter();
 
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(1, NX.I18n.get('Tasks_Select_Title'));
@@ -258,7 +258,7 @@ Ext.define('NX.coreui.controller.Tasks', {
         list = me.getList();
 
     if (list) {
-      me.getTaskTypeStore().load();
+      me.getStore('TaskType').load();
     }
   },
 
@@ -304,7 +304,7 @@ Ext.define('NX.coreui.controller.Tasks', {
               me.getDescription(me.getTaskModel().create(response.data))),
             type: 'success'
           });
-          me.getTaskStore().load();
+          me.getStore('Task').load();
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);
@@ -384,7 +384,7 @@ Ext.define('NX.coreui.controller.Tasks', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Task.remove(model.getId(), function(response) {
-      me.getTaskStore().load();
+      me.getStore('Task').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Tasks_Delete_Success', description), type: 'success'
@@ -403,7 +403,7 @@ Ext.define('NX.coreui.controller.Tasks', {
         model, modelId, description;
 
     // Reload the form
-    me.getTaskStore().load();
+    me.getStore('Task').load();
 
     modelId = decodeURIComponent(bookmark.getSegment(1));
     model = me.getList().getStore().getById(modelId);
@@ -417,7 +417,7 @@ Ext.define('NX.coreui.controller.Tasks', {
         NX.direct.coreui_Task.run(model.getId(), function(response) {
           me.getContent().getEl().unmask();
           if (Ext.isObject(response) && response.success) {
-            me.getTaskStore().load();
+            me.getStore('Task').load();
             NX.Messages.add({
               text: NX.I18n.format('Tasks_Run_Success', description), type: 'success'
             });
@@ -437,7 +437,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       model, modelId, description;
 
     // Reload the form
-    me.getTaskStore().load();
+    me.getStore('Task').load();
 
     modelId = decodeURIComponent(bookmark.getSegment(1));
     model = me.getList().getStore().getById(modelId);
@@ -451,7 +451,7 @@ Ext.define('NX.coreui.controller.Tasks', {
         NX.direct.coreui_Task.stop(model.getId(), function(response) {
           me.getContent().getEl().unmask();
           if (Ext.isObject(response) && response.success) {
-            me.getTaskStore().load();
+            me.getStore('Task').load();
             NX.Messages.add({
               text: NX.I18n.format('Tasks_Stop_Success', description), type: 'success'
             });

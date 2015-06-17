@@ -149,7 +149,7 @@ Ext.define('NX.coreui.controller.Roles', {
     var me = this,
       feature = me.getFeature();
 
-    me.getRoleBySourceStore().load({
+    me.getStore('RoleBySource').load({
       params: {
         source: menuItem.source
       }
@@ -169,8 +169,8 @@ Ext.define('NX.coreui.controller.Roles', {
         list = me.getList();
 
     if (list) {
-      me.getRoleSourceStore().load();
-      me.getPrivilegeStore().load();
+      me.getStore('RoleSource').load();
+      me.getStore('Privilege').load();
       me.getSettings().down('#roles').getStore().load();
     }
   },
@@ -233,7 +233,7 @@ Ext.define('NX.coreui.controller.Roles', {
     var me = this,
         win = form.up('nx-coreui-role-add');
 
-    me.getRoleStore().load();
+    me.getStore('Role').load();
   },
 
   /**
@@ -247,7 +247,7 @@ Ext.define('NX.coreui.controller.Roles', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Role.remove(model.getId(), function(response) {
-      me.getRoleStore().load();
+      me.getStore('Role').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Roles_Delete_Message', description), type: 'success'

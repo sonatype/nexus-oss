@@ -174,7 +174,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     if (Ext.isDefined(model)) {
       me.getFeature().setItemClass(1, NX.Icons.cls('capability-' + model.get('state'), 'x16'));
 
-      capabilityTypeModel = me.getCapabilityTypeStore().getById(model.get('typeId'));
+      capabilityTypeModel = me.getStore('CapabilityType').getById(model.get('typeId'));
 
       me.eventuallyShowWarning(model);
       me.showSummary(model);
@@ -298,7 +298,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         list = me.getList();
 
     if (list) {
-      me.getCapabilityTypeStore().load(
+      me.getStore('CapabilityType').load(
           function() {
             me.reselect();
           }
@@ -383,7 +383,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
                 me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
-          me.getCapabilityStore().load(function() {
+          me.getStore('Capability').load(function() {
             me.reselect();
           });
         }
@@ -413,7 +413,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
                 me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
-          me.getCapabilityStore().load();
+          me.getStore('Capability').load();
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);
@@ -432,7 +432,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         description = me.getDescription(model);
 
     NX.direct.capability_Capability.remove(model.getId(), function(response) {
-      me.getCapabilityStore().load(function() {
+      me.getStore('Capability').load(function() {
         me.reselect();
       });
       if (Ext.isObject(response) && response.success) {
@@ -461,7 +461,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     NX.direct.capability_Capability.enable(model.getId(), function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        me.getCapabilityStore().load();
+        me.getStore('Capability').load();
         NX.Messages.add({
           text: NX.I18n.format('Capabilities_Enable_Text', description),
           type: 'success'
@@ -487,7 +487,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     NX.direct.capability_Capability.disable(model.getId(), function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        me.getCapabilityStore().load();
+        me.getStore('Capability').load();
         NX.Messages.add({
           text: NX.I18n.format('Capabilities_Disable_Text', description),
           type: 'success'

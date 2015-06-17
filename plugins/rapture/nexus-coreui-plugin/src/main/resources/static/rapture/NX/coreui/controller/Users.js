@@ -270,7 +270,7 @@ Ext.define('NX.coreui.controller.Users', {
         userSourceButton.sourceId = 'default';
       }
       me.updateEmptyText();
-      me.getUserStore().load({
+      me.getStore('User').load({
         params: {
           filter: [
             { property: 'source', value: userSourceButton.sourceId },
@@ -296,8 +296,8 @@ Ext.define('NX.coreui.controller.Users', {
         list = me.getList();
 
     if (list) {
-      me.getUserSourceStore().load();
-      me.getRoleStore().load();
+      me.getStore('UserSource').load();
+      me.getStore('Role').load();
     }
   },
 
@@ -349,7 +349,7 @@ Ext.define('NX.coreui.controller.Users', {
     }
     else {
       me.updateEmptyText();
-      me.getUserStore().removeAll();
+      me.getStore('User').removeAll();
     }
   },
 
@@ -371,7 +371,7 @@ Ext.define('NX.coreui.controller.Users', {
     }
     else {
       me.updateEmptyText();
-      me.getUserStore().removeAll();
+      me.getStore('User').removeAll();
     }
   },
 
@@ -413,7 +413,7 @@ Ext.define('NX.coreui.controller.Users', {
     var me = this,
         win = form.up('nx-coreui-user-add');
 
-    me.getUserStore().load();
+    me.getStore('User').load();
   },
 
   /**
@@ -451,7 +451,7 @@ Ext.define('NX.coreui.controller.Users', {
         description = me.getDescription(model);
 
     NX.direct.coreui_User.remove(model.getId(), model.get('realm'), function(response) {
-      me.getUserStore().load();
+      me.getStore('User').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Users_Delete_Success', description), type: 'success'

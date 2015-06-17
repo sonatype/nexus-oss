@@ -224,8 +224,8 @@ Ext.define('NX.coreui.controller.Repositories', {
         list = me.getList();
 
     if (list) {
-      me.getBlobstoreStore().load();
-      me.getRepositoryRecipeStore().load();
+      me.getStore('Blobstore').load();
+      me.getStore('RepositoryRecipe').load();
     }
   },
 
@@ -310,7 +310,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     var me = this;
 
     Ext.Array.each(repositoryStatuses, function(repositoryStatus) {
-      var repositoryModel = me.getNXCoreuiStoreRepositoryStore().findRecord('name', repositoryStatus.repositoryName);
+      var repositoryModel = me.getStore('NX.coreui.store.Repository').findRecord('name', repositoryStatus.repositoryName);
       if (repositoryModel) {
         repositoryModel.set('status', repositoryStatus);
         repositoryModel.commit(true);

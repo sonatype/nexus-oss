@@ -88,7 +88,7 @@ Ext.define('NX.controller.Icon', {
     //</if>
 
     // build styles for each icon in store
-    me.getIconStore().each(function (record) {
+    me.getStore('Icon').each(function (record) {
       var img, style = me.buildIconStyle(record.data);
       //me.logDebug('Adding style: ' + style);
       styles.push(style);
@@ -184,7 +184,7 @@ Ext.define('NX.controller.Icon', {
 
     // TODO: complain if we are overwriting an icon
 
-    me.getIconStore().add(icon);
+    me.getStore('Icon').add(icon);
   },
 
   /**
@@ -218,7 +218,7 @@ Ext.define('NX.controller.Icon', {
    */
   findIcon: function (name, variant) {
     var me = this,
-        store = me.getIconStore(),
+        store = me.getStore('Icon'),
         recordId;
 
     recordId = store.findBy(function (record, id) {

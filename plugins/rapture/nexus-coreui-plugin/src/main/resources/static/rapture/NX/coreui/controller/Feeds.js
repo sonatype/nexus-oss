@@ -111,7 +111,7 @@ Ext.define('NX.coreui.controller.Feeds', {
         list = me.getList();
 
     if (list) {
-      me.getFeedStore().load();
+      me.getStore('Feed').load();
     }
   },
 
@@ -122,7 +122,7 @@ Ext.define('NX.coreui.controller.Feeds', {
     var me = this;
 
     if (model) {
-      me.getFeedEntryStore().filter({ id: 'key', property: 'key', value: model.get('key') });
+      me.getStore('FeedEntry').filter({ id: 'key', property: 'key', value: model.get('key') });
     }
   },
 

@@ -135,7 +135,7 @@ Ext.define('NX.coreui.controller.Browse', {
    */
   onRepositorySelection: function(model) {
     var me = this,
-        componentStore = me.getComponentStore(),
+        componentStore = me.getStore('Component'),
         results = me.getResults(),
         componentFilter = me.getComponentFilter();
 
@@ -174,7 +174,7 @@ Ext.define('NX.coreui.controller.Browse', {
    */
   onSearch: function(searchBox, value) {
     var me = this,
-        componentStore = me.getComponentStore(),
+        componentStore = me.getStore('Component'),
         results = me.getResults(),
         emptyText = NX.I18n.get('Browse_BrowseResultList_EmptyText_Filter');
 
@@ -198,7 +198,7 @@ Ext.define('NX.coreui.controller.Browse', {
    */
   onSearchCleared: function() {
     var me = this,
-        componentStore = me.getComponentStore(),
+        componentStore = me.getStore('Component'),
         results = me.getResults();
 
     if (results.emptyText) {

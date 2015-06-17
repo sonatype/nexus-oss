@@ -163,7 +163,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     var me = this,
         win = button.up('window'),
         form = button.up('form').getForm(),
-        store = me.getLoggerStore(),
+        store = me.getStore('Logger'),
         values = form.getFieldValues(),
         model = store.getById(values.name);
 

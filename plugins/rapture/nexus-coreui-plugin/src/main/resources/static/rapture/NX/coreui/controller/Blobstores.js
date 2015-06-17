@@ -140,7 +140,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
         list = me.getList();
 
     if (list) {
-      me.getBlobstoreTypeStore().load();
+      me.getStore('BlobstoreType').load();
     }
   },
 
