@@ -17,8 +17,6 @@ import javax.inject.Inject;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.MavenHostedFacet;
-import org.sonatype.nexus.repository.maven.internal.maven2.Constants;
-import org.sonatype.nexus.repository.maven.internal.maven2.Maven2Format;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MimeRulesSource;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;

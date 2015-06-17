@@ -50,7 +50,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;

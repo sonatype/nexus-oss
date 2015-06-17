@@ -23,7 +23,6 @@ import org.sonatype.nexus.scheduling.schedule.Weekly;
 import org.sonatype.nexus.scheduling.schedule.Weekly.Weekday;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.joda.time.DateTime;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.quartz.CronTrigger;

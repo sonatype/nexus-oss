@@ -21,11 +21,8 @@ import javax.net.ssl.SSLContext;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
 import org.sonatype.nexus.ldap.internal.LdapURL;
-import org.sonatype.nexus.ldap.internal.connector.DefaultLdapConnector;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapAuthConfiguration;
 import org.sonatype.nexus.ldap.internal.connector.dao.LdapDAOException;
-import org.sonatype.nexus.ldap.internal.connector.dao.LdapGroupDAO;
-import org.sonatype.nexus.ldap.internal.connector.dao.LdapUserDAO;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Host;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;

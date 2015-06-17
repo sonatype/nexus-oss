@@ -23,7 +23,6 @@ import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 
 import com.google.common.collect.Maps;
-import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;

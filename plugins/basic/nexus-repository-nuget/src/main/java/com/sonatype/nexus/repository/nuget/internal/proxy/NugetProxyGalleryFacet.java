@@ -23,8 +23,6 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;

@@ -14,7 +14,6 @@ package org.sonatype.nexus.atlas.internal;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.ZipOutputStream;

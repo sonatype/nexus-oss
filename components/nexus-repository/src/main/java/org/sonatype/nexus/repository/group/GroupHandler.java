@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Request;

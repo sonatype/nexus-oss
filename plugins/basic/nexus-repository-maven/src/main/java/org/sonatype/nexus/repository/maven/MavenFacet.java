@@ -18,7 +18,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Content;
