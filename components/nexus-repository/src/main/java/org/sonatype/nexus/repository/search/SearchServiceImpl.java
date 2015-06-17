@@ -24,6 +24,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -43,6 +44,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.client.Client;
@@ -51,6 +53,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.internal.InternalSearchResponse;
+import org.elasticsearch.search.sort.SortBuilder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
@@ -237,12 +240,16 @@ public class SearchServiceImpl
 
   @Override
   public Iterable<SearchHit> browse(final QueryBuilder query, final int from, final int size) {
-    SearchResponse response = search(query, from, size);
+    SearchResponse response = search(query, null, from, size);
     return Arrays.asList(response.getHits().getHits());
   }
 
   @Override
-  public SearchResponse search(final QueryBuilder query, final int from, final int size) {
+  public SearchResponse search(final QueryBuilder query,
+                               final @Nullable List<SortBuilder> sort,
+                               final int from,
+                               final int size)
+  {
     checkNotNull(query);
     try {
       if (!client.get().admin().indices().prepareValidateQuery().setQuery(query).execute().actionGet().isValid()) {
@@ -257,13 +264,18 @@ public class SearchServiceImpl
     if (searchableIndexes.length == 0) {
       return new SearchResponse(InternalSearchResponse.empty(), null, 0, 0, 0, new ShardSearchFailure[]{});
     }
-    return client.get().prepareSearch(searchableIndexes)
+
+    SearchRequestBuilder searchRequestBuilder = client.get().prepareSearch(searchableIndexes)
         .setTypes(TYPE)
         .setQuery(query)
         .setFrom(from)
-        .setSize(size)
-        .execute()
-        .actionGet();
+        .setSize(size);
+    if (sort != null) {
+      for (SortBuilder entry : sort) {
+        searchRequestBuilder.addSort(entry);
+      }
+    }
+    return searchRequestBuilder.execute().actionGet();
   }
 
   private String[] getSearchableIndexes() {
