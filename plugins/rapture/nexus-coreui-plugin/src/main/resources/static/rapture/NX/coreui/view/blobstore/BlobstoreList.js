@@ -29,7 +29,7 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreList', {
     stateId: 'nx-coreui-blobstore-list'
   },
 
-  store: 'NX.coreui.store.Blobstore',
+  store: 'Blobstore',
   
   columns: [
     {

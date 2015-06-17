@@ -29,7 +29,7 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     stateId: 'nx-coreui-repository-list'
   },
 
-  store: 'NX.coreui.store.Repository',
+  store: 'Repository',
   
   columns: [
     {
