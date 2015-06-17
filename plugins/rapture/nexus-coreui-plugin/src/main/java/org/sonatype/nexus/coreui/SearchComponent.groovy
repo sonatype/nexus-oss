@@ -82,14 +82,14 @@ extends DirectComponentSupport
       def sortBuilders = []
       if (sort) {
         if (sort.property == P_GROUP) {
-          sortBuilders << SortBuilders.fieldSort("${sort.property}.raw").order(SortOrder.valueOf(sort.direction))
-          sortBuilders << SortBuilders.fieldSort("${P_NAME}.raw").order(SortOrder.ASC)
+          sortBuilders << SortBuilders.fieldSort("${sort.property}.case_insensitive").order(SortOrder.valueOf(sort.direction))
+          sortBuilders << SortBuilders.fieldSort("${P_NAME}.case_insensitive").order(SortOrder.ASC)
           sortBuilders << SortBuilders.fieldSort(P_VERSION).order(SortOrder.ASC)
         }
         else if (sort.property == P_NAME) {
-          sortBuilders << SortBuilders.fieldSort("${sort.property}.raw").order(SortOrder.valueOf(sort.direction))
+          sortBuilders << SortBuilders.fieldSort("${sort.property}.case_insensitive").order(SortOrder.valueOf(sort.direction))
           sortBuilders << SortBuilders.fieldSort(P_VERSION).order(SortOrder.ASC)
-          sortBuilders << SortBuilders.fieldSort("${P_GROUP}.raw").order(SortOrder.ASC)
+          sortBuilders << SortBuilders.fieldSort("${P_GROUP}.case_insensitive").order(SortOrder.ASC)
         }
         else {
           sortBuilders = [SortBuilders.fieldSort(sort.property).order(SortOrder.valueOf(sort.direction))]
