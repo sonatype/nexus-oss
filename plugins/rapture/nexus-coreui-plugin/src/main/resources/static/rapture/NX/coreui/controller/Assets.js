@@ -69,22 +69,12 @@ Ext.define('NX.coreui.controller.Assets', {
    * Shows information about selected component/asset.
    */
   showAssetInfo: function(container, componentModel, assetModel) {
-    var panel = container.down('nx-coreui-component-assetinfo'),
-        info = {};
+    var panel = container.down('nx-coreui-component-assetinfo');
 
     if (!panel) {
       panel = container.add({xtype: 'nx-coreui-component-assetinfo', weight: 10});
     }
-
-    info[NX.I18n.get('Assets_Info_Path')] = NX.util.Url.asRepositoryLink(assetModel.get('repositoryName'),
-        assetModel.get('name'));
-    info[NX.I18n.get('Assets_Info_ContentType')] = assetModel.get('contentType');
-    info[NX.I18n.get('Assets_Info_FileSize')] = Ext.util.Format.fileSize(assetModel.get('size'));
-    info[NX.I18n.get('Assets_Info_Last_Updated')] = new Date(assetModel.get('lastUpdated')) ;
-    info[NX.I18n.get('Assets_Info_sha1')] = assetModel.get('sha1');
-    info[NX.I18n.get('Assets_Info_md5')] = assetModel.get('md5');
-
-    panel.showInfo(info);
+    panel.setAssetModel(assetModel);
   },
 
   showComponentDetails: function(container, componentModel) {
