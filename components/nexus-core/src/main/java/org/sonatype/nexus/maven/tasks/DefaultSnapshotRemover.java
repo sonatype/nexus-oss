@@ -235,7 +235,7 @@ public class DefaultSnapshotRemover
           new RecreateMavenMetadataWalkerProcessor(log, getDeleteOperation(request));
 
       final List<String> markedPaths = parentOMatic.getMarkedPaths();
-      if(log.isInfoEnabled()){
+      if (log.isInfoEnabled()) {
         log.info("rebuilding metadata for {} paths on repository {}", markedPaths != null ? markedPaths.size() : 0,
             repository.getId());
       }
@@ -248,7 +248,7 @@ public class DefaultSnapshotRemover
 
         ctxMd.getProcessors().add(metadataRebuildProcessor);
 
-        if(log.isTraceEnabled()){
+        if (log.isTraceEnabled()) {
           log.trace("rebuilding metadata for {} on repository {}", path,
               repository.getId());
         }
@@ -289,9 +289,12 @@ public class DefaultSnapshotRemover
     }
   }
 
-  private static class CacheEntry{
+  private static class CacheEntry
+  {
     private final List<StorageFileItem> items;
+
     private Long mostRecentItemLastRequested;
+
     private final Gav gav;
 
     CacheEntry(final StorageFileItem item, final Gav gav) {
@@ -300,9 +303,9 @@ public class DefaultSnapshotRemover
       this.gav = checkNotNull(gav);
     }
 
-    void addItem(StorageFileItem item){
+    void addItem(StorageFileItem item) {
       this.items.add(checkNotNull(item));
-      if(mostRecentItemLastRequested == null || item.getLastRequested() > mostRecentItemLastRequested){
+      if (mostRecentItemLastRequested == null || item.getLastRequested() > mostRecentItemLastRequested) {
         this.mostRecentItemLastRequested = item.getLastRequested();
       }
     }
@@ -430,7 +433,7 @@ public class DefaultSnapshotRemover
       final HashSet<Long> versionsToRemove = Sets.newHashSet();
       boolean checkIfReleaseExists = request.isRemoveIfReleaseExists();
       // track the most recent last requested time for each build in the same GAV <build-number,item-data)
-      final Map<Integer,CacheEntry> uniqueBuildsNearestRequestTimes = Maps.newHashMap();
+      final Map<Integer, CacheEntry> uniqueBuildsNearestRequestTimes = Maps.newHashMap();
 
       for (StorageItem item : items) {
         // only process artifacts
@@ -440,7 +443,7 @@ public class DefaultSnapshotRemover
               ((MavenRepository) coll.getRepositoryItemUid().getRepository()).getGavCalculator().pathToGav(
                   item.getPath());
 
-          if(log.isDebugEnabled()){
+          if (log.isDebugEnabled()) {
             log.debug(item.getPath());
           }
 
@@ -454,7 +457,7 @@ public class DefaultSnapshotRemover
               // only check release once per _all_ timestamped GAV pom since it is expensive
               checkIfReleaseExists = false;
               if (releaseExistsForSnapshot(gav, item.getItemContext())) {
-                if(log.isDebugEnabled()) {
+                if (log.isDebugEnabled()) {
                   log.debug("release found");
                 }
 
@@ -464,7 +467,7 @@ public class DefaultSnapshotRemover
                 break;
               }
               else {
-                if(log.isDebugEnabled()){
+                if (log.isDebugEnabled()) {
                   log.debug("release not found");
                 }
               }
@@ -473,11 +476,12 @@ public class DefaultSnapshotRemover
             item.getItemContext().put(Gav.class.getName(), gav);
 
             // do not check timestamp of signature or hash files, only rely on the main storage item
-            if(gav.isHash() || gav.isSignature()) {
-              if(log.isTraceEnabled()){
+            if (gav.isHash() || gav.isSignature()) {
+              if (log.isTraceEnabled()) {
                 log.trace("Skipping lastRequested for: {}", item.getPath());
               }
-            } else {
+            }
+            else {
 
               if (gav.getSnapshotTimeStamp() != null) {
 
@@ -507,14 +511,15 @@ public class DefaultSnapshotRemover
                   final Integer uniqueSnapKey = gav.getSnapshotBuildNumber();
                   final CacheEntry previouslyCached = uniqueBuildsNearestRequestTimes.get(uniqueSnapKey);
 
-                  if(previouslyCached == null){
+                  if (previouslyCached == null) {
                     uniqueBuildsNearestRequestTimes.put(uniqueSnapKey, new CacheEntry((StorageFileItem) item, gav));
-                  } else {
-                    previouslyCached.addItem((StorageFileItem)item);
+                  }
+                  else {
+                    previouslyCached.addItem((StorageFileItem) item);
                   }
                 }
                 // compare maven snapshot timestamp in file name to dateThreshold
-                else if (mavenSnapshotTimestamp < dateThreshold){
+                else if (mavenSnapshotTimestamp < dateThreshold) {
                   log.trace("maven timestamp {} earlier than threshold {}", mavenSnapshotTimestamp, dateThreshold);
                   versionsToRemove.add(mavenSnapshotTimestamp);
                   addStorageFileItemToMap(toDeleteSnapshotsAndFiles, gav, (StorageFileItem) item);
@@ -559,12 +564,13 @@ public class DefaultSnapshotRemover
       }
       else {
 
-        if(!uniqueBuildsNearestRequestTimes.isEmpty()){
-          log.debug("processing {} cached builds by most recently requested date", uniqueBuildsNearestRequestTimes.size());
-          for (CacheEntry entry : uniqueBuildsNearestRequestTimes.values()){
-            if(entry.mostRecentItemLastRequested < dateThreshold){
-              for(StorageFileItem sfi : entry.items){
-                if(log.isTraceEnabled()){
+        if (!uniqueBuildsNearestRequestTimes.isEmpty()) {
+          log.debug("processing {} cached builds by most recently requested date",
+              uniqueBuildsNearestRequestTimes.size());
+          for (CacheEntry entry : uniqueBuildsNearestRequestTimes.values()) {
+            if (entry.mostRecentItemLastRequested < dateThreshold) {
+              for (StorageFileItem sfi : entry.items) {
+                if (log.isTraceEnabled()) {
                   log.trace("remove: {} most recent lastRequested={} ({}),dateThreshold={} ({})", sfi.getName(),
                       entry.mostRecentItemLastRequested,
                       entry.mostRecentItemLastRequested > 0 ? new Date(entry.mostRecentItemLastRequested) : "",
@@ -574,8 +580,8 @@ public class DefaultSnapshotRemover
               }
             }
             else {
-              for(StorageFileItem sfi : entry.items){
-                if(log.isTraceEnabled()){
+              for (StorageFileItem sfi : entry.items) {
+                if (log.isTraceEnabled()) {
                   log.trace("retain: {} most recent lastRequested={} ({}),dateThreshold={} ({})", sfi.getName(),
                       entry.mostRecentItemLastRequested,
                       entry.mostRecentItemLastRequested > 0 ? new Date(entry.mostRecentItemLastRequested) : "",
