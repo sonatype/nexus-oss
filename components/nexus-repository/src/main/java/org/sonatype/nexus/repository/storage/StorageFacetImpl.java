@@ -25,6 +25,7 @@ import javax.validation.groups.Default;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardAspect;
 import org.sonatype.nexus.orient.DatabaseInstance;
@@ -57,6 +58,8 @@ public class StorageFacetImpl
     extends FacetSupport
     implements StorageFacet
 {
+  private final LocalNodeAccess localNodeAccess;
+
   private final BlobStoreManager blobStoreManager;
 
   private final Provider<DatabaseInstance> databaseInstanceProvider;
@@ -106,7 +109,8 @@ public class StorageFacetImpl
   private WritePolicySelector writePolicySelector;
 
   @Inject
-  public StorageFacetImpl(final BlobStoreManager blobStoreManager,
+  public StorageFacetImpl(final LocalNodeAccess localNodeAccess,
+                          final BlobStoreManager blobStoreManager,
                           final @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider,
                           final BucketEntityAdapter bucketEntityAdapter,
                           final ComponentEntityAdapter componentEntityAdapter,
@@ -115,6 +119,7 @@ public class StorageFacetImpl
                           final ContentValidatorSelector contentValidatorSelector,
                           final MimeRulesSourceSelector mimeRulesSourceSelector)
   {
+    this.localNodeAccess = checkNotNull(localNodeAccess);
     this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
 
@@ -280,7 +285,7 @@ public class StorageFacetImpl
     return StateGuardAspect.around(
         new StorageTxImpl(
             createdBy(),
-            new BlobTx(blobStore),
+            new BlobTx(localNodeAccess, blobStore),
             db,
             isUserManagedDb,
             bucket,

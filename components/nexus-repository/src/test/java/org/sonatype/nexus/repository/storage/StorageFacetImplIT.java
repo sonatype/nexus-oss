@@ -22,6 +22,7 @@ import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.entity.EntityVersion;
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
 import org.sonatype.nexus.orient.HexRecordIdObfuscator;
@@ -94,6 +95,8 @@ public class StorageFacetImplIT
 
   @Before
   public void setUp() throws Exception {
+    LocalNodeAccess mockLocalNodeAccess = mock(LocalNodeAccess.class);
+    when(mockLocalNodeAccess.getId()).thenReturn("testNodeId");
     BlobStoreManager mockBlobStoreManager = mock(BlobStoreManager.class);
     when(mockBlobStoreManager.get(anyString())).thenReturn(mock(BlobStore.class));
     BucketEntityAdapter bucketEntityAdapter = new BucketEntityAdapter();
@@ -106,6 +109,7 @@ public class StorageFacetImplIT
     ContentValidatorSelector contentValidatorSelector = new ContentValidatorSelector(Collections.<String, ContentValidator>emptyMap(), new DefaultContentValidator(new DefaultMimeSupport()));
     MimeRulesSourceSelector mimeRulesSourceSelector = new MimeRulesSourceSelector(Collections.<String, MimeRulesSource>emptyMap());
     underTest = new StorageFacetImpl(
+        mockLocalNodeAccess,
         mockBlobStoreManager,
         Providers.of(database.getInstance()),
         bucketEntityAdapter,
