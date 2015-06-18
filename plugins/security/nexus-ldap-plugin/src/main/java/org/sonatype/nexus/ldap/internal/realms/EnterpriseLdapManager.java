@@ -21,8 +21,6 @@ import java.util.TreeSet;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.net.ssl.SSLContext;
-
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
 import org.sonatype.nexus.common.app.NexusStoppedEvent;
@@ -41,10 +39,7 @@ import org.sonatype.nexus.ldap.internal.connector.dao.NoSuchLdapUserException;
 import org.sonatype.nexus.ldap.internal.events.LdapClearCacheEvent;
 import org.sonatype.nexus.ldap.internal.persist.LdapConfigurationManager;
 import org.sonatype.nexus.ldap.internal.persist.LdapServerNotFoundException;
-import org.sonatype.nexus.ldap.internal.persist.entity.Connection;
-import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Protocol;
 import org.sonatype.nexus.ldap.internal.persist.entity.LdapConfiguration;
-import org.sonatype.nexus.ldap.internal.ssl.SSLLdapContextFactory;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -52,8 +47,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.realm.ldap.LdapContextFactory;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 // TODO: this really should be threaded so we make multiple parallel requests

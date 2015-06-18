@@ -13,7 +13,6 @@
 package org.sonatype.nexus.mime;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;

@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.scheduling.TaskSupport;
 
 /**

@@ -25,7 +25,6 @@ import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
-import org.sonatype.nexus.repository.storage.StorageFacetImpl;
 import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
 

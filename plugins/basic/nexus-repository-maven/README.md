@@ -27,7 +27,6 @@ Use this config to create Maven2 hosted repository, use name `maven2-hosted` (or
     "writePolicy" : "ALLOW"
   }
 }
-
 ```
 
 Use this config to create Maven proxy repository, use name `maven2-proxy` (or as you wish, but update accordingly the group configuration below):
@@ -121,7 +120,7 @@ Group "maven2-group":
 	</mirrors>
 </settings>
 ```
-* kick of a build and deploy:
+* kick off a build and deploy:
 ```
 mvn -s settings.xml clean deploy -Dtest=void -DfailIfNoTests=false -DaltDeploymentRepository=local-nexus-admin::default::http://localhost:8081/repository/maven2-hosted/ -U
 ```

@@ -26,9 +26,9 @@ Note: curl commands have been escaped for bash
 
 ## Hosted
 
-    curl -u admin:admin123 -X PUT -v -include -F package=@src/test/resources/SONATYPE.TEST.1.0.nupkg http://localhost:8081/repository/nugethosted1/
-    curl -u admin:admin123 -X GET -v http://localhost:8081/repository/nugethosted1/SONATYPE.TEST/1.0
-    curl -u admin:admin123 -X DELETE -v http://localhost:8081/repository/nugethosted1/SONATYPE.TEST/1.0
+    curl -u admin:admin123 -X PUT -v -include -F package=@src/test/resources/SONATYPE.TEST.1.0.nupkg http://localhost:8081/repository/nuget-hosted/
+    curl -u admin:admin123 -X GET -v http://localhost:8081/repository/nuget-hosted/SONATYPE.TEST/1.0 -o SONATYPE.TEST.1.0.nupkg
+    curl -u admin:admin123 -X DELETE -v http://localhost:8081/repository/nuget-hosted/SONATYPE.TEST/1.0
 
 ### Viewing Components in OrientDB
 
@@ -40,11 +40,10 @@ Note: curl commands have been escaped for bash
 
 ## Default Search when VS is opened
 
-    curl -u admin:admin123 -X GET -v "http://localhost:8081/repository/nugetproxy/Search()/\$count?\$filter=IsLatestVersion&searchTerm=''&targetFramework='net45'&includePrerelease=false"
-    curl -u admin:admin123 -X GET -v "http://localhost:8081/repository/nugetproxy/Search()?\$filter=IsLatestVersion&\$orderby=DownloadCount%20desc,Id&\$skip=0&\$top=30&searchTerm=''&targetFramework='net45'&includePrerelease=false"
+    curl -u admin:admin123 -X GET -v "http://localhost:8081/repository/nuget.org-proxy/Search()/\$count?\$filter=IsLatestVersion&searchTerm=''&targetFramework='net45'&includePrerelease=false"
+    curl -u admin:admin123 -X GET -v "http://localhost:8081/repository/nuget.org-proxy/Search()?\$filter=IsLatestVersion&\$orderby=DownloadCount%20desc,Id&\$skip=0&\$top=30&searchTerm=''&targetFramework='net45'&includePrerelease=false"
 
 ## Searching for 'Web'
 
-    curl -u admin:admin123 -X GET -v "http://localhost:8081/repository/nugetproxy/Search()/\$count?\$filter=IsLatestVersion&searchTerm='Web'&targetFramework='net45'&includePrerelease=false"
-    curl -u admin:admin123 -X GET -v "http://localhost:8081/repository/nugetproxy/Search()?\$filter=IsLatestVersion&\$skip=0&\$top=30&searchTerm='Web'&targetFramework='net45'&includePrerelease=false"
-
+    curl -u admin:admin123 -X GET -v "http://localhost:8081/repository/nuget.org-proxy/Search()/\$count?\$filter=IsLatestVersion&searchTerm='Web'&targetFramework='net45'&includePrerelease=false"
+    curl -u admin:admin123 -X GET -v "http://localhost:8081/repository/nuget.org-proxy/Search()?\$filter=IsLatestVersion&\$skip=0&\$top=30&searchTerm='Web'&targetFramework='net45'&includePrerelease=false"
