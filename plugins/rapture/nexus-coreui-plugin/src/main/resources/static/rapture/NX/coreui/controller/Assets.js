@@ -20,7 +20,8 @@
 Ext.define('NX.coreui.controller.Assets', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.I18n'
+    'NX.I18n',
+    'Ext.util.Format'
   ],
 
   views: [
@@ -68,17 +69,12 @@ Ext.define('NX.coreui.controller.Assets', {
    * Shows information about selected component/asset.
    */
   showAssetInfo: function(container, componentModel, assetModel) {
-    var panel = container.down('nx-coreui-component-assetinfo'),
-        info = {};
+    var panel = container.down('nx-coreui-component-assetinfo');
 
     if (!panel) {
       panel = container.add({xtype: 'nx-coreui-component-assetinfo', weight: 10});
     }
-
-    info[NX.I18n.get('Assets_Info_Name')] = assetModel.get('name');
-    info[NX.I18n.get('Assets_Info_ContentType')] = assetModel.get('contentType');
-
-    panel.showInfo(info);
+    panel.setAssetModel(assetModel);
   },
 
   showComponentDetails: function(container, componentModel) {
