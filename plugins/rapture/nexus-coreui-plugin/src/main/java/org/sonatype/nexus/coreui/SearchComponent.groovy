@@ -24,7 +24,6 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.PagedResponse
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.repository.search.SearchService
-import org.sonatype.nexus.repository.storage.StorageFacet
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
@@ -36,9 +35,9 @@ import org.elasticsearch.index.query.FilterBuilders
 import org.elasticsearch.index.query.FilteredQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
-import org.elasticsearch.search.sort.SortBuilders
 import org.elasticsearch.search.sort.SortOrder
 
+import static org.elasticsearch.search.sort.SortBuilders.fieldSort
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME
@@ -81,18 +80,22 @@ extends DirectComponentSupport
       def sort = parameters?.sort?.get(0)
       def sortBuilders = []
       if (sort) {
-        if (sort.property == P_GROUP) {
-          sortBuilders << SortBuilders.fieldSort("${sort.property}.case_insensitive").order(SortOrder.valueOf(sort.direction))
-          sortBuilders << SortBuilders.fieldSort("${P_NAME}.case_insensitive").order(SortOrder.ASC)
-          sortBuilders << SortBuilders.fieldSort(P_VERSION).order(SortOrder.ASC)
-        }
-        else if (sort.property == P_NAME) {
-          sortBuilders << SortBuilders.fieldSort("${sort.property}.case_insensitive").order(SortOrder.valueOf(sort.direction))
-          sortBuilders << SortBuilders.fieldSort(P_VERSION).order(SortOrder.ASC)
-          sortBuilders << SortBuilders.fieldSort("${P_GROUP}.case_insensitive").order(SortOrder.ASC)
-        }
-        else {
-          sortBuilders = [SortBuilders.fieldSort(sort.property).order(SortOrder.valueOf(sort.direction))]
+        switch (sort.property) {
+          case P_GROUP:
+            sortBuilders << fieldSort("${P_GROUP}.case_insensitive").order(SortOrder.valueOf(sort.direction))
+            sortBuilders << fieldSort("${P_NAME}.case_insensitive").order(SortOrder.ASC)
+            sortBuilders << fieldSort(P_VERSION).order(SortOrder.ASC)
+            break
+          case P_NAME:
+            sortBuilders << fieldSort("${P_NAME}.case_insensitive").order(SortOrder.valueOf(sort.direction))
+            sortBuilders << fieldSort(P_VERSION).order(SortOrder.ASC)
+            sortBuilders << fieldSort("${P_GROUP}.case_insensitive").order(SortOrder.ASC)
+            break
+          case 'repositoryName':
+            sortBuilders = [fieldSort(P_REPOSITORY_NAME).order(SortOrder.valueOf(sort.direction))]
+            break
+          default:
+            sortBuilders = [fieldSort(sort.property).order(SortOrder.valueOf(sort.direction))]
         }
       }
       SearchResponse response = searchService.search(query, sortBuilders, parameters.start, parameters.limit)
