@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.internal.app;
 
+import java.lang.management.ManagementFactory;
+
 import javax.crypto.Cipher;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +32,8 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import org.eclipse.sisu.bean.BeanManager;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormat;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -136,6 +140,9 @@ public class NxApplication
     beanManager.unmanage();
 
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPED);
+
+    long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+    log.info("Uptime: {}", PeriodFormat.getDefault().print(new Period(uptime)));
     log.info("Stopped {}", getNexusNameForLogs());
   }
 }
