@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.wonderland.rest;
 
-import java.security.Principal;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -80,14 +78,15 @@ public class AuthenticateResource
 
     // Require current user to be the requested user to authenticate
     final Subject subject = SecurityUtils.getSubject();
-    final Object principal =  subject.getPrincipal();
+    final Object principal = subject.getPrincipal();
     final String principalName = principal == null ? "" : principal.toString();
 
-    if(log.isDebugEnabled()){
-      log.debug("payload username: {}, payload password: {}, principal: {}", username, Strings2.mask(password), principalName);
+    if (log.isDebugEnabled()) {
+      log.debug("payload username: {}, payload password: {}, principal: {}", username, Strings2.mask(password),
+          principalName);
     }
 
-    if(!principalName.equals(username)) {
+    if (!principalName.equals(username)) {
       log.warn("auth token request denied - authenticated user {} does not match payload user {}",
           principalName, username);
       throw new WebApplicationException("Username mismatch", Status.BAD_REQUEST);
