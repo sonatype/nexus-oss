@@ -285,7 +285,7 @@ public class StorageFacetImpl
     return StateGuardAspect.around(
         new StorageTxImpl(
             createdBy(),
-            new BlobTx(localNodeAccess.getId(), blobStore),
+            new BlobTx(localNodeAccess, blobStore),
             db,
             isUserManagedDb,
             bucket,

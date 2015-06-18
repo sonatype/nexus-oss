@@ -23,6 +23,7 @@ import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.hash.MultiHashingInputStream;
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Sets;
@@ -38,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 class BlobTx
     extends ComponentSupport
 {
-  private final String nodeId;
+  private final LocalNodeAccess localNodeAccess;
 
   private final BlobStore blobStore;
 
@@ -46,8 +47,8 @@ class BlobTx
 
   private final Set<BlobRef> deletionRequests = Sets.newHashSet();
 
-  public BlobTx(final String nodeId, final BlobStore blobStore) {
-    this.nodeId = checkNotNull(nodeId);
+  public BlobTx(final LocalNodeAccess localNodeAccess, final BlobStore blobStore) {
+    this.localNodeAccess = checkNotNull(localNodeAccess);
     this.blobStore = checkNotNull(blobStore);
   }
 
@@ -58,7 +59,7 @@ class BlobTx
   {
     final MultiHashingInputStream hashingStream = new MultiHashingInputStream(hashAlgorithms, inputStream);
     Blob blob = blobStore.create(hashingStream, headers);
-    BlobRef blobRef = new BlobRef(nodeId, blobStore.getBlobStoreConfiguration().getName(), blob.getId().asUniqueString());
+    BlobRef blobRef = new BlobRef(localNodeAccess.getId(), blobStore.getBlobStoreConfiguration().getName(), blob.getId().asUniqueString());
     AssetBlob assetBlob = new AssetBlob(blobRef, hashingStream.count(), contentType, hashingStream.hashes());
     newlyCreatedBlobs.add(assetBlob);
     return assetBlob;
