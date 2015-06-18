@@ -21,8 +21,8 @@ import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
-import org.sonatype.nexus.testsuite.repository.FormatClientSupport;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
@@ -76,7 +76,7 @@ public class MavenContentValidationIT
 
   private Server upstream;
 
-  private FormatClientSupport client;
+  private Maven2Client client;
 
   @Before
   public void setupMavenDebugStorage() {
@@ -170,7 +170,7 @@ public class MavenContentValidationIT
     mavenCentralConfiguration.attributes("proxy").set("remoteUrl", "http://localhost:" + upstream.getPort() + "/");
     mavenCentral = repositoryManager.update(mavenCentralConfiguration);
 
-    client = new FormatClientSupport(HttpClients.custom().build(), HttpClientContext.create(),
+    client = new Maven2Client(HttpClients.custom().build(), HttpClientContext.create(),
         resolveUrl(nexusUrl, "/repository/" + mavenCentral.getName() + "/").toURI());
   }
 
