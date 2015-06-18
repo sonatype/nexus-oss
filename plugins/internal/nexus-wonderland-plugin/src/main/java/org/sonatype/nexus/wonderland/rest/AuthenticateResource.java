@@ -87,13 +87,22 @@ public class AuthenticateResource
   public AuthTicketXO post(final AuthTokenXO token) {
     checkNotNull(token);
 
-    String username = Tokens.decodeBase64String(token.getU());
-    String password = Tokens.decodeBase64String(token.getP());
-    log.debug("Authenticate w/username: {}, password: {}", username, Tokens.mask(password));
+    final String username = Tokens.decodeBase64String(token.getU());
+    final String password = Tokens.decodeBase64String(token.getP());
 
     // Require current user to be the requested user to authenticate
-    Subject subject = security.getSubject();
-    if (!subject.getPrincipal().toString().equals(username)) {
+    final Subject subject = security.getSubject();
+    final Object principal = subject.getPrincipal();
+    final String principalName = principal == null ? "" : principal.toString();
+
+    if (log.isDebugEnabled()) {
+      log.debug("payload username: {}, payload password: {}, principal: {}", username, Tokens.mask(password),
+          principalName);
+    }
+
+    if (!principalName.equals(username)) {
+      log.warn("auth token request denied - authenticated user {} does not match payload user {}",
+          principalName, username);
       throw new WebApplicationMessageException(Status.BAD_REQUEST, "Username mismatch");
     }
 
