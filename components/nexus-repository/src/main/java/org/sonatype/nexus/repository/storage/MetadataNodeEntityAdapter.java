@@ -51,7 +51,7 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NA
  *
  * @since 3.0
  */
-public abstract class MetadataNodeEntityAdapter<T extends MetadataNode>
+public abstract class MetadataNodeEntityAdapter<T extends MetadataNode<?>>
     extends CollectionEntityAdapter<T>
 {
 

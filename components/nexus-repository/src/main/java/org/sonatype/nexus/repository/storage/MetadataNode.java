@@ -148,11 +148,12 @@ public abstract class MetadataNode<T>
     return attributes().child(format());
   }
 
-  protected <T> T require(final T value, final String name) {
+  protected <V> V require(final V value, final String name) {
     checkState(value != null, "Missing property: %s", name);
     return value;
   }
 
+  @SuppressWarnings("unchecked")
   private T self() {
     return (T) this;
   }

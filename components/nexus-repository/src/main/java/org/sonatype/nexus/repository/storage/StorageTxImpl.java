@@ -229,7 +229,7 @@ public class StorageTxImpl
     return bucketOwns(bucket, asset) ? asset : null;
   }
 
-  private boolean bucketOwns(final Bucket bucket, final @Nullable MetadataNode item) {
+  private boolean bucketOwns(final Bucket bucket, final @Nullable MetadataNode<?> item) {
     return item != null && Objects.equals(id(bucket), item.bucketId());
   }
 
