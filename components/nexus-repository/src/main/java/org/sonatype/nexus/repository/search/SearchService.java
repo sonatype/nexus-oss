@@ -12,11 +12,16 @@
  */
 package org.sonatype.nexus.repository.search;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.Repository;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortBuilder;
 
 /**
  * Search service: maintains indexes for repositories and performs indexing/deindexing of data, along with search.
@@ -59,6 +64,6 @@ public interface SearchService
   /**
    * Search component metadata and browse results (paged).
    */
-  SearchResponse search(QueryBuilder query, int from, int size);
+  SearchResponse search(QueryBuilder query, @Nullable List<SortBuilder> sort, int from, int size);
 
 }
