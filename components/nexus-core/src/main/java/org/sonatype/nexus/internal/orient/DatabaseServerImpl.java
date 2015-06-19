@@ -15,9 +15,6 @@ package org.sonatype.nexus.internal.orient;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +28,6 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.OConstants;
-import com.orientechnologies.orient.core.OSignalHandler;
 import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.server.OServer;
@@ -45,7 +41,6 @@ import com.orientechnologies.orient.server.config.OServerStorageConfiguration;
 import com.orientechnologies.orient.server.config.OServerUserConfiguration;
 import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProtocolBinary;
 import org.apache.commons.io.output.WriterOutputStream;
-import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -175,32 +170,7 @@ public class DatabaseServerImpl
 
     // global shutdown
     Orient.instance().shutdown();
-    uninstallOrientSignalHandlers();
 
     log.info("Shutdown");
-  }
-
-  /**
-   * Attempts to uninstall OrientDB's signal handlers to avoid dangling references when rebooting.
-   */
-  @IgnoreJRERequirement
-  @SuppressWarnings("restriction")
-  private void uninstallOrientSignalHandlers() {
-    try {
-      Field signalHandlerField = Orient.class.getDeclaredField("signalHandler");
-      signalHandlerField.setAccessible(true);
-
-      Field redefinedHandlersField = OSignalHandler.class.getDeclaredField("redefinedHandlers");
-      redefinedHandlersField.setAccessible(true);
-
-      // retrieve the original signal handlers that were redefined by OrientDB and re-install them
-      Object redefinedHandlers = redefinedHandlersField.get(signalHandlerField.get(Orient.instance()));
-      for (Entry<?, ?> entry : ((Map<?, ?>) redefinedHandlers).entrySet()) {
-        sun.misc.Signal.handle((sun.misc.Signal) entry.getKey(), (sun.misc.SignalHandler) entry.getValue());
-      }
-    }
-    catch (Exception | LinkageError e) {
-      log.warn("Problem uninstalling OrientDB signal handlers", e);
-    }
   }
 }
