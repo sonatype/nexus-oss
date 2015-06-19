@@ -27,9 +27,10 @@ Ext.define('NX.coreui.controller.Search', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: ['nx-coreui-search-result-list', 'nx-coreui-component-asset-list'],
-
+  masters: [
+    'nx-coreui-search-result-list',
+    'nx-coreui-component-asset-list'
+  ],
   stores: [
     'Asset',
     'SearchFilter',
@@ -117,7 +118,7 @@ Ext.define('NX.coreui.controller.Search', {
       }
     ], me);
 
-    me.getSearchFilterStore().each(function(model) {
+    me.getStore('SearchFilter').each(function(model) {
       me.registerFeature(model, me);
     });
 
@@ -167,10 +168,10 @@ Ext.define('NX.coreui.controller.Search', {
     var me = this,
         models;
 
-    models = me.getSearchCriteriaStore().add(criterias);
+    models = me.getStore('SearchCriteria').add(criterias);
     if (owner) {
       owner.on('destroy', function() {
-        me.getSearchCriteriaStore().remove(models)
+        me.getStore('SearchCriteria').remove(models)
       }, me);
     }
   },
@@ -262,7 +263,7 @@ Ext.define('NX.coreui.controller.Search', {
         searchPanel = me.getFeature(),
         searchFilter = searchPanel.searchFilter,
         searchCriteriaPanel = searchPanel.down('#criteria'),
-        searchCriteriaStore = me.getSearchCriteriaStore(),
+        searchCriteriaStore = me.getStore('SearchCriteria'),
         addCriteriaMenu = [],
         bookmarkSegments = NX.Bookmarks.getBookmark().getSegments(),
         bookmarkValues = {},
@@ -283,8 +284,8 @@ Ext.define('NX.coreui.controller.Search', {
     }
 
     searchCriteriaPanel.removeAll();
-    me.getSearchResultStore().removeAll();
-    me.getSearchResultStore().clearFilter(true);
+    me.getStore('SearchResult').removeAll();
+    me.getStore('SearchResult').clearFilter(true);
 
     if (searchFilter && searchFilter.get('criterias')) {
       Ext.Array.each(Ext.Array.from(searchFilter.get('criterias')), function(criteria) {
@@ -355,7 +356,7 @@ Ext.define('NX.coreui.controller.Search', {
       menu: addCriteriaMenu
     });
 
-    me.getSearchResultStore().filter();
+    me.getStore('SearchResult').filter();
   },
 
   /**
@@ -425,7 +426,7 @@ Ext.define('NX.coreui.controller.Search', {
     var me = this;
 
     if (me.getFeature()) {
-      me.getSearchResultStore().filter();
+      me.getStore('SearchResult').filter();
     }
   },
 
@@ -437,7 +438,7 @@ Ext.define('NX.coreui.controller.Search', {
    */
   applyFilter: function(searchCriteria, apply) {
     var me = this,
-        store = me.getSearchResultStore(),
+        store = me.getStore('SearchResult'),
         filter = searchCriteria.filter;
 
     if (filter && Ext.isFunction(filter) && !(filter instanceof Ext.util.Filter)) {
@@ -545,7 +546,7 @@ Ext.define('NX.coreui.controller.Search', {
       readOnly: false
     }));
 
-    me.getSearchFilterStore().add(model);
+    me.getStore('SearchFilter').add(model);
 
     me.getApplication().getFeaturesController().registerFeature({
       path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),

@@ -26,16 +26,17 @@ Ext.define('NX.coreui.controller.Repositories', {
     'NX.I18n'
   ],
 
-  masters: 'nx-coreui-repository-list',
-
+  masters: [
+    'nx-coreui-repository-list'
+  ],
   models: [
-    'NX.coreui.store.Repository'
+    'Repository'
   ],
   stores: [
     'Blobstore',
-    'NX.coreui.store.Repository',
+    'Repository',
     'RepositoryRecipe',
-    'NX.coreui.store.RepositoryReference'
+    'RepositoryReference'
   ],
   views: [
     'repository.RepositoryAdd',
@@ -104,6 +105,11 @@ Ext.define('NX.coreui.controller.Repositories', {
         },
         '#State': {
           receivingchanged: me.onStateReceivingChanged
+        }
+      },
+      store: {
+        '#Repository': {
+          load: me.reselect
         }
       },
       component: {
@@ -218,8 +224,8 @@ Ext.define('NX.coreui.controller.Repositories', {
         list = me.getList();
 
     if (list) {
-      me.getBlobstoreStore().load();
-      me.getRepositoryRecipeStore().load();
+      me.getStore('Blobstore').load();
+      me.getStore('RepositoryRecipe').load();
     }
   },
 
@@ -228,14 +234,9 @@ Ext.define('NX.coreui.controller.Repositories', {
    */
   onSettingsSubmitted: function(form, action) {
     var me = this,
-        win = form.up('nx-coreui-repository-add');
+      win = form.up('nx-coreui-repository-add');
 
-    if (win) {
-      me.loadStoreAndSelect(action.result.data.id, true);
-    }
-    else {
-      me.loadStore(Ext.emptyFn);
-    }
+    me.getStore('Repository').load();
   },
 
   /**
@@ -246,7 +247,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Repository.remove(model.getId(), function(response) {
-      me.loadStore(Ext.emptyFn);
+      me.getStore('Repository').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Repository deleted: ' + description, type: 'success' });
       }
@@ -309,7 +310,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     var me = this;
 
     Ext.Array.each(repositoryStatuses, function(repositoryStatus) {
-      var repositoryModel = me.getNXCoreuiStoreRepositoryStore().findRecord('name', repositoryStatus.repositoryName);
+      var repositoryModel = me.getStore('Repository').findRecord('name', repositoryStatus.repositoryName);
       if (repositoryModel) {
         repositoryModel.set('status', repositoryStatus);
         repositoryModel.commit(true);

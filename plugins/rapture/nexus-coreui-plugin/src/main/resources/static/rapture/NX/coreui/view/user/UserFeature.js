@@ -26,7 +26,9 @@ Ext.define('NX.coreui.view.user.UserFeature', {
 
   iconName: 'user-default',
 
-  masters: { xtype: 'nx-coreui-user-list' },
+  masters: [
+    { xtype: 'nx-coreui-user-list' }
+  ],
 
   tabs: [
     { xtype: 'nx-coreui-user-settings', title: NX.I18n.get('User_UserFeature_Settings_Title'), weight: 10 }

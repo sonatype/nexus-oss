@@ -26,7 +26,9 @@ Ext.define('NX.coreui.view.feed.FeedFeature', {
 
   iconName: 'feed-default',
 
-  masters: { xtype: 'nx-coreui-feed-list' },
+  masters: [
+    { xtype: 'nx-coreui-feed-list' }
+  ],
 
   actions: [
     { xtype: 'button', text: NX.I18n.get('Feed_FeedFeature_Subscribe_Button'), glyph: 'xf09e@FontAwesome' /* fa-rss */, action: 'subscribe', disabled: true }

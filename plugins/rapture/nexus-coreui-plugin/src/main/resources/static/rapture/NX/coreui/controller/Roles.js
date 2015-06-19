@@ -25,9 +25,9 @@ Ext.define('NX.coreui.controller.Roles', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-role-list',
-
+  masters: [
+    'nx-coreui-role-list'
+  ],
   models: [
     'Role'
   ],
@@ -91,6 +91,9 @@ Ext.define('NX.coreui.controller.Roles', {
         }
       },
       store: {
+        '#Role': {
+          load: me.reselect
+        },
         '#RoleSource': {
           load: me.onRoleSourceLoad
         }
@@ -146,7 +149,7 @@ Ext.define('NX.coreui.controller.Roles', {
     var me = this,
       feature = me.getFeature();
 
-    me.getRoleBySourceStore().load({
+    me.getStore('RoleBySource').load({
       params: {
         source: menuItem.source
       }
@@ -166,8 +169,8 @@ Ext.define('NX.coreui.controller.Roles', {
         list = me.getList();
 
     if (list) {
-      me.getRoleSourceStore().load();
-      me.getPrivilegeStore().load();
+      me.getStore('RoleSource').load();
+      me.getStore('Privilege').load();
       me.getSettings().down('#roles').getStore().load();
     }
   },
@@ -230,11 +233,7 @@ Ext.define('NX.coreui.controller.Roles', {
     var me = this,
         win = form.up('nx-coreui-role-add');
 
-    if (win) {
-      me.loadStoreAndSelect(action.result.data.id, true);
-    } else {
-      me.loadStore(Ext.emptyFn);
-    }
+    me.getStore('Role').load();
   },
 
   /**
@@ -248,7 +247,7 @@ Ext.define('NX.coreui.controller.Roles', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Role.remove(model.getId(), function(response) {
-      me.loadStore();
+      me.getStore('Role').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Roles_Delete_Message', description), type: 'success'

@@ -109,7 +109,7 @@ Ext.define('NX.controller.Features', {
           clonedFeature.visible = NX.controller.Features.alwaysVisible;
         }
 
-        me.getFeatureStore().addSorted(me.getFeatureModel().create(clonedFeature));
+        me.getStore('Feature').addSorted(me.getFeatureModel().create(clonedFeature));
       });
     }
   },
@@ -136,9 +136,9 @@ Ext.define('NX.controller.Features', {
         path = clonedFeature.mode + '/' + path;
         clonedFeature.path = '/' + path;
 
-        model = me.getFeatureStore().getById(clonedFeature.path);
+        model = me.getStore('Feature').getById(clonedFeature.path);
         if (model) {
-          me.getFeatureStore().remove(model);
+          me.getStore('Feature').remove(model);
         }
       });
     }

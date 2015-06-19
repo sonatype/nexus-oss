@@ -104,7 +104,7 @@ Ext.define('NX.controller.Message', {
       }
     });
 
-    me.getMessageStore().on('datachanged', me.updateHeader, me);
+    me.getStore('Message').on('datachanged', me.updateHeader, me);
   },
 
   /**
@@ -115,7 +115,7 @@ Ext.define('NX.controller.Message', {
   updateHeader: function () {
     var me = this,
         button = me.getButton(),
-        count = me.getMessageStore().getCount();
+        count = me.getStore('Message').getCount();
 
     if (button) {
       if (count) {
@@ -155,7 +155,7 @@ Ext.define('NX.controller.Message', {
    */
   addMessage: function (message) {
     var me = this,
-        store = me.getMessageStore();
+        store = me.getStore('Message');
 
     if (!message.type) {
       message.type = 'default';

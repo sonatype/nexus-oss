@@ -26,9 +26,9 @@ Ext.define('NX.coreui.view.system.Bundles', {
 
   iconName: 'bundle-default',
 
-  masters: {
-    xtype: 'nx-coreui-system-bundlelist'
-  },
+  masters: [
+    { xtype: 'nx-coreui-system-bundlelist' }
+  ],
 
   tabs: {
     xtype: 'nx-info-panel',

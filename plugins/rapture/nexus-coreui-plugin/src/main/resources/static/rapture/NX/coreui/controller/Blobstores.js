@@ -25,14 +25,14 @@ Ext.define('NX.coreui.controller.Blobstores', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-blobstore-list',
-
+  masters: [
+    'nx-coreui-blobstore-list'
+  ],
   models: [
     'Blobstore'
   ],
   stores: [
-    'NX.coreui.store.Blobstore',
+    'Blobstore',
     'BlobstoreType'
   ],
   views: [
@@ -81,6 +81,11 @@ Ext.define('NX.coreui.controller.Blobstores', {
       controller: {
         '#Refresh': {
           refresh: me.loadRecipe
+        }
+      },
+      store: {
+        '#Blobstore': {
+          load: me.reselect
         }
       },
       component: {
@@ -135,7 +140,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
         list = me.getList();
 
     if (list) {
-      me.getBlobstoreTypeStore().load();
+      me.getStore('BlobstoreType').load();
     }
   },
 
@@ -146,12 +151,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
     var me = this,
         win = form.up('nx-coreui-blobstore-add');
 
-    if (win) {
-      me.loadStoreAndSelect(action.result.data.id, true);
-    }
-    else {
-      me.loadStore(Ext.emptyFn);
-    }
+    me.getStore('Blobstore').load();
   },
 
   /**
@@ -162,7 +162,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Blobstore.remove(model.getId(), function(response) {
-      me.loadStore(Ext.emptyFn);
+      me.getStore('Blobstore').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Blobstore deleted: ' + description, type: 'success' });
       }

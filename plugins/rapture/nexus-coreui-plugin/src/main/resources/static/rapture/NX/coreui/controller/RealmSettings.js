@@ -87,7 +87,7 @@ Ext.define('NX.coreui.controller.RealmSettings', {
         panel = me.getPanel();
 
     if (panel) {
-      me.getRealmTypeStore().load(function() {
+      me.getStore('RealmType').load(function() {
         // The form depends on this store, so load it after the store has loaded
         me.getForm().load();
       });

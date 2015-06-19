@@ -25,9 +25,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-ldapserver-list',
-
+  masters: [
+    'nx-coreui-ldapserver-list'
+  ],
   models: [
     'LdapServer'
   ],
@@ -96,6 +96,11 @@ Ext.define('NX.coreui.controller.LdapServers', {
       controller: {
         '#Refresh': {
           refresh: me.loadTemplates
+        }
+      },
+      store: {
+        '#LdapServer': {
+          load: me.reselect
         }
       },
       component: {
@@ -268,7 +273,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
               me.getDescription(me.getLdapServerModel().create(response.data))),
             type: 'success'
           });
-          me.loadStore(Ext.emptyFn);
+          me.getStore('LdapServer').load();
         }
       }
     });
@@ -299,7 +304,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
               me.getDescription(me.getLdapServerModel().create(response.data))),
             type: 'success'
           });
-          me.loadStoreAndSelect(response.data.id, true);
+          me.getStore('LdapServer').load();
         }
       }
     });
@@ -314,7 +319,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         list = me.getList();
 
     if (list) {
-      me.getLdapSchemaTemplateStore().load();
+      me.getStore('LdapSchemaTemplate').load();
     }
   },
 
@@ -365,7 +370,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         description = me.getDescription(model);
 
     NX.direct.ldap_LdapServer.remove(model.getId(), function(response) {
-      me.loadStore();
+      me.getStore('LdapServer').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: NX.I18n.format('LdapServers_Delete_Success', description), type: 'success' });
       }
@@ -383,7 +388,6 @@ Ext.define('NX.coreui.controller.LdapServers', {
 
     NX.direct.ldap_LdapServer.changeOrder(order, function(response) {
       if (Ext.isObject(response) && response.success) {
-        me.loadStore();
         win.close();
         NX.Messages.add({ text: NX.I18n.get('LdapServers_ChangeOrder_Success'), type: 'success' });
       }

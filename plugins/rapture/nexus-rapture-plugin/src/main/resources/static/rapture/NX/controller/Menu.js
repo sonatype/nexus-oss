@@ -218,7 +218,7 @@ Ext.define('NX.controller.Menu', {
       me.logDebug('Selected feature: ' + path);
       //</if>
 
-      me.selectFeature(me.getFeatureStore().getById(featureMenuModel.get('path')));
+      me.selectFeature(me.getStore('Feature').getById(featureMenuModel.get('path')));
       me.populateFeatureGroupStore(featureMenuModel);
       if (me.bookmarkingEnabled) {
         me.bookmark(featureMenuModel);
@@ -250,7 +250,7 @@ Ext.define('NX.controller.Menu', {
   populateFeatureGroupStore: function (record) {
     var me = this,
         features = [],
-        featureStore = me.getFeatureStore();
+        featureStore = me.getStore('Feature');
 
     // add all children of the record to the group store, but do not include the node for the current record
     record.eachChild(function (node) {
@@ -259,7 +259,7 @@ Ext.define('NX.controller.Menu', {
       });
     });
 
-    me.getFeatureGroupStore().loadData(features);
+    me.getStore('FeatureGroup').loadData(features);
   },
 
   /**
@@ -291,7 +291,7 @@ Ext.define('NX.controller.Menu', {
         me.refreshModes();
       }
       if (menuBookmark) {
-        node = me.getFeatureMenuStore().getRootNode().findChild('bookmark', menuBookmark, true);
+        node = me.getStore('FeatureMenu').getRootNode().findChild('bookmark', menuBookmark, true);
       }
       // in case that we do not have a bookmark to navigate to or we have to navigate to first feature,
       // find the first feature
@@ -300,7 +300,7 @@ Ext.define('NX.controller.Menu', {
           me.selectFirstAvailableMode();
           me.refreshModes();
         }
-        node = me.getFeatureMenuStore().getRootNode().firstChild;
+        node = me.getStore('FeatureMenu').getRootNode().firstChild;
 
         //<if debug>
         me.logDebug('Automatically selected: ' + node.get('bookmark'));
@@ -318,7 +318,7 @@ Ext.define('NX.controller.Menu', {
         delete me.currentSelectedPath;
         // if the feature to navigate to is not available in menu check out if is hidden (probably no permissions)
         if (menuBookmark) {
-          feature = me.getFeatureStore().findRecord('bookmark', menuBookmark, 0, false, false, true);
+          feature = me.getStore('Feature').findRecord('bookmark', menuBookmark, 0, false, false, true);
         }
         me.getFeatureMenu().getSelectionModel().deselectAll();
         if (feature) {
@@ -352,11 +352,11 @@ Ext.define('NX.controller.Menu', {
     var me = this,
         shouldRefresh = false;
 
-    me.getFeatureStore().each(function (feature) {
+    me.getStore('Feature').each(function (feature) {
       var visible, previousVisible;
       if (feature.get('mode') === me.mode) {
         visible = feature.get('visible')();
-        previousVisible = me.getFeatureMenuStore().getRootNode().findChild('path', feature.get('path'), true) !== null;
+        previousVisible = me.getStore('FeatureMenu').getRootNode().findChild('path', feature.get('path'), true) !== null;
         shouldRefresh = (visible !== previousVisible);
       }
       return !shouldRefresh;
@@ -405,7 +405,7 @@ Ext.define('NX.controller.Menu', {
         visibleModes = [],
         feature;
 
-    me.getFeatureStore().each(function (rec) {
+    me.getStore('Feature').each(function (rec) {
       feature = rec.getData();
       if (feature.visible() && !feature.group && visibleModes.indexOf(feature.mode) === -1) {
         visibleModes.push(feature.mode);
@@ -470,15 +470,15 @@ Ext.define('NX.controller.Menu', {
     }
     me.getFeatureMenu().setTitle(menuTitle);
 
-    me.getFeatureMenuStore().getRootNode().removeAll();
+    me.getStore('FeatureMenu').getRootNode().removeAll();
 
     // create leafs and all parent groups of those leafs
-    me.getFeatureStore().each(function (rec) {
+    me.getStore('Feature').each(function (rec) {
       feature = rec.getData();
       // iterate only visible features
       if ((me.mode === feature.mode) && feature.visible()) {
         segments = feature.path.split('/');
-        parent = me.getFeatureMenuStore().getRootNode();
+        parent = me.getStore('FeatureMenu').getRootNode();
         for (var i = 2; i < segments.length; i++) {
           child = parent.findChild('path', segments.slice(0, i + 1).join('/'), false);
           if (child) {
@@ -513,7 +513,7 @@ Ext.define('NX.controller.Menu', {
     });
 
     // remove all groups without children
-    me.getFeatureMenuStore().getRootNode().cascadeBy(function (node) {
+    me.getStore('FeatureMenu').getRootNode().cascadeBy(function (node) {
       if (node.get('group') && !node.hasChildNodes()) {
         groupsToRemove.push(node);
       }
@@ -522,7 +522,7 @@ Ext.define('NX.controller.Menu', {
       node.parentNode.removeChild(node, true);
     });
 
-    me.getFeatureMenuStore().sort([
+    me.getStore('FeatureMenu').sort([
       { property: 'weight', direction: 'ASC' },
       { property: 'text', direction: 'ASC' }
     ]);
@@ -582,7 +582,7 @@ Ext.define('NX.controller.Menu', {
 
     me.mode = mode;
     me.refreshTree();
-    me.navigateTo(NX.Bookmarks.fromToken(me.getFeatureMenuStore().getRootNode().firstChild.get('bookmark')));
+    me.navigateTo(NX.Bookmarks.fromToken(me.getStore('FeatureMenu').getRootNode().firstChild.get('bookmark')));
     NX.Bookmarks.bookmark(me.getBookmark());
   },
 

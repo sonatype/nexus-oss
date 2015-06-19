@@ -26,7 +26,9 @@ Ext.define('NX.coreui.view.privilege.PrivilegeFeature', {
 
   iconName: 'privilege-default',
 
-  masters: { xtype: 'nx-coreui-privilege-list' },
+  masters: [
+    { xtype: 'nx-coreui-privilege-list' }
+  ],
 
   tabs: {
     xtype: 'nx-info-panel',

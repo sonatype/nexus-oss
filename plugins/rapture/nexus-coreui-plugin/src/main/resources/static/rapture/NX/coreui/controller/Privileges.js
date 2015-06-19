@@ -27,9 +27,9 @@ Ext.define('NX.coreui.controller.Privileges', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-privilege-list',
-
+  masters: [
+    'nx-coreui-privilege-list'
+  ],
   stores: [
     'Privilege'
   ],
@@ -85,6 +85,23 @@ Ext.define('NX.coreui.controller.Privileges', {
   },
 
   permission: 'nexus:privileges',
+
+  /**
+   * @override
+   */
+  init: function() {
+    var me = this;
+
+    me.callParent();
+
+    me.listen({
+      store: {
+        '#Privilege': {
+          load: me.reselect
+        }
+      }
+    });
+  },
 
   /**
    * @override
@@ -146,7 +163,6 @@ Ext.define('NX.coreui.controller.Privileges', {
     var me = this;
 
     NX.direct.coreui_Privilege.remove(model.getId(), function (response) {
-      me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Privileges_Delete_Success', model.get('name')),

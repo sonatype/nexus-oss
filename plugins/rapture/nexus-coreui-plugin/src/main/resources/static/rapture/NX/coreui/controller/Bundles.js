@@ -26,9 +26,9 @@ Ext.define('NX.coreui.controller.Bundles', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-system-bundlelist',
-
+  masters: [
+    'nx-coreui-system-bundlelist'
+  ],
   stores: [
     'Bundle'
   ],
@@ -62,6 +62,23 @@ Ext.define('NX.coreui.controller.Bundles', {
       file: 'plugin.png',
       variants: ['x16', 'x32']
     }
+  },
+
+  /**
+   * @override
+   */
+  init: function() {
+    var me = this;
+
+    me.callParent();
+
+    me.listen({
+      store: {
+        '#Bundle': {
+          load: me.reselect
+        }
+      }
+    });
   },
 
   /**

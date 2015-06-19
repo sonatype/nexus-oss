@@ -26,24 +26,21 @@ Ext.define('NX.coreui.controller.Feeds', {
     'NX.Windows',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-feed-list',
-
+  masters: [
+    'nx-coreui-feed-list'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
-
   stores: [
     'Feed',
     'FeedEntry'
   ],
-
   views: [
     'feed.FeedFeature',
     'feed.FeedEntryList',
     'feed.FeedList'
   ],
-
   refs: [
     { ref: 'feature', selector: 'nx-coreui-feed-feature' },
     { ref: 'list', selector: 'nx-coreui-feed-list' },
@@ -114,7 +111,7 @@ Ext.define('NX.coreui.controller.Feeds', {
         list = me.getList();
 
     if (list) {
-      me.getFeedStore().load();
+      me.getStore('Feed').load();
     }
   },
 
@@ -125,7 +122,7 @@ Ext.define('NX.coreui.controller.Feeds', {
     var me = this;
 
     if (model) {
-      me.getFeedEntryStore().filter({ id: 'key', property: 'key', value: model.get('key') });
+      me.getStore('FeedEntry').filter({ id: 'key', property: 'key', value: model.get('key') });
     }
   },
 

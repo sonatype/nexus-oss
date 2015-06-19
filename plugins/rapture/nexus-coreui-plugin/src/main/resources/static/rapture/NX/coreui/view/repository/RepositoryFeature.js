@@ -26,7 +26,9 @@ Ext.define('NX.coreui.view.repository.RepositoryFeature', {
 
   iconName: 'repository-default',
 
-  masters: { xtype: 'nx-coreui-repository-list' },
+  masters: [
+    { xtype: 'nx-coreui-repository-list' }
+  ],
 
   tabs: { xtype: 'nx-coreui-repository-settings' },
 

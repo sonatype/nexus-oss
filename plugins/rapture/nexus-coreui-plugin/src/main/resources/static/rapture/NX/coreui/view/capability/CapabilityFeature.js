@@ -26,7 +26,9 @@ Ext.define('NX.coreui.view.capability.CapabilityFeature', {
 
   iconName: 'capability-default',
 
-  masters: { xtype: 'nx-coreui-capability-list' },
+  masters: [
+    { xtype: 'nx-coreui-capability-list' }
+  ],
 
   tabs: [
     { xtype: 'nx-coreui-capability-summary', weight: 10 },

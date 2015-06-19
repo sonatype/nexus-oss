@@ -110,7 +110,7 @@ Ext.define('NX.controller.State', {
 
   getValue: function(key, defaultValue) {
     var me = this,
-        model = me.getStateStore().getById(key),
+        model = me.getStore('State').getById(key),
         value;
 
     if (model) {
@@ -130,11 +130,11 @@ Ext.define('NX.controller.State', {
    */
   setValue: function (key, value, hash) {
     var me = this,
-        model = me.getStateStore().getById(key);
+        model = me.getStore('State').getById(key);
 
     if (!model) {
       if (Ext.isDefined(value)) {
-        me.getStateStore().add(me.getStateModel().create({ key: key, value: value, hash: hash }));
+        me.getStore('State').add(me.getStateModel().create({ key: key, value: value, hash: hash }));
       }
     }
     else {
@@ -147,10 +147,10 @@ Ext.define('NX.controller.State', {
         }
       }
       else {
-        me.getStateStore().remove(model);
+        me.getStore('State').remove(model);
       }
     }
-    me.getStateStore().commitChanges();
+    me.getStore('State').commitChanges();
     if (me.statusProvider) {
       if (Ext.isDefined(value) && hash) {
         me.statusProvider.baseParams[key] = hash;
