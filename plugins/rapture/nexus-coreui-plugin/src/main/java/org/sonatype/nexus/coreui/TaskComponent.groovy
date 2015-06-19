@@ -210,11 +210,11 @@ class TaskComponent
             return "Blocked";
           case RunState.CANCELED:
             return "Cancelling";
-          default:
-            return 'Unknown running'
+          case RunState.STARTING:
+            return "Starting";
         }
-      default:
-        return 'Unknown'
+      case State.DONE:
+        return 'Done'
     }
   }
 
