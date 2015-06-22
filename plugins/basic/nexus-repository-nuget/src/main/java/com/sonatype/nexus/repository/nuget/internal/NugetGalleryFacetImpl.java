@@ -47,7 +47,6 @@ import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
-import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.Payload;
@@ -233,57 +232,28 @@ public class NugetGalleryFacetImpl
 
   @Override
   public void putMetadata(final Map<String, String> metadata) {
-    storage.perform(new Operation<Object>()
-    {
-      @Override
-      public Object execute(final StorageTx tx) {
-        createOrUpdatePackage(tx, metadata);
-        return null;
-      }
-
-      @Override
-      public String toString() {
-        return String.format("putMetadata(%s)", metadata);
-      }
-    });
+    try (StorageTx tx = openStorageTx()) {
+      createOrUpdatePackage(tx, metadata);
+      tx.commit();
+    }
 
     // Separate tx is necessary for the meantime, since the re-querying orient doesn't pick up uncommitted state
-    storage.perform(new Operation<Object>()
-    {
-      @Override
-      public Object execute(final StorageTx tx) {
-        maintainAggregateInfo(tx, metadata.get(ID));
-        return null;
-      }
-
-      @Override
-      public String toString() {
-        return String.format("maintainAggregateInfo(%s)", metadata);
-      }
-    });
+    try (StorageTx tx = openStorageTx()) {
+      maintainAggregateInfo(tx, metadata.get(ID));
+      tx.commit();
+    }
   }
 
   @Override
   public void putContent(final String id, final String version, final InputStream content) throws IOException {
-    try (TempStreamSupplier t = new TempStreamSupplier(content)) {
-      storage.perform(new Operation<Object>()
-      {
-        @Override
-        public Object execute(final StorageTx tx) {
-          Component component = findComponent(tx, id, version);
-          checkState(
-              component != null && tx.browseAssets(component).iterator().hasNext(),
-              "Component metadata does not exist yet"
-          );
-          createOrUpdateAssetAndContents(tx, component, t.get(), null);
-          return null;
-        }
-
-        @Override
-        public String toString() {
-          return String.format("putContent(%s, %s)", id, version);
-        }
-      });
+    try (StorageTx tx = openStorageTx()) {
+      Component component = findComponent(tx, id, version);
+      checkState(
+          component != null && tx.browseAssets(component).iterator().hasNext(),
+          "Component metadata does not exist yet"
+      );
+      createOrUpdateAssetAndContents(tx, component, content, null);
+      tx.commit();
     }
   }
 
@@ -427,25 +397,15 @@ public class NugetGalleryFacetImpl
   @Override
   public void setLastVerified(final String id, final String version, final DateTime date) {
     checkNotNull(date);
-    final Date priorDate = storage.perform(new Operation<Date>()
-    {
-      @Override
-      public Date execute(final StorageTx tx) {
-        Asset asset = findAsset(tx, id, version);
-        checkState(asset != null);
+    try (StorageTx tx = openStorageTx()) {
+      Asset asset = findAsset(tx, id, version);
+      checkState(asset != null);
 
-        final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
-        asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
-
-        return priorDate;
-      }
-
-      @Override
-      public String toString() {
-        return String.format("setLastVerified(%s, %s, %s)", id, version, date);
-      }
-    });
-    log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
+      final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+      log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
+      asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
+      tx.commit();
+    }
   }
 
   @Override

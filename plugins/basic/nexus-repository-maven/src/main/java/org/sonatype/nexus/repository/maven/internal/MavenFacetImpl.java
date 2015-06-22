@@ -28,7 +28,6 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
@@ -43,7 +42,6 @@ import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
-import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.types.ProxyType;
@@ -53,7 +51,6 @@ import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
@@ -154,18 +151,9 @@ public class MavenFacetImpl
   @Override
   public Content get(final MavenPath path) throws IOException {
     log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    return storageFacet.perform(new Operation<Content>()
-    {
-      @Override
-      public Content execute(final StorageTx tx) {
-        return toContent(tx, path);
-      }
-
-      @Override
-      public String toString() {
-        return String.format("get(%s)", path.getPath());
-      }
-    });
+    try (StorageTx tx = storageFacet.openTx()) {
+      return toContent(tx, path);
+    }
   }
 
   @Nullable
@@ -207,31 +195,9 @@ public class MavenFacetImpl
   public void put(final MavenPath path, final Payload payload)
       throws IOException
   {
-    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
-      storageFacet.perform(new Operation<Void>()
-      {
-        @Override
-        public Void execute(final StorageTx tx) {
-          try {
-            put(tx, path, payload, streamSupplier.get());
-            return null;
-          }
-          catch (IOException e) {
-            throw Throwables.propagate(e);
-          }
-        }
-
-        @Override
-        public String toString() {
-          return String.format("put(%s)", path.getPath());
-        }
-      });
-    }
-    catch (RuntimeException e) {
-      if (e.getCause() instanceof IOException) {
-        throw (IOException) e.getCause();
-      }
-      throw e;
+    try (StorageTx tx = storageFacet.openTx()) {
+      put(tx, path, payload, payload.openInputStream());
+      tx.commit();
     }
   }
 
@@ -428,25 +394,17 @@ public class MavenFacetImpl
 
   @Override
   public boolean setLastVerified(final MavenPath path, final DateTime verified) throws IOException {
-    return storageFacet.perform(new Operation<Boolean>()
-    {
-      @Override
-      public Boolean execute(final StorageTx tx) {
-        final Asset asset = findAsset(tx, tx.getBucket(), path);
-        if (asset == null) {
-          return false;
-        }
-        final NestedAttributesMap attributes = asset.formatAttributes();
-        attributes.set(P_LAST_VERIFIED, verified.toDate());
-        tx.saveAsset(asset);
-        return true;
+    try (StorageTx tx = storageFacet.openTx()) {
+      final Asset asset = findAsset(tx, tx.getBucket(), path);
+      if (asset == null) {
+        return false;
       }
-
-      @Override
-      public String toString() {
-        return String.format("setLastVerified(%s, %s)", path.getPath(), verified);
-      }
-    });
+      final NestedAttributesMap attributes = asset.formatAttributes();
+      attributes.set(P_LAST_VERIFIED, verified.toDate());
+      tx.saveAsset(asset);
+      tx.commit();
+      return true;
+    }
   }
 
   /**
