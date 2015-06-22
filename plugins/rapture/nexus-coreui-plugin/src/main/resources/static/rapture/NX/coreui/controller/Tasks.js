@@ -259,6 +259,7 @@ Ext.define('NX.coreui.controller.Tasks', {
 
     if (list) {
       me.getStore('TaskType').load();
+      me.getStore('Task').load();
     }
   },
 
