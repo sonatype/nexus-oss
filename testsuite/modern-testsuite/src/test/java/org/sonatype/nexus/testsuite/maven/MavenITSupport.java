@@ -29,10 +29,12 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
+import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.testsuite.NexusCoreITSupport;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.base.Charsets;
 import com.google.common.hash.HashCode;
@@ -114,13 +116,25 @@ public abstract class MavenITSupport
   protected void write(final Repository repository, final String path, final Payload payload) throws IOException {
     final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
     final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
-    mavenFacet.put(mavenPath, payload);
+    UnitOfWork.begin(repository.facet(StorageFacet.class).txSupplier());
+    try {
+      mavenFacet.put(mavenPath, payload);
+    }
+    finally {
+      UnitOfWork.end();
+    }
   }
 
   protected Content read(final Repository repository, final String path) throws IOException {
     final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
     final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
-    return mavenFacet.get(mavenPath);
+    UnitOfWork.begin(repository.facet(StorageFacet.class).txSupplier());
+    try {
+      return mavenFacet.get(mavenPath);
+    }
+    finally {
+      UnitOfWork.end();
+    }
   }
 
   protected Metadata parseMetadata(final Content content) throws Exception {
@@ -133,18 +147,24 @@ public abstract class MavenITSupport
   protected void verifyHashesExistAndCorrect(final Repository repository, final String path) throws Exception {
     final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
     final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
-    final Content content = mavenFacet.get(mavenPath);
-    assertThat(content, notNullValue());
-    final Map<HashAlgorithm, HashCode> hashCodes = content.getAttributes()
-        .require(Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
-    for (HashType hashType : HashType.values()) {
-      final Content contentHash = mavenFacet.get(mavenPath.hash(hashType));
-      final String storageHash = hashCodes.get(hashType.getHashAlgorithm()).toString();
-      assertThat(storageHash, notNullValue());
-      try (InputStream is = contentHash.openInputStream()) {
-        final String mavenHash = CharStreams.toString(new InputStreamReader(is, Charsets.UTF_8));
-        assertThat(storageHash, equalTo(mavenHash));
+    UnitOfWork.begin(repository.facet(StorageFacet.class).txSupplier());
+    try {
+      final Content content = mavenFacet.get(mavenPath);
+      assertThat(content, notNullValue());
+      final Map<HashAlgorithm, HashCode> hashCodes = content.getAttributes()
+          .require(Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
+      for (HashType hashType : HashType.values()) {
+        final Content contentHash = mavenFacet.get(mavenPath.hash(hashType));
+        final String storageHash = hashCodes.get(hashType.getHashAlgorithm()).toString();
+        assertThat(storageHash, notNullValue());
+        try (InputStream is = contentHash.openInputStream()) {
+          final String mavenHash = CharStreams.toString(new InputStreamReader(is, Charsets.UTF_8));
+          assertThat(storageHash, equalTo(mavenHash));
+        }
       }
+    }
+    finally {
+      UnitOfWork.end();
     }
   }
 }

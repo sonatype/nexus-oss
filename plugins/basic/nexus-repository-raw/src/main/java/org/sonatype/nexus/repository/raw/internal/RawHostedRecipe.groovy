@@ -28,6 +28,7 @@ import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
+import org.sonatype.nexus.repository.storage.UnitOfWorkHandler;
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
@@ -85,6 +86,9 @@ class RawHostedRecipe
   PartialFetchHandler partialFetchHandler
 
   @Inject
+  UnitOfWorkHandler unitOfWorkHandler
+
+  @Inject
   RawContentHandler rawContentHandler
 
   @Inject
@@ -123,6 +127,7 @@ class RawHostedRecipe
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(partialFetchHandler)
+        .handler(unitOfWorkHandler)
         .handler(rawContentHandler)
         .create())
 

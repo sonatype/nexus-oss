@@ -22,6 +22,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -31,8 +32,13 @@ import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.transaction.Transactional;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
+import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
+import com.orientechnologies.common.concur.ONeedRetryException;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import org.joda.time.DateTime;
 
 import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
@@ -64,49 +70,58 @@ public class RawContentFacetImpl
 
   @Nullable
   @Override
+  @Transactional(retryOn = IllegalStateException.class)
   public RawContent get(final String path) {
-    try (StorageTx tx = getStorage().openTx()) {
-      final Component component = getComponent(tx, path, tx.getBucket());
-      if (component == null) {
-        return null;
-      }
+    StorageTx tx = UnitOfWork.currentTransaction();
 
-      final Asset asset = tx.firstAsset(component);
-      final Blob blob = tx.requireBlob(asset.requireBlobRef());
-
-      return marshall(asset, blob);
+    final Component component = getComponent(tx, path, tx.getBucket());
+    if (component == null) {
+      return null;
     }
+
+    final Asset asset = tx.firstAsset(component);
+    final Blob blob = tx.requireBlob(asset.requireBlobRef());
+
+    return marshall(asset, blob);
   }
 
   @Override
   public void put(final String path, final RawContent content) throws IOException, InvalidContentException {
-    try (StorageTx tx = getStorage().openTx()) {
-      final Bucket bucket = tx.getBucket();
-      Component component = getComponent(tx, path, bucket);
-      Asset asset;
-      if (component == null) {
-        // CREATE
-        component = tx.createComponent(bucket, getRepository().getFormat())
-            .group(getGroup(path))
-            .name(getName(path));
-
-        // Set attributes map to contain "raw" format-specific metadata (in this case, path)
-        component.formatAttributes().set(P_PATH, path);
-        tx.saveComponent(component);
-
-        asset = tx.createAsset(bucket, component);
-        asset.name(component.name());
-      }
-      else {
-        // UPDATE
-        asset = tx.firstAsset(component);
-      }
-
-      asset.formatAttributes().set(P_LAST_VERIFIED_DATE, new Date());
-      tx.setBlob(asset, path, content.openInputStream(), hashAlgorithms, null, content.getContentType());
-      tx.saveAsset(asset);
-      tx.commit();
+    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
+      doPutContent(path, streamSupplier, content);
     }
+  }
+
+  @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
+  protected void doPutContent(final String path, final Supplier<InputStream> streamSupplier, final RawContent content)
+      throws IOException
+  {
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    final Bucket bucket = tx.getBucket();
+    Component component = getComponent(tx, path, bucket);
+    Asset asset;
+    if (component == null) {
+      // CREATE
+      component = tx.createComponent(bucket, getRepository().getFormat())
+          .group(getGroup(path))
+          .name(getName(path));
+
+      // Set attributes map to contain "raw" format-specific metadata (in this case, path)
+      component.formatAttributes().set(P_PATH, path);
+      tx.saveComponent(component);
+
+      asset = tx.createAsset(bucket, component);
+      asset.name(component.name());
+    }
+    else {
+      // UPDATE
+      asset = tx.firstAsset(component);
+    }
+
+    asset.formatAttributes().set(P_LAST_VERIFIED_DATE, new Date());
+    tx.setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, content.getContentType());
+    tx.saveAsset(asset);
   }
 
   private String getGroup(String path) {
@@ -132,40 +147,35 @@ public class RawContentFacetImpl
   }
 
   @Override
+  @Transactional
   public boolean delete(final String path) throws IOException {
-    try (StorageTx tx = getStorage().openTx()) {
-      final Component component = getComponent(tx, path, tx.getBucket());
-      if (component == null) {
-        return false;
-      }
+    StorageTx tx = UnitOfWork.currentTransaction();
 
-      tx.deleteComponent(component);
-      tx.commit();
-      return true;
+    final Component component = getComponent(tx, path, tx.getBucket());
+    if (component == null) {
+      return false;
     }
+
+    tx.deleteComponent(component);
+    return true;
   }
 
   @Override
+  @Transactional(retryOn = ONeedRetryException.class)
   public void updateLastVerified(final String path, final DateTime lastUpdated) throws IOException {
-    try (StorageTx tx = getStorage().openTx()) {
-      Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
+    StorageTx tx = UnitOfWork.currentTransaction();
 
-      if (component == null) {
-        log.debug("Attempting to set last verified date for non-existent raw component {}", path);
-      }
+    Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
 
-      final Asset asset = tx.firstAsset(component);
-
-      final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
-      log.debug("Updating last verified date of {} from {} to {}", path, priorDate, lastUpdated);
-      asset.formatAttributes().set(P_LAST_VERIFIED_DATE, lastUpdated.toDate());
-      tx.saveAsset(tx.firstAsset(component));
-      tx.commit();
+    if (component == null) {
+      log.debug("Attempting to set last verified date for non-existent raw component {}", path);
     }
-  }
 
-  private StorageFacet getStorage() {
-    return getRepository().facet(StorageFacet.class);
+    final Asset asset = tx.firstAsset(component);
+
+    final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+    asset.formatAttributes().set(P_LAST_VERIFIED_DATE, lastUpdated.toDate());
+    tx.saveAsset(tx.firstAsset(component));
   }
 
   // TODO: Consider a top-level indexed property (e.g. "locator") to make these common lookups fast

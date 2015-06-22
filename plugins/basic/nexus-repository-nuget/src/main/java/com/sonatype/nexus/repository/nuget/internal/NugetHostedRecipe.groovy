@@ -71,6 +71,7 @@ class NugetHostedRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)
+        .handler(unitOfWorkHandler)
         .handler(pushHandler)
         .create())
 

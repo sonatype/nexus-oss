@@ -99,6 +99,7 @@ extends MavenRecipeSupport
         .handler(partialFetchHandler)
         .handler(versionPolicyHandler)
         .handler(contentHeadersHandler)
+        .handler(unitOfWorkHandler)
         .handler(proxyHandler)
         .create())
 
@@ -106,6 +107,7 @@ extends MavenRecipeSupport
     builder.route(newMetadataRouteBuilder()
         .handler(negativeCacheHandler)
         .handler(contentHeadersHandler)
+        .handler(unitOfWorkHandler)
         .handler(proxyHandler)
         .create())
 

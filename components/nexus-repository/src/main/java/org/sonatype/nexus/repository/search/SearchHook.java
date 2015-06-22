@@ -18,6 +18,7 @@ import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTxHook;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.collect.Sets;
 
@@ -85,11 +86,17 @@ public class SearchHook
 
   @Override
   public void postCommit() {
-    for (EntityId entityId : deindexable) {
-      searchFacet.delete(entityId);
+    UnitOfWork.begin(searchFacet.txSupplier());
+    try {
+      for (EntityId entityId : deindexable) {
+        searchFacet.delete(entityId);
+      }
+      for (EntityId entityId : indexable) {
+        searchFacet.put(entityId);
+      }
     }
-    for (EntityId entityId : indexable) {
-      searchFacet.put(entityId);
+    finally {
+      UnitOfWork.end();
     }
   }
 }

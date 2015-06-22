@@ -186,8 +186,10 @@ public class StorageFacetImpl
   @Override
   protected void doDelete() throws Exception {
     // TODO: Make this a soft delete and cleanup later so it doesn't block for large repos.
-    try (StorageTx tx = openStorageTx(databaseInstanceProvider.get().acquire(), false)) {
+    try (StorageTx tx = openStorageTx(databaseInstanceProvider.get().acquire())) {
+      tx.begin();
       tx.deleteBucket(tx.getBucket());
+      tx.commit();
     }
   }
 
@@ -207,15 +209,13 @@ public class StorageFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public StorageTx openTx() {
-    return openStorageTx(databaseInstanceProvider.get().acquire(), false);
-  }
-
-  @Override
-  @Guarded(by = STARTED)
-  public StorageTx openTx(final ODatabaseDocumentTx db) {
-    checkNotNull(db);
-    return openStorageTx(db, true);
+  public Supplier<StorageTx> txSupplier() {
+    return new Supplier<StorageTx>()
+    {
+      public StorageTx get() {
+        return openStorageTx(databaseInstanceProvider.get().acquire());
+      }
+    };
   }
 
   @Override
@@ -238,7 +238,7 @@ public class StorageFacetImpl
   }
 
   @Nonnull
-  private StorageTx openStorageTx(final ODatabaseDocumentTx db, final boolean isUserManagedDb) {
+  private StorageTx openStorageTx(final ODatabaseDocumentTx db) {
     final List<StorageTxHook> hooks = new ArrayList<>(hookSuppliers.size());
     for (Supplier<StorageTxHook> hookSupplier : hookSuppliers) {
       hooks.add(hookSupplier.get());
@@ -249,7 +249,6 @@ public class StorageFacetImpl
             createdBy(),
             new BlobTx(localNodeAccess, blobStore),
             db,
-            isUserManagedDb,
             bucket,
             config.writePolicy == null ? WritePolicy.ALLOW : config.writePolicy,
             writePolicySelector,

@@ -41,27 +41,30 @@ import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
-import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload.InputStreamSupplier;
+import org.sonatype.nexus.transaction.Transactional;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.xml.XmlEscapers;
+import com.orientechnologies.common.concur.ONeedRetryException;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -99,22 +102,9 @@ public class NugetGalleryFacetImpl
 
   protected Clock clock = new Clock();
 
-  private StorageFacet storage;
-
   private static final VersionScheme SCHEME = new GenericVersionScheme();
 
   private static final String P_LAST_VERIFIED_DATE = "last_verified";
-
-  @Override
-  protected void doInit(final Configuration configuration) throws Exception {
-    super.doInit(configuration);
-    storage = facet(StorageFacet.class);
-  }
-
-  @Override
-  protected void doDestroy() throws Exception {
-    storage = null;
-  }
 
   @Override
   @Guarded(by = STARTED)
@@ -124,29 +114,29 @@ public class NugetGalleryFacetImpl
     return count(operation, query, getRepositories());
   }
 
+  @Transactional
   protected int count(@SuppressWarnings("unused") final String operation,
                       final Map<String, String> query,
                       final Iterable<Repository> repositories)
   {
     final ComponentQuery componentQuery = ODataUtils.query(query, true);
 
-    try (StorageTx storageTx = openStorageTx()) {
-      int count = executeCount(componentQuery, storageTx, repositories);
+    StorageTx tx = UnitOfWork.currentTransaction();
 
-      final Integer skip = parseSkip(query.get("$skip"));
-      if (null != skip && skip >= 0) {
-        // If we were asked to skip some values, deduct this from the total count reported by the query
-        count = Math.max(0, count - skip);
-      }
-      final Integer top = parseTop(query.get("$top"));
-      if (null != top && top >= 0) {
-        // If we were asked for the top 'n' values, then cap the count at no more than this value
-        count = Math.min(count, top.intValue());
-      }
+    int count = executeCount(componentQuery, tx, repositories);
 
-      storageTx.commit();
-      return count;
+    final Integer skip = parseSkip(query.get("$skip"));
+    if (null != skip && skip >= 0) {
+      // If we were asked to skip some values, deduct this from the total count reported by the query
+      count = Math.max(0, count - skip);
     }
+    final Integer top = parseTop(query.get("$top"));
+    if (null != top && top >= 0) {
+      // If we were asked for the top 'n' values, then cap the count at no more than this value
+      count = Math.min(count, top.intValue());
+    }
+
+    return count;
   }
 
   @Override
@@ -164,38 +154,37 @@ public class NugetGalleryFacetImpl
   /**
    * Generate a {@link FeedResult} for a given feed query.
    */
+  @Transactional
   protected FeedResult feed(final String base, final String operation, final Map<String, String> query,
                             final Iterable<Repository> repositories)
   {
     FeedResult result = new FeedResult(base, operation, query);
 
-    try (StorageTx storageTx = openStorageTx()) {
+    StorageTx tx = UnitOfWork.currentTransaction();
 
-      // NXCM-4502 add inlinecount only if requested
-      if (inlineCountRequested(query)) {
-        int inlineCount = executeCount(ODataUtils.query(query, true), storageTx, repositories);
+    // NXCM-4502 add inlinecount only if requested
+    if (inlineCountRequested(query)) {
+      int inlineCount = executeCount(ODataUtils.query(query, true), tx, repositories);
 
-        result.setCount(inlineCount);
-      }
-
-      final ComponentQuery componentQuery = ODataUtils.query(query, false);
-      final Iterable<Asset> assets = storageTx.findAssets(componentQuery.getWhere(),
-          componentQuery.getParameters(), getRepositories(), componentQuery.getQuerySuffix());
-
-      int n = 0;
-      for (Asset asset : assets) {
-        n++;
-        final NestedAttributesMap nugetAttributes = asset.formatAttributes();
-        final Map<String, ?> data = toData(nugetAttributes, extraTemplateVars(base, operation));
-
-        result.addEntry(data);
-        if (n == ODataUtils.PAGE_SIZE) {
-          result.setSkipLinkEntry(data);
-        }
-      }
-
-      storageTx.commit();
+      result.setCount(inlineCount);
     }
+
+    final ComponentQuery componentQuery = ODataUtils.query(query, false);
+    final Iterable<Asset> assets = tx.findAssets(componentQuery.getWhere(),
+        componentQuery.getParameters(), getRepositories(), componentQuery.getQuerySuffix());
+
+    int n = 0;
+    for (Asset asset : assets) {
+      n++;
+      final NestedAttributesMap nugetAttributes = asset.formatAttributes();
+      final Map<String, ?> data = toData(nugetAttributes, extraTemplateVars(base, operation));
+
+      result.addEntry(data);
+      if (n == ODataUtils.PAGE_SIZE) {
+        result.setSkipLinkEntry(data);
+      }
+    }
+
     return result;
   }
 
@@ -232,29 +221,30 @@ public class NugetGalleryFacetImpl
 
   @Override
   public void putMetadata(final Map<String, String> metadata) {
-    try (StorageTx tx = openStorageTx()) {
-      createOrUpdatePackage(tx, metadata);
-      tx.commit();
-    }
 
-    // Separate tx is necessary for the meantime, since the re-querying orient doesn't pick up uncommitted state
-    try (StorageTx tx = openStorageTx()) {
-      maintainAggregateInfo(tx, metadata.get(ID));
-      tx.commit();
-    }
+    createOrUpdatePackage(metadata);
+
+    maintainAggregateInfo(metadata.get(ID));
   }
 
   @Override
   public void putContent(final String id, final String version, final InputStream content) throws IOException {
-    try (StorageTx tx = openStorageTx()) {
-      Component component = findComponent(tx, id, version);
-      checkState(
-          component != null && tx.browseAssets(component).iterator().hasNext(),
-          "Component metadata does not exist yet"
-      );
-      createOrUpdateAssetAndContents(tx, component, content, null);
-      tx.commit();
+    try (TempStreamSupplier streamSupplier = new TempStreamSupplier(content)) {
+      doPutContent(id, version, streamSupplier);
     }
+  }
+
+  @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
+  protected void doPutContent(final String id, final String version, final Supplier<InputStream> streamSupplier)
+  {
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    Component component = findComponent(tx, id, version);
+    checkState(
+        component != null && tx.browseAssets(component).iterator().hasNext(),
+        "Component metadata does not exist yet"
+    );
+    createOrUpdateAssetAndContents(tx, component, streamSupplier.get(), null);
   }
 
   @VisibleForTesting
@@ -273,23 +263,26 @@ public class NugetGalleryFacetImpl
   }
 
   @Override
+  @Transactional
   public String entry(final String base, final String id, final String version) {
     final Map<String, String> extra = ImmutableMap.of("BASEURI", base, "NAMESPACES", WITH_NAMESPACES);
 
     final StringBuilder xml = new StringBuilder();
-    try (StorageTx tx = openStorageTx()) {
-      final Component component = findComponent(tx, id, version);
-      if (component == null) {
-        return null;
-      }
 
-      final Asset asset = findAsset(tx, component);
-      checkState(asset != null);
-      final Map<String, ?> entryData = toData(asset.formatAttributes(), extra);
+    StorageTx tx = UnitOfWork.currentTransaction();
 
-      final String nugetEntry = ODataTemplates.NUGET_ENTRY;
-      xml.append(interpolateTemplate(nugetEntry, entryData));
+    final Component component = findComponent(tx, id, version);
+    if (component == null) {
+      return null;
     }
+
+    final Asset asset = findAsset(tx, component);
+    checkState(asset != null);
+    final Map<String, ?> entryData = toData(asset.formatAttributes(), extra);
+
+    final String nugetEntry = ODataTemplates.NUGET_ENTRY;
+    xml.append(interpolateTemplate(nugetEntry, entryData));
+
     return xml.toString();
   }
 
@@ -309,12 +302,11 @@ public class NugetGalleryFacetImpl
   public void put(final InputStream inputStream) throws IOException, NugetPackageException {
     String componentId;
 
-    try (StorageTx storageTx = openStorageTx();
-         TempStreamSupplier tempStream = new TempStreamSupplier(inputStream)) {
+    try (TempStreamSupplier streamSupplier = new TempStreamSupplier(inputStream)) {
 
       final Map<String, String> recordMetadata = Maps.newHashMap();
       Map<String, String> packageMetadata;
-      try (InputStream in = tempStream.get()) {
+      try (InputStream in = streamSupplier.get()) {
         packageMetadata = NugetPackageUtils.packageMetadata(in);
       }
 
@@ -326,125 +318,126 @@ public class NugetGalleryFacetImpl
       recordMetadata.put(LAST_UPDATED, creationTime);
       recordMetadata.put(PUBLISHED, creationTime);
 
-      try (InputStream in = tempStream.get()) {
-        createOrUpdatePackageAndContents(storageTx, recordMetadata, in);
+      try (InputStream in = streamSupplier.get()) {
+        createOrUpdatePackageAndContents(recordMetadata, in);
       }
 
       componentId = recordMetadata.get(ID);
-      storageTx.commit();
-    }
 
-    if (componentId != null) {
-      try (StorageTx storageTx = openStorageTx()) {
-        maintainAggregateInfo(storageTx, componentId);
-        storageTx.commit();
+      if (componentId != null) {
+        maintainAggregateInfo(componentId);
       }
     }
   }
 
   @Override
   @Guarded(by = STARTED)
-  public Payload get(final String id, final String version) throws IOException {
+  @Transactional(retryOn = IllegalStateException.class)
+  public Payload get(final String id, final String version) {
     checkNotNull(id);
     checkNotNull(version);
 
-    try (StorageTx tx = openStorageTx()) {
-      Asset asset = findAsset(tx, id, version);
-      if (asset == null) {
-        return null;
-      }
+    StorageTx tx = UnitOfWork.currentTransaction();
 
-      final BlobRef blobRef = asset.blobRef();
-      if (blobRef == null) {
-        return null;
-      }
-
-      final Blob blob = tx.requireBlob(blobRef);
-      String contentType = asset.contentType();
-
-      return new StreamPayload(
-          new InputStreamSupplier()
-          {
-            @Nonnull
-            @Override
-            public InputStream get() throws IOException {
-              return blob.getInputStream();
-            }
-          },
-          blob.getMetrics().getContentSize(),
-          contentType
-      );
+    Asset asset = findAsset(tx, id, version);
+    if (asset == null) {
+      return null;
     }
+
+    final BlobRef blobRef = asset.blobRef();
+    if (blobRef == null) {
+      return null;
+    }
+
+    final Blob blob = tx.requireBlob(blobRef);
+    String contentType = asset.contentType();
+
+    return new StreamPayload(
+        new InputStreamSupplier()
+        {
+          @Nonnull
+          @Override
+          public InputStream get() throws IOException {
+            return blob.getInputStream();
+          }
+        },
+        blob.getMetrics().getContentSize(),
+        contentType
+    );
   }
 
   @Override
+  @Transactional
   public DateTime getLastVerified(final String id, final String version) {
     checkNotNull(id);
     checkNotNull(version);
 
-    try (StorageTx tx = openStorageTx()) {
-      final Asset asset = findAsset(tx, id, version);
+    StorageTx tx = UnitOfWork.currentTransaction();
 
-      checkState(asset != null);
+    final Asset asset = findAsset(tx, id, version);
 
-      Date date = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+    checkState(asset != null);
 
-      log.debug("Content for {} {} last verified as of {}", id, version, date);
-      return new DateTime(checkNotNull(date));
-    }
+    Date date = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+
+    log.debug("Content for {} {} last verified as of {}", id, version, date);
+    return new DateTime(checkNotNull(date));
   }
 
   @Override
+  @Transactional(retryOn = ONeedRetryException.class)
   public void setLastVerified(final String id, final String version, final DateTime date) {
     checkNotNull(date);
-    try (StorageTx tx = openStorageTx()) {
-      Asset asset = findAsset(tx, id, version);
-      checkState(asset != null);
 
-      final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
-      log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
-      asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
-      tx.commit();
-    }
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    Asset asset = findAsset(tx, id, version);
+    checkState(asset != null);
+
+    final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
+    log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
+    asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
   }
 
   @Override
-  public boolean delete(final String id, final String version) throws IOException {
+  @Transactional
+  public boolean delete(final String id, final String version) {
     checkNotNull(id);
     checkNotNull(version);
 
-    try (StorageTx tx = openStorageTx()) {
-      Component component = findComponent(tx, id, version);
-      if (component == null) {
-        return false;
-      }
-      tx.deleteComponent(component);
-      tx.commit();
-      return true;
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    Component component = findComponent(tx, id, version);
+    if (component == null) {
+      return false;
     }
+    tx.deleteComponent(component);
+
+    return true;
   }
 
   @VisibleForTesting
-  StorageTx openStorageTx() {
-    return storage.openTx();
-  }
-
-  @VisibleForTesting
-  Component createOrUpdatePackageAndContents(final StorageTx storageTx, final Map<String, String> recordMetadata,
-                                             final InputStream packageStream)
+  @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
+  protected Component createOrUpdatePackageAndContents(final Map<String, String> recordMetadata,
+                                                       final InputStream packageStream)
   {
-    final Component component = createOrUpdateComponent(storageTx, recordMetadata);
-    createOrUpdateAssetAndContents(storageTx, component, packageStream, recordMetadata);
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    final Component component = createOrUpdateComponent(tx, recordMetadata);
+    createOrUpdateAssetAndContents(tx, component, packageStream, recordMetadata);
     return component;
   }
 
   @VisibleForTesting
-  Component createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata)
+  @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
+  protected Component createOrUpdatePackage(final Map<String, String> recordMetadata)
   {
-    final Component component = createOrUpdateComponent(storageTx, recordMetadata);
-    Asset asset = findOrCreateAsset(storageTx, component);
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    final Component component = createOrUpdateComponent(tx, recordMetadata);
+    Asset asset = findOrCreateAsset(tx, component);
     updateAssetMetadata(asset, recordMetadata, component.isNew());
-    storageTx.saveAsset(asset);
+    tx.saveAsset(asset);
     return component;
   }
 
@@ -479,10 +472,10 @@ public class NugetGalleryFacetImpl
     }
   }
 
-  private Asset findOrCreateAsset(final StorageTx storageTx, final Component component) {
-    Asset asset = findAsset(storageTx, component);
+  private Asset findOrCreateAsset(final StorageTx tx, final Component component) {
+    Asset asset = findAsset(tx, component);
     if (asset == null) {
-      asset = storageTx.createAsset(storageTx.getBucket(), component);
+      asset = tx.createAsset(tx.getBucket(), component);
       asset.name(component.name());
     }
     return asset;
@@ -490,8 +483,8 @@ public class NugetGalleryFacetImpl
 
   @Nullable
   @VisibleForTesting
-  protected Asset findAsset(final StorageTx storageTx, final Component component) {
-    final Iterable<Asset> assets = storageTx.browseAssets(component);
+  protected Asset findAsset(final StorageTx tx, final Component component) {
+    final Iterable<Asset> assets = tx.browseAssets(component);
     if (assets.iterator().hasNext()) {
       return assets.iterator().next();
     }
@@ -499,7 +492,8 @@ public class NugetGalleryFacetImpl
   }
 
   @Nullable
-  private Asset findAsset(final StorageTx tx, final String id, final String version) {
+  @VisibleForTesting
+  protected Asset findAsset(final StorageTx tx, final String id, final String version) {
     Component component = findComponent(tx, id, version);
     if (component == null) {
       return null;
@@ -517,19 +511,22 @@ public class NugetGalleryFacetImpl
    * - have up to date aggregate download count info
    * (updating download counts is different for hosted and proxies; proxies possibly don't need to..)
    */
-  protected void maintainAggregateInfo(final StorageTx storageTx, final String id) {
-    maintainAggregateInfo(storageTx, findComponentsById(storageTx, id));
+  @Transactional(retryOn = ONeedRetryException.class)
+  protected void maintainAggregateInfo(final String id) {
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    maintainAggregateInfo(tx, findComponentsById(tx, id));
   }
 
   @VisibleForTesting
-  void maintainAggregateInfo(final StorageTx storageTx, final Iterable<Component> versions) {
+  void maintainAggregateInfo(final StorageTx tx, final Iterable<Component> versions) {
     long totalDownloadCount = 0;
 
     SortedSet<Component> releases = Sets.newTreeSet(new ComponentVersionComparator());
     SortedSet<Component> allReleases = Sets.newTreeSet(new ComponentVersionComparator());
 
     for (Component version : versions) {
-      final NestedAttributesMap nugetAttributes = storageTx.firstAsset(version).formatAttributes();
+      final NestedAttributesMap nugetAttributes = tx.firstAsset(version).formatAttributes();
 
       final boolean isPrerelease = nugetAttributes.require(P_IS_PRERELEASE, Boolean.class);
       if (!isPrerelease) {
@@ -545,7 +542,7 @@ public class NugetGalleryFacetImpl
     Component absoluteLatestVersion = allReleases.isEmpty() ? null : allReleases.last();
 
     for (Component component : allReleases) {
-      final Asset asset = storageTx.firstAsset(component);
+      final Asset asset = tx.firstAsset(component);
       final NestedAttributesMap nugetAttributes = asset.formatAttributes();
 
       nugetAttributes.set(P_IS_LATEST_VERSION, component.equals(latestVersion));
@@ -554,29 +551,29 @@ public class NugetGalleryFacetImpl
       if (isRepoAuthoritative()) {
         nugetAttributes.set(P_DOWNLOAD_COUNT, totalDownloadCount);
       }
-      storageTx.saveAsset(asset);
+      tx.saveAsset(asset);
     }
   }
 
-  private Iterable<Component> findComponentsById(final StorageTx storageTx, final Object id) {
+  private Iterable<Component> findComponentsById(final StorageTx tx, final Object id) {
     final String whereClause = "name = :name";
     Map<String, Object> parameters = ImmutableMap.of(P_NAME, id);
-    return storageTx.findComponents(whereClause, parameters, getRepositories(), null);
+    return tx.findComponents(whereClause, parameters, getRepositories(), null);
   }
 
-  private void createOrUpdateAssetAndContents(final StorageTx storageTx,
+  private void createOrUpdateAssetAndContents(final StorageTx tx,
                                               final Component component,
                                               final InputStream in,
                                               final Map<String, String> data)
   {
     try {
-      Asset asset = findOrCreateAsset(storageTx, component);
+      Asset asset = findOrCreateAsset(tx, component);
       updateAssetMetadata(asset, data, component.isNew());
 
       asset.formatAttributes().set(P_LAST_VERIFIED_DATE, new Date());
-      storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
+      tx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
 
-      storageTx.saveAsset(asset);
+      tx.saveAsset(asset);
     }
     catch (IOException e) {
       throw Throwables.propagate(e);
@@ -593,13 +590,13 @@ public class NugetGalleryFacetImpl
     }
   }
 
-  private Component createOrUpdateComponent(final StorageTx storageTx,
+  private Component createOrUpdateComponent(final StorageTx tx,
                                             final Map<String, String> data)
   {
     final String id = checkNotNull(data.get(ID));
     final String version = checkVersion(data.get(VERSION));
 
-    final Component component = findOrCreateComponent(storageTx, id, version);
+    final Component component = findOrCreateComponent(tx, id, version);
 
     NestedAttributesMap nugetAttr = component.formatAttributes();
     nugetAttr.set(P_ID, data.get(ID));
@@ -608,7 +605,7 @@ public class NugetGalleryFacetImpl
     nugetAttr.set(P_TITLE, data.get(TITLE));
     nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
 
-    storageTx.saveComponent(component);
+    tx.saveComponent(component);
     return component;
   }
 
@@ -675,35 +672,35 @@ public class NugetGalleryFacetImpl
     }
   }
 
-  private Component findOrCreateComponent(final StorageTx storageTx, final String name,
+  private Component findOrCreateComponent(final StorageTx tx, final String name,
                                           final String version)
   {
-    final Component found = findComponent(storageTx, name, version);
+    final Component found = findComponent(tx, name, version);
     if (found != null) {
       return found;
     }
 
-    return createComponent(storageTx, name, version);
+    return createComponent(tx, name, version);
   }
 
   @VisibleForTesting
-  Component findComponent(final StorageTx storageTx, final String name, final Object version) {
+  Component findComponent(final StorageTx tx, final String name, final Object version) {
     Builder builder = new Builder().where("name = ").param(name).where(" and version = ").param(version);
 
-    return Iterables.getFirst(findComponents(storageTx, builder.build()), null);
+    return Iterables.getFirst(findComponents(tx, builder.build()), null);
   }
 
-  private Iterable<Component> findComponents(final StorageTx storageTx, final ComponentQuery query) {
-    return storageTx.findComponents(query.getWhere(), query.getParameters(),
+  private Iterable<Component> findComponents(final StorageTx tx, final ComponentQuery query) {
+    return tx.findComponents(query.getWhere(), query.getParameters(),
         getRepositories(), query.getQuerySuffix());
   }
 
-  private Component createComponent(final StorageTx storageTx,
+  private Component createComponent(final StorageTx tx,
                                     final String name,
                                     final String version)
   {
     log.debug("Creating NuGet component {} v. {}", name, version);
-    return storageTx.createComponent(storageTx.getBucket(), getRepository().getFormat())
+    return tx.createComponent(tx.getBucket(), getRepository().getFormat())
         .name(name)
         .version(version); // Nuget components don't have a group
   }
@@ -712,10 +709,10 @@ public class NugetGalleryFacetImpl
     return InlineCount.ALLPAGES.equals(parseInlineCount(query.get("$inlinecount")));
   }
 
-  private int executeCount(final ComponentQuery query, final StorageTx storageTx,
+  private int executeCount(final ComponentQuery query, final StorageTx tx,
                            final Iterable<Repository> repositories)
   {
-    return (int) storageTx.countAssets(query.getWhere(), query.getParameters(), repositories,
+    return (int) tx.countAssets(query.getWhere(), query.getParameters(), repositories,
         query.getQuerySuffix());
   }
 

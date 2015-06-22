@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.security.SecurityFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
+import org.sonatype.nexus.repository.storage.UnitOfWorkHandler;
 import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
@@ -55,6 +56,9 @@ abstract class MavenRecipeSupport
 
   @Inject
   SecurityHandler securityHandler
+
+  @Inject
+  UnitOfWorkHandler unitOfWorkHandler
 
   @Inject
   PartialFetchHandler partialFetchHandler

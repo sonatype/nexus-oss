@@ -28,6 +28,7 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
@@ -48,11 +49,16 @@ import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
+import org.sonatype.nexus.transaction.Transactional;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
+import com.orientechnologies.common.concur.ONeedRetryException;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -149,25 +155,13 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
+  @Transactional(retryOn = IllegalStateException.class)
   public Content get(final MavenPath path) throws IOException {
     log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    try (StorageTx tx = storageFacet.openTx()) {
-      return toContent(tx, path);
-    }
-  }
 
-  @Nullable
-  @Override
-  public Content get(final StorageTx tx, final MavenPath path) throws IOException {
-    log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    return toContent(tx, path);
-  }
+    final StorageTx tx = UnitOfWork.currentTransaction();
 
-  /**
-   * Creates {@link Content} from passed in {@link Asset}.
-   */
-  private Content toContent(final StorageTx tx, final MavenPath mavenPath) {
-    final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
+    final Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
       return null;
     }
@@ -195,29 +189,24 @@ public class MavenFacetImpl
   public void put(final MavenPath path, final Payload payload)
       throws IOException
   {
-    try (StorageTx tx = storageFacet.openTx()) {
-      put(tx, path, payload, payload.openInputStream());
-      tx.commit();
+    log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
+
+    try (TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
+      doPut(path, payload, streamSupplier);
     }
   }
 
-  @Override
-  public void put(final StorageTx tx, final MavenPath path, final Payload payload)
+  @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
+  protected void doPut(final MavenPath path,
+                       final Payload payload,
+                       final Supplier<InputStream> streamSupplier)
       throws IOException
   {
-    put(tx, path, payload, payload.openInputStream());
-  }
+    final StorageTx tx = UnitOfWork.currentTransaction();
 
-  private void put(final StorageTx tx,
-                   final MavenPath path,
-                   final Payload payload,
-                   final InputStream inputStream)
-      throws IOException
-  {
-    log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
     final AssetBlob assetBlob = tx.createBlob(
         path.getPath(),
-        inputStream,
+        streamSupplier.get(),
         HashType.ALGORITHMS,
         null,
         payload.getContentType()
@@ -328,16 +317,10 @@ public class MavenFacetImpl
   }
 
   @Override
+  @Transactional
   public boolean delete(final MavenPath... paths) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      boolean result = delete(tx, paths);
-      tx.commit();
-      return result;
-    }
-  }
+    final StorageTx tx = UnitOfWork.currentTransaction();
 
-  @Override
-  public boolean delete(final StorageTx tx, final MavenPath... paths) throws IOException {
     boolean result = false;
     for (MavenPath path : paths) {
       log.debug("DELETE {} : {}", getRepository().getName(), path.getPath());
@@ -351,7 +334,7 @@ public class MavenFacetImpl
     return result;
   }
 
-  private boolean deleteArtifact(final MavenPath path, final StorageTx tx) throws IOException {
+  private boolean deleteArtifact(final MavenPath path, final StorageTx tx) {
     final Component component = findComponent(tx, tx.getBucket(), path);
     if (component == null) {
       return false;
@@ -367,7 +350,7 @@ public class MavenFacetImpl
     return true;
   }
 
-  private boolean deleteFile(final MavenPath path, final StorageTx tx) throws IOException {
+  private boolean deleteFile(final MavenPath path, final StorageTx tx) {
     final Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
       return false;
@@ -377,34 +360,37 @@ public class MavenFacetImpl
   }
 
   @Override
+  @Transactional
   public DateTime getLastVerified(final MavenPath path) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      final Asset asset = findAsset(tx, tx.getBucket(), path);
-      if (asset == null) {
-        return null;
-      }
-      final NestedAttributesMap attributes = asset.formatAttributes();
-      final Date date = attributes.get(P_LAST_VERIFIED, Date.class);
-      if (date == null) {
-        return null;
-      }
-      return new DateTime(date);
+    final StorageTx tx = UnitOfWork.currentTransaction();
+
+    final Asset asset = findAsset(tx, tx.getBucket(), path);
+    if (asset == null) {
+      return null;
     }
+    final NestedAttributesMap attributes = asset.formatAttributes();
+    final Date date = attributes.get(P_LAST_VERIFIED, Date.class);
+    if (date == null) {
+      return null;
+    }
+    return new DateTime(date);
   }
 
   @Override
+  @Transactional(retryOn = ONeedRetryException.class)
   public boolean setLastVerified(final MavenPath path, final DateTime verified) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      final Asset asset = findAsset(tx, tx.getBucket(), path);
-      if (asset == null) {
-        return false;
-      }
-      final NestedAttributesMap attributes = asset.formatAttributes();
-      attributes.set(P_LAST_VERIFIED, verified.toDate());
-      tx.saveAsset(asset);
-      tx.commit();
-      return true;
+    final StorageTx tx = UnitOfWork.currentTransaction();
+
+    final Asset asset = findAsset(tx, tx.getBucket(), path);
+    if (asset == null) {
+      return false;
     }
+
+    final NestedAttributesMap attributes = asset.formatAttributes();
+    attributes.set(P_LAST_VERIFIED, verified.toDate());
+    tx.saveAsset(asset);
+
+    return true;
   }
 
   /**

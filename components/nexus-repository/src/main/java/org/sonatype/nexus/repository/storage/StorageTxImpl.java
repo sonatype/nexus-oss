@@ -36,6 +36,7 @@ import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.IllegalOperationException;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.transaction.UnitOfWork;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Supplier;
@@ -50,9 +51,9 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.common.entity.EntityHelper.id;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_CHECKSUM;
+import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.ACTIVE;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.CLOSED;
 import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.OPEN;
-import static org.sonatype.nexus.repository.storage.StorageTxImpl.State.RESOLVED;
 
 /**
  * Default {@link StorageTx} implementation.
@@ -65,13 +66,13 @@ public class StorageTxImpl
 {
   private static final long DELETE_BATCH_SIZE = 100L;
 
+  private static final int MAX_RETRIES = 8;
+
   private final String createdBy;
 
   private final BlobTx blobTx;
 
   private final ODatabaseDocumentTx db;
-
-  private final boolean userManagedDb;
 
   private final Bucket bucket;
 
@@ -95,10 +96,11 @@ public class StorageTxImpl
 
   private final StorageTxHook hook;
 
+  private int retries = 0;
+
   public StorageTxImpl(final String createdBy,
                        final BlobTx blobTx,
                        final ODatabaseDocumentTx db,
-                       final boolean userManagedDb,
                        final Bucket bucket,
                        final WritePolicy writePolicy,
                        final WritePolicySelector writePolicySelector,
@@ -113,7 +115,6 @@ public class StorageTxImpl
     this.createdBy = checkNotNull(createdBy);
     this.blobTx = checkNotNull(blobTx);
     this.db = checkNotNull(db);
-    this.userManagedDb = userManagedDb;
     this.bucket = checkNotNull(bucket);
     this.writePolicy = checkNotNull(writePolicy);
     this.writePolicySelector = checkNotNull(writePolicySelector);
@@ -129,14 +130,13 @@ public class StorageTxImpl
     // To be discussed in future, or at the point when we will have need for nested TX
     // Note: orient DB sports some rudimentary support for nested TXes
     checkArgument(!db.getTransaction().isActive(), "Nested DB TX!");
-    db.begin(TXTYPE.OPTIMISTIC);
   }
 
   public static final class State
   {
     public static final String OPEN = "OPEN";
 
-    public static final String RESOLVED = "RESOLVED";
+    public static final String ACTIVE = "ACTIVE";
 
     public static final String CLOSED = "CLOSED";
   }
@@ -148,62 +148,94 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Transitions(from = OPEN, to = ACTIVE)
+  public void begin() {
+    db.begin(TXTYPE.OPTIMISTIC);
+  }
+
+  @Override
+  @Guarded(by = {OPEN, ACTIVE})
   public ODatabaseDocumentTx getDb() {
     return db;
   }
 
   @Override
-  @Transitions(from = OPEN, to = RESOLVED)
+  @Transitions(from = ACTIVE, to = OPEN)
   public void commit() {
     db.commit();
     blobTx.commit();
-    hook.postCommit();
+
+    final UnitOfWork work = UnitOfWork.pause();
+    try {
+      hook.postCommit();
+    }
+    finally {
+      UnitOfWork.resume(work);
+    }
+
+    retries = 0;
   }
 
   @Override
-  @Transitions(from = OPEN, to = RESOLVED)
+  @Transitions(from = ACTIVE, to = OPEN)
   public void rollback() {
     db.rollback();
     blobTx.rollback();
-    hook.postRollback();
+
+    final UnitOfWork work = UnitOfWork.pause();
+    try {
+      hook.postRollback();
+    }
+    finally {
+      UnitOfWork.resume(work);
+    }
   }
 
   @Override
-  @Transitions(from = {OPEN, RESOLVED}, to = CLOSED)
-  public void close() {
+  public boolean isActive() {
+    return ACTIVE.equals(stateGuard.getCurrent());
+  }
 
+  @Override
+  public boolean allowRetry() {
+    if (retries < MAX_RETRIES) {
+      retries++;
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  @Transitions(from = {OPEN, ACTIVE}, to = CLOSED)
+  public void close() {
     // If the transaction has not been committed, then we roll back.
-    if (OPEN.equals(stateGuard.getCurrent())) {
+    if (ACTIVE.equals(stateGuard.getCurrent())) {
       rollback();
     }
 
-    if (!userManagedDb) {
-      db.close(); // rolls back and releases ODatabaseDocumentTx to pool
-    }
-    blobTx.rollback(); // no-op if no changes have occurred since last commit
+    db.close(); // rolls back and releases ODatabaseDocumentTx to pool
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = {OPEN, ACTIVE})
   public Bucket getBucket() {
     return bucket;
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Iterable<Bucket> browseBuckets() {
     return bucketEntityAdapter.browse(db);
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Iterable<Asset> browseAssets(final Bucket bucket) {
     return assetEntityAdapter.browseByBucket(db, bucket);
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Iterable<Asset> browseAssets(final Component component) {
     return assetEntityAdapter.browseByComponent(db, component);
   }
@@ -214,14 +246,14 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Iterable<Component> browseComponents(final Bucket bucket) {
     return componentEntityAdapter.browseByBucket(db, bucket);
   }
 
   @Nullable
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Asset findAsset(final EntityId id, final Bucket bucket) {
     checkNotNull(id);
     checkNotNull(bucket);
@@ -235,14 +267,14 @@ public class StorageTxImpl
 
   @Nullable
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Asset findAssetWithProperty(final String propName, final Object propValue, final Bucket bucket) {
     return assetEntityAdapter.findByProperty(db, propName, propValue, bucket);
   }
 
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Iterable<Asset> findAssets(@Nullable String whereClause,
                                     @Nullable Map<String, Object> parameters,
                                     @Nullable Iterable<Repository> repositories,
@@ -252,7 +284,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public long countAssets(@Nullable String whereClause,
                           @Nullable Map<String, Object> parameters,
                           @Nullable Iterable<Repository> repositories,
@@ -263,7 +295,7 @@ public class StorageTxImpl
 
   @Nullable
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Component findComponent(final EntityId id, final Bucket bucket) {
     checkNotNull(id);
     checkNotNull(bucket);
@@ -273,13 +305,13 @@ public class StorageTxImpl
 
   @Nullable
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Component findComponentWithProperty(final String propName, final Object propValue, final Bucket bucket) {
     return componentEntityAdapter.findByProperty(db, propName, propValue, bucket);
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Iterable<Component> findComponents(@Nullable String whereClause,
                                             @Nullable Map<String, Object> parameters,
                                             @Nullable Iterable<Repository> repositories,
@@ -289,7 +321,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public long countComponents(@Nullable String whereClause,
                               @Nullable Map<String, Object> parameters,
                               @Nullable Iterable<Repository> repositories,
@@ -299,7 +331,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Asset createAsset(final Bucket bucket, final Format format) {
     checkNotNull(format);
     return createAsset(bucket, format.toString());
@@ -315,7 +347,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Asset createAsset(final Bucket bucket, final Component component) {
     checkNotNull(component);
     Asset asset = createAsset(bucket, component.format());
@@ -324,7 +356,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Component createComponent(final Bucket bucket, final Format format) {
     checkNotNull(bucket);
     checkNotNull(format);
@@ -361,7 +393,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public void deleteComponent(Component component) {
     deleteComponent(component, true);
   }
@@ -377,7 +409,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public void deleteAsset(Asset asset) {
     deleteAsset(asset, writePolicySelector.select(asset, writePolicy));
   }
@@ -427,7 +459,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public AssetBlob createBlob(final String blobName,
                               final InputStream inputStream,
                               final Iterable<HashAlgorithm> hashAlgorithms,
@@ -458,7 +490,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public void attachBlob(final Asset asset, final AssetBlob assetBlob)
   {
     checkNotNull(asset);
@@ -518,7 +550,7 @@ public class StorageTxImpl
 
   @Nullable
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Blob getBlob(final BlobRef blobRef) {
     checkNotNull(blobRef);
 
@@ -526,7 +558,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = OPEN)
+  @Guarded(by = ACTIVE)
   public Blob requireBlob(final BlobRef blobRef) {
     Blob blob = getBlob(blobRef);
     checkState(blob != null, "Blob not found: %s", blobRef);

@@ -89,23 +89,18 @@ public class NugetGalleryFacetImplPutTest
   {
     final NugetGalleryFacetImpl galleryFacet = buildSpy(true);
 
-    final StorageTx tx = mock(StorageTx.class);
-
-    doReturn(tx).when(galleryFacet).openStorageTx();
-
     final InputStream packageStream = getClass().getResourceAsStream("/SONATYPE.TEST.1.0.nupkg");
 
-    doNothing().when(galleryFacet).maintainAggregateInfo(any(StorageTx.class), eq("SONATYPE.TEST"));
+    doNothing().when(galleryFacet).maintainAggregateInfo(eq("SONATYPE.TEST"));
 
     Component component = mock(Component.class);
     ORID orid = mock(ORID.class);
-    doReturn(component).when(galleryFacet)
-        .createOrUpdatePackageAndContents(any(StorageTx.class), any(Map.class), any(InputStream.class));
+    doReturn(component).when(galleryFacet).createOrUpdatePackageAndContents(any(Map.class), any(InputStream.class));
     when(component.isNew()).thenReturn(isNew);
 
     galleryFacet.put(packageStream);
 
-    verify(galleryFacet).maintainAggregateInfo(tx, "SONATYPE.TEST");
+    verify(galleryFacet).maintainAggregateInfo("SONATYPE.TEST");
   }
 
   @Test
