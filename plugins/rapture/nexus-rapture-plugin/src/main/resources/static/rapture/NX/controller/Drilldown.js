@@ -284,11 +284,16 @@ Ext.define('NX.controller.Drilldown', {
   selectModel: function (index, modelId) {
     var me = this,
         lists = Ext.ComponentQuery.query('nx-drilldown-master'),
-        model = lists[index].getStore().getById(modelId);
+        store = lists[index].getStore(),
+        model;
 
-    lists[index].fireEvent('selection', lists[index], model);
-    me.onModelChanged(index, model);
-    me.loadView(index + 1, false, model);
+    // getById() throws an error if a model ID is found, but not cached, check for content first
+    if (store.getCount()) {
+      model = store.getById(modelId);
+      lists[index].fireEvent('selection', lists[index], model);
+      me.onModelChanged(index, model);
+      me.loadView(index + 1, false, model);
+    }
   },
 
   /**
