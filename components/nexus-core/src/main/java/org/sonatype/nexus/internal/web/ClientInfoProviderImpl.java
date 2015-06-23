@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.security.ClientInfo;
 import org.sonatype.nexus.security.ClientInfoProvider;
-import org.sonatype.nexus.servlet.RemoteIPFinder;
 
 import com.google.common.net.HttpHeaders;
 import com.google.inject.OutOfScopeException;
@@ -55,7 +54,7 @@ public class ClientInfoProviderImpl
       Subject subject = SecurityUtils.getSubject();
       return new ClientInfo(
           subject != null && subject.getPrincipal() != null ? subject.getPrincipal().toString() : null,
-          RemoteIPFinder.findIP(request),
+          request.getRemoteAddr(),
           request.getHeader(HttpHeaders.USER_AGENT)
       );
     }
