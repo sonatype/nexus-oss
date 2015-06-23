@@ -12,6 +12,9 @@
  */
 package com.sonatype.nexus.repository.nuget.internal
 
+import javax.inject.Named
+import javax.inject.Singleton
+
 import com.sonatype.nexus.repository.nuget.internal.proxy.NugetGroupRecipe
 import com.sonatype.nexus.repository.nuget.internal.proxy.NugetProxyRecipe
 
@@ -19,9 +22,6 @@ import org.sonatype.nexus.blobstore.api.BlobStoreManager
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.manager.DefaultRepositoriesContributor
 import org.sonatype.nexus.repository.storage.WritePolicy
-
-import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * Provide default hosted and proxy repositories for NuGet.
@@ -57,7 +57,7 @@ class NugetDefaultRepositoriesContributor
             attributes:
                 [
                     proxy: [
-                        remoteUrl     : 'http://www.nuget.org/api/v2/',
+                        remoteUrl     : 'https://www.nuget.org/api/v2/',
                         artifactMaxAge: 5
                     ],
                     storage: [

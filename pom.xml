@@ -528,12 +528,6 @@
           <version>1.6</version>
         </plugin>
 
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>modello-plugin-upgrade</artifactId>
-          <version>1.1</version>
-        </plugin>
-
         <!--
         Generate sisu index metadata.
         -->
@@ -1107,19 +1101,6 @@
               <configuration>
                 <lifecycleMappingMetadata>
                   <pluginExecutions>
-                    <pluginExecution>
-                      <pluginExecutionFilter>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>modello-plugin-upgrade</artifactId>
-                        <versionRange>[1.0,)</versionRange>
-                        <goals>
-                          <goal>upgrade</goal>
-                        </goals>
-                      </pluginExecutionFilter>
-                      <action>
-                        <execute/>
-                      </action>
-                    </pluginExecution>
                     <pluginExecution>
                       <pluginExecutionFilter>
                         <groupId>org.apache.maven.plugins</groupId>

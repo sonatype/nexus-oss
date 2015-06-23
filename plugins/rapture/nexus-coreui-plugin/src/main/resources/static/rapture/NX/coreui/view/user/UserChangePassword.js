@@ -76,7 +76,7 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
 
       buttonAlign: 'left',
       buttons: [
-        { text: NX.I18n.get('User_UserChangePassword_Submit_Button'), action: 'changepassword', formBind: true, ui: 'nx-primary' },
+        { text: NX.I18n.get('User_UserChangePassword_Submit_Button'), action: 'changepassword', formBind: true, bindToEnter: true, ui: 'nx-primary' },
         { text: NX.I18n.get('User_UserChangePassword_Cancel_Button'), handler: function () {
           this.up('window').close();
         }}
