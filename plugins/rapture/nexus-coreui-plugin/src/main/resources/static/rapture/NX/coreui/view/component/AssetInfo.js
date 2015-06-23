@@ -25,14 +25,41 @@ Ext.define('NX.coreui.view.component.AssetInfo', {
   ],
 
   /**
+   * model to display 
+   */
+  assetModel: null,
+  
+  /**
    * @override
    */
   initComponent: function() {
     var me = this;
 
     me.callParent(arguments);
-
+    
     me.setTitle(NX.I18n.get('Component_AssetInfo_Info_Title'));
+  },
+
+  /**
+   * @public
+   * @param {object} assetModel the asset to display 
+   * @param {String} format the format for the asset
+   */
+  setAssetModel: function(assetModel, format) {
+    var me = this,
+        info = {};
+    me.assetModel = assetModel;
+    
+    // display common data
+    var contentType = assetModel.get('contentType');
+    var size = assetModel.get('size');
+    info[NX.I18n.get('Assets_Info_Path')] = NX.util.Url.asRepositoryLink(assetModel, format);
+    info[NX.I18n.get('Assets_Info_ContentType')] = contentType;
+    info[NX.I18n.get('Assets_Info_FileSize')] = Ext.util.Format.fileSize(size);
+    info[NX.I18n.get('Assets_Info_Last_Updated')] = new Date(assetModel.get('lastUpdated')) ;
+    info[NX.I18n.get('Assets_Info_Locally_Cached')] = contentType !== 'unknown' && size > 0 ;
+    info[NX.I18n.get('Assets_Info_BlobRef')] = assetModel.get('blobRef');
+    me.showInfo(info);
   }
 
 });

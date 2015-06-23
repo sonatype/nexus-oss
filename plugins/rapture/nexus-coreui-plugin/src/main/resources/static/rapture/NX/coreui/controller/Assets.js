@@ -20,12 +20,14 @@
 Ext.define('NX.coreui.controller.Assets', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.I18n'
+    'NX.I18n',
+    'Ext.util.Format'
   ],
 
   views: [
     'component.AssetContainer',
     'component.AssetInfo',
+    'component.AssetAttributes',
     'component.AssetList',
     'component.ComponentDetails'
   ],
@@ -68,17 +70,26 @@ Ext.define('NX.coreui.controller.Assets', {
    * Shows information about selected component/asset.
    */
   showAssetInfo: function(container, componentModel, assetModel) {
-    var panel = container.down('nx-coreui-component-assetinfo'),
-        info = {};
+    var info = container.down('nx-coreui-component-assetinfo'),
+      attributes = container.down('nx-coreui-component-assetattributes'),
+      panel;
 
-    if (!panel) {
-      panel = container.add({xtype: 'nx-coreui-component-assetinfo', weight: 10});
+    if (!info) {
+      info = container.add({xtype: 'nx-coreui-component-assetinfo', weight: 10});
     }
+    info.setAssetModel(assetModel, componentModel.get('format'));
 
-    info[NX.I18n.get('Assets_Info_Name')] = assetModel.get('name');
-    info[NX.I18n.get('Assets_Info_ContentType')] = assetModel.get('contentType');
+    if (!attributes) {
 
-    panel.showInfo(info);
+      attributes = Ext.create('widget.nx-coreui-component-assetattributes');
+      panel = Ext.create('Ext.Panel', {
+        ui: 'nx-inset',
+        weight: 10
+      });
+      panel.add(attributes);
+      container.add(panel);
+    }
+    attributes.setAssetModel(assetModel, componentModel.get('format'));
   },
 
   showComponentDetails: function(container, componentModel) {

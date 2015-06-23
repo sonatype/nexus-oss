@@ -31,6 +31,9 @@ Ext.define('NX.coreui.view.component.AssetList', {
 
   store: 'Asset',
 
+  // Prevent the store from automatically loading
+  loadStore: Ext.emptyFn,
+
   allowDeselect: true,
 
   viewConfig: {
