@@ -31,6 +31,9 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
 
   store: 'SearchResult',
 
+  // Prevent the store from automatically loading
+  loadStore: Ext.emptyFn,
+
   style: {
     'background-color': '#F4F4F4'
   },

@@ -75,6 +75,14 @@ Ext.define('NX.view.info.Panel', {
     var me = this;
 
     me.down('nx-info').showInfo(info);
-  }
+  },
 
+  /**
+   * @public
+   * Add an additional component to enhance the info.
+   */
+  addSection: function(component) {
+    var me = this;
+    me.down('nx-info').up('panel').add(component);
+  }
 });

@@ -45,9 +45,13 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Browse_BrowseResultList_Version_Column: 'Version',
     Browse_BrowseResultList_EmptyText_View: 'No components found in repository',
     Browse_BrowseResultList_EmptyText_Filter: 'No components matched "$filter"',
-    Assets_Info_Name: 'Name',
+    Assets_Info_Path: 'Path',
     Assets_Info_ContentType: 'Content Type',
-
+    Assets_Info_FileSize: 'File size',
+    Assets_Info_Last_Updated: 'Last updated',
+    Assets_Info_Locally_Cached: 'Locally cached',
+    Assets_Info_BlobRef: 'Blob Reference',
+    
     // Browse -> Search
     Search_Text: 'Search',
     Search_Description: 'Search for components by attribute',

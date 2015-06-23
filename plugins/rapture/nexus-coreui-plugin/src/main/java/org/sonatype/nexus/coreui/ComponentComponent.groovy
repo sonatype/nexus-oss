@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
 import org.sonatype.nexus.repository.security.RepositoryViewPermission
+import org.sonatype.nexus.repository.storage.Asset
 import org.sonatype.nexus.repository.storage.Component
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageTx
@@ -49,6 +50,19 @@ class ComponentComponent
     extends DirectComponentSupport
 {
   private static String UNATTACHED = "unattached";
+
+  private static final Closure ASSET_CONVERTER = { Asset asset, String componentName, String repositoryName ->
+    new AssetXO(
+        id: asset.entityMetadata.id,
+        name: asset.name() ?: componentName,
+        contentType: asset.contentType() ?: 'unknown',
+        size: asset.size() ?: 0,
+        repositoryName: repositoryName,
+        lastUpdated: asset.lastUpdated().millis,
+        blobRef: asset.blobRef() ? asset.blobRef.toString() : '',
+        attributes: asset.attributes().backing()
+    )
+  }
 
   @Inject
   SecurityHelper securityHelper
@@ -117,7 +131,7 @@ class ComponentComponent
             format: component.format()
         )
       }
-      if (parameters.start == 0 && !filter && readUnattachedAssets(storageTx, repositories)) {
+      if (parameters.start == 0 && !filter && readUnattachedAssets(storageTx, repositories, repository.name)) {
         results = new ArrayList<>(results)
         results.add(0, new ComponentXO(
             id: UNATTACHED,
@@ -136,7 +150,8 @@ class ComponentComponent
 
   @DirectMethod
   List<AssetXO> readAssets(final StoreLoadParameters parameters) {
-    Repository repository = repositoryManager.get(parameters.getFilter('repositoryName'))
+    String repositoryName = parameters.getFilter('repositoryName')
+    Repository repository = repositoryManager.get(repositoryName)
     securityHelper.ensurePermitted(new RepositoryViewPermission(repository, READ))
 
     if (!repository.configuration.online) {
@@ -156,7 +171,7 @@ class ComponentComponent
       }
 
       if (componentId == UNATTACHED) {
-        return readUnattachedAssets(storageTx, repositories)
+        return readUnattachedAssets(storageTx, repositories, repositoryName)
       }
       else if (repositories.size() == 1) {
         Component component = storageTx.findComponent(new EntityId(componentId), storageTx.getBucket())
@@ -165,13 +180,7 @@ class ComponentComponent
           return null
         }
 
-        return storageTx.browseAssets(component).collect { asset ->
-          new AssetXO(
-              id: asset.entityMetadata.id,
-              name: asset.name() ?: component.name(),
-              contentType: asset.contentType()
-          )
-        }
+        return storageTx.browseAssets(component).collect(ASSET_CONVERTER.rcurry(component.name(), repositoryName))
       }
       else {
         def componentGroup = parameters.getFilter('componentGroup')
@@ -190,13 +199,8 @@ class ComponentComponent
             params << ['version': componentVersion]
           }
           def groupBy = " GROUP BY ${StorageFacet.P_NAME}"
-          return storageTx.findAssets(whereClause, params, repositories, groupBy).collect { asset ->
-            new AssetXO(
-                id: asset.entityMetadata.id,
-                name: asset.name() ?: componentName,
-                contentType: asset.contentType()
-            )
-          }
+          return storageTx.findAssets(whereClause, params, repositories, groupBy).
+              collect(ASSET_CONVERTER.rcurry(componentName, repositoryName))
         }
       }
     }
@@ -205,13 +209,10 @@ class ComponentComponent
     }
   }
 
-  private List<AssetXO> readUnattachedAssets(final StorageTx storageTx, final Iterable<Repository> repositories) {
-    return storageTx.findAssets("${StorageFacet.P_COMPONENT} IS NULL", null, repositories, null).collect { asset ->
-      new AssetXO(
-          id: asset.entityMetadata.id,
-          name: asset.name(),
-          contentType: asset.contentType()
-      )
-    }
+  private List<AssetXO> readUnattachedAssets(final StorageTx storageTx, final Iterable<Repository> repositories,
+                                             String requestedRepositoryName)
+  {
+    return storageTx.findAssets("${StorageFacet.P_COMPONENT} IS NULL", null, repositories, null).
+        collect(ASSET_CONVERTER.rcurry(null, requestedRepositoryName))
   }
 }

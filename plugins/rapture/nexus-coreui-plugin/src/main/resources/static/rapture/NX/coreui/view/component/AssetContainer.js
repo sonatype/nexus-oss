@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.component.AssetContainer', {
     'NX.Icons'
   ],
 
-  autoscroll: true,
+  autoScroll: true,
 
   layout: {
     type: 'vbox',
