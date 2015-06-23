@@ -142,7 +142,7 @@ Ext.define('NX.controller.Help', {
    */
   onFeatureHelp: function() {
     var me = this,
-        keyword = me.selectedFeature.get('helpKeyword'),
+        keyword = me.selectedFeature.get('helpKeyword').replace(new RegExp('_', 'g'), '%20'),
         url = me.baseUrl + '/docs-search/' + NX.State.getVersionMajorMinor() + '/' + keyword;
 
     NX.Windows.open(url);
