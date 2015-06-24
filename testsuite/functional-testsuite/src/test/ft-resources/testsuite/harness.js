@@ -62,5 +62,17 @@ Harness.start(
           ]
         }
       ]
+    },
+
+    {
+      group: 'BlobStore',
+      items: [
+        {
+          group: 'FT',
+          items: [
+            { url: 'testsuite/blobstore/110_blobstore_crud.t.js' }
+          ]
+        }
+      ]
     }
 );

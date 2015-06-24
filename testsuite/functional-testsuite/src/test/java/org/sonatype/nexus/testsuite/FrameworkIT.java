@@ -15,7 +15,7 @@ package org.sonatype.nexus.testsuite;
 import org.junit.Test;
 
 /**
- * Framework related Siesta tests.
+ * Framework tests.
  */
 public class FrameworkIT
     extends SiestaTestSupport
