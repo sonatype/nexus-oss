@@ -95,41 +95,17 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>gmaven-plugin</artifactId>
         <executions>
           <execution>
+            <id>prepare-siesta-js</id>
             <phase>process-test-resources</phase>
             <goals>
-              <goal>run</goal>
+              <goal>execute</goal>
             </goals>
             <configuration>
-              <target>
-                <!--
-                Extract siesta resources, executable scripts and binaries.
-                HACK: This is extracted into src/test/ft-resources for NEXUS_RESOURCE_DIRS loading support
-                -->
-                <mkdir dir="${project.basedir}/src/test/ft-resources/testsuite/lib/siesta"/>
-                <unzip src="${project.build.directory}/dependency/siesta-standard.zip"
-                       dest="${project.basedir}/src/test/ft-resources/testsuite/lib/siesta">
-                  <cutdirsmapper dirs="1"/>
-                  <patternset>
-                    <include name="*/resources/**"/>
-                    <include name="*/siesta-all.js"/>
-                    <include name="*/siesta-coverage-all.js"/>
-                    <include name="*/bin/**"/>
-                  </patternset>
-                </unzip>
-
-                <!--
-                Ensure scripts and binaries are executable.
-                -->
-                <chmod perm="u+x">
-                  <fileset dir="${project.basedir}/src/test/ft-resources/testsuite/lib/siesta/bin">
-                    <include name="**"/>
-                  </fileset>
-                </chmod>
-              </target>
+              <source>${project.basedir}/src/test/script/prepare_siestajs.groovy</source>
             </configuration>
           </execution>
         </executions>
