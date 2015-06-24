@@ -10,7 +10,7 @@ package org.sonatype.nexus.testsuite;
 import org.junit.Test;
 
 /**
- * Security related Siesta tests.
+ * Security tests.
  */
 public class SecurityIT
     extends SiestaTestSupport
