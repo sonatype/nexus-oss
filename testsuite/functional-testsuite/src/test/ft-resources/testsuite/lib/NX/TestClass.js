@@ -231,7 +231,5 @@ Class('NX.TestClass', {
         }
       }
     }
-    
-    
   }
 });
