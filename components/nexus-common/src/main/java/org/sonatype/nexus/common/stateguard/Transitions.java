@@ -34,4 +34,6 @@ public @interface Transitions
   String[] from() default {};
 
   String to();
+
+  Class<? extends Exception>[] ignore() default {};
 }
