@@ -11,11 +11,20 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
+def siestaDir = new File(project.basedir, '/src/test/ft-resources/testsuite/lib/siesta')
+def preparedFile = new File(siestaDir, '.prepared')
+
+if (preparedFile.exists()) {
+  println "Already prepared Siesta-JS in: $siestaDir"
+  return
+}
+
+println "Preparing Siesta-JS in: $siestaDir"
+
 // Extract siesta resources, executable scripts and binaries.
 // HACK: This is extracted into src/test/ft-resources for NEXUS_RESOURCE_DIRS loading support
-ant.mkdir(dir: "${project.basedir}/src/test/ft-resources/testsuite/lib/siesta")
-ant.unzip(src: "${project.build.directory}/dependency/siesta-standard.zip",
-    dest: "${project.basedir}/src/test/ft-resources/testsuite/lib/siesta") {
+ant.mkdir(dir: siestaDir)
+ant.unzip(src: "${project.build.directory}/dependency/siesta-standard.zip", dest: siestaDir) {
   cutdirsmapper(dirs: 1)
   patternset {
     include(name: '*/resources/**')
@@ -27,7 +36,17 @@ ant.unzip(src: "${project.build.directory}/dependency/siesta-standard.zip",
 
 // Ensure scripts and binaries are executable
 ant.chmod(perm: 'u+x') {
-  fileset(dir: "${project.basedir}/src/test/ft-resources/testsuite/lib/siesta/bin") {
+  fileset(dir: "${siestaDir}/bin") {
     include(name: '**')
   }
 }
+
+// cache extjs resources for siesta-js harness
+ant.get(src: 'http://cdn.sencha.com/ext/gpl/5.1.0/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css',
+    dest: "$siestaDir/extjs-all.css")
+ant.get(src: 'http://cdn.sencha.com/ext/gpl/5.1.0/build/ext-all-debug.js',
+    dest: "$siestaDir/extjs-all.js")
+
+// Mark as prepared
+ant.touch(file: preparedFile)
+
