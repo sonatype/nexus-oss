@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -309,6 +310,7 @@ public class NugetProxyGalleryFacet
       {
         @Override
         public Integer call() throws Exception {
+          // The count cache shouldn't contain nulls, so return 0 if we fail to get a result from the feed
           return firstNonNull(fetcher.cachePackageFeed(remote, nugetQuery, false, new ODataConsumer()
           {
             @Override

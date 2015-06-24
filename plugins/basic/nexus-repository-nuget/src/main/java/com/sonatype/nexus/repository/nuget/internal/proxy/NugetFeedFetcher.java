@@ -41,6 +41,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -79,6 +80,12 @@ public class NugetFeedFetcher
     do {
       // download and cache results, following 'next' links if requested
       final Payload payload = getPayload(proxy, remoteUrl);
+
+      if (payload == null) {
+        // The request returned no XML. Return whatever the splicer learned on the last correctly processed
+        // page of XML.
+        return splicer.getCount();
+      }
 
       remoteUrl = null;
       try (InputStream is = payload.openInputStream()) {
@@ -150,6 +157,7 @@ public class NugetFeedFetcher
     else {
       log.warn("Status code {} contacting {}", status.getStatusCode(), uri);
     }
+    HttpClientUtils.closeQuietly(response);
     return null;
   }
 }
