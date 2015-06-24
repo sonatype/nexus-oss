@@ -47,6 +47,7 @@ public class SiestaTestSupport
         wrappedBundle(maven("org.apache.ant", "ant").versionAsInProject()),
 
         // FIXME: This does not take effect unless you do *NOT* have NEXUS_RESOURCE_DIRS set
+        // FIXME: Needs to include more resource-dirs as well to pick up changes
         editConfigurationFileExtend("etc/system.properties",
             "nexus.resource.dirs", resolveBaseFile("src/test/ft-resources").getAbsolutePath()
         )
