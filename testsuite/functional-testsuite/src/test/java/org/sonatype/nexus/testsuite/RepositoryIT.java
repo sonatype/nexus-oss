@@ -15,7 +15,7 @@ package org.sonatype.nexus.testsuite;
 import org.junit.Test;
 
 /**
- * Repository related Siesta tests.
+ * Repository tests.
  */
 public class RepositoryIT
     extends SiestaTestSupport

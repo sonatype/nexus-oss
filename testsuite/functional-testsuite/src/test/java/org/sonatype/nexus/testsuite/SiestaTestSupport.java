@@ -30,7 +30,7 @@ import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 
 /**
- * Support for Siesta tests.
+ * Support for Siesta-JS based tests.
  */
 @RunWith(PaxExamParameterized.class)
 @ExamReactorStrategy(PerClass.class)
