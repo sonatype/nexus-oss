@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.common.stateguard;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -49,9 +50,11 @@ public class GuardedInterceptor
 
     log.trace("Invoking: {} -> {}", guard, method);
 
-    MethodInvocationAction action = new MethodInvocationAction(invocation);
-    Object result = guard.run(action);
-    action.maybeThrow();
-    return result;
+    try {
+      return guard.run(new MethodInvocationAction(invocation));
+    }
+    catch (InvocationTargetException e) {
+      throw e.getCause();
+    }
   }
 }

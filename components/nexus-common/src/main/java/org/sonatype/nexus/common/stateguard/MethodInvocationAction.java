@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.common.stateguard;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.annotation.Nullable;
 
 import org.aopalliance.intercept.MethodInvocation;
@@ -27,8 +29,6 @@ class MethodInvocationAction
 {
   private final MethodInvocation invocation;
 
-  private Throwable failure;
-
   public MethodInvocationAction(final MethodInvocation invocation) {
     this.invocation = invocation;
   }
@@ -39,15 +39,11 @@ class MethodInvocationAction
     try {
       return invocation.proceed();
     }
-    catch (Throwable throwable) {
-      failure = throwable;
-      return null;
+    catch (Exception e) {
+      throw e;
     }
-  }
-
-  public void maybeThrow() throws Throwable {
-    if (failure != null) {
-      throw failure;
+    catch (Throwable e) {
+      throw new InvocationTargetException(e);
     }
   }
 }
