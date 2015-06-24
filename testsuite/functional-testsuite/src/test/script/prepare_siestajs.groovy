@@ -36,7 +36,7 @@ ant.unzip(src: "${project.build.directory}/dependency/siesta-standard.zip", dest
 
 // Ensure scripts and binaries are executable
 ant.chmod(perm: 'u+x') {
-  fileset(dir: "${siestaDir}/bin") {
+  fileset(dir: "$siestaDir/bin") {
     include(name: '**')
   }
 }

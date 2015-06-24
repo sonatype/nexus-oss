@@ -86,5 +86,19 @@ Harness.start(
           ]
         }
       ]
+    },
+
+    {
+      group: 'Security',
+      items: [
+        {
+          group: 'FT',
+          items: [
+            { url: 'testsuite/security/210_security_role.t.js' },
+            { url: 'testsuite/security/310_security_user.t.js' },
+            { url: 'testsuite/security/410_security_anonymous.t.js' }
+          ]
+        }
+      ]
     }
 );
