@@ -178,11 +178,8 @@ Ext.define('NX.coreui.controller.Assets', {
     var me = this,
         component = me.getAssetList().componentModel;
     button.mon(
-        NX.Conditions.or(
-            NX.Conditions.isPermitted('nexus:repository-admin:*:*:delete'),
-            NX.Conditions.isPermitted('nexus:repository-admin:' + component.get('format') + ':' +
-                component.get('repositoryName') + ':delete')
-        )
+        NX.Conditions.isPermitted('nexus:repository-view:' + component.get('format') + ':' +
+            component.get('repositoryName') + ':delete')
     ),
     {
       satisfied: button.enable,
