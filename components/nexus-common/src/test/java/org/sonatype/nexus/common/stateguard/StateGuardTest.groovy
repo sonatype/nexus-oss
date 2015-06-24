@@ -205,6 +205,57 @@ class StateGuardTest
     assert underTest.current == FAILED
   }
 
+  private class Target implements StateGuardAware
+  {
+    Class<? extends Throwable> failureType;
+
+    public Target(Class<? extends Throwable> failureType) {
+      this.failureType = failureType
+    }
+
+    public StateGuard getStateGuard() {
+      return underTest;
+    }
+
+    @Guarded(by = NEW)
+    @Transitions(from = NEW, to = INITIALISED)
+    public void go() {
+      if (failureType != null) {
+        throw failureType.newInstance()
+      }
+    }
+  }
+
+  @Test
+  void 'transition with method invocation failing with exception'() {
+    try {
+      new TransitionsInterceptor().invoke(new SimpleMethodInvocation(
+        new Target(FailureException.class), Target.class.getMethod('go'), new Object[0]))
+
+      fail()
+    }
+    catch (FailureException e) {
+      // expected
+    }
+
+    assert underTest.current == FAILED
+  }
+
+  @Test
+  void 'transition with method invocation failing with error'() {
+    try {
+      new TransitionsInterceptor().invoke(new SimpleMethodInvocation(
+        new Target(FailureError.class), Target.class.getMethod('go'), new Object[0]))
+
+      fail()
+    }
+    catch (FailureError e) {
+      // expected
+    }
+
+    assert underTest.current == FAILED
+  }
+
   @Test
   void 'basic guard'() {
     def action = new TriggeredAction()
@@ -231,5 +282,35 @@ class StateGuardTest
 
     assert underTest.current == NEW
     assert !action.triggered
+  }
+
+  @Test
+  void 'guard with method invocation failing with exception'() {
+    try {
+      new GuardedInterceptor().invoke(new SimpleMethodInvocation(
+        new Target(FailureException.class), Target.class.getMethod("go"), new Object[0]))
+
+      fail()
+    }
+    catch (FailureException e) {
+      // expected
+    }
+
+    assert underTest.current == NEW
+  }
+
+  @Test
+  void 'guard with method invocation failing with error'() {
+    try {
+      new GuardedInterceptor().invoke(new SimpleMethodInvocation(
+        new Target(FailureError.class), Target.class.getMethod("go"), new Object[0]))
+
+      fail()
+    }
+    catch (FailureError e) {
+      // expected
+    }
+
+    assert underTest.current == NEW
   }
 }
