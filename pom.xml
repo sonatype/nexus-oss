@@ -657,7 +657,7 @@
               <exclude>**/nexus-ldap-plugin/**/org/sonatype/nexus/ldap/internal/connector/dao/LdapEncoder.java</exclude>
 
               <!--
-              Exclude siesta resources
+              Exclude siesta-js resources
               -->
               <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite/lib/siesta/**</exclude>
             </excludes>
