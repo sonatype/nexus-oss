@@ -33,8 +33,10 @@ Ext.define('NX.app.PluginConfig', {
     'MenuGroup',
     'Refresh',
     'SettingsForm',
+    'Tutorial',
     'UiSessionTimeout',
     'User',
+    'Ext.ux.util.AlwaysOnTop',
 
     {
       id: 'Branding',

@@ -1,0 +1,255 @@
+.x-ux-callout.default {
+  background: #e9f2ff;
+  border: 2px solid #8eaace;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  overflow: visible;
+  border-radius: 6px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  -webkit-box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.3);
+  color: #8eaace;
+}
+.x-ux-callout.default.top:after,
+.x-ux-callout.default.top:before,
+.x-ux-callout.default.top-left:after,
+.x-ux-callout.default.top-left:before,
+.x-ux-callout.default.top-right:after,
+.x-ux-callout.default.top-right:before {
+  bottom: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.x-ux-callout.default.top:after {
+  border-bottom-color: #e9f2ff;
+  border-width: 8px;
+  left: 50%;
+  margin-left: -8px;
+}
+.x-ux-callout.default.top:before {
+  border-bottom-color: #8eaace;
+  border-width: 11px;
+  left: 50%;
+  margin-left: -11px;
+}
+.x-ux-callout.default.top-left {
+  -webkit-border-top-left-radius: 1;
+  -moz-border-radius-topleft: 1;
+  border-top-left-radius: 1;
+}
+.x-ux-callout.default.top-left:after {
+  border-bottom-color: #e9f2ff;
+  border-width: 8px;
+  left: 10px;
+  margin-left: -8px;
+}
+.x-ux-callout.default.top-left:before {
+  border-bottom-color: #8eaace;
+  border-width: 11px;
+  left: 10px;
+  margin-left: -11px;
+}
+.x-ux-callout.default.top-right {
+  -webkit-border-top-right-radius: 1;
+  -moz-border-radius-topright: 1;
+  border-top-right-radius: 1;
+}
+.x-ux-callout.default.top-right:after {
+  border-bottom-color: #e9f2ff;
+  border-width: 8px;
+  left: 100%;
+  margin-left: -19px;
+}
+.x-ux-callout.default.top-right:before {
+  border-bottom-color: #8eaace;
+  border-width: 11px;
+  left: 100%;
+  margin-left: -22px;
+}
+.x-ux-callout.default.bottom:after,
+.x-ux-callout.default.bottom:before,
+.x-ux-callout.default.bottom-left:after,
+.x-ux-callout.default.bottom-left:before,
+.x-ux-callout.default.bottom-right:after,
+.x-ux-callout.default.bottom-right:before {
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.x-ux-callout.default.bottom:after {
+  border-top-color: #e9f2ff;
+  border-width: 8px;
+  left: 50%;
+  margin-left: -8px;
+}
+.x-ux-callout.default.bottom:before {
+  border-top-color: #8eaace;
+  border-width: 11px;
+  left: 50%;
+  margin-left: -11px;
+}
+.x-ux-callout.default.bottom-left {
+  -webkit-border-bottom-left-radius: 1;
+  -moz-border-radius-bottomleft: 1;
+  border-bottom-left-radius: 1;
+}
+.x-ux-callout.default.bottom-left:after {
+  border-top-color: #e9f2ff;
+  border-width: 8px;
+  left: 10px;
+  margin-left: -8px;
+}
+.x-ux-callout.default.bottom-left:before {
+  border-top-color: #8eaace;
+  border-width: 11px;
+  left: 10px;
+  margin-left: -11px;
+}
+.x-ux-callout.default.bottom-right {
+  -webkit-border-bottom-right-radius: 1;
+  -moz-border-radius-bottomright: 1;
+  border-bottom-right-radius: 1;
+}
+.x-ux-callout.default.bottom-right:after {
+  border-top-color: #e9f2ff;
+  border-width: 8px;
+  left: 100%;
+  margin-left: -19px;
+}
+.x-ux-callout.default.bottom-right:before {
+  border-top-color: #8eaace;
+  border-width: 11px;
+  left: 100%;
+  margin-left: -22px;
+}
+.x-ux-callout.default.right:after,
+.x-ux-callout.default.right:before,
+.x-ux-callout.default.right-top:after,
+.x-ux-callout.default.right-top:before,
+.x-ux-callout.default.right-bottom:after,
+.x-ux-callout.default.right-bottom:before {
+  left: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  /* width: 0; */
+
+  position: absolute;
+  pointer-events: none;
+}
+.x-ux-callout.default.right:after {
+  border-left-color: #e9f2ff;
+  border-width: 8px;
+  top: 50%;
+  margin-top: -8px;
+}
+.x-ux-callout.default.right:before {
+  border-left-color: #8eaace;
+  border-width: 11px;
+  top: 50%;
+  margin-top: -11px;
+}
+.x-ux-callout.default.right-top {
+  -webkit-border-top-right-radius: 1;
+  -moz-border-radius-topright: 1;
+  border-top-right-radius: 1;
+}
+.x-ux-callout.default.right-top:after {
+  border-left-color: #e9f2ff;
+  border-width: 8px;
+  top: 10px;
+  margin-top: -8px;
+}
+.x-ux-callout.default.right-top:before {
+  border-left-color: #8eaace;
+  border-width: 11px;
+  top: 10px;
+  margin-top: -11px;
+}
+.x-ux-callout.default.right-bottom {
+  -webkit-border-bottom-right-radius: 1;
+  -moz-border-radius-bottomright: 1;
+  border-bottom-right-radius: 1;
+}
+.x-ux-callout.default.right-bottom:after {
+  border-left-color: #e9f2ff;
+  border-width: 8px;
+  top: 100%;
+  margin-top: -19px;
+}
+.x-ux-callout.default.right-bottom:before {
+  border-left-color: #8eaace;
+  border-width: 11px;
+  top: 100%;
+  margin-top: -22px;
+}
+.x-ux-callout.default.left:after,
+.x-ux-callout.default.left:before,
+.x-ux-callout.default.left-top:after,
+.x-ux-callout.default.left-top:before,
+.x-ux-callout.default.left-bottom:after,
+.x-ux-callout.default.left-bottom:before {
+  right: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.x-ux-callout.default.left:after {
+  border-right-color: #e9f2ff;
+  border-width: 8px;
+  top: 50%;
+  margin-top: -8px;
+}
+.x-ux-callout.default.left:before {
+  border-right-color: #8eaace;
+  border-width: 11px;
+  top: 50%;
+  margin-top: -11px;
+}
+.x-ux-callout.default.left-top {
+  -webkit-border-top-left-radius: 1;
+  -moz-border-radius-topleft: 1;
+  border-top-left-radius: 1;
+}
+.x-ux-callout.default.left-top:after {
+  border-right-color: #e9f2ff;
+  border-width: 8px;
+  top: 10px;
+  margin-top: -8px;
+}
+.x-ux-callout.default.left-top:before {
+  border-right-color: #8eaace;
+  border-width: 11px;
+  top: 10px;
+  margin-top: -11px;
+}
+.x-ux-callout.default.left-bottom {
+  -webkit-border-bottom-left-radius: 1;
+  -moz-border-radius-bottomleft: 1;
+  border-bottom-left-radius: 1;
+}
+.x-ux-callout.default.left-bottom:after {
+  border-right-color: #e9f2ff;
+  border-width: 8px;
+  top: 100%;
+  margin-top: -19px;
+}
+.x-ux-callout.default.left-bottom:before {
+  border-right-color: #8eaace;
+  border-width: 11px;
+  top: 100%;
+  margin-top: -22px;
+}

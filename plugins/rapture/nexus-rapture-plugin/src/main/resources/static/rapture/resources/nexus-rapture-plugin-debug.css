@@ -16,6 +16,15 @@
 @import url('fonts/font-awesome-4.2.0/css/font-awesome.min.css');
 
 /**
+ * Ext.ux.callout.Callout
+ */
+@import url('ux/callout/resource/css/theme/cartoon.min.css');
+@import url('ux/callout/resource/css/theme/default.min.css');
+@import url('ux/callout/resource/css/theme/fancy-blue.min.css');
+@import url('ux/callout/resource/css/theme/gray.min.css');
+@import url('ux/callout/resource/css/theme/yellow.min.css');
+
+/**
  * @class NX.view.header.Panel
  */
 .nx-header-productname {

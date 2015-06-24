@@ -101,10 +101,12 @@ Ext.define('NX.view.Main', {
       { xtype: 'nx-header-quicksearch', hidden: true },
       '->',
       //{ xtype: 'nx-header-messages', ui: 'nx-header' },
+      { xtype: 'nx-header-tutorial', ui: 'nx-header' },
       { xtype: 'nx-header-refresh', ui: 'nx-header' },
       { xtype: 'nx-header-help', ui: 'nx-header' },
       {
         xtype: 'nx-header-mode',
+        itemId: 'nx-header-user-mode',
         items: { xtype: 'nx-header-user-mode' }
       },
       { xtype: 'nx-header-signin', ui: 'nx-header' },

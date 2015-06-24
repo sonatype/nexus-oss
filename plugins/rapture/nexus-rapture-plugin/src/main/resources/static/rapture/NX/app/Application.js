@@ -78,7 +78,11 @@ Ext.define('NX.app.Application', {
 
     // custom grid columns
     'NX.ext.grid.column.Icon',
-    'NX.ext.grid.column.Link'
+    'NX.ext.grid.column.Link',
+
+    // user extensions
+    'Ext.ux.window.Notification',
+    'Ext.ux.callout.Callout'
   ],
 
   name: 'NX',
