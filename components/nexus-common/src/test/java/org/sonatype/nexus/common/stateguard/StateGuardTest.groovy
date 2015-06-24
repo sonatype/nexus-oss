@@ -176,6 +176,27 @@ class StateGuardTest
     assert underTest.current == FAILED
   }
 
+  @Test
+  void 'transition with action ignoring exception'() {
+    try {
+      underTest.transition(INITIALISED, FailureException.class)
+          .from(NEW)
+          .run(new Action<Void>() {
+        @Override
+        Void run() throws Exception {
+          throw new FailureException()
+        }
+      })
+
+      fail()
+    }
+    catch (FailureException e) {
+      // expected
+    }
+
+    assert underTest.current == INITIALISED
+  }
+
   private static class FailureError
       extends Error
   {
