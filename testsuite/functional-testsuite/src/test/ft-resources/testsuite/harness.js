@@ -74,5 +74,17 @@ Harness.start(
           ]
         }
       ]
+    },
+
+    {
+      group: 'Repository',
+      items: [
+        {
+          group: 'FT',
+          items: [
+            { url: 'testsuite/repository/110_repository_crud.t.js' }
+          ]
+        }
+      ]
     }
 );
