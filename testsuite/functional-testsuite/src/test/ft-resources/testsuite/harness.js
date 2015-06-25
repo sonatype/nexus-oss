@@ -100,5 +100,17 @@ Harness.start(
           ]
         }
       ]
+    },
+
+    {
+      group: 'System',
+      items: [
+        {
+          group: 'FT',
+          items: [
+            { url: 'testsuite/system/110_system_tasks.t.js' }
+          ]
+        }
+      ]
     }
 );
