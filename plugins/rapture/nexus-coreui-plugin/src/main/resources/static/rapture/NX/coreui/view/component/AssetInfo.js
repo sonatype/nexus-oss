@@ -35,6 +35,22 @@ Ext.define('NX.coreui.view.component.AssetInfo', {
   initComponent: function() {
     var me = this;
 
+    me.dockedItems = {
+      xtype: 'toolbar',
+      dock: 'top',
+      cls: 'nx-actions nx-borderless',
+
+      items: [
+        '->',
+        {
+          xtype: 'button',
+          text: NX.I18n.get('AssetInfo_Delete_Button'),
+          glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
+          action: 'deleteAsset',
+          disabled: false
+        }
+      ]
+    };
     me.callParent(arguments);
     
     me.setTitle(NX.I18n.get('Component_AssetInfo_Info_Title'));
