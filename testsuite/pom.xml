@@ -95,7 +95,7 @@
       <id>functional-testsuite</id>
       <activation>
         <property>
-          <name>FT</name>
+          <name>ft</name>
         </property>
       </activation>
       <modules>
