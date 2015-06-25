@@ -11,7 +11,6 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-
 var Harness = Siesta.Harness.Browser.ExtJS;
 
 // HACK: fix component inspector api link to proper version
