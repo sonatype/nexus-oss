@@ -10,7 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+
 var Harness = Siesta.Harness.Browser.ExtJS;
+
+// HACK: fix component inspector api link to proper version
+Siesta.CurrentLocale['Siesta.Harness.Browser.UI.DomContainer'].docsUrlText =
+    'http://docs.sencha.com/extjs/4.2.3/#!/api/{1}';
 
 Harness.configure({
   title: 'Nexus Functional TestSuite',
