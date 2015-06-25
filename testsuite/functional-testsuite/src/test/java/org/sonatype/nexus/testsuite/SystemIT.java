@@ -18,7 +18,7 @@ import org.junit.Test;
  * System tests.
  */
 public class SystemIT
-    extends SiestaTestSupport
+    extends FunctionalTestSupport
 {
   public SystemIT(final String executable, final String[] options) {
     super(executable, options);

@@ -12,13 +12,9 @@
  */
 package org.sonatype.nexus.testsuite;
 
-import java.util.List;
+import org.sonatype.nexus.testsuite.siestajs.SiestaTestSupport;
 
-import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
-
-import com.google.common.collect.ImmutableList;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExamParameterized;
@@ -30,20 +26,29 @@ import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 
 /**
- * Support for Siesta-JS based tests.
+ * Functional test-support.
  */
 @RunWith(PaxExamParameterized.class)
 @ExamReactorStrategy(PerClass.class)
-public class SiestaTestSupport
-    extends NexusPaxExamSupport
+public class FunctionalTestSupport
+    extends SiestaTestSupport
 {
+  public FunctionalTestSupport(final String executable, final String[] options) {
+    super(executable, options);
+  }
+
+  //
+  // Configuration
+  //
+
   @Configuration
   public static Option[] config() {
     return options(
         // TODO: Can we use the it.nexus.bundle.groupId and it.nexus.bundle.artifactId properties?
         nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
 
-        // install Ant dependencies as bundles (required by TestLauncher.groovy)
+        // Add testsuite dependencies as bundles
+        wrappedBundle(maven("org.sonatype.nexus", "nexus-siestajs-testsupport").versionAsInProject()),
         wrappedBundle(maven("org.apache.ant", "ant-launcher").versionAsInProject()),
         wrappedBundle(maven("org.apache.ant", "ant").versionAsInProject()),
 
@@ -53,37 +58,5 @@ public class SiestaTestSupport
             "nexus.resource.dirs", resolveBaseFile("src/test/ft-resources").getAbsolutePath()
         )
     );
-  }
-
-  private final String executable;
-
-  private final String[] options;
-
-  private static Object[] driver(final String executable, final String... options) {
-    return new Object[]{executable, options};
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> drivers() {
-    // FIXME: Expose this configuration for changing via build execution system properties
-    return ImmutableList.of(
-        driver("phantomjs")
-    );
-  }
-
-  public SiestaTestSupport(final String executable, final String[] options) {
-    this.executable = executable;
-    this.options = options;
-  }
-
-  /**
-   * Run a set of tests.
-   *
-   * @param include Regular expression of tests to run.
-   */
-  protected void run(final String include) throws InterruptedException {
-    waitFor(responseFrom(nexusUrl));
-    TestLauncher launcher = new TestLauncher(executable, options, nexusUrl);
-    launcher.launch(include);
   }
 }

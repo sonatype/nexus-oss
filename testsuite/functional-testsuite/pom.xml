@@ -37,7 +37,7 @@
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-pax-exam</artifactId>
+      <artifactId>nexus-siestajs-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -46,25 +46,6 @@
       <artifactId>${it.nexus.bundle.artifactId}</artifactId>
       <version>${it.nexus.bundle.version}</version>
       <type>zip</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.bryntum.siesta</groupId>
-      <artifactId>siesta-standard</artifactId>
-      <type>zip</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.ant</groupId>
-      <artifactId>ant</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

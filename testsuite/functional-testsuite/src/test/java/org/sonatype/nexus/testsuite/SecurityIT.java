@@ -18,7 +18,7 @@ import org.junit.Test;
  * Security tests.
  */
 public class SecurityIT
-    extends SiestaTestSupport
+    extends FunctionalTestSupport
 {
   public SecurityIT(final String executable, final String[] options) {
     super(executable, options);

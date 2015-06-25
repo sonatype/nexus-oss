@@ -18,7 +18,7 @@ import org.junit.Test;
  * Blob-store tests.
  */
 public class BlobStoreIT
-    extends SiestaTestSupport
+    extends FunctionalTestSupport
 {
   public BlobStoreIT(final String executable, final String[] options) {
     super(executable, options);

@@ -30,6 +30,7 @@
   <modules>
     <module>nexus-test-common</module>
     <module>nexus-pax-exam</module>
+    <module>nexus-siestajs-testsupport</module>
   </modules>
 
   <dependencyManagement>

@@ -18,7 +18,7 @@ import org.junit.Test;
  * Repository tests.
  */
 public class RepositoryIT
-    extends SiestaTestSupport
+    extends FunctionalTestSupport
 {
   public RepositoryIT(final String executable, final String[] options) {
     super(executable, options);

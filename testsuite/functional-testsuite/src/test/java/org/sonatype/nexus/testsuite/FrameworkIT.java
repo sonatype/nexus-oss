@@ -18,7 +18,7 @@ import org.junit.Test;
  * Framework tests.
  */
 public class FrameworkIT
-    extends SiestaTestSupport
+    extends FunctionalTestSupport
 {
   public FrameworkIT(final String executable, final String[] options) {
     super(executable, options);
