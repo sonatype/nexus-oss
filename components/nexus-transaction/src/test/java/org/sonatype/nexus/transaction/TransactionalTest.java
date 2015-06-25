@@ -25,6 +25,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -52,6 +54,9 @@ public class TransactionalTest
 
   @Test
   public void testNonTransactional() {
+
+    methods.nonTransactional();
+    methods.nonTransactional();
     methods.nonTransactional();
 
     verifyNoMoreInteractions(tx);
@@ -59,30 +64,171 @@ public class TransactionalTest
 
   @Test
   public void testTransactional() throws Exception {
+
+    methods.transactional();
+    methods.transactional();
     methods.transactional();
 
     InOrder order = inOrder(tx);
     order.verify(tx).begin();
     order.verify(tx).commit();
     order.verify(tx).close();
+    order.verify(tx).begin();
+    order.verify(tx).commit();
+    order.verify(tx).close();
+    order.verify(tx).begin();
+    order.verify(tx).commit();
+    order.verify(tx).close();
+    verifyNoMoreInteractions(tx);
+  }
+
+  @Test
+  public void testPauseResume() throws Exception {
+    final Transaction tx2 = mock(Transaction.class);
+
+    methods.transactional();
+
+    final UnitOfWork work = UnitOfWork.pause();
+    try {
+      UnitOfWork.begin(Suppliers.ofInstance(tx2));
+      try {
+        methods.transactional();
+      }
+      finally {
+        UnitOfWork.end();
+      }
+    }
+    finally {
+      UnitOfWork.resume(work);
+    }
+    methods.transactional();
+
+    InOrder order = inOrder(tx, tx2);
+    order.verify(tx).begin();
+    order.verify(tx).commit();
+    order.verify(tx).close();
+    order.verify(tx2).begin();
+    order.verify(tx2).commit();
+    order.verify(tx2).close();
+    order.verify(tx).begin();
+    order.verify(tx).commit();
+    order.verify(tx).close();
+    verifyNoMoreInteractions(tx);
+  }
+
+  @Test
+  public void testBatchTransactional() throws Exception {
+    UnitOfWork.beginBatch(Suppliers.ofInstance(tx));
+    try {
+      methods.transactional();
+      methods.transactional();
+      methods.transactional();
+    }
+    finally {
+      UnitOfWork.end();
+    }
+
+    InOrder order = inOrder(tx);
+    order.verify(tx).begin();
+    order.verify(tx).commit();
+    order.verify(tx).isActive();
+    order.verify(tx).begin();
+    order.verify(tx).commit();
+    order.verify(tx).isActive();
+    order.verify(tx).begin();
+    order.verify(tx).commit();
+    order.verify(tx).isActive();
+    order.verify(tx).close();
     verifyNoMoreInteractions(tx);
   }
 
   @Test
   public void testNested() throws Exception {
+    when(tx.isActive()).thenReturn(true);
+
+    methods.outer();
+    methods.outer();
     methods.outer();
 
     InOrder order = inOrder(tx);
     order.verify(tx).begin();
+    order.verify(tx, times(2)).isActive();
+    order.verify(tx).commit();
+    order.verify(tx).close();
+    order.verify(tx).begin();
+    order.verify(tx, times(2)).isActive();
+    order.verify(tx).commit();
+    order.verify(tx).close();
+    order.verify(tx).begin();
+    order.verify(tx, times(2)).isActive();
     order.verify(tx).commit();
     order.verify(tx).close();
     verifyNoMoreInteractions(tx);
   }
 
-  @Test(expected = IOException.class)
-  public void testImplicitCommit() throws Exception {
+  @Test
+  public void testBatchNested() throws Exception {
+    when(tx.isActive()).thenReturn(true, true, false, true, true, false, true, true, false);
+
+    UnitOfWork.beginBatch(Suppliers.ofInstance(tx));
     try {
-      methods.implicitIgnore();
+      methods.outer();
+      methods.outer();
+      methods.outer();
+    }
+    finally {
+      UnitOfWork.end();
+    }
+
+    InOrder order = inOrder(tx);
+    order.verify(tx).begin();
+    order.verify(tx, times(2)).isActive();
+    order.verify(tx).commit();
+    order.verify(tx).isActive();
+    order.verify(tx).begin();
+    order.verify(tx, times(2)).isActive();
+    order.verify(tx).commit();
+    order.verify(tx).isActive();
+    order.verify(tx).begin();
+    order.verify(tx, times(2)).isActive();
+    order.verify(tx).commit();
+    order.verify(tx).isActive();
+    order.verify(tx).close();
+    verifyNoMoreInteractions(tx);
+  }
+
+  @Test(expected = IOException.class)
+  public void testRollbackOnCheckedException() throws Exception {
+    try {
+      methods.rollbackOnCheckedException();
+    }
+    finally {
+      InOrder order = inOrder(tx);
+      order.verify(tx).begin();
+      order.verify(tx).rollback();
+      order.verify(tx).close();
+      verifyNoMoreInteractions(tx);
+    }
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testRollbackOnUncheckedException() throws Exception {
+    try {
+      methods.rollbackOnUncheckedException();
+    }
+    finally {
+      InOrder order = inOrder(tx);
+      order.verify(tx).begin();
+      order.verify(tx).rollback();
+      order.verify(tx).close();
+      verifyNoMoreInteractions(tx);
+    }
+  }
+
+  @Test(expected = IOException.class)
+  public void testIgnoreCheckedException() throws Exception {
+    try {
+      methods.ignoreCheckedException();
     }
     finally {
       InOrder order = inOrder(tx);
@@ -94,24 +240,25 @@ public class TransactionalTest
   }
 
   @Test(expected = IllegalStateException.class)
-  public void testImplicitRollback() throws Exception {
+  public void testIgnoreUncheckedException() throws Exception {
     try {
-      methods.implicitRollback();
+      methods.ignoreUncheckedException();
     }
     finally {
       InOrder order = inOrder(tx);
       order.verify(tx).begin();
-      order.verify(tx).rollback();
+      order.verify(tx).commit();
       order.verify(tx).close();
       verifyNoMoreInteractions(tx);
     }
   }
 
   @Test
-  public void testImplicitRetrySuccess() throws Exception {
+  public void testRetrySuccessOnCheckedException() throws Exception {
     when(tx.allowRetry()).thenReturn(true);
+
     methods.setCountdownToSuccess(3);
-    methods.implicitRetry();
+    methods.retryOnCheckedException();
 
     InOrder order = inOrder(tx);
     order.verify(tx).begin();
@@ -129,12 +276,13 @@ public class TransactionalTest
     verifyNoMoreInteractions(tx);
   }
 
-  @Test(expected = ExampleRetryException.class)
-  public void testImplicitRetryFail() throws Exception {
+  @Test(expected = IOException.class)
+  public void testRetryFailureOnCheckedException() throws Exception {
     when(tx.allowRetry()).thenReturn(true).thenReturn(false);
+
     methods.setCountdownToSuccess(100);
     try {
-      methods.implicitRetry();
+      methods.retryOnCheckedException();
     }
     finally {
       InOrder order = inOrder(tx);
@@ -144,44 +292,17 @@ public class TransactionalTest
       order.verify(tx).begin();
       order.verify(tx).rollback();
       order.verify(tx).allowRetry();
-      order.verify(tx).close();
-      verifyNoMoreInteractions(tx);
-    }
-  }
-
-  @Test(expected = IllegalStateException.class)
-  public void testExplicitCommit() throws Exception {
-    try {
-      methods.explicitIgnore();
-    }
-    finally {
-      InOrder order = inOrder(tx);
-      order.verify(tx).begin();
-      order.verify(tx).commit();
-      order.verify(tx).close();
-      verifyNoMoreInteractions(tx);
-    }
-  }
-
-  @Test(expected = IOException.class)
-  public void testExplicitRollback() throws Exception {
-    try {
-      methods.explicitRollback();
-    }
-    finally {
-      InOrder order = inOrder(tx);
-      order.verify(tx).begin();
-      order.verify(tx).rollback();
       order.verify(tx).close();
       verifyNoMoreInteractions(tx);
     }
   }
 
   @Test
-  public void testExplicitRetrySuccess() throws Exception {
+  public void testRetrySuccessOnUncheckedException() throws Exception {
     when(tx.allowRetry()).thenReturn(true);
+
     methods.setCountdownToSuccess(3);
-    methods.explicitRetry();
+    methods.retryOnUncheckedException();
 
     InOrder order = inOrder(tx);
     order.verify(tx).begin();
@@ -199,12 +320,13 @@ public class TransactionalTest
     verifyNoMoreInteractions(tx);
   }
 
-  @Test(expected = IOException.class)
-  public void testExplicitRetryFail() throws Exception {
+  @Test(expected = IllegalStateException.class)
+  public void testRetryFailureOnUncheckedException() throws Exception {
     when(tx.allowRetry()).thenReturn(true).thenReturn(false);
+
     methods.setCountdownToSuccess(100);
     try {
-      methods.explicitRetry();
+      methods.retryOnUncheckedException();
     }
     finally {
       InOrder order = inOrder(tx);

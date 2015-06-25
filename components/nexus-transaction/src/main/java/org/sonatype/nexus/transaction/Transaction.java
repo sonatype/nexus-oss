@@ -26,6 +26,8 @@ public interface Transaction
 
   void rollback() throws Exception;
 
+  boolean isActive();
+
   /**
    * @return {@code true} if we're allowed to try the work again, otherwise {@code false}<br>
    *         (avoid always returning {@code true} unless you want infinite retries)

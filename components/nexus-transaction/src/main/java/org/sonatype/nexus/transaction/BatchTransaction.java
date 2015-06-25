@@ -13,10 +13,44 @@
 package org.sonatype.nexus.transaction;
 
 /**
- * Example exception to exercise implicit retry support.
+ * {@link Transaction} that stays open until the batch is complete.
+ * 
+ * @since 3.0
  */
-public class ExampleRetryException
-    extends RuntimeException
+final class BatchTransaction
+    implements Transaction
 {
-  private static final long serialVersionUID = 1L;
+  final Transaction delegate;
+
+  BatchTransaction(final Transaction delegate) {
+    this.delegate = delegate;
+  }
+
+  public void begin() throws Exception {
+    delegate.begin();
+  }
+
+  public void commit() throws Exception {
+    delegate.commit();
+  }
+
+  public void rollback() throws Exception {
+    delegate.rollback();
+  }
+
+  public boolean isActive() {
+    return delegate.isActive();
+  }
+
+  public boolean allowRetry() {
+    return delegate.allowRetry();
+  }
+
+  public void close() throws Exception {
+    // no-op
+  }
+
+  public void closeBatch() throws Exception {
+    delegate.close();
+  }
 }

@@ -14,6 +14,7 @@ package org.sonatype.nexus.transaction;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import com.google.common.base.Suppliers;
 import com.google.inject.Guice;
 import org.junit.Test;
 
@@ -31,6 +32,24 @@ public class UnitOfWorkTest
   @Test(expected = IllegalStateException.class)
   public void testCannotEndNoWork() {
     UnitOfWork.end();
+  }
+
+  @Test
+  public void testCanPauseNoWork() {
+    UnitOfWork.resume(UnitOfWork.pause());
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testCannotResumeTwice() {
+    UnitOfWork.begin(Suppliers.<Transaction> ofInstance(null));
+    try {
+      UnitOfWork work = UnitOfWork.pause();
+      UnitOfWork.resume(work);
+      UnitOfWork.resume(work);
+    }
+    finally {
+      UnitOfWork.end();
+    }
   }
 
   @Test(expected = IllegalStateException.class)

@@ -25,13 +25,9 @@ class TransactionalWrapper
 
   private final MethodInvocation mi;
 
-  private final Class<?>[] methodThrows;
-
   public TransactionalWrapper(final Transactional spec, final MethodInvocation mi) {
     this.spec = spec;
     this.mi = mi;
-
-    methodThrows = mi.getMethod().getExceptionTypes();
   }
 
   /**
@@ -40,9 +36,9 @@ class TransactionalWrapper
   public Object proceedWithTransaction(final Transaction tx) throws Throwable {
     while (true) {
       boolean committed = false;
+      Throwable throwing = null;
       try {
         tx.begin();
-        Throwable throwing = null;
         try {
           return mi.proceed();
         }
@@ -50,7 +46,7 @@ class TransactionalWrapper
           throwing = e;
         }
         finally {
-          if (throwing == null || requestCommit(throwing)) {
+          if (throwing == null || instanceOf(throwing, spec.ignore())) {
             tx.commit();
             committed = true;
           }
@@ -62,39 +58,16 @@ class TransactionalWrapper
       catch (final Exception e) { // ignore VM errors as here as we don't rollback/retry on them
         if (!committed) {
           tx.rollback();
-          if (requestRetry(e) && tx.allowRetry()) {
+          if (instanceOf(e, spec.retryOn()) && tx.allowRetry()) {
             continue;
           }
+        }
+        if (throwing != null && throwing != e) {
+          e.addSuppressed(throwing);
         }
         throw e;
       }
     }
-  }
-
-  /**
-   * @return {@code true} if we should commit the transaction on this exception.
-   */
-  private boolean requestCommit(final Throwable e) {
-    if (instanceOf(e, spec.ignore())) {
-      return true; // explicit ignore overrides everything else
-    }
-    if (instanceOf(e, spec.retryOn())) {
-      return false; // explicit retry implies explicit rollback
-    }
-    if (spec.rollbackOn().length > 0) {
-      return !instanceOf(e, spec.rollbackOn());
-    }
-    return instanceOf(e, methodThrows);
-  }
-
-  /**
-   * @return {@code true} if we should retry the transaction on this exception.
-   */
-  private boolean requestRetry(final Throwable e) {
-    if (spec.retryOn().length > 0) {
-      return instanceOf(e, spec.retryOn());
-    }
-    return e.getClass().getName().contains("Retry");
   }
 
   /**

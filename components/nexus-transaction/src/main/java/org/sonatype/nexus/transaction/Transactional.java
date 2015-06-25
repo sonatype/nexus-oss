@@ -27,17 +27,12 @@ import java.lang.annotation.Target;
 public @interface Transactional
 {
   /**
-   * List of exceptions to rollback on, defaults to exceptions not declared thrown by the method.
-   */
-  Class<? extends Exception>[] rollbackOn() default {};
-
-  /**
-   * List of exceptions to retry the transaction on, defaults to those with 'Retry' in their name.
-   */
-  Class<? extends Exception>[] retryOn() default {};
-
-  /**
-   * List of exceptions to not rollback on, defaults to exceptions declared thrown by the method.
+   * List of exceptions to not rollback on.
    */
   Class<? extends Exception>[] ignore() default {};
+
+  /**
+   * List of exceptions to retry the method on.
+   */
+  Class<? extends Exception>[] retryOn() default {};
 }

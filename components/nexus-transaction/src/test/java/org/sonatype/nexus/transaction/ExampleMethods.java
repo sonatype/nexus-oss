@@ -46,12 +46,12 @@ public class ExampleMethods
   }
 
   @Transactional
-  public String implicitIgnore() throws IOException {
+  public String rollbackOnCheckedException() throws IOException {
     throw new IOException();
   }
 
   @Transactional
-  public String implicitRollback() throws IOException {
+  public String rollbackOnUncheckedException() throws IOException {
     throw new IllegalStateException();
   }
 
@@ -61,28 +61,28 @@ public class ExampleMethods
     this.countdown = countdown;
   }
 
-  @Transactional
-  public String implicitRetry() throws IOException {
+  @Transactional(ignore = IOException.class)
+  public String ignoreCheckedException() throws IOException {
+    throw new IOException();
+  }
+
+  @Transactional(ignore = RuntimeException.class)
+  public String ignoreUncheckedException() throws IOException {
+    throw new IllegalStateException();
+  }
+
+  @Transactional(retryOn = IOException.class)
+  public String retryOnCheckedException() throws IOException {
     if (countdown-- > 0) {
-      throw new ExampleRetryException();
+      throw new IOException();
     }
     return "success";
   }
 
-  @Transactional(ignore = Exception.class)
-  public String explicitIgnore() throws IOException {
-    throw new IllegalStateException();
-  }
-
-  @Transactional(rollbackOn = Exception.class)
-  public String explicitRollback() throws IOException {
-    throw new IOException();
-  }
-
-  @Transactional(retryOn = Exception.class)
-  public String explicitRetry() throws IOException {
+  @Transactional(retryOn = RuntimeException.class)
+  public String retryOnUncheckedException() throws IOException {
     if (countdown-- > 0) {
-      throw new IOException();
+      throw new IllegalStateException();
     }
     return "success";
   }

@@ -25,16 +25,18 @@ class TransactionInterceptor
     implements MethodInterceptor
 {
   public Object invoke(final MethodInvocation mi) throws Throwable {
-    if (UnitOfWork.currentTransaction() != null) {
+    final UnitOfWork work = UnitOfWork.self();
+
+    if (work.isActive()) {
       return mi.proceed();
     }
 
-    try (final Transaction tx = UnitOfWork.prepareTransaction()) {
+    try (final Transaction tx = work.acquireTransaction()) {
       final Transactional spec = mi.getMethod().getAnnotation(Transactional.class);
       return new TransactionalWrapper(spec, mi).proceedWithTransaction(tx);
     }
     finally {
-      UnitOfWork.clearTransaction();
+      work.releaseTransaction();
     }
   }
 }
