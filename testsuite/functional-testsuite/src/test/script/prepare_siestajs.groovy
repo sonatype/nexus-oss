@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-def siestaDir = new File(project.basedir, '/src/test/ft-resources/testsuite/lib/siesta')
+def siestaDir = new File(project.basedir as File, '/src/test/ft-resources/testsuite/lib/siesta')
 def preparedFile = new File(siestaDir, '.prepared')
 
 if (preparedFile.exists()) {
@@ -46,22 +46,23 @@ ant.get(src: 'http://cdn.sencha.com/ext/gpl/5.1.0/build/ext-all-debug.js',
     dest: "$siestaDir/extjs-all.js")
 
 [
-  "ext-theme-crisp-all.css",
-  "ext-theme-crisp-all_01.css",
-  "ext-theme-crisp-all_02.css",
-  "images/button/default-toolbar-large-arrow.png",
-  "images/util/splitter/mini-left.png",
-  "images/tools/tool-sprites.png",
-  "images/form/checkbox.png",
-  "images/tree/folder-open.png",
-  "images/tree/leaf.png"
+  'ext-theme-crisp-all.css',
+  'ext-theme-crisp-all_01.css',
+  'ext-theme-crisp-all_02.css',
+  'images/button/default-toolbar-large-arrow.png',
+  'images/util/splitter/mini-left.png',
+  'images/tools/tool-sprites.png',
+  'images/form/checkbox.png',
+  'images/tree/folder-open.png',
+  'images/tree/leaf.png'
 ].each() {
-  dirFile = it.split('/(?=[^/]+$)')
-  if (dirFile.length > 1) {
-    ant.mkdir(dir: "${siestaDir}/${dirFile[0]}")
+  // ensure directory structure
+  new File(it).parent?.with {
+    ant.mkdir(dir: new File(siestaDir, it))
   }
-  ant.get(src: "http://cdn.sencha.com/ext/gpl/5.1.0/packages/ext-theme-crisp/build/resources/${it}",
-    dest: "$siestaDir/${it}")
+  // fetch content
+  ant.get(src: "http://cdn.sencha.com/ext/gpl/5.1.0/packages/ext-theme-crisp/build/resources/$it",
+      dest: "$siestaDir/$it")
 }
 
 // Mark as prepared
