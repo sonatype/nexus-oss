@@ -73,7 +73,10 @@ StartTest(function(t) {
             function(next) {
               // Wait for the animation to finish
               t.waitForAnimations(function() {
-                t.click('>>nx-coreui-blobstore-feature button[action=delete]');
+                // FIXME: appears this will return more components than expected and produces warnings:
+                //t.click('>>nx-coreui-blobstore-feature button[action=delete]');
+                // FIXME: but this works, but is very obtuse:
+                t.click('>>[itemId=feature-content] [itemId=nx-drilldown] nx-drilldown-item [itemId=browse1] nx-drilldown-details nx-actions button[action=delete]');
                 next();
               });
             },
