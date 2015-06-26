@@ -38,7 +38,7 @@ Class('NX.TestHarness', {
 
         // detect the application url to use, enable debug
         var url = '/';
-        if (this.debug) {
+        if (debug) {
           url = url + '?debug';
         }
         console.log('URL: ' + url);
