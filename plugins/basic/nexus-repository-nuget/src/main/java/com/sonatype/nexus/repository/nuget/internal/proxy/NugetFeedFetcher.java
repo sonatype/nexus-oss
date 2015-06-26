@@ -118,7 +118,7 @@ public class NugetFeedFetcher
       return null;
     }
     catch (XmlPullParserException e) {
-      throw new IOException("Invalid nuget feed XML received.", e);
+      throw new IOException("Invalid nuget feed XML received", e);
     }
     catch (URISyntaxException e) {
       throw new IOException("Invalid 'next page' URI in nuget XML feed", e);
