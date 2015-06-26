@@ -58,6 +58,8 @@ public class SiestaTestSupport
   @Parameterized.Parameters
   public static List<Object[]> drivers() {
     // FIXME: Expose this configuration for changing via build execution system properties
-    return ImmutableList.of(driver("phantomjs"));
+    return ImmutableList.of(
+        driver("phantomjs", "--pause=500", "--page-pause=500")
+    );
   }
 }
