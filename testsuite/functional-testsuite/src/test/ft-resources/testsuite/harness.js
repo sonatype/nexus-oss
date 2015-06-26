@@ -12,7 +12,7 @@
  */
 
 NX.TestHarness.configure({
-  title: 'Nexus OSS Functional TestSuite'
+  title: 'Nexus OSS FT'
 });
 
 NX.TestHarness.start(
@@ -23,8 +23,8 @@ NX.TestHarness.start(
           group: 'UT',
           hostPageUrl: undefined,
           preload: [
-            'static/rapture/baseapp-prod.js',
-            'static/rapture/extdirect-prod.js'
+            NX.TestHarness.resource('static/rapture/baseapp-{mode}.js'),
+            NX.TestHarness.resource('static/rapture/extdirect-{mode}.js')
           ],
           items: [
             { url: 'testsuite/framework/010_statechange.t.js' },

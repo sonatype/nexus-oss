@@ -22,15 +22,28 @@ Class('NX.TestHarness', {
   isa: Siesta.Harness.Browser.ExtJS,
 
   my: {
+    has: {
+      appMode: 'prod'
+    },
+
     methods: {
       configure: function (config) {
+        var debug = window.location.href.search("[?&]debug") > -1;
+        console.log('Debug: ' + debug);
+
+        if (debug) {
+          this.appMode = 'debug';
+        }
+        console.log('App Mode: ' + this.appMode);
+
         // detect the application url to use, enable debug
         var url = '/';
-        if (window.location.href.search("[?&]debug") > -1) {
+        if (this.debug) {
           url = url + '?debug';
         }
         console.log('URL: ' + url);
 
+        // apply defaults to the configuration
         Ext.applyIf(config, {
           testClass: NX.TestClass,
 
@@ -55,6 +68,10 @@ Class('NX.TestHarness', {
         });
 
         this.SUPER(config);
+      },
+
+      resource: function(ref) {
+        return ref.replace('{mode}', this.appMode);
       }
     }
   }
