@@ -11,44 +11,20 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-var Harness = Siesta.Harness.Browser.ExtJS;
-
-// HACK: fix component inspector api link to proper version
-Siesta.CurrentLocale['Siesta.Harness.Browser.UI.DomContainer'].docsUrlText =
-    'http://docs.sencha.com/extjs/4.2.3/#!/api/{1}';
-
-Harness.configure({
-  title: 'Nexus Functional TestSuite',
-
-  loaderPath: {
-    NX: 'static/rapture/NX'
-  },
-
-  // use our custom test-class extensions
-  testClass: NX.TestClass,
-
-  // HACK: Run tests sequentially, better chance of this working due to problem with session
-  runCore: 'sequential',
-  speedRun: true,
-
-  hostPageUrl: '/',
-  waitForAppReady: true
+NX.TestHarness.configure({
+  title: 'Nexus OSS Functional TestSuite'
 });
 
-Harness.start(
+NX.TestHarness.start(
     {
       group: 'Framework',
       items: [
         {
           group: 'UT',
           hostPageUrl: undefined,
-          waitForAppReady: false,
           preload: [
-            //'static/rapture/resources/baseapp-debug.css',
-            //'static/rapture/resources/rapture.css',
-            //'static/rapture/resources/loading.css',
-            'static/rapture/baseapp-debug.js',
-            'static/rapture/extdirect-debug.js'
+            'static/rapture/baseapp-prod.js',
+            'static/rapture/extdirect-prod.js'
           ],
           items: [
             { url: 'testsuite/framework/010_statechange.t.js' },
@@ -60,8 +36,6 @@ Harness.start(
           group: 'FT',
           items: [
             { url: 'testsuite/framework/110_signin_signout.t.js' },
-            // FIXME: disable this test, which is constantly failing with phantomjs
-            //{ url: 'testsuite/framework/120_bookmarking.t.js' },
             { url: 'testsuite/framework/130_mode_button.t.js' },
             { url: 'testsuite/framework/140_unsupported_browser.t.js' }
           ]
