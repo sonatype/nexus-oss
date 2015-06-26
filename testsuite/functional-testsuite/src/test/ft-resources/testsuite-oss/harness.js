@@ -71,6 +71,18 @@ NX.TestHarness.start(
     },
 
     {
+      group: 'Support',
+      items: [
+        {
+          group: 'FT',
+          items: [
+            { url: 'testsuite-oss/support/support_metrics.t.js' }
+          ]
+        }
+      ]
+    },
+
+    {
       group: 'System',
       items: [
         {
