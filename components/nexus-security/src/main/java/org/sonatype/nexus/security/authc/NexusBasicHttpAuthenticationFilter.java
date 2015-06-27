@@ -120,8 +120,11 @@ public class NexusBasicHttpAuthenticationFilter
   }
 
   @Override
-  protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
-      ServletResponse response) throws Exception
+  protected boolean onLoginSuccess(AuthenticationToken token,
+                                   Subject subject,
+                                   ServletRequest request,
+                                   ServletResponse response)
+      throws Exception
   {
     if (request instanceof HttpServletRequest) {
       // Prefer the subject principal over the token's, as these could be different for token-based auth
