@@ -204,7 +204,11 @@ Ext.define('NX.controller.State', {
 
   notifyChange: function (key, value, oldValue) {
     var me = this;
+
+    //<if debug>
     me.logDebug('Changed: ' + key + ' -> ' + (value ? Ext.JSON.encode(value) : '(deleted)'));
+    //</if>
+
     me.fireEvent(key.toLowerCase() + 'changed', value, oldValue);
     me.fireEvent('changed', key, value, oldValue);
   },
