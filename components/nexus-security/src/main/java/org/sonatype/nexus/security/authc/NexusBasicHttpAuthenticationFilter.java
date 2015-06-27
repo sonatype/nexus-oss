@@ -132,8 +132,8 @@ public class NexusBasicHttpAuthenticationFilter
       String userId = principal.toString();
 
       // Attach principal+userId to request so we can use that in the request-log
-      ((HttpServletRequest) request).setAttribute(ATTR_USER_PRINCIPAL, principal);
-      ((HttpServletRequest) request).setAttribute(ATTR_USER_ID, userId);
+      request.setAttribute(ATTR_USER_PRINCIPAL, principal);
+      request.setAttribute(ATTR_USER_ID, userId);
     }
     return super.onLoginSuccess(token, subject, request, response);
   }
