@@ -28,7 +28,9 @@ Ext.define('NX.ext.SearchBox', {
   submitValue: false,
 
   /**
-   * @cfg {int} number of milliseconds to trigger searching (defaults to 1000)
+   * Number of milliseconds to trigger searching (defaults to 1000).
+   *
+   * @cfg {Number}
    */
   searchDelay: 1000,
 
@@ -98,8 +100,9 @@ Ext.define('NX.ext.SearchBox', {
   },
 
   /**
-   * @private
    * Clear search.
+   *
+   * @private
    */
   onTrigger1Click: function () {
     var me = this;
@@ -108,8 +111,9 @@ Ext.define('NX.ext.SearchBox', {
   },
 
   /**
-   * @private
    * Search on ENTER.
+   *
+   * @private
    */
   onEnter: function () {
     var me = this;
@@ -118,8 +122,9 @@ Ext.define('NX.ext.SearchBox', {
   },
 
   /**
-   * @private
    * Trigger search.
+   *
+   * @private
    */
   onValueChange: function (trigger, value) {
     var me = this;
@@ -134,8 +139,9 @@ Ext.define('NX.ext.SearchBox', {
   },
 
   /**
-   * @public
    * Search for value and fires a 'search' event.
+   *
+   * @public
    * @param value to search for
    */
   search: function (value) {
@@ -152,8 +158,9 @@ Ext.define('NX.ext.SearchBox', {
   },
 
   /**
-   * @public
    * Clears the search and fires a 'searchcleared' event.
+   *
+   * @public
    */
   clearSearch: function () {
     var me = this;

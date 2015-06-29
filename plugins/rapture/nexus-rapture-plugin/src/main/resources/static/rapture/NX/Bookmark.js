@@ -65,7 +65,7 @@ Ext.define('NX.Bookmark', {
 
   /**
    * @public
-   * @param {int} index of segment
+   * @param {Number} index of segment
    * @returns {String} segment at index if defined
    */
   getSegment: function (index) {

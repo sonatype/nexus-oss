@@ -72,7 +72,7 @@ Ext.define('NX.coreui.view.component.AssetAttributes', {
 
   /**
    * @public
-   * @param {object} assetModel the asset to display
+   * @param {Object} assetModel the asset to display
    * @param {String} format the format for the asset
    */
   setAssetModel: function(assetModel, format) {
