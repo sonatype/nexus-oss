@@ -22,9 +22,10 @@ if (preparedFile.exists()) {
 println "Preparing Siesta-JS in: $siestaDir"
 
 // Extract siesta resources, executable scripts and binaries.
+def artifact = project.artifactMap['com.bryntum.siesta:siesta-standard']
 // HACK: This is extracted into src/test/ft-resources for NEXUS_RESOURCE_DIRS loading support
 ant.mkdir(dir: siestaDir)
-ant.unzip(src: "${project.build.directory}/dependency/siesta-standard.zip", dest: siestaDir) {
+ant.unzip(src: artifact.file, dest: siestaDir) {
   cutdirsmapper(dirs: 1)
   patternset {
     include(name: '*/resources/**')
