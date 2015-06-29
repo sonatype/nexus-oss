@@ -62,7 +62,7 @@ abstract class MavenRecipeSupport
   ConditionalRequestHandler conditionalRequestHandler
 
   @Inject
-  MavenHeadersHandler mavenHeadersHandler
+  ContentHandler contentHandler
 
   final MavenPathParser mavenPathParser
 
