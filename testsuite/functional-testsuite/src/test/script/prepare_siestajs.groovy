@@ -11,7 +11,9 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-def siestaDir = new File(project.basedir as File, '/src/test/ft-resources/testsuite/lib/siesta')
+// HACK: This is extracted into src/test/ft-resources for NEXUS_RESOURCE_DIRS loading support
+def ftDir = new File(project.basedir as File, '/src/test/ft-resources')
+def siestaDir = new File(ftDir, 'testsuite/lib/siesta')
 def preparedFile = new File(siestaDir, '.prepared')
 
 if (preparedFile.exists()) {
@@ -22,10 +24,9 @@ if (preparedFile.exists()) {
 println "Preparing Siesta-JS in: $siestaDir"
 
 // Extract siesta resources, executable scripts and binaries.
-def artifact = project.artifactMap['com.bryntum.siesta:siesta-standard']
-// HACK: This is extracted into src/test/ft-resources for NEXUS_RESOURCE_DIRS loading support
+def siestaArtifact = project.artifactMap['com.bryntum.siesta:siesta-standard']
 ant.mkdir(dir: siestaDir)
-ant.unzip(src: artifact.file, dest: siestaDir) {
+ant.unzip(src: siestaArtifact.file, dest: siestaDir) {
   cutdirsmapper(dirs: 1)
   patternset {
     include(name: '*/resources/**')
@@ -42,5 +43,13 @@ ant.chmod(perm: 'u+x') {
   }
 }
 
+// Extract common ft resources
+def testsupportArtifact = project.artifactMap['org.sonatype.nexus:nexus-siestajs-testsupport']
+ant.unzip(src: testsupportArtifact.file, dest: ftDir) {
+  cutdirsmapper(dirs: 1)
+  patternset {
+    include(name: 'ft-overlay/**')
+  }
+}
 // Mark as prepared
 ant.touch(file: preparedFile)
