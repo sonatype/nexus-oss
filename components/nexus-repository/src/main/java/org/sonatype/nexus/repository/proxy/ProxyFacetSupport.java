@@ -215,6 +215,7 @@ public abstract class ProxyFacetSupport
       result.getAttributes().set(Content.CONTENT_LAST_MODIFIED,
           extractLastModified(request, response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
       result.getAttributes().set(Content.CONTENT_ETAG, extractETag(response.getLastHeader(HttpHeaders.ETAG)));
+      indicateVerified(context);
       return result;
     }
     if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
