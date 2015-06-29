@@ -14,7 +14,7 @@ package org.sonatype.nexus.transaction;
 
 /**
  * {@link Transaction} that stays open until the batch is complete.
- * 
+ *
  * @since 3.0
  */
 final class BatchTransaction

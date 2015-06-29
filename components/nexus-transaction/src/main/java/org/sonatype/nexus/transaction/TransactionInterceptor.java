@@ -21,7 +21,7 @@ import org.aopalliance.intercept.MethodInvocation;
  *
  * @since 3.0
  */
-class TransactionInterceptor
+final class TransactionInterceptor
     implements MethodInterceptor
 {
   public Object invoke(final MethodInvocation mi) throws Throwable {

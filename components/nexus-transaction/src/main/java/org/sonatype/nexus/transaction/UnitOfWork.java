@@ -25,10 +25,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Utility class that gives any contained transactional methods access to transactions.
+ * Utility class that lets you scope a sequence of work containing transactional methods:
  *
  * <pre>
  * UnitOfWork.begin(transactionSupplier);
+ * try {
+ *   // ... do transactional work
+ * }
+ * finally {
+ *   UnitOfWork.end();
+ * }
+ * </pre>
+ *
+ * If you want the same transaction to be re-used (i.e. batched) across the unit-of-work:
+ *
+ * <pre>
+ * UnitOfWork.beginBatch(transactionSupplier);
  * try {
  *   // ... do transactional work
  * }
@@ -51,7 +63,7 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 3.0
  */
-public class UnitOfWork
+public final class UnitOfWork
 {
   private static final ThreadLocal<UnitOfWork> SELF = new ThreadLocal<>();
 
@@ -107,7 +119,7 @@ public class UnitOfWork
   /**
    * Resumes the given unit-of-work.
    */
-  public static void resume(UnitOfWork self) {
+  public static void resume(final UnitOfWork self) {
     checkState(SELF.get() == null, "Unit of work is already set");
     SELF.set(self);
   }

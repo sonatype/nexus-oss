@@ -12,22 +12,29 @@
  */
 package org.sonatype.nexus.transaction;
 
-import org.aopalliance.intercept.MethodInvocation;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import org.aopalliance.intercept.Joinpoint;
 
 /**
  * Wraps an intercepted method with transactional behaviour.
  *
  * @since 3.0
  */
-class TransactionalWrapper
+final class TransactionalWrapper
+    extends ComponentSupport
 {
   private final Transactional spec;
 
-  private final MethodInvocation mi;
+  private final Joinpoint aspect;
 
-  public TransactionalWrapper(final Transactional spec, final MethodInvocation mi) {
+  private final boolean tracing;
+
+  public TransactionalWrapper(final Transactional spec, final Joinpoint aspect) {
     this.spec = spec;
-    this.mi = mi;
+    this.aspect = aspect;
+
+    tracing = log.isTraceEnabled();
   }
 
   /**
@@ -38,15 +45,21 @@ class TransactionalWrapper
       boolean committed = false;
       Throwable throwing = null;
       try {
+        if (tracing) {
+          log.trace("BEGIN {} : {}", tx, aspect.getStaticPart());
+        }
         tx.begin();
         try {
-          return mi.proceed();
+          return aspect.proceed();
         }
         catch (final Throwable e) { // make sure we capture VM errors here (will be rethrown later)
           throwing = e;
         }
         finally {
           if (throwing == null || instanceOf(throwing, spec.ignore())) {
+            if (tracing) {
+              log.trace("COMMIT {} : {}", tx, aspect.getStaticPart(), throwing);
+            }
             tx.commit();
             committed = true;
           }
@@ -57,8 +70,14 @@ class TransactionalWrapper
       }
       catch (final Exception e) { // ignore VM errors as here as we don't rollback/retry on them
         if (!committed) {
+          if (tracing) {
+            log.trace("ROLLBACK {} : {}", tx, aspect.getStaticPart(), e);
+          }
           tx.rollback();
           if (instanceOf(e, spec.retryOn()) && tx.allowRetry()) {
+            if (tracing) {
+              log.trace("RETRY {} : {}", tx, aspect.getStaticPart());
+            }
             continue;
           }
         }
