@@ -27,17 +27,17 @@ NX.TestHarness.start(
             NX.TestHarness.resource('static/rapture/extdirect-{mode}.js')
           ],
           items: [
-            { url: 'testsuite/framework/statechange.t.js' },
-            { url: 'testsuite/framework/validation.t.js' }
+            { url: 'testsuite-oss/framework/statechange.t.js' },
+            { url: 'testsuite-oss/framework/validation.t.js' }
           ]
         },
 
         {
           group: 'FT',
           items: [
-            { url: 'testsuite/framework/signin_signout.t.js' },
-            { url: 'testsuite/framework/mode_button.t.js' },
-            { url: 'testsuite/framework/unsupported_browser.t.js' }
+            { url: 'testsuite-oss/framework/signin_signout.t.js' },
+            { url: 'testsuite-oss/framework/mode_button.t.js' },
+            { url: 'testsuite-oss/framework/unsupported_browser.t.js' }
           ]
         }
       ]
@@ -49,8 +49,8 @@ NX.TestHarness.start(
         {
           group: 'FT',
           items: [
-            { url: 'testsuite/repository/blobstore_crud.t.js' },
-            { url: 'testsuite/repository/repository_crud.t.js' }
+            { url: 'testsuite-oss/repository/blobstore_crud.t.js' },
+            { url: 'testsuite-oss/repository/repository_crud.t.js' }
           ]
         }
       ]
@@ -62,9 +62,9 @@ NX.TestHarness.start(
         {
           group: 'FT',
           items: [
-            { url: 'testsuite/security/security_role.t.js' },
-            { url: 'testsuite/security/security_user.t.js' },
-            { url: 'testsuite/security/security_anonymous.t.js' }
+            { url: 'testsuite-oss/security/security_role.t.js' },
+            { url: 'testsuite-oss/security/security_user.t.js' },
+            { url: 'testsuite-oss/security/security_anonymous.t.js' }
           ]
         }
       ]
@@ -76,7 +76,7 @@ NX.TestHarness.start(
         {
           group: 'FT',
           items: [
-            { url: 'testsuite/system/system_tasks.t.js' }
+            { url: 'testsuite-oss/system/system_tasks.t.js' }
           ]
         }
       ]
