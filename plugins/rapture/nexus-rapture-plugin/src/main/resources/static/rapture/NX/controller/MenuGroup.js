@@ -50,7 +50,7 @@ Ext.define('NX.controller.MenuGroup', {
    *
    * @private
    * @param {NX.view.feature.Group} view
-   * @param {Feature[]} records
+   * @param {NX.model.Feature[]} records
    */
   onSelection: function (view, records) {
     var me = this,

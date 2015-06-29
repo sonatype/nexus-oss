@@ -103,7 +103,7 @@ Ext.define('NX.util.Url', {
   /**
    * @public
    * Creates a link to an asset in a repository.
-   * @param {object} assetModel the asset to create a link for
+   * @param {Object} assetModel the asset to create a link for
    * @param {String} format the format of the repository storing this asset
    */
   asRepositoryLink: function(assetModel, format) {

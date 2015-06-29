@@ -85,9 +85,10 @@ Ext.define('NX.ext.form.field.ValueSet', {
   input: undefined,
 
   /**
-   * @cfg {String} emptyText
    * The default text to place into an empty field.
-   * @see Ext.form.field.Text#emptyText
+   * See {@link Ext.form.field.Text#emptyText}
+   *
+   * @cfg {String} emptyText
    */
   emptyText: undefined,
 
