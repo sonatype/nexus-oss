@@ -49,7 +49,6 @@ import static com.google.common.base.Preconditions.checkState;
 public class MetadataBuilder
     extends ComponentSupport
 {
-
   private final VersionScheme versionScheme;
 
   private String groupId;
