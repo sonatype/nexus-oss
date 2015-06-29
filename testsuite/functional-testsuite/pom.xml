@@ -82,7 +82,13 @@
         <configuration>
           <filesets>
             <fileset>
-              <directory>${project.basedir}/src/test/ft-resources/testsuite/lib/siesta</directory>
+              <directory>${project.basedir}/src/test/ft-resources</directory>
+              <includes>
+                <include>testsuite.html</include>
+              </includes>
+            </fileset>
+            <fileset>
+              <directory>${project.basedir}/src/test/ft-resources/testsuite/lib</directory>
             </fileset>
           </filesets>
         </configuration>
