@@ -32,7 +32,7 @@ Ext.define('NX.Security', {
   },
 
   /**
-   * @see {@link NX.controller.User#hasUser}
+   * See {@link NX.controller.User#hasUser}
    */
   hasUser: function () {
     var me = this;
@@ -42,7 +42,7 @@ Ext.define('NX.Security', {
   },
 
   /**
-   * @see {@link NX.controller.User#askToAuthenticate}
+   * See {@link NX.controller.User#askToAuthenticate}
    */
   askToAuthenticate: function (message, options) {
     var me = this;
@@ -52,7 +52,7 @@ Ext.define('NX.Security', {
   },
 
   /**
-   * @see {@link NX.controller.User#doWithAuthenticationToken}
+   * See {@link NX.controller.User#doWithAuthenticationToken}
    */
   doWithAuthenticationToken: function (message, options) {
     var me = this;
@@ -62,7 +62,7 @@ Ext.define('NX.Security', {
   },
 
   /**
-   * @see {@link NX.controller.User#signOut}
+   * See {@link NX.controller.User#signOut}
    */
   signOut: function () {
     var me = this;

@@ -32,29 +32,30 @@ Ext.define('NX.Bookmarks', {
   },
 
   /**
-   * @see {@link NX.controller.Bookmarking#getBookmark}
+   * See {@link NX.controller.Bookmarking#getBookmark}
    */
   getBookmark: function () {
     return this.controller().getBookmark();
   },
 
   /**
-   * @see {@link NX.controller.Bookmarking#bookmark}
+   * See {@link NX.controller.Bookmarking#bookmark}
    */
   bookmark: function (bookmark, caller) {
     return this.controller().bookmark(bookmark, caller);
   },
 
   /**
-   * @see {@link NX.controller.Bookmarking#navigateTo}
+   * See {@link NX.controller.Bookmarking#navigateTo}
    */
   navigateTo: function (bookmark, caller) {
     return this.controller().navigateTo(bookmark, caller);
   },
 
   /**
-   * @public
    * Creates a new bookmark.
+   *
+   * @public
    * @param [{String}] token bookmark token
    * @returns {NX.Bookmark} created bookmark
    */
@@ -63,8 +64,9 @@ Ext.define('NX.Bookmarks', {
   },
 
   /**
-   * @public
    * Creates a new bookmark from provided segments.
+   *
+   * @public
    * @param {String[]} segments bookmark segments
    * @returns {NX.Bookmark} created bookmark
    */
@@ -79,6 +81,7 @@ Ext.define('NX.Bookmarks', {
   /**
    * Encodes the value suitable to be used as a bookmark token.
    * (eliminate spaces and lower case)
+   *
    * @param value to be encoded
    * @returns {String} encoded value
    */
