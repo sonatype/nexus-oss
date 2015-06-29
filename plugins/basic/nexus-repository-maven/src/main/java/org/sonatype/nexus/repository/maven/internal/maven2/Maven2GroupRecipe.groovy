@@ -83,7 +83,7 @@ extends MavenRecipeSupport
 
     // Note: partialFetchHandler NOT added for Maven metadata
     builder.route(newMetadataRouteBuilder()
-        .handler(contentHandler)
+        .handler(contentHeadersHandler)
         .handler(groupMetadataHandler)
         .create())
 

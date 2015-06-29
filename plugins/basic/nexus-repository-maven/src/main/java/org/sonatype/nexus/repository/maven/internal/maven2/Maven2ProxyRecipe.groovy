@@ -98,14 +98,14 @@ extends MavenRecipeSupport
         .handler(negativeCacheHandler)
         .handler(partialFetchHandler)
         .handler(versionPolicyHandler)
-        .handler(contentHandler)
+        .handler(contentHeadersHandler)
         .handler(proxyHandler)
         .create())
 
     // Note: partialFetchHandler NOT added for Maven metadata
     builder.route(newMetadataRouteBuilder()
         .handler(negativeCacheHandler)
-        .handler(contentHandler)
+        .handler(contentHeadersHandler)
         .handler(proxyHandler)
         .create())
 

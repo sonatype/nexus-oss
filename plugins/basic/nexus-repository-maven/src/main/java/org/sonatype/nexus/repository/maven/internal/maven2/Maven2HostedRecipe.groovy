@@ -87,13 +87,13 @@ extends MavenRecipeSupport
     builder.route(newArtifactRouteBuilder()
         .handler(partialFetchHandler)
         .handler(versionPolicyHandler)
-        .handler(contentHandler)
+        .handler(contentHeadersHandler)
         .handler(hostedHandler)
         .create())
 
     // Note: partialFetchHandler NOT added for Maven metadata
     builder.route(newMetadataRouteBuilder()
-        .handler(contentHandler)
+        .handler(contentHeadersHandler)
         .handler(hostedHandler)
         .create())
 
