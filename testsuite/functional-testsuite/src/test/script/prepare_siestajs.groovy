@@ -13,18 +13,18 @@
 
 // HACK: This is extracted into src/test/ft-resources for NEXUS_RESOURCE_DIRS loading support
 def ftDir = new File(project.basedir as File, '/src/test/ft-resources')
-def siestaDir = new File(ftDir, 'testsuite-lib/siesta')
-def preparedFile = new File(siestaDir, '.prepared')
-def artifacts = project.artifactMap as Map
+def preparedFile = new File(ftDir, 'testsuite-lib/.prepared')
 
 if (preparedFile.exists()) {
-  println "Already prepared Siesta-JS in: $siestaDir"
+  println 'FT resources already prepared'
   return
 }
 
-println "Preparing Siesta-JS in: $siestaDir"
+println 'Preparing FT resources'
+def artifacts = project.artifactMap as Map
 
 // Extract siesta resources, executable scripts and binaries.
+def siestaDir = new File(ftDir, 'testsuite-lib/siesta')
 ant.mkdir(dir: siestaDir)
 ant.unzip(src: artifacts['com.bryntum.siesta:siesta-standard'].file, dest: siestaDir) {
   cutdirsmapper(dirs: 1)
