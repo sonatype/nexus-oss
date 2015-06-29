@@ -22,7 +22,7 @@ import org.aopalliance.intercept.Joinpoint;
  * Utility class that lets you wrap arbitrary sections of code as &#064;{@link Transactional}.
  *
  * <pre>
- * UnitOfWork.transactional(new Operation&lt;T, SomeException&gt;()
+ * Operations.transactional(new Operation&lt;T, SomeException&gt;()
  * {
  *   &#064;Transactional
  *   public T call() throws SomeException {
