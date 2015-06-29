@@ -208,9 +208,9 @@ public class MetadataRebuilder
                 @Override
                 public boolean result(Object iRecord) {
                   final ODocument doc = (ODocument) iRecord;
-                  final String groupId = doc.field(MavenAttributes.P_GROUP_ID, OType.STRING);
-                  final String artifactId = doc.field(MavenAttributes.P_ARTIFACT_ID, OType.STRING);
-                  final Set<String> baseVersions = doc.field(MavenAttributes.P_BASE_VERSION, OType.EMBEDDEDSET);
+                  final String groupId = doc.field("groupId", OType.STRING);
+                  final String artifactId = doc.field("artifactId", OType.STRING);
+                  final Set<String> baseVersions = doc.field("baseVersions", OType.EMBEDDEDSET);
 
                   final boolean groupChange = !Objects.equals(currentGroupId, groupId);
                   if (groupChange) {
