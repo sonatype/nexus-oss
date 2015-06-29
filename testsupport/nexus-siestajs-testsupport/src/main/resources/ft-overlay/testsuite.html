@@ -35,7 +35,7 @@
       margin: 0;
       padding: 0;
     }
-    .loading-message {
+    .loading-header {
       text-align: center;
       padding: 10px;
       font-size: large;
@@ -43,7 +43,7 @@
   </style>
 </head>
 <body>
-<div class="loading-message">
+<div class="loading-header">
   Loading <strong>Nexus FT Harness</strong>...
 </div>
 
@@ -59,15 +59,15 @@
     return query;
   }
 
-  // load the testsuite-<edition>/harness.js script or complain
-  if (window.location.search.search("[?&]edition=") === -1) {
-    alert('Missing parameter: edition');
+  // load the testsuite-<name>/harness.js script or complain
+  if (window.location.search.search("[?&]name=") === -1) {
+    alert('Missing parameter: name');
   }
   else {
     var params = parseQuery(window.location.search.substring(1));
-    var edition = params['edition'];
-    console.info('Edition:', edition);
-    document.write('<script type="text/javascript" src="testsuite-' + edition + '/harness.js"><\/script>');
+    var name = params['name'];
+    console.info('Name:', name);
+    document.write('<script type="text/javascript" src="testsuite-' + name + '/harness.js"><\/script>');
   }
 </script>
 </body>
