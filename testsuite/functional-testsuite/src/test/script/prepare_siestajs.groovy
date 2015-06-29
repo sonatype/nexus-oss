@@ -15,6 +15,7 @@
 def ftDir = new File(project.basedir as File, '/src/test/ft-resources')
 def siestaDir = new File(ftDir, 'testsuite-lib/siesta')
 def preparedFile = new File(siestaDir, '.prepared')
+def artifacts = project.artifactMap as Map
 
 if (preparedFile.exists()) {
   println "Already prepared Siesta-JS in: $siestaDir"
@@ -24,9 +25,8 @@ if (preparedFile.exists()) {
 println "Preparing Siesta-JS in: $siestaDir"
 
 // Extract siesta resources, executable scripts and binaries.
-def siestaArtifact = project.artifactMap['com.bryntum.siesta:siesta-standard']
 ant.mkdir(dir: siestaDir)
-ant.unzip(src: siestaArtifact.file, dest: siestaDir) {
+ant.unzip(src: artifacts['com.bryntum.siesta:siesta-standard'].file, dest: siestaDir) {
   cutdirsmapper(dirs: 1)
   patternset {
     include(name: '*/resources/**')
@@ -44,8 +44,7 @@ ant.chmod(perm: 'u+x') {
 }
 
 // Extract common ft resources
-def testsupportArtifact = project.artifactMap['org.sonatype.nexus:nexus-siestajs-testsupport']
-ant.unzip(src: testsupportArtifact.file, dest: ftDir) {
+ant.unzip(src: artifacts['org.sonatype.nexus:nexus-siestajs-testsupport'].file, dest: ftDir) {
   cutdirsmapper(dirs: 1)
   patternset {
     include(name: 'ft-overlay/**')
