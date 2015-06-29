@@ -665,7 +665,7 @@
               <!--
               Exclude siesta-js resources
               -->
-              <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite/lib/siesta/**</exclude>
+              <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite-lib/siesta/**</exclude>
             </excludes>
           </configuration>
         </plugin>

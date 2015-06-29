@@ -53,7 +53,7 @@ class TestLauncher
   {
     log.info 'ID: {}', id
 
-    this.binDirectory = util.resolveFile('src/test/ft-resources/testsuite/lib/siesta/bin').canonicalFile
+    this.binDirectory = util.resolveFile('src/test/ft-resources/testsuite-lib/siesta/bin').canonicalFile
     assert binDirectory.exists()
     log.info 'Binaries directory: {}', this.binDirectory
 
