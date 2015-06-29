@@ -84,13 +84,13 @@ public class MavenFacetImpl
 {
   // artifact shared properties of both, artifact component and artifact asset
 
-  private static final String P_GROUP_ID = "groupId";
+  private static final String P_GROUP_ID = "group_id";
 
-  private static final String P_ARTIFACT_ID = "artifactId";
+  private static final String P_ARTIFACT_ID = "artifact_id";
 
   private static final String P_VERSION = "version";
 
-  private static final String P_BASE_VERSION = "baseVersion";
+  private static final String P_BASE_VERSION = "base_version";
 
   private static final String P_CLASSIFIER = "classifier";
 
@@ -104,11 +104,11 @@ public class MavenFacetImpl
 
   private static final String P_ASSET_KEY = "key";
 
-  private static final String P_CONTENT_LAST_MODIFIED = "contentLastModified";
+  private static final String P_CONTENT_LAST_MODIFIED = "content_last_modified";
 
-  private static final String P_CONTENT_ETAG = "etag";
+  private static final String P_CONTENT_ETAG = "content_etag";
 
-  private static final String P_LAST_VERIFIED = "lastVerified";
+  private static final String P_LAST_VERIFIED = "last_verified";
 
   private final Map<String, MavenPathParser> mavenPathParsers;
 
