@@ -13,7 +13,7 @@
 
 // HACK: This is extracted into src/test/ft-resources for NEXUS_RESOURCE_DIRS loading support
 def ftDir = new File(project.basedir as File, '/src/test/ft-resources')
-def siestaDir = new File(ftDir, 'testsuite/lib/siesta')
+def siestaDir = new File(ftDir, 'testsuite-lib/siesta')
 def preparedFile = new File(siestaDir, '.prepared')
 
 if (preparedFile.exists()) {
