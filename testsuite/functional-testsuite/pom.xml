@@ -48,13 +48,6 @@
       <type>zip</type>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>com.bryntum.siesta</groupId>
-      <artifactId>siesta-standard</artifactId>
-      <type>zip</type>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>

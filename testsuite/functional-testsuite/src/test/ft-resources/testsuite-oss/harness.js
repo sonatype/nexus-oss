@@ -12,7 +12,7 @@
  */
 
 NX.TestHarness.configure({
-  title: 'Nexus OSS FT'
+  title: 'Nexus FT: OSS'
 });
 
 NX.TestHarness.start(
