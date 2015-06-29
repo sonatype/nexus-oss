@@ -51,7 +51,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Assets_Info_Last_Updated: 'Last updated',
     Assets_Info_Locally_Cached: 'Locally cached',
     Assets_Info_BlobRef: 'Blob Reference',
-    
+    AssetInfo_Delete_Button: 'Delete asset',
+    AssetInfo_Delete_Title: 'Confirm deletion?',
+    AssetInfo_Delete_Success: 'Asset deleted: {0}',
+
     // Browse -> Search
     Search_Text: 'Search',
     Search_Description: 'Search for components by attribute',

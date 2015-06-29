@@ -14,7 +14,8 @@
 
 /**
  * **{@link Ext.form.action.DirectLoad}** overrides.
- * @see "https://support.sencha.com/index.php#ticket-17182"
+ *
+ * See: https://support.sencha.com/index.php#ticket-17182
  *
  * @since 3.0
  */

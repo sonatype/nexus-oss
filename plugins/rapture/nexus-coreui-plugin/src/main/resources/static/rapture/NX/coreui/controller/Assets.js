@@ -33,7 +33,9 @@ Ext.define('NX.coreui.controller.Assets', {
   ],
 
   refs: [
-    {ref: 'assetContainer', selector: 'nx-coreui-component-assetcontainer'}
+    {ref: 'assetContainer', selector: 'nx-coreui-component-assetcontainer'},
+    {ref: 'assetList', selector: 'nx-coreui-component-asset-list'},
+    {ref: 'assetInfo', selector: 'nx-coreui-component-assetinfo'}
   ],
 
   /**
@@ -60,6 +62,10 @@ Ext.define('NX.coreui.controller.Assets', {
         'nx-coreui-component-asset-list': {
           updated: me.loadAssets,
           cellclick: me.updateAssetContainer
+        },
+        'nx-coreui-component-assetinfo button[action=deleteAsset]': {
+          afterrender: me.bindDeleteAssetButton,
+          click: me.deleteAsset
         }
       }
     });
@@ -162,6 +168,46 @@ Ext.define('NX.coreui.controller.Assets', {
         assetContainer = me.getAssetContainer();
 
     assetContainer.refreshInfo(gridView.up('grid').componentModel, assetModel);
+  },
+
+  /**
+   * @protected
+   * Enable 'Delete' when user has 'delete' permission.
+   */
+  bindDeleteAssetButton: function(button) {
+    var me = this,
+        component = me.getAssetList().componentModel;
+    button.mon(
+        NX.Conditions.isPermitted('nexus:repository-view:' + component.get('format') + ':' +
+            component.get('repositoryName') + ':delete')
+    ),
+    {
+      satisfied: button.enable,
+      unsatisfied: button.disable,
+      scope: button
+    }
+  },
+
+  /**                                
+   * @private
+   * Remove selected asset.
+   */
+  deleteAsset: function () {
+    var me = this,
+        info = me.getAssetInfo();
+
+    if (info) {
+      var asset = info.assetModel;
+      NX.Dialogs.askConfirmation(NX.I18n.get('AssetInfo_Delete_Title'), asset.get('name'), function () {
+        NX.direct.coreui_Component.deleteAsset(asset.getId(), asset.get('repositoryName'), function (response) {
+          if (Ext.isObject(response) && response.success) {
+            me.getAssetList().getStore().load();
+            Ext.util.History.back();
+            NX.Messages.add({ text: NX.I18n.format('AssetInfo_Delete_Success', asset.get('name')), type: 'success' });
+          }
+        });
+      });
+    }
   }
 
 });

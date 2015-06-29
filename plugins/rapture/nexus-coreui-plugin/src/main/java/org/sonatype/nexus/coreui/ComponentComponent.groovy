@@ -31,11 +31,15 @@ import org.sonatype.nexus.repository.storage.Component
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.StorageTx
 import org.sonatype.nexus.security.SecurityHelper
+import org.sonatype.nexus.validation.Validate
 
 import com.google.common.collect.ImmutableList
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.hibernate.validator.constraints.NotEmpty
 
+import static org.sonatype.nexus.repository.security.BreadActions.DELETE
 import static org.sonatype.nexus.repository.security.BreadActions.READ
 
 /**
@@ -69,7 +73,7 @@ class ComponentComponent
 
   @Inject
   RepositoryManager repositoryManager
-
+  
   @DirectMethod
   PagedResponse<ComponentXO> read(final StoreLoadParameters parameters) {
     Repository repository = repositoryManager.get(parameters.getFilter('repositoryName'))
@@ -203,6 +207,24 @@ class ComponentComponent
               collect(ASSET_CONVERTER.rcurry(componentName, repositoryName))
         }
       }
+    }
+    finally {
+      storageTx.close()
+    }
+  }
+
+  @DirectMethod
+  @RequiresAuthentication
+  @Validate
+  void deleteAsset(@NotEmpty String assetId, @NotEmpty String repositoryName) {
+    Repository repository = repositoryManager.get(repositoryName)
+    securityHelper.ensurePermitted(new RepositoryViewPermission(repository, DELETE))
+    StorageTx storageTx = repository.facet(StorageFacet).openTx()
+    try {
+      Asset asset = storageTx.findAsset(new EntityId(assetId), storageTx.getBucket())
+      log.info 'Deleting asset: {}', asset
+      storageTx.deleteAsset(asset)
+      storageTx.commit()
     }
     finally {
       storageTx.close()

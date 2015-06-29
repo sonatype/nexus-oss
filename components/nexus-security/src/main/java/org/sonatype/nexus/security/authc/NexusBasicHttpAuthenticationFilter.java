@@ -120,8 +120,11 @@ public class NexusBasicHttpAuthenticationFilter
   }
 
   @Override
-  protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
-      ServletResponse response) throws Exception
+  protected boolean onLoginSuccess(AuthenticationToken token,
+                                   Subject subject,
+                                   ServletRequest request,
+                                   ServletResponse response)
+      throws Exception
   {
     if (request instanceof HttpServletRequest) {
       // Prefer the subject principal over the token's, as these could be different for token-based auth
@@ -132,8 +135,8 @@ public class NexusBasicHttpAuthenticationFilter
       String userId = principal.toString();
 
       // Attach principal+userId to request so we can use that in the request-log
-      ((HttpServletRequest) request).setAttribute(ATTR_USER_PRINCIPAL, principal);
-      ((HttpServletRequest) request).setAttribute(ATTR_USER_ID, userId);
+      request.setAttribute(ATTR_USER_PRINCIPAL, principal);
+      request.setAttribute(ATTR_USER_ID, userId);
     }
     return super.onLoginSuccess(token, subject, request, response);
   }

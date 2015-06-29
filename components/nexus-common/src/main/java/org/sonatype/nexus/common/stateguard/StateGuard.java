@@ -115,8 +115,8 @@ public class StateGuard
   /**
    * Create a transition to given state.
    */
-  public Transition transition(final String to) {
-    return new TransitionImpl(to);
+  public Transition transition(final String to, final Class<? extends Exception>[] ignore) {
+    return new TransitionImpl(to, ignore);
   }
 
   /**
@@ -138,11 +138,14 @@ public class StateGuard
   {
     private final String to;
 
+    private final Class<? extends Exception>[] ignore;
+
     @Nullable
     private String[] allowed;
 
-    private TransitionImpl(final String to) {
+    private TransitionImpl(final String to, final Class<? extends Exception>[] ignore) {
       this.to = checkNotNull(to);
+      this.ignore = checkNotNull(ignore);
     }
 
     @Override
@@ -180,11 +183,18 @@ public class StateGuard
           return result;
         }
         catch (Throwable t) {
-          log.error("Failed transition: {} -> {}", current, to, t);
+          if (ignore(t)) {
+            current = to;
 
-          // maybe set failure state
-          if (failure != null) {
-            current = failure;
+            log.trace("Transitioned: {} ignoring: {}", to, t.toString());
+          }
+          else {
+            log.error("Failed transition: {} -> {}", current, to, t);
+  
+            // maybe set failure state
+            if (failure != null) {
+              current = failure;
+            }
           }
 
           Throwables.propagateIfPossible(t, Exception.class, Error.class);
@@ -194,6 +204,15 @@ public class StateGuard
       finally {
         lock.unlock();
       }
+    }
+
+    private boolean ignore(final Throwable t) {
+      for (final Class<? extends Exception> type : ignore) {
+        if (type.isInstance(t)) {
+          return true;
+        }
+      }
+      return false;
     }
   }
 

@@ -337,7 +337,7 @@ Ext.define('NX.coreui.controller.Search', {
         criteria: criteria,
         criteriaId: criteria.getId(),
         action: 'add',
-        hidden: Ext.isDefined(criterias[criteria.getId()])
+        disabled: Ext.isDefined(criterias[criteria.getId()])
       });
     });
     Ext.Object.each(criteriasPerGroup, function(key, value) {
@@ -380,7 +380,7 @@ Ext.define('NX.coreui.controller.Search', {
         cmpClass = Ext.ClassManager.getByAlias('widget.nx-coreui-searchcriteria-' + criteria.getId()),
         cmp;
 
-    menuitem.hide();
+    menuitem.disable();
     if (!cmpClass) {
       cmpClass = Ext.ClassManager.getByAlias('widget.nx-coreui-searchcriteria-text');
     }
@@ -404,7 +404,7 @@ Ext.define('NX.coreui.controller.Search', {
         searchCriteriaPanel = searchPanel.down('#criteria');
 
     searchCriteriaPanel.remove(searchCriteria);
-    searchCriteriaPanel.down('menuitem[criteriaId=' + searchCriteria.criteriaId + ']').show();
+    searchCriteriaPanel.down('menuitem[criteriaId=' + searchCriteria.criteriaId + ']').enable();
     me.applyFilter({ criteriaId: searchCriteria.criteriaId }, true);
   },
 
