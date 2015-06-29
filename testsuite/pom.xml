@@ -87,6 +87,22 @@
   </build>
 
   <profiles>
+
+    <!--
+    Enable functional-testsuite module
+    -->
+    <profile>
+      <id>functional-testsuite</id>
+      <activation>
+        <property>
+          <name>ft</name>
+        </property>
+      </activation>
+      <modules>
+        <module>functional-testsuite</module>
+      </modules>
+    </profile>
+
     <!--
     Generate testsuite shard configurations.
     -->

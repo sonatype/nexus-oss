@@ -171,6 +171,13 @@
         </exclusions>
       </dependency>
 
+      <dependency>
+        <groupId>com.bryntum.siesta</groupId>
+        <artifactId>siesta-standard</artifactId>
+        <version>3.0.2</version>
+        <type>zip</type>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

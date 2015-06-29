@@ -355,6 +355,12 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-siestajs-testsupport</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
       <!-- assemblies -->
 
       <dependency>
@@ -635,9 +641,11 @@
               <exclude>**/assemblies/**/src/main/resources/overlay/**</exclude>
 
               <!--
-              Exclude test resource files, many of these need specific content w/o headers.
+              Exclude (most) test resource files, many of these need specific content w/o headers.
               -->
-              <exclude>**/src/test/*resources/**</exclude>
+              <exclude>**/src/test/resources/**</exclude>
+              <exclude>**/src/test/filtered-resources/**</exclude>
+              <exclude>**/src/test/it-resources/**</exclude>
 
               <!--
               Exclude third-party resources.
@@ -653,6 +661,11 @@
               -->
               <exclude>**/nexus-extdirect-plugin/**/com/softwarementors/**</exclude>
               <exclude>**/nexus-ldap-plugin/**/org/sonatype/nexus/ldap/internal/connector/dao/LdapEncoder.java</exclude>
+
+              <!--
+              Exclude siesta-js resources
+              -->
+              <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite-lib/siesta/**</exclude>
             </excludes>
           </configuration>
         </plugin>
