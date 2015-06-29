@@ -45,11 +45,14 @@ class TestLauncher
 
   private URL nexusUrl
 
+  private String testsuiteName
+
   boolean debug = true
 
   TestLauncher(final String executableName,
                final String[] executableOptions,
-               final URL nexusUrl)
+               final URL nexusUrl,
+               final String testsuiteName)
   {
     log.info 'ID: {}', id
 
@@ -65,6 +68,9 @@ class TestLauncher
 
     this.nexusUrl = nexusUrl
     log.info 'Nexus URL: {}', this.nexusUrl
+
+    this.testsuiteName = testsuiteName
+    log.info 'Testsuite name: {}', this.testsuiteName
   }
 
   /**
@@ -118,7 +124,7 @@ class TestLauncher
    * Resolve the testsuite url.
    */
   private URL getUrl() {
-    return new URL("${nexusUrl}testsuite.html")
+    return new URL("${nexusUrl}testsuite.html?name=${testsuiteName}")
   }
 
   /**

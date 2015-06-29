@@ -34,7 +34,7 @@ public class FunctionalTestSupport
     extends SiestaTestSupport
 {
   public FunctionalTestSupport(final String executable, final String[] options) {
-    super(executable, options);
+    super(executable, options, "oss");
   }
 
   //

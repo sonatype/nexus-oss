@@ -31,9 +31,18 @@ public class SiestaTestSupport
 
   private final String[] options;
 
-  public SiestaTestSupport(final String executable, final String[] options) {
+  /**
+   * The testsuite name to pass to {@code testsuite.html?name=}.
+   */
+  private final String testsuiteName;
+
+  public SiestaTestSupport(final String executable,
+                           final String[] options,
+                           final String testsuiteName)
+  {
     this.executable = executable;
     this.options = options;
+    this.testsuiteName = testsuiteName;
   }
 
   /**
@@ -43,7 +52,7 @@ public class SiestaTestSupport
    */
   protected void run(final String include) throws InterruptedException {
     waitFor(responseFrom(nexusUrl));
-    TestLauncher launcher = new TestLauncher(executable, options, nexusUrl);
+    TestLauncher launcher = new TestLauncher(executable, options, nexusUrl, testsuiteName);
     launcher.launch(include);
   }
 
