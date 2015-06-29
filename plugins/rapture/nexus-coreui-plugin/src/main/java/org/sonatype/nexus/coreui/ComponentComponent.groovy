@@ -139,7 +139,8 @@ class ComponentComponent
         results = new ArrayList<>(results)
         results.add(0, new ComponentXO(
             id: UNATTACHED,
-            repositoryName: repository.name
+            repositoryName: repository.name,
+            format: repository.format.getValue()
         ))
       }
       return new PagedResponse<ComponentXO>(
