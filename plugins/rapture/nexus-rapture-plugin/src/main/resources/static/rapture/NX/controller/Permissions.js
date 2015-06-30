@@ -20,6 +20,7 @@
 Ext.define('NX.controller.Permissions', {
   extend: 'Ext.app.Controller',
   requires: [
+    'NX.State',
     'NX.Permissions'
   ],
   mixins: {
@@ -59,12 +60,30 @@ Ext.define('NX.controller.Permissions', {
     );
   },
 
+  /**
+   * Prime initial set of permissions from state.
+   *
+   * @override
+   */
   onLaunch: function () {
-    var me = this;
+    var me = this,
+        rawData = NX.State.getValue('permissions');
 
-    me.fetchPermissions();
+    //<if debug>
+    me.logDebug('Initial permissions: ', rawData);
+    //</if>
+
+    me.getStore('Permission').loadRawData(rawData, false);
+    NX.Permissions.setPermissions(me.getPermissions());
+
+    //<if debug>
+    me.logInfo('Permissions primed');
+    //</if>
   },
 
+  /**
+   * @private
+   */
   onUpdate: function (store, record, operation) {
     var me = this;
 
@@ -96,7 +115,7 @@ Ext.define('NX.controller.Permissions', {
     NX.Permissions.setPermissions(me.getPermissions());
 
     //<if debug>
-    me.logDebug('Permissions changed. Firing event');
+    me.logDebug('Permissions changed; Firing event');
     //</if>
 
     me.fireEvent('changed', NX.Permissions);
@@ -108,10 +127,11 @@ Ext.define('NX.controller.Permissions', {
    */
   getPermissions: function () {
     var me = this,
+        store = me.getStore('Permission'),
         perms = {};
 
-    me.getStore('Permission').clearFilter();
-    me.getStore('Permission').each(function (rec) {
+    store.clearFilter();
+    store.each(function (rec) {
       perms[rec.get('id')] = rec.get('permitted');
     });
 

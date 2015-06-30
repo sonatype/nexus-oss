@@ -39,7 +39,7 @@ Ext.define('NX.view.dev.Permissions', {
       xtype: 'nx-iconcolumn',
       text: 'Permitted',
       dataIndex: 'permitted',
-      width: 80,
+      width: 100,
       align: 'center',
       editor: 'checkbox',
       iconVariant: 'x16',

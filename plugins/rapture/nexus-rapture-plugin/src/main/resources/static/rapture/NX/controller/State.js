@@ -84,7 +84,18 @@ Ext.define('NX.controller.State', {
     );
   },
 
+  /**
+   * Install initial state, primed from app.js
+   *
+   * @override
+   */
   onLaunch: function () {
+    var me = this;
+
+    //<if debug>
+    me.logDebug('Initial state: ', NX.app.state);
+    //</if>
+
     var uiSettings = NX.app.state['uiSettings'];
 
     NX.State.setBrowserSupported(
@@ -98,6 +109,10 @@ Ext.define('NX.controller.State', {
     delete NX.app.state['uiSettings'];
     NX.State.setValues(NX.app.state);
     NX.State.setValues({ uiSettings: uiSettings });
+
+    //<if debug>
+    me.logInfo('State primed');
+    //</if>
   },
 
   /**
