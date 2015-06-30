@@ -23,7 +23,8 @@ NX.TestHarness.start(
           hostPageUrl: undefined,
           preload: [
             NX.TestHarness.resource('static/rapture/baseapp-{mode}.js'),
-            NX.TestHarness.resource('static/rapture/extdirect-{mode}.js')
+            NX.TestHarness.resource('static/rapture/extdirect-{mode}.js'),
+            'static/rapture/bootstrap.js'
           ],
           items: [
             { url: 'testsuite-oss/framework/statechange.t.js' },
