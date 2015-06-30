@@ -10,13 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.maven.internal;
+package org.sonatype.nexus.repository.view;
 
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Request;
-import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -34,16 +30,16 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.when;
 
 /**
- * UT for {@link MavenHeadersHandler}.
+ * UT for {@link ContentHeadersHandler}.
  *
  * @since 3.0
  */
-public class MavenHeadersHandlerTest
+public class ContentHeadersHandlerTest
     extends TestSupport
 {
   final DateTime now = DateTime.now();
 
-  final MavenHeadersHandler subject = new MavenHeadersHandler();
+  final ContentHeadersHandler subject = new ContentHeadersHandler();
 
   final String payloadString = "testPayload";
 
