@@ -131,11 +131,7 @@ Ext.define('NX.controller.Logging', {
 
     // HACK: experimental: remote events to server
     if (me.remote) {
-      // HACK: kill timestamp... GSON freaks out
-      var copy = Ext.clone(event);
-      delete copy.timestamp;
-
-      NX.direct.rapture_LogEvent.recordEvent(copy);
+      NX.direct.rapture_LogEvent.recordEvent(event);
     }
   }
 });
