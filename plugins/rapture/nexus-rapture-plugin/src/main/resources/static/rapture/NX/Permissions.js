@@ -91,6 +91,11 @@ Ext.define('NX.Permissions', {
     var me = this,
         hasPermission = false;
 
+    // HACK: for now complain if we see 'undefined' in permission string
+    if (expectedPermission.search('undefined') !== -1) {
+      me.logError('Invalid permission check:', expectedPermission);
+    }
+
     // short-circuit if permissions are not installed
     if (!me.available()) {
       return false;
