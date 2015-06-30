@@ -39,6 +39,26 @@ Ext.define('NX.view.dev.Panel', {
     xtype: 'tabpanel',
     tabPosition: 'bottom',
 
+    stateful: true,
+    stateId: 'nx-dev-panel.tabs',
+    stateEvents: [ 'tabchange' ],
+
+    /**
+     * @override
+     */
+    getState: function() {
+      return {
+        activeTabId: this.items.findIndex('id', this.getActiveTab().id)
+      }
+    },
+
+    /**
+     * @override
+     */
+    applyState: function(state) {
+      this.setActiveTab(state.activeTabId);
+    },
+
     items: [
       { xtype: 'nx-dev-tests' },
       { xtype: 'nx-dev-styles' },
