@@ -56,10 +56,9 @@ Ext.define('NX.util.condition.IsPermitted', {
   },
 
   /**
-   * @public
-   *
    * Sets permission and re-evaluate.
    *
+   * @public
    * @param {String} permission permission
    */
   setPermission: function(permission) {
