@@ -49,6 +49,9 @@ Ext.define('NX.controller.dev.Conditions', {
     }
   ],
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -83,6 +86,9 @@ Ext.define('NX.controller.dev.Conditions', {
     });
   },
 
+  /**
+   * @override
+   */
   onLaunch: function () {
     var me = this,
         devPanelTab = me.getDevPanelTabs();

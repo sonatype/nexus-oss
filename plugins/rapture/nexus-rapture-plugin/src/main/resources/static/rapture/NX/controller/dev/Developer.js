@@ -93,8 +93,9 @@ Ext.define('NX.controller.dev.Developer', {
   },
 
   /**
-   * @private
    * Show/Hide developer panel based on debug state.
+   *
+   * @private
    * @param {Ext.Panel} developerPanel
    */
   manageDeveloperPanel: function (developerPanel) {

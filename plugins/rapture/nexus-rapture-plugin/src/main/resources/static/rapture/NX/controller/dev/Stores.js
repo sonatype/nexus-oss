@@ -31,7 +31,7 @@ Ext.define('NX.controller.dev.Stores', {
   ],
 
   /**
-   * @protected
+   * @override
    */
   init: function () {
     var me = this;
