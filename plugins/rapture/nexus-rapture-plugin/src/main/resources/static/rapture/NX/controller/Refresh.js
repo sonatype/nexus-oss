@@ -63,8 +63,9 @@ Ext.define('NX.controller.Refresh', {
   },
 
   /**
-   * @public
    * Fire refresh event.
+   *
+   * @public
    */
   refresh: function () {
     var me = this;
