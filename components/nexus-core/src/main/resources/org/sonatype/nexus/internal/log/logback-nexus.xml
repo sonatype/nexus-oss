@@ -42,7 +42,7 @@
   <logger name="org.apache.felix" level="WARN"/>
   <logger name="org.apache.karaf" level="WARN"/>
 
-  <root level="${root.level}">
+  <root level="${root.level:-INFO}">
     <appender-ref ref="osgi"/>
     <appender-ref ref="console"/>
     <appender-ref ref="logfile"/>
