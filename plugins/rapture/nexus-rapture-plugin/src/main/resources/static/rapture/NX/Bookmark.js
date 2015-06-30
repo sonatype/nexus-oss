@@ -88,6 +88,7 @@ Ext.define('NX.Bookmark', {
 
   /**
    * Appends a segment to current segment.
+   *
    * @param {String/String[]} segments to append
    * @returns {NX.Bookmark} itself
    */

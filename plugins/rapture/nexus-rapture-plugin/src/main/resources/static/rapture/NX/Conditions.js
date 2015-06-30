@@ -76,6 +76,7 @@ Ext.define('NX.Conditions', {
 
   /**
    * Takes as parameter {NX.util.condition.Condition}s to be AND-ed.
+   *
    * @returns {NX.util.condition.Conjunction}
    */
   and: function () {
@@ -84,6 +85,7 @@ Ext.define('NX.Conditions', {
 
   /**
    * Takes as parameter {NX.util.condition.Condition}s to be OR-ed.
+   *
    * @returns {NX.util.condition.Disjunction}
    */
   or: function () {
@@ -92,6 +94,7 @@ Ext.define('NX.Conditions', {
 
   /**
    * No-op condition that is never satisfied.
+   *
    * @returns {NX.util.condition.NeverSatisfied}
    */
   never: function() {
