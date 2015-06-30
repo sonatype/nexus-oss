@@ -36,6 +36,7 @@
     -->
     <extjs.omit>true</extjs.omit>
     <extjs.omit.debug>true</extjs.omit.debug>
+    <extjs.omit.assert>true</extjs.omit.assert>
     <maven.yuicompressor.nomunge>false</maven.yuicompressor.nomunge>
     <maven.yuicompressor.nominify>false</maven.yuicompressor.nominify>
     <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
@@ -264,6 +265,7 @@
                 <outputFile>${project.build.outputDirectory}/static/rapture/${project.artifactId}-debug.js</outputFile>
                 <omitFlags>
                   <debug>${extjs.omit.debug}</debug>
+                  <assert>${extjs.omit.assert}</assert>
                 </omitFlags>
               </configuration>
             </execution>
