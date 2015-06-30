@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -129,7 +129,7 @@ StartTest(function(t) {
           {click: '#writePolicy => .x-form-text'},
           {click: '#writePolicy.getPicker() => .x-boundlist-item:contains(Disable redeploy)'},
           Ext.apply(Ext.clone(waitForStoreToLoad),
-              {trigger: {click: '>>nx-settingsform button[action=save]'}}
+              {trigger: {click: '>>nx-coreui-repository-settings button[action=save]'}}
           ),          
           function(next) {
             t.waitForAnimations(next);

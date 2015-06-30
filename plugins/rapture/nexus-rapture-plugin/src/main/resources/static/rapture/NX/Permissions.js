@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,7 @@
 Ext.define('NX.Permissions', {
   singleton: true,
   requires: [
+    'NX.Assert',
     'NX.util.Array'
   ],
   mixins: {
@@ -90,6 +91,10 @@ Ext.define('NX.Permissions', {
   check: function(expectedPermission) {
     var me = this,
         hasPermission = false;
+
+    //<if assert>
+    NX.Assert.assert(expectedPermission.search('undefined') === -1, 'Invalid permission check:', expectedPermission);
+    //</if>
 
     // short-circuit if permissions are not installed
     if (!me.available()) {
