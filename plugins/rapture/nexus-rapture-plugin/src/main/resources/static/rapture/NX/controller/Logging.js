@@ -68,6 +68,8 @@ Ext.define('NX.controller.Logging', {
   },
 
   /**
+   * Get the logging threshold.
+   *
    * @public
    * @returns {string}
    */
@@ -76,6 +78,8 @@ Ext.define('NX.controller.Logging', {
   },
 
   /**
+   * Set the logging threshold.
+   *
    * @public
    * @param {string} threshold
    */
@@ -120,11 +124,6 @@ Ext.define('NX.controller.Logging', {
     // ignore events that do not exceed threshold
     if (!me.exceedsThreshold(event.level)) {
       return;
-    }
-
-    // ensure events have a timestamp
-    if (!event.timestamp) {
-      event.timestamp = Date.now();
     }
 
     me.getStore('LogEvent').add(event);
