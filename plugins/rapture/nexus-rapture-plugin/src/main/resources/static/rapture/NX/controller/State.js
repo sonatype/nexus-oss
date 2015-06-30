@@ -49,8 +49,9 @@ Ext.define('NX.controller.State', {
   maxDisconnectWarnings: 3,
 
   /**
-   * @private
    * True when state is received from server.
+   *
+   * @private
    */
   receiving: false,
 
@@ -80,8 +81,9 @@ Ext.define('NX.controller.State', {
 
     me.addEvents(
         /**
-         * @event changed
          * Fires when any of application context values changes.
+         *
+         * @event changed
          */
         'changed'
     );
@@ -224,7 +226,7 @@ Ext.define('NX.controller.State', {
     var me = this;
 
     //<if debug>
-    me.logTrace('Changed: ' + key + ' -> ' + (value ? Ext.JSON.encode(value) : '(deleted)'));
+    me.logTrace('Changed:', key, '->', (value ? Ext.JSON.encode(value) : '(deleted)'));
     //</if>
 
     me.fireEvent(key.toLowerCase() + 'changed', value, oldValue);
@@ -232,8 +234,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * Reset state pooling when uiSettings.statusInterval changes.
+   *
+   * @private
    */
   onUiSettingsChanged: function (uiSettings, oldUiSettings) {
     var me = this,
@@ -278,7 +281,7 @@ Ext.define('NX.controller.State', {
         });
 
         //<if debug>
-        me.logDebug('State pooling configured for ' + newStatusInterval + ' seconds');
+        me.logDebug('State pooling configured for', newStatusInterval, 'seconds');
         //</if>
       }
     }
@@ -294,8 +297,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * On sign-in/sign-out update status interval.
+   *
+   * @private
    */
   onUserChanged: function (user, oldUser) {
     var me = this,
@@ -323,8 +327,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * Called when state pooling was successful.
+   *
+   * @private
    */
   onSuccess: function (event) {
     var me = this,
@@ -359,8 +364,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * Called when state pooling failed.
+   *
+   * @private
    */
   onError: function (event) {
     var me = this;
@@ -413,8 +419,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @public
    * Refreshes status from server on demand.
+   *
+   * @public
    */
   refreshNow: function () {
     var me = this;
@@ -425,8 +432,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * Show messages about license.
+   *
+   * @private
    * @param {Object} license
    * @param {Number} license.installed
    * @param {Object} oldLicense

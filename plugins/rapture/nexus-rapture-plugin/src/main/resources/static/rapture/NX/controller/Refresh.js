@@ -47,14 +47,16 @@ Ext.define('NX.controller.Refresh', {
 
     me.addEvents(
       /**
+       * Fires before the refresh is performed.
+       *
        * @event beforerefresh
-       * Fires before the refresh is performed
        */
       'beforerefresh',
 
       /**
-       * @event refresh
        * Fires when refresh should be performed.
+       *
+       * @event refresh
        */
       'refresh'
     );

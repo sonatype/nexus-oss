@@ -27,6 +27,9 @@ Ext.define('NX.controller.Dashboard', {
     'dashboard.Welcome'
   ],
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 

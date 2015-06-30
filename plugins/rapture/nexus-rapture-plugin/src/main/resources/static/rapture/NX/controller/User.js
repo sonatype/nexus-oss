@@ -61,6 +61,9 @@ Ext.define('NX.controller.User', {
     }
   ],
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -101,21 +104,24 @@ Ext.define('NX.controller.User', {
 
     me.addEvents(
         /**
-         * @event signin
          * Fires when a user had been successfully signed-in.
+         *
+         * @event signin
          * @param {Object} user
          */
         'signin',
 
         /**
+         * Fires before a user is signed out.
+         *
          * @event beforesignout
-         * Fires before a user is signed out
          */
         'beforesignout',
 
         /**
-         * @event signout
          * Fires when a user had been successfully signed-out.
+         *
+         * @event signout
          */
         'signout'
     );
@@ -150,8 +156,9 @@ Ext.define('NX.controller.User', {
   },
 
   /**
-   * @public
    * Shows sign-in or authentication window based on the fact that we have an user or not.
+   *
+   * @public
    * @param {String} [message] Message to be shown in authentication window
    * @param {Object} [options] TODO
    */
@@ -167,8 +174,9 @@ Ext.define('NX.controller.User', {
   },
 
   /**
-   * @public
    * Shows authentication window in order to retrieve an authentication token.
+   *
+   * @public
    * @param {String} [message] Message to be shown in authentication window
    * @param {Object} [options] TODO
    */
@@ -181,8 +189,9 @@ Ext.define('NX.controller.User', {
   },
 
   /**
-   * @private
    * Shows sign-in window.
+   *
+   * @private
    * @param {Object} [options] TODO
    */
   showSignInWindow: function (options) {
@@ -194,8 +203,9 @@ Ext.define('NX.controller.User', {
   },
 
   /**
-   * @private
    * Shows authenticate window.
+   *
+   * @private
    * @param {String} [message] Message to be shown in authentication window
    * @param {Object} [options] TODO
    */
@@ -227,7 +237,7 @@ Ext.define('NX.controller.User', {
     win.getEl().mask(NX.I18n.get('User_SignIn_Mask'));
 
     //<if debug>
-    me.logDebug('Sign-in user: "' + values.username + '" ...');
+    me.logDebug('Sign-in user: "', values.username, '" ...');
     //</if>
 
     Ext.Ajax.request({
@@ -296,7 +306,7 @@ Ext.define('NX.controller.User', {
     win.getEl().mask(NX.I18n.get('User_Controller_Authenticate_Mask'));
 
     //<if debug>
-    me.logDebug('Authenticating user "' + values.username + '" ...');
+    me.logDebug('Authenticating user "', values.username, '" ...');
     //</if>
 
     NX.direct.rapture_Security.authenticate(b64username, b64password, function (response) {

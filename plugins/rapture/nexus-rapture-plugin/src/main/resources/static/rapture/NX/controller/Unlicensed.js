@@ -59,8 +59,9 @@ Ext.define('NX.controller.Unlicensed', {
   },
 
   /**
-   * @override
    * Show {@link NX.view.Unlicensed} view from {@link Ext.container.Viewport}.
+   *
+   * @override
    */
   onLaunch: function () {
     var me = this,
@@ -76,8 +77,9 @@ Ext.define('NX.controller.Unlicensed', {
   },
 
   /**
-   * @public
    * Removes {@link NX.view.Unlicensed} view from {@link Ext.container.Viewport}.
+   *
+   * @public
    */
   onDestroy: function () {
     var me = this,
