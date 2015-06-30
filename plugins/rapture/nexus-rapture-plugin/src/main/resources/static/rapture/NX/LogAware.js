@@ -23,6 +23,7 @@ Ext.define('NX.LogAware', {
   ],
 
   /**
+   * @protected
    * @param {String} level
    * @param {Array} args
    */
@@ -43,7 +44,7 @@ Ext.define('NX.LogAware', {
   },
 
   /**
-   * @public
+   * @protected
    */
   logDebug: function () {
     //<if debug>
@@ -52,7 +53,7 @@ Ext.define('NX.LogAware', {
   },
 
   /**
-   * @public
+   * @protected
    */
   logInfo: function () {
     //<if debug>
@@ -61,7 +62,7 @@ Ext.define('NX.LogAware', {
   },
 
   /**
-   * @public
+   * @protected
    */
   logWarn: function () {
     //<if debug>
@@ -70,7 +71,7 @@ Ext.define('NX.LogAware', {
   },
 
   /**
-   * @public
+   * @protected
    */
   logError: function () {
     //<if debug>

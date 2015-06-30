@@ -84,7 +84,18 @@ Ext.define('NX.controller.State', {
     );
   },
 
+  /**
+   * Install initial state, primed from app.js
+   *
+   * @override
+   */
   onLaunch: function () {
+    var me = this;
+
+    //<if debug>
+    me.logDebug('Initial state: ', NX.app.state);
+    //</if>
+
     var uiSettings = NX.app.state['uiSettings'];
 
     NX.State.setBrowserSupported(
@@ -98,6 +109,10 @@ Ext.define('NX.controller.State', {
     delete NX.app.state['uiSettings'];
     NX.State.setValues(NX.app.state);
     NX.State.setValues({ uiSettings: uiSettings });
+
+    //<if debug>
+    me.logInfo('State primed');
+    //</if>
   },
 
   /**
@@ -204,7 +219,11 @@ Ext.define('NX.controller.State', {
 
   notifyChange: function (key, value, oldValue) {
     var me = this;
+
+    //<if debug>
     me.logDebug('Changed: ' + key + ' -> ' + (value ? Ext.JSON.encode(value) : '(deleted)'));
+    //</if>
+
     me.fireEvent(key.toLowerCase() + 'changed', value, oldValue);
     me.fireEvent('changed', key, value, oldValue);
   },
@@ -366,6 +385,7 @@ Ext.define('NX.controller.State', {
           // Stop polling
           me.statusProvider.disconnect();
 
+          // FIXME: i18n
           // Show the UI with a modal dialog error
           NX.Dialogs.showError(
               'Server disconnected',
@@ -422,6 +442,7 @@ Ext.define('NX.controller.State', {
 
   reloadWhenServerIdChanged: function (serverId, oldServerId) {
     if (oldServerId && (serverId !== oldServerId)) {
+      // FIXME: i18n
       NX.Dialogs.showInfo(
           'Server restarted',
           'Application will be reloaded as server has been restarted',

@@ -13,7 +13,7 @@
 /*global Ext*/
 
 /**
- * Shows an icon display of features in the {@link FeatureGroup} store.
+ * Shows an icon display of features in the {@link NX.store.FeatureGroup} store.
  *
  * @since 3.0
  */

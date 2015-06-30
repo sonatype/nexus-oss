@@ -54,19 +54,19 @@ Ext.define('NX.view.SettingsForm', {
   settingsFormSubmitOnEnter: false,
 
   /**
-   * @cfg {string/function} Text to be used when displaying submit/load messages. If is a function it will be called
+   * @cfg {String/Function} Text to be used when displaying submit/load messages. If is a function it will be called
    * with submit/load response data as parameter and it should return a String.
    * If text contains "${action}", it will be replaced with performed action.
    */
   settingsFormSuccessMessage: undefined,
 
   /**
-   * @cfg {string/function} [settingsFormLoadMessage: 'Loading...'] Text to be used as mask while loading data.
+   * @cfg {String/Function} [settingsFormLoadMessage: 'Loading...'] Text to be used as mask while loading data.
    */
   settingsFormLoadMessage: NX.I18n.get('SettingsForm_Load_Message'),
 
   /**
-   * @cfg {string/function} [settingsFormSubmitMessage: 'Saving...'] Text to be used as mask while submitting data.
+   * @cfg {String/Function} [settingsFormSubmitMessage: 'Saving...'] Text to be used as mask while submitting data.
    */
   settingsFormSubmitMessage: NX.I18n.get('SettingsForm_Submit_Message'),
 
@@ -76,7 +76,7 @@ Ext.define('NX.view.SettingsForm', {
   editableCondition: undefined,
 
   /**
-   * @cfg {string} Optional text to be shown in case that form is not editable (condition is not satisfied).
+   * @cfg {String} Optional text to be shown in case that form is not editable (condition is not satisfied).
    */
   editableMarker: undefined,
 

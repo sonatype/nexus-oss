@@ -85,9 +85,10 @@ Ext.define('NX.ext.form.field.ValueSet', {
   input: undefined,
 
   /**
-   * @cfg {String} emptyText
    * The default text to place into an empty field.
-   * @see Ext.form.field.Text#emptyText
+   * See {@link Ext.form.field.Text#emptyText}
+   *
+   * @cfg {String} emptyText
    */
   emptyText: undefined,
 
@@ -102,7 +103,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
   glyphAddButton: 'xf055@FontAwesome' /* fa-plus-circle */,
 
   /**
-   * @cfg {String} [glyphAddButton="xf056@FontAwesome"]
+   * @cfg {String} [glyphDeleteButton="xf056@FontAwesome"]
    */
   glyphDeleteButton: 'xf056@FontAwesome' /* fa-minus-circle */,
 

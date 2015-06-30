@@ -180,6 +180,7 @@ public class SecurityComponent
   public Map<String, Object> getState() {
     Map<String, Object> state = new HashMap<>();
     state.put("user", getUser());
+    state.put("permissions", getPermissions());
 
     AnonymousConfiguration anonymousConfiguration = anonymousManager.getConfiguration();
     state.put("anonymousUsername", anonymousConfiguration.isEnabled() ? anonymousConfiguration.getUserId() : null);
