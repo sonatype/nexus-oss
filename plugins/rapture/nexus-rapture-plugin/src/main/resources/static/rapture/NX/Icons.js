@@ -30,7 +30,6 @@ Ext.define('NX.Icons', {
    * Helper to get the CSS class for a named icon with optional variant.
    *
    * @public
-   * @static
    */
   cls: function (name, variant) {
     var cls = 'nx-icon-' + name;
@@ -44,7 +43,6 @@ Ext.define('NX.Icons', {
    * Helper to get html text for a named icon with variant.
    *
    * @public
-   * @static
    */
   img: function(name, variant) {
     return Ext.DomHelper.markup({

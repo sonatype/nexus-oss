@@ -80,4 +80,21 @@
     </plugins>
   </build>
 
+  <profiles>
+    <!--
+    Enable functional-testsuite support module
+    -->
+    <profile>
+      <id>functional-testsuite</id>
+      <activation>
+        <property>
+          <name>ft</name>
+        </property>
+      </activation>
+      <modules>
+        <module>nexus-siestajs-testsupport</module>
+      </modules>
+    </profile>
+  </profiles>
+
 </project>

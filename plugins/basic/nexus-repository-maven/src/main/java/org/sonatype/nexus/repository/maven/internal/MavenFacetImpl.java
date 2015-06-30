@@ -80,36 +80,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 public class MavenFacetImpl
     extends FacetSupport
-    implements MavenFacet
+    implements MavenFacet, MavenAttributes
 {
-  // artifact shared properties of both, artifact component and artifact asset
-
-  private static final String P_GROUP_ID = "groupId";
-
-  private static final String P_ARTIFACT_ID = "artifactId";
-
-  private static final String P_VERSION = "version";
-
-  private static final String P_BASE_VERSION = "baseVersion";
-
-  private static final String P_CLASSIFIER = "classifier";
-
-  private static final String P_EXTENSION = "extension";
-
-  // artifact component properties
-
-  private static final String P_COMPONENT_KEY = "key";
-
-  // shared properties for both artifact and metadata assets
-
-  private static final String P_ASSET_KEY = "key";
-
-  private static final String P_CONTENT_LAST_MODIFIED = "contentLastModified";
-
-  private static final String P_CONTENT_ETAG = "etag";
-
-  private static final String P_LAST_VERIFIED = "lastVerified";
-
   private final Map<String, MavenPathParser> mavenPathParsers;
 
   @VisibleForTesting

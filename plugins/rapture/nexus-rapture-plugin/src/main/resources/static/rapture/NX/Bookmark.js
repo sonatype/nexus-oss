@@ -21,8 +21,9 @@ Ext.define('NX.Bookmark', {
 
   config: {
     /**
-     * @public
      * Bookmark token.
+     *
+     * @public
      * @type {String}
      */
     token: undefined
@@ -39,8 +40,9 @@ Ext.define('NX.Bookmark', {
   },
 
   /**
-   * @private
    * Validates token to be a String and calculates segments.
+   *
+   * @private
    * @param token to apply
    * @returns {String} token
    */
@@ -65,7 +67,7 @@ Ext.define('NX.Bookmark', {
 
   /**
    * @public
-   * @param {int} index of segment
+   * @param {Number} index of segment
    * @returns {String} segment at index if defined
    */
   getSegment: function (index) {

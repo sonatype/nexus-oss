@@ -64,7 +64,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
   /**
    * @override
    * Imports capability into settings field set.
-   * @param {NX.model.Capability} model capability model
+   * @param {NX.coreui.model.Capability} model capability model
    */
   loadRecord: function(model) {
     var me = this,

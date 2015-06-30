@@ -23,6 +23,7 @@ Ext.define('NX.LogAware', {
   ],
 
   /**
+   * @protected
    * @param {String} level
    * @param {Array} args
    */
@@ -32,28 +33,28 @@ Ext.define('NX.LogAware', {
   },
 
   /**
-   * @public
+   * @protected
    */
   logDebug: function () {
     this.log('debug', Array.prototype.slice.call(arguments));
   },
 
   /**
-   * @public
+   * @protected
    */
   logInfo: function () {
     this.log('info', Array.prototype.slice.call(arguments));
   },
 
   /**
-   * @public
+   * @protected
    */
   logWarn: function () {
     this.log('warn', Array.prototype.slice.call(arguments));
   },
 
   /**
-   * @public
+   * @protected
    */
   logError: function () {
     this.log('error', Array.prototype.slice.call(arguments));

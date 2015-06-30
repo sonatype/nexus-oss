@@ -338,9 +338,7 @@ Ext.define('NX.controller.Drilldown', {
   bindDeleteButton: function (button) {
     var me = this;
     button.mon(
-        NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission + ':delete')
-        ),
+        NX.Conditions.isPermitted(me.permission + ':delete'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
