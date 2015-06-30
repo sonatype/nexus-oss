@@ -239,7 +239,7 @@ Ext.define('NX.app.Application', {
     remotingProvider = Ext.direct.Manager.addProvider(NX.direct.api.REMOTING_API);
 
     // configure Ext.Direct buffer-window milliseconds
-    remotingProvider.enableBuffer = 100;
+    remotingProvider.enableBuffer = 10;
 
     // disable retry
     remotingProvider.maxRetries = 0;
