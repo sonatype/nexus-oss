@@ -28,6 +28,9 @@ Ext.define('NX.view.dev.Logging', {
     deferEmptyText: false
   },
 
+  stateful: true,
+  stateId: 'nx-dev-logging',
+
   columns: [
     { text: 'level', dataIndex: 'level' },
     { text: 'logger', dataIndex: 'logger', flex: 1 },
