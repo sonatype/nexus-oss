@@ -48,7 +48,6 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
           ui: 'nx-subsection',
           itemId: 'nx-coreui-capability-summary-subsection',
           frame: true,
-          title: NX.I18n.get('Capability_CapabilitySummary_Summary_Title'),
           layout: 'column',
           weight: 10,
           items: [

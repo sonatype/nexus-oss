@@ -698,7 +698,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Capability_CapabilitySummary_Title: 'Summary',
     Capability_CapabilitySettings_Title: 'Settings',
     Capability_CapabilitySettingsForm_Enabled_FieldLabel: 'Enable this capability',
-    Capability_CapabilitySummary_Summary_Title: 'Summary',
     Capability_CapabilitySummary_Status_Title: 'Status',
     Capability_CapabilitySummary_About_Title: 'About',
     Capability_CapabilitySummary_Notes_Title: 'Notes',
