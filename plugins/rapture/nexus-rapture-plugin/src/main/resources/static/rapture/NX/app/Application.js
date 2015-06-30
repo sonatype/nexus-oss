@@ -259,11 +259,13 @@ Ext.define('NX.app.Application', {
    * Initialize state manager.
    */
   initState: function () {
-    var me = this;
+    var me = this,
+        provider;
 
     // If local storage is supported install state provider
     if (Ext.util.LocalStorage.supported) {
-      Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
+      provider = Ext.create('Ext.state.LocalStorageProvider');
+      Ext.state.Manager.setProvider(provider);
       //<if debug>
       me.logDebug('Configured state provider: local');
       //</if>
@@ -274,10 +276,13 @@ Ext.define('NX.app.Application', {
       //</if>
     }
 
-    // HACK: for debugging
-    //provider.on('statechange', function (provider, key, value, opts) {
-    //  me.logDebug('State changed: ' + key + '=' + value);
-    //});
+    //<if debug>
+    if (provider) {
+      provider.on('statechange', function (provider, key, value, opts) {
+        me.logTrace('State changed:', key, '=', value);
+      });
+    }
+    //</if>
   },
 
   /**
