@@ -114,8 +114,10 @@ Ext.define('NX.app.Application', {
   ],
 
   /**
+   * Managed controller configurations.
+   *
    * @private
-   * {@link Ext.util.MixedCollection} containing managed controllers configurations
+   * @property {Ext.util.MixedCollection}
    */
   managedControllers: undefined,
 
@@ -155,7 +157,7 @@ Ext.define('NX.app.Application', {
 
     //<if debug>
     me.logInfo('Initializing');
-    me.logDebug(me.managedControllers.getCount() + ' managed controllers');
+    me.logDebug(me.managedControllers.getCount(), 'managed controllers');
     //</if>
 
     // Configure blank image URL
@@ -332,7 +334,7 @@ Ext.define('NX.app.Application', {
           changes = true;
 
           //<if debug>
-          me.logDebug('Destroying controller: ' + key);
+          me.logDebug('Destroying controller:', key);
           //</if>
 
           ref.controller.fireEvent('destroy', ref.controller);
@@ -358,7 +360,7 @@ Ext.define('NX.app.Application', {
           changes = true;
 
           //<if debug>
-          me.logDebug('Initializing controller: ' + key);
+          me.logDebug('Initializing controller:', key);
           //</if>
 
           ref.controller = me.getController(key);

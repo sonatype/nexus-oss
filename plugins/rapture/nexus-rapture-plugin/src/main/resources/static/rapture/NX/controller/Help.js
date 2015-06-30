@@ -113,8 +113,9 @@ Ext.define('NX.controller.Help', {
   },
 
   /**
-   * @private
    * Update help menu content.
+   *
+   * @private
    * @param {NX.model.Feature} feature selected feature
    */
   onFeatureSelected: function (feature) {

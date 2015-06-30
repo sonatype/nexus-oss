@@ -39,9 +39,10 @@ Ext.define('NX.controller.KeyNav', {
   },
 
   /**
-   * @private
    * Install a key nav that will trigger click on any form buttons marked with "bindToEnter: true",
    * (usually submit button) on ENTER.
+   *
+   * @private
    */
   installEnterKey: function (button) {
     var form = button.up('form');

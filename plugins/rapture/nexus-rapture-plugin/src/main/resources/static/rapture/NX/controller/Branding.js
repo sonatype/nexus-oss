@@ -57,8 +57,9 @@ Ext.define('NX.controller.Branding', {
   },
 
   /**
-   * @private
    * Render header/footer branding when branding configuration changes.
+   *
+   * @private
    */
   onBrandingChanged: function() {
     var me = this;
@@ -68,8 +69,9 @@ Ext.define('NX.controller.Branding', {
   },
 
   /**
-   * @private
    * Render header branding.
+   *
+   * @private
    */
   renderHeaderBranding: function() {
     var me = this,
@@ -88,8 +90,9 @@ Ext.define('NX.controller.Branding', {
   },
 
   /**
-   * @private
    * Render footer branding.
+   *
+   * @private
    */
   renderFooterBranding: function() {
     var me = this,

@@ -70,8 +70,9 @@ Ext.define('NX.controller.Main', {
   },
 
   /**
-   * @override
    * Show {@link NX.view.Main} view from {@link Ext.container.Viewport}.
+   *
+   * @override
    */
   onLaunch: function () {
     var me = this,
@@ -87,8 +88,9 @@ Ext.define('NX.controller.Main', {
   },
 
   /**
-   * @public
    * Removes {@link NX.view.Main} view from {@link Ext.container.Viewport}.
+   *
+   * @public
    */
   onDestroy: function () {
     var me = this,

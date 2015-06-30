@@ -67,7 +67,7 @@ Ext.define('NX.controller.Icon', {
         img;
 
     //<if debug>
-    me.logDebug('Preloading: ' + url);
+    me.logTrace('Preloading:', url);
     //</if>
 
     img = new Image();
@@ -103,7 +103,7 @@ Ext.define('NX.controller.Icon', {
     me.stylesheet = Ext.util.CSS.createStyleSheet(styles.join(' '), 'nx-icons');
 
     //<if debug>
-    me.logDebug('Stylesheet installed with ' + me.stylesheet.cssRules.length + ' rules');
+    me.logDebug('Stylesheet installed with', me.stylesheet.cssRules.length, 'rules');
     //</if>
   },
 
@@ -176,10 +176,10 @@ Ext.define('NX.controller.Icon', {
 
     // complain if height/width are missing as this could cause the image not to display
     if (!icon.height) {
-      me.logWarn('Icon missing height: ' + icon.css);
+      me.logWarn('Icon missing height:', icon.css);
     }
     if (!icon.width) {
-      me.logWarn('Icon missing width: ' + icon.css);
+      me.logWarn('Icon missing width:', icon.css);
     }
 
     // TODO: complain if we are overwriting an icon
