@@ -23,9 +23,10 @@ import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.security.SecurityFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
-import org.sonatype.nexus.repository.view.ConditionalRequestHandler
+import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.ExceptionHandler
+import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
+import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route.Builder
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
 
@@ -62,7 +63,7 @@ abstract class MavenRecipeSupport
   ConditionalRequestHandler conditionalRequestHandler
 
   @Inject
-  MavenHeadersHandler mavenHeadersHandler
+  ContentHeadersHandler contentHeadersHandler
 
   final MavenPathParser mavenPathParser
 

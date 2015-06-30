@@ -26,17 +26,12 @@ Ext.define('NX.app.PluginStrings', {
     'NX.I18n'
   ],
 
-  /*
-   * Note: Symbols follow the following naming convention:
-   * <Class>_<Name>_<Component or Attribute>
-   */
+  //
+  // Note: Symbols follow the following naming convention:
+  // <Class>_<Name>_<Component or Attribute>
+  //
 
   keys: {
-
-    /*
-     * Global strings
-     */
-
     // Header
     Header_Panel_Logo_Text: 'Sonatype Nexus',
     Header_BrowseMode_Title: 'Browse',

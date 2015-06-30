@@ -57,7 +57,7 @@ Ext.define('NX.ext.tab.SortedPanel', {
 
   // FIXME: This doesn't belong here, this is styling treatment for master/detail tabs only
   /**
-   * @Override
+   * @override
    */
   onAdd: function(item, index) {
     var me = this;
