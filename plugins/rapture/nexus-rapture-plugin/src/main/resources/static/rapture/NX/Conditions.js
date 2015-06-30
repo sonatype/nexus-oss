@@ -56,7 +56,7 @@ Ext.define('NX.Conditions', {
   },
 
   /**
-   * @param {String} form a {@link NX.view.SettingsForm} selector as specified by (@link Ext.ComponentQuery#query}
+   * @param {String} form a {@link NX.view.SettingsForm} selector as specified by {@link Ext.ComponentQuery#query}
    * @param {Function} [fn] to be called when form has a record to perform additional checks on the passed in model
    * @returns {NX.util.condition.FormHasRecord}
    */
