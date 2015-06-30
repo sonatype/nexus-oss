@@ -80,7 +80,7 @@ Ext.define('NX.controller.Content', {
     });
 
     // remove the current contents
-    content.removeAll();
+    content.removeAll(true);
 
     // Hide the breadcrumb
     content.showRoot();

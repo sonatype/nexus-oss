@@ -61,7 +61,7 @@ Ext.define('NX.view.drilldown.Details', {
         activeTab: 0,
         layoutOnTabChange: true,
         flex: 1,
-        items: me.tabs
+        items: Ext.clone(me.tabs)
       }
     ];
 
