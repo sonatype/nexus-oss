@@ -47,7 +47,7 @@ Ext.define('NX.controller.Help', {
 
   /**
    * @private
-   * @type {NX.model.Feature}
+   * @property {NX.model.Feature}
    */
   selectedFeature: undefined,
 

@@ -23,8 +23,7 @@ Ext.define('NX.Bookmark', {
     /**
      * Bookmark token.
      *
-     * @public
-     * @type {String}
+     * @cfg {String}
      */
     token: undefined
   },
