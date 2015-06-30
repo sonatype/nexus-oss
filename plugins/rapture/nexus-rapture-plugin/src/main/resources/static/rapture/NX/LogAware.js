@@ -28,35 +28,54 @@ Ext.define('NX.LogAware', {
    * @param {Array} args
    */
   log: function (level, args) {
+    //<if debug>
     args.unshift('[' + Ext.getClassName(this) + ']');
     NX.Log.log(level, args);
+    //</if>
+  },
+
+  /**
+   * @public
+   */
+  logTrace: function () {
+    //<if debug>
+    this.log('trace', Array.prototype.slice.call(arguments));
+    //</if>
   },
 
   /**
    * @protected
    */
   logDebug: function () {
+    //<if debug>
     this.log('debug', Array.prototype.slice.call(arguments));
+    //</if>
   },
 
   /**
    * @protected
    */
   logInfo: function () {
+    //<if debug>
     this.log('info', Array.prototype.slice.call(arguments));
+    //</if>
   },
 
   /**
    * @protected
    */
   logWarn: function () {
+    //<if debug>
     this.log('warn', Array.prototype.slice.call(arguments));
+    //</if>
   },
 
   /**
    * @protected
    */
   logError: function () {
+    //<if debug>
     this.log('error', Array.prototype.slice.call(arguments));
+    //</if>
   }
 });

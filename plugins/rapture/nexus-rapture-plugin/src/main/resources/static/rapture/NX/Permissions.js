@@ -104,7 +104,7 @@ Ext.define('NX.Permissions', {
     // or use cached implied if we know it
     if (me.impliedCache[expectedPermission] !== undefined) {
       //<if debug>
-      me.logDebug('Using cached implied permission: ' + expectedPermission + ' is: ' +
+      me.logTrace('Using cached implied permission: ' + expectedPermission + ' is: ' +
           me.impliedCache[expectedPermission]);
       //</if>
       hasPermission = me.impliedCache[expectedPermission];
@@ -123,7 +123,7 @@ Ext.define('NX.Permissions', {
       me.impliedCache[expectedPermission] = hasPermission;
 
       //<if debug>
-      me.logDebug('Cached implied permission: ' + expectedPermission + ' is: ' + hasPermission);
+      me.logTrace('Cached implied permission: ' + expectedPermission + ' is: ' + hasPermission);
       //</if>
     }
 
@@ -146,7 +146,7 @@ Ext.define('NX.Permissions', {
         part1, part2, i;
 
     //<if debug>
-    me.logDebug('Checking if: ' + permission1 + ' implies: ' + permission2);
+    me.logTrace('Checking if: ' + permission1 + ' implies: ' + permission2);
     //</if>
 
     for (i = 0; i < parts2.length; i++) {
