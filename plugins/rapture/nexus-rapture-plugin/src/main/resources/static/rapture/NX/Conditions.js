@@ -75,7 +75,7 @@ Ext.define('NX.Conditions', {
   },
 
   /**
-   * Takes as parameter {NX.util.condition.Condition}s to be AND-ed.
+   * Takes as parameter {@link NX.util.condition.Condition}s to be AND-ed.
    *
    * @returns {NX.util.condition.Conjunction}
    */
@@ -84,7 +84,7 @@ Ext.define('NX.Conditions', {
   },
 
   /**
-   * Takes as parameter {NX.util.condition.Condition}s to be OR-ed.
+   * Takes as parameter {@link NX.util.condition.Condition}s to be OR-ed.
    *
    * @returns {NX.util.condition.Disjunction}
    */
