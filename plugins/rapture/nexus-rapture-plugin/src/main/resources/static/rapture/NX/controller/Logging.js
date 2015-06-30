@@ -45,7 +45,7 @@ Ext.define('NX.controller.Logging', {
   threshold: 'debug',
 
   /**
-   * Attach to NX.Log helper.
+   * Attach to {@link NX.Log} helper.
    *
    * @override
    */
@@ -60,10 +60,10 @@ Ext.define('NX.controller.Logging', {
    * @param {boolean} flag
    */
   setRemote: function (flag) {
-    var me = this;
     this.remote = flag;
+
     //<if debug>
-    me.logInfo('Remote events:', flag ? 'enabled' : 'disabled');
+    this.logInfo('Remote events:', flag ? 'enabled' : 'disabled');
     //</if>
   },
 
@@ -84,7 +84,7 @@ Ext.define('NX.controller.Logging', {
   },
 
   /**
-   * Mapping of NX.store.LogLevel weights.
+   * Mapping of {@link NX.store.LogLevel} weights.
    *
    * @private
    */
@@ -101,8 +101,8 @@ Ext.define('NX.controller.Logging', {
    * Check if given level exceeds configured threshold.
    *
    * @private
-   * @param {string} level
-   * @return {boolean}
+   * @param {String} level
+   * @return {Boolean}
    */
   exceedsThreshold: function (level) {
     return this.levelWeights[level] >= this.levelWeights[this.threshold];
