@@ -21,13 +21,13 @@ public interface MavenAttributes
 {
   // artifact shared properties of both, artifact component and artifact asset
 
-  String P_GROUP_ID = "group_id";
+  String P_GROUP_ID = "groupId";
 
-  String P_ARTIFACT_ID = "artifact_id";
+  String P_ARTIFACT_ID = "artifactId";
 
   String P_VERSION = "version";
 
-  String P_BASE_VERSION = "base_version";
+  String P_BASE_VERSION = "baseVersion";
 
   String P_CLASSIFIER = "classifier";
 
@@ -41,9 +41,9 @@ public interface MavenAttributes
 
   String P_ASSET_KEY = "key";
 
-  String P_CONTENT_LAST_MODIFIED = "content_last_modified";
+  String P_CONTENT_LAST_MODIFIED = "contentLastModified";
 
-  String P_CONTENT_ETAG = "content_etag";
+  String P_CONTENT_ETAG = "contentEtag";
 
-  String P_LAST_VERIFIED = "last_verified";
+  String P_LAST_VERIFIED = "lastVerified";
 }
