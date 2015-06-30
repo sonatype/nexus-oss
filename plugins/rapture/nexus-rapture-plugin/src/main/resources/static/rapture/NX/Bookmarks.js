@@ -32,21 +32,21 @@ Ext.define('NX.Bookmarks', {
   },
 
   /**
-   * See {@link NX.controller.Bookmarking#getBookmark}
+   * @see NX.controller.Bookmarking#getBookmark
    */
   getBookmark: function () {
     return this.controller().getBookmark();
   },
 
   /**
-   * See {@link NX.controller.Bookmarking#bookmark}
+   * @see NX.controller.Bookmarking#bookmark
    */
   bookmark: function (bookmark, caller) {
     return this.controller().bookmark(bookmark, caller);
   },
 
   /**
-   * See {@link NX.controller.Bookmarking#navigateTo}
+   * @see NX.controller.Bookmarking#navigateTo
    */
   navigateTo: function (bookmark, caller) {
     return this.controller().navigateTo(bookmark, caller);
@@ -56,7 +56,7 @@ Ext.define('NX.Bookmarks', {
    * Creates a new bookmark.
    *
    * @public
-   * @param [{String}] token bookmark token
+   * @param {String} token bookmark token
    * @returns {NX.Bookmark} created bookmark
    */
   fromToken: function (token) {
