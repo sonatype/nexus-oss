@@ -663,9 +663,10 @@
               <exclude>**/nexus-ldap-plugin/**/org/sonatype/nexus/ldap/internal/connector/dao/LdapEncoder.java</exclude>
 
               <!--
-              Exclude siesta-js resources
+              Exclude functional-testsuite overlay resources
               -->
-              <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite-lib/siesta/**</exclude>
+              <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite-lib/**</exclude>
+              <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite.html</exclude>
             </excludes>
           </configuration>
         </plugin>
