@@ -43,6 +43,7 @@ Ext.define('NX.controller.Features', {
 
   /**
    * Registers features.
+   *
    * @param {Array/Object} features to be registered
    * @param {Ext.util.Observable} [owner] to be watched to automatically unregister the features if owner is destroyed
    */
