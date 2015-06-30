@@ -47,7 +47,7 @@ Ext.define('NX.Conditions', {
   },
 
   /**
-   * @param {String} grid a grid selector as specified by (@link Ext.ComponentQuery#query}
+   * @param {String} grid a grid selector as specified by {@link Ext.ComponentQuery#query}
    * @param {Function} [fn] to be called when grid has a selection to perform additional checks on the passed in model
    * @returns {NX.util.condition.GridHasSelection}
    */
