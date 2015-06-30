@@ -129,7 +129,7 @@ StartTest(function(t) {
           {click: '#writePolicy => .x-form-text'},
           {click: '#writePolicy.getPicker() => .x-boundlist-item:contains(Disable redeploy)'},
           Ext.apply(Ext.clone(waitForStoreToLoad),
-              {trigger: {click: '>>nx-settingsform button[action=save]'}}
+              {trigger: {click: '>>nx-coreui-repository-settings button[action=save]'}}
           ),          
           function(next) {
             t.waitForAnimations(next);
