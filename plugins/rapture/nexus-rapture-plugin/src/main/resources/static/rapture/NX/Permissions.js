@@ -20,6 +20,7 @@
 Ext.define('NX.Permissions', {
   singleton: true,
   requires: [
+    'NX.Assert',
     'NX.util.Array'
   ],
   mixins: {
@@ -91,10 +92,9 @@ Ext.define('NX.Permissions', {
     var me = this,
         hasPermission = false;
 
-    // HACK: for now complain if we see 'undefined' in permission string
-    if (expectedPermission.search('undefined') !== -1) {
-      me.logError('Invalid permission check:', expectedPermission);
-    }
+    //<if assert>
+    NX.Assert.assert(expectedPermission.search('undefined') === -1, 'Invalid permission check:', expectedPermission);
+    //</if>
 
     // short-circuit if permissions are not installed
     if (!me.available()) {
