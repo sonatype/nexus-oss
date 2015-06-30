@@ -37,7 +37,6 @@ import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import org.sonatype.sisu.litmus.testsupport.port.PortRegistry;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.junit.After;
@@ -55,15 +54,8 @@ import org.ops4j.pax.exam.karaf.options.KarafDistributionConfigurationFileExtend
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.slf4j.Logger;
 
-import static org.ops4j.pax.exam.CoreOptions.composite;
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.propagateSystemProperty;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-import static org.ops4j.pax.exam.CoreOptions.systemTimeout;
-import static org.ops4j.pax.exam.CoreOptions.vmOptions;
-import static org.ops4j.pax.exam.CoreOptions.when;
-import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.ops4j.pax.exam.CoreOptions.*;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
 /**
@@ -123,12 +115,11 @@ public abstract class NexusPaxExamSupport
   @Inject
   protected TaskScheduler taskScheduler;
 
-  protected final Logger log = (Logger) Preconditions.checkNotNull(this.createLogger());
+  protected final Logger log = checkNotNull(createLogger());
 
   protected Logger createLogger() {
     return Loggers.getLogger(this);
   }
-
 
   // -------------------------------------------------------------------------
 
@@ -322,6 +313,10 @@ public abstract class NexusPaxExamSupport
 
     boolean debugging = Boolean.parseBoolean(System.getProperty("it.debug"));
 
+    // allow overriding of the out-of-the-box logback configuration
+    File logbackProperties = resolveBaseFile("target/test-classes/logback.properties");
+    File logbackNexusXml = resolveBaseFile("target/test-classes/logback-nexus.xml");
+
     return composite(
 
         vmOptions("-Xmx400m", "-XX:MaxPermSize=192m"), // taken from testsuite config
@@ -363,6 +358,11 @@ public abstract class NexusPaxExamSupport
         // move work directory inside unpacked distribution
         editConfigurationFilePut("etc/nexus.properties", //
             "nexus-work", "${nexus-base}/sonatype-work/nexus"),
+
+        when(logbackProperties.canRead()).useOptions( //
+            replaceConfigurationFile("sonatype-work/nexus/etc/logback.properties", logbackProperties)),
+        when(logbackNexusXml.canRead()).useOptions( //
+            replaceConfigurationFile("sonatype-work/nexus/etc/logback-nexus.xml", logbackNexusXml)),
 
         // randomize ports...
         editConfigurationFilePut("etc/nexus.properties", //
