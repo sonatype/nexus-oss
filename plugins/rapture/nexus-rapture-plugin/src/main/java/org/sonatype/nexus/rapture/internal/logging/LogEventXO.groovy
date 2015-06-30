@@ -22,7 +22,7 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class LogEventXO
 {
-  // timestamp?
+  Long timestamp
 
   String logger
 

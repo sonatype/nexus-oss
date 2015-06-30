@@ -20,7 +20,7 @@
 Ext.define('NX.model.LogEvent', {
   extend: 'Ext.data.Model',
   fields: [
-    { name: 'timestamp', type: 'date' },
+    { name: 'timestamp', type: 'int' },
     { name: 'logger', type: 'string' },
     { name: 'level', type: 'string' },
     { name: 'message', type: 'string' }

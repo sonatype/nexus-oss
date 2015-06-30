@@ -66,7 +66,7 @@ Ext.define('NX.Log', {
   recordEvent: function (level, logger, message) {
     var me = this,
         event = {
-          timestamp: new Date(),
+          timestamp: Date.now(),
           level: level,
           logger: logger,
           message: message

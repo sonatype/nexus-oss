@@ -124,7 +124,7 @@ Ext.define('NX.controller.Logging', {
 
     // ensure events have a timestamp
     if (!event.timestamp) {
-      event.timestamp = new Date();
+      event.timestamp = Date.now();
     }
 
     me.getStore('LogEvent').add(event);

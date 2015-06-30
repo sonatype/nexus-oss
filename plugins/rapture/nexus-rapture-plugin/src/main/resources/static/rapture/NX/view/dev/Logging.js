@@ -32,7 +32,7 @@ Ext.define('NX.view.dev.Logging', {
     { text: 'level', dataIndex: 'level' },
     { text: 'logger', dataIndex: 'logger', flex: 1 },
     { text: 'message', dataIndex: 'message', flex: 3 },
-    { text: 'timestamp', dataIndex: 'timestamp', width: 300 }
+    { text: 'timestamp', dataIndex: 'timestamp', width: 130 }
   ],
 
   tbar: [
