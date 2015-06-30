@@ -19,6 +19,9 @@
  */
 Ext.define('NX.util.condition.WatchState', {
   extend: 'NX.util.condition.Condition',
+  requires: [
+    'NX.State'
+  ],
 
   /**
    * @cfg {String}

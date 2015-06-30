@@ -23,13 +23,16 @@ Ext.define('NX.util.condition.FormHasRecord', {
   extend: 'NX.util.condition.Condition',
 
   /**
-   * @cfg {String} A form selector as specified by (@link Ext.ComponentQuery#query}
+   * A form selector as specified by (@link Ext.ComponentQuery#query}.
+   *
+   * @cfg {String}
    */
   form: undefined,
 
   /**
-   * @cfg {Function} An optional function to be called when form has a record to perform additional checks on the
-   * passed in model
+   * An optional function to be called when form has a record to perform additional checks on the passed in model.
+   *
+   * @cfg {Function}
    */
   fn: undefined,
 

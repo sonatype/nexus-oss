@@ -28,21 +28,32 @@ Ext.define('NX.util.condition.Condition', {
 
   /**
    * Generated id used by event bus.
+   *
+   * @property {String}
    */
   id: undefined,
 
   /**
-   * @private {Number} number of listeners listening to this condition
+   * Number of listeners listening to this condition.
+   *
+   * @private
+   * @property {Number}
    */
   listenerCounter: 0,
 
   /**
-   * @private {Boolean} true when this condition is bounded
+   * True when this condition is bounded.
+   *
+   * @private
+   * @property {Boolean}
    */
   bounded: false,
 
   /**
-   * @private {Boolean} true when this condition is satisfied
+   * True when this condition is satisfied.
+   *
+   * @private
+   * @property {Boolean}
    */
   satisfied: false,
 
@@ -73,6 +84,9 @@ Ext.define('NX.util.condition.Condition', {
   },
 
   // HACK: comment the following lines to let debug messages flow
+  /**
+   * @override
+   */
   logDebug: function () {
     // empty
   },

@@ -22,13 +22,17 @@ Ext.define('NX.util.condition.GridHasSelection', {
   extend: 'NX.util.condition.Condition',
 
   /**
-   * @cfg {String} A grid selector as specified by (@link Ext.ComponentQuery#query}
+   * A grid selector as specified by (@link Ext.ComponentQuery#query}.
+   *
+   * @cfg {String}
    */
   grid: undefined,
 
   /**
-   * @cfg {Function} An optional function to be called when grid has a selection to perform additional checks on the
-   * passed in model
+   * An optional function to be called when grid has a selection to perform additional checks on the
+   * passed in model.
+   *
+   * @cfg {Function}
    */
   fn: undefined,
 
