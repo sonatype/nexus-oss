@@ -75,9 +75,9 @@ public class SharedHttpClientConnectionManager
 
     this.connectionPoolIdleTime = checkNotNull(connectionPoolIdleTime);
     this.connectionPoolEvictingDelayTime = checkNotNull(connectionPoolEvictingDelayTime);
-    log.debug("Connection pool idle-time: {}", connectionPoolIdleTime);
-
     setValidateAfterInactivity(connectionPoolValidateAfterInactivityTime.toMillisI());
+    log.debug("Connection pool idle-time: {}, evicting delay: {}, validate after inactivity: {}",
+        connectionPoolIdleTime, connectionPoolEvictingDelayTime, connectionPoolValidateAfterInactivityTime);
   }
 
   private static Registry<ConnectionSocketFactory> createRegistry(final List<SSLContextSelector> sslContextSelectors) {
