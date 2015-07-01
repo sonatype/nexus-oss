@@ -13,7 +13,7 @@
 /*global Ext, NX*/
 
 /**
- * {@link NX.model.LogEvent} sink.
+ * Allows customizable processing of {@link NX.model.LogEvent}.
  *
  * @since 3.0
  */
@@ -47,6 +47,7 @@ Ext.define('NX.util.log.Sink', {
   /**
    * @public
    * @param {NX.model.LogEvent} event
+   * @see #handle
    */
   receive: function(event) {
     if (this.enabled) {
@@ -55,6 +56,8 @@ Ext.define('NX.util.log.Sink', {
   },
 
   /**
+   * Sub-class should override to provide processing of the event when sink is enabled.
+   *
    * @private
    */
   handle: function(event) {
