@@ -21,6 +21,8 @@ Ext.define('NX.util.log.StoreSink', {
   extend: 'NX.util.log.Sink',
 
   /**
+   * Reference to the event store.
+   *
    * @private
    * @property {NX.store.LogEvent}
    */
