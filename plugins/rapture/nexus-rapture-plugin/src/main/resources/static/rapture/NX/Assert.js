@@ -45,7 +45,7 @@ Ext.define('NX.Assert', {
         expression = args.shift();
     if (!expression) {
       args.unshift('Assertion failure:');
-      this.logError(args);
+      this.logError.apply(this, args);
     }
     //</if>
   }
