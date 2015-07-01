@@ -15,6 +15,8 @@
 /**
  * Console {@link NX.util.log.Sink}.
  *
+ * Emits events to the browser console.
+ *
  * @since 3.0
  */
 Ext.define('NX.util.log.ConsoleSink', {
