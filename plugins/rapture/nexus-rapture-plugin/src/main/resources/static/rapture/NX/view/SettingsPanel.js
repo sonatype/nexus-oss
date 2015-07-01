@@ -73,14 +73,14 @@ Ext.define('NX.view.SettingsPanel', {
   },
 
   /**
-   * Loads an Ext.data.Model into this form (internally just calls NX.view.SettingsForm.loadRecord)
+   * Loads an {@link Ext.data.Model? into this form
+   * (internally just calls {@link NX.view.SettingsForm#loadRecord}).
    *
    * @public
    * @param model The model to load
    */
   loadRecord: function(model) {
     var settingsForm = this.down('nx-settingsform');
-
     if (settingsForm) {
       settingsForm.loadRecord(model);
     }
