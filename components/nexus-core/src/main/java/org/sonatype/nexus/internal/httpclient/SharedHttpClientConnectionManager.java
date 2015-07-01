@@ -52,6 +52,8 @@ public class SharedHttpClientConnectionManager
 
   private final Time connectionPoolIdleTime;
 
+  private final Time connectionPoolEvictingDelayTime;
+
   private ConnectionEvictionThread evictionThread;
 
   @Inject
@@ -59,7 +61,8 @@ public class SharedHttpClientConnectionManager
       final List<SSLContextSelector> sslContextSelectors,
       @Named("${nexus.httpclient.connectionpool.size:-20}") final int connectionPoolSize,
       @Named("${nexus.httpclient.connectionpool.maxSize:-200}") final int connectionPoolMaxSize,
-      @Named("${nexus.httpclient.connectionpool.idleTime:-30s}") final Time connectionPoolIdleTime)
+      @Named("${nexus.httpclient.connectionpool.idleTime:-30s}") final Time connectionPoolIdleTime,
+      @Named("${nexus.httpclient.connectionpool.evictingDelayTime:-5s}") final Time connectionPoolEvictingDelayTime)
   {
     super(createRegistry(sslContextSelectors));
 
@@ -70,6 +73,7 @@ public class SharedHttpClientConnectionManager
     log.debug("Connection pool size: {}", connectionPoolSize);
 
     this.connectionPoolIdleTime = checkNotNull(connectionPoolIdleTime);
+    this.connectionPoolEvictingDelayTime = checkNotNull(connectionPoolEvictingDelayTime);
     log.debug("Connection pool idle-time: {}", connectionPoolIdleTime);
 
     setValidateAfterInactivity(-1);
@@ -105,7 +109,7 @@ public class SharedHttpClientConnectionManager
 
   @Override
   public void start() throws Exception {
-    evictionThread = new ConnectionEvictionThread(this, connectionPoolIdleTime);
+    evictionThread = new ConnectionEvictionThread(this, connectionPoolIdleTime, connectionPoolEvictingDelayTime);
     evictionThread.start();
   }
 

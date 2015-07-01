@@ -38,33 +38,34 @@ class ConnectionEvictionThread
 
   private final long idleTimeMillis;
 
-  private final long delay;
+  private final long delayMillis;
 
   @VisibleForTesting
   ConnectionEvictionThread(final HttpClientConnectionManager connectionManager,
                            final long idleTimeMillis,
-                           final long delay)
+                           final long delayMillis)
   {
     super("nexus-httpclient-eviction-thread");
     checkArgument(idleTimeMillis > -1, "Keep alive period in milliseconds cannot be negative");
+    checkArgument(delayMillis > 0, "Evicting delay period in milliseconds must be grater than 0");
     this.connectionManager = checkNotNull(connectionManager);
     this.idleTimeMillis = idleTimeMillis;
-    this.delay = delay;
+    this.delayMillis = delayMillis;
     setDaemon(true);
     setPriority(MIN_PRIORITY);
   }
 
-  ConnectionEvictionThread(final HttpClientConnectionManager connectionManager, final Time idleTime) {
-    this(connectionManager, idleTime.toMillisI(), 5000);
+  ConnectionEvictionThread(final HttpClientConnectionManager connectionManager, final Time idleTime, final Time delay) {
+    this(connectionManager, idleTime.toMillisI(), delay.toMillis());
   }
 
   @Override
   public void run() {
-    log.debug("Starting '{}' (delay {} millis)", getName(), delay);
+    log.debug("Starting '{}' (delay {} millis)", getName(), delayMillis);
     try {
       while (true) {
         synchronized (this) {
-          wait(delay);
+          wait(delayMillis);
 
           try {
             connectionManager.closeExpiredConnections();
