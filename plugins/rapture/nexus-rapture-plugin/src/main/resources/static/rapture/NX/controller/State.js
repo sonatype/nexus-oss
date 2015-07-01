@@ -345,15 +345,8 @@ Ext.define('NX.controller.State', {
     // propagate event data
     state = event.data.data;
 
-    if (!me.reloadWhenServerIdChanged(serverId, state.values.serverId ? state.values.serverId.value : serverId)) {
-      me.setValues(state.values);
-
-      // fire commands if there are any
-      if (state.commands) {
-        Ext.each(state.commands, function (command) {
-          me.fireEvent('command' + command.type.toLowerCase(), command.data);
-        });
-      }
+    if (!me.reloadWhenServerIdChanged(serverId, state.serverId ? state.serverId.value : serverId)) {
+      me.setValues(state);
     }
 
     // TODO: Fire global refresh event

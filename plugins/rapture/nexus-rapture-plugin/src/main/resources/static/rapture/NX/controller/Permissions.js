@@ -38,7 +38,7 @@ Ext.define('NX.controller.Permissions', {
       controller: {
         '#State': {
           userchanged: me.fetchPermissions,
-          commandfetchpermissions: me.fetchPermissions
+          permissionschanged: me.loadPermissions
         }
       },
       store: {
@@ -96,12 +96,25 @@ Ext.define('NX.controller.Permissions', {
   fetchPermissions: function () {
     var me = this;
 
+    NX.Permissions.resetPermissions();
     //<if debug>
     me.logDebug('Fetching permissions...');
     //</if>
-
-    NX.Permissions.resetPermissions();
     me.getStore('Permission').load();
+  },
+
+  /**
+   * @private
+   */
+  loadPermissions: function (permissions) {
+    var me = this;
+
+    //<if debug>
+    me.logDebug('Loading permissions...');
+    //</if>
+
+    me.getStore('Permission').loadRawData(permissions, false);
+    me.firePermissionsChanged();
   },
 
   /**

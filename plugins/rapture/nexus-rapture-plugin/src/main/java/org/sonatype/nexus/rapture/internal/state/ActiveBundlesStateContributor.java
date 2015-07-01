@@ -80,9 +80,4 @@ public class ActiveBundlesStateContributor
     return ImmutableMap.of(STATE_ID, (Object)activeBundles);
   }
 
-  @Override
-  @Nullable
-  public Map<String, Object> getCommands() {
-    return null;
-  }
 }
