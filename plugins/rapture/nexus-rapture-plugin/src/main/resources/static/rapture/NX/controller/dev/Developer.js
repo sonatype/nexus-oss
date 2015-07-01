@@ -177,8 +177,6 @@ Ext.define('NX.controller.dev.Developer', {
    * @private
    */
   testMessages: function () {
-    var me = this;
-
     Ext.each(['default', 'primary', 'danger', 'warning', 'success'], function (type) {
       NX.Messages.add({
         type: type,
