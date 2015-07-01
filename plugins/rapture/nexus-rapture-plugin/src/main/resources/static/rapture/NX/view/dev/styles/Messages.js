@@ -19,6 +19,8 @@
  */
 Ext.define('NX.view.dev.styles.Messages', {
   extend: 'NX.view.dev.styles.StyleSection',
+
+  //<if debug>
   requires: [
     'NX.Icons'
   ],
@@ -64,4 +66,5 @@ Ext.define('NX.view.dev.styles.Messages', {
 
     me.callParent();
   }
+  //</if>
 });

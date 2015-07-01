@@ -19,6 +19,8 @@
  */
 Ext.define('NX.controller.dev.Developer', {
   extend: 'Ext.app.Controller',
+
+  //<if debug>
   requires: [
     'NX.State',
     'NX.Messages'
@@ -196,5 +198,5 @@ Ext.define('NX.controller.dev.Developer', {
   toggleUnsupportedBrowser: function() {
     NX.State.setBrowserSupported(!NX.State.isBrowserSupported());
   }
-
+  //</if>
 });

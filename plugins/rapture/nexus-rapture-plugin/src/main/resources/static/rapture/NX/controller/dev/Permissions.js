@@ -19,6 +19,8 @@
  */
 Ext.define('NX.controller.dev.Permissions', {
   extend: 'Ext.app.Controller',
+
+  //<if debug>
   requires: [
     'NX.Permissions'
   ],
@@ -138,5 +140,5 @@ Ext.define('NX.controller.dev.Permissions', {
 
     deleteButton.setDisabled(!records.length);
   }
-
+  //</if>
 });

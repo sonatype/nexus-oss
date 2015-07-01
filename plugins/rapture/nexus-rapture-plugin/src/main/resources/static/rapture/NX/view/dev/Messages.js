@@ -21,6 +21,7 @@ Ext.define('NX.view.dev.Messages', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-dev-messages',
 
+  //<if debug>
   title: 'Messages',
   store: 'Message',
   emptyText: 'No messages',
@@ -47,5 +48,5 @@ Ext.define('NX.view.dev.Messages', {
     { ptype: 'rowediting', clicksToEdit: 1 },
     'gridfilterbox'
   ]
-
+  //</if>
 });

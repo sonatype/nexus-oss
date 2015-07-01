@@ -21,6 +21,7 @@ Ext.define('NX.view.dev.Conditions', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-dev-conditions',
 
+  //<if debug>
   title: 'Conditions',
   store: 'NX.store.dev.Condition',
   emptyText: 'No condition',
@@ -52,5 +53,5 @@ Ext.define('NX.view.dev.Conditions', {
     { xtype: 'checkbox', itemId: 'showSatisfied', boxLabel: 'Show Satisfied', value: true },
     { xtype: 'checkbox', itemId: 'showUnsatisfied', boxLabel: 'Show Unsatisfied', value: true }
   ]
-
+  //</if>
 });

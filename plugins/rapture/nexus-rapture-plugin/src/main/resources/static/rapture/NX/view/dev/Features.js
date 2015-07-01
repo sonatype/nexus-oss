@@ -21,6 +21,7 @@ Ext.define('NX.view.dev.Features', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-dev-features',
 
+  //<if debug>
   title: 'Features',
   store: 'Feature',
   emptyText: 'No features',
@@ -57,4 +58,5 @@ Ext.define('NX.view.dev.Features', {
     deferEmptyText: false,
     markDirty: false
   }
+  //</if>
 });

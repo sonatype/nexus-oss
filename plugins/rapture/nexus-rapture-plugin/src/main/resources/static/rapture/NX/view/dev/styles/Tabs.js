@@ -20,6 +20,7 @@
 Ext.define('NX.view.dev.styles.Tabs', {
   extend: 'NX.view.dev.styles.StyleSection',
 
+  //<if debug>
   title: 'Tabs',
   layout: {
     type: 'vbox',
@@ -70,4 +71,5 @@ Ext.define('NX.view.dev.styles.Tabs', {
 
     me.callParent();
   }
+  //</if>
 });

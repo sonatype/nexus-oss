@@ -21,6 +21,7 @@ Ext.define('NX.view.dev.Tests', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dev-tests',
 
+  //<if debug>
   title: 'Tests',
 
   layout: {
@@ -35,4 +36,5 @@ Ext.define('NX.view.dev.Tests', {
     { xtype: 'button', text: 'message types', action: 'testMessages' },
     { xtype: 'button', text: 'toggle unsupported browser', action: 'toggleUnsupportedBrowser'}
   ]
+  //</if>
 });

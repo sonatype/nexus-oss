@@ -21,6 +21,7 @@ Ext.define('NX.view.dev.State', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-dev-state',
 
+  //<if debug>
   title: 'State',
   store: 'State',
   emptyText: 'No values',
@@ -37,4 +38,5 @@ Ext.define('NX.view.dev.State', {
       }
     }
   ]
+  //</if>
 });

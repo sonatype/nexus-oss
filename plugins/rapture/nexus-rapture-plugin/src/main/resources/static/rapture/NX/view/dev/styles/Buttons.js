@@ -19,6 +19,8 @@
  */
 Ext.define('NX.view.dev.styles.Buttons', {
   extend: 'NX.view.dev.styles.StyleSection',
+
+  //<if debug>
   requires: [
     'Ext.XTemplate'
   ],
@@ -105,4 +107,6 @@ Ext.define('NX.view.dev.styles.Buttons', {
 
     me.callParent();
   }
+  //</if>
+
 });

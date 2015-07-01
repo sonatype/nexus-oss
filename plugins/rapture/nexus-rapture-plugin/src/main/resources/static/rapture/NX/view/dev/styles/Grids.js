@@ -19,6 +19,8 @@
  */
 Ext.define('NX.view.dev.styles.Grids', {
   extend: 'NX.view.dev.styles.StyleSection',
+
+  //<if debug>
   requires: [
     'Ext.data.ArrayStore'
   ],
@@ -59,4 +61,5 @@ Ext.define('NX.view.dev.styles.Grids', {
 
     me.callParent();
   }
+  //</if>
 });

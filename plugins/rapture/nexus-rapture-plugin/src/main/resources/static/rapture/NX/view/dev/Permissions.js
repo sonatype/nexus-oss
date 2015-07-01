@@ -19,6 +19,8 @@
  */
 Ext.define('NX.view.dev.Permissions', {
   extend: 'Ext.grid.Panel',
+
+  //<if debug>
   requires: [
     'NX.Permissions'
   ],
@@ -58,4 +60,5 @@ Ext.define('NX.view.dev.Permissions', {
     { xtype: 'button', text: 'Add', action: 'add' },
     { xtype: 'button', text: 'Delete', action: 'delete', disabled: true }
   ]
+  //</if>
 });

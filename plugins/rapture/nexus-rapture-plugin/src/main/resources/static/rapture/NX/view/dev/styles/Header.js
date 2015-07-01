@@ -19,6 +19,8 @@
  */
 Ext.define('NX.view.dev.styles.Header', {
   extend: 'NX.view.dev.styles.StyleSection',
+
+  //<if debug>
   requires: [
     'Ext.XTemplate',
     'NX.State',
@@ -190,4 +192,5 @@ Ext.define('NX.view.dev.styles.Header', {
 
     me.callParent();
   }
+  //</if>
 });

@@ -53,6 +53,7 @@ Ext.define('NX.app.PluginConfig', {
       }
     },
 
+    //<if debug>
     // dev controllers (visible when ?debug and rapture capability debugAllowed = true)
     {
       id: 'dev.Conditions',
@@ -84,5 +85,6 @@ Ext.define('NX.app.PluginConfig', {
         return NX.app.Application.debugMode;
       }
     }
+    //</if>
   ]
 });

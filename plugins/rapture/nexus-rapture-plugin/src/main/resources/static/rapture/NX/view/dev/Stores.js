@@ -20,6 +20,8 @@
 Ext.define('NX.view.dev.Stores', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dev-stores',
+
+  //<if debug>
   requires: [
     'Ext.data.Store',
     'Ext.data.StoreManager'
@@ -97,5 +99,5 @@ Ext.define('NX.view.dev.Stores', {
 
     me.callParent();
   }
-
+  //</if>
 });

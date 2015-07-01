@@ -19,6 +19,8 @@
  */
 Ext.define('NX.view.dev.styles.Pickers', {
   extend: 'NX.view.dev.styles.StyleSection',
+
+  //<if debug>
   requires: [
     'Ext.data.ArrayStore'
   ],
@@ -60,4 +62,5 @@ Ext.define('NX.view.dev.styles.Pickers', {
 
     me.callParent();
   }
+  //</if>
 });

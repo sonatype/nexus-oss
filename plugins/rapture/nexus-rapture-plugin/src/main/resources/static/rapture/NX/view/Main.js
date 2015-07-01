@@ -66,6 +66,7 @@ Ext.define('NX.view.Main', {
       hidden: false
     },
 
+    //<if debug>
     {
       xtype: 'nx-dev-panel',
       region: 'south',
@@ -80,6 +81,7 @@ Ext.define('NX.view.Main', {
       // default to hidden, only show if debug enabled
       hidden: true
     }
+    //</if>
   ],
 
   /**

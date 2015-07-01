@@ -20,6 +20,8 @@
 Ext.define('NX.view.dev.Styles', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dev-styles',
+
+  //<if debug>
   requires: [
     'NX.view.dev.styles.Header',
     'NX.view.dev.styles.Colors',
@@ -88,4 +90,5 @@ Ext.define('NX.view.dev.Styles', {
 
     me.callParent();
   }
+  //</if>
 });

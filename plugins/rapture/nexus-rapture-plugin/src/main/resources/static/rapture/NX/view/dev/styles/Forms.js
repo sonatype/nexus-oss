@@ -20,6 +20,7 @@
 Ext.define('NX.view.dev.styles.Forms', {
   extend: 'NX.view.dev.styles.StyleSection',
 
+  //<if debug>
   title: 'Forms',
   layout: {
     type: 'hbox',
@@ -211,4 +212,5 @@ Ext.define('NX.view.dev.styles.Forms', {
 
     me.callParent();
   }
+  //</if>
 });

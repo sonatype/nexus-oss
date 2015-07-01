@@ -20,6 +20,7 @@
 Ext.define('NX.view.dev.styles.Toolbars', {
   extend: 'NX.view.dev.styles.StyleSection',
 
+  //<if debug>
   title: 'Toolbars',
 
   /**
@@ -104,4 +105,5 @@ Ext.define('NX.view.dev.styles.Toolbars', {
 
     me.callParent();
   }
+  //</if>
 });

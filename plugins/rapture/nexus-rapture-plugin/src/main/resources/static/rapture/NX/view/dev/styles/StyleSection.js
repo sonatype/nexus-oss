@@ -20,6 +20,7 @@
 Ext.define('NX.view.dev.styles.StyleSection', {
   extend: 'Ext.panel.Panel',
 
+  //<if debug>
   ui: 'nx-light',
   bodyPadding: '5px 5px 5px 5px',
 
@@ -54,4 +55,5 @@ Ext.define('NX.view.dev.styles.StyleSection', {
     }
     return obj;
   }
+  //</if>
 });

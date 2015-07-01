@@ -20,6 +20,7 @@
 Ext.define('NX.view.dev.styles.Tooltips', {
   extend: 'NX.view.dev.styles.StyleSection',
 
+  //<if debug>
   title: 'Tooltips',
 
   /**
@@ -34,4 +35,5 @@ Ext.define('NX.view.dev.styles.Tooltips', {
 
     me.callParent();
   }
+  //</if>
 });

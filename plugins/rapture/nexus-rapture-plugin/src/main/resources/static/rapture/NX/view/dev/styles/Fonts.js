@@ -19,6 +19,8 @@
  */
 Ext.define('NX.view.dev.styles.Fonts', {
   extend: 'NX.view.dev.styles.StyleSection',
+
+  //<if debug>
   requires: [
     'Ext.XTemplate'
   ],
@@ -141,4 +143,5 @@ Ext.define('NX.view.dev.styles.Fonts', {
 
     me.callParent();
   }
+  //</if>
 });

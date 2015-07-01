@@ -20,6 +20,7 @@
 Ext.define('NX.view.dev.styles.Other', {
   extend: 'NX.view.dev.styles.StyleSection',
 
+  //<if debug>
   title: 'Other',
   layout: {
     type: 'vbox',
@@ -57,4 +58,5 @@ Ext.define('NX.view.dev.styles.Other', {
 
     me.callParent();
   }
+  //</if>
 });

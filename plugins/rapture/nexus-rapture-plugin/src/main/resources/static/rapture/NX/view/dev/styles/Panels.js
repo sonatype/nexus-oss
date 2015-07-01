@@ -20,6 +20,7 @@
 Ext.define('NX.view.dev.styles.Panels', {
   extend: 'NX.view.dev.styles.StyleSection',
 
+  //<if debug>
   title: 'Panels',
 
   layout: {
@@ -82,4 +83,5 @@ Ext.define('NX.view.dev.styles.Panels', {
 
     me.callParent();
   }
+  //</if>
 });

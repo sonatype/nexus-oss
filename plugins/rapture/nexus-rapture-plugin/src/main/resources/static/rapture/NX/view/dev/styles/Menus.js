@@ -20,6 +20,7 @@
 Ext.define('NX.view.dev.styles.Menus', {
   extend: 'NX.view.dev.styles.StyleSection',
 
+  //<if debug>
   title: 'Menus',
   layout: {
     type: 'hbox',
@@ -61,4 +62,5 @@ Ext.define('NX.view.dev.styles.Menus', {
 
     me.callParent();
   }
+  //</if>
 });

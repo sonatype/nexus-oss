@@ -19,6 +19,8 @@
  */
 Ext.define('NX.view.dev.Panel', {
   extend: 'Ext.panel.Panel',
+
+  //<if debug>
   requires: [
     'NX.view.dev.Styles'
   ],
@@ -71,4 +73,5 @@ Ext.define('NX.view.dev.Panel', {
       { xtype: 'nx-dev-logging' }
     ]
   }
+  //</if>
 });

@@ -21,6 +21,7 @@ Ext.define('NX.view.dev.Icons', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-dev-icons',
 
+  //<if debug>
   title: 'Icons',
   store: 'Icon',
   emptyText: 'No icons',
@@ -51,5 +52,5 @@ Ext.define('NX.view.dev.Icons', {
     { ptype: 'rowediting', clicksToEdit: 1 },
     'gridfilterbox'
   ]
-
+  //</if>
 });

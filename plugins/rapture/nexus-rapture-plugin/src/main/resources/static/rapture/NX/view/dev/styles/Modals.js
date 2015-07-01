@@ -19,6 +19,8 @@
  */
 Ext.define('NX.view.dev.styles.Modals', {
   extend: 'NX.view.dev.styles.StyleSection',
+
+  //<if debug>
   requires: [
     'NX.I18n'
   ],
@@ -122,4 +124,5 @@ Ext.define('NX.view.dev.styles.Modals', {
 
     me.callParent();
   }
+  //</if>
 });
