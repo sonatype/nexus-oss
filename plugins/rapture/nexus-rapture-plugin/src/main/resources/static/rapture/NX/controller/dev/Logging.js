@@ -19,6 +19,9 @@
  */
 Ext.define('NX.controller.dev.Logging', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.util.log.RemoteSink'
+  ],
 
   stores: [
     'LogEvent',
@@ -47,7 +50,7 @@ Ext.define('NX.controller.dev.Logging', {
         },
         'nx-dev-logging checkbox[itemId=remote]': {
           change: function(checkbox) {
-            me.getController('Logging').setRemote(checkbox.getValue());
+            NX.util.log.RemoteSink.setEnabled(checkbox.getValue());
           }
         },
         'nx-dev-logging combobox[itemId=threshold]': {

@@ -19,8 +19,11 @@
  */
 Ext.define('NX.controller.Logging', {
   extend: 'Ext.app.Controller',
-  require: [
-    'NX.Log'
+  requires: [
+    'NX.Log',
+    'NX.util.log.StoreSink',
+    'NX.util.log.ConsoleSink',
+    'NX.util.log.RemoteSink'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -31,11 +34,12 @@ Ext.define('NX.controller.Logging', {
   ],
 
   /**
-   * Enable event remoting.
+   * Array of sinks to receive events.
    *
-   * @property {Boolean}
+   * @private
+   * @property {NX.util.log.Sink[]}
    */
-  remote: false,
+  sinks: [],
 
   /**
    * Logging threshold.
@@ -43,6 +47,15 @@ Ext.define('NX.controller.Logging', {
    * @property {string}
    */
   threshold: 'debug',
+
+  /**
+   * @override
+   */
+  init: function () {
+    this.sinks.push(Ext.create('NX.util.log.StoreSink', this.getStore('LogEvent')));
+    this.sinks.push(NX.util.log.ConsoleSink);
+    this.sinks.push(NX.util.log.RemoteSink);
+  },
 
   /**
    * Attach to {@link NX.Log} helper.
@@ -54,24 +67,10 @@ Ext.define('NX.controller.Logging', {
   },
 
   /**
-   * Toggle event remoting.
-   *
-   * @public
-   * @param {boolean} flag
-   */
-  setRemote: function (flag) {
-    this.remote = flag;
-
-    //<if debug>
-    this.logInfo('Remote events:', flag ? 'enabled' : 'disabled');
-    //</if>
-  },
-
-  /**
    * Get the logging threshold.
    *
    * @public
-   * @returns {string}
+   * @returns {String}
    */
   getThreshold: function () {
     return this.threshold;
@@ -81,14 +80,14 @@ Ext.define('NX.controller.Logging', {
    * Set the logging threshold.
    *
    * @public
-   * @param {string} threshold
+   * @param {String} threshold
    */
   setThreshold: function (threshold) {
     this.threshold = threshold;
   },
 
   /**
-   * Mapping of {@link NX.store.LogLevel} weights.
+   * Mapping of {@link NX.model.LogLevel} weights.
    *
    * @private
    */
@@ -119,18 +118,16 @@ Ext.define('NX.controller.Logging', {
    * @param event
    */
   recordEvent: function (event) {
-    var me = this;
+    var me = this, i;
 
     // ignore events that do not exceed threshold
     if (!me.exceedsThreshold(event.level)) {
       return;
     }
 
-    me.getStore('LogEvent').add(event);
-
-    // HACK: experimental: remote events to server
-    if (me.remote) {
-      NX.direct.rapture_LogEvent.recordEvent(event);
+    // pass events to all sinks
+    for (i = 0; i < me.sinks.length; i++) {
+      me.sinks[i].receive(event);
     }
   }
 });

@@ -98,7 +98,7 @@ Ext.define('NX.controller.State', {
     var me = this;
 
     //<if debug>
-    me.logDebug('Initial state: ', NX.app.state);
+    me.logDebug('Initial state:', Ext.encode(NX.app.state));
     //</if>
 
     var uiSettings = NX.app.state['uiSettings'];
