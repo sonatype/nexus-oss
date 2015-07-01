@@ -289,9 +289,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
   },
 
   getSubmitValue: function () {
-    var me = this;
-
-    return me.getValue();
+    return this.getValue();
   },
 
   isValid: function () {
@@ -318,8 +316,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
   },
 
   markInvalid: function (errors) {
-    var me = this;
-    me.items.items[0].items.items[0].markInvalid(errors);
+    this.items.items[0].items.items[0].markInvalid(errors);
   },
 
   getErrors: function () {
@@ -345,8 +342,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
    */
   clearInvalid: function () {
     // Clear the message and fire the 'valid' event
-    var me = this;
-    me.items.items[0].items.items[0].clearInvalid();
+    this.items.items[0].items.items[0].clearInvalid();
   },
 
   /**
@@ -364,10 +360,9 @@ Ext.define('NX.ext.form.field.ValueSet', {
    * @returns {Array} store values as an array
    */
   getValues: function () {
-    var me = this,
-        values = [];
+    var values = [];
 
-    me.store.each(function (model) {
+    this.store.each(function (model) {
       values.push(model.get('value'));
     });
 

@@ -113,10 +113,8 @@ Ext.define('NX.coreui.controller.Blobstores', {
    * @override
    */
   onSelection: function(list, model) {
-    var me = this;
-
     if (Ext.isDefined(model)) {
-      me.getSettings().loadRecord(model);
+      this.getSettings().loadRecord(model);
     }
   },
 
@@ -148,10 +146,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
    * @private
    */
   onSettingsSubmitted: function(form, action) {
-    var me = this,
-        win = form.up('nx-coreui-blobstore-add');
-
-    me.getStore('Blobstore').load();
+    this.getStore('Blobstore').load();
   },
 
   /**

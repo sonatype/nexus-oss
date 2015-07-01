@@ -62,8 +62,7 @@ Ext.define('NX.util.Url', {
    * @public
    */
   addRepositoryUrlStrategy: function(format, strategy) {
-    var me = this;
-    me.repositoryUrlStrategies[format] = strategy;
+    this.repositoryUrlStrategies[format] = strategy;
   },
 
   /**
@@ -114,7 +113,7 @@ Ext.define('NX.util.Url', {
    * @param {String} format the format of the repository storing this asset
    */
   asRepositoryLink: function(assetModel, format) {
-    var me = this, linkStrategy = me.repositoryUrlStrategies[format];
+    var linkStrategy = this.repositoryUrlStrategies[format];
     return linkStrategy(assetModel);
   }
 

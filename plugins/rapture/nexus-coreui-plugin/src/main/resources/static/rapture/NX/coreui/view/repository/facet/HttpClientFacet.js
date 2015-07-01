@@ -55,8 +55,7 @@ Ext.define('NX.coreui.view.repository.facet.HttpClientFacet', {
                 value: 'username' ,
                 listeners: {
                   'change': function(combo) {
-                    var me = this,
-                        ntlmFields = me.up('form').down('#ntlmFields');
+                    var ntlmFields = this.up('form').down('#ntlmFields');
 
                     if(combo.getValue() === 'ntlm') {
                       ntlmFields.show();

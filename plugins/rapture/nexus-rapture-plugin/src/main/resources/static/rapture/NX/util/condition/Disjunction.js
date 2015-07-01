@@ -63,8 +63,7 @@ Ext.define('NX.util.condition.Disjunction', {
   },
 
   toString: function () {
-    var me = this;
-    return me.conditions.join(' OR ');
+    return this.conditions.join(' OR ');
   }
 
 });

@@ -32,7 +32,7 @@ Ext.define('NX.view.ExpireSession', {
   initComponent: function () {
     var me = this;
 
-    Ext.apply(this, {
+    Ext.apply(me, {
       items: [
         {
           xtype: 'label',

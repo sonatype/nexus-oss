@@ -131,8 +131,7 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
    * Get host/port out of config.
    */
   getHostAndPort: function(config) {
-    var me = this,
-        sslCertificates = me.getController('NX.coreui.controller.SslCertificates'),
+    var sslCertificates = this.getController('NX.coreui.controller.SslCertificates'),
         valueOf = function(value) {
           if (Ext.isString(value)) {
             return value;

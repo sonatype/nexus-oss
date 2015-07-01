@@ -278,12 +278,11 @@ Ext.define('NX.controller.User', {
    * @private
    */
   doAuthenticateAction: function (button) {
-    var me = this,
-        win = button.up('window');
+    var win = button.up('window');
 
     // invoke optional authenticateAction callback registered on window
     if (win.options && Ext.isFunction(win.options.authenticateAction)) {
-      win.options.authenticateAction.call(me, button);
+      win.options.authenticateAction.call(this, button);
     }
   },
 
@@ -295,8 +294,7 @@ Ext.define('NX.controller.User', {
    * @private
    */
   authenticate: function (button) {
-    var me = this,
-        win = button.up('window'),
+    var win = button.up('window'),
         form = button.up('form'),
         user = NX.State.getUser(),
         values = Ext.applyIf(form.getValues(), {username: user ? user.id : undefined}),
@@ -306,7 +304,7 @@ Ext.define('NX.controller.User', {
     win.getEl().mask(NX.I18n.get('User_Controller_Authenticate_Mask'));
 
     //<if debug>
-    me.logDebug('Authenticating user "', values.username, '" ...');
+    this.logDebug('Authenticating user "', values.username, '" ...');
     //</if>
 
     NX.direct.rapture_Security.authenticate(b64username, b64password, function (response) {
@@ -327,8 +325,7 @@ Ext.define('NX.controller.User', {
    * @private
    */
   retrieveAuthenticationToken: function (button) {
-    var me = this,
-        win = button.up('window'),
+    var win = button.up('window'),
         form = button.up('form'),
         user = NX.State.getUser(),
         values = Ext.applyIf(form.getValues(), {username: user ? user.id : undefined}),
@@ -338,7 +335,7 @@ Ext.define('NX.controller.User', {
     win.getEl().mask(NX.I18n.get('User_Retrieving_Mask'));
 
     //<if debug>
-    me.logDebug('Retrieving authentication token...');
+    this.logDebug('Retrieving authentication token...');
     //</if>
 
     NX.direct.rapture_Security.authenticationToken(b64username, b64password, function (response) {

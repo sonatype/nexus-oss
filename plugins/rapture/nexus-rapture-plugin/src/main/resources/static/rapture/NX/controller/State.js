@@ -129,8 +129,7 @@ Ext.define('NX.controller.State', {
   },
 
   getValue: function(key, defaultValue) {
-    var me = this,
-        model = me.getStore('State').getById(key),
+    var model = this.getStore('State').getById(key),
         value;
 
     if (model) {
@@ -211,15 +210,13 @@ Ext.define('NX.controller.State', {
   },
 
   onEntryUpdated: function (store, model, operation, modifiedFieldNames) {
-    var me = this;
     if ((operation === Ext.data.Model.EDIT) && modifiedFieldNames.indexOf('value') > -1) {
-      me.notifyChange(model.get('key'), model.get('value'), model.modified.value);
+      this.notifyChange(model.get('key'), model.get('value'), model.modified.value);
     }
   },
 
   onEntryRemoved: function (store, model) {
-    var me = this;
-    me.notifyChange(model.get('key'), undefined, model.get('value'));
+    this.notifyChange(model.get('key'), undefined, model.get('value'));
   },
 
   notifyChange: function (key, value, oldValue) {
@@ -302,12 +299,11 @@ Ext.define('NX.controller.State', {
    * @private
    */
   onUserChanged: function (user, oldUser) {
-    var me = this,
-        uiSettings;
+    var uiSettings;
 
     if (Ext.isDefined(user) !== Ext.isDefined(oldUser)) {
       uiSettings = NX.State.getValue('uiSettings');
-      me.onUiSettingsChanged(uiSettings, uiSettings);
+      this.onUiSettingsChanged(uiSettings, uiSettings);
     }
   },
 

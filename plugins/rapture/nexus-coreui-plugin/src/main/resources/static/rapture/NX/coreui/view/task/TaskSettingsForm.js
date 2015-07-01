@@ -128,9 +128,7 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
    * Additionally, marks invalid properties.
    */
   markInvalid: function(errors) {
-    var me = this;
-
-    me.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
+    this.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
   }
 
 });

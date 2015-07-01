@@ -233,10 +233,7 @@ Ext.define('NX.coreui.controller.Repositories', {
    * @private
    */
   onSettingsSubmitted: function(form, action) {
-    var me = this,
-      win = form.up('nx-coreui-repository-add');
-
-    me.getStore('Repository').load();
+    this.getStore('Repository').load();
   },
 
   /**

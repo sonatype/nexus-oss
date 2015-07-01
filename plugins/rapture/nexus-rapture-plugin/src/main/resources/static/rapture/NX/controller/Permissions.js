@@ -85,10 +85,8 @@ Ext.define('NX.controller.Permissions', {
    * @private
    */
   onUpdate: function (store, record, operation) {
-    var me = this;
-
     if (operation === Ext.data.Model.COMMIT) {
-      me.firePermissionsChanged();
+      this.firePermissionsChanged();
     }
   },
 
@@ -126,8 +124,7 @@ Ext.define('NX.controller.Permissions', {
    * @return {object} permissions
    */
   getPermissions: function () {
-    var me = this,
-        store = me.getStore('Permission'),
+    var store = this.getStore('Permission'),
         perms = {};
 
     store.clearFilter();

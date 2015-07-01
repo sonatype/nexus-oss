@@ -80,7 +80,6 @@ Ext.define('NX.util.DateFormat', {
    * @return {String} The formatted date string
    */
   timestamp: function (value, format) {
-    var me = this;
     format = format || NX.util.DateFormat.forName('datetime')['long'];
     return value ? Ext.util.Format.date(new Date(value), format) : undefined;
   },
