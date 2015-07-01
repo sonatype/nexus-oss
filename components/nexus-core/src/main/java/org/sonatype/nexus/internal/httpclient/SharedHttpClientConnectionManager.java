@@ -13,6 +13,7 @@
 package org.sonatype.nexus.internal.httpclient;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,6 +27,7 @@ import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.impl.conn.DefaultHttpClientConnectionOperator;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +67,12 @@ public class SharedHttpClientConnectionManager
       @Named("${nexus.httpclient.connectionpool.evictingDelayTime:-5s}") final Time connectionPoolEvictingDelayTime,
       @Named("${nexus.httpclient.connectionpool.validateAfterInactivityTime:-2s}") final Time connectionPoolValidateAfterInactivityTime)
   {
-    super(createRegistry(sslContextSelectors));
+    super(
+        new DefaultHttpClientConnectionOperator(createRegistry(sslContextSelectors), null, null),
+        null,
+        connectionPoolIdleTime.toMillis(),
+        TimeUnit.MILLISECONDS
+    );
 
     setMaxTotal(connectionPoolMaxSize);
     log.debug("Connection pool max-size: {}", connectionPoolMaxSize);
