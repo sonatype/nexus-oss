@@ -10,42 +10,57 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext*/
+/*global Ext, NX*/
 
 /**
- * Dashboard controller.
+ * Allows customizable processing of {@link NX.model.LogEvent}.
  *
  * @since 3.0
  */
-Ext.define('NX.controller.Dashboard', {
-  extend: 'Ext.app.Controller',
-  requires: [
-    'NX.I18n'
-  ],
-
-  views: [
-    'dashboard.Welcome'
-  ],
+Ext.define('NX.util.log.Sink', {
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
   /**
-   * @override
+   * Sink enabled.
+   *
+   * @property {Boolean}
+   * @readonly
    */
-  init: function () {
-    var me = this;
+  enabled: true,
 
-    me.getApplication().getFeaturesController().registerFeature({
-      path: '/Welcome',
-      mode: 'browse',
-      view: 'NX.view.dashboard.Welcome',
-      text: NX.I18n.get('Dashboard_Title'),
-      description: NX.I18n.get('Dashboard_Description'),
-      iconConfig: {
-        file: 'house.png',
-        variants: ['x16', 'x32']
-      },
-      weight: 10,
-      authenticationRequired: false
-    });
+  /**
+   * Toggle enabled.
+   *
+   * @public
+   * @param {boolean} flag
+   */
+  setEnabled: function (flag) {
+    this.enabled = flag;
+
+    //<if debug>
+    this.logInfo('Enabled:', flag);
+    //</if>
+  },
+
+  /**
+   * @public
+   * @param {NX.model.LogEvent} event
+   * @see #handle
+   */
+  receive: function(event) {
+    if (this.enabled) {
+      this.handle(event);
+    }
+  },
+
+  /**
+   * Sub-class should override to provide processing of the event when sink is enabled.
+   *
+   * @private
+   */
+  handle: function(event) {
+    throw 'abstract-method';
   }
-
 });

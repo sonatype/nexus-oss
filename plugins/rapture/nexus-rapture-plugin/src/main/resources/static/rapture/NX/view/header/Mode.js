@@ -24,16 +24,15 @@ Ext.define('NX.view.header.Mode', {
   layout: 'absolute',
 
   /**
-   * @private
-   * Add a caret to the mode button
+   * Add a caret to the mode button.
+   *
+   * @override
    */
   initComponent: function() {
-    var me = this;
-
-    me.callParent(arguments);
+    this.callParent(arguments);
 
     // Add caret
-    me.add({
+    this.add({
       xtype: 'container',
       cls: 'nx-caret',
       width: 0,

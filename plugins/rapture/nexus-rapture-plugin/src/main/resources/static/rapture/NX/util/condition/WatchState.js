@@ -19,15 +19,22 @@
  */
 Ext.define('NX.util.condition.WatchState', {
   extend: 'NX.util.condition.Condition',
+  requires: [
+    'NX.State'
+  ],
 
   /**
-   * @cfg {String} state value key.
+   * @cfg {String}
+   *
+   * State value key.
    */
   key: undefined,
 
   /**
-   * @cfg {Function} An optional function to be called when a state value changes. If not specified, a boolean check
+   * An optional function to be called when a state value changes. If not specified, a boolean check
    * against value will be performed.
+   *
+   * @cfg {Function}
    */
   fn: undefined,
 

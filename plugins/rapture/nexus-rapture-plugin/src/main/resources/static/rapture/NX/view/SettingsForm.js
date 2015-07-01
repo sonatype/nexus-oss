@@ -19,16 +19,17 @@
  */
 Ext.define('NX.view.SettingsForm', {
   extend: 'Ext.form.Panel',
-  alias: 'widget.nx-settingsform',
-  ui: 'nx-subsection',
-  frame: true,
   requires: [
     'NX.I18n'
   ],
+  alias: 'widget.nx-settingsform',
+  ui: 'nx-subsection',
+  frame: true,
 
   /**
+   * Set trackResetOnLoad by default.
+   *
    * @private
-   * Set trackResetOnLoad by default
    */
   constructor : function(config) {
     config = config || {};
@@ -130,22 +131,27 @@ Ext.define('NX.view.SettingsForm', {
 
     me.addEvents(
         /**
-         * @event recordloaded
          * Fires when a record is loaded via {@link Ext.form.Panel#loadRecord}.
+         *
+         * @event recordloaded
          * @param {Ext.form.Panel} this form
          * @param {Ext.data.Model} loaded record
          */
         'recordloaded',
+
         /**
-         * @event loaded
          * Fires after form was loaded via configured api.
+         *
+         * @event loaded
          * @param {Ext.form.Panel} this form
          * @param {Ext.form.action.Action} load action
          */
         'loaded',
+
         /**
-         * @event submitted
          * Fires after form was submitted via configured api.
+         *
+         * @event submitted
          * @param {Ext.form.Panel} this form
          * @param {Ext.form.action.Action} submit action
          */
@@ -154,8 +160,9 @@ Ext.define('NX.view.SettingsForm', {
   },
 
   /**
-   * @override
    * Fires 'recordloaded' after record was loaded.
+   *
+   * @override
    */
   loadRecord: function (record) {
     var me = this;
@@ -164,9 +171,10 @@ Ext.define('NX.view.SettingsForm', {
     me.fireEvent('recordloaded', me, record);
   },
 
-  /*
+  /**
+   * Reset the dirty state of the form.
+   *
    * @private
-   * Reset the dirty state of the form
    */
   resetDirtyState: function (form) {
     var realform = form.getForm();
@@ -174,8 +182,9 @@ Ext.define('NX.view.SettingsForm', {
   },
 
   /**
-   * @public
    * Sets the read only state for all fields of this form.
+   *
+   * @public
    * @param {boolean} editable
    */
   setEditable: function (editable) {

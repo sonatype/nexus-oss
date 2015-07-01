@@ -77,6 +77,12 @@ Ext.define('NX.app.PluginConfig', {
       active: function () {
         return NX.app.Application.debugMode;
       }
+    },
+    {
+      id: 'dev.Logging',
+      active: function () {
+        return NX.app.Application.debugMode;
+      }
     }
   ]
 });

@@ -35,7 +35,8 @@ Ext.define('NX.controller.dev.Developer', {
     'dev.Messages',
     'dev.Features',
     'dev.State',
-    'dev.Stores'
+    'dev.Stores',
+    'dev.Logging'
   ],
 
   refs: [
@@ -84,16 +85,20 @@ Ext.define('NX.controller.dev.Developer', {
     });
   },
 
-  onLaunch: function(){
+  /**
+   * @override
+   */
+  onLaunch: function () {
     var me = this;
-    Ext.each(Ext.ComponentQuery.query('nx-dev-panel'), function(panel){
+    Ext.each(Ext.ComponentQuery.query('nx-dev-panel'), function (panel) {
       me.manageDeveloperPanel(panel);
     });
   },
 
   /**
-   * @private
    * Show/Hide developer panel based on debug state.
+   *
+   * @private
    * @param {Ext.Panel} developerPanel
    */
   manageDeveloperPanel: function (developerPanel) {
@@ -175,8 +180,6 @@ Ext.define('NX.controller.dev.Developer', {
    * @private
    */
   testMessages: function () {
-    var me = this;
-
     Ext.each(['default', 'primary', 'danger', 'warning', 'success'], function (type) {
       NX.Messages.add({
         type: type,

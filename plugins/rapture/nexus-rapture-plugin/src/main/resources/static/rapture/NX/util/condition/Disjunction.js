@@ -22,7 +22,9 @@ Ext.define('NX.util.condition.Disjunction', {
   extend: 'NX.util.condition.Condition',
 
   /**
-   * @cfg {NX.util.condition.Condition[]} Array of conditions to be OR-ed
+   * Array of conditions to be OR-ed.
+   *
+   * @cfg {NX.util.condition.Condition[]}
    */
   conditions: undefined,
 

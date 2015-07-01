@@ -47,7 +47,7 @@ Ext.define('NX.Conditions', {
   },
 
   /**
-   * @param {String} grid a grid selector as specified by (@link Ext.ComponentQuery#query}
+   * @param {String} grid a grid selector as specified by {@link Ext.ComponentQuery#query}
    * @param {Function} [fn] to be called when grid has a selection to perform additional checks on the passed in model
    * @returns {NX.util.condition.GridHasSelection}
    */
@@ -56,7 +56,7 @@ Ext.define('NX.Conditions', {
   },
 
   /**
-   * @param {String} form a {@link NX.view.SettingsForm} selector as specified by (@link Ext.ComponentQuery#query}
+   * @param {String} form a {@link NX.view.SettingsForm} selector as specified by {@link Ext.ComponentQuery#query}
    * @param {Function} [fn] to be called when form has a record to perform additional checks on the passed in model
    * @returns {NX.util.condition.FormHasRecord}
    */
@@ -75,7 +75,8 @@ Ext.define('NX.Conditions', {
   },
 
   /**
-   * Takes as parameter {NX.util.condition.Condition}s to be AND-ed.
+   * Takes as parameter {@link NX.util.condition.Condition}s to be AND-ed.
+   *
    * @returns {NX.util.condition.Conjunction}
    */
   and: function () {
@@ -83,7 +84,8 @@ Ext.define('NX.Conditions', {
   },
 
   /**
-   * Takes as parameter {NX.util.condition.Condition}s to be OR-ed.
+   * Takes as parameter {@link NX.util.condition.Condition}s to be OR-ed.
+   *
    * @returns {NX.util.condition.Disjunction}
    */
   or: function () {
@@ -92,6 +94,7 @@ Ext.define('NX.Conditions', {
 
   /**
    * No-op condition that is never satisfied.
+   *
    * @returns {NX.util.condition.NeverSatisfied}
    */
   never: function() {

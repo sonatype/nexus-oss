@@ -23,14 +23,12 @@ Ext.define('NX.LogAware', {
   ],
 
   /**
-   * @protected
    * @param {String} level
    * @param {Array} args
    */
   log: function (level, args) {
     //<if debug>
-    args.unshift('[' + Ext.getClassName(this) + ']');
-    NX.Log.log(level, args);
+    NX.Log.recordEvent(level, Ext.getClassName(this), args.join(' '));
     //</if>
   },
 
@@ -44,7 +42,7 @@ Ext.define('NX.LogAware', {
   },
 
   /**
-   * @protected
+   * @public
    */
   logDebug: function () {
     //<if debug>
@@ -53,7 +51,7 @@ Ext.define('NX.LogAware', {
   },
 
   /**
-   * @protected
+   * @public
    */
   logInfo: function () {
     //<if debug>
@@ -62,7 +60,7 @@ Ext.define('NX.LogAware', {
   },
 
   /**
-   * @protected
+   * @public
    */
   logWarn: function () {
     //<if debug>
@@ -71,7 +69,7 @@ Ext.define('NX.LogAware', {
   },
 
   /**
-   * @protected
+   * @public
    */
   logError: function () {
     //<if debug>

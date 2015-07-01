@@ -48,6 +48,9 @@ Ext.define('NX.controller.UiSessionTimeout', {
 
   expirationTicker: undefined,
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -70,13 +73,17 @@ Ext.define('NX.controller.UiSessionTimeout', {
     });
   },
 
+  /**
+   * @override
+   */
   onLaunch: function () {
     this.setupTimeout();
   },
   
   /**
-   * @private
    * Reset UI session timeout when uiSettings.sessionTimeout changes.
+   *
+   * @private
    * @param {Object} uiSettings
    * @param {Number} uiSettings.sessionTimeout
    * @param {Object} oldUiSettings
@@ -105,7 +112,7 @@ Ext.define('NX.controller.UiSessionTimeout', {
     me.cancelTimeout();
     if ((user &&  NX.State.isReceiving()) && sessionTimeout > 0) {
       //<if debug>
-      me.logDebug('Session expiration enabled for ' + sessionTimeout + ' minutes');
+      me.logDebug('Session expiration enabled for', sessionTimeout, 'minutes');
       //</if>
 
       me.activityMonitor = Ext.create('Ext.ux.ActivityMonitor', {
@@ -124,7 +131,7 @@ Ext.define('NX.controller.UiSessionTimeout', {
     var me = this, 
         expireSessionView = me.getExpireSessionWindow();
     
-    //close the window if the session has not yet expired or if the server is disconnected
+    // close the window if the session has not yet expired or if the server is disconnected
     if(expireSessionView  && (!expireSessionView.sessionExpired() || !NX.State.isReceiving())) {
       expireSessionView.close();
     }

@@ -69,8 +69,9 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   },
 
   /**
-   * @private
    * Filter grid.
+   *
+   * @private
    */
   onSearch: function (searchbox, value) {
     var me = this;
@@ -82,8 +83,9 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   },
 
   /**
+   * Clear the filter before destroying this plugin.
+   *
    * @protected
-   * Clear the filter before destroying this plugin
    */
   destroy: function() {
     var me = this;
@@ -94,8 +96,9 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   },
 
   /**
-   * @private
    * Clear filtering on grid.
+   *
+   * @private
    */
   onSearchCleared: function () {
     var me = this;
@@ -107,8 +110,9 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   },
 
   /**
-   * @private
    * Syncs filtering value with search box.
+   *
+   * @private
    */
   syncSearchBox: function () {
     var me = this;

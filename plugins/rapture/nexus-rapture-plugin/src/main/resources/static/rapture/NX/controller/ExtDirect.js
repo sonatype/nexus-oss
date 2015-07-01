@@ -27,6 +27,9 @@ Ext.define('NX.controller.ExtDirect', {
     'NX.Messages'
   ],
 
+  /**
+   * @override
+   */
   init: function() {
     var me = this;
 
@@ -40,14 +43,17 @@ Ext.define('NX.controller.ExtDirect', {
   },
 
   /**
-   * @private
    * Checks Ext.Direct response and automatically show warning messages if an error occurred.
    * If response specifies that authentication is required, will show the sign-in window.
+   *
+   * @private
    */
   checkResponse: function(provider, transaction) {
     var me = this,
         result = transaction.result,
         message;
+
+    // FIXME: Anything that does logging here can cause Ext.Direct log event remoting to spin out of control
 
     if (Ext.isDefined(result)) {
       if (Ext.isDefined(result.success) && result.success === false) {
@@ -76,13 +82,14 @@ Ext.define('NX.controller.ExtDirect', {
       NX.Messages.add({text: message, type: 'warning'});
     }
 
-    //<if debug>
-    var logMsg = transaction.action + ':' + transaction.method + " -> " + (message ? 'Failed: ' + message : 'OK');
-    if (Ext.isDefined(result) && result.errors) {
-      logMsg += (' Errors: ' + Ext.encode(result.errors));
-    }
-    me.logDebug(logMsg);
-    //</if>
+    // HACK: disabled for now as this causes problems remoting LogEvents
+    ////<if debug>
+    //var logMsg = transaction.action + ':' + transaction.method + " -> " + (message ? 'Failed: ' + message : 'OK');
+    //if (Ext.isDefined(result) && result.errors) {
+    //  logMsg += (' Errors: ' + Ext.encode(result.errors));
+    //}
+    //me.logDebug(logMsg);
+    ////</if>
   }
 
 });

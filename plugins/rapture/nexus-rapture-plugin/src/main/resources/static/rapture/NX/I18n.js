@@ -37,11 +37,12 @@ Ext.define('NX.I18n', {
 
   /**
    * @public
+   * @param {String} key
    */
   get: function(key) {
     var text = this.keys[key];
     if (text === null || text === undefined) {
-      this.logWarn('Missing I18n key: ' + key);
+      this.logWarn('Missing I18n key:', key);
       return 'MISSING_I18N:' + key;
     }
     return text;
@@ -49,8 +50,8 @@ Ext.define('NX.I18n', {
 
   /**
    * @public
-   * @param key
-   * @param values
+   * @param {String} key
+   * @param {Object...} values
    * @returns {String}
    */
   format: function(key) {

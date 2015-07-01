@@ -28,14 +28,16 @@ Ext.define('NX.Permissions', {
   },
 
   /**
-   * @private
    * Map between permission and permitted boolean value.
+   *
+   * @private
    */
   permissions: undefined,
 
   /**
-   * @private
    * Map of permission to implied calculated value.
+   *
+   * @private
    */
   impliedCache: undefined,
 
@@ -48,9 +50,10 @@ Ext.define('NX.Permissions', {
   },
 
   /**
+   * Sets permissions.
+   *
    * @public
    * @param {object} permissions
-   * Sets permissions.
    */
   setPermissions: function(permissions) {
     var me = this;
@@ -67,8 +70,9 @@ Ext.define('NX.Permissions', {
   },
 
   /**
-   * @public
    * Resets all permissions.
+   *
+   * @public
    */
   resetPermissions: function() {
     var me = this;
@@ -109,8 +113,7 @@ Ext.define('NX.Permissions', {
     // or use cached implied if we know it
     if (me.impliedCache[expectedPermission] !== undefined) {
       //<if debug>
-      me.logTrace('Using cached implied permission: ' + expectedPermission + ' is: ' +
-          me.impliedCache[expectedPermission]);
+      me.logTrace('Using cached implied permission:', expectedPermission, 'is:', me.impliedCache[expectedPermission]);
       //</if>
       hasPermission = me.impliedCache[expectedPermission];
     }
@@ -128,7 +131,7 @@ Ext.define('NX.Permissions', {
       me.impliedCache[expectedPermission] = hasPermission;
 
       //<if debug>
-      me.logTrace('Cached implied permission: ' + expectedPermission + ' is: ' + hasPermission);
+      me.logTrace('Cached implied permission:', expectedPermission, 'is:', hasPermission);
       //</if>
     }
 
@@ -136,10 +139,9 @@ Ext.define('NX.Permissions', {
   },
 
   /**
-   * @private
-   *
    * Returns true if permission1 implies permission2 using same logic as WildcardPermission.
    *
+   * @private
    * @param {string} permission1    Granted permission
    * @param {string} permission2    Permission under-test
    * @return {boolean}
@@ -151,7 +153,7 @@ Ext.define('NX.Permissions', {
         part1, part2, i;
 
     //<if debug>
-    me.logTrace('Checking if: ' + permission1 + ' implies: ' + permission2);
+    me.logTrace('Checking if:', permission1, 'implies:', permission2);
     //</if>
 
     for (i = 0; i < parts2.length; i++) {

@@ -21,7 +21,9 @@ Ext.define('NX.util.condition.StoreHasRecords', {
   extend: 'NX.util.condition.Condition',
 
   /**
-   * @cfg {String} Id of store to be monitored
+   * Id of store to be monitored.
+   *
+   * @cfg {String}
    */
   store: undefined,
 

@@ -21,6 +21,7 @@ Ext.define('NX.view.UnsupportedBrowser', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-unsupported-browser',
   requires: [
+    'NX.I18n',
     'NX.Icons'
   ],
 

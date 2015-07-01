@@ -22,7 +22,9 @@ Ext.define('NX.util.condition.Conjunction', {
   extend: 'NX.util.condition.Condition',
 
   /**
-   * @cfg {NX.util.condition.Condition[]} Array of conditions to be AND-ed
+   * Array of conditions to be AND-ed.
+   *
+   * @cfg {NX.util.condition.Condition[]}
    */
   conditions: undefined,
 

@@ -20,6 +20,7 @@
 Ext.define('NX.app.Loader', {
   requires: [
     'NX.app.Application',
+    'Ext.app.Controller',
     'Ext.util.MixedCollection'
   ],
   mixins: {
@@ -42,7 +43,7 @@ Ext.define('NX.app.Loader', {
     var me = this, App;
 
     //<if debug>
-    me.logDebug('Loading');
+    me.logInfo('Loading');
     //</if>
 
     // sanity check config
@@ -54,7 +55,7 @@ Ext.define('NX.app.Loader', {
     }
 
     //<if debug>
-    me.logDebug('ExtJS version: ' + Ext.getVersion('extjs'));
+    me.logDebug('ExtJS version:', Ext.getVersion('extjs'));
     //</if>
 
     me.controllers = Ext.create('Ext.util.MixedCollection');
@@ -67,7 +68,7 @@ Ext.define('NX.app.Loader', {
         NX.app.debug = true;
 
         //<if debug>
-        me.logDebug('Debug mode enabled');
+        me.logInfo('Debug mode enabled');
         //</if>
       }
       else {
@@ -77,7 +78,7 @@ Ext.define('NX.app.Loader', {
 
     // apply all plugin configurations
     //<if debug>
-    me.logDebug('Plugin configs: ' + config.pluginConfigs);
+    me.logDebug('Plugin configs:', config.pluginConfigs);
     //</if>
 
     Ext.each(config.pluginConfigs, function (className) {
@@ -96,13 +97,13 @@ Ext.define('NX.app.Loader', {
       });
 
       //<if debug>
-      me.logDebug('Application loaded');
+      me.logInfo('Application loaded');
       //</if>
 
       Ext.app.Application.instance.start();
 
       //<if debug>
-      me.logDebug('Application started');
+      me.logInfo('Application started');
       //</if>
     });
   },
@@ -118,7 +119,7 @@ Ext.define('NX.app.Loader', {
         config;
 
     //<if debug>
-    me.logDebug('Applying plugin config: ' + className);
+    me.logDebug('Applying plugin config:', className);
     //</if>
 
     config = Ext.create(className);
@@ -134,7 +135,7 @@ Ext.define('NX.app.Loader', {
     // resolve all controllers
     if (me.controllers) {
       //<if debug>
-      me.logDebug(me.controllers.getCount() + ' plugin controllers:');
+      me.logDebug(me.controllers.getCount(), 'plugin controllers:');
       //</if>
 
       me.controllers.each(function (controller) {

@@ -23,8 +23,7 @@ Ext.define('NX.Bookmark', {
     /**
      * Bookmark token.
      *
-     * @public
-     * @type {String}
+     * @cfg {String}
      */
     token: undefined
   },
@@ -34,9 +33,11 @@ Ext.define('NX.Bookmark', {
    */
   segments: undefined,
 
+  /**
+   * @constructor
+   */
   constructor: function (config) {
-    var me = this;
-    me.initConfig(config);
+    this.initConfig(config);
   },
 
   /**
@@ -81,13 +82,12 @@ Ext.define('NX.Bookmark', {
    * @returns {Array} list of all segments in this bookmarks
    */
   getSegments: function() {
-    var me = this;
-
-    return me.segments;
+    return this.segments;
   },
 
   /**
    * Appends a segment to current segment.
+   *
    * @param {String/String[]} segments to append
    * @returns {NX.Bookmark} itself
    */

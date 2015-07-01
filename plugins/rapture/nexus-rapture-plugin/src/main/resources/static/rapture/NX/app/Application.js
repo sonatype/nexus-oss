@@ -102,6 +102,7 @@ Ext.define('NX.app.Application', {
    * Always active controllers.
    */
   controllers: [
+    'Logging',
     'State',
     'Bookmarking',
     'ExtDirect',
@@ -113,8 +114,10 @@ Ext.define('NX.app.Application', {
   ],
 
   /**
+   * Managed controller configurations.
+   *
    * @private
-   * {@link Ext.util.MixedCollection} containing managed controllers configurations
+   * @property {Ext.util.MixedCollection}
    */
   managedControllers: undefined,
 
@@ -141,7 +144,6 @@ Ext.define('NX.app.Application', {
       return NX.State.getValue('debug') === true;
     },
     bundleActive: function (symbolicName) {
-      // FIXME: Rename key
       return NX.State.getValue('activeBundles').indexOf(symbolicName) > -1;
     }
   },
@@ -154,8 +156,8 @@ Ext.define('NX.app.Application', {
     var me = this;
 
     //<if debug>
-    me.logDebug('Initializing');
-    me.logDebug(me.managedControllers.getCount() + ' managed controllers');
+    me.logInfo('Initializing');
+    me.logDebug(me.managedControllers.getCount(), 'managed controllers');
     //</if>
 
     // Configure blank image URL
@@ -173,8 +175,9 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Hook into browser error handling (in order to log them).
+   *
+   * @private
    */
   initErrorHandler: function () {
     var me = this,
@@ -204,8 +207,9 @@ Ext.define('NX.app.Application', {
   },
 
   /**
+   * Handle application error.
+   *
    * @private
-   * Log catched error.
    */
   handleError: function (error) {
     var me = this;
@@ -216,10 +220,11 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Customize error to-string handling.
    *
    * Ext.Error.toString() assumes instance, but raise(String) makes anonymous object.
+   *
+   * @private
    */
   errorAsString: function (error) {
     var className = error.sourceClass || '',
@@ -229,8 +234,9 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Initialize Ex.Direct remote providers.
+   *
+   * @private
    */
   initDirect: function () {
     var me = this,
@@ -238,8 +244,8 @@ Ext.define('NX.app.Application', {
 
     remotingProvider = Ext.direct.Manager.addProvider(NX.direct.api.REMOTING_API);
 
-    // disable buffering of method calls
-    remotingProvider.enableBuffer = false;
+    // configure Ext.Direct buffer-window milliseconds
+    remotingProvider.enableBuffer = 10;
 
     // disable retry
     remotingProvider.maxRetries = 0;
@@ -253,15 +259,18 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Initialize state manager.
+   *
+   * @private
    */
   initState: function () {
-    var me = this;
+    var me = this,
+        provider;
 
     // If local storage is supported install state provider
     if (Ext.util.LocalStorage.supported) {
-      Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
+      provider = Ext.create('Ext.state.LocalStorageProvider');
+      Ext.state.Manager.setProvider(provider);
       //<if debug>
       me.logDebug('Configured state provider: local');
       //</if>
@@ -272,21 +281,25 @@ Ext.define('NX.app.Application', {
       //</if>
     }
 
-    // HACK: for debugging
-    //provider.on('statechange', function (provider, key, value, opts) {
-    //  me.logDebug('State changed: ' + key + '=' + value);
-    //});
+    //<if debug>
+    if (provider) {
+      provider.on('statechange', function (provider, key, value, opts) {
+        me.logTrace('State changed:', key, '=', value);
+      });
+    }
+    //</if>
   },
 
   /**
-   * @public
    * Starts the application.
+   *
+   * @public
    */
   start: function () {
     var me = this, hideMask;
 
     //<if debug>
-    me.logDebug('Starting');
+    me.logInfo('Starting');
     //</if>
 
     Ext.create('NX.view.Viewport');
@@ -312,8 +325,9 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Create / Destroy managed controllers based on their active status.
+   *
+   * @private
    */
   syncManagedControllers: function () {
     var me = this,
@@ -332,7 +346,7 @@ Ext.define('NX.app.Application', {
           changes = true;
 
           //<if debug>
-          me.logDebug('Destroying controller: ' + key);
+          me.logDebug('Destroying controller:', key);
           //</if>
 
           ref.controller.fireEvent('destroy', ref.controller);
@@ -358,7 +372,7 @@ Ext.define('NX.app.Application', {
           changes = true;
 
           //<if debug>
-          me.logDebug('Initializing controller: ' + key);
+          me.logDebug('Initializing controller:', key);
           //</if>
 
           ref.controller = me.getController(key);

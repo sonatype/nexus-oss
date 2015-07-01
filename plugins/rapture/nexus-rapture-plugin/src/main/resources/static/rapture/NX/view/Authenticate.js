@@ -21,6 +21,7 @@ Ext.define('NX.view.Authenticate', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-authenticate',
   requires: [
+    'NX.Icons',
     'NX.I18n'
   ],
   ui: 'nx-inset',

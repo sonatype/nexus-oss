@@ -31,7 +31,7 @@ Ext.define('NX.controller.dev.Stores', {
   ],
 
   /**
-   * @protected
+   * @override
    */
   init: function () {
     var me = this;
@@ -61,17 +61,16 @@ Ext.define('NX.controller.dev.Stores', {
         grid = panel.down('grid'),
         store, columns = [];
 
-    if (grid) {
-      panel.remove(grid);
-    }
     if (storeId) {
       store = Ext.data.StoreManager.get(storeId);
       if (store) {
         Ext.each(store.model.getFields(), function (field) {
           columns.push({ text: field.name, dataIndex: field.name });
         });
+        panel.removeAll(true);
         panel.add({
           xtype: 'grid',
+          autoScroll: true,
           store: store,
           columns: columns
         });

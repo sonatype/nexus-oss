@@ -10,20 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext*/
+/*global Ext, NX*/
 
 /**
- * Messages button.
+ * Remote {@link NX.util.log.Sink}.
+ *
+ * Sends events to server via Ext.Direct.
  *
  * @since 3.0
  */
-Ext.define('NX.view.header.Messages', {
-  extend: 'Ext.button.Button',
-  requires: [
-    'NX.I18n'
-  ],
-  alias: 'widget.nx-header-messages',
+Ext.define('NX.util.log.RemoteSink', {
+  extend: 'NX.util.log.Sink',
+  singleton: true,
 
-  glyph: 'xf0f3@FontAwesome', // fa-bell
-  tooltip: NX.I18n.get('Header_Messages_Tooltip')
+  /**
+   * @constructor
+   */
+  constructor: function () {
+    // sink defaults to disabled
+    this.enabled = false;
+  },
+
+  /**
+   * @override
+   */
+  handle: function (event) {
+    NX.direct.rapture_LogEvent.recordEvent(event);
+  }
 });

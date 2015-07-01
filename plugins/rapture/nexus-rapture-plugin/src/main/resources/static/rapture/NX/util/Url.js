@@ -19,6 +19,9 @@
  */
 Ext.define('NX.util.Url', {
   singleton: true,
+  requires: [
+    'Ext.String'
+  ],
 
   /**
    * Returns the base URL of the Nexus server.  URL never ends with '/'.
@@ -28,8 +31,9 @@ Ext.define('NX.util.Url', {
   baseUrl: NX.app.baseUrl,
 
   /**
+   * Strategies for building urls to download assets.
+   *
    * @private
-   * Strategies for building urls to download assets
    */
   repositoryUrlStrategies: {
     maven2: function(assetModel) {
@@ -53,8 +57,9 @@ Ext.define('NX.util.Url', {
   },
 
   /**
-   * @public
    * Add a strategy to build repository download links for a particular strategy.
+   *
+   * @public
    */
   addRepositoryUrlStrategy: function(format, strategy) {
     var me = this;
@@ -80,8 +85,9 @@ Ext.define('NX.util.Url', {
   },
 
   /**
-   * @public
    * Creates a link.
+   *
+   * @public
    * @param {String} url to link to
    * @param {String} [text] link text. If omitted, defaults to url value.
    * @param {String} [target] link target. If omitted, defaults to '_blank'
@@ -101,8 +107,9 @@ Ext.define('NX.util.Url', {
   },
 
   /**
-   * @public
    * Creates a link to an asset in a repository.
+   *
+   * @public
    * @param {Object} assetModel the asset to create a link for
    * @param {String} format the format of the repository storing this asset
    */

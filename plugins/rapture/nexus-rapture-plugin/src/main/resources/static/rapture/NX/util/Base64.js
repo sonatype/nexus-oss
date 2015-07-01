@@ -24,9 +24,14 @@ Ext.define('NX.util.Base64', {
     'NX.util.Utf8'
   ],
 
+  /**
+   * @private
+   */
   keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
 
   /**
+   * Encode given input string as BASE-64.
+   *
    * @public
    */
   encode: function (input) {
@@ -64,6 +69,8 @@ Ext.define('NX.util.Base64', {
   },
 
   /**
+   * Decode given BASE-64 encoded input string.
+   *
    * @public
    */
   decode: function (input) {

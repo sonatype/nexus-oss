@@ -19,6 +19,9 @@
  */
 Ext.define('NX.util.Array', {
   singleton: true,
+  requires: [
+    'Ext.Array'
+  ],
 
   /**
    * Check if one array contains all elements from another.

@@ -57,8 +57,9 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   },
 
   /**
-   * @protected
    * Returns true if the field value is defined and matches the filtering function.
+   *
+   * @protected
    * @param filterValue to match
    * @param record record that was used to extract the value to be matched
    * @param fieldName filter field name that was used to extract the value to be matched
@@ -70,8 +71,9 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   },
 
   /**
-   * @public
    * Filters on specified value.
+   *
+   * @public
    * @param value to filter upon
    */
   filter: function (value) {
@@ -82,8 +84,9 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   },
 
   /**
-   * @public
    * Clears filter.
+   *
+   * @public
    */
   clearFilter: function () {
     var me = this;
@@ -95,8 +98,9 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   },
 
   /**
-   * @public
    * Filters on current filter value.
+   *
+   * @public
    */
   applyFilter: function () {
     var me = this,
@@ -112,10 +116,7 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
     }
     if (me.filterValue) {
       //<if debug>
-      me.logDebug(
-          'Filtering ' + me.filteredStore.self.getName() + ' on [' + me.filterValue
-              + '] using fields: ' + me.filteredFields
-      );
+      me.logTrace('Filtering', me.filteredStore.self.getName(), 'on [', me.filterValue, '] using fields:', me.filteredFields);
       //</if>
 
       me.filteredStore.filter(me.filteringFilter);
@@ -124,7 +125,7 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
       me.filteredStore.removeFilter(me.filteringFilter);
 
       //<if debug>
-      me.logDebug('Filtering cleared on ' + me.filteredStore.self.getName());
+      me.logTrace('Filtering cleared on', me.filteredStore.self.getName());
       //</if>
     }
     if (remoteFilter) {
@@ -136,8 +137,9 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   },
 
   /**
-   * @private
    * Clear filter value if store is filtered from outside.
+   *
+   * @private
    */
   syncFilterValue: function (store, filters) {
     var me = this,
@@ -160,8 +162,9 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   },
 
   /**
-   * @private
    * Bind plugin to grid.
+   *
+   * @private
    * @param grid to bind to
    */
   init: function (grid) {
@@ -199,19 +202,19 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   },
 
   /**
-   * @private
    * Handles configuration of grid.
+   *
+   * @private
    * @param grid that was reconfigure
    */
   onBeforeRender: function (grid) {
-    var me = this;
-
-    me.onReconfigure(grid, grid.getStore(), grid.columns);
+    this.onReconfigure(grid, grid.getStore(), grid.columns);
   },
 
   /**
-   * @private
    * Handles reconfiguration of grid.
+   *
+   * @private
    * @param grid that was reconfigured
    * @param store new store
    * @param columns new columns
@@ -221,15 +224,16 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
         store = store || me.grid.getStore();
 
     //<if debug>
-    me.logDebug('Grid ' + grid.id + ' reconfigured, binding to new store');
+    me.logTrace('Grid', grid.id, 'reconfigured; binding to new store');
     //</if>
 
     me.reconfigureStore(store, me.extractColumnsWithDataIndex(columns));
   },
 
   /**
-   * @private
    * Unbinds from current store and register itself to provided store.
+   *
+   * @private
    * @param store to register itself to
    * @param filteredFields fields to be used while filtering
    */
@@ -244,8 +248,9 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   },
 
   /**
-   * @private
    * Register itself as listener of load events on provided store.
+   *
+   * @private
    * @param store to register itself to
    */
   bindToStore: function (store) {
@@ -253,7 +258,7 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
     me.filteredStore = store;
     if (store) {
       //<if debug>
-      me.logDebug('Binding to store ' + me.filteredStore.self.getName());
+      me.logTrace('Binding to store', me.filteredStore.self.getName());
       //</if>
 
       me.grid.mon(store, 'load', me.applyFilter, me);
@@ -262,15 +267,16 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   },
 
   /**
-   * @private
    * Remove itself as listener from provided store.
+   *
+   * @private
    * @param store to remove itself from
    */
   unbindFromStore: function (store) {
     var me = this;
     if (store) {
       //<if debug>
-      me.logDebug('Unbinding from store ' + me.filteredStore.self.getName());
+      me.logTrace('Unbinding from store', me.filteredStore.self.getName());
       //</if>
 
       me.grid.mun(store, 'load', me.applyFilter, me);
@@ -279,8 +285,9 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   },
 
   /**
-   * @private
    * Returns the dataIndex property of all grid columns.
+   *
+   * @private
    * @returns {Array} of fields names
    */
   extractColumnsWithDataIndex: function (columns) {
@@ -298,5 +305,4 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
       return filterFieldNames;
     }
   }
-
 });

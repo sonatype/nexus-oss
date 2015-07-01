@@ -65,8 +65,9 @@ Ext.define('NX.controller.UnsupportedBrowser', {
   },
 
   /**
-   * @override
    * Show {@link NX.view.UnsupportedBrowser} view from {@link Ext.container.Viewport}.
+   *
+   * @override
    */
   onLaunch: function () {
     var me = this,
@@ -82,8 +83,9 @@ Ext.define('NX.controller.UnsupportedBrowser', {
   },
 
   /**
-   * @public
    * Removes {@link NX.view.UnsupportedBrowser} view from {@link Ext.container.Viewport}.
+   *
+   * @public
    */
   onDestroy: function () {
     var me = this,

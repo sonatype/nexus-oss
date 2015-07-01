@@ -19,12 +19,15 @@
  */
 Ext.define('NX.view.ExpireSession', {
   extend: 'NX.view.ModalDialog',
+  requires: [
+    'NX.I18n'
+  ],
   alias: 'widget.nx-expire-session',
 
   title: NX.I18n.get('ExpireSession_Title'),
 
   /**
-   * @protected
+   * @override
    */
   initComponent: function () {
     var me = this;
@@ -71,6 +74,7 @@ Ext.define('NX.view.ExpireSession', {
 
   /**
    * Check to see if the dialog is showing that it is expired.
+   *
    * @public
    * @returns {boolean}
    */

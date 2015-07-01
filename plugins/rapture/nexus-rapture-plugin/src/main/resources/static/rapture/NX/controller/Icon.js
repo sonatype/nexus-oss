@@ -60,14 +60,14 @@ Ext.define('NX.controller.Icon', {
 
   /**
    * @private
-   * @param url
+   * @param {String} url
    */
   preloadImage: function(url) {
     var me = this,
         img;
 
     //<if debug>
-    me.logDebug('Preloading: ' + url);
+    me.logTrace('Preloading:', url);
     //</if>
 
     img = new Image();
@@ -103,7 +103,7 @@ Ext.define('NX.controller.Icon', {
     me.stylesheet = Ext.util.CSS.createStyleSheet(styles.join(' '), 'nx-icons');
 
     //<if debug>
-    me.logDebug('Stylesheet installed with ' + me.stylesheet.cssRules.length + ' rules');
+    me.logDebug('Stylesheet installed with', me.stylesheet.cssRules.length, 'rules');
     //</if>
   },
 
@@ -113,8 +113,7 @@ Ext.define('NX.controller.Icon', {
    * @private
    */
   buildIconStyle: function (icon) {
-    var me = this,
-        style;
+    var style;
 
     style = '.' + icon.cls + ' {';
     style += 'background: url(' + icon.url + ') no-repeat center center !important;';
@@ -176,10 +175,10 @@ Ext.define('NX.controller.Icon', {
 
     // complain if height/width are missing as this could cause the image not to display
     if (!icon.height) {
-      me.logWarn('Icon missing height: ' + icon.css);
+      me.logWarn('Icon missing height:', icon.css);
     }
     if (!icon.width) {
-      me.logWarn('Icon missing width: ' + icon.css);
+      me.logWarn('Icon missing width:', icon.css);
     }
 
     // TODO: complain if we are overwriting an icon
@@ -193,8 +192,7 @@ Ext.define('NX.controller.Icon', {
    * @private
    */
   configureIcon: function (icon) {
-    var me = this,
-        variant = icon.variant;
+    var variant = icon.variant;
 
     // automatically apply 'x<size>'
     if (Ext.isString(variant)) {

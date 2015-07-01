@@ -10,20 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext*/
+/*global Ext, NX*/
 
 /**
- * Messages button.
+ * Store {@link NX.util.log.Sink} into {@link NX.store.LogEvent} store.
  *
  * @since 3.0
  */
-Ext.define('NX.view.header.Messages', {
-  extend: 'Ext.button.Button',
-  requires: [
-    'NX.I18n'
-  ],
-  alias: 'widget.nx-header-messages',
+Ext.define('NX.util.log.StoreSink', {
+  extend: 'NX.util.log.Sink',
 
-  glyph: 'xf0f3@FontAwesome', // fa-bell
-  tooltip: NX.I18n.get('Header_Messages_Tooltip')
+  /**
+   * Reference to the event store.
+   *
+   * @private
+   * @property {NX.store.LogEvent}
+   */
+  store: undefined,
+
+  /**
+   * @constructor
+   * @param {NX.store.LogEvent} store
+   */
+  constructor: function (store) {
+    this.store = store;
+  },
+
+  /**
+   * @override
+   */
+  handle: function (event) {
+    this.store.add(event);
+  }
 });

@@ -43,6 +43,7 @@ Ext.define('NX.controller.Features', {
 
   /**
    * Registers features.
+   *
    * @param {Array/Object} features to be registered
    * @param {Ext.util.Observable} [owner] to be watched to automatically unregister the features if owner is destroyed
    */
@@ -71,8 +72,7 @@ Ext.define('NX.controller.Features', {
 
         // complain if there is no view configuration
         if (!clonedFeature.view) {
-          me.logError('Missing view configuration for feature at path: ' + clonedFeature.path);
-          // TODO: Maybe raise an error instead?
+          me.logError('Missing view configuration for feature at path:', clonedFeature.path);
         }
 
         path = clonedFeature.path;
@@ -116,6 +116,7 @@ Ext.define('NX.controller.Features', {
 
   /**
    * Un-registers features.
+   *
    * @param {Object[]/Object} features to be unregistered
    */
   unregisterFeature: function (features) {

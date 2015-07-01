@@ -19,143 +19,67 @@
  */
 Ext.define('NX.Log', {
   singleton: true,
+  requires: [
+    'NX.Console'
+  ],
 
   /**
    * @private
    */
-  console: undefined,
+  controller: undefined,
 
   /**
-   * Set to true to disable all application logging.
+   * Queue of events logged before controller is attached.
+   * This is deleted upon attachment after events are passed to the controller.
    *
-   * NOTE: all logging is already disabled when using mode=prod sources; logging calls are stripped out.
-   *
-   * @public
-   * @property {Boolean}
+   * @private
    */
-  disable: false,
+  eventQueue: [],
 
   /**
-   * Set to true to enable trace logging.
+   * Attach to the logging controller.
    *
    * @public
-   * @property {Boolean}
+   * @param {NX.controller.Logging} controller
    */
-  traceEnabled: false,
+  attach: function (controller) {
+    var me = this;
+    me.controller = controller;
 
-  /**
-   * Set to false to disable debug logging.
-   *
-   * @public
-   * @property {Boolean}
-   */
-  debugEnabled: true,
-
-  /**
-   * Set up the logging environment.
-   */
-  constructor: function () {
-    //<if debug>
-    this.console = NX.global.console || {};
-
-    // apply default empty functions to console if missing
-    Ext.applyIf(this.console, {
-      log: Ext.emptyFn,
-      info: Ext.emptyFn,
-      warn: Ext.emptyFn,
-      error: Ext.emptyFn
+    // reply queued events and clear
+    Ext.each(me.eventQueue, function (event) {
+      me.controller.recordEvent(event);
     });
+    delete me.eventQueue;
 
-    // use ?debug to enable
-    this.debugEnabled = NX.global.location.href.search("[?&]debug") > -1;
-
-    // use ?debug&trace to enable
-    this.traceEnabled = NX.global.location.href.search("[?&]trace") > -1;
-    //</if>
+    NX.Console.info('Logging controller attached');
   },
 
   /**
+   * Record a log event.
+   *
    * @public
-   * @param {String} level
-   * @param {Array} args
+   * @param {string} level
+   * @param {string} logger
+   * @param {string} message
    */
-  log: function (level, args) {
-    //<if debug>
-    if (this.disable) {
-      return;
+  recordEvent: function (level, logger, message) {
+    var me = this,
+        event = {
+          timestamp: Date.now(),
+          level: level,
+          logger: logger,
+          message: message
+        };
+
+    // if controller is attached, delegate to record the event
+    if (me.controller) {
+      me.controller.recordEvent(event);
     }
-
-    var c = this.console;
-    switch (level) {
-      case 'trace':
-        if (this.traceEnabled) {
-          c.log.apply(c, args);
-        }
-        break;
-
-      case 'debug':
-        if (this.debugEnabled) {
-          c.log.apply(c, args);
-        }
-        break;
-
-      case 'info':
-        c.info.apply(c, args);
-        break;
-
-      case 'warn':
-        c.warn.apply(c, args);
-        break;
-
-      case 'error':
-        c.error.apply(c, args);
-        break;
+    else {
+      // else queue the event and emit to console
+      me.eventQueue.push(event);
+      NX.Console.log(level, [logger, message]);
     }
-    //</if>
-  },
-
-  /**
-   * @public
-   */
-  trace: function() {
-    //<if debug>
-    this.log('trace', Array.prototype.slice.call(arguments));
-    //</if>
-  },
-
-  /**
-   * @public
-   */
-  debug: function () {
-    //<if debug>
-    this.log('debug', Array.prototype.slice.call(arguments));
-    //</if>
-  },
-
-  /**
-   * @public
-   */
-  info: function () {
-    //<if debug>
-    this.log('info', Array.prototype.slice.call(arguments));
-    //</if>
-  },
-
-  /**
-   * @public
-   */
-  warn: function () {
-    //<if debug>
-    this.log('warn', Array.prototype.slice.call(arguments));
-    //</if>
-  },
-
-  /**
-   * @public
-   */
-  error: function () {
-    //<if debug>
-    this.log('error', Array.prototype.slice.call(arguments));
-    //</if>
   }
 });

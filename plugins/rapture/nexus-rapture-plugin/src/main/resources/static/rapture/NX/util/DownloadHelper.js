@@ -29,16 +29,16 @@ Ext.define('NX.util.DownloadHelper', {
   },
 
   /**
-   * @private
-   *
    * ExtJS component identifier for nested iframe.
+   *
+   * @private
    */
   windowId: 'nx-download-frame',
 
   /**
-   * @private
-   *
    * Window names in IE are very picky, using '_' instead of '-' so that its its a valid javascript identifier.
+   *
+   * @private
    */
   windowName: 'nx_download_frame',
 
@@ -62,7 +62,7 @@ Ext.define('NX.util.DownloadHelper', {
       });
 
       //<if debug>
-      me.logDebug('Created download-frame: ' + frame);
+      me.logDebug('Created download-frame:', frame);
       //</if>
     }
 
@@ -77,7 +77,7 @@ Ext.define('NX.util.DownloadHelper', {
     var me = this;
 
     //<if debug>
-    me.logDebug('Downloading URL: ' + url);
+    me.logDebug('Downloading URL:', url);
     //</if>
 
     // resolve the download frame
