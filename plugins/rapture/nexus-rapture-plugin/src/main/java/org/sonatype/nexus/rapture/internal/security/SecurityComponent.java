@@ -43,7 +43,6 @@ import org.apache.shiro.subject.Subject;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.rapture.internal.state.StateComponent.shouldSend;
 
 /**
  * Security Ext.Direct component.
@@ -161,13 +160,6 @@ public class SecurityComponent
 
   @DirectMethod
   public List<PermissionXO> getPermissions() {
-    List<PermissionXO> permissions = calculatePermissions();
-    // store hash so we do not send later on a command to fetch
-    shouldSend("permissions", permissions);
-    return permissions;
-  }
-
-  public List<PermissionXO> calculatePermissions() {
     List<PermissionXO> permissions = null;
     Subject subject = securitySystem.getSubject();
     if (isLoggedIn(subject)) {
@@ -185,18 +177,6 @@ public class SecurityComponent
     AnonymousConfiguration anonymousConfiguration = anonymousManager.getConfiguration();
     state.put("anonymousUsername", anonymousConfiguration.isEnabled() ? anonymousConfiguration.getUserId() : null);
     return state;
-  }
-
-  @Override
-  public Map<String, Object> getCommands() {
-    HashMap<String, Object> commands = new HashMap<>();
-
-    List<PermissionXO> permissions = calculatePermissions();
-    if (permissions != null && shouldSend("permissions", permissions)) {
-      commands.put("fetchpermissions", null);
-    }
-
-    return commands;
   }
 
   private boolean isLoggedIn(final Subject subject) {

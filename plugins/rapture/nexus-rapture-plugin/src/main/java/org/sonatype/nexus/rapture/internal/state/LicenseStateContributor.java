@@ -54,12 +54,6 @@ public class LicenseStateContributor
     return ImmutableMap.of(STATE_ID, calculateLicense());
   }
 
-  @Nullable
-  @Override
-  public Map<String, Object> getCommands() {
-    return null;
-  }
-
   private Object calculateLicense() {
     SystemStatus status = systemStatus.get();
     LicenseXO result = new LicenseXO();
