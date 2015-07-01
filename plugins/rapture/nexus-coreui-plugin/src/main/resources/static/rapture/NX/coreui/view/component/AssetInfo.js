@@ -36,9 +36,7 @@ Ext.define('NX.coreui.view.component.AssetInfo', {
     var me = this;
 
     me.dockedItems = {
-      xtype: 'toolbar',
-      dock: 'top',
-      cls: 'nx-actions nx-borderless',
+      xtype: 'nx-actions',
 
       items: [
         '->',

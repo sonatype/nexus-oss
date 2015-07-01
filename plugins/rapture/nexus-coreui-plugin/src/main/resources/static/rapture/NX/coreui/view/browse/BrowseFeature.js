@@ -58,16 +58,11 @@ Ext.define('NX.coreui.view.browse.BrowseFeature', {
       pack: 'start'
     },
 
-    items: [
-      {
-        xtype: 'nx-actions'
-      },
-      {
-        xtype: 'nx-coreui-component-assetcontainer',
-        header: false,
-        flex: 1
-      }
-    ]
+    items: {
+      xtype: 'nx-coreui-component-assetcontainer',
+      header: false,
+      flex: 1
+    }
   },
 
   /**
