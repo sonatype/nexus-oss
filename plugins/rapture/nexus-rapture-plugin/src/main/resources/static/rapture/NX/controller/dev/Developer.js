@@ -85,9 +85,12 @@ Ext.define('NX.controller.dev.Developer', {
     });
   },
 
-  onLaunch: function(){
+  /**
+   * @override
+   */
+  onLaunch: function () {
     var me = this;
-    Ext.each(Ext.ComponentQuery.query('nx-dev-panel'), function(panel){
+    Ext.each(Ext.ComponentQuery.query('nx-dev-panel'), function (panel) {
       me.manageDeveloperPanel(panel);
     });
   },
