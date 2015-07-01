@@ -113,8 +113,7 @@ Ext.define('NX.controller.Icon', {
    * @private
    */
   buildIconStyle: function (icon) {
-    var me = this,
-        style;
+    var style;
 
     style = '.' + icon.cls + ' {';
     style += 'background: url(' + icon.url + ') no-repeat center center !important;';
