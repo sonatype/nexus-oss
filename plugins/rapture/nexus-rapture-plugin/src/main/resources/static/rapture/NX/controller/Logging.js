@@ -16,6 +16,7 @@
  * Logging controller.
  *
  * @since 3.0
+ * @see NX.util.log.Sink
  */
 Ext.define('NX.controller.Logging', {
   extend: 'Ext.app.Controller',
