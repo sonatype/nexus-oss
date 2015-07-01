@@ -33,9 +33,11 @@ Ext.define('NX.Bookmark', {
    */
   segments: undefined,
 
+  /**
+   * @constructor
+   */
   constructor: function (config) {
-    var me = this;
-    me.initConfig(config);
+    this.initConfig(config);
   },
 
   /**
@@ -80,9 +82,7 @@ Ext.define('NX.Bookmark', {
    * @returns {Array} list of all segments in this bookmarks
    */
   getSegments: function() {
-    var me = this;
-
-    return me.segments;
+    return this.segments;
   },
 
   /**
