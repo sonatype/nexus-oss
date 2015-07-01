@@ -19,6 +19,9 @@
  */
 Ext.define('NX.view.ExpireSession', {
   extend: 'NX.view.ModalDialog',
+  requires: [
+    'NX.I18n'
+  ],
   alias: 'widget.nx-expire-session',
 
   title: NX.I18n.get('ExpireSession_Title'),

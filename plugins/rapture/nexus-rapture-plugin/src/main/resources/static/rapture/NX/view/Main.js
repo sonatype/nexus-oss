@@ -82,6 +82,9 @@ Ext.define('NX.view.Main', {
     }
   ],
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 
