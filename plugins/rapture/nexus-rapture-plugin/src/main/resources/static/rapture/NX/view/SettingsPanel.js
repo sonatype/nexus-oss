@@ -73,7 +73,7 @@ Ext.define('NX.view.SettingsPanel', {
   },
 
   /**
-   * Loads an {@link Ext.data.Model? into this form
+   * Loads an {@link Ext.data.Model} into this form
    * (internally just calls {@link NX.view.SettingsForm#loadRecord}).
    *
    * @public
