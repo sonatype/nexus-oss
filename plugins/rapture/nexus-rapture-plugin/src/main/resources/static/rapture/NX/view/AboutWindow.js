@@ -21,6 +21,7 @@ Ext.define('NX.view.AboutWindow', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-aboutwindow',
   requires: [
+    'NX.I18n',
     'NX.Icons',
     'NX.State',
     'NX.util.Url'
