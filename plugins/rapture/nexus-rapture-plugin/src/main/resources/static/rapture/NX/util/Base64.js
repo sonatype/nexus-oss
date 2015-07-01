@@ -24,6 +24,9 @@ Ext.define('NX.util.Base64', {
     'NX.util.Utf8'
   ],
 
+  /**
+   * @private
+   */
   keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
 
   /**
