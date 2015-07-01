@@ -66,6 +66,14 @@
       <artifactId>httpmime</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.testsuite</groupId>
+      <artifactId>nexus-modern-testsuite</artifactId>
+      <version>${it.nexus.bundle.version}</version>
+      <scope>test</scope>
+      <type>test-jar</type>
+    </dependency>
   </dependencies>
 
   <build>

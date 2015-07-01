@@ -12,6 +12,7 @@
  */
 // HACK: This is extracted into src/test/ft-resources for NEXUS_RESOURCE_DIRS loading support
 def ftDir = new File(project.basedir as File, '/src/test/ft-resources')
+def itDir = new File(project.basedir as File, '/src/test/it-resources')
 def preparedFile = new File(ftDir, 'testsuite-lib/.prepared')
 
 if (preparedFile.exists()) {
@@ -47,6 +48,13 @@ ant.unzip(src: artifacts['org.sonatype.nexus:nexus-siestajs-testsupport'].file, 
   cutdirsmapper(dirs: 1)
   patternset {
     include(name: 'ft-overlay/**')
+  }
+}
+
+// Extract common test file resources
+ant.unzip(src: artifacts['org.sonatype.nexus.testsuite:nexus-modern-testsuite'].file, dest: itDir) {
+  patternset {
+    exclude(name: '**/*.class')
   }
 }
 // Mark as prepared

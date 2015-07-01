@@ -46,6 +46,7 @@ import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.is
 import static org.ops4j.pax.exam.CoreOptions.maven
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle
+import static groovy.io.FileType.*
 
 /**
  * Search related Siesta tests.
@@ -105,7 +106,7 @@ extends FunctionalTestSupport
             ]
         ]
     ))
-    publish(httpClient, repository, resolveTestFile('aopalliance-1.0.jar'), 'aopalliance/aopalliance/1.0/aopalliance-1.0.jar')
+    publish(httpClient, repository, resolveTestFileAnywhereInResources('.*aopalliance-1.0.jar$'), 'aopalliance/aopalliance/1.0/aopalliance-1.0.jar')
   }
 
   void setupNuget(final CloseableHttpClient httpClient) {
@@ -120,7 +121,7 @@ extends FunctionalTestSupport
             ]
         ]
     ))
-    publish(httpClient, repository, resolveTestFile('SONATYPE.TEST.1.0.nupkg'), '')
+    publish(httpClient, repository, resolveTestFileAnywhereInResources('.*SONATYPE.TEST.1.0.nupkg$'), '')
   }
 
   void setupRaw(final CloseableHttpClient httpClient) {
@@ -135,7 +136,7 @@ extends FunctionalTestSupport
             ]
         ]
     ))
-    publish(httpClient, repository, resolveTestFile('alphabet.txt'), 'alphabet.txt')
+    publish(httpClient, repository, resolveTestFileAnywhereInResources('.*alphabet.txt$'), 'alphabet.txt')
   }
 
   void publish(final CloseableHttpClient httpClient, final Repository repository, final File file, final String path) {
@@ -158,5 +159,16 @@ extends FunctionalTestSupport
   @Test
   void suite() {
     run("search/.*\\.t.js")
+  }
+
+  public File resolveTestFileAnywhereInResources(final String regex) {
+    def files = []
+    testData.dataDir.eachFileRecurse (FILES){
+      if(it.path.matches(regex)) {
+        files << it
+      }
+    }
+    assert files && files.size() == 1 : "Expected to find a single file named $regex"
+    return files[0]
   }
 }
