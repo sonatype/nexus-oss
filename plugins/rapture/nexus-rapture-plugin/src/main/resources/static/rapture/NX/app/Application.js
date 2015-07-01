@@ -175,8 +175,9 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Hook into browser error handling (in order to log them).
+   *
+   * @private
    */
   initErrorHandler: function () {
     var me = this,
@@ -206,8 +207,9 @@ Ext.define('NX.app.Application', {
   },
 
   /**
+   * Handle application error.
+   *
    * @private
-   * Log catched error.
    */
   handleError: function (error) {
     var me = this;
@@ -218,10 +220,11 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Customize error to-string handling.
    *
    * Ext.Error.toString() assumes instance, but raise(String) makes anonymous object.
+   *
+   * @private
    */
   errorAsString: function (error) {
     var className = error.sourceClass || '',
@@ -231,8 +234,9 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Initialize Ex.Direct remote providers.
+   *
+   * @private
    */
   initDirect: function () {
     var me = this,
@@ -255,8 +259,9 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Initialize state manager.
+   *
+   * @private
    */
   initState: function () {
     var me = this,
@@ -286,8 +291,9 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @public
    * Starts the application.
+   *
+   * @public
    */
   start: function () {
     var me = this, hideMask;
@@ -319,8 +325,9 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Create / Destroy managed controllers based on their active status.
+   *
+   * @private
    */
   syncManagedControllers: function () {
     var me = this,
