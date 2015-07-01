@@ -19,20 +19,25 @@
  */
 Ext.define('NX.view.UnsavedChanges', {
   extend: 'NX.view.ModalDialog',
+  requires: [
+    'NX.I18n'
+  ],
   alias: 'widget.nx-unsaved-changes',
 
   title: NX.I18n.get('UnsavedChanges_Title'),
   defaultFocus: 'nx-discard',
 
   /**
+   * Panel with content to be saved.
+   *
    * @public
-   * Panel with content to be saved
    */
   content: null,
 
   /**
+   * Function to call if content is to be discarded.
+   *
    * @public
-   * Function to call if content is to be discarded
    */
   callback: Ext.emptyFn,
 
