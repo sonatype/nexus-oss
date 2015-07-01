@@ -42,12 +42,12 @@ Ext.define('NX.view.UnsavedChanges', {
   callback: Ext.emptyFn,
 
   /**
-   * @protected
+   * @override
    */
   initComponent: function () {
     var me = this;
 
-    Ext.apply(this, {
+    Ext.apply(me, {
       items: {
         xtype: 'panel',
         ui: 'nx-inset',
