@@ -20,6 +20,7 @@
 Ext.define('NX.controller.dev.Logging', {
   extend: 'Ext.app.Controller',
   requires: [
+    'NX.util.log.ConsoleSink',
     'NX.util.log.RemoteSink'
   ],
 
@@ -46,6 +47,11 @@ Ext.define('NX.controller.dev.Logging', {
         'nx-dev-logging button[action=clear]': {
           click: function(button) {
             me.getStore('LogEvent').removeAll();
+          }
+        },
+        'nx-dev-logging checkbox[itemId=console]': {
+          change: function(checkbox) {
+            NX.util.log.ConsoleSink.setEnabled(checkbox.getValue());
           }
         },
         'nx-dev-logging checkbox[itemId=remote]': {

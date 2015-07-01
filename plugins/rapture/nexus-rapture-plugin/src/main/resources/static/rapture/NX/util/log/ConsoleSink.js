@@ -25,6 +25,14 @@ Ext.define('NX.util.log.ConsoleSink', {
   ],
 
   /**
+   * @constructor
+   */
+  constructor: function () {
+    // sink defaults to disabled
+    this.enabled = false;
+  },
+
+  /**
    * @override
    */
   handle: function (event) {

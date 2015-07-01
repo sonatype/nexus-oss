@@ -64,6 +64,11 @@ Ext.define('NX.view.dev.Logging', {
     '-',
     {
       xtype: 'checkbox',
+      itemId: 'console',
+      boxLabel: 'Mirror console'
+    },
+    {
+      xtype: 'checkbox',
       itemId: 'remote',
       boxLabel: 'Remote events'
     }

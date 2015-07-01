@@ -27,7 +27,7 @@ Ext.define('NX.util.log.RemoteSink', {
    * @constructor
    */
   constructor: function () {
-    // remote sink defaults to disabled
+    // sink defaults to disabled
     this.enabled = false;
   },
 
