@@ -192,8 +192,7 @@ Ext.define('NX.controller.Icon', {
    * @private
    */
   configureIcon: function (icon) {
-    var me = this,
-        variant = icon.variant;
+    var variant = icon.variant;
 
     // automatically apply 'x<size>'
     if (Ext.isString(variant)) {
