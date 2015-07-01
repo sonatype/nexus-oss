@@ -60,7 +60,7 @@ Ext.define('NX.controller.Icon', {
 
   /**
    * @private
-   * @param url
+   * @param {String} url
    */
   preloadImage: function(url) {
     var me = this,
