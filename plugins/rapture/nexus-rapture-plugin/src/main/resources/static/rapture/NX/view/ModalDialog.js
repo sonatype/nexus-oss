@@ -20,9 +20,6 @@
 Ext.define('NX.view.ModalDialog', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-modal-dialog',
-  requires: [
-    'NX.I18n'
-  ],
 
   layout: 'fit',
   autoShow: true,
@@ -30,5 +27,4 @@ Ext.define('NX.view.ModalDialog', {
   constrain: true,
   width: 400,
   closable: false
-
 });

@@ -62,8 +62,9 @@ Ext.define('NX.view.SettingsPanel', {
   },
 
   /**
+   * Remove all settings forms from this settings panel.
+   *
    * @override
-   * Remove all settings forms from this settings panel
    */
   removeAllSettingsForms: function() {
     var me = this;
@@ -72,13 +73,13 @@ Ext.define('NX.view.SettingsPanel', {
   },
 
   /**
-   * @public
    * Loads an Ext.data.Model into this form (internally just calls NX.view.SettingsForm.loadRecord)
+   *
+   * @public
    * @param model The model to load
    */
   loadRecord: function(model) {
-    var me = this,
-        settingsForm = me.down('nx-settingsform');
+    var settingsForm = this.down('nx-settingsform');
 
     if (settingsForm) {
       settingsForm.loadRecord(model);
