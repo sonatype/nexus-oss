@@ -88,9 +88,7 @@ Ext.define('NX.coreui.view.user.UserSearchBox', {
    * Clear search.
    */
   onTrigger1Click: function() {
-    var me = this;
-
-    me.clearSearch();
+    this.clearSearch();
   },
 
   /**

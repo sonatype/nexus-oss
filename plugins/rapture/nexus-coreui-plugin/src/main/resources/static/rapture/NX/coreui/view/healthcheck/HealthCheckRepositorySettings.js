@@ -141,8 +141,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
    * Preset form base params to repository id.
    */
   applyRepository: function(repositoryModel) {
-    var me = this,
-        form = me.down('nx-settingsform');
+    var form = this.down('nx-settingsform');
 
     form.getForm().baseParams = {
       repositoryId: repositoryModel ? repositoryModel.getId() : undefined

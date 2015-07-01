@@ -49,8 +49,7 @@ Ext.define('NX.controller.ExtDirect', {
    * @private
    */
   checkResponse: function(provider, transaction) {
-    var me = this,
-        result = transaction.result,
+    var result = transaction.result,
         message;
 
     // FIXME: Anything that does logging here can cause Ext.Direct log event remoting to spin out of control
@@ -88,7 +87,7 @@ Ext.define('NX.controller.ExtDirect', {
     //if (Ext.isDefined(result) && result.errors) {
     //  logMsg += (' Errors: ' + Ext.encode(result.errors));
     //}
-    //me.logDebug(logMsg);
+    //this.logDebug(logMsg);
     ////</if>
   }
 

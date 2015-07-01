@@ -112,8 +112,7 @@ Ext.define('NX.view.feature.Content', {
    * @param text
    */
   setDescription: function(text) {
-    var me = this,
-        label = me.down('#description');
+    var label = this.down('#description');
 
     label.setText(text);
   },
@@ -134,7 +133,8 @@ Ext.define('NX.view.feature.Content', {
 
     if (enable) {
       me.discardUnsavedChanges = true;
-    } else {
+    }
+    else {
       me.discardUnsavedChanges = false;
     }
   }

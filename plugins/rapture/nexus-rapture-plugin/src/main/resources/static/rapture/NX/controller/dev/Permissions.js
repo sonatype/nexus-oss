@@ -93,8 +93,7 @@ Ext.define('NX.controller.dev.Permissions', {
    * @private
    */
   deleteModel : function () {
-    var me = this,
-        grid = me.getGrid(),
+    var grid = this.getGrid(),
         editor = grid.getPlugin('editor');
 
     editor.cancelEdit();
@@ -133,8 +132,7 @@ Ext.define('NX.controller.dev.Permissions', {
   },
 
   onSelectionChange: function (selectionModel, records) {
-    var me = this,
-        deleteButton = me.getGrid().down('button[action=delete]');
+    var deleteButton = this.getGrid().down('button[action=delete]');
 
     deleteButton.setDisabled(!records.length);
   }

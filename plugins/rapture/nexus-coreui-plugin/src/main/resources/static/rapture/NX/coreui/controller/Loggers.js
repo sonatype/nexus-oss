@@ -110,8 +110,7 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Loads logger store.
    */
   loadStore: function () {
-    var me = this,
-        list = me.getList();
+    var list = this.getList();
 
     if (list) {
       list.getStore().load();
@@ -123,9 +122,7 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Shows success messages after records has been written (create/update).
    */
   onWrite: function (store, operation) {
-    var me = this;
-
-    me.loadStore();
+    this.loadStore();
     if (operation.success) {
       Ext.Array.each(operation.records, function (model) {
         NX.Messages.add({ text: NX.I18n.format('Loggers_Write_Success', operation.action, model.get('name')), type: 'success' });

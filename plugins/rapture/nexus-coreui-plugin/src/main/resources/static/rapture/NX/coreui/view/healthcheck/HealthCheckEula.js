@@ -56,8 +56,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckEula', {
         ui: 'footer',
         items: [
           { xtype: 'button', text: 'I Agree', action: 'agree', formBind: true, ui: 'nx-primary', handler: function () {
-            var me = this,
-                win = me.up('window');
+            var win = this.up('window');
 
             win.close();
             if (win.acceptFn) {

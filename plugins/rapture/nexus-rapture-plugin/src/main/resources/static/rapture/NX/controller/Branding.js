@@ -74,9 +74,8 @@ Ext.define('NX.controller.Branding', {
    * @private
    */
   renderHeaderBranding: function() {
-    var me = this,
-        branding = NX.State.getValue('branding'),
-        headerBranding = me.getHeaderBranding();
+    var branding = NX.State.getValue('branding'),
+        headerBranding = this.getHeaderBranding();
 
     if (headerBranding) {
       if (branding && branding['headerEnabled']) {
@@ -95,9 +94,8 @@ Ext.define('NX.controller.Branding', {
    * @private
    */
   renderFooterBranding: function() {
-    var me = this,
-        branding = NX.State.getValue('branding'),
-        footerBranding = me.getFooterBranding();
+    var branding = NX.State.getValue('branding'),
+        footerBranding = this.getFooterBranding();
 
     if (footerBranding) {
       if (branding && branding['footerEnabled']) {

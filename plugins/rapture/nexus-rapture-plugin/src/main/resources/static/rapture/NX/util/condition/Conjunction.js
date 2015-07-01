@@ -60,8 +60,7 @@ Ext.define('NX.util.condition.Conjunction', {
   },
 
   toString: function () {
-    var me = this;
-    return me.conditions.join(' AND ');
+    return this.conditions.join(' AND ');
   }
 
 });

@@ -246,8 +246,7 @@ Ext.define('NX.coreui.controller.Log', {
    * @param {String} text log content
    */
   showLog: function (text) {
-    var me = this,
-        textarea = me.getList().down('textarea');
+    var textarea = this.getList().down('textarea');
 
     textarea.setValue(text);
     // scroll to the bottom

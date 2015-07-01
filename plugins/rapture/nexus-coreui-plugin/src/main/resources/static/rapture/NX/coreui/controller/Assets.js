@@ -164,8 +164,7 @@ Ext.define('NX.coreui.controller.Assets', {
    * Update asset shown in asset container.
    */
   updateAssetContainer: function(gridView, td, cellIndex, assetModel) {
-    var me = this,
-        assetContainer = me.getAssetContainer();
+    var assetContainer = this.getAssetContainer();
 
     assetContainer.refreshInfo(gridView.up('grid').componentModel, assetModel);
   },
@@ -175,8 +174,7 @@ Ext.define('NX.coreui.controller.Assets', {
    * Enable 'Delete' when user has 'delete' permission.
    */
   bindDeleteAssetButton: function(button) {
-    var me = this,
-        component = me.getAssetList().componentModel;
+    var component = this.getAssetList().componentModel;
     button.mon(
         NX.Conditions.isPermitted('nexus:repository-view:' + component.get('format') + ':' +
             component.get('repositoryName') + ':delete')

@@ -72,9 +72,7 @@ Ext.define('NX.Bookmark', {
    * @returns {String} segment at index if defined
    */
   getSegment: function (index) {
-    var me = this;
-
-    return me.segments[index];
+    return this.segments[index];
   },
 
   /**

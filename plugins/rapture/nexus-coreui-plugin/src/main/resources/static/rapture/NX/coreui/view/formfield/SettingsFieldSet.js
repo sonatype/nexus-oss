@@ -138,8 +138,7 @@ Ext.define('NX.coreui.view.formfield.SettingsFieldSet', {
    * an object hash of `{id: msg, id2: msg2}`, or a {@link Ext.data.Errors} object.
    */
   markInvalid: function (errors) {
-    var me = this,
-        form = me.up('form').getForm(),
+    var form = this.up('form').getForm(),
         remainingMessages = [],
         key, marked, field;
 

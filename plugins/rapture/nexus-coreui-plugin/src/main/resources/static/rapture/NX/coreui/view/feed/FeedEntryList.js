@@ -53,14 +53,5 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
           '<p>{content}</p>'
       )
     }
-  ],
-
-  /**
-   * @override
-   */
-  initComponent: function () {
-    var me = this;
-
-    me.callParent();
-  }
+  ]
 });

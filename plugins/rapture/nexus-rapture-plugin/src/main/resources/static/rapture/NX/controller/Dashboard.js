@@ -31,9 +31,7 @@ Ext.define('NX.controller.Dashboard', {
    * @override
    */
   init: function () {
-    var me = this;
-
-    me.getApplication().getFeaturesController().registerFeature({
+    this.getApplication().getFeaturesController().registerFeature({
       path: '/Welcome',
       mode: 'browse',
       view: 'NX.view.dashboard.Welcome',

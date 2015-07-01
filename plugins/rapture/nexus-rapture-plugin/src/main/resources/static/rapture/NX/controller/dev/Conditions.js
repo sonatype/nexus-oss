@@ -90,8 +90,7 @@ Ext.define('NX.controller.dev.Conditions', {
    * @override
    */
   onLaunch: function () {
-    var me = this,
-        devPanelTab = me.getDevPanelTabs();
+    var devPanelTab = this.getDevPanelTabs();
 
     if (devPanelTab) {
       devPanelTab.add({ xtype: 'nx-dev-conditions' });
@@ -134,8 +133,7 @@ Ext.define('NX.controller.dev.Conditions', {
   },
 
   boundedChanged: function (condition) {
-    var me = this,
-        store = me.getStore('NX.store.dev.Condition'),
+    var store = this.getStore('NX.store.dev.Condition'),
         model;
 
     if (condition.bounded) {
@@ -151,8 +149,7 @@ Ext.define('NX.controller.dev.Conditions', {
   },
 
   stateChanged: function (condition) {
-    var me = this,
-        store = me.getStore('NX.store.dev.Condition'),
+    var store = this.getStore('NX.store.dev.Condition'),
         model = store.getById(condition.id);
 
     if (model) {

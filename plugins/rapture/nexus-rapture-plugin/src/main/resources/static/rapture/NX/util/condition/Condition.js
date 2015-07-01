@@ -159,8 +159,7 @@ Ext.define('NX.util.condition.Condition', {
    * @returns {boolean} true, if condition is satisfied
    */
   isSatisfied: function () {
-    var me = this;
-    return me.satisfied;
+    return this.satisfied;
   },
 
   /**

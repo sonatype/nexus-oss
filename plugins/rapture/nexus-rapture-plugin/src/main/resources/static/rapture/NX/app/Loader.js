@@ -160,8 +160,6 @@ Ext.define('NX.app.Loader', {
    * @return        controller configuration
    */
   defineController: function(config) {
-    var me = this;
-
     // simple definition of controller class-name
     if (Ext.isString(config)) {
       return {

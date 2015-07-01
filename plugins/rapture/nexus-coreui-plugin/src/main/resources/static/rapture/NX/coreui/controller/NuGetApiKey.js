@@ -122,8 +122,6 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
    * @param {String} apiKey to show
    */
   showApiKey: function(apiKey) {
-    var me = this;
-
     Ext.widget('nx-coreui-nuget-apikeydetails', { apiKey: apiKey });
   },
 

@@ -19,8 +19,7 @@ Ext.define('NX.util.condition.NeverSatisfied', {
   extend: 'NX.util.condition.Condition',
   
   toString: function () {
-    var me = this;
-    return me.self.getName() + '{ never satisfied }';
+    return this.self.getName() + '{ never satisfied }';
   }
 
 });

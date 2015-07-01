@@ -53,12 +53,11 @@ Ext.define('NX.controller.MenuGroup', {
    * @param {NX.model.Feature[]} records
    */
   onSelection: function (view, records) {
-    var me = this,
-        feature;
+    var feature;
 
     if (records.length > 0) {
       feature = records[0];
-      NX.Bookmarks.navigateTo(NX.Bookmarks.fromToken(feature.get('bookmark')), me);
+      NX.Bookmarks.navigateTo(NX.Bookmarks.fromToken(feature.get('bookmark')), this);
     }
   }
 

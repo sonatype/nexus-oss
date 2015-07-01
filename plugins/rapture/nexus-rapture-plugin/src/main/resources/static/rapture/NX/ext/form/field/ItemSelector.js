@@ -60,8 +60,6 @@ Ext.define('NX.ext.form.field.ItemSelector', {
    * @param button
    */
   customizeButton: function (name, button) {
-    var me = this;
-
     // remove icon
     delete button.iconCls;
 
@@ -172,9 +170,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
    * @private
    */
   onSearchCleared: function () {
-    var me = this;
-
-    me.fromField.store.clearFilter();
+    this.fromField.store.clearFilter();
   },
 
   // HACK: Looks like original item selector forgot to unbind from store which results in NPEs in #populateFromStore

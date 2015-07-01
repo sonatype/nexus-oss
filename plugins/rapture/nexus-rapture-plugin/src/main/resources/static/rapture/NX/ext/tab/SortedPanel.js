@@ -60,14 +60,12 @@ Ext.define('NX.ext.tab.SortedPanel', {
    * @override
    */
   onAdd: function(item, index) {
-    var me = this;
-
     item.tabConfig = item.tabConfig || {};
     Ext.applyIf(item.tabConfig, {
       // HACK: force tabs to follow scss style for borders
       border: null
     });
 
-    me.callParent([item, index]);
+    this.callParent([item, index]);
   }
 });

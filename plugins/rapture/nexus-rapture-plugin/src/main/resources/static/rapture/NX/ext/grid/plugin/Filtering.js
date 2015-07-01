@@ -66,8 +66,7 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
    * @param fieldValue to me matched
    */
   matches: function (filterValue, record, fieldName, fieldValue) {
-    var me = this;
-    return me.filterFn(fieldValue, filterValue);
+    return this.filterFn(fieldValue, filterValue);
   },
 
   /**

@@ -27,9 +27,7 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
    * @override
    */
   init: function () {
-    var me = this;
-
-    me.getApplication().getFeaturesController().registerFeature([
+    this.getApplication().getFeaturesController().registerFeature([
       {
         mode: 'admin',
         path: '/Repository',

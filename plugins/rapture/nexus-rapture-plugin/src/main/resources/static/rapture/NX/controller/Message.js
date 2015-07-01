@@ -132,8 +132,7 @@ Ext.define('NX.controller.Message', {
    * @param button
    */
   toggleMessages: function(button) {
-    var me = this,
-        panel = me.getPanel();
+    var panel = this.getPanel();
 
     if (panel.isVisible()) {
       panel.hide();

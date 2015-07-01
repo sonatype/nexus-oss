@@ -61,15 +61,14 @@ Ext.define('NX.Icons', {
    * @returns {string}
    */
   url: function(name, variant, ext) {
-    var me = this,
-        file = name;
+    var file = name;
 
     if (ext === undefined) {
       ext = 'png';
     }
     file += '.' + ext;
 
-    return me.url2(file, variant);
+    return this.url2(file, variant);
   },
 
   /**

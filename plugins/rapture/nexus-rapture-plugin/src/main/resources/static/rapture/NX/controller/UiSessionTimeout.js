@@ -90,13 +90,11 @@ Ext.define('NX.controller.UiSessionTimeout', {
    * @param {Number} oldUiSettings.sessionTimeout
    */
   onUiSettingsChanged: function (uiSettings, oldUiSettings) {
-    var me = this;
-
     uiSettings = uiSettings || {};
     oldUiSettings = oldUiSettings || {};
 
     if (uiSettings.sessionTimeout !== oldUiSettings.sessionTimeout) {
-      me.setupTimeout();
+      this.setupTimeout();
     }
   },
 
@@ -159,10 +157,8 @@ Ext.define('NX.controller.UiSessionTimeout', {
    * @private
    */
   showExpirationWindow: function () {
-    var me = this;
-
     NX.Messages.add({text: NX.I18n.get('UiSessionTimeout_Expire_Message'), type: 'warning' });
-    me.getExpireSessionView().create();
+    this.getExpireSessionView().create();
   },
 
   /**
