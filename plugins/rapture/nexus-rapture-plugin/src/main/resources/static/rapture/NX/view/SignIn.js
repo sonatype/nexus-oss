@@ -36,12 +36,12 @@ Ext.define('NX.view.SignIn', {
   resizable: false,
 
   /**
-   * @protected
+   * @override
    */
   initComponent: function () {
     var me = this;
 
-    Ext.apply(this, {
+    Ext.apply(me, {
       items: {
         xtype: 'form',
         defaultType: 'textfield',
