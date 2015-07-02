@@ -133,10 +133,8 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    * @override
    */
   onSelection: function (list, model) {
-    var me = this;
-
     if (Ext.isDefined(model)) {
-      me.getDetails().loadRecord(model);
+      this.getDetails().loadRecord(model);
     }
   },
 

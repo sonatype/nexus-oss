@@ -106,11 +106,9 @@ Ext.define('NX.view.drilldown.Drilldown', {
    * Create a new drilldown item
    */
   createDrilldownItem: function(index, browsePanel, createPanel) {
-    var me = this;
-
     return {
       xtype: 'nx-drilldown-item',
-      itemClass: NX.Icons.cls(me.iconName) + (index === 0 ? '-x32' : '-x16'),
+      itemClass: NX.Icons.cls(this.iconName) + (index === 0 ? '-x32' : '-x16'),
       items: [
         {
           xtype: 'container',
@@ -138,8 +136,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
    * Set the name of the referenced drilldown item
    */
   setItemName: function (index, text) {
-    var me = this,
-      items = me.padItems(index);
+    var items = this.padItems(index);
 
     items[index].setItemName(text);
   },
@@ -149,8 +146,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
    * Set the icon class of the referenced drilldown item
    */
   setItemClass: function (index, cls) {
-    var me = this,
-      items = me.padItems(index);
+    var items = this.padItems(index);
 
     items[index].setItemClass(cls);
   },
@@ -160,8 +156,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
    * Set the bookmark of the breadcrumb segment associated with the referenced drilldown item
    */
   setItemBookmark: function (index, bookmark, scope) {
-    var me = this,
-      items = me.padItems(index);
+    var items = this.padItems(index);
 
     items[index].setItemBookmark(bookmark, scope);
   },
@@ -522,8 +517,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
    * @param minPerButton The minimum to resize each button (until all buttons are at this minimum)
    */
   reduceButtonWidth: function(buttons, width, minPerButton) {
-    var me = this,
-      currentWidth = 0,
+    var currentWidth = 0,
       setToWidth;
 
     // Sort the buttons by width
@@ -556,7 +550,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
         else {
           // No. Set the width of this button to that of the next button, and re-run the algorithm.
           buttons[i].setWidth(buttons[i+1].getWidth());
-          me.reduceButtonWidth(buttons, width, minPerButton);
+          this.reduceButtonWidth(buttons, width, minPerButton);
         }
       }
       else {

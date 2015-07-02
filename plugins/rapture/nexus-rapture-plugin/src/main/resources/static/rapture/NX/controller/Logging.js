@@ -98,7 +98,8 @@ Ext.define('NX.controller.Logging', {
     debug: 3,
     info: 4,
     warn: 5,
-    off: 6
+    error: 6,
+    off: 7
   },
 
   /**

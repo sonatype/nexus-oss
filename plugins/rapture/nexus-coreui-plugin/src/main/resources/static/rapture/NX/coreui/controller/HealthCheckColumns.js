@@ -84,9 +84,8 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
    * Loads/set Health Check fields on loaded records.
    */
   loadHealthCheckFields: function(store, records) {
-    var me = this,
-        components = [],
-        resultList = me.getHealthcheckResult();
+    var components = [],
+        resultList = this.getHealthcheckResult();
 
     if (!resultList || !resultList['healthCheckColumns']) {
       return;

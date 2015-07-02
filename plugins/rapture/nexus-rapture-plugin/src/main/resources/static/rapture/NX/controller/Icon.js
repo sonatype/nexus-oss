@@ -63,11 +63,10 @@ Ext.define('NX.controller.Icon', {
    * @param {String} url
    */
   preloadImage: function(url) {
-    var me = this,
-        img;
+    var img;
 
     //<if debug>
-    me.logTrace('Preloading:', url);
+    this.logTrace('Preloading:', url);
     //</if>
 
     img = new Image();
@@ -215,8 +214,7 @@ Ext.define('NX.controller.Icon', {
    * @public
    */
   findIcon: function (name, variant) {
-    var me = this,
-        store = me.getStore('Icon'),
+    var store = this.getStore('Icon'),
         recordId;
 
     recordId = store.findBy(function (record, id) {

@@ -64,8 +64,7 @@ Ext.define('NX.view.dev.Stores', {
               reader: {
                 type: 'json',
                 read: function (data) {
-                  var me = this,
-                      stores = [];
+                  var stores = [];
 
                   data.each(function (store) {
                     stores.push({
@@ -73,7 +72,7 @@ Ext.define('NX.view.dev.Stores', {
                     });
                   });
 
-                  return me.readRecords(stores);
+                  return this.readRecords(stores);
                 }
               }
             },

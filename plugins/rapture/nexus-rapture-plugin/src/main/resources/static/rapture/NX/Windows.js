@@ -34,7 +34,7 @@ Ext.define('NX.Windows', {
    * @return Browser window object or {@code null} if unable to open.
    */
   open: function(url, name, specs, replace) {
-    var me = this, win;
+    var win;
 
     // apply default window specs if omitted, helps keep windows user-controllable on most browsers
     if (specs === undefined) {
@@ -42,7 +42,7 @@ Ext.define('NX.Windows', {
     }
 
     //<if debug>
-    me.logDebug('Opening window: url=' + url + ', name=' + name + ', specs=' + specs + ', replace=' + replace);
+    this.logDebug('Opening window: url=' + url + ', name=' + name + ', specs=' + specs + ', replace=' + replace);
     //</if>
 
     win = NX.global.open(url, name, specs, replace);

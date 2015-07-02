@@ -25,7 +25,9 @@ Ext.define('NX.view.dev.Logging', {
   store: 'LogEvent',
   emptyText: 'No events',
   viewConfig: {
-    deferEmptyText: false
+    deferEmptyText: false,
+    // allow browser text selection
+    enableTextSelection: true
   },
 
   stateful: true,
@@ -37,6 +39,11 @@ Ext.define('NX.view.dev.Logging', {
     { text: 'message', dataIndex: 'message', flex: 3 },
     { text: 'timestamp', dataIndex: 'timestamp', width: 130 }
   ],
+
+  //selType: 'rowmodel',
+  //selModel: {
+  //  mode: 'MULTI'
+  //},
 
   tbar: [
     {

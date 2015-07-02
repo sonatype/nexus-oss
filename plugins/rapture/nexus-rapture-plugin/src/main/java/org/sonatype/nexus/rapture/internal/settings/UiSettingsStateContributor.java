@@ -52,12 +52,6 @@ public class UiSettingsStateContributor
     return ImmutableMap.of(STATE_ID, calculateSettings());
   }
 
-  @Nullable
-  @Override
-  public Map<String, Object> getCommands() {
-    return null;
-  }
-
   private Object calculateSettings() {
     return rapture.getSettings();
   }

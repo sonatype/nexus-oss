@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.rapture.internal.state;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,14 +66,7 @@ public class StateComponent
 
   @Timed
   @DirectPollMethod(event = "rapture_State_get")
-  public StateXO get(final Map<String, String> hashes) {
-    StateXO state = new StateXO();
-    state.setValues(getValues(hashes));
-    state.setCommands(getCommands());
-    return state;
-  }
-
-  public Map<String, Object> getValues(final Map<String, String> hashes) {
+  public Map<String, Object> getState(final Map<String, String> hashes) {
     HashMap<String, Object> values = new HashMap<>();
 
     // First add an entry for each hash we got.
@@ -105,34 +97,6 @@ public class StateComponent
     maybeSend(values, hashes, "serverId", serverId);
 
     return values;
-  }
-
-  private List<CommandXO> getCommands() {
-    List<CommandXO> commands = new ArrayList<>();
-
-    for (Provider<StateContributor> contributor : stateContributors) {
-      try {
-        Map<String, Object> stateCommands = contributor.get().getCommands();
-        if (stateCommands != null) {
-          for (Entry<String, Object> entry : stateCommands.entrySet()) {
-            if (!Strings2.isBlank(entry.getKey())) {
-              CommandXO command = new CommandXO();
-              command.setType(entry.getKey());
-              command.setData(entry.getValue());
-              commands.add(command);
-            }
-            else {
-              log.warn("Blank command-id returned by {} (ignored)", contributor.getClass().getName());
-            }
-          }
-        }
-      }
-      catch (Exception e) {
-        log.warn("Failed to get commands from {} (ignored)", contributor.getClass().getName(), e);
-      }
-    }
-
-    return commands;
   }
 
   /**
@@ -173,30 +137,4 @@ public class StateComponent
     return null;
   }
 
-  public static boolean shouldSend(final String key, final Object value) {
-    boolean shouldSend = true;
-    if (WebContextManager.isWebContextAttachedToCurrentThread()) {
-      HttpSession session = WebContextManager.get().getRequest().getSession(false);
-      if (session != null) {
-        String sessionAttribute = "state-digest-" + key;
-        String currentDigest = (String) session.getAttribute(sessionAttribute);
-        String newDigest = null;
-        if (value != null) {
-          newDigest = hash(value);
-        }
-        if (Objects.equal(currentDigest, newDigest)) {
-          shouldSend = false;
-        }
-        else {
-          if (newDigest != null) {
-            session.setAttribute(sessionAttribute, newDigest);
-          }
-          else {
-            session.removeAttribute(sessionAttribute);
-          }
-        }
-      }
-    }
-    return shouldSend;
-  }
 }

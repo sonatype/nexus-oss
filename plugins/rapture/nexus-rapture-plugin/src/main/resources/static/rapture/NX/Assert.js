@@ -19,9 +19,9 @@
  */
 Ext.define('NX.Assert', {
   singleton: true,
-  requires: [
-    'NX.Log'
-  ],
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
   /**
    * Set to true to disable all assertions.
@@ -45,7 +45,7 @@ Ext.define('NX.Assert', {
         expression = args.shift();
     if (!expression) {
       args.unshift('Assertion failure:');
-      NX.Log.error.apply(NX.Log, args);
+      this.logError.apply(this, args);
     }
     //</if>
   }

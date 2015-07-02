@@ -105,9 +105,7 @@ Ext.define('NX.ext.SearchBox', {
    * @private
    */
   onTrigger1Click: function () {
-    var me = this;
-
-    me.clearSearch();
+    this.clearSearch();
   },
 
   /**

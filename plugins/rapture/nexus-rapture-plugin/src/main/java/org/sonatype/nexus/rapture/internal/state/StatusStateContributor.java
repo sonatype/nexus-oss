@@ -54,12 +54,6 @@ public class StatusStateContributor
     return ImmutableMap.of(STATE_ID, calculateStatus());
   }
 
-  @Nullable
-  @Override
-  public Map<String, Object> getCommands() {
-    return null;
-  }
-
   private Object calculateStatus() {
     SystemStatus status = systemStatus.get();
     StatusXO result = new StatusXO();

@@ -123,10 +123,8 @@ Ext.define('NX.coreui.controller.Roles', {
   },
 
   onSelection: function(list, model) {
-    var me = this;
-
     if (Ext.isDefined(model)) {
-      me.getSettings().loadRecord(model);
+      this.getSettings().loadRecord(model);
     }
   },
 
@@ -180,8 +178,7 @@ Ext.define('NX.coreui.controller.Roles', {
    * (Re)create external role mapping entries.
    */
   onRoleSourceLoad: function(store) {
-    var me = this,
-        list = me.getList(),
+    var list = this.getList(),
         newButton, menuItems = [];
 
     if (list) {
@@ -230,10 +227,7 @@ Ext.define('NX.coreui.controller.Roles', {
    * @private
    */
   onSettingsSubmitted: function(form, action) {
-    var me = this,
-        win = form.up('nx-coreui-role-add');
-
-    me.getStore('Role').load();
+    this.getStore('Role').load();
   },
 
   /**

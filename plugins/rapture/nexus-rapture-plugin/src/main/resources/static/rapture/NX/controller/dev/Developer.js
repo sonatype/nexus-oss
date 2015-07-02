@@ -102,10 +102,9 @@ Ext.define('NX.controller.dev.Developer', {
    * @param {Ext.Panel} developerPanel
    */
   manageDeveloperPanel: function (developerPanel) {
-    var me = this,
-        debug = NX.State.getValue('debug');
+    var debug = NX.State.getValue('debug');
 
-    developerPanel = developerPanel || me.getDeveloper();
+    developerPanel = developerPanel || this.getDeveloper();
 
     if (developerPanel) {
       if (debug) {

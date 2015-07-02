@@ -274,7 +274,7 @@ public class RaptureWebResourceBundle
    * Returns the initial state for the application.
    */
   private Map<String, Object> getState() {
-    return stateComponentProvider.get().getValues(Maps.<String, String>newHashMap());
+    return stateComponentProvider.get().getState(Maps.<String, String>newHashMap());
   }
 
   /**

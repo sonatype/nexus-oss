@@ -78,8 +78,6 @@ Ext.define('NX.controller.SettingsForm', {
    * @private
    */
   loadForm: function (form, options) {
-    var me = this;
-
     if (!form.isDestroyed && form.rendered) {
       if (form.api && form.api.load) {
         // Load the form

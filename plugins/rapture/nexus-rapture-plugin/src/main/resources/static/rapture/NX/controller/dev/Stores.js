@@ -55,9 +55,8 @@ Ext.define('NX.controller.dev.Stores', {
    * @private
    */
   onStoreSelected: function (combobox) {
-    var me = this,
-        storeId = combobox.getValue(),
-        panel = me.getStores(),
+    var storeId = combobox.getValue(),
+        panel = this.getStores(),
         grid = panel.down('grid'),
         store, columns = [];
 
@@ -82,8 +81,7 @@ Ext.define('NX.controller.dev.Stores', {
    * @private
    */
   loadStore: function () {
-    var me = this,
-        panel = me.getStores(),
+    var panel = this.getStores(),
         grid = panel.down('grid');
 
     if (grid) {
@@ -95,8 +93,7 @@ Ext.define('NX.controller.dev.Stores', {
    * @private
    */
   clearStore: function () {
-    var me = this,
-        panel = me.getStores(),
+    var panel = this.getStores(),
         grid = panel.down('grid');
 
     if (grid) {

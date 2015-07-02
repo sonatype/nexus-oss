@@ -125,8 +125,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
    * Load analytics event store.
    */
   load: function () {
-    var me = this,
-        list = me.getList();
+    var list = this.getList();
 
     if (list) {
       list.getStore().load();

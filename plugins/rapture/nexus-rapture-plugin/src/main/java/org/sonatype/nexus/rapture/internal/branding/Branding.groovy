@@ -60,11 +60,6 @@ class Branding
     return null
   }
 
-  @Override
-  Map<String, Object> getCommands() {
-    return null
-  }
-
   void set(final BrandingCapabilityConfiguration config) {
     this.config = config
   }

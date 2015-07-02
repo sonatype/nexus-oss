@@ -147,13 +147,12 @@ Ext.define('NX.Permissions', {
    * @return {boolean}
    */
   implies: function(permission1, permission2) {
-    var me = this,
-        parts1 = permission1.split(':'),
+    var parts1 = permission1.split(':'),
         parts2 = permission2.split(':'),
         part1, part2, i;
 
     //<if debug>
-    me.logTrace('Checking if:', permission1, 'implies:', permission2);
+    this.logTrace('Checking if:', permission1, 'implies:', permission2);
     //</if>
 
     for (i = 0; i < parts2.length; i++) {

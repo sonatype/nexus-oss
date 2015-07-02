@@ -212,10 +212,9 @@ Ext.define('NX.app.Application', {
    * @private
    */
   handleError: function (error) {
-    var me = this;
     NX.Messages.add({
       type: 'danger',
-      text: me.errorAsString(error)
+      text: this.errorAsString(error)
     });
   },
 
@@ -239,8 +238,7 @@ Ext.define('NX.app.Application', {
    * @private
    */
   initDirect: function () {
-    var me = this,
-        remotingProvider;
+    var remotingProvider;
 
     remotingProvider = Ext.direct.Manager.addProvider(NX.direct.api.REMOTING_API);
 
@@ -254,7 +252,7 @@ Ext.define('NX.app.Application', {
     remotingProvider.timeout = 60 * 1000;
 
     //<if debug>
-    me.logDebug('Configured Ext.Direct');
+    this.logDebug('Configured Ext.Direct');
     //</if>
   },
 

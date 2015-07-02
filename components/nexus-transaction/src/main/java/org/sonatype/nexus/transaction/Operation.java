@@ -10,19 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rapture.internal.state
+package org.sonatype.nexus.transaction;
 
-import groovy.transform.ToString
+import java.util.concurrent.Callable;
 
 /**
- * State exchange object.
- *
+ * Represents a {@link Callable} with a more specific throws clause.
+ * 
  * @since 3.0
  */
-@ToString(includePackage = false, includeNames = true)
-class StateXO
+public interface Operation<T, E extends Exception>
+    extends Callable<T>
 {
-  Map<String, Object> values
-
-  List<CommandXO> commands
+  T call() throws E;
 }

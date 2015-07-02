@@ -225,8 +225,7 @@ Ext.define('NX.coreui.controller.Users', {
    * @private
    */
   showChangePasswordWindowForSelection: function() {
-    var me = this,
-        list = me.getList(),
+    var list = this.getList(),
         userId = list.getSelectionModel().getSelection()[0].getId();
 
     NX.Security.doWithAuthenticationToken(
@@ -306,8 +305,7 @@ Ext.define('NX.coreui.controller.Users', {
    * (Re)create user source filters.
    */
   onUserSourceLoad: function(store) {
-    var me = this,
-        list = me.getList(),
+    var list = this.getList(),
         userSourceButton;
 
     if (list) {
@@ -410,10 +408,7 @@ Ext.define('NX.coreui.controller.Users', {
    * @private
    */
   onSettingsSubmitted: function(form, action) {
-    var me = this,
-        win = form.up('nx-coreui-user-add');
-
-    me.getStore('User').load();
+    this.getStore('User').load();
   },
 
   /**
@@ -465,13 +460,12 @@ Ext.define('NX.coreui.controller.Users', {
    * Enable 'More' actions as appropriate for user's permissions.
    */
   bindMoreButton: function(button) {
-    var me = this,
-        setMenuItem = button.down('menuitem[action=setpassword]');
+    var setMenuItem = button.down('menuitem[action=setpassword]');
 
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted('nexus:userschangepw:create'),
-            NX.Conditions.gridHasSelection(me.masters[0], function(model) {
+            NX.Conditions.gridHasSelection(this.masters[0], function(model) {
               return !model.get('external') && model.getId() !== NX.State.getValue('anonymousUsername');
             })
         ),

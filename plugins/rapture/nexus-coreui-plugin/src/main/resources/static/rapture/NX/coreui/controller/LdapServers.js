@@ -328,10 +328,8 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Enable 'Change Order' when user has 'update' permission.
    */
   bindChangeOrderButton: function(button) {
-    var me = this;
-
     button.mon(
-        NX.Conditions.isPermitted(me.permission + ':update'),
+        NX.Conditions.isPermitted(this.permission + ':update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -345,10 +343,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Enable 'ClearCache' when user has 'delete' permission and there is at least one LDAP server configured.
    */
   bindClearCacheButton: function(button) {
-    var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission + ':delete'),
+            NX.Conditions.isPermitted(this.permission + ':delete'),
             NX.Conditions.storeHasRecords('LdapServer')
         ),
         {
@@ -382,8 +379,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Change LDAP servers order.
    */
   changeOrder: function(button) {
-    var me = this,
-        win = button.up('window'),
+    var win = button.up('window'),
         order = button.up('form').down('nx-itemorderer').getValue();
 
     NX.direct.ldap_LdapServer.changeOrder(order, function(response) {
@@ -457,13 +453,12 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Verify LDAP login.
    */
   verifyLogin: function(button) {
-    var me = this,
-        win = button.up('window'),
+    var win = button.up('window'),
         form = button.up('form'),
         loginValues = form.getForm().getFieldValues(),
         userName = NX.util.Base64.encode(loginValues.username),
         userPass = NX.util.Base64.encode(loginValues.password),
-        values = me.getValues(),
+        values = this.getValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
     form.getEl().mask(NX.I18n.format('LdapServers_VerifyLogin_Mask', url));
@@ -482,8 +477,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Get form values from connection adn user/group form.
    */
   getValues: function() {
-    var me = this,
-        feature = me.getFeature(),
+    var feature = this.getFeature(),
         values = {}, url, connectionForm, userGroupForm;
 
     if (feature.down('nx-coreui-ldapserver-connection-add')) {
