@@ -495,13 +495,19 @@ Ext.define('NX.controller.Drilldown', {
       drilldown = me.getDrilldown(),
       feature = drilldown.up('nx-feature-content'),
       items = me.getDrilldownItems(),
-      item = items[index],
-      createContainer;
+      item = items[index];
 
     if (item && item.el) {
+
+      // Restore the current card
+      me.currentIndex = index;
+      item.getLayout().setActiveItem(item.cardIndex);
+
       var left = feature.el.getX() - (index * feature.el.getWidth());
       if (animate) {
-        // Slide the requested panel into view
+        // Suspend layouts until the drilldown animation is complete
+        Ext.suspendLayouts();
+
         drilldown.animate({
           easing: 'easeInOut',
           duration: 200,
@@ -509,30 +515,40 @@ Ext.define('NX.controller.Drilldown', {
             x: left
           },
           callback: function() {
+            // Update the breadcrumb
+            me.refreshBreadcrumb();
+
+            // Put focus on the panel we’re navigating to
             me.hideAllExceptAndFocus(me.currentIndex);
+
+            // Destroy any create wizard panels after current
+            for (var i = index + 1; i < items.length; ++i) {
+              items[i].down('#create' + i).removeAll();
+            }
+
+            // Resume layouts
+            Ext.resumeLayouts(true);
+
+            // Resize the breadcrumb to fit the window
+            me.resizeBreadcrumb();
           }
         });
       } else {
         // Show the requested panel, without animation
         drilldown.setX(left, false);
 
+        // Update the breadcrumb
+        me.refreshBreadcrumb();
+        me.resizeBreadcrumb();
+
         // Put focus on the panel we’re navigating to
         me.hideAllExceptAndFocus(index);
+
+        // Destroy any create wizard panels after current
+        for (var i = index + 1; i < items.length; ++i) {
+          items[i].down('#create' + i).removeAll();
+        }
       }
-      me.currentIndex = index;
-
-      // Update the breadcrumb
-      me.refreshBreadcrumb();
-      me.resizeBreadcrumb();
-
-      // Restore the current card
-      item.getLayout().setActiveItem(item.cardIndex);
-    }
-
-    // Destroy any create wizard panels after current
-    for (var i = index + 1; i < items.length; ++i) {
-      createContainer = items[i].down('#create' + i);
-      createContainer.removeAll();
     }
   },
 
