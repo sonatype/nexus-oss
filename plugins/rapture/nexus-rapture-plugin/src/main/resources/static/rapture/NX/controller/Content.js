@@ -109,7 +109,7 @@ Ext.define('NX.controller.Content', {
     cmp.fireEvent('activate', cmp);
 
     //<if debug>
-    me.logDebug('Content changed to:', text, '(' + cmp.self.getName() + ')');
+    me.logInfo('Content changed to:', text, '(' + cmp.self.getName() + ')');
     //</if>
   }
 
