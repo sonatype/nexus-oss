@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -61,6 +61,9 @@ Ext.define('NX.controller.User', {
     }
   ],
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -101,21 +104,24 @@ Ext.define('NX.controller.User', {
 
     me.addEvents(
         /**
-         * @event signin
          * Fires when a user had been successfully signed-in.
+         *
+         * @event signin
          * @param {Object} user
          */
         'signin',
 
         /**
+         * Fires before a user is signed out.
+         *
          * @event beforesignout
-         * Fires before a user is signed out
          */
         'beforesignout',
 
         /**
-         * @event signout
          * Fires when a user had been successfully signed-out.
+         *
+         * @event signout
          */
         'signout'
     );
@@ -150,8 +156,9 @@ Ext.define('NX.controller.User', {
   },
 
   /**
-   * @public
    * Shows sign-in or authentication window based on the fact that we have an user or not.
+   *
+   * @public
    * @param {String} [message] Message to be shown in authentication window
    * @param {Object} [options] TODO
    */
@@ -167,8 +174,9 @@ Ext.define('NX.controller.User', {
   },
 
   /**
-   * @public
    * Shows authentication window in order to retrieve an authentication token.
+   *
+   * @public
    * @param {String} [message] Message to be shown in authentication window
    * @param {Object} [options] TODO
    */
@@ -181,8 +189,9 @@ Ext.define('NX.controller.User', {
   },
 
   /**
-   * @private
    * Shows sign-in window.
+   *
+   * @private
    * @param {Object} [options] TODO
    */
   showSignInWindow: function (options) {
@@ -194,8 +203,9 @@ Ext.define('NX.controller.User', {
   },
 
   /**
-   * @private
    * Shows authenticate window.
+   *
+   * @private
    * @param {String} [message] Message to be shown in authentication window
    * @param {Object} [options] TODO
    */
@@ -227,7 +237,7 @@ Ext.define('NX.controller.User', {
     win.getEl().mask(NX.I18n.get('User_SignIn_Mask'));
 
     //<if debug>
-    me.logDebug('Sign-in user: "' + values.username + '" ...');
+    me.logDebug('Sign-in user: "', values.username, '" ...');
     //</if>
 
     Ext.Ajax.request({
@@ -268,12 +278,11 @@ Ext.define('NX.controller.User', {
    * @private
    */
   doAuthenticateAction: function (button) {
-    var me = this,
-        win = button.up('window');
+    var win = button.up('window');
 
     // invoke optional authenticateAction callback registered on window
     if (win.options && Ext.isFunction(win.options.authenticateAction)) {
-      win.options.authenticateAction.call(me, button);
+      win.options.authenticateAction.call(this, button);
     }
   },
 
@@ -285,8 +294,7 @@ Ext.define('NX.controller.User', {
    * @private
    */
   authenticate: function (button) {
-    var me = this,
-        win = button.up('window'),
+    var win = button.up('window'),
         form = button.up('form'),
         user = NX.State.getUser(),
         values = Ext.applyIf(form.getValues(), {username: user ? user.id : undefined}),
@@ -296,7 +304,7 @@ Ext.define('NX.controller.User', {
     win.getEl().mask(NX.I18n.get('User_Controller_Authenticate_Mask'));
 
     //<if debug>
-    me.logDebug('Authenticating user "' + values.username + '" ...');
+    this.logDebug('Authenticating user "', values.username, '" ...');
     //</if>
 
     NX.direct.rapture_Security.authenticate(b64username, b64password, function (response) {
@@ -317,8 +325,7 @@ Ext.define('NX.controller.User', {
    * @private
    */
   retrieveAuthenticationToken: function (button) {
-    var me = this,
-        win = button.up('window'),
+    var win = button.up('window'),
         form = button.up('form'),
         user = NX.State.getUser(),
         values = Ext.applyIf(form.getValues(), {username: user ? user.id : undefined}),
@@ -328,7 +335,7 @@ Ext.define('NX.controller.User', {
     win.getEl().mask(NX.I18n.get('User_Retrieving_Mask'));
 
     //<if debug>
-    me.logDebug('Retrieving authentication token...');
+    this.logDebug('Retrieving authentication token...');
     //</if>
 
     NX.direct.rapture_Security.authenticationToken(b64username, b64password, function (response) {

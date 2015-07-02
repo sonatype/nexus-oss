@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -55,8 +55,7 @@ Ext.define('NX.controller.Drilldown', {
   deleteModel: undefined,
 
   onLaunch: function () {
-    var me = this;
-    me.getApplication().getIconController().addIcons({
+    this.getApplication().getIconController().addIcons({
       'drilldown-info': {
         file: 'information.png',
         variants: ['x16', 'x32']
@@ -89,7 +88,7 @@ Ext.define('NX.controller.Drilldown', {
     }
 
     // New button
-    componentListener['nx-drilldown button[action=new]'] = {
+    componentListener[me.masters[0] + ' ^ nx-drilldown button[action=new]'] = {
       afterrender: me.bindNewButton
     };
 
@@ -123,11 +122,10 @@ Ext.define('NX.controller.Drilldown', {
    * @public
    */
   reselect: function () {
-    var me = this,
-        lists = Ext.ComponentQuery.query('nx-drilldown-master');
+    var lists = Ext.ComponentQuery.query('nx-drilldown-master');
 
     if (lists.length) {
-      me.navigateTo(NX.Bookmarks.getBookmark());
+      this.navigateTo(NX.Bookmarks.getBookmark());
     }
   },
 
@@ -136,14 +134,13 @@ Ext.define('NX.controller.Drilldown', {
    * When a list item is clicked, display the new view and update the bookmark
    */
   onCellClick: function(list, td, cellIndex, model, tr, rowIndex, e) {
-    var me = this,
-      index = Ext.ComponentQuery.query('nx-drilldown-master').indexOf(list.up('grid'));
+    var index = Ext.ComponentQuery.query('nx-drilldown-master').indexOf(list.up('grid'));
 
     //if the cell target is a link, let it do it's thing
     if(e.getTarget('a')) {
       return false;
     }
-    me.loadView(index + 1, true, model);
+    this.loadView(index + 1, true, model);
   },
 
   /**
@@ -201,8 +198,7 @@ Ext.define('NX.controller.Drilldown', {
    * @param cmp An optional component to load
    */
   loadCreateWizard: function (index, animate, cmp) {
-    var me = this,
-      feature = me.getFeature();
+    var feature = this.getFeature();
 
     // Reset all non-root bookmarks
     for (var i = 1; i <= index; ++i) {
@@ -218,8 +214,7 @@ Ext.define('NX.controller.Drilldown', {
    * Bookmark specified model / selected tab.
    */
   bookmark: function (model) {
-    var me = this,
-        lists = Ext.ComponentQuery.query('nx-drilldown-master'),
+    var lists = Ext.ComponentQuery.query('nx-drilldown-master'),
         bookmark = NX.Bookmarks.getBookmark().getSegments(),
         segments = [],
         index = 0;
@@ -239,7 +234,7 @@ Ext.define('NX.controller.Drilldown', {
     }
 
     // Set the bookmark
-    NX.Bookmarks.bookmark(NX.Bookmarks.fromSegments(segments), me);
+    NX.Bookmarks.bookmark(NX.Bookmarks.fromSegments(segments), this);
   },
 
   /**
@@ -320,9 +315,8 @@ Ext.define('NX.controller.Drilldown', {
    * Enable 'New' when user has 'create' permission.
    */
   bindNewButton: function (button) {
-    var me = this;
     button.mon(
-        NX.Conditions.isPermitted(me.permission + ':create'),
+        NX.Conditions.isPermitted(this.permission + ':create'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -336,11 +330,8 @@ Ext.define('NX.controller.Drilldown', {
    * Enable 'Delete' when user has 'delete' permission.
    */
   bindDeleteButton: function (button) {
-    var me = this;
     button.mon(
-        NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission + ':delete')
-        ),
+        NX.Conditions.isPermitted(this.permission + ':delete'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,9 +21,9 @@ Ext.define('NX.Bookmark', {
 
   config: {
     /**
-     * @public
      * Bookmark token.
-     * @type {String}
+     *
+     * @cfg {String}
      */
     token: undefined
   },
@@ -33,14 +33,17 @@ Ext.define('NX.Bookmark', {
    */
   segments: undefined,
 
+  /**
+   * @constructor
+   */
   constructor: function (config) {
-    var me = this;
-    me.initConfig(config);
+    this.initConfig(config);
   },
 
   /**
-   * @private
    * Validates token to be a String and calculates segments.
+   *
+   * @private
    * @param token to apply
    * @returns {String} token
    */
@@ -69,9 +72,7 @@ Ext.define('NX.Bookmark', {
    * @returns {String} segment at index if defined
    */
   getSegment: function (index) {
-    var me = this;
-
-    return me.segments[index];
+    return this.segments[index];
   },
 
   /**
@@ -79,13 +80,12 @@ Ext.define('NX.Bookmark', {
    * @returns {Array} list of all segments in this bookmarks
    */
   getSegments: function() {
-    var me = this;
-
-    return me.segments;
+    return this.segments;
   },
 
   /**
    * Appends a segment to current segment.
+   *
    * @param {String/String[]} segments to append
    * @returns {NX.Bookmark} itself
    */

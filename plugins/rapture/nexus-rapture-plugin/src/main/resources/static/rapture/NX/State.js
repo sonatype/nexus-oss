@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -34,8 +34,9 @@ Ext.define('NX.State', {
 
     me.addEvents(
         /**
-         * @event changed
          * Fires when any of application context values changes.
+         *
+         * @event changed
          * @param {NX.State} this
          */
         'changed'
@@ -47,8 +48,7 @@ Ext.define('NX.State', {
    * @returns {boolean} true, if browser is supported
    */
   isBrowserSupported: function () {
-    var me = this;
-    return me.getValue('browserSupported') === true;
+    return this.getValue('browserSupported') === true;
   },
 
   /**
@@ -56,9 +56,7 @@ Ext.define('NX.State', {
    * @param {boolean} value true, if browser is supported
    */
   setBrowserSupported: function (value) {
-    var me = this;
-
-    me.setValue('browserSupported', value === true);
+    this.setValue('browserSupported', value === true);
   },
 
   /**
@@ -66,8 +64,7 @@ Ext.define('NX.State', {
    * @returns {boolean} true, if license is required
    */
   requiresLicense: function () {
-    var me = this;
-    return me.getValue('license', {})['required'] === true;
+    return this.getValue('license', {})['required'] === true;
   },
 
   /**
@@ -75,8 +72,7 @@ Ext.define('NX.State', {
    * @returns {boolean} true, if license is installed
    */
   isLicenseInstalled: function () {
-    var me = this;
-    return me.getValue('license', {})['installed'] === true;
+    return this.getValue('license', {})['installed'] === true;
   },
 
   /**
@@ -84,8 +80,7 @@ Ext.define('NX.State', {
    * @returns {Object} current user, if any
    */
   getUser: function () {
-    var me = this;
-    return me.getValue('user');
+    return this.getValue('user');
   },
 
   /**
@@ -94,8 +89,7 @@ Ext.define('NX.State', {
    * @returns {*}
    */
   setUser: function (user) {
-    var me = this;
-    me.setValue('user', user);
+    this.setValue('user', user);
   },
 
   /**
@@ -121,7 +115,7 @@ Ext.define('NX.State', {
   },
 
   /**
-   * Return status.edition
+   * Return status.edition.
    *
    * @public
    * @returns {string}
@@ -131,7 +125,8 @@ Ext.define('NX.State', {
   },
 
   /**
-   * Return whether or not we're receiving from the server
+   * Return whether or not we're receiving from the server.
+   *
    * @returns {boolean}
    */
   isReceiving: function() {
@@ -139,18 +134,15 @@ Ext.define('NX.State', {
   },
 
   getValue: function (key, defaultValue) {
-    var me = this;
-    return me.controller().getValue(key, defaultValue);
+    return this.controller().getValue(key, defaultValue);
   },
 
   setValue: function (key, value) {
-    var me = this;
-    me.controller().setValue(key, value);
+    this.controller().setValue(key, value);
   },
 
   setValues: function (values) {
-    var me = this;
-    me.controller().setValues(values);
+    this.controller().setValues(values);
   },
 
   /**

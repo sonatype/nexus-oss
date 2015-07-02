@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -28,12 +28,4 @@ public interface StateContributor
    */
   @Nullable
   Map<String, Object> getState();
-
-  /**
-   * Returns mapping of command-id to command-payload (command-payload can be null).
-   *
-   * Commands are instructions to the UI to do something, like fetch permission because they have changed.
-   */
-  @Nullable
-  Map<String, Object> getCommands();
 }

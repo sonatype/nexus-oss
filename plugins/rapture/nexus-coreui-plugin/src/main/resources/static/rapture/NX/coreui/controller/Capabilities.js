@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -312,10 +312,9 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * Enable 'New' button when user has 'create' permission and there is at least one capability type.
    */
   bindNewButton: function(button) {
-    var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission + ':create'),
+            NX.Conditions.isPermitted(this.permission + ':create'),
             NX.Conditions.storeHasRecords('CapabilityType')
         ),
         {
@@ -554,8 +553,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @return {String[]} Sorted list of dynamic capability tag names.
    */
   discoverDynamicTags: function(store) {
-    var me = this,
-        tags = [];
+    var tags = [];
 
     store.each(function(model) {
       Ext.Object.each(model.get('tags'), function(key) {
@@ -567,7 +565,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     Ext.Array.sort(tags);
 
     //<if debug>
-    me.logDebug('Discovered dynamic tags: ', tags);
+    this.logDebug('Discovered dynamic tags: ', tags);
     //</if>
 
     return tags;
@@ -605,8 +603,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {String[]} tags
    */
   addDynamicTagDataToStoreRecords: function(store, tags) {
-    var me = this;
-
     store.each(function(model) {
       // apply dynamic tag data to 'tag$' fields if the record has any tag data
       var data = model.get('tags');
@@ -619,7 +615,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     store.commitChanges();
 
     //<if debug>
-    me.logDebug('Dynamic tag data applied Capability store records');
+    this.logDebug('Dynamic tag data applied Capability store records');
     //</if>
   },
 
@@ -631,8 +627,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {String[]} tags
    */
   addDynamicTagsToGrid: function(panel, tags) {
-    var me = this,
-        columns = Ext.Array.clone(panel.originalColumns),
+    var columns = Ext.Array.clone(panel.originalColumns),
         tagColumns = [];
 
     // create new colums for each dynamic tag
@@ -650,7 +645,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     panel.reconfigure(null, columns);
 
     //<if debug>
-    me.logDebug('Dynamic tag columns added to grid');
+    this.logDebug('Dynamic tag columns added to grid');
     //</if>
   }
 

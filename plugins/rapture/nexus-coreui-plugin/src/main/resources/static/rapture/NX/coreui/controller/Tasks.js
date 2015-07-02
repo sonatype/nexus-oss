@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -174,8 +174,7 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @param {NX.coreui.model.Task} model task model
    */
   showSummary: function(model) {
-    var me = this,
-      info = {};
+    var info = {};
 
     info[NX.I18n.get('Tasks_ID_Info')] = model.getId();
     info[NX.I18n.get('Tasks_Name_Info')] = model.get('name');
@@ -185,7 +184,7 @@ Ext.define('NX.coreui.controller.Tasks', {
     info[NX.I18n.get('Tasks_LastRun_Info')] = model.get('lastRun');
     info[NX.I18n.get('Tasks_LastResult_Info')] = model.get('lastRunResult');
 
-    me.getInfo().showInfo(info);
+    this.getInfo().showInfo(info);
   },
 
   /**

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -87,30 +87,42 @@ public class NugetFeedFetcher
         return splicer.getCount();
       }
 
-      remoteUrl = null;
       try (InputStream is = payload.openInputStream()) {
-        // Here, the splicer eats an entire page of content
-        final String nextPageUrl = splicer.consumePage(is);
-
-        if (followNextPageLinks && nextPageUrl != null) {
-          if (visited.add(nextPageUrl)) {
-            remoteUrl = new URI(nextPageUrl);
-          }
-          else {
-            log.warn("Page cycle detected: {} -> {}", visited, nextPageUrl);
-          }
-        }
-      }
-      catch (XmlPullParserException e) {
-        throw new IOException("Invalid nuget feed XML received via proxy repo " + proxy.getName(), e);
-      }
-      catch (URISyntaxException e) {
-        throw new IOException("Invalid 'next page' URI in nuget XML feed", e);
+        remoteUrl = parseFeed(is, splicer, visited, followNextPageLinks);
       }
     }
     while (remoteUrl != null);
 
     return splicer.getCount();
+  }
+
+  /**
+   * Consume a page of feed XML from the InputStream.
+   *
+   * @return The URI for the next (unvisited) page, if there is one.
+   */
+  private URI parseFeed(final InputStream is, final FeedSplicer splicer, final Set<String> visited,
+                        final boolean followNextPageLinks) throws IOException
+  {
+    try {
+      final String nextPageUrl = splicer.consumePage(is);
+
+      if (followNextPageLinks && nextPageUrl != null) {
+        if (visited.add(nextPageUrl)) {
+          return new URI(nextPageUrl);
+        }
+        else {
+          log.warn("Page cycle detected: {} -> {}", visited, nextPageUrl);
+        }
+      }
+      return null;
+    }
+    catch (XmlPullParserException e) {
+      throw new IOException("Invalid nuget feed XML received", e);
+    }
+    catch (URISyntaxException e) {
+      throw new IOException("Invalid 'next page' URI in nuget XML feed", e);
+    }
   }
 
   /**

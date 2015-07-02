@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,7 @@
 Ext.define('NX.Permissions', {
   singleton: true,
   requires: [
+    'NX.Assert',
     'NX.util.Array'
   ],
   mixins: {
@@ -27,14 +28,16 @@ Ext.define('NX.Permissions', {
   },
 
   /**
-   * @private
    * Map between permission and permitted boolean value.
+   *
+   * @private
    */
   permissions: undefined,
 
   /**
-   * @private
    * Map of permission to implied calculated value.
+   *
+   * @private
    */
   impliedCache: undefined,
 
@@ -47,9 +50,10 @@ Ext.define('NX.Permissions', {
   },
 
   /**
+   * Sets permissions.
+   *
    * @public
    * @param {object} permissions
-   * Sets permissions.
    */
   setPermissions: function(permissions) {
     var me = this;
@@ -66,8 +70,9 @@ Ext.define('NX.Permissions', {
   },
 
   /**
-   * @public
    * Resets all permissions.
+   *
+   * @public
    */
   resetPermissions: function() {
     var me = this;
@@ -91,6 +96,10 @@ Ext.define('NX.Permissions', {
     var me = this,
         hasPermission = false;
 
+    //<if assert>
+    NX.Assert.assert(expectedPermission.search('undefined') === -1, 'Invalid permission check:', expectedPermission);
+    //</if>
+
     // short-circuit if permissions are not installed
     if (!me.available()) {
       return false;
@@ -104,8 +113,7 @@ Ext.define('NX.Permissions', {
     // or use cached implied if we know it
     if (me.impliedCache[expectedPermission] !== undefined) {
       //<if debug>
-      me.logDebug('Using cached implied permission: ' + expectedPermission + ' is: ' +
-          me.impliedCache[expectedPermission]);
+      me.logTrace('Using cached implied permission:', expectedPermission, 'is:', me.impliedCache[expectedPermission]);
       //</if>
       hasPermission = me.impliedCache[expectedPermission];
     }
@@ -123,7 +131,7 @@ Ext.define('NX.Permissions', {
       me.impliedCache[expectedPermission] = hasPermission;
 
       //<if debug>
-      me.logDebug('Cached implied permission: ' + expectedPermission + ' is: ' + hasPermission);
+      me.logTrace('Cached implied permission:', expectedPermission, 'is:', hasPermission);
       //</if>
     }
 
@@ -131,22 +139,20 @@ Ext.define('NX.Permissions', {
   },
 
   /**
-   * @private
-   *
    * Returns true if permission1 implies permission2 using same logic as WildcardPermission.
    *
+   * @private
    * @param {string} permission1    Granted permission
    * @param {string} permission2    Permission under-test
    * @return {boolean}
    */
   implies: function(permission1, permission2) {
-    var me = this,
-        parts1 = permission1.split(':'),
+    var parts1 = permission1.split(':'),
         parts2 = permission2.split(':'),
         part1, part2, i;
 
     //<if debug>
-    me.logDebug('Checking if: ' + permission1 + ' implies: ' + permission2);
+    this.logTrace('Checking if:', permission1, 'implies:', permission2);
     //</if>
 
     for (i = 0; i < parts2.length; i++) {

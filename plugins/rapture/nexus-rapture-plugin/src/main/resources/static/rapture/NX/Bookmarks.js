@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -32,21 +32,21 @@ Ext.define('NX.Bookmarks', {
   },
 
   /**
-   * See {@link NX.controller.Bookmarking#getBookmark}
+   * @see NX.controller.Bookmarking#getBookmark
    */
   getBookmark: function () {
     return this.controller().getBookmark();
   },
 
   /**
-   * See {@link NX.controller.Bookmarking#bookmark}
+   * @see NX.controller.Bookmarking#bookmark
    */
   bookmark: function (bookmark, caller) {
     return this.controller().bookmark(bookmark, caller);
   },
 
   /**
-   * See {@link NX.controller.Bookmarking#navigateTo}
+   * @see NX.controller.Bookmarking#navigateTo
    */
   navigateTo: function (bookmark, caller) {
     return this.controller().navigateTo(bookmark, caller);
@@ -56,7 +56,7 @@ Ext.define('NX.Bookmarks', {
    * Creates a new bookmark.
    *
    * @public
-   * @param [{String}] token bookmark token
+   * @param {String} token bookmark token
    * @returns {NX.Bookmark} created bookmark
    */
   fromToken: function (token) {

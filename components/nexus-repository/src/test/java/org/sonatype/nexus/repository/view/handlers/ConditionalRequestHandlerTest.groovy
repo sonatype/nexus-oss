@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,21 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.view
+package org.sonatype.nexus.repository.view.handlers
 
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.http.HttpMethods
+import org.sonatype.nexus.repository.view.ContentTypes
+import org.sonatype.nexus.repository.view.Context
+import org.sonatype.nexus.repository.view.Request
+import org.sonatype.nexus.repository.view.Response
+import org.sonatype.nexus.repository.view.Status
+import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.payloads.StringPayload
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import com.google.common.net.HttpHeaders
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Matchers
 import org.mockito.Mock
 
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.mockito.Matchers.any
 import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.times
 import static org.mockito.Mockito.verify
@@ -61,7 +67,7 @@ class ConditionalRequestHandlerTest
   void prepare() {
     when(context.getRepository()).thenReturn(repository)
     when(repository.facet(eq(ViewFacet.class))).thenReturn(viewFacet)
-    when(viewFacet.dispatch(any(Request))).thenReturn(response200);
+    when(viewFacet.dispatch(Matchers.any(Request))).thenReturn(response200);
   }
 
   @Test

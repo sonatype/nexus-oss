@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -31,7 +31,7 @@ Ext.define('NX.controller.dev.Stores', {
   ],
 
   /**
-   * @protected
+   * @override
    */
   init: function () {
     var me = this;
@@ -55,23 +55,21 @@ Ext.define('NX.controller.dev.Stores', {
    * @private
    */
   onStoreSelected: function (combobox) {
-    var me = this,
-        storeId = combobox.getValue(),
-        panel = me.getStores(),
+    var storeId = combobox.getValue(),
+        panel = this.getStores(),
         grid = panel.down('grid'),
         store, columns = [];
 
-    if (grid) {
-      panel.remove(grid);
-    }
     if (storeId) {
       store = Ext.data.StoreManager.get(storeId);
       if (store) {
         Ext.each(store.model.getFields(), function (field) {
           columns.push({ text: field.name, dataIndex: field.name });
         });
+        panel.removeAll(true);
         panel.add({
           xtype: 'grid',
+          autoScroll: true,
           store: store,
           columns: columns
         });
@@ -83,8 +81,7 @@ Ext.define('NX.controller.dev.Stores', {
    * @private
    */
   loadStore: function () {
-    var me = this,
-        panel = me.getStores(),
+    var panel = this.getStores(),
         grid = panel.down('grid');
 
     if (grid) {
@@ -96,8 +93,7 @@ Ext.define('NX.controller.dev.Stores', {
    * @private
    */
   clearStore: function () {
-    var me = this,
-        panel = me.getStores(),
+    var panel = this.getStores(),
         grid = panel.down('grid');
 
     if (grid) {

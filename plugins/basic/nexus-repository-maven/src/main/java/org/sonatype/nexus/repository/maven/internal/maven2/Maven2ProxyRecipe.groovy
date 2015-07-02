@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,31 +19,21 @@ import javax.inject.Provider
 import javax.inject.Singleton
 
 import org.sonatype.nexus.repository.Format
-import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
-import org.sonatype.nexus.repository.maven.internal.MavenArtifactMatcher
-import org.sonatype.nexus.repository.maven.internal.MavenFacetImpl
-import org.sonatype.nexus.repository.maven.internal.MavenHeadersHandler
-import org.sonatype.nexus.repository.maven.internal.MavenMetadataMatcher
 import org.sonatype.nexus.repository.maven.MavenPathParser
 import org.sonatype.nexus.repository.maven.internal.MavenProxyFacet
 import org.sonatype.nexus.repository.maven.internal.MavenRecipeSupport
 import org.sonatype.nexus.repository.maven.internal.VersionPolicyHandler
 import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
 import org.sonatype.nexus.repository.negativecache.NegativeCacheHandler
-import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
-import org.sonatype.nexus.repository.security.SecurityHandler
-import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
-import org.sonatype.nexus.repository.view.handlers.TimingHandler
 
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 
@@ -108,14 +98,14 @@ extends MavenRecipeSupport
         .handler(negativeCacheHandler)
         .handler(partialFetchHandler)
         .handler(versionPolicyHandler)
-        .handler(mavenHeadersHandler)
+        .handler(contentHeadersHandler)
         .handler(proxyHandler)
         .create())
 
     // Note: partialFetchHandler NOT added for Maven metadata
     builder.route(newMetadataRouteBuilder()
         .handler(negativeCacheHandler)
-        .handler(mavenHeadersHandler)
+        .handler(contentHeadersHandler)
         .handler(proxyHandler)
         .create())
 

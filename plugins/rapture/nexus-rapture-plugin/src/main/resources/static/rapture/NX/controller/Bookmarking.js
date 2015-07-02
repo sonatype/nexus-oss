@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -49,8 +49,9 @@ Ext.define('NX.controller.Bookmarking', {
 
     me.addEvents(
         /**
-         * @event navigate
          * Fires when user navigates to a new bookmark.
+         *
+         * @event navigate
          * @param {String} bookmark value
          */
         'navigate'
@@ -66,8 +67,9 @@ Ext.define('NX.controller.Bookmarking', {
   },
 
   /**
-   * @public
    * Sets bookmark to a specified value.
+   *
+   * @public
    * @param {NX.Bookmark} bookmark new bookmark
    * @param {Object} [caller] whom is asking to bookmark
    */
@@ -81,7 +83,7 @@ Ext.define('NX.controller.Bookmarking', {
 
     if (bookmark && oldValue !== bookmark.getToken()) {
       //<if debug>
-      me.logDebug('Bookmark: ' + bookmark.getToken() + (caller ? ' (' + caller.self.getName() + ')' : ''));
+      me.logDebug('Bookmark:', bookmark.getToken(), (caller ? '(' + caller.self.getName() + ')' : ''));
       //</if>
 
       Ext.History.bookmark = bookmark.getToken();
@@ -90,8 +92,9 @@ Ext.define('NX.controller.Bookmarking', {
   },
 
   /**
-   * @public
    * Sets bookmark to a specified value and navigates to it.
+   *
+   * @public
    * @param {NX.Bookmark} bookmark to navigate to
    * @param {Object} [caller] whom is asking to navigate
    */
@@ -104,7 +107,7 @@ Ext.define('NX.controller.Bookmarking', {
 
     if (bookmark) {
       //<if debug>
-      me.logDebug('Navigate to: ' + bookmark.getToken() + (caller ? ' (' + caller.self.getName() + ')' : ''));
+      me.logDebug('Navigate to:', bookmark.getToken(), (caller ? '(' + caller.self.getName() + ')' : ''));
       //</if>
 
       me.bookmark(bookmark, caller);
@@ -113,8 +116,9 @@ Ext.define('NX.controller.Bookmarking', {
   },
 
   /**
-   * @override
    * Navigate to current bookmark.
+   *
+   * @override
    */
   onLaunch: function () {
     var me = this;
@@ -125,8 +129,9 @@ Ext.define('NX.controller.Bookmarking', {
   },
 
   /**
-   * @private
    * Sets bookmark to a specified value and navigates to it.
+   *
+   * @private
    * @param {String} token to navigate to
    */
   onNavigate: function (token) {
@@ -139,8 +144,9 @@ Ext.define('NX.controller.Bookmarking', {
   },
 
   /**
-   * @private
    * Start listening to **{@link Ext.History}** change events.
+   *
+   * @private
    */
   bindToHistory: function () {
     var me = this;

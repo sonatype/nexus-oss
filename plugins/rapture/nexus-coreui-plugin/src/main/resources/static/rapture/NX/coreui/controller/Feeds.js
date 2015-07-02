@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -119,10 +119,8 @@ Ext.define('NX.coreui.controller.Feeds', {
    * @private
    */
   onSelection: function (list, model) {
-    var me = this;
-
     if (model) {
-      me.getStore('FeedEntry').filter({ id: 'key', property: 'key', value: model.get('key') });
+      this.getStore('FeedEntry').filter({ id: 'key', property: 'key', value: model.get('key') });
     }
   },
 
@@ -131,8 +129,7 @@ Ext.define('NX.coreui.controller.Feeds', {
    * Open a new tab targeting feed url.
    */
   subscribe: function () {
-    var me = this,
-        selection = me.getList().getSelectionModel().getSelection();
+    var selection = this.getList().getSelectionModel().getSelection();
 
     if (selection.length) {
       NX.Windows.open(selection[0].get('url'));
@@ -144,7 +141,6 @@ Ext.define('NX.coreui.controller.Feeds', {
    * Enable 'Subscribe' when a feed is selected.
    */
   bindSubscribeButton: function (button) {
-    var me = this;
     button.mon(
         NX.Conditions.and(
             NX.Conditions.gridHasSelection('nx-coreui-feed-list')

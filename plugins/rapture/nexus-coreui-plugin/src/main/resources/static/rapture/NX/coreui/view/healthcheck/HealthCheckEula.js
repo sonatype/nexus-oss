@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -56,8 +56,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckEula', {
         ui: 'footer',
         items: [
           { xtype: 'button', text: 'I Agree', action: 'agree', formBind: true, ui: 'nx-primary', handler: function () {
-            var me = this,
-                win = me.up('window');
+            var win = this.up('window');
 
             win.close();
             if (win.acceptFn) {

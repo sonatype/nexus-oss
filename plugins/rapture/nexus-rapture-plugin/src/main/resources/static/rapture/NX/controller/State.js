@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -49,11 +49,15 @@ Ext.define('NX.controller.State', {
   maxDisconnectWarnings: 3,
 
   /**
-   * @private
    * True when state is received from server.
+   *
+   * @private
    */
   receiving: false,
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -77,14 +81,26 @@ Ext.define('NX.controller.State', {
 
     me.addEvents(
         /**
-         * @event changed
          * Fires when any of application context values changes.
+         *
+         * @event changed
          */
         'changed'
     );
   },
 
+  /**
+   * Install initial state, primed from app.js
+   *
+   * @override
+   */
   onLaunch: function () {
+    var me = this;
+
+    //<if debug>
+    me.logDebug('Initial state:', Ext.encode(NX.app.state));
+    //</if>
+
     var uiSettings = NX.app.state['uiSettings'];
 
     NX.State.setBrowserSupported(
@@ -98,6 +114,10 @@ Ext.define('NX.controller.State', {
     delete NX.app.state['uiSettings'];
     NX.State.setValues(NX.app.state);
     NX.State.setValues({ uiSettings: uiSettings });
+
+    //<if debug>
+    me.logInfo('State primed');
+    //</if>
   },
 
   /**
@@ -109,8 +129,7 @@ Ext.define('NX.controller.State', {
   },
 
   getValue: function(key, defaultValue) {
-    var me = this,
-        model = me.getStore('State').getById(key),
+    var model = this.getStore('State').getById(key),
         value;
 
     if (model) {
@@ -191,22 +210,20 @@ Ext.define('NX.controller.State', {
   },
 
   onEntryUpdated: function (store, model, operation, modifiedFieldNames) {
-    var me = this;
     if ((operation === Ext.data.Model.EDIT) && modifiedFieldNames.indexOf('value') > -1) {
-      me.notifyChange(model.get('key'), model.get('value'), model.modified.value);
+      this.notifyChange(model.get('key'), model.get('value'), model.modified.value);
     }
   },
 
   onEntryRemoved: function (store, model) {
-    var me = this;
-    me.notifyChange(model.get('key'), undefined, model.get('value'));
+    this.notifyChange(model.get('key'), undefined, model.get('value'));
   },
 
   notifyChange: function (key, value, oldValue) {
     var me = this;
 
     //<if debug>
-    me.logDebug('Changed: ' + key + ' -> ' + (value ? Ext.JSON.encode(value) : '(deleted)'));
+    me.logTrace('Changed:', key, '->', (value ? Ext.JSON.encode(value) : '(deleted)'));
     //</if>
 
     me.fireEvent(key.toLowerCase() + 'changed', value, oldValue);
@@ -214,8 +231,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * Reset state pooling when uiSettings.statusInterval changes.
+   *
+   * @private
    */
   onUiSettingsChanged: function (uiSettings, oldUiSettings) {
     var me = this,
@@ -260,7 +278,7 @@ Ext.define('NX.controller.State', {
         });
 
         //<if debug>
-        me.logDebug('State pooling configured for ' + newStatusInterval + ' seconds');
+        me.logDebug('State pooling configured for', newStatusInterval, 'seconds');
         //</if>
       }
     }
@@ -276,16 +294,16 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * On sign-in/sign-out update status interval.
+   *
+   * @private
    */
   onUserChanged: function (user, oldUser) {
-    var me = this,
-        uiSettings;
+    var uiSettings;
 
     if (Ext.isDefined(user) !== Ext.isDefined(oldUser)) {
       uiSettings = NX.State.getValue('uiSettings');
-      me.onUiSettingsChanged(uiSettings, uiSettings);
+      this.onUiSettingsChanged(uiSettings, uiSettings);
     }
   },
 
@@ -305,8 +323,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * Called when state pooling was successful.
+   *
+   * @private
    */
   onSuccess: function (event) {
     var me = this,
@@ -326,23 +345,17 @@ Ext.define('NX.controller.State', {
     // propagate event data
     state = event.data.data;
 
-    if (!me.reloadWhenServerIdChanged(serverId, state.values.serverId ? state.values.serverId.value : serverId)) {
-      me.setValues(state.values);
-
-      // fire commands if there are any
-      if (state.commands) {
-        Ext.each(state.commands, function (command) {
-          me.fireEvent('command' + command.type.toLowerCase(), command.data);
-        });
-      }
+    if (!me.reloadWhenServerIdChanged(serverId, state.serverId ? state.serverId.value : serverId)) {
+      me.setValues(state);
     }
 
     // TODO: Fire global refresh event
   },
 
   /**
-   * @private
    * Called when state pooling failed.
+   *
+   * @private
    */
   onError: function (event) {
     var me = this;
@@ -395,8 +408,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @public
    * Refreshes status from server on demand.
+   *
+   * @public
    */
   refreshNow: function () {
     var me = this;
@@ -407,8 +421,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * Show messages about license.
+   *
+   * @private
    * @param {Object} license
    * @param {Number} license.installed
    * @param {Object} oldLicense

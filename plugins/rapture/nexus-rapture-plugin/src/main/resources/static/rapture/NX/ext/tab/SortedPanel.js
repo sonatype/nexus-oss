@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -60,14 +60,12 @@ Ext.define('NX.ext.tab.SortedPanel', {
    * @override
    */
   onAdd: function(item, index) {
-    var me = this;
-
     item.tabConfig = item.tabConfig || {};
     Ext.applyIf(item.tabConfig, {
       // HACK: force tabs to follow scss style for borders
       border: null
     });
 
-    me.callParent([item, index]);
+    this.callParent([item, index]);
   }
 });

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -48,7 +48,7 @@ public class FunctionalTestSupport
         nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
 
         // Add testsuite dependencies as bundles
-        wrappedBundle(maven("org.sonatype.nexus", "nexus-siestajs-testsupport").versionAsInProject()),
+        wrappedBundle(maven("org.sonatype.nexus", "nexus-siestajs-testsupport").versionAsInProject()).startLevel(101),
         wrappedBundle(maven("org.apache.ant", "ant-launcher").versionAsInProject()),
         wrappedBundle(maven("org.apache.ant", "ant").versionAsInProject()),
 

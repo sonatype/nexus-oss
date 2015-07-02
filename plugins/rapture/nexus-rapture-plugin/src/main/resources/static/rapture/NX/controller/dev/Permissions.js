@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -93,8 +93,7 @@ Ext.define('NX.controller.dev.Permissions', {
    * @private
    */
   deleteModel : function () {
-    var me = this,
-        grid = me.getGrid(),
+    var grid = this.getGrid(),
         editor = grid.getPlugin('editor');
 
     editor.cancelEdit();
@@ -133,8 +132,7 @@ Ext.define('NX.controller.dev.Permissions', {
   },
 
   onSelectionChange: function (selectionModel, records) {
-    var me = this,
-        deleteButton = me.getGrid().down('button[action=delete]');
+    var deleteButton = this.getGrid().down('button[action=delete]');
 
     deleteButton.setDisabled(!records.length);
   }

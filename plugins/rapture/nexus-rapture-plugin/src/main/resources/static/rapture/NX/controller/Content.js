@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -53,8 +53,9 @@ Ext.define('NX.controller.Content', {
   },
 
   /**
-   * @private
    * Update content to selected feature view.
+   *
+   * @private
    * @param {NX.model.Feature} feature selected feature
    */
   onFeatureSelected: function (feature) {
@@ -75,7 +76,7 @@ Ext.define('NX.controller.Content', {
     }
     me.mon(cmp, 'destroy', function () {
       //<if debug>
-      me.logDebug('Destroyed: ' + cmp.self.getName());
+      me.logTrace('Destroyed:', cmp.self.getName());
       //</if>
     });
 
@@ -108,7 +109,7 @@ Ext.define('NX.controller.Content', {
     cmp.fireEvent('activate', cmp);
 
     //<if debug>
-    me.logDebug('Content changed to: ' + text + ' (' + cmp.self.getName() + ')');
+    me.logDebug('Content changed to:', text, '(' + cmp.self.getName() + ')');
     //</if>
   }
 

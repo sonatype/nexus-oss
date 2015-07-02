@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -314,6 +314,12 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-thread</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-transaction</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -663,9 +669,10 @@
               <exclude>**/nexus-ldap-plugin/**/org/sonatype/nexus/ldap/internal/connector/dao/LdapEncoder.java</exclude>
 
               <!--
-              Exclude siesta-js resources
+              Exclude functional-testsuite overlay resources
               -->
-              <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite-lib/siesta/**</exclude>
+              <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite-lib/**</exclude>
+              <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite.html</exclude>
             </excludes>
           </configuration>
         </plugin>

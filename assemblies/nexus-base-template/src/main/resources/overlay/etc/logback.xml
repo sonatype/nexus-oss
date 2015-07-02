@@ -20,8 +20,6 @@
     </rollingPolicy>
   </appender>
 
-  <logger name="Sisu" level="INFO"/>
-
   <logger name="org.eclipse.jetty.webapp" level="INFO"/>
   <logger name="org.eclipse.jetty.webapp.StandardDescriptorProcessor" level="WARN"/>
 
@@ -29,7 +27,7 @@
   <logger name="org.apache.felix" level="WARN"/>
   <logger name="org.apache.karaf" level="WARN"/>
 
-  <root level="${nexus.log.level:-INFO}">
+  <root level="${root.level:-INFO}">
     <appender-ref ref="osgi"/>
     <appender-ref ref="console"/>
     <appender-ref ref="logfile"/>

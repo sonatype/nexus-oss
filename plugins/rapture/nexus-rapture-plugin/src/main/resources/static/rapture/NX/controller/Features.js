@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -43,6 +43,7 @@ Ext.define('NX.controller.Features', {
 
   /**
    * Registers features.
+   *
    * @param {Array/Object} features to be registered
    * @param {Ext.util.Observable} [owner] to be watched to automatically unregister the features if owner is destroyed
    */
@@ -71,8 +72,7 @@ Ext.define('NX.controller.Features', {
 
         // complain if there is no view configuration
         if (!clonedFeature.view) {
-          me.logError('Missing view configuration for feature at path: ' + clonedFeature.path);
-          // TODO: Maybe raise an error instead?
+          me.logError('Missing view configuration for feature at path:', clonedFeature.path);
         }
 
         path = clonedFeature.path;
@@ -116,6 +116,7 @@ Ext.define('NX.controller.Features', {
 
   /**
    * Un-registers features.
+   *
    * @param {Object[]/Object} features to be unregistered
    */
   unregisterFeature: function (features) {
@@ -149,8 +150,7 @@ Ext.define('NX.controller.Features', {
    * @param feature
    */
   configureIcon: function (path, feature) {
-    var me = this,
-        defaultIconName = 'feature-' + feature.mode + '-' + path.toLowerCase().replace(/\//g, '-').replace(/\s/g, '');
+    var defaultIconName = 'feature-' + feature.mode + '-' + path.toLowerCase().replace(/\//g, '-').replace(/\s/g, '');
 
     // inline icon registration for feature
     if (feature.iconConfig) {
@@ -162,7 +162,7 @@ Ext.define('NX.controller.Features', {
       else {
         icon.name = defaultIconName;
       }
-      me.getApplication().getIconController().addIcon(icon);
+      this.getApplication().getIconController().addIcon(icon);
     }
 
     // default icon name if not set

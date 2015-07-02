@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -39,6 +39,26 @@ Ext.define('NX.view.dev.Panel', {
     xtype: 'tabpanel',
     tabPosition: 'bottom',
 
+    stateful: true,
+    stateId: 'nx-dev-panel.tabs',
+    stateEvents: [ 'tabchange' ],
+
+    /**
+     * @override
+     */
+    getState: function() {
+      return {
+        activeTabId: this.items.findIndex('id', this.getActiveTab().id)
+      }
+    },
+
+    /**
+     * @override
+     */
+    applyState: function(state) {
+      this.setActiveTab(state.activeTabId);
+    },
+
     items: [
       { xtype: 'nx-dev-tests' },
       { xtype: 'nx-dev-styles' },
@@ -47,7 +67,8 @@ Ext.define('NX.view.dev.Panel', {
       { xtype: 'nx-dev-permissions' },
       { xtype: 'nx-dev-messages' },
       { xtype: 'nx-dev-state' },
-      { xtype: 'nx-dev-stores' }
+      { xtype: 'nx-dev-stores' },
+      { xtype: 'nx-dev-logging' }
     ]
   }
 });

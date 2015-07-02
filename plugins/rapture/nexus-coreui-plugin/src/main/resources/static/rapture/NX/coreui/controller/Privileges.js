@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -160,8 +160,6 @@ Ext.define('NX.coreui.controller.Privileges', {
    * @param model privilege to be deleted
    */
   deleteModel: function (model) {
-    var me = this;
-
     NX.direct.coreui_Privilege.remove(model.getId(), function (response) {
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({

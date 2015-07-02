@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -35,6 +35,7 @@ import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.MavenPathParser;
 import org.sonatype.nexus.repository.maven.internal.DigestExtractor;
+import org.sonatype.nexus.repository.maven.internal.MavenAttributes;
 import org.sonatype.nexus.repository.maven.internal.maven2.Constants;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.BucketEntityAdapter;
@@ -132,7 +133,7 @@ public class MetadataRebuilder
         "SELECT " +
             "group as groupId, " +
             "name as artifactId, " +
-            "set(attributes.maven2.baseVersion) as baseVersions " +
+            "set(attributes.maven2." + MavenAttributes.P_BASE_VERSION + ") as baseVersions " +
             "FROM component WHERE bucket=:bucket"
     );
     if (!Strings.isNullOrEmpty(groupId)) {
@@ -142,7 +143,7 @@ public class MetadataRebuilder
         sql.append(" and name=:artifactId");
         sqlParams.put("artifactId", artifactId);
         if (!Strings.isNullOrEmpty(baseVersion)) {
-          sql.append(" and attributes.maven2.baseVersion=:baseVersion");
+          sql.append(" and attributes.maven2." + MavenAttributes.P_BASE_VERSION + "=:baseVersion");
           sqlParams.put("baseVersion", baseVersion);
         }
       }
@@ -274,7 +275,8 @@ public class MetadataRebuilder
           @Override
           public Void execute(final StorageTx tx) {
             final Iterable<Component> components = tx.findComponents(
-                "group = :groupId and name = :artifactId and attributes.maven2.baseVersion = :baseVersion",
+                "group = :groupId and name = :artifactId and attributes.maven2." + MavenAttributes.P_BASE_VERSION +
+                    " = :baseVersion",
                 ImmutableMap.<String, Object>of(
                     "groupId", groupId,
                     "artifactId", artifactId,
@@ -335,7 +337,7 @@ public class MetadataRebuilder
 
         @Override
         public String toString() {
-          return String.format("processMetadata(%s, %s)", groupId,  artifactId);
+          return String.format("processMetadata(%s, %s)", groupId, artifactId);
         }
       });
     }

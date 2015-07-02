@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -66,28 +66,32 @@ Ext.define('NX.controller.Menu', {
   ],
 
   /**
-   * @private
    * Current mode.
+   *
+   * @private
    */
   mode: undefined,
 
   /**
-   * @private
    * Modes discovered by searching all buttons with a mode property.
+   *
+   * @private
    */
   availableModes: [],
 
   bookmarkingEnabled: true,
 
   /**
+   * Current selected path.
+   *
    * @private {String}
-   * Current selected path
    */
   currentSelectedPath: undefined,
 
   /**
-   * @private {Boolean}
    * True if menu should auto navigate to first available feature.
+   *
+   * @private {Boolean}
    */
   navigateToFirstFeature: false,
 
@@ -158,8 +162,9 @@ Ext.define('NX.controller.Menu', {
 
     me.addEvents(
         /**
-         * @event featureselected
          * Fires when a feature is selected.
+         *
+         * @event featureselected
          * @param {NX.model.Feature} selected feature
          */
         'featureselected'
@@ -184,7 +189,7 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
-   * Register as Application listener && rebuild menu.
+   * Register as Application listener and rebuild menu.
    */
   onAfterRender: function () {
     var me = this;
@@ -215,7 +220,7 @@ Ext.define('NX.controller.Menu', {
       me.currentSelectedPath = path;
 
       //<if debug>
-      me.logDebug('Selected feature: ' + path);
+      me.logInfo('Selected feature:', path);
       //</if>
 
       me.selectFeature(me.getStore('Feature').getById(featureMenuModel.get('path')));
@@ -230,13 +235,12 @@ Ext.define('NX.controller.Menu', {
    * @private
    */
   selectFeature: function (featureModel) {
-    var me = this,
-        path;
+    var path;
 
     if (featureModel) {
       path = featureModel.get('path');
       if (path && path.length > 0) {
-        me.fireEvent('featureselected', featureModel);
+        this.fireEvent('featureselected', featureModel);
       }
     }
   },
@@ -281,7 +285,7 @@ Ext.define('NX.controller.Menu', {
       }
 
       //<if debug>
-      me.logDebug('Navigate to: ' + menuBookmark);
+      me.logInfo('Navigate to:', menuBookmark);
       //</if>
 
       mode = me.getMode(bookmark);
@@ -303,7 +307,7 @@ Ext.define('NX.controller.Menu', {
         node = me.getStore('FeatureMenu').getRootNode().firstChild;
 
         //<if debug>
-        me.logDebug('Automatically selected: ' + node.get('bookmark'));
+        me.logDebug('Automatically selected:', node.get('bookmark'));
         //</if>
       }
       // select the bookmarked feature in menu, if available
@@ -340,13 +344,13 @@ Ext.define('NX.controller.Menu', {
   },
 
   onSignOut: function () {
-    var me = this;
-    me.navigateToFirstFeature = true;
+    this.navigateToFirstFeature = true;
   },
 
   /**
-   * @private
    * On a state change check features visibility and trigger a menu refresh if necessary.
+   *
+   * @private
    */
   onStateChange: function () {
     var me = this,
@@ -387,7 +391,7 @@ Ext.define('NX.controller.Menu', {
     var me = this;
 
     //<if debug>
-    me.logDebug('Refreshing menu (mode ' + me.mode + ')');
+    me.logDebug('Refreshing menu; mode:', me.mode);
     //</if>
 
     me.refreshVisibleModes();
@@ -413,7 +417,7 @@ Ext.define('NX.controller.Menu', {
     });
 
     //<if debug>
-    me.logDebug('Visible modes: ' + visibleModes);
+    me.logDebug('Visible modes:', visibleModes);
     //</if>
 
     Ext.each(me.availableModes, function (button) {
@@ -459,7 +463,7 @@ Ext.define('NX.controller.Menu', {
         feature, segments, parent, child, modeButton;
 
     //<if debug>
-    me.logDebug('Refreshing tree (mode ' + me.mode + ')');
+    me.logDebug('Refreshing tree; mode:', me.mode);
     //</if>
 
     Ext.suspendLayouts();
@@ -531,14 +535,15 @@ Ext.define('NX.controller.Menu', {
   },
 
   createNotAvailableFeature: function (feature) {
-    var me = this;
-    return me.getFeatureModel().create({
+    return this.getFeatureModel().create({
       text: feature.get('text'),
       path: feature.get('path'),
       description: feature.get('description'),
       iconName: feature.get('iconName'),
       view: {
         xtype: 'nx-feature-notvisible',
+
+        // FIXME: i18n
         text: feature.get('text') + ' feature is not available as '
             + (NX.State.getValue('user') ? ' you do not have the required permissions' : ' you are not logged in')
       },
@@ -547,8 +552,7 @@ Ext.define('NX.controller.Menu', {
   },
 
   createNotFoundFeature: function (bookmark) {
-    var me = this;
-    return me.getFeatureModel().create({
+    return this.getFeatureModel().create({
       text: 'Not found',
       path: '/Not Found',
       description: bookmark,
@@ -569,15 +573,16 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
-   * @public
    * Change mode.
+   *
+   * @public
    * @param {String} mode to change to
    */
   changeMode: function (mode) {
     var me = this;
 
     //<if debug>
-    me.logDebug('Mode changed: ' + mode);
+    me.logDebug('Mode changed:', mode);
     //</if>
 
     me.mode = mode;
@@ -587,23 +592,21 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
-   * @private
    * Register a mode button.
+   *
+   * @private
    */
   registerModeButton: function (button) {
-    var me = this;
-
-    me.availableModes.push(button);
+    this.availableModes.push(button);
   },
 
   /**
-   * @private
    * Unregister a mode button.
+   *
+   * @private
    */
   unregisterModeButton: function (button) {
-    var me = this;
-
-    Ext.Array.remove(me.availableModes, button);
+    Ext.Array.remove(this.availableModes, button);
   },
 
   selectFirstAvailableMode: function () {
@@ -617,7 +620,7 @@ Ext.define('NX.controller.Menu', {
     });
 
     //<if debug>
-    me.logDebug('Auto selecting mode: ' + me.mode);
+    me.logDebug('Auto selecting mode:', me.mode);
     //</if>
   },
 
@@ -628,8 +631,9 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
+   * Check for unsaved changes before opening a menu item.
+   *
    * @private
-   * Check for unsaved changes before opening a menu item
    */
   warnBeforeMenuSelect: function(tree, td, cellIndex, record) {
     var me = this;
@@ -642,8 +646,9 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
+   * Check for unsaved changes before switching modes.
+   *
    * @private
-   * Check for unsaved changes before switching modes
    */
   warnBeforeModeSelect: function(button, e, eOpts) {
     var me = this;
@@ -661,8 +666,9 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
+   * Check for unsaved changes before doing a search.
+   *
    * @private
-   * Check for unsaved changes before doing a search
    */
   warnBeforeSearch: function() {
     var me = this,
@@ -676,13 +682,12 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
+   * Check for unsaved changes before clicking a button.
+   *
    * @private
-   * Check for unsaved changes before clicking a button
    */
   warnBeforeButtonClick: function(button, e) {
-    var me = this;
-
-    return me.warnBeforeNavigate(
+    return this.warnBeforeNavigate(
       function() {
         button.handler.call(button.scope, button, e);
       }
@@ -690,8 +695,9 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
+   * Check for unsaved changes before refreshing the view.
+   *
    * @private
-   * Check for unsaved changes before refreshing the view
    */
   warnBeforeRefresh: function() {
     var me = this,
@@ -705,13 +711,12 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
+   * Check for unsaved changes before signing out.
+   *
    * @private
-   * Check for unsaved changes before signing out
    */
   warnBeforeSignOut: function() {
-    var me = this;
-
-    return me.warnBeforeNavigate(
+    return this.warnBeforeNavigate(
       function() {
         NX.getApplication().getController('User').signOut();
       }
@@ -719,8 +724,9 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
+   * Check for unsaved changes. Warn the user, and stop or continue navigation.
+   *
    * @private
-   * Check for unsaved changes. Warn the user, and stop or continue navigation
    */
   warnBeforeNavigate: function(callback) {
     var me = this,
@@ -746,15 +752,15 @@ Ext.define('NX.controller.Menu', {
     }
   },
 
+  // FIXME: jsdoc
   /**
-   * @private
    * Show warning modal about unsaved changes, and take action
    *
+   * @private
    * @param record The menu item we’re trying to navigate to
    */
   showUnsavedChangesModal: function(callback) {
-    var me = this,
-      content = me.getFeatureContent();
+    var content = this.getFeatureContent();
 
     Ext.create('NX.view.UnsavedChanges', {
       content: content,
@@ -769,8 +775,9 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
-   * @private
    * Are any forms dirty?
+   *
+   * @private
    */
   hasDirt: function() {
     var dirty = false,
@@ -791,8 +798,9 @@ Ext.define('NX.controller.Menu', {
 
 
   /**
+   * Disable backspace as a means for navigating back.
+   *
    * @private
-   * Disable backspace as a means for navigating back
    */
   disableBackspaceNav: function() {
     var parent = Ext.isIE ? document : window;
@@ -803,9 +811,10 @@ Ext.define('NX.controller.Menu', {
     });
   },
 
-  /*
+  /**
+   * Warn people about refreshing or closing their browser when there are unsaved changes.
+   *
    * @private
-   * Warn people about refreshing or closing their browser when there are unsaved changes
    */
   warnBeforeUnload: function() {
     var me = this;

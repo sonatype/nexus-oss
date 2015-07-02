@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -59,8 +59,9 @@ Ext.define('NX.controller.Unlicensed', {
   },
 
   /**
-   * @override
    * Show {@link NX.view.Unlicensed} view from {@link Ext.container.Viewport}.
+   *
+   * @override
    */
   onLaunch: function () {
     var me = this,
@@ -76,8 +77,9 @@ Ext.define('NX.controller.Unlicensed', {
   },
 
   /**
-   * @public
    * Removes {@link NX.view.Unlicensed} view from {@link Ext.container.Viewport}.
+   *
+   * @public
    */
   onDestroy: function () {
     var me = this,

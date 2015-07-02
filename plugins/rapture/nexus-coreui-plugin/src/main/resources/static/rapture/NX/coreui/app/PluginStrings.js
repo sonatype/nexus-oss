@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -698,7 +698,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Capability_CapabilitySummary_Title: 'Summary',
     Capability_CapabilitySettings_Title: 'Settings',
     Capability_CapabilitySettingsForm_Enabled_FieldLabel: 'Enable this capability',
-    Capability_CapabilitySummary_Summary_Title: 'Summary',
     Capability_CapabilitySummary_Status_Title: 'Status',
     Capability_CapabilitySummary_About_Title: 'About',
     Capability_CapabilitySummary_Notes_Title: 'Notes',

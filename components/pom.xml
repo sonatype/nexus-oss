@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -57,6 +57,7 @@
     <module>nexus-servlet</module>
     <module>nexus-supportzip-api</module>
     <module>nexus-thread</module>
+    <module>nexus-transaction</module>
     <module>nexus-validation</module>
     <module>nexus-webresources-api</module>
     <module>pax-logging-metrics</module>

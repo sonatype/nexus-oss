@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -164,8 +164,7 @@ Ext.define('NX.coreui.controller.Assets', {
    * Update asset shown in asset container.
    */
   updateAssetContainer: function(gridView, td, cellIndex, assetModel) {
-    var me = this,
-        assetContainer = me.getAssetContainer();
+    var assetContainer = this.getAssetContainer();
 
     assetContainer.refreshInfo(gridView.up('grid').componentModel, assetModel);
   },
@@ -175,8 +174,7 @@ Ext.define('NX.coreui.controller.Assets', {
    * Enable 'Delete' when user has 'delete' permission.
    */
   bindDeleteAssetButton: function(button) {
-    var me = this,
-        component = me.getAssetList().componentModel;
+    var component = this.getAssetList().componentModel;
     button.mon(
         NX.Conditions.isPermitted('nexus:repository-view:' + component.get('format') + ':' +
             component.get('repositoryName') + ':delete')

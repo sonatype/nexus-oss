@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -23,40 +23,57 @@ Ext.define('NX.LogAware', {
   ],
 
   /**
-   * @protected
    * @param {String} level
    * @param {Array} args
    */
   log: function (level, args) {
-    args.unshift('[' + Ext.getClassName(this) + ']');
-    NX.Log.log(level, args);
+    //<if debug>
+    NX.Log.recordEvent(level, Ext.getClassName(this), args.join(' '));
+    //</if>
   },
 
   /**
-   * @protected
+   * @public
+   */
+  logTrace: function () {
+    //<if debug>
+    this.log('trace', Array.prototype.slice.call(arguments));
+    //</if>
+  },
+
+  /**
+   * @public
    */
   logDebug: function () {
+    //<if debug>
     this.log('debug', Array.prototype.slice.call(arguments));
+    //</if>
   },
 
   /**
-   * @protected
+   * @public
    */
   logInfo: function () {
+    //<if debug>
     this.log('info', Array.prototype.slice.call(arguments));
+    //</if>
   },
 
   /**
-   * @protected
+   * @public
    */
   logWarn: function () {
+    //<if debug>
     this.log('warn', Array.prototype.slice.call(arguments));
+    //</if>
   },
 
   /**
-   * @protected
+   * @public
    */
   logError: function () {
+    //<if debug>
     this.log('error', Array.prototype.slice.call(arguments));
+    //</if>
   }
 });

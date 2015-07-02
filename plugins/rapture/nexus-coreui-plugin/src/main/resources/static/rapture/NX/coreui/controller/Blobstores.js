@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -113,10 +113,8 @@ Ext.define('NX.coreui.controller.Blobstores', {
    * @override
    */
   onSelection: function(list, model) {
-    var me = this;
-
     if (Ext.isDefined(model)) {
-      me.getSettings().loadRecord(model);
+      this.getSettings().loadRecord(model);
     }
   },
 
@@ -148,10 +146,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
    * @private
    */
   onSettingsSubmitted: function(form, action) {
-    var me = this,
-        win = form.up('nx-coreui-blobstore-add');
-
-    me.getStore('Blobstore').load();
+    this.getStore('Blobstore').load();
   },
 
   /**

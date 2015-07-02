@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -61,15 +61,14 @@ Ext.define('NX.Icons', {
    * @returns {string}
    */
   url: function(name, variant, ext) {
-    var me = this,
-        file = name;
+    var file = name;
 
     if (ext === undefined) {
       ext = 'png';
     }
     file += '.' + ext;
 
-    return me.url2(file, variant);
+    return this.url2(file, variant);
   },
 
   /**

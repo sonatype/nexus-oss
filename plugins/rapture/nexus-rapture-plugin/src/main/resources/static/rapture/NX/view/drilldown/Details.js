@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -71,31 +71,27 @@ Ext.define('NX.view.drilldown.Details', {
   },
 
   showInfo: function(message) {
-    var me = this,
-        infoPanel = me.down('>#info');
+    var infoPanel = this.down('>#info');
 
     infoPanel.setTitle(message);
     infoPanel.show();
   },
 
   clearInfo: function() {
-    var me = this,
-        infoPanel = me.down('>#info');
+    var infoPanel = this.down('>#info');
 
     infoPanel.hide();
   },
 
   showWarning: function(message) {
-    var me = this,
-        warningPanel = me.down('>#warning');
+    var warningPanel = this.down('>#warning');
 
     warningPanel.setTitle(message);
     warningPanel.show();
   },
 
   clearWarning: function() {
-    var me = this,
-        warningPanel = me.down('>#warning');
+    var warningPanel = this.down('>#warning');
 
     warningPanel.hide();
   },
@@ -121,8 +117,7 @@ Ext.define('NX.view.drilldown.Details', {
    * @returns {String} bookmark token of selected tab
    */
   getBookmarkOfSelectedTab: function() {
-    var me = this,
-        tabPanel = me.down('>#tab');
+    var tabPanel = this.down('>#tab');
 
     return tabPanel.getActiveTab().bookmark;
   },
@@ -147,8 +142,7 @@ Ext.define('NX.view.drilldown.Details', {
    * Calculates bookmarks of all tabs based on tab title.
    */
   calculateBookmarks: function() {
-    var me = this,
-        tabPanel = me.down('>#tab');
+    var tabPanel = this.down('>#tab');
 
     tabPanel.items.each(function(tab) {
       if (tab.title) {

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,50 +19,67 @@
  */
 Ext.define('NX.Log', {
   singleton: true,
+  requires: [
+    'NX.Console'
+  ],
 
   /**
-   * @param {String} level
-   * @param {Array} args
+   * @private
    */
-  log: function (level, args) {
-    var config = {
-      level: level,
-      msg: args.join(' ')
-    };
+  controller: undefined,
 
-    // translate debug -> log for Ext.log
-    if (level === 'debug') {
-      config.level = 'log';
+  /**
+   * Queue of events logged before controller is attached.
+   * This is deleted upon attachment after events are passed to the controller.
+   *
+   * @private
+   */
+  eventQueue: [],
+
+  /**
+   * Attach to the logging controller.
+   *
+   * @public
+   * @param {NX.controller.Logging} controller
+   */
+  attach: function (controller) {
+    var me = this;
+    me.controller = controller;
+
+    // reply queued events and clear
+    Ext.each(me.eventQueue, function (event) {
+      me.controller.recordEvent(event);
+    });
+    delete me.eventQueue;
+
+    NX.Console.info('Logging controller attached');
+  },
+
+  /**
+   * Record a log event.
+   *
+   * @public
+   * @param {string} level
+   * @param {string} logger
+   * @param {string} message
+   */
+  recordEvent: function (level, logger, message) {
+    var me = this,
+        event = {
+          timestamp: Date.now(),
+          level: level,
+          logger: logger,
+          message: message
+        };
+
+    // if controller is attached, delegate to record the event
+    if (me.controller) {
+      me.controller.recordEvent(event);
     }
-
-    Ext.log(config);
-  },
-
-  /**
-   * @public
-   */
-  debug: function () {
-    this.log('debug', Array.prototype.slice.call(arguments));
-  },
-
-  /**
-   * @public
-   */
-  info: function () {
-    this.log('info', Array.prototype.slice.call(arguments));
-  },
-
-  /**
-   * @public
-   */
-  warn: function () {
-    this.log('warn', Array.prototype.slice.call(arguments));
-  },
-
-  /**
-   * @public
-   */
-  error: function () {
-    this.log('error', Array.prototype.slice.call(arguments));
+    else {
+      // else queue the event and emit to console
+      me.eventQueue.push(event);
+      NX.Console.log(level, [logger, message]);
+    }
   }
 });

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -51,7 +51,8 @@ Ext.define('NX.view.info.Panel', {
 
     if (me.framed) {
       me.items = inset;
-    } else {
+    }
+    else {
       me.items = subsection;
     }
 
@@ -63,7 +64,6 @@ Ext.define('NX.view.info.Panel', {
    */
   setTitle: function(title) {
     var me = this;
-
     me.titled = title;
     me.down('panel').down('panel').setTitle(title);
   },
@@ -72,9 +72,7 @@ Ext.define('NX.view.info.Panel', {
    * @public
    */
   showInfo: function (info) {
-    var me = this;
-
-    me.down('nx-info').showInfo(info);
+    this.down('nx-info').showInfo(info);
   },
 
   /**
@@ -82,7 +80,6 @@ Ext.define('NX.view.info.Panel', {
    * Add an additional component to enhance the info.
    */
   addSection: function(component) {
-    var me = this;
-    me.down('nx-info').up('panel').add(component);
+    this.down('nx-info').up('panel').add(component);
   }
 });
