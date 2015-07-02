@@ -26,9 +26,11 @@ import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
+import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
@@ -38,6 +40,12 @@ import com.google.common.base.Charsets;
 import com.google.common.hash.HashCode;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.it.Verifier;
@@ -45,10 +53,12 @@ import org.junit.Before;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 
 /**
@@ -58,6 +68,9 @@ public abstract class MavenITSupport
     extends NexusCoreITSupport
 {
   @Inject
+  protected RepositoryManager repositoryManager;
+
+  @Inject
   protected LogManager logManager;
 
   private final MetadataXpp3Reader reader = new MetadataXpp3Reader();
@@ -65,6 +78,7 @@ public abstract class MavenITSupport
   @Configuration
   public static Option[] configureNexus() {
     return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
+        mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject(),
         wrappedBundle(maven("org.apache.maven.shared", "maven-verifier").versionAsInProject()),
         wrappedBundle(maven("org.apache.maven.shared", "maven-shared-utils").versionAsInProject()));
   }
@@ -129,6 +143,34 @@ public abstract class MavenITSupport
       return reader.read(is);
     }
   }
+
+  protected Repository redirectProxy(final String name, final String remoteUrl) throws Exception {
+    checkNotNull(name);
+    Repository proxy = repositoryManager.get(name);
+    checkNotNull(proxy);
+    assertThat(proxy.getType().getValue(), equalTo(ProxyType.NAME));
+    org.sonatype.nexus.repository.config.Configuration proxyConfiguration = proxy.getConfiguration();
+    proxyConfiguration.attributes("proxy").set("remoteUrl", remoteUrl);
+    return repositoryManager.update(proxyConfiguration);
+  }
+
+  protected Maven2Client createAdminMaven2Client(final String repositoryName) throws Exception {
+    return createMaven2Client(repositoryName, "admin", "admin123");
+  }
+
+  protected Maven2Client createMaven2Client(final String repositoryName, final String username, final String password) throws Exception {
+    checkNotNull(repositoryName);
+    checkNotNull(username);
+    checkNotNull(password);
+    Repository repository = repositoryManager.get(repositoryName);
+    checkNotNull(repository);
+    AuthScope scope = new AuthScope(nexusUrl.getHost(), -1);
+    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    credentialsProvider.setCredentials(scope, new UsernamePasswordCredentials(username, password));
+    return new Maven2Client(HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build(), HttpClientContext.create(),
+        resolveUrl(nexusUrl, "/repository/" + repositoryName + "/").toURI());
+  }
+
 
   protected void verifyHashesExistAndCorrect(final Repository repository, final String path) throws Exception {
     final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
