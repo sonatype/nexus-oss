@@ -79,7 +79,7 @@ Ext.define('NX.Log', {
     else {
       // else queue the event and emit to console
       me.eventQueue.push(event);
-      NX.Console.log(level, [level, logger, message.join(' ')]);
+      NX.Console.recordEvent(event);
     }
   }
 });

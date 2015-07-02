@@ -22,8 +22,7 @@
 Ext.define('NX.util.log.ConsoleSink', {
   extend: 'NX.util.log.Sink',
   requires: [
-    'NX.Console',
-    'NX.Log'
+    'NX.Console'
   ],
 
   // default to disabled
@@ -33,6 +32,6 @@ Ext.define('NX.util.log.ConsoleSink', {
    * @override
    */
   receive: function (event) {
-    NX.Console.log(event.level, [event.level, event.logger, event.message.join(' ')]);
+    NX.Console.recordEvent(event);
   }
 });

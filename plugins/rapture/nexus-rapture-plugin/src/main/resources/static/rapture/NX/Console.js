@@ -53,7 +53,6 @@ Ext.define('NX.Console', {
    * Set up the console environment.
    */
   constructor: function () {
-    //<if debug>
     this.console = NX.global.console || {};
 
     // apply default empty functions to console if missing
@@ -69,16 +68,16 @@ Ext.define('NX.Console', {
 
     // use ?debug&trace to enable
     this.traceEnabled = NX.global.location.href.search("[?&]trace") > -1;
-    //</if>
   },
 
   /**
+   * Output a message to console at given level.
+   *
    * @public
    * @param {String} level
    * @param {Array} args
    */
   log: function (level, args) {
-    //<if debug>
     var c = this.console;
     switch (level) {
       case 'trace':
@@ -105,51 +104,60 @@ Ext.define('NX.Console', {
         c.error.apply(c, args);
         break;
     }
-    //</if>
   },
 
   /**
+   * Outputs a trace message.
+   *
    * @public
    */
   trace: function() {
-    //<if debug>
     this.log('trace', Array.prototype.slice.call(arguments));
-    //</if>
   },
 
   /**
+   * Outputs a debug message.
+   *
    * @public
    */
   debug: function () {
-    //<if debug>
     this.log('debug', Array.prototype.slice.call(arguments));
-    //</if>
   },
 
   /**
+   * Outputs an info message.
+   *
    * @public
    */
   info: function () {
-    //<if debug>
     this.log('info', Array.prototype.slice.call(arguments));
-    //</if>
   },
 
   /**
+   * Outputs a warn message.
+   *
    * @public
    */
   warn: function () {
-    //<if debug>
     this.log('warn', Array.prototype.slice.call(arguments));
-    //</if>
   },
 
   /**
+   * Outputs an error message.
+   *
    * @public
    */
   error: function () {
-    //<if debug>
     this.log('error', Array.prototype.slice.call(arguments));
-    //</if>
+  },
+
+  /**
+   * Helper to record event details to console.
+   *
+   * @public
+   * @param event
+   */
+  recordEvent: function(event) {
+    this.log(event.level, [event.level, event.logger, event.message.join(' ')]);
   }
 });
