@@ -19,7 +19,7 @@
     <File>${nexus-work}/logs/request.log</File>
     <Append>true</Append>
     <encoder class="org.sonatype.nexus.bootstrap.log.AccessPatternLayoutEncoder">
-      <pattern>common</pattern>
+      <pattern>%clientHost %l %user [%date] "%requestURL" %statusCode %bytesSent %elapsedTime</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>${nexus-work}/logs/request.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
