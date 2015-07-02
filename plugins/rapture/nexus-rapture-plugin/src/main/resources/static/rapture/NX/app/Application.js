@@ -282,7 +282,7 @@ Ext.define('NX.app.Application', {
     //<if debug>
     if (provider) {
       provider.on('statechange', function (provider, key, value, opts) {
-        me.logTrace('State changed:', key, '=', value);
+        me.logTrace('State changed:', key, '->', (value ? value : '(deleted)'));
       });
     }
     //</if>

@@ -223,7 +223,7 @@ Ext.define('NX.controller.State', {
     var me = this;
 
     //<if debug>
-    me.logTrace('Changed:', key, '->', (value ? Ext.JSON.encode(value) : '(deleted)'));
+    me.logTrace('Changed:', key, '->', (value ? value : '(deleted)'));
     //</if>
 
     me.fireEvent(key.toLowerCase() + 'changed', value, oldValue);
