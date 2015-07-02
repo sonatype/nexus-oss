@@ -742,7 +742,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     System_HttpSettings_ProxyPort_FieldLabel: 'HTTP proxy port',
     System_HttpSettings_Authentication_Title: 'Authentication',
     System_HttpSettings_ExcludeHosts_FieldLabel: 'Hosts to exclude from HTTP/HTTPS proxy',
-    System_HttpSettings_ExcludeHosts_HelpText: 'Java http.nonProxyHosts glob-like expressions are supported (do not use \'|\' delimiter)',
+    System_HttpSettings_ExcludeHosts_HelpText: 'Accepts Java "http.nonProxyHosts" wildcard patterns (one per line, no \'|\' hostname delimiters)',
     System_HttpSettings_HttpsProxy_Title: 'HTTPS proxy',
     System_HttpSettings_HttpsProxyHost_FieldLabel: 'HTTPS proxy host',
     System_HttpSettings_HttpsProxyHost_HelpText: 'No https:// required (e.g. "proxy-host" or "192.168.1.101")',

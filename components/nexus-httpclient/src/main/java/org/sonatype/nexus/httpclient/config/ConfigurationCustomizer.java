@@ -25,6 +25,7 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.httpclient.HttpClientPlan;
 import org.sonatype.nexus.httpclient.SSLContextSelector;
 import org.sonatype.nexus.httpclient.internal.NexusHttpRoutePlanner;
@@ -62,13 +63,6 @@ public class ConfigurationCustomizer
     implements HttpClientPlan.Customizer
 {
   /**
-   * Default non-proxyHosts value, used by Java7 too. Always appended to the user given list, if any.
-   */
-  private static final List<String> DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS = ImmutableList.of(
-      "localhost", "127.*", "[::1]", "0.0.0.0", "[::0]"
-  );
-
-  /**
    * Simple reusable function that converts "glob-like" expressions to regexp.
    */
   private static final Function<String, String> GLOB_STRING_TO_REGEXP_STRING = new Function<String, String>()
@@ -80,16 +74,6 @@ public class ConfigurationCustomizer
               .replaceAll("\\]", "\\\\]") + ")";
     }
   };
-
-  /**
-   * Regexp pattern used as default or as fallback when user pattern cannot be converted to regexp. Built from
-   * {@link #DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS}.
-   */
-  private static final Pattern DEFAULT_NO_PROXY_HOSTS_PATTERN =
-      Pattern.compile(Joiner.on("|").join(
-              Iterables.transform(DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS, GLOB_STRING_TO_REGEXP_STRING)
-          )
-      );
 
   static {
     /**
@@ -215,86 +199,17 @@ public class ConfigurationCustomizer
     if (proxy.getNonProxyHosts() != null) {
       patterns.addAll(Arrays.asList(proxy.getNonProxyHosts()));
     }
-    patterns.addAll(DEFAULT_NO_PROXY_HOSTS_PATTERN_STRINGS);
     String nonProxyPatternString = Joiner.on("|").join(Iterables.transform(patterns, GLOB_STRING_TO_REGEXP_STRING));
-    Pattern nonProxyPattern;
-    try {
-      nonProxyPattern = Pattern.compile(nonProxyPatternString, Pattern.CASE_INSENSITIVE);
+    Pattern nonProxyPattern = null;
+    if (!Strings2.isBlank(nonProxyPatternString)) {
+      try {
+        nonProxyPattern = Pattern.compile(nonProxyPatternString, Pattern.CASE_INSENSITIVE);
+      }
+      catch (PatternSyntaxException e) {
+        log.warn("Invalid non-proxy host regex: {}, using defaults", nonProxyPatternString, e);
+      }
     }
-    catch (PatternSyntaxException e) {
-      log.warn("Invalid non-proxy host regex: {}, using defaults", nonProxyPatternString, e);
-      nonProxyPattern = DEFAULT_NO_PROXY_HOSTS_PATTERN;
-    }
-    syncHttpSystemProperties(proxy);
     return new NexusHttpRoutePlanner(proxies, nonProxyPattern);
-  }
-
-  private void syncHttpSystemProperties(final ProxyConfiguration proxy) {
-    // HTTP proxy
-    ProxyServerConfiguration http = proxy.getHttp();
-    if (http != null && http.isEnabled()) {
-      System.setProperty("http.proxyHost", http.getHost());
-      System.setProperty("http.proxyPort", Integer.toString(http.getPort()));
-      if (http.getAuthentication() != null) {
-        if (http.getAuthentication() instanceof UsernameAuthenticationConfiguration) {
-          UsernameAuthenticationConfiguration usernamePassword = (UsernameAuthenticationConfiguration) http
-              .getAuthentication();
-          System.setProperty("http.proxyUser", usernamePassword.getUsername());
-          System.setProperty("http.proxyPassword", usernamePassword.getPassword());
-        }
-        else {
-          log.warn("Authentication {} not supported for Java Networking, system properties not set",
-              http.getAuthentication().getClass().getSimpleName());
-        }
-      }
-      else {
-        System.clearProperty("http.proxyUser");
-        System.clearProperty("http.proxyPassword");
-      }
-    }
-    else {
-      System.clearProperty("http.proxyHost");
-      System.clearProperty("http.proxyPort");
-      System.clearProperty("http.proxyUser");
-      System.clearProperty("http.proxyPassword");
-    }
-
-    // HTTPS proxy
-    ProxyServerConfiguration https = proxy.getHttps();
-    if (https != null && https.isEnabled()) {
-      System.setProperty("https.proxyHost", https.getHost());
-      System.setProperty("https.proxyPort", Integer.toString(https.getPort()));
-      if (https.getAuthentication() != null) {
-        if (https.getAuthentication() instanceof UsernameAuthenticationConfiguration) {
-          UsernameAuthenticationConfiguration usernamePassword = (UsernameAuthenticationConfiguration) https
-              .getAuthentication();
-          System.setProperty("https.proxyUser", usernamePassword.getUsername());
-          System.setProperty("https.proxyPassword", usernamePassword.getPassword());
-        }
-        else {
-          log.warn("Authentication {} not supported for Java Networking, system properties not set",
-              https.getAuthentication().getClass().getSimpleName());
-        }
-      }
-      else {
-        System.clearProperty("https.proxyUser");
-        System.clearProperty("https.proxyPassword");
-      }
-    }
-    else {
-      System.clearProperty("https.proxyHost");
-      System.clearProperty("https.proxyPort");
-      System.clearProperty("https.proxyUser");
-      System.clearProperty("https.proxyPassword");
-    }
-
-    // nonProxyHosts
-    if (proxy.getNonProxyHosts() != null) {
-      System.setProperty("http.nonProxyHosts", Joiner.on("|").join(proxy.getNonProxyHosts()));
-    }
-    else {
-      System.clearProperty("http.nonProxyHosts");
-    }
   }
 
   /**
