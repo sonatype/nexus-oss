@@ -45,6 +45,7 @@ Ext.define('NX.view.feature.Content', {
   listeners: {
     afterrender: function(obj) {
       obj.rendered = true;
+      obj.showRoot();
     }
   },
 
