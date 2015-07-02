@@ -285,6 +285,9 @@ Ext.define('NX.controller.Drilldown', {
     // getById() throws an error if a model ID is found, but not cached, check for content first
     if (store.getCount()) {
       model = store.getById(modelId);
+      if (model === null) {
+        model = store.getById(parseInt(modelId)); // check for integer model id
+      }
       lists[index].fireEvent('selection', lists[index], model);
       me.onModelChanged(index, model);
       me.loadView(index + 1, false, model);
