@@ -19,10 +19,6 @@
  */
 Ext.define('NX.view.dev.Logging', {
   extend: 'Ext.grid.Panel',
-  requires: [
-    'NX.Log'
-  ],
-
   alias: 'widget.nx-dev-logging',
 
   title: 'Logging',
@@ -45,7 +41,7 @@ Ext.define('NX.view.dev.Logging', {
       dataIndex: 'message',
       flex: 3,
       renderer: function(value) {
-        return NX.Log.renderMessage(value);
+        return value.join(' ');
       }
     },
     {text: 'timestamp', dataIndex: 'timestamp', width: 130}
@@ -77,22 +73,12 @@ Ext.define('NX.view.dev.Logging', {
     '-',
     {
       xtype: 'checkbox',
-      itemId: 'console',
-      boxLabel: 'Mirror console'
-    },
-    {
-      xtype: 'checkbox',
-      itemId: 'remote',
-      boxLabel: 'Remote events'
-    },
-    '-',
-    {
-      xtype: 'label',
-      text: 'Max size:'
+      itemId: 'buffer',
+      boxLabel: 'Buffer'
     },
     {
       xtype: 'numberfield',
-      itemId: 'maxSize',
+      itemId: 'bufferSize',
       width: 50,
       allowDecimals: false,
       allowExponential: false,
@@ -103,6 +89,17 @@ Ext.define('NX.view.dev.Logging', {
       minValue: -1,
       maxValue: 999,
       value: 200
+    },
+    '-',
+    {
+      xtype: 'checkbox',
+      itemId: 'console',
+      boxLabel: 'Mirror console'
+    },
+    {
+      xtype: 'checkbox',
+      itemId: 'remote',
+      boxLabel: 'Remote events'
     }
   ],
 

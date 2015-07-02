@@ -33,6 +33,6 @@ Ext.define('NX.util.log.ConsoleSink', {
    * @override
    */
   receive: function (event) {
-    NX.Console.log(event.level, [event.logger, NX.Log.renderMessage(event.message)]);
+    NX.Console.log(event.level, [event.level, event.logger, event.message.join(' ')]);
   }
 });

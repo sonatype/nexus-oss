@@ -79,21 +79,7 @@ Ext.define('NX.Log', {
     else {
       // else queue the event and emit to console
       me.eventQueue.push(event);
-      NX.Console.log(level, [logger, me.renderMessage(message)]);
+      NX.Console.log(level, [level, logger, message.join(' ')]);
     }
-  },
-
-  /**
-   * Render log-event message.
-   *
-   * @public
-   * @param message
-   * @returns {String}
-   */
-  renderMessage: function(message) {
-    if (Ext.isArray(message)) {
-      return message.join(' ');
-    }
-    return message;
   }
 });

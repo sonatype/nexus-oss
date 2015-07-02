@@ -21,9 +21,6 @@
  */
 Ext.define('NX.util.log.RemoteSink', {
   extend: 'NX.util.log.Sink',
-  requires: [
-    'NX.Log'
-  ],
 
   // default to disabled
   enabled: false,
@@ -34,7 +31,7 @@ Ext.define('NX.util.log.RemoteSink', {
   receive: function (event) {
     // copy event to transform message
     var copy = Ext.clone(event);
-    copy.message = NX.Log.renderMessage(copy.message);
+    copy.message = copy.message.join(' ');
     NX.direct.rapture_LogEvent.recordEvent(copy);
   }
 });

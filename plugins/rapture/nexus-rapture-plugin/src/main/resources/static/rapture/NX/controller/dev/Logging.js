@@ -60,6 +60,24 @@ Ext.define('NX.controller.dev.Logging', {
           }
         },
 
+        'nx-dev-logging checkbox[itemId=buffer]': {
+          afterrender: function (checkbox) {
+            checkbox.setValue(sink('store').enabled);
+          },
+          change: function (checkbox) {
+            sink('store').setEnabled(checkbox.getValue());
+          }
+        },
+
+        'nx-dev-logging numberfield[itemId=bufferSize]': {
+          afterrender: function (field) {
+            field.setValue(sink('store').maxSize);
+          },
+          change: function (field) {
+            sink('store').setMaxSize(field.getValue());
+          }
+        },
+
         'nx-dev-logging checkbox[itemId=console]': {
           afterrender: function (checkbox) {
             checkbox.setValue(sink('console').enabled);
@@ -75,15 +93,6 @@ Ext.define('NX.controller.dev.Logging', {
           },
           change: function (checkbox) {
             sink('remote').setEnabled(checkbox.getValue());
-          }
-        },
-
-        'nx-dev-logging numberfield[itemId=maxSize]': {
-          afterrender: function (field) {
-            field.setValue(sink('store').maxSize);
-          },
-          change: function (field) {
-            sink('store').setMaxSize(field.getValue());
           }
         }
       }
