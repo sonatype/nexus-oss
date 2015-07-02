@@ -23,7 +23,7 @@ Ext.define('NX.view.dev.Logging', {
 
   title: 'Logging',
   store: 'LogEvent',
-  emptyText: 'No events',
+  emptyText: 'No events in buffer',
   viewConfig: {
     deferEmptyText: false,
     // allow browser text selection
