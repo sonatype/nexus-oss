@@ -498,46 +498,41 @@ Ext.define('NX.controller.Drilldown', {
       item = items[index],
       createContainer;
 
-    // Destroy any create wizard panels after current
-    for (var i = index + 1; i < items.length; ++i) {
-      createContainer = items[i].down('#create' + i);
-      createContainer.removeAll();
-    }
-
     if (item && item.el) {
-
-      // Restore the current card
-      items[index].getLayout().setActiveItem(items[index].cardIndex);
-
-      // Hack to suppress resize events until the animation is complete
-      if (animate) {
-        drilldown.ownerCt.suspendEvents(false);
-        setTimeout(function () {
-          drilldown.ownerCt.resumeEvents();
-          me.hideAllExceptAndFocus(index);
-        }, 300);
-      } else {
-        me.hideAllExceptAndFocus(index);
-      }
-
-      // Slide the requested panel into view
       var left = feature.el.getX() - (index * feature.el.getWidth());
       if (animate) {
+        // Slide the requested panel into view
         drilldown.animate({
           easing: 'easeInOut',
           duration: 200,
           to: {
             x: left
+          },
+          callback: function() {
+            me.hideAllExceptAndFocus(me.currentIndex);
           }
         });
       } else {
+        // Show the requested panel, without animation
         drilldown.setX(left, false);
+
+        // Put focus on the panel we’re navigating to
+        me.hideAllExceptAndFocus(index);
       }
       me.currentIndex = index;
 
       // Update the breadcrumb
       me.refreshBreadcrumb();
       me.resizeBreadcrumb();
+
+      // Restore the current card
+      item.getLayout().setActiveItem(item.cardIndex);
+    }
+
+    // Destroy any create wizard panels after current
+    for (var i = index + 1; i < items.length; ++i) {
+      createContainer = items[i].down('#create' + i);
+      createContainer.removeAll();
     }
   },
 
@@ -574,20 +569,16 @@ Ext.define('NX.controller.Drilldown', {
   refreshBreadcrumb: function() {
     var me = this,
       content = me.getDrilldown().up('#feature-content'),
-      root = content.down('#feature-root'),
       breadcrumb = content.down('#breadcrumb'),
-      items = me.getDrilldownItems();
+      items = me.getDrilldownItems(),
+      objs = [];
 
     if (me.currentIndex == 0) {
       // Feature's home page, no breadcrumb required
-      breadcrumb.hide();
-      root.show();
+      content.showRoot();
     } else {
-      breadcrumb.removeAll();
-
       // Make a breadcrumb (including icon and 'home' link)
-      breadcrumb.add(
-        {
+      objs.push({
           xtype: 'button',
           scale: 'large',
           ui: 'nx-drilldown',
@@ -606,7 +597,7 @@ Ext.define('NX.controller.Drilldown', {
 
       // Create the rest of the links
       for (var i = 1; i <= me.currentIndex && i < items.length; ++i) {
-        breadcrumb.add([
+        objs.push(
           // Separator
           {
             xtype: 'label',
@@ -637,11 +628,11 @@ Ext.define('NX.controller.Drilldown', {
               }
             }
           })(i)
-        ]);
+        );
       }
 
-      root.hide();
-      breadcrumb.show();
+      breadcrumb.removeAll();
+      breadcrumb.add(objs);
     }
   },
 
@@ -817,5 +808,4 @@ Ext.define('NX.controller.Drilldown', {
       me.getDrilldownDetails().removeTab(tab);
     }
   }
-
 });

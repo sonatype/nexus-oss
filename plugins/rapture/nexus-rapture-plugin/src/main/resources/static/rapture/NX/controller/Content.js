@@ -58,7 +58,7 @@ Ext.define('NX.controller.Content', {
           }
         },
         'nx-feature-content nx-drilldown': {
-          afterrender: function(obj) {
+          boxready: function(obj) {
             obj.fireEvent('resetdrilldown');
           }
         }
@@ -97,9 +97,6 @@ Ext.define('NX.controller.Content', {
     // remove the current contents
     content.removeAll();
 
-    // Hide the breadcrumb
-    content.showRoot();
-
     // update title and icon
     content.setTitle(text);
     content.setIconCls(NX.Icons.cls(iconName, 'x32'));
@@ -115,6 +112,9 @@ Ext.define('NX.controller.Content', {
       description = '';
     }
     content.setDescription(description);
+
+    // Update the breadcrumb
+    content.showRoot();
 
     // install new feature view
     content.add(cmp);

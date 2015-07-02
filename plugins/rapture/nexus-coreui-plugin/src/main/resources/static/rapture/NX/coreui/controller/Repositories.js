@@ -146,6 +146,8 @@ Ext.define('NX.coreui.controller.Repositories', {
         settingsPanel = me.getSettings(),
         formCls = Ext.ClassManager.getByAlias('widget.nx-coreui-repository-' + model.get('recipe'));
 
+    Ext.suspendLayouts();
+
     if (!formCls) {
       me.logWarn('Could not find settings form for: ' + model.getId());
     }
@@ -166,6 +168,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         });
       }
     }
+    Ext.resumeLayouts();
   },
 
   /**
