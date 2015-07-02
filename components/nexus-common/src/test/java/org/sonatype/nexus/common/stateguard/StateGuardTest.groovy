@@ -179,7 +179,7 @@ class StateGuardTest
   @Test
   void 'transition with action ignoring exception'() {
     try {
-      underTest.transition(INITIALISED, FailureException.class)
+      underTest.transition(INITIALISED, false, FailureException.class)
           .from(NEW)
           .run(new Action<Void>() {
         @Override

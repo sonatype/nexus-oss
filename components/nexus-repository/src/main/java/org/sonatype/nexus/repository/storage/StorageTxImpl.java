@@ -160,7 +160,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Transitions(from = ACTIVE, to = OPEN)
+  @Transitions(from = ACTIVE, to = OPEN, silent = true)
   public void commit() {
     db.commit();
     blobTx.commit();
