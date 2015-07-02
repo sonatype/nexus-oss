@@ -20,7 +20,8 @@
 Ext.define('NX.controller.Content', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.State'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -109,7 +110,7 @@ Ext.define('NX.controller.Content', {
     cmp.fireEvent('activate', cmp);
 
     //<if debug>
-    me.logInfo('Content changed to:', text, '(' + cmp.self.getName() + ')');
+    me.logInfo('Content changed to:', text, 'class:', cmp.self.getName());
     //</if>
   }
 
