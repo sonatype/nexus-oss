@@ -29,7 +29,7 @@ Ext.define('NX.util.Validator', {
    */
   default_url_options: {
     protocols: ['http', 'https', 'ftp'],
-    require_tld: true,
+    require_tld: false,
     require_protocol: false,
     allow_underscores: false
   },
