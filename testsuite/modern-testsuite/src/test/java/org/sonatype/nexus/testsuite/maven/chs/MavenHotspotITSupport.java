@@ -26,6 +26,10 @@ import javax.inject.Inject;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.maven.tasks.RebuildMaven2MetadataTask;
+import org.sonatype.nexus.repository.maven.tasks.RebuildMaven2MetadataTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
 import org.sonatype.tests.http.server.fluent.Server;
@@ -129,7 +133,8 @@ public abstract class MavenHotspotITSupport
   }
 
   protected <T> List<T> performSwarm(final List<? extends Callable<T>> clients) throws Exception {
-    final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+    final ExecutorService executorService = Executors
+        .newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
     final CountDownLatch startLatch = new CountDownLatch(1);
     final CountDownLatch endLatch = new CountDownLatch(clients.size());
 
@@ -261,6 +266,30 @@ public abstract class MavenHotspotITSupport
       HttpResponse response = client.put(uri, new StringEntity("test"));
       EntityUtils.consume(response.getEntity());
       return response;
+    }
+  }
+
+  /**
+   * A simple client rebuilding Maven2 metadata using blocking execution.
+   */
+  public static class RebuildMavenMetadata
+      implements Callable<HttpResponse>
+  {
+    private final TaskScheduler taskScheduler;
+
+    private final String repositoryName;
+
+    public RebuildMavenMetadata(final TaskScheduler taskScheduler, final String repositoryName) {
+      this.taskScheduler = checkNotNull(taskScheduler);
+      this.repositoryName = checkNotNull(repositoryName);
+    }
+
+    @Override
+    public HttpResponse call() throws Exception {
+      TaskConfiguration configuration = taskScheduler.createTaskConfigurationInstance(RebuildMaven2MetadataTask.class);
+      configuration.setString(RebuildMaven2MetadataTaskDescriptor.REPOSITORY_NAME_FIELD_ID, repositoryName);
+      taskScheduler.submit(configuration).getCurrentState().getFuture().get();
+      return null;
     }
   }
 }
