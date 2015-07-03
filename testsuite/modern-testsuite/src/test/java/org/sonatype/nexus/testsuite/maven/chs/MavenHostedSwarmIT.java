@@ -70,7 +70,7 @@ public class MavenHostedSwarmIT
       clients.add(new UriGet(repositoryClient, RELEASE_TXT_ARTIFACT_PATH));
     }
 
-    // put initial as we dom't know will GET or PUT "win"
+    // put initial as we don't know will GET or PUT "win"
     HttpResponse response = repositoryClient.put(RELEASE_TXT_ARTIFACT_PATH, new StringEntity("test"));
     assertThat(response.getStatusLine().getStatusCode(), equalTo(201));
 
