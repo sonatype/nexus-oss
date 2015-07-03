@@ -87,7 +87,7 @@ public class HttpConditions
     checkNotNull(request);
     final Headers stashedHeaders = request.getAttributes().require(HTTP_CONDITIONS, Headers.class);
     for (Entry<String, String> entry : stashedHeaders.entries()) {
-      request.getHeaders().set(entry.getKey(), entry.getValue());
+      request.getHeaders().set(entry.getKey(), stashedHeaders.getAll(entry.getKey()));
     }
     return request;
   }
