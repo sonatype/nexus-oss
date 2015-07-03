@@ -476,6 +476,20 @@ public class ContentServlet
       etag = null;
     }
 
+    // handle conditional GETs only for "static" content, actual content stored, not generated
+    if (!file.isContentGenerated() && file.getResourceStoreRequest().getIfModifiedSince() != 0
+        && file.getModified() <= file.getResourceStoreRequest().getIfModifiedSince()) {
+      // this is a conditional GET using time-stamp
+      response.setStatus(SC_NOT_MODIFIED);
+      return;
+    }
+    else if (!file.isContentGenerated() && file.getResourceStoreRequest().getIfNoneMatch() != null && etag != null
+        && file.getResourceStoreRequest().getIfNoneMatch().equals(etag)) {
+      // this is a conditional GET using ETag
+      response.setStatus(SC_NOT_MODIFIED);
+      return;
+    }
+
     response.setHeader("Content-Type", file.getMimeType());
     response.setDateHeader("Last-Modified", file.getModified());
 
@@ -488,50 +502,37 @@ public class ContentServlet
       response.setHeader("Content-Length", String.valueOf(file.getLength()));
     }
 
-    // handle conditional GETs only for "static" content, actual content stored, not generated
-    if (!file.isContentGenerated() && file.getResourceStoreRequest().getIfModifiedSince() != 0
-        && file.getModified() <= file.getResourceStoreRequest().getIfModifiedSince()) {
-      // this is a conditional GET using time-stamp
-      response.setStatus(SC_NOT_MODIFIED);
+    final List<Range<Long>> ranges = getRequestedRanges(request, file.getLength());
+
+    // pour the content, but only if needed (this method will be called even for HEAD reqs, but with content tossed
+    // away), so be conservative as getting input stream involves locking etc, is expensive
+    final boolean contentNeeded = "GET".equalsIgnoreCase(request.getMethod());
+    if (ranges.isEmpty()) {
+      if (contentNeeded) {
+        webUtils.sendContent(file.getInputStream(), response);
+      }
     }
-    else if (!file.isContentGenerated() && file.getResourceStoreRequest().getIfNoneMatch() != null && etag != null
-        && file.getResourceStoreRequest().getIfNoneMatch().equals(etag)) {
-      // this is a conditional GET using ETag
-      response.setStatus(SC_NOT_MODIFIED);
+    else if (ranges.size() > 1) {
+      throw new ErrorStatusException(SC_NOT_IMPLEMENTED, "Not Implemented",
+          "Multiple ranges not yet supported.");
     }
     else {
-      final List<Range<Long>> ranges = getRequestedRanges(request, file.getLength());
-
-      // pour the content, but only if needed (this method will be called even for HEAD reqs, but with content tossed
-      // away), so be conservative as getting input stream involves locking etc, is expensive
-      final boolean contentNeeded = "GET".equalsIgnoreCase(request.getMethod());
-      if (ranges.isEmpty()) {
-        if (contentNeeded) {
-          webUtils.sendContent(file.getInputStream(), response);
-        }
+      final Range<Long> range = ranges.get(0);
+      if (!isRequestedRangeSatisfiable(file, range)) {
+        response.setStatus(SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+        response.setHeader("Content-Length", "0");
+        response.setHeader("Content-Range", "bytes */" + file.getLength());
+        return;
       }
-      else if (ranges.size() > 1) {
-        throw new ErrorStatusException(SC_NOT_IMPLEMENTED, "Not Implemented",
-            "Multiple ranges not yet supported.");
-      }
-      else {
-        final Range<Long> range = ranges.get(0);
-        if (!isRequestedRangeSatisfiable(file, range)) {
-          response.setStatus(SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-          response.setHeader("Content-Length", "0");
-          response.setHeader("Content-Range", "bytes */" + file.getLength());
-          return;
-        }
-        final long bodySize = 1 + range.upperEndpoint() - range.lowerEndpoint();
-        response.setStatus(SC_PARTIAL_CONTENT);
-        response.setHeader("Content-Length", String.valueOf(bodySize));
-        response.setHeader("Content-Range",
-            range.lowerEndpoint() + "-" + range.upperEndpoint() + "/" + file.getLength());
-        if (contentNeeded) {
-          try (final InputStream in = file.getInputStream()) {
-            in.skip(range.lowerEndpoint());
-            webUtils.sendContent(limit(in, bodySize), response);
-          }
+      final long bodySize = 1 + range.upperEndpoint() - range.lowerEndpoint();
+      response.setStatus(SC_PARTIAL_CONTENT);
+      response.setHeader("Content-Length", String.valueOf(bodySize));
+      response.setHeader("Content-Range",
+          range.lowerEndpoint() + "-" + range.upperEndpoint() + "/" + file.getLength());
+      if (contentNeeded) {
+        try (final InputStream in = file.getInputStream()) {
+          in.skip(range.lowerEndpoint());
+          webUtils.sendContent(limit(in, bodySize), response);
         }
       }
     }
