@@ -14,6 +14,12 @@
  * Tests system capabilities CRUD.
  */
 StartTest(function(t) {
+    var waitForStoreToLoad = {
+        waitFor: 'storesToLoad', args: function() {
+            return t.cq1('nx-coreui-capability-list').getStore();
+        }
+    };
+
     t.describe('Given an admin when the admin is administering Capabilities', function(t) {
         t.it('then CRUD should work', function(t) {
             t.chain(
@@ -26,6 +32,36 @@ StartTest(function(t) {
                 // and wait for add dialog
                 function(next) {
                     t.waitForAnimations(next);
+                },
+                function(next) {
+                    var grid = t.cq1('nx-coreui-capability-selecttype'),
+                        baseURLRow = t.getRow(grid, grid.getStore().find('name', 'Base URL: Force'));
+                    t.click(baseURLRow, next);
+                },
+                function(next) {
+                    t.waitForAnimations(next);
+                },
+                // we are ready to go, so press the "Add" button and wait for grid to refresh
+                Ext.apply(Ext.clone(waitForStoreToLoad),
+                    {trigger: {click: '>>nx-coreui-capability-add button[action=add]'}}
+                ),
+                // verify that the capability was added
+                function(next) {
+                    var grid = t.cq1('nx-coreui-capability-list'),
+                        store = grid.getStore(),
+                        model = store.findRecord('typeName', 'Base URL: Force');
+
+                    // we can find the created record in store
+                    t.ok(model, 'Capability "Base URL: Force" exists');
+                    // and values are the one we set
+                    if (model) {
+                        t.is(model.get('typeId'), 'baseurl.force');
+                    }
+
+                    // view the detail panel
+                    t.click(t.getRow(grid, grid.getView().indexOf(model)));
+
+                    next();
                 }
             );
         });
