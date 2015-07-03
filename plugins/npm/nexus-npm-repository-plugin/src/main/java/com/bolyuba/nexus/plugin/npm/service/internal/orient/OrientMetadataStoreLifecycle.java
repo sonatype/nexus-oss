@@ -58,8 +58,9 @@ public class OrientMetadataStoreLifecycle
       orientMetadataStore.stop();
     } catch( Exception ex ){
       log.warn("Problem stopping the npm metadata store", ex);
+    } finally {
+       log.debug("Asking Orient to shutdown...");
+       Orient.instance().shutdown(); 
     }
-    log.debug("Asking Orient to shutdown...");
-    Orient.instance().shutdown();
   }
 }
