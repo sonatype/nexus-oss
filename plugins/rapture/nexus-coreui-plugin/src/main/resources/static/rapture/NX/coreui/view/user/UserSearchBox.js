@@ -43,17 +43,19 @@ Ext.define('NX.coreui.view.user.UserSearchBox', {
 
     me.addEvents(
         /**
-         * @event search
          * Fires when a search trigger was pressed.
-         * @param {NX.view.header.SearchBox} this search box
+         *
+         * @event search
+         * @param {NX.coreui.view.user.UserSearchBox} this search box
          * @param {String} search value
          */
         'search',
 
         /**
-         * @event searchcleared
          * Fires when a search value had been cleared.
-         * @param {NX.view.header.SearchBox} this search box
+         *
+         * @event searchcleared
+         * @param {NX.coreui.view.user.UserSearchBox} this search box
          */
         'searchcleared'
     );
@@ -84,16 +86,18 @@ Ext.define('NX.coreui.view.user.UserSearchBox', {
   },
 
   /**
-   * @private
    * Clear search.
+   *
+   * @private
    */
   onTrigger1Click: function() {
     this.clearSearch();
   },
 
   /**
-   * @private
    * Search on search trigger pressed.
+   *
+   * @private
    */
   onTrigger2Click: function() {
     var me = this;
@@ -102,8 +106,9 @@ Ext.define('NX.coreui.view.user.UserSearchBox', {
   },
 
   /**
-   * @private
    * Search on ENTER.
+   *
+   * @private
    */
   onEnter: function() {
     var me = this;
@@ -112,8 +117,9 @@ Ext.define('NX.coreui.view.user.UserSearchBox', {
   },
 
   /**
-   * @public
    * Search for value and fires a 'search' event.
+   *
+   * @public
    * @param value to search for
    */
   search: function(value) {
@@ -126,8 +132,9 @@ Ext.define('NX.coreui.view.user.UserSearchBox', {
   },
 
   /**
-   * @public
    * Clears the search.
+   *
+   * @public
    */
   clearSearch: function() {
     var me = this;
