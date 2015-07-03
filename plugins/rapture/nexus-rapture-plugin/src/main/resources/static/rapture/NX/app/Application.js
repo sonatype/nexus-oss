@@ -323,6 +323,12 @@ Ext.define('NX.app.Application', {
   },
 
   /**
+   * Fired when synchronizing controllers and changes were detected.
+   *
+   * @event controllerschanged
+   */
+
+  /**
    * Create / Destroy managed controllers based on their active status.
    *
    * @private
