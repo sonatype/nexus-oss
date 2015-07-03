@@ -73,6 +73,11 @@ Ext.define('NX.controller.dev.Logging', {
           afterrender: function (field) {
             field.setValue(sink('store').maxSize);
           },
+
+          // update the max-size when enter or loss of focus
+          blur: function(field, event) {
+            sink('store').setMaxSize(field.getValue());
+          },
           keypress: function (field, event) {
             if (event.getKey() == event.ENTER) {
               sink('store').setMaxSize(field.getValue());
