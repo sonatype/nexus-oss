@@ -135,7 +135,7 @@ Ext.define('NX.controller.Permissions', {
 
   /**
    * @private
-   * @return {object} permissions
+   * @return {Object} permissions
    */
   getPermissions: function () {
     var store = this.getStore('Permission'),
