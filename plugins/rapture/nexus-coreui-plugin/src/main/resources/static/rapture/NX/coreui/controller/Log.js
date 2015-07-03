@@ -19,9 +19,6 @@
  */
 Ext.define('NX.coreui.controller.Log', {
   extend: 'NX.controller.Drilldown',
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
   requires: [
     'Ext.util.TaskManager',
     'Ext.Ajax',
@@ -43,6 +40,9 @@ Ext.define('NX.coreui.controller.Log', {
     { ref: 'list', selector: 'nx-coreui-log-viewer' }
   ],
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -95,8 +95,9 @@ Ext.define('NX.coreui.controller.Log', {
   },
 
   /**
-   * @private
    * Shows mark log window.
+   *
+   * @private
    */
   showMarkWindow: function () {
     Ext.widget({ xtype: 'nx-coreui-log-mark' });

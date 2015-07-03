@@ -19,7 +19,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Metrics', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.Ajax',
     'NX.Messages',
@@ -28,9 +28,6 @@ Ext.define('NX.coreui.controller.Metrics', {
     'NX.util.DownloadHelper',
     'NX.I18n'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'support.Metrics'
