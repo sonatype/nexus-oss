@@ -55,7 +55,7 @@ Ext.define('NX.controller.Permissions', {
          * Fires when permissions change.
          *
          * @event changed
-         * @param {NX.Permissions}
+         * @param {NX.Permissions} permissions  Permissions helper.
          */
         'changed'
     );
