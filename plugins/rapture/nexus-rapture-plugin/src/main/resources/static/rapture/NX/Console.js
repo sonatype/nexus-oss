@@ -110,6 +110,7 @@ Ext.define('NX.Console', {
    * Outputs a trace message.
    *
    * @public
+   * @param {String/Object/Array} message
    */
   trace: function() {
     this.log('trace', Array.prototype.slice.call(arguments));
@@ -119,6 +120,7 @@ Ext.define('NX.Console', {
    * Outputs a debug message.
    *
    * @public
+   * @param {String/Object/Array} message
    */
   debug: function () {
     this.log('debug', Array.prototype.slice.call(arguments));
@@ -128,6 +130,7 @@ Ext.define('NX.Console', {
    * Outputs an info message.
    *
    * @public
+   * @param {String/Object/Array} message
    */
   info: function () {
     this.log('info', Array.prototype.slice.call(arguments));
@@ -137,6 +140,7 @@ Ext.define('NX.Console', {
    * Outputs a warn message.
    *
    * @public
+   * @param {String/Object/Array} message
    */
   warn: function () {
     this.log('warn', Array.prototype.slice.call(arguments));
@@ -146,6 +150,7 @@ Ext.define('NX.Console', {
    * Outputs an error message.
    *
    * @public
+   * @param {String/Object/Array} message
    */
   error: function () {
     this.log('error', Array.prototype.slice.call(arguments));
@@ -154,7 +159,7 @@ Ext.define('NX.Console', {
   /**
    * Helper to record event details to console.
    *
-   * @public
+   * @internal
    * @param event
    */
   recordEvent: function(event) {

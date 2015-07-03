@@ -68,7 +68,7 @@ Ext.define('NX.controller.Message', {
    * At the moment, mainly intended for use by functional tests that need to
    * override default settings.
    *
-   * @private
+   * @internal
    * @property {Object}
    */
   windowOptions: {},
