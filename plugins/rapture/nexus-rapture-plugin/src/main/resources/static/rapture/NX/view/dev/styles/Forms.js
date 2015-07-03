@@ -143,7 +143,6 @@ Ext.define('NX.view.dev.styles.Forms', {
           },
           {
             hideLabel: true,
-            /*id: 'htmleditor',*/
             xtype: 'htmleditor',
             name: 'html',
             enableColors: false,
