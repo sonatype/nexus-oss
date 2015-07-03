@@ -57,6 +57,19 @@ NX.TestHarness.start(
     },
 
     {
+      group: 'Search',
+      items: [
+        {
+          group: 'FT',
+          items: [
+            { url: 'testsuite-oss/search/search_basic.t.js' }
+          ]
+        }
+      ]
+    },
+
+
+    {
       group: 'Security',
       items: [
         {
