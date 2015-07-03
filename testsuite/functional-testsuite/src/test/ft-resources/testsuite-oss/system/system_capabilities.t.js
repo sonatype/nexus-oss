@@ -35,13 +35,13 @@ StartTest(function(t) {
         function(next) {
           t.waitForAnimations(next);
         },
-        // Find the row and click it
+        // Find the capability and click it
         function(next) {
           var grid = t.cq1('nx-coreui-capability-selecttype'),
               baseURLRow = t.getRow(grid, grid.getStore().find('name', name));
               t.click(baseURLRow, next);
         },
-        // and wait for capability details
+        // and wait for details to load
         function(next) {
           t.waitForAnimations(next);
         },
@@ -65,9 +65,24 @@ StartTest(function(t) {
 
           next();
         },
+        //and wait for details to load
         function(next) {
           t.waitForAnimations(next);
         },
+
+        // UPDATE: Select Settings pill and wait for transition
+        function(next) {
+          t.waitForAnimations(function() {
+            t.click('>>nx-drilldown-details tab[text=Settings]');
+            next();
+          });
+        },
+        // then set capability to disabled
+        {click: '>>nx-coreui-capability-settings field[name=enabled]'},
+        // Save changes
+        {click: '>>nx-coreui-capability-settings button[action=save]'},
+
+        //READD VERIFY
 
         // DELETE: press delete button
         {click: '>>nx-coreui-capability-feature button[action=delete]'},
