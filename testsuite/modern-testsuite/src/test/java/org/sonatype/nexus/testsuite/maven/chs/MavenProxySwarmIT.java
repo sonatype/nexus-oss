@@ -54,8 +54,8 @@ public class MavenProxySwarmIT
 
     performSwarm();
 
-    // we are aware that without locking, many of the the swarm members (if not all) would cause it's "own" fetch from remote
-    assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(greaterThan(2)));
+    // depending on concurrency 1+ clients will go remotely (we use no locking)
+    assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(greaterThan(1)));
     pathRecorderBehaviour.clear();
 
     performSwarm();
