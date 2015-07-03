@@ -64,7 +64,8 @@ NX.TestHarness.start(
           items: [
             { url: 'testsuite-oss/security/security_role.t.js' },
             { url: 'testsuite-oss/security/security_user.t.js' },
-            { url: 'testsuite-oss/security/security_anonymous.t.js' }
+            { url: 'testsuite-oss/security/security_anonymous.t.js' },
+            { url: 'testsuite-oss/security/security_realms.t.js' }
           ]
         }
       ]
