@@ -32,7 +32,6 @@ Ext.define('NX.controller.dev.Developer', {
     'dev.Tests',
     'dev.Styles',
     'dev.Icons',
-    'dev.Messages',
     'dev.Features',
     'dev.State',
     'dev.Stores',
@@ -69,6 +68,8 @@ Ext.define('NX.controller.dev.Developer', {
         'nx-dev-panel tool[type=maximize]': {
           click: me.onMaximize
         },
+
+        // Tests actions
         'nx-dev-tests button[action=testError]': {
           click: me.testError
         },
