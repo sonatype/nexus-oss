@@ -82,7 +82,19 @@ StartTest(function(t) {
         // Save changes
         {click: '>>nx-coreui-capability-settings button[action=save]'},
 
-        //READD VERIFY
+          // and verify that:
+          function(next) {
+            var grid = t.cq1('nx-coreui-capability-list'),
+                store = grid.getStore(),
+                model = store.findRecord('typeName', name);
+
+            // we can find the updated record in store
+            t.ok(model, 'Capability ' + name + ' exists');
+            // and is it disabled
+            t.is(model.get('enabled'), 0);
+
+            next();
+          },
 
         // DELETE: press delete button
         {click: '>>nx-coreui-capability-feature button[action=delete]'},
