@@ -53,6 +53,7 @@ import org.junit.Before;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -144,11 +145,11 @@ public abstract class MavenITSupport
     }
   }
 
-  protected Repository redirectProxy(final String name, final String remoteUrl) throws Exception {
-    checkNotNull(name);
-    Repository proxy = repositoryManager.get(name);
+  protected Repository redirectProxy(final String repositoryName, final String remoteUrl) throws Exception {
+    checkNotNull(repositoryName);
+    Repository proxy = repositoryManager.get(repositoryName);
     checkNotNull(proxy);
-    assertThat(proxy.getType().getValue(), equalTo(ProxyType.NAME));
+    checkArgument(ProxyType.NAME.equals(proxy.getType().getValue()));
     org.sonatype.nexus.repository.config.Configuration proxyConfiguration = proxy.getConfiguration();
     proxyConfiguration.attributes("proxy").set("remoteUrl", remoteUrl);
     return repositoryManager.update(proxyConfiguration);
@@ -170,7 +171,6 @@ public abstract class MavenITSupport
     return new Maven2Client(HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build(), HttpClientContext.create(),
         resolveUrl(nexusUrl, "/repository/" + repositoryName + "/").toURI());
   }
-
 
   protected void verifyHashesExistAndCorrect(final Repository repository, final String path) throws Exception {
     final MavenFacet mavenFacet = repository.facet(MavenFacet.class);
