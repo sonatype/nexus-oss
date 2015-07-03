@@ -42,7 +42,7 @@ Ext.define('NX.Log', {
   /**
    * Attach to the logging controller.
    *
-   * @public
+   * @internal
    * @param {NX.controller.Logging} controller
    */
   attach: function (controller) {
