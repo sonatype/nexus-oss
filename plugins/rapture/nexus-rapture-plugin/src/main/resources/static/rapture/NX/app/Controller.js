@@ -28,6 +28,7 @@ Ext.define('NX.app.Controller', {
    * Event fired when a controller is being destroyed.
    *
    * @event destroy
+   * @param {NX.app.Controller} controller  The controller being destroyed.
    */
 
   /**
