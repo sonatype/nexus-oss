@@ -384,8 +384,9 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
+   * Refresh modes and feature menu.
+   *
    * @public
-   * Refresh modes & feature menu.
    */
   refreshMenu: function () {
     var me = this;
@@ -400,9 +401,10 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
-   * @private
    * Refreshes modes buttons based on the fact that there are features visible for that mode or not.
    * In case that current mode is no longer visible, auto selects a new one.
+   *
+   * @private
    */
   refreshVisibleModes: function () {
     var me = this,
