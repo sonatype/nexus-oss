@@ -32,10 +32,20 @@ Ext.define('NX.controller.Features', {
   ],
 
   statics: {
+    /**
+     * Always returns true.
+     *
+     * @returns {boolean}
+     */
     alwaysVisible: function () {
       return true;
     },
 
+    /**
+     * Always returns false.
+     *
+     * @returns {boolean}
+     */
     alwaysHidden: function () {
       return false;
     }
