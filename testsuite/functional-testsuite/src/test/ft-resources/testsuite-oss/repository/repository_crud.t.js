@@ -30,6 +30,7 @@ StartTest(function(t) {
             t.waitForAnimations(next);
           },
           {waitFor: 'CQ', args: 'nx-coreui-repository-list'},
+          Ext.clone(waitForStoreToLoad),
           function(next) {
             var grid = t.cq1('nx-coreui-repository-list'),
                 store = grid.getStore(),

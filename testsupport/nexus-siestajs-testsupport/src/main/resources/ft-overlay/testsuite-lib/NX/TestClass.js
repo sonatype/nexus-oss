@@ -153,7 +153,10 @@ Class('NX.TestClass', {
         },
         { type: 'admin[TAB]', target: this.cq1('#username') },
         { type: 'admin123', target: this.cq1('#password') },
-        { type: '[ENTER]' }
+        { type: '[ENTER]' },
+        function(next) {
+          this.waitForAnimations(next);
+        }
       ];
     },
 
@@ -230,6 +233,29 @@ Class('NX.TestClass', {
           return this.cq1(cq).getStore();
         }
       }
+    },
+
+    /**
+     * Wait for a feature to be enabled, so that its title is shown and there is no message on
+     * the screen indicating access to the feature was denied.
+     * @param {String} title the title of the expected feature
+     * @param {Function} callback
+     * @param {Object} scope
+     * @param {Number} timeout
+     * @returns {*}
+     */
+    waitForFeature: function(title, callback, scope, timeout) {
+      return this.waitFor({
+        method: function() {
+          return this.cq1('label[cls=nx-feature-name]').text === title &&
+              this.waitForCQNotFound('nx-feature-notvisible', Ext.emptyFn)
+        },
+        callback: callback,
+        scope: scope,
+        timeout: timeout,
+        assertionName: 'waitForFeature',
+        description: ' feature to be set to "' + title + '"'
+      });
     }
   }
 });
