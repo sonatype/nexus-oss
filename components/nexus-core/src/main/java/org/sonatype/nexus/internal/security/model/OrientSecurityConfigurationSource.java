@@ -16,7 +16,6 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -40,9 +39,7 @@ import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.nexus.security.user.UserNotFoundException;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
@@ -169,7 +166,7 @@ public class OrientSecurityConfigurationSource
 
   @Override
   public SecurityConfiguration loadConfiguration() {
-    configuration = new CachingOrientSecurityConfiguration();
+    configuration = new OrientSecurityConfiguration();
     return getConfiguration();
   }
 
@@ -504,51 +501,4 @@ public class OrientSecurityConfigurationSource
     }
   }
 
-  private class CachingOrientSecurityConfiguration
-      extends OrientSecurityConfiguration
-  {
-    private final ConcurrentMap<String, CUserRoleMapping> userRoleMappings;
-
-    private CachingOrientSecurityConfiguration() {
-      userRoleMappings = Maps.newConcurrentMap();
-      for (CUserRoleMapping mapping : super.getUserRoleMappings()) {
-        userRoleMappings.put(userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping);
-      }
-    }
-
-    @Override
-    public List<CUserRoleMapping> getUserRoleMappings() {
-      return ImmutableList.copyOf(userRoleMappings.values());
-    }
-
-    @Override
-    public CUserRoleMapping getUserRoleMapping(final String userId, final String source) {
-      checkNotNull(userId, "user id");
-      checkNotNull(source, "source");
-      return userRoleMappings.get(userRoleMappingKey(userId, source));
-    }
-
-    @Override
-    public void addUserRoleMapping(final CUserRoleMapping mapping) {
-      super.addUserRoleMapping(mapping);
-      userRoleMappings.put(userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping);
-    }
-
-    @Override
-    public void updateUserRoleMapping(final CUserRoleMapping mapping) throws NoSuchRoleMappingException {
-      super.updateUserRoleMapping(mapping);
-      userRoleMappings.put(userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping);
-    }
-
-    @Override
-    public boolean removeUserRoleMapping(final String userId, final String source) {
-      boolean found = super.removeUserRoleMapping(userId, source);
-      userRoleMappings.remove(userRoleMappingKey(userId, source));
-      return found;
-    }
-
-    private String userRoleMappingKey(final String userId, final String source) {
-      return userId + "|" + source;
-    }
-  }
 }
