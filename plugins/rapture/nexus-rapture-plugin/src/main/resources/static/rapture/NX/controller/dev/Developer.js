@@ -123,33 +123,34 @@ Ext.define('NX.controller.dev.Developer', {
    */
   onMaximize: function(tool) {
     var panel = tool.up('nx-dev-panel'),
-        container = panel.up('container'),
+        tabs = panel.down('tabpanel'),
         win;
 
-    container.remove(panel, false);
-    panel.getHeader().hide();
+    panel.remove(tabs, false);
 
     win = Ext.create('Ext.window.Window', {
+      title: panel.title,
+      iconCls: panel.iconCls,
+      glyph: panel.glyph,
+
       maximized: true,
       autoScroll: true,
       closable: false,
+
       layout: 'fit',
-      items: panel,
+      items: tabs,
       tools: [
         {
           type: 'close',
-          handler: function() {
-            win.hide(panel, function() {
-              win.remove(panel, false);
-              panel.getHeader().show();
-              container.add(panel);
+          handler: function () {
+            win.hide(panel, function () {
+              win.remove(tabs, false);
+              panel.add(tabs);
               win.destroy();
             });
           }
         }
-      ],
-      title: panel.title,
-      iconCls: panel.iconCls
+      ]
     });
 
     win.show(panel);
