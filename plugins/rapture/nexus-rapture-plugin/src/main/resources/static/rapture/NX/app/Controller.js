@@ -24,16 +24,22 @@ Ext.define('NX.app.Controller', {
   },
 
   /**
+   * Event fired when a controller is being destroyed.
+   *
    * @event destroy
    */
 
   /**
+   * Optional callback to invoke when a controller is being destroyed.
+   *
    * @protected
    * @property {Function}
    */
   onDestroy: undefined,
 
   /**
+   * Optional callback to invoke when a controller has fully destroyed.
+   *
    * @protected
    * @property {Function}
    */
