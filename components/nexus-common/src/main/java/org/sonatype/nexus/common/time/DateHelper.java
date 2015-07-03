@@ -25,6 +25,9 @@ import org.joda.time.DateTime;
  */
 public class DateHelper
 {
+  /**
+   * Converts input {@link Date} to {@link DateTime}, or {@code null} if input is {@code null}.
+   */
   @Nullable
   public static DateTime toDateTime(@Nullable final Date date) {
     if (date == null) {
@@ -33,6 +36,9 @@ public class DateHelper
     return new DateTime(date.getTime());
   }
 
+  /**
+   * Converts input {@link DateTime} to {@link Date}, or {@code null} if input is {@code null}.
+   */
   @Nullable
   public static Date toDate(@Nullable final DateTime dateTime) {
     if (dateTime == null) {

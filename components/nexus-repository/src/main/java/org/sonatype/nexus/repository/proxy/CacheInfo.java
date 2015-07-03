@@ -26,7 +26,8 @@ import static org.sonatype.nexus.common.time.DateHelper.toDate;
 import static org.sonatype.nexus.common.time.DateHelper.toDateTime;
 
 /**
- * A proxy cache info for given element.
+ * A proxy cache auxiliary info for given element. {@link ProxyFacetSupport} relies on information provided by this
+ * class to implement "aging" and proxy cache invalidation.
  *
  * @since 3.0
  */
@@ -48,10 +49,16 @@ public class CacheInfo
     this.cacheToken = cacheToken;
   }
 
+  /**
+   * Returns the {@link DateTime} when this item was last checked remotely for new version.
+   */
   public DateTime getLastVerified() {
     return lastVerified;
   }
 
+  /**
+   * Returns the "cache token" that was in effect when this item was last checked remotely for new version.
+   */
   @Nullable
   public String getCacheToken() {
     return cacheToken;
@@ -65,6 +72,10 @@ public class CacheInfo
         '}';
   }
 
+  /**
+   * Helper method that extracts {@link CacheInfo} from an {@link Asset}. Input cannot be {@code null}, but returned
+   * value might be, if passed in {@link Asset} does not contain cache-info properties.
+   */
   @Nullable
   public static CacheInfo extract(final Asset asset) {
     checkNotNull(asset);
@@ -77,6 +88,9 @@ public class CacheInfo
     return new CacheInfo(lastVerified, cacheToken);
   }
 
+  /**
+   * Helper method that applies {@link CacheInfo} to an {@link Asset}. None of the inputs may be {@code null}.
+   */
   public static void apply(final Asset asset, final CacheInfo cacheInfo) {
     checkNotNull(asset);
     checkNotNull(cacheInfo);

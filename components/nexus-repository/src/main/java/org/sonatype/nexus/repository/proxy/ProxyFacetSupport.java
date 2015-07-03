@@ -167,7 +167,7 @@ public abstract class ProxyFacetSupport
 
   @Override
   public void invalidateProxyCaches() {
-    log.info("Expiring proxy caches of {}", getRepository().getName());
+    log.info("Invalidating proxy caches of {}", getRepository().getName());
     this.cacheToken = Long.toString(System.nanoTime());
   }
 

@@ -35,17 +35,18 @@ public class Content
     implements Payload
 {
   /**
-   * Key of content "Last-Modified", with type {@link DateTime}.
+   * Key of content "Last-Modified" attribute, with type {@link DateTime}.
    */
   public static final String CONTENT_LAST_MODIFIED = "lastModified";
 
   /**
-   * Key of content "ETag", with type of {@link String}.
+   * Key of content "ETag" attribute, with type of {@link String}.
    */
   public static final String CONTENT_ETAG = "etag";
 
   /**
-   * Key of the "hashCodes" attribute map, with type of {@link TypeTokens#HASH_CODES_MAP}.
+   * Key of the "hashCodes" attribute, with type of {@link TypeTokens#HASH_CODES_MAP}. Essentially, this is a map
+   * of content hashes required by the format from where this content originates.
    *
    * @see TypeTokens#HASH_CODES_MAP
    */

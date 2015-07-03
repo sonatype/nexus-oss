@@ -45,6 +45,10 @@ public class ContentMarshaller
 
   private ContentMarshaller() {}
 
+  /**
+   * Extracts non-format specific content attributes into the passed in {@link AttributesMap} (usually originating from
+   * {@link Content#getAttributes()}) from passed in {@link Asset} and format required hashes.
+   */
   public static void extract(final AttributesMap content,
                              final Asset asset,
                              final Iterable<HashAlgorithm> hashAlgorithms)
@@ -68,6 +72,10 @@ public class ContentMarshaller
     content.set(CacheInfo.class, CacheInfo.extract(asset));
   }
 
+  /**
+   * Applies non-format specific content attributes onto passed in {@link Asset} from passed in {@link AttributesMap}
+   * (usually originating from {@link Content#getAttributes()}).
+   */
   public static void apply(final Asset asset, final AttributesMap content) {
     checkNotNull(asset);
     checkNotNull(content);
