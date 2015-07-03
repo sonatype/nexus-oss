@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.view.Context;
@@ -55,7 +56,8 @@ public class DiagnoseHandler
 
     sb.append("Name: ").append(name).append("\n");
     sb.append("Method: ").append(method).append("\n");
-    sb.append("Port: ").append(connector.getPort()).append("\n");
+    sb.append("Docker Port: ").append(connector.getPort()).append("\n");
+    sb.append("Base URL: ").append(BaseUrlHolder.get()).append("\n");
 
     return HttpResponses.ok(new StringPayload(sb.toString(), MediaType.PLAIN_TEXT_UTF_8.toString()));
   }

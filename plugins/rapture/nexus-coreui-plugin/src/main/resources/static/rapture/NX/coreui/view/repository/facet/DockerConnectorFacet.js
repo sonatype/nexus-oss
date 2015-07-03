@@ -22,11 +22,6 @@ Ext.define('NX.coreui.view.repository.facet.DockerConnectorFacet', {
     'NX.I18n'
   ],
 
-  defaults: {
-    allowBlank: false,
-    itemCls: 'required-field'
-  },
-
   /**
    * @override
    */
@@ -39,6 +34,11 @@ Ext.define('NX.coreui.view.repository.facet.DockerConnectorFacet', {
         cls: 'nx-form-section',
         title: 'Connector',
 
+        defaults: {
+          allowBlank: false,
+          itemCls: 'required-field'
+        },
+
         items: [
           {
             xtype: 'combo',
@@ -47,7 +47,8 @@ Ext.define('NX.coreui.view.repository.facet.DockerConnectorFacet', {
             editable: false,
             store: [
               ['REDIRECT', 'Redirect'],
-              ['FORWARD', 'Forward']
+              ['FORWARD', 'Forward'],
+              ['REVERSE_PROXY', 'Transparent Reverse proxy']
             ],
             queryMode: 'local'
           }

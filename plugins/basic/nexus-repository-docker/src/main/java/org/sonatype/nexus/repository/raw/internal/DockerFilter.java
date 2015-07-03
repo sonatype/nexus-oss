@@ -14,15 +14,19 @@
 package org.sonatype.nexus.repository.raw.internal;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -30,17 +34,50 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.common.app.BaseUrlHolder;
+import org.sonatype.nexus.common.app.BaseUrlManager;
+
+import org.eclipse.jetty.proxy.ProxyServlet;
+
 @Named
 @Singleton
 public class DockerFilter
     implements Filter
 {
 
+  private final BaseUrlManager baseUrlManager;
+
   private Map<Integer, Config> configs = new ConcurrentHashMap<>();
+
+  private TransparentReverseProxyServlet reverseProxy = new TransparentReverseProxyServlet();
+
+  @Inject
+  public DockerFilter(final BaseUrlManager baseUrlManager) {this.baseUrlManager = baseUrlManager;}
 
   @Override
   public void init(final FilterConfig config) throws ServletException {
-    // ignore
+    reverseProxy.init(new ServletConfig()
+    {
+      @Override
+      public String getServletName() {
+        return "reverse-proxy";
+      }
+
+      @Override
+      public ServletContext getServletContext() {
+        return config.getServletContext();
+      }
+
+      @Override
+      public String getInitParameter(final String name) {
+        return null;
+      }
+
+      @Override
+      public Enumeration<String> getInitParameterNames() {
+        return null;
+      }
+    });
   }
 
   @Override
@@ -66,11 +103,14 @@ public class DockerFilter
                 "/repository/" + config.repositoryName + uri
             ));
           }
-          else {
+          else if (Strategy.FORWARD == config.strategy) {
             RequestDispatcher requestDispatcher = httpRequest.getRequestDispatcher(
                 "/repository/" + config.repositoryName + uri
             );
             requestDispatcher.forward(new RequestHack(httpRequest), response);
+          }
+          else if (Strategy.REVERSE_PROXY == config.strategy) {
+            reverseProxy.service(request, response);
           }
           return;
         }
@@ -113,6 +153,29 @@ public class DockerFilter
         return;
       }
       super.setAttribute(name, o);
+    }
+  }
+
+  private class TransparentReverseProxyServlet
+      extends ProxyServlet
+  {
+    @Override
+    protected String rewriteTarget(final HttpServletRequest httpRequest) {
+      Config config = configs.get(httpRequest.getLocalPort());
+      if (config != null) {
+        String uri = httpRequest.getRequestURI();
+        if (httpRequest.getQueryString() != null) {
+          uri = uri + "?" + httpRequest.getQueryString();
+        }
+        if (!uri.startsWith("/repository/" + config.repositoryName)) {
+          String baseUrl = baseUrlManager.getUrl();
+          if (baseUrl == null) {
+            baseUrl = BaseUrlHolder.get();
+          }
+          return baseUrl + "/repository/" + config.repositoryName + uri;
+        }
+      }
+      return null;
     }
   }
 

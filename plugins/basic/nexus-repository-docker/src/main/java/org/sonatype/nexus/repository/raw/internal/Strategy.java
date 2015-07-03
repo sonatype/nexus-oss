@@ -17,5 +17,5 @@ package org.sonatype.nexus.repository.raw.internal;
  */
 public enum Strategy
 {
-  REDIRECT, FORWARD
+  REDIRECT, FORWARD, REVERSE_PROXY
 }
