@@ -18,14 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.controller.dev.Developer', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.State',
     'NX.Messages'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'dev.Panel',

@@ -18,16 +18,13 @@
  * @since 3.0
  */
 Ext.define('NX.controller.State', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.direct.Manager',
     'NX.Dialogs',
     'NX.Messages',
     'NX.I18n'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   models: [
     'State'

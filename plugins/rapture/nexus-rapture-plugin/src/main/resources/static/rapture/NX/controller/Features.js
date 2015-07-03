@@ -18,10 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Features', {
-  extend: 'Ext.app.Controller',
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
+  extend: 'NX.app.Controller',
 
   models: [
     'Feature'

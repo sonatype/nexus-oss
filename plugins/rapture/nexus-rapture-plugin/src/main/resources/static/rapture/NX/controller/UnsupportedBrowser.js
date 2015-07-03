@@ -18,13 +18,10 @@
  * @since 3.0
  */
 Ext.define('NX.controller.UnsupportedBrowser', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.State'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'UnsupportedBrowser',
@@ -85,7 +82,7 @@ Ext.define('NX.controller.UnsupportedBrowser', {
   /**
    * Removes {@link NX.view.UnsupportedBrowser} view from {@link Ext.container.Viewport}.
    *
-   * @public
+   * @override
    */
   onDestroy: function () {
     var me = this,

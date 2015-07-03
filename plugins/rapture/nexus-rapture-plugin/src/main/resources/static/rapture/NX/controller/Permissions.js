@@ -18,19 +18,19 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Permissions', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.State',
     'NX.Permissions'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   stores: [
     'Permission'
   ],
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -52,8 +52,9 @@ Ext.define('NX.controller.Permissions', {
 
     me.addEvents(
         /**
-         * @event changed
          * Fires when permissions change.
+         *
+         * @event changed
          * @param {NX.Permissions}
          */
         'changed'

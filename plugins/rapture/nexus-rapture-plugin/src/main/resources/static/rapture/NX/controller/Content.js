@@ -18,14 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Content', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Icons',
     'NX.State'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'feature.Content'

@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Menu', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Bookmarks',
     'NX.controller.User',
@@ -27,9 +27,6 @@ Ext.define('NX.controller.Menu', {
     'NX.Security',
     'NX.State'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'feature.Menu',
@@ -179,8 +176,10 @@ Ext.define('NX.controller.Menu', {
 
   /**
    * Unregister Application listener.
+   *
+   * @override
    */
-  destroy: function(){
+  destroy: function() {
     var me = this;
 
     me.getApplication().un('controllerschanged', me.refreshMenu, me);

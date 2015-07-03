@@ -19,7 +19,7 @@
  * @see NX.util.log.Sink
  */
 Ext.define('NX.controller.Logging', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Log',
     'NX.util.log.StoreSink',
@@ -27,8 +27,7 @@ Ext.define('NX.controller.Logging', {
     'NX.util.log.RemoteSink'
   ],
   mixins: {
-    stateful: 'Ext.state.Stateful',
-    logAware: 'NX.LogAware'
+    stateful: 'Ext.state.Stateful'
   },
 
   stores: [

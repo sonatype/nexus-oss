@@ -18,14 +18,10 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Message', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Icons'
   ],
-
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'message.Notification'

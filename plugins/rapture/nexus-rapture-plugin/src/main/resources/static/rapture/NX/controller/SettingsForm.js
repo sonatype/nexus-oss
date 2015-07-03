@@ -19,7 +19,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.SettingsForm', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.ComponentQuery',
     'NX.Messages'
