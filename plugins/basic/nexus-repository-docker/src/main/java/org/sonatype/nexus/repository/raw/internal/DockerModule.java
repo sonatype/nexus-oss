@@ -32,7 +32,7 @@ public class DockerModule
     {
       @Override
       protected void configureServlets() {
-        filter("/*").through(RedirectFilter.class);
+        filter("/*").through(DockerFilter.class);
       }
     });
   }

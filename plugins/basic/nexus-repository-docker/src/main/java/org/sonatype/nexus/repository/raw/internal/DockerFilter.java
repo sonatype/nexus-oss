@@ -22,19 +22,21 @@ import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 @Named
 @Singleton
-public class RedirectFilter
+public class DockerFilter
     implements Filter
 {
 
-  private Map<Integer, String> redirects = new ConcurrentHashMap<>();
+  private Map<Integer, Config> configs = new ConcurrentHashMap<>();
 
   @Override
   public void init(final FilterConfig config) throws ServletException {
@@ -52,16 +54,24 @@ public class RedirectFilter
   {
     if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
       HttpServletRequest httpRequest = (HttpServletRequest) request;
-      String repositoryName = redirects.get(request.getLocalPort());
-      if (repositoryName != null) {
+      Config config = configs.get(request.getLocalPort());
+      if (config != null) {
         String uri = httpRequest.getRequestURI();
         if (httpRequest.getQueryString() != null) {
           uri = uri + "?" + httpRequest.getQueryString();
         }
-        if (!uri.startsWith("/repository/" + repositoryName)) {
-          ((HttpServletResponse) response).sendRedirect(((HttpServletResponse) response).encodeRedirectURL(
-              "/repository/" + repositoryName + uri
-          ));
+        if (!uri.startsWith("/repository/" + config.repositoryName)) {
+          if (Strategy.REDIRECT == config.strategy) {
+            ((HttpServletResponse) response).sendRedirect(((HttpServletResponse) response).encodeRedirectURL(
+                "/repository/" + config.repositoryName + uri
+            ));
+          }
+          else {
+            RequestDispatcher requestDispatcher = httpRequest.getRequestDispatcher(
+                "/repository/" + config.repositoryName + uri
+            );
+            requestDispatcher.forward(new RequestHack(httpRequest), response);
+          }
           return;
         }
       }
@@ -69,12 +79,42 @@ public class RedirectFilter
     chain.doFilter(request, response);
   }
 
-  void addRedirect(Integer port, String path) {
-    redirects.put(port, path);
+  void addRepository(Integer port, String repositoryName, final Strategy strategy) {
+    configs.put(port, new Config(repositoryName, strategy));
   }
 
-  void removeRedirect(Integer port) {
-    redirects.remove(port);
+  void removeRepository(Integer port) {
+    configs.remove(port);
   }
+
+  private static class Config
+  {
+    private final String repositoryName;
+
+    private final Strategy strategy;
+
+    private Config(final String repositoryName, final Strategy strategy) {
+      this.repositoryName = repositoryName;
+      this.strategy = strategy;
+    }
+  }
+
+  private static class RequestHack
+      extends HttpServletRequestWrapper
+  {
+
+    public RequestHack(final HttpServletRequest request) {
+      super(request);
+    }
+
+    @Override
+    public void setAttribute(final String name, final Object o) {
+      if ("javax.servlet.forward.servlet_path".equals(name)) {
+        return;
+      }
+      super.setAttribute(name, o);
+    }
+  }
+
 
 }

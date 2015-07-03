@@ -14,10 +14,12 @@ package org.sonatype.nexus.repository.raw.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.constraints.NotNull;
 
 import org.sonatype.nexus.bootstrap.jetty.JettyServer;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 
 import org.eclipse.jetty.server.Server;
@@ -33,18 +35,41 @@ public class ConnectorFacetImpl
     extends FacetSupport
     implements ConnectorFacet
 {
-  private final RedirectFilter redirectFilter;
+  static final String CONFIG_KEY = "connector";
+
+  private final DockerFilter dockerFilter;
+
+  static class Config
+  {
+    @NotNull
+    public Strategy strategy;
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "strategy=" + strategy +
+          '}';
+    }
+  }
+
+  private Config config;
 
   private ServerConnector jettyConnector;
 
   @Inject
-  public ConnectorFacetImpl(final RedirectFilter redirectFilter) {
-    this.redirectFilter = redirectFilter;
+  public ConnectorFacetImpl(final DockerFilter dockerFilter) {
+    this.dockerFilter = dockerFilter;
   }
 
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
     // empty
+  }
+
+  @Override
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+    log.debug("Config: {}", config);
   }
 
   @Override
@@ -54,15 +79,14 @@ public class ConnectorFacetImpl
       jettyConnector = new ServerConnector(server);
       server.addConnector(jettyConnector);
       jettyConnector.start();
-      redirectFilter.addRedirect(getPort(), getRepository().getName());
+      dockerFilter.addRepository(getPort(), getRepository().getName(), config.strategy);
     }
   }
 
   @Override
   protected void doStop() throws Exception {
     if (jettyConnector != null) {
-
-      redirectFilter.removeRedirect(getPort());
+      dockerFilter.removeRepository(getPort());
       jettyConnector.stop();
       Server server = JettyServer.getServer();
       server.removeConnector(jettyConnector);

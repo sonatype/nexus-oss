@@ -24,7 +24,8 @@ Ext.define('NX.coreui.view.repository.recipe.DockerHosted', {
     'NX.Conditions',
     'NX.I18n',
     'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.StorageFacetHosted'
+    'NX.coreui.view.repository.facet.StorageFacetHosted',
+    'NX.coreui.view.repository.facet.DockerConnectorFacet'
   ],
   
   /**
@@ -34,6 +35,7 @@ Ext.define('NX.coreui.view.repository.recipe.DockerHosted', {
     var me = this;
 
     me.items = [
+      { xtype: 'nx-coreui-repository-docker-connector-facet'},
       { xtype: 'nx-coreui-repository-storage-facet'},
       { xtype: 'nx-coreui-repository-storage-hosted-facet', writePolicy: 'ALLOW'}
     ];
