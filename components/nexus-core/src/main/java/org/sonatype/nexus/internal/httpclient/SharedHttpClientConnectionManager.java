@@ -13,6 +13,7 @@
 package org.sonatype.nexus.internal.httpclient;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,6 +27,7 @@ import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.impl.conn.DefaultHttpClientConnectionOperator;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,8 @@ public class SharedHttpClientConnectionManager
 
   private final Time connectionPoolIdleTime;
 
+  private final Time connectionPoolEvictingDelayTime;
+
   private ConnectionEvictionThread evictionThread;
 
   @Inject
@@ -59,9 +63,16 @@ public class SharedHttpClientConnectionManager
       final List<SSLContextSelector> sslContextSelectors,
       @Named("${nexus.httpclient.connectionpool.size:-20}") final int connectionPoolSize,
       @Named("${nexus.httpclient.connectionpool.maxSize:-200}") final int connectionPoolMaxSize,
-      @Named("${nexus.httpclient.connectionpool.idleTime:-30s}") final Time connectionPoolIdleTime)
+      @Named("${nexus.httpclient.connectionpool.idleTime:-30s}") final Time connectionPoolIdleTime,
+      @Named("${nexus.httpclient.connectionpool.evictingDelayTime:-5s}") final Time connectionPoolEvictingDelayTime,
+      @Named("${nexus.httpclient.connectionpool.validateAfterInactivityTime:-2s}") final Time connectionPoolValidateAfterInactivityTime)
   {
-    super(createRegistry(sslContextSelectors));
+    super(
+        new DefaultHttpClientConnectionOperator(createRegistry(sslContextSelectors), null, null),
+        null,
+        connectionPoolIdleTime.toMillis(),
+        TimeUnit.MILLISECONDS
+    );
 
     setMaxTotal(connectionPoolMaxSize);
     log.debug("Connection pool max-size: {}", connectionPoolMaxSize);
@@ -70,9 +81,10 @@ public class SharedHttpClientConnectionManager
     log.debug("Connection pool size: {}", connectionPoolSize);
 
     this.connectionPoolIdleTime = checkNotNull(connectionPoolIdleTime);
-    log.debug("Connection pool idle-time: {}", connectionPoolIdleTime);
-
-    setValidateAfterInactivity(-1);
+    this.connectionPoolEvictingDelayTime = checkNotNull(connectionPoolEvictingDelayTime);
+    setValidateAfterInactivity(connectionPoolValidateAfterInactivityTime.toMillisI());
+    log.debug("Connection pool idle-time: {}, evicting delay: {}, validate after inactivity: {}",
+        connectionPoolIdleTime, connectionPoolEvictingDelayTime, connectionPoolValidateAfterInactivityTime);
   }
 
   private static Registry<ConnectionSocketFactory> createRegistry(final List<SSLContextSelector> sslContextSelectors) {
@@ -105,7 +117,7 @@ public class SharedHttpClientConnectionManager
 
   @Override
   public void start() throws Exception {
-    evictionThread = new ConnectionEvictionThread(this, connectionPoolIdleTime);
+    evictionThread = new ConnectionEvictionThread(this, connectionPoolIdleTime, connectionPoolEvictingDelayTime);
     evictionThread.start();
   }
 

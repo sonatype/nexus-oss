@@ -12,11 +12,12 @@
  */
 package org.sonatype.nexus.httpclient.config;
 
+import java.util.regex.Pattern;
+
 import javax.validation.ConstraintValidatorContext;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.validation.ConstraintValidatorSupport;
-
-import com.google.common.base.Strings;
 
 /**
  * {@link NonProxyHosts} validator.
@@ -26,6 +27,22 @@ import com.google.common.base.Strings;
 public class NonProxyHostsValidator
     extends ConstraintValidatorSupport<NonProxyHosts, String[]>
 {
+  /**
+   * Pattern checking for allowed characters, best we can do, as input may be:
+   * <ul>
+   * <li>hostname w/o or w/ wildcard (incomplete)</li>
+   * <li>IPv4 address w/o or w/ wildcard (incomplete)</li>
+   * <li>IPv6 non-compressed address w/o or w/ wildcard (incomplete)</li>
+   * <li>IPv6 compressed address w/o or w/ wildcard (incomplete)</li>
+   * </ul>
+   * Due to the "incomplete" case (hostname may be missing domain, IPv4 might have one, two, three or four segments,
+   * IPv6 might have three or more segments) the validation we perform here is basically just enforcing allowed
+   * characters, and simply not treating these as hostname or IP address, but merely as an opaque pattern.
+   * If wildcard present, wildcard in a nonProxyHost element may be only on it's beginning or end, nowhere else.
+   */
+  private static final Pattern CONTENT_PATTERN = Pattern
+      .compile("\\*?[\\p{IsAlphabetic}|\\d|\\-|\\_|\\.|\\:|\\[|\\]]+\\*?");
+
   @Override
   public boolean isValid(final String[] values, final ConstraintValidatorContext context) {
     for (String value : values) {
@@ -40,20 +57,17 @@ public class NonProxyHostsValidator
    * Returns {@code true} if value is considered as valid nonProxyHosts expression. This is NOT validating the
    * single-string used to set system property (where expressions are delimited with "|")!
    */
-  private boolean isValid(final String value) {
+  private boolean isValid(String value) {
     // A value should be a non-empty string optionally prefixed or suffixed with an asterisk
-    if (Strings.isNullOrEmpty(value)) {
-      // must be non-empty
+    // must be non-empty, non-blank
+    if (Strings2.isBlank(value)) {
       return false;
     }
-    if (value.contains("|")) {
-      // must not contain | separator (used to separate multiple values in system properties)
+    // must not contain | separator (used to separate multiple values in system properties)
+    if (value.indexOf('|') > -1) {
       return false;
     }
-    if (value.contains("*") && !(value.startsWith("*") || value.endsWith("*"))) {
-      // if contains asterisk, it must be at beginning or end only
-      return false;
-    }
-    return true;
+    // asterisk '*' can be only on beginning or end
+    return CONTENT_PATTERN.matcher(value).matches();
   }
 }
