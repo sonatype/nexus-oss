@@ -62,6 +62,27 @@ StartTest(function(t) {
                     t.click(t.getRow(grid, grid.getView().indexOf(model)));
 
                     next();
+                },
+                function(next) {
+                    t.waitForAnimations(next);
+                },
+                // remove it and check is gone
+                // press delete button
+                {click: '>>nx-coreui-capability-feature button[action=delete]'},
+                // then agree with removal and wait for grid to refresh
+                Ext.apply(Ext.clone(waitForStoreToLoad),
+                    {trigger: {click: '>>button[text=Yes]'}}
+                ),
+                // then check that deleted capability is no longer available in grid
+                function(next) {
+                    var grid = t.cq1('nx-coreui-capability-list'),
+                        store = grid.getStore(),
+                        model = store.findRecord('typeName', 'Base URL: Force');
+
+                    t.ok(!model, 'Capability "Base URL: Force" has been removed');
+                    t.ok(!grid.getSelectionModel().getSelection().length, 'Grid has no selection');
+
+                    next();
                 }
             );
         });
