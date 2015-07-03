@@ -41,7 +41,11 @@ Ext.define('NX.controller.Help', {
   ],
 
   /**
+   * The base-url for help links.
+   *
    * @private
+   * @property {String}
+   * @readonly
    */
   baseUrl: 'http://links.sonatype.com/products/nexus',
 
