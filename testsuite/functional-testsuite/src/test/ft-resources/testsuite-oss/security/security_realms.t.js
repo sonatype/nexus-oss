@@ -18,7 +18,22 @@ StartTest(function(t) {
     t.it('Realms view is populated', function(t) {
       t.chain(
         t.openPageAsAdmin('admin/security/realms'),
-        { waitFor: 'CQVisible', args: 'nx-coreui-security-realm-settings' }
+        { waitFor: 'CQVisible', args: 'nx-coreui-security-realm-settings' },
+        function(next) {
+          var store = t.cq1('>>nx-coreui-security-realm-settings nx-itemselector').toField.getStore();
+          t.waitFor(function() {
+            return store.count() > 0;
+          }, next)
+        },
+        function(next) {
+          var store = t.cq1('>>nx-coreui-security-realm-settings nx-itemselector').toField.getStore();
+          var authcIndex = store.find('name', 'Nexus Authenticating Realm');
+          var authzIndex = store.find('name', 'Nexus Authorizing Realm');
+          t.ok(authcIndex >= 0, 'Active realm store does not contain the authc realm');
+          t.ok(authzIndex >= 0, 'Active realm store does not contain the authz realm');
+          t.ok(authcIndex < authzIndex, 'Authc realm is not ordered before authz realm');
+          next();
+        }
       );
     });
     t.it('Can filter realms by name', function(t) {
