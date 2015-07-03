@@ -61,7 +61,7 @@ public class MavenProxySwarmIT
     performSwarm();
 
     // warmed cache, no remote fetch should happen anymore
-    assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(0));
+    assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(equalTo(0)));
   }
 
   private void performSwarm() throws Exception {
