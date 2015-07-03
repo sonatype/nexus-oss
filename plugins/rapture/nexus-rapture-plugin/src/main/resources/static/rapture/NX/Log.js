@@ -24,7 +24,10 @@ Ext.define('NX.Log', {
   ],
 
   /**
+   * Reference to attached logging controller.
+   *
    * @private
+   * @property {NX.controller.Logging}
    */
   controller: undefined,
 
