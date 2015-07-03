@@ -14,77 +14,79 @@
  * Tests system capabilities CRUD.
  */
 StartTest(function(t) {
-    var waitForStoreToLoad = {
-        waitFor: 'storesToLoad', args: function() {
-            return t.cq1('nx-coreui-capability-list').getStore();
+  var waitForStoreToLoad = {
+    waitFor: 'storesToLoad', args: function() {
+        return t.cq1('nx-coreui-capability-list').getStore();
+    }
+  },
+      // Name of Capability tested
+      name = 'Base URL: Force';
+
+  t.describe('Given an admin when the admin is administering Capabilities', function(t) {
+    t.it('then CRUD should work', function(t) {
+      t.chain(
+        t.openPageAsAdmin('admin/system/capabilities'),
+        // CREATE: Wait for create capability button to be enabled
+        {waitFor: 'CQ', args: 'nx-coreui-capability-list button[action=new][disabled=false]'},
+
+        // Press the create capability button
+        {click: '>>nx-coreui-capability-list button[action=new]'},
+        // and wait for list
+        function(next) {
+          t.waitForAnimations(next);
+        },
+        // Find the row and click it
+        function(next) {
+          var grid = t.cq1('nx-coreui-capability-selecttype'),
+              baseURLRow = t.getRow(grid, grid.getStore().find('name', name));
+              t.click(baseURLRow, next);
+        },
+        // and wait for capability details
+        function(next) {
+          t.waitForAnimations(next);
+        },
+        // Press the "Add" button and wait for grid to refresh
+        Ext.apply(Ext.clone(waitForStoreToLoad),
+          {trigger: {click: '>>nx-coreui-capability-add button[action=add]'}}
+        ),
+        // READ: verify that the capability was added
+        function(next) {
+          var grid = t.cq1('nx-coreui-capability-list'),
+              store = grid.getStore(),
+              model = store.findRecord('typeName', name);
+
+          // We can find the created record
+          t.ok(model, 'Capability ' + name + ' exists');
+          // and values are the ones we set
+          t.is(model.get('typeId'), 'baseurl.force');
+
+          // view the detail panel
+          t.click(t.getRow(grid, grid.getView().indexOf(model)));
+
+          next();
+        },
+        function(next) {
+          t.waitForAnimations(next);
+        },
+
+        // DELETE: press delete button
+        {click: '>>nx-coreui-capability-feature button[action=delete]'},
+        // then agree with removal and wait for grid to refresh
+        Ext.apply(Ext.clone(waitForStoreToLoad),
+          {trigger: {click: '>>button[text=Yes]'}}
+        ),
+        // then check that deleted capability is no longer available in grid
+        function(next) {
+          var grid = t.cq1('nx-coreui-capability-list'),
+              store = grid.getStore(),
+              model = store.findRecord('typeName', name);
+
+          t.ok(!model, 'Capability ' + name + ' has been removed');
+          t.ok(!grid.getSelectionModel().getSelection().length, 'Grid has no selection');
+
+          next();
         }
-    };
-
-    t.describe('Given an admin when the admin is administering Capabilities', function(t) {
-        t.it('then CRUD should work', function(t) {
-            t.chain(
-                t.openPageAsAdmin('admin/system/capabilities'),
-                // Wait for create capability button to be enabled
-                {waitFor: 'CQ', args: 'nx-coreui-capability-list button[action=new][disabled=false]'},
-
-                // Press the create capability button
-                {click: '>>nx-coreui-capability-list button[action=new]'},
-                // and wait for add dialog
-                function(next) {
-                    t.waitForAnimations(next);
-                },
-                function(next) {
-                    var grid = t.cq1('nx-coreui-capability-selecttype'),
-                        baseURLRow = t.getRow(grid, grid.getStore().find('name', 'Base URL: Force'));
-                    t.click(baseURLRow, next);
-                },
-                function(next) {
-                    t.waitForAnimations(next);
-                },
-                // we are ready to go, so press the "Add" button and wait for grid to refresh
-                Ext.apply(Ext.clone(waitForStoreToLoad),
-                    {trigger: {click: '>>nx-coreui-capability-add button[action=add]'}}
-                ),
-                // verify that the capability was added
-                function(next) {
-                    var grid = t.cq1('nx-coreui-capability-list'),
-                        store = grid.getStore(),
-                        model = store.findRecord('typeName', 'Base URL: Force');
-
-                    // we can find the created record in store
-                    t.ok(model, 'Capability "Base URL: Force" exists');
-                    // and values are the one we set
-                    if (model) {
-                        t.is(model.get('typeId'), 'baseurl.force');
-                    }
-
-                    // view the detail panel
-                    t.click(t.getRow(grid, grid.getView().indexOf(model)));
-
-                    next();
-                },
-                function(next) {
-                    t.waitForAnimations(next);
-                },
-                // remove it and check is gone
-                // press delete button
-                {click: '>>nx-coreui-capability-feature button[action=delete]'},
-                // then agree with removal and wait for grid to refresh
-                Ext.apply(Ext.clone(waitForStoreToLoad),
-                    {trigger: {click: '>>button[text=Yes]'}}
-                ),
-                // then check that deleted capability is no longer available in grid
-                function(next) {
-                    var grid = t.cq1('nx-coreui-capability-list'),
-                        store = grid.getStore(),
-                        model = store.findRecord('typeName', 'Base URL: Force');
-
-                    t.ok(!model, 'Capability "Base URL: Force" has been removed');
-                    t.ok(!grid.getSelectionModel().getSelection().length, 'Grid has no selection');
-
-                    next();
-                }
-            );
-        });
+      );
     });
+  });
 });
