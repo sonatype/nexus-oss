@@ -38,14 +38,6 @@
     </dependency>
 
     <!--
-    Temporary dependency to workaround PAXURL-299
-    -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-    </dependency>
-
-    <!--
     Pax-Exam setup for Karaf-based distributions
     -->
     <dependency>
