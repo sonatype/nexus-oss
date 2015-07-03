@@ -35,6 +35,7 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
+import org.sonatype.nexus.repository.maven.internal.maven2.Maven2HostedRecipe;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2ProxyRecipe;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.repository.storage.WritePolicy;
@@ -136,6 +137,23 @@ public abstract class MavenITSupport
     try (InputStream is = content.openInputStream()) {
       return reader.read(is);
     }
+  }
+
+  @Nonnull
+  protected Configuration hostedConfig(final String name, final VersionPolicy versionPolicy) {
+    final Configuration config = new Configuration();
+    config.setRepositoryName(name);
+    config.setRecipeName(Maven2HostedRecipe.NAME);
+    config.setOnline(true);
+
+    final NestedAttributesMap maven = config.attributes("maven");
+    maven.set("versionPolicy", versionPolicy.name());
+
+    NestedAttributesMap storage = config.attributes("storage");
+    storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
+    storage.set("writePolicy", WritePolicy.ALLOW.name());
+
+    return config;
   }
 
   @Nonnull

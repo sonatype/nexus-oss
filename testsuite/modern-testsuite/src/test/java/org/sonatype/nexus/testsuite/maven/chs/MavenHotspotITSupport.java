@@ -12,28 +12,43 @@
  */
 package org.sonatype.nexus.testsuite.maven.chs;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
-import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
-import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
 import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.PathRecorderBehaviour;
 
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.HttpClients;
+import com.google.common.base.Function;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.apache.http.HttpResponse;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.ops4j.pax.exam.Option;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 
@@ -51,11 +66,11 @@ public abstract class MavenHotspotITSupport
     );
   }
 
-  protected static final String RELEASE_XML_ARTIFACT_PATH = "group/artifact/1.0/artifact-1.0.xml";
+  protected static final String RELEASE_XML_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.xml";
 
-  protected static final String RELEASE_ZIP_ARTIFACT_PATH = "group/artifact/1.0/artifact-1.0.zip";
+  protected static final String RELEASE_ZIP_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.zip";
 
-  protected static final String RELEASE_TXT_ARTIFACT_PATH = "group/artifact/1.0/artifact-1.0.txt";
+  protected static final String RELEASE_TXT_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.txt";
 
   @Rule
   public TestName testName = new TestName();
@@ -74,11 +89,7 @@ public abstract class MavenHotspotITSupport
 
   protected GeneratorBehaviour txtArtifactGenerator;
 
-  private Repository repository;
-
-  private Server upstream;
-
-  protected Maven2Client repositoryClient;
+  protected Server upstream;
 
   @Before
   public void setupMavenDebugStorage() {
@@ -106,14 +117,6 @@ public abstract class MavenHotspotITSupport
             txtArtifactGenerator
         )
         .start();
-
-    final Configuration configuration = proxyConfig(testName.getMethodName(),
-        "http://localhost:" + upstream.getPort() + "/", VersionPolicy.RELEASE);
-    repository = repositoryManager.create(configuration);
-    assertThat(repository, notNullValue());
-
-    repositoryClient = new Maven2Client(HttpClients.custom().build(), HttpClientContext.create(),
-        resolveUrl(nexusUrl, "/repository/" + repository.getName() + "/").toURI());
   }
 
   @After
@@ -122,6 +125,142 @@ public abstract class MavenHotspotITSupport
   {
     if (upstream != null) {
       upstream.stop();
+    }
+  }
+
+  protected <T> List<T> performSwarm(final List<? extends Callable<T>> clients) throws Exception {
+    final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+    final CountDownLatch startLatch = new CountDownLatch(1);
+    final CountDownLatch endLatch = new CountDownLatch(clients.size());
+
+    final Map<Integer, Future<T>> futures = Maps.newLinkedHashMap();
+    int i = 0;
+    for (Callable<T> client : clients) {
+      final Future<T> future = executorService.submit(new ControlledCallable(startLatch, endLatch, client));
+      futures.put(i++, future);
+    }
+
+    // let it loose and wait for them to finish
+    startLatch.countDown();
+    endLatch.await(30, TimeUnit.SECONDS);
+    executorService.shutdown();
+
+    return Lists.newArrayList(
+        Iterables.transform(futures.values(), new Function<Future<T>, T>()
+        {
+          @Override
+          public T apply(final Future<T> input) {
+            try {
+              return input.get();
+            }
+            catch (Exception e) {
+              throw Throwables.propagate(e);
+            }
+          }
+        })
+    );
+  }
+
+  private static class ControlledCallable<T>
+      implements Callable<T>
+  {
+    private final CountDownLatch startLatch;
+
+    private final CountDownLatch endLatch;
+
+    private final Callable<T> controlled;
+
+    public ControlledCallable(final CountDownLatch startLatch,
+                              final CountDownLatch endLatch,
+                              final Callable<T> controlled)
+    {
+      this.startLatch = startLatch;
+      this.endLatch = endLatch;
+      this.controlled = controlled;
+    }
+
+    @Override
+    public T call() throws Exception {
+      startLatch.await();
+      try {
+        return controlled.call();
+      }
+      finally {
+        endLatch.countDown();
+      }
+    }
+  }
+
+  // == clients
+
+  protected void assertAllHttpResponse(final List<HttpResponse> responses, final Matcher<HttpResponse> matcher) {
+    for (HttpResponse response : responses) {
+      assertThat(response, matcher);
+    }
+  }
+
+  protected void assertAllHttpResponseIs2xx(final List<HttpResponse> responses) {
+    assertAllHttpResponse(responses, new BaseMatcher<HttpResponse>()
+    {
+      @Override
+      public boolean matches(final Object o) {
+        if (o instanceof HttpResponse) {
+          HttpResponse r = (HttpResponse) o;
+          return r.getStatusLine().getStatusCode() >= 200 && r.getStatusLine().getStatusCode() <= 299;
+        }
+        return false;
+      }
+
+      @Override
+      public void describeTo(final Description description) {
+        description.appendText("HTTP 2xx response code");
+      }
+    });
+  }
+
+  /**
+   * A simple client performing a GET against single URL.
+   */
+  public static class UriGet
+      implements Callable<HttpResponse>
+  {
+    private final Maven2Client client;
+
+    private final String uri;
+
+    public UriGet(final Maven2Client client, final String uri) {
+      this.client = checkNotNull(client);
+      this.uri = checkNotNull(uri);
+    }
+
+    @Override
+    public HttpResponse call() throws Exception {
+      HttpResponse response = client.get(uri);
+      EntityUtils.consume(response.getEntity());
+      return response;
+    }
+  }
+
+  /**
+   * A simple client performing a PUT against single URL.
+   */
+  public static class UriPut
+      implements Callable<HttpResponse>
+  {
+    private final Maven2Client client;
+
+    private final String uri;
+
+    public UriPut(final Maven2Client client, final String uri) {
+      this.client = checkNotNull(client);
+      this.uri = checkNotNull(uri);
+    }
+
+    @Override
+    public HttpResponse call() throws Exception {
+      HttpResponse response = client.put(uri, new StringEntity("test"));
+      EntityUtils.consume(response.getEntity());
+      return response;
     }
   }
 }
