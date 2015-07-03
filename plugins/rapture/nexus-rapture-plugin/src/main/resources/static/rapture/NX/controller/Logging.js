@@ -96,6 +96,7 @@ Ext.define('NX.controller.Logging', {
    */
   onLaunch: function () {
     NX.Log.attach(this);
+    this.logInfo('Attached');
   },
 
   /**

@@ -51,8 +51,6 @@ Ext.define('NX.Log', {
       me.controller.recordEvent(event);
     });
     delete me.eventQueue;
-
-    NX.Console.info('Logging controller attached');
   },
 
   /**
