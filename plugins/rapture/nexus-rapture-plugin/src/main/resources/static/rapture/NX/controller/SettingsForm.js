@@ -101,8 +101,9 @@ Ext.define('NX.controller.SettingsForm', {
   },
 
   /**
-   * @private
    * Submits the form containing the button, if form's api submit function is defined.
+   *
+   * @private
    */
   submitForm: function (button) {
     var me = this,
