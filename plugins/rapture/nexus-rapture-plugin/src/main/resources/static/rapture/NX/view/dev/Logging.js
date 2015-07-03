@@ -82,13 +82,17 @@ Ext.define('NX.view.dev.Logging', {
       width: 50,
       allowDecimals: false,
       allowExponential: false,
-      keyNavEnabled: false,
-      mouseWheelEnabled: false,
-      checkChangeBuffer: 1000,
-      hideTrigger: true,
       minValue: -1,
       maxValue: 999,
-      value: 200
+      value: 200,
+
+      // listen for key events
+      enableKeyEvents: true,
+
+      // disable the spinner muck
+      hideTrigger: true,
+      mouseWheelEnabled: false,
+      keyNavEnabled: false
     },
     '-',
     {
