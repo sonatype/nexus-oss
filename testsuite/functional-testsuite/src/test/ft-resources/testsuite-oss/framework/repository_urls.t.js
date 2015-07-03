@@ -20,12 +20,13 @@ StartTest(function(t) {
    * @param pathname
    */
   function verify(link, text, pathname) {
-    var doc = new DOMParser().parseFromString(link, 'text/html');
-    t.expect(doc.links.length).toBe(1);
-    var a = doc.links[0];
+    var element = new Ext.Element(document.createElement('div'));
+    element.insertHtml('beforeEnd',link);
+    var a = element.down('a').dom;
     t.expect(a.target).toBe('_blank');
     t.expect(a.text).toBe(text);
     t.expect(a.pathname).toBe(pathname);
+    element.destroy();
   }
   
   t.ok(Ext, 'Ext is here');
