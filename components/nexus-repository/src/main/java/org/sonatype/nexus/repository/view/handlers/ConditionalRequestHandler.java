@@ -22,7 +22,6 @@ import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Predicate;
-import com.google.common.net.HttpHeaders;
 
 import static org.sonatype.nexus.repository.http.HttpConditions.copyAsUnconditionalGet;
 import static org.sonatype.nexus.repository.http.HttpConditions.requestPredicate;
@@ -67,13 +66,13 @@ public class ConditionalRequestHandler
       case GET:
       case HEAD: {
         final Response response = context.proceed();
+        // keep all response headers like Last-Modified and ETag, etc
         if (response.getStatus().isSuccessful() && !requestPredicate.apply(response)) {
-          // copy only ETag header, leave out all other entity headers
-          final Response.Builder responseBuilder = new Response.Builder().status(Status.success(NOT_MODIFIED));
-          if (response.getHeaders().contains(HttpHeaders.ETAG)) {
-            responseBuilder.header(HttpHeaders.ETAG, response.getHeaders().get(HttpHeaders.ETAG));
-          }
-          return responseBuilder.build();
+          return new Response.Builder()
+              .copy(response)
+              .status(Status.failure(NOT_MODIFIED))
+              .payload(null)
+              .build();
         }
         else {
           return response;
