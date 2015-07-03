@@ -16,6 +16,7 @@
  * Nexus managed controller.
  *
  * @since 3.0
+ * @see NX.app.Application#syncManagedControllers
  */
 Ext.define('NX.app.Controller', {
   extend: 'Ext.app.Controller',
