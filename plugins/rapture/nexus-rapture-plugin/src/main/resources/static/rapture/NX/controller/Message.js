@@ -63,7 +63,7 @@ Ext.define('NX.controller.Message', {
   },
 
   /**
-   * Internal customization of message.Notification window options.
+   * Internal customization of {@link NX.view.message.Notification} window options.
    *
    * At the moment, mainly intended for use by functional tests that need to
    * override default settings.
