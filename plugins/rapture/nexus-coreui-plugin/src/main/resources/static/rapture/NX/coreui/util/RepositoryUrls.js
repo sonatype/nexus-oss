@@ -31,7 +31,6 @@
  */
 Ext.define('NX.coreui.util.RepositoryUrls', {
   singleton: true,
-  alternateClassName: ['RepositoryUrls'],
   requires: [
     'NX.util.Url',
     'NX.Assert'

@@ -54,15 +54,15 @@ StartTest(function(t) {
       });
       
       t.it('Can render a link for maven assets', function(t){
-        var link = RepositoryUrls.asRepositoryLink(mavenAsset, 'maven2');
+        var link = NX.coreui.util.RepositoryUrls.asRepositoryLink(mavenAsset, 'maven2');
         verify(link, '/org/sonatype/test/1.0/test.jar', '/repository/test/org/sonatype/test/1.0/test.jar');
       });
       t.it('Can render a link for nuget assets', function(t){
-        var link = RepositoryUrls.asRepositoryLink(nugetAsset, 'nuget');
+        var link = NX.coreui.util.RepositoryUrls.asRepositoryLink(nugetAsset, 'nuget');
         verify(link, '/test/1.0', '/repository/test/test/1.0');
       });
       t.it('Can render a link for raw assets', function(t){
-        var link = RepositoryUrls.asRepositoryLink(rawAsset, 'raw');
+        var link = NX.coreui.util.RepositoryUrls.asRepositoryLink(rawAsset, 'raw');
         verify(link, 'test.txt', '/repository/test/test.txt');
       });
 
