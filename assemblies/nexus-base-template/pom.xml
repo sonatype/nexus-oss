@@ -302,9 +302,9 @@
 
                 <!-- trim out various enterprise/deployment features we don't need at the moment -->
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg">
-                  <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.3/xml/features"/>
-                  <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.1.4/xml/features"/>
-                  <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.3/xml/features"/>
+                  <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.4/xml/features"/>
+                  <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.2.3/xml/features"/>
+                  <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.4/xml/features"/>
                   <replacefilter token=",kar,ssh,management"/>
                   <replacefilter token=",region"/>
                 </replace>
