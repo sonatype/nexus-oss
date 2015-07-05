@@ -16,14 +16,17 @@ import javax.annotation.Nonnull;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
+import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Predicate;
+import com.google.common.net.HttpHeaders;
 
-import static org.sonatype.nexus.repository.http.HttpConditions.copyAsUnconditionalGet;
+import static org.sonatype.nexus.repository.http.HttpConditions.makeConditional;
+import static org.sonatype.nexus.repository.http.HttpConditions.makeUnconditional;
 import static org.sonatype.nexus.repository.http.HttpConditions.requestPredicate;
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
@@ -47,7 +50,13 @@ public class ConditionalRequestHandler
   public Response handle(@Nonnull final Context context) throws Exception {
     final Predicate<Response> requestPredicate = requestPredicate(context.getRequest());
     if (requestPredicate != null) {
-      return handleConditional(context, requestPredicate);
+      makeUnconditional(context.getRequest());
+      try {
+        return handleConditional(context, requestPredicate);
+      }
+      finally {
+        makeConditional(context.getRequest());
+      }
     }
 
     return context.proceed();
@@ -66,13 +75,13 @@ public class ConditionalRequestHandler
       case GET:
       case HEAD: {
         final Response response = context.proceed();
-        // keep all response headers like Last-Modified and ETag, etc
         if (response.getStatus().isSuccessful() && !requestPredicate.apply(response)) {
-          return new Response.Builder()
-              .copy(response)
-              .status(Status.failure(NOT_MODIFIED))
-              .payload(null)
-              .build();
+          // copy only ETag header, leave out all other entity headers
+          final Response.Builder responseBuilder = new Response.Builder().status(Status.success(NOT_MODIFIED));
+          if (response.getHeaders().contains(HttpHeaders.ETAG)) {
+            responseBuilder.header(HttpHeaders.ETAG, response.getHeaders().get(HttpHeaders.ETAG));
+          }
+          return responseBuilder.build();
         }
         else {
           return response;
@@ -82,8 +91,8 @@ public class ConditionalRequestHandler
       case POST:
       case PUT:
       case DELETE: {
-        final Response response = context.getRepository().facet(ViewFacet.class).dispatch(
-            copyAsUnconditionalGet(context.getRequest()));
+        final Request getRequest = new Request.Builder().copy(context.getRequest()).action(GET).build();
+        final Response response = context.getRepository().facet(ViewFacet.class).dispatch(getRequest);
         if (response.getStatus().isSuccessful() && !requestPredicate.apply(response)) {
           // keep all response headers like Last-Modified and ETag, etc
           return new Response.Builder()
