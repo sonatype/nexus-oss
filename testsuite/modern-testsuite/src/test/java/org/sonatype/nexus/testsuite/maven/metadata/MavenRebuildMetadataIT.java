@@ -12,10 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.maven.metadata;
 
-import javax.inject.Inject;
-
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.MavenHostedFacet;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MimeRulesSource;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
@@ -39,9 +36,6 @@ import static org.hamcrest.Matchers.hasSize;
 public class MavenRebuildMetadataIT
     extends MavenITSupport
 {
-  @Inject
-  private RepositoryManager repositoryManager;
-
   private boolean deployed = false;
 
   private Repository mavenSnapshots;

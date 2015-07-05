@@ -14,13 +14,8 @@ package org.sonatype.nexus.testsuite.maven.content;
 
 import java.io.File;
 
-import javax.inject.Inject;
-
-import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
 import org.sonatype.tests.http.server.fluent.Behaviours;
@@ -28,23 +23,18 @@ import org.sonatype.tests.http.server.fluent.Server;
 
 import com.google.common.net.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.contains;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
@@ -55,22 +45,9 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 public class MavenContentValidationIT
     extends MavenITSupport
 {
-  @org.ops4j.pax.exam.Configuration
-  public static Option[] configureNexus() {
-    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
-        mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject()
-    );
-  }
-
   private static final byte[] EMPTY_ZIP = {
       80, 75, 05, 06, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
   };
-
-  @Inject
-  private RepositoryManager repositoryManager;
-
-  @Inject
-  private LogManager logManager;
 
   private Repository mavenCentral;
 
@@ -163,15 +140,8 @@ public class MavenContentValidationIT
             "This is not a hash, this is rubbish declared as XML", "text/xml"))
         .start();
 
-    Repository repo = repositoryManager.get("maven-central");
-    assertThat(repo, notNullValue());
-    Configuration mavenCentralConfiguration = repo.getConfiguration();
-    mavenCentralConfiguration.attributes("storage").set("strictContentTypeValidation", Boolean.TRUE.toString());
-    mavenCentralConfiguration.attributes("proxy").set("remoteUrl", "http://localhost:" + upstream.getPort() + "/");
-    mavenCentral = repositoryManager.update(mavenCentralConfiguration);
-
-    client = new Maven2Client(HttpClients.custom().build(), HttpClientContext.create(),
-        resolveUrl(nexusUrl, "/repository/" + mavenCentral.getName() + "/").toURI());
+    mavenCentral = redirectProxy("maven-central", "http://localhost:" + upstream.getPort() + "/");
+    client = createAdminMaven2Client(mavenCentral.getName());
   }
 
   @After
@@ -200,15 +170,19 @@ public class MavenContentValidationIT
     // verify log contains traces of format overrides
     final File logfile = logManager.getLogFile("nexus.log");
     assertThat(logfile, exists());
-    assertThat(logfile, contains("Content /abbot/abbot/0.13.0/abbot-0.13.0.pom.xml declared as text/xml, determined as application/xml"));
+    assertThat(logfile, contains(
+        "Content /abbot/abbot/0.13.0/abbot-0.13.0.pom.xml declared as text/xml, determined as application/xml"));
   }
 
   @Test
   public void negativeTest() throws Exception {
     // Note: upstream server uses different MIME types (imitates Central), but Maven repo after validation enforces layout types!
-    get404("badabbot/abbot/0.13.0/abbot-0.13.0.pom", allOf(containsString("Detected content type"), containsString("expected [application/xml")));
-    get404("badabbot/abbot/0.13.0/abbot-0.13.0.jar", allOf(containsString("Detected content type"), containsString("expected [application/java-archive")));
-    get404("badabbot/abbot/0.13.0/maven-metadata.xml", allOf(containsString("Detected content type"), containsString("expected [application/xml")));
+    get404("badabbot/abbot/0.13.0/abbot-0.13.0.pom",
+        allOf(containsString("Detected content type"), containsString("expected [application/xml")));
+    get404("badabbot/abbot/0.13.0/abbot-0.13.0.jar",
+        allOf(containsString("Detected content type"), containsString("expected [application/java-archive")));
+    get404("badabbot/abbot/0.13.0/maven-metadata.xml",
+        allOf(containsString("Detected content type"), containsString("expected [application/xml")));
     get404("badabbot/abbot/0.13.0/maven-metadata.xml.sha1", containsString("Not a Maven2 digest"));
   }
 
