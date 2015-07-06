@@ -14,6 +14,7 @@ package org.sonatype.nexus;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.Collection;
 import java.util.Date;
 
@@ -41,6 +42,8 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormat;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -188,6 +191,11 @@ public class NxApplication
   @Override
   protected void doStop() {
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPING);
+
+    // log uptime before triggering activity which may run into problems
+    long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+    log.info("Uptime: {}", PeriodFormat.getDefault().print(new Period(uptime)));
+
     // Due to no dependency mechanism in NX for components, we need to fire off a hint about shutdown first
     eventBus.post(new NexusStoppingEvent(this));
     // kill services + notify
