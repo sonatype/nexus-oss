@@ -54,7 +54,7 @@ public class DiagnoseHandler
 
     StringBuilder sb = new StringBuilder();
 
-    sb.append("Name: ").append(name).append("\n");
+    sb.append("Path: ").append(context.getRequest().getPath()).append("\n");
     sb.append("Method: ").append(method).append("\n");
     sb.append("Docker Port: ").append(connector.getPort()).append("\n");
     sb.append("Base URL: ").append(BaseUrlHolder.get()).append("\n");
