@@ -100,8 +100,12 @@ public class DockerFilter
         }
         if (!uri.startsWith("/repository/" + config.repositoryName)) {
           if (Strategy.REDIRECT == config.strategy) {
+            String baseUrl = baseUrlManager.getUrl();
+            if (baseUrl == null) {
+              baseUrl = "";
+            }
             ((HttpServletResponse) response).sendRedirect(((HttpServletResponse) response).encodeRedirectURL(
-                "/repository/" + config.repositoryName + uri
+                baseUrl + "/repository/" + config.repositoryName + uri
             ));
           }
           else if (Strategy.FORWARD == config.strategy) {
