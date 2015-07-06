@@ -86,7 +86,7 @@ public abstract class ProxyFacetSupport
 
   private boolean remoteUrlChanged;
 
-  private String cacheToken;
+  private volatile String cacheToken;
 
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
