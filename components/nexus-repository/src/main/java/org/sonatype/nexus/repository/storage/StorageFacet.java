@@ -51,7 +51,7 @@ public interface StorageFacet
   String P_CHECKSUM = "checksum";
 
   /**
-   * Key of {@link Asset} component reference attribute (if asset balongs to a component).
+   * Key of {@link Asset} component reference attribute (if asset belongs to a component).
    */
   String P_COMPONENT = "component";
 
@@ -75,7 +75,9 @@ public interface StorageFacet
   /**
    * Key of {@link Component} and {@link Asset} attribute denoting when the record was last updated. This denotes a
    * timestamp when CMA last modified any attribute of the record, and has nothing to do with content change, it's age
-   * or it's last modified attributes. This record is present always on {@link Component} and {@link Asset}.
+   * or it's last modified attributes. This property is present always on {@link Component} and {@link Asset}.
+   *
+   * @see MetadataNodeEntityAdapter#writeFields(com.orientechnologies.orient.core.record.impl.ODocument, org.sonatype.nexus.repository.storage.MetadataNode)
    */
   String P_LAST_UPDATED = "last_updated";
 
