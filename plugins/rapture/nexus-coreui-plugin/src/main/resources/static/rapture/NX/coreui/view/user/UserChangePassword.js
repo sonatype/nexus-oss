@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.user.UserChangePassword', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-coreui-user-changepassword',
   requires: [
     'NX.Conditions',
@@ -29,10 +29,6 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
   title: NX.I18n.get('User_UserChangePassword_Title'),
   defaultFocus: 'password',
 
-  layout: 'fit',
-  autoShow: true,
-  modal: true,
-  constrain: true,
   width: 320,
 
   /**

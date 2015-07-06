@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-coreui-nuget-apikeydetails',
   requires: [
     'NX.Icons',
@@ -26,13 +26,10 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
     'NX.I18n',
     'NX.util.Url'
   ],
+  ui: 'nx-inset',
 
   title: 'NuGet API Key',
-  autoShow: true,
-  modal: true,
-  constrain: true,
   width: 640,
-  resizable: false,
 
   /**
    * @cfg {String} NuGet API Key
@@ -47,7 +44,6 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
 
     me.items = {
       xtype: 'form',
-      bodyPadding: 10,
       items: [
         {
           xtype: 'panel',
@@ -95,7 +91,7 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
                 padding: '2px',
                 'font-family': 'monospace'
               }
-            },
+            }
           ]
         },
         {

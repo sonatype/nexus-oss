@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.view.Authenticate', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-authenticate',
   requires: [
     'NX.Icons',
@@ -28,13 +28,8 @@ Ext.define('NX.view.Authenticate', {
 
   title: NX.I18n.get('Authenticate_Title'),
 
-  layout: 'fit',
-  autoShow: true,
-  modal: true,
-  constrain: true,
   width: 320,
   defaultFocus: 'password',
-  resizable: false,
 
   /**
    * @cfg message Message to be shown

@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.view.ChangeOrderWindow', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-changeorderwindow',
   requires: [
     'NX.ext.form.field.ItemOrderer',
@@ -26,10 +26,6 @@ Ext.define('NX.view.ChangeOrderWindow', {
   ],
   ui: 'nx-inset',
 
-  layout: 'fit',
-  autoShow: true,
-  modal: true,
-  constrain: true,
   width: 460,
 
   displayField: 'name',

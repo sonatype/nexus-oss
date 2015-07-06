@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.view.SignIn', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-signin',
   requires: [
     'NX.I18n'
@@ -27,13 +27,8 @@ Ext.define('NX.view.SignIn', {
 
   title: NX.I18n.get('SignIn_Title'),
 
-  layout: 'fit',
-  autoShow: true,
-  modal: true,
-  constrain: true,
   width: 320,
   defaultFocus: 'username',
-  resizable: false,
 
   /**
    * @override
