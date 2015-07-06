@@ -22,6 +22,7 @@ import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import org.junit.Test;
 
@@ -29,6 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -47,11 +49,16 @@ public class NugetGalleryFacetImplGetTest
 
     final NugetGalleryFacetImpl galleryFacet = spy(new NugetGalleryFacetImpl());
 
-    final StorageTx tx = mock(StorageTx.class);
-    doReturn(tx).when(galleryFacet).openStorageTx();
-    doReturn(null).when(galleryFacet).findComponent(tx, packageId, version);
+    doReturn(null).when(galleryFacet).findComponent(any(StorageTx.class), eq(packageId), eq(version));
 
-    final Payload payload = galleryFacet.get(packageId, version);
+    UnitOfWork.beginBatch(mock(StorageTx.class));
+    final Payload payload;
+    try {
+      payload = galleryFacet.get(packageId, version);
+    }
+    finally {
+      UnitOfWork.pause();
+    }
 
     assertThat(payload, is(nullValue()));
   }
@@ -77,15 +84,22 @@ public class NugetGalleryFacetImplGetTest
     final Component component = mock(Component.class);
 
     final StorageTx tx = mock(StorageTx.class);
-    doReturn(tx).when(galleryFacet).openStorageTx();
-    doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
+
+    doReturn(component).when(galleryFacet).findComponent(any(StorageTx.class), eq(packageId), eq(version));
     when(tx.firstAsset(component)).thenReturn(asset);
     when(asset.contentType()).thenReturn(contentType);
     when(asset.blobRef()).thenReturn(blobRef);
     when(tx.requireBlob(eq(blobRef))).thenReturn(blob);
     when(blob.getInputStream()).thenReturn(blobStream);
 
-    final Payload payload = galleryFacet.get(packageId, version);
+    UnitOfWork.beginBatch(tx);
+    final Payload payload;
+    try {
+      payload = galleryFacet.get(packageId, version);
+    }
+    finally {
+      UnitOfWork.end();
+    }
 
     assertTrue(payload instanceof StreamPayload);
     StreamPayload streamPayload = (StreamPayload) payload;

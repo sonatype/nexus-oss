@@ -13,12 +13,15 @@
 package org.sonatype.nexus.repository.http;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.repository.view.Headers;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 
@@ -30,7 +33,6 @@ import org.apache.http.client.utils.DateUtils;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 
 /**
  * Helper defining common HTTP conditions.
@@ -39,22 +41,55 @@ import static org.sonatype.nexus.repository.http.HttpMethods.GET;
  */
 public class HttpConditions
 {
+  /**
+   * Request attribute containing the stashed conditions.
+   */
+  private static final String HTTP_CONDITIONS = HttpConditions.class.getName() + ".conditions";
+
+  /**
+   * List of supported headers. This list must be in sync with headers supported in {@link #requestPredicate(Request)}.
+   */
+  private static final List<String> SUPPORTED_HEADERS = Arrays.asList(
+      HttpHeaders.IF_MODIFIED_SINCE,
+      HttpHeaders.IF_UNMODIFIED_SINCE,
+      HttpHeaders.IF_MATCH,
+      HttpHeaders.IF_NONE_MATCH
+  );
+
   private HttpConditions() {}
 
   /**
-   * Copies passed in {@link Request} and but sets action to GET and removes all supported conditions
-   * making the GET request "unconditional". This method must be in sync with {@link #requestPredicate(Request)}
-   * and process same conditions.
+   * Stashes the conditions of the passed in request, making it non-conditional request. To reverse this change,
+   * use {@link #makeConditional(Request)} method.
    */
   @Nonnull
-  public static Request copyAsUnconditionalGet(@Nonnull final Request request) {
+  public static Request makeUnconditional(@Nonnull final Request request) {
     checkNotNull(request);
-    final Request getRequest = new Request.Builder().copy(request).action(GET).build();
-    getRequest.getHeaders().remove(HttpHeaders.IF_MODIFIED_SINCE);
-    getRequest.getHeaders().remove(HttpHeaders.IF_UNMODIFIED_SINCE);
-    getRequest.getHeaders().remove(HttpHeaders.IF_MATCH);
-    getRequest.getHeaders().remove(HttpHeaders.IF_NONE_MATCH);
-    return getRequest;
+    final Headers stashedHeaders = new Headers();
+    for (String httpHeader : SUPPORTED_HEADERS) {
+      List<String> headerValues = request.getHeaders().getAll(httpHeader);
+      if (headerValues != null) {
+        stashedHeaders.set(httpHeader, headerValues);
+      }
+      request.getHeaders().remove(httpHeader);
+    }
+    request.getAttributes().set(HTTP_CONDITIONS, stashedHeaders);
+    return request;
+  }
+
+  /**
+   * Un-stash the conditions originally found in {@link Request}. This method accepts only requests returned by {@link
+   * #makeUnconditional(Request)} method, otherwise will throw {@link IllegalStateException}. This method must be used
+   * in pair with the method above.
+   */
+  @Nonnull
+  public static Request makeConditional(@Nonnull final Request request) {
+    checkNotNull(request);
+    final Headers stashedHeaders = request.getAttributes().require(HTTP_CONDITIONS, Headers.class);
+    for (Entry<String, String> entry : stashedHeaders.entries()) {
+      request.getHeaders().set(entry.getKey(), stashedHeaders.getAll(entry.getKey()));
+    }
+    return request;
   }
 
   /**
