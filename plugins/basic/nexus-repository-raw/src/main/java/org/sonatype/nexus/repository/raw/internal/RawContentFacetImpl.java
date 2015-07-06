@@ -123,8 +123,7 @@ public class RawContentFacetImpl
 
     AttributesMap contentAttributes = null;
     if (payload instanceof Content) {
-      final Content content = (Content) payload;
-      contentAttributes = content.getAttributes();
+      contentAttributes = ((Content) payload).getAttributes();
     }
     ContentMarshaller.applyToAssetMaintainLastModified(asset, contentAttributes);
     tx.setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
