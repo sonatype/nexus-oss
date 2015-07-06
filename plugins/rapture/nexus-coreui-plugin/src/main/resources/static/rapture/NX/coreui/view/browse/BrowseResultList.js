@@ -19,10 +19,13 @@
  */
 Ext.define('NX.coreui.view.browse.BrowseResultList', {
   extend: 'NX.view.drilldown.Master',
-  alias: ['widget.nx-coreui-browse-result-list', 'widget.nx-coreui-healthcheck-result-list'],
+  alias: 'widget.nx-coreui-browse-result-list',
   requires: [
     'NX.I18n'
   ],
+
+  // Mark grid as health check columns target
+  healthCheckColumnsTarget: true,
 
   config: {
     stateful: true,
