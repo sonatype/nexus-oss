@@ -63,7 +63,10 @@ Class('NX.TestHarness', {
           // disable recording offsets
           recorderConfig: {
             recordOffsets: false
-          }
+          },
+          
+          // increase timeout for stability of CI testing
+          defaultTimeout: 30000
         });
 
         this.SUPER(config);
