@@ -98,7 +98,9 @@ public class DockerFilter
         if (httpRequest.getQueryString() != null) {
           uri = uri + "?" + httpRequest.getQueryString();
         }
-        if (!uri.startsWith("/repository/" + config.repositoryName)) {
+        if (!uri.startsWith("/static")
+            && !uri.startsWith("/error.html")
+            && !uri.startsWith("/repository/" + config.repositoryName)) {
           if (Strategy.REDIRECT == config.strategy) {
             String baseUrl = baseUrlManager.getUrl();
             if (baseUrl == null) {
