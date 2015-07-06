@@ -138,11 +138,10 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Shows add logger window.
    */
   showAddWindow: function (button) {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Loggers_Create_Title'));
+    me.setItemName(1, NX.I18n.get('Loggers_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-logger-add'));
   },
 

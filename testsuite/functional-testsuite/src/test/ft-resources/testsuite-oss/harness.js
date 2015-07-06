@@ -28,7 +28,8 @@ NX.TestHarness.start(
           ],
           items: [
             { url: 'testsuite-oss/framework/statechange.t.js' },
-            { url: 'testsuite-oss/framework/validation.t.js' }
+            { url: 'testsuite-oss/framework/validation.t.js' },
+            { url: 'testsuite-oss/framework/repository_urls.t.js' }
           ]
         },
 
