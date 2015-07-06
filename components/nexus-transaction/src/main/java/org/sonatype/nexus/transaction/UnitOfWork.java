@@ -15,8 +15,6 @@ package org.sonatype.nexus.transaction;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.base.Throwables;
@@ -99,11 +97,12 @@ public final class UnitOfWork
    * @return current transaction
    */
   @SuppressWarnings("unchecked")
-  public static @Nullable <T extends Transaction> T currentTransaction() {
+  public static <T extends Transaction> T currentTransaction() {
     Transaction tx = self().tx;
     if (tx instanceof BatchTransaction) {
       tx = ((BatchTransaction) tx).delegate;
     }
+    checkState(tx != null, "No transaction for current context");
     return (T) tx;
   }
 
