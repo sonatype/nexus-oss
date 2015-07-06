@@ -326,14 +326,7 @@ public class MavenFacetImpl
       throws IOException
   {
     tx.attachBlob(asset, assetBlob);
-    if (contentAttributes != null) {
-      ContentMarshaller.applyToAsset(asset, contentAttributes);
-    }
-    if (contentAttributes == null || !contentAttributes.contains(Content.CONTENT_LAST_MODIFIED)) {
-      AttributesMap newAttributes = new AttributesMap();
-      newAttributes.set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
-      ContentMarshaller.applyToAsset(asset, newAttributes);
-    }
+    ContentMarshaller.applyToAssetMaintainLastModified(asset, contentAttributes);
   }
 
   @Override

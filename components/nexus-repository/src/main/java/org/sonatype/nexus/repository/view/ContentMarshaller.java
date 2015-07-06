@@ -15,6 +15,8 @@ package org.sonatype.nexus.repository.view;
 import java.util.Date;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
@@ -61,13 +63,13 @@ public class ContentMarshaller
    */
   public static void extractFromAsset(final Asset asset,
                                       final Iterable<HashAlgorithm> hashAlgorithms,
-                                      final AttributesMap content)
+                                      final AttributesMap contentAttributes)
   {
     checkNotNull(asset);
     checkNotNull(hashAlgorithms);
-    final NestedAttributesMap contentAttributes = asset.attributes().child(P_CONTENT);
-    final DateTime lastModified = toDateTime(contentAttributes.get(P_LAST_MODIFIED, Date.class));
-    final String etag = contentAttributes.get(P_ETAG, String.class);
+    final NestedAttributesMap assetAttributes = asset.attributes().child(P_CONTENT);
+    final DateTime lastModified = toDateTime(assetAttributes.get(P_LAST_MODIFIED, Date.class));
+    final String etag = assetAttributes.get(P_ETAG, String.class);
 
     final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
     final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
@@ -76,25 +78,46 @@ public class ContentMarshaller
       hashCodes.put(algorithm, hashCode);
     }
 
-    content.set(Content.CONTENT_LAST_MODIFIED, lastModified);
-    content.set(Content.CONTENT_ETAG, etag);
-    content.set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
-    content.set(CacheInfo.class, CacheInfoMarshaller.extractFromAsset(asset));
+    contentAttributes.set(Content.CONTENT_LAST_MODIFIED, lastModified);
+    contentAttributes.set(Content.CONTENT_ETAG, etag);
+    contentAttributes.set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
+    contentAttributes.set(CacheInfo.class, CacheInfoMarshaller.extractFromAsset(asset));
   }
 
   /**
    * Applies non-format specific content attributes onto passed in {@link Asset} from passed in {@link AttributesMap}
    * (usually originating from {@link Content#getAttributes()}).
    */
-  public static void applyToAsset(final Asset asset, final AttributesMap content) {
+  public static void applyToAsset(final Asset asset, final AttributesMap contentAttributes) {
     checkNotNull(asset);
-    checkNotNull(content);
-    final NestedAttributesMap contentAttributes = asset.attributes().child(P_CONTENT);
-    contentAttributes.set(P_LAST_MODIFIED, toDate(content.get(Content.CONTENT_LAST_MODIFIED, DateTime.class)));
-    contentAttributes.set(P_ETAG, content.get(Content.CONTENT_ETAG, String.class));
-    final CacheInfo cacheInfo = content.get(CacheInfo.class);
+    checkNotNull(contentAttributes);
+    final NestedAttributesMap assetAttributes = asset.attributes().child(P_CONTENT);
+    assetAttributes.set(P_LAST_MODIFIED, toDate(contentAttributes.get(Content.CONTENT_LAST_MODIFIED, DateTime.class)));
+    assetAttributes.set(P_ETAG, contentAttributes.get(Content.CONTENT_ETAG, String.class));
+    final CacheInfo cacheInfo = contentAttributes.get(CacheInfo.class);
     if (cacheInfo != null) {
       CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
     }
+  }
+
+  /**
+   * Applies non-format specific content attributes onto passed in {@link Asset} from passed in {@link AttributesMap}
+   * (usually originating from {@link Content#getAttributes()}). The {@code contentAttributes} input may be null too,
+   * in which case this method will create empty content attributes. If the content attributes (passed in or new) does
+   * not contains {@link Content#CONTENT_LAST_MODIFIED} mapping, mapping with "now" timestamp will be added.
+   *
+   * @see #applyToAsset(Asset, AttributesMap)
+   */
+  public static void applyToAssetMaintainLastModified(final Asset asset,
+                                                      @Nullable final AttributesMap contentAttributes)
+  {
+    AttributesMap ca = contentAttributes;
+    if (ca == null) {
+      ca = new AttributesMap();
+    }
+    if (!ca.contains(Content.CONTENT_LAST_MODIFIED)) {
+      ca.set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
+    }
+    applyToAsset(asset, ca);
   }
 }

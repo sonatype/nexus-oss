@@ -69,7 +69,6 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
-import org.joda.time.DateTime;
 import org.odata4j.producer.InlineCount;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -585,18 +584,8 @@ public class NugetGalleryFacetImpl
     try {
       Asset asset = findOrCreateAsset(storageTx, component);
       updateAssetMetadata(asset, data, component.isNew());
-
-      if (contentAttributes != null) {
-        ContentMarshaller.applyToAsset(asset, contentAttributes);
-      }
-      if (contentAttributes == null || !contentAttributes.contains(Content.CONTENT_LAST_MODIFIED)) {
-        AttributesMap newAttributes = new AttributesMap();
-        newAttributes.set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
-        ContentMarshaller.applyToAsset(asset, newAttributes);
-      }
-
+      ContentMarshaller.applyToAssetMaintainLastModified(asset, contentAttributes);
       storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
-
       storageTx.saveAsset(asset);
     }
     catch (IOException e) {

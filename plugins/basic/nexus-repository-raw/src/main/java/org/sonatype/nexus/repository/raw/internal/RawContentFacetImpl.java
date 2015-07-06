@@ -40,7 +40,6 @@ import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
-import org.joda.time.DateTime;
 
 import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
@@ -112,15 +111,12 @@ public class RawContentFacetImpl
               asset = tx.firstAsset(component);
             }
 
+            AttributesMap contentAttributes = null;
             if (payload instanceof Content) {
               final Content content = (Content) payload;
-              ContentMarshaller.applyToAsset(asset, content.getAttributes());
+              contentAttributes = content.getAttributes();
             }
-            else {
-              AttributesMap newAttributes = new AttributesMap();
-              newAttributes.set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
-              ContentMarshaller.applyToAsset(asset, newAttributes);
-            }
+            ContentMarshaller.applyToAssetMaintainLastModified(asset, contentAttributes);
 
             tx.setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
             tx.saveAsset(asset);
