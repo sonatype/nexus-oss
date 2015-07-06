@@ -29,42 +29,7 @@ Ext.define('NX.util.Url', {
    * @public
    */
   baseUrl: NX.app.baseUrl,
-
-  /**
-   * Strategies for building urls to download assets.
-   *
-   * @private
-   */
-  repositoryUrlStrategies: {
-    maven2: function(assetModel) {
-      var repositoryName = assetModel.get('repositoryName'),
-          assetName = assetModel.get('name');
-      return NX.util.Url.asLink(NX.util.Url.baseUrl + '/repository/' + repositoryName + assetName, assetName);
-    },
-    nuget: function(assetModel) {
-      var repositoryName = assetModel.get('repositoryName'),
-          assetName = assetModel.get('name'),
-          attributes = assetModel.get('attributes'),
-          version = attributes.nuget.version,
-          path = '/' + assetName + '/' + version;
-      return NX.util.Url.asLink(NX.util.Url.baseUrl + '/repository/' + repositoryName + path, path);
-    },
-    raw: function(assetModel) {
-      var repositoryName = assetModel.get('repositoryName'),
-          assetName = assetModel.get('name');
-      return NX.util.Url.asLink(NX.util.Url.baseUrl + '/repository/' + repositoryName + '/' + assetName, assetName);
-    }
-  },
-
-  /**
-   * Add a strategy to build repository download links for a particular strategy.
-   *
-   * @public
-   */
-  addRepositoryUrlStrategy: function(format, strategy) {
-    this.repositoryUrlStrategies[format] = strategy;
-  },
-
+  
   /**
    * @public
    */
@@ -103,18 +68,6 @@ Ext.define('NX.util.Url', {
       id = '';
     }
     return '<a href="' + url + '" target="' + target + '"' + id + '>' + text + '</a>';
-  },
-
-  /**
-   * Creates a link to an asset in a repository.
-   *
-   * @public
-   * @param {Object} assetModel the asset to create a link for
-   * @param {String} format the format of the repository storing this asset
-   */
-  asRepositoryLink: function(assetModel, format) {
-    var linkStrategy = this.repositoryUrlStrategies[format];
-    return linkStrategy(assetModel);
   }
 
 });
