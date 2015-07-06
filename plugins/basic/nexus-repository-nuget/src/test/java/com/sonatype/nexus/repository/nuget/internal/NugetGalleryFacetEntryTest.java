@@ -20,6 +20,7 @@ import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.transaction.UnitOfWork;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;
@@ -29,6 +30,7 @@ import org.mockito.Spy;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -50,19 +52,24 @@ public class NugetGalleryFacetEntryTest
     final String packageId = "screwdriver";
     final String version = "0.1.1";
 
-    final StorageTx tx = mock(StorageTx.class);
-    doReturn(tx).when(underTest).openStorageTx();
-
     // Wire the mocks together: component has asset, asset has format attributes
-    doReturn(component).when(underTest).findComponent(tx, packageId, version);
-    doReturn(asset).when(underTest).findAsset(tx, component);
+    doReturn(component).when(underTest).findComponent(any(StorageTx.class), eq(packageId), eq(version));
+    doReturn(asset).when(underTest).findAsset(any(StorageTx.class), eq(component));
     doReturn(mock(NestedAttributesMap.class)).when(asset).formatAttributes();
 
     final HashMap<String, ?> data = Maps.newHashMap();
     doReturn(data).when(underTest).toData(any(NestedAttributesMap.class),
         anyMapOf(String.class, String.class));
 
-    underTest.entry("base", packageId, version);
+    final StorageTx tx = mock(StorageTx.class);
+
+    UnitOfWork.beginBatch(tx);
+    try {
+      underTest.entry("base", packageId, version);
+    }
+    finally {
+      UnitOfWork.end();
+    }
 
     verify(underTest).interpolateTemplate(ODataTemplates.NUGET_ENTRY, data);
   }

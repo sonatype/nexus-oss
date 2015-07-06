@@ -124,6 +124,10 @@ public class NxApplication
   protected void doStop() throws Exception {
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPING);
 
+    // log uptime before triggering activity which may run into problems
+    long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+    log.info("Uptime: {}", PeriodFormat.getDefault().print(new Period(uptime)));
+
     // Due to no dependency mechanism in NX for components, we need to fire off a hint about shutdown first
     eventBus.post(new NexusStoppingEvent(this));
 
@@ -141,8 +145,6 @@ public class NxApplication
 
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPED);
 
-    long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
-    log.info("Uptime: {}", PeriodFormat.getDefault().print(new Period(uptime)));
     log.info("Stopped {}", getNexusNameForLogs());
   }
 }

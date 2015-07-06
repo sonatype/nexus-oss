@@ -115,8 +115,15 @@ public class StateGuard
   /**
    * Create a transition to given state.
    */
-  public Transition transition(final String to, final Class<? extends Exception>[] ignore) {
-    return new TransitionImpl(to, ignore);
+  public Transition transition(final String to) {
+    return new TransitionImpl(to, false, new Class[0]);
+  }
+
+  /**
+   * Create a transition to given state with custom exception-handling behaviour.
+   */
+  public Transition transition(final String to, final boolean silent, final Class<? extends Exception>[] ignore) {
+    return new TransitionImpl(to, silent, ignore);
   }
 
   /**
@@ -138,13 +145,16 @@ public class StateGuard
   {
     private final String to;
 
+    private final boolean silent;
+
     private final Class<? extends Exception>[] ignore;
 
     @Nullable
     private String[] allowed;
 
-    private TransitionImpl(final String to, final Class<? extends Exception>[] ignore) {
+    private TransitionImpl(final String to, final boolean silent, final Class<? extends Exception>[] ignore)    {
       this.to = checkNotNull(to);
+      this.silent = silent;
       this.ignore = checkNotNull(ignore);
     }
 
@@ -189,7 +199,12 @@ public class StateGuard
             log.trace("Transitioned: {} ignoring: {}", to, t.toString());
           }
           else {
-            log.error("Failed transition: {} -> {}", current, to, t);
+            if (silent) {
+              log.debug("Failed transition: {} -> {}", current, to, t);
+            }
+            else {
+              log.error("Failed transition: {} -> {}", current, to, t);
+            }
   
             // maybe set failure state
             if (failure != null) {
