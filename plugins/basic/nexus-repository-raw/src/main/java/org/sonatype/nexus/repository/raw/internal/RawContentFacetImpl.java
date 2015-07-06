@@ -34,7 +34,6 @@ import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.ContentMarshaller;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.nexus.transaction.Transactional;
@@ -125,7 +124,7 @@ public class RawContentFacetImpl
     if (payload instanceof Content) {
       contentAttributes = ((Content) payload).getAttributes();
     }
-    ContentMarshaller.applyToAsset(asset, ContentMarshaller.maintainLastModified(asset, contentAttributes));
+    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
     tx.setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(asset);
   }
@@ -191,7 +190,7 @@ public class RawContentFacetImpl
 
   private Content marshall(final Asset asset, final Blob blob) {
     final Content content = new Content(new BlobPayload(blob, asset.requireContentType()));
-    ContentMarshaller.extractFromAsset(asset, hashAlgorithms, content.getAttributes());
+    Content.extractFromAsset(asset, hashAlgorithms, content.getAttributes());
     return content;
   }
 }

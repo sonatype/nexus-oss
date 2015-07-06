@@ -47,7 +47,6 @@ import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.ContentMarshaller;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.nexus.transaction.Transactional;
@@ -165,7 +164,7 @@ public class MavenFacetImpl
     final Blob blob = tx.requireBlob(asset.requireBlobRef());
     final String contentType = asset.contentType();
     final Content content = new Content(new BlobPayload(blob, contentType));
-    ContentMarshaller.extractFromAsset(asset, HashType.ALGORITHMS, content.getAttributes());
+    Content.extractFromAsset(asset, HashType.ALGORITHMS, content.getAttributes());
     return content;
   }
 
@@ -280,7 +279,7 @@ public class MavenFacetImpl
       throws IOException
   {
     tx.attachBlob(asset, assetBlob);
-    ContentMarshaller.applyToAsset(asset, ContentMarshaller.maintainLastModified(asset, contentAttributes));
+    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
   }
 
   @Override
