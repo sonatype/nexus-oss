@@ -63,7 +63,13 @@ Class('NX.TestHarness', {
           // disable recording offsets
           recorderConfig: {
             recordOffsets: false
-          }
+          },
+
+          // default describe() timeout after 5 minutes
+          describeTimeout: 300000,
+
+          // default it() timeout after 30 seconds
+          itTimeout: 30000
         });
 
         this.SUPER(config);
