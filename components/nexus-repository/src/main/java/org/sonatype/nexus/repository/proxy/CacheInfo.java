@@ -19,7 +19,7 @@ import org.joda.time.DateTime;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A proxy cache auxiliary info for given element. {@link ProxyFacetSupport} relies on information provided by this
+ * Maintains cache details for proxied resources. {@link ProxyFacetSupport} relies on information provided by this
  * class to implement "aging" and proxy cache invalidation.
  *
  * @since 3.0

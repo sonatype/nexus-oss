@@ -69,13 +69,13 @@ public abstract class ProxyFacetSupport
      * Artifact max-age minutes.
      */
     @NotNull
-    public int artifactMaxAge;
+    public int contentMaxAge;
 
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
           "remoteUrl=" + remoteUrl +
-          ", artifactMaxAge=" + artifactMaxAge +
+          ", contentMaxAge=" + contentMaxAge +
           '}';
     }
   }
@@ -285,7 +285,7 @@ public abstract class ProxyFacetSupport
       return true;
     }
 
-    if (config.artifactMaxAge < 0) {
+    if (config.contentMaxAge < 0) {
       log.trace("Content max age checking disabled");
       return false;
     }
@@ -301,7 +301,7 @@ public abstract class ProxyFacetSupport
       log.debug("Content expired (cacheToken)");
       return true;
     }
-    if (cacheInfo.getLastVerified().isBefore(new DateTime().minusMinutes(config.artifactMaxAge))) {
+    if (cacheInfo.getLastVerified().isBefore(new DateTime().minusMinutes(config.contentMaxAge))) {
       log.debug("Content expired (age)");
       return true;
     }
