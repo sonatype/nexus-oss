@@ -249,5 +249,32 @@ Class('NX.TestClass', {
         }
       }
     }
+  },
+
+  override: {
+    /**
+     * Custom isReady() to cope with rapture application bootstrap.
+     *
+     * @override
+     */
+    isReady: function () {
+      var result = this.SUPERARG(arguments);
+      if (!result.ready) {
+        return result;
+      }
+
+      console.error('NX application ready:', this.global.NX.application.ready);
+      if (!this.global.NX.application.ready) {
+        return {
+          ready: false,
+          reason: 'NX application is not ready'
+        }
+      }
+      else {
+        return {
+          ready: true
+        }
+      }
+    }
   }
 });
