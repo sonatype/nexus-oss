@@ -43,7 +43,6 @@ import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.CacheInfo;
-import org.sonatype.nexus.repository.proxy.CacheInfoMarshaller;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
@@ -365,7 +364,7 @@ public class NugetGalleryFacetImpl
     checkState(asset != null);
 
     log.debug("Updating cacheInfo of {} {} to {}", id, version, cacheInfo);
-    CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
+    CacheInfo.applyToAsset(asset, cacheInfo);
     tx.saveAsset(asset);
   }
 

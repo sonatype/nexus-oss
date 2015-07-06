@@ -24,7 +24,6 @@ import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.proxy.CacheInfo;
-import org.sonatype.nexus.repository.proxy.CacheInfoMarshaller;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.util.TypeTokens;
@@ -154,7 +153,7 @@ public class Content
     contentAttributes.set(Content.CONTENT_LAST_MODIFIED, lastModified);
     contentAttributes.set(Content.CONTENT_ETAG, etag);
     contentAttributes.set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
-    contentAttributes.set(CacheInfo.class, CacheInfoMarshaller.extractFromAsset(asset));
+    contentAttributes.set(CacheInfo.class, CacheInfo.extractFromAsset(asset));
   }
 
   /**
@@ -169,7 +168,7 @@ public class Content
     assetAttributes.set(P_ETAG, contentAttributes.get(Content.CONTENT_ETAG, String.class));
     final CacheInfo cacheInfo = contentAttributes.get(CacheInfo.class);
     if (cacheInfo != null) {
-      CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
+      CacheInfo.applyToAsset(asset, cacheInfo);
     }
   }
 

@@ -37,7 +37,6 @@ import org.sonatype.nexus.repository.maven.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.MavenPathParser;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.repository.proxy.CacheInfo;
-import org.sonatype.nexus.repository.proxy.CacheInfoMarshaller;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -335,7 +334,7 @@ public class MavenFacetImpl
       return false;
     }
 
-    CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
+    CacheInfo.applyToAsset(asset, cacheInfo);
     tx.saveAsset(asset);
 
     return true;

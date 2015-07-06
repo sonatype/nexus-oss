@@ -27,7 +27,6 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.proxy.CacheInfo;
-import org.sonatype.nexus.repository.proxy.CacheInfoMarshaller;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -178,7 +177,7 @@ public class RawContentFacetImpl
 
     final Asset asset = tx.firstAsset(component);
 
-    CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
+    CacheInfo.applyToAsset(asset, cacheInfo);
     tx.saveAsset(tx.firstAsset(component));
   }
 

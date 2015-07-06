@@ -12,11 +12,18 @@
  */
 package org.sonatype.nexus.repository.proxy;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
+
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.repository.storage.Asset;
 
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.common.time.DateHelper.toDate;
+import static org.sonatype.nexus.common.time.DateHelper.toDateTime;
 
 /**
  * Maintains cache details for proxied resources. {@link ProxyFacetSupport} relies on information provided by this
@@ -57,5 +64,48 @@ public class CacheInfo
         "lastVerified=" + lastVerified +
         ", cacheToken='" + cacheToken + '\'' +
         '}';
+  }
+
+  // Persistence of attributes to and from Asset
+
+  /**
+   * Key of the nested map on {@link Asset} attributes carrying cache info related attributes.
+   */
+  private static final String P_PROXY_CACHE = "proxy_cache";
+
+  /**
+   * Last verified {@link Date}.
+   */
+  private static final String P_LAST_VERIFIED = "last_verified";
+
+  /**
+   * Cache token {@link String}.
+   */
+  private static final String P_CACHE_TOKEN = "cache_token";
+
+  /**
+   * Extracts non-format specific cache info from passed in {@link Asset}.
+   */
+  @Nullable
+  public static CacheInfo extractFromAsset(final Asset asset) {
+    checkNotNull(asset);
+    final NestedAttributesMap proxyCache = asset.attributes().child(P_PROXY_CACHE);
+    final DateTime lastVerified = toDateTime(proxyCache.get(P_LAST_VERIFIED, Date.class));
+    if (lastVerified == null) {
+      return null;
+    }
+    final String cacheToken = proxyCache.get(P_CACHE_TOKEN, String.class);
+    return new CacheInfo(lastVerified, cacheToken);
+  }
+
+  /**
+   * Applies non-format specific cache info attributes onto passed in {@link Asset}.
+   */
+  public static void applyToAsset(final Asset asset, final CacheInfo cacheInfo) {
+    checkNotNull(asset);
+    checkNotNull(cacheInfo);
+    final NestedAttributesMap proxyCache = asset.attributes().child(P_PROXY_CACHE);
+    proxyCache.set(P_LAST_VERIFIED, toDate(cacheInfo.getLastVerified()));
+    proxyCache.set(P_CACHE_TOKEN, cacheInfo.getCacheToken());
   }
 }
