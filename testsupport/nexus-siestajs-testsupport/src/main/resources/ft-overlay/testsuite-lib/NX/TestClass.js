@@ -56,7 +56,9 @@ Class('NX.TestClass', {
           };
         }
 
+        // FIXME: remove this, or change level once this is proven to function
         console.error('NX application ready:', this.global.NX.application.ready);
+
         if (!this.global.NX.application.ready) {
           return {
             ready: false,
