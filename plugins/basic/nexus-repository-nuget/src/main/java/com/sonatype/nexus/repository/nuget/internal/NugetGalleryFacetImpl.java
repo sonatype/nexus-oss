@@ -544,7 +544,7 @@ public class NugetGalleryFacetImpl
     try {
       Asset asset = findOrCreateAsset(tx, component);
       updateAssetMetadata(asset, data, component.isNew());
-      ContentMarshaller.applyToAssetMaintainLastModified(asset, contentAttributes);
+      ContentMarshaller.applyToAsset(asset, ContentMarshaller.maintainLastModified(asset, contentAttributes));
       tx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
       tx.saveAsset(asset);
     }

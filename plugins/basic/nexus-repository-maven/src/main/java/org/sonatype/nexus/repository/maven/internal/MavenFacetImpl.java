@@ -280,7 +280,7 @@ public class MavenFacetImpl
       throws IOException
   {
     tx.attachBlob(asset, assetBlob);
-    ContentMarshaller.applyToAssetMaintainLastModified(asset, contentAttributes);
+    ContentMarshaller.applyToAsset(asset, ContentMarshaller.maintainLastModified(asset, contentAttributes));
   }
 
   @Override

@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.view;
 import java.util.Date;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
@@ -43,7 +44,7 @@ public class ContentMarshaller
   /**
    * Key of the nested map on {@link Asset} attributes carrying content related attributes.
    */
-  private static final String P_CONTENT = "content";
+  private static final String P_CONTENT_ATTRIBUTES = "contentAttributes";
 
   /**
    * Key of last modified {@link Date}.
@@ -67,7 +68,7 @@ public class ContentMarshaller
   {
     checkNotNull(asset);
     checkNotNull(hashAlgorithms);
-    final NestedAttributesMap assetAttributes = asset.attributes().child(P_CONTENT);
+    final NestedAttributesMap assetAttributes = asset.attributes().child(P_CONTENT_ATTRIBUTES);
     final DateTime lastModified = toDateTime(assetAttributes.get(P_LAST_MODIFIED, Date.class));
     final String etag = assetAttributes.get(P_ETAG, String.class);
 
@@ -91,7 +92,7 @@ public class ContentMarshaller
   public static void applyToAsset(final Asset asset, final AttributesMap contentAttributes) {
     checkNotNull(asset);
     checkNotNull(contentAttributes);
-    final NestedAttributesMap assetAttributes = asset.attributes().child(P_CONTENT);
+    final NestedAttributesMap assetAttributes = asset.attributes().child(P_CONTENT_ATTRIBUTES);
     assetAttributes.set(P_LAST_MODIFIED, toDate(contentAttributes.get(Content.CONTENT_LAST_MODIFIED, DateTime.class)));
     assetAttributes.set(P_ETAG, contentAttributes.get(Content.CONTENT_ETAG, String.class));
     final CacheInfo cacheInfo = contentAttributes.get(CacheInfo.class);
@@ -101,15 +102,12 @@ public class ContentMarshaller
   }
 
   /**
-   * Applies non-format specific content attributes onto passed in {@link Asset} from passed in {@link AttributesMap}
-   * (usually originating from {@link Content#getAttributes()}). The {@code contentAttributes} input may be null too,
-   * in which case this method will create empty content attributes. If the content attributes (passed in or new) does
-   * not contains {@link Content#CONTENT_LAST_MODIFIED} mapping, mapping with "now" timestamp will be added.
-   *
-   * @see #applyToAsset(Asset, AttributesMap)
+   * Maintains the "last modified" attribute of the content by setting it to "now". It accepts {@code null}s, and the
+   * returned instance will have changes applied. Never returns {@code null}.
    */
-  public static void applyToAssetMaintainLastModified(final Asset asset,
-                                                      @Nullable final AttributesMap contentAttributes)
+  @Nonnull
+  public static AttributesMap maintainLastModified(final Asset asset,
+                                                   @Nullable final AttributesMap contentAttributes)
   {
     AttributesMap ca = contentAttributes;
     if (ca == null) {
@@ -118,6 +116,6 @@ public class ContentMarshaller
     if (!ca.contains(Content.CONTENT_LAST_MODIFIED)) {
       ca.set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
     }
-    applyToAsset(asset, ca);
+    return ca;
   }
 }
