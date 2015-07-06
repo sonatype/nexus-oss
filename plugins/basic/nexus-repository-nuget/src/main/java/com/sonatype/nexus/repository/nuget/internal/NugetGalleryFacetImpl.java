@@ -232,12 +232,12 @@ public class NugetGalleryFacetImpl
   @Override
   public void putContent(final String id, final String version, final Content content) throws IOException {
     try (TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      doPutContent(id, version, streamSupplier, content);
+      doPutContent(id, version, streamSupplier, content.getAttributes());
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutContent(final String id, final String version, final Supplier<InputStream> streamSupplier, final Content content)
+  protected void doPutContent(final String id, final String version, final Supplier<InputStream> streamSupplier, final AttributesMap contentAttributes)
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
@@ -246,7 +246,7 @@ public class NugetGalleryFacetImpl
         component != null && tx.browseAssets(component).iterator().hasNext(),
         "Component metadata does not exist yet"
     );
-    createOrUpdateAssetAndContents(tx, component, streamSupplier.get(), null, content.getAttributes());
+    createOrUpdateAssetAndContents(tx, component, streamSupplier.get(), null, contentAttributes);
   }
 
   @VisibleForTesting
