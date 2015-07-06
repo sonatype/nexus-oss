@@ -19,17 +19,20 @@ import javax.inject.Provider;
 import org.sonatype.nexus.httpclient.HttpClientManager;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.eclipse.sisu.Typed;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * {@link HttpClient} provider via {@link HttpClientManager}.
+ * {@link HttpClient} (and {@link CloseableHttpClient}) provider via {@link HttpClientManager}.
  *
  * @since 3.0
  */
 @Named
+@Typed({HttpClient.class, CloseableHttpClient.class})
 public class HttpClientProvider
-    implements Provider<HttpClient>
+    implements Provider<CloseableHttpClient>
 {
   private final HttpClientManager httpClientManager;
 
@@ -39,7 +42,7 @@ public class HttpClientProvider
   }
 
   @Override
-  public HttpClient get() {
+  public CloseableHttpClient get() {
     return httpClientManager.create();
   }
 }
