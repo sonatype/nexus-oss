@@ -16,6 +16,8 @@ import javax.inject.Named;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
+import org.eclipse.sisu.inject.DefaultRankingFunction;
+import org.eclipse.sisu.inject.RankingFunction;
 
 /**
  * Docker Guice module.
@@ -35,5 +37,6 @@ public class DockerModule
         filter("/*").through(DockerFilter.class);
       }
     });
+    bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0));
   }
 }
