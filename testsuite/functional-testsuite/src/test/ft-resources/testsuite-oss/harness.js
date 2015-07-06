@@ -57,6 +57,19 @@ NX.TestHarness.start(
     },
 
     {
+      group: 'Search',
+      items: [
+        {
+          group: 'FT',
+          items: [
+            { url: 'testsuite-oss/search/search_basic.t.js' }
+          ]
+        }
+      ]
+    },
+
+
+    {
       group: 'Security',
       items: [
         {
@@ -64,7 +77,22 @@ NX.TestHarness.start(
           items: [
             { url: 'testsuite-oss/security/security_role.t.js' },
             { url: 'testsuite-oss/security/security_user.t.js' },
-            { url: 'testsuite-oss/security/security_anonymous.t.js' }
+            { url: 'testsuite-oss/security/security_anonymous.t.js' },
+            { url: 'testsuite-oss/security/security_realms.t.js' }
+          ]
+        }
+      ]
+    },
+
+    {
+      group: 'Support',
+      items: [
+        {
+          group: 'FT',
+          items: [
+            { url: 'testsuite-oss/support/support_metrics.t.js' },
+            { url: 'testsuite-oss/support/support_sysinfo.t.js' },
+            { url: 'testsuite-oss/support/support_zip.t.js' }
           ]
         }
       ]
@@ -76,6 +104,7 @@ NX.TestHarness.start(
         {
           group: 'FT',
           items: [
+            { url: 'testsuite-oss/system/system_bundles.t.js' },
             { url: 'testsuite-oss/system/system_tasks.t.js' }
           ]
         }
