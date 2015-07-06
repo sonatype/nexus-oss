@@ -15,105 +15,113 @@
  */
 StartTest(function(t) {
   var waitForStoreToLoad = {
-    waitFor: 'storesToLoad', args: function() {
-        return t.cq1('nx-coreui-capability-list').getStore();
-    }
-  },
-      // Name of Capability tested
+        waitFor: 'storesToLoad', args: function() {
+          return t.cq1('nx-coreui-capability-list').getStore();
+        }
+      },
+  // Name of Capability tested
       name = 'Base URL: Force';
 
-  t.describe('Given an admin when the admin is administering Capabilities', function(t) {
-    t.it('then CRUD should work', function(t) {
+  t.describe('Given an admin administering Capabilities', function(t) {
+    t.it('Should be able to create a new Capability', function(t) {
       t.chain(
-        t.openPageAsAdmin('admin/system/capabilities'),
-        // CREATE: Wait for create capability button to be enabled
-        {waitFor: 'CQ', args: 'nx-coreui-capability-list button[action=new][disabled=false]'},
+          t.openPageAsAdmin('admin/system/capabilities'),
+          // CREATE: Wait for create capability button to be enabled
+          {waitFor: 'CQ', args: 'nx-coreui-capability-list button[action=new][disabled=false]'},
 
-        // Press the create capability button
-        {click: '>>nx-coreui-capability-list button[action=new]'},
-        // and wait for list
-        function(next) {
-          t.waitForAnimations(next);
-        },
-        // Find the capability and click it
-        function(next) {
-          var grid = t.cq1('nx-coreui-capability-selecttype'),
-              baseURLRow = t.getRow(grid, grid.getStore().find('name', name));
+          // Press the create capability button
+          {click: '>>nx-coreui-capability-list button[action=new]'},
+          // and wait for list
+          function(next) {
+            t.waitForAnimations(next);
+          },
+          // Find the capability and click it
+          function(next) {
+            var grid = t.cq1('nx-coreui-capability-selecttype'),
+                baseURLRow = t.getRow(grid, grid.getStore().find('name', name));
 
-          t.click(baseURLRow, next);
-        },
-        // and wait for details to load
-        function(next) {
-          t.waitForAnimations(next);
-        },
-        // Press the "Add" button and wait for grid to refresh
-        Ext.apply(Ext.clone(waitForStoreToLoad),
-          {trigger: {click: '>>nx-coreui-capability-add button[action=add]'}}
-        ),
-        // READ: Verify that
-        function(next) {
-          var grid = t.cq1('nx-coreui-capability-list'),
-              store = grid.getStore(),
-              model = store.findRecord('typeName', name);
+            t.click(baseURLRow, next);
+          },
+          // and wait for details to load
+          function(next) {
+            t.waitForAnimations(next);
+          },
+          // Press the "Add" button and wait for grid to refresh
+          Ext.apply(Ext.clone(waitForStoreToLoad),
+              {trigger: {click: '>>nx-coreui-capability-add button[action=add]'}}
+          ),
+          // READ: Verify that our record is saved
+          function(next) {
+            var grid = t.cq1('nx-coreui-capability-list'),
+                store = grid.getStore(),
+                model = store.findRecord('typeName', name);
 
-          // we can find the created capability
-          t.ok(model, 'Capability ' + name + ' exists');
-          // and values correspond
-          t.is(model.get('typeId'), 'baseurl.force');
+            // we can find the created capability
+            t.ok(model, 'Capability ' + name + ' exists');
+            // and values correspond
+            t.is(model.get('typeId'), 'baseurl.force');
 
-          // Back to the detail panel view
-          t.click(t.getRow(grid, grid.getView().indexOf(model)));
+            // Back to the detail panel view
+            t.click(t.getRow(grid, grid.getView().indexOf(model)));
 
-          next();
-        },
-        //and wait for view to load
-        function(next) {
-          t.waitForAnimations(next);
-        },
-
-        // UPDATE: Select Settings pill and wait for transition
-        function(next) {
-          t.waitForAnimations(function() {
-            t.click('>>nx-drilldown-details tab[text=Settings]');
             next();
-          });
-        },
-        // then set capability to disabled
-        {click: '>>nx-coreui-capability-settings field[name=enabled]'},
-        // Save changes
-        {click: '>>nx-coreui-capability-settings button[action=save]'},
+          },
+          //and wait for view to load
+          function(next) {
+            t.waitForAnimations(next);
+          }
+      );
+    });
+    t.it('Should be able to update the new Capability', function(t) {
+      t.chain(
+          // UPDATE: Select Settings pill and wait for transition
+          function(next) {
+            t.waitForAnimations(function() {
+              t.click('>>nx-drilldown-details tab[text=Settings]');
+              next();
+            });
+          },
+          // then set capability to disabled
+          {click: '>>nx-coreui-capability-settings field[name=enabled]'},
+          // Save changes
+          Ext.apply(Ext.clone(waitForStoreToLoad),
+              {trigger: {click: '>>nx-coreui-capability-settings button[action=save]'}}
+          ),
 
-        // Verify that
-        function(next) {
-          var grid = t.cq1('nx-coreui-capability-list'),
-              store = grid.getStore(),
-              model = store.findRecord('typeName', name);
+          // Verify that
+          function(next) {
+            var grid = t.cq1('nx-coreui-capability-list'),
+                store = grid.getStore(),
+                model = store.findRecord('typeName', name);
 
-          // we can find the updated record in store
-          t.ok(model, 'Capability ' + name + ' exists');
-          // and is it disabled
-          t.is(model.get('enabled'), 0);
+            // we can find the updated record in store
+            t.ok(model, 'Capability ' + name + ' exists');
+            // and is it disabled
+            t.is(model.get('enabled'), false);
 
-          next();
-        },
+            next();
+          }
+      );
+    });
+    t.it('Should be able to delete the new Capability', function(t) {
+      t.chain(
+          // DELETE: Press delete button
+          {click: '>>nx-coreui-capability-feature button[action=delete]'},
+          // then agree with removal and wait for grid to refresh
+          Ext.apply(Ext.clone(waitForStoreToLoad),
+              {trigger: {click: '>>button[text=Yes]'}}
+          ),
+          // Check that deleted capability is no longer available in grid
+          function(next) {
+            var grid = t.cq1('nx-coreui-capability-list'),
+                store = grid.getStore(),
+                model = store.findRecord('typeName', name);
 
-        // DELETE: Press delete button
-        {click: '>>nx-coreui-capability-feature button[action=delete]'},
-        // then agree with removal and wait for grid to refresh
-        Ext.apply(Ext.clone(waitForStoreToLoad),
-          {trigger: {click: '>>button[text=Yes]'}}
-        ),
-        // Check that deleted capability is no longer available in grid
-        function(next) {
-          var grid = t.cq1('nx-coreui-capability-list'),
-              store = grid.getStore(),
-              model = store.findRecord('typeName', name);
+            t.ok(!model, 'Capability ' + name + ' has been removed');
+            t.ok(!grid.getSelectionModel().getSelection().length, 'Grid has no selection');
 
-          t.ok(!model, 'Capability ' + name + ' has been removed');
-          t.ok(!grid.getSelectionModel().getSelection().length, 'Grid has no selection');
-
-          next();
-        }
+            next();
+          }
       );
     });
   });
