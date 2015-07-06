@@ -44,7 +44,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 class Maven2HostedRecipe
 extends MavenRecipeSupport
 {
-  static final String NAME = 'maven2-hosted'
+  public static final String NAME = 'maven2-hosted'
 
   @Inject
   Provider<SearchFacet> searchFacet
