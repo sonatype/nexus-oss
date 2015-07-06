@@ -26,10 +26,7 @@ import javax.inject.Inject;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
-import org.sonatype.nexus.repository.maven.tasks.RebuildMaven2MetadataTask;
-import org.sonatype.nexus.repository.maven.tasks.RebuildMaven2MetadataTaskDescriptor;
-import org.sonatype.nexus.scheduling.TaskConfiguration;
-import org.sonatype.nexus.scheduling.TaskScheduler;
+import org.sonatype.nexus.repository.maven.MavenHostedFacet;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
 import org.sonatype.tests.http.server.fluent.Server;
@@ -276,20 +273,15 @@ public abstract class MavenHotspotITSupport
   public static class RebuildMavenMetadata
       implements Callable<HttpResponse>
   {
-    private final TaskScheduler taskScheduler;
+    private final MavenHostedFacet mavenHostedFacet;
 
-    private final String repositoryName;
-
-    public RebuildMavenMetadata(final TaskScheduler taskScheduler, final String repositoryName) {
-      this.taskScheduler = checkNotNull(taskScheduler);
-      this.repositoryName = checkNotNull(repositoryName);
+    public RebuildMavenMetadata(final MavenHostedFacet mavenHostedFacet) {
+      this.mavenHostedFacet = checkNotNull(mavenHostedFacet);
     }
 
     @Override
     public HttpResponse call() throws Exception {
-      TaskConfiguration configuration = taskScheduler.createTaskConfigurationInstance(RebuildMaven2MetadataTask.class);
-      configuration.setString(RebuildMaven2MetadataTaskDescriptor.REPOSITORY_NAME_FIELD_ID, repositoryName);
-      taskScheduler.submit(configuration).getCurrentState().getFuture().get();
+      mavenHostedFacet.rebuildMetadata(null, null, null);
       return null;
     }
   }

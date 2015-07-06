@@ -43,7 +43,7 @@ public class MavenProxySwarmIT
     extends MavenHotspotITSupport
 {
   @Test
-  public void swarm() throws Exception {
+  public void getSame() throws Exception {
     final Configuration configuration = proxyConfig(testName.getMethodName(),
         "http://localhost:" + upstream.getPort() + "/", VersionPolicy.RELEASE);
     Repository repository = repositoryManager.create(configuration);

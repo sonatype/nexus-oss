@@ -18,10 +18,8 @@ import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
-import org.sonatype.sisu.goodies.common.ByteSize;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -31,8 +29,6 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClients;
-import org.hamcrest.CoreMatchers;
-import org.joda.time.DateTime;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
@@ -40,8 +36,6 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
 
 /**
  * Maven hosted swarm: multiple clients asking, while others are deploying the SAME artifact from a hosted repository.
@@ -51,14 +45,15 @@ public class MavenHostedSwarmIT
     extends MavenHotspotITSupport
 {
   @Test
-  public void swarm() throws Exception {
+  public void hostedGetPutSame() throws Exception {
     final Configuration configuration = hostedConfig(testName.getMethodName(), VersionPolicy.RELEASE);
     Repository repository = repositoryManager.create(configuration);
     assertThat(repository, notNullValue());
     AuthScope scope = new AuthScope(nexusUrl.getHost(), -1);
     CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
     credentialsProvider.setCredentials(scope, new UsernamePasswordCredentials("admin", "admin123"));
-    final Maven2Client repositoryClient = new Maven2Client(HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build(), HttpClientContext.create(),
+    final Maven2Client repositoryClient = new Maven2Client(
+        HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build(), HttpClientContext.create(),
         resolveUrl(nexusUrl, "/repository/" + repository.getName() + "/").toURI());
 
     // create clients
