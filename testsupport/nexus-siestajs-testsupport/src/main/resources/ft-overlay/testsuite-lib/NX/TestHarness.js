@@ -66,7 +66,7 @@ Class('NX.TestHarness', {
           },
           
           // increase timeout for stability of CI testing
-          defaultTimeout: 30000
+          defaultTimeout: 60000
         });
 
         this.SUPER(config);
