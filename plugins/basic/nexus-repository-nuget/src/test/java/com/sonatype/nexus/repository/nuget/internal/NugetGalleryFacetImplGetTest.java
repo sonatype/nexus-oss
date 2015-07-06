@@ -35,6 +35,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -113,7 +114,7 @@ public class NugetGalleryFacetImplGetTest
       UnitOfWork.end();
     }
 
-    assertTrue(content != null);
+    assertThat(component, notNullValue());
     assertThat(content.openInputStream(), is(blobStream));
     assertThat(content.getSize(), is(size));
     assertThat(content.getContentType(), is(contentType));

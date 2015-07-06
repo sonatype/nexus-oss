@@ -37,14 +37,14 @@ public class CacheInfo
   }
 
   /**
-   * Returns the {@link DateTime} when this item was last checked remotely for new version.
+   * Returns the {@link DateTime} when this item was last checked remotely for updates.
    */
   public DateTime getLastVerified() {
     return lastVerified;
   }
 
   /**
-   * Returns the "cache token" that was in effect when this item was last checked remotely for new version.
+   * Returns the "cache token" that was in effect when this item was last checked remotely for updates.
    */
   @Nullable
   public String getCacheToken() {

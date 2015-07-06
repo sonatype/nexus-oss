@@ -368,7 +368,7 @@ public class NugetGalleryFacetImpl
     Asset asset = findAsset(tx, id, version);
     checkState(asset != null);
 
-    log.debug("Updating cacheInfo of {} {} tp {}", id, version, cacheInfo);
+    log.debug("Updating cacheInfo of {} {} to {}", id, version, cacheInfo);
     CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
     tx.saveAsset(asset);
   }

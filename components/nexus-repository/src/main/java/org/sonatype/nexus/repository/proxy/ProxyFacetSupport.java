@@ -284,11 +284,14 @@ public abstract class ProxyFacetSupport
       // not in cache
       return true;
     }
+
     if (config.artifactMaxAge < 0) {
       log.trace("Content max age checking disabled");
       return false;
     }
 
+    // FIXME: maybe require(CacheInfo.class), as cache content w/o CacheInfo should not exists in the first place
+    // FIXME: what happens with cache content once we go distributed?
     final CacheInfo cacheInfo = content.getAttributes().get(CacheInfo.class);;
     if (cacheInfo == null) {
       log.debug("Content cache info unknown");

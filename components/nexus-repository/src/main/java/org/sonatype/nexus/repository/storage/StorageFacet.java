@@ -27,12 +27,12 @@ public interface StorageFacet
     extends Facet
 {
   /**
-   * Key of {@link Component} and {@link Asset} attributes as nested map.
+   * Key of {@link Component} and {@link Asset} attributes nested map.
    */
   String P_ATTRIBUTES = "attributes";
 
   /**
-   * Key of {@link Asset} blob ref attribute.
+   * Key of {@link Asset} blob ref attribute (if asset has backing content).
    *
    * @see StorageTx#attachBlob(Asset, AssetBlob)
    */
@@ -44,19 +44,19 @@ public interface StorageFacet
   String P_BUCKET = "bucket";
 
   /**
-   * Key of {@link Asset} nested map of blob content hashes.
+   * Key of {@link Asset} nested map of blob content hashes (if asset has backing content).
    *
    * @see StorageTx#attachBlob(Asset, AssetBlob)
    */
   String P_CHECKSUM = "checksum";
 
   /**
-   * Key of {@link Asset} component reference attribute.
+   * Key of {@link Asset} component reference attribute (if asset balongs to a component).
    */
   String P_COMPONENT = "component";
 
   /**
-   * Key of {@link Asset} for content type attribute.
+   * Key of {@link Asset} for content type attribute (if asset has backing content).
    *
    * @see StorageTx#attachBlob(Asset, AssetBlob)
    */
@@ -75,7 +75,7 @@ public interface StorageFacet
   /**
    * Key of {@link Component} and {@link Asset} attribute denoting when the record was last updated. This denotes a
    * timestamp when CMA last modified any attribute of the record, and has nothing to do with content change, it's age
-   * or it's last modified.
+   * or it's last modified attributes. This record is present always on {@link Component} and {@link Asset}.
    */
   String P_LAST_UPDATED = "last_updated";
 
@@ -95,7 +95,7 @@ public interface StorageFacet
   String P_REPOSITORY_NAME = "repository_name";
 
   /**
-   * Key of {@link Asset} size attribute.
+   * Key of {@link Asset} size attribute (if asset has backing content).
    *
    * @see StorageTx#attachBlob(Asset, AssetBlob)
    */
