@@ -290,13 +290,8 @@ public abstract class ProxyFacetSupport
       return false;
     }
 
-    // FIXME: maybe require(CacheInfo.class), as cache content w/o CacheInfo should not exists in the first place
-    // FIXME: what happens with cache content once we go distributed?
-    final CacheInfo cacheInfo = content.getAttributes().get(CacheInfo.class);;
-    if (cacheInfo == null) {
-      log.debug("Content cache info unknown");
-      return true;
-    }
+    // Note: content w/o CacheInfo was not stored by ProxyFacetSupport, see fetch(String, Context, Content)
+    final CacheInfo cacheInfo = content.getAttributes().require(CacheInfo.class);;
     if (cacheToken != null && !cacheToken.equals(cacheInfo.getCacheToken())) {
       log.debug("Content expired (cacheToken)");
       return true;
