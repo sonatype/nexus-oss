@@ -44,6 +44,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.proxy.CacheInfo;
+import org.sonatype.nexus.repository.proxy.CacheInfoMarshaller;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
@@ -392,7 +393,7 @@ public class NugetGalleryFacetImpl
       String contentType = asset.contentType();
 
       final Content content = new Content(new BlobPayload(blob, contentType));
-      ContentMarshaller.extract(content.getAttributes(), asset, singletonList(HashAlgorithm.SHA512));
+      ContentMarshaller.extractFromAsset(asset, singletonList(HashAlgorithm.SHA512), content.getAttributes());
       return content;
     }
   }
@@ -407,7 +408,7 @@ public class NugetGalleryFacetImpl
         Asset asset = findAsset(tx, id, version);
         checkState(asset != null);
 
-        CacheInfo.apply(asset, cacheInfo);
+        CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
         return null;
       }
 
@@ -586,12 +587,12 @@ public class NugetGalleryFacetImpl
       updateAssetMetadata(asset, data, component.isNew());
 
       if (contentAttributes != null) {
-        ContentMarshaller.apply(asset, contentAttributes);
+        ContentMarshaller.applyToAsset(asset, contentAttributes);
       }
       if (contentAttributes == null || !contentAttributes.contains(Content.CONTENT_LAST_MODIFIED)) {
         AttributesMap newAttributes = new AttributesMap();
         newAttributes.set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
-        ContentMarshaller.apply(asset, newAttributes);
+        ContentMarshaller.applyToAsset(asset, newAttributes);
       }
 
       storageTx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");

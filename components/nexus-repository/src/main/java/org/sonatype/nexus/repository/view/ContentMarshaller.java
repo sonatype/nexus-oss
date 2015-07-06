@@ -19,6 +19,7 @@ import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.proxy.CacheInfo;
+import org.sonatype.nexus.repository.proxy.CacheInfoMarshaller;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 
@@ -31,16 +32,25 @@ import static org.sonatype.nexus.common.time.DateHelper.toDate;
 import static org.sonatype.nexus.common.time.DateHelper.toDateTime;
 
 /**
- * Extracts non-format specific auxiliary matadata from asset.
+ * Extracts non-format specific auxiliary metadata from asset.
  *
  * @since 3.0
  */
 public class ContentMarshaller
 {
+  /**
+   * Key of the nested map on {@link Asset} attributes carrying content related attributes.
+   */
   private static final String P_CONTENT = "content";
 
+  /**
+   * Key of last modified {@link Date}.
+   */
   private static final String P_LAST_MODIFIED = "last_modified";
 
+  /**
+   * Key of etag {@link String}. If extracted from upstream response, it must have quotes removed.
+   */
   private static final String P_ETAG = "etag";
 
   private ContentMarshaller() {}
@@ -49,9 +59,9 @@ public class ContentMarshaller
    * Extracts non-format specific content attributes into the passed in {@link AttributesMap} (usually originating from
    * {@link Content#getAttributes()}) from passed in {@link Asset} and format required hashes.
    */
-  public static void extract(final AttributesMap content,
-                             final Asset asset,
-                             final Iterable<HashAlgorithm> hashAlgorithms)
+  public static void extractFromAsset(final Asset asset,
+                                      final Iterable<HashAlgorithm> hashAlgorithms,
+                                      final AttributesMap content)
   {
     checkNotNull(asset);
     checkNotNull(hashAlgorithms);
@@ -69,14 +79,14 @@ public class ContentMarshaller
     content.set(Content.CONTENT_LAST_MODIFIED, lastModified);
     content.set(Content.CONTENT_ETAG, etag);
     content.set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
-    content.set(CacheInfo.class, CacheInfo.extract(asset));
+    content.set(CacheInfo.class, CacheInfoMarshaller.extractFromAsset(asset));
   }
 
   /**
    * Applies non-format specific content attributes onto passed in {@link Asset} from passed in {@link AttributesMap}
    * (usually originating from {@link Content#getAttributes()}).
    */
-  public static void apply(final Asset asset, final AttributesMap content) {
+  public static void applyToAsset(final Asset asset, final AttributesMap content) {
     checkNotNull(asset);
     checkNotNull(content);
     final NestedAttributesMap contentAttributes = asset.attributes().child(P_CONTENT);
@@ -84,7 +94,7 @@ public class ContentMarshaller
     contentAttributes.set(P_ETAG, content.get(Content.CONTENT_ETAG, String.class));
     final CacheInfo cacheInfo = content.get(CacheInfo.class);
     if (cacheInfo != null) {
-      CacheInfo.apply(asset, cacheInfo);
+      CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
     }
   }
 }

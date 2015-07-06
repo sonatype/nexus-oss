@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.proxy.CacheInfo;
+import org.sonatype.nexus.repository.proxy.CacheInfoMarshaller;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -113,12 +114,12 @@ public class RawContentFacetImpl
 
             if (payload instanceof Content) {
               final Content content = (Content) payload;
-              ContentMarshaller.apply(asset, content.getAttributes());
+              ContentMarshaller.applyToAsset(asset, content.getAttributes());
             }
             else {
               AttributesMap newAttributes = new AttributesMap();
               newAttributes.set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
-              ContentMarshaller.apply(asset, newAttributes);
+              ContentMarshaller.applyToAsset(asset, newAttributes);
             }
 
             tx.setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
@@ -195,7 +196,7 @@ public class RawContentFacetImpl
         }
 
         final Asset asset = tx.firstAsset(component);
-        CacheInfo.apply(asset, cacheInfo);
+        CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
         tx.saveAsset(tx.firstAsset(component));
         return null;
       }
@@ -219,7 +220,7 @@ public class RawContentFacetImpl
 
   private Content marshall(final Asset asset, final Blob blob) {
     final Content content = new Content(new BlobPayload(blob, asset.requireContentType()));
-    ContentMarshaller.extract(content.getAttributes(), asset, hashAlgorithms);
+    ContentMarshaller.extractFromAsset(asset, hashAlgorithms, content.getAttributes());
     return content;
   }
 }

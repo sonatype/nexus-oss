@@ -12,18 +12,11 @@
  */
 package org.sonatype.nexus.repository.proxy;
 
-import java.util.Date;
-
 import javax.annotation.Nullable;
-
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
-import org.sonatype.nexus.repository.storage.Asset;
 
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.common.time.DateHelper.toDate;
-import static org.sonatype.nexus.common.time.DateHelper.toDateTime;
 
 /**
  * A proxy cache auxiliary info for given element. {@link ProxyFacetSupport} relies on information provided by this
@@ -33,12 +26,6 @@ import static org.sonatype.nexus.common.time.DateHelper.toDateTime;
  */
 public class CacheInfo
 {
-  private static final String P_PROXY_CACHE = "proxy_cache";
-
-  private static final String P_LAST_VERIFIED = "last_verified";
-
-  private static final String P_CACHE_TOKEN = "cache_token";
-
   private final DateTime lastVerified;
 
   @Nullable
@@ -70,32 +57,5 @@ public class CacheInfo
         "lastVerified=" + lastVerified +
         ", cacheToken='" + cacheToken + '\'' +
         '}';
-  }
-
-  /**
-   * Helper method that extracts {@link CacheInfo} from an {@link Asset}. Input cannot be {@code null}, but returned
-   * value might be, if passed in {@link Asset} does not contain cache-info properties.
-   */
-  @Nullable
-  public static CacheInfo extract(final Asset asset) {
-    checkNotNull(asset);
-    final NestedAttributesMap proxyCache = asset.attributes().child(P_PROXY_CACHE);
-    final DateTime lastVerified = toDateTime(proxyCache.get(P_LAST_VERIFIED, Date.class));
-    if (lastVerified == null) {
-      return null;
-    }
-    final String cacheToken = proxyCache.get(P_CACHE_TOKEN, String.class);
-    return new CacheInfo(lastVerified, cacheToken);
-  }
-
-  /**
-   * Helper method that applies {@link CacheInfo} to an {@link Asset}. None of the inputs may be {@code null}.
-   */
-  public static void apply(final Asset asset, final CacheInfo cacheInfo) {
-    checkNotNull(asset);
-    checkNotNull(cacheInfo);
-    final NestedAttributesMap proxyCache = asset.attributes().child(P_PROXY_CACHE);
-    proxyCache.set(P_LAST_VERIFIED, toDate(cacheInfo.getLastVerified()));
-    proxyCache.set(P_CACHE_TOKEN, cacheInfo.getCacheToken());
   }
 }

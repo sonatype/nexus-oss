@@ -37,6 +37,7 @@ import org.sonatype.nexus.repository.maven.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.MavenPathParser;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.repository.proxy.CacheInfo;
+import org.sonatype.nexus.repository.proxy.CacheInfoMarshaller;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -183,7 +184,7 @@ public class MavenFacetImpl
     final Blob blob = tx.requireBlob(asset.requireBlobRef());
     final String contentType = asset.contentType();
     final Content content = new Content(new BlobPayload(blob, contentType));
-    ContentMarshaller.extract(content.getAttributes(), asset, HashType.ALGORITHMS);
+    ContentMarshaller.extractFromAsset(asset, HashType.ALGORITHMS, content.getAttributes());
     return content;
   }
 
@@ -326,12 +327,12 @@ public class MavenFacetImpl
   {
     tx.attachBlob(asset, assetBlob);
     if (contentAttributes != null) {
-      ContentMarshaller.apply(asset, contentAttributes);
+      ContentMarshaller.applyToAsset(asset, contentAttributes);
     }
     if (contentAttributes == null || !contentAttributes.contains(Content.CONTENT_LAST_MODIFIED)) {
       AttributesMap newAttributes = new AttributesMap();
       newAttributes.set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
-      ContentMarshaller.apply(asset, newAttributes);
+      ContentMarshaller.applyToAsset(asset, newAttributes);
     }
   }
 
@@ -394,7 +395,7 @@ public class MavenFacetImpl
         if (asset == null) {
           return false;
         }
-        CacheInfo.apply(asset, cacheInfo);
+        CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
         tx.saveAsset(asset);
         return true;
       }
