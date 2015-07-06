@@ -60,6 +60,8 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.it.Verifier;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.ops4j.pax.exam.Option;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -77,6 +79,9 @@ import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 public abstract class MavenITSupport
     extends NexusCoreITSupport
 {
+  @Rule
+  public TestName testName = new TestName();
+
   @Inject
   protected RepositoryManager repositoryManager;
 
@@ -101,8 +106,7 @@ public abstract class MavenITSupport
   protected void mvnDeploy(final String project, final String version, final String deployRepositoryName)
       throws Exception
   {
-    // TODO: Rule TestName does not work due to PAX ITs?
-    final File mavenBaseDir = resolveBaseFile("target/maven-it-support/" + project).getAbsoluteFile();
+    final File mavenBaseDir = resolveBaseFile("target/" + getClass().getSimpleName() + "-" + testName.getMethodName() + "/" + project).getAbsoluteFile();
     final File mavenSettings = new File(mavenBaseDir, "settings.xml").getAbsoluteFile();
     final File mavenPom = new File(mavenBaseDir, "pom.xml").getAbsoluteFile();
 

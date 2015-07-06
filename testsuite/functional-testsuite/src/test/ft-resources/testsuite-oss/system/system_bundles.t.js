@@ -18,12 +18,18 @@ StartTest(function(t) {
     t.it('Bundles view is populated', function(t) {
       t.chain(
         t.openPageAsAdmin('admin/system/bundles'),
-        { waitFor: 'CQVisible', args: 'nx-coreui-system-bundlelist' }
+        { waitFor: 'CQVisible', args: 'nx-coreui-system-bundlelist' },
+        function(next) {
+          var store = t.cq1('nx-coreui-system-bundlelist').getStore();
+          t.waitFor(function() {
+            return store.count() > 0;
+          }, next)
+        }
       );
     });
     t.it('Can filter bundles by name', function(t) {
       t.chain(
-        {type: 'nexus-bootstrap', target: '>>nx-coreui-system-bundlelist nx-searchbox'},
+        { type: 'nexus-bootstrap', target: '>>nx-coreui-system-bundlelist nx-searchbox' },
         function(next) {
           var store = t.cq1('nx-coreui-system-bundlelist').getStore();
           t.waitFor(function() {

@@ -91,7 +91,8 @@ NX.TestHarness.start(
           group: 'FT',
           items: [
             { url: 'testsuite-oss/support/support_metrics.t.js' },
-            { url: 'testsuite-oss/support/support_sysinfo.t.js' }
+            { url: 'testsuite-oss/support/support_sysinfo.t.js' },
+            { url: 'testsuite-oss/support/support_zip.t.js' }
           ]
         }
       ]

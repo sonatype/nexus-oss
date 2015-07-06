@@ -23,7 +23,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -42,9 +45,42 @@ public class TransactionalTest
   @Mock
   Transaction tx;
 
+  boolean isActive;
+
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     UnitOfWork.begin(Suppliers.ofInstance(tx));
+
+    when(tx.isActive()).thenAnswer(new Answer<Boolean>()
+    {
+      public Boolean answer(InvocationOnMock invocation) throws Throwable {
+        return isActive;
+      }
+    });
+
+    doAnswer(new Answer<Void>()
+    {
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        isActive = true;
+        return null;
+      }
+    }).when(tx).begin();
+
+    doAnswer(new Answer<Void>()
+    {
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        isActive = false;
+        return null;
+      }
+    }).when(tx).commit();
+
+    doAnswer(new Answer<Void>()
+    {
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        isActive = false;
+        return null;
+      }
+    }).when(tx).rollback();
   }
 
   @After
@@ -144,7 +180,6 @@ public class TransactionalTest
 
   @Test
   public void testNested() throws Exception {
-    when(tx.isActive()).thenReturn(true);
 
     methods.outer();
     methods.outer();
@@ -168,7 +203,6 @@ public class TransactionalTest
 
   @Test
   public void testBatchNested() throws Exception {
-    when(tx.isActive()).thenReturn(true, true, false, true, true, false, true, true, false);
 
     UnitOfWork.beginBatch(Suppliers.ofInstance(tx));
     try {
@@ -195,6 +229,16 @@ public class TransactionalTest
     order.verify(tx).isActive();
     order.verify(tx).close();
     verifyNoMoreInteractions(tx);
+  }
+
+  @Test
+  public void testCanSeeTransactionInsideTransactional() {
+    methods.canSeeTransactionInsideTransactional();
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testCannotSeeTransactionOutsideTransactional() {
+    methods.cannotSeeTransactionOutsideTransactional();
   }
 
   @Test(expected = IOException.class)
