@@ -58,6 +58,8 @@ public class DiagnoseHandler
     sb.append("Method: ").append(method).append("\n");
     sb.append("Docker Port: ").append(connector.getPort()).append("\n");
     sb.append("Base URL: ").append(BaseUrlHolder.get()).append("\n");
+    sb.append("Host header: ").append(context.getRequest().getHeaders().get("Host")).append("\n");
+    sb.append("X-Forwarded-Host header: ").append(context.getRequest().getHeaders().get("X-Forwarded-Host")).append("\n");
 
     return HttpResponses.ok(new StringPayload(sb.toString(), MediaType.PLAIN_TEXT_UTF_8.toString()));
   }

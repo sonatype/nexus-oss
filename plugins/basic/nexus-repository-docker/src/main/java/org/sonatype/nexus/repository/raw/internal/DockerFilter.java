@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.common.app.BaseUrlManager;
 
+import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.proxy.ProxyServlet;
 
 @Named
@@ -176,6 +177,11 @@ public class DockerFilter
         }
       }
       return null;
+    }
+
+    @Override
+    protected void addProxyHeaders(final HttpServletRequest clientRequest, final Request proxyRequest) {
+      // avoid adding X-Forwarded headers
     }
   }
 
