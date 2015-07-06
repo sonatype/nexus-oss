@@ -56,11 +56,6 @@ Ext.define('NX.controller.Content', {
               obj.down('nx-drilldown').fireEvent('syncsize');
             }
           }
-        },
-        'nx-feature-content nx-drilldown': {
-          boxready: function(obj) {
-            obj.fireEvent('resetdrilldown');
-          }
         }
       }
     });
