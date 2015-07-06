@@ -172,7 +172,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         capabilityTypeModel;
 
     if (Ext.isDefined(model)) {
-      me.getFeature().setItemClass(1, NX.Icons.cls('capability-' + model.get('state'), 'x16'));
+      me.setItemClass(1, NX.Icons.cls('capability-' + model.get('state'), 'x16'));
 
       capabilityTypeModel = me.getStore('CapabilityType').getById(model.get('typeId'));
 
@@ -190,13 +190,13 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {NX.coreui.model.Capability} model capability model
    */
   eventuallyShowWarning: function(model) {
-    var drilldown = this.getList().up('nx-drilldown');
+    var me = this;
 
     if (model.get('enabled') && !model.get('active')) {
-      drilldown.showWarning(model.get('stateDescription'));
+      me.showWarning(model.get('stateDescription'));
     }
     else {
-      drilldown.clearWarning();
+      me.clearWarning();
     }
   },
 
@@ -252,11 +252,10 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    */
   showSelectTypePanel: function() {
-    var me = this,
-        feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Capabilities_Select_Title'));
+    me.setItemName(1, NX.I18n.get('Capabilities_Select_Title'));
     me.loadCreateWizard(1, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -279,11 +278,10 @@ Ext.define('NX.coreui.controller.Capabilities', {
    */
   showAddPanel: function(list, td, cellIndex, model) {
     var me = this,
-        feature = me.getFeature(),
         panel;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(2, NX.I18n.format('Capabilities_Create_Title', model.get('name')));
+    me.setItemName(2, NX.I18n.format('Capabilities_Create_Title', model.get('name')));
     me.loadCreateWizard(2, true, panel = Ext.create('widget.nx-coreui-capability-add'));
     var m = me.getCapabilityModel().create({ typeId: model.getId(), enabled: true });
     panel.down('nx-settingsform').loadRecord(m);

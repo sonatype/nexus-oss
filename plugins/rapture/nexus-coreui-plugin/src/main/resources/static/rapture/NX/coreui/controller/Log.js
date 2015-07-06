@@ -34,11 +34,9 @@ Ext.define('NX.coreui.controller.Log', {
 
   views: [
     'logging.LogViewer',
-    'logging.LogMark',
-    'logging.LogFeature'
+    'logging.LogMark'
   ],
   refs: [
-    { ref: 'feature', selector: 'nx-coreui-log-feature' },
     { ref: 'content', selector: 'nx-feature-content' },
     { ref: 'list', selector: 'nx-coreui-log-viewer' }
   ],
@@ -53,7 +51,7 @@ Ext.define('NX.coreui.controller.Log', {
       path: '/Support/Logging/Log Viewer',
       text: NX.I18n.get('Log_Text'),
       description: NX.I18n.get('Log_Description'),
-      view: { xtype: 'nx-coreui-log-feature' },
+      view: { xtype: 'nx-coreui-log-viewer' },
       iconConfig: {
         file: 'script_text.png',
         variants: ['x16', 'x32']

@@ -146,13 +146,15 @@ Ext.define('NX.coreui.controller.Repositories', {
         settingsPanel = me.getSettings(),
         formCls = Ext.ClassManager.getByAlias('widget.nx-coreui-repository-' + model.get('recipe'));
 
+    Ext.suspendLayouts();
+
     if (!formCls) {
       me.logWarn('Could not find settings form for: ' + model.getId());
     }
     else {
       if (Ext.isDefined(model)) {
         // Show the correct icon in the breadcrumb
-        me.getFeature().setItemClass(1, NX.Icons.cls('repository-' + model.get('type'), 'x16'));
+        me.setItemClass(1, NX.Icons.cls('repository-' + model.get('type'), 'x16'));
 
         // Load the form
         settingsPanel.removeAllSettingsForms();
@@ -166,18 +168,18 @@ Ext.define('NX.coreui.controller.Repositories', {
         });
       }
     }
+    Ext.resumeLayouts();
   },
 
   /**
    * @private
    */
   showSelectRecipePanel: function() {
-    var me = this,
-        feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Repositories_SelectRecipe_Title'));
-    feature.setItemClass(1, NX.Icons.cls('repository-hosted', 'x16'));
+    me.setItemName(1, NX.I18n.get('Repositories_SelectRecipe_Title'));
+    me.setItemClass(1, NX.Icons.cls('repository-hosted', 'x16'));
 
     // Show the panel
     me.loadCreateWizard(1, true, Ext.widget({
@@ -202,7 +204,6 @@ Ext.define('NX.coreui.controller.Repositories', {
    */
   showAddRepositoryPanel: function(list, td, cellIndex, model) {
     var me = this,
-        feature = me.getFeature(),
         formCls = Ext.ClassManager.getByAlias('widget.nx-coreui-repository-' + model.getId());
 
     if (!formCls) {
@@ -210,8 +211,8 @@ Ext.define('NX.coreui.controller.Repositories', {
     }
     else {
       // Show the second panel in the create wizard, and set the breadcrumb
-      feature.setItemName(2, NX.I18n.format('Repositories_Create_Title', model.get('name')));
-      feature.setItemClass(2, NX.Icons.cls('repository-hosted', 'x16'));
+      me.setItemName(2, NX.I18n.format('Repositories_Create_Title', model.get('name')));
+      me.setItemClass(2, NX.Icons.cls('repository-hosted', 'x16'));
       me.loadCreateWizard(2, true, { xtype: 'nx-coreui-repository-add', recipe: model });
     }
   },
