@@ -21,6 +21,7 @@ NX.TestHarness.start(
         {
           group: 'UT',
           hostPageUrl: undefined,
+          waitForNxAppReady: false,
           preload: [
             NX.TestHarness.resource('static/rapture/baseapp-{mode}.js'),
             NX.TestHarness.resource('static/rapture/extdirect-{mode}.js'),
@@ -67,7 +68,6 @@ NX.TestHarness.start(
         }
       ]
     },
-
 
     {
       group: 'Security',
