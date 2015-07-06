@@ -41,7 +41,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 class Maven2GroupRecipe
 extends MavenRecipeSupport
 {
-  static final String NAME = 'maven2-group'
+  public static final String NAME = 'maven2-group'
 
   @Inject
   Provider<Maven2GroupFacet> mavenGroupFacet
