@@ -149,6 +149,7 @@ public abstract class MavenHotspotITSupport
     startLatch.countDown();
     endLatch.await(30, TimeUnit.SECONDS);
     executorService.shutdown();
+    executorService.awaitTermination(30, TimeUnit.SECONDS);
 
     return Lists.newArrayList(
         Iterables.transform(futures.values(), new Function<Future<T>, T>()
