@@ -54,9 +54,10 @@ public class OrientMetadataStoreLifecycle
   @Subscribe
   public void on(final NexusStoppedEvent e) throws Exception {
     log.debug("Asking npm metadata store to stop...");
-    try{
+    try {
       orientMetadataStore.stop();
-    } catch( Exception ex ){
+    }
+    catch (Exception ex) {
       log.warn("Problem stopping the npm metadata store", ex);
     }
     log.debug("Asking Orient to shutdown...");
