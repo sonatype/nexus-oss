@@ -87,7 +87,7 @@ Ext.define('NX.coreui.util.RepositoryUrls', {
     NX.Assert.assert(assetModel, 'Expected an assetModel with format: ' + format);
     //</if>
     //<if debug>
-    this.logTrace('Creating link for format and asset: '[format, assetModel]);
+    this.logTrace('Creating link for format and asset: ', format, assetModel.get('name'));
     //</if>
 
     var linkStrategy = this.repositoryUrlStrategies[format];
