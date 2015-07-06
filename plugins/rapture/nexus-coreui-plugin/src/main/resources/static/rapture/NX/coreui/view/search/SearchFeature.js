@@ -108,8 +108,10 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
   initComponent: function() {
     var me = this;
+    me.on('afterrender', function() {
+      // Set default icon for the component version list
+      me.down('nx-coreui-component-asset-list').up('nx-drilldown-item').setItemClass('nx-icon-search-component-detail-x16');
+    });
     me.callParent(arguments);
-    // Set default icon for the component version list
-    me.down('nx-coreui-component-asset-list').up('nx-drilldown-item').setItemClass('nx-icon-search-component-detail-x16');
   }
 });
