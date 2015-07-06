@@ -17,6 +17,24 @@ Class('NX.TestClass', {
   isa: Siesta.Test.ExtJS,
 
   methods: {
+    /**
+     * Customized describe() to configure saner default timeouts.
+     *
+     * @override
+     */
+    describe: function(name, code, timeout) {
+      this.SUPER(name, code, timeout === undefined ? this.harness.describeTimeout : timeout);
+    },
+
+    /**
+     * Customized it() to configure saner default timeouts.
+     *
+     * @override
+     */
+    it: function(name, code, timeout) {
+      this.SUPER(name, code, timeout === undefined ? this.harness.itTimeout : timeout);
+    },
+
     do: function (callback) {
       var me = this,
           params = Array.prototype.slice.call(arguments, 1);
