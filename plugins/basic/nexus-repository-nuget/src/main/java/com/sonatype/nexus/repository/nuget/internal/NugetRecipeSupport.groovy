@@ -19,6 +19,7 @@ import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacet
+import org.sonatype.nexus.repository.storage.UnitOfWorkHandler;
 import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
@@ -74,6 +75,9 @@ abstract class NugetRecipeSupport
   SecurityHandler securityHandler
 
   @Inject
+  UnitOfWorkHandler unitOfWorkHandler
+
+  @Inject
   NugetPushHandler pushHandler
 
   @Inject
@@ -124,6 +128,7 @@ abstract class NugetRecipeSupport
         new TokenMatcher(PACKAGE_ENTRY_PATTERN)))
         .handler(timingHandler)
         .handler(securityHandler)
+        .handler(unitOfWorkHandler)
         .handler(feedHandler)
         .handler(notFound())
         .create())
@@ -136,6 +141,7 @@ abstract class NugetRecipeSupport
         .handler(securityHandler)
         .handler(conditionalRequestHandler)
         .handler(contentHeadersHandler)
+        .handler(unitOfWorkHandler)
         .handler(itemHandler)
         .handler(notFound())
         .create())

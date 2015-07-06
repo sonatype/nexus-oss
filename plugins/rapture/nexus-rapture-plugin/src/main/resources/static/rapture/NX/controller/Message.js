@@ -150,6 +150,17 @@ Ext.define('NX.controller.Message', {
   },
 
   /**
+   * Internal customization of message window options.
+   * At the moment, mainly intended for use by functional tests that need to
+   * override default settings.
+   *
+   * @private
+   * @property {Object}
+   */
+  windowOptions: {
+  },
+
+  /**
    * @public
    */
   addMessage: function (message) {
@@ -166,11 +177,12 @@ Ext.define('NX.controller.Message', {
     store.insert(0, message);
 
     // show transient message notification
-    me.getView('message.Notification').create({
+    var cfg = Ext.clone(me.windowOptions);
+    me.getView('message.Notification').create(Ext.apply(cfg, {
       ui: 'nx-message-' + message.type,
       iconCls: NX.Icons.cls('message-' + message.type, 'x16'),
       title: Ext.String.capitalize(message.type),
       html: message.text
-    });
+    }));
   }
 });

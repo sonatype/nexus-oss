@@ -43,7 +43,6 @@ import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
-import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.types.ProxyType;
@@ -51,10 +50,13 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.ContentMarshaller;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
+import org.sonatype.nexus.transaction.Transactional;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Throwables;
-import org.joda.time.DateTime;
+import com.google.common.base.Supplier;
+import com.orientechnologies.common.concur.ONeedRetryException;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -150,34 +152,13 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
+  @Transactional(retryOn = IllegalStateException.class)
   public Content get(final MavenPath path) throws IOException {
     log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    return storageFacet.perform(new Operation<Content>()
-    {
-      @Override
-      public Content execute(final StorageTx tx) {
-        return toContent(tx, path);
-      }
 
-      @Override
-      public String toString() {
-        return String.format("get(%s)", path.getPath());
-      }
-    });
-  }
+    final StorageTx tx = UnitOfWork.currentTransaction();
 
-  @Nullable
-  @Override
-  public Content get(final StorageTx tx, final MavenPath path) throws IOException {
-    log.debug("GET {} : {}", getRepository().getName(), path.getPath());
-    return toContent(tx, path);
-  }
-
-  /**
-   * Creates {@link Content} from passed in {@link Asset}.
-   */
-  private Content toContent(final StorageTx tx, final MavenPath mavenPath) {
-    final Asset asset = findAsset(tx, tx.getBucket(), mavenPath);
+    final Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
       return null;
     }
@@ -192,51 +173,24 @@ public class MavenFacetImpl
   public void put(final MavenPath path, final Payload payload)
       throws IOException
   {
-    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
-      storageFacet.perform(new Operation<Void>()
-      {
-        @Override
-        public Void execute(final StorageTx tx) {
-          try {
-            put(tx, path, payload, streamSupplier.get());
-            return null;
-          }
-          catch (IOException e) {
-            throw Throwables.propagate(e);
-          }
-        }
-
-        @Override
-        public String toString() {
-          return String.format("put(%s)", path.getPath());
-        }
-      });
-    }
-    catch (RuntimeException e) {
-      if (e.getCause() instanceof IOException) {
-        throw (IOException) e.getCause();
-      }
-      throw e;
-    }
-  }
-
-  @Override
-  public void put(final StorageTx tx, final MavenPath path, final Payload payload)
-      throws IOException
-  {
-    put(tx, path, payload, payload.openInputStream());
-  }
-
-  private void put(final StorageTx tx,
-                   final MavenPath path,
-                   final Payload payload,
-                   final InputStream inputStream)
-      throws IOException
-  {
     log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
+
+    try (TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
+      doPut(path, payload, streamSupplier);
+    }
+  }
+
+  @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
+  protected void doPut(final MavenPath path,
+                       final Payload payload,
+                       final Supplier<InputStream> streamSupplier)
+      throws IOException
+  {
+    final StorageTx tx = UnitOfWork.currentTransaction();
+
     final AssetBlob assetBlob = tx.createBlob(
         path.getPath(),
-        inputStream,
+        streamSupplier.get(),
         HashType.ALGORITHMS,
         null,
         payload.getContentType()
@@ -330,16 +284,10 @@ public class MavenFacetImpl
   }
 
   @Override
+  @Transactional
   public boolean delete(final MavenPath... paths) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      boolean result = delete(tx, paths);
-      tx.commit();
-      return result;
-    }
-  }
+    final StorageTx tx = UnitOfWork.currentTransaction();
 
-  @Override
-  public boolean delete(final StorageTx tx, final MavenPath... paths) throws IOException {
     boolean result = false;
     for (MavenPath path : paths) {
       log.debug("DELETE {} : {}", getRepository().getName(), path.getPath());
@@ -353,7 +301,7 @@ public class MavenFacetImpl
     return result;
   }
 
-  private boolean deleteArtifact(final MavenPath path, final StorageTx tx) throws IOException {
+  private boolean deleteArtifact(final MavenPath path, final StorageTx tx) {
     final Component component = findComponent(tx, tx.getBucket(), path);
     if (component == null) {
       return false;
@@ -369,7 +317,7 @@ public class MavenFacetImpl
     return true;
   }
 
-  private boolean deleteFile(final MavenPath path, final StorageTx tx) throws IOException {
+  private boolean deleteFile(final MavenPath path, final StorageTx tx) {
     final Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
       return false;
@@ -379,25 +327,19 @@ public class MavenFacetImpl
   }
 
   @Override
+  @Transactional(retryOn = ONeedRetryException.class)
   public boolean setCacheInfo(final MavenPath path, final CacheInfo cacheInfo) throws IOException {
-    return storageFacet.perform(new Operation<Boolean>()
-    {
-      @Override
-      public Boolean execute(final StorageTx tx) {
-        final Asset asset = findAsset(tx, tx.getBucket(), path);
-        if (asset == null) {
-          return false;
-        }
-        CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
-        tx.saveAsset(asset);
-        return true;
-      }
+    final StorageTx tx = UnitOfWork.currentTransaction();
 
-      @Override
-      public String toString() {
-        return String.format("setCacheInfo(%s, %s)", path.getPath(), cacheInfo);
-      }
-    });
+    final Asset asset = findAsset(tx, tx.getBucket(), path);
+    if (asset == null) {
+      return false;
+    }
+
+    CacheInfoMarshaller.applyToAsset(asset, cacheInfo);
+    tx.saveAsset(asset);
+
+    return true;
   }
 
   /**

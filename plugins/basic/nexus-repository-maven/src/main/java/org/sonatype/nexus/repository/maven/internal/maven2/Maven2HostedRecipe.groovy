@@ -59,10 +59,6 @@ extends MavenRecipeSupport
   HostedHandler hostedHandler
 
   @Inject
-  @Named(Maven2Format.NAME)
-  MavenPathParser mavenPathParser
-
-  @Inject
   Maven2HostedRecipe(@Named(HostedType.NAME) final Type type,
                      @Named(Maven2Format.NAME) final Format format,
                      @Named(Maven2Format.NAME) MavenPathParser mavenPathParser,
@@ -88,12 +84,14 @@ extends MavenRecipeSupport
         .handler(partialFetchHandler)
         .handler(versionPolicyHandler)
         .handler(contentHeadersHandler)
+        .handler(unitOfWorkHandler)
         .handler(hostedHandler)
         .create())
 
     // Note: partialFetchHandler NOT added for Maven metadata
     builder.route(newMetadataRouteBuilder()
         .handler(contentHeadersHandler)
+        .handler(unitOfWorkHandler)
         .handler(hostedHandler)
         .create())
 

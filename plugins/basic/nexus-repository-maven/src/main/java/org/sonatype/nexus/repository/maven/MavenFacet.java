@@ -20,11 +20,8 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.repository.proxy.CacheInfo;
-import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
-
-import org.joda.time.DateTime;
 
 /**
  * Maven facet, present on all Maven repositories.
@@ -55,15 +52,6 @@ public interface MavenFacet
   void put(MavenPath path, Payload payload) throws IOException;
 
   boolean delete(MavenPath... paths) throws IOException;
-
-  // Batch operations
-
-  @Nullable
-  Content get(StorageTx tx, MavenPath path) throws IOException;
-
-  void put(StorageTx tx, MavenPath path, Payload payload) throws IOException;
-
-  boolean delete(StorageTx tx, MavenPath... paths) throws IOException;
 
   // proxy operations
 
