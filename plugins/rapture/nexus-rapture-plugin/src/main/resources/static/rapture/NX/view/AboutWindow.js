@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.view.AboutWindow', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-aboutwindow',
   requires: [
     'NX.I18n',
@@ -32,11 +32,8 @@ Ext.define('NX.view.AboutWindow', {
     align: 'stretch'
   },
 
-  autoShow: true,
-  modal: true,
-  constrain: true,
-  width: 640,
   height: 480,
+  padding: 0,
 
   title: NX.I18n.get('AboutWindow_Title'),
 
@@ -45,6 +42,8 @@ Ext.define('NX.view.AboutWindow', {
    */
   initComponent: function () {
     var me = this;
+
+    me.setWidth(me.LARGE_MODAL);
 
     me.items = [
       {

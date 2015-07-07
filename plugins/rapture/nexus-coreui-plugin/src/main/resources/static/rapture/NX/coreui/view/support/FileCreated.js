@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.support.FileCreated', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-coreui-support-filecreated',
   requires: [
     'NX.I18n'
@@ -35,19 +35,13 @@ Ext.define('NX.coreui.view.support.FileCreated', {
    */
   fileType: undefined,
 
-  layout: 'fit',
-  autoShow: true,
-  constrain: true,
-  resizable: false,
-  width: 630,
-  border: false,
-  modal: true,
-
   /**
    * @override
    */
   initComponent: function () {
     var me = this;
+
+    me.setWidth(me.LARGE_MODAL);
 
     Ext.apply(me, {
       title: me.title || me.fileType + ' Created',
