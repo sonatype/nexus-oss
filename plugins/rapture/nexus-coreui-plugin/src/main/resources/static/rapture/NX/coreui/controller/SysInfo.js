@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SysInfo', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Permissions',
     'NX.util.Url',
@@ -26,9 +26,6 @@ Ext.define('NX.coreui.controller.SysInfo', {
     'NX.Messages',
     'NX.I18n'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'support.SysInfo'
@@ -107,8 +104,9 @@ Ext.define('NX.coreui.controller.SysInfo', {
   },
 
   /**
-   * @private
    * Download system information report.
+   *
+   * @private
    */
   download: function () {
     NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf('service/siesta/atlas/system-information'));

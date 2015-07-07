@@ -24,7 +24,10 @@ Ext.define('NX.Log', {
   ],
 
   /**
+   * Reference to attached logging controller.
+   *
    * @private
+   * @property {NX.controller.Logging}
    */
   controller: undefined,
 
@@ -39,7 +42,7 @@ Ext.define('NX.Log', {
   /**
    * Attach to the logging controller.
    *
-   * @public
+   * @internal
    * @param {NX.controller.Logging} controller
    */
   attach: function (controller) {
@@ -51,17 +54,15 @@ Ext.define('NX.Log', {
       me.controller.recordEvent(event);
     });
     delete me.eventQueue;
-
-    NX.Console.info('Logging controller attached');
   },
 
   /**
    * Record a log event.
    *
    * @public
-   * @param {string} level
-   * @param {string} logger
-   * @param {string} message
+   * @param {String} level
+   * @param {String} logger
+   * @param {String/Array} message
    */
   recordEvent: function (level, logger, message) {
     var me = this,
@@ -79,7 +80,7 @@ Ext.define('NX.Log', {
     else {
       // else queue the event and emit to console
       me.eventQueue.push(event);
-      NX.Console.log(level, [logger, message]);
+      NX.Console.recordEvent(event);
     }
   }
 });

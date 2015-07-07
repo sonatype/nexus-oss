@@ -18,13 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Content', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.State'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'feature.Content'
@@ -52,8 +50,15 @@ Ext.define('NX.controller.Content', {
       component: {
         'nx-feature-content': {
           resize: function (obj) {
-            if (obj && obj.down('nx-drilldown')) {
-              obj.down('nx-drilldown').fireEvent('syncsize');
+            var drilldown;
+            if (obj) {
+              drilldown = obj.down('nx-drilldown');
+              if (drilldown) {
+                drilldown.fireEvent('syncsize');
+              }
+              Ext.ComponentQuery.query('nx-modal-dialog').forEach(function(d) {
+                d.center();
+              });
             }
           }
         }
@@ -118,7 +123,7 @@ Ext.define('NX.controller.Content', {
     cmp.fireEvent('activate', cmp);
 
     //<if debug>
-    me.logDebug('Content changed to:', text, '(' + cmp.self.getName() + ')');
+    me.logInfo('Content changed to:', text, 'class:', cmp.self.getName());
     //</if>
   }
 

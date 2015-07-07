@@ -149,6 +149,15 @@ Ext.define('NX.app.Application', {
   },
 
   /**
+   * Flag to indicate that app is ready.
+   *
+   * @public
+   * @property {Boolean}
+   * @readonly
+   */
+  ready: false,
+
+  /**
    * @override
    * @param {NX.app.Application} app this class
    */
@@ -282,7 +291,7 @@ Ext.define('NX.app.Application', {
     //<if debug>
     if (provider) {
       provider.on('statechange', function (provider, key, value, opts) {
-        me.logTrace('State changed:', key, '=', value);
+        me.logTrace('State changed:', key, '->', (value ? value : '(deleted)'));
       });
     }
     //</if>
@@ -294,7 +303,7 @@ Ext.define('NX.app.Application', {
    * @public
    */
   start: function () {
-    var me = this, hideMask;
+    var me = this, becomeReady;
 
     //<if debug>
     me.logInfo('Starting');
@@ -311,16 +320,26 @@ Ext.define('NX.app.Application', {
       }
     });
 
-    // hide the loading mask after we have loaded
-    hideMask = function () {
+    becomeReady = function () {
+      // hide the loading mask after we have loaded
       Ext.get('loading').remove();
       Ext.fly('loading-mask').animate({ opacity: 0, remove: true });
+
+      // mark app as ready
+      me.logInfo('Ready');
+      me.ready = true;
     };
 
     // FIXME: Need a better way to know when the UI is actually rendered so we can hide the mask
     // HACK: for now increasing delay slightly to cope with longer loading times
-    Ext.defer(hideMask, 500);
+    Ext.defer(becomeReady, 500);
   },
+
+  /**
+   * Fired when synchronizing controllers and changes were detected.
+   *
+   * @event controllerschanged
+   */
 
   /**
    * Create / Destroy managed controllers based on their active status.

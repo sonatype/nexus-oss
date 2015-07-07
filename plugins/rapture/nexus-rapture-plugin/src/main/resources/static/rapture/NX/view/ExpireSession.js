@@ -32,6 +32,8 @@ Ext.define('NX.view.ExpireSession', {
   initComponent: function () {
     var me = this;
 
+    me.setWidth(me.MEDIUM_MODAL);
+
     Ext.apply(me, {
       items: [
         {

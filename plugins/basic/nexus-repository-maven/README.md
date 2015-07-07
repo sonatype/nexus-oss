@@ -39,7 +39,7 @@ Use this config to create Maven proxy repository, use name `maven2-proxy` (or as
   },
   "proxy" : {
     "remoteUrl" : "http://repo1.maven.org/maven2/",
-    "artifactMaxAge" : 3600
+    "contentMaxAge" : 3600
   },
   "httpclient" : {
     "connection" : {

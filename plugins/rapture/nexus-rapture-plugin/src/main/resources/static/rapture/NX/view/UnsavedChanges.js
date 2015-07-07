@@ -47,6 +47,8 @@ Ext.define('NX.view.UnsavedChanges', {
   initComponent: function () {
     var me = this;
 
+    me.setWidth(me.SMALL_MODAL);
+
     Ext.apply(me, {
       items: {
         xtype: 'panel',
