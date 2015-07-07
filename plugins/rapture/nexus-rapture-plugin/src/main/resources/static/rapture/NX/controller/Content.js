@@ -56,9 +56,6 @@ Ext.define('NX.controller.Content', {
               if (drilldown) {
                 drilldown.fireEvent('syncsize');
               }
-              Ext.ComponentQuery.query('nx-modal-dialog').forEach(function(d) {
-                d.center();
-              });
             }
           }
         }
