@@ -28,9 +28,10 @@ StartTest(function(t) {
           {waitForCQVisible: sslCertificateListCQ},
           {click: 'nx-coreui-sslcertificate-list button[text=Load certificate] => .x-btn-button'},
           {click: '>>menuitem[action=newfrompem]'},
-          {waitForCQVisible: pemLoadCQ},
-          {
-            type: [
+          {waitForCQVisible: pemLoadCQ + '[disabled=true]', desc: 'initially load certificate button is disabled'},
+          function(next) {
+            var pemField = t.cq1(pemFieldCQ);
+            pemField.setValue([
               '-----BEGIN CERTIFICATE-----',
               'MIIEBzCCAu+gAwIBAgIJAKfcFT5TCwrIMA0GCSqGSIb3DQEBCwUAMIGZMQswCQYD',
               'VQQGEwJVUzERMA8GA1UECAwITWFyeWxhbmQxDzANBgNVBAcMBkZ1bHRvbjERMA8G',
@@ -55,9 +56,10 @@ StartTest(function(t) {
               '/uW7JeOnXxWD4VVAuvHJFOGmaPaMoepQh1W4ueAy2GT1D45+PFeXQ8Yd0OO10c+n',
               'wkOCAIGTk0wExqk/I/ytX9QrXdklowikn5se',
               '-----END CERTIFICATE-----'
-            ].join('\n'), target: pemFieldCQ
+            ].join('\n'));
+            next()
           },
-          {click: pemLoadCQ},
+          {click: pemLoadCQ + '[disabled=false]', desc: 'load certificate button enables once PEM is pasted'},
           function(next) {
             t.waitForAnimations(next);
           },
