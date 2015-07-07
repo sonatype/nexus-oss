@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.dev.Conditions', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.util.Filter'
   ],
@@ -97,6 +97,9 @@ Ext.define('NX.controller.dev.Conditions', {
     }
   },
 
+  /**
+   * @override
+   */
   onDestroy: function () {
     var me = this,
         devConditionsPanel = me.getDevConditionsPanel();

@@ -128,7 +128,7 @@ Ext.define('NX.view.dev.styles.Forms', {
             xtype: 'checkboxgroup',
             columns: [100, 100],
             items: [
-              {boxLabel: 'Foo', checked: true, id: 'fooChk', inputId: 'fooChkInput'},
+              {boxLabel: 'Foo', checked: true, inputId: 'fooChkInput'},
               {boxLabel: 'Bar'}
             ]
           },
@@ -143,7 +143,6 @@ Ext.define('NX.view.dev.styles.Forms', {
           },
           {
             hideLabel: true,
-            id: 'htmleditor',
             xtype: 'htmleditor',
             name: 'html',
             enableColors: false,

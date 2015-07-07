@@ -18,37 +18,13 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Message', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
-    'NX.Icons',
-    'NX.Messages'
+    'NX.Icons'
   ],
 
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
-
-  models: [
-    'Message'
-  ],
-  stores: [
-    'Message'
-  ],
   views: [
-    'header.Messages',
-    'message.Panel',
     'message.Notification'
-  ],
-
-  refs: [
-    {
-      ref: 'button',
-      selector: 'nx-header-messages'
-    },
-    {
-      ref: 'panel',
-      selector: 'nx-message-panel'
-    }
   ],
 
   /**
@@ -84,101 +60,32 @@ Ext.define('NX.controller.Message', {
         preload: true
       }
     });
-
-    me.listen({
-      controller: {
-        '#User': {
-          signout: me.clearMessages
-        }
-      },
-      component: {
-        'nx-header-messages': {
-          click: me.toggleMessages
-        },
-        'nx-message-panel button[action=clear]': {
-          click: me.clearMessages
-        },
-        'nx-message-panel button[action=close]': {
-          click: me.toggleMessages
-        }
-      }
-    });
-
-    me.getStore('Message').on('datachanged', me.updateHeader, me);
   },
 
   /**
-   * Change the panel title when the # of records in the store changes.
+   * Internal customization of {@link NX.view.message.Notification} window options.
    *
-   * @private
-   */
-  updateHeader: function () {
-    var me = this,
-        button = me.getButton(),
-        count = me.getStore('Message').getCount();
-
-    if (button) {
-      if (count) {
-        button.setText(count);
-      }
-      else {
-        button.setText('');
-      }
-    }
-  },
-
-  /**
-   * @private
-   * @param button
-   */
-  toggleMessages: function(button) {
-    var panel = this.getPanel();
-
-    if (panel.isVisible()) {
-      panel.hide();
-    }
-    else {
-      panel.show();
-    }
-  },
-
-  /**
-   * @private
-   */
-  clearMessages: function () {
-    this.getMessageStore().removeAll();
-  },
-
-  /**
-   * Internal customization of message window options.
    * At the moment, mainly intended for use by functional tests that need to
    * override default settings.
    *
-   * @private
+   * @internal
    * @property {Object}
    */
-  windowOptions: {
-  },
+  windowOptions: {},
 
   /**
    * @public
    */
   addMessage: function (message) {
-    var me = this,
-        store = me.getStore('Message');
-
     if (!message.type) {
       message.type = 'default';
     }
 
     message.timestamp = new Date();
 
-    // add new messages to the top of the store
-    store.insert(0, message);
-
     // show transient message notification
-    var cfg = Ext.clone(me.windowOptions);
-    me.getView('message.Notification').create(Ext.apply(cfg, {
+    var cfg = Ext.clone(this.windowOptions);
+    this.getView('message.Notification').create(Ext.apply(cfg, {
       ui: 'nx-message-' + message.type,
       iconCls: NX.Icons.cls('message-' + message.type, 'x16'),
       title: Ext.String.capitalize(message.type),

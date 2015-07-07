@@ -156,13 +156,13 @@ Ext.define('NX.coreui.controller.Tasks', {
       taskTypeModel = me.getStore('TaskType').getById(model.get('typeId'));
       if (taskTypeModel) {
         if (!settings) {
-          me.getFeature().addTab({ xtype: 'nx-coreui-task-settings', title: NX.I18n.get('Tasks_Settings_Title'), weight: 20 });
+          me.addTab({ xtype: 'nx-coreui-task-settings', title: NX.I18n.get('Tasks_Settings_Title'), weight: 20 });
         }
         me.showSettings(model);
       }
       else {
         if (settings) {
-          me.getFeature().removeTab(settings);
+          me.removeTab(settings);
         }
       }
     }
@@ -200,14 +200,13 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @private
    */
   showSelectTypePanel: function() {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     //clear any filters that may previously have been applied
     me.getStore('TaskType').clearFilter();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Tasks_Select_Title'));
+    me.setItemName(1, NX.I18n.get('Tasks_Select_Title'));
     me.loadCreateWizard(1, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -226,11 +225,10 @@ Ext.define('NX.coreui.controller.Tasks', {
    */
   showAddPanel: function(list, td, cellIndex, model) {
     var me = this,
-      feature = me.getFeature(),
       panel;
 
     // Show the second panel in the create wizard, and set the breadcrumb
-    feature.setItemName(2, NX.I18n.format('Tasks_Create_Title', model.get('name')));
+    me.setItemName(2, NX.I18n.format('Tasks_Create_Title', model.get('name')));
     me.loadCreateWizard(2, true, panel = Ext.widget({
       xtype: 'panel',
       layout: {

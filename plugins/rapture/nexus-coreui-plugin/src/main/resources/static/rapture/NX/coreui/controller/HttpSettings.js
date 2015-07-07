@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.HttpSettings', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Permissions',
     'NX.I18n'
@@ -59,8 +59,9 @@ Ext.define('NX.coreui.controller.HttpSettings', {
   },
 
   /**
-   * @private
    * Enable HTTPS proxy settings only when HTTP proxy settings are enabled.
+   *
+   * @private
    */
   onHttpEnabledChanged: function (httpEnabled) {
     var form = httpEnabled.up('form'),
