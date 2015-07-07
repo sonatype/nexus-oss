@@ -35,13 +35,13 @@ Ext.define('NX.coreui.view.support.FileCreated', {
    */
   fileType: undefined,
 
-  width: 630,
-
   /**
    * @override
    */
   initComponent: function () {
     var me = this;
+
+    me.setWidth(me.LARGE_MODAL);
 
     Ext.apply(me, {
       title: me.title || me.fileType + ' Created',

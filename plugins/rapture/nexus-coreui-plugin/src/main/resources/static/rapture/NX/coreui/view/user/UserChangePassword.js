@@ -29,8 +29,6 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
   title: NX.I18n.get('User_UserChangePassword_Title'),
   defaultFocus: 'password',
 
-  width: 320,
-
   /**
    * @cfg userId to change password for
    */
@@ -41,6 +39,8 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
    */
   initComponent: function () {
     var me = this;
+
+    me.setWidth(me.SMALL_MODAL);
 
     me.items = {
       xtype: 'form',

@@ -29,7 +29,6 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
   ui: 'nx-inset',
 
   title: 'NuGet API Key',
-  width: 640,
 
   /**
    * @cfg {String} NuGet API Key
@@ -41,6 +40,8 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
    */
   initComponent: function() {
     var me = this;
+
+    me.setWidth(me.LARGE_MODAL);
 
     me.items = {
       xtype: 'form',

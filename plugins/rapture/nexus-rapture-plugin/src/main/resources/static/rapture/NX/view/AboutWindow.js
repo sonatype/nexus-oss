@@ -32,7 +32,6 @@ Ext.define('NX.view.AboutWindow', {
     align: 'stretch'
   },
 
-  width: 640,
   height: 480,
   padding: 0,
 
@@ -43,6 +42,8 @@ Ext.define('NX.view.AboutWindow', {
    */
   initComponent: function () {
     var me = this;
+
+    me.setWidth(me.LARGE_MODAL);
 
     me.items = [
       {

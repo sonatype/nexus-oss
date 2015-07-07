@@ -26,8 +26,6 @@ Ext.define('NX.view.ChangeOrderWindow', {
   ],
   ui: 'nx-inset',
 
-  width: 460,
-
   displayField: 'name',
   valueField: 'id',
 
@@ -36,6 +34,8 @@ Ext.define('NX.view.ChangeOrderWindow', {
    */
   initComponent: function () {
     var me = this;
+
+    me.setWidth(me.MEDIUM_MODAL);
 
     me.items = {
       xtype: 'form',

@@ -28,7 +28,6 @@ Ext.define('NX.view.Authenticate', {
 
   title: NX.I18n.get('Authenticate_Title'),
 
-  width: 320,
   defaultFocus: 'password',
 
   /**
@@ -41,6 +40,8 @@ Ext.define('NX.view.Authenticate', {
    */
   initComponent: function () {
     var me = this;
+
+    me.setWidth(me.SMALL_MODAL);
 
     if (!me.message) {
       me.message = NX.I18n.get('Authenticate_Help_Text');

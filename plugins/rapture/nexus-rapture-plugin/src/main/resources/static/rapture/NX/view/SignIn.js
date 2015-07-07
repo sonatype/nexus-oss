@@ -27,7 +27,6 @@ Ext.define('NX.view.SignIn', {
 
   title: NX.I18n.get('SignIn_Title'),
 
-  width: 320,
   defaultFocus: 'username',
 
   /**
@@ -35,6 +34,8 @@ Ext.define('NX.view.SignIn', {
    */
   initComponent: function () {
     var me = this;
+
+    me.setWidth(me.SMALL_MODAL);
 
     Ext.apply(me, {
       items: {
