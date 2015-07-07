@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
@@ -33,6 +32,7 @@ import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
+import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
@@ -42,14 +42,14 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.group.GroupFacet;
+import org.sonatype.nexus.repository.proxy.CacheInfo;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
-import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.payloads.StreamPayload;
-import org.sonatype.nexus.repository.view.payloads.StreamPayload.InputStreamSupplier;
+import org.sonatype.nexus.repository.view.Content;
+import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.nexus.transaction.Transactional;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
@@ -69,7 +69,6 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
-import org.joda.time.DateTime;
 import org.odata4j.producer.InlineCount;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -103,8 +102,6 @@ public class NugetGalleryFacetImpl
   protected Clock clock = new Clock();
 
   private static final VersionScheme SCHEME = new GenericVersionScheme();
-
-  private static final String P_LAST_VERIFIED_DATE = "last_verified";
 
   @Override
   @Guarded(by = STARTED)
@@ -228,14 +225,14 @@ public class NugetGalleryFacetImpl
   }
 
   @Override
-  public void putContent(final String id, final String version, final InputStream content) throws IOException {
-    try (TempStreamSupplier streamSupplier = new TempStreamSupplier(content)) {
-      doPutContent(id, version, streamSupplier);
+  public void putContent(final String id, final String version, final Content content) throws IOException {
+    try (TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
+      doPutContent(id, version, streamSupplier, content.getAttributes());
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutContent(final String id, final String version, final Supplier<InputStream> streamSupplier)
+  protected void doPutContent(final String id, final String version, final Supplier<InputStream> streamSupplier, final AttributesMap contentAttributes)
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
@@ -244,7 +241,7 @@ public class NugetGalleryFacetImpl
         component != null && tx.browseAssets(component).iterator().hasNext(),
         "Component metadata does not exist yet"
     );
-    createOrUpdateAssetAndContents(tx, component, streamSupplier.get(), null);
+    createOrUpdateAssetAndContents(tx, component, streamSupplier.get(), null, contentAttributes);
   }
 
   @VisibleForTesting
@@ -333,7 +330,7 @@ public class NugetGalleryFacetImpl
   @Override
   @Guarded(by = STARTED)
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload get(final String id, final String version) {
+  public Content get(final String id, final String version) throws IOException {
     checkNotNull(id);
     checkNotNull(version);
 
@@ -348,55 +345,27 @@ public class NugetGalleryFacetImpl
     if (blobRef == null) {
       return null;
     }
-
     final Blob blob = tx.requireBlob(blobRef);
     String contentType = asset.contentType();
 
-    return new StreamPayload(
-        new InputStreamSupplier()
-        {
-          @Nonnull
-          @Override
-          public InputStream get() throws IOException {
-            return blob.getInputStream();
-          }
-        },
-        blob.getMetrics().getContentSize(),
-        contentType
-    );
-  }
-
-  @Override
-  @Transactional
-  public DateTime getLastVerified(final String id, final String version) {
-    checkNotNull(id);
-    checkNotNull(version);
-
-    StorageTx tx = UnitOfWork.currentTransaction();
-
-    final Asset asset = findAsset(tx, id, version);
-
-    checkState(asset != null);
-
-    Date date = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
-
-    log.debug("Content for {} {} last verified as of {}", id, version, date);
-    return new DateTime(checkNotNull(date));
+    final Content content = new Content(new BlobPayload(blob, contentType));
+    Content.extractFromAsset(asset, singletonList(HashAlgorithm.SHA512), content.getAttributes());
+    return content;
   }
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public void setLastVerified(final String id, final String version, final DateTime date) {
-    checkNotNull(date);
+  public void setCacheInfo(final String id, final String version, final CacheInfo cacheInfo) {
+    checkNotNull(cacheInfo);
 
     StorageTx tx = UnitOfWork.currentTransaction();
 
     Asset asset = findAsset(tx, id, version);
     checkState(asset != null);
 
-    final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
-    log.debug("Updating last verified date of {} {} from {} to {}", id, version, priorDate, date);
-    asset.formatAttributes().set(P_LAST_VERIFIED_DATE, date.toDate());
+    log.debug("Updating cacheInfo of {} {} to {}", id, version, cacheInfo);
+    CacheInfo.applyToAsset(asset, cacheInfo);
+    tx.saveAsset(asset);
   }
 
   @Override
@@ -424,7 +393,7 @@ public class NugetGalleryFacetImpl
     StorageTx tx = UnitOfWork.currentTransaction();
 
     final Component component = createOrUpdateComponent(tx, recordMetadata);
-    createOrUpdateAssetAndContents(tx, component, packageStream, recordMetadata);
+    createOrUpdateAssetAndContents(tx, component, packageStream, recordMetadata, null);
     return component;
   }
 
@@ -564,15 +533,14 @@ public class NugetGalleryFacetImpl
   private void createOrUpdateAssetAndContents(final StorageTx tx,
                                               final Component component,
                                               final InputStream in,
-                                              final Map<String, String> data)
+                                              final Map<String, String> data,
+                                              @Nullable final AttributesMap contentAttributes)
   {
     try {
       Asset asset = findOrCreateAsset(tx, component);
       updateAssetMetadata(asset, data, component.isNew());
-
-      asset.formatAttributes().set(P_LAST_VERIFIED_DATE, new Date());
+      Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
       tx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
-
       tx.saveAsset(asset);
     }
     catch (IOException e) {

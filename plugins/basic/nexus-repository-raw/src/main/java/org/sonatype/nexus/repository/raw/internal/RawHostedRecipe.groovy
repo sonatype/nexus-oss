@@ -31,6 +31,8 @@ import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.storage.UnitOfWorkHandler;
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
+import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
+import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
 import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
@@ -92,6 +94,13 @@ class RawHostedRecipe
   RawContentHandler rawContentHandler
 
   @Inject
+  ConditionalRequestHandler conditionalRequestHandler
+
+  @Inject
+  ContentHeadersHandler contentHeadersHandler
+
+
+  @Inject
   RawHostedRecipe(@Named(HostedType.NAME) final Type type,
                   @Named(RawFormat.NAME) final Format format)
   {
@@ -127,6 +136,8 @@ class RawHostedRecipe
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(partialFetchHandler)
+        .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
         .handler(rawContentHandler)
         .create())

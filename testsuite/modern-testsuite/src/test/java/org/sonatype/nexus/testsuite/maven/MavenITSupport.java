@@ -199,7 +199,7 @@ public abstract class MavenITSupport
 
     final NestedAttributesMap proxy = config.attributes("proxy");
     proxy.set("remoteUrl", remoteUrl);
-    proxy.set("artifactMaxAge", 5);
+    proxy.set("contentMaxAge", 5);
 
     NestedAttributesMap storage = config.attributes("storage");
     storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);

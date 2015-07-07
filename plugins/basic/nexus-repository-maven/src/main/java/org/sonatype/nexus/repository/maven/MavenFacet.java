@@ -19,10 +19,9 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
+import org.sonatype.nexus.repository.proxy.CacheInfo;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
-
-import org.joda.time.DateTime;
 
 /**
  * Maven facet, present on all Maven repositories.
@@ -56,7 +55,5 @@ public interface MavenFacet
 
   // proxy operations
 
-  DateTime getLastVerified(MavenPath path) throws IOException;
-
-  boolean setLastVerified(MavenPath path, DateTime verified) throws IOException;
+  boolean setCacheInfo(MavenPath path, CacheInfo cacheInfo) throws IOException;
 }

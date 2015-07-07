@@ -38,4 +38,10 @@ public interface ProxyFacet
    * Returns the root of the remote repository.
    */
   URI getRemoteUrl();
+
+  /**
+   * Invalidates all entries from proxy cache, causing all subsequent requests to attempt to fetch new or updated
+   * content, if any.
+   */
+  void invalidateProxyCaches();
 }

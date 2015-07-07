@@ -69,7 +69,7 @@ public class RawITSupport
 
     final NestedAttributesMap proxy = config.attributes("proxy");
     proxy.set("remoteUrl", remoteUrl);
-    proxy.set("artifactMaxAge", 5);
+    proxy.set("contentMaxAge", 5);
 
     final NestedAttributesMap negativeCache = config.attributes("negativeCache");
     negativeCache.set("enabled", true);

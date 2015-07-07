@@ -14,24 +14,27 @@ package org.sonatype.nexus.repository.raw.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
+import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.raw.RawContent;
+import org.sonatype.nexus.repository.proxy.CacheInfo;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.view.Content;
+import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.nexus.transaction.Transactional;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
@@ -39,7 +42,6 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.orientechnologies.common.concur.ONeedRetryException;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
-import org.joda.time.DateTime;
 
 import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
@@ -58,8 +60,6 @@ public class RawContentFacetImpl
 {
   private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(MD5, SHA1);
 
-  private static final String P_LAST_VERIFIED_DATE = "last_verified";
-
   // TODO: raw does not have config, this method is here only to have this bundle do Import-Package org.sonatype.nexus.repository.config
   // TODO: as FacetSupport subclass depends on it. Actually, this facet does not need any kind of configuration
   // TODO: it's here only to circumvent this OSGi/maven-bundle-plugin issue.
@@ -71,7 +71,7 @@ public class RawContentFacetImpl
   @Nullable
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public RawContent get(final String path) {
+  public Content get(final String path) {
     StorageTx tx = UnitOfWork.currentTransaction();
 
     final Component component = getComponent(tx, path, tx.getBucket());
@@ -86,14 +86,14 @@ public class RawContentFacetImpl
   }
 
   @Override
-  public void put(final String path, final RawContent content) throws IOException, InvalidContentException {
+  public void put(final String path, final Payload content) throws IOException, InvalidContentException {
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
       doPutContent(path, streamSupplier, content);
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutContent(final String path, final Supplier<InputStream> streamSupplier, final RawContent content)
+  protected void doPutContent(final String path, final Supplier<InputStream> streamSupplier, final Payload payload)
       throws IOException
   {
     StorageTx tx = UnitOfWork.currentTransaction();
@@ -119,8 +119,12 @@ public class RawContentFacetImpl
       asset = tx.firstAsset(component);
     }
 
-    asset.formatAttributes().set(P_LAST_VERIFIED_DATE, new Date());
-    tx.setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, content.getContentType());
+    AttributesMap contentAttributes = null;
+    if (payload instanceof Content) {
+      contentAttributes = ((Content) payload).getAttributes();
+    }
+    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
+    tx.setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(asset);
   }
 
@@ -162,7 +166,7 @@ public class RawContentFacetImpl
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public void updateLastVerified(final String path, final DateTime lastUpdated) throws IOException {
+  public void setCacheInfo(final String path, final CacheInfo cacheInfo) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
     Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
@@ -173,8 +177,8 @@ public class RawContentFacetImpl
 
     final Asset asset = tx.firstAsset(component);
 
-    final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
-    asset.formatAttributes().set(P_LAST_VERIFIED_DATE, lastUpdated.toDate());
+    log.debug("Updating cacheInfo of {} to {}", path, cacheInfo);
+    CacheInfo.applyToAsset(asset, cacheInfo);
     tx.saveAsset(tx.firstAsset(component));
   }
 
@@ -184,31 +188,9 @@ public class RawContentFacetImpl
     return tx.findComponentWithProperty(property, path, bucket);
   }
 
-  private RawContent marshall(final Asset asset, final Blob blob) {
-    final String contentType = asset.requireContentType();
-    final DateTime lastVerified = new DateTime(asset.formatAttributes().require(P_LAST_VERIFIED_DATE, Date.class));
-
-    return new RawContent()
-    {
-      @Override
-      public String getContentType() {
-        return contentType;
-      }
-
-      @Override
-      public long getSize() {
-        return blob.getMetrics().getContentSize();
-      }
-
-      @Override
-      public InputStream openInputStream() {
-        return blob.getInputStream();
-      }
-
-      @Override
-      public DateTime getLastVerified() {
-        return lastVerified;
-      }
-    };
+  private Content marshall(final Asset asset, final Blob blob) {
+    final Content content = new Content(new BlobPayload(blob, asset.requireContentType()));
+    Content.extractFromAsset(asset, hashAlgorithms, content.getAttributes());
+    return content;
   }
 }

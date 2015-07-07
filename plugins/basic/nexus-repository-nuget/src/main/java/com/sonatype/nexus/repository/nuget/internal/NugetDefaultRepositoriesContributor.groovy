@@ -58,7 +58,7 @@ class NugetDefaultRepositoriesContributor
                 [
                     proxy: [
                         remoteUrl     : 'https://www.nuget.org/api/v2/',
-                        artifactMaxAge: 5
+                        contentMaxAge: 5
                     ],
                     storage: [
                         blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME

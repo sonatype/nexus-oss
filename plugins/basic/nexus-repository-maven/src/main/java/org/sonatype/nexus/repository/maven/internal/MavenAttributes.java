@@ -33,17 +33,9 @@ public interface MavenAttributes
 
   String P_EXTENSION = "extension";
 
-  // artifact component properties
+  // keys
 
   String P_COMPONENT_KEY = "key";
 
-  // shared properties for both artifact and metadata assets
-
   String P_ASSET_KEY = "key";
-
-  String P_CONTENT_LAST_MODIFIED = "contentLastModified";
-
-  String P_CONTENT_ETAG = "contentEtag";
-
-  String P_LAST_VERIFIED = "lastVerified";
 }
