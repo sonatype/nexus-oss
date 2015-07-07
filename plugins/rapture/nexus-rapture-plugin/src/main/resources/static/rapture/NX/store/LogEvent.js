@@ -18,6 +18,6 @@
  * @since 3.0
  */
 Ext.define('NX.store.LogEvent', {
-  extend: 'Ext.data.Store',
+  extend: 'Ext.data.ArrayStore',
   model: 'NX.model.LogEvent'
 });

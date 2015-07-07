@@ -18,9 +18,9 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SearchRaw', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
-    'NX.I18n',
+    'NX.I18n'
   ],
 
   /**

@@ -26,10 +26,7 @@ StartTest(function(t) {
     t.it('Default repositories are populated', function(t) {
       t.chain(
           t.openPageAsAdmin('admin/repository/repositories'),
-          function(next) {
-            t.waitForAnimations(next);
-          },
-          {waitFor: 'CQ', args: 'nx-coreui-repository-list'},
+          {waitForRowsVisible: 'nx-coreui-repository-list'},
           function(next) {
             var grid = t.cq1('nx-coreui-repository-list'),
                 store = grid.getStore(),
@@ -47,7 +44,7 @@ StartTest(function(t) {
             next();
           }
       )
-    }, 300000);
+    });
     t.it('Repository creation', function(t) {
       t.chain(
           {click: '>>nx-coreui-repository-list button[text=Create repository]'},
@@ -90,7 +87,7 @@ StartTest(function(t) {
             next();
           }
       );
-    }, 300000);
+    });
     t.it('Repository display', function(t) {
       t.chain(
           function(next) {
@@ -122,7 +119,7 @@ StartTest(function(t) {
             next();
           }
       );
-    }, 300000);
+    });
     t.it('Repository update', function(t) {
       t.chain(
           //update the writePolicy
@@ -150,7 +147,7 @@ StartTest(function(t) {
             next();
           }
       );
-    }, 300000);
+    });
     t.it('Repository delete', function(t) {
       t.chain(
           function(next) {
@@ -174,7 +171,7 @@ StartTest(function(t) {
             next();
           }
       );
-    }, 300000)
+    })
 
-  }, 300000);
+  });
 });

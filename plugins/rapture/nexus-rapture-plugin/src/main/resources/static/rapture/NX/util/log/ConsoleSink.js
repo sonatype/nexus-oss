@@ -21,23 +21,17 @@
  */
 Ext.define('NX.util.log.ConsoleSink', {
   extend: 'NX.util.log.Sink',
-  singleton: true,
   requires: [
     'NX.Console'
   ],
 
-  /**
-   * @constructor
-   */
-  constructor: function () {
-    // sink defaults to disabled
-    this.enabled = false;
-  },
+  // default to disabled
+  enabled: false,
 
   /**
    * @override
    */
-  handle: function (event) {
-    NX.Console.log(event.level, [event.logger, event.message]);
+  receive: function (event) {
+    NX.Console.recordEvent(event);
   }
 });

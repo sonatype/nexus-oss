@@ -89,7 +89,7 @@ Ext.define('NX.app.Loader', {
     App = Ext.ClassManager.get('NX.app.Application');
     Ext.onReady(function () {
       //<if debug>
-      me.logDebug('Received ready event');
+      me.logDebug('Received Ext.ready event');
       //</if>
 
       Ext.app.Application.instance = new App({

@@ -23,17 +23,22 @@ Ext.define('NX.LogAware', {
   ],
 
   /**
+   * Log a message at the given level.
+   *
    * @param {String} level
    * @param {Array} args
    */
   log: function (level, args) {
     //<if debug>
-    NX.Log.recordEvent(level, Ext.getClassName(this), args.join(' '));
+    NX.Log.recordEvent(level, Ext.getClassName(this), args);
     //</if>
   },
 
   /**
+   * Log a trace message.
+   *
    * @public
+   * @param {String/Object/Array} message
    */
   logTrace: function () {
     //<if debug>
@@ -42,7 +47,10 @@ Ext.define('NX.LogAware', {
   },
 
   /**
+   * Log a debug message.
+   *
    * @public
+   * @param {String/Object/Array} message
    */
   logDebug: function () {
     //<if debug>
@@ -51,7 +59,10 @@ Ext.define('NX.LogAware', {
   },
 
   /**
+   * Log an info message.
+   *
    * @public
+   * @param {String/Object/Array} message
    */
   logInfo: function () {
     //<if debug>
@@ -60,7 +71,10 @@ Ext.define('NX.LogAware', {
   },
 
   /**
+   * Log a warn message.
+   *
    * @public
+   * @param {String/Object/Array} message
    */
   logWarn: function () {
     //<if debug>
@@ -69,7 +83,10 @@ Ext.define('NX.LogAware', {
   },
 
   /**
+   * Log an error message.
+   *
    * @public
+   * @param {String/Object/Array} message
    */
   logError: function () {
     //<if debug>

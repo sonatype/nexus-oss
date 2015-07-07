@@ -18,11 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.dev.Logging', {
-  extend: 'Ext.app.Controller',
-  requires: [
-    'NX.util.log.ConsoleSink',
-    'NX.util.log.RemoteSink'
-  ],
+  extend: 'NX.app.Controller',
 
   stores: [
     'LogEvent',
@@ -42,34 +38,71 @@ Ext.define('NX.controller.dev.Logging', {
   init: function () {
     var me = this;
 
+    // helper to lookup sink by name via Logging controller
+    function sink(name) {
+      return me.getController('Logging').getSink(name);
+    }
+
     me.listen({
       component: {
         'nx-dev-logging button[action=clear]': {
-          click: function(button) {
+          click: function (button) {
             me.getStore('LogEvent').removeAll();
           }
         },
-        'nx-dev-logging checkbox[itemId=console]': {
-          change: function(checkbox) {
-            NX.util.log.ConsoleSink.setEnabled(checkbox.getValue());
-          }
-        },
-        'nx-dev-logging checkbox[itemId=remote]': {
-          change: function(checkbox) {
-            NX.util.log.RemoteSink.setEnabled(checkbox.getValue());
-          }
-        },
+
         'nx-dev-logging combobox[itemId=threshold]': {
-          select: function(combo) {
-            me.getController('Logging').setThreshold(combo.getValue());
-          },
-          afterrender: function(combo) {
+          afterrender: function (combo) {
             combo.select(me.getController('Logging').getThreshold());
+          },
+          select: function (combo) {
+            me.getController('Logging').setThreshold(combo.getValue());
+          }
+        },
+
+        'nx-dev-logging checkbox[itemId=buffer]': {
+          afterrender: function (checkbox) {
+            checkbox.setValue(sink('store').enabled);
+          },
+          change: function (checkbox) {
+            sink('store').setEnabled(checkbox.getValue());
+          }
+        },
+
+        'nx-dev-logging numberfield[itemId=bufferSize]': {
+          afterrender: function (field) {
+            field.setValue(sink('store').maxSize);
+          },
+
+          // update the max-size when enter or loss of focus
+          blur: function(field, event) {
+            sink('store').setMaxSize(field.getValue());
+          },
+          keypress: function (field, event) {
+            if (event.getKey() == event.ENTER) {
+              sink('store').setMaxSize(field.getValue());
+            }
+          }
+        },
+
+        'nx-dev-logging checkbox[itemId=console]': {
+          afterrender: function (checkbox) {
+            checkbox.setValue(sink('console').enabled);
+          },
+          change: function (checkbox) {
+            sink('console').setEnabled(checkbox.getValue());
+          }
+        },
+
+        'nx-dev-logging checkbox[itemId=remote]': {
+          afterrender: function (checkbox) {
+            checkbox.setValue(sink('remote').enabled);
+          },
+          change: function (checkbox) {
+            sink('remote').setEnabled(checkbox.getValue());
           }
         }
       }
     });
-
-    // TODO: automatically scroll to bottom of event list, how can we do that?
   }
 });
