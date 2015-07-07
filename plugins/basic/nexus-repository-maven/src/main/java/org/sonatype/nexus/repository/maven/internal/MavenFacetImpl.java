@@ -334,6 +334,7 @@ public class MavenFacetImpl
       return false;
     }
 
+    log.debug("Updating cacheInfo of {} to {}", path.getPath(), cacheInfo);
     CacheInfo.applyToAsset(asset, cacheInfo);
     tx.saveAsset(asset);
 

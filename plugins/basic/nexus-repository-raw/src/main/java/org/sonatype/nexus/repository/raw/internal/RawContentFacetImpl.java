@@ -177,6 +177,7 @@ public class RawContentFacetImpl
 
     final Asset asset = tx.firstAsset(component);
 
+    log.debug("Updating cacheInfo of {} to {}", path, cacheInfo);
     CacheInfo.applyToAsset(asset, cacheInfo);
     tx.saveAsset(tx.firstAsset(component));
   }
