@@ -102,9 +102,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     HealthCheckSearch_Security_Header: 'Security',
     HealthCheckSearch_License_Header: 'License',
     HealthCheckSearch_Disabled_Tooltip: 'The age and popularity data is only available once Repository Health Check (RHC) has been enabled.',
-    HealthCheckSearch_Error_Tooltip: 'Error retrieving data from Sonatype CLM',
+    HealthCheckSearch_Error_Tooltip: 'Error retrieving component data',
     HealthCheckSearch_Quota_Tooltip: 'The query limit for age and popularity data has been reached. Contact Sonatype support to extend current quota limits.',
-    HealthCheckSearch_Unavailable_Tooltip: 'CLM data is not available for this component.<br/>Internal components are not covered in Sonatype CLM.',
+    HealthCheckSearch_Unavailable_Tooltip: 'No data available for this component',
     Component_AssetInfo_Info_Title: 'Info',
 
     // Browse -> Search -> Raw
