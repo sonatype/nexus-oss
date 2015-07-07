@@ -39,7 +39,9 @@ NX.TestHarness.start(
           items: [
             { url: 'testsuite-oss/framework/signin_signout.t.js' },
             { url: 'testsuite-oss/framework/mode_button.t.js' },
-            { url: 'testsuite-oss/framework/unsupported_browser.t.js' }
+            { url: 'testsuite-oss/framework/unsupported_browser.t.js' },
+            { url: 'testsuite-oss/framework/bookmarking_unauthenticated.t.js' },
+            { url: 'testsuite-oss/framework/bookmarking_authenticated.t.js' }
           ]
         }
       ]
