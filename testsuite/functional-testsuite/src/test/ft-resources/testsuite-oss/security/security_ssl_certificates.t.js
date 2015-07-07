@@ -26,7 +26,7 @@ StartTest(function(t) {
       t.chain(
           t.openPageAsAdmin('admin/security/sslcertificates'),
           {waitForCQVisible: sslCertificateListCQ},
-          {click: 'nx-coreui-sslcertificate-list button[text=Load certificate] => .x-btn-button'},
+          {click: '>>nx-coreui-sslcertificate-list button[text=Load certificate] => .x-btn-button'},
           {click: '>>menuitem[action=newfrompem]'},
           {waitForCQVisible: pemLoadCQ + '[disabled=true]', desc: 'initially load certificate button is disabled'},
           function(next) {
@@ -78,6 +78,37 @@ StartTest(function(t) {
             t.expect(values.fingerprint).toBe('A9:28:E6:E1:62:66:5C:69:79:60:3A:A1:69:53:75:06:0A:C0:DE:FA');
 
             next()
+          },
+          {click: '>>nx-coreui-sslcertificate-details-form button[action=back]', desc: 'cancel before accepting'},
+          {waitForCQVisible: sslCertificateListCQ, desc: 'returning to the list view'},
+          function(next){
+            t.waitForAnimations(next);
+          }
+      )
+    });
+
+    var serverFieldCQ = '>>nx-coreui-sslcertificate-add-from-server #server';
+
+    t.it('An admin can load a certificate from a server', function(t) {
+
+      t.chain(
+          {click: '>>nx-coreui-sslcertificate-list button[text=Load certificate] => .x-btn-button'},
+          {click: '>>menuitem[action=newfromserver]'},
+          {waitForCQVisible: serverFieldCQ},
+          {type: 'https://repo1.maven.org/maven2/', target: serverFieldCQ},
+          {click: '>>nx-coreui-sslcertificate-add-from-server button[action=load]'},
+          {waitForCQVisible: '>>nx-coreui-sslcertificate-details-panel', desc: 'details are loaded for inspection'},
+          function(next, detailsPanel) {
+            var form = detailsPanel[0].down('form').getForm(),
+                values = form.getFieldValues();
+
+            t.expect(values.subjectCommonName).toBe('repo1.maven.org');
+            t.expect(values.subjectOrganization).toBe('Sonatype, Inc');
+
+            next()
+          },
+          function(next){
+            t.waitForAnimations(next);
           },
           {click: '>>nx-coreui-sslcertificate-details-form button[action=back]', desc: 'cancel before accepting'},
           {waitForCQVisible: sslCertificateListCQ, desc: 'returning to the list view'}
