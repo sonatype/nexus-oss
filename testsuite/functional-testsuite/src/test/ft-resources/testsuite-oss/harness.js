@@ -107,6 +107,7 @@ NX.TestHarness.start(
           items: [
             { url: 'testsuite-oss/system/system_bundles.t.js' },
             { url: 'testsuite-oss/system/system_tasks.t.js' },
+            { url: 'testsuite-oss/system/system_email.t.js' },
             { url: 'testsuite-oss/system/http_configuration.t.js' }
           ]
         }
