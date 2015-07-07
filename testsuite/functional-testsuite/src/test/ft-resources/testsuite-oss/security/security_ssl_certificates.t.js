@@ -85,7 +85,7 @@ StartTest(function(t) {
             t.waitForAnimations(next);
           }
       )
-    });
+    }, 60000);
 
     var serverFieldCQ = '>>nx-coreui-sslcertificate-add-from-server #server';
 
