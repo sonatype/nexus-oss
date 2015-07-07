@@ -50,8 +50,15 @@ Ext.define('NX.controller.Content', {
       component: {
         'nx-feature-content': {
           resize: function (obj) {
-            if (obj && obj.down('nx-drilldown')) {
-              obj.down('nx-drilldown').fireEvent('syncsize');
+            var drilldown;
+            if (obj) {
+              drilldown = obj.down('nx-drilldown');
+              if (drilldown) {
+                drilldown.fireEvent('syncsize');
+              }
+              Ext.ComponentQuery.query('nx-modal-dialog').forEach(function(d) {
+                d.center();
+              });
             }
           }
         }
