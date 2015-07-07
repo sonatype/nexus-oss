@@ -33,6 +33,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -76,6 +77,13 @@ public class LoggersResource
   }
 
   /**
+   * Helper to check precondition of logger name.
+   */
+  private static void checkLoggerName(final String name) {
+    checkArgument(name.equals(StringEscapeUtils.escapeHtml(name)), "Invalid logger name");
+  }
+
+  /**
    * Sets the level of a logger.
    *
    * @param logger logger name/level (cannot be null)
@@ -92,6 +100,7 @@ public class LoggersResource
     checkNotNull(logger, "logger");
     checkNotNull(logger.getLevel(), "logger level");
     checkArgument(StringUtils.isNotEmpty(logger.getName()), "name cannot be empty");
+    checkLoggerName(logger.getName());
 
     return logger.withLevel(configurator.setLevel(logger.getName(), logger.getLevel()));
   }
@@ -113,6 +122,7 @@ public class LoggersResource
       throws Exception
   {
     checkNotNull(name, "name");
+    checkLoggerName(name);
     checkNotNull(logger, "logger");
     checkNotNull(logger.getLevel(), "logger level");
 
