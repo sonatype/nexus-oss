@@ -63,7 +63,7 @@ Ext.define('NX.coreui.controller.Browse', {
       variants: ['x16', 'x32']
     },
     visible: function() {
-      return NX.Permissions.check('nexus:search:read');
+      return NX.Permissions.checkExistsWithPrefix('nexus:repository-view');
     }
   },
 
