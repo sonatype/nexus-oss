@@ -34,7 +34,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 
 /**
@@ -102,7 +102,7 @@ public class MavenProxySwarmIT
     assertAllHttpResponseIs2xx(performSwarm(clients));
 
     // depending on concurrency 1+ clients will go remotely (we use no locking)
-    assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(greaterThan(1)));
+    assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(greaterThanOrEqualTo(1)));
     pathRecorderBehaviour.clear();
 
     assertAllHttpResponseIs2xx(performSwarm(clients));
