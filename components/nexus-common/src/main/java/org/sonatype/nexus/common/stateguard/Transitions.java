@@ -35,5 +35,13 @@ public @interface Transitions
 
   String to();
 
+  /**
+   * Log interrupted transitions at debug level instead of error.
+   */
+  boolean silent() default false;
+
+  /**
+   * Continue to transition the state for the following exceptions.
+   */
   Class<? extends Exception>[] ignore() default {};
 }

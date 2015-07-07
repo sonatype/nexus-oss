@@ -18,13 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Content', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.State'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'feature.Content'
@@ -47,6 +45,15 @@ Ext.define('NX.controller.Content', {
       controller: {
         '#Menu': {
           featureselected: me.onFeatureSelected
+        }
+      },
+      component: {
+        'nx-feature-content': {
+          resize: function (obj) {
+            if (obj && obj.down('nx-drilldown')) {
+              obj.down('nx-drilldown').fireEvent('syncsize');
+            }
+          }
         }
       }
     });
@@ -83,9 +90,6 @@ Ext.define('NX.controller.Content', {
     // remove the current contents
     content.removeAll();
 
-    // Hide the breadcrumb
-    content.showRoot();
-
     // update title and icon
     content.setTitle(text);
     content.setIconCls(NX.Icons.cls(iconName, 'x32'));
@@ -102,6 +106,9 @@ Ext.define('NX.controller.Content', {
     }
     content.setDescription(description);
 
+    // Update the breadcrumb
+    content.showRoot();
+
     // install new feature view
     content.add(cmp);
 
@@ -109,7 +116,7 @@ Ext.define('NX.controller.Content', {
     cmp.fireEvent('activate', cmp);
 
     //<if debug>
-    me.logDebug('Content changed to:', text, '(' + cmp.self.getName() + ')');
+    me.logInfo('Content changed to:', text, 'class:', cmp.self.getName());
     //</if>
   }
 

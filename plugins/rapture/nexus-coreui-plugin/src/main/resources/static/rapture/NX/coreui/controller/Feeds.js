@@ -29,9 +29,6 @@ Ext.define('NX.coreui.controller.Feeds', {
   masters: [
     'nx-coreui-feed-list'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
   stores: [
     'Feed',
     'FeedEntry'

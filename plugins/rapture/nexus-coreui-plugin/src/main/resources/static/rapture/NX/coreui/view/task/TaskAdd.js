@@ -38,9 +38,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
 
       buttons: [
         { text: NX.I18n.get('Task_TaskList_New_Button'), action: 'add', formBind: true, ui: 'nx-primary' },
-        { text: NX.I18n.get('Add_Cancel_Button'), handler: function () {
-          this.up('nx-drilldown').showChild(0, true);
-        }}
+        { text: NX.I18n.get('Add_Cancel_Button'), action: 'back' }
       ]
     };
 

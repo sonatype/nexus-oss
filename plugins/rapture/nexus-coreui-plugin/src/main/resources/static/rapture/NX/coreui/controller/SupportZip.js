@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SupportZip', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Permissions',
     'NX.Security',
@@ -27,10 +27,6 @@ Ext.define('NX.coreui.controller.SupportZip', {
     'NX.util.DownloadHelper',
     'NX.I18n'
   ],
-
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'support.SupportZip',

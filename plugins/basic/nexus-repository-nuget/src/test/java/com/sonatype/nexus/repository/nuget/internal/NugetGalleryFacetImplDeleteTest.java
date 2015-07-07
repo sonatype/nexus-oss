@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.transaction.UnitOfWork;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -27,6 +28,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import static java.util.Arrays.asList;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -59,22 +62,28 @@ public class NugetGalleryFacetImplDeleteTest
         return repository;
       }
     });
+
     final StorageTx tx = mock(StorageTx.class);
-    doReturn(tx).when(galleryFacet).openStorageTx();
 
     final Component component = mock(Component.class);
     final Asset asset = mock(Asset.class);
-    final BlobRef blobRef = mock(BlobRef.class); //new BlobRef("local", "default", "a34af31");
+    final BlobRef blobRef = mock(BlobRef.class); // new BlobRef("local", "default", "a34af31");
     final EntityMetadata metadata = mock(EntityMetadata.class);
 
     // Wire the mocks together: component has asset, asset has blobRef
-    doReturn(component).when(galleryFacet).findComponent(tx, packageId, version);
+    doReturn(component).when(galleryFacet).findComponent(any(StorageTx.class), eq(packageId), eq(version));
     when(tx.browseAssets(component)).thenReturn(asList(asset));
     when(asset.blobRef()).thenReturn(blobRef);
     when(component.getEntityMetadata()).thenReturn(metadata);
     when(metadata.getId()).thenReturn(mock(EntityId.class));
 
-    galleryFacet.delete(packageId, version);
+    UnitOfWork.beginBatch(tx);
+    try {
+      galleryFacet.delete(packageId, version);
+    }
+    finally {
+      UnitOfWork.end();
+    }
 
     // Verify that everything got deleted
     verify(tx).deleteComponent(component);

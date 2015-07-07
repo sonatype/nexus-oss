@@ -23,7 +23,7 @@ Ext.define('NX.view.dev.Logging', {
 
   title: 'Logging',
   store: 'LogEvent',
-  emptyText: 'No events',
+  emptyText: 'No events in buffer',
   viewConfig: {
     deferEmptyText: false,
     // allow browser text selection
@@ -34,16 +34,18 @@ Ext.define('NX.view.dev.Logging', {
   stateId: 'nx-dev-logging',
 
   columns: [
-    { text: 'level', dataIndex: 'level' },
-    { text: 'logger', dataIndex: 'logger', flex: 1 },
-    { text: 'message', dataIndex: 'message', flex: 3 },
-    { text: 'timestamp', dataIndex: 'timestamp', width: 130 }
+    {text: 'level', dataIndex: 'level'},
+    {text: 'logger', dataIndex: 'logger', flex: 1},
+    {
+      text: 'message',
+      dataIndex: 'message',
+      flex: 3,
+      renderer: function(value) {
+        return value.join(' ');
+      }
+    },
+    {text: 'timestamp', dataIndex: 'timestamp', width: 130}
   ],
-
-  //selType: 'rowmodel',
-  //selModel: {
-  //  mode: 'MULTI'
-  //},
 
   tbar: [
     {
@@ -71,6 +73,30 @@ Ext.define('NX.view.dev.Logging', {
     '-',
     {
       xtype: 'checkbox',
+      itemId: 'buffer',
+      boxLabel: 'Buffer'
+    },
+    {
+      xtype: 'numberfield',
+      itemId: 'bufferSize',
+      width: 50,
+      allowDecimals: false,
+      allowExponential: false,
+      minValue: -1,
+      maxValue: 999,
+      value: 200,
+
+      // listen for key events
+      enableKeyEvents: true,
+
+      // disable the spinner muck
+      hideTrigger: true,
+      mouseWheelEnabled: false,
+      keyNavEnabled: false
+    },
+    '-',
+    {
+      xtype: 'checkbox',
       itemId: 'console',
       boxLabel: 'Mirror console'
     },
@@ -82,6 +108,21 @@ Ext.define('NX.view.dev.Logging', {
   ],
 
   plugins: [
-    'gridfilterbox'
+    {
+      ptype: 'rowexpander',
+      rowBodyTpl: Ext.create('Ext.XTemplate',
+          '<table class="nx-rowexpander">',
+          '<tr>',
+          '<td class="x-selectable">{[this.render(values)]}</td>',
+          '</tr>',
+          '</table>',
+          {
+            compiled: true,
+            render: function (values) {
+              return Ext.encode(values.message);
+            }
+          })
+    },
+    {ptype: 'gridfilterbox'}
   ]
 });

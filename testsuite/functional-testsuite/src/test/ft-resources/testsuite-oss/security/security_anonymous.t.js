@@ -47,7 +47,7 @@ StartTest(function(t) {
             next();
           }
       );
-    }, 300000);
+    });
     t.it('Can disable anonymous user', function(t) {
       t.chain(
           {click: '>>nx-coreui-security-anonymous-settings checkbox[name=enabled]'},
@@ -62,7 +62,7 @@ StartTest(function(t) {
             next();
           }
       );
-    }, 300000);
+    });
     t.it('Can enable anonymous user', function(t) {
       t.chain(
           // enable anonymous user
@@ -78,7 +78,7 @@ StartTest(function(t) {
             next();
           }
       );
-    }, 300000);
-  }, 300000);
+    });
+  });
 });
 

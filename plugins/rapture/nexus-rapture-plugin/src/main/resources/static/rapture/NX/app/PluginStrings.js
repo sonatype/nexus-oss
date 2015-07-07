@@ -88,10 +88,6 @@ Ext.define('NX.app.PluginStrings', {
     ChangeOrderWindow_Submit_Button: 'Save',
     ChangeOrderWindow_Cancel_Button: 'Cancel',
 
-    // Messages
-    Header_Messages_Tooltip: 'Toggle messages display',
-    Message_Panel_Empty: 'No messages',
-
     // Server
     User_ConnectFailure_Message: 'Operation failed as server could not be contacted',
     State_Reconnected_Message: 'Server reconnected',

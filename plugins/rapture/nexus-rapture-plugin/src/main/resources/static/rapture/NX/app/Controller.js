@@ -10,20 +10,40 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext*/
+/*global Ext, NX*/
 
 /**
- * Messages button.
+ * Nexus managed controller.
  *
  * @since 3.0
+ * @see NX.app.Application#syncManagedControllers
  */
-Ext.define('NX.view.header.Messages', {
-  extend: 'Ext.button.Button',
-  requires: [
-    'NX.I18n'
-  ],
-  alias: 'widget.nx-header-messages',
+Ext.define('NX.app.Controller', {
+  extend: 'Ext.app.Controller',
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
-  glyph: 'xf0f3@FontAwesome', // fa-bell
-  tooltip: NX.I18n.get('Header_Messages_Tooltip')
+  /**
+   * Event fired when a controller is being destroyed.
+   *
+   * @event destroy
+   * @param {NX.app.Controller} controller  The controller being destroyed.
+   */
+
+  /**
+   * Optional callback to invoke when a controller is being destroyed.
+   *
+   * @protected
+   * @property {Function}
+   */
+  onDestroy: undefined,
+
+  /**
+   * Optional callback to invoke when a controller has fully destroyed.
+   *
+   * @protected
+   * @property {Function}
+   */
+  destroy: undefined
 });

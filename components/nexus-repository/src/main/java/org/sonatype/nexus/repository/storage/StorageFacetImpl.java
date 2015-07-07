@@ -38,8 +38,6 @@ import org.sonatype.nexus.security.ClientInfoProvider;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
-import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -188,8 +186,10 @@ public class StorageFacetImpl
   @Override
   protected void doDelete() throws Exception {
     // TODO: Make this a soft delete and cleanup later so it doesn't block for large repos.
-    try (StorageTx tx = openStorageTx(databaseInstanceProvider.get().acquire(), false)) {
+    try (StorageTx tx = openStorageTx(databaseInstanceProvider.get().acquire())) {
+      tx.begin();
       tx.deleteBucket(tx.getBucket());
+      tx.commit();
     }
   }
 
@@ -209,15 +209,13 @@ public class StorageFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public StorageTx openTx() {
-    return openStorageTx(databaseInstanceProvider.get().acquire(), false);
-  }
-
-  @Override
-  @Guarded(by = STARTED)
-  public StorageTx openTx(final ODatabaseDocumentTx db) {
-    checkNotNull(db);
-    return openStorageTx(db, true);
+  public Supplier<StorageTx> txSupplier() {
+    return new Supplier<StorageTx>()
+    {
+      public StorageTx get() {
+        return openStorageTx(databaseInstanceProvider.get().acquire());
+      }
+    };
   }
 
   @Override
@@ -226,41 +224,6 @@ public class StorageFacetImpl
     checkNotNull(hookSupplier);
     hookSuppliers.remove(hookSupplier);
   }
-
-  private static final int MAX_CONCURRENT_MODIFICATION_ATTEMPTS = 3;
-
-  @Override
-  @Guarded(by = STARTED)
-  public <T> T perform(final Operation<T> operation) {
-    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
-      return perform(db, operation);
-    }
-  }
-
-  @Override
-  @Guarded(by = STARTED)
-  public <T> T perform(final ODatabaseDocumentTx db, final Operation<T> operation) {
-    checkNotNull(db);
-    checkNotNull(operation);
-    RuntimeException lastException = null;
-    for (int attempt = 0; attempt < MAX_CONCURRENT_MODIFICATION_ATTEMPTS; attempt++) {
-      try (StorageTx tx = openTx(db)) {
-        try {
-          T result = operation.execute(tx);
-          tx.commit();
-          return result;
-        }
-        catch (IllegalStateException | OConcurrentModificationException | ORecordDuplicatedException e) {
-          lastException = e;
-          log.debug("Failed operation {} on {}:", operation, getRepository(), e);
-        }
-      }
-    }
-    throw new IllegalStateException(
-        "Cannot apply " + operation + " after " + MAX_CONCURRENT_MODIFICATION_ATTEMPTS + " attempts",
-        lastException);
-  }
-
 
   /**
    * Returns the "principal name" to be used with current instance of {@link StorageTx}.
@@ -275,7 +238,7 @@ public class StorageFacetImpl
   }
 
   @Nonnull
-  private StorageTx openStorageTx(final ODatabaseDocumentTx db, final boolean isUserManagedDb) {
+  private StorageTx openStorageTx(final ODatabaseDocumentTx db) {
     final List<StorageTxHook> hooks = new ArrayList<>(hookSuppliers.size());
     for (Supplier<StorageTxHook> hookSupplier : hookSuppliers) {
       hooks.add(hookSupplier.get());
@@ -286,7 +249,6 @@ public class StorageFacetImpl
             createdBy(),
             new BlobTx(localNodeAccess, blobStore),
             db,
-            isUserManagedDb,
             bucket,
             config.writePolicy == null ? WritePolicy.ALLOW : config.writePolicy,
             writePolicySelector,

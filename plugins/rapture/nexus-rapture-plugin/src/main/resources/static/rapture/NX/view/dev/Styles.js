@@ -37,6 +37,9 @@ Ext.define('NX.view.dev.Styles', {
     'NX.view.dev.styles.Grids',
     'NX.view.dev.styles.Other'
   ],
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
   title: 'Styles',
 
@@ -75,15 +78,27 @@ Ext.define('NX.view.dev.Styles', {
         'Other'
       ];
 
-      Ext.each(sections, function (section) {
-        var component = Ext.create('NX.view.dev.styles.' + section);
-        me.add(component);
+      me.logDebug('Creating style guide');
+
+      // TODO: See if suspending layouts here actually helps anything?
+      //Ext.AbstractComponent.suspendLayouts();
+      //try {
+      Ext.Array.each(sections, function (section) {
+        me.add(Ext.create('NX.view.dev.styles.' + section));
       });
+      //}
+      //finally {
+      //  Ext.AbstractComponent.resumeLayouts(true);
+      //}
+
+      me.logDebug('Style guide ready');
     });
 
     // and destroy on deactivate to save memory
     me.on('deactivate', function () {
       me.removeAll(true);
+
+      me.logDebug('Destroyed style guide');
     });
 
     me.callParent();

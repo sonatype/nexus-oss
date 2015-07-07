@@ -185,11 +185,10 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    */
   showConnectionPanel: function() {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('LdapServers_CreateConnection_Title'));
+    me.setItemName(1, NX.I18n.get('LdapServers_CreateConnection_Title'));
     me.loadCreateWizard(1, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -211,11 +210,10 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    */
   showUserAndGroupPanel: function() {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(2, NX.I18n.get('LdapServers_CreateUsersAndGroups_Title'));
+    me.setItemName(2, NX.I18n.get('LdapServers_CreateUsersAndGroups_Title'));
     me.loadCreateWizard(2, true, Ext.widget({
       xtype: 'panel',
       layout: {

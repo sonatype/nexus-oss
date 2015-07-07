@@ -105,7 +105,6 @@ Ext.define('NX.view.dev.styles.Modals', {
         items: [
           {
             xtype: 'label',
-            id: 'expire',
             text: 'Session is about to expire',
             style: {
               'color': 'red',

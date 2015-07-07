@@ -13,9 +13,9 @@
 package org.sonatype.nexus.repository.storage;
 
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.base.Supplier;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
  * Storage {@link Facet}, providing component and asset storage for a repository.
@@ -74,36 +74,7 @@ public interface StorageFacet
   void registerWritePolicySelector(WritePolicySelector writePolicySelector);
 
   /**
-   * Opens a transaction.
+   * Supplies transactions for use in {@link UnitOfWork}.
    */
-  StorageTx openTx();
-
-  /**
-   * Opens a transaction with given OrientDB connection.
-   */
-  StorageTx openTx(ODatabaseDocumentTx db);
-
-  /**
-   * Operation that should be retried in case of Orient MVCC detected conflict. Usually these are "update" related
-   * operations. Implementation should be immutable/stateless, and implemented with caution that the execute method
-   * might be invoked multiple times. Operation must save any updated entity, but must NOT commit as {@link StorageTx}
-   * is not reusable after commit currently.
-   */
-  interface Operation<T>
-  {
-    T execute(StorageTx tx);
-  }
-
-  /**
-   * Handles retries of passed in {@link Operation}, if needed. Operation will receive newly opened {@link StorageTx}
-   * and on clean return from this method it is guaranteed that operation did succeed and change is commited.
-   */
-  <T> T perform(Operation<T> operation);
-
-  /**
-   * Handles retries of passed in {@link Operation}, if needed. Operation will receive newly opened {@link StorageTx}
-   * and on clean return from this method it is guaranteed that operation did succeed and change is commited. This
-   * method will use given OrientDB connection.
-   */
-  <T> T perform(ODatabaseDocumentTx db, Operation<T> operation);
+  Supplier<StorageTx> txSupplier();
 }

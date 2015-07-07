@@ -37,6 +37,7 @@ import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
+import org.sonatype.nexus.transaction.Transactional;
 import org.sonatype.sisu.goodies.common.Time;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -131,7 +132,7 @@ public class NugetProxyGalleryFacet
         getProxyRepositories(),
         new CountFetcher(fetcher));
 
-    final int hostedCount = super.count(operation, parameters, getHostedRepositories());
+    final int hostedCount = count(operation, parameters, getHostedRepositories());
 
     return sum(remoteCounts) + hostedCount;
   }
@@ -185,6 +186,7 @@ public class NugetProxyGalleryFacet
   }
 
   @Override
+  @Transactional
   public String entry(final String base, final String id, final String version) {
     String entryXml = super.entry(base, id, version);
 

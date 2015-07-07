@@ -16,6 +16,101 @@
 Class('NX.TestClass', {
   isa: Siesta.Test.ExtJS,
 
+  has: {
+    /**
+     * Copied from {@link NX.TestHarness#waitForNxAppReady}.
+     */
+    waitForNxAppReady: undefined,
+
+    /**
+     * Copied from {@link NX.TestHarness#describeTimeout}.
+     */
+    describeTimeout: undefined,
+
+    /**
+     * Copied from {@link NX.TestHarness#itTimeout}.
+     */
+    itTimeout: undefined
+  },
+
+  override: {
+    /**
+     * Custom isReady() to cope with rapture application bootstrap.
+     *
+     * @override
+     */
+    isReady: function () {
+      var result = this.SUPERARG(arguments);
+
+      if (!result.ready) {
+        // super test framework is not ready
+        return result;
+      }
+
+      // maybe wait for NX.application to become ready
+      if (this.waitForNxAppReady) {
+        if (this.global.NX === undefined || this.global.NX.application === undefined) {
+          return {
+            ready: false,
+            reason: 'NX application namespace missing'
+          };
+        }
+
+        console.info('NX application ready:', this.global.NX.application.ready);
+
+        if (!this.global.NX.application.ready) {
+          return {
+            ready: false,
+            reason: 'NX application is not ready'
+          };
+        }
+      }
+
+      return {
+        ready: true
+      };
+    },
+
+    /**
+     * Customized describe() to configure saner default timeouts.
+     *
+     * @override
+     */
+    describe: function(name, code, timeout) {
+      this.SUPER(name, code, timeout === undefined ? this.describeTimeout : timeout);
+    },
+
+    /**
+     * Customized it() to configure saner default timeouts.
+     *
+     * @override
+     */
+    it: function(name, code, timeout) {
+      this.SUPER(name, code, timeout === undefined ? this.itTimeout : timeout);
+    },
+
+    /**
+     * @override
+     */
+    processSubTestConfig: function() {
+      var me = this,
+          config = this.SUPERARG(arguments);
+
+      // sub-tests should not wait for NX app ready
+      config.waitForNxAppReady = false;
+
+      // Propagate configuration customization to sub-tests
+      Joose.A.each([
+        'describeTimeout',
+        'itTimeout'
+      ], function (name) {
+        config[name] = me[name];
+      });
+
+      return config;
+    }
+  },
+
   methods: {
     do: function (callback) {
       var me = this,
@@ -230,6 +325,29 @@ Class('NX.TestClass', {
           return this.cq1(cq).getStore();
         }
       }
+    },
+
+    /**
+     * Wait for a feature to be enabled, so that its title is shown and there is no message on
+     * the screen indicating access to the feature was denied.
+     * @param {String} title the title of the expected feature
+     * @param {Function} callback
+     * @param {Object} scope
+     * @param {Number} timeout
+     * @returns {*}
+     */
+    waitForFeature: function(title, callback, scope, timeout) {
+      return this.waitFor({
+        method: function() {
+          return this.cq1('label[cls=nx-feature-name]').text === title &&
+              this.waitForCQNotFound('nx-feature-notvisible', Ext.emptyFn)
+        },
+        callback: callback,
+        scope: scope,
+        timeout: timeout,
+        assertionName: 'waitForFeature',
+        description: ' feature to be set to "' + title + '"'
+      });
     }
   }
 });

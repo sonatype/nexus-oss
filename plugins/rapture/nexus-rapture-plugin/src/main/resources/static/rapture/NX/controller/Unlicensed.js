@@ -18,10 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Unlicensed', {
-  extend: 'Ext.app.Controller',
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
+  extend: 'NX.app.Controller',
 
   views: [
     'Unlicensed',
@@ -79,7 +76,7 @@ Ext.define('NX.controller.Unlicensed', {
   /**
    * Removes {@link NX.view.Unlicensed} view from {@link Ext.container.Viewport}.
    *
-   * @public
+   * @override
    */
   onDestroy: function () {
     var me = this,

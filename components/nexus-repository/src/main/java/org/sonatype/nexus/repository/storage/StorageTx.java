@@ -24,6 +24,7 @@ import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.transaction.Transaction;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
@@ -33,7 +34,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
  * @since 3.0
  */
 public interface StorageTx
-    extends AutoCloseable
+    extends Transaction
 {
   /**
    * Provides the underlying graph transaction.
@@ -42,6 +43,11 @@ public interface StorageTx
    * directly commit, rollback, or close the underlying transaction.
    */
   ODatabaseDocumentTx getDb();
+
+  /**
+   * Begins the transaction.
+   */
+  void begin();
 
   /**
    * Commits the transaction.

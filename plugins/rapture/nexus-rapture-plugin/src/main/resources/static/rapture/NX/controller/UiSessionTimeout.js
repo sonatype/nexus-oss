@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.UiSessionTimeout', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.ux.ActivityMonitor',
     'NX.Messages',
@@ -27,9 +27,6 @@ Ext.define('NX.controller.UiSessionTimeout', {
     'NX.I18n',
     'NX.State'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'ExpireSession'

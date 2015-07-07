@@ -18,16 +18,13 @@
  * @since 3.0
  */
 Ext.define('NX.controller.User', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.util.Base64',
     'NX.Messages',
     'NX.State',
     'NX.I18n'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'header.SignIn',

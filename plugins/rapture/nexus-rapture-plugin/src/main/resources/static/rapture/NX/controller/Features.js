@@ -18,10 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Features', {
-  extend: 'Ext.app.Controller',
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
+  extend: 'NX.app.Controller',
 
   models: [
     'Feature'
@@ -32,10 +29,20 @@ Ext.define('NX.controller.Features', {
   ],
 
   statics: {
+    /**
+     * Always returns true.
+     *
+     * @returns {boolean}
+     */
     alwaysVisible: function () {
       return true;
     },
 
+    /**
+     * Always returns false.
+     *
+     * @returns {boolean}
+     */
     alwaysHidden: function () {
       return false;
     }

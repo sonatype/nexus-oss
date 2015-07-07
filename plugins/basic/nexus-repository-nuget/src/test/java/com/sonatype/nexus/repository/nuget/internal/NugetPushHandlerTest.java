@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
@@ -25,6 +27,7 @@ import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import org.apache.commons.fileupload.util.Streams;
 import org.junit.Before;
@@ -49,6 +52,10 @@ public class NugetPushHandlerTest
 
   Repository repository = mock(Repository.class);
 
+  StorageTx tx = mock(StorageTx.class);
+
+  StorageFacet storageFacet = mock(StorageFacet.class);
+
   NugetGalleryFacet nugetGalleryFacet = mock(NugetGalleryFacet.class);
 
   NugetPushHandler underTest = new NugetPushHandler();
@@ -57,6 +64,8 @@ public class NugetPushHandlerTest
   public void setup() throws Exception {
     when(context.getRequest()).thenReturn(request);
     when(context.getRepository()).thenReturn(repository);
+    when(storageFacet.txSupplier()).thenReturn(Suppliers.ofInstance(tx));
+    when(repository.facet(StorageFacet.class)).thenReturn(storageFacet);
     when(repository.facet(NugetGalleryFacet.class)).thenReturn(nugetGalleryFacet);
   }
 

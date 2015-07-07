@@ -10,42 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext*/
+package org.sonatype.nexus.repository.storage;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.repository.view.Context;
+import org.sonatype.nexus.repository.view.Handler;
+import org.sonatype.nexus.repository.view.Response;
+import org.sonatype.nexus.transaction.UnitOfWork;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
- * List of all messages.
+ * Invokes the remaining handler chain within the repository's unit-of-work.
  *
  * @since 3.0
  */
-Ext.define('NX.view.dev.Messages', {
-  extend: 'Ext.grid.Panel',
-  alias: 'widget.nx-dev-messages',
-
-  title: 'Messages',
-  store: 'Message',
-  emptyText: 'No messages',
-  viewConfig: {
-    deferEmptyText: false
-  },
-
-  columns: [
-    {
-      xtype: 'nx-iconcolumn',
-      text: 'icon',
-      dataIndex: 'type',
-      width: 48,
-      align: 'center',
-      iconNamePrefix: 'message-',
-      iconVariant: 'x16'
-    },
-    { text: 'type', dataIndex: 'type' },
-    { text: 'text', dataIndex: 'text', flex: 1 },
-    { text: 'timestamp', dataIndex: 'timestamp', width: 300 }
-  ],
-
-  plugins: [
-    { ptype: 'rowediting', clicksToEdit: 1 },
-    'gridfilterbox'
-  ]
-
-});
+@Named
+@Singleton
+public class UnitOfWorkHandler
+    extends ComponentSupport
+    implements Handler
+{
+  @Override
+  public Response handle(Context context) throws Exception {
+    UnitOfWork.begin(context.getRepository().facet(StorageFacet.class).txSupplier());
+    try {
+      return context.proceed();
+    }
+    finally {
+      UnitOfWork.end();
+    }
+  }
+}

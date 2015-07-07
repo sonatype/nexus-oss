@@ -18,10 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Main', {
-  extend: 'Ext.app.Controller',
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
+  extend: 'NX.app.Controller',
 
   views: [
     'Main',
@@ -90,7 +87,7 @@ Ext.define('NX.controller.Main', {
   /**
    * Removes {@link NX.view.Main} view from {@link Ext.container.Viewport}.
    *
-   * @public
+   * @override
    */
   onDestroy: function () {
     var me = this,

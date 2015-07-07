@@ -65,7 +65,6 @@ Ext.define('NX.view.dev.Panel', {
       { xtype: 'nx-dev-icons' },
       { xtype: 'nx-dev-features' },
       { xtype: 'nx-dev-permissions' },
-      { xtype: 'nx-dev-messages' },
       { xtype: 'nx-dev-state' },
       { xtype: 'nx-dev-stores' },
       { xtype: 'nx-dev-logging' }

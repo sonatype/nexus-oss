@@ -28,7 +28,7 @@ Ext.define('NX.ext.SearchBox', {
   submitValue: false,
 
   /**
-   * Number of milliseconds to trigger searching (defaults to 1000).
+   * Number of milliseconds to trigger searching.
    *
    * @cfg {Number}
    */
@@ -53,23 +53,26 @@ Ext.define('NX.ext.SearchBox', {
 
     me.addEvents(
         /**
+         * Fires before a search is performed.
+         *
          * @event beforesearch
-         * Fires before a search is performed
          */
         'beforesearch',
 
         /**
-         * @event search
          * Fires when a search values was typed. Fires with a delay of **{@link #searchDelay}**.
-         * @param {NX.view.header.SearchBox} this search box
+         *
+         * @event search
+         * @param {NX.ext.SearchBox} this search box
          * @param {String} search value
          */
         'search',
 
         /**
-         * @event searchcleared
          * Fires when a search value had been cleared.
-         * @param {NX.view.header.SearchBox} this search box
+         *
+         * @event searchcleared
+         * @param {NX.ext.SearchBox} this search box
          */
         'searchcleared'
     );

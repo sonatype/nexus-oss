@@ -12,10 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.maven.deploy;
 
-import javax.inject.Inject;
-
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -39,9 +36,6 @@ import static org.hamcrest.Matchers.hasSize;
 public class MavenDeployIT
     extends MavenITSupport
 {
-  @Inject
-  private RepositoryManager repositoryManager;
-
   private Repository mavenSnapshots;
 
   private Repository mavenReleases;

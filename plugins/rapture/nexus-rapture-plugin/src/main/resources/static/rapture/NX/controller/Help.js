@@ -18,15 +18,12 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Help', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Icons',
     'NX.I18n',
     'NX.Windows'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'header.Help',
@@ -41,7 +38,11 @@ Ext.define('NX.controller.Help', {
   ],
 
   /**
+   * The base-url for help links.
+   *
    * @private
+   * @property {String}
+   * @readonly
    */
   baseUrl: 'http://links.sonatype.com/products/nexus',
 

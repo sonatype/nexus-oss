@@ -18,15 +18,12 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Outreach', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.util.Url',
     'NX.State',
     'NX.Permissions'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   refs: [
     { ref: 'welcomePage', selector: 'nx-dashboard-welcome' }

@@ -32,7 +32,7 @@ Ext.define('NX.view.message.Notification', {
   paddingX: 10,
   paddingY: 55,
 
-  stickWhileHover: false,
+  stickWhileHover: true,
   slideInDuration: 800,
   slideBackDuration: 1500,
   autoCloseDelay: 4000,
