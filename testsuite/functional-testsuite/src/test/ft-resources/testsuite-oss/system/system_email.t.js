@@ -14,101 +14,82 @@
  * Tests system email server viewing, updating, discarding.
  */
 StartTest(function(t) {
-  var enabled, 
-      host, 
-      port, 
-      subject, 
-      username, 
-      password;
+  var originalValues;
 
   t.describe('Given an admin administering Email Server', function(t) {
-    t.it('Should be able to view the configuration', function (t) {
+    t.it('Should be able to view the configuration', function(t) {
       t.chain(
           t.openPageAsAdmin('admin/system/emailserver'),
           {wait: 'CQVisible', args: '>>nx-coreui-system-smtp-settings'},
-          // capture the values to use later to verify discard, reset form
-          function (next) {
-            var settings = t.cq1('nx-coreui-system-smtp-settings');
-            enabled = settings.down('checkbox[name=enabled]').getValue();
-            host = settings.down('field[name=host]').getValue();
-            port = settings.down('field[name=port]').getValue();
-            subject = settings.down('field[name=subjectPrefix]').getValue();
-            username = settings.down('field[name=username]').getValue();
-            password = settings.down('field[name=password]').getValue();
+          // capture the values to use later to verify, discard, and reset form
+          function(next) {
+            var settings = t.cq1('nx-coreui-system-smtp-settings'),
+                form = settings.down('form').getForm();
+            originalValues = form.getFieldValues();
             next();
           }
       );
-    }); 
+    });
     t.it('Should be able to discard settings on the form', function(t) {
-      t.chain( 
-          // click the enabled checkbox
-          {click: '>>checkbox[name=enabled]'},
+      t.chain(
           // type in some test strings to empty fields
-          {type: '_test', target: '>>nx-coreui-system-smtp-settings field[name=subjectPrefix]'},
-          {type: '_testUser', target: '>>nx-coreui-system-smtp-settings field[name=username]'},
-          {type: '_testPassword', target: '>>nx-coreui-system-smtp-settings field[name=password]'},
-          // press the "Save" button
-          {click: '>>nx-coreui-system-smtp-settings button[text=Discard]'},
+          t.selectAndType('_test', '>>nx-coreui-system-smtp-settings field[name=subjectPrefix]'),
+          t.selectAndType('_testUser', '>>nx-coreui-system-smtp-settings field[name=username]'),
+          t.selectAndType('_testPassword', '>>nx-coreui-system-smtp-settings field[name=password]'),
+          {click: '>>nx-coreui-system-smtp-settings button[text=Discard]', desc: 'Discard all changes'},
           // let the UI update
           function(next) {
             t.waitForAnimations(next);
           },
           // test that we actually discarded the new values
           function(next) {
-            var settings = t.cq1('nx-coreui-system-smtp-settings'),
-                enabledField = settings.down('checkbox[name=enabled]').getValue(),
-                hostField = settings.down('field[name=host]').getValue(),
-                portField = settings.down('field[name=port]').getValue(),
-                subjectField = settings.down('field[name=subjectPrefix]').getValue(),
-                usernameField = settings.down('field[name=username]').getValue(),
-                passwordField = settings.down('field[name=password]').getValue();
-            
-            // compare fields values after to fields state at first view
-            t.expect(enabledField).toBe(enabled);
-            t.expect(hostField).toBe(host);
-            t.expect(portField).toBe(port);
-            t.expect(subjectField).toBe(subject);
-            t.expect(usernameField).toBe(username);
-            t.expect(passwordField).toBe(password); 
+            var form = t.cq1('nx-coreui-system-smtp-settings').down('form').getForm();
+            t.isDeeply(originalValues, form.getFieldValues(), 'Form should be back in original state');
             next();
           }
       )
     });
     t.it('Should be able to enable the server with test values', function(t) {
       t.chain(
-          // click the enabled checkbox
-          {click: '>>checkbox[name=enabled]'},
           // type in some test strings to empty fields
-          {type: '_test', target: '>>nx-coreui-system-smtp-settings field[name=subjectPrefix]'},
-          {type: '_testUser', target: '>>nx-coreui-system-smtp-settings field[name=username]'},
-          {type: '_testPassword', target: '>>nx-coreui-system-smtp-settings field[name=password]'},
+          t.selectAndType('_test', '>>nx-coreui-system-smtp-settings field[name=subjectPrefix]'),
+          t.selectAndType('_testUser', '>>nx-coreui-system-smtp-settings field[name=username]'),
+          t.selectAndType('_testPassword', '>>nx-coreui-system-smtp-settings field[name=password]'),
           // press the "Save" button
-          {click: '>>nx-coreui-system-smtp-settings button[action=save]'},
-          
+          {click: '>>nx-coreui-system-smtp-settings button[action=save]', desc: 'Save new settings'},
+          // let the UI update
           function(next) {
             t.waitForAnimations(next);
+          },
+          // verify new values
+          function(next) {
+            var form = t.cq1('nx-coreui-system-smtp-settings').down('form').getForm();
+            t.isDeeply(Ext.apply(Ext.clone(originalValues), {
+                  subjectPrefix: '_test',
+                  username: '_testUser',
+                  password: '_testPassword'
+                }), form.getFieldValues(), 'Form should be updated');
+            next();
           }
-        )
+      )
     });
     t.it('Should accept default values', function(t) {
       t.chain(
-        function(next) {
-          t.selectAndType(enabled, '>>nx-coreui-system-smtp-settings checkbox[name=enabled]');
-          t.selectAndType(host, '>>nx-coreui-system-smtp-settings field[name=host]');
-          t.selectAndType(port, '>>nx-coreui-system-smtp-settings field[name=port]');
-          t.selectAndType(subject, '>>nx-coreui-system-smtp-settings field[name=subjectPrefix]');
-          t.selectAndType(username, '>>nx-coreui-system-smtp-settings field[name=username]');
-          t.selectAndType(password, '>>nx-coreui-system-smtp-settings field[name=password]');
-          next();
-        },
-        function(next) {
-          t.waitForAnimations(next);
-        }, 
-        // press the "Save" button
-        {click: '>>nx-coreui-system-smtp-settings button[action=save]'},
-        function(next) {
-          t.waitForAnimations(next);
-        } 
+          t.selectAndType(originalValues.host, '>>nx-coreui-system-smtp-settings field[name=host]'),
+          t.selectAndType(originalValues.port, '>>nx-coreui-system-smtp-settings field[name=port]'),
+          t.selectAndType('', '>>nx-coreui-system-smtp-settings field[name=subjectPrefix]'), //value is undefined to start when we dump the fields
+          t.selectAndType(originalValues.username, '>>nx-coreui-system-smtp-settings field[name=username]'),
+          t.selectAndType(originalValues.password, '>>nx-coreui-system-smtp-settings field[name=password]'),
+          // press the "Save" button
+          {click: '>>nx-coreui-system-smtp-settings button[action=save]'},
+          function(next) {
+            t.waitForAnimations(next);
+          },
+          function(next) {
+            var form = t.cq1('nx-coreui-system-smtp-settings').down('form').getForm();
+            t.isDeeply(originalValues, form.getFieldValues(), 'Form should be back in original state');
+            next();
+          }
       )
     });
   });
