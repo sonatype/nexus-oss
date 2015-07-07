@@ -17,17 +17,25 @@ import java.io.InputStream;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobRef;
+import org.sonatype.nexus.common.collect.AttributesMap;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
+import com.google.common.collect.Maps;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -83,29 +91,32 @@ public class NugetGalleryFacetImplGetTest
     final Asset asset = mock(Asset.class);
     final Component component = mock(Component.class);
 
+    final NestedAttributesMap assetAttributes = new NestedAttributesMap("attributes", Maps.<String, Object>newHashMap());
+    assetAttributes.child(StorageFacet.P_CHECKSUM).set(HashAlgorithm.SHA512.name(),
+        HashAlgorithm.SHA512.function().hashLong(1L).toString());
+
     final StorageTx tx = mock(StorageTx.class);
 
     doReturn(component).when(galleryFacet).findComponent(any(StorageTx.class), eq(packageId), eq(version));
     when(tx.firstAsset(component)).thenReturn(asset);
     when(asset.contentType()).thenReturn(contentType);
     when(asset.blobRef()).thenReturn(blobRef);
+    when(asset.attributes()).thenReturn(assetAttributes);
     when(tx.requireBlob(eq(blobRef))).thenReturn(blob);
     when(blob.getInputStream()).thenReturn(blobStream);
 
     UnitOfWork.beginBatch(tx);
-    final Payload payload;
+    final Content content;
     try {
-      payload = galleryFacet.get(packageId, version);
+      content = galleryFacet.get(packageId, version);
     }
     finally {
       UnitOfWork.end();
     }
 
-    assertTrue(payload instanceof StreamPayload);
-    StreamPayload streamPayload = (StreamPayload) payload;
-
-    assertThat(streamPayload.openInputStream(), is(blobStream));
-    assertThat(streamPayload.getSize(), is(size));
-    assertThat(streamPayload.getContentType(), is(contentType));
+    assertThat(component, notNullValue());
+    assertThat(content.openInputStream(), is(blobStream));
+    assertThat(content.getSize(), is(size));
+    assertThat(content.getContentType(), is(contentType));
   }
 }

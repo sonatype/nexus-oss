@@ -21,6 +21,7 @@ NX.TestHarness.start(
         {
           group: 'UT',
           hostPageUrl: undefined,
+          waitForNxAppReady: false,
           preload: [
             NX.TestHarness.resource('static/rapture/baseapp-{mode}.js'),
             NX.TestHarness.resource('static/rapture/extdirect-{mode}.js'),
@@ -28,7 +29,8 @@ NX.TestHarness.start(
           ],
           items: [
             { url: 'testsuite-oss/framework/statechange.t.js' },
-            { url: 'testsuite-oss/framework/validation.t.js' }
+            { url: 'testsuite-oss/framework/validation.t.js' },
+            { url: 'testsuite-oss/framework/repository_urls.t.js' }
           ]
         },
 
@@ -37,7 +39,9 @@ NX.TestHarness.start(
           items: [
             { url: 'testsuite-oss/framework/signin_signout.t.js' },
             { url: 'testsuite-oss/framework/mode_button.t.js' },
-            { url: 'testsuite-oss/framework/unsupported_browser.t.js' }
+            { url: 'testsuite-oss/framework/unsupported_browser.t.js' },
+            { url: 'testsuite-oss/framework/bookmarking_unauthenticated.t.js' },
+            { url: 'testsuite-oss/framework/bookmarking_authenticated.t.js' }
           ]
         }
       ]
@@ -67,7 +71,6 @@ NX.TestHarness.start(
         }
       ]
     },
-
 
     {
       group: 'Security',
@@ -106,7 +109,8 @@ NX.TestHarness.start(
           items: [
             { url: 'testsuite-oss/system/system_bundles.t.js' },
             { url: 'testsuite-oss/system/system_tasks.t.js' },
-            { url: 'testsuite-oss/system/http_configuration.t.js' }
+            { url: 'testsuite-oss/system/http_configuration.t.js' },
+            { url: 'testsuite-oss/system/system_capabilities.t.js' }
           ]
         }
       ]

@@ -18,16 +18,13 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Icon', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.Error',
     'Ext.util.CSS',
     'NX.util.Url',
     'NX.Icons'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   models: [
     'Icon'

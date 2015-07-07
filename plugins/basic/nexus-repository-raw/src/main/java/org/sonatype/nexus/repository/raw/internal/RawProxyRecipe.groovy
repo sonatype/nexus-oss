@@ -33,6 +33,8 @@ import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.storage.UnitOfWorkHandler;
 import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
+import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
+import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
 import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
@@ -100,6 +102,12 @@ class RawProxyRecipe
   ProxyHandler proxyHandler
 
   @Inject
+  ConditionalRequestHandler conditionalRequestHandler
+
+  @Inject
+  ContentHeadersHandler contentHeadersHandler
+
+  @Inject
   public RawProxyRecipe(final @Named(ProxyType.NAME) Type type,
                         final @Named(RawFormat.NAME) Format format)
   {
@@ -131,6 +139,8 @@ class RawProxyRecipe
         .handler(exceptionHandler)
         .handler(negativeCacheHandler)
         .handler(partialFetchHandler)
+        .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
         .handler(proxyHandler)
         .handler(notFound())

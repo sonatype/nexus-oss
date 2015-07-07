@@ -69,13 +69,13 @@ public abstract class ProxyFacetSupport
      * Artifact max-age minutes.
      */
     @NotNull
-    public int artifactMaxAge;
+    public int contentMaxAge;
 
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
           "remoteUrl=" + remoteUrl +
-          ", artifactMaxAge=" + artifactMaxAge +
+          ", contentMaxAge=" + contentMaxAge +
           '}';
     }
   }
@@ -85,6 +85,8 @@ public abstract class ProxyFacetSupport
   private HttpClientFacet httpClient;
 
   private boolean remoteUrlChanged;
+
+  private volatile String cacheToken;
 
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
@@ -147,15 +149,11 @@ public abstract class ProxyFacetSupport
 
     Content content = getCachedPayload(context);
 
-    if (content == null || isStale(context)) {
+    if (isStale(context, content)) {
       try {
         final Content remote = fetch(context, content);
         if (remote != null) {
-
-          // TODO: Introduce content validation.. perhaps content's type not matching path's implied type.
-
           store(context, remote);
-
           content = getCachedPayload(context);
         }
       }
@@ -165,6 +163,12 @@ public abstract class ProxyFacetSupport
       }
     }
     return content;
+  }
+
+  @Override
+  public void invalidateProxyCaches() {
+    log.info("Invalidating proxy caches of {}", getRepository().getName());
+    this.cacheToken = Long.toString(System.nanoTime());
   }
 
   /**
@@ -206,19 +210,21 @@ public abstract class ProxyFacetSupport
     StatusLine status = response.getStatusLine();
     log.debug("Status: {}", status);
 
+    final CacheInfo cacheInfo = new CacheInfo(DateTime.now(), cacheToken);
+
     if (status.getStatusCode() == HttpStatus.SC_OK) {
       HttpEntity entity = response.getEntity();
       log.debug("Entity: {}", entity);
 
       Payload payload = new HttpEntityPayload(response, entity);
       final Content result = new Content(payload);
-      result.getAttributes().set(Content.CONTENT_LAST_MODIFIED,
-          extractLastModified(request, response.getLastHeader(HttpHeaders.LAST_MODIFIED)));
-      result.getAttributes().set(Content.CONTENT_ETAG, extractETag(response.getLastHeader(HttpHeaders.ETAG)));
+      result.getAttributes().set(Content.CONTENT_LAST_MODIFIED, extractLastModified(request, response));
+      result.getAttributes().set(Content.CONTENT_ETAG, extractETag(response));
+      result.getAttributes().set(CacheInfo.class, cacheInfo);
       return result;
     }
     if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
-      indicateVerified(context);
+      indicateVerified(context, cacheInfo);
     }
     HttpClientUtils.closeQuietly(response);
 
@@ -229,7 +235,8 @@ public abstract class ProxyFacetSupport
    * Extract Last-Modified date from response if possible, or {@code null}.
    */
   @Nullable
-  private DateTime extractLastModified(final HttpGet request, final Header lastModifiedHeader) {
+  private DateTime extractLastModified(final HttpGet request, final HttpResponse response) {
+    final Header lastModifiedHeader = response.getLastHeader(HttpHeaders.LAST_MODIFIED);
     if (lastModifiedHeader != null) {
       try {
         return new DateTime(DateUtils.parseDate(lastModifiedHeader.getValue()).getTime());
@@ -246,7 +253,8 @@ public abstract class ProxyFacetSupport
    * Extract ETag from response if possible, or {@code null}.
    */
   @Nullable
-  private String extractETag(final Header etagHeader) {
+  private String extractETag(final HttpResponse response) {
+    final Header etagHeader = response.getLastHeader(HttpHeaders.ETAG);
     if (etagHeader != null) {
       final String etag = etagHeader.getValue();
       if (!Strings.isNullOrEmpty(etag)) {
@@ -262,36 +270,36 @@ public abstract class ProxyFacetSupport
   }
 
   /**
-   * For whatever component/asset is implied by the Context, return the date it was last verified up to date, or {@code
-   * null} if it isn't present.
-   */
-  @Nullable
-  protected abstract DateTime getCachedPayloadLastVerified(final Context context) throws IOException;
-
-  /**
    * For whatever component/asset
    */
-  protected abstract void indicateVerified(final Context context) throws IOException;
+  protected abstract void indicateVerified(final Context context, final CacheInfo cacheInfo) throws IOException;
 
   /**
    * Provide the URL of the content relative to the repository root.
    */
   protected abstract String getUrl(final @Nonnull Context context);
 
-  private boolean isStale(final Context context) throws IOException {
-    if (config.artifactMaxAge < 0) {
-      log.trace("Artifact max age checking disabled");
-      return false;
-    }
-
-    final DateTime lastUpdated = getCachedPayloadLastVerified(context);
-
-    if (lastUpdated == null) {
-      log.debug("Artifact last modified date unknown");
+  private boolean isStale(final Context context, final Content content) throws IOException {
+    if (content == null) {
+      // not in cache
       return true;
     }
 
-    final DateTime earliestFreshDate = new DateTime().minusMinutes(config.artifactMaxAge);
-    return lastUpdated.isBefore(earliestFreshDate);
+    if (config.contentMaxAge < 0) {
+      log.trace("Content max age checking disabled");
+      return false;
+    }
+
+    // Note: content w/o CacheInfo was not stored by ProxyFacetSupport, see fetch(String, Context, Content)
+    final CacheInfo cacheInfo = content.getAttributes().require(CacheInfo.class);;
+    if (cacheToken != null && !cacheToken.equals(cacheInfo.getCacheToken())) {
+      log.debug("Content expired (cacheToken)");
+      return true;
+    }
+    if (cacheInfo.getLastVerified().isBefore(new DateTime().minusMinutes(config.contentMaxAge))) {
+      log.debug("Content expired (age)");
+      return true;
+    }
+    return false;
   }
 }

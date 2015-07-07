@@ -19,7 +19,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.SettingsForm', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.ComponentQuery',
     'NX.Messages'
@@ -101,8 +101,9 @@ Ext.define('NX.controller.SettingsForm', {
   },
 
   /**
-   * @private
    * Submits the form containing the button, if form's api submit function is defined.
+   *
+   * @private
    */
   submitForm: function (button) {
     var me = this,

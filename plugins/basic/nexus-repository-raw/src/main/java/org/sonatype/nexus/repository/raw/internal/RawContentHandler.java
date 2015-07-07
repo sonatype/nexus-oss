@@ -18,9 +18,10 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.repository.raw.RawContent;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
+import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -33,8 +34,6 @@ import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
 import static org.sonatype.nexus.repository.http.HttpMethods.MKCOL;
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
-import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toContent;
-import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toPayload;
 
 /**
  * Raw content hosted handler.
@@ -61,15 +60,15 @@ public class RawContentHandler
     switch (method) {
       case HEAD:
       case GET: {
-        RawContent content = storage.get(name);
+        Content content = storage.get(name);
         if (content == null) {
           return HttpResponses.notFound(name);
         }
-        return HttpResponses.ok(toPayload(content));
+        return HttpResponses.ok(content);
       }
 
       case PUT: {
-        RawContent content = toContent(context.getRequest().getPayload(), new DateTime());
+        Payload content = context.getRequest().getPayload();
 
         storage.put(name, content);
         return HttpResponses.created();

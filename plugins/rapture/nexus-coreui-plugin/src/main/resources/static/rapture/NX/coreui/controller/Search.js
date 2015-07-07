@@ -500,7 +500,7 @@ Ext.define('NX.coreui.controller.Search', {
   setAssetIcon: function(container, componentModel, assetModel) {
     if (assetModel) {
       // Set the appropriate breadcrumb icon
-      me.setItemClass(2, container.iconCls);
+      this.setItemClass(2, container.iconCls);
     }
   },
 

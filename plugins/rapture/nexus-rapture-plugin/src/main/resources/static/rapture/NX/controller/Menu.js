@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Menu', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Bookmarks',
     'NX.controller.User',
@@ -27,9 +27,6 @@ Ext.define('NX.controller.Menu', {
     'NX.Security',
     'NX.State'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'feature.Menu',
@@ -179,8 +176,10 @@ Ext.define('NX.controller.Menu', {
 
   /**
    * Unregister Application listener.
+   *
+   * @override
    */
-  destroy: function(){
+  destroy: function() {
     var me = this;
 
     me.getApplication().un('controllerschanged', me.refreshMenu, me);
@@ -384,8 +383,9 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
+   * Refresh modes and feature menu.
+   *
    * @public
-   * Refresh modes & feature menu.
    */
   refreshMenu: function () {
     var me = this;
@@ -400,9 +400,10 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
-   * @private
    * Refreshes modes buttons based on the fact that there are features visible for that mode or not.
    * In case that current mode is no longer visible, auto selects a new one.
+   *
+   * @private
    */
   refreshVisibleModes: function () {
     var me = this,

@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.HealthCheckColumns', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.grid.column.Column',
     'NX.Conditions',
@@ -35,7 +35,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
     'SearchResult'
   ],
   refs: [
-    { ref: 'healthcheckResult', selector: 'nx-coreui-healthcheck-result-list' },
+    { ref: 'healthcheckResult', selector: 'grid[healthCheckColumnsTarget=true]' },
     { ref: 'componentDetails', selector: 'nx-coreui-component-details' }
   ],
 
@@ -55,7 +55,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
         }
       },
       component: {
-        'nx-coreui-healthcheck-result-list': {
+        'grid[healthCheckColumnsTarget=true]': {
           afterrender: me.bindHealthCheckColumns,
           selection: me.showHealthCheckInfo
         }
