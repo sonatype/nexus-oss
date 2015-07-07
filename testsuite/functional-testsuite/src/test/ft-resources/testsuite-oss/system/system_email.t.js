@@ -14,6 +14,19 @@
  * Tests system email server viewing, updating, discarding.
  */
 StartTest(function(t) {
+  var enabled, 
+      host, 
+      port, 
+      subject, 
+      username, 
+      password,
+      enabledField,
+      hostField,
+      portField,
+      subjectField,
+      usernameField,
+      passwordField;
+
   t.describe('Given an admin administering Email Server', function(t) {
     t.it('Should be able to view the configuration', function (t) {
       t.chain(
@@ -83,7 +96,7 @@ StartTest(function(t) {
           }
         )
     });
-    t.it('Should accept default values' function(t) {
+    t.it('Should accept default values', function(t) {
       t.chain(
 
 
