@@ -248,7 +248,10 @@ Class('NX.TestClass', {
         },
         { type: 'admin[TAB]', target: this.cq1('#username') },
         { type: 'admin123', target: this.cq1('#password') },
-        { type: '[ENTER]' }
+        { type: '[ENTER]' },
+        function(next) {
+          this.waitForAnimations(next);
+        }
       ];
     },
 
