@@ -92,9 +92,9 @@ public class MapdbBlobMetadataStore
   @Override
   protected void doStart() throws Exception {
     DirSupport.mkdir(file.getParentFile());
-    this.database = DBMaker.newFileDB(file)
+    this.database = DBMaker.fileDB(file)
         .checksumEnable()
-        .mmapFileEnableIfSupported()
+        .fileMmapEnableIfSupported()
         .makeTxMaker();
   }
 
@@ -105,15 +105,15 @@ public class MapdbBlobMetadataStore
   }
 
   private Atomic.Long idSequence(final DB db) {
-    return db.getAtomicLong("id_sequence");
+    return db.atomicLong("id_sequence");
   }
 
   private HTreeMap<BlobId, MetadataRecord> entries(final DB db) {
-    return db.getHashMap("entries");
+    return db.hashMap("entries");
   }
 
   private NavigableSet<BlobId> states(final DB db, final BlobState state) {
-    return db.getTreeSet("state_" + state.name());
+    return db.treeSet("state_" + state.name());
   }
 
   /**
@@ -308,16 +308,12 @@ public class MapdbBlobMetadataStore
 
     log.trace("Get: {}", id);
 
-    DB db = database.makeTx();
-    try {
+    try (DB db = database.makeTx()) {
       MetadataRecord record = entries(db).get(id);
       if (record != null) {
         return convert(record);
       }
       return null;
-    }
-    finally {
-      db.close();
     }
   }
 
@@ -415,12 +411,8 @@ public class MapdbBlobMetadataStore
   @Override
   public long getBlobCount() {
     ensureStarted();
-    DB db = database.makeTx();
-    try {
+    try (DB db = database.makeTx()) {
       return entries(db).sizeLong();
-    }
-    finally {
-      db.close();
     }
   }
 
