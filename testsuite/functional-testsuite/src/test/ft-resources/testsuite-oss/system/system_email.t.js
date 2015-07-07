@@ -36,7 +36,7 @@ StartTest(function(t) {
           t.selectAndType('_test', '>>nx-coreui-system-smtp-settings field[name=subjectPrefix]'),
           t.selectAndType('_testUser', '>>nx-coreui-system-smtp-settings field[name=username]'),
           t.selectAndType('_testPassword', '>>nx-coreui-system-smtp-settings field[name=password]'),
-          {click: '>>nx-coreui-system-smtp-settings button[text=Discard]', desc: 'Discard all changes'},
+          {click: '>>nx-coreui-system-smtp-settings button[action=discard]', desc: 'Discard all changes'},
           // let the UI update
           function(next) {
             t.waitForAnimations(next);
