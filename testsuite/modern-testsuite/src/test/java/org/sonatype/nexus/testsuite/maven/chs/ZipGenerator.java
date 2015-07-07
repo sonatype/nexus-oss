@@ -42,8 +42,7 @@ public class ZipGenerator
       return EMPTY_ZIP.length;
     }
     else {
-      long timesZeroByte = length - EMPTY_ZIP.length;
-      return EMPTY_ZIP.length + timesZeroByte;
+      return length;
     }
   }
 
