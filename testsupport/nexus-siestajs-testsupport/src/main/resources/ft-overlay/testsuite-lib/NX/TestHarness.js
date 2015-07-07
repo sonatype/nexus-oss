@@ -22,25 +22,53 @@ Class('NX.TestHarness', {
 
   my: {
     has: {
-      appMode: 'prod'
+      /**
+       * @private
+       * @property {String}
+       */
+      appMode: 'prod',
+
+      /**
+       * Wait for {@link NX.app.Application#ready} to become true.
+       *
+       * @cfg {Boolean}
+       */
+      waitForNxAppReady: true,
+
+      /**
+       * default describe() timeout after 5 minutes.
+       *
+       * @cfg {Number}
+       */
+      describeTimeout: 300000,
+
+      /**
+       * default it() timeout after 30 seconds.
+       *
+       * @cfg {Number}
+       */
+      itTimeout: 30000
     },
 
     methods: {
+      /**
+       * @override
+       */
       configure: function (config) {
         var debug = window.location.href.search("[?&]debug") > -1;
-        console.log('Debug: ' + debug);
+        console.log('Debug:', debug);
 
         if (debug) {
           this.appMode = 'debug';
         }
-        console.log('App Mode: ' + this.appMode);
+        console.log('App Mode:', this.appMode);
 
         // detect the application url to use, enable debug
         var url = '/';
         if (debug) {
           url = url + '?debug';
         }
-        console.log('URL: ' + url);
+        console.log('URL:', url);
 
         // apply defaults to the configuration
         Ext.applyIf(config, {
@@ -63,18 +91,37 @@ Class('NX.TestHarness', {
           // disable recording offsets
           recorderConfig: {
             recordOffsets: false
-          },
-
-          // default describe() timeout after 5 minutes
-          describeTimeout: 300000,
-
-          // default it() timeout after 30 seconds
-          itTimeout: 30000
+          }
         });
 
         this.SUPER(config);
       },
 
+      /**
+       * Propagate harness configuration customization to tests.
+       *
+       * @override
+       */
+      getNewTestConfiguration: function (desc, scopeProvider, contentManager, launchOptions) {
+        var me = this,
+            config = this.SUPERARG(arguments);
+
+        Joose.A.each([
+          'waitForNxAppReady',
+          'describeTimeout',
+          'itTimeout'
+        ], function (name) {
+          config[name] = me.getDescriptorConfig(desc, name);
+        });
+
+        return config
+      },
+
+      /**
+       * @public
+       * @param ref
+       * @returns {XML|void|string}
+       */
       resource: function(ref) {
         return ref.replace('{mode}', this.appMode);
       }
