@@ -37,37 +37,15 @@ Ext.define('NX.view.feature.Content', {
       {
         xtype: 'panel',
         layout: { type: 'hbox' },
-        itemId: 'breadcrumb',
-        hidden: true
-      },
-      {
-        xtype: 'panel',
-        layout: { type: 'hbox' },
-        itemId: 'feature-root',
-        items: [
-          {
-            xtype: 'label',
-            cls: 'nx-feature-name',
-            itemId: 'title'
-          },
-          {
-            xtype: 'label',
-            cls: 'nx-feature-description',
-            itemId: 'description'
-          }
-        ]
+        itemId: 'breadcrumb'
       }
     ]
   },
 
   listeners: {
-    afterRender: function(){
-      var me = this,
-          title = me.down('#title'),
-          description = me.down('#description');
-
-      me.setTitle(title.text);
-      me.setDescription(description.text);
+    afterrender: function(obj) {
+      obj.rendered = true;
+      obj.showRoot();
     }
   },
 
@@ -76,11 +54,25 @@ Ext.define('NX.view.feature.Content', {
    */
   showRoot: function() {
     var me = this;
-    var root = me.down('#feature-root');
     var breadcrumb = me.down('#breadcrumb');
 
-    root.show();
-    breadcrumb.hide();
+    if (!me.rendered) {
+      return;
+    }
+
+    breadcrumb.removeAll();
+    breadcrumb.add(
+      {
+        xtype: 'label',
+        cls: 'nx-feature-name',
+        text: me.currentTitle
+      },
+      {
+        xtype: 'label',
+        cls: 'nx-feature-description',
+        text: me.currentDescription
+      }
+    );
   },
 
   /**
@@ -96,12 +88,10 @@ Ext.define('NX.view.feature.Content', {
    * @param text
    */
   setTitle: function(text) {
-    var me = this,
-        label = me.down('#title');
+    var me = this;
 
     me.callParent(arguments);
 
-    label.setText(text);
     me.currentTitle = text;
   },
 
@@ -112,9 +102,7 @@ Ext.define('NX.view.feature.Content', {
    * @param text
    */
   setDescription: function(text) {
-    var label = this.down('#description');
-
-    label.setText(text);
+    this.currentDescription = text;
   },
 
   /**

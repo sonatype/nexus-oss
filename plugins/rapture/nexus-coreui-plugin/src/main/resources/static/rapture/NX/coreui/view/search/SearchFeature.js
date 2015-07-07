@@ -21,21 +21,21 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-searchfeature',
 
-  // TODO: Needed?
-  itemId: 'searchfeature',
-
   iconName: 'search-default',
 
   masters: [
     {
       xtype: 'panel',
-      layout: 'border',
+      layout: {
+        type: 'vbox',
+        align: 'stretch',
+        pack: 'start'
+      },
       items: [
         {
           xtype: 'panel',
           itemId: 'criteria',
 
-          region: 'north',
           header: false,
 
           style: {
@@ -58,14 +58,13 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
         },
         {
           xtype: 'nx-coreui-search-result-list',
-          region: 'center',
+          flex: 1,
           header: false
         }
       ]
     },
     {
       xtype: 'panel',
-      region: 'center',
       layout: {
         type: 'vbox',
         align: 'stretch',
@@ -109,8 +108,10 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
   initComponent: function() {
     var me = this;
+    me.on('afterrender', function() {
+      // Set default icon for the component version list
+      me.down('nx-coreui-component-asset-list').up('nx-drilldown-item').setItemClass('nx-icon-search-component-detail-x16');
+    });
     me.callParent(arguments);
-    // Set default icon for the component version list
-    me.down('nx-coreui-component-asset-list').up('nx-drilldown-item').setItemClass('nx-icon-search-component-detail-x16');
   }
 });

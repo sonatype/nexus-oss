@@ -45,7 +45,7 @@ public class TransitionsInterceptor
 
     Transitions config = method.getAnnotation(Transitions.class);
     checkState(config != null);
-    Transition transition = states.transition(config.to(), config.ignore());
+    Transition transition = states.transition(config.to(), config.silent(), config.ignore());
     if (config.from() != null && config.from().length != 0) {
       transition = transition.from(config.from());
     }
