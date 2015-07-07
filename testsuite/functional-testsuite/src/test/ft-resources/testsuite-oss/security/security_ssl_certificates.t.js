@@ -89,7 +89,8 @@ StartTest(function(t) {
 
     var serverFieldCQ = '>>nx-coreui-sslcertificate-add-from-server #server';
 
-    t.it('An admin can load a certificate from a server', function(t) {
+    //disabled as we don't want CI to connect to external servers
+    t.xit('An admin can load a certificate from a server', function(t) {
 
       t.chain(
           {click: '>>nx-coreui-sslcertificate-list button[text=Load certificate] => .x-btn-button'},
