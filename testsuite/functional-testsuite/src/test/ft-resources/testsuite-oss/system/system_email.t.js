@@ -92,8 +92,23 @@ StartTest(function(t) {
     });
     t.it('Should accept default values', function(t) {
       t.chain(
-
-
+        function(next) {
+          t.selectAndType(enabled, '>>nx-coreui-system-smtp-settings checkbox[name=enabled]');
+          t.selectAndType(host, '>>nx-coreui-system-smtp-settings field[name=host]');
+          t.selectAndType(port, '>>nx-coreui-system-smtp-settings field[name=port]');
+          t.selectAndType(subject, '>>nx-coreui-system-smtp-settings field[name=subjectPrefix]');
+          t.selectAndType(username, '>>nx-coreui-system-smtp-settings field[name=username]');
+          t.selectAndType(password, '>>nx-coreui-system-smtp-settings field[name=password]');
+          next();
+        },
+        function(next) {
+          t.waitForAnimations(next);
+        }, 
+        // press the "Save" button
+        {click: '>>nx-coreui-system-smtp-settings button[action=save]'},
+        function(next) {
+          t.waitForAnimations(next);
+        } 
       )
     });
   });
