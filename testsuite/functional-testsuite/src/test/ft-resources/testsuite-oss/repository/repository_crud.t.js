@@ -26,11 +26,7 @@ StartTest(function(t) {
     t.it('Default repositories are populated', function(t) {
       t.chain(
           t.openPageAsAdmin('admin/repository/repositories'),
-          function(next) {
-            t.waitForAnimations(next);
-          },
-          {waitFor: 'CQ', args: 'nx-coreui-repository-list'},
-          Ext.clone(waitForStoreToLoad),
+          {waitForRowsVisible: 'nx-coreui-repository-list'},
           function(next) {
             var grid = t.cq1('nx-coreui-repository-list'),
                 store = grid.getStore(),
