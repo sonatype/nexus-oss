@@ -20,15 +20,15 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
+import org.sonatype.sisu.goodies.common.ByteSize;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClients;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
@@ -44,31 +44,58 @@ import static org.hamcrest.Matchers.equalTo;
 public class MavenHostedSwarmIT
     extends MavenHotspotITSupport
 {
-  @Test
-  public void hostedGetPutSame() throws Exception {
+  private void hostedSwarm(final String path, final Generator generator, final Supplier<ByteSize> lengthSupplier)
+      throws Exception
+  {
     final Configuration configuration = hostedConfig(testName.getMethodName(), VersionPolicy.RELEASE);
     Repository repository = repositoryManager.create(configuration);
     assertThat(repository, notNullValue());
-    AuthScope scope = new AuthScope(nexusUrl.getHost(), -1);
-    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    credentialsProvider.setCredentials(scope, new UsernamePasswordCredentials("admin", "admin123"));
-    final Maven2Client repositoryClient = new Maven2Client(
-        HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build(), HttpClientContext.create(),
-        resolveUrl(nexusUrl, "/repository/" + repository.getName() + "/").toURI());
+    final Maven2Client repositoryClient = createAdminMaven2Client(repository.getName());
 
     // create clients
     final List<Callable<HttpResponse>> clients = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
-      clients.add(new UriPut(repositoryClient, RELEASE_TXT_ARTIFACT_PATH));
+      clients.add(new UriPut(repositoryClient, path, generator, lengthSupplier));
     }
     for (int i = 0; i < 15; i++) {
-      clients.add(new UriGet(repositoryClient, RELEASE_TXT_ARTIFACT_PATH));
+      clients.add(new UriGet(repositoryClient, path));
     }
 
     // put initial as we don't know will GET or PUT "win"
-    HttpResponse response = repositoryClient.put(RELEASE_TXT_ARTIFACT_PATH, new StringEntity("test"));
+    final HttpEntity entity = generatedEntity(generator, lengthSupplier.get());
+    HttpResponse response = repositoryClient.put(path, entity);
     assertThat(response.getStatusLine().getStatusCode(), equalTo(201));
 
     assertAllHttpResponseIs2xx(performSwarm(clients));
+  }
+
+  @Test
+  public void smallZip() throws Exception {
+    hostedSwarm(RELEASE_ZIP_ARTIFACT_PATH, new ZipGenerator(), Suppliers.ofInstance(ByteSize.kiloBytes(1)));
+  }
+
+  @Test
+  public void mediumZip() throws Exception {
+    hostedSwarm(RELEASE_ZIP_ARTIFACT_PATH, new ZipGenerator(), Suppliers.ofInstance(ByteSize.kiloBytes(100)));
+  }
+
+  @Test
+  public void largeZip() throws Exception {
+    hostedSwarm(RELEASE_ZIP_ARTIFACT_PATH, new ZipGenerator(), Suppliers.ofInstance(ByteSize.megaBytes(5)));
+  }
+
+  @Test
+  public void smallXml() throws Exception {
+    hostedSwarm(RELEASE_XML_ARTIFACT_PATH, new XmlGenerator(), Suppliers.ofInstance(ByteSize.kiloBytes(1)));
+  }
+
+  @Test
+  public void mediumXml() throws Exception {
+    hostedSwarm(RELEASE_XML_ARTIFACT_PATH, new XmlGenerator(), Suppliers.ofInstance(ByteSize.kiloBytes(10)));
+  }
+
+  @Test
+  public void largeXml() throws Exception {
+    hostedSwarm(RELEASE_XML_ARTIFACT_PATH, new XmlGenerator(), Suppliers.ofInstance(ByteSize.kiloBytes(500)));
   }
 }

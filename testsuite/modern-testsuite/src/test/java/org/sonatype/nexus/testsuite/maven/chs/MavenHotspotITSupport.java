@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.testsuite.maven.chs;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -29,27 +33,35 @@ import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.MavenHostedFacet;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
-import org.sonatype.tests.http.server.fluent.Server;
-import org.sonatype.tests.http.server.jetty.behaviour.PathRecorderBehaviour;
+import org.sonatype.sisu.goodies.common.ByteSize;
 
 import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.ByteStreams;
+import com.google.common.net.HttpHeaders;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.ops4j.pax.exam.Option;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 
@@ -82,51 +94,9 @@ public abstract class MavenHotspotITSupport
   @Inject
   private LogManager logManager;
 
-  protected PathRecorderBehaviour pathRecorderBehaviour;
-
-  protected GeneratorBehaviour xmlArtifactGenerator;
-
-  protected GeneratorBehaviour zipArtifactGenerator;
-
-  protected GeneratorBehaviour txtArtifactGenerator;
-
-  protected Server upstream;
-
   @Before
   public void setupMavenDebugStorage() {
     logManager.setLoggerLevel("org.sonatype.nexus.repository.storage", LoggerLevel.DEBUG);
-  }
-
-  @Before
-  public void prepare() throws Exception {
-    pathRecorderBehaviour = new PathRecorderBehaviour();
-    xmlArtifactGenerator = new GeneratorBehaviour(new XmlGenerator());
-    zipArtifactGenerator = new GeneratorBehaviour(new ZipGenerator());
-    txtArtifactGenerator = new GeneratorBehaviour(new TextGenerator());
-
-    upstream = Server.withPort(0)
-        .serve("/" + RELEASE_XML_ARTIFACT_PATH).withBehaviours(
-            pathRecorderBehaviour,
-            xmlArtifactGenerator
-        )
-        .serve("/" + RELEASE_ZIP_ARTIFACT_PATH).withBehaviours(
-            pathRecorderBehaviour,
-            zipArtifactGenerator
-        )
-        .serve("/" + RELEASE_TXT_ARTIFACT_PATH).withBehaviours(
-            pathRecorderBehaviour,
-            txtArtifactGenerator
-        )
-        .start();
-  }
-
-  @After
-  public void cleanup()
-      throws Exception
-  {
-    if (upstream != null) {
-      upstream.stop();
-    }
   }
 
   protected <T> List<T> performSwarm(final List<? extends Callable<T>> clients) throws Exception {
@@ -221,6 +191,58 @@ public abstract class MavenHotspotITSupport
     });
   }
 
+  public static HttpEntity generatedEntity(final Generator generator, final ByteSize length) {
+    final long exactContentLength = generator.getExactContentLength(length.toBytes());
+    final Header contentType = new BasicHeader(HttpHeaders.CONTENT_TYPE, generator.getContentType());
+    final HttpEntity entity = new HttpEntity() {
+      @Override
+      public boolean isRepeatable() {
+        return true;
+      }
+
+      @Override
+      public boolean isChunked() {
+        return false;
+      }
+
+      @Override
+      public long getContentLength() {
+        return exactContentLength;
+      }
+
+      @Override
+      public Header getContentType() {
+        return contentType;
+      }
+
+      @Override
+      public Header getContentEncoding() {
+        return null;
+      }
+
+      @Override
+      public InputStream getContent() throws IOException, UnsupportedOperationException {
+        return generator.generate(exactContentLength);
+      }
+
+      @Override
+      public void writeTo(final OutputStream outstream) throws IOException {
+        ByteStreams.copy(getContent(), outstream);
+      }
+
+      @Override
+      public boolean isStreaming() {
+        return false;
+      }
+
+      @Override
+      public void consumeContent() throws IOException {
+        // nop
+      }
+    };
+    return entity;
+  }
+
   /**
    * A simple client performing a GET against single URL.
    */
@@ -239,6 +261,9 @@ public abstract class MavenHotspotITSupport
     @Override
     public HttpResponse call() throws Exception {
       HttpResponse response = client.get(uri);
+      checkState(response.getEntity() != null);
+      // consume by actually reading the stream
+      long copied = ByteStreams.copy(response.getEntity().getContent(), ByteStreams.nullOutputStream());
       EntityUtils.consume(response.getEntity());
       return response;
     }
@@ -254,16 +279,53 @@ public abstract class MavenHotspotITSupport
 
     private final String uri;
 
-    public UriPut(final Maven2Client client, final String uri) {
+    private final Generator generator;
+
+    private final Supplier<ByteSize> lengthSupplier;
+
+    public UriPut(final Maven2Client client,
+                  final String uri,
+                  final Generator generator,
+                  final Supplier<ByteSize> lengthSupplier)
+    {
       this.client = checkNotNull(client);
       this.uri = checkNotNull(uri);
+      this.generator = checkNotNull(generator);
+      this.lengthSupplier = checkNotNull(lengthSupplier);
     }
 
     @Override
     public HttpResponse call() throws Exception {
-      HttpResponse response = client.put(uri, new StringEntity("test"));
+      final HttpEntity entity = generatedEntity(generator, lengthSupplier.get());
+      HttpResponse response = client.put(uri, entity);
       EntityUtils.consume(response.getEntity());
       return response;
+    }
+  }
+
+  /**
+   * Repeat.
+   */
+  public static class Repeat<V>
+      implements Callable<List<V>>
+  {
+    private final int count;
+
+    private final Callable<V> delegate;
+
+    public Repeat(final int count, final Callable<V> delegate) {
+      checkArgument(count > 0);
+      this.count = count;
+      this.delegate = checkNotNull(delegate);
+    }
+
+    @Override
+    public List<V> call() throws Exception {
+      final List<V> result = new ArrayList<>(count);
+      for (int i = 0; i < count; i++) {
+        result.add(delegate.call());
+      }
+      return result;
     }
   }
 

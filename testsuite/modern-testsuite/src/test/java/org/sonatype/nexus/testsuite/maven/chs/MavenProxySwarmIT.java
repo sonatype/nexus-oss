@@ -21,10 +21,12 @@ import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.sisu.goodies.common.ByteSize;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.behaviour.PathRecorderBehaviour;
 
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.HttpClients;
 import org.joda.time.DateTime;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
@@ -42,22 +44,59 @@ import static org.hamcrest.Matchers.hasSize;
 public class MavenProxySwarmIT
     extends MavenHotspotITSupport
 {
-  @Test
-  public void getSame() throws Exception {
+  protected PathRecorderBehaviour pathRecorderBehaviour;
+
+  protected GeneratorBehaviour xmlArtifactGenerator;
+
+  protected GeneratorBehaviour zipArtifactGenerator;
+
+  protected GeneratorBehaviour txtArtifactGenerator;
+
+  protected Server upstream;
+
+  @Before
+  public void prepare() throws Exception {
+    pathRecorderBehaviour = new PathRecorderBehaviour();
+    xmlArtifactGenerator = new GeneratorBehaviour(new XmlGenerator());
+    zipArtifactGenerator = new GeneratorBehaviour(new ZipGenerator());
+    txtArtifactGenerator = new GeneratorBehaviour(new TextGenerator());
+
+    upstream = Server.withPort(0)
+        .serve("/" + RELEASE_XML_ARTIFACT_PATH).withBehaviours(
+            pathRecorderBehaviour,
+            xmlArtifactGenerator
+        )
+        .serve("/" + RELEASE_ZIP_ARTIFACT_PATH).withBehaviours(
+            pathRecorderBehaviour,
+            zipArtifactGenerator
+        )
+        .serve("/" + RELEASE_TXT_ARTIFACT_PATH).withBehaviours(
+            pathRecorderBehaviour,
+            txtArtifactGenerator
+        )
+        .start();
+  }
+
+  @After
+  public void cleanup()
+      throws Exception
+  {
+    if (upstream != null) {
+      upstream.stop();
+    }
+  }
+
+  private void proxySwarm(final String path) throws Exception {
     final Configuration configuration = proxyConfig(testName.getMethodName(),
         "http://localhost:" + upstream.getPort() + "/", VersionPolicy.RELEASE);
     Repository repository = repositoryManager.create(configuration);
     assertThat(repository, notNullValue());
-    final Maven2Client repositoryClient = new Maven2Client(HttpClients.custom().build(), HttpClientContext.create(),
-        resolveUrl(nexusUrl, "/repository/" + repository.getName() + "/").toURI());
-
-    // deliver me a 10MB zip file
-    zipArtifactGenerator.setContentProperties(ByteSize.megaBytes(10L), true, DateTime.now().minusHours(1), null);
+    final Maven2Client repositoryClient = createAdminMaven2Client(repository.getName());
 
     // create clients
     final List<UriGet> clients = new ArrayList<>();
     for (int i = 0; i < 15; i++) {
-      clients.add(new UriGet(repositoryClient, RELEASE_ZIP_ARTIFACT_PATH));
+      clients.add(new UriGet(repositoryClient, path));
     }
 
     assertAllHttpResponseIs2xx(performSwarm(clients));
@@ -70,5 +109,41 @@ public class MavenProxySwarmIT
 
     // warmed cache, no remote fetch should happen anymore
     assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(equalTo(0)));
+  }
+
+  @Test
+  public void smallZip() throws Exception {
+    zipArtifactGenerator.setContentProperties(ByteSize.kiloBytes(10), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_ZIP_ARTIFACT_PATH);
+  }
+
+  @Test
+  public void mediumZip() throws Exception {
+    zipArtifactGenerator.setContentProperties(ByteSize.kiloBytes(500), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_ZIP_ARTIFACT_PATH);
+  }
+
+  @Test
+  public void largeZip() throws Exception {
+    zipArtifactGenerator.setContentProperties(ByteSize.megaBytes(5), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_ZIP_ARTIFACT_PATH);
+  }
+
+  @Test
+  public void smallXml() throws Exception {
+    xmlArtifactGenerator.setContentProperties(ByteSize.kiloBytes(1), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_XML_ARTIFACT_PATH);
+  }
+
+  @Test
+  public void mediumXml() throws Exception {
+    xmlArtifactGenerator.setContentProperties(ByteSize.kiloBytes(10), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_XML_ARTIFACT_PATH);
+  }
+
+  @Test
+  public void largeXml() throws Exception {
+    xmlArtifactGenerator.setContentProperties(ByteSize.kiloBytes(500), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_XML_ARTIFACT_PATH);
   }
 }
