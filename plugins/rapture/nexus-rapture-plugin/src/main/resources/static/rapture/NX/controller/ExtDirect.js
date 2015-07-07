@@ -18,10 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.ExtDirect', {
-  extend: 'Ext.app.Controller',
-  mixins: [
-    'NX.LogAware'
-  ],
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Security',
     'NX.Messages'

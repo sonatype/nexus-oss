@@ -18,15 +18,12 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Bookmarking', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.History',
     'NX.Bookmark',
     'NX.Bookmarks'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   /**
    * If this controller had been launched. Becomes true after onLaunch() method is called by ExtJS.

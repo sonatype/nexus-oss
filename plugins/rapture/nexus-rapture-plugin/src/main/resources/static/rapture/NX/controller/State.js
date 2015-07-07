@@ -18,16 +18,13 @@
  * @since 3.0
  */
 Ext.define('NX.controller.State', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.direct.Manager',
     'NX.Dialogs',
     'NX.Messages',
     'NX.I18n'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   models: [
     'State'
@@ -98,7 +95,7 @@ Ext.define('NX.controller.State', {
     var me = this;
 
     //<if debug>
-    me.logDebug('Initial state:', Ext.encode(NX.app.state));
+    me.logTrace('Initial state:', NX.app.state);
     //</if>
 
     var uiSettings = NX.app.state['uiSettings'];
@@ -223,7 +220,7 @@ Ext.define('NX.controller.State', {
     var me = this;
 
     //<if debug>
-    me.logTrace('Changed:', key, '->', (value ? Ext.JSON.encode(value) : '(deleted)'));
+    me.logTrace('Changed:', key, '->', (value ? value : '(deleted)'));
     //</if>
 
     me.fireEvent(key.toLowerCase() + 'changed', value, oldValue);
