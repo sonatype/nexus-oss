@@ -19,13 +19,7 @@ StartTest(function(t) {
       port, 
       subject, 
       username, 
-      password,
-      enabledField,
-      hostField,
-      portField,
-      subjectField,
-      usernameField,
-      passwordField;
+      password;
 
   t.describe('Given an admin administering Email Server', function(t) {
     t.it('Should be able to view the configuration', function (t) {
@@ -61,13 +55,13 @@ StartTest(function(t) {
           },
           // test that we actually discarded the new values
           function(next) {
-            var settings = t.cq1('nx-coreui-system-smtp-settings');
-            enabledField = settings.down('checkbox[name=enabled]').getValue();
-            hostField = settings.down('field[name=host]').getValue();
-            portField = settings.down('field[name=port]').getValue();
-            subjectField = settings.down('field[name=subjectPrefix]').getValue();
-            usernameField = settings.down('field[name=username]').getValue();
-            passwordField = settings.down('field[name=password]').getValue();
+            var settings = t.cq1('nx-coreui-system-smtp-settings'),
+                enabledField = settings.down('checkbox[name=enabled]').getValue(),
+                hostField = settings.down('field[name=host]').getValue(),
+                portField = settings.down('field[name=port]').getValue(),
+                subjectField = settings.down('field[name=subjectPrefix]').getValue(),
+                usernameField = settings.down('field[name=username]').getValue(),
+                passwordField = settings.down('field[name=password]').getValue();
             
             // compare fields values after to fields state at first view
             t.expect(enabledField).toBe(enabled);
