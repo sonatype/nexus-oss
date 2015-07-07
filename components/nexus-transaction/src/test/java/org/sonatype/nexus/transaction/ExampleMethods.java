@@ -25,13 +25,11 @@ import static com.google.common.base.Preconditions.checkState;
 public class ExampleMethods
 {
   public String nonTransactional() {
-    checkState(UnitOfWork.currentTransaction() == null);
     return "success";
   }
 
   @Transactional
   public String transactional() {
-    checkState(UnitOfWork.currentTransaction() != null);
     return "success";
   }
 
@@ -43,6 +41,16 @@ public class ExampleMethods
   @Transactional
   public String inner() {
     return transactional();
+  }
+
+  @Transactional
+  public void canSeeTransactionInsideTransactional() {
+    checkState(UnitOfWork.currentTransaction() != null);
+  }
+
+  // should throw IllegalStateException
+  public void cannotSeeTransactionOutsideTransactional() {
+    UnitOfWork.currentTransaction();
   }
 
   @Transactional

@@ -101,8 +101,10 @@ class ComponentComponent
       querySuffix += " LIMIT ${parameters.limit}"
     }
 
-    StorageTx storageTx = repository.facet(StorageFacet).openTx()
+    StorageTx storageTx = repository.facet(StorageFacet).txSupplier().get()
     try {
+      storageTx.begin();
+
       def repositories
       try {
         repositories = repository.facet(GroupFacet).leafMembers()
@@ -147,6 +149,8 @@ class ComponentComponent
           (results.size() < parameters.limit ? 0 : parameters.limit) + results.size() + parameters.start,
           results
       )
+
+      storageTx.commit();
     }
     finally {
       storageTx.close()
@@ -165,8 +169,10 @@ class ComponentComponent
 
     def componentId = parameters.getFilter('componentId')
 
-    StorageTx storageTx = repository.facet(StorageFacet).openTx()
+    StorageTx storageTx = repository.facet(StorageFacet).txSupplier().get()
     try {
+      storageTx.begin();
+
       def repositories
       try {
         repositories = repository.facet(GroupFacet).leafMembers()
@@ -208,6 +214,8 @@ class ComponentComponent
               collect(ASSET_CONVERTER.rcurry(componentName, repositoryName))
         }
       }
+
+      storageTx.commit();
     }
     finally {
       storageTx.close()
@@ -220,8 +228,9 @@ class ComponentComponent
   void deleteAsset(@NotEmpty String assetId, @NotEmpty String repositoryName) {
     Repository repository = repositoryManager.get(repositoryName)
     securityHelper.ensurePermitted(new RepositoryViewPermission(repository, DELETE))
-    StorageTx storageTx = repository.facet(StorageFacet).openTx()
+    StorageTx storageTx = repository.facet(StorageFacet).txSupplier().get()
     try {
+      storageTx.begin();
       Asset asset = storageTx.findAsset(new EntityId(assetId), storageTx.getBucket())
       log.info 'Deleting asset: {}', asset
       storageTx.deleteAsset(asset)
