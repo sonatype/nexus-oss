@@ -19,7 +19,7 @@
  * @see NX.util.log.Sink
  */
 Ext.define('NX.controller.Logging', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Log',
     'NX.util.log.StoreSink',
@@ -27,7 +27,7 @@ Ext.define('NX.controller.Logging', {
     'NX.util.log.RemoteSink'
   ],
   mixins: {
-    logAware: 'NX.LogAware'
+    stateful: 'Ext.state.Stateful'
   },
 
   stores: [
@@ -35,27 +35,57 @@ Ext.define('NX.controller.Logging', {
   ],
 
   /**
-   * Array of sinks to receive events.
+   * Map of named sinks.
+   *
+   * @private
+   * @property {Object}
+   * @readonly
+   */
+  sinks: {},
+
+  /**
+   * Array of configured sinks.
+   *
+   * Mirrors {@link #sinks} values, but in array form for faster evaluation.
    *
    * @private
    * @property {NX.util.log.Sink[]}
+   * @readonly
    */
-  sinks: [],
+  sinkRefs: undefined,
 
   /**
    * Logging threshold.
    *
-   * @property {string}
+   * @private
+   * @property {String}
    */
   threshold: 'debug',
+
+  /**
+   * @constructor
+   */
+  constructor: function () {
+    this.mixins.stateful.constructor.call(this, {
+      stateful: true,
+      stateId: this.self.getName()
+    });
+
+    this.callParent(arguments);
+    this.initState();
+  },
 
   /**
    * @override
    */
   init: function () {
-    this.sinks.push(Ext.create('NX.util.log.StoreSink', this.getStore('LogEvent')));
-    this.sinks.push(NX.util.log.ConsoleSink);
-    this.sinks.push(NX.util.log.RemoteSink);
+    this.sinks = {
+      store: Ext.create('NX.util.log.StoreSink', this.getStore('LogEvent')),
+      console: Ext.create('NX.util.log.ConsoleSink'),
+      remote: Ext.create('NX.util.log.RemoteSink')
+    };
+    // build array of all sink objects for faster evaluation
+    this.sinkRefs = Ext.Object.getValues(this.sinks);
   },
 
   /**
@@ -65,6 +95,27 @@ Ext.define('NX.controller.Logging', {
    */
   onLaunch: function () {
     NX.Log.attach(this);
+    this.logInfo('Attached');
+  },
+
+  /**
+   * @override
+   * @return {Object}
+   */
+  getState: function() {
+    return {
+      threshold: this.threshold
+    };
+  },
+
+  /**
+   * Returns sink by name, or undefined.
+   *
+   * @public
+   * @param {String} name
+   */
+  getSink: function(name) {
+    return this.sinks[name];
   },
 
   /**
@@ -85,12 +136,14 @@ Ext.define('NX.controller.Logging', {
    */
   setThreshold: function (threshold) {
     this.threshold = threshold;
+    this.saveState();
   },
 
   /**
    * Mapping of {@link NX.model.LogLevel} weights.
    *
    * @private
+   * @property {Object}
    */
   levelWeights: {
     all: 1,
@@ -120,16 +173,16 @@ Ext.define('NX.controller.Logging', {
    * @param event
    */
   recordEvent: function (event) {
-    var me = this, i;
-
     // ignore events that do not exceed threshold
-    if (!me.exceedsThreshold(event.level)) {
+    if (!this.exceedsThreshold(event.level)) {
       return;
     }
 
-    // pass events to all sinks
-    for (i = 0; i < me.sinks.length; i++) {
-      me.sinks[i].receive(event);
+    // pass events to all enabled sinks
+    for (var i=0; i<this.sinkRefs.length; i++) {
+      if (this.sinkRefs[i].enabled) {
+        this.sinkRefs[i].receive(event);
+      }
     }
   }
 });

@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.KeyNav', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.util.KeyNav'
   ],

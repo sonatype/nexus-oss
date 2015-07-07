@@ -291,7 +291,7 @@ Ext.define('NX.app.Application', {
     //<if debug>
     if (provider) {
       provider.on('statechange', function (provider, key, value, opts) {
-        me.logTrace('State changed:', key, '=', value);
+        me.logTrace('State changed:', key, '->', (value ? value : '(deleted)'));
       });
     }
     //</if>
@@ -334,6 +334,12 @@ Ext.define('NX.app.Application', {
     // HACK: for now increasing delay slightly to cope with longer loading times
     Ext.defer(becomeReady, 500);
   },
+
+  /**
+   * Fired when synchronizing controllers and changes were detected.
+   *
+   * @event controllerschanged
+   */
 
   /**
    * Create / Destroy managed controllers based on their active status.

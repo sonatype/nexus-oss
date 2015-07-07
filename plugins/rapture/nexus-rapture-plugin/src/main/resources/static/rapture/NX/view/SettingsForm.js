@@ -62,12 +62,12 @@ Ext.define('NX.view.SettingsForm', {
   settingsFormSuccessMessage: undefined,
 
   /**
-   * @cfg {String/Function} [settingsFormLoadMessage: 'Loading...'] Text to be used as mask while loading data.
+   * @cfg {String/Function} [settingsFormLoadMessage] Text to be used as mask while loading data.
    */
   settingsFormLoadMessage: NX.I18n.get('SettingsForm_Load_Message'),
 
   /**
-   * @cfg {String/Function} [settingsFormSubmitMessage: 'Saving...'] Text to be used as mask while submitting data.
+   * @cfg {String/Function} [settingsFormSubmitMessage] Text to be used as mask while submitting data.
    */
   settingsFormSubmitMessage: NX.I18n.get('SettingsForm_Submit_Message'),
 

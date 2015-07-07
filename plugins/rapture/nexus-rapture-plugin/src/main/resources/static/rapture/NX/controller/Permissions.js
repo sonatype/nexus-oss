@@ -18,19 +18,19 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Permissions', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.State',
     'NX.Permissions'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   stores: [
     'Permission'
   ],
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -52,9 +52,10 @@ Ext.define('NX.controller.Permissions', {
 
     me.addEvents(
         /**
-         * @event changed
          * Fires when permissions change.
-         * @param {NX.Permissions}
+         *
+         * @event changed
+         * @param {NX.Permissions} permissions  Permissions helper.
          */
         'changed'
     );
@@ -70,7 +71,7 @@ Ext.define('NX.controller.Permissions', {
         rawData = NX.State.getValue('permissions');
 
     //<if debug>
-    me.logTrace('Initial permissions:', Ext.encode(rawData));
+    me.logTrace('Initial permissions:', rawData);
     //</if>
 
     me.getStore('Permission').loadRawData(rawData, false);
@@ -134,7 +135,7 @@ Ext.define('NX.controller.Permissions', {
 
   /**
    * @private
-   * @return {object} permissions
+   * @return {Object} permissions
    */
   getPermissions: function () {
     var store = this.getStore('Permission'),

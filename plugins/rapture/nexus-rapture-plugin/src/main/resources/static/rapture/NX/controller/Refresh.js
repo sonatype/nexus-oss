@@ -18,14 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Refresh', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Messages',
     'NX.I18n'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'header.Refresh'

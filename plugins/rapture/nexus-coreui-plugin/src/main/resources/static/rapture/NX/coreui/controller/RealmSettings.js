@@ -18,15 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.RealmSettings', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'security.RealmSettings'

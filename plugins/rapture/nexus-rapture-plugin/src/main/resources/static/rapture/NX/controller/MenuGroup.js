@@ -18,13 +18,10 @@
  * @since 3.0
  */
 Ext.define('NX.controller.MenuGroup', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Bookmarks'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'feature.Group'

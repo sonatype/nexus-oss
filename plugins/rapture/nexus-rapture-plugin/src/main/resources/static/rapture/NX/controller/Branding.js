@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Branding', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.State'
   ],

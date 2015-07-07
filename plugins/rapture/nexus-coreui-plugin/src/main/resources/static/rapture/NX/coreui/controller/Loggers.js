@@ -43,6 +43,9 @@ Ext.define('NX.coreui.controller.Loggers', {
     { ref: 'list', selector: 'nx-coreui-logger-list' }
   ],
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 

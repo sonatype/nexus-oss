@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Drilldown', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Conditions',
     'NX.Dialogs',
@@ -26,9 +26,7 @@ Ext.define('NX.controller.Drilldown', {
     'NX.view.drilldown.Drilldown',
     'NX.view.drilldown.Item'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
+
   views: [
     'drilldown.Drilldown',
     'drilldown.Details'
@@ -53,6 +51,9 @@ Ext.define('NX.controller.Drilldown', {
    */
   deleteModel: undefined,
 
+  /**
+   * @override
+   */
   onLaunch: function () {
     this.getApplication().getIconController().addIcons({
       'drilldown-info': {
