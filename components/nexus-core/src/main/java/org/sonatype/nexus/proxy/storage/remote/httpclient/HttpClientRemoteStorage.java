@@ -511,16 +511,24 @@ public class HttpClientRemoteStorage
     if (outboundRequestLog.isDebugEnabled()) {
       stopwatch = new Stopwatch().start();
     }
+
+    HttpResponse response = null;
     try {
-      return doExecuteRequest(repository, request, httpRequest, contentRequest);
+      response = doExecuteRequest(repository, request, httpRequest, contentRequest);
     }
     finally {
       timerContext.stop();
       if (stopwatch != null) {
-        outboundRequestLog
-            .debug("[{}] {} {} - {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI(), stopwatch);
+        outboundRequestLog.debug("[{}] {} {} -> {}; {}",
+            repository.getId(),
+            httpRequest.getMethod(),
+            httpRequest.getURI(),
+            response != null ? response.getStatusLine() : "null",
+            stopwatch);
       }
     }
+
+    return response;
   }
 
   private Timer timer(final ProxyRepository repository, final HttpUriRequest httpRequest, final String baseUrl) {
