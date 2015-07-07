@@ -60,7 +60,7 @@ StartTest(function(t) {
               next();
             }
         )
-      }, 300000);
+      });
       t.it('Can delete an existing BlobStore', function(t) {
         t.chain(
             function(next) {
@@ -94,7 +94,7 @@ StartTest(function(t) {
               next();
             }
         );
-      }, 300000);
-    }, 300000);
-  }, 300000);
+      });
+    });
+  });
 });

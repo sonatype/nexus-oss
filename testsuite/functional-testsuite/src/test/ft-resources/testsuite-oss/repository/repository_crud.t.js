@@ -44,7 +44,7 @@ StartTest(function(t) {
             next();
           }
       )
-    }, 300000);
+    });
     t.it('Repository creation', function(t) {
       t.chain(
           {click: '>>nx-coreui-repository-list button[text=Create repository]'},
@@ -87,7 +87,7 @@ StartTest(function(t) {
             next();
           }
       );
-    }, 300000);
+    });
     t.it('Repository display', function(t) {
       t.chain(
           function(next) {
@@ -119,7 +119,7 @@ StartTest(function(t) {
             next();
           }
       );
-    }, 300000);
+    });
     t.it('Repository update', function(t) {
       t.chain(
           //update the writePolicy
@@ -147,7 +147,7 @@ StartTest(function(t) {
             next();
           }
       );
-    }, 300000);
+    });
     t.it('Repository delete', function(t) {
       t.chain(
           function(next) {
@@ -171,7 +171,7 @@ StartTest(function(t) {
             next();
           }
       );
-    }, 300000)
+    })
 
-  }, 300000);
+  });
 });

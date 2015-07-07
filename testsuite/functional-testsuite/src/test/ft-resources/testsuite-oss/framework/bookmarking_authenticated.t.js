@@ -56,5 +56,5 @@ StartTest(function(t) {
         })
     )
     featureStore.clearFilter(true);
-  }, 300000)
+  })
 });

@@ -39,7 +39,7 @@ StartTest(function(t) {
             next();
           }
       )
-    }, 300000);
+    });
     t.it('Maven search finds maven components', function(t) {
       t.chain(
           t.openPageAsAdmin('browse/search/maven'),
@@ -57,7 +57,7 @@ StartTest(function(t) {
             next();
           }
       )
-    }, 300000);
+    });
     t.it('Keyword search finds nuget components', function(t) {
       t.chain(
           t.openPageAsAdmin('browse/search'),
@@ -75,7 +75,7 @@ StartTest(function(t) {
             next();
           }
       )
-    }, 300000);
+    });
     t.it('Nuget search finds nuget components', function(t) {
       t.chain(
           t.openPageAsAdmin('browse/search/nuget'),
@@ -93,7 +93,7 @@ StartTest(function(t) {
             next();
           }
       )
-    }, 300000);
+    });
     t.it('Keyword search finds raw components', function(t) {
       t.chain(
           t.openPageAsAdmin('browse/search'),
@@ -111,7 +111,7 @@ StartTest(function(t) {
             next();
           }
       )
-    }, 300000);
+    });
     t.it('Raw search finds raw components', function(t) {
       t.chain(
           t.openPageAsAdmin('browse/search/raw'),
@@ -129,6 +129,6 @@ StartTest(function(t) {
             next();
           }
       )
-    }, 300000);
-  }, 300000);
+    });
+  });
 });
