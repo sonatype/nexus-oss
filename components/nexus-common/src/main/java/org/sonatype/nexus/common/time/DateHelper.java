@@ -10,23 +10,40 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.raw;
+package org.sonatype.nexus.common.time;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.Date;
+
+import javax.annotation.Nullable;
 
 import org.joda.time.DateTime;
 
 /**
+ * Helper for {@link DateTime} and {@link Date} types.
+ *
  * @since 3.0
  */
-public interface RawContent
+public class DateHelper
 {
-  String getContentType();
+  /**
+   * Converts input {@link Date} to {@link DateTime}, or {@code null} if input is {@code null}.
+   */
+  @Nullable
+  public static DateTime toDateTime(@Nullable final Date date) {
+    if (date == null) {
+      return null;
+    }
+    return new DateTime(date.getTime());
+  }
 
-  long getSize();
-
-  InputStream openInputStream() throws IOException;
-
-  DateTime getLastVerified();
+  /**
+   * Converts input {@link DateTime} to {@link Date}, or {@code null} if input is {@code null}.
+   */
+  @Nullable
+  public static Date toDate(@Nullable final DateTime dateTime) {
+    if (dateTime == null) {
+      return null;
+    }
+    return dateTime.toDate();
+  }
 }

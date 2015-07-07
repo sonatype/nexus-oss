@@ -87,6 +87,8 @@ class NugetProxyRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)
+        .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
         .handler(proxyHandler)
         .handler(notFound())

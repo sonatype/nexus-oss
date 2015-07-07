@@ -21,11 +21,10 @@ import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.proxy.CacheInfo;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
-
-import org.joda.time.DateTime;
 
 /**
  * Maven specific implementation of {@link ProxyFacetSupport}.
@@ -55,13 +54,8 @@ public class MavenProxyFacet
   }
 
   @Override
-  protected DateTime getCachedPayloadLastVerified(final Context context) throws IOException {
-    return mavenFacet.getLastVerified(mavenPath(context));
-  }
-
-  @Override
-  protected void indicateVerified(final Context context) throws IOException {
-    mavenFacet.setLastVerified(mavenPath(context), new DateTime());
+  protected void indicateVerified(final Context context, final CacheInfo cacheInfo) throws IOException {
+    mavenFacet.setCacheInfo(mavenPath(context), cacheInfo);
   }
 
   @Override
