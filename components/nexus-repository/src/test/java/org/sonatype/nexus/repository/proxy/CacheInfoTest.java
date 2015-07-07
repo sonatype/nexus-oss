@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.proxy;
 
+import java.util.Date;
+
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -79,5 +81,20 @@ public class CacheInfoTest
     assertThat(cacheInfo, notNullValue());
     assertThat(cacheInfo.getLastVerified(), equalTo(now));
     assertThat(cacheInfo.getCacheToken(), equalTo(cacheToken));
+  }
+
+  @Test
+  public void lastVerifiedAndCacheTokenApply() {
+    final DateTime now = DateTime.now();
+    final String cacheToken = "foo-bar";
+    NestedAttributesMap attributes = new NestedAttributesMap(P_ATTRIBUTES, Maps.<String, Object>newHashMap());
+    Asset asset = mock(Asset.class);
+    when(asset.attributes()).thenReturn(attributes);
+    CacheInfo cacheInfo = new CacheInfo(now, cacheToken);
+    CacheInfo.applyToAsset(asset, cacheInfo);
+    assertThat(asset.attributes().child(CacheInfo.P_PROXY_CACHE).get(CacheInfo.P_LAST_VERIFIED, Date.class),
+        equalTo(now.toDate()));
+    assertThat(asset.attributes().child(CacheInfo.P_PROXY_CACHE).get(CacheInfo.P_CACHE_TOKEN, String.class),
+        equalTo(cacheToken));
   }
 }

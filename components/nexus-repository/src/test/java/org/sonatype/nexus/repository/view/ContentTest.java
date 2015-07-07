@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import java.util.Date;
 import java.util.List;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
@@ -105,5 +106,24 @@ public class ContentTest
     assertThat(contentAttributes.get(Content.CONTENT_LAST_MODIFIED, DateTime.class), equalTo(now));
     assertThat(contentAttributes.get(Content.CONTENT_ETAG, String.class), equalTo(etag));
     assertThat(contentAttributes.contains(Content.CONTENT_HASH_CODES_MAP), is(true));
+  }
+
+  @Test
+  public void lastModifiedAndEtagApply() {
+    final DateTime now = DateTime.now();
+    final String etag = "foo-bar";
+    final NestedAttributesMap attributes = nestedAttributesMap();
+    attributes.child(Content.P_CONTENT_ATTRIBUTES).set(Content.P_LAST_MODIFIED, now.toDate());
+    attributes.child(Content.P_CONTENT_ATTRIBUTES).set(Content.P_ETAG, etag);
+    Asset asset = mock(Asset.class);
+    when(asset.attributes()).thenReturn(attributes);
+    AttributesMap contentAttributes = new AttributesMap();
+    contentAttributes.set(Content.CONTENT_LAST_MODIFIED, now);
+    contentAttributes.set(Content.CONTENT_ETAG, etag);
+    Content.applyToAsset(asset, contentAttributes);
+    assertThat(asset.attributes().child(Content.P_CONTENT_ATTRIBUTES).get(Content.P_LAST_MODIFIED, Date.class),
+        equalTo(now.toDate()));
+    assertThat(asset.attributes().child(Content.P_CONTENT_ATTRIBUTES).get(Content.P_ETAG, String.class), equalTo(
+        etag));
   }
 }
