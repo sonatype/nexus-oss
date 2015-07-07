@@ -181,13 +181,20 @@ public class NexusHttpAuthenticationFilter
   }
 
   /**
+   * Allow customization of 401 status line message.
+   */
+  protected String getUnauthorizedMessage(final ServletRequest request) {
+    return "Unauthorized";
+  }
+
+  /**
    * If request comes from a web-browser render an error page, else perform default challenge.
    */
   @Override
   protected boolean sendChallenge(final ServletRequest request, final ServletResponse response) {
     if (browserDetector.isBrowserInitiated(request)) {
       HttpServletResponse httpResponse = WebUtils.toHttp(response);
-      httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED, getUnauthorizedMessage(request));
       // omit WWW-Authenticate we do NOT want to have browser prompt
 
       Map<String,Object> params = ImmutableMap.of(
@@ -209,7 +216,13 @@ public class NexusHttpAuthenticationFilter
       return false;
     }
     else {
-      return super.sendChallenge(request, response);
+      String message = getUnauthorizedMessage(request);
+      getLogger().debug("Authentication required: sending 401 Authentication challenge response: {}", message);
+      HttpServletResponse httpResponse = WebUtils.toHttp(response);
+      httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED, message);
+      String authcHeader = getAuthcScheme() + " realm=\"" + getApplicationName() + "\"";
+      httpResponse.setHeader(AUTHENTICATE_HEADER, authcHeader);
+      return false;
     }
   }
 
