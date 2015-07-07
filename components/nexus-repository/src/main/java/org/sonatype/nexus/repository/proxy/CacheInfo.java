@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.storage.Asset;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -71,17 +72,20 @@ public class CacheInfo
   /**
    * Key of the nested map on {@link Asset} attributes carrying cache info related attributes.
    */
-  private static final String P_PROXY_CACHE = "proxy_cache";
+  @VisibleForTesting
+  static final String P_PROXY_CACHE = "proxy_cache";
 
   /**
    * Last verified {@link Date}.
    */
-  private static final String P_LAST_VERIFIED = "last_verified";
+  @VisibleForTesting
+  static final String P_LAST_VERIFIED = "last_verified";
 
   /**
    * Cache token {@link String}.
    */
-  private static final String P_CACHE_TOKEN = "cache_token";
+  @VisibleForTesting
+  static final String P_CACHE_TOKEN = "cache_token";
 
   /**
    * Extracts non-format specific cache info from passed in {@link Asset}.

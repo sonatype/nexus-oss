@@ -28,6 +28,7 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.util.TypeTokens;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
 import org.joda.time.DateTime;
@@ -117,17 +118,20 @@ public class Content
   /**
    * Key of the nested map on {@link Asset} attributes carrying content related attributes.
    */
-  private static final String P_CONTENT_ATTRIBUTES = "contentAttributes";
+  @VisibleForTesting
+  static final String P_CONTENT_ATTRIBUTES = "content_attributes";
 
   /**
    * Key of last modified {@link Date}.
    */
-  private static final String P_LAST_MODIFIED = "last_modified";
+  @VisibleForTesting
+  static final String P_LAST_MODIFIED = "last_modified";
 
   /**
    * Key of etag {@link String}. If extracted from upstream response, it must have quotes removed.
    */
-  private static final String P_ETAG = "etag";
+  @VisibleForTesting
+  static final String P_ETAG = "etag";
 
   /**
    * Extracts non-format specific content attributes into the passed in {@link AttributesMap} (usually originating from
