@@ -311,6 +311,7 @@ Ext.define('NX.controller.Menu', {
       if (node) {
         me.bookmarkingEnabled = me.navigateToFirstFeature;
         me.navigateToFirstFeature = false;
+        console.log(node.getPath('text'));
         me.getFeatureMenu().selectPath(node.getPath('text'), 'text', undefined, function () {
           me.getFeatureMenu().fireEvent('itemclick', me.getFeatureMenu(), node);
           me.bookmarkingEnabled = true;
