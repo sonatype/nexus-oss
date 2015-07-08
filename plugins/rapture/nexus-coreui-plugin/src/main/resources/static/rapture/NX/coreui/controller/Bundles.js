@@ -73,6 +73,11 @@ Ext.define('NX.coreui.controller.Bundles', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadStores
+        }
+      },
       store: {
         '#Bundle': {
           load: me.reselect
@@ -118,5 +123,13 @@ Ext.define('NX.coreui.controller.Bundles', {
 
       me.getInfo().showInfo(info);
     }
+  },
+
+  /**
+   * @private
+   * Load all of the stores associated with this controller
+   */
+  loadStores: function () {
+    this.getStore('Bundle').load();
   }
 });

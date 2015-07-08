@@ -88,10 +88,11 @@ Ext.define('NX.controller.Drilldown', {
     }
 
     // Drilldown
-    componentListener[me.masters[0] + ' ^ nx-drilldown'] = {
+    componentListener[(me.masters[0] || me.detail) + ' ^ nx-drilldown'] = {
       syncsize: me.syncSizeToOwner,
-      resetdrilldown: function() {
+      activate: function() {
         me.currentIndex = 0;
+        me.reselect();
         me.syncSizeToOwner();
       }
     };
@@ -115,15 +116,7 @@ Ext.define('NX.controller.Drilldown', {
     };
 
     me.listen({
-      component: componentListener,
-      controller: {
-        '#Bookmarking': {
-          navigate: me.navigateTo
-        },
-        '#Refresh': {
-          refresh: me.reselect
-        }
-      }
+      component: componentListener
     });
 
     if (me.icons) {
@@ -393,6 +386,7 @@ Ext.define('NX.controller.Drilldown', {
    * Given N drilldown items, this panel should have a width of N times the current screen width
    */
   syncSizeToOwner: function () {
+    console.log("syncSizeToOwner()");
     var me = this,
       drilldown = me.getDrilldown(),
       owner = drilldown.ownerCt.body.el,

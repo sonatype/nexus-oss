@@ -88,6 +88,11 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadStores
+        }
+      },
       store: {
         '#SslCertificate': {
           load: me.reselect
@@ -280,6 +285,14 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         NX.Messages.add({ text: NX.I18n.format('SslCertificates_Load_Success', description), type: 'success' });
       }
     });
+  },
+
+  /**
+   * @private
+   * Load all of the stores associated with this controller
+   */
+  loadStores: function () {
+    this.getStore('SslCertificate').load();
   },
 
   /**

@@ -83,6 +83,11 @@ Ext.define('NX.coreui.controller.Browse', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadStores
+        }
+      },
       store: {
         '#Repository': {
           load: me.reselect
@@ -163,6 +168,16 @@ Ext.define('NX.coreui.controller.Browse', {
 
     me.getComponentDetails().setComponentModel(model);
     me.getAssets().setComponentModel(model);
+  },
+
+  /**
+   * @private
+   * Load all of the stores associated with this controller
+   */
+  loadStores: function() {
+    var me = this;
+
+    me.getStore('Repository').load();
   },
 
   /**

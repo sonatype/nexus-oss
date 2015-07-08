@@ -117,7 +117,7 @@ Ext.define('NX.coreui.controller.Users', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRelatedStores
+          refresh: me.loadStores
         }
       },
       store: {
@@ -130,7 +130,7 @@ Ext.define('NX.coreui.controller.Users', {
       },
       component: {
         'nx-coreui-user-list': {
-          beforerender: me.loadRelatedStores
+          beforerender: me.loadStores
         },
         'nx-coreui-user-list button[action=new]': {
           click: me.showAddWindow
@@ -279,7 +279,6 @@ Ext.define('NX.coreui.controller.Users', {
           if (Ext.isFunction(cb)) {
             cb(records, operation, success);
           }
-          me.reselect();
         }
       });
     }
@@ -287,13 +286,14 @@ Ext.define('NX.coreui.controller.Users', {
 
   /**
    * @private
-   * (Re)load related stores.
+   * Load all of the stores associated with this controller
    */
-  loadRelatedStores: function() {
+  loadStores: function() {
     var me = this,
         list = me.getList();
 
     if (list) {
+      me.loadStore();
       me.getStore('UserSource').load();
       me.getStore('Role').load();
     }
