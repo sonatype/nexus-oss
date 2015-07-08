@@ -208,7 +208,7 @@ Ext.define('NX.app.Application', {
       me.handleError(err);
     };
 
-    // FIXME: This will catch more errorTimeout to use for remotings, but duplicates messages for ext errors
+    // FIXME: This will catch more errors, but duplicates messages for ext errors
     // FIXME: Without this however some javascript errors will go unhandled
     NX.global.onerror = function (msg, url, line) {
       me.handleError({ msg: msg + ' (' + url + ':' + line + ')' });
