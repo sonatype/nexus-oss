@@ -110,6 +110,9 @@ Ext.define('NX.controller.Menu', {
         '#Permissions': {
           changed: me.refreshMenu
         },
+        '#State': {
+          changed: me.onStateChange
+        },
         '#Bookmarking': {
           navigate: me.navigateTo
         },
