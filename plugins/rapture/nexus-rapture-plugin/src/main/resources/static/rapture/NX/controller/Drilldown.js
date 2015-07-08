@@ -88,7 +88,7 @@ Ext.define('NX.controller.Drilldown', {
     }
 
     // Drilldown
-    componentListener[me.masters[0] + ' ^ nx-drilldown'] = {
+    componentListener[(me.masters[0] || me.detail) + ' ^ nx-drilldown'] = {
       syncsize: me.syncSizeToOwner,
       activate: function() {
         me.currentIndex = 0;
@@ -386,6 +386,7 @@ Ext.define('NX.controller.Drilldown', {
    * Given N drilldown items, this panel should have a width of N times the current screen width
    */
   syncSizeToOwner: function () {
+    console.log("syncSizeToOwner()");
     var me = this,
       drilldown = me.getDrilldown(),
       owner = drilldown.ownerCt.body.el,
