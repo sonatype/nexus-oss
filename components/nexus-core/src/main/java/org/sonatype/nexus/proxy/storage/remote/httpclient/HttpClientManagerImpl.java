@@ -230,24 +230,40 @@ public class HttpClientManagerImpl
                 " from proxy " + proxyRepository + " but no location present");
           }
 
+          final String repoId = proxyRepository.getId();
+
           // Some complication here as it appears that something may be null, but its not clear what was null
-          final URI sourceUri = ((HttpUriRequest)request).getURI();
+          URI sourceUri = ((HttpUriRequest) request).getURI();
+          if (!sourceUri.isAbsolute()) {
+            try {
+              sourceUri = URI.create(proxyRepository.getRemoteUrl()).resolve(sourceUri);
+            }
+            catch (Exception e) {
+              logger.debug("[{}] Problem resolving {} against {}", repoId, sourceUri, proxyRepository.getRemoteUrl());
+            }
+          }
+
           final String sourceScheme = schemeOf(sourceUri);
           final String sourceHost = hostOf(sourceUri);
 
           final URI targetUri = createLocationURI(locationHeader.getValue());
+
           final String targetScheme = schemeOf(targetUri);
           final String targetHost = hostOf(targetUri);
+
+          final int redirectCode = response.getStatusLine().getStatusCode();
 
           // nag about redirection peculiarities, in any case
           if (!Objects.equals(sourceScheme, targetScheme)) {
             if ("http".equals(targetScheme)) {
               // security risk: HTTPS > HTTP downgrade, you are not safe as you think!
-              logger.debug("Downgrade from HTTPS to HTTP during redirection {} -> {}", sourceUri, targetUri);
+              logger.debug("[{}] Downgrade from HTTPS to HTTP during {} redirect {} -> {}",
+                  repoId, redirectCode, sourceUri, targetUri);
             }
             else if ("https".equals(targetScheme) && Objects.equals(sourceHost, targetHost)) {
               // misconfiguration: your repository configured with wrong protocol and causes performance problems?
-              logger.debug("Protocol upgrade during redirection on same host {} -> {}", sourceUri, targetUri);
+              logger.debug("[{}] Protocol upgrade during {} redirect on same host {} -> {}",
+                  repoId, redirectCode, sourceUri, targetUri);
             }
           }
 
@@ -255,12 +271,14 @@ public class HttpClientManagerImpl
           // hence, we do this ONLY if the HttpRequest is "marked" as such request
           if (Boolean.TRUE == context.getAttribute(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY)) {
             if (targetUri.getPath().endsWith("/")) {
-              logger.debug("Not following redirection to index {} -> {}", sourceUri, targetUri);
+              logger.debug("[{}] Not following {} redirect to index {} -> {}",
+                  repoId, redirectCode, sourceUri, targetUri);
               return false;
             }
           }
 
-          logger.debug("Following redirection {} -> {}", sourceUri, targetUri);
+          logger.debug("[{}] Following {} redirect {} -> {}",
+              repoId, redirectCode, sourceUri, targetUri);
           return true;
         }
 
