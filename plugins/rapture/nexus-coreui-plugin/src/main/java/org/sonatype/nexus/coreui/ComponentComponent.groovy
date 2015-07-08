@@ -25,6 +25,7 @@ import org.sonatype.nexus.repository.MissingFacetException
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
+import org.sonatype.nexus.repository.security.BreadActions
 import org.sonatype.nexus.repository.security.RepositoryViewPermission
 import org.sonatype.nexus.repository.storage.Asset
 import org.sonatype.nexus.repository.storage.Component
@@ -38,9 +39,6 @@ import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.hibernate.validator.constraints.NotEmpty
-
-import static org.sonatype.nexus.repository.security.BreadActions.DELETE
-import static org.sonatype.nexus.repository.security.BreadActions.READ
 
 /**
  * Component {@link DirectComponent}.
@@ -77,7 +75,7 @@ class ComponentComponent
   @DirectMethod
   PagedResponse<ComponentXO> read(final StoreLoadParameters parameters) {
     Repository repository = repositoryManager.get(parameters.getFilter('repositoryName'))
-    securityHelper.ensurePermitted(new RepositoryViewPermission(repository, READ))
+    securityHelper.ensurePermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))
 
     if (!repository.configuration.online) {
       return null
@@ -161,7 +159,7 @@ class ComponentComponent
   List<AssetXO> readAssets(final StoreLoadParameters parameters) {
     String repositoryName = parameters.getFilter('repositoryName')
     Repository repository = repositoryManager.get(repositoryName)
-    securityHelper.ensurePermitted(new RepositoryViewPermission(repository, READ))
+    securityHelper.ensurePermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))
 
     if (!repository.configuration.online) {
       return null
@@ -227,7 +225,7 @@ class ComponentComponent
   @Validate
   void deleteAsset(@NotEmpty String assetId, @NotEmpty String repositoryName) {
     Repository repository = repositoryManager.get(repositoryName)
-    securityHelper.ensurePermitted(new RepositoryViewPermission(repository, DELETE))
+    securityHelper.ensurePermitted(new RepositoryViewPermission(repository, BreadActions.DELETE))
     StorageTx storageTx = repository.facet(StorageFacet).txSupplier().get()
     try {
       storageTx.begin();

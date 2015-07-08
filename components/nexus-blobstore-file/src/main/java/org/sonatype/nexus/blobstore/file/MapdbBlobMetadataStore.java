@@ -94,6 +94,7 @@ public class MapdbBlobMetadataStore
     DirSupport.mkdir(file.getParentFile());
     this.database = DBMaker.newFileDB(file)
         .checksumEnable()
+        .mmapFileEnableIfSupported()
         .makeTxMaker();
   }
 
