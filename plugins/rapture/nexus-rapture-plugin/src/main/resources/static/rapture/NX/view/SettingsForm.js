@@ -92,8 +92,16 @@ Ext.define('NX.view.SettingsForm', {
   buttonAlign: 'left',
 
   buttons: [
-    { text: NX.I18n.get('SettingsForm_Save_Button'), formBind: true, action: 'save', ui: 'nx-primary', bindToEnter: false },
-    { text: NX.I18n.get('SettingsForm_Discard_Button'),
+    { 
+      text: NX.I18n.get('SettingsForm_Save_Button'), 
+      formBind: true, 
+      action: 'save', 
+      ui: 'nx-primary', 
+      bindToEnter: false 
+    },
+    { 
+      text: NX.I18n.get('SettingsForm_Discard_Button'), 
+      action: 'discard',
       handler: function () {
         var form = this.up('form'),
             record = form.getRecord();

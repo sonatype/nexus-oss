@@ -104,7 +104,7 @@ StartTest(function(t) {
     });
     t.it('Can discard changes on the form', function(t) {
       t.chain(
-          {click: '>>nx-coreui-system-http-settings button[text=Discard]'},
+          {click: '>>nx-coreui-system-http-settings button[action=discard]'},
           function(next) {
             var settings = t.cq1('>>nx-coreui-system-http-settings'),
                 form = settings.down('form').getForm(),
