@@ -40,26 +40,13 @@
    */
 
   /**
-   * Flag if debug is enabled.
+   * Container for bootstrap cruft.
    *
    * @internal
-   * @property {Boolean} debug
-   * @readonly
-   */
-
-  /**
-   * Initial application base-url.
-   *
-   * @internal
-   * @property {String} baseUrl
-   * @readonly
-   */
-
-  /**
-   * Initial application state.
-   *
-   * @internal
-   * @property {Object} state
+   * @property {Object} app
+   * @property {Boolean} app.debug  Flag if debug is enabled.
+   * @property {String} app.baseUrl Initial application base-url.
+   * @property {Object} app.state   Initial application state.
    * @readonly
    */
 });
