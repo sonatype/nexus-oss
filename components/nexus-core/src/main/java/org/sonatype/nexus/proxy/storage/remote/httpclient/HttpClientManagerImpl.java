@@ -269,23 +269,21 @@ public class HttpClientManagerImpl
             if (!Objects.equals(sourceScheme, targetScheme)) {
               if ("http".equals(targetScheme)) {
                 // security risk: HTTPS > HTTP downgrade, you are not safe as you think!
-                logger.debug("[{}] Downgrade from HTTPS to HTTP during {} redirect {} -> {}",
-                    repoId, redirectCode, sourceUri, targetUri);
+                logger.debug("[{}] Downgrade from HTTPS to HTTP during {} redirect {} -> {}", repoId, redirectCode,
+                    sourceUri, targetUri);
               }
               else if ("https".equals(targetScheme) && Objects.equals(sourceHost, targetHost)) {
                 // misconfiguration: your repository configured with wrong protocol and causes performance problems?
-                logger.debug("[{}] Protocol upgrade during {} redirect on same host {} -> {}",
-                    repoId, redirectCode, sourceUri, targetUri);
+                logger.debug("[{}] Protocol upgrade during {} redirect on same host {} -> {}", repoId, redirectCode,
+                    sourceUri, targetUri);
               }
             }
 
             if (redirecting) {
-              logger.debug("[{}] Following {} redirect {} -> {}",
-                  repoId, redirectCode, sourceUri, targetUri);
+              logger.debug("[{}] Following {} redirect {} -> {}", repoId, redirectCode, sourceUri, targetUri);
             }
             else {
-              logger.debug("[{}] Not following {} redirect to index {} -> {}",
-                  repoId, redirectCode, sourceUri, targetUri);
+              logger.debug("[{}] Not following {} redirect to {} -> {}", repoId, redirectCode, sourceUri, targetUri);
             }
           }
 
