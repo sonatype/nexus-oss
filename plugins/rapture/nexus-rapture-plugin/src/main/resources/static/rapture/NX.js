@@ -12,7 +12,7 @@
  */
 /*global Ext*/
 
-// NOTE: This is not a real class, but exists for documentation purposes ONLY
+// NOTE: This is not a real class, but exists for jsdoc purposes ONLY
 // NOTE: Namespace is created via bootstrap.js and app.js
 
 /**
