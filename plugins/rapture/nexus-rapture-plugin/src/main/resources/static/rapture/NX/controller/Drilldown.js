@@ -88,7 +88,7 @@ Ext.define('NX.controller.Drilldown', {
     }
 
     // Drilldown
-    componentListener[me.masters[0] + ' ^ nx-drilldown'] = {
+    componentListener['nx-drilldown-item ^ nx-drilldown'] = {
       syncsize: me.syncSizeToOwner,
       resetdrilldown: function() {
         me.currentIndex = 0;
