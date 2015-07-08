@@ -509,7 +509,11 @@ public class HttpClientRemoteStorage
     final TimerContext timerContext = timer.time();
     Stopwatch stopwatch = null;
     if (outboundRequestLog.isDebugEnabled()) {
-      stopwatch = new Stopwatch().start();
+      outboundRequestLog.debug("[{}] {} {}",
+          repository.getId(),
+          httpRequest.getMethod(),
+          httpRequest.getURI());
+      stopwatch = Stopwatch.createStarted();
     }
 
     HttpResponse response = null;
