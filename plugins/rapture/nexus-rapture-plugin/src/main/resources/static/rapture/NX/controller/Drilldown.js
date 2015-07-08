@@ -116,15 +116,7 @@ Ext.define('NX.controller.Drilldown', {
     };
 
     me.listen({
-      component: componentListener,
-      controller: {
-        '#Bookmarking': {
-          //navigate: me.navigateTo
-        },
-        '#Refresh': {
-          //refresh: me.reselect
-        }
-      }
+      component: componentListener
     });
 
     if (me.icons) {
