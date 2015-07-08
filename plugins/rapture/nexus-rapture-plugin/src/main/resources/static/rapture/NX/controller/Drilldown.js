@@ -90,7 +90,7 @@ Ext.define('NX.controller.Drilldown', {
     // Drilldown
     componentListener[me.masters[0] + ' ^ nx-drilldown'] = {
       syncsize: me.syncSizeToOwner,
-      activate: function() {
+      resetdrilldown: function() {
         me.currentIndex = 0;
         me.reselect();
         me.syncSizeToOwner();

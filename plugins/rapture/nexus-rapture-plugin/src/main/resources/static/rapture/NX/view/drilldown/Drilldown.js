@@ -113,6 +113,8 @@ Ext.define('NX.view.drilldown.Drilldown', {
 
     // Add resize events
     me.addEvents('syncsize');
+    me.addEvents('resetdrilldown');
+    me.fireEvent('resetdrilldown');
   },
 
   /**

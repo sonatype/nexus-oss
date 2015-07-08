@@ -115,6 +115,7 @@ Ext.define('NX.controller.Permissions', {
     //</if>
 
     me.getStore('Permission').loadRawData(permissions, false);
+    me.firePermissionsChanged();
   },
 
   /**
