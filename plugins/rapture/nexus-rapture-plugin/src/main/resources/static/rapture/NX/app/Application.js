@@ -158,6 +158,15 @@ Ext.define('NX.app.Application', {
   ready: false,
 
   /**
+   * Timeout to use for remoting.
+   *
+   * @public
+   * @property {Number}
+   * @readonly
+   */
+  remotingTimeout: 60 * 1000,
+
+  /**
    * @override
    * @param {NX.app.Application} app this class
    */
@@ -257,8 +266,8 @@ Ext.define('NX.app.Application', {
     // disable retry
     remotingProvider.maxRetries = 0;
 
-    // default request timeout to 60 seconds
-    remotingProvider.timeout = 60 * 1000;
+    // default request timeout
+    remotingProvider.timeout = this.remotingTimeout;
 
     //<if debug>
     this.logDebug('Configured Ext.Direct');
