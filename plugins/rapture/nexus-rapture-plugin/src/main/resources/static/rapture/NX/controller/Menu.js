@@ -126,7 +126,7 @@ Ext.define('NX.controller.Menu', {
       },
       component: {
         'nx-feature-menu': {
-          select: me.onSelection,
+          itemclick: me.onItemClick,
           afterrender: me.onAfterRender,
           beforecellclick: me.warnBeforeMenuSelect
         },
@@ -211,23 +211,21 @@ Ext.define('NX.controller.Menu', {
   /**
    * @private
    */
-  onSelection: function (panel, featureMenuModel) {
+  onItemClick: function (panel, featureMenuModel) {
     var me = this,
         path = featureMenuModel.get('path');
 
-    if ((path !== me.currentSelectedPath) || featureMenuModel.get('group')) {
-      me.currentSelectedPath = path;
+    me.currentSelectedPath = path;
 
-      //<if debug>
-      me.logInfo('Selected feature:', path);
-      //</if>
+    //<if debug>
+    me.logInfo('Selected feature:', path);
+    //</if>
 
-      me.selectFeature(me.getStore('Feature').getById(featureMenuModel.get('path')));
-      me.populateFeatureGroupStore(featureMenuModel);
-      if (me.bookmarkingEnabled) {
-        me.bookmark(featureMenuModel);
-      }
+    if (me.bookmarkingEnabled) {
+      me.bookmark(featureMenuModel);
     }
+    me.selectFeature(me.getStore('Feature').getById(featureMenuModel.get('path')));
+    me.populateFeatureGroupStore(featureMenuModel);
   },
 
   /**
@@ -314,6 +312,7 @@ Ext.define('NX.controller.Menu', {
         me.bookmarkingEnabled = me.navigateToFirstFeature;
         me.navigateToFirstFeature = false;
         me.getFeatureMenu().selectPath(node.getPath('text'), 'text', undefined, function () {
+          me.getFeatureMenu().fireEvent('itemclick', me.getFeatureMenu(), node);
           me.bookmarkingEnabled = true;
         });
       }
@@ -377,7 +376,7 @@ Ext.define('NX.controller.Menu', {
     var me = this,
         bookmark = node.get('bookmark');
 
-    if (!(NX.Bookmarks.getBookmark().getSegment(0) === bookmark)) {
+    if (NX.Bookmarks.getBookmark().getToken() !== bookmark) {
       NX.Bookmarks.bookmark(NX.Bookmarks.fromToken(bookmark), me);
     }
   },
@@ -642,6 +641,7 @@ Ext.define('NX.controller.Menu', {
     return me.warnBeforeNavigate(
       function () {
         me.getFeatureMenu().getSelectionModel().select(record);
+        me.getFeatureMenu().fireEvent('itemclick', me.getFeatureMenu(), record);
       }
     )
   },
