@@ -47,6 +47,12 @@ Ext.define('NX.controller.Drilldown', {
   masters: null,
 
   /**
+   * @override
+   * The xtype of the detail panel used by this drilldown. Only needed when no masters exist.
+   */
+  detail: null,
+
+  /**
    * @cfg {Function} optional function to be called on delete
    */
   deleteModel: undefined,
