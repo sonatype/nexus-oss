@@ -36,6 +36,10 @@ Ext.define('NX.util.condition.FormHasRecord', {
    */
   fn: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.FormHasRecord}
+   */
   bind: function () {
     var me = this,
         components = {}, queryResult;
@@ -57,6 +61,9 @@ Ext.define('NX.util.condition.FormHasRecord', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function (form) {
     var me = this,
         satisfied = false,
@@ -76,9 +83,12 @@ Ext.define('NX.util.condition.FormHasRecord', {
     }
   },
 
+  /**
+   * @override
+   * @returns {String}
+   */
   toString: function () {
-    var me = this;
-    return me.self.getName() + '{ form=' + me.form + ' }';
+    return this.self.getName() + '{ form=' + this.form + ' }';
   }
 
 });

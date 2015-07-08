@@ -28,6 +28,10 @@ Ext.define('NX.util.condition.Disjunction', {
    */
   conditions: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.Disjunction}
+   */
   bind: function () {
     var me = this;
 
@@ -46,6 +50,9 @@ Ext.define('NX.util.condition.Disjunction', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function () {
     var me = this,
         satisfied = false;
@@ -62,6 +69,10 @@ Ext.define('NX.util.condition.Disjunction', {
     }
   },
 
+  /**
+   * @override
+   * @returns {String}
+   */
   toString: function () {
     return this.conditions.join(' OR ');
   }

@@ -83,7 +83,7 @@ StartTest(function(t) {
       );
     });
     // PhantomJS doesn't currently handle this scenario correctly
-    if (!(/PhantomJS/.test(t.global.navigator.userAgent))) {
+    if (!t.harness.isPhantomJS) {
       t.it('Update Logger', function(t) {
         t.chain(
           // update logging level for {newLoggerName}
@@ -106,7 +106,10 @@ StartTest(function(t) {
           }
         );
       });
+    } else {
+      t.diag('Skipping "Update Logger" test in phantomjs due to rendering issues');
     }
+    
     t.it('Delete Logger', function(t) {
       t.chain(
         // delete logger {newLoggerName}
