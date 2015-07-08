@@ -45,7 +45,8 @@ NX.define('Nexus.logging.view.Add', {
    */
   initComponent: function() {
     var me = this,
-        icons = Nexus.logging.Icons;
+        icons = Nexus.logging.Icons,
+        loggerNamePattern = /^[a-zA-Z0-9_.]+$/;
 
     Ext.apply(me, {
       items: [
@@ -72,7 +73,11 @@ NX.define('Nexus.logging.view.Add', {
               name: 'name',
               allowBlank: false,
               validateOnBlur: false, // allow cancel to be clicked w/o validating this to be non-blank
-              anchor: '96%'
+              anchor: '96%',
+              validator: function(value) {
+                return loggerNamePattern.test(value);
+              },
+              invalidText: 'This field should only contain letters, numbers, _ and .'
             },
             {
               xtype: 'nx-logging-combo-logger-level',
