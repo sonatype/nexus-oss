@@ -95,7 +95,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadTemplates
+          refresh: me.onRefresh
         }
       },
       store: {
@@ -105,7 +105,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
       },
       component: {
         'nx-coreui-ldapserver-list': {
-          beforerender: me.loadTemplates
+          beforerender: me.onRefresh
         },
         'nx-coreui-ldapserver-list button[action=new]': {
           click: me.showConnectionPanel
@@ -312,11 +312,12 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    * Load LDAP schema templates store.
    */
-  loadTemplates: function() {
+  onRefresh: function() {
     var me = this,
         list = me.getList();
 
     if (list) {
+      me.getStore('LdapServer').load();
       me.getStore('LdapSchemaTemplate').load();
     }
   },

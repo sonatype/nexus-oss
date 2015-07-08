@@ -78,7 +78,7 @@ Ext.define('NX.controller.Bookmarking', {
       return;
     }
 
-    if (bookmark && oldValue !== bookmark.getToken()) {
+    if (bookmark && oldValue != bookmark.getToken()) {
       //<if debug>
       me.logDebug('Bookmark:', bookmark.getToken(), (caller ? '(' + caller.self.getName() + ')' : ''));
       //</if>

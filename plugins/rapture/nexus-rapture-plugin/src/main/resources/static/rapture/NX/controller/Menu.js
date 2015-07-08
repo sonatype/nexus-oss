@@ -110,9 +110,6 @@ Ext.define('NX.controller.Menu', {
         '#Permissions': {
           changed: me.refreshMenu
         },
-        '#State': {
-          changed: me.onStateChange
-        },
         '#Bookmarking': {
           navigate: me.navigateTo
         },
@@ -126,8 +123,7 @@ Ext.define('NX.controller.Menu', {
       },
       component: {
         'nx-feature-menu': {
-          select: me.onSelection,
-          afterrender: me.onAfterRender,
+          itemclick: me.onItemClick,
           beforecellclick: me.warnBeforeMenuSelect
         },
         'nx-header-panel button[mode]': {
@@ -188,16 +184,6 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
-   * Register as Application listener and rebuild menu.
-   */
-  onAfterRender: function () {
-    var me = this;
-
-    me.getApplication().on('controllerschanged', me.refreshMenu, me);
-    me.refreshMenu();
-  },
-
-  /**
    * @public
    * @returns {NX.Bookmark} a bookmark for current selected feature (if any)
    */
@@ -211,23 +197,24 @@ Ext.define('NX.controller.Menu', {
   /**
    * @private
    */
-  onSelection: function (panel, featureMenuModel) {
+  onItemClick: function (panel, featureMenuModel) {
     var me = this,
         path = featureMenuModel.get('path');
 
-    if ((path !== me.currentSelectedPath) || featureMenuModel.get('group')) {
+    //if ((path !== me.currentSelectedPath) || featureMenuModel.get('group')) {
       me.currentSelectedPath = path;
 
       //<if debug>
       me.logInfo('Selected feature:', path);
       //</if>
 
-      me.selectFeature(me.getStore('Feature').getById(featureMenuModel.get('path')));
-      me.populateFeatureGroupStore(featureMenuModel);
       if (me.bookmarkingEnabled) {
         me.bookmark(featureMenuModel);
       }
-    }
+
+      me.selectFeature(me.getStore('Feature').getById(featureMenuModel.get('path')));
+      me.populateFeatureGroupStore(featureMenuModel);
+    //}
   },
 
   /**
@@ -314,6 +301,7 @@ Ext.define('NX.controller.Menu', {
         me.bookmarkingEnabled = me.navigateToFirstFeature;
         me.navigateToFirstFeature = false;
         me.getFeatureMenu().selectPath(node.getPath('text'), 'text', undefined, function () {
+          me.getFeatureMenu().fireEvent('itemclick', me.getFeatureMenu(), node);
           me.bookmarkingEnabled = true;
         });
       }
@@ -377,7 +365,7 @@ Ext.define('NX.controller.Menu', {
     var me = this,
         bookmark = node.get('bookmark');
 
-    if (!(NX.Bookmarks.getBookmark().getSegment(0) === bookmark)) {
+    if (NX.Bookmarks.getBookmark().getToken() !== bookmark) {
       NX.Bookmarks.bookmark(NX.Bookmarks.fromToken(bookmark), me);
     }
   },

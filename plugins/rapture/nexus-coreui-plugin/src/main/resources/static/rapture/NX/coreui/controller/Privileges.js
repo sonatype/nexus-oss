@@ -95,6 +95,11 @@ Ext.define('NX.coreui.controller.Privileges', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadStores
+        }
+      },
       store: {
         '#Privilege': {
           load: me.reselect
@@ -151,6 +156,14 @@ Ext.define('NX.coreui.controller.Privileges', {
           scope: button
         }
     );
+  },
+
+  /**
+   * @private
+   * Load all of the stores associated with this controller
+   */
+  loadStores: function () {
+    this.getStore('Privilege').load();
   },
 
   /**

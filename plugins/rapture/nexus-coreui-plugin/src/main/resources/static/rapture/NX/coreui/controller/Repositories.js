@@ -101,7 +101,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRelatedStores
+          refresh: me.loadStores
         },
         '#State': {
           receivingchanged: me.onStateReceivingChanged
@@ -122,7 +122,7 @@ Ext.define('NX.coreui.controller.Repositories', {
           click: me.showSelectRecipePanel
         },
         'nx-coreui-repository-settings-form': {
-          submitted: me.onSettingsSubmitted
+          submitted: me.loadStores
         },
         'nx-coreui-repository-selectrecipe': {
           cellclick: me.showAddRepositoryPanel
@@ -232,9 +232,11 @@ Ext.define('NX.coreui.controller.Repositories', {
 
   /**
    * @private
+   * Load all of the stores associated with this controller
    */
-  onSettingsSubmitted: function(form, action) {
+  loadStores: function() {
     this.getStore('Repository').load();
+    this.loadRelatedStores();
   },
 
   /**
