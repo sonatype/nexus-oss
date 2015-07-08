@@ -43,7 +43,7 @@ StartTest(function(t) {
         t.chain(
             function(next) {
               t.navigateTo(feature.get('bookmark'));
-              t.screenshot(feature.get('bookmark') + '.png', next);
+              next();
             },
             {waitFor: 'bookmark', args: feature.get('bookmark')},
             {waitFor: 'Feature', args: feature.get('text')},

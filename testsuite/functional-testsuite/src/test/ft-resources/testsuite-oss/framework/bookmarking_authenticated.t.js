@@ -21,15 +21,12 @@ StartTest(function(t) {
     '/admin/Support/Logging/Log Viewer', //errors on load?
     '/admin/Support/Support Request', //challenges for Authenticate when logged in already
     '/admin/Security/Realms' //errors on load?
-  ], messages = [];
+  ];
 
   t.ok(Ext);
   t.ok(NX);
   t.waitForSessionToBeInvalidated();
 
-  t.getExt().ux.window.Notification.on('afterRender', function(){
-    messages.push('message'); 
-  });
   t.describe('An admin can use bookmarks to navigate the entire UI', function(t) {
     var featureStore = t.Ext().StoreManager.get('Feature');
     featureStore.filter(function(item) {
@@ -44,7 +41,6 @@ StartTest(function(t) {
             t.chain(
                 function(next) {
                   t.navigateTo(feature.get('bookmark'));
-                  console.log(messages);
                   next();
                 },
                 {waitFor: 'bookmark', args: feature.get('bookmark')},
