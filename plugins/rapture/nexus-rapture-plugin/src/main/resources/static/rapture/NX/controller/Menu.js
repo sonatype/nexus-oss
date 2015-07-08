@@ -201,20 +201,18 @@ Ext.define('NX.controller.Menu', {
     var me = this,
         path = featureMenuModel.get('path');
 
-    //if ((path !== me.currentSelectedPath) || featureMenuModel.get('group')) {
-      me.currentSelectedPath = path;
+    me.currentSelectedPath = path;
 
-      //<if debug>
-      me.logInfo('Selected feature:', path);
-      //</if>
+    //<if debug>
+    me.logInfo('Selected feature:', path);
+    //</if>
 
-      if (me.bookmarkingEnabled) {
-        me.bookmark(featureMenuModel);
-      }
+    if (me.bookmarkingEnabled) {
+      me.bookmark(featureMenuModel);
+    }
 
-      me.selectFeature(me.getStore('Feature').getById(featureMenuModel.get('path')));
-      me.populateFeatureGroupStore(featureMenuModel);
-    //}
+    me.selectFeature(me.getStore('Feature').getById(featureMenuModel.get('path')));
+    me.populateFeatureGroupStore(featureMenuModel);
   },
 
   /**
