@@ -92,7 +92,6 @@ Ext.define('NX.controller.Drilldown', {
       syncsize: me.syncSizeToOwner,
       activate: function() {
         me.currentIndex = 0;
-        me.reselect();
         me.syncSizeToOwner();
       }
     };
