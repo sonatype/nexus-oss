@@ -124,7 +124,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
           }
         });
       }
-    });
+    }, undefined, {enableBuffer: false});
   },
 
   /**
