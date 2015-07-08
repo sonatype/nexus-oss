@@ -42,7 +42,7 @@ Ext.define('NX.util.condition.GridHasSelection', {
    */
   bind: function () {
     var me = this,
-        components = {}, queryResult;
+        components = {};
 
     if (!me.bounded) {
       components[me.grid] = {
