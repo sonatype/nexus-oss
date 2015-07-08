@@ -630,6 +630,7 @@ Ext.define('NX.controller.Menu', {
     return me.warnBeforeNavigate(
       function () {
         me.getFeatureMenu().getSelectionModel().select(record);
+        me.getFeatureMenu().fireEvent('itemclick', me.getFeatureMenu(), record);
       }
     )
   },
