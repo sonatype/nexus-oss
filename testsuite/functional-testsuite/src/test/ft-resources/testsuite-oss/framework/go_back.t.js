@@ -28,12 +28,7 @@ StartTest(function(t) {
           function(next) {
             t.waitForAnimations(next);
           },
-          function(next) {
-            var tree = t.cq1('nx-feature-menu'),
-                selectedRow = tree.getSelectionModel().getSelection()[0];
-            tree.fireEvent('itemclick', tree, selectedRow);
-            next();
-          },
+          {click : "nx-feature-menu => .x-tree-node-text:contains('Repositories')"},
           {waitForRowsVisible: 'nx-coreui-repository-list'}
       )
     });
