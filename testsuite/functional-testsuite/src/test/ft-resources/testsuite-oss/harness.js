@@ -94,6 +94,7 @@ NX.TestHarness.start(
         {
           group: 'FT',
           items: [
+            { url: 'testsuite-oss/support/support_logging.t.js' },
             { url: 'testsuite-oss/support/support_metrics.t.js' },
             { url: 'testsuite-oss/support/support_sysinfo.t.js' },
             { url: 'testsuite-oss/support/support_zip.t.js' }
@@ -110,6 +111,7 @@ NX.TestHarness.start(
           items: [
             { url: 'testsuite-oss/system/system_bundles.t.js' },
             { url: 'testsuite-oss/system/system_tasks.t.js' },
+            { url: 'testsuite-oss/system/system_email.t.js' },
             { url: 'testsuite-oss/system/http_configuration.t.js' },
             { url: 'testsuite-oss/system/system_capabilities.t.js' }
           ]
