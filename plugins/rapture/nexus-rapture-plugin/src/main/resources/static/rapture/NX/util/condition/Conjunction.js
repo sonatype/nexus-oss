@@ -28,6 +28,10 @@ Ext.define('NX.util.condition.Conjunction', {
    */
   conditions: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.Conjunction}
+   */
   bind: function () {
     var me = this;
 
@@ -46,6 +50,9 @@ Ext.define('NX.util.condition.Conjunction', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function () {
     var me = this,
         satisfied = true;
@@ -59,6 +66,10 @@ Ext.define('NX.util.condition.Conjunction', {
     }
   },
 
+  /**
+   * @overrdie
+   * @returns {String}
+   */
   toString: function () {
     return this.conditions.join(' AND ');
   }

@@ -44,7 +44,7 @@ Ext.define('NX.util.condition.Condition', {
   /**
    * True when this condition is bounded.
    *
-   * @private
+   * @protected
    * @property {Boolean}
    */
   bounded: false,
@@ -57,6 +57,10 @@ Ext.define('NX.util.condition.Condition', {
    */
   satisfied: false,
 
+  /**
+   * @constructor
+   * @param {Object} config
+   */
   constructor: function (config) {
     var me = this;
 

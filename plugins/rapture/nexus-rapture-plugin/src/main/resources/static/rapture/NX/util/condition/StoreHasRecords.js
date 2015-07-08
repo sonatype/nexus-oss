@@ -27,6 +27,10 @@ Ext.define('NX.util.condition.StoreHasRecords', {
    */
   store: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.StoreHasRecords}
+   */
   bind: function () {
     var me = this,
         store;
@@ -45,6 +49,9 @@ Ext.define('NX.util.condition.StoreHasRecords', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function (store) {
     var me = this;
 
@@ -53,9 +60,12 @@ Ext.define('NX.util.condition.StoreHasRecords', {
     }
   },
 
+  /**
+   * @override
+   * @returns {String}
+   */
   toString: function () {
-    var me = this;
-    return me.self.getName() + '{ store=' + me.store + ' }';
+    return this.self.getName() + '{ store=' + this.store + ' }';
   }
 
 });

@@ -22,9 +22,14 @@ Ext.define('NX.util.condition.IsPermitted', {
 
   /**
    * @private
+   * @property {String}
    */
   permission: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.IsPermitted}
+   */
   bind: function () {
     var me = this,
         controller;
@@ -42,6 +47,9 @@ Ext.define('NX.util.condition.IsPermitted', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function () {
     var me = this;
 
@@ -50,22 +58,23 @@ Ext.define('NX.util.condition.IsPermitted', {
     }
   },
 
+  /**
+   * @override
+   * @returns {String}
+   */
   toString: function () {
-    var me = this;
-    return me.self.getName() + '{ permission=' + me.permission + ' }';
+    return this.self.getName() + '{ permission=' + this.permission + ' }';
   },
 
   /**
    * Sets permission and re-evaluate.
    *
    * @public
-   * @param {String} permission permission
+   * @param {String} permission
    */
   setPermission: function(permission) {
-    var me = this;
-
-    me.permission = permission;
-    me.evaluate();
+    this.permission = permission;
+    this.evaluate();
   }
 
 });
