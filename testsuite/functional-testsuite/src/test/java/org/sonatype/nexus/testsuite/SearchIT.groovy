@@ -62,9 +62,9 @@ extends FunctionalTestSupport
   }
 
   @org.ops4j.pax.exam.Configuration
-  public static Option[] config() {
+  public static Option[] configureNexus() {
     OptionUtils.combine(
-        FunctionalTestSupport.config(),
+        FunctionalTestSupport.configureNexus(),
         wrappedBundle(maven("org.apache.httpcomponents", "httpmime").versionAsInProject())
             .overwriteManifest(WrappedUrlProvisionOption.OverwriteMode.FULL).instructions("DynamicImport-Package=*")
     )
