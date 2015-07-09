@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.browse.BrowseFeature', {
 
   masters: [
     {xtype: 'nx-coreui-browse-repository-list'},
-    {xtype: 'nx-coreui-browse-result-list'},
+    {xtype: 'nx-coreui-browse-components-list'},
     {
       xtype: 'panel',
       region: 'center',
