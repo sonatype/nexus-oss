@@ -211,6 +211,7 @@ class ComponentComponent
         }
       }
 
+      return null
     }
     finally {
       storageTx.close()
