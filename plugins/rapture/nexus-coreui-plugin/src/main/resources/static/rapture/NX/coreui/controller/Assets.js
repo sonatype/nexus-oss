@@ -174,16 +174,17 @@ Ext.define('NX.coreui.controller.Assets', {
    * Enable 'Delete' when user has 'delete' permission.
    */
   bindDeleteAssetButton: function(button) {
-    var component = this.getAssetList().componentModel;
+    var assetModel = this.getAssetContainer().assetModel;
     button.mon(
-        NX.Conditions.isPermitted('nexus:repository-view:' + component.get('format') + ':' +
-            component.get('repositoryName') + ':delete')
-    ),
-    {
-      satisfied: button.enable,
-      unsatisfied: button.disable,
-      scope: button
-    }
+        NX.Conditions.isPermitted(
+            'nexus:repository-view:' + assetModel.get('format') + ':' + assetModel.get('repositoryName') + ':delete'
+        ),
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
   },
 
   /**
