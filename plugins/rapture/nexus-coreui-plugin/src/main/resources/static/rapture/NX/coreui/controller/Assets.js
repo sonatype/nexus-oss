@@ -35,7 +35,8 @@ Ext.define('NX.coreui.controller.Assets', {
   refs: [
     {ref: 'assetContainer', selector: 'nx-coreui-component-assetcontainer'},
     {ref: 'assetList', selector: 'nx-coreui-component-asset-list'},
-    {ref: 'assetInfo', selector: 'nx-coreui-component-assetinfo'}
+    {ref: 'assetInfo', selector: 'nx-coreui-component-assetinfo'},
+    {ref: 'deleteAssetButton', selector: 'nx-coreui-component-assetinfo button[action=deleteAsset]'}
   ],
 
   /**
@@ -66,7 +67,6 @@ Ext.define('NX.coreui.controller.Assets', {
           cellclick: me.updateAssetContainer
         },
         'nx-coreui-component-assetinfo button[action=deleteAsset]': {
-          afterrender: me.bindDeleteAssetButton,
           click: me.deleteAsset
         }
       }
@@ -163,17 +163,19 @@ Ext.define('NX.coreui.controller.Assets', {
   },
 
   /**
-   * @private
-   *
    * Update asset shown in asset container.
+   *
+   * @private
    */
   updateAssetContainer: function(gridView, td, cellIndex, assetModel) {
     this.getAssetContainer().refreshInfo(assetModel);
+    this.bindDeleteAssetButton(this.getDeleteAssetButton());
   },
 
   /**
-   * @protected
    * Enable 'Delete' when user has 'delete' permission.
+   *
+   * @protected
    */
   bindDeleteAssetButton: function(button) {
     var assetModel = this.getAssetContainer().assetModel;
