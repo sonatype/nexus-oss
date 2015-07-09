@@ -27,6 +27,8 @@ Ext.define('NX.util.Url', {
    * Returns the base URL of the Nexus server.  URL never ends with '/'.
    *
    * @public
+   * @property {String}
+   * @readonly
    */
   baseUrl: NX.app.baseUrl,
   
