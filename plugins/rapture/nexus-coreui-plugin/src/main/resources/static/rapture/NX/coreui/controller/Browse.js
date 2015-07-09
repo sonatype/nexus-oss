@@ -46,7 +46,7 @@ Ext.define('NX.coreui.controller.Browse', {
 
   refs: [
     {ref: 'feature', selector: 'nx-coreui-browsefeature'},
-    {ref: 'results', selector: 'nx-coreui-browsefeature nx-coreui-browse-component-list'},
+    {ref: 'componentList', selector: 'nx-coreui-browsefeature nx-coreui-browse-component-list'},
     {ref: 'componentDetails', selector: 'nx-coreui-browsefeature nx-coreui-component-details'},
     {ref: 'assets', selector: 'nx-coreui-browsefeature nx-coreui-component-asset-list'},
     {ref: 'componentFilter', selector: 'nx-coreui-browsefeature nx-coreui-browse-component-list #filter'}
@@ -136,7 +136,7 @@ Ext.define('NX.coreui.controller.Browse', {
   onRepositorySelection: function(model) {
     var me = this,
         componentStore = me.getStore('Component'),
-        results = me.getResults(),
+        results = me.getComponentList(),
         componentFilter = me.getComponentFilter();
 
     componentStore.filters.removeAtKey('filter');
@@ -175,7 +175,7 @@ Ext.define('NX.coreui.controller.Browse', {
   onSearch: function(searchBox, value) {
     var me = this,
         componentStore = me.getStore('Component'),
-        results = me.getResults(),
+        results = me.getComponentList(),
         emptyText = NX.I18n.get('Browse_BrowseComponentList_EmptyText_Filter');
 
     if (!results.emptyText) {
@@ -199,7 +199,7 @@ Ext.define('NX.coreui.controller.Browse', {
   onSearchCleared: function() {
     var me = this,
         componentStore = me.getStore('Component'),
-        results = me.getResults();
+        results = me.getComponentList();
 
     if (results.emptyText) {
       results.getView().emptyText = results.emptyText;
