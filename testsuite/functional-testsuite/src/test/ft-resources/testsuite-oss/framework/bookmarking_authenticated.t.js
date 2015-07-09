@@ -23,8 +23,8 @@ StartTest(function(t) {
     '/admin/Security/Realms' //errors on load?
   ];
 
-  t.ok(Ext);
-  t.ok(NX);
+  t.ok(Ext, 'Ext is here');
+  t.ok(NX, 'NX is here');
   t.waitForSessionToBeInvalidated();
 
   t.describe('An admin can use bookmarks to navigate the entire UI', function(t) {

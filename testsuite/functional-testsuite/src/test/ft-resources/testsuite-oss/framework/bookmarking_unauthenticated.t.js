@@ -26,10 +26,10 @@ StartTest(function(t) {
         return !item.get('authenticationRequired') && ignoredFeatures.indexOf(item.get('path')) === -1;
       };
 
-  t.ok(Ext);
-  t.ok(NX);
+  t.ok(Ext, 'Ext is here');
+  t.ok(NX, 'NX is here');
   t.waitForSessionToBeInvalidated();
-  
+
   t.describe('Can use bookmarks to navigate the UI', function(t) {
     var featureStore = t.Ext().StoreManager.get('Feature');
     featureStore.filter([
