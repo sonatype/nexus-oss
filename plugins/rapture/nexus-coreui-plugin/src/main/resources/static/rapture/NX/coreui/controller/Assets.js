@@ -166,9 +166,7 @@ Ext.define('NX.coreui.controller.Assets', {
    * Update asset shown in asset container.
    */
   updateAssetContainer: function(gridView, td, cellIndex, assetModel) {
-    var assetContainer = this.getAssetContainer();
-
-    assetContainer.refreshInfo(assetModel);
+    this.getAssetContainer().refreshInfo(assetModel);
   },
 
   /**
