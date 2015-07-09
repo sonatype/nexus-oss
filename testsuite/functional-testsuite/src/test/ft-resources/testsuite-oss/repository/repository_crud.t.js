@@ -125,20 +125,21 @@ StartTest(function(t) {
           //update the writePolicy
           {click: '#writePolicy => .x-form-text'},
           {click: '#writePolicy.getPicker() => .x-boundlist-item:contains(Disable redeploy)'},
-          Ext.apply(Ext.clone(waitForStoreToLoad),
-              {trigger: {click: '>>nx-coreui-repository-settings button[action=save]'}}
-          ),          
+          {click: '>>nx-coreui-repository-settings button[action=save]'},
+          function(next) {
+            var store = t.cq1('nx-coreui-repository-list').getStore();
+            t.click('>>nx-coreui-repository-settings button[action=save]', function() {
+              t.waitForStoresToLoad(store, next);
+            });
+          },
           function(next) {
             t.waitForAnimations(next);
           },
           function(next) {
             t.navigateTo('admin/repository/repositories');
-            next()
+            next();
           },
-          {waitFor: 'CQ', args: 'nx-coreui-repository-list'},
-          function(next) {
-            t.waitForAnimations(next);
-          },
+          {waitForRowsVisible: 'nx-coreui-repository-list'},
           function(next) {
             var grid = t.cq1('nx-coreui-repository-list'),
                 store = grid.getStore(),
