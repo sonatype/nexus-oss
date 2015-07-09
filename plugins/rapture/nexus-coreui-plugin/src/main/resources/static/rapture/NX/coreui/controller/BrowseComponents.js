@@ -68,7 +68,7 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
   },
 
   icons: {
-    'browse-default': {file: 'database.png', variants: ['x16', 'x32']},
+    'browse-component-default': {file: 'database.png', variants: ['x16', 'x32']},
     'browse-component': {file: 'box_front.png', variants: ['x16', 'x32']},
     'browse-component-detail': {file: 'box_front_open.png', variants: ['x16', 'x32']},
     'browse-unattached': {file: 'file_extension_default.png', variants: ['x16', 'x32']}
