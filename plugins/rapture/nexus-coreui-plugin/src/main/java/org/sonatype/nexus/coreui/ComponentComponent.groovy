@@ -211,7 +211,6 @@ class ComponentComponent
         }
       }
 
-      storageTx.commit();
     }
     finally {
       storageTx.close()
