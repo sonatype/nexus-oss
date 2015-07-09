@@ -15,7 +15,7 @@
  */
 StartTest(function(t) {
 
-  var checkMode = function(mode, collapsed, next) {
+  var checkMode = function(mode, collapsed, next, t) {
     var menu = t.cq1('nx-feature-menu');
     t.diag('While in ' + mode + ' mode');
     t.is(menu.title, mode, 'Menu title is "' + mode + '"');
@@ -47,7 +47,7 @@ StartTest(function(t) {
       t.chain(
           {click: '>>nx-header-browse-mode'},
           function(next) {
-            checkMode('Browse', false, next);
+            checkMode('Browse', false, next, t);
           }
       );
     });
@@ -56,7 +56,7 @@ StartTest(function(t) {
       t.chain(
           {click: '>>nx-header-admin-mode'},
           function(next) {
-            checkMode('Administration', false, next);
+            checkMode('Administration', false, next, t);
           }
       );
     });
@@ -65,7 +65,7 @@ StartTest(function(t) {
       t.chain(
           {click: '>>nx-header-user-mode'},
           function(next) {
-            checkMode('User', false, next);
+            checkMode('User', false, next, t);
           }
       );
     });
