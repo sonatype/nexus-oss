@@ -217,12 +217,13 @@ Ext.define('NX.coreui.controller.Browse', {
   },
 
   /**
-   * @private
    * Set the appropriate breadcrumb icon.
-   * @param {NX.coreui.model.Component} componentModel selected asset
+   *
+   * @private
+   * @param {NX.coreui.view.component.AssetContainer} container asset container
    * @param {NX.coreui.model.Asset} assetModel selected asset
    */
-  setAssetIcon: function(container, componentModel, assetModel) {
+  setAssetIcon: function(container, assetModel) {
     if (assetModel) {
       // Set the appropriate breadcrumb icon
       this.setItemClass(3, container.iconCls);

@@ -72,10 +72,13 @@ Ext.define('NX.coreui.controller.Assets', {
   },
 
   /**
-   * @private
    * Shows information about selected component/asset.
+   *
+   * @private
+   * @param {NX.coreui.view.component.AssetContainer} container asset container
+   * @param {NX.coreui.model.Asset} assetModel selected asset
    */
-  showAssetInfo: function(container, componentModel, assetModel) {
+  showAssetInfo: function(container, assetModel) {
     var info = container.down('nx-coreui-component-assetinfo'),
       attributes = container.down('nx-coreui-component-assetattributes'),
       panel;
@@ -86,7 +89,6 @@ Ext.define('NX.coreui.controller.Assets', {
     info.setAssetModel(assetModel);
 
     if (!attributes) {
-
       attributes = Ext.create('widget.nx-coreui-component-assetattributes');
       panel = Ext.create('Ext.Panel', {
         ui: 'nx-inset',
@@ -166,7 +168,7 @@ Ext.define('NX.coreui.controller.Assets', {
   updateAssetContainer: function(gridView, td, cellIndex, assetModel) {
     var assetContainer = this.getAssetContainer();
 
-    assetContainer.refreshInfo(gridView.up('grid').componentModel, assetModel);
+    assetContainer.refreshInfo(assetModel);
   },
 
   /**
@@ -186,7 +188,7 @@ Ext.define('NX.coreui.controller.Assets', {
     }
   },
 
-  /**                                
+  /**
    * @private
    * Remove selected asset.
    */
