@@ -82,7 +82,7 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
         description: NX.I18n.get('FeatureGroups_Browse_Description'),
         group: true,
         iconConfig: {
-          file: 'upload.png',
+          file: 'box_front.png',
           variants: ['x16', 'x32']
         }
       },
@@ -93,7 +93,7 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
         description: NX.I18n.get('FeatureGroups_Upload_Description'),
         group: true,
         iconConfig: {
-          file: 'plugin.png',
+          file: 'upload.png',
           variants: ['x16', 'x32']
         }
       }

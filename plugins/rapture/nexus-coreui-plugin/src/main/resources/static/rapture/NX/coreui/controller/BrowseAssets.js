@@ -56,7 +56,7 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
     description: NX.I18n.get('Browse_Assets_Description_Feature'),
     view: 'NX.coreui.view.browse.BrowseAssetFeature',
     iconConfig: {
-      file: 'plugin.png',
+      file: 'file_extension_default.png',
       variants: ['x16', 'x32']
     },
     visible: function() {
@@ -65,7 +65,7 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
   },
 
   icons: {
-    'browse-asset-default': {file: 'database.png', variants: ['x16', 'x32']}
+    'browse-asset-default': {file: 'file_extension_default.png', variants: ['x16', 'x32']}
   },
 
   /**
