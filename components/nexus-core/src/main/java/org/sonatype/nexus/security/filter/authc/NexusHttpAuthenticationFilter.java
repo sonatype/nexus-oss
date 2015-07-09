@@ -184,12 +184,7 @@ public class NexusHttpAuthenticationFilter
    * Allow customization of 401 status line message.
    */
   protected String getUnauthorizedMessage(final ServletRequest request) {
-    try {
-        return "Unauthorized";
-    }
-    catch (RuntimeException e) {
-        // ignore
-    }
+    return "Unauthorized";
   }
 
   /**
