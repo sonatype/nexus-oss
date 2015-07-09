@@ -39,8 +39,6 @@ import org.apache.http.impl.client.HttpClients
 import org.junit.Before
 import org.junit.Test
 import org.ops4j.pax.exam.Option
-import org.ops4j.pax.exam.OptionUtils
-import org.ops4j.pax.exam.options.WrappedUrlProvisionOption
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.is
@@ -63,10 +61,9 @@ extends FunctionalTestSupport
 
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
-    OptionUtils.combine(
+    return options(
         FunctionalTestSupport.configureNexus(),
         wrappedBundle(maven("org.apache.httpcomponents", "httpmime").versionAsInProject())
-            .overwriteManifest(WrappedUrlProvisionOption.OverwriteMode.FULL).instructions("DynamicImport-Package=*")
     )
   }
 

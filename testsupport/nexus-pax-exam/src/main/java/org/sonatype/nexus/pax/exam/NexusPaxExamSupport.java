@@ -450,6 +450,13 @@ public abstract class NexusPaxExamSupport
     return result.toArray(new Option[result.size()]);
   }
 
+  /**
+   * Processes two sequences of options and combines them into a single sequence.
+   */
+  public static Option[] options(final Option[] options1, final Option... options2) {
+    return options(OptionUtils.combine(options1, options2));
+  }
+
   // -------------------------------------------------------------------------
 
   @Before
