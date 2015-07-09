@@ -26,7 +26,7 @@ Ext.define('NX.coreui.controller.Browse', {
     'NX.I18n'
   ],
   masters: [
-    'nx-coreui-browse-repository-list',
+    'nx-coreui-browsefeature nx-coreui-browse-repository-list',
     'nx-coreui-browse-component-list',
     'nx-coreui-component-asset-list'
   ],
@@ -52,11 +52,11 @@ Ext.define('NX.coreui.controller.Browse', {
     {ref: 'componentFilter', selector: 'nx-coreui-browsefeature nx-coreui-browse-component-list #filter'}
   ],
 
-  features: {
+  features:     {
     mode: 'browse',
-    path: '/Browse',
-    text: NX.I18n.get('Browse_Title_Feature'),
-    description: NX.I18n.get('Browse_Description_Feature'),
+    path: '/Browse/Components',
+    text: NX.I18n.get('Browse_Components_Title_Feature'),
+    description: NX.I18n.get('Browse_Components_Description_Feature'),
     view: 'NX.coreui.view.browse.BrowseFeature',
     iconConfig: {
       file: 'plugin.png',
@@ -175,7 +175,7 @@ Ext.define('NX.coreui.controller.Browse', {
   onSearch: function(searchBox, value) {
     var grid = searchBox.up('grid'),
         store = grid.getStore(),
-        emptyText = NX.I18n.get('Browse_BrowseComponentList_EmptyText_Filter');
+        emptyText = grid.getView().emptyTextFilter;
 
     if (!grid.emptyText) {
       grid.emptyText = grid.getView().emptyText;

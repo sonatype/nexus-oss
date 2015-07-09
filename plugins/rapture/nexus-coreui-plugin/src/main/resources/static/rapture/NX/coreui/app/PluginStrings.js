@@ -32,8 +32,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
 
   keys: {
     // Browse -> Browse
-    Browse_Title_Feature: 'Browse',
-    Browse_Description_Feature: 'Browse components and assets',
+    Browse_Assets_Title_Feature: 'Assets',
+    Browse_Assets_Description_Feature: 'Browse assets',
+    Browse_Components_Title_Feature: 'Components',
+    Browse_Components_Description_Feature: 'Browse components and assets',
     Browse_BrowseRepositoryList_Name_Column: 'Name',
     Browse_BrowseRepositoryList_Type_Column: 'Type',
     Browse_BrowseRepositoryList_Format_Column: 'Format',
@@ -45,6 +47,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Browse_BrowseComponentList_Version_Column: 'Version',
     Browse_BrowseComponentList_EmptyText_View: 'No components found in repository',
     Browse_BrowseComponentList_EmptyText_Filter: 'No components matched "$filter"',
+    Browse_BrowseAssetList_Name_Column: 'Name',
+    Browse_BrowseAssetList_EmptyText_View: 'No assets found in repository',
+    Browse_BrowseAssetList_EmptyText_Filter: 'No assets matched "$filter"',
     Assets_Info_Path: 'Path',
     Assets_Info_ContentType: 'Content Type',
     Assets_Info_FileSize: 'File size',
@@ -133,6 +138,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Feed_FeedFeature_List_Title: 'Events',
     Feed_FeedEntryList_Title_Header: 'Title',
     Feed_FeedEntryList_Date_Header: 'Date',
+
+    // Browse -> Browse
+    FeatureGroups_Browse_Text: 'Browse',
+    FeatureGroups_Browse_Description: 'Browse assets and components',
 
     // Browse -> Upload
     FeatureGroups_Upload_Text: 'Upload',

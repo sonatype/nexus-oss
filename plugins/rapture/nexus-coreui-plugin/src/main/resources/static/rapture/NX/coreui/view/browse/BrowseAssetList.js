@@ -29,7 +29,7 @@ Ext.define('NX.coreui.view.browse.BrowseAssetList', {
     stateId: 'nx-coreui-browse-asset-list'
   },
 
-  store: 'Component',
+  store: 'Asset',
 
   // Prevent the store from automatically loading
   loadStore: Ext.emptyFn,
@@ -39,48 +39,35 @@ Ext.define('NX.coreui.view.browse.BrowseAssetList', {
   },
 
   viewConfig: {
-    emptyText: NX.I18n.get('Browse_BrowseComponentList_EmptyText_View'),
+    emptyText: NX.I18n.get('Browse_BrowseAssetList_EmptyText_View'),
+    emptyTextFilter: NX.I18n.get('Browse_BrowseAssetList_EmptyText_Filter'),
     deferEmptyText: false
   },
 
   columns: [
     {
       xtype: 'nx-iconcolumn',
-      dataIndex: 'id',
+      dataIndex: 'contentType',
       width: 36,
       iconVariant: 'x16',
+      iconNamePrefix: 'asset-type-',
       iconName: function(value) {
-        if (value === 'unattached') {
-          return 'browse-unattached';
+        var assetType;
+
+        if (value) {
+          assetType = value.replace('/', '-');
+          if (NX.getApplication().getIconController().findIcon('asset-type-' + assetType, 'x16')) {
+            return assetType;
+          }
         }
-        return 'browse-component';
+        return 'default';
       }
     },
     {
-      text: NX.I18n.get('Browse_BrowseComponentList_Name_Column'),
+      text: NX.I18n.get('Browse_BrowseAssetList_Name_Column'),
       dataIndex: 'name',
       stateId: 'name',
-      flex: 3,
-      renderer: function(value) {
-        if (!value) {
-          return NX.I18n.get('Browse_BrowseComponentList_Name_Column_Unattached');
-        }
-        return value;
-      }
-    },
-    {
-      text: NX.I18n.get('Browse_BrowseComponentList_Group_Column'),
-      dataIndex: 'group',
-      stateId: 'group',
-      flex: 4,
-      renderer: NX.ext.grid.column.Renderers.optionalData
-    },
-    {
-      text: NX.I18n.get('Browse_BrowseComponentList_Version_Column'),
-      dataIndex: 'version',
-      stateId: 'version',
-      flex: 1,
-      renderer: NX.ext.grid.column.Renderers.optionalData
+      flex: 1
     }
   ],
 

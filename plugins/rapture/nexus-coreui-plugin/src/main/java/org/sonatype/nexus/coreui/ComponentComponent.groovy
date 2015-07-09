@@ -57,6 +57,7 @@ class ComponentComponent
     new AssetXO(
         id: asset.entityMetadata.id,
         name: asset.name() ?: componentName,
+        format: asset.format(),
         contentType: asset.contentType() ?: 'unknown',
         size: asset.size() ?: 0,
         repositoryName: repositoryName,
@@ -71,7 +72,7 @@ class ComponentComponent
 
   @Inject
   RepositoryManager repositoryManager
-  
+
   @DirectMethod
   PagedResponse<ComponentXO> read(final StoreLoadParameters parameters) {
     Repository repository = repositoryManager.get(parameters.getFilter('repositoryName'))
@@ -118,8 +119,8 @@ class ComponentComponent
       if (filter) {
         whereClause = "${StorageFacet.P_NAME} LIKE :nameFilter OR ${StorageFacet.P_GROUP} LIKE :groupFilter OR ${StorageFacet.P_VERSION} LIKE :versionFilter"
         queryParams = [
-            'nameFilter': "%${filter}%",
-            'groupFilter': "%${filter}%",
+            'nameFilter'   : "%${filter}%",
+            'groupFilter'  : "%${filter}%",
             'versionFilter': "%${filter}%"
         ]
       }
@@ -212,6 +213,69 @@ class ComponentComponent
       }
 
       return null
+    }
+    finally {
+      storageTx.close()
+    }
+  }
+
+  @DirectMethod
+  PagedResponse<AssetXO> readAssets(final StoreLoadParameters parameters) {
+    Repository repository = repositoryManager.get(parameters.getFilter('repositoryName'))
+    securityHelper.ensurePermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))
+
+    if (!repository.configuration.online) {
+      return null
+    }
+
+    def sort = parameters.sort?.get(0)
+    def querySuffix = ''
+    if (sort) {
+      querySuffix += " ORDER BY ${sort.property} ${sort.direction}"
+      if (sort.property == StorageFacet.P_GROUP) {
+        querySuffix += ", ${StorageFacet.P_NAME} ASC,${StorageFacet.P_VERSION} ASC"
+      }
+      else if (sort.property == StorageFacet.P_NAME) {
+        querySuffix += ", ${StorageFacet.P_VERSION} ASC,${StorageFacet.P_GROUP} ASC"
+      }
+    }
+    if (parameters.start) {
+      querySuffix += " SKIP ${parameters.start}"
+    }
+    if (parameters.limit) {
+      querySuffix += " LIMIT ${parameters.limit}"
+    }
+
+    StorageTx storageTx = repository.facet(StorageFacet).txSupplier().get()
+    try {
+      storageTx.begin();
+
+      def repositories
+      try {
+        repositories = repository.facet(GroupFacet).leafMembers()
+        querySuffix = " GROUP BY ${StorageFacet.P_GROUP},${StorageFacet.P_NAME},${StorageFacet.P_VERSION}" + querySuffix
+      }
+      catch (MissingFacetException e) {
+        repositories = ImmutableList.of(repository)
+      }
+
+      def whereClause = null
+      def queryParams = null
+      def filter = parameters.getFilter('filter')
+      if (filter) {
+        whereClause = "${StorageFacet.P_NAME} LIKE :nameFilter"
+        queryParams = [
+            'nameFilter': "%${filter}%"
+        ]
+      }
+
+      List<AssetXO> results = storageTx.findAssets(whereClause, queryParams, repositories, querySuffix)
+          .collect(ASSET_CONVERTER.rcurry(null, repository.name))
+
+      return new PagedResponse<AssetXO>(
+          (results.size() < parameters.limit ? 0 : parameters.limit) + results.size() + parameters.start,
+          results
+      )
     }
     finally {
       storageTx.close()

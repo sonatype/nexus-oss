@@ -43,6 +43,7 @@ Ext.define('NX.coreui.view.browse.BrowseComponentList', {
 
   viewConfig: {
     emptyText: NX.I18n.get('Browse_BrowseComponentList_EmptyText_View'),
+    emptyTextFilter: NX.I18n.get('Browse_BrowseComponentList_EmptyText_Filter'),
     deferEmptyText: false
   },
 
