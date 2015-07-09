@@ -27,7 +27,7 @@ Ext.define('NX.coreui.controller.Browse', {
   ],
   masters: [
     'nx-coreui-browse-repository-list',
-    'nx-coreui-browse-components-list',
+    'nx-coreui-browse-component-list',
     'nx-coreui-component-asset-list'
   ],
   stores: [
@@ -41,15 +41,15 @@ Ext.define('NX.coreui.controller.Browse', {
   views: [
     'browse.BrowseFeature',
     'browse.BrowseRepositoryList',
-    'browse.BrowseComponentsList'
+    'browse.BrowseComponentList'
   ],
 
   refs: [
     {ref: 'feature', selector: 'nx-coreui-browsefeature'},
-    {ref: 'results', selector: 'nx-coreui-browsefeature nx-coreui-browse-components-list'},
+    {ref: 'results', selector: 'nx-coreui-browsefeature nx-coreui-browse-component-list'},
     {ref: 'componentDetails', selector: 'nx-coreui-browsefeature nx-coreui-component-details'},
     {ref: 'assets', selector: 'nx-coreui-browsefeature nx-coreui-component-asset-list'},
-    {ref: 'componentFilter', selector: 'nx-coreui-browsefeature nx-coreui-browse-components-list #filter'}
+    {ref: 'componentFilter', selector: 'nx-coreui-browsefeature nx-coreui-browse-component-list #filter'}
   ],
 
   features: {
@@ -92,7 +92,7 @@ Ext.define('NX.coreui.controller.Browse', {
         'nx-coreui-browsefeature nx-coreui-component-assetcontainer': {
           updated: me.setAssetIcon
         },
-        'nx-coreui-browsefeature nx-coreui-browse-components-list #filter': {
+        'nx-coreui-browsefeature nx-coreui-browse-component-list #filter': {
           search: me.onSearch,
           searchcleared: me.onSearchCleared
         }
@@ -176,7 +176,7 @@ Ext.define('NX.coreui.controller.Browse', {
     var me = this,
         componentStore = me.getStore('Component'),
         results = me.getResults(),
-        emptyText = NX.I18n.get('Browse_BrowseComponentsList_EmptyText_Filter');
+        emptyText = NX.I18n.get('Browse_BrowseComponentList_EmptyText_Filter');
 
     if (!results.emptyText) {
       results.emptyText = results.getView().emptyText;

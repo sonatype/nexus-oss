@@ -17,9 +17,9 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.browse.BrowseComponentsList', {
+Ext.define('NX.coreui.view.browse.BrowseComponentList', {
   extend: 'NX.view.drilldown.Master',
-  alias: 'widget.nx-coreui-browse-components-list',
+  alias: 'widget.nx-coreui-browse-component-list',
   requires: [
     'NX.I18n'
   ],
@@ -29,7 +29,7 @@ Ext.define('NX.coreui.view.browse.BrowseComponentsList', {
 
   config: {
     stateful: true,
-    stateId: 'nx-coreui-browse-components-list'
+    stateId: 'nx-coreui-browse-component-list'
   },
 
   store: 'Component',
@@ -42,7 +42,7 @@ Ext.define('NX.coreui.view.browse.BrowseComponentsList', {
   },
 
   viewConfig: {
-    emptyText: NX.I18n.get('Browse_BrowseComponentsList_EmptyText_View'),
+    emptyText: NX.I18n.get('Browse_BrowseComponentList_EmptyText_View'),
     deferEmptyText: false
   },
 
@@ -60,26 +60,26 @@ Ext.define('NX.coreui.view.browse.BrowseComponentsList', {
       }
     },
     {
-      text: NX.I18n.get('Browse_BrowseComponentsList_Name_Column'),
+      text: NX.I18n.get('Browse_BrowseComponentList_Name_Column'),
       dataIndex: 'name',
       stateId: 'name',
       flex: 3,
       renderer: function(value) {
         if (!value) {
-          return NX.I18n.get('Browse_BrowseComponentsList_Name_Column_Unattached');
+          return NX.I18n.get('Browse_BrowseComponentList_Name_Column_Unattached');
         }
         return value;
       }
     },
     {
-      text: NX.I18n.get('Browse_BrowseComponentsList_Group_Column'),
+      text: NX.I18n.get('Browse_BrowseComponentList_Group_Column'),
       dataIndex: 'group',
       stateId: 'group',
       flex: 4,
       renderer: NX.ext.grid.column.Renderers.optionalData
     },
     {
-      text: NX.I18n.get('Browse_BrowseComponentsList_Version_Column'),
+      text: NX.I18n.get('Browse_BrowseComponentList_Version_Column'),
       dataIndex: 'version',
       stateId: 'version',
       flex: 1,
