@@ -13,11 +13,11 @@
 /*global Ext, NX*/
 
 /**
- * Browse controller.
+ * Browse components controller.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.controller.Browse', {
+Ext.define('NX.coreui.controller.BrowseComponents', {
   extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Bookmarks',
