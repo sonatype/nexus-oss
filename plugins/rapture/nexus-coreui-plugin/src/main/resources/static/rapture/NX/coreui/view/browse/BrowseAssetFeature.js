@@ -21,7 +21,7 @@ Ext.define('NX.coreui.view.browse.BrowseAssetFeature', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-browseassetfeature',
 
-  iconName: 'browse-default',
+  iconName: 'browse-asset-default',
 
   masters: [
     {xtype: 'nx-coreui-browse-repository-list'},
