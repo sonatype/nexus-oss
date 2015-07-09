@@ -43,7 +43,7 @@ Ext.define('NX.controller.MenuGroup', {
   },
 
   /**
-   * Invoked when **{@link NX.view.feature.Group}** item is selected.
+   * Invoked when {@link NX.view.feature.Group} item is selected.
    *
    * @private
    * @param {NX.view.feature.Group} view
