@@ -147,8 +147,6 @@ class ComponentComponent
           (results.size() < parameters.limit ? 0 : parameters.limit) + results.size() + parameters.start,
           results
       )
-
-      storageTx.commit();
     }
     finally {
       storageTx.close()
