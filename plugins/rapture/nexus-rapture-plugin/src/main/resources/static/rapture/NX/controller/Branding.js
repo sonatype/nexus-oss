@@ -62,10 +62,8 @@ Ext.define('NX.controller.Branding', {
    * @private
    */
   onBrandingChanged: function() {
-    var me = this;
-
-    me.renderHeaderBranding();
-    me.renderFooterBranding();
+    this.renderHeaderBranding();
+    this.renderFooterBranding();
   },
 
   /**
