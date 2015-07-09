@@ -26,7 +26,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     'NX.Messages',
     'NX.I18n'
   ],
-
+  detail: 'nx-coreui-logger-list',
   stores: [
     'Logger'
   ],
