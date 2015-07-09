@@ -283,7 +283,7 @@ public class HttpClientManagerImpl
               logger.debug("[{}] Following {} redirect {} -> {}", repoId, redirectCode, sourceUri, targetUri);
             }
             else {
-              logger.debug("[{}] Not following {} redirect to {} -> {}", repoId, redirectCode, sourceUri, targetUri);
+              logger.debug("[{}] Not following {} redirect {} -> {}", repoId, redirectCode, sourceUri, targetUri);
             }
           }
 
