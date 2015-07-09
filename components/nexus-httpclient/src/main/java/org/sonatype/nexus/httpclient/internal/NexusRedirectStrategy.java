@@ -91,6 +91,11 @@ public class NexusRedirectStrategy
       final String targetScheme = schemeOf(targetUri);
       final String targetHost = hostOf(targetUri);
 
+      // FIXME: sourceUri might be relative while targetUri is always absolute, which can lead to
+      // false-positive logging because the source scheme (null) differs from the target ("http")
+      // One way to fix this is to resolve the relative sourceUri against the original proxy URL,
+      // but this relies on access to the original configuration.
+
       // nag about redirection peculiarities, in any case
       if (!Objects.equals(sourceScheme, targetScheme)) {
         if (HTTP.equals(targetScheme)) {
