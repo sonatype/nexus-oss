@@ -60,7 +60,9 @@ Ext.define('NX.coreui.controller.Assets', {
           updated: me.showComponentDetails
         },
         'nx-coreui-component-asset-list': {
-          updated: me.loadAssets,
+          updated: me.loadAssets
+        },
+        'grid[assetContainerSource=true]': {
           cellclick: me.updateAssetContainer
         },
         'nx-coreui-component-assetinfo button[action=deleteAsset]': {

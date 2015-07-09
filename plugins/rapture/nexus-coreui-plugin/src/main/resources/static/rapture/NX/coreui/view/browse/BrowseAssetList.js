@@ -31,6 +31,9 @@ Ext.define('NX.coreui.view.browse.BrowseAssetList', {
 
   store: 'Asset',
 
+  // Marker for source of targets to be shown in container assets
+  assetContainerSource: true,
+
   // Prevent the store from automatically loading
   loadStore: Ext.emptyFn,
 

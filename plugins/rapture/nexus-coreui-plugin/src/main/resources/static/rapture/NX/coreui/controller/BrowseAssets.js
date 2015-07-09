@@ -118,9 +118,6 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
     if (modelType == "RepositoryReference") {
       me.onRepositorySelection(model);
     }
-    else if (modelType == "Asset") {
-      me.onAssetSelection(model);
-    }
   },
 
   /**
@@ -145,16 +142,6 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
         value: model.get('name')
       }
     ]);
-  },
-
-  /**
-   * Update asset shown in asset container.
-   *
-   * @private
-   * @param {NX.coreui.model.Asset} model selected asset
-   */
-  onAssetSelection: function(model) {
-    this.getAssetContainer().refreshInfo(model);
   },
 
   /**
