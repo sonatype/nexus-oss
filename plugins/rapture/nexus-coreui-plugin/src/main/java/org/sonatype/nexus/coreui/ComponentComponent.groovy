@@ -232,12 +232,6 @@ class ComponentComponent
     def querySuffix = ''
     if (sort) {
       querySuffix += " ORDER BY ${sort.property} ${sort.direction}"
-      if (sort.property == StorageFacet.P_GROUP) {
-        querySuffix += ", ${StorageFacet.P_NAME} ASC,${StorageFacet.P_VERSION} ASC"
-      }
-      else if (sort.property == StorageFacet.P_NAME) {
-        querySuffix += ", ${StorageFacet.P_VERSION} ASC,${StorageFacet.P_GROUP} ASC"
-      }
     }
     if (parameters.start) {
       querySuffix += " SKIP ${parameters.start}"
@@ -253,7 +247,7 @@ class ComponentComponent
       def repositories
       try {
         repositories = repository.facet(GroupFacet).leafMembers()
-        querySuffix = " GROUP BY ${StorageFacet.P_GROUP},${StorageFacet.P_NAME},${StorageFacet.P_VERSION}" + querySuffix
+        querySuffix = " GROUP BY ${StorageFacet.P_NAME}" + querySuffix
       }
       catch (MissingFacetException e) {
         repositories = ImmutableList.of(repository)
