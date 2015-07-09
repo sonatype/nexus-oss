@@ -29,7 +29,7 @@ Ext.define('NX.coreui.view.component.AssetList', {
    */
   componentModel: undefined,
 
-  store: 'Asset',
+  store: 'ComponentAsset',
 
   // Prevent the store from automatically loading
   loadStore: Ext.emptyFn,

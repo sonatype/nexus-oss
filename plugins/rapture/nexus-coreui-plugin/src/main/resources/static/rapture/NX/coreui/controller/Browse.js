@@ -31,8 +31,8 @@ Ext.define('NX.coreui.controller.Browse', {
     'nx-coreui-component-asset-list'
   ],
   stores: [
-    'Asset',
-    'Component'
+    'Component',
+    'ComponentAsset'
   ],
   models: [
     'Component'

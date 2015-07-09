@@ -32,7 +32,7 @@ Ext.define('NX.coreui.controller.Search', {
     'nx-coreui-component-asset-list'
   ],
   stores: [
-    'Asset',
+    'ComponentAsset',
     'SearchFilter',
     'SearchCriteria',
     'SearchResult'

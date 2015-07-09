@@ -154,7 +154,7 @@ class ComponentComponent
   }
 
   @DirectMethod
-  List<AssetXO> readAssets(final StoreLoadParameters parameters) {
+  List<AssetXO> readComponentAssets(final StoreLoadParameters parameters) {
     String repositoryName = parameters.getFilter('repositoryName')
     Repository repository = repositoryManager.get(repositoryName)
     securityHelper.ensurePermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))
