@@ -166,24 +166,23 @@ Ext.define('NX.coreui.controller.Browse', {
   },
 
   /**
-   * @private
    * Filter grid.
    *
+   * @private
    * @param {NX.ext.SearchBox} searchBox component
    * @param {String} value to be searched
    */
   onSearch: function(searchBox, value) {
-    var me = this,
-        componentStore = me.getStore('Component'),
-        componentList = me.getComponentList(),
+    var grid = searchBox.up('grid'),
+        store = grid.getStore(),
         emptyText = NX.I18n.get('Browse_BrowseComponentList_EmptyText_Filter');
 
-    if (!componentList.emptyText) {
-      componentList.emptyText = componentList.getView().emptyText;
+    if (!grid.emptyText) {
+      grid.emptyText = grid.getView().emptyText;
     }
-    componentList.getView().emptyText = '<div class="x-grid-empty">' + emptyText.replace(/\$filter/, value) + '</div>';
-    componentList.getSelectionModel().deselectAll();
-    componentStore.addFilter([
+    grid.getView().emptyText = '<div class="x-grid-empty">' + emptyText.replace(/\$filter/, value) + '</div>';
+    grid.getSelectionModel().deselectAll();
+    store.addFilter([
       {
         id: 'filter',
         property: 'filter',
@@ -193,25 +192,26 @@ Ext.define('NX.coreui.controller.Browse', {
   },
 
   /**
-   * @private
    * Clear filtering on grid.
+   *
+   * @private
+   * @param {NX.ext.SearchBox} searchBox component
    */
-  onSearchCleared: function() {
-    var me = this,
-        componentStore = me.getStore('Component'),
-        componentList = me.getComponentList();
+  onSearchCleared: function(searchBox) {
+    var grid = searchBox.up('grid'),
+        store = grid.getStore();
 
-    if (componentList.emptyText) {
-      componentList.getView().emptyText = componentList.emptyText;
+    if (grid.emptyText) {
+      grid.getView().emptyText = grid.emptyText;
     }
-    componentList.getSelectionModel().deselectAll();
+    grid.getSelectionModel().deselectAll();
     // we have to remove filter directly as store#removeFilter() does not work when store#remoteFilter = true
-    if (componentStore.filters.removeAtKey('filter')) {
-      if (componentStore.filters.length) {
-        componentStore.filter();
+    if (store.filters.removeAtKey('filter')) {
+      if (store.filters.length) {
+        store.filter();
       }
       else {
-        componentStore.clearFilter();
+        store.clearFilter();
       }
     }
   },
