@@ -25,11 +25,13 @@ Ext.define('NX.I18n', {
 
   /**
    * @private
+   * @property {Object}
    */
   keys: {},
 
   /**
    * @public
+   * @param {Object} keys
    */
   register: function(keys) {
     Ext.apply(this.keys, keys);
