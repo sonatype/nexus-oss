@@ -396,8 +396,7 @@ public class MavenFacetImpl
                           final Bucket bucket,
                           final MavenPath mavenPath)
   {
-    final String assetKeyName =
-        StorageFacet.P_ATTRIBUTES + "." + getRepository().getFormat().getValue() + "." + P_ASSET_KEY;
-    return tx.findAssetWithProperty(assetKeyName, getAssetKey(mavenPath), bucket);
+    // The maven path is stored in the asset 'name' field, which is indexed (the maven format-specific key is not).
+    return tx.findAssetWithProperty(StorageFacet.P_NAME, getAssetKey(mavenPath), bucket);
   }
 }
