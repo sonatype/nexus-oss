@@ -34,10 +34,17 @@ import com.bolyuba.nexus.plugin.npm.service.PackageRoot;
 import com.bolyuba.nexus.plugin.npm.service.internal.MetadataParser;
 import com.bolyuba.nexus.plugin.npm.service.internal.PackageRootIterator;
 import com.bolyuba.nexus.plugin.npm.service.internal.ProxyMetadataTransport;
+import com.google.common.base.Stopwatch;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -61,12 +68,15 @@ public class HttpProxyMetadataTransport
 
   private final HttpClientManager httpClientManager;
 
+  private final MetricsRegistry metricsRegistry;
+
   @Inject
   public HttpProxyMetadataTransport(final MetadataParser metadataParser,
                                     final HttpClientManager httpClientManager)
   {
     this.metadataParser = checkNotNull(metadataParser);
     this.httpClientManager = checkNotNull(httpClientManager);
+    this.metricsRegistry = Metrics.defaultRegistry();
   }
 
   /**
@@ -82,15 +92,38 @@ public class HttpProxyMetadataTransport
     try {
       final HttpGet get = new HttpGet(
           buildUri(npmProxyRepository, "-/all")); // TODO: this in NPM specific, might try both root and NPM api
-      outboundRequestLog.debug("{} - NPM GET {}", npmProxyRepository.getId(), get.getURI());
       get.addHeader("accept", NpmRepository.JSON_MIME_TYPE);
       final HttpClientContext context = new HttpClientContext();
       context.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, npmProxyRepository);
-      final HttpResponse httpResponse = httpClient.execute(get, context);
+
+      final Timer timer = timer(get, npmProxyRepository.getRemoteUrl());
+      final TimerContext timerContext = timer.time();
+      Stopwatch stopwatch = null;
+
+      if (outboundRequestLog.isDebugEnabled()) {
+        outboundRequestLog.debug("[{}] {} {}", npmProxyRepository.getId(), get.getMethod(), get.getURI());
+        stopwatch = Stopwatch.createStarted();
+      }
+
+      final HttpResponse httpResponse;
       try {
-        outboundRequestLog.debug("{} - NPM GET {} - {}", npmProxyRepository.getId(), get.getURI(),
-            httpResponse.getStatusLine());
-        if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+        httpResponse = httpClient.execute(get, context);
+      }
+      finally {
+        timerContext.stop();
+        if (stopwatch != null) {
+          stopwatch.stop();
+        }
+      }
+
+      final StatusLine statusLine = httpResponse.getStatusLine();
+      if (outboundRequestLog.isDebugEnabled()) {
+        outboundRequestLog.debug("[{}] {} {} -> {}; {}", npmProxyRepository.getId(), get.getMethod(), get.getURI(),
+            statusLine, stopwatch);
+      }
+
+      try {
+        if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
           final File tempFile = File
               .createTempFile(npmProxyRepository.getId() + "-root", "temp.json",
                   metadataParser.getTemporaryDirectory());
@@ -102,7 +135,11 @@ public class HttpProxyMetadataTransport
           final FileContentLocator cl = new FileContentLocator(tempFile, NpmRepository.JSON_MIME_TYPE, true);
           return metadataParser.parseRegistryRoot(npmProxyRepository.getId(), cl);
         }
-        throw new IOException("Unexpected response from registry root " + httpResponse.getStatusLine());
+        if (log.isDebugEnabled()) {
+          log.debug("[{}] {} {} -> unexpected: {}", npmProxyRepository.getId(), get.getMethod(), get.getURI(),
+              statusLine);
+        }
+        throw new IOException("Unexpected response from registry root " + statusLine);
       }
       finally {
         EntityUtils.consumeQuietly(httpResponse.getEntity());
@@ -126,21 +163,44 @@ public class HttpProxyMetadataTransport
         npmProxyRepository.getRemoteStorageContext());
     try {
       final HttpGet get = new HttpGet(buildUri(npmProxyRepository, packageName));
-      outboundRequestLog.debug("{} - NPM GET {}", npmProxyRepository.getId(), get.getURI());
       get.addHeader("accept", NpmRepository.JSON_MIME_TYPE);
       if (expired != null && expired.getProperties().containsKey(PROP_ETAG)) {
         get.addHeader("if-none-match", expired.getProperties().get(PROP_ETAG));
       }
       final HttpClientContext context = new HttpClientContext();
       context.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, npmProxyRepository);
-      final HttpResponse httpResponse = httpClient.execute(get, context);
+
+      final Timer timer = timer(get, npmProxyRepository.getRemoteUrl());
+      final TimerContext timerContext = timer.time();
+      Stopwatch stopwatch = null;
+
+      if (outboundRequestLog.isDebugEnabled()) {
+        outboundRequestLog.debug("[{}] {} {}", npmProxyRepository.getId(), get.getMethod(), get.getURI());
+        stopwatch = Stopwatch.createStarted();
+      }
+
+      final HttpResponse httpResponse;
       try {
-        outboundRequestLog.debug("{} - NPM GET {} - {}", npmProxyRepository.getId(), get.getURI(),
-            httpResponse.getStatusLine());
-        if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
+        httpResponse = httpClient.execute(get, context);
+      }
+      finally {
+        timerContext.stop();
+        if (stopwatch != null) {
+          stopwatch.stop();
+        }
+      }
+
+      final StatusLine statusLine = httpResponse.getStatusLine();
+      if (outboundRequestLog.isDebugEnabled()) {
+        outboundRequestLog.debug("[{}] {} {} -> {}; {}", npmProxyRepository.getId(), get.getMethod(), get.getURI(),
+            statusLine, stopwatch);
+      }
+
+      try {
+        if (statusLine.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
           return expired;
         }
-        if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+        if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
           final PreparedContentLocator pcl = new PreparedContentLocator(httpResponse.getEntity().getContent(),
               NpmRepository.JSON_MIME_TYPE, ContentLocator.UNKNOWN_LENGTH);
           final PackageRoot fresh = metadataParser.parsePackageRoot(npmProxyRepository.getId(), pcl);
@@ -171,5 +231,9 @@ public class HttpProxyMetadataTransport
     else {
       return registryUrl + "/" + pathElem;
     }
+  }
+
+  private Timer timer(final HttpUriRequest httpRequest, final String baseUrl) {
+    return metricsRegistry.newTimer(HttpProxyMetadataTransport.class, baseUrl, httpRequest.getMethod());
   }
 }
