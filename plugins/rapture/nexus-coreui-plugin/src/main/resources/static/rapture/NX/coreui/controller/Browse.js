@@ -26,7 +26,7 @@ Ext.define('NX.coreui.controller.Browse', {
     'NX.I18n'
   ],
   masters: [
-    'nx-coreui-browsefeature nx-coreui-browse-repository-list',
+    'nx-coreui-browsecomponentfeature nx-coreui-browse-repository-list',
     'nx-coreui-browse-component-list',
     'nx-coreui-component-asset-list'
   ],
@@ -39,17 +39,17 @@ Ext.define('NX.coreui.controller.Browse', {
   ],
 
   views: [
-    'browse.BrowseFeature',
-    'browse.BrowseRepositoryList',
-    'browse.BrowseComponentList'
+    'browse.BrowseComponentFeature',
+    'browse.BrowseComponentList',
+    'browse.BrowseRepositoryList'
   ],
 
   refs: [
-    {ref: 'feature', selector: 'nx-coreui-browsefeature'},
-    {ref: 'componentList', selector: 'nx-coreui-browsefeature nx-coreui-browse-component-list'},
-    {ref: 'componentDetails', selector: 'nx-coreui-browsefeature nx-coreui-component-details'},
-    {ref: 'assets', selector: 'nx-coreui-browsefeature nx-coreui-component-asset-list'},
-    {ref: 'componentFilter', selector: 'nx-coreui-browsefeature nx-coreui-browse-component-list #filter'}
+    {ref: 'feature', selector: 'nx-coreui-browsecomponentfeature'},
+    {ref: 'componentList', selector: 'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list'},
+    {ref: 'componentDetails', selector: 'nx-coreui-browsecomponentfeature nx-coreui-component-details'},
+    {ref: 'assets', selector: 'nx-coreui-browsecomponentfeature nx-coreui-component-asset-list'},
+    {ref: 'componentFilter', selector: 'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list #filter'}
   ],
 
   features:     {
@@ -57,7 +57,7 @@ Ext.define('NX.coreui.controller.Browse', {
     path: '/Browse/Components',
     text: NX.I18n.get('Browse_Components_Title_Feature'),
     description: NX.I18n.get('Browse_Components_Description_Feature'),
-    view: 'NX.coreui.view.browse.BrowseFeature',
+    view: 'NX.coreui.view.browse.BrowseComponentFeature',
     iconConfig: {
       file: 'plugin.png',
       variants: ['x16', 'x32']
@@ -89,10 +89,10 @@ Ext.define('NX.coreui.controller.Browse', {
         }
       },
       component: {
-        'nx-coreui-browsefeature nx-coreui-component-assetcontainer': {
+        'nx-coreui-browsecomponentfeature nx-coreui-component-assetcontainer': {
           updated: me.setAssetIcon
         },
-        'nx-coreui-browsefeature nx-coreui-browse-component-list #filter': {
+        'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list #filter': {
           search: me.onSearch,
           searchcleared: me.onSearchCleared
         }

@@ -17,9 +17,9 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.browse.BrowseFeature', {
+Ext.define('NX.coreui.view.browse.BrowseComponentFeature', {
   extend: 'NX.view.drilldown.Drilldown',
-  alias: 'widget.nx-coreui-browsefeature',
+  alias: 'widget.nx-coreui-browsecomponentfeature',
 
   iconName: 'browse-default',
 
