@@ -245,7 +245,7 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
-   * Updates the **{@link NX.store.FeatureGroup} store with children of selected feature.
+   * Updates the {@link NX.store.FeatureGroup} store with children of selected feature.
    *
    * @private
    * @param {NX.model.FeatureMenu} record
