@@ -797,7 +797,6 @@ Ext.define('NX.controller.Menu', {
     return dirty;
   },
 
-
   /**
    * Disable backspace as a means for navigating back.
    *
