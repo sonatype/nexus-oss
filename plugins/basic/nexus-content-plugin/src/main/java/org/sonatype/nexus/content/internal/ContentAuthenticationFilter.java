@@ -66,10 +66,32 @@ public class ContentAuthenticationFilter
     return false;
   }
 
+  /**
+   * Servlet request attribute to mark request as protected.
+   */
+  private static final String RESTRICTED_ATTR = ContentRestrictedToken.class.getSimpleName();
+
+  /**
+   * Return custom error message when content access is protected.
+   */
+  @Override
+  protected String getUnauthorizedMessage(final ServletRequest request) {
+    Object attr = request.getAttribute(RESTRICTED_ATTR);
+    if (attr != null) {
+      return "Content access is protected by token";
+    }
+    else {
+      return super.getUnauthorizedMessage(request);
+    }
+  }
+
   @Override
   protected AuthenticationToken createToken(final ServletRequest request, final ServletResponse response) {
     if (isRestricted(request)) {
       getLogger().debug("Content authentication for request is restricted");
+
+      // mark request as protected for better error messaging
+      request.setAttribute(RESTRICTED_ATTR, true);
 
       // We know our super-class makes UsernamePasswordTokens, ask super to pull out the relevant details
       UsernamePasswordToken basis = (UsernamePasswordToken) super.createToken(request, response);
