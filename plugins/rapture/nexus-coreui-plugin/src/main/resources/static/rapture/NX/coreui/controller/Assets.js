@@ -83,7 +83,7 @@ Ext.define('NX.coreui.controller.Assets', {
     if (!info) {
       info = container.add({xtype: 'nx-coreui-component-assetinfo', weight: 10});
     }
-    info.setAssetModel(assetModel, componentModel.get('format'));
+    info.setAssetModel(assetModel);
 
     if (!attributes) {
 
@@ -95,7 +95,7 @@ Ext.define('NX.coreui.controller.Assets', {
       panel.add(attributes);
       container.add(panel);
     }
-    attributes.setAssetModel(assetModel, componentModel.get('format'));
+    attributes.setAssetModel(assetModel);
   },
 
   showComponentDetails: function(container, componentModel) {
