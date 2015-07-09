@@ -45,7 +45,8 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
   refs: [
     {ref: 'feature', selector: 'nx-coreui-browseassetfeature'},
     {ref: 'assetList', selector: 'nx-coreui-browseassetfeature nx-coreui-browse-asset-list'},
-    {ref: 'assetFilter', selector: 'nx-coreui-browseassetfeature nx-coreui-browse-asset-list #filter'}
+    {ref: 'assetFilter', selector: 'nx-coreui-browseassetfeature nx-coreui-browse-asset-list #filter'},
+    {ref: 'assetContainer', selector: 'nx-coreui-browseassetfeature nx-coreui-component-assetcontainer'},
   ],
 
   features: {
@@ -117,13 +118,15 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
     if (modelType == "RepositoryReference") {
       me.onRepositorySelection(model);
     }
+    else if (modelType == "Asset") {
+      me.onAssetSelection(model);
+    }
   },
 
   /**
-   * @private
-   *
    * Load assets for selected repository.
    *
+   * @private
    * @param {NX.coreui.model.RepositoryReference} model selected repository
    */
   onRepositorySelection: function(model) {
@@ -142,6 +145,16 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
         value: model.get('name')
       }
     ]);
+  },
+
+  /**
+   * Update asset shown in asset container.
+   *
+   * @private
+   * @param {NX.coreui.model.Asset} model selected asset
+   */
+  onAssetSelection: function(model) {
+    this.getAssetContainer().refreshInfo(model);
   },
 
   /**
@@ -205,7 +218,7 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
   setAssetIcon: function(container, assetModel) {
     if (assetModel) {
       // Set the appropriate breadcrumb icon
-      this.setItemClass(3, container.iconCls);
+      this.setItemClass(2, container.iconCls);
     }
   }
 
