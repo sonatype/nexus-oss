@@ -46,7 +46,7 @@ Ext.define('NX.coreui.view.component.AssetInfo', {
           text: NX.I18n.get('AssetInfo_Delete_Button'),
           glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
           action: 'deleteAsset',
-          disabled: false
+          disabled: true
         }
       ]
     };
