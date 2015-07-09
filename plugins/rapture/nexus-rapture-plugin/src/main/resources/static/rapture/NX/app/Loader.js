@@ -31,6 +31,7 @@ Ext.define('NX.app.Loader', {
    * Discovered plugin controllers.
    *
    * @private
+   * @property {Ext.util.MixedCollection}
    */
   controllers: undefined,
 
