@@ -190,6 +190,7 @@ public class NexusHttpAuthenticationFilter
     catch (RuntimeException e) {
         // ignore
     }
+    return "OOPS";
   }
 
   /**
