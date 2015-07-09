@@ -42,9 +42,8 @@ public class FunctionalTestSupport
   //
 
   @Configuration
-  public static Option[] config() {
+  public static Option[] configureNexus() {
     return options(
-        // TODO: Can we use the it.nexus.bundle.groupId and it.nexus.bundle.artifactId properties?
         nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
 
         // Add testsuite dependencies as bundles

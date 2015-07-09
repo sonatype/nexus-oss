@@ -66,7 +66,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
  *
  * <pre>
  * &#064;Configuration
- * public static Option[] config() {
+ * public static Option[] configureNexus() {
  *   return options( //
  *       nexusDistribution(&quot;org.sonatype.nexus.assemblies&quot;, &quot;nexus-base-template&quot;), //
  *       nexusPlugin(&quot;org.sonatype.nexus.plugins&quot;, &quot;nexus-repository-raw&quot;) //
@@ -271,6 +271,9 @@ public abstract class NexusPaxExamSupport
   // -------------------------------------------------------------------------
 
   /**
+   * To test a different version set the 'it.nexus.bundle.version' system property.<br>
+   * You can also override the 'groupId', 'artifactId', and 'classifier' the same way.
+   *
    * @return Pax-Exam option to install a Nexus distribution based on groupId and artifactId
    */
   public static Option nexusDistribution(final String groupId, final String artifactId) {
@@ -278,6 +281,9 @@ public abstract class NexusPaxExamSupport
   }
 
   /**
+   * To test a different version set the 'it.nexus.bundle.version' system property.<br>
+   * You can also override the 'groupId', 'artifactId', and 'classifier' the same way.
+   *
    * @return Pax-Exam option to install a Nexus distribution based on groupId, artifactId and classifier
    */
   public static Option nexusDistribution(final String groupId, final String artifactId, final String classifier) {
