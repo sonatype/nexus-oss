@@ -27,6 +27,10 @@ Ext.define('NX.State', {
     logAware: 'NX.LogAware'
   },
 
+  /**
+   * @constructor
+   * @param {Object} config
+   */
   constructor: function (config) {
     var me = this;
 
