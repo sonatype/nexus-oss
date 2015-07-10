@@ -21,11 +21,10 @@ StartTest(function(t) {
     '/admin/Support/Logging/Log Viewer', //errors on load?
     '/admin/Support/Support Request', //challenges for Authenticate when logged in already
     '/admin/Security/Realms' //errors on load?
-  ];
+  ], loggedIn = false;
 
   t.ok(Ext, 'Ext is here');
   t.ok(NX, 'NX is here');
-  t.waitForSessionToBeInvalidated();
 
   t.describe('An admin can use bookmarks to navigate the entire UI', function(t) {
     var featureStore = t.Ext().StoreManager.get('Feature');
@@ -34,17 +33,21 @@ StartTest(function(t) {
     });
 
     t.chain(
-        t.signIn(),
         featureStore.data.each(function(feature) {
-          var path = feature.get('path');
+          var path = feature.get('path'),
+              bookmark = feature.get('bookmark'),
+              text = feature.get('text');
+          
           t.it('When logged in as admin, can navigate to ' + path, function(t) {
             t.chain(
+                !loggedIn ?  t.openPageAsAdmin('browse/welcome') : null,
                 function(next) {
-                  t.navigateTo(feature.get('bookmark'));
+                  loggedIn = true;
+                  t.navigateTo(bookmark);
                   next();
                 },
-                {waitFor: 'bookmark', args: feature.get('bookmark')},
-                {waitFor: 'Feature', args: feature.get('text')},
+                {waitFor: 'bookmark', args: bookmark, desc: 'waiting for bookmark: ' + bookmark},
+                {waitFor: 'Feature', args: text, desc: 'waiting for text: ' + text},
                 function(next) {
                   t.waitForFn(function() {
                     return t.global.location.hash === '#' + feature.get('bookmark');
@@ -54,7 +57,7 @@ StartTest(function(t) {
 
           });
         })
-    )
+    );
     featureStore.clearFilter(true);
   })
 });
