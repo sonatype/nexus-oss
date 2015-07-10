@@ -64,6 +64,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
             itemId: 'name',
             labelAlign: 'left',
             fieldLabel: NX.I18n.get('Repository_RepositorySettingsForm_Name_FieldLabel'),
+            helpText: NX.I18n.get('Repository_RepositorySettingsForm_Name_HelpText'),
             readOnly: true,
             vtype: 'nx-name'
           },
@@ -74,6 +75,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
             itemId: 'format',
             labelAlign: 'left',
             fieldLabel: NX.I18n.get('Repository_RepositorySettingsForm_Format_FieldLabel'),
+            helpText: NX.I18n.get('Repository_RepositorySettingsForm_Format_HelpText'),
             allowBlank: true,
             readOnly: true
           },
@@ -84,6 +86,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
             itemId: 'type',
             labelAlign: 'left',
             fieldLabel: NX.I18n.get('Repository_RepositorySettingsForm_Type_FieldLabel'),
+            helpText: NX.I18n.get('Repository_RepositorySettingsForm_Type_HelpText'),
             allowBlank: true,
             readOnly: true
           },
@@ -95,6 +98,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
             itemId: 'url',
             labelAlign: 'left',
             fieldLabel: NX.I18n.get('Repository_RepositorySettingsForm_URL_FieldLabel'),
+            helpText: NX.I18n.get('Repository_RepositorySettingsForm_URL_HelpText'),
             allowBlank: true,
             readOnly: true
           },
