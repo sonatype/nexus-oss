@@ -32,32 +32,30 @@ StartTest(function(t) {
       return item.get('authenticationRequired') && ignoredFeatures.indexOf(item.get('path')) === -1;
     });
 
-    t.chain(
-        featureStore.data.each(function(feature) {
-          var path = feature.get('path'),
-              bookmark = feature.get('bookmark'),
-              text = feature.get('text');
-          
-          t.it('When logged in as admin, can navigate to ' + path, function(t) {
-            t.chain(
-                !loggedIn ?  t.openPageAsAdmin('browse/welcome') : null,
-                function(next) {
-                  loggedIn = true;
-                  t.navigateTo(bookmark);
-                  next();
-                },
-                {waitFor: 'bookmark', args: bookmark, desc: 'waiting for bookmark: ' + bookmark},
-                {waitFor: 'Feature', args: text, desc: 'waiting for text: ' + text},
-                function(next) {
-                  t.waitForFn(function() {
-                    return t.global.location.hash === '#' + feature.get('bookmark');
-                  }, next)
-                }
-            )
+    featureStore.data.each(function(feature) {
+      var path = feature.get('path'),
+          bookmark = feature.get('bookmark'),
+          text = feature.get('text');
 
-          });
-        })
-    );
+      t.it('When logged in as admin, can navigate to ' + path, function(t) {
+        t.chain(
+            !loggedIn ? t.openPageAsAdmin('browse/welcome') : null,
+            function(next) {
+              loggedIn = true;
+              t.navigateTo(bookmark);
+              next();
+            },
+            {waitFor: 'bookmark', args: bookmark, desc: 'waiting for bookmark: ' + bookmark},
+            {waitFor: 'Feature', args: text, desc: 'waiting for text: ' + text},
+            function(next) {
+              t.waitForFn(function() {
+                return t.global.location.hash === '#' + feature.get('bookmark');
+              }, next)
+            }
+        )
+
+      });
+    });
     featureStore.clearFilter(true);
   })
 });
