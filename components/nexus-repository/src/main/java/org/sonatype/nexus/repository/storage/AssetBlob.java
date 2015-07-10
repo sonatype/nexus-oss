@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 
@@ -35,6 +36,8 @@ public class AssetBlob
 {
   private final BlobRef blobRef;
 
+  private final Blob blob;
+
   private final long size;
 
   private final String contentType;
@@ -44,11 +47,13 @@ public class AssetBlob
   private boolean attached;
 
   public AssetBlob(final BlobRef blobRef,
+                   final Blob blob,
                    final long size,
                    final String contentType,
                    final Map<HashAlgorithm, HashCode> hashes)
   {
     this.blobRef = checkNotNull(blobRef);
+    this.blob = checkNotNull(blob);
     this.size = size;
     this.contentType = checkNotNull(contentType);
     this.hashes = checkNotNull(hashes);
@@ -78,6 +83,11 @@ public class AssetBlob
   @Nonnull
   public BlobRef getBlobRef() {
     return blobRef;
+  }
+
+  @Nonnull
+  public Blob getBlob() {
+    return blob;
   }
 
   /**

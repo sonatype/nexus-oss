@@ -49,7 +49,7 @@ public interface MavenFacet
   @Nullable
   Content get(MavenPath path) throws IOException;
 
-  void put(MavenPath path, Payload payload) throws IOException;
+  Content put(MavenPath path, Payload payload) throws IOException;
 
   boolean delete(MavenPath... paths) throws IOException;
 

@@ -43,9 +43,9 @@ public class RawProxyFacet
   }
 
   @Override
-  protected void store(final Context context, final Content payload) throws IOException, InvalidContentException {
+  protected Content store(final Context context, final Content payload) throws IOException, InvalidContentException {
     final String path = componentPath(context);
-    content().put(path, payload);
+    return content().put(path, payload);
   }
 
   @Override

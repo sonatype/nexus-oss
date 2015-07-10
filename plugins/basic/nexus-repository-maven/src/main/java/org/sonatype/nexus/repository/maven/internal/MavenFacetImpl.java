@@ -160,7 +160,16 @@ public class MavenFacetImpl
     if (asset == null) {
       return null;
     }
+    return toContent(asset);
+  }
+
+  private Content toContent(final Asset asset) {
+    final StorageTx tx = UnitOfWork.currentTransaction();
     final Blob blob = tx.requireBlob(asset.requireBlobRef());
+    return toContent(asset, blob);
+  }
+
+  private Content toContent(final Asset asset, final Blob blob) {
     final String contentType = asset.contentType();
     final Content content = new Content(new BlobPayload(blob, contentType));
     Content.extractFromAsset(asset, HashType.ALGORITHMS, content.getAttributes());
@@ -168,20 +177,20 @@ public class MavenFacetImpl
   }
 
   @Override
-  public void put(final MavenPath path, final Payload payload)
+  public Content put(final MavenPath path, final Payload payload)
       throws IOException
   {
     log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
 
     try (TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
-      doPut(path, payload, streamSupplier);
+      return doPut(path, payload, streamSupplier);
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPut(final MavenPath path,
-                       final Payload payload,
-                       final Supplier<InputStream> streamSupplier)
+  protected Content doPut(final MavenPath path,
+                          final Payload payload,
+                          final Supplier<InputStream> streamSupplier)
       throws IOException
   {
     final StorageTx tx = UnitOfWork.currentTransaction();
@@ -197,18 +206,19 @@ public class MavenFacetImpl
     if (payload instanceof Content) {
       contentAttributes = ((Content) payload).getAttributes();
     }
+
     if (path.getCoordinates() != null) {
-      putArtifact(tx, path, assetBlob, contentAttributes);
+      return toContent(putArtifact(tx, path, assetBlob, contentAttributes), assetBlob.getBlob());
     }
     else {
-      putFile(tx, path, assetBlob, contentAttributes);
+      return toContent(putFile(tx, path, assetBlob, contentAttributes), assetBlob.getBlob());
     }
   }
 
-  private void putArtifact(final StorageTx tx,
-                           final MavenPath path,
-                           final AssetBlob assetBlob,
-                           @Nullable final AttributesMap contentAttributes)
+  private Asset putArtifact(final StorageTx tx,
+                            final MavenPath path,
+                            final AssetBlob assetBlob,
+                            @Nullable final AttributesMap contentAttributes)
       throws IOException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
@@ -249,12 +259,14 @@ public class MavenFacetImpl
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
+
+    return asset;
   }
 
-  private void putFile(final StorageTx tx,
-                       final MavenPath path,
-                       final AssetBlob assetBlob,
-                       @Nullable final AttributesMap contentAttributes)
+  private Asset putFile(final StorageTx tx,
+                        final MavenPath path,
+                        final AssetBlob assetBlob,
+                        @Nullable final AttributesMap contentAttributes)
       throws IOException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
@@ -269,6 +281,8 @@ public class MavenFacetImpl
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
+
+    return asset;
   }
 
   private void putAssetPayload(final StorageTx tx,

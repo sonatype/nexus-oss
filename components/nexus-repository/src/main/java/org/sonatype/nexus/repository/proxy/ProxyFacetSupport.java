@@ -153,8 +153,7 @@ public abstract class ProxyFacetSupport
       try {
         final Content remote = fetch(context, content);
         if (remote != null) {
-          store(context, remote);
-          content = getCachedPayload(context);
+          return store(context, remote);
         }
       }
       catch (IOException e) {
@@ -180,7 +179,7 @@ public abstract class ProxyFacetSupport
    * Store a new Payload, freshly fetched from the remote URL. The Context indicates which component
    * was being requested.
    */
-  protected abstract void store(final Context context, final Content content)
+  protected abstract Content store(final Context context, final Content content)
       throws IOException, InvalidContentException;
 
   @Nullable
@@ -291,7 +290,8 @@ public abstract class ProxyFacetSupport
     }
 
     // Note: content w/o CacheInfo was not stored by ProxyFacetSupport, see fetch(String, Context, Content)
-    final CacheInfo cacheInfo = content.getAttributes().require(CacheInfo.class);;
+    final CacheInfo cacheInfo = content.getAttributes().require(CacheInfo.class);
+    ;
     if (cacheToken != null && !cacheToken.equals(cacheInfo.getCacheToken())) {
       log.debug("Content expired (cacheToken)");
       return true;

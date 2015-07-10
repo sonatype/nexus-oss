@@ -82,10 +82,10 @@ public class NugetProxyFacet
   }
 
   @Override
-  protected void store(final Context context, final Content payload) throws IOException, InvalidContentException {
+  protected Content store(final Context context, final Content payload) throws IOException, InvalidContentException {
     // The metadata will have been cached by this time, so we just need to set the content
     String[] coords = coords(context);
-    gallery().putContent(coords[0], coords[1], payload);
+   return gallery().putContent(coords[0], coords[1], payload);
   }
 
   @Override
