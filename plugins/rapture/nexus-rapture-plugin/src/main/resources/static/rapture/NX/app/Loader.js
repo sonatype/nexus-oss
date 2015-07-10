@@ -31,6 +31,7 @@ Ext.define('NX.app.Loader', {
    * Discovered plugin controllers.
    *
    * @private
+   * @property {Ext.util.MixedCollection}
    */
   controllers: undefined,
 
@@ -112,7 +113,7 @@ Ext.define('NX.app.Loader', {
    * Apply plugin customizations.
    *
    * @private
-   * @param className
+   * @param {String} className
    */
   applyPluginConfig: function (className) {
     var me = this,
@@ -156,8 +157,8 @@ Ext.define('NX.app.Loader', {
    * Define controller from configuration.
    *
    * @private
-   * @param config
-   * @return        controller configuration
+   * @param {String|Object} config
+   * @return {Object} controller configuration
    */
   defineController: function(config) {
     // simple definition of controller class-name
