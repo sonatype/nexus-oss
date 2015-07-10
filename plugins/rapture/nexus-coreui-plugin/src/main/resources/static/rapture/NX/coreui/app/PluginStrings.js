@@ -42,7 +42,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Browse_BrowseRepositoryList_EmptyText_View: 'No browseable repositories defined',
     Browse_BrowseRepositoryList_EmptyText_Filter: 'No repositories matched "$filter"',
     Browse_BrowseComponentList_Name_Column: 'Name',
-    Browse_BrowseComponentList_Name_Column_Unattached: '-- Unattached assets --',
     Browse_BrowseComponentList_Group_Column: 'Group',
     Browse_BrowseComponentList_Version_Column: 'Version',
     Browse_BrowseComponentList_EmptyText_View: 'No components found in repository',

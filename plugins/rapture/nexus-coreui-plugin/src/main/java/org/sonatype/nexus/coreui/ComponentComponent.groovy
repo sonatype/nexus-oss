@@ -51,7 +51,6 @@ import org.hibernate.validator.constraints.NotEmpty
 class ComponentComponent
     extends DirectComponentSupport
 {
-  private static String UNATTACHED = "unattached";
 
   private static final Closure ASSET_CONVERTER = { Asset asset, String componentName, String repositoryName ->
     new AssetXO(
@@ -136,14 +135,6 @@ class ComponentComponent
             format: component.format()
         )
       }
-      if (parameters.start == 0 && !filter && readUnattachedAssets(storageTx, repositories, repository.name)) {
-        results = new ArrayList<>(results)
-        results.add(0, new ComponentXO(
-            id: UNATTACHED,
-            repositoryName: repository.name,
-            format: repository.format.getValue()
-        ))
-      }
       return new PagedResponse<ComponentXO>(
           (results.size() < parameters.limit ? 0 : parameters.limit) + results.size() + parameters.start,
           results
@@ -178,10 +169,7 @@ class ComponentComponent
         repositories = ImmutableList.of(repository)
       }
 
-      if (componentId == UNATTACHED) {
-        return readUnattachedAssets(storageTx, repositories, repositoryName)
-      }
-      else if (repositories.size() == 1) {
+      if (repositories.size() == 1) {
         Component component = storageTx.findComponent(new EntityId(componentId), storageTx.getBucket())
         if (component == null) {
           log.warn 'Component {} not found', componentId
@@ -295,10 +283,4 @@ class ComponentComponent
     }
   }
 
-  private List<AssetXO> readUnattachedAssets(final StorageTx storageTx, final Iterable<Repository> repositories,
-                                             String requestedRepositoryName)
-  {
-    return storageTx.findAssets("${StorageFacet.P_COMPONENT} IS NULL", null, repositories, null).
-        collect(ASSET_CONVERTER.rcurry(null, requestedRepositoryName))
-  }
 }

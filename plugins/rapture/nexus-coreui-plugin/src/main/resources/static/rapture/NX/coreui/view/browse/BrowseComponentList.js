@@ -53,10 +53,7 @@ Ext.define('NX.coreui.view.browse.BrowseComponentList', {
       dataIndex: 'id',
       width: 36,
       iconVariant: 'x16',
-      iconName: function(value) {
-        if (value === 'unattached') {
-          return 'browse-unattached';
-        }
+      iconName: function() {
         return 'browse-component';
       }
     },
@@ -64,13 +61,7 @@ Ext.define('NX.coreui.view.browse.BrowseComponentList', {
       text: NX.I18n.get('Browse_BrowseComponentList_Name_Column'),
       dataIndex: 'name',
       stateId: 'name',
-      flex: 3,
-      renderer: function(value) {
-        if (!value) {
-          return NX.I18n.get('Browse_BrowseComponentList_Name_Column_Unattached');
-        }
-        return value;
-      }
+      flex: 3
     },
     {
       text: NX.I18n.get('Browse_BrowseComponentList_Group_Column'),
