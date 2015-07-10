@@ -15,8 +15,8 @@
  */
 StartTest(function(t) {
 
-  t.describe('Go back via the feature menu', function(t) {
-    t.it('Drill out', function(t) {
+  t.describe('When in a drilldown feature, go back to the first panel', function(t) {
+    t.it('Go back using the feature menu', function(t) {
       t.chain(
           t.openPageAsAdmin('admin/repository/repositories'),
           {waitForRowsVisible: 'nx-coreui-repository-list'},
