@@ -215,7 +215,7 @@ public class MavenFacetImpl
       throws IOException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
-    Component component = findComponent(tx, tx.getBucket(), path);
+    Component component = findComponent(tx, path);
     if (component == null) {
       // Create and set top-level properties
       component = tx.createComponent(tx.getBucket(), getRepository().getFormat())
@@ -298,7 +298,7 @@ public class MavenFacetImpl
   }
 
   private boolean deleteArtifact(final MavenPath path, final StorageTx tx) {
-    final Component component = findComponent(tx, tx.getBucket(), path);
+    final Component component = findComponent(tx, path);
     if (component == null) {
       return false;
     }
@@ -340,20 +340,10 @@ public class MavenFacetImpl
   }
 
   /**
-   * Returns component key based on passed in {@link Coordinates} G:A:V values.
-   */
-  private String getComponentKey(final Coordinates coordinates) {
-    return coordinates.getGroupId()
-        + ":" + coordinates.getArtifactId()
-        + ":" + coordinates.getVersion();
-  }
-
-  /**
-   * Finds component by key.
+   * Finds component by maven path.
    */
   @Nullable
   private Component findComponent(final StorageTx tx,
-                                  final Bucket bucket,
                                   final MavenPath mavenPath)
   {
     final Coordinates coordinates = mavenPath.getCoordinates();
