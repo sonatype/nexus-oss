@@ -26,7 +26,7 @@ Ext.define('NX.ext.form.field.Checkbox', {
     var me = this;
 
     if (me.helpText && ! me.isHelpTextPlaced) {
-      me.boxLabel = '<span style="font-size: 10px;">' + me.helpText + '</span>';
+      me.boxLabel = '<span class="nx-boxlabel">' + me.helpText + '</span>';
       me.isHelpTextPlaced = true;
     }
 

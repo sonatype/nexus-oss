@@ -38,7 +38,7 @@ Ext.define('NX.ext.form.field.Base', {
     var me = this;
 
     if (me.helpText && !me.isHelpTextPlaced) {
-      me.afterLabelTpl = '<span style="font-size: 10px;">' + me.helpText + '</span>';
+      me.afterLabelTpl = '<span class="nx-boxlabel">' + me.helpText + '</span>';
       me.isHelpTextPlaced = true;
     }
 
