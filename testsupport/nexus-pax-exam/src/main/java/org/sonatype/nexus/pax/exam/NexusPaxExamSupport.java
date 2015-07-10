@@ -52,6 +52,7 @@ import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionConfigurationFileExtendOption;
 import org.ops4j.pax.exam.options.MavenUrlReference;
+import org.ops4j.pax.exam.options.ProvisionOption;
 import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -65,10 +66,10 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
  *
  * <pre>
  * &#064;Configuration
- * public static Option[] config() {
- *   return options(
- *       nexusDistribution(&quot;org.sonatype.nexus.assemblies&quot;, &quot;nexus-base-template&quot;),
- *       nexusPlugin(&quot;org.sonatype.nexus.plugins&quot;, &quot;nexus-repository-raw&quot;)
+ * public static Option[] configureNexus() {
+ *   return options( //
+ *       nexusDistribution(&quot;org.sonatype.nexus.assemblies&quot;, &quot;nexus-base-template&quot;), //
+ *       nexusPlugin(&quot;org.sonatype.nexus.plugins&quot;, &quot;nexus-repository-raw&quot;) //
  *   );
  * }
  * </pre>
@@ -83,6 +84,8 @@ public abstract class NexusPaxExamSupport
   public static final String NEXUS_PAX_EXAM_TIMEOUT_KEY = "nexus.pax.exam.timeout";
 
   public static final int NEXUS_PAX_EXAM_TIMEOUT_DEFAULT = 300000;
+
+  public static final int NEXUS_TEST_START_LEVEL = 200;
 
   // -------------------------------------------------------------------------
 
@@ -268,6 +271,9 @@ public abstract class NexusPaxExamSupport
   // -------------------------------------------------------------------------
 
   /**
+   * To test a different version set the 'it.nexus.bundle.version' system property.<br>
+   * You can also override the 'groupId', 'artifactId', and 'classifier' the same way.
+   *
    * @return Pax-Exam option to install a Nexus distribution based on groupId and artifactId
    */
   public static Option nexusDistribution(final String groupId, final String artifactId) {
@@ -275,6 +281,9 @@ public abstract class NexusPaxExamSupport
   }
 
   /**
+   * To test a different version set the 'it.nexus.bundle.version' system property.<br>
+   * You can also override the 'groupId', 'artifactId', and 'classifier' the same way.
+   *
    * @return Pax-Exam option to install a Nexus distribution based on groupId, artifactId and classifier
    */
   public static Option nexusDistribution(final String groupId, final String artifactId, final String classifier) {
@@ -414,15 +423,21 @@ public abstract class NexusPaxExamSupport
   public static Option[] options(final Option... options) {
     final List<Option> result = new ArrayList<>();
 
-    // filter out the individual nexus-features values
     final List<String> nexusFeatures = new ArrayList<>();
     for (final Option o : OptionUtils.expand(options)) {
+
+      // filter out the individual nexus-features values
       if (o instanceof KarafDistributionConfigurationFileExtendOption) {
         if ("nexus-features".equals(((KarafDistributionConfigurationFileExtendOption) o).getKey())) {
           nexusFeatures.add(((KarafDistributionConfigurationFileExtendOption) o).getValue());
           continue;
         }
       }
+      // provide default start level for any additional test bundles
+      else if (o instanceof ProvisionOption<?> && ((ProvisionOption<?>) o).getStartLevel() == null) {
+        ((ProvisionOption<?>) o).startLevel(NEXUS_TEST_START_LEVEL);
+      }
+
       result.add(o);
     }
 
@@ -433,6 +448,13 @@ public abstract class NexusPaxExamSupport
     }
 
     return result.toArray(new Option[result.size()]);
+  }
+
+  /**
+   * Processes two sequences of options and combines them into a single sequence.
+   */
+  public static Option[] options(final Option[] options1, final Option... options2) {
+    return options(OptionUtils.combine(options1, options2));
   }
 
   // -------------------------------------------------------------------------
@@ -465,7 +487,7 @@ public abstract class NexusPaxExamSupport
    */
   private static Option nexusPaxExam() {
     final String version = MavenUtils.getArtifactVersion("org.sonatype.nexus", "nexus-pax-exam");
-    Option result = mavenBundle("org.sonatype.nexus", "nexus-pax-exam", version);
+    Option result = mavenBundle("org.sonatype.nexus", "nexus-pax-exam", version).startLevel(0);
 
     final File nexusPaxExam = resolveBaseFile("target/nexus-pax-exam-" + version + ".jar");
     if (nexusPaxExam.isFile()) {

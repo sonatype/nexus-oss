@@ -18,8 +18,9 @@ StartTest(function(t) {
    * @param link
    * @param text
    * @param pathname
+   * @param t {@link Siesta.Test}
    */
-  function verify(link, text, pathname) {
+  function verify(link, text, pathname, t) {
     var element = new Ext.Element(document.createElement('div'));
     element.insertHtml('beforeEnd',link);
     var a = element.down('a').dom;
@@ -28,7 +29,7 @@ StartTest(function(t) {
     t.expect(a.pathname).toBe(pathname);
     element.destroy();
   }
-  
+
   t.ok(Ext, 'Ext is here');
   t.ok(NX, 'NX is here');
 
@@ -52,18 +53,18 @@ StartTest(function(t) {
         name: 'test.txt',
         repositoryName: 'test'
       });
-      
+
       t.it('Can render a link for maven assets', function(t){
         var link = NX.coreui.util.RepositoryUrls.asRepositoryLink(mavenAsset, 'maven2');
-        verify(link, '/org/sonatype/test/1.0/test.jar', '/repository/test/org/sonatype/test/1.0/test.jar');
+        verify(link, '/org/sonatype/test/1.0/test.jar', '/repository/test/org/sonatype/test/1.0/test.jar', t);
       });
       t.it('Can render a link for nuget assets', function(t){
         var link = NX.coreui.util.RepositoryUrls.asRepositoryLink(nugetAsset, 'nuget');
-        verify(link, '/test/1.0', '/repository/test/test/1.0');
+        verify(link, '/test/1.0', '/repository/test/test/1.0', t);
       });
       t.it('Can render a link for raw assets', function(t){
         var link = NX.coreui.util.RepositoryUrls.asRepositoryLink(rawAsset, 'raw');
-        verify(link, 'test.txt', '/repository/test/test.txt');
+        verify(link, 'test.txt', '/repository/test/test.txt', t);
       });
 
     });

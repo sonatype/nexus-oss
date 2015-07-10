@@ -15,7 +15,7 @@
       <pattern>%d{"yyyy-MM-dd HH:mm:ss,SSSZ"} %-5p [%thread] %X{userId} %c - %m%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${karaf.data}/log/karaf.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+      <fileNamePattern>${karaf.data}/log/karaf-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
       <maxHistory>90</maxHistory>
     </rollingPolicy>
   </appender>
