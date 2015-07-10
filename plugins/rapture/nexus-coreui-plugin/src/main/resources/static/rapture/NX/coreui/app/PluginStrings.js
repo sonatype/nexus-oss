@@ -201,7 +201,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Repository_RepositorySettingsForm_Format_FieldLabel: 'Format',
     Repository_RepositorySettingsForm_Format_HelpText: 'The format chosen as the recipe for this repository',
     Repository_RepositorySettingsForm_Type_FieldLabel: 'Type',
-    Repository_RepositorySettingsForm_Type_HelpText: 'The version policy for this repository',
+    Repository_RepositorySettingsForm_Type_HelpText: 'The type of repository (i.e. group, hosted, or proxy)',
     Repository_RepositorySettingsForm_Online_FieldLabel: 'Online',
     Repository_RepositorySettingsForm_Online_HelpText: 'If checked, the repository accepts incoming requests',
     Repository_Facet_ProxyFacet_ArtifactAge_FieldLabel: 'Maximum artifact age',
