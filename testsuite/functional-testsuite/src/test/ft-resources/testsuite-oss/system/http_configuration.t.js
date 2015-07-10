@@ -34,6 +34,7 @@ StartTest(function(t) {
       );
     });
     t.it('Can update the configuration', function(t) {
+      var message = t.spyOn(NX.application.getController('Message'), 'addMessage').and.callThrough();
       t.chain(
           {type: '_test', target: '>>nx-coreui-system-http-settings field[name=userAgentSuffix]'},
           {type: '[UP]', target: '>>nx-coreui-system-http-settings field[name=timeout]'},
@@ -41,10 +42,6 @@ StartTest(function(t) {
           {click: '>>nx-coreui-system-http-settings button[action=save][disabled=false]'},
           {waitFor: 'CQVisible', args: 'window[ui=nx-message-success]'},
           function(next) {
-            // FIXME: refactor/redesign how we test for message notifications
-            //var messages = t.Ext().StoreManager.get('Message'),
-            //    message = messages.getAt(0);
-
             var settings = t.cq1('nx-coreui-system-http-settings');
 
             //the form is updated
@@ -52,10 +49,10 @@ StartTest(function(t) {
             t.expect(settings.down('field[name=timeout]').getValue()).toBe(++timeout);
             t.expect(settings.down('field[name=retries]').getValue()).toBe(++retries);
 
-            //a success message is displayed
-            // FIXME: refactor/redesign how we test for message notifications
-            //t.expect(message.get('text')).toBe('HTTP system settings updated');
-            //t.expect(message.get('type')).toBe('success');
+            t.expect(message).toHaveBeenCalled();
+            var lastMessage = message.calls.mostRecent().args[0];
+            t.expect(lastMessage.text).toBe('HTTP system settings updated');
+            t.expect(lastMessage.type).toBe('success');
             next()
           }
       )
