@@ -31,6 +31,7 @@
     <osgi-spec.version>4.3.1</osgi-spec.version>
     <felix.version>4.4.0</felix.version>
     <karaf.version>3.0.4</karaf.version>
+    <karaf-cellar.version>3.0.3</karaf-cellar.version>
   </properties>
 
   <dependencyManagement>
@@ -109,6 +110,14 @@
         <groupId>org.apache.karaf.shell</groupId>
         <artifactId>org.apache.karaf.shell.table</artifactId>
         <version>${karaf.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.karaf.cellar</groupId>
+        <artifactId>apache-karaf-cellar</artifactId>
+        <classifier>features</classifier>
+        <type>xml</type>
+        <version>${karaf-cellar.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
