@@ -515,8 +515,9 @@ Ext._startTime = new Date().getTime();
         functionFactoryCache: {},
         
         cacheableFunctionFactory: function() {
-            var args = Array.prototype.slice.call(arguments),
-                cache = this.functionFactoryCache,
+            var me = this,
+                args = Array.prototype.slice.call(arguments),
+                cache = me.functionFactoryCache,
                 idx, fn, ln;
                 
              if (Ext.isSandboxed) {
@@ -537,7 +538,8 @@ Ext._startTime = new Date().getTime();
         },
         
         functionFactory: function() {
-            var args = Array.prototype.slice.call(arguments),
+            var me = this,
+                args = Array.prototype.slice.call(arguments),
                 ln;
                 
             if (Ext.isSandboxed) {
