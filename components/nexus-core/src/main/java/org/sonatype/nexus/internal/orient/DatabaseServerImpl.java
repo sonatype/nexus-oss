@@ -15,6 +15,7 @@ package org.sonatype.nexus.internal.orient;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,12 +34,15 @@ import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.server.OServer;
 import com.orientechnologies.orient.server.config.OServerConfiguration;
 import com.orientechnologies.orient.server.config.OServerEntryConfiguration;
+import com.orientechnologies.orient.server.config.OServerHandlerConfiguration;
 import com.orientechnologies.orient.server.config.OServerNetworkConfiguration;
 import com.orientechnologies.orient.server.config.OServerNetworkListenerConfiguration;
 import com.orientechnologies.orient.server.config.OServerNetworkProtocolConfiguration;
+import com.orientechnologies.orient.server.config.OServerParameterConfiguration;
 import com.orientechnologies.orient.server.config.OServerSecurityConfiguration;
 import com.orientechnologies.orient.server.config.OServerStorageConfiguration;
 import com.orientechnologies.orient.server.config.OServerUserConfiguration;
+import com.orientechnologies.orient.server.handler.OJMXPlugin;
 import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProtocolBinary;
 import org.apache.commons.io.output.WriterOutputStream;
 
@@ -123,16 +127,25 @@ public class DatabaseServerImpl
         new OServerEntryConfiguration("server.database.path", databaseDir.getPath())
     };
 
-    config.handlers = Lists.newArrayList();
+    config.handlers = new ArrayList<>();
 
-    config.hooks = Lists.newArrayList();
+    // configure JMX handler
+    OServerHandlerConfiguration jmxHandler = new OServerHandlerConfiguration();
+    jmxHandler.clazz = OJMXPlugin.class.getCanonicalName();
+    jmxHandler.parameters = new OServerParameterConfiguration[] {
+        new OServerParameterConfiguration("enabled", "true"),
+        new OServerParameterConfiguration("profilerManaged", "true")
+    };
+    config.handlers.add(jmxHandler);
+
+    config.hooks = new ArrayList<>();
 
     config.network = new OServerNetworkConfiguration();
     config.network.protocols = Lists.newArrayList(
         new OServerNetworkProtocolConfiguration("binary", ONetworkProtocolBinary.class.getName())
     );
 
-    config.network.listeners = Lists.newArrayList();
+    config.network.listeners = new ArrayList<>();
 
     // HACK: Optionally enable the binary listener
     if (listenerEnabled) {
@@ -152,8 +165,8 @@ public class DatabaseServerImpl
     };
 
     config.security = new OServerSecurityConfiguration();
-    config.security.users = Lists.newArrayList();
-    config.security.resources = Lists.newArrayList();
+    config.security.users = new ArrayList<>();
+    config.security.resources = new ArrayList<>();
 
     // latest advice is to disable DB compression as it doesn't buy much,
     // also snappy has issues with use of native lib (unpacked under tmp)
