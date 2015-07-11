@@ -32,6 +32,7 @@ import com.orientechnologies.orient.core.OConstants;
 import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.server.OServer;
+import com.orientechnologies.orient.server.config.OServerCommandConfiguration;
 import com.orientechnologies.orient.server.config.OServerConfiguration;
 import com.orientechnologies.orient.server.config.OServerEntryConfiguration;
 import com.orientechnologies.orient.server.config.OServerHandlerConfiguration;
@@ -44,6 +45,8 @@ import com.orientechnologies.orient.server.config.OServerStorageConfiguration;
 import com.orientechnologies.orient.server.config.OServerUserConfiguration;
 import com.orientechnologies.orient.server.handler.OJMXPlugin;
 import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProtocolBinary;
+import com.orientechnologies.orient.server.network.protocol.http.ONetworkProtocolHttpDb;
+import com.orientechnologies.orient.server.network.protocol.http.command.get.OServerCommandGetStaticContent;
 import org.apache.commons.io.output.WriterOutputStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -62,16 +65,20 @@ public class DatabaseServerImpl
 {
   private final ApplicationDirectories applicationDirectories;
 
-  private final boolean listenerEnabled;
+  private final boolean binaryListenerEnabled;
+
+  private final boolean httpListenerEnabled;
 
   private OServer server;
 
   @Inject
   public DatabaseServerImpl(final ApplicationDirectories applicationDirectories,
-                            final @Named("${nexus.orient.listenerEnabled:-false}") boolean listenerEnabled)
+                            final @Named("${nexus.orient.binaryListenerEnabled:-false}") boolean binaryListenerEnabled,
+                            final @Named("${nexus.orient.httpListenerEnabled:-false}") boolean httpListenerEnabled)
   {
     this.applicationDirectories = checkNotNull(applicationDirectories);
-    this.listenerEnabled = listenerEnabled;
+    this.binaryListenerEnabled = binaryListenerEnabled;
+    this.httpListenerEnabled = httpListenerEnabled;
 
     log.info("OrientDB version: {}", OConstants.getVersion());
 
@@ -80,9 +87,16 @@ public class DatabaseServerImpl
   }
 
   @ManagedAttribute
-  public boolean isListenerEnabled() {
-    return listenerEnabled;
+  public boolean isBinaryListenerEnabled() {
+    return binaryListenerEnabled;
   }
+
+  @ManagedAttribute
+  public boolean isHttpListenerEnabled() {
+    return httpListenerEnabled;
+  }
+
+  // FIXME: May need to revisit embedded configuration strategy, this is quite nasty
 
   @Override
   protected void doStart() throws Exception {
@@ -131,7 +145,7 @@ public class DatabaseServerImpl
 
     // configure JMX handler
     OServerHandlerConfiguration jmxHandler = new OServerHandlerConfiguration();
-    jmxHandler.clazz = OJMXPlugin.class.getCanonicalName();
+    jmxHandler.clazz = OJMXPlugin.class.getName();
     jmxHandler.parameters = new OServerParameterConfiguration[] {
         new OServerParameterConfiguration("enabled", "true"),
         new OServerParameterConfiguration("profilerManaged", "true")
@@ -142,20 +156,48 @@ public class DatabaseServerImpl
 
     config.network = new OServerNetworkConfiguration();
     config.network.protocols = Lists.newArrayList(
-        new OServerNetworkProtocolConfiguration("binary", ONetworkProtocolBinary.class.getName())
+        new OServerNetworkProtocolConfiguration("binary", ONetworkProtocolBinary.class.getName()),
+        new OServerNetworkProtocolConfiguration("http", ONetworkProtocolHttpDb.class.getName())
     );
 
     config.network.listeners = new ArrayList<>();
 
     // HACK: Optionally enable the binary listener
-    if (listenerEnabled) {
-      OServerNetworkListenerConfiguration binaryListener = new OServerNetworkListenerConfiguration();
-      binaryListener.ipAddress = "0.0.0.0";
-      binaryListener.portRange = "2424-2430";
-      binaryListener.protocol = "binary";
-      binaryListener.socket = "default";
-      config.network.listeners.add(binaryListener);
-      log.info("Listener enabled: {}:[{}]", binaryListener.ipAddress, binaryListener.portRange);
+    if (binaryListenerEnabled) {
+      OServerNetworkListenerConfiguration listener = new OServerNetworkListenerConfiguration();
+      listener.ipAddress = "0.0.0.0";
+      listener.portRange = "2424-2430";
+      listener.protocol = "binary";
+      listener.socket = "default";
+      config.network.listeners.add(listener);
+      log.info("Binary listener enabled: {}:[{}]", listener.ipAddress, listener.portRange);
+    }
+
+    // HACK: Optionally enable the http listener
+    if (httpListenerEnabled) {
+      OServerNetworkListenerConfiguration listener = new OServerNetworkListenerConfiguration();
+      listener.ipAddress = "0.0.0.0";
+      listener.portRange = "2480-2490";
+      listener.protocol = "http";
+      listener.socket = "default";
+      listener.parameters = new OServerParameterConfiguration[] {
+          new OServerParameterConfiguration("network.http.charset", "UTF-8"),
+          new OServerParameterConfiguration("network.http.jsonResponseError", "true")
+      };
+
+      OServerCommandConfiguration getCommand = new OServerCommandConfiguration();
+      getCommand.implementation = OServerCommandGetStaticContent.class.getName();
+      getCommand.pattern = "GET|www GET|studio/ GET| GET|*.htm GET|*.html GET|*.xml GET|*.jpeg GET|*.jpg GET|*.png GET|*.gif GET|*.js GET|*.css GET|*.swf GET|*.ico GET|*.txt GET|*.otf GET|*.pjs GET|*.svg GET|*.json GET|*.woff GET|*.ttf GET|*.svgz";
+      getCommand.parameters = new OServerEntryConfiguration[] {
+          new OServerEntryConfiguration("http.cache:*.htm *.html", "Cache-Control: no-cache, no-store, max-age=0, must-revalidate\\r\\nPragma: no-cache"),
+          new OServerEntryConfiguration("http.cache:default", "Cache-Control: max-age=120")
+      };
+      listener.commands = new OServerCommandConfiguration[] {
+          getCommand
+      };
+
+      config.network.listeners.add(listener);
+      log.info("HTTP listener enabled: {}:[{}]", listener.ipAddress, listener.portRange);
     }
 
     config.storages = new OServerStorageConfiguration[]{};
