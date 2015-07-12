@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -37,6 +37,9 @@ Ext.define('NX.view.dev.Styles', {
     'NX.view.dev.styles.Grids',
     'NX.view.dev.styles.Other'
   ],
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
   title: 'Styles',
 
@@ -75,15 +78,27 @@ Ext.define('NX.view.dev.Styles', {
         'Other'
       ];
 
-      Ext.each(sections, function (section) {
-        var component = Ext.create('NX.view.dev.styles.' + section);
-        me.add(component);
+      me.logDebug('Creating style guide');
+
+      // TODO: See if suspending layouts here actually helps anything?
+      //Ext.AbstractComponent.suspendLayouts();
+      //try {
+      Ext.Array.each(sections, function (section) {
+        me.add(Ext.create('NX.view.dev.styles.' + section));
       });
+      //}
+      //finally {
+      //  Ext.AbstractComponent.resumeLayouts(true);
+      //}
+
+      me.logDebug('Style guide ready');
     });
 
     // and destroy on deactivate to save memory
     me.on('deactivate', function () {
       me.removeAll(true);
+
+      me.logDebug('Destroyed style guide');
     });
 
     me.callParent();

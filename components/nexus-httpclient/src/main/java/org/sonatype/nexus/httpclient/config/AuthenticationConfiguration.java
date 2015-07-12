@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -11,6 +11,8 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.httpclient.config;
+
+import com.google.common.base.Throwables;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -33,4 +35,13 @@ public abstract class AuthenticationConfiguration
   }
 
   // TODO: preemptive?
+
+  public AuthenticationConfiguration copy() {
+    try {
+      return (AuthenticationConfiguration)clone();
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
+  }
 }

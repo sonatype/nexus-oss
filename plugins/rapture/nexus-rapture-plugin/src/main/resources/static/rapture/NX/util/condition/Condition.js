@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -28,24 +28,39 @@ Ext.define('NX.util.condition.Condition', {
 
   /**
    * Generated id used by event bus.
+   *
+   * @property {String}
    */
   id: undefined,
 
   /**
-   * @private {Number} number of listeners listening to this condition
+   * Number of listeners listening to this condition.
+   *
+   * @private
+   * @property {Number}
    */
   listenerCounter: 0,
 
   /**
-   * @private {Boolean} true when this condition is bounded
+   * True when this condition is bounded.
+   *
+   * @protected
+   * @property {Boolean}
    */
   bounded: false,
 
   /**
-   * @private {Boolean} true when this condition is satisfied
+   * True when this condition is satisfied.
+   *
+   * @private
+   * @property {Boolean}
    */
   satisfied: false,
 
+  /**
+   * @constructor
+   * @param {Object} config
+   */
   constructor: function (config) {
     var me = this;
 
@@ -55,14 +70,17 @@ Ext.define('NX.util.condition.Condition', {
 
     me.addEvents(
         /**
-         * @event satisfied
          * Fires when condition is satisfied.
+         *
+         * @event satisfied
          * @param {NX.util.condition.Condition} this
          */
         'satisfied',
+
         /**
-         * @event unsatisfied
          * Fires when condition is not satisfied.
+         *
+         * @event unsatisfied
          * @param {NX.util.condition.Condition} this
          */
         'unsatisfied'
@@ -70,14 +88,18 @@ Ext.define('NX.util.condition.Condition', {
   },
 
   // HACK: comment the following lines to let debug messages flow
+  /**
+   * @override
+   */
   logDebug: function () {
     // empty
   },
 
   /**
-   * @protected
    * Sets {@link #bounded} = true.
-   * @returns itself
+   *
+   * @protected
+   * @chainable
    */
   bind: function () {
     var me = this;
@@ -90,9 +112,10 @@ Ext.define('NX.util.condition.Condition', {
   },
 
   /**
-   * @protected
    * Clears all listeners of this condition and sets {@link #bounded} = false.
-   * @returns itself
+   *
+   * @protected
+   * @chainable
    */
   unbind: function () {
     var me = this;
@@ -107,8 +130,9 @@ Ext.define('NX.util.condition.Condition', {
   },
 
   /**
-   * @protected
    * Sets {@link #bounded} = false and makes condition unsatisfied.
+   *
+   * @protected
    * @param bounded
    */
   setBounded: function (bounded) {
@@ -120,7 +144,7 @@ Ext.define('NX.util.condition.Condition', {
         }
 
         //<if debug>
-        me.logDebug((bounded ? 'Bounded: ' : 'Unbounded: ') + me);
+        me.logDebug((bounded ? 'Bounded:' : 'Unbounded:'), me);
         //</if>
 
         me.bounded = bounded;
@@ -139,13 +163,13 @@ Ext.define('NX.util.condition.Condition', {
    * @returns {boolean} true, if condition is satisfied
    */
   isSatisfied: function () {
-    var me = this;
-    return me.satisfied;
+    return this.satisfied;
   },
 
   /**
-   * @protected
    * Sets {@link #satisfied} = true and fires 'satisfied' / 'unsatisfied' if satisfied changed.
+   *
+   * @protected
    * @param {boolean} satisfied if condition is satisfied
    */
   setSatisfied: function (satisfied) {
@@ -153,7 +177,7 @@ Ext.define('NX.util.condition.Condition', {
     if (Ext.isDefined(me.satisfied)) {
       if (satisfied !== me.satisfied) {
         //<if debug>
-        me.logDebug((satisfied ? 'Satisfied: ' : 'Unsatisfied: ') + me);
+        me.logDebug((satisfied ? 'Satisfied:' : 'Unsatisfied:'), me);
         //</if>
 
         me.satisfied = satisfied;
@@ -169,8 +193,9 @@ Ext.define('NX.util.condition.Condition', {
   },
 
   /**
-   * @override
    * Additionally, {@link #bind}s when first listener added.
+   *
+   * @override
    */
   addListener: function (ename, fn, scope, options) {
     var me = this;
@@ -184,8 +209,9 @@ Ext.define('NX.util.condition.Condition', {
   },
 
   /**
-   * @override
    * Additionally, {@link #unbind}s when no more listeners.
+   *
+   * @override
    */
   removeListener: function (ename, fn, scope) {
     var me = this;

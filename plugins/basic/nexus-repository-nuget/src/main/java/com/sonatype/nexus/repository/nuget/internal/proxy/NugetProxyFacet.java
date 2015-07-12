@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -13,7 +13,6 @@
 package com.sonatype.nexus.repository.nuget.internal.proxy;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
@@ -24,13 +23,11 @@ import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacet;
 import com.sonatype.nexus.repository.nuget.odata.ODataConsumer;
 
 import org.sonatype.nexus.repository.InvalidContentException;
+import org.sonatype.nexus.repository.proxy.CacheInfo;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
-
-import org.joda.time.DateTime;
 
 /**
  * Serves NuGet packages, and also exposes proxy configuration and content-fetching.
@@ -50,12 +47,7 @@ public class NugetProxyFacet
   @Override
   protected Content getCachedPayload(final Context context) throws IOException {
     String[] coords = coords(context);
-    Payload payload = gallery().get(coords[0], coords[1]);
-    if (payload != null) {
-      // TODO: get last-modified and etag
-      return new Content(payload);
-    }
-    return null;
+    return gallery().get(coords[0], coords[1]);
   }
 
   @Override
@@ -71,7 +63,7 @@ public class NugetProxyFacet
 
     // Cache the metadata from the remote, grabbing the content location as we go
     final StringBuilder contentLocation = new StringBuilder();
-    fetcher.cachePackageFeed(getRepository(), remoteEntryUri, 2, false, new ODataConsumer()
+    fetcher.cachePackageFeed(getRepository(), remoteEntryUri, false, new ODataConsumer()
     {
       @Override
       public void consume(final Map<String, String> data) {
@@ -93,26 +85,21 @@ public class NugetProxyFacet
   protected void store(final Context context, final Content payload) throws IOException, InvalidContentException {
     // The metadata will have been cached by this time, so we just need to set the content
     String[] coords = coords(context);
-    try (InputStream in = payload.openInputStream()) {
-      gallery().putContent(coords[0], coords[1], in);
-    }
+    gallery().putContent(coords[0], coords[1], payload);
   }
 
   @Override
-  protected DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException {
+  protected void indicateVerified(final Context context, final CacheInfo cacheInfo) throws IOException {
     String[] coords = coords(context);
-    return gallery().getLastUpdatedDate(coords[0], coords[1]);
+    gallery().setCacheInfo(coords[0], coords[1], cacheInfo);
   }
 
   @Override
-  protected void indicateUpToDate(final Context context) throws IOException {
-    // TODO: this will never happen; super.fetch's http GET request isn't conditional.
-  }
-
-  @Override
-  protected String getUrl(final @Nonnull Context context) {
-    // Unnecessary to implement this, as we override fetch in a way that doesn't use it
-    throw new UnsupportedOperationException();
+  protected String getUrl(@Nonnull final Context context) {
+    // This is only implemented for error-reporting purposes. It returns the Nexus
+    // URL for the content, rather than the remote one, as these can differ.
+    final String[] coords = coords(context);
+    return coords[0] + "/" + coords[1];
   }
 
   private NugetGalleryFacet gallery() {

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -40,6 +40,7 @@ Ext.define('NX.app.Application', {
   uses: [
     // framework patches
     'Ext.patch.Ticket_15227',
+    'Ext.patch.Ticket_17866',
     'Ext.patch.Ticket_18960',
     'Ext.patch.Ticket_18964',
     'Ext.patch.Ticket_21425',
@@ -47,6 +48,7 @@ Ext.define('NX.app.Application', {
     'Ext.patch.Ticket_22557_2',
 
     // direct overrides
+    'NX.ext.direct.RemotingProvider',
     'NX.ext.form.action.DirectLoad',
     'NX.ext.form.action.DirectSubmit',
 
@@ -101,6 +103,7 @@ Ext.define('NX.app.Application', {
    * Always active controllers.
    */
   controllers: [
+    'Logging',
     'State',
     'Bookmarking',
     'ExtDirect',
@@ -112,8 +115,10 @@ Ext.define('NX.app.Application', {
   ],
 
   /**
+   * Managed controller configurations.
+   *
    * @private
-   * {@link Ext.util.MixedCollection} containing managed controllers configurations
+   * @property {Ext.util.MixedCollection}
    */
   managedControllers: undefined,
 
@@ -140,10 +145,18 @@ Ext.define('NX.app.Application', {
       return NX.State.getValue('debug') === true;
     },
     bundleActive: function (symbolicName) {
-      // FIXME: Rename key
       return NX.State.getValue('activeBundles').indexOf(symbolicName) > -1;
     }
   },
+
+  /**
+   * Flag to indicate that app is ready.
+   *
+   * @public
+   * @property {Boolean}
+   * @readonly
+   */
+  ready: false,
 
   /**
    * @override
@@ -153,8 +166,8 @@ Ext.define('NX.app.Application', {
     var me = this;
 
     //<if debug>
-    me.logDebug('Initializing');
-    me.logDebug(me.managedControllers.getCount() + ' managed controllers');
+    me.logInfo('Initializing');
+    me.logDebug(me.managedControllers.getCount(), 'managed controllers');
     //</if>
 
     // Configure blank image URL
@@ -172,8 +185,9 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Hook into browser error handling (in order to log them).
+   *
+   * @private
    */
   initErrorHandler: function () {
     var me = this,
@@ -203,22 +217,23 @@ Ext.define('NX.app.Application', {
   },
 
   /**
+   * Handle application error.
+   *
    * @private
-   * Log catched error.
    */
   handleError: function (error) {
-    var me = this;
     NX.Messages.add({
       type: 'danger',
-      text: me.errorAsString(error)
+      text: this.errorAsString(error)
     });
   },
 
   /**
-   * @private
    * Customize error to-string handling.
    *
    * Ext.Error.toString() assumes instance, but raise(String) makes anonymous object.
+   *
+   * @private
    */
   errorAsString: function (error) {
     var className = error.sourceClass || '',
@@ -228,14 +243,17 @@ Ext.define('NX.app.Application', {
   },
 
   /**
-   * @private
    * Initialize Ex.Direct remote providers.
+   *
+   * @private
    */
   initDirect: function () {
-    var me = this,
-        remotingProvider;
+    var remotingProvider;
 
     remotingProvider = Ext.direct.Manager.addProvider(NX.direct.api.REMOTING_API);
+
+    // configure Ext.Direct buffer-window milliseconds
+    remotingProvider.enableBuffer = 10;
 
     // disable retry
     remotingProvider.maxRetries = 0;
@@ -244,20 +262,23 @@ Ext.define('NX.app.Application', {
     remotingProvider.timeout = 60 * 1000;
 
     //<if debug>
-    me.logDebug('Configured Ext.Direct');
+    this.logDebug('Configured Ext.Direct');
     //</if>
   },
 
   /**
-   * @private
    * Initialize state manager.
+   *
+   * @private
    */
   initState: function () {
-    var me = this;
+    var me = this,
+        provider;
 
     // If local storage is supported install state provider
     if (Ext.util.LocalStorage.supported) {
-      Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
+      provider = Ext.create('Ext.state.LocalStorageProvider');
+      Ext.state.Manager.setProvider(provider);
       //<if debug>
       me.logDebug('Configured state provider: local');
       //</if>
@@ -268,21 +289,25 @@ Ext.define('NX.app.Application', {
       //</if>
     }
 
-    // HACK: for debugging
-    //provider.on('statechange', function (provider, key, value, opts) {
-    //  me.logDebug('State changed: ' + key + '=' + value);
-    //});
+    //<if debug>
+    if (provider) {
+      provider.on('statechange', function (provider, key, value, opts) {
+        me.logTrace('State changed:', key, '->', (value ? value : '(deleted)'));
+      });
+    }
+    //</if>
   },
 
   /**
-   * @public
    * Starts the application.
+   *
+   * @public
    */
   start: function () {
-    var me = this, hideMask;
+    var me = this, becomeReady;
 
     //<if debug>
-    me.logDebug('Starting');
+    me.logInfo('Starting');
     //</if>
 
     Ext.create('NX.view.Viewport');
@@ -296,20 +321,31 @@ Ext.define('NX.app.Application', {
       }
     });
 
-    // hide the loading mask after we have loaded
-    hideMask = function () {
+    becomeReady = function () {
+      // hide the loading mask after we have loaded
       Ext.get('loading').remove();
       Ext.fly('loading-mask').animate({ opacity: 0, remove: true });
+
+      // mark app as ready
+      me.logInfo('Ready');
+      me.ready = true;
     };
 
     // FIXME: Need a better way to know when the UI is actually rendered so we can hide the mask
     // HACK: for now increasing delay slightly to cope with longer loading times
-    Ext.defer(hideMask, 500);
+    Ext.defer(becomeReady, 500);
   },
 
   /**
-   * @private
+   * Fired when synchronizing controllers and changes were detected.
+   *
+   * @event controllerschanged
+   */
+
+  /**
    * Create / Destroy managed controllers based on their active status.
+   *
+   * @private
    */
   syncManagedControllers: function () {
     var me = this,
@@ -328,7 +364,7 @@ Ext.define('NX.app.Application', {
           changes = true;
 
           //<if debug>
-          me.logDebug('Destroying controller: ' + key);
+          me.logDebug('Destroying controller:', key);
           //</if>
 
           ref.controller.fireEvent('destroy', ref.controller);
@@ -354,7 +390,7 @@ Ext.define('NX.app.Application', {
           changes = true;
 
           //<if debug>
-          me.logDebug('Initializing controller: ' + key);
+          me.logDebug('Initializing controller:', key);
           //</if>
 
           ref.controller = me.getController(key);

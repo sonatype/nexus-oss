@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import javax.annotation.Nonnull;
 
-import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -53,7 +52,7 @@ public class ProxyHandler
       return HttpResponses.notFound();
     }
     catch (IOException e) {
-      return HttpResponses.serviceUnavailable();
+      return HttpResponses.badGateway();
     }
   }
 

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -39,7 +39,7 @@ Ext.define('NX.view.dev.styles.Header', {
         items = [],
         logo = [];
 
-    logo.push({ xtype: 'label', text: NX.I18n.get('GLOBAL_HEADER_TITLE'), cls: 'nx-header-productname' });
+    logo.push({ xtype: 'label', text: NX.I18n.get('Header_Panel_Logo_Text'), cls: 'nx-header-productname' });
 
     // HACK remove this
     var logoOnly = false;
@@ -75,7 +75,7 @@ Ext.define('NX.view.dev.styles.Header', {
               toggleGroup: 'examplemode',
               allowDepress: false,
               title: 'Browse',
-              tooltip: NX.I18n.get('GLOBAL_HEADER_BROWSE_TOOLTIP'),
+              tooltip: NX.I18n.get('Header_BrowseMode_Tooltip'),
               glyph: 'xf1b2@FontAwesome' /* fa-cube */
             }
           },
@@ -90,7 +90,7 @@ Ext.define('NX.view.dev.styles.Header', {
               toggleGroup: 'examplemode',
               allowDepress: false,
               title: 'Administration',
-              tooltip: NX.I18n.get('GLOBAL_HEADER_ADMIN_TOOLTIP'),
+              tooltip: NX.I18n.get('Header_AdminMode_Tooltip'),
               glyph: 'xf013@FontAwesome' /* fa-gear */
             }
           },
@@ -99,8 +99,8 @@ Ext.define('NX.view.dev.styles.Header', {
             xtype: 'nx-searchbox',
             cls: 'nx-quicksearch',
             width: 200,
-            emptyText: NX.I18n.get('GLOBAL_HEADER_SEARCH_PLACEHOLDER'),
-            inputAttrTpl: "data-qtip='" + NX.I18n.get('GLOBAL_HEADER_SEARCH_TOOLTIP') + "'" // field tooltip
+            emptyText: NX.I18n.get('Header_QuickSearch_Empty'),
+            inputAttrTpl: "data-qtip='" + NX.I18n.get('Header_QuickSearch_Tooltip') + "'" // field tooltip
           },
           '->',
           //{
@@ -112,13 +112,13 @@ Ext.define('NX.view.dev.styles.Header', {
           {
             xtype: 'button',
             ui: 'nx-header',
-            tooltip: NX.I18n.get('GLOBAL_HEADER_REFRESH_TOOLTIP'),
+            tooltip: NX.I18n.get('Header_Refresh_Tooltip'),
             glyph: 'xf021@FontAwesome' // fa-refresh
           },
           {
             xtype: 'button',
             ui: 'nx-header',
-            tooltip: NX.I18n.get('GLOBAL_HEADER_HELP_TOOLTIP'),
+            tooltip: NX.I18n.get('Header_Help_Tooltip'),
             glyph: 'xf059@FontAwesome', // fa-question-circle
             arrowCls: '', // hide the menu button arrow
             menu: [
@@ -145,22 +145,22 @@ Ext.define('NX.view.dev.styles.Header', {
               allowDepress: false,
               title: 'User',
               text: 'admin',
-              tooltip: NX.I18n.get('GLOBAL_HEADER_USER_TOOLTIP'),
+              tooltip: NX.I18n.get('User_Tooltip'),
               glyph: 'xf007@FontAwesome'
             }
           },
           {
             xtype: 'button',
             ui: 'nx-header',
-            text: NX.I18n.get('GLOBAL_HEADER_SIGN_IN'),
-            tooltip: NX.I18n.get('GLOBAL_HEADER_SIGN_IN_TOOLTIP'),
+            text: NX.I18n.get('Header_SignIn_Text'),
+            tooltip: NX.I18n.get('Header_SignIn_Tooltip'),
             glyph: 'xf090@FontAwesome'
           },
           {
             xtype: 'button',
             ui: 'nx-header',
-            text: NX.I18n.get('GLOBAL_HEADER_SIGN_OUT'),
-            tooltip: NX.I18n.get('GLOBAL_HEADER_SIGN_OUT'),
+            text: NX.I18n.get('Header_SignOut_Text'),
+            tooltip: NX.I18n.get('Header_SignOut_Text'),
             hidden: true,
             glyph: 'xf08b@FontAwesome'
           }

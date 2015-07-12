@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,8 +18,6 @@ import org.sonatype.nexus.capability.UniquePerCapabilityType;
 import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.validation.group.Create;
 
-import org.jetbrains.annotations.NonNls;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -32,16 +30,12 @@ public class BrandingCapabilityConfiguration
     extends BrandingXO
 {
 
-  @NonNls
   public static final String HEADER_ENABLED = "headerEnabled";
 
-  @NonNls
   public static final String HEADER_HTML = "headerHtml";
 
-  @NonNls
   public static final String FOOTER_ENABLED = "footerEnabled";
 
-  @NonNls
   public static final String FOOTER_HTML = "footerHtml";
 
   public BrandingCapabilityConfiguration(final Map<String, String> properties) {

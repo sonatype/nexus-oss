@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -35,7 +35,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -51,7 +50,6 @@ public class AuthenticateResource
     extends ComponentSupport
     implements Resource
 {
-  @NonNls
   public static final String RESOURCE_URI = WonderlandConstants.REST_PREFIX + "/authenticate";
 
   private final AuthTicketService authTickets;
@@ -75,13 +73,22 @@ public class AuthenticateResource
   public AuthTicketXO post(final AuthTokenXO token) {
     checkNotNull(token);
 
-    String username = Strings2.decodeBase64(token.getU());
-    String password = Strings2.decodeBase64(token.getP());
-    log.debug("Authenticate w/username: {}, password: {}", username, Strings2.mask(password));
+    final String username = Strings2.decodeBase64(token.getU());
+    final String password = Strings2.decodeBase64(token.getP());
 
     // Require current user to be the requested user to authenticate
-    Subject subject = SecurityUtils.getSubject();
-    if (!subject.getPrincipal().toString().equals(username)) {
+    final Subject subject = SecurityUtils.getSubject();
+    final Object principal = subject.getPrincipal();
+    final String principalName = principal == null ? "" : principal.toString();
+
+    if (log.isDebugEnabled()) {
+      log.debug("payload username: {}, payload password: {}, principal: {}", username, Strings2.mask(password),
+          principalName);
+    }
+
+    if (!principalName.equals(username)) {
+      log.warn("auth token request denied - authenticated user {} does not match payload user {}",
+          principalName, username);
       throw new WebApplicationException("Username mismatch", Status.BAD_REQUEST);
     }
 

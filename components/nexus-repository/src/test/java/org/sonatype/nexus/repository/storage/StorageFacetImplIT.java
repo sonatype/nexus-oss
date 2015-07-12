@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.repository.storage;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +21,9 @@ import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.entity.EntityVersion;
+import org.sonatype.nexus.common.node.LocalNodeAccess;
+import org.sonatype.nexus.mime.MimeRulesSource;
+import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
 import org.sonatype.nexus.orient.HexRecordIdObfuscator;
 import org.sonatype.nexus.orient.PersistentDatabaseInstanceRule;
 import org.sonatype.nexus.repository.Format;
@@ -28,6 +31,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.search.SearchFacet;
+import org.sonatype.nexus.security.ClientInfoProvider;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -53,9 +57,9 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.common.entity.EntityHelper.id;
@@ -90,6 +94,8 @@ public class StorageFacetImplIT
 
   @Before
   public void setUp() throws Exception {
+    LocalNodeAccess mockLocalNodeAccess = mock(LocalNodeAccess.class);
+    when(mockLocalNodeAccess.getId()).thenReturn("testNodeId");
     BlobStoreManager mockBlobStoreManager = mock(BlobStoreManager.class);
     when(mockBlobStoreManager.get(anyString())).thenReturn(mock(BlobStore.class));
     BucketEntityAdapter bucketEntityAdapter = new BucketEntityAdapter();
@@ -99,10 +105,18 @@ public class StorageFacetImplIT
     componentEntityAdapter.installDependencies(recordIdObfuscator);
     assetEntityAdapter = new AssetEntityAdapter(bucketEntityAdapter, componentEntityAdapter);
     assetEntityAdapter.installDependencies(recordIdObfuscator);
+    ContentValidatorSelector contentValidatorSelector = new ContentValidatorSelector(Collections.<String, ContentValidator>emptyMap(), new DefaultContentValidator(new DefaultMimeSupport()));
+    MimeRulesSourceSelector mimeRulesSourceSelector = new MimeRulesSourceSelector(Collections.<String, MimeRulesSource>emptyMap());
     underTest = new StorageFacetImpl(
+        mockLocalNodeAccess,
         mockBlobStoreManager,
         Providers.of(database.getInstance()),
-        bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter
+        bucketEntityAdapter,
+        componentEntityAdapter,
+        assetEntityAdapter,
+        mock(ClientInfoProvider.class),
+        contentValidatorSelector,
+        mimeRulesSourceSelector
     );
     underTest.installDependencies(mock(EventBus.class));
 
@@ -115,10 +129,12 @@ public class StorageFacetImplIT
         .thenReturn(config);
 
     when(testRepository1.getName()).thenReturn("test-repository-1");
+    when(testRepository1.getFormat()).thenReturn(testFormat);
     when(testRepository1.facet(ConfigurationFacet.class)).thenReturn(configurationFacet);
     when(testRepository1.facet(SearchFacet.class)).thenReturn(mock(SearchFacet.class));
 
     when(testRepository2.getName()).thenReturn("test-repository-2");
+    when(testRepository2.getFormat()).thenReturn(testFormat);
     when(testRepository2.facet(ConfigurationFacet.class)).thenReturn(configurationFacet);
     when(testRepository2.facet(SearchFacet.class)).thenReturn(mock(SearchFacet.class));
 
@@ -134,7 +150,7 @@ public class StorageFacetImplIT
 
   @Test
   public void initialState() {
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       // We should have one bucket, which was auto-created for the repository during initialization
       checkSize(tx.browseBuckets(), 1);
     }
@@ -142,7 +158,7 @@ public class StorageFacetImplIT
 
   @Test
   public void startWithEmptyAttributes() {
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Asset asset = tx.createAsset(tx.getBucket(), testFormat);
       Component component = tx.createComponent(tx.getBucket(), testFormat);
 
@@ -159,7 +175,7 @@ public class StorageFacetImplIT
   @Test
   public void getAndSetAttributes() {
     EntityId docId;
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Asset asset = tx.createAsset(tx.getBucket(), testFormat);
       asset.name("asset");
       NestedAttributesMap map = asset.attributes();
@@ -177,7 +193,7 @@ public class StorageFacetImplIT
       docId = asset.getEntityMetadata().getId();
     }
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       NestedAttributesMap map = tx.findAsset(docId, tx.getBucket()).attributes();
 
       assertThat(map.size(), is(2));
@@ -191,7 +207,7 @@ public class StorageFacetImplIT
   @Test
   public void findAssets() throws Exception {
     // Setup: add an asset in both repositories
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Asset asset1 = tx.createAsset(tx.getBucket(), testFormat);
       asset1.name("asset1");
       asset1.size(42L);
@@ -201,7 +217,7 @@ public class StorageFacetImplIT
 
     underTest.attach(testRepository2);
     underTest.init();
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Asset asset2 = tx.createAsset(tx.getBucket(), testFormat);
       asset2.name("asset2");
       asset2.size(42L);
@@ -210,7 +226,7 @@ public class StorageFacetImplIT
     }
 
     // Queries
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
 
       // Find assets with name = "asset1"
 
@@ -281,7 +297,7 @@ public class StorageFacetImplIT
     // Transaction 1:
     // Create a new asset with property "attributes" that's a map of maps (stored as an embeddedmap)
     EntityId docId;
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Bucket bucket = tx.getBucket();
       Asset asset = tx.createAsset(bucket, testFormat);
       asset.name("asset");
@@ -294,7 +310,7 @@ public class StorageFacetImplIT
 
     // Transaction 2:
     // Get the asset and make sure it contains what we expect
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Bucket bucket = tx.getBucket();
       Asset asset = tx.findAsset(docId, bucket);
       assert asset != null;
@@ -316,7 +332,7 @@ public class StorageFacetImplIT
 
     // Transaction 3:
     // Make sure we can use dot notation to query for the asset by some aspect of the attributes
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Map<String, String> parameters = ImmutableMap.of("fooValue", "bar");
       String query = String.format("select from %s where attributes.bag1.foo = :fooValue", AssetEntityAdapter.DB_CLASS);
 
@@ -334,7 +350,7 @@ public class StorageFacetImplIT
     EntityId asset2Id = null;
     EntityId componentId = null;
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       // Verify initial state with browse
       Bucket bucket = tx.getBucket();
 
@@ -363,7 +379,7 @@ public class StorageFacetImplIT
       componentId = id(component);
     }
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Bucket bucket = tx.getBucket();
 
       checkSize(tx.browseAssets(bucket), 2);
@@ -400,7 +416,7 @@ public class StorageFacetImplIT
 
   @Test
   public void componentAssetLinksAreDurable() {
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Bucket bucket = tx.getBucket();
       final Component component = tx.createComponent(bucket, testFormat).name("component");
       tx.saveComponent(component);
@@ -411,7 +427,7 @@ public class StorageFacetImplIT
       tx.commit();
     }
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Asset asset = tx.findAssetWithProperty("name", "asset", tx.getBucket());
       assertThat(asset, is(notNullValue()));
 
@@ -445,7 +461,7 @@ public class StorageFacetImplIT
     // setup
     final EntityId assetId;
     EntityVersion firstVersion;
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Bucket bucket = tx.getBucket();
       Asset asset = tx.createAsset(bucket, testFormat);
       asset.name("asset");
@@ -457,7 +473,7 @@ public class StorageFacetImplIT
 
     // test
     // 1. start a tx (mainTx) in the main thread
-    try (StorageTx mainTx = underTest.openTx()) {
+    try (StorageTx mainTx = beginTX()) {
       Bucket bucket = mainTx.getBucket();
       Asset asset = null;
 
@@ -472,7 +488,7 @@ public class StorageFacetImplIT
       {
         @Override
         public void run() {
-          try (StorageTx auxTx = underTest.openTx()) {
+          try (StorageTx auxTx = beginTX()) {
             Bucket bucket = auxTx.getBucket();
             Asset asset = checkNotNull(auxTx.findAsset(assetId, bucket));
             asset.name("firstValue");
@@ -500,7 +516,7 @@ public class StorageFacetImplIT
     }
 
     // not simulating a conflict; verify the expected state
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Bucket bucket = tx.getBucket();
       Asset asset = checkNotNull(tx.findAsset(assetId, bucket));
 
@@ -545,7 +561,7 @@ public class StorageFacetImplIT
   }
 
   private Component createComponent(final String group, final String name, final String version) throws Exception {
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Bucket bucket = tx.getBucket();
       Component component = tx.createComponent(bucket, testFormat)
           .group(group)
@@ -558,7 +574,7 @@ public class StorageFacetImplIT
   }
 
   private Asset createAsset(final Component component, final String name) throws Exception {
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       Bucket bucket = tx.getBucket();
       Asset asset;
       if (component != null) {
@@ -602,7 +618,7 @@ public class StorageFacetImplIT
   @Test
   public void repeatedAssetModificationsAreSaved() throws Exception {
     createComponent("testGroup", "testName", "testVersion");
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Component component = tx.findComponentWithProperty("version", "testVersion", tx.getBucket());
       final Asset asset = tx.createAsset(tx.getBucket(), component).name("asset");
 
@@ -619,7 +635,7 @@ public class StorageFacetImplIT
       tx.commit();
     }
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Component component = tx.findComponentWithProperty("version", "testVersion", tx.getBucket());
       final Iterable<Asset> assets = tx.browseAssets(component);
       final Asset asset = assets.iterator().next();
@@ -631,7 +647,7 @@ public class StorageFacetImplIT
 
   @Test
   public void transactionsRollBackWhenRequired() throws Exception {
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Component component = tx.createComponent(tx.getBucket(), testFormat)
           .group("myGroup")
           .version("0.9")
@@ -640,7 +656,7 @@ public class StorageFacetImplIT
       tx.rollback();
     }
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Component component = tx.findComponentWithProperty("group", "myGroup", tx.getBucket());
       assertThat(component, is(nullValue()));
     }
@@ -649,7 +665,7 @@ public class StorageFacetImplIT
   @Test
   public void transactionsRollBackOnException() throws Exception {
     try {
-      try (StorageTx tx = underTest.openTx()) {
+      try (StorageTx tx = beginTX()) {
         final Component component = tx.createComponent(tx.getBucket(), testFormat)
             .group("myGroup")
             .version("0.9")
@@ -661,7 +677,7 @@ public class StorageFacetImplIT
     catch (IllegalStateException ignored) {
     }
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Component component = tx.findComponentWithProperty("group", "myGroup", tx.getBucket());
       assertThat(component, is(nullValue()));
     }
@@ -669,7 +685,7 @@ public class StorageFacetImplIT
 
   @Test
   public void transactionContentIsSaved() throws Exception {
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Component component = tx.createComponent(tx.getBucket(), testFormat)
           .group("myGroup")
           .version("0.9")
@@ -678,7 +694,7 @@ public class StorageFacetImplIT
       tx.commit();
     }
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Iterable<Component> components = tx.browseComponents(tx.getBucket());
       final Component component = tx.findComponentWithProperty("group", "myGroup", tx.getBucket());
       assertThat(component, is(notNullValue()));
@@ -690,7 +706,7 @@ public class StorageFacetImplIT
   public void entityIdCanBeUsedInLaterTransactions() throws Exception {
     EntityId componentId;
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Component component = tx.createComponent(tx.getBucket(), testFormat).name("component");
       tx.saveComponent(component);
 
@@ -699,7 +715,7 @@ public class StorageFacetImplIT
       tx.commit();
     }
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Component component = tx.findComponent(componentId, tx.getBucket());
       assertThat("component", component, is(notNullValue()));
       assertThat(component.name(), is("component"));
@@ -711,7 +727,7 @@ public class StorageFacetImplIT
     EntityId componentId;
     EntityId assetId;
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Component component = tx.createComponent(tx.getBucket(), testFormat).name("component");
       tx.saveComponent(component);
 
@@ -724,7 +740,7 @@ public class StorageFacetImplIT
       assetId = id(asset);
     }
 
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Component component = tx.findComponent(componentId, tx.getBucket());
       assertThat("component", component, is(notNullValue()));
       assertThat(component.name(), is("component"));
@@ -737,12 +753,18 @@ public class StorageFacetImplIT
 
   @Test
   public void dependentQueryFromUncommittedComponentDoesNotThrowException() throws Exception {
-    try (StorageTx tx = underTest.openTx()) {
+    try (StorageTx tx = beginTX()) {
       final Component component = tx.createComponent(tx.getBucket(), testFormat).name("component");
       tx.saveComponent(component);
 
       // Correct use of attached entity ids prevent an exception being thrown by this line
       tx.browseAssets(component);
     }
+  }
+
+  private StorageTx beginTX() {
+    final StorageTx tx = underTest.txSupplier().get();
+    tx.begin();
+    return tx;
   }
 }

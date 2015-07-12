@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,18 +21,60 @@ Ext.define('NX.coreui.view.component.AssetInfo', {
   extend: 'NX.view.info.Panel',
   alias: 'widget.nx-coreui-component-assetinfo',
   requires: [
-    'NX.I18n'
+    'NX.I18n',
+    'NX.coreui.util.RepositoryUrls'
   ],
 
+  /**
+   * model to display 
+   */
+  assetModel: null,
+  
   /**
    * @override
    */
   initComponent: function() {
     var me = this;
 
-    me.callParent(arguments);
+    me.dockedItems = {
+      xtype: 'nx-actions',
 
-    me.setTitle(NX.I18n.get('BROWSE_SEARCH_DETAILS_INFO_TAB'));
+      items: [
+        '->',
+        {
+          xtype: 'button',
+          text: NX.I18n.get('AssetInfo_Delete_Button'),
+          glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
+          action: 'deleteAsset',
+          disabled: true
+        }
+      ]
+    };
+    me.callParent(arguments);
+    
+    me.setTitle(NX.I18n.get('Component_AssetInfo_Info_Title'));
+  },
+
+  /**
+   * @public
+   * @param {Object} assetModel the asset to display
+   * @param {String} format the format for the asset
+   */
+  setAssetModel: function(assetModel, format) {
+    var me = this,
+        info = {};
+    me.assetModel = assetModel;
+    
+    // display common data
+    var contentType = assetModel.get('contentType');
+    var size = assetModel.get('size');
+    info[NX.I18n.get('Assets_Info_Path')] = NX.coreui.util.RepositoryUrls.asRepositoryLink(assetModel, format);
+    info[NX.I18n.get('Assets_Info_ContentType')] = contentType;
+    info[NX.I18n.get('Assets_Info_FileSize')] = Ext.util.Format.fileSize(size);
+    info[NX.I18n.get('Assets_Info_Last_Updated')] = new Date(assetModel.get('lastUpdated')) ;
+    info[NX.I18n.get('Assets_Info_Locally_Cached')] = contentType !== 'unknown' && size > 0 ;
+    info[NX.I18n.get('Assets_Info_BlobRef')] = assetModel.get('blobRef');
+    me.showInfo(info);
   }
 
 });

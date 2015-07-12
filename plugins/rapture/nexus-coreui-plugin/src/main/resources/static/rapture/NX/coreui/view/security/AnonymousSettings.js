@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -31,30 +31,30 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
     me.settingsForm = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: NX.I18n.get('ADMIN_ANONYMOUS_UPDATE_SUCCESS'),
+        settingsFormSuccessMessage: NX.I18n.get('Security_AnonymousSettings_Update_Success'),
         api: {
           load: 'NX.direct.coreui_AnonymousSettings.read',
           submit: 'NX.direct.coreui_AnonymousSettings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings:update'),
-        editableMarker: NX.I18n.get('ADMIN_ANONYMOUS_UPDATE_ERROR'),
+        editableMarker: NX.I18n.get('Security_AnonymousSettings_Update_Error'),
         items: [
           {
             xtype: 'checkbox',
             name: 'enabled',
             value: true,
-            boxLabel: NX.I18n.get('ADMIN_ANONYMOUS_ALLOW')
+            boxLabel: NX.I18n.get('Security_AnonymousSettings_Allow_BoxLabel')
           },
           {
             xtype: 'textfield',
             name: 'userId',
-            fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME'),
+            fieldLabel: NX.I18n.get('Security_AnonymousSettings_Username_FieldLabel'),
             allowBlank: false
           },
           {
             xtype: 'combo',
             name: 'realmName',
-            fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_REALMNAME'),
+            fieldLabel: NX.I18n.get('Security_AnonymousSettings_Realm_FieldLabel'),
             queryMode: 'local',
             displayField: 'name',
             valueField: 'id',

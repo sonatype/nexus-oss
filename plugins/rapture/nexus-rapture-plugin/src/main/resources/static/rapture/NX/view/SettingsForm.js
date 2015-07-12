@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,16 +19,17 @@
  */
 Ext.define('NX.view.SettingsForm', {
   extend: 'Ext.form.Panel',
-  alias: 'widget.nx-settingsform',
-  ui: 'nx-subsection',
-  frame: true,
   requires: [
     'NX.I18n'
   ],
+  alias: 'widget.nx-settingsform',
+  ui: 'nx-subsection',
+  frame: true,
 
   /**
+   * Set trackResetOnLoad by default.
+   *
    * @private
-   * Set trackResetOnLoad by default
    */
   constructor : function(config) {
     config = config || {};
@@ -54,21 +55,21 @@ Ext.define('NX.view.SettingsForm', {
   settingsFormSubmitOnEnter: false,
 
   /**
-   * @cfg {string/function} Text to be used when displaying submit/load messages. If is a function it will be called
+   * @cfg {String/Function} Text to be used when displaying submit/load messages. If is a function it will be called
    * with submit/load response data as parameter and it should return a String.
    * If text contains "${action}", it will be replaced with performed action.
    */
   settingsFormSuccessMessage: undefined,
 
   /**
-   * @cfg {string/function} [settingsFormLoadMessage: 'Loading...'] Text to be used as mask while loading data.
+   * @cfg {String/Function} [settingsFormLoadMessage] Text to be used as mask while loading data.
    */
-  settingsFormLoadMessage: NX.I18n.get('GLOBAL_SETTINGS_LOADING'),
+  settingsFormLoadMessage: NX.I18n.get('SettingsForm_Load_Message'),
 
   /**
-   * @cfg {string/function} [settingsFormSubmitMessage: 'Saving...'] Text to be used as mask while submitting data.
+   * @cfg {String/Function} [settingsFormSubmitMessage] Text to be used as mask while submitting data.
    */
-  settingsFormSubmitMessage: NX.I18n.get('GLOBAL_SETTINGS_SAVING'),
+  settingsFormSubmitMessage: NX.I18n.get('SettingsForm_Submit_Message'),
 
   /**
    * @cfg {NX.util.condition.Condition} The condition to be satisfied in order for this form to be editable.
@@ -76,7 +77,7 @@ Ext.define('NX.view.SettingsForm', {
   editableCondition: undefined,
 
   /**
-   * @cfg {string} Optional text to be shown in case that form is not editable (condition is not satisfied).
+   * @cfg {String} Optional text to be shown in case that form is not editable (condition is not satisfied).
    */
   editableMarker: undefined,
 
@@ -91,8 +92,16 @@ Ext.define('NX.view.SettingsForm', {
   buttonAlign: 'left',
 
   buttons: [
-    { text: NX.I18n.get('GLOBAL_BUTTON_SAVE'), formBind: true, action: 'save', ui: 'nx-primary', bindToEnter: false },
-    { text: NX.I18n.get('GLOBAL_BUTTON_DISCARD'),
+    { 
+      text: NX.I18n.get('SettingsForm_Save_Button'), 
+      formBind: true, 
+      action: 'save', 
+      ui: 'nx-primary', 
+      bindToEnter: false 
+    },
+    { 
+      text: NX.I18n.get('SettingsForm_Discard_Button'), 
+      action: 'discard',
       handler: function () {
         var form = this.up('form'),
             record = form.getRecord();
@@ -130,22 +139,27 @@ Ext.define('NX.view.SettingsForm', {
 
     me.addEvents(
         /**
-         * @event recordloaded
          * Fires when a record is loaded via {@link Ext.form.Panel#loadRecord}.
+         *
+         * @event recordloaded
          * @param {Ext.form.Panel} this form
          * @param {Ext.data.Model} loaded record
          */
         'recordloaded',
+
         /**
-         * @event loaded
          * Fires after form was loaded via configured api.
+         *
+         * @event loaded
          * @param {Ext.form.Panel} this form
          * @param {Ext.form.action.Action} load action
          */
         'loaded',
+
         /**
-         * @event submitted
          * Fires after form was submitted via configured api.
+         *
+         * @event submitted
          * @param {Ext.form.Panel} this form
          * @param {Ext.form.action.Action} submit action
          */
@@ -154,8 +168,9 @@ Ext.define('NX.view.SettingsForm', {
   },
 
   /**
-   * @override
    * Fires 'recordloaded' after record was loaded.
+   *
+   * @override
    */
   loadRecord: function (record) {
     var me = this;
@@ -164,9 +179,10 @@ Ext.define('NX.view.SettingsForm', {
     me.fireEvent('recordloaded', me, record);
   },
 
-  /*
+  /**
+   * Reset the dirty state of the form.
+   *
    * @private
-   * Reset the dirty state of the form
    */
   resetDirtyState: function (form) {
     var realform = form.getForm();
@@ -174,8 +190,9 @@ Ext.define('NX.view.SettingsForm', {
   },
 
   /**
-   * @public
    * Sets the read only state for all fields of this form.
+   *
+   * @public
    * @param {boolean} editable
    */
   setEditable: function (editable) {

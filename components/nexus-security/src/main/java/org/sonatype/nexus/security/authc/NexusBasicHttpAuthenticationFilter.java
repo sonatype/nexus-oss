@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.security.authc;
 
 import java.io.IOException;
@@ -20,8 +19,10 @@ import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
@@ -29,6 +30,9 @@ import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.sonatype.nexus.security.SecurityFilter.ATTR_USER_ID;
+import static org.sonatype.nexus.security.SecurityFilter.ATTR_USER_PRINCIPAL;
 
 /**
  * Nexus security filter providing HTTP BASIC authentication support.
@@ -112,5 +116,27 @@ public class NexusBasicHttpAuthenticationFilter
     }
 
     super.cleanup(request, response, failure);
+  }
+
+  @Override
+  protected boolean onLoginSuccess(AuthenticationToken token,
+                                   Subject subject,
+                                   ServletRequest request,
+                                   ServletResponse response)
+      throws Exception
+  {
+    if (request instanceof HttpServletRequest) {
+      // Prefer the subject principal over the token's, as these could be different for token-based auth
+      Object principal = subject.getPrincipal();
+      if (principal == null) {
+        principal = token.getPrincipal();
+      }
+      String userId = principal.toString();
+
+      // Attach principal+userId to request so we can use that in the request-log
+      request.setAttribute(ATTR_USER_PRINCIPAL, principal);
+      request.setAttribute(ATTR_USER_ID, userId);
+    }
+    return super.onLoginSuccess(token, subject, request, response);
   }
 }

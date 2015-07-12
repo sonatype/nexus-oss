@@ -1,4 +1,16 @@
 {
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "case_insensitive_sort": {
+          "tokenizer": "keyword",
+          "filter": [
+            "lowercase"
+          ]
+        }
+      }
+    }
+  },
   "mappings": {
     "component": {
       "properties": {
@@ -36,18 +48,18 @@
         "group": {
           "type": "string",
           "fields": {
-            "raw": {
+            "case_insensitive": {
               "type": "string",
-              "index": "not_analyzed"
+              "analyzer": "case_insensitive_sort"
             }
           }
         },
         "name": {
           "type": "string",
           "fields": {
-            "raw": {
+            "case_insensitive": {
               "type": "string",
-              "index": "not_analyzed"
+              "analyzer": "case_insensitive_sort"
             }
           }
         },

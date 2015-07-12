@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -15,11 +15,10 @@ package org.sonatype.nexus.repository.maven.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Locale;
-
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.io.LimitedInputStream;
+import org.sonatype.nexus.common.text.Strings2;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -37,7 +36,8 @@ public class DigestExtractor
 {
   private static final int MAX_CHARS_NEEDED = 120;
 
-  private DigestExtractor() {}
+  private DigestExtractor() {
+  }
 
   /**
    * Extract the digest string from a stream, that carries a payload of a Maven sha1/md5 file. Method closes the
@@ -104,7 +104,7 @@ public class DigestExtractor
     if (!isDigest(digest) && raw.contains(" ")) {
       // check if the raw string is an uncompressed checksum with file name suffix, e.g.
       // 'DCAB 88FC 2A04 3C24 79A6 DE67 6A2F 8179 E9EA 2167 pom.xml'
-      digest = compress(raw.substring(0, raw.lastIndexOf(" ")).trim());
+      digest = compress(raw.substring(0, raw.lastIndexOf(' ')).trim());
     }
 
     if (isDigest(digest)) {
@@ -116,14 +116,20 @@ public class DigestExtractor
   }
 
   /**
-   * Returns {@code true} if the input string "looks like" digest hex (md5 or sha1).
+   * Returns {@code true} if the input string "looks like" digest hex (md5 or sha1). Method is safe to accept even
+   * {@code null}s, naturally that will result with {@code false} result.
    */
-  public static boolean isDigest(final String digest) {
+  public static boolean isDigest(@Nullable final String digest) {
+    if (Strings.isNullOrEmpty(digest)) {
+      return false;
+    }
     return digest.length() >= 32 && digest.matches("^[a-f0-9]+$");
   }
 
-  private static String compress(String digest) {
-    digest = digest.replaceAll(" ", "").toLowerCase(Locale.US);
-    return digest;
+  /**
+   * Removes white space and lower cases the digest string.
+   */
+  private static String compress(final String digest) {
+    return Strings2.lower(digest.replaceAll(" ", ""));
   }
 }

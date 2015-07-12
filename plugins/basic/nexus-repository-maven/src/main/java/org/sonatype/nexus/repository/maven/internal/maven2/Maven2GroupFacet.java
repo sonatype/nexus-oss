@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -40,10 +40,10 @@ import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -107,8 +107,8 @@ public class Maven2GroupFacet
     for (Map.Entry<Repository, Response> entry : responses.entrySet()) {
       if (entry.getValue().getStatus().getCode() == HttpStatus.OK) {
         final Response response = entry.getValue();
-        if (response instanceof PayloadResponse && ((PayloadResponse) response).getPayload() instanceof Content) {
-          metadataContents.put(entry.getKey(), (Content) ((PayloadResponse) response).getPayload());
+        if (response.getPayload() instanceof Content) {
+          metadataContents.put(entry.getKey(), (Content) response.getPayload());
         }
       }
     }
@@ -156,7 +156,7 @@ public class Maven2GroupFacet
     final Content content = new Content(
         new BytesPayload(
             byteArray,
-            Maven2Format.METADATA_CONTENT_TYPE
+            Maven2MimeRulesSource.METADATA_TYPE
         ));
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
     content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}");
@@ -174,7 +174,7 @@ public class Maven2GroupFacet
       final HashCode hashCode = hashCodes.get(hashType.getHashAlgorithm());
       if (hashCode != null) {
         final Content hashContent = new Content(
-            new StringPayload(hashCode.toString(), Maven2Format.CHECKSUM_CONTENT_TYPE));
+            new StringPayload(hashCode.toString(), Constants.CHECKSUM_CONTENT_TYPE));
         hashContent.getAttributes().set(Content.CONTENT_LAST_MODIFIED, now);
         mavenFacet.put(mavenPath.hash(hashType), hashContent);
       }
@@ -191,6 +191,7 @@ public class Maven2GroupFacet
       final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
       // group deletes md + hashes, but it should do only on md change in member
       if (!mavenPath.isHash() && mavenFacet.getMavenPathParser().isRepositoryMetadata(mavenPath)) {
+        UnitOfWork.begin(getRepository().facet(StorageFacet.class).txSupplier());
         try {
           final List<MavenPath> paths = Lists.newArrayList();
           paths.add(mavenPath.main());
@@ -202,6 +203,9 @@ public class Maven2GroupFacet
         catch (IOException e) {
           log.warn("Could not evict merged metadata from {} cache at {}", getRepository().getName(),
               mavenPath.getPath(), e);
+        }
+        finally {
+          UnitOfWork.end();
         }
       }
     }

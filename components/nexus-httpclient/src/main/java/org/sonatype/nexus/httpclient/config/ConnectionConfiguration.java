@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -17,6 +17,8 @@ import javax.annotation.Nullable;
 import org.sonatype.sisu.goodies.common.Time;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.base.Throwables;
 
 /**
  * Connection configuration.
@@ -27,6 +29,7 @@ public class ConnectionConfiguration
     implements Cloneable
 {
   @Nullable
+  @JsonSerialize(using = SecondsSerializer.class)
   @JsonDeserialize(using = SecondsDeserializer.class)
   private Time timeout;
 
@@ -35,8 +38,6 @@ public class ConnectionConfiguration
 
   @Nullable
   private String userAgentSuffix;
-
-  // TODO: query-string
 
   @Nullable
   private Boolean useTrustStore;
@@ -68,6 +69,15 @@ public class ConnectionConfiguration
   public Boolean getUseTrustStore() { return useTrustStore; }
 
   public void setUseTrustStore(@Nullable final Boolean useTrustStore) { this.useTrustStore = useTrustStore; }
+
+  public ConnectionConfiguration copy() {
+    try {
+      return (ConnectionConfiguration)clone();
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
+  }
 
   @Override
   public String toString() {

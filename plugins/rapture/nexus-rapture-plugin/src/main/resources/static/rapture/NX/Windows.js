@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -34,7 +34,7 @@ Ext.define('NX.Windows', {
    * @return Browser window object or {@code null} if unable to open.
    */
   open: function(url, name, specs, replace) {
-    var me = this, win;
+    var win;
 
     // apply default window specs if omitted, helps keep windows user-controllable on most browsers
     if (specs === undefined) {
@@ -42,12 +42,12 @@ Ext.define('NX.Windows', {
     }
 
     //<if debug>
-    me.logDebug('Opening window: url=' + url + ', name=' + name + ', specs=' + specs + ', replace=' + replace);
+    this.logDebug('Opening window: url=' + url + ', name=' + name + ', specs=' + specs + ', replace=' + replace);
     //</if>
 
     win = NX.global.open(url, name, specs, replace);
     if (win === null) {
-      NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_BLOCKED_POPUP_DANGER'), type: 'danger'});
+      NX.Messages.add({text: NX.I18n.get('Windows_Popup_Message'), type: 'danger'});
     }
     return win;
   }

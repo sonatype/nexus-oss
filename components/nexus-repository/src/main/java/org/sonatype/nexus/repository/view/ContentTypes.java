@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -23,5 +23,9 @@ public class ContentTypes
 
   public static final String TEXT_HTML = "text/html";
 
-  public static final String TEXT_XML = "text/xml";
+  public static final String APPLICATION_JSON = "application/json";
+
+  public static final String APPLICATION_XML = "application/xml";
+
+  public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 }

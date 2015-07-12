@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -148,11 +148,12 @@ public abstract class MetadataNode<T>
     return attributes().child(format());
   }
 
-  protected <T> T require(final T value, final String name) {
+  protected <V> V require(final V value, final String name) {
     checkState(value != null, "Missing property: %s", name);
     return value;
   }
 
+  @SuppressWarnings("unchecked")
   private T self() {
     return (T) this;
   }

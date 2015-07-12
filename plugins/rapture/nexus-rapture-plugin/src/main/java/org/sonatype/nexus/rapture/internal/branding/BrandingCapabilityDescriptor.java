@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,10 +19,10 @@ import java.util.Set;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.capability.CapabilityDescriptorSupport;
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
-import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.TextAreaFormField;
@@ -30,7 +30,6 @@ import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
 import com.google.common.collect.Lists;
-import org.jetbrains.annotations.NonNls;
 
 /**
  * {@link BrandingCapability} descriptor.
@@ -43,7 +42,6 @@ public class BrandingCapabilityDescriptor
     extends CapabilityDescriptorSupport<BrandingCapabilityConfiguration>
     implements Taggable
 {
-  @NonNls
   public static final String TYPE_ID = "rapture.branding";
 
   public static final CapabilityType TYPE = CapabilityType.capabilityType(TYPE_ID);

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,13 +20,15 @@
 Ext.define('NX.coreui.controller.Bundles', {
   extend: 'NX.controller.Drilldown',
   requires: [
+    'NX.view.info.Panel',
+    'NX.view.info.Entry',
     'NX.util.Url',
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-system-bundlelist',
-
+  masters: [
+    'nx-coreui-system-bundlelist'
+  ],
   stores: [
     'Bundle'
   ],
@@ -43,8 +45,8 @@ Ext.define('NX.coreui.controller.Bundles', {
   features: {
     mode: 'admin',
     path: '/System/Bundles',
-    text: NX.I18n.get('ADMIN_BUNDLES_TITLE'),
-    description: NX.I18n.get('ADMIN_BUNDLES_SUBTITLE'),
+    text: NX.I18n.get('Bundles_Text'),
+    description: NX.I18n.get('Bundles_Description'),
     view: 'NX.coreui.view.system.Bundles',
     iconConfig: {
       file: 'plugin.png',
@@ -65,6 +67,23 @@ Ext.define('NX.coreui.controller.Bundles', {
   /**
    * @override
    */
+  init: function() {
+    var me = this;
+
+    me.callParent();
+
+    me.listen({
+      store: {
+        '#Bundle': {
+          load: me.reselect
+        }
+      }
+    });
+  },
+
+  /**
+   * @override
+   */
   getDescription: function (model) {
     return model.get('name');
   },
@@ -78,22 +97,22 @@ Ext.define('NX.coreui.controller.Bundles', {
 
     if (Ext.isDefined(model)) {
       info = {};
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_ID')] = model.get('id');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_NAME')] = model.get('name');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_SYMBOLIC_NAME')] = model.get('symbolicName');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_VERSION')] = model.get('version');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_STATE')] = model.get('state');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_LOCATION')] = model.get('location');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_START_LEVEL')] = model.get('startLevel');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_LAST_MODIFIED')] = model.get('lastModified');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_FRAGMENT')] = model.get('fragment');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_FRAGMENTS')] = model.get('fragments');
-      info[NX.I18n.get('ADMIN_BUNDLES_SUMMARY_FRAGMENT_HOSTS')] = model.get('fragmentHosts');
+      info[NX.I18n.get('Bundles_ID_Info')] = model.get('id');
+      info[NX.I18n.get('Bundles_Name_Info')] = model.get('name');
+      info[NX.I18n.get('Bundles_SymbolicName_Info')] = model.get('symbolicName');
+      info[NX.I18n.get('Bundles_Version_Info')] = model.get('version');
+      info[NX.I18n.get('Bundles_State_Info')] = model.get('state');
+      info[NX.I18n.get('Bundles_Location_Info')] = model.get('location');
+      info[NX.I18n.get('Bundles_StartLevel_Info')] = model.get('startLevel');
+      info[NX.I18n.get('Bundles_LastModified_Info')] = model.get('lastModified');
+      info[NX.I18n.get('Bundles_Fragment_Info')] = model.get('fragment');
+      info[NX.I18n.get('Bundles_Fragments_Info')] = model.get('fragments');
+      info[NX.I18n.get('Bundles_FragmentHosts_Info')] = model.get('fragmentHosts');
 
       headers = model.get('headers');
       if (headers) {
         Ext.iterate(headers, function (key, value) {
-          info[NX.I18n.format('ADMIN_BUNDLES_SUMMARY_HEADER', key)] = value;
+          info[NX.I18n.format('Bundles_Summary_Info', key)] = value;
         });
       }
 

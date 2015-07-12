@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.transaction.Transaction;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
@@ -32,7 +34,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
  * @since 3.0
  */
 public interface StorageTx
-    extends AutoCloseable
+    extends Transaction
 {
   /**
    * Provides the underlying graph transaction.
@@ -41,6 +43,11 @@ public interface StorageTx
    * directly commit, rollback, or close the underlying transaction.
    */
   ODatabaseDocumentTx getDb();
+
+  /**
+   * Begins the transaction.
+   */
+  void begin();
 
   /**
    * Commits the transaction.
@@ -208,16 +215,52 @@ public interface StorageTx
   void deleteBucket(Bucket bucket);
 
   /**
-   * Creates a new Blob.
-   */
-  BlobRef createBlob(InputStream inputStream, Map<String, String> headers);
-
-  /**
    * Creates a new Blob and updates the given asset with a reference to it, hash metadata, size, and content type.
    * The old blob, if any, will be deleted.
+   *
+   * @param asset               the {@link Asset} that should reference newly created blob.
+   * @param blobName            blob name (must not be unique), but it will be used also in content validation. See
+   *                            {@link ContentValidator}.
+   * @param inputStream         the content to be streamed into blob store.
+   * @param hashAlgorithms      {@link HashAlgorithm}s to be applied while streaming to blob store, will be set
+   *                            in {@link Asset} attributes.
+   * @param headers             optional, custom headers for blob, if any.
+   * @param declaredContentType optional, the declared MIME type of the blob. See {@link ContentValidator}.
+   * @return Attached instance of {@link AssetBlob} of the newly created blob. As side effect, passed in {@link Asset}
+   * is modified too, but is unsaved. Caller must ensure {@link #saveAsset(Asset)} is invoked before this TX ends.
    */
-  BlobRef setBlob(InputStream inputStream, Map<String, String> headers, Asset asset,
-                  Iterable<HashAlgorithm> hashAlgorithms, String contentType);
+  AssetBlob setBlob(Asset asset,
+                    String blobName,
+                    InputStream inputStream,
+                    Iterable<HashAlgorithm> hashAlgorithms,
+                    @Nullable Map<String, String> headers,
+                    @Nullable String declaredContentType) throws IOException;
+
+  /**
+   * Creates a new Blob and returns its {@link AssetBlob}. Blobs created but not attached in a scope of a TX to any
+   * asset are considered as "orphans", and they will be deleted from blob store at the end of a TX.
+   *
+   * @param blobName            blob name (must not be unique), but it will be used also in content validation. See
+   *                            {@link ContentValidator}.
+   * @param inputStream         the content to be streamed into blob store.
+   * @param hashAlgorithms      {@link HashAlgorithm}s to be applied while streaming to blob store, returned in {@link
+   *                            AssetBlob}.
+   * @param headers             optional, custom headers for blob, if any.
+   * @param declaredContentType optional, the declared MIME type of the blob. See {@link ContentValidator}.
+   * @return Unattached instance of {@link AssetBlob} that should be attached to some {@link Asset} during this
+   * transaction using {@link #attachBlob(Asset, AssetBlob)} method.
+   */
+  AssetBlob createBlob(String blobName,
+                       InputStream inputStream,
+                       Iterable<HashAlgorithm> hashAlgorithms,
+                       @Nullable Map<String, String> headers,
+                       @Nullable String declaredContentType) throws IOException;
+
+  /**
+   * Attaches a Blob to asset and updates the given asset with a reference to it, hash metadata, size, and content
+   * type. The asset's old blob, if any, will be deleted.
+   */
+  void attachBlob(Asset asset, AssetBlob assetBlob);
 
   /**
    * Gets a Blob, or {@code null if not found}.

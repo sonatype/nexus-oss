@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -12,10 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.maven.deploy;
 
-import javax.inject.Inject;
-
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -39,9 +36,6 @@ import static org.hamcrest.Matchers.hasSize;
 public class MavenDeployIT
     extends MavenITSupport
 {
-  @Inject
-  private RepositoryManager repositoryManager;
-
   private Repository mavenSnapshots;
 
   private Repository mavenReleases;

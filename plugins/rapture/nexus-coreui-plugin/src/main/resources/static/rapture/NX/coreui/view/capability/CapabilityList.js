@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-capability-list',
   requires: [
-    'NX.I18n'
+    'NX.I18n',
+    'NX.ext.grid.column.Renderers'
   ],
 
   store: 'Capability',
@@ -35,13 +36,28 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
       dataIndex: 'state',
       hideable: false
     },
-    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_TYPE_COLUMN'), dataIndex: 'typeName', flex: 1 },
-    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', flex: 1, groupable: false },
-    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NOTES_COLUMN'), dataIndex: 'notes', flex: 1 }
+    {
+      text: NX.I18n.get('Capability_CapabilityList_Type_Header'),
+      dataIndex: 'typeName',
+      flex: 1
+    },
+    {
+      text: NX.I18n.get('Capability_CapabilityList_Description_Header'),
+      dataIndex: 'description',
+      flex: 1,
+      groupable: false,
+      renderer: NX.ext.grid.column.Renderers.optionalData
+    },
+    {
+      text: NX.I18n.get('Capability_CapabilityList_Notes_Header'),
+      dataIndex: 'notes',
+      flex: 1,
+      renderer: NX.ext.grid.column.Renderers.optionalData
+    }
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('ADMIN_CAPABILITIES_LIST_EMPTY_STATE'),
+    emptyText: NX.I18n.get('Capability_CapabilityList_EmptyText'),
     deferEmptyText: false,
     getRowClass: function (record) {
       if (record.get('enabled') && !record.get('active')) {
@@ -57,7 +73,7 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NEW_BUTTON'),
+        text: NX.I18n.get('Capability_CapabilityList_New_Button'),
         action: 'new',
         disabled: true,
         glyph: 'xf055@FontAwesome' /* fa-plus-circle */
@@ -73,8 +89,15 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_CAPABILITIES_LIST_FILTER_EMPTY') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Capability_CapabilityList_Filter_EmptyText') }
   ],
+
+  /**
+   * Copy of original column configuration, to support adding dynamic tag columns.
+   *
+   * @public
+   */
+  originalColumns: undefined,
 
   /**
    * @override

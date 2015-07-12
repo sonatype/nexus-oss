@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,8 +24,8 @@ Ext.define('NX.view.header.SignOut', {
     'NX.I18n'
   ],
 
-  text: NX.I18n.get('GLOBAL_HEADER_SIGN_OUT'),
-  tooltip: NX.I18n.get('GLOBAL_HEADER_SIGN_OUT_TOOLTIP'),
+  text: NX.I18n.get('Header_SignOut_Text'),
+  tooltip: NX.I18n.get('Header_SignOut_Tooltip'),
   glyph: 'xf08b@FontAwesome', // fa-sign-out
   hidden: true
 

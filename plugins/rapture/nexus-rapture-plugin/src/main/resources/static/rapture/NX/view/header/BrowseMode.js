@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -45,7 +45,7 @@ Ext.define('NX.view.header.BrowseMode', {
    * @cfg collapseMenu If menu should be collapsed automatically when mode is selected
    */
   collapseMenu: true,
-  title: NX.I18n.get('GLOBAL_HEADER_BROWSE_TITLE'),
-  tooltip: NX.I18n.get('GLOBAL_HEADER_BROWSE_TOOLTIP'),
+  title: NX.I18n.get('Header_BrowseMode_Title'),
+  tooltip: NX.I18n.get('Header_BrowseMode_Tooltip'),
   glyph: 'xf1b2@FontAwesome' /* fa-cube */
 });

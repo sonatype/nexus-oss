@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -47,17 +47,7 @@ public class NugetPushHandler
     try {
       switch (action) {
         case HttpMethods.PUT:
-          checkArgument(request.isMultipart(), "Multipart request required");
-
-          boolean created = false;
-          final Iterable<Payload> multiparts = request.getMultiparts();
-          for (Payload payload : multiparts) {
-            storePayload(context, payload);
-            created = true;
-          }
-          checkArgument(created, "No content was provided");
-
-          return HttpResponses.created(new StringPayload(EMPTY_HTMLDOC, Charsets.UTF_8, "text/html"));
+          return push(context, request);
         default:
           return HttpResponses.methodNotAllowed(action, HttpMethods.PUT);
       }
@@ -65,6 +55,22 @@ public class NugetPushHandler
     catch (Exception e) {
       return convertToXmlError(e);
     }
+  }
+
+  private Response push(@Nonnull final Context context, final Request request)
+      throws IOException, NugetPackageException
+  {
+    checkArgument(request.isMultipart(), "Multipart request required");
+
+    boolean created = false;
+    final Iterable<Payload> multiparts = request.getMultiparts();
+    for (Payload payload : multiparts) {
+      storePayload(context, payload);
+      created = true;
+    }
+    checkArgument(created, "No content was provided");
+
+    return HttpResponses.created(new StringPayload(EMPTY_HTMLDOC, Charsets.UTF_8, "text/html"));
   }
 
   private void storePayload(final Context context, final Payload payload) throws IOException, NugetPackageException

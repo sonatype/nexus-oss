@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -15,17 +15,18 @@ package org.sonatype.nexus.testsuite.repository;
 import java.io.IOException;
 import java.net.URI;
 
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import javax.annotation.Nonnull;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.util.EntityUtils;
-import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Support class for HTTP-based repository test clients.
@@ -69,7 +70,7 @@ public class FormatClientSupport
     return response;
   }
 
-  @NotNull
+  @Nonnull
   protected URI resolve(final String path) {
     return repositoryBaseUri.resolve(path);
   }
@@ -77,5 +78,10 @@ public class FormatClientSupport
   public static int status(HttpResponse response) {
     checkNotNull(response);
     return response.getStatusLine().getStatusCode();
+  }
+
+  public static byte[] bytes(HttpResponse response) throws IOException {
+    checkState(response.getEntity() != null);
+    return EntityUtils.toByteArray(response.getEntity());
   }
 }

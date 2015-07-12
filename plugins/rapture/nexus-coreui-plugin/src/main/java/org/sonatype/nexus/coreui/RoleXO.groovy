@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,7 @@ import org.sonatype.nexus.validation.group.Update
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
+import org.hibernate.validator.constraints.ScriptAssert
 
 /**
  * Role exchange object.
@@ -27,6 +28,7 @@ import org.hibernate.validator.constraints.NotEmpty
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
+@ScriptAssert(lang = 'groovy', script = '!_this.roles?.contains(_this.id)', message = 'A Role cannot contain itself')
 class RoleXO
 {
   @NotEmpty

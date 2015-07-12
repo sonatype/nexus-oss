@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
@@ -98,8 +99,8 @@ public class Maven2MetadataMerger
     }
     catch (InvalidVersionSpecificationException e) {
       // this never happens, see implementation
+      throw Throwables.propagate(e);
     }
-    return null;
   }
 
   public static class MetadataEnvelope {
@@ -155,7 +156,7 @@ public class Maven2MetadataMerger
       // the last non-snapshot in ordered list, may be null
       String release = null;
       for (int i = result.getVersioning().getVersions().size() - 1; i >= 0; i--) {
-        if (!result.getVersioning().getVersions().get(i).endsWith("SNAPSHOT")) {
+        if (!result.getVersioning().getVersions().get(i).endsWith(Constants.SNAPSHOT_VERSION_SUFFIX)) {
           release = result.getVersioning().getVersions().get(i);
           break;
         }

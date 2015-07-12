@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SUMMARY_TAB'),
+  title: NX.I18n.get('Capability_CapabilitySummary_Title'),
   autoScroll: true,
 
   layout: {
@@ -48,7 +48,6 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
           ui: 'nx-subsection',
           itemId: 'nx-coreui-capability-summary-subsection',
           frame: true,
-          title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SUMMARY_SECTION'),
           layout: 'column',
           weight: 10,
           items: [
@@ -62,33 +61,33 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
           xtype: 'nx-coreui-capability-status',
           ui: 'nx-subsection',
           frame: true,
-          title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_STATUS_SECTION'),
+          title: NX.I18n.get('Capability_CapabilitySummary_Status_Title'),
           weight: 20
         },
         {
           xtype: 'nx-coreui-capability-about',
           ui: 'nx-subsection',
           frame: true,
-          title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_ABOUT_SECTION'),
+          title: NX.I18n.get('Capability_CapabilitySummary_About_Title'),
           weight: 30
         },
         {
           xtype: 'nx-settingsform',
           itemId: 'nx-coreui-capability-notes-subsection',
-          title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_NOTES_SECTION'),
+          title: NX.I18n.get('Capability_CapabilitySummary_Notes_Title'),
           weight: 40,
           api: {
             submit: 'NX.direct.capability_Capability.updateNotes'
           },
           settingsFormSuccessMessage: function (data) {
-            var description = NX.I18n.format('ADMIN_CAPABILITIES_UPDATE_SUCCESS', data['typeName']);
+            var description = NX.I18n.format('Capabilities_Update_Success', data['typeName']);
             if (data['description']) {
               description += ' - ' + data['description'];
             }
             return description;
           },
           editableCondition: NX.Conditions.isPermitted('nexus:capabilities:update'),
-          editableMarker: NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_ERROR'),
+          editableMarker: NX.I18n.get('Capabilities_Update_Error'),
           items: [
             {
               xtype: 'hiddenfield',
@@ -96,7 +95,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
             },
             {
               xtype: 'textarea',
-              helpText: NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_NOTES_HELP'),
+              helpText: NX.I18n.get('Capability_CapabilitySummary_Notes_HelpText'),
               name: 'notes',
               allowBlank: true,
               anchor: '100%'

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,24 +18,21 @@
  * @since 3.0
  */
 Ext.define('NX.controller.dev.Developer', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.State',
     'NX.Messages'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'dev.Panel',
     'dev.Tests',
     'dev.Styles',
     'dev.Icons',
-    'dev.Messages',
     'dev.Features',
     'dev.State',
-    'dev.Stores'
+    'dev.Stores',
+    'dev.Logging'
   ],
 
   refs: [
@@ -68,6 +65,8 @@ Ext.define('NX.controller.dev.Developer', {
         'nx-dev-panel tool[type=maximize]': {
           click: me.onMaximize
         },
+
+        // Tests actions
         'nx-dev-tests button[action=testError]': {
           click: me.testError
         },
@@ -84,23 +83,26 @@ Ext.define('NX.controller.dev.Developer', {
     });
   },
 
-  onLaunch: function(){
+  /**
+   * @override
+   */
+  onLaunch: function () {
     var me = this;
-    Ext.each(Ext.ComponentQuery.query('nx-dev-panel'), function(panel){
+    Ext.each(Ext.ComponentQuery.query('nx-dev-panel'), function (panel) {
       me.manageDeveloperPanel(panel);
     });
   },
 
   /**
-   * @private
    * Show/Hide developer panel based on debug state.
+   *
+   * @private
    * @param {Ext.Panel} developerPanel
    */
   manageDeveloperPanel: function (developerPanel) {
-    var me = this,
-        debug = NX.State.getValue('debug');
+    var debug = NX.State.getValue('debug');
 
-    developerPanel = developerPanel || me.getDeveloper();
+    developerPanel = developerPanel || this.getDeveloper();
 
     if (developerPanel) {
       if (debug) {
@@ -119,33 +121,34 @@ Ext.define('NX.controller.dev.Developer', {
    */
   onMaximize: function(tool) {
     var panel = tool.up('nx-dev-panel'),
-        container = panel.up('container'),
+        tabs = panel.down('tabpanel'),
         win;
 
-    container.remove(panel, false);
-    panel.getHeader().hide();
+    panel.remove(tabs, false);
 
     win = Ext.create('Ext.window.Window', {
+      title: panel.title,
+      iconCls: panel.iconCls,
+      glyph: panel.glyph,
+
       maximized: true,
       autoScroll: true,
       closable: false,
+
       layout: 'fit',
-      items: panel,
+      items: tabs,
       tools: [
         {
           type: 'close',
-          handler: function() {
-            win.hide(panel, function() {
-              win.remove(panel, false);
-              panel.getHeader().show();
-              container.add(panel);
+          handler: function () {
+            win.hide(panel, function () {
+              win.remove(tabs, false);
+              panel.add(tabs);
               win.destroy();
             });
           }
         }
-      ],
-      title: panel.title,
-      iconCls: panel.iconCls
+      ]
     });
 
     win.show(panel);
@@ -175,8 +178,6 @@ Ext.define('NX.controller.dev.Developer', {
    * @private
    */
   testMessages: function () {
-    var me = this;
-
     Ext.each(['default', 'primary', 'danger', 'warning', 'success'], function (type) {
       NX.Messages.add({
         type: type,

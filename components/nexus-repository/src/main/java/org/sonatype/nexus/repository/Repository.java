@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -104,8 +104,13 @@ public interface Repository
   /**
    * Returns a facet instance for the given type.
    *
-   * @throws MissingFacetException  Request facet type was not previously attached.
+   * @throws MissingFacetException Request facet type was not previously attached.
    */
   @Nonnull
   <T extends Facet> T facet(Class<T> type) throws MissingFacetException;
+
+  /**
+   * Returns the URL for the root of the repository, without its trailing slash.
+   */
+  String getUrl();
 }

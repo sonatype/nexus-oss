@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -34,29 +34,29 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
     me.settingsForm = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: NX.I18n.get('ADMIN_SMTP_UPDATE_SUCCESS'),
+        settingsFormSuccessMessage: NX.I18n.get('System_SmtpSettings_Update_Success'),
         api: {
           load: 'NX.direct.coreui_Email.read',
           submit: 'NX.direct.coreui_Email.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings:update'),
-        editableMarker: NX.I18n.get('ADMIN_SMTP_UPDATE_ERROR'),
+        editableMarker: NX.I18n.get('System_SmtpSettings_Update_Error'),
 
         items: [
           {
             xtype: 'checkbox',
             name: 'enabled',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_ENABLED')
+            fieldLabel: NX.I18n.get('System_SmtpSettings_Enabled_FieldLabel')
           },
           {
             xtype: 'textfield',
             name: 'host',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_HOST')
+            fieldLabel: NX.I18n.get('System_SmtpSettings_Host_FieldLabel')
           },
           {
             xtype: 'numberfield',
             name: 'port',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_PORT'),
+            fieldLabel: NX.I18n.get('System_SmtpSettings_Port_FieldLabel'),
             minValue: 1,
             maxValue: 65536,
             allowDecimals: false,
@@ -65,24 +65,24 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
           {
             xtype: 'nx-email',
             name: 'fromAddress',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_FROM_ADDRESS')
+            fieldLabel: NX.I18n.get('System_SmtpSettings_FromAddress_FieldLabel')
           },
           {
             xtype: 'textfield',
             name: 'subjectPrefix',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_SUBJECT_PREFIX'),
+            fieldLabel: NX.I18n.get('System_SmtpSettings_SubjectPrefix_FieldLabel'),
             allowBlank: true
           },
           {
             xtype: 'textfield',
             name: 'username',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_USERNAME'),
+            fieldLabel: NX.I18n.get('System_SmtpSettings_Username_FieldLabel'),
             allowBlank: true
           },
           {
             xtype: 'nx-password',
             name: 'password',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_PASSWORD'),
+            fieldLabel: NX.I18n.get('System_SmtpSettings_Password_FieldLabel'),
             allowBlank: true
           }
         ]
@@ -93,7 +93,7 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
 
     me.down('nx-settingsform').getDockedItems('toolbar[dock="bottom"]')[0].add({
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_SMTP_VERIFY_BUTTON'),
+      text: NX.I18n.get('System_SmtpSettings_VerifyServer_Button'),
       formBind: true,
       action: 'verify',
       glyph: 'xf003@FontAwesome' /* fa-envelope-o */

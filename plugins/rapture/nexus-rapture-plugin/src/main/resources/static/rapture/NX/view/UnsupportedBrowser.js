@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,6 +21,7 @@ Ext.define('NX.view.UnsupportedBrowser', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-unsupported-browser',
   requires: [
+    'NX.I18n',
     'NX.Icons'
   ],
 
@@ -50,7 +51,7 @@ Ext.define('NX.view.UnsupportedBrowser', {
         items: [
           {
             xtype: 'label',
-            text: NX.I18n.get('GLOBAL_UNSUPPORTED_TITLE'),
+            text: NX.I18n.get('UnsupportedBrowser_Title'),
             // TODO replace style with UI
             style: {
               'color': '#000000',
@@ -62,7 +63,7 @@ Ext.define('NX.view.UnsupportedBrowser', {
           },
           {
             xtype: 'label',
-            text: NX.I18n.get('GLOBAL_UNSUPPORTED_ALTERNATIVES'),
+            text: NX.I18n.get('UnsupportedBrowser_Alternatives_Text'),
             // TODO replace style with UI
             style: {
               'font-size': '10px'
@@ -82,7 +83,7 @@ Ext.define('NX.view.UnsupportedBrowser', {
               { xtype: 'image', width: 72, height: 72, src: NX.Icons.url('safari', 'x72') }
             ]
           },
-          { xtype: 'button', text: NX.I18n.get('GLOBAL_UNSUPPORTED_CONTINUE_BUTTON'), action: 'continue' }
+          { xtype: 'button', text: NX.I18n.get('UnsupportedBrowser_Continue_Button'), action: 'continue' }
         ]
       },
       {

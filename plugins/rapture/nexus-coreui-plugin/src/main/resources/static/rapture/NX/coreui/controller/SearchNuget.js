@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,9 +18,9 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SearchNuget', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
-    'NX.I18n',
+    'NX.I18n'
   ],
 
   /**
@@ -33,17 +33,17 @@ Ext.define('NX.coreui.controller.SearchNuget', {
     search.registerCriteria([
       {
         id: 'attributes.nuget.id',
-        group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_NUGET'),
+        group: NX.I18n.get('SearchNuget_Group'),
         config: {
-          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_NUGET_ID'),
+          fieldLabel: NX.I18n.get('SearchNuget_ID_FieldLabel'),
           width: 300
         }
       },
       {
-        id: 'attributes.nuget.tags',
-        group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_NUGET'),
+        id: 'assets.attributes.nuget.tags',
+        group: NX.I18n.get('SearchNuget_Group'),
         config: {
-          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_NUGET_TAGS'),
+          fieldLabel: NX.I18n.get('SearchNuget_Tags_FieldLabel'),
           width: 300
         }
       }
@@ -52,13 +52,13 @@ Ext.define('NX.coreui.controller.SearchNuget', {
     search.registerFilter({
       id: 'nuget',
       name: 'NuGet',
-      text: NX.I18n.get('BROWSE_SEARCH_NUGET_TITLE'),
-      description: NX.I18n.get('BROWSE_SEARCH_NUGET_SUBTITLE'),
+      text: NX.I18n.get('SearchNuget_Text'),
+      description: NX.I18n.get('SearchNuget_Description'),
       readOnly: true,
       criterias: [
         { id: 'format', value: 'nuget', hidden: true },
         { id: 'attributes.nuget.id' },
-        { id: 'attributes.nuget.tags' }
+        { id: 'assets.attributes.nuget.tags' }
       ]
     }, me);
   }

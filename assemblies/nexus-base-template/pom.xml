@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -135,15 +135,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-timeline-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-plugin</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -311,9 +302,9 @@
 
                 <!-- trim out various enterprise/deployment features we don't need at the moment -->
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg">
-                  <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.3/xml/features"/>
-                  <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.1.4/xml/features"/>
-                  <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.3/xml/features"/>
+                  <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.4/xml/features"/>
+                  <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.2.3/xml/features"/>
+                  <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.4/xml/features"/>
                   <replacefilter token=",kar,ssh,management"/>
                   <replacefilter token=",region"/>
                 </replace>
@@ -351,7 +342,6 @@
             <feature>nexus-ssl-plugin</feature>
             <feature>nexus-ldap-plugin</feature>
             <feature>nexus-timeline-plugin</feature>
-            <feature>nexus-capabilities-plugin</feature>
             <feature>nexus-logging-plugin</feature>
             <feature>nexus-atlas-plugin</feature>
             <feature>nexus-wonderland-plugin</feature>

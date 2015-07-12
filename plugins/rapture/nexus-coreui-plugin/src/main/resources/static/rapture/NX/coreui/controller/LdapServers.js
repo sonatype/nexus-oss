@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -25,9 +25,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-ldapserver-list',
-
+  masters: [
+    'nx-coreui-ldapserver-list'
+  ],
   models: [
     'LdapServer'
   ],
@@ -71,8 +71,8 @@ Ext.define('NX.coreui.controller.LdapServers', {
   features: {
     mode: 'admin',
     path: '/Security/LDAP',
-    text: NX.I18n.get('ADMIN_LDAP_TITLE'),
-    description: NX.I18n.get('ADMIN_LDAP_SUBTITLE'),
+    text: NX.I18n.get('LdapServers_Text'),
+    description: NX.I18n.get('LdapServers_Description'),
     view: { xtype: 'nx-coreui-ldapserver-feature' },
     iconConfig: {
       file: 'book_addresses.png',
@@ -96,6 +96,11 @@ Ext.define('NX.coreui.controller.LdapServers', {
       controller: {
         '#Refresh': {
           refresh: me.loadTemplates
+        }
+      },
+      store: {
+        '#LdapServer': {
+          load: me.reselect
         }
       },
       component: {
@@ -180,11 +185,10 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    */
   showConnectionPanel: function() {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_LDAP_CREATE_CONNECTION'));
+    me.setItemName(1, NX.I18n.get('LdapServers_CreateConnection_Title'));
     me.loadCreateWizard(1, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -206,11 +210,10 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    */
   showUserAndGroupPanel: function() {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(2, NX.I18n.get('ADMIN_LDAP_CREATE_GROUP'));
+    me.setItemName(2, NX.I18n.get('LdapServers_CreateUsersAndGroups_Title'));
     me.loadCreateWizard(2, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -258,17 +261,17 @@ Ext.define('NX.coreui.controller.LdapServers', {
     Ext.apply(modelData, values);
 
     // Apply masks
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_LDAP_UPDATE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('LdapServers_Update_Mask'));
     NX.direct.ldap_LdapServer.update(modelData, function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: NX.I18n.format('ADMIN_LDAP_UPDATE_SUCCESS',
+            text: NX.I18n.format('LdapServers_Update_Success',
               me.getDescription(me.getLdapServerModel().create(response.data))),
             type: 'success'
           });
-          me.loadStore(Ext.emptyFn);
+          me.getStore('LdapServer').load();
         }
       }
     });
@@ -289,17 +292,17 @@ Ext.define('NX.coreui.controller.LdapServers', {
     Ext.apply(values, connectionForm.getForm().getFieldValues());
     Ext.apply(values, userGroupForm.getForm().getFieldValues());
 
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_LDAP_CREATE_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('LdapServers_Create_Mask'));
     NX.direct.ldap_LdapServer.create(values, function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: NX.I18n.format('ADMIN_LDAP_CREATE_SUCCESS',
+            text: NX.I18n.format('LdapServers_Create_Success',
               me.getDescription(me.getLdapServerModel().create(response.data))),
             type: 'success'
           });
-          me.loadStoreAndSelect(response.data.id, false);
+          me.getStore('LdapServer').load();
         }
       }
     });
@@ -314,7 +317,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         list = me.getList();
 
     if (list) {
-      me.getLdapSchemaTemplateStore().load();
+      me.getStore('LdapSchemaTemplate').load();
     }
   },
 
@@ -323,10 +326,8 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Enable 'Change Order' when user has 'update' permission.
    */
   bindChangeOrderButton: function(button) {
-    var me = this;
-
     button.mon(
-        NX.Conditions.isPermitted(me.permission + ':update'),
+        NX.Conditions.isPermitted(this.permission + ':update'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -340,10 +341,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Enable 'ClearCache' when user has 'delete' permission and there is at least one LDAP server configured.
    */
   bindClearCacheButton: function(button) {
-    var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission + ':delete'),
+            NX.Conditions.isPermitted(this.permission + ':delete'),
             NX.Conditions.storeHasRecords('LdapServer')
         ),
         {
@@ -365,9 +365,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
         description = me.getDescription(model);
 
     NX.direct.ldap_LdapServer.remove(model.getId(), function(response) {
-      me.loadStore();
+      me.getStore('LdapServer').load();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_LDAP_DELETE_SUCCESS', description), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('LdapServers_Delete_Success', description), type: 'success' });
       }
     });
   },
@@ -377,15 +377,13 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Change LDAP servers order.
    */
   changeOrder: function(button) {
-    var me = this,
-        win = button.up('window'),
+    var win = button.up('window'),
         order = button.up('form').down('nx-itemorderer').getValue();
 
     NX.direct.ldap_LdapServer.changeOrder(order, function(response) {
       if (Ext.isObject(response) && response.success) {
-        me.loadStore();
         win.close();
-        NX.Messages.add({ text: NX.I18n.get('ADMIN_LDAP_ORDER_SUCCESS'), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.get('LdapServers_ChangeOrder_Success'), type: 'success' });
       }
     });
   },
@@ -397,7 +395,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
   clearCache: function(button) {
     NX.direct.ldap_LdapServer.clearCache(function(response) {
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: NX.I18n.get('ADMIN_LDAP_DETAILS_CLEAR_CACHE_SUCCESS'), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.get('LdapServers_ClearCache_Success'), type: 'success' });
       }
     });
   },
@@ -411,12 +409,12 @@ Ext.define('NX.coreui.controller.LdapServers', {
         values = form.getForm().getFieldValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
-    form.getEl().mask(NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_CONNECTION_MASK', url));
+    form.getEl().mask(NX.I18n.format('LdapServers_VerifyConnection_Mask', url));
 
     NX.direct.ldap_LdapServer.verifyConnection(values, function(response) {
       form.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_CONNECTION_SUCCESS', url), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('LdapServers_VerifyConnection_Success', url), type: 'success' });
       }
     });
   },
@@ -430,12 +428,12 @@ Ext.define('NX.coreui.controller.LdapServers', {
         values = me.getValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
-    me.getMain().getEl().mask(NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_MAPPING_MASK', url));
+    me.getMain().getEl().mask(NX.I18n.format('LdapServers_VerifyMapping_Mask', url));
 
     NX.direct.ldap_LdapServer.verifyUserMapping(values, function(response) {
       me.getMain().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({text: NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_MAPPING_SUCCESS', url), type: 'success'});
+        NX.Messages.add({text: NX.I18n.format('LdapServers_VerifyMapping_Success', url), type: 'success'});
         Ext.widget('nx-coreui-ldapserver-userandgroup-testresults', {mappedUsers: response.data});
       }
     });
@@ -453,22 +451,21 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Verify LDAP login.
    */
   verifyLogin: function(button) {
-    var me = this,
-        win = button.up('window'),
+    var win = button.up('window'),
         form = button.up('form'),
         loginValues = form.getForm().getFieldValues(),
         userName = NX.util.Base64.encode(loginValues.username),
         userPass = NX.util.Base64.encode(loginValues.password),
-        values = me.getValues(),
+        values = this.getValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
-    form.getEl().mask(NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_LOGIN_MASK', url));
+    form.getEl().mask(NX.I18n.format('LdapServers_VerifyLogin_Mask', url));
 
     NX.direct.ldap_LdapServer.verifyLogin(values, userName, userPass, function(response) {
       form.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         win.close();
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_LDAP_DETAILS_VERIFY_LOGIN_SUCCESS', url), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('LdapServers_VerifyLogin_Success', url), type: 'success' });
       }
     });
   },
@@ -478,8 +475,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Get form values from connection adn user/group form.
    */
   getValues: function() {
-    var me = this,
-        feature = me.getFeature(),
+    var feature = this.getFeature(),
         values = {}, url, connectionForm, userGroupForm;
 
     if (feature.down('nx-coreui-ldapserver-connection-add')) {

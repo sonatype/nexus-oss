@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -26,7 +26,7 @@ Ext.define('NX.coreui.view.logging.LogMark', {
   ],
   ui: 'nx-inset',
 
-  title: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_TITLE'),
+  title: NX.I18n.get('Logging_LogMark_Title'),
   defaultFocus: 'message',
 
   items: {
@@ -35,15 +35,15 @@ Ext.define('NX.coreui.view.logging.LogMark', {
     defaults: {
       anchor: '100%'
     },
-    settingsFormSuccessMessage: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_SUCCESS'),
+    settingsFormSuccessMessage: NX.I18n.get('Logging_LogMark_Success'),
     settingsFormSubmitOnEnter: true,
-    editableMarker: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_ERROR'),
+    editableMarker: NX.I18n.get('Logging_LogMark_Error'),
     items: [
       {
         xtype: 'textfield',
         name: 'message',
         itemId: 'message',
-        fieldLabel: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE'),
+        fieldLabel: NX.I18n.get('Logging_LogMark_FieldLabel'),
         allowBlank: false
       }
     ]
@@ -55,12 +55,9 @@ Ext.define('NX.coreui.view.logging.LogMark', {
   initComponent: function () {
     var me = this;
 
-    // FIXME: This does nothing; https://issues.sonatype.org/browse/NEXUS-8647
-    me.editableCondition = NX.Conditions.isPermitted('nexus:logging:mark');
-
     me.items.buttons = [
-      { text: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary', bindToEnter: me.items.settingsFormSubmitOnEnter },
-      { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler:
+      { text: NX.I18n.get('Logging_LogViewer_Mark_Button'), action: 'add', formBind: true, ui: 'nx-primary', bindToEnter: me.items.settingsFormSubmitOnEnter },
+      { text: NX.I18n.get('Add_Cancel_Button'), handler:
         function() {
           me.close();
         }

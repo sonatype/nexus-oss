@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -16,6 +16,8 @@ import java.util.Arrays;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+
+import com.google.common.base.Throwables;
 
 /**
  * Proxy configuration.
@@ -34,6 +36,7 @@ public class ProxyConfiguration
   private ProxyServerConfiguration https;
 
   @Nullable
+  @NonProxyHosts
   private String[] nonProxyHosts;
 
   @Nullable
@@ -61,6 +64,25 @@ public class ProxyConfiguration
 
   public void setNonProxyHosts(@Nullable final String[] nonProxyHosts) {
     this.nonProxyHosts = nonProxyHosts;
+  }
+
+  public ProxyConfiguration copy() {
+    try {
+      ProxyConfiguration copy = (ProxyConfiguration)clone();
+      if (http != null) {
+        copy.http = http.copy();
+      }
+      if (https != null) {
+        copy.https = https.copy();
+      }
+      if (nonProxyHosts != null) {
+        copy.nonProxyHosts = nonProxyHosts.clone();
+      }
+      return copy;
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override

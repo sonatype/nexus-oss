@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -28,9 +28,9 @@
   <packaging>pom</packaging>
 
   <properties>
-    <groovy.version>2.3.7</groovy.version>
+    <groovy.version>2.4.3</groovy.version>
     <ant.version>1.9.3</ant.version>
-    <spock.version>1.0-groovy-2.3</spock.version>
+    <spock.version>1.0-groovy-2.4</spock.version>
   </properties>
 
   <!--

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,10 +21,12 @@ Ext.define('NX.view.dev.Stores', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dev-stores',
   requires: [
-    'Ext.data.Store'
+    'Ext.data.Store',
+    'Ext.data.StoreManager'
   ],
 
   title: 'Stores',
+  layout: 'fit',
 
   /**
    * @override
@@ -33,56 +35,63 @@ Ext.define('NX.view.dev.Stores', {
     var me = this;
 
     Ext.apply(me, {
-      items: {
-        xtype: 'panel',
-        tbar:[
-          {
-            xtype: 'combo',
-            name: 'storeId',
-            emptyText: 'select a store',
-            queryMode: 'local',
-            displayField: 'id',
-            valueField: 'id',
-            trigger2Cls: 'x-form-search-trigger',
-            onTrigger2Click: function () {
-              this.getStore().load();
-            },
-            store: Ext.create('Ext.data.Store', {
-              fields: ['id'],
-              data: Ext.data.StoreManager,
-              proxy: {
-                type: 'memory',
-                reader: {
-                  type: 'json',
-                  read: function (data) {
-                    var me = this,
-                        stores = [];
+      items: [
+        {
+          xtype: 'label',
+          text: 'No store selected',
+          padding: '10 10 10 10'
+        }
+      ],
 
-                    data.each(function (store) {
-                      stores.push({
-                        id: store.storeId
-                      });
+      tbar: [
+        {
+          xtype: 'combo',
+          name: 'storeId',
+          width: 300,
+          emptyText: 'select a store',
+          queryMode: 'local',
+          displayField: 'id',
+          valueField: 'id',
+          trigger2Cls: 'x-form-search-trigger',
+          onTrigger2Click: function () {
+            this.getStore().load();
+          },
+          store: Ext.create('Ext.data.Store', {
+            fields: ['id'],
+            data: Ext.data.StoreManager,
+            proxy: {
+              type: 'memory',
+              reader: {
+                type: 'json',
+                read: function (data) {
+                  var stores = [];
+
+                  data.each(function (store) {
+                    stores.push({
+                      id: store.storeId
                     });
+                  });
 
-                    return me.readRecords(stores);
-                  }
+                  return this.readRecords(stores);
                 }
-              },
-              sorters: { property: 'id', direction: 'ASC' }
-            })
-          },
-          {
-            xtype: 'button',
-            text: 'Load store',
-            action: 'load'
-          },
-          {
-            xtype: 'button',
-            text: 'Clear store',
-            action: 'clear'
-          }
-        ]
-      }
+              }
+            },
+            sorters: {property: 'id', direction: 'ASC'}
+          })
+        },
+        {
+          xtype: 'button',
+          text: 'Load store',
+          action: 'load',
+          glyph: 'xf0ab@FontAwesome' /* fa-arrow-circle-down */
+        },
+        {
+          xtype: 'button',
+          text: 'Clear store',
+          action: 'clear',
+          glyph: 'xf12d@FontAwesome' /* fa-eraser */
+        }
+      ]
     });
 
     me.callParent();

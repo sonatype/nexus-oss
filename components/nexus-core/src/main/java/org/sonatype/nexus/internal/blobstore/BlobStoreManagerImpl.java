@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -34,7 +34,6 @@ import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
 import org.sonatype.nexus.jmx.reflect.ManagedObject;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
@@ -84,8 +83,11 @@ public class BlobStoreManagerImpl
     store.start();
     List<BlobStoreConfiguration> configurations = store.list();
     if (configurations.isEmpty()) {
-      log.debug("No BlobStores configured");
-      return;
+      log.debug("No BlobStores configured; provisioning default BlobStore");
+      store.create(FileBlobStore.configure(
+          DEFAULT_BLOBSTORE_NAME, basedir.toAbsolutePath().resolve(DEFAULT_BLOBSTORE_NAME).toString()
+      ));
+      configurations = store.list();
     }
 
     log.debug("Restoring {} BlobStores", configurations.size());
@@ -139,7 +141,14 @@ public class BlobStoreManagerImpl
 
     store.create(configuration);
 
-    BlobStore blobStore = newBlobStore(configuration);
+    BlobStore blobStore;
+    try {
+      blobStore = newBlobStore(configuration);
+    } catch (Exception e) {
+      store.delete(configuration);
+      throw e;
+    }
+
     track(configuration.getName(), blobStore);
 
     blobStore.start();
@@ -167,26 +176,7 @@ public class BlobStoreManagerImpl
   public BlobStore get(final String name) {
     checkNotNull(name);
 
-    synchronized (stores) {
-      BlobStore blobStore = stores.get(name);
-
-      // TODO - remove auto-create functionality?
-      // blob-store not defined, create
-      if (blobStore == null) {
-        // create and start
-        try {
-
-          BlobStoreConfiguration configuration = FileBlobStore
-              .configure(name, basedir.toAbsolutePath().toString() + "/" + name);
-          blobStore = create(configuration);
-        }
-        catch (Exception e) {
-          throw Throwables.propagate(e);
-        }
-      }
-
-      return blobStore;
-    }
+    return stores.get(name);
   }
 
   @Override

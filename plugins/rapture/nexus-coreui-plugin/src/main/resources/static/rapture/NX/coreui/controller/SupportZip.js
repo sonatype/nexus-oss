@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SupportZip', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Permissions',
     'NX.Security',
@@ -27,10 +27,6 @@ Ext.define('NX.coreui.controller.SupportZip', {
     'NX.util.DownloadHelper',
     'NX.I18n'
   ],
-
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'support.SupportZip',
@@ -57,8 +53,8 @@ Ext.define('NX.coreui.controller.SupportZip', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Support ZIP',
-      text: NX.I18n.get('ADMIN_SUPPORT_ZIP_TITLE'),
-      description: NX.I18n.get('ADMIN_SUPPORT_ZIP_SUBTITLE'),
+      text: NX.I18n.get('SupportZip_Title'),
+      description: NX.I18n.get('SupportZip_Description'),
       view: { xtype: 'nx-coreui-support-supportzip' },
       iconConfig: {
         file: 'file_extension_zip.png',
@@ -97,7 +93,7 @@ Ext.define('NX.coreui.controller.SupportZip', {
         fileName = win.down('form').getValues().name;
 
     NX.Security.doWithAuthenticationToken(
-        NX.I18n.get('ADMIN_SUPPORT_ZIP_DOWNLOAD_AUTHENTICATE'),
+        NX.I18n.get('SupportZip_Authenticate_Text'),
         {
           success: function (authToken) {
             NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf(

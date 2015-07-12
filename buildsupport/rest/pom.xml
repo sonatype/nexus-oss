@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -28,12 +28,18 @@
   <packaging>pom</packaging>
 
   <properties>
-    <siesta2.version>2.1-SNAPSHOT</siesta2.version>
+    <siesta2.version>2.2.0-SNAPSHOT</siesta2.version>
     <jackson2.version>2.4.1</jackson2.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>javax.ws.rs</groupId>
+        <artifactId>javax.ws.rs-api</artifactId>
+        <version>2.0</version>
+      </dependency>
 
       <dependency>
         <groupId>org.jsoup</groupId>

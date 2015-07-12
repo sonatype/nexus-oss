@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -141,8 +141,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
    * Preset form base params to repository id.
    */
   applyRepository: function(repositoryModel) {
-    var me = this,
-        form = me.down('nx-settingsform');
+    var form = this.down('nx-settingsform');
 
     form.getForm().baseParams = {
       repositoryId: repositoryModel ? repositoryModel.getId() : undefined

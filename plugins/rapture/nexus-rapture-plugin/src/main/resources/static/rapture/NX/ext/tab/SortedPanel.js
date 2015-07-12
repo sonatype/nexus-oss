@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,11 +20,6 @@
 Ext.define('NX.ext.tab.SortedPanel', {
   extend: 'Ext.tab.Panel',
   alias: 'widget.nx-sorted-tabpanel',
-
-  /**
-   * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab
-   */
-  autoHideTabHeader: true,
 
   listeners: {
     /**
@@ -56,59 +51,21 @@ Ext.define('NX.ext.tab.SortedPanel', {
       });
 
       me.insert(position, component);
-      if (me.autoHideTabHeader) {
-        if (me.rendered && me.items.length > 1) {
-          me.getTabBar().show();
-        }
-      }
       me.resumeEvents();
-    },
-
-    /**
-     * @private
-     * Hide tab bar in case of one or less tabs.
-     */
-    remove: function () {
-      var me = this;
-
-      if (me.autoHideTabHeader) {
-        if (me.rendered && me.items.length <= 1) {
-          me.getTabBar().hide();
-        }
-      }
-    },
-
-    /**
-     * @private
-     * Hide/Show tab bar based on number of tabs (no tab bar for one or less tabs).
-     */
-    afterrender: function () {
-      var me = this;
-
-      if (me.autoHideTabHeader) {
-        if (me.items.length > 1) {
-          me.getTabBar().show();
-        }
-        else {
-          me.getTabBar().hide();
-        }
-      }
     }
   },
 
   // FIXME: This doesn't belong here, this is styling treatment for master/detail tabs only
   /**
-   * @Override
+   * @override
    */
   onAdd: function(item, index) {
-    var me = this;
-
     item.tabConfig = item.tabConfig || {};
     Ext.applyIf(item.tabConfig, {
       // HACK: force tabs to follow scss style for borders
       border: null
     });
 
-    me.callParent([item, index]);
+    this.callParent([item, index]);
   }
 });

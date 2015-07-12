@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.NuGetApiKey', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Conditions',
     'NX.Permissions',
@@ -47,8 +47,8 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
       {
         mode: 'user',
         path: '/NuGet API Token',
-        text: NX.I18n.get('NUGET_APIKEY_TITLE'),
-        description: NX.I18n.get('NUGET_APIKEY_SUB_TITLE'),
+        text: NX.I18n.get('NuGetApiKey_Text'),
+        description: NX.I18n.get('NuGetApiKey_Description'),
         view: { xtype: 'nx-coreui-nuget-apikey' },
         iconConfig: {
           file: 'key.png',
@@ -82,7 +82,7 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
     var me = this;
 
     NX.Security.doWithAuthenticationToken(
-        NX.I18n.get('NUGET_APIKEY_ACCESS_HELP'),
+        NX.I18n.get('Nuget_NuGetApiKey_Access_HelpText'),
         {
           success: function(authToken) {
             NX.direct.nuget_NuGetApiKey.readKey(authToken, function(response) {
@@ -103,7 +103,7 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
     var me = this;
 
     NX.Security.doWithAuthenticationToken(
-        NX.I18n.get('NUGET_APIKEY_RESET_HELP'),
+        NX.I18n.get('Nuget_NuGetApiKey_Reset_HelpText'),
         {
           success: function(authToken) {
             NX.direct.nuget_NuGetApiKey.resetKey(authToken, function(response) {
@@ -122,8 +122,6 @@ Ext.define('NX.coreui.controller.NuGetApiKey', {
    * @param {String} apiKey to show
    */
   showApiKey: function(apiKey) {
-    var me = this;
-
     Ext.widget('nx-coreui-nuget-apikeydetails', { apiKey: apiKey });
   },
 

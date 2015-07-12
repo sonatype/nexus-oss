@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -37,57 +37,57 @@ Ext.define('NX.coreui.store.SearchCriteria', {
     {
       id: 'format',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_FORMAT')
+        fieldLabel: NX.I18n.get('SearchCriteria_Format_FieldLabel')
       }
     },
     {
       id: 'keyword',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_KEYWORD'),
+        fieldLabel: NX.I18n.get('SearchCriteria_Keyword_FieldLabel'),
         width: 250
       }
     },
     {
       id: 'version',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_VERSION')
+        fieldLabel: NX.I18n.get('SearchCriteria_Version_FieldLabel')
       }
     },
     {
       id: 'group.raw',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP'),
+        fieldLabel: NX.I18n.get('SearchCriteria_Group_FieldLabel'),
         width: 250
       }
     },
     {
       id: 'name.raw',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_NAME'),
+        fieldLabel: NX.I18n.get('SearchCriteria_Name_FieldLabel'),
         width: 200
       }
     },
     {
       id: 'assets.attributes.checksum.sha1',
-      group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_CHECKSUM'),
+      group: NX.I18n.get('SearchCriteria_Checksum_Group'),
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_SHA_1'),
+        fieldLabel: NX.I18n.get('SearchCriteria_SHA1_FieldLabel'),
         width: 250
       }
     },
     {
       id: 'assets.attributes.checksum.sha512',
-      group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_CHECKSUM'),
+      group: NX.I18n.get('SearchCriteria_Checksum_Group'),
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_SHA_512'),
+        fieldLabel: NX.I18n.get('SearchCriteria_SHA2_FieldLabel'),
         width: 250
       }
     },
     {
       id: 'assets.attributes.checksum.md5',
-      group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_CHECKSUM'),
+      group: NX.I18n.get('SearchCriteria_Checksum_Group'),
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MD5'),
+        fieldLabel: NX.I18n.get('SearchCriteria_MD5_FieldLabel'),
         width: 250
       }
     }

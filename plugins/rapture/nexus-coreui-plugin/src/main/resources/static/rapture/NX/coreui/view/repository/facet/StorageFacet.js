@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,11 +24,6 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
     'NX.I18n'
   ],
 
-  defaults: {
-    allowBlank: false,
-    itemCls: 'required-field'
-  },
-
   /**
    * @override
    */
@@ -39,10 +34,35 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacet', {
       {
         xtype: 'fieldset',
         cls: 'nx-form-section',
-        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_STORAGE_FACET'),
-        hidden: true,
+        title: NX.I18n.get('Repository_Facet_StorageFacet_Title'),
+
+        defaults: {
+          allowBlank: false,
+          itemCls: 'required-field'
+        },
+
         items: [
-          // TODO add blob store selection
+          {
+            xtype: 'combo',
+            name: 'attributes.storage.blobStoreName',
+            itemId: 'blobStoreName',
+            fieldLabel: NX.I18n.get('Repository_Facet_StorageFacet_BlobStore_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_StorageFacet_BlobStore_HelpText'),
+            emptyText: NX.I18n.get('Repository_Facet_StorageFacet_BlobStore_EmptyText'),
+            editable: false,
+            store: 'Blobstore',
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'name',
+            readOnlyOnUpdate: true
+          },
+          {
+            xtype: 'checkbox',
+            name: 'attributes.storage.strictContentTypeValidation',
+            itemId: 'strictContentTypeValidation',
+            fieldLabel: NX.I18n.get('Repository_Facet_StorageFacet_ContentTypeValidation_FieldLabel'),
+            value: true
+          }
         ]
       }
     ];

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -26,15 +26,15 @@ Ext.define('NX.coreui.view.role.RoleFeature', {
 
   iconName: 'role-default',
 
-  masters: { xtype: 'nx-coreui-role-list' },
+  masters: [
+    { xtype: 'nx-coreui-role-list' }
+  ],
 
   tabs: [
-    { xtype: 'nx-coreui-role-settings', title: NX.I18n.get('ADMIN_ROLES_DETAILS_SETTINGS_TAB'), weight: 10 },
-    { xtype: 'nx-coreui-privilege-trace', title: NX.I18n.get('ADMIN_ROLES_DETAILS_TRACE_TAB'), weight: 20 },
-    { xtype: 'nx-coreui-role-tree', title: NX.I18n.get('ADMIN_ROLES_DETAILS_ROLE_TAB'), weight: 30 }
+    { xtype: 'nx-coreui-role-settings', title: NX.I18n.get('Role_RoleFeature_Settings_Title'), weight: 10 }
   ],
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_ROLES_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('Role_RoleFeature_Delete_Button'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ]
 });

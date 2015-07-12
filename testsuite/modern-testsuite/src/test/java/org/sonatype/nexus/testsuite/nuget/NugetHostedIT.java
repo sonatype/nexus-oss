@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.nuget;
 
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpStatus;
 
+import com.google.common.io.Files;
 import org.apache.http.HttpResponse;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +31,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
@@ -124,6 +127,18 @@ public class NugetHostedIT
     assertThat(delete, is(HttpStatus.NOT_FOUND));
   }
 
+  @Test
+  public void downloadPackage() throws Exception {
+    final int publish = nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
+    assertThat(publish, is(HttpStatus.CREATED));
+    waitFor(calmPeriod());
+
+    final HttpResponse response = nuget.packageContent("SONATYPE.TEST", "1.0");
+
+    assertThat(status(response), is(HttpStatus.OK));
+    assertThat(bytes(response), is(Files.toByteArray(resolveTestFile("SONATYPE.TEST.1.0.nupkg"))));
+  }
+
   /**
    * Search for an uploaded package with a search term.
    */
@@ -160,5 +175,24 @@ public class NugetHostedIT
     final List<Map<String, String>> entries = parseFeedXml(feedXml);
     assertThat("entry count", entries.size(), is(1));
     assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
+  }
+
+  /**
+   * Ensure that a url encoded ODATA query for an uploaded package's metadata
+   * returns an entry that contains a valid content link to the package.
+   */
+  @Test
+  public void encodedOdataQuery() throws Exception {
+    nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
+
+    final String entryXml = nuget.feedXml(URLEncoder.encode("Packages(Id='SONATYPE.TEST',Version='1.0')", "UTF-8"));
+    final List<Map<String, String>> entries = parseFeedXml(entryXml);
+
+    assertThat("entry count", entries.size(), is(1));
+    assertThat("entry ID", entries.get(0).get("ID"), is("SONATYPE.TEST"));
+
+    final String contentSrc = entries.get(0).get("LOCATION");
+    final HttpResponse response = nuget.get(contentSrc);
+    assertThat(String.format("%n%s", contentSrc), status(response), is(HttpStatus.OK));
   }
 }

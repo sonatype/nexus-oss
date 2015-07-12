@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -38,20 +38,20 @@ Ext.define('NX.coreui.view.repository.facet.NegativeCacheFacet', {
       {
         xtype: 'fieldset',
         cls: 'nx-form-section',
-        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_CACHE_FACET'),
+        title: NX.I18n.get('Repository_Facet_NegativeCacheFacet_Title'),
 
         items: [
           {
             xtype: 'checkbox',
             name: 'attributes.negativeCache.enabled',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_ENABLED'),
+            fieldLabel: NX.I18n.get('Repository_Facet_NegativeCacheFacet_Enabled_FieldLabel'),
             value: true
           },
           {
             xtype: 'numberfield',
             name: 'attributes.negativeCache.timeToLive',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NEGATIVE_CACHE_TTL_HELP'),
+            fieldLabel: NX.I18n.get('Repository_Facet_NegativeCacheFacet_TTL_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_NegativeCacheFacet_TTL_HelpText'),
             minValue: -1,
             value: 1440
           }

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,9 +19,6 @@
  */
 Ext.define('NX.coreui.controller.Log', {
   extend: 'NX.controller.Drilldown',
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
   requires: [
     'Ext.util.TaskManager',
     'Ext.Ajax',
@@ -34,15 +31,16 @@ Ext.define('NX.coreui.controller.Log', {
 
   views: [
     'logging.LogViewer',
-    'logging.LogMark',
-    'logging.LogFeature'
+    'logging.LogMark'
   ],
   refs: [
-    { ref: 'feature', selector: 'nx-coreui-log-feature' },
     { ref: 'content', selector: 'nx-feature-content' },
     { ref: 'list', selector: 'nx-coreui-log-viewer' }
   ],
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -51,9 +49,9 @@ Ext.define('NX.coreui.controller.Log', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Logging/Log Viewer',
-      text: NX.I18n.get('ADMIN_LOG_VIEWER_TITLE'),
-      description: NX.I18n.get('ADMIN_LOG_VIEWER_SUBTITLE'),
-      view: { xtype: 'nx-coreui-log-feature' },
+      text: NX.I18n.get('Log_Text'),
+      description: NX.I18n.get('Log_Description'),
+      view: { xtype: 'nx-coreui-log-viewer' },
       iconConfig: {
         file: 'script_text.png',
         variants: ['x16', 'x32']
@@ -95,8 +93,9 @@ Ext.define('NX.coreui.controller.Log', {
   },
 
   /**
-   * @private
    * Shows mark log window.
+   *
+   * @private
    */
   showMarkWindow: function () {
     Ext.widget({ xtype: 'nx-coreui-log-mark' });
@@ -112,7 +111,7 @@ Ext.define('NX.coreui.controller.Log', {
         values = form.getValues();
 
     win.hide();
-    me.getContent().getEl().mask(NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MASK'));
+    me.getContent().getEl().mask(NX.I18n.get('Log_LogMark_Mask'));
     NX.direct.logging_Log.mark(values, function(response) {
       me.getContent().getEl().unmask();
       if (Ext.isObject(response)) {
@@ -211,7 +210,7 @@ Ext.define('NX.coreui.controller.Log', {
     if (logPanel) {
       size = logPanel.down('#refreshSize').getValue();
 
-      me.getContent().getEl().mask(NX.I18n.get('ADMIN_LOG_VIEWER_LOAD_MASK'));
+      me.getContent().getEl().mask(NX.I18n.get('Log_Loading_Mask'));
 
       //<if debug>
       me.logDebug('Retrieving last ' + size + 'kb from log');
@@ -234,7 +233,7 @@ Ext.define('NX.coreui.controller.Log', {
         },
         failure: function (response) {
           me.getContent().getEl().unmask();
-          me.showLog(NX.I18n.format('ADMIN_LOG_VIEWER_LOAD_FAILURE', response.statusText));
+          me.showLog(NX.I18n.format('Log_Load_Failure', response.statusText));
         }
       });
     }
@@ -246,8 +245,7 @@ Ext.define('NX.coreui.controller.Log', {
    * @param {String} text log content
    */
   showLog: function (text) {
-    var me = this,
-        textarea = me.getList().down('textarea');
+    var textarea = this.getList().down('textarea');
 
     textarea.setValue(text);
     // scroll to the bottom
@@ -260,7 +258,7 @@ Ext.define('NX.coreui.controller.Log', {
    */
   bindMarkButton: function (button) {
     button.mon(
-        NX.Conditions.isPermitted('nexus:logging:update'),
+        NX.Conditions.isPermitted('nexus:logging:mark'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -39,7 +39,7 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
           '->',
           {
             xtype: 'nx-searchbox',
-            emptyText: NX.I18n.get('GLOBAL_FILTER_PLACEHOLDER'),
+            emptyText: NX.I18n.get('Grid_Plugin_FilterBox_Empty'),
             searchDelay: 200,
             width: 200,
             listeners: {
@@ -69,8 +69,9 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   },
 
   /**
-   * @private
    * Filter grid.
+   *
+   * @private
    */
   onSearch: function (searchbox, value) {
     var me = this;
@@ -82,8 +83,9 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   },
 
   /**
+   * Clear the filter before destroying this plugin.
+   *
    * @protected
-   * Clear the filter before destroying this plugin
    */
   destroy: function() {
     var me = this;
@@ -94,8 +96,9 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   },
 
   /**
-   * @private
    * Clear filtering on grid.
+   *
+   * @private
    */
   onSearchCleared: function () {
     var me = this;
@@ -107,8 +110,9 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   },
 
   /**
-   * @private
    * Syncs filtering value with search box.
+   *
+   * @private
    */
   syncSearchBox: function () {
     var me = this;

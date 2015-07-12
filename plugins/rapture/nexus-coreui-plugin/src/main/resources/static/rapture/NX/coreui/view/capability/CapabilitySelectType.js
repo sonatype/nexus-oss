@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -34,8 +34,8 @@ Ext.define('NX.coreui.view.capability.CapabilitySelectType', {
         return 'capability-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_CAPABILITIES_SELECT_TYPE_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
-    { header: NX.I18n.get('ADMIN_CAPABILITIES_SELECT_TYPE_DESCRIPTION_COLUMN'), dataIndex: 'about', flex: 2,
+    { header: NX.I18n.get('Capability_CapabilitySelectType_Type_Header'), dataIndex: 'name', flex: 1 },
+    { header: NX.I18n.get('Capability_CapabilitySelectType_Description_Header'), dataIndex: 'about', flex: 2,
       renderer: function(val) {
         var i;
         if (val) {

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -36,7 +36,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleOnce', {
         xtype: 'datefield',
         name: 'startDate',
         itemId: 'startDate',
-        fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE'),
+        fieldLabel: NX.I18n.get('Task_TaskScheduleDaily_StartDate_FieldLabel'),
         allowBlank: false,
         format: 'm/d/Y',
         value: new Date(),
@@ -46,7 +46,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleOnce', {
         xtype: 'timefield',
         name: 'startTime',
         itemId: 'startTime',
-        fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_TIME'),
+        fieldLabel: NX.I18n.get('Task_TaskScheduleHourly_EndDate_FieldLabel'),
         helpText: 'The time this task should start running in your time zone ' + NX.util.DateFormat.getTimeZone() + '.',
         allowBlank: false,
         format: 'H:i',

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -31,6 +31,8 @@ import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.storage.StorageTxHook;
+import org.sonatype.nexus.transaction.Transactional;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
@@ -58,6 +60,14 @@ public class SearchFacetImpl
 
   private final Map<String, ComponentMetadataProducer> componentMetadataProducers;
 
+  private final Supplier<StorageTxHook> searchHook = new Supplier<StorageTxHook>()
+  {
+    @Override
+    public StorageTxHook get() {
+      return new SearchHook(SearchFacetImpl.this);
+    }
+  };
+
   @Inject
   public SearchFacetImpl(final SearchService searchService,
                          final Map<String, ComponentMetadataProducer> componentMetadataProducers)
@@ -69,19 +79,14 @@ public class SearchFacetImpl
   @Override
   protected void doInit(final Configuration configuration) throws Exception {
     super.doInit(configuration);
-    facet(StorageFacet.class).registerHookSupplier(new Supplier<StorageTxHook>()
-    {
-      @Override
-      public StorageTxHook get() {
-        return new SearchHook(SearchFacetImpl.this);
-      }
-    });
+    facet(StorageFacet.class).registerHookSupplier(searchHook);
   }
 
   /**
    * Indexes a component with given id.
    */
   @Guarded(by = STARTED)
+  @Transactional
   protected void put(final EntityId componentId) {
     checkNotNull(componentId);
     try {
@@ -89,13 +94,14 @@ public class SearchFacetImpl
       additional.put(P_REPOSITORY_NAME, getRepository().getName());
       Component component;
       List<Asset> assets;
-      try (StorageTx tx = facet(StorageFacet.class).openTx()) {
-        component = tx.findComponent(componentId, tx.getBucket());
-        if (component == null) {
-          return;
-        }
-        assets = Lists.newArrayList(tx.browseAssets(component));
+
+      final StorageTx tx = UnitOfWork.currentTransaction();
+      component = tx.findComponent(componentId, tx.getBucket());
+      if (component == null) {
+        return;
       }
+      assets = Lists.newArrayList(tx.browseAssets(component));
+
       String json = JsonUtils.merge(componentMetadata(component, assets), JsonUtils.from(additional));
       searchService.put(getRepository(), EntityHelper.id(component).toString(), json);
     }
@@ -119,7 +125,12 @@ public class SearchFacetImpl
 
   @Override
   protected void doDelete() {
+    facet(StorageFacet.class).unregisterHookSupplier(searchHook);
     searchService.deleteIndex(getRepository());
+  }
+
+  Supplier<StorageTx> txSupplier() {
+    return getRepository().facet(StorageFacet.class).txSupplier();
   }
 
   /**

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -27,28 +28,25 @@ import com.sonatype.nexus.repository.nuget.odata.ODataConsumer;
 import com.sonatype.nexus.repository.nuget.security.NugetApiKey;
 import com.sonatype.nexus.repository.nuget.security.NugetApiKeyStore;
 
+import org.sonatype.nexus.blobstore.api.BlobStoreManager;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport;
-import org.sonatype.sisu.goodies.common.Loggers;
 
-import com.google.common.base.Preconditions;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.options.WrappedUrlProvisionOption.OverwriteMode;
-import org.slf4j.Logger;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 
 /**
@@ -71,38 +69,30 @@ public abstract class NugetITSupport
   @Inject
   private RealmManager realmManager;
 
-  @NonNls
-  protected final Logger log = (Logger) Preconditions.checkNotNull(this.createLogger());
-
-  protected Logger createLogger() {
-    return Loggers.getLogger(this);
-  }
-
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
     return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
         withHttps(),
-        wrappedBundle(maven("org.apache.httpcomponents", "httpmime").versionAsInProject())
-            .overwriteManifest(OverwriteMode.FULL).instructions("DynamicImport-Package=*"),
-        // TODO: This should be replaced with:
-        // mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject()
-        // ..once the http-testing-harness duplicate import of org.sonatype.tests.http.server.api is corrected.
-        wrappedBundle(maven("org.sonatype.http-testing-harness", "server-provider").versionAsInProject())
-            .overwriteManifest(OverwriteMode.FULL).instructions("DynamicImport-Package=*")
+        wrappedBundle(maven("org.apache.httpcomponents", "httpmime").versionAsInProject()),
+        mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject()
     );
   }
 
-  @NotNull
+  @Nonnull
   protected Configuration hostedConfig(final String name) {
     final Configuration config = new Configuration();
     config.setRepositoryName(name);
     config.setRecipeName(NugetHostedRecipe.NAME);
     config.setOnline(true);
-    config.attributes("storage").set("writePolicy", WritePolicy.ALLOW.toString());
+
+    NestedAttributesMap storage = config.attributes("storage");
+    storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
+    storage.set("writePolicy", WritePolicy.ALLOW.toString());
+
     return config;
   }
 
-  @NotNull
+  @Nonnull
   protected NugetClient nugetClient(final Repository repository) throws Exception {
     final URL url = repositoryBaseUrl(repository);
     waitFor(responseFrom(url));
@@ -112,7 +102,7 @@ public abstract class NugetITSupport
     return new NugetClient(clientBuilder().build(), clientContext(), url.toURI(), apiKey);
   }
 
-  @NotNull
+  @Nonnull
   private String prepareApiKey(final PrincipalCollection admin) {
     char[] apiKey = keyStore.getApiKey(admin);
     log.info("Existing nuget api key for {} is {}", admin, apiKey);

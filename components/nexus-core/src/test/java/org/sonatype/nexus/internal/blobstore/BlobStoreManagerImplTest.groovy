@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -27,6 +27,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.mockito.Mock
 
+import static org.junit.Assert.fail
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.doReturn
@@ -106,18 +107,6 @@ class BlobStoreManagerImplTest
     verify(blobStore).stop();
     verify(store).delete(configuration);
   }
-  
-  @Test
-  void 'BlobStores will be eagerly created if not already configured'() {
-    BlobStore blobStore = mock(BlobStore)
-    when(provider.get()).thenReturn(blobStore)
-    
-    BlobStore autoCreatedBlobStore = underTest.get('test')
-    
-    verify(blobStore).start()
-    verify(store).create(any(BlobStoreConfiguration))
-    assert blobStore == autoCreatedBlobStore
-  }
 
   @Test
   void 'Can delete an existing BlobStore by name'() {
@@ -143,6 +132,27 @@ class BlobStoreManagerImplTest
     underTest.stop()
     
     verify(blobStore).stop()
+  }
+
+  @Test
+  void 'Invalid configuration is rolled back'() {
+    BlobStore blobStore = mock(BlobStore)
+    when(provider.get()).thenThrow(new IllegalArgumentException())
+
+    BlobStoreConfiguration configuration = createConfig('test')
+
+    try {
+      underTest.create(configuration)
+      fail()
+    }
+    catch (Exception e) {
+      // expected
+    }
+
+    verify(store).create(configuration)
+    verify(store).delete(configuration)
+
+    assert underTest.browse().toList() == []
   }
 
   private BlobStoreConfiguration createConfig(name = 'foo', attributes = [file:[path:'baz']]) {

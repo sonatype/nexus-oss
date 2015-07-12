@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,10 +19,14 @@ import javax.annotation.Nullable;
 import static java.util.Arrays.asList;
 
 /**
+ * Synthesizes a count from remote and hosted component counts.
+ *
  * @since 3.0
  */
 public class CountReportingPolicy
 {
+  private CountReportingPolicy() {}
+
   public static int determineReportedCount(final int remoteCount, final int localCount,
                                            @Nullable final Integer pageSize, @Nullable final Integer skip)
   {

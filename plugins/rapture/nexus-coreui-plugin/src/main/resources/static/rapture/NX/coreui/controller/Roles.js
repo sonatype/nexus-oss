@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -25,9 +25,9 @@ Ext.define('NX.coreui.controller.Roles', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-role-list',
-
+  masters: [
+    'nx-coreui-role-list'
+  ],
   models: [
     'Role'
   ],
@@ -42,15 +42,12 @@ Ext.define('NX.coreui.controller.Roles', {
     'role.RoleFeature',
     'role.RoleList',
     'role.RoleSettings',
-    'role.RoleSettingsForm',
-    'role.RoleTree'
+    'role.RoleSettingsForm'
   ],
   refs: [
     { ref: 'feature', selector: 'nx-coreui-role-feature' },
     { ref: 'list', selector: 'nx-coreui-role-list' },
-    { ref: 'settings', selector: 'nx-coreui-role-feature nx-coreui-role-settings' },
-    { ref: 'privilegeTrace', selector: 'nx-coreui-role-feature nx-coreui-privilege-trace' },
-    { ref: 'roleTree', selector: 'nx-coreui-role-feature nx-coreui-role-tree' }
+    { ref: 'settings', selector: 'nx-coreui-role-feature nx-coreui-role-settings' }
   ],
   icons: {
     'role-default': {
@@ -65,8 +62,8 @@ Ext.define('NX.coreui.controller.Roles', {
   features: {
     mode: 'admin',
     path: '/Security/Roles',
-    text: NX.I18n.get('ADMIN_ROLES_TITLE'),
-    description: NX.I18n.get('ADMIN_ROLES_SUBTITLE'),
+    text: NX.I18n.get('Roles_Text'),
+    description: NX.I18n.get('Roles_Description'),
     view: { xtype: 'nx-coreui-role-feature' },
     iconConfig: {
       file: 'user_policeman.png',
@@ -94,6 +91,9 @@ Ext.define('NX.coreui.controller.Roles', {
         }
       },
       store: {
+        '#Role': {
+          load: me.reselect
+        },
         '#RoleSource': {
           load: me.onRoleSourceLoad
         }
@@ -110,12 +110,6 @@ Ext.define('NX.coreui.controller.Roles', {
         },
         'nx-coreui-role-settings-form': {
           submitted: me.onSettingsSubmitted
-        },
-        'nx-coreui-role-feature nx-coreui-privilege-trace': {
-          activate: me.onPrivilegeTraceActivate
-        },
-        'nx-coreui-role-feature nx-coreui-role-tree': {
-          activate: me.onRoleTreeActivate
         }
       }
     });
@@ -129,12 +123,8 @@ Ext.define('NX.coreui.controller.Roles', {
   },
 
   onSelection: function(list, model) {
-    var me = this;
-
     if (Ext.isDefined(model)) {
-      me.getSettings().loadRecord(model);
-      me.getPrivilegeTrace().loadRecord(model.data);
-      me.getRoleTree().loadRecord(model.data);
+      this.getSettings().loadRecord(model);
     }
   },
 
@@ -142,11 +132,10 @@ Ext.define('NX.coreui.controller.Roles', {
    * @private
    */
   showAddWindowRole: function() {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'));
+    me.setItemName(1, NX.I18n.get('Roles_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-role-add'));
   },
 
@@ -157,14 +146,14 @@ Ext.define('NX.coreui.controller.Roles', {
     var me = this,
       feature = me.getFeature();
 
-    me.getRoleBySourceStore().load({
+    me.getStore('RoleBySource').load({
       params: {
         source: menuItem.source
       }
     });
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'));
+    feature.setItemName(1, NX.I18n.get('Roles_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-role-add', { source: menuItem.source }));
   },
 
@@ -177,8 +166,8 @@ Ext.define('NX.coreui.controller.Roles', {
         list = me.getList();
 
     if (list) {
-      me.getRoleSourceStore().load();
-      me.getPrivilegeStore().load();
+      me.getStore('RoleSource').load();
+      me.getStore('Privilege').load();
       me.getSettings().down('#roles').getStore().load();
     }
   },
@@ -188,8 +177,7 @@ Ext.define('NX.coreui.controller.Roles', {
    * (Re)create external role mapping entries.
    */
   onRoleSourceLoad: function(store) {
-    var me = this,
-        list = me.getList(),
+    var list = this.getList(),
         newButton, menuItems = [];
 
     if (list) {
@@ -206,7 +194,7 @@ Ext.define('NX.coreui.controller.Roles', {
         });
       });
       newButton.menu.add({
-        text: NX.I18n.get('ADMIN_ROLES_LIST_EXTERNAL_ROLE_ITEM'),
+        text: NX.I18n.get('Roles_New_ExternalRoleItem'),
         menu: menuItems,
         iconCls: NX.Icons.cls('role-externalmapping', 'x16')
       });
@@ -237,39 +225,8 @@ Ext.define('NX.coreui.controller.Roles', {
   /**
    * @private
    */
-  onPrivilegeTraceActivate: function(panel) {
-    var me = this;
-
-    panel.loadRecord({
-      roles: me.getSettings().down('#roles').getValue(),
-      privileges: me.getSettings().down('#privileges').getValue()
-    });
-  },
-
-  /**
-   * @private
-   */
-  onRoleTreeActivate: function(panel) {
-    var me = this;
-
-    panel.loadRecord({
-      roles: me.getSettings().down('#roles').getValue(),
-      privileges: me.getSettings().down('#privileges').getValue()
-    });
-  },
-
-  /**
-   * @private
-   */
   onSettingsSubmitted: function(form, action) {
-    var me = this,
-        win = form.up('nx-coreui-role-add');
-
-    if (win) {
-      me.loadStoreAndSelect(action.result.data.id, false);
-    } else {
-      me.loadStore(Ext.emptyFn);
-    }
+    this.getStore('Role').load();
   },
 
   /**
@@ -283,10 +240,10 @@ Ext.define('NX.coreui.controller.Roles', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Role.remove(model.getId(), function(response) {
-      me.loadStore();
+      me.getStore('Role').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: NX.I18n.format('ADMIN_ROLES_DETAILS_DELETE_ROLE', description), type: 'success'
+          text: NX.I18n.format('Roles_Delete_Message', description), type: 'success'
         });
       }
     });

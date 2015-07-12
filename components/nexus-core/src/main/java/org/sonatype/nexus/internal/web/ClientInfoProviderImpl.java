@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.security.ClientInfo;
 import org.sonatype.nexus.security.ClientInfoProvider;
-import org.sonatype.nexus.servlet.RemoteIPFinder;
 
 import com.google.common.net.HttpHeaders;
 import com.google.inject.OutOfScopeException;
@@ -55,7 +54,7 @@ public class ClientInfoProviderImpl
       Subject subject = SecurityUtils.getSubject();
       return new ClientInfo(
           subject != null && subject.getPrincipal() != null ? subject.getPrincipal().toString() : null,
-          RemoteIPFinder.findIP(request),
+          request.getRemoteAddr(),
           request.getHeader(HttpHeaders.USER_AGENT)
       );
     }

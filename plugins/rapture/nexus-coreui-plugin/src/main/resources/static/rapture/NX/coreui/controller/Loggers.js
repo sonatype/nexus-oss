@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -26,7 +26,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     'NX.Messages',
     'NX.I18n'
   ],
-
+  detail: 'nx-coreui-logger-list',
   stores: [
     'Logger'
   ],
@@ -43,6 +43,9 @@ Ext.define('NX.coreui.controller.Loggers', {
     { ref: 'list', selector: 'nx-coreui-logger-list' }
   ],
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -58,8 +61,8 @@ Ext.define('NX.coreui.controller.Loggers', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Logging',
-      text: NX.I18n.get('ADMIN_LOGGING_TITLE'),
-      description: NX.I18n.get('ADMIN_LOGGING_SUBTITLE'),
+      text: NX.I18n.get('Loggers_Text'),
+      description: NX.I18n.get('Loggers_Description'),
       view: { xtype: 'nx-coreui-logging-feature' },
       iconConfig: {
         file: 'book.png',
@@ -110,8 +113,7 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Loads logger store.
    */
   loadStore: function () {
-    var me = this,
-        list = me.getList();
+    var list = this.getList();
 
     if (list) {
       list.getStore().load();
@@ -123,12 +125,10 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Shows success messages after records has been written (create/update).
    */
   onWrite: function (store, operation) {
-    var me = this;
-
-    me.loadStore();
+    this.loadStore();
     if (operation.success) {
       Ext.Array.each(operation.records, function (model) {
-        NX.Messages.add({ text: NX.I18n.format('ADMIN_LOGGING_WRITE_SUCCESS', operation.action, model.get('name')), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('Loggers_Write_Success', operation.action, model.get('name')), type: 'success' });
       });
     }
   },
@@ -138,11 +138,10 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Shows add logger window.
    */
   showAddWindow: function (button) {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_LOGGING_CREATE_TITLE'));
+    me.setItemName(1, NX.I18n.get('Loggers_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-logger-add'));
   },
 
@@ -163,23 +162,23 @@ Ext.define('NX.coreui.controller.Loggers', {
     var me = this,
         win = button.up('window'),
         form = button.up('form').getForm(),
-        store = me.getLoggerStore(),
+        store = me.getStore('Logger'),
         values = form.getFieldValues(),
         model = store.getById(values.name);
 
     if (model) {
-      NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_LOGGING_UPDATE_TITLE'),
-          NX.I18n.format('ADMIN_LOGGING_UPDATE_HELP', values.name, values.level),
+      NX.Dialogs.askConfirmation(NX.I18n.get('Loggers_Update_Title'),
+          NX.I18n.format('Loggers_HelpText', values.name, values.level),
           function () {
             model.set('level', values.level);
-            me.loadView(null, null, true);
+            me.loadView(0, true);
           }
       );
     }
     else {
       model = me.getLoggerModel().create(values);
       store.addSorted(model);
-      me.loadView(null, null, true);
+      me.loadView(0, true);
     }
   },
 
@@ -193,11 +192,11 @@ Ext.define('NX.coreui.controller.Loggers', {
         selection = list.getSelectionModel().getSelection();
 
     if (selection.length) {
-      NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_LOGGING_DELETE_CONFIRM'), selection[0].get('name'), function () {
+      NX.Dialogs.askConfirmation(NX.I18n.get('Loggers_Delete_Title'), selection[0].get('name'), function () {
         NX.direct.logging_Loggers.remove(selection[0].getId(), function (response) {
           me.loadStore();
           if (Ext.isObject(response) && response.success) {
-            NX.Messages.add({ text: NX.I18n.format('ADMIN_LOGGING_DELETE_SUCCESS', selection[0].get('name')), type: 'success' });
+            NX.Messages.add({ text: NX.I18n.format('Loggers_Delete_Success', selection[0].get('name')), type: 'success' });
           }
         });
       });
@@ -211,11 +210,11 @@ Ext.define('NX.coreui.controller.Loggers', {
   resetLoggers: function () {
     var me = this;
 
-    NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_LOGGING_RESET_TITLE'), NX.I18n.get('ADMIN_LOGGING_RESET_HELP'), function () {
+    NX.Dialogs.askConfirmation(NX.I18n.get('Loggers_Reset_Title'), NX.I18n.get('Loggers_Reset_HelpText'), function () {
       NX.direct.logging_Loggers.reset(function (response) {
         me.loadStore();
         if (Ext.isObject(response) && response.success) {
-          NX.Messages.add({ text: NX.I18n.get('ADMIN_LOGGING_RESET_SUCCESS'), type: 'success' });
+          NX.Messages.add({ text: NX.I18n.get('Loggers_Reset_Success'), type: 'success' });
         }
       });
     });

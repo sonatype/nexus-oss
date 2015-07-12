@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -23,7 +23,6 @@ import org.sonatype.nexus.scheduling.schedule.Weekly;
 import org.sonatype.nexus.scheduling.schedule.Weekly.Weekday;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.joda.time.DateTime;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.quartz.CronTrigger;

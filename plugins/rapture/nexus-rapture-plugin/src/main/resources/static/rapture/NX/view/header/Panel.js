@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -62,7 +62,7 @@ Ext.define('NX.view.header.Panel', {
             items: [
               {
                 xtype: 'label',
-                text: NX.I18n.get('GLOBAL_HEADER_TITLE'),
+                text: NX.I18n.get('Header_Panel_Logo_Text'),
                 cls: 'nx-header-productname'
               },
               {

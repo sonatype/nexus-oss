@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -33,7 +33,7 @@ Ext.define('NX.view.footer.Panel', {
   items: [
     {
       xtype: 'container',
-      html: NX.I18n.get('GLOBAL_FOOTER_COPYRIGHT'),
+      html: NX.I18n.get('Footer_Panel_HTML'),
       style: {
         'background-color': '#444444',
         'color': '#C6C6C6',

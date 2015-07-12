@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -40,17 +40,17 @@ Ext.define('NX.coreui.view.task.TaskList', {
         return 'task-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 1 },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_TYPE_COLUMN'), dataIndex: 'typeName', stateId: 'typeName', flex: 1 },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_STATUS_COLUMN'), dataIndex: 'statusDescription', stateId: 'statusDescription' },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_SCHEDULE_COLUMN'), dataIndex: 'schedule', stateId: 'schedule' },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_NEXT_RUN_COLUMN'), dataIndex: 'nextRun', stateId: 'nextRun', flex: 1 },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_LAST_RUN_COLUMN'), dataIndex: 'lastRun', stateId: 'lastRun', flex: 1 },
-    { header: NX.I18n.get('ADMIN_TASKS_LIST_LAST_RESULT_COLUMN'), dataIndex: 'lastRunResult', stateId: 'lastRunResult' }
+    { header: NX.I18n.get('Task_TaskList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 1 },
+    { header: NX.I18n.get('Task_TaskList_Type_Header'), dataIndex: 'typeName', stateId: 'typeName', flex: 1 },
+    { header: NX.I18n.get('Task_TaskList_Status_Header'), dataIndex: 'statusDescription', stateId: 'statusDescription' },
+    { header: NX.I18n.get('Task_TaskList_Schedule_Header'), dataIndex: 'schedule', stateId: 'schedule' },
+    { header: NX.I18n.get('Task_TaskList_NextRun_Header'), dataIndex: 'nextRun', stateId: 'nextRun', flex: 1 },
+    { header: NX.I18n.get('Task_TaskList_LastRun_Header'), dataIndex: 'lastRun', stateId: 'lastRun', flex: 1 },
+    { header: NX.I18n.get('Task_TaskList_LastResult_Header'), dataIndex: 'lastRunResult', stateId: 'lastRunResult' }
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('ADMIN_TASKS_LIST_EMPTY_STATE'),
+    emptyText: NX.I18n.get('Task_TaskList_EmptyState'),
     deferEmptyText: false
   },
 
@@ -61,7 +61,7 @@ Ext.define('NX.coreui.view.task.TaskList', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_TASKS_LIST_NEW_BUTTON'),
+        text: NX.I18n.get('Task_TaskList_New_Button'),
         glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
         action: 'new',
         disabled: true
@@ -70,7 +70,7 @@ Ext.define('NX.coreui.view.task.TaskList', {
   }],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_TASKS_LIST_FILTER_ERROR') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Task_TaskList_Filter_EmptyState') }
   ]
 
 });

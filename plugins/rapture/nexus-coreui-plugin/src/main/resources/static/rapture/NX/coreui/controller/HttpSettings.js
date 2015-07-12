@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.HttpSettings', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Permissions',
     'NX.I18n'
@@ -37,8 +37,8 @@ Ext.define('NX.coreui.controller.HttpSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/System/HTTP',
-      text: NX.I18n.get('ADMIN_HTTP_TITLE'),
-      description: NX.I18n.get('ADMIN_HTTP_SUBTITLE'),
+      text: NX.I18n.get('HttpSettings_Text'),
+      description: NX.I18n.get('HttpSettings_Description'),
       view: { xtype: 'nx-coreui-system-http-settings' },
       iconConfig: {
         file: 'lorry.png',
@@ -59,8 +59,9 @@ Ext.define('NX.coreui.controller.HttpSettings', {
   },
 
   /**
-   * @private
    * Enable HTTPS proxy settings only when HTTP proxy settings are enabled.
+   *
+   * @private
    */
   onHttpEnabledChanged: function (httpEnabled) {
     var form = httpEnabled.up('form'),

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -26,7 +26,6 @@ Ext.define('NX.coreui.view.repository.recipe.RawProxy', {
     'NX.coreui.view.repository.facet.ProxyFacet',
     'NX.coreui.view.repository.facet.StorageFacet',
     'NX.coreui.view.repository.facet.HttpClientFacet',
-    'NX.coreui.view.repository.facet.RawContentFacet',
     'NX.coreui.view.repository.facet.NegativeCacheFacet'
   ],
   
@@ -37,7 +36,6 @@ Ext.define('NX.coreui.view.repository.recipe.RawProxy', {
     var me = this;
 
     me.items = [
-      { xtype: 'nx-coreui-repository-content-rawcontent-facet' },
       { xtype: 'nx-coreui-repository-proxy-facet'},
       { xtype: 'nx-coreui-repository-storage-facet'},
       { xtype: 'nx-coreui-repository-negativecache-facet'},

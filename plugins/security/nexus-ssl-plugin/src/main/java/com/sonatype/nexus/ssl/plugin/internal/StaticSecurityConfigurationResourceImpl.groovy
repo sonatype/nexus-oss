@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -35,6 +35,7 @@ class StaticSecurityConfigurationResourceImpl
         privileges: [
             new CPrivilege(
                 id: 'ssl-truststore-all',
+                description: 'All permissions for SSL Truststore',
                 type: 'application',
                 properties: [
                     domain : 'ssl-truststore',
@@ -43,6 +44,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ssl-truststore-read',
+                description: 'Read permission for SSL Truststore',
                 type: 'application',
                 properties: [
                     domain : 'ssl-truststore',
@@ -51,6 +53,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ssl-truststore-create',
+                description: 'Create permission for SSL Truststore',
                 type: 'application',
                 properties: [
                     domain : 'ssl-truststore',
@@ -59,6 +62,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ssl-truststore-update',
+                description: 'Update permission for SSL Truststore',
                 type: 'application',
                 properties: [
                     domain : 'ssl-truststore',
@@ -67,6 +71,7 @@ class StaticSecurityConfigurationResourceImpl
             ),
             new CPrivilege(
                 id: 'ssl-truststore-delete',
+                description: 'Delete permission for SSL Truststore',
                 type: 'application',
                 properties: [
                     domain : 'ssl-truststore',

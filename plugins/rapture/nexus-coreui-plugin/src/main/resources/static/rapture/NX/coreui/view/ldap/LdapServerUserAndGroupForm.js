@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -27,6 +27,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
 
   items: { xtype: 'nx-coreui-ldapserver-userandgroup-fieldset' },
 
+  editableMarker: NX.I18n.get('Ldap_LdapServerConnectionForm_Update_Error'),
+
   /**
    * @override
    */
@@ -38,8 +40,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
     me.callParent(arguments);
 
     me.getDockedItems('toolbar[dock="bottom"]')[0].add(
-        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_MAPPING_BUTTON'), formBind: true, action: 'verifyusermapping' },
-        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_LOGIN_BUTTON'), formBind: true, action: 'verifylogin' }
+        { xtype: 'button', text: NX.I18n.get('Ldap_LdapServerUserAndGroupForm_VerifyGroupMapping_Button'), formBind: true, action: 'verifyusermapping' },
+        { xtype: 'button', text: NX.I18n.get('Ldap_LdapServerUserAndGroupForm_VerifyLogin_Button'), formBind: true, action: 'verifylogin' }
     );
   },
 
@@ -48,9 +50,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
    * Additionally, marks invalid properties.
    */
   markInvalid: function(errors) {
-    var me = this;
-
-    me.down('nx-coreui-ldapserver-userandgroup-fieldset').markInvalid(errors);
+    this.down('nx-coreui-ldapserver-userandgroup-fieldset').markInvalid(errors);
   }
 
 });

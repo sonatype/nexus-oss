@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,7 +19,6 @@ import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.validation.group.Create;
 
 import com.google.common.collect.Maps;
-import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -33,19 +32,14 @@ public class SettingsCapabilityConfiguration
     extends RaptureSettings
 {
 
-  @NonNls
   public static final String DEBUG_ALLOWED = "debugAllowed";
 
-  @NonNls
   public static final String STATUS_INTERVAL_AUTHENTICATED = "statusIntervalAuthenticated";
 
-  @NonNls
   public static final String STATUS_INTERVAL_ANONYMOUS = "statusIntervalAnonymous";
 
-  @NonNls
   public static final String SESSION_TIMEOUT = "sessionTimeout";
 
-  @NonNls
   public static final String TITLE = "title";
 
   public SettingsCapabilityConfiguration() {

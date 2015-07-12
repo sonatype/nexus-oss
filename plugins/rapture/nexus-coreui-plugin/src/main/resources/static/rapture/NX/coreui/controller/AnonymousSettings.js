@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.AnonymousSettings', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Permissions',
     'NX.I18n'
@@ -37,8 +37,8 @@ Ext.define('NX.coreui.controller.AnonymousSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Security/Anonymous',
-      text: NX.I18n.get('ADMIN_ANONYMOUS_TITLE'),
-      description: NX.I18n.get('ADMIN_ANONYMOUS_SUBTITLE'),
+      text: NX.I18n.get('AnonymousSettings_Text'),
+      description: NX.I18n.get('AnonymousSettings_Description'),
       view: { xtype: 'nx-coreui-security-anonymous-settings' },
       iconConfig: {
         file: 'user_silhouette.png',

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -12,22 +12,30 @@
  */
 package org.sonatype.nexus.httpclient.config;
 
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.httpclient.HttpClientPlan;
 import org.sonatype.nexus.httpclient.SSLContextSelector;
 import org.sonatype.nexus.httpclient.internal.NexusHttpRoutePlanner;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.net.HttpHeaders;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -54,6 +62,46 @@ public class ConfigurationCustomizer
     extends ComponentSupport
     implements HttpClientPlan.Customizer
 {
+  /**
+   * Simple reusable function that converts "glob-like" expressions to regexp.
+   */
+  private static final Function<String, String> GLOB_STRING_TO_REGEXP_STRING = new Function<String, String>()
+  {
+    @Override
+    public String apply(final String input) {
+      return "(" +
+          input.toLowerCase(Locale.US).replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*?").replaceAll("\\[", "\\\\[")
+              .replaceAll("\\]", "\\\\]") + ")";
+    }
+  };
+
+  static {
+    /**
+     * Install custom {@link Authenticator} for proxy.
+     */
+    Authenticator.setDefault(new Authenticator()
+    {
+      @Override
+      protected PasswordAuthentication getPasswordAuthentication() {
+        if (getRequestorType() == RequestorType.PROXY) {
+          String prot = getRequestingProtocol().toLowerCase();
+          String host = System.getProperty(prot + ".proxyHost", "");
+          String port = System.getProperty(prot + ".proxyPort", "80");
+          String user = System.getProperty(prot + ".proxyUser", "");
+          String password = System.getProperty(prot + ".proxyPassword", "");
+
+          if (getRequestingHost().equalsIgnoreCase(host)) {
+            if (Integer.parseInt(port) == getRequestingPort()) {
+              // Seems to be OK.
+              return new PasswordAuthentication(user, password.toCharArray());
+            }
+          }
+        }
+        return null;
+      }
+    });
+  }
+
   private final HttpClientConfiguration configuration;
 
   public ConfigurationCustomizer(final HttpClientConfiguration configuration) {
@@ -104,8 +152,6 @@ public class ConfigurationCustomizer
    * Apply proxy-server configuration to plan.
    */
   private void apply(final ProxyConfiguration proxy, final HttpClientPlan plan) {
-    Map<String, HttpHost> proxies = new HashMap<>(2);
-
     // HTTP proxy
     ProxyServerConfiguration http = proxy.getHttp();
     if (http != null && http.isEnabled()) {
@@ -113,8 +159,6 @@ public class ConfigurationCustomizer
       if (http.getAuthentication() != null) {
         apply(http.getAuthentication(), plan, host);
       }
-      proxies.put(HTTP, host);
-      proxies.put(HTTPS, host);
     }
 
     // HTTPS proxy
@@ -124,22 +168,48 @@ public class ConfigurationCustomizer
       if (https.getAuthentication() != null) {
         apply(https.getAuthentication(), plan, host);
       }
+    }
+    plan.getClient().setRoutePlanner(createRoutePlanner(proxy));
+  }
+
+  /**
+   * Creates instance of {@link NexusHttpRoutePlanner} from passed in configuration, never {@code null}.
+   */
+  @VisibleForTesting
+  NexusHttpRoutePlanner createRoutePlanner(final ProxyConfiguration proxy) {
+    Map<String, HttpHost> proxies = new HashMap<>(2);
+
+    // HTTP proxy
+    ProxyServerConfiguration http = proxy.getHttp();
+    if (http != null && http.isEnabled()) {
+      HttpHost host = new HttpHost(http.getHost(), http.getPort());
+      proxies.put(HTTP, host);
       proxies.put(HTTPS, host);
     }
 
-    // Non-proxy hosts (nexus-specific regular expression implementation)
-    Set<Pattern> patterns = new HashSet<>();
+    // HTTPS proxy
+    ProxyServerConfiguration https = proxy.getHttps();
+    if (https != null && https.isEnabled()) {
+      HttpHost host = new HttpHost(https.getHost(), https.getPort());
+      proxies.put(HTTPS, host);
+    }
+
+    // Non-proxy hosts (Java http.nonProxyHosts formatted glob-like patterns converted to single Regexp expression)
+    LinkedHashSet<String> patterns = new LinkedHashSet<>();
     if (proxy.getNonProxyHosts() != null) {
-      for (String regex : proxy.getNonProxyHosts()) {
-        try {
-          patterns.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
-        }
-        catch (PatternSyntaxException e) {
-          log.warn("Invalid non-proxy host regex: {}", regex, e);
-        }
+      patterns.addAll(Arrays.asList(proxy.getNonProxyHosts()));
+    }
+    String nonProxyPatternString = Joiner.on("|").join(Iterables.transform(patterns, GLOB_STRING_TO_REGEXP_STRING));
+    Pattern nonProxyPattern = null;
+    if (!Strings2.isBlank(nonProxyPatternString)) {
+      try {
+        nonProxyPattern = Pattern.compile(nonProxyPatternString, Pattern.CASE_INSENSITIVE);
+      }
+      catch (PatternSyntaxException e) {
+        log.warn("Invalid non-proxy host regex: {}, using defaults", nonProxyPatternString, e);
       }
     }
-    plan.getClient().setRoutePlanner(new NexusHttpRoutePlanner(proxies, patterns));
+    return new NexusHttpRoutePlanner(proxies, nonProxyPattern);
   }
 
   /**

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -31,8 +31,8 @@ import org.hibernate.validator.constraints.NotEmpty
 class RepositoryXO
 {
   @Pattern(
-      regexp = /^[a-zA-Z0-9\-\.]{1}[a-zA-Z0-9_\-\.]*$/,
-      message = 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed'
+      regexp = /^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$/,
+      message = 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed and may not start with underscore or dot.'
   )
   @NotEmpty
   @UniqueRepositoryName(groups = Create)

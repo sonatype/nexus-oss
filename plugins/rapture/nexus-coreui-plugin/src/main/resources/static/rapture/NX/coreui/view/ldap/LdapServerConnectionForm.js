@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -27,6 +27,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionForm', {
 
   items: { xtype: 'nx-coreui-ldapserver-connection-fieldset' },
 
+  editableMarker: NX.I18n.get('Ldap_LdapServerConnectionForm_Update_Error'),
+
   /**
    * @override
    */
@@ -38,7 +40,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionForm', {
     me.callParent(arguments);
 
     me.getDockedItems('toolbar[dock="bottom"]')[0].add(
-        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_CONNECTION_VERIFY_BUTTON'), formBind: true, action: 'verifyconnection' }
+        { xtype: 'button', text: NX.I18n.get('Ldap_LdapServerConnectionForm_VerifyConnection_Button'), formBind: true, action: 'verifyconnection' }
     );
   }
 

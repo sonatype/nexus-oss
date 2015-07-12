@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -28,27 +28,30 @@ Ext.define('NX.coreui.view.system.HttpRequestSettings', {
     {
       xtype: 'textfield',
       name: 'userAgentSuffix',
-      fieldLabel: NX.I18n.get('ADMIN_HTTP_USER_AGENT_SUFFIX'),
-      helpText: NX.I18n.get('ADMIN_HTTP_USER_AGENT_SUFFIX_HELP')
+      fieldLabel: NX.I18n.get('System_HttpRequestSettings_UserAgentCustomization_FieldLabel'),
+      helpText: NX.I18n.get('System_HttpRequestSettings_UserAgentCustomization_HelpText')
     },
     {
       xtype: 'numberfield',
       name: 'timeout',
-      fieldLabel: NX.I18n.get('ADMIN_HTTP_TIMEOUT'),
-      helpText: NX.I18n.get('ADMIN_HTTP_TIMEOUT_HELP'),
+      fieldLabel: NX.I18n.get('System_HttpRequestSettings_Timeout_FieldLabel'),
+      helpText: NX.I18n.get('System_HttpRequestSettings_Timeout_HelpText'),
       allowDecimals: false,
       allowExponential: false,
-      minValue: 0,
-      maxValue: 3600
+      minValue: 1,
+      maxValue: 3600,
+      emptyText: '20'
     },
     {
       xtype: 'numberfield',
       name: 'retries',
-      fieldLabel: NX.I18n.get('ADMIN_HTTP_ATTEMPTS'),
+      fieldLabel: NX.I18n.get('System_HttpRequestSettings_Attempts_FieldLabel'),
+      helpText: NX.I18n.get('System_HttpRequestSettings_Attempts_HelpText'),
       allowDecimals: false,
       allowExponential: false,
       minValue: 0,
-      maxValue: 10
+      maxValue: 10,
+      emptyText: '2'
     }
   ]
 

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,6 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.BaseEncoding;
-import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,13 +31,11 @@ public final class Strings2
   /**
    * Platform new-line separator.
    */
-  @NonNls
   public static final String NL = System.lineSeparator();
 
   /**
    * Password mask.
    */
-  @NonNls
   public static final String MASK = "****";
 
   private Strings2() {}

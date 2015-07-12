@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -29,16 +29,16 @@ Ext.define('NX.util.DownloadHelper', {
   },
 
   /**
-   * @private
-   *
    * ExtJS component identifier for nested iframe.
+   *
+   * @private
    */
   windowId: 'nx-download-frame',
 
   /**
-   * @private
-   *
    * Window names in IE are very picky, using '_' instead of '-' so that its its a valid javascript identifier.
+   *
+   * @private
    */
   windowName: 'nx_download_frame',
 
@@ -62,7 +62,7 @@ Ext.define('NX.util.DownloadHelper', {
       });
 
       //<if debug>
-      me.logDebug('Created download-frame: ' + frame);
+      me.logDebug('Created download-frame:', frame);
       //</if>
     }
 
@@ -77,7 +77,7 @@ Ext.define('NX.util.DownloadHelper', {
     var me = this;
 
     //<if debug>
-    me.logDebug('Downloading URL: ' + url);
+    me.logDebug('Downloading URL:', url);
     //</if>
 
     // resolve the download frame
@@ -93,7 +93,7 @@ Ext.define('NX.util.DownloadHelper', {
 
     // open new window in hidden download-from to initiate download
     if (NX.Windows.open(url, me.windowName) !== null) {
-      NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_DOWNLOAD_SUCCESS'), type: 'success'});
+      NX.Messages.add({text: NX.I18n.get('Util_DownloadHelper_Download_Message'), type: 'success'});
     }
   }
 });

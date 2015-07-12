@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -30,6 +30,12 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacetHosted', {
   },
 
   /**
+   * @cfg String
+   * Set the write policy of storage, defaults to ALLOW_ONCE.
+   */
+  writePolicy: 'ALLOW_ONCE',
+
+  /**
    * @override
    */
   initComponent: function() {
@@ -39,22 +45,23 @@ Ext.define('NX.coreui.view.repository.facet.StorageFacetHosted', {
       {
         xtype: 'fieldset',
         cls: 'nx-form-section',
-        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_HOSTED_FACET'),
+        title: NX.I18n.get('Repository_Facet_StorageFacetHosted_Title'),
 
         items: [
           {
             xtype: 'combo',
             name: 'attributes.storage.writePolicy',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP'),
-            emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_PLACEHOLDER'),
+            itemId: 'writePolicy',
+            fieldLabel: NX.I18n.get('Repository_Facet_StorageFacetHosted_Deployment_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_StorageFacetHosted_Deployment_HelpText'),
+            emptyText: NX.I18n.get('Repository_Facet_StorageFacetHosted_Deployment_EmptyText'),
             editable: false,
             store: [
-              ['ALLOW', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_ALLOW_ITEM')],
-              ['ALLOW_ONCE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_DISABLE_ITEM')],
-              ['DENY', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_RO_ITEM')]
+              ['ALLOW', NX.I18n.get('Repository_Facet_StorageFacetHosted_Deployment_AllowItem')],
+              ['ALLOW_ONCE', NX.I18n.get('Repository_Facet_StorageFacetHosted_Deployment_DisableItem')],
+              ['DENY', NX.I18n.get('Repository_Facet_StorageFacetHosted_Deployment_ReadOnlyItem')]
             ],
-            value: 'ALLOW_ONCE',
+            value: me.writePolicy,
             queryMode: 'local'
           }
         ]

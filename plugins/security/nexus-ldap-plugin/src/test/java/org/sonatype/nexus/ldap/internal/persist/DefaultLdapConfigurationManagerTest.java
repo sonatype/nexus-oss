@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -93,11 +93,10 @@ public class DefaultLdapConfigurationManagerTest
   }
 
   private void compareConfiguration(LdapConfiguration expected, LdapConfiguration actual) throws Exception {
-    // FIXME: The use of object-mapper here is completly unused?!
     final ObjectMapper objectMapper = new ObjectMapper();
     final String expectedString = objectMapper.writeValueAsString(expected);
     final String actualString = objectMapper.writeValueAsString(actual);
-    assertThat(expected, equalTo(actual));
+    assertThat(expectedString, equalTo(actualString));
   }
 
   @Test

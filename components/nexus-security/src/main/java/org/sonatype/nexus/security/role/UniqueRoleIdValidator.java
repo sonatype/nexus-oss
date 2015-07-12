@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -17,6 +17,9 @@ import javax.inject.Named;
 import javax.validation.ConstraintValidatorContext;
 
 import org.sonatype.nexus.security.SecuritySystem;
+import org.sonatype.nexus.security.authz.AuthorizationManager;
+import org.sonatype.nexus.security.authz.NoSuchAuthorizationManagerException;
+import org.sonatype.nexus.security.internal.AuthorizationManagerImpl;
 import org.sonatype.nexus.validation.ConstraintValidatorSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -30,22 +33,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class UniqueRoleIdValidator
     extends ConstraintValidatorSupport<UniqueRoleId, String>
 {
-  private final SecuritySystem securitySystem;
+  private final AuthorizationManager authorizationManager;
 
   @Inject
-  public UniqueRoleIdValidator(final SecuritySystem securitySystem) {
-    this.securitySystem = checkNotNull(securitySystem);
+  public UniqueRoleIdValidator(final SecuritySystem securitySystem) throws NoSuchAuthorizationManagerException {
+    this.authorizationManager = checkNotNull(securitySystem).getAuthorizationManager(AuthorizationManagerImpl.SOURCE);
   }
 
   @Override
   public boolean isValid(final String value, final ConstraintValidatorContext context) {
     log.trace("Validating unique role-id: {}", value);
-    // TODO: sort out if we should limit to DEFAULT_SOURCE?
-    for (Role role : securitySystem.listRoles()) {
-      if (value.equals(role.getRoleId())) {
-        return false;
-      }
+    try {
+      authorizationManager.getRole(value);
+      return false;
     }
-    return true;
+    catch (NoSuchRoleException e) {
+      return true;
+    }
   }
 }

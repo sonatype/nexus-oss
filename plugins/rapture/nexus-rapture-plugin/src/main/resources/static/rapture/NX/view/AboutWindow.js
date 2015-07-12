@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,9 +18,10 @@
  * @since 3.0
  */
 Ext.define('NX.view.AboutWindow', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-aboutwindow',
   requires: [
+    'NX.I18n',
     'NX.Icons',
     'NX.State',
     'NX.util.Url'
@@ -31,19 +32,18 @@ Ext.define('NX.view.AboutWindow', {
     align: 'stretch'
   },
 
-  autoShow: true,
-  modal: true,
-  constrain: true,
-  width: 640,
   height: 480,
+  padding: 0,
 
-  title: NX.I18n.get('GLOBAL_ABOUT_TITLE'),
+  title: NX.I18n.get('AboutWindow_Title'),
 
   /**
    * @override
    */
   initComponent: function () {
     var me = this;
+
+    me.setWidth(me.LARGE_MODAL);
 
     me.items = [
       {
@@ -73,12 +73,12 @@ Ext.define('NX.view.AboutWindow', {
         flex: 1,
         items: [
           {
-            title: NX.I18n.get('GLOBAL_ABOUT_COPYRIGHT_TAB'),
+            title: NX.I18n.get('AboutWindow_About_Title'),
             xtype: 'uxiframe',
             src: NX.util.Url.urlOf('/COPYRIGHT.html')
           },
           {
-            title: NX.I18n.get('GLOBAL_ABOUT_LICENSE_TAB'),
+            title: NX.I18n.get('AboutWindow_License_Tab'),
             xtype: 'uxiframe',
             src: NX.util.Url.urlOf('/LICENSE.html')
           }
@@ -87,7 +87,7 @@ Ext.define('NX.view.AboutWindow', {
     ];
 
     me.buttons = [
-      { text: NX.I18n.get('GLOBAL_ABOUT_CLOSE_BUTTON'), action: 'close', ui: 'nx-primary', handler: function () { me.close(); }}
+      { text: NX.I18n.get('AboutWindow_Close_Button'), action: 'close', ui: 'nx-primary', handler: function () { me.close(); }}
     ];
     me.buttonAlign = 'left';
 

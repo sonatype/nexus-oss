@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -60,8 +60,6 @@ Ext.define('NX.ext.form.field.ItemSelector', {
    * @param button
    */
   customizeButton: function (name, button) {
-    var me = this;
-
     // remove icon
     delete button.iconCls;
 
@@ -96,7 +94,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
     if (!me.fromField) {
       tbar = {
         xtype: 'nx-searchbox',
-        emptyText: NX.I18n.get('GLOBAL_ITEM_SELECTOR_FILTER'),
+        emptyText: NX.I18n.get('Form_Field_ItemSelector_Empty'),
         searchDelay: 200,
         listeners: {
           search: me.onSearch,
@@ -172,9 +170,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
    * @private
    */
   onSearchCleared: function () {
-    var me = this;
-
-    me.fromField.store.clearFilter();
+    this.fromField.store.clearFilter();
   },
 
   // HACK: Looks like original item selector forgot to unbind from store which results in NPEs in #populateFromStore

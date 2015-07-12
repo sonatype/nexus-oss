@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,11 +19,13 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpStatus;
 
 import com.google.common.io.Files;
+import org.apache.http.entity.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
@@ -48,12 +50,10 @@ public class RawHostedIT
     final String path = "alphabet.txt";
 
     final File testFile = resolveTestFile(path);
-    final int response = rawClient.put(path, testFile);
+    final int response = rawClient.put(path, ContentType.TEXT_PLAIN, testFile);
     assertThat(response, is(HttpStatus.CREATED));
 
-    final byte[] bytes = rawClient.getBytes(path);
-
-    assertThat(bytes, is(Files.toByteArray(testFile)));
+    assertThat(bytes(rawClient.get(path)), is(Files.toByteArray(testFile)));
 
     assertThat(status(rawClient.delete(path)), is(HttpStatus.NO_CONTENT));
 

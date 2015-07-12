@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupMappingTestResults', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_LDAP_MAPPING_TITLE'),
+  title: NX.I18n.get('Ldap_LdapServerUserAndGroupMappingTestResults_Title'),
 
   layout: 'fit',
   autoShow: true,
@@ -35,7 +35,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupMappingTestResults', {
 
   buttonAlign: 'left',
   buttons: [
-    { text: NX.I18n.get('ADMIN_LDAP_MAPPING_CANCEL_BUTTON'), handler: function () {
+    { text: NX.I18n.get('Ldap_LdapServerUserAndGroupMappingTestResults_Close_Button'), handler: function () {
       this.up('window').close();
     }}
   ],
@@ -51,10 +51,10 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupMappingTestResults', {
     me.items = {
       xtype: 'grid',
       columns: [
-        { header: NX.I18n.get('ADMIN_LDAP_MAPPING_ID_COLUMN'), dataIndex: 'username', flex: 1 },
-        { header: NX.I18n.get('ADMIN_LDAP_MAPPING_NAME_COLUMN'), dataIndex: 'realName', flex: 1 },
-        { header: NX.I18n.get('ADMIN_LDAP_MAPPING_EMAIL_COLUMN'), dataIndex: 'email', width: 250 },
-        { header: NX.I18n.get('ADMIN_LDAP_MAPPING_ROLES_COLUMN'), dataIndex: 'membership', flex: 3 }
+        { header: NX.I18n.get('Ldap_LdapServerUserAndGroupMappingTestResults_ID_Header'), dataIndex: 'username', flex: 1 },
+        { header: NX.I18n.get('Ldap_LdapServerUserAndGroupMappingTestResults_Name_Header'), dataIndex: 'realName', flex: 1 },
+        { header: NX.I18n.get('Ldap_LdapServerUserAndGroupMappingTestResults_Email_Header'), dataIndex: 'email', width: 250 },
+        { header: NX.I18n.get('Ldap_LdapServerUserAndGroupMappingTestResults_Roles_Header'), dataIndex: 'membership', flex: 3 }
       ],
       store: Ext.create('Ext.data.JsonStore', {
         fields: ['username', 'realName', 'email', 'membership'],

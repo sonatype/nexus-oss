@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.repository.search;
 
 import java.io.IOException;
@@ -19,16 +18,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
@@ -42,6 +43,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.client.Client;
@@ -50,7 +52,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.internal.InternalSearchResponse;
-import org.jetbrains.annotations.NotNull;
+import org.elasticsearch.search.sort.SortBuilder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
@@ -99,7 +101,8 @@ public class SearchServiceImpl
     checkNotNull(repository);
     // TODO we should calculate the checksum of index settings and compare it with a value stored in index _meta tags
     // in case that they not match (settings changed) we should drop the index, recreate it and re-index all components
-    if (!client.get().admin().indices().prepareExists(repository.getName()).execute().actionGet().isExists()) {
+    if (!client.get().admin().indices().prepareExists(safeIndexName(repository)).execute().actionGet()
+        .isExists()) {
       // determine list of mapping configuration urls
       List<URL> urls = Lists.newArrayListWithExpectedSize(indexSettingsContributors.size() + 1);
       urls.add(Resources.getResource(getClass(), MAPPING_JSON)); // core mapping
@@ -236,12 +239,16 @@ public class SearchServiceImpl
 
   @Override
   public Iterable<SearchHit> browse(final QueryBuilder query, final int from, final int size) {
-    SearchResponse response = search(query, from, size);
+    SearchResponse response = search(query, null, from, size);
     return Arrays.asList(response.getHits().getHits());
   }
 
   @Override
-  public SearchResponse search(final QueryBuilder query, final int from, final int size) {
+  public SearchResponse search(final QueryBuilder query,
+                               final @Nullable List<SortBuilder> sort,
+                               final int from,
+                               final int size)
+  {
     checkNotNull(query);
     try {
       if (!client.get().admin().indices().prepareValidateQuery().setQuery(query).execute().actionGet().isValid()) {
@@ -256,13 +263,18 @@ public class SearchServiceImpl
     if (searchableIndexes.length == 0) {
       return new SearchResponse(InternalSearchResponse.empty(), null, 0, 0, 0, new ShardSearchFailure[]{});
     }
-    return client.get().prepareSearch(searchableIndexes)
+
+    SearchRequestBuilder searchRequestBuilder = client.get().prepareSearch(searchableIndexes)
         .setTypes(TYPE)
         .setQuery(query)
         .setFrom(from)
-        .setSize(size)
-        .execute()
-        .actionGet();
+        .setSize(size);
+    if (sort != null) {
+      for (SortBuilder entry : sort) {
+        searchRequestBuilder.addSort(entry);
+      }
+    }
+    return searchRequestBuilder.execute().actionGet();
   }
 
   private String[] getSearchableIndexes() {
@@ -286,9 +298,9 @@ public class SearchServiceImpl
   /**
    * Sanitize repository name in a consistent fashion to ensure that the name used for an index is safe.
    */
-  @NotNull
+  @Nonnull
   private String safeIndexName(final Repository repository) {
-    return repository.getName().toLowerCase(Locale.ENGLISH);
+    return Strings2.lower(repository.getName());
   }
 
 }

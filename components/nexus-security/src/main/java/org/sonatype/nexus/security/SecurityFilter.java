@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -42,9 +42,9 @@ public class SecurityFilter
 {
   private static final Logger log = LoggerFactory.getLogger(SecurityFilter.class);
 
-  private static final String ATTR_USER_PRINCIPAL = "nexus.user.principal";
+  public static final String ATTR_USER_PRINCIPAL = "nexus.user.principal";
 
-  private static final String ATTR_USER_ID = "nexus.user.id";
+  public static final String ATTR_USER_ID = "nexus.user.id";
 
   @Inject
   public SecurityFilter(final WebSecurityManager webSecurityManager,

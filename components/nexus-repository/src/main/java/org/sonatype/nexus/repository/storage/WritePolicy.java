@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -28,7 +28,7 @@ public enum WritePolicy
   /**
    * Asset can be linked with a blob.
    * Asset cannot be re-linked with another blob.
-   * Asset cannot be unlinked from a blob.
+   * Asset can be unlinked from a blob (blob can be deleted).
    */
   ALLOW_ONCE,
   /**
@@ -36,5 +36,26 @@ public enum WritePolicy
    * Asset cannot be re-linked with another blob.
    * Asset cannot be unlinked from a blob.
    */
-  DENY
+  DENY;
+
+  /**
+   * Returns {@code true} if Create allowed with this policy.
+   */
+  public boolean checkCreateAllowed() {
+    return this != DENY;
+  }
+
+  /**
+   * Returns {@code true} if Update allowed with this policy.
+   */
+  public boolean checkUpdateAllowed() {
+    return this == ALLOW;
+  }
+
+  /**
+   * Returns {@code true} if Delete allowed with this policy.
+   */
+  public boolean checkDeleteAllowed() {
+    return this != DENY;
+  }
 }

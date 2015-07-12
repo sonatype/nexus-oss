@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -37,7 +37,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsForm', {
       {
         xtype: 'panel',
         ui: 'nx-subsection',
-        title: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_SECTION'),
+        title: NX.I18n.get('Ssl_SslCertificateDetailsForm_Subject_Title'),
         items: {
           xtype: 'fieldset',
           margin: 0,
@@ -47,16 +47,16 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsForm', {
             labelAlign: 'left'
           },
           items: [
-            { name: 'subjectCommonName', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_NAME') },
-            { name: 'subjectOrganization', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_ORGANIZATION') },
-            { name: 'subjectOrganizationalUnit', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_UNIT') }
+            { name: 'subjectCommonName', fieldLabel: NX.I18n.get('Ssl_SslCertificateDetailsForm_SubjectCommonName_FieldLabel') },
+            { name: 'subjectOrganization', fieldLabel: NX.I18n.get('Ssl_SslCertificateDetailsForm_SubjectOrganization_FieldLabel') },
+            { name: 'subjectOrganizationalUnit', fieldLabel: NX.I18n.get('Ssl_SslCertificateDetailsForm_SubjectUnit_FieldLabel') }
           ]
         }
       },
       {
         xtype: 'panel',
         ui: 'nx-subsection',
-        title: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_SECTION'),
+        title: NX.I18n.get('Ssl_SslCertificateDetailsForm_Issuer_Title'),
         items: {
           xtype: 'fieldset',
           margin: 0,
@@ -66,16 +66,16 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsForm', {
             labelAlign: 'left'
           },
           items: [
-            { name: 'issuerCommonName', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_NAME') },
-            { name: 'issuerOrganization', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_ORGANIZATION') },
-            { name: 'issuerOrganizationalUnit', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_UNIT') }
+            { name: 'issuerCommonName', fieldLabel: NX.I18n.get('Ssl_SslCertificateDetailsForm_IssuerName_FieldLabel') },
+            { name: 'issuerOrganization', fieldLabel: NX.I18n.get('Ssl_SslCertificateDetailsForm_IssuerOrganization_FieldLabel') },
+            { name: 'issuerOrganizationalUnit', fieldLabel: NX.I18n.get('Ssl_SslCertificateDetailsForm_IssuerUnit_FieldLabel') }
           ]
         }
       },
       {
         xtype: 'panel',
         ui: 'nx-subsection',
-        title: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_SECTION'),
+        title: NX.I18n.get('Ssl_SslCertificateDetailsForm_Certificate_Title'),
         items: {
           xtype: 'fieldset',
           margin: 0,
@@ -87,17 +87,17 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsForm', {
           items: [
             {
               name: 'issuedOn',
-              fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_ISSUED'),
+              fieldLabel: NX.I18n.get('Ssl_SslCertificateDetailsForm_CertificateIssuedOn_FieldLabel'),
               renderer: NX.util.DateFormat.timestampRenderer()
             },
             {
               name: 'expiresOn',
-              fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_VALID'),
+              fieldLabel: NX.I18n.get('Ssl_SslCertificateDetailsForm_CertificateValidUntil_FieldLabel'),
               renderer: NX.util.DateFormat.timestampRenderer()
             },
             {
               name: 'fingerprint',
-              fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_FINGERPRINT')
+              fieldLabel: NX.I18n.get('Ssl_SslCertificateDetailsForm_CertificateFingerprint_FieldLabel')
             }
           ]
         }

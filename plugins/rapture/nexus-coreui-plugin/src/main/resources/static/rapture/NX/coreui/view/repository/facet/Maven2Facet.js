@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -40,30 +40,24 @@ Ext.define('NX.coreui.view.repository.facet.Maven2Facet', {
       {
         xtype: 'fieldset',
         cls: 'nx-form-section',
-        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_MAVEN2_FACET'),
+        title: NX.I18n.get('Repository_Facet_Maven2Facet_Title'),
 
         items: [
           {
             xtype: 'combo',
             name: 'attributes.maven.versionPolicy',
             itemId: 'versionPolicy',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_HELP'),
-            emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_PLACEHOLDER'),
+            fieldLabel: NX.I18n.get('Maven2Facet_VersionPolicy_FieldLabel'),
+            helpText: NX.I18n.get('Maven2Facet_VersionPolicy_HelpText'),
+            emptyText: NX.I18n.get('Maven2Facet_VersionPolicy_EmptyText'),
             editable: false,
             store: [
-              ['RELEASE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_RELEASE_ITEM')],
-              ['SNAPSHOT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_SNAPSHOT_ITEM')],
-              ['MIXED', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_VERSION_POLICY_MIXED_ITEM')]
+              ['RELEASE', NX.I18n.get('Maven2Facet_VersionPolicy_ReleaseItem')],
+              ['SNAPSHOT', NX.I18n.get('Maven2Facet_VersionPolicy_SnapshotItem')],
+              ['MIXED', NX.I18n.get('Maven2Facet_VersionPolicy_MixedItem')]
             ],
             value: 'RELEASE',
             readOnlyOnUpdate: true
-          },
-          {
-            xtype: 'checkbox',
-            name: 'attributes.maven.strictContentTypeValidation',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CONTENT_TYPE_VALIDATION'),
-            value: true
           }
         ]
       }

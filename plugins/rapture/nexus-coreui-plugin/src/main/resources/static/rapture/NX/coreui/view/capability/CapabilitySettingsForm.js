@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -39,7 +39,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
     },
     {
       xtype: 'checkbox',
-      fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SETTINGS_ENABLED'),
+      fieldLabel: NX.I18n.get('Capability_CapabilitySettingsForm_Enabled_FieldLabel'),
       name: 'enabled',
       allowBlank: false,
       checked: true,
@@ -48,10 +48,23 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
     { xtype: 'nx-coreui-formfield-settingsfieldset' }
   ],
 
+  editableMarker: NX.I18n.get('Capability_CapabilityAdd_Create_Error'),
+
+  /**
+   * @override
+   */
+  initComponent: function() {
+    var me = this;
+
+    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:capabilities:update');
+
+    me.callParent(arguments);
+  },
+
   /**
    * @override
    * Imports capability into settings field set.
-   * @param {NX.model.Capability} model capability model
+   * @param {NX.coreui.model.Capability} model capability model
    */
   loadRecord: function(model) {
     var me = this,

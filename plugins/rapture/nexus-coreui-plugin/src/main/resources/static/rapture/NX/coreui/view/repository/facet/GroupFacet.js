@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -71,17 +71,17 @@ Ext.define('NX.coreui.view.repository.facet.GroupFacet', {
       {
         xtype: 'fieldset',
         cls: 'nx-form-section',
-        title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_SETTINGS_GROUP_FACET'),
+        title: NX.I18n.get('Repository_Facet_GroupFacet_Title'),
 
         items: {
           xtype: 'nx-itemselector',
           name: 'attributes.group.memberNames',
           itemId: 'groupMemberNames',
-          fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS'),
-          helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_HELP'),
+          fieldLabel: NX.I18n.get('Repository_Facet_GroupFacet_Members_FieldLabel'),
+          helpText: NX.I18n.get('Repository_Facet_GroupFacet_Members_HelpText'),
           buttons: ['up', 'add', 'remove', 'down'],
-          fromTitle: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_FROM'),
-          toTitle: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_TO'),
+          fromTitle: NX.I18n.get('Repository_Facet_GroupFacet_Members_FromTitle'),
+          toTitle: NX.I18n.get('Repository_Facet_GroupFacet_Members_ToTitle'),
           store: me.repositoryStore,
           valueField: 'id',
           displayField: 'name'

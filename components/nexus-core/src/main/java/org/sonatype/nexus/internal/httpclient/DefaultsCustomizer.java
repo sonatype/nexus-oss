@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -23,6 +23,7 @@ import org.sonatype.sisu.goodies.common.Time;
 
 import com.google.common.net.HttpHeaders;
 import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,6 +43,8 @@ public class DefaultsCustomizer
 
   private final Time requestTimeout;
 
+  private final Time connectionRequestTimeout;
+
   private final Time keepAliveDuration;
 
   private final ByteSize bufferSize;
@@ -49,7 +52,8 @@ public class DefaultsCustomizer
   @Inject
   public DefaultsCustomizer(
       final UserAgentGenerator userAgentGenerator,
-      @Named("${nexus.httpclient.requestTimeout:-30s}") final Time requestTimeout,
+      @Named("${nexus.httpclient.requestTimeout:-20s}") final Time requestTimeout,
+      @Named("${nexus.httpclient.connectionRequestTimeout:-30s}") final Time connectionRequestTimeout,
       @Named("${nexus.httpclient.keepAliveDuration:-30s}") final Time keepAliveDuration,
       @Named("${nexus.httpclient.bufferSize:-8k}") final ByteSize bufferSize)
   {
@@ -57,6 +61,9 @@ public class DefaultsCustomizer
 
     this.requestTimeout = checkNotNull(requestTimeout);
     log.debug("Request timeout: {}", requestTimeout);
+
+    this.connectionRequestTimeout = checkNotNull(connectionRequestTimeout);
+    log.debug("Connection request timeout: {}", connectionRequestTimeout);
 
     this.keepAliveDuration = checkNotNull(keepAliveDuration);
     log.debug("Keep-alive duration: {}", keepAliveDuration);
@@ -73,11 +80,17 @@ public class DefaultsCustomizer
     plan.getHeaders().put(HttpHeaders.USER_AGENT, plan.getUserAgent());
 
     plan.getClient().setKeepAliveStrategy(new NexusConnectionKeepAliveStrategy(keepAliveDuration.toMillis()));
+    plan.getClient().setRetryHandler(new StandardHttpRequestRetryHandler(2, false));
 
     plan.getConnection().setBufferSize(bufferSize.toBytesI());
 
-    plan.getRequest().setConnectionRequestTimeout(requestTimeout.toMillisI());
+    plan.getRequest().setConnectionRequestTimeout(connectionRequestTimeout.toMillisI());
     plan.getRequest().setCookieSpec(CookieSpecs.IGNORE_COOKIES);
     plan.getRequest().setExpectContinueEnabled(false);
+
+    int requestTimeoutMillis = requestTimeout.toMillisI();
+    plan.getSocket().setSoTimeout(requestTimeoutMillis);
+    plan.getRequest().setConnectTimeout(requestTimeoutMillis);
+    plan.getRequest().setSocketTimeout(requestTimeoutMillis);
   }
 }

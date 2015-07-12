@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -41,18 +41,18 @@ Ext.define('NX.coreui.view.role.RoleList', {
         return 'role-default';
       }
     },
-    {header: NX.I18n.get('ADMIN_ROLES_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 1},
-    {header: NX.I18n.get('ADMIN_ROLES_LIST_SOURCE_COLUMN'), dataIndex: 'source', stateId: 'source'},
-    {header: NX.I18n.get('ADMIN_ROLES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', stateId: 'description', flex: 1}
+    {header: NX.I18n.get('Role_RoleList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 1},
+    {header: NX.I18n.get('Role_RoleList_Source_Header'), dataIndex: 'source', stateId: 'source'},
+    {header: NX.I18n.get('Role_RoleList_Description_Header'), dataIndex: 'description', stateId: 'description', flex: 1}
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('ADMIN_ROLES_LIST_EMPTY_STATE'),
+    emptyText: NX.I18n.get('Role_RoleList_EmptyText'),
     deferEmptyText: false
   },
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_ROLES_LIST_FILTER_ERROR') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Role_RoleList_Filter_EmptyText') }
   ],
 
   /**
@@ -66,9 +66,9 @@ Ext.define('NX.coreui.view.role.RoleList', {
       dock: 'top',
       cls: 'nx-actions nx-borderless',
       items: [
-        { xtype: 'button', text: NX.I18n.get('ADMIN_ROLES_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
+        { xtype: 'button', text: NX.I18n.get('Role_RoleList_New_Button'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
           menu: [
-            { text: NX.I18n.get('ADMIN_ROLES_LIST_NEXUS_ROLE_ITEM'), action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
+            { text: NX.I18n.get('Role_RoleList_New_NexusRoleItem'), action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
           ]
         }
       ]

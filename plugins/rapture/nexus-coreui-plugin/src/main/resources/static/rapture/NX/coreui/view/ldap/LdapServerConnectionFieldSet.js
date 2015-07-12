@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -38,11 +38,11 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     {
       name: 'name',
       itemId: 'name',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_NAME')
+      fieldLabel: NX.I18n.get('LdapServersConnectionFieldSet_Name_FieldLabel')
     },
     {
       xtype: 'label',
-      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_ADDRESS'),
+      text: NX.I18n.get('LdapServersConnectionFieldSet_Address_Text'),
       style: {
         fontWeight: 'bold',
         display: 'block',
@@ -52,7 +52,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     },
     {
       xtype: 'label',
-      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_ADDRESS_HELP'),
+      text: NX.I18n.get('LdapServersConnectionFieldSet_Address_HelpText'),
       style: {
         fontSize: '10px',
         display: 'block',
@@ -66,11 +66,11 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       cls: 'nx-float-left',
       blankText: 'Required',
       width: 85,
-      emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_PLACEHOLDER'),
+      emptyText: NX.I18n.get('LdapServersConnectionFieldSet_Protocol_EmptyText'),
       editable: false,
       store: [
-        ['ldap', NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_PLAIN_ITEM')],
-        ['ldaps', NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_SECURE_ITEM')]
+        ['ldap', NX.I18n.get('LdapServersConnectionFieldSet_Protocol_PlainItem')],
+        ['ldaps', NX.I18n.get('LdapServersConnectionFieldSet_Protocol_SecureItem')]
       ],
       queryMode: 'local',
       listeners: {
@@ -91,7 +91,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       cls: 'nx-float-left',
       blankText: 'Required',
       width: 405,
-      emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST_PLACEHOLDER'),
+      emptyText: NX.I18n.get('LdapServersConnectionFieldSet_Host_EmptyText'),
       listeners: {
         change: function(){
           var protocol = this.up('form').down('#port');
@@ -111,7 +111,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       cls: 'nx-float-left',
       blankText: 'Required',
       width: 75,
-      emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PORT_PLACEHOLDER'),
+      emptyText: NX.I18n.get('LdapServersConnectionFieldSet_Port_EmptyText'),
       minValue: 1,
       maxValue: 65535,
       allowDecimals: false,
@@ -130,21 +130,21 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     },
     {
       name: 'searchBase',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_BASE'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_BASE_HELP'),
+      fieldLabel: NX.I18n.get('LdapServersConnectionFieldSet_Base_FieldLabel'),
+      helpText: NX.I18n.get('LdapServersConnectionFieldSet_Base_HelpText'),
       cls: 'nx-clear-both'
     },
     {
       xtype: 'combo',
       name: 'authScheme',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH'),
-      emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH_PLACEHOLDER'),
+      fieldLabel: NX.I18n.get('LdapServersConnectionFieldSet_AuthMethod_FieldLabel'),
+      emptyText: NX.I18n.get('LdapServersConnectionFieldSet_AuthMethod_EmptyText'),
       editable: false,
       store: [
-        ['simple', NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH_SIMPLE_ITEM')],
-        ['none', NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH_ANONYMOUS_ITEM')],
-        ['DIGEST-MD5', NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH_DIGEST_ITEM')],
-        ['CRAM-MD5', NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH_CRAM_ITEM')]
+        ['simple', NX.I18n.get('LdapServersConnectionFieldSet_AuthMethod_SimpleItem')],
+        ['none', NX.I18n.get('LdapServersConnectionFieldSet_AuthMethod_AnonymousItem')],
+        ['DIGEST-MD5', NX.I18n.get('LdapServersConnectionFieldSet_AuthMethod_DigestItem')],
+        ['CRAM-MD5', NX.I18n.get('LdapServersConnectionFieldSet_AuthMethod_CramItem')]
       ],
       queryMode: 'local',
       listeners: {
@@ -156,30 +156,30 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     {
       name: 'authRealm',
       itemId: 'authRealm',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_SASL'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_SASL_HELP'),
+      fieldLabel: NX.I18n.get('LdapServersConnectionFieldSet_SaslRealm_FieldLabel'),
+      helpText: NX.I18n.get('LdapServersConnectionFieldSet_SaslRealm_HelpText'),
       allowBlank: true,
       authScheme: ['DIGEST-MD5', 'CRAM-MD5']
     },
     {
       name: 'authUsername',
       itemId: 'authUsername',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_USERNAME'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_USERNAME_HELP'),
+      fieldLabel: NX.I18n.get('LdapServersConnectionFieldSet_Username_FieldLabel'),
+      helpText: NX.I18n.get('LdapServersConnectionFieldSet_Username_HelpText'),
       authScheme: ['simple', 'DIGEST-MD5', 'CRAM-MD5']
     },
     {
       xtype: 'nx-password',
       name: 'authPassword',
       itemId: 'authPassword',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_PASSWORD'),
+      fieldLabel: NX.I18n.get('LdapServersConnectionFieldSet_Password_FieldLabel'),
       inputType: 'password',
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PASSWORD_HELP'),
+      helpText: NX.I18n.get('LdapServersConnectionFieldSet_Password_HelpText'),
       authScheme: ['simple', 'DIGEST-MD5', 'CRAM-MD5']
     },
     {
       xtype: 'label',
-      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES'),
+      text: NX.I18n.get('LdapServersConnectionFieldSet_Rules_Text'),
       style: {
         fontWeight: 'bold',
         display: 'block',
@@ -189,7 +189,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     },
     {
       xtype: 'label',
-      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES_HELP'),
+      text: NX.I18n.get('LdapServersConnectionFieldSet_Rules_HelpText'),
       style: {
         fontSize: '10px',
         display: 'block',
@@ -199,7 +199,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     {
       xtype: 'label',
       cls: 'nx-float-left nx-interstitial-label',
-      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES_1')
+      text: NX.I18n.get('LdapServersConnectionFieldSet_Rules_Text1')
     },
     {
       xtype: 'numberfield',
@@ -211,7 +211,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     {
       xtype: 'label',
       cls: 'nx-float-left nx-interstitial-label',
-      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES_2')
+      text: NX.I18n.get('LdapServersConnectionFieldSet_Rules_Text2')
     },
     {
       xtype: 'numberfield',
@@ -223,7 +223,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     {
       xtype: 'label',
       cls: 'nx-float-left nx-interstitial-label',
-      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES_3')
+      text: NX.I18n.get('LdapServersConnectionFieldSet_Rules_Text3')
     },
     {
       xtype: 'numberfield',
@@ -235,7 +235,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     {
       xtype: 'label',
       cls: 'nx-float-left nx-interstitial-label',
-      text: NX.I18n.get('ADMIN_LDAP_CONNECTION_RULES_4')
+      text: NX.I18n.get('LdapServersConnectionFieldSet_Rules_Text4')
     }
   ],
 

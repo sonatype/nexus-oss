@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -62,7 +62,7 @@ Ext.define('NX.util.DateFormat', {
 
     // if no format, complain and return the full ISO-8601 format
     if (!name) {
-      this.logWarn('Missing named format: ' + name);
+      this.logWarn('Missing named format:', name);
       return 'c';
     }
 
@@ -72,21 +72,22 @@ Ext.define('NX.util.DateFormat', {
   },
 
   /**
-   * @public
    * Formats the passed timestamp using the specified format pattern.
+   *
+   * @public
    * @param {Number} value The value to format converted to a date by the Javascript's built-in Date#parse method.
    * @param {String} [format] Any valid date format string. Defaults to {@link Ext.Date#defaultFormat}.
    * @return {String} The formatted date string
    */
   timestamp: function (value, format) {
-    var me = this;
     format = format || NX.util.DateFormat.forName('datetime')['long'];
     return value ? Ext.util.Format.date(new Date(value), format) : undefined;
   },
 
   /**
-   * @public
    * Returns a timestamp rendering function that can be reused to apply a date format multiple times efficiently.
+   *
+   * @public
    * @param {String} format Any valid date format string. Defaults to {@link Ext.Date#defaultFormat}.
    * @return {Function} The date formatting function
    */

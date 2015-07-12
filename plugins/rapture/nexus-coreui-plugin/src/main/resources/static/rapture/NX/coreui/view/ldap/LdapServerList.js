@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -40,13 +40,13 @@ Ext.define('NX.coreui.view.ldap.LdapServerList', {
         return 'ldapserver-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_LDAP_LIST_ORDER_COLUMN'), dataIndex: 'order', stateId: 'order', width: 80 },
-    { header: NX.I18n.get('ADMIN_LDAP_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 1 },
-    { header: NX.I18n.get('ADMIN_LDAP_LIST_URL_COLUMN'), dataIndex: 'url', stateId: 'url', flex: 1 }
+    { header: NX.I18n.get('Ldap_LdapServerList_Order_Header'), dataIndex: 'order', stateId: 'order', width: 80 },
+    { header: NX.I18n.get('Ldap_LdapServerList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 1 },
+    { header: NX.I18n.get('Ldap_LdapServerList_URL_Header'), dataIndex: 'url', stateId: 'url', flex: 1 }
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('ADMIN_LDAP_LIST_EMPTY_STATE'),
+    emptyText: NX.I18n.get('Ldap_LdapServerList_EmptyText'),
     deferEmptyText: false
   },
 
@@ -57,21 +57,21 @@ Ext.define('NX.coreui.view.ldap.LdapServerList', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_LDAP_LIST_NEW_BUTTON'),
+        text: NX.I18n.get('Ldap_LdapServerList_New_Button'),
         glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
         action: 'new',
         disabled: true
       },
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_LDAP_LIST_ORDER_BUTTON'),
+        text: NX.I18n.get('Ldap_LdapServerList_ChangeOrder_Button'),
         glyph: 'xf162@FontAwesome' /* fa-sort-numeric-asc */,
         action: 'changeorder',
         disabled: true
       },
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_LDAP_LIST_CACHE_BUTTON'),
+        text: NX.I18n.get('Ldap_LdapServerList_ClearCache_Button'),
         glyph: 'xf014@FontAwesome' /* fa-trash-o */,
         action: 'clearcache',
         disabled: true
@@ -80,7 +80,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerList', {
   }],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_LDAP_LIST_FILTER_ERROR') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Ldap_LdapServerList_Filter_EmptyText') }
   ]
 
 });

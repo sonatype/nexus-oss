@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -71,8 +71,17 @@ public class HttpClientConfiguration
 
   public HttpClientConfiguration copy() {
     try {
-      // FIXME: Address deep clone
-      return (HttpClientConfiguration) clone();
+      HttpClientConfiguration copy = (HttpClientConfiguration) clone();
+      if (connection != null) {
+        copy.connection = connection.copy();
+      }
+      if (proxy != null) {
+        copy.proxy = proxy.copy();
+      }
+      if (authentication != null) {
+        copy.authentication = authentication.copy();
+      }
+      return copy;
     }
     catch (CloneNotSupportedException e) {
       throw Throwables.propagate(e);

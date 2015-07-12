@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -33,7 +33,7 @@ Ext.define('NX.coreui.view.capability.CapabilityStatus', {
    * @param {String} text status text
    */
   showStatus: function (text) {
-    this.html = text || NX.I18n.get('ADMIN_CAPABILITIES_STATUS_EMPTY_STATE');
+    this.html = text || NX.I18n.get('Capability_CapabilityStatus_EmptyText');
     if (this.body) {
       this.update(this.html);
     }

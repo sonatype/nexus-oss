@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -36,7 +36,7 @@ Ext.define('NX.view.feature.NotFound', {
     me.items = [
       {
         xtype: 'label',
-        text: me.path ? NX.I18n.format('GLOBAL_404_PATH', me.path) : NX.I18n.get('GLOBAL_404_NO_PATH'),
+        text: me.path ? NX.I18n.format('Feature_NotFoundPath_Text', me.path) : NX.I18n.get('Feature_NotFound_Text'),
         style: {
           'color': '#000000',
           'font-size': '20px',

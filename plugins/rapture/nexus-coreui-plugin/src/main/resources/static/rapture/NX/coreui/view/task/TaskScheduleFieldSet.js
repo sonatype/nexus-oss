@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -35,17 +35,17 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
       xtype: 'combo',
       name: 'schedule',
       itemId: 'schedule',
-      fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE'),
-      emptyText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_PLACEHOLDER'),
+      fieldLabel: NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_FieldLabel'),
+      emptyText: NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_EmptyText'),
       editable: false,
       store: [
-        ['manual', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_MANUAL')],
-        ['once', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_ONCE')],
-        ['hourly', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_HOURLY')],
-        ['daily', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_DAILY')],
-        ['weekly', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_WEEKLY')],
-        ['monthly', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_MONTHLY')],
-        ['advanced', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_ADVANCED')]
+        ['manual', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_ManualItem')],
+        ['once', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_OnceItem')],
+        ['hourly', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_HourlyItem')],
+        ['daily', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_DailyItem')],
+        ['weekly', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_WeeklyItem')],
+        ['monthly', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_MonthlyItem')],
+        ['advanced', NX.I18n.get('Task_TaskScheduleFieldSet_Recurrence_AdvancedItem')]
       ],
       queryMode: 'local',
       listeners: {

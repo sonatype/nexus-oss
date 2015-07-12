@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkState;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 
 /**
  * Session servlet, to expose end-point for configuration of Shiro authentication filter to
@@ -56,6 +57,8 @@ public class SessionServlet
     // sanity check
     checkState(subject.isAuthenticated());
     checkState(subject.getSession(false) != null);
+
+    response.setStatus(SC_NO_CONTENT);
   }
 
   /**
@@ -71,6 +74,9 @@ public class SessionServlet
 
     // sanity check
     checkState(!subject.isAuthenticated());
+    checkState(!subject.isRemembered());
     checkState(subject.getSession(false) == null);
+
+    response.setStatus(SC_NO_CONTENT);
   }
 }

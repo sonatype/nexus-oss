@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,15 +20,16 @@
 Ext.define('NX.view.ModalDialog', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-modal-dialog',
-  requires: [
-    'NX.I18n'
-  ],
 
   layout: 'fit',
   autoShow: true,
   modal: true,
   constrain: true,
-  width: 400,
-  closable: false
+  closable: false,
+  resizable: false,
 
+  // Standard modal widths
+  SMALL_MODAL: 320,
+  MEDIUM_MODAL: 480,
+  LARGE_MODAL: 640
 });

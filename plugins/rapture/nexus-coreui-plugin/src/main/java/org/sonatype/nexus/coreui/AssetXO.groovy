@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -14,6 +14,7 @@ package org.sonatype.nexus.coreui
 
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Asset exchange object.
@@ -24,7 +25,27 @@ import groovy.transform.ToString
 @EqualsAndHashCode(includes = ["id"])
 class AssetXO
 {
+  @NotEmpty
   String id
+
+  @NotEmpty
   String name
+
+  @NotEmpty
   String contentType
+
+  @NotEmpty
+  long size
+
+  @NotEmpty
+  String repositoryName
+
+  @NotEmpty
+  long lastUpdated
+  
+  @NotEmpty
+  String blobRef
+
+  @NotEmpty
+  Map<String, Map<String, Object>> attributes
 }

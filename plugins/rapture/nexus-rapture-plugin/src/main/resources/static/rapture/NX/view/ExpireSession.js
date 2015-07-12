@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,22 +19,27 @@
  */
 Ext.define('NX.view.ExpireSession', {
   extend: 'NX.view.ModalDialog',
+  requires: [
+    'NX.I18n'
+  ],
   alias: 'widget.nx-expire-session',
 
-  title: NX.I18n.get('GLOBAL_EXPIRE_TITLE'),
+  title: NX.I18n.get('ExpireSession_Title'),
 
   /**
-   * @protected
+   * @override
    */
   initComponent: function () {
     var me = this;
 
-    Ext.apply(this, {
+    me.setWidth(me.MEDIUM_MODAL);
+
+    Ext.apply(me, {
       items: [
         {
           xtype: 'label',
           id: 'expire',
-          text: NX.I18n.get('GLOBAL_EXPIRE_HELP'),
+          text: NX.I18n.get('ExpireSession_Help_Text'),
           style: {
             'color': 'red',
             'font-size': '20px',
@@ -44,9 +49,9 @@ Ext.define('NX.view.ExpireSession', {
       ],
       buttonAlign: 'left',
       buttons: [
-        { text: NX.I18n.get('GLOBAL_EXPIRE_CANCEL_BUTTON'), action: 'cancel' },
+        { text: NX.I18n.get('ExpireSession_Cancel_Button'), action: 'cancel' },
         {
-          text: NX.I18n.get('GLOBAL_EXPIRE_SIGN_IN_BUTTON'),
+          text: NX.I18n.get('ExpireSession_SignIn_Button'),
           action: 'signin',
           hidden: true,
           itemId: 'expiredSignIn',
@@ -56,7 +61,7 @@ Ext.define('NX.view.ExpireSession', {
           }
         },
         {
-          text: NX.I18n.get('GLOBAL_EXPIRE_CLOSE_BUTTON'),
+          text: NX.I18n.get('ExpireSession_Close_Button'),
           action: 'close',
           hidden: true,
           handler: function() {
@@ -71,6 +76,7 @@ Ext.define('NX.view.ExpireSession', {
 
   /**
    * Check to see if the dialog is showing that it is expired.
+   *
    * @public
    * @returns {boolean}
    */

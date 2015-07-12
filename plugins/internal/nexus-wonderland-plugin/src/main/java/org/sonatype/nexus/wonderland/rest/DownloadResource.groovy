@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -31,7 +31,6 @@ import org.sonatype.siesta.Resource
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.jetbrains.annotations.NonNls
 
 import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION
 import static com.google.common.net.HttpHeaders.CONTENT_LENGTH
@@ -52,7 +51,6 @@ class DownloadResource
     extends ComponentSupport
     implements Resource
 {
-  @NonNls
   static final String RESOURCE_URI = /* WonderlandPlugin.REST_PREFIX */ '/wonderland/download'
 
   private final DownloadService downloadService

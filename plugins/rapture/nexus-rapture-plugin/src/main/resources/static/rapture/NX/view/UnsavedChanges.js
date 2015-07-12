@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,38 +19,45 @@
  */
 Ext.define('NX.view.UnsavedChanges', {
   extend: 'NX.view.ModalDialog',
+  requires: [
+    'NX.I18n'
+  ],
   alias: 'widget.nx-unsaved-changes',
 
-  title: NX.I18n.get('GLOBAL_UNSAVED_TITLE'),
+  title: NX.I18n.get('UnsavedChanges_Title'),
   defaultFocus: 'nx-discard',
 
   /**
+   * Panel with content to be saved.
+   *
    * @public
-   * Panel with content to be saved
    */
   content: null,
 
   /**
+   * Function to call if content is to be discarded.
+   *
    * @public
-   * Function to call if content is to be discarded
    */
   callback: Ext.emptyFn,
 
   /**
-   * @protected
+   * @override
    */
   initComponent: function () {
     var me = this;
 
-    Ext.apply(this, {
+    me.setWidth(me.SMALL_MODAL);
+
+    Ext.apply(me, {
       items: {
         xtype: 'panel',
         ui: 'nx-inset',
-        html: NX.I18n.get('GLOBAL_UNSAVED_MESSAGE'),
+        html: NX.I18n.get('UnsavedChanges_Help_HTML'),
         buttonAlign: 'left',
         buttons: [
           {
-            text: NX.I18n.get('GLOBAL_UNSAVED_DISCARD_BUTTON'),
+            text: NX.I18n.get('UnsavedChanges_Discard_Button'),
             ui: 'nx-primary',
             itemId: 'nx-discard',
             handler: function () {
@@ -60,7 +67,7 @@ Ext.define('NX.view.UnsavedChanges', {
               me.close();
             }
           },
-          { text: NX.I18n.get('GLOBAL_UNSAVED_BACK_BUTTON'), handler: me.close, scope: me }
+          { text: NX.I18n.get('UnsavedChanges_Back_Button'), handler: me.close, scope: me }
         ]
       }
     });

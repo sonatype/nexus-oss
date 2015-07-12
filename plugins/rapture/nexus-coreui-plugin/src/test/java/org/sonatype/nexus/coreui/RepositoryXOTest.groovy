@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -35,9 +35,14 @@ class RepositoryXOTest
   Validator validator
 
   // semi-random sample of invalid characters from Latin and other character sets
-  static List INVALID_NAMES = ('#,* #\'\\/?<>| \r\n\t,+@&å©不βخ'.collect{it} + '_leadingUnderscore').asImmutable()
+  static List INVALID_NAMES = (
+      '#,* #\'\\/?<>| \r\n\t,+@&å©不βخ'.collect { it }
+          + '_leadingUnderscore'
+          + '.'
+          + '..'
+  ).asImmutable()
 
-  static final List VALID_NAMES = ['Foo_1.2-3', '.foo', 'foo.', '-0.', 'a', '1', '.'].asImmutable()
+  static final List VALID_NAMES = ['Foo_1.2-3' , 'foo.', '-0.', 'a', '1'].asImmutable()
 
   def "Name is always required"() {
     when:

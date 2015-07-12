@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,8 +21,9 @@ import org.sonatype.nexus.capability.Capability;
 import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
-import org.sonatype.nexus.capability.support.condition.Conditions;
-import org.sonatype.nexus.capability.support.condition.RepositoryConditions.RepositoryName;
+import org.sonatype.nexus.capability.condition.Conditions;
+import org.sonatype.nexus.repository.capability.RepositoryConditions;
+import org.sonatype.nexus.repository.capability.RepositoryConditions.RepositoryName;
 
 import static org.sonatype.nexus.capability.Tag.repositoryTag;
 import static org.sonatype.nexus.capability.Tag.tags;
@@ -36,15 +37,20 @@ public class RepositoryIsInServiceCapability
 
   private final Conditions conditions;
 
+  private final RepositoryConditions repositoryConditions;
+
   @Inject
-  public RepositoryIsInServiceCapability(final Conditions conditions) {
+  public RepositoryIsInServiceCapability(final Conditions conditions,
+                                         final RepositoryConditions repositoryConditions)
+  {
     this.conditions = conditions;
+    this.repositoryConditions = repositoryConditions;
   }
 
   @Override
   public Condition activationCondition() {
     return conditions.logical().and(
-        conditions.repository().repositoryIsOnline(new RepositoryName()
+        repositoryConditions.repositoryIsOnline(new RepositoryName()
         {
           @Override
           public String get() {
@@ -57,14 +63,13 @@ public class RepositoryIsInServiceCapability
 
   @Override
   public Condition validityCondition() {
-    return conditions.repository().repositoryExists(new RepositoryName()
+    return repositoryConditions.repositoryExists(new RepositoryName()
     {
       @Override
       public String get() {
         return context().properties().get(REPOSITORY);
       }
-    }
-    );
+    });
   }
 
   @Override

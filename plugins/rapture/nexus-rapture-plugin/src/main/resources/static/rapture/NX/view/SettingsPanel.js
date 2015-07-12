@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -56,30 +56,27 @@ Ext.define('NX.view.SettingsPanel', {
    * @param form The form to add to this settings panel
    */
   addSettingsForm: function(form) {
-    var me = this;
-
-    me.down('panel').add(form);
+    this.down('panel').add(form);
   },
 
   /**
+   * Remove all settings forms from this settings panel.
+   *
    * @override
-   * Remove all settings forms from this settings panel
    */
   removeAllSettingsForms: function() {
-    var me = this;
-
-    me.down('panel').removeAll();
+    this.down('panel').removeAll();
   },
 
   /**
+   * Loads an {@link Ext.data.Model} into this form
+   * (internally just calls {@link NX.view.SettingsForm#loadRecord}).
+   *
    * @public
-   * Loads an Ext.data.Model into this form (internally just calls NX.view.SettingsForm.loadRecord)
    * @param model The model to load
    */
   loadRecord: function(model) {
-    var me = this,
-        settingsForm = me.down('nx-settingsform');
-
+    var settingsForm = this.down('nx-settingsform');
     if (settingsForm) {
       settingsForm.loadRecord(model);
     }

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -17,6 +17,7 @@ import javax.validation.Valid;
 
 import org.sonatype.nexus.validation.constraint.PortNumber;
 
+import com.google.common.base.Throwables;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
@@ -70,6 +71,19 @@ public class ProxyServerConfiguration
 
   public void setAuthentication(@Nullable final AuthenticationConfiguration authentication) {
     this.authentication = authentication;
+  }
+
+  public ProxyServerConfiguration copy() {
+    try {
+      ProxyServerConfiguration copy = (ProxyServerConfiguration)clone();
+      if (authentication != null) {
+        copy.authentication = authentication.copy();
+      }
+      return copy;
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override

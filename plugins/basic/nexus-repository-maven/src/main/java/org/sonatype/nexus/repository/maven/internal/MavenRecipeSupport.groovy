@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -23,8 +23,11 @@ import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.security.SecurityFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
+import org.sonatype.nexus.repository.storage.UnitOfWorkHandler;
+import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.ExceptionHandler
+import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
+import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route.Builder
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
 
@@ -55,10 +58,16 @@ abstract class MavenRecipeSupport
   SecurityHandler securityHandler
 
   @Inject
+  UnitOfWorkHandler unitOfWorkHandler
+
+  @Inject
   PartialFetchHandler partialFetchHandler
 
   @Inject
-  MavenHeadersHandler mavenHeadersHandler
+  ConditionalRequestHandler conditionalRequestHandler
+
+  @Inject
+  ContentHeadersHandler contentHeadersHandler
 
   final MavenPathParser mavenPathParser
 
@@ -76,6 +85,7 @@ abstract class MavenRecipeSupport
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)
+        .handler(conditionalRequestHandler)
   }
 
   Builder newMetadataRouteBuilder() {
@@ -84,5 +94,6 @@ abstract class MavenRecipeSupport
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)
+        .handler(conditionalRequestHandler)
   }
 }

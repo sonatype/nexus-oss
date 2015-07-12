@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -176,6 +176,27 @@ class StateGuardTest
     assert underTest.current == FAILED
   }
 
+  @Test
+  void 'transition with action ignoring exception'() {
+    try {
+      underTest.transition(INITIALISED, false, FailureException.class)
+          .from(NEW)
+          .run(new Action<Void>() {
+        @Override
+        Void run() throws Exception {
+          throw new FailureException()
+        }
+      })
+
+      fail()
+    }
+    catch (FailureException e) {
+      // expected
+    }
+
+    assert underTest.current == INITIALISED
+  }
+
   private static class FailureError
       extends Error
   {
@@ -195,6 +216,57 @@ class StateGuardTest
           throw new FailureError()
         }
       })
+
+      fail()
+    }
+    catch (FailureError e) {
+      // expected
+    }
+
+    assert underTest.current == FAILED
+  }
+
+  private class Target implements StateGuardAware
+  {
+    Class<? extends Throwable> failureType;
+
+    public Target(Class<? extends Throwable> failureType) {
+      this.failureType = failureType
+    }
+
+    public StateGuard getStateGuard() {
+      return underTest;
+    }
+
+    @Guarded(by = NEW)
+    @Transitions(from = NEW, to = INITIALISED)
+    public void go() {
+      if (failureType != null) {
+        throw failureType.newInstance()
+      }
+    }
+  }
+
+  @Test
+  void 'transition with method invocation failing with exception'() {
+    try {
+      new TransitionsInterceptor().invoke(new SimpleMethodInvocation(
+        new Target(FailureException.class), Target.class.getMethod('go'), new Object[0]))
+
+      fail()
+    }
+    catch (FailureException e) {
+      // expected
+    }
+
+    assert underTest.current == FAILED
+  }
+
+  @Test
+  void 'transition with method invocation failing with error'() {
+    try {
+      new TransitionsInterceptor().invoke(new SimpleMethodInvocation(
+        new Target(FailureError.class), Target.class.getMethod('go'), new Object[0]))
 
       fail()
     }
@@ -231,5 +303,35 @@ class StateGuardTest
 
     assert underTest.current == NEW
     assert !action.triggered
+  }
+
+  @Test
+  void 'guard with method invocation failing with exception'() {
+    try {
+      new GuardedInterceptor().invoke(new SimpleMethodInvocation(
+        new Target(FailureException.class), Target.class.getMethod("go"), new Object[0]))
+
+      fail()
+    }
+    catch (FailureException e) {
+      // expected
+    }
+
+    assert underTest.current == NEW
+  }
+
+  @Test
+  void 'guard with method invocation failing with error'() {
+    try {
+      new GuardedInterceptor().invoke(new SimpleMethodInvocation(
+        new Target(FailureError.class), Target.class.getMethod("go"), new Object[0]))
+
+      fail()
+    }
+    catch (FailureError e) {
+      // expected
+    }
+
+    assert underTest.current == NEW
   }
 }

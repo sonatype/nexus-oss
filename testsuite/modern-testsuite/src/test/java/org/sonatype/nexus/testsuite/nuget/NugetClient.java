@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -103,6 +103,10 @@ public class NugetClient
 
   public String entryXml(final String packageId, final String version) throws IOException {
     return asString(entry(packageId, version));
+  }
+
+  public HttpResponse packageContent(final String packageId, final String version) throws IOException {
+    return get(String.format("%s/%s", packageId, version));
   }
 
   public String vsSearchFeedXml(final String searchTerm) throws IOException {

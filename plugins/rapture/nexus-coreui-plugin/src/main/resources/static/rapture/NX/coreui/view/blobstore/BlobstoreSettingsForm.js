@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -29,10 +29,10 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreSettingsForm', {
     submit: 'NX.direct.coreui_Blobstore.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return NX.I18n.get('ADMIN_BLOBSTORES_UPDATE_SUCCESS') + data['name'];
+    return NX.I18n.get('Blobstore_BlobstoreSettingsForm_Update_Success') + data['name'];
   },
 
-  editableMarker: NX.I18n.get('ADMIN_BLOBSTORES_UPDATE_ERROR'),
+  editableMarker: NX.I18n.get('Blobstore_BlobstoreSettingsForm_Update_Error'),
 
   initComponent: function() {
     var me = this;
@@ -44,13 +44,13 @@ Ext.define('NX.coreui.view.blobstore.BlobstoreSettingsForm', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: NX.I18n.get('ADMIN_BLOBSTORES_SETTINGS_NAME'),
+        fieldLabel: NX.I18n.get('Blobstore_BlobstoreSettingsForm_Name_FieldLabel'),
         readOnly: true
       },
       {
         xtype: 'textarea',
         name: 'attributes',
-        fieldLabel: NX.I18n.get('ADMIN_BLOBSTORES_SETTINGS_ATTRIBUTES'),
+        fieldLabel: NX.I18n.get('Blobstore_BlobstoreSettingsForm_Attributes_FieldLabel'),
         height: 300,
         allowBlank: false,
         cls: 'nx-monospace-field'

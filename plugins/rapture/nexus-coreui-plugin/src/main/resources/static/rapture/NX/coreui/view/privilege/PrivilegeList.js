@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -43,19 +43,19 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
 
     // NOTE: Not including ID here as for user-created privileges these are random strings
 
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 2 },
+    { header: NX.I18n.get('Privilege_PrivilegeList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 2 },
 
     {
-      header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_DESCRIPTION_COLUMN'),
+      header: NX.I18n.get('Privilege_PrivilegeList_Description_Header'),
       dataIndex: 'description',
       stateId: 'description',
       flex: 4
     },
 
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TYPE_COLUMN'), dataIndex: 'type', stateId: 'type', flex: 1 },
+    { header: NX.I18n.get('Privilege_PrivilegeList_Type_Header'), dataIndex: 'type', stateId: 'type', flex: 1 },
 
     {
-      header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_PERMISSION_COLUMN'),
+      header: NX.I18n.get('Privilege_PrivilegeList_Permission_Header'),
       dataIndex: 'permission',
       stateId: 'permission',
       flex: 2
@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('ADMIN_PRIVILEGES_LIST_EMPTY_STATE'),
+    emptyText: NX.I18n.get('Privilege_PrivilegeList_EmptyText'),
     deferEmptyText: false
   },
 
@@ -74,6 +74,6 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
   }],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_PRIVILEGES_LIST_FILTER_ERROR') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Privilege_PrivilegeList_Filter_EmptyText') }
   ]
 });

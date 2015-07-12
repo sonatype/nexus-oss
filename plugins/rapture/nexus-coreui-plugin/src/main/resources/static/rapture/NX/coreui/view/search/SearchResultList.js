@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,6 +24,9 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
     'NX.I18n'
   ],
 
+  // Mark grid as health check columns target
+  healthCheckColumnsTarget: true,
+
   config: {
     stateful: true,
     stateId: 'nx-coreui-search-result-list'
@@ -31,12 +34,15 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
 
   store: 'SearchResult',
 
+  // Prevent the store from automatically loading
+  loadStore: Ext.emptyFn,
+
   style: {
     'background-color': '#F4F4F4'
   },
 
   viewConfig: {
-    emptyText: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_EMPTY_STATE'),
+    emptyText: NX.I18n.get('Search_SearchResultList_EmptyText'),
     deferEmptyText: false
   },
 
@@ -49,24 +55,20 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
         return 'search-component';
       }
     },
-    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', flex: 3 },
-    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_GROUP_COLUMN'), dataIndex: 'group', stateId: 'group', flex: 4 },
-    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_VERSION_COLUMN'), dataIndex: 'version', stateId: 'version', flex: 1 },
-    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_FORMAT_COLUMN'), dataIndex: 'format', stateId: 'format', width: 70 },
+    { header: NX.I18n.get('Search_SearchResultList_Name_Header'), dataIndex: 'name', stateId: 'name', flex: 3 },
     {
-      header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_REPOSITORY_COLUMN'),
+      header: NX.I18n.get('Search_SearchResultList_Group_Header'), dataIndex: 'group', stateId: 'group', flex: 4,
+      renderer: NX.ext.grid.column.Renderers.optionalData
+    },
+    { header: NX.I18n.get('Search_SearchResultList_Version_Header'), dataIndex: 'version', stateId: 'version', flex: 1,
+      renderer: NX.ext.grid.column.Renderers.optionalData
+    },
+    { header: NX.I18n.get('Search_SearchResultList_Format_Header'), dataIndex: 'format', stateId: 'format', width: 70 },
+    {
+      header: NX.I18n.get('Search_SearchResultList_Repository_Header'),
       dataIndex: 'repositoryName',
       stateId: 'repositoryName',
       hidden: true
-    }
-  ],
-
-  dockedItems: [
-    {
-      xtype: 'pagingtoolbar',
-      store: 'SearchResult',
-      dock: 'top',
-      displayInfo: false
     }
   ]
 

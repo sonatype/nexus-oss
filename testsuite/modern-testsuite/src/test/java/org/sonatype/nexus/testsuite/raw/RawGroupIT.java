@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,6 +18,7 @@ import org.sonatype.nexus.repository.http.HttpStatus;
 
 import com.google.common.io.Files;
 import org.apache.http.HttpResponse;
+import org.apache.http.entity.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -25,6 +26,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
@@ -69,9 +71,9 @@ public class RawGroupIT
   @Test
   public void memberContentIsFound() throws Exception {
     File testFile = resolveTestFile(TEST_CONTENT);
-    hosted1.put(TEST_PATH, testFile);
+    hosted1.put(TEST_PATH, ContentType.TEXT_PLAIN, testFile);
 
-    assertThat(groupClient.getBytes(TEST_PATH), is(Files.toByteArray(testFile)));
+    assertThat(bytes(groupClient.get(TEST_PATH)), is(Files.toByteArray(testFile)));
   }
 
   /**
@@ -80,10 +82,10 @@ public class RawGroupIT
   @Test
   public void firstSuccessfulResponseWins() throws Exception {
     File testFile = resolveTestFile(TEST_CONTENT);
-    hosted1.put(TEST_PATH, testFile);
-    hosted2.put(TEST_PATH, resolveTestFile(TEST_CONTENT2));
+    hosted1.put(TEST_PATH, ContentType.TEXT_PLAIN, testFile);
+    hosted2.put(TEST_PATH, ContentType.TEXT_PLAIN, resolveTestFile(TEST_CONTENT2));
 
-    assertThat(groupClient.getBytes(TEST_PATH), is(Files.toByteArray(testFile)));
+    assertThat(bytes(groupClient.get(TEST_PATH)), is(Files.toByteArray(testFile)));
   }
 
   /**
@@ -94,8 +96,8 @@ public class RawGroupIT
     File testFile = resolveTestFile(TEST_CONTENT);
 
     // Only the second repository has any content
-    hosted2.put(TEST_PATH, resolveTestFile(TEST_CONTENT));
+    hosted2.put(TEST_PATH, ContentType.TEXT_PLAIN, resolveTestFile(TEST_CONTENT));
 
-    assertThat(groupClient.getBytes(TEST_PATH), is(Files.toByteArray(testFile)));
+    assertThat(bytes(groupClient.get(TEST_PATH)), is(Files.toByteArray(testFile)));
   }
 }

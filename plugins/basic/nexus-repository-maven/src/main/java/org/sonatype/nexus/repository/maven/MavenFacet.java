@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,13 +18,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
-import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.proxy.CacheInfo;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
-
-import org.joda.time.DateTime;
 
 /**
  * Maven facet, present on all Maven repositories.
@@ -52,22 +49,11 @@ public interface MavenFacet
   @Nullable
   Content get(MavenPath path) throws IOException;
 
-  Content put(MavenPath path, Payload payload) throws IOException, InvalidContentException;
+  void put(MavenPath path, Payload payload) throws IOException;
 
   boolean delete(MavenPath... paths) throws IOException;
 
-  // Batch operations
-
-  @Nullable
-  Content get(StorageTx tx, MavenPath path) throws IOException;
-
-  Content put(StorageTx tx, MavenPath path, Payload payload) throws IOException, InvalidContentException;
-
-  boolean delete(StorageTx tx, MavenPath... paths) throws IOException;
-
   // proxy operations
 
-  DateTime getLastVerified(MavenPath path) throws IOException;
-
-  boolean setLastVerified(MavenPath path, DateTime verified) throws IOException;
+  boolean setCacheInfo(MavenPath path, CacheInfo cacheInfo) throws IOException;
 }

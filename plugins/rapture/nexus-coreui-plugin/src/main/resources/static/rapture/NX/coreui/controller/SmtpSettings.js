@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SmtpSettings', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Messages',
     'NX.Permissions',
@@ -57,8 +57,8 @@ Ext.define('NX.coreui.controller.SmtpSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/System/Email Server',
-      text: NX.I18n.get('ADMIN_SMTP_TITLE'),
-      description: NX.I18n.get('ADMIN_SMTP_SUBTITLE'),
+      text: NX.I18n.get('SmtpSettings_Text'),
+      description: NX.I18n.get('SmtpSettings_Description'),
       view: { xtype: 'nx-coreui-system-smtp-settings' },
       iconConfig: {
         file: 'email.png',
@@ -104,12 +104,12 @@ Ext.define('NX.coreui.controller.SmtpSettings', {
         smtpSettings = panel.down('form').getForm().getFieldValues();
 
     win.close();
-    me.getContent().mask(NX.I18n.format('ADMIN_SMTP_VERIFY_MASK', smtpSettings.host));
+    me.getContent().mask(NX.I18n.format('SmtpSettings_Verify_Mask', smtpSettings.host));
 
     NX.direct.coreui_Email.sendVerification(smtpSettings, email, function (response) {
       me.getContent().unmask();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: NX.I18n.get('ADMIN_SMTP_VERIFY_SUCCESS'), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.get('SmtpSettings_Verify_Success'), type: 'success' });
       }
     });
   }

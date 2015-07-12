@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -40,17 +40,15 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
       items: [
         {
           xtype: 'textfield',
-          fieldLabel: NX.I18n.get('ADMIN_SSL_LOAD_HELP'),
+          fieldLabel: NX.I18n.get('Ssl_SslCertificateAddFromServer_Load_FieldLabel'),
           name: 'server',
           itemId: 'server'
         }
       ],
 
       buttons: [
-        { text: NX.I18n.get('ADMIN_SSL_LIST_LOAD_BUTTON'), action: 'load', formBind: true, bindToEnter: true, ui: 'nx-primary' },
-        { text: NX.I18n.get('ADMIN_SSL_LOAD_CANCEL_BUTTON'), handler: function () {
-          this.up('nx-drilldown').showChild(0, true);
-        }}
+        { text: NX.I18n.get('Ssl_SslCertificateList_Load_Button'), action: 'load', formBind: true, bindToEnter: true, ui: 'nx-primary' },
+        { text: NX.I18n.get('Ssl_SslCertificateAddFromServer_Cancel_Button'), action: 'back' }
       ]
     };
 

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,11 +19,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.blobstore.api.BlobStoreManager;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
-import org.sonatype.nexus.repository.storage.StorageFacetImpl;
 import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
 
@@ -94,7 +95,11 @@ public class SimpleSessionCookieIT
       testRepositoryConfig.setRecipeName("raw-hosted"); // using name here to not complicate importing of internal class
       testRepositoryConfig.setRepositoryName(TEST_REPOSITORY_NAME);
       testRepositoryConfig.setOnline(true);
-      testRepositoryConfig.attributes("storage").set("writePolicy", WritePolicy.ALLOW.toString());
+
+      NestedAttributesMap storage = testRepositoryConfig.attributes("storage");
+      storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
+      storage.set("writePolicy", WritePolicy.ALLOW.toString());
+
       testRepository = repositoryManager.create(testRepositoryConfig);
     }
   }
@@ -188,7 +193,7 @@ public class SimpleSessionCookieIT
       withCommonBrowserHeaders(loginRequest);
 
       try (CloseableHttpResponse response = client.execute(loginRequest, clientContext())) {
-        assertThat(response.getStatusLine().getStatusCode(), is(200));
+        assertThat(response.getStatusLine().getStatusCode(), is(204));
         assertThat("login cookie should have been stored in the cookie store", cookieStore.getCookies(), hasSize(1));
         assertThat("expected session cookie in cookie store", getSessionCookie(cookieStore), notNullValue());
 
@@ -226,7 +231,7 @@ public class SimpleSessionCookieIT
       // 2. Logout, sending valid session cookie, no credentials
       // Set-Cookie: NXSESSIONID=deleteMe; Path=/; Max-Age=0; Expires=Sun, 28-Dec-2014 15:59:11 GMT
       try (CloseableHttpResponse response = client.execute(logoutRequest, logoutContext)) {
-        assertThat(response.getStatusLine().getStatusCode(), is(200));
+        assertThat(response.getStatusLine().getStatusCode(), is(204));
 
         // can't use client CookieStore to examine logout cookie, because the Expires header will prevent it from being
         // added but we can implicitly confirm it expired the existing cookie according to our client

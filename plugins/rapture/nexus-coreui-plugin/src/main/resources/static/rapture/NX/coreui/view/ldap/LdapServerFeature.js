@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -26,14 +26,16 @@ Ext.define('NX.coreui.view.ldap.LdapServerFeature', {
 
   iconName: 'ldapserver-default',
 
-  masters: { xtype: 'nx-coreui-ldapserver-list' },
+  masters: [
+    { xtype: 'nx-coreui-ldapserver-list' }
+  ],
 
   tabs: [
-    { xtype: 'nx-coreui-ldapserver-connection', title: NX.I18n.get('ADMIN_LDAP_DETAILS_CONNECTION_TAB'), weight: 10 },
-    { xtype: 'nx-coreui-ldapserver-userandgroup', title: NX.I18n.get('ADMIN_LDAP_DETAILS_GROUP_TAB'), weight: 20 }
+    { xtype: 'nx-coreui-ldapserver-connection', title: NX.I18n.get('Ldap_LdapServerFeature_Connection_Title'), weight: 10 },
+    { xtype: 'nx-coreui-ldapserver-userandgroup', title: NX.I18n.get('Ldap_LdapServerFeature_UserAndGroup_Title'), weight: 20 }
   ],
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('Ldap_LdapServerFeature_Delete_Button'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ]
 });

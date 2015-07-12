@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -15,12 +15,12 @@ package org.sonatype.nexus.repository.view.payloads;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.view.Payload;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Stream payload.
@@ -30,26 +30,24 @@ import static com.google.common.base.Preconditions.checkState;
 public class StreamPayload
     implements Payload
 {
-  private final InputStream stream;
+  private final InputStreamSupplier stream;
 
   private final long size;
 
   private final String contentType;
 
-  private boolean opened = false;
-
-  public StreamPayload(final InputStream stream, final long size, final @Nullable String contentType)
-  {
+  public StreamPayload(final InputStreamSupplier stream, final long size, @Nullable final String contentType) {
     this.stream = checkNotNull(stream);
     this.size = size;
     this.contentType = contentType;
   }
 
+  /**
+   * Returnes opened stream from configured supplier.
+   */
   @Override
-  public synchronized InputStream openInputStream() throws IOException {
-    checkState(!opened, "This payload's stream has been opened already.");
-    opened = true;
-    return stream;
+  public InputStream openInputStream() throws IOException {
+    return stream.get();
   }
 
   @Override
@@ -70,5 +68,20 @@ public class StreamPayload
         ", size=" + size +
         ", contentType='" + contentType + '\'' +
         '}';
+  }
+
+  //
+  // Supplier
+  //
+
+  // NOTE: Not using Guava Supplier, as we need to express throws IOException
+
+  /**
+   * Supplies an {@link InputStream}.
+   */
+  public interface InputStreamSupplier
+  {
+    @Nonnull
+    InputStream get() throws IOException;
   }
 }

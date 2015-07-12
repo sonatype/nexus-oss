@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.AnalyticsSettings', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Permissions',
     'NX.State',
@@ -38,8 +38,8 @@ Ext.define('NX.coreui.controller.AnalyticsSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Analytics',
-      text: NX.I18n.get('ADMIN_ANALYTICS_TITLE'),
-      description: NX.I18n.get('ADMIN_ANALYTICS_SUBTITLE'),
+      text: NX.I18n.get('AnalyticsSettings_Text'),
+      description: NX.I18n.get('AnalyticsSettings_Description'),
       view: { xtype: 'nx-coreui-analytics-settings' },
       iconConfig: {
         file: 'system_monitor.png',

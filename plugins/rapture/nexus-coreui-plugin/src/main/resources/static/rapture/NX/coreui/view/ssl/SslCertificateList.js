@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -42,25 +42,25 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
       }
     },
     {
-      header: NX.I18n.get('ADMIN_SSL_LIST_NAME_COLUMN'),
+      header: NX.I18n.get('Ssl_SslCertificateList_Name_Header'),
       dataIndex: 'subjectCommonName',
       stateId: 'subjectCommonName',
       flex: 1
     },
     {
-      header: NX.I18n.get('ADMIN_SSL_LIST_TO_COLUMN'),
+      header: NX.I18n.get('Ssl_SslCertificateList_IssuedTo_Header'),
       dataIndex: 'subjectOrganization',
       stateId: 'subjectOrganization',
       flex: 1
     },
     {
-      header: NX.I18n.get('ADMIN_SSL_LIST_BY_COLUMN'),
+      header: NX.I18n.get('Ssl_SslCertificateList_IssuedBy_Header'),
       dataIndex: 'issuerOrganization',
       stateId: 'issuerOrganization',
       flex: 1
     },
     {
-      header: NX.I18n.get('ADMIN_SSL_LIST_FINGERPRINT_COLUMN'),
+      header: NX.I18n.get('Ssl_SslCertificateList_Fingerprint_Header'),
       dataIndex: 'fingerprint',
       stateId: 'fingerprint',
       flex: 1
@@ -68,12 +68,12 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('ADMIN_SSL_LIST_EMPTY_STATE'),
+    emptyText: NX.I18n.get('Ssl_SslCertificateList_EmptyText'),
     deferEmptyText: false
   },
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_SSL_LIST_FILTER_ERROR') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Ssl_SslCertificateList_Filter_EmptyText') }
   ],
 
   /**
@@ -89,18 +89,18 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
       items: [
         {
           xtype: 'button',
-          text: NX.I18n.get('ADMIN_SSL_LIST_NEW_BUTTON'),
+          text: NX.I18n.get('Ssl_SslCertificateList_New_Button'),
           glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
           action: 'new',
           disabled: true,
           menu: [
             {
-              text: NX.I18n.get('ADMIN_SSL_LIST_LOAD_BUTTON'),
+              text: NX.I18n.get('Ssl_SslCertificateList_Load_Button'),
               action: 'newfromserver',
               iconCls: NX.Icons.cls('sslcertificate-add-by-server', 'x16')
             },
             {
-              text: NX.I18n.get('ADMIN_SSL_LIST_PASTE_BUTTON'),
+              text: NX.I18n.get('Ssl_SslCertificateList_Paste_Button'),
               action: 'newfrompem',
               iconCls: NX.Icons.cls('sslcertificate-add-by-pem', 'x16')
             }

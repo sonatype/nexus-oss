@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -25,14 +25,14 @@ Ext.define('NX.coreui.controller.Blobstores', {
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  masters: 'nx-coreui-blobstore-list',
-
+  masters: [
+    'nx-coreui-blobstore-list'
+  ],
   models: [
     'Blobstore'
   ],
   stores: [
-    'NX.coreui.store.Blobstore',
+    'Blobstore',
     'BlobstoreType'
   ],
   views: [
@@ -56,8 +56,8 @@ Ext.define('NX.coreui.controller.Blobstores', {
   features: {
     mode: 'admin',
     path: '/Repository/Blobstores',
-    text: NX.I18n.get('ADMIN_BLOBSTORES_TITLE'),
-    description: NX.I18n.get('ADMIN_BLOBSTORES_SUBTITLE'),
+    text: NX.I18n.get('Blobstores_Text'),
+    description: NX.I18n.get('Blobstores_Description'),
     view: { xtype: 'nx-coreui-blobstore-feature' },
     iconConfig: {
       file: 'drive_network.png',
@@ -81,6 +81,11 @@ Ext.define('NX.coreui.controller.Blobstores', {
       controller: {
         '#Refresh': {
           refresh: me.loadRecipe
+        }
+      },
+      store: {
+        '#Blobstore': {
+          load: me.reselect
         }
       },
       component: {
@@ -108,10 +113,8 @@ Ext.define('NX.coreui.controller.Blobstores', {
    * @override
    */
   onSelection: function(list, model) {
-    var me = this;
-
     if (Ext.isDefined(model)) {
-      me.getSettings().loadRecord(model);
+      this.getSettings().loadRecord(model);
     }
   },
 
@@ -119,11 +122,10 @@ Ext.define('NX.coreui.controller.Blobstores', {
    * @private
    */
   showAddWindow: function() {
-    var me = this,
-        feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_BLOBSTORES_CREATE_TITLE'));
+    me.setItemName(1, NX.I18n.get('Blobstores_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-blobstore-add'));
   },
 
@@ -135,7 +137,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
         list = me.getList();
 
     if (list) {
-      me.getBlobstoreTypeStore().load();
+      me.getStore('BlobstoreType').load();
     }
   },
 
@@ -143,15 +145,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
    * @private
    */
   onSettingsSubmitted: function(form, action) {
-    var me = this,
-        win = form.up('nx-coreui-blobstore-add');
-
-    if (win) {
-      me.loadStoreAndSelect(action.result.data.id, false);
-    }
-    else {
-      me.loadStore(Ext.emptyFn);
-    }
+    this.getStore('Blobstore').load();
   },
 
   /**
@@ -162,7 +156,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
         description = me.getDescription(model);
 
     NX.direct.coreui_Blobstore.remove(model.getId(), function(response) {
-      me.loadStore(Ext.emptyFn);
+      me.getStore('Blobstore').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Blobstore deleted: ' + description, type: 'success' });
       }

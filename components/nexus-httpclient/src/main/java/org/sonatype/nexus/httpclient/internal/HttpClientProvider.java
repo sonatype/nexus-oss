@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,17 +19,20 @@ import javax.inject.Provider;
 import org.sonatype.nexus.httpclient.HttpClientManager;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.eclipse.sisu.Typed;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * {@link HttpClient} provider via {@link HttpClientManager}.
+ * {@link HttpClient} (and {@link CloseableHttpClient}) provider via {@link HttpClientManager}.
  *
  * @since 3.0
  */
 @Named
+@Typed({HttpClient.class, CloseableHttpClient.class})
 public class HttpClientProvider
-    implements Provider<HttpClient>
+    implements Provider<CloseableHttpClient>
 {
   private final HttpClientManager httpClientManager;
 
@@ -39,7 +42,7 @@ public class HttpClientProvider
   }
 
   @Override
-  public HttpClient get() {
+  public CloseableHttpClient get() {
     return httpClientManager.create();
   }
 }

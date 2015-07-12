@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,6 +24,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * Handler that caches 404 responses.
+ *
  * When context invocation returns 404, it caches the 404 status to avoid future invocations (if cached status is
  * present).
  *
@@ -55,7 +56,10 @@ public class NegativeCacheHandler
       }
     }
     else {
-      response = new Response(status);
+      response = new Response.Builder()
+          .status(status)
+          .build();
+
       log.debug("Found {} in negative cache, returning {}", key, response);
     }
     return response;

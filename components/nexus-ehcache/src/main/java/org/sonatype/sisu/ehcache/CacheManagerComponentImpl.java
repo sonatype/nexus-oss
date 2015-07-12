@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,6 +18,7 @@ import java.lang.management.ManagementFactory;
 import java.net.URL;
 
 import javax.annotation.Nullable;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -35,10 +36,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link CacheManagerComponent}.
- *
- * Note: as SISU-93 is not yet here, and this component does need explicit shutdown
- * (in case when multiple instances are re-created of it, like in UT environment),
- * you have to use {@link #shutdown()} method.
  */
 @Named
 @Singleton
@@ -73,21 +70,12 @@ public class CacheManagerComponentImpl
   }
 
   @Override
+  @PreDestroy
   public synchronized void shutdown() {
     if (cacheManager != null) {
       logger.info("Shutting down");
       cacheManager.shutdown();
       cacheManager = null;
-    }
-  }
-
-  @Override
-  public void finalize() throws Throwable {
-    try {
-      shutdown();
-    }
-    finally {
-      super.finalize();
     }
   }
 

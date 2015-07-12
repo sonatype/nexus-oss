@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -30,7 +30,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
 
   controllers: [
     {
-      id: 'NX.coreui.controller.AssetInfo',
+      id: 'NX.coreui.controller.Assets',
       active: function () {
         return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
       }
@@ -54,18 +54,25 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
-      id: 'NX.coreui.controller.Capabilities',
-      active: function () {
-        return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-capabilities-plugin');
-      }
-    },
-    'NX.coreui.controller.FeatureGroups',
-    {
-      id: 'NX.coreui.controller.Feeds',
+      id: 'NX.coreui.controller.Browse',
       active: function () {
         return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
       }
     },
+    {
+      id: 'NX.coreui.controller.Capabilities',
+      active: function () {
+        return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
+      }
+    },
+    'NX.coreui.controller.FeatureGroups',
+    // HACK: Disabling 'Feeds' feature for now until its purpose/use in NX3 can be better understood
+    //{
+    //  id: 'NX.coreui.controller.Feeds',
+    //  active: function () {
+    //    return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
+    //  }
+    //},
     {
       id: 'NX.coreui.controller.HttpSettings',
       active: function () {
@@ -73,13 +80,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
-      id: 'NX.coreui.controller.GeneralSettings',
-      active: function () {
-        return NX.app.Application.bundleActive('org.sonatype.nexus.plugins.nexus-coreui-plugin');
-      }
-    },
-    {
-      id: 'NX.coreui.controller.HealthCheckSearch',
+      id: 'NX.coreui.controller.HealthCheckColumns',
       active: function () {
         return NX.app.Application.bundleActive('com.sonatype.nexus.plugins.nexus-healthcheck-oss-plugin')
             || NX.app.Application.bundleActive('com.sonatype.nexus.plugins.nexus-clm-plugin');

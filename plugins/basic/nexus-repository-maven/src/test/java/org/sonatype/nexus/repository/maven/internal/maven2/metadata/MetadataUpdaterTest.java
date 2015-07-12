@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -29,6 +29,7 @@ import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
+import org.sonatype.nexus.transaction.UnitOfWork;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Charsets;
@@ -41,7 +42,6 @@ import org.mockito.Mock;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -79,10 +79,9 @@ public class MetadataUpdaterTest
   private MetadataUpdater testSubject;
 
   @Before
-  public void prepare() throws IOException {
+  public void prepare() {
     when(contentAttributes.require(Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP)).thenReturn(hashes);
     when(content.getAttributes()).thenReturn(contentAttributes);
-    when(mavenFacet.put(eq(tx), any(MavenPath.class), any(Payload.class))).thenReturn(content);
 
     when(repository.getName()).thenReturn("name");
     when(repository.facet(eq(MavenFacet.class))).thenReturn(mavenFacet);
@@ -91,49 +90,69 @@ public class MetadataUpdaterTest
 
   @Test
   public void updateWithNonExisting() throws IOException {
-    testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
-    verify(tx, times(0)).commit();
-    verify(mavenFacet, times(1)).get(eq(tx), eq(mavenPath));
-    verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
+    when(mavenFacet.get(mavenPath)).thenReturn(null, content);
+    UnitOfWork.beginBatch(tx);
+    try {
+      testSubject.update(mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
+    }
+    finally {
+      UnitOfWork.end();
+    }
+    verify(tx, times(1)).commit();
+    verify(mavenFacet, times(2)).get(eq(mavenPath));
+    verify(mavenFacet, times(1)).put(eq(mavenPath), any(Payload.class));
   }
 
   @Test
   public void updateWithExisting() throws IOException {
-    when(mavenFacet.get(tx, mavenPath)).thenReturn(
+    when(mavenFacet.get(mavenPath)).thenReturn(
         new Content(
             new StringPayload("<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadata><groupId>group</groupId></metadata>",
-                "text/xml")));
-    testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
-    verify(tx, times(0)).commit();
-    verify(mavenFacet, times(1)).get(eq(tx), eq(mavenPath));
-    verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
+                "text/xml")), content);
+    UnitOfWork.beginBatch(tx);
+    try {
+      testSubject.update(mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
+    }
+    finally {
+      UnitOfWork.end();
+    }
+    verify(tx, times(1)).commit();
+    verify(mavenFacet, times(2)).get(eq(mavenPath));
+    verify(mavenFacet, times(1)).put(eq(mavenPath), any(Payload.class));
   }
 
   @Test
   public void updateWithExistingCorrupted() throws IOException {
-    when(mavenFacet.get(tx, mavenPath)).thenReturn(
-        new Content(new StringPayload("ThisIsNotAnXml", "text/xml")));
-    testSubject.update(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
-    verify(tx, times(0)).commit();
-    verify(mavenFacet, times(1)).get(eq(tx), eq(mavenPath));
-    verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
+    when(mavenFacet.get(mavenPath)).thenReturn(
+        new Content(new StringPayload("ThisIsNotAnXml", "text/xml")), content);
+    UnitOfWork.beginBatch(tx);
+    try {
+      testSubject.update(mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
+    }
+    finally {
+      UnitOfWork.end();
+    }
+    verify(tx, times(1)).commit();
+    verify(mavenFacet, times(2)).get(eq(mavenPath));
+    verify(mavenFacet, times(1)).put(eq(mavenPath), any(Payload.class));
   }
 
   @Test
   public void replace() throws IOException {
-    testSubject.replace(tx, mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
+    when(mavenFacet.get(mavenPath)).thenReturn(content);
+    testSubject.replace(mavenPath, Maven2Metadata.newGroupLevel(DateTime.now(), "group", new ArrayList<Plugin>()));
     verify(tx, times(0)).commit();
-    verify(mavenFacet, times(0)).get(eq(tx), eq(mavenPath));
-    verify(mavenFacet, times(1)).put(eq(tx), eq(mavenPath), any(Payload.class));
+    verify(mavenFacet, times(1)).get(eq(mavenPath));
+    verify(mavenFacet, times(1)).put(eq(mavenPath), any(Payload.class));
   }
 
   @Test
   public void delete() throws IOException {
-    testSubject.delete(tx, mavenPath);
+    testSubject.delete(mavenPath);
     verify(tx, times(0)).commit();
-    verify(mavenFacet, times(0)).get(eq(tx), eq(mavenPath));
-    verify(mavenFacet, times(0)).put(eq(tx), eq(mavenPath), any(Payload.class));
+    verify(mavenFacet, times(0)).get(eq(mavenPath));
+    verify(mavenFacet, times(0)).put(eq(mavenPath), any(Payload.class));
     verify(mavenFacet, times(1))
-        .delete(eq(tx), eq(mavenPath), eq(mavenPath.hash(HashType.SHA1)), eq(mavenPath.hash(HashType.MD5)));
+        .delete(eq(mavenPath), eq(mavenPath.hash(HashType.SHA1)), eq(mavenPath.hash(HashType.MD5)));
   }
 }

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -40,9 +40,9 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
         return 'logger-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_LOGGING_NAME_COLUMN'), dataIndex: 'name', stateId: 'name', hideable: false, flex: 1 },
+    { header: NX.I18n.get('Logging_LoggerList_Name_Header'), dataIndex: 'name', stateId: 'name', hideable: false, flex: 1 },
     {
-      header: NX.I18n.get('ADMIN_LOGGING_LEVEL_COLUMN'),
+      header: NX.I18n.get('Logging_LoggerList_Level_Header'),
       dataIndex: 'level',
       stateId: 'level',
       hideable: false,
@@ -50,13 +50,13 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
         xtype: 'combo',
         editable: false,
         store: [
-          ['TRACE', NX.I18n.get('ADMIN_LOGGING_TRACE_ITEM')],
-          ['DEBUG', NX.I18n.get('ADMIN_LOGGING_DEBUG_ITEM')],
-          ['INFO', NX.I18n.get('ADMIN_LOGGING_INFO_ITEM')],
-          ['WARN', NX.I18n.get('ADMIN_LOGGING_WARN_ITEM')],
-          ['ERROR', NX.I18n.get('ADMIN_LOGGING_ERROR_ITEM')],
-          ['OFF', NX.I18n.get('ADMIN_LOGGING_OFF_ITEM')],
-          ['DEFAULT', NX.I18n.get('ADMIN_LOGGING_DEFAULT_ITEM')]
+          ['TRACE', NX.I18n.get('Logging_LoggerList_Level_TraceItem')],
+          ['DEBUG', NX.I18n.get('Logging_LoggerList_Level_DebugItem')],
+          ['INFO', NX.I18n.get('Logging_LoggerList_Level_InfoItem')],
+          ['WARN', NX.I18n.get('Logging_LoggerList_Level_WarnItem')],
+          ['ERROR', NX.I18n.get('Logging_LoggerList_Level_ErrorItem')],
+          ['OFF', NX.I18n.get('Logging_LoggerList_Level_OffItem')],
+          ['DEFAULT', NX.I18n.get('Logging_LoggerList_Level_DefaultItem')]
         ],
         queryMode: 'local'
       }
@@ -64,7 +64,7 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('ADMIN_LOGGING_EMPTY_STATE'),
+    emptyText: NX.I18n.get('Logging_LoggerList_EmptyText'),
     deferEmptyText: false
   },
 
@@ -75,14 +75,14 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     items: [
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_LOGGING_NEW_BUTTON'),
+        text: NX.I18n.get('Logging_LoggerList_New_Button'),
         glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
         action: 'new',
         disabled: true
       },
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_LOGGING_DELETE_BUTTON'),
+        text: NX.I18n.get('Logging_LoggerList_Delete_Button'),
         glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
         action: 'delete',
         disabled: true
@@ -90,7 +90,7 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
       '-',
       {
         xtype: 'button',
-        text: NX.I18n.get('ADMIN_LOGGING_RESET_BUTTON'),
+        text: NX.I18n.get('Logging_LoggerList_Reset_Button'),
         glyph: 'xf0e2@FontAwesome' /* fa-undo */,
         action: 'reset',
         disabled: true
@@ -100,7 +100,7 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
 
   plugins: [
     { pluginId: 'editor', ptype: 'rowediting', clicksToEdit: 1, errorSummary: false },
-    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_LOGGING_FILTER_ERROR') }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('Logging_LoggerList_Filter_EmptyText') }
   ]
 
 });

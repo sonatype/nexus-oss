@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,15 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.RealmSettings', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Permissions',
     'NX.I18n'
   ],
-
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'security.RealmSettings'
@@ -57,8 +53,8 @@ Ext.define('NX.coreui.controller.RealmSettings', {
       mode: 'admin',
       path: '/Security/Realms',
       view: { xtype: 'nx-coreui-security-realm-settings' },
-      text: NX.I18n.get('ADMIN_REALMS_TITLE'),
-      description: NX.I18n.get('ADMIN_REALMS_SUBTITLE'),
+      text: NX.I18n.get('RealmSettings_Text'),
+      description: NX.I18n.get('RealmSettings_Description'),
       iconConfig: {
         file: 'shield.png',
         variants: ['x16', 'x32']
@@ -87,7 +83,7 @@ Ext.define('NX.coreui.controller.RealmSettings', {
         panel = me.getPanel();
 
     if (panel) {
-      me.getRealmTypeStore().load(function() {
+      me.getStore('RealmType').load(function() {
         // The form depends on this store, so load it after the store has loaded
         me.getForm().load();
       });

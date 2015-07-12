@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.TreeSet;
 
@@ -24,6 +25,7 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.maven.MavenPath.Coordinates;
+import org.sonatype.nexus.repository.maven.internal.maven2.Constants;
 import org.sonatype.nexus.repository.maven.internal.maven2.metadata.Maven2Metadata.Plugin;
 import org.sonatype.nexus.repository.maven.internal.maven2.metadata.Maven2Metadata.Snapshot;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -61,7 +63,7 @@ public class MetadataBuilder
 
   // A level
 
-  private final TreeSet<Version> baseVersions;
+  private final NavigableSet<Version> baseVersions;
 
   // V level
 
@@ -83,7 +85,7 @@ public class MetadataBuilder
   // groupId
 
   public boolean onEnterGroupId(final String groupId) {
-    checkNotNull(groupId, "groupId");
+    checkNotNull(groupId);
     if (Objects.equals(groupId, this.groupId)) {
       return false;
     }
@@ -97,7 +99,7 @@ public class MetadataBuilder
 
   @Nullable
   public Maven2Metadata onExitGroupId() {
-    checkState(groupId != null, "groupId");
+    checkState(groupId != null);
     log.debug("<- G: {}", groupId);
     if (plugins.isEmpty()) {
       log.debug("No plugins in group: {}", groupId);
@@ -128,8 +130,8 @@ public class MetadataBuilder
   // artifactId
 
   public boolean onEnterArtifactId(final String artifactId) {
-    checkState(groupId != null, "groupId == null");
-    checkNotNull(artifactId, "artifactId");
+    checkState(groupId != null);
+    checkNotNull(artifactId);
     if (Objects.equals(artifactId, this.artifactId)) {
       return false;
     }
@@ -142,7 +144,7 @@ public class MetadataBuilder
 
   @Nullable
   public Maven2Metadata onExitArtifactId() {
-    checkState(artifactId != null, "artifactId");
+    checkState(artifactId != null);
     log.debug("<- GA: {}:{}", groupId, artifactId);
     if (baseVersions.isEmpty()) {
       log.debug("Nothing to generate: {}:{}", groupId, artifactId);
@@ -151,10 +153,10 @@ public class MetadataBuilder
     Iterator<Version> vi = baseVersions.descendingIterator();
     String latest = vi.next().toString();
     String release = latest;
-    while (release.endsWith("SNAPSHOT") && vi.hasNext()) {
+    while (release.endsWith(Constants.SNAPSHOT_VERSION_SUFFIX) && vi.hasNext()) {
       release = vi.next().toString();
     }
-    if (release.endsWith("SNAPSHOT")) {
+    if (release.endsWith(Constants.SNAPSHOT_VERSION_SUFFIX)) {
       release = null;
     }
     return Maven2Metadata.newArtifactLevel(
@@ -173,7 +175,7 @@ public class MetadataBuilder
   }
 
   private void addBaseVersion(final String baseVersion) {
-    checkNotNull(baseVersion, "baseVersion");
+    checkNotNull(baseVersion);
     try {
       if (baseVersions.add(versionScheme.parseVersion(baseVersion))) {
         log.debug("Added base version {}:{}:{}", groupId, artifactId, baseVersion);
@@ -205,9 +207,9 @@ public class MetadataBuilder
   }
 
   public boolean onEnterBaseVersion(final String baseVersion) {
-    checkState(groupId != null, "groupId == null");
-    checkState(artifactId != null, "artifactId == null");
-    checkNotNull(baseVersion, "baseVersion");
+    checkState(groupId != null);
+    checkState(artifactId != null);
+    checkNotNull(baseVersion);
     if (Objects.equals(baseVersion, this.baseVersion)) {
       return false;
     }
@@ -220,9 +222,9 @@ public class MetadataBuilder
 
   @Nullable
   public Maven2Metadata onExitBaseVersion() {
-    checkState(baseVersion != null, "baseVersion");
+    checkState(baseVersion != null);
     log.debug("<- GAbV: {}:{}:{}", groupId, artifactId, baseVersion);
-    if (!baseVersion.endsWith("SNAPSHOT") || latestVersionCoordinates == null) {
+    if (!baseVersion.endsWith(Constants.SNAPSHOT_VERSION_SUFFIX) || latestVersionCoordinates == null) {
       // release version does not have version-level metadata
       log.debug("Not a snapshot or nothing to generate: {}:{}:{}", groupId, artifactId, baseVersion);
       return null;
@@ -250,7 +252,7 @@ public class MetadataBuilder
   }
 
   public void addArtifactVersion(final MavenPath mavenPath) {
-    checkNotNull(mavenPath, "mavenPath");
+    checkNotNull(mavenPath);
     if (mavenPath.isSubordinate() || mavenPath.getCoordinates() == null) {
       return;
     }

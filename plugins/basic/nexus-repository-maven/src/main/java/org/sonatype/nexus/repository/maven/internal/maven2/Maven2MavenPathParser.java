@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -40,7 +40,7 @@ public class Maven2MavenPathParser
 
   @Override
   public boolean isRepositoryMetadata(final MavenPath path) {
-    return path.main().getFileName().equals(Maven2Format.METADATA_FILENAME);
+    return path.main().getFileName().equals(Constants.METADATA_FILENAME);
   }
 
   /**
@@ -70,7 +70,7 @@ public class Maven2MavenPathParser
       final String groupId = str.substring(0, gEndPos).replace('/', '.');
       final String artifactId = str.substring(gEndPos + 1, aEndPos);
       final String baseVersion = str.substring(aEndPos + 1, vEndPos);
-      final boolean snapshot = baseVersion.endsWith("SNAPSHOT");
+      final boolean snapshot = baseVersion.endsWith(Constants.SNAPSHOT_VERSION_SUFFIX);
       final String fileName = str.substring(vEndPos + 1);
       str = fileName;
 
@@ -92,7 +92,7 @@ public class Maven2MavenPathParser
         }
       }
 
-      if (str.endsWith(Maven2Format.METADATA_FILENAME)) {
+      if (str.endsWith(Constants.METADATA_FILENAME)) {
         return null;
       }
 
@@ -103,7 +103,7 @@ public class Maven2MavenPathParser
       if (snapshot) {
         int vSnapshotStart = artifactId.length() + baseVersion.length() - 10 + 3;
         version = str.substring(vSnapshotStart, vSnapshotStart + 8);
-        if ("SNAPSHOT".equals(version)) {
+        if (Constants.SNAPSHOT_VERSION_SUFFIX.equals(version)) {
           version = baseVersion; // reset it
           int nTailPos = artifactId.length() + baseVersion.length() + 1;
           tail = str.substring(nTailPos);
@@ -115,7 +115,7 @@ public class Maven2MavenPathParser
           );
 
           try {
-            timestamp = Maven2Format.METADATA_DOTTED_TIMESTAMP.parseDateTime(
+            timestamp = Constants.METADATA_DOTTED_TIMESTAMP.parseDateTime(
                 snapshotTimestampedVersion.toString()).getMillis();
           }
           catch (IllegalArgumentException e) {

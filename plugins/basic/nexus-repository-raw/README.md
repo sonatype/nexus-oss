@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -15,9 +15,9 @@
 # Configure Repositories
 
     orient:connect plocal:data/db/config admin admin
-    orient:insert 'into repository_configuration SET repository_name="rawhosted1", recipe_name="raw-hosted", attributes={"rawContent":{"strictContentTypeValidation":true}}'
+    orient:insert 'into repository_configuration SET repository_name="rawhosted1", recipe_name="raw-hosted", online=true, attributes={"storage":{"writePolicy":"ALLOW"}}'
     orient:insert 'into repository_configuration SET repository_name="rawhosted2", recipe_name="raw-hosted", attributes={"rawContent":{"strictContentTypeValidation":true}}'
-    orient:insert 'into repository_configuration SET repository_name="rawproxy1", recipe_name="raw-proxy", attributes={"rawContent":{"strictContentTypeValidation":false},"proxy":{"remoteUrl":"http://repo1.maven.org/maven2/junit/junit/","artifactMaxAge":120}, "httpclient":{"connection":{"timeout":20000, "retries":2}},"negativeCache":{"enabled":true}}'
+    orient:insert 'into repository_configuration SET repository_name="rawproxy1", recipe_name="raw-proxy", attributes={"rawContent":{"strictContentTypeValidation":false},"proxy":{"remoteUrl":"http://repo1.maven.org/maven2/junit/junit/","contentMaxAge":120}, "httpclient":{"connection":{"timeout":20000, "retries":2}},"negativeCache":{"enabled":true}}'
     orient:insert 'into repository_configuration SET repository_name="rawgroup1", recipe_name="raw-group", attributes={"group": { "memberNames": ["rawhosted1", "rawhosted1", "rawproxy1"] }}'
     system:shutdown --force --reboot
 
@@ -51,4 +51,5 @@
     curl -v -X GET http://repo1.maven.org/maven2/junit/junit/maven-metadata.xml
 
 ## Partial Fetch Example
-   curl -v --user 'admin:admin123' -H 'Range: bytes=100-' -X GET http://localhost:8081/repository/rawproxy1/maven-metadata.xml
+
+    curl -v --user 'admin:admin123' -H 'Range: bytes=100-' -X GET http://localhost:8081/repository/rawproxy1/maven-metadata.xml

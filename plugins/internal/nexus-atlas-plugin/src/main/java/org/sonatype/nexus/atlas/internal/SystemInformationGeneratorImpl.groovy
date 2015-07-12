@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -23,6 +23,7 @@ import org.sonatype.nexus.atlas.SystemInformationGenerator
 import org.sonatype.nexus.common.app.ApplicationDirectories
 import org.sonatype.nexus.common.app.GlobalComponentLookupHelper
 import org.sonatype.nexus.common.app.SystemStatus
+import org.sonatype.nexus.common.node.LocalNodeAccess
 import org.sonatype.nexus.common.text.Strings2
 import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.sisu.goodies.common.Iso8601Date
@@ -56,13 +57,16 @@ class SystemInformationGeneratorImpl
 
   private final BundleService bundleService
 
+  private final LocalNodeAccess localNodeAccess
+
   @Inject
   SystemInformationGeneratorImpl(final GlobalComponentLookupHelper componentLookupHelper,
                                  final ApplicationDirectories applicationDirectories,
                                  final Provider<SystemStatus> systemStatusProvider,
                                  final @Parameters Map<String, String> parameters,
                                  final BundleContext bundleContext,
-                                 final BundleService bundleService)
+                                 final BundleService bundleService,
+                                 final LocalNodeAccess localNodeAccess)
   {
     this.componentLookupHelper = checkNotNull(componentLookupHelper)
     this.applicationDirectories = checkNotNull(applicationDirectories)
@@ -70,6 +74,7 @@ class SystemInformationGeneratorImpl
     this.parameters = checkNotNull(parameters)
     this.bundleContext = checkNotNull(bundleContext)
     this.bundleService = checkNotNull(bundleService)
+    this.localNodeAccess = checkNotNull(localNodeAccess)
   }
 
   @Override
@@ -83,6 +88,7 @@ class SystemInformationGeneratorImpl
     def parameters = this.parameters
     def bundleContext = this.bundleContext
     def bundleService = this.bundleService
+    def localNodeAccess = this.localNodeAccess
 
     def fileref = { File file ->
       if (file) {
@@ -153,6 +159,14 @@ class SystemInformationGeneratorImpl
           'version': systemStatus.version,
           'edition': systemStatus.editionShort,
           'state': systemStatus.state
+      ]
+
+      return data
+    }
+
+    def reportNexusNode = {
+      def data = [
+          'node-id': localNodeAccess.id
       ]
 
       return data
@@ -243,6 +257,7 @@ class SystemInformationGeneratorImpl
         'system-network': reportNetwork(),
         'system-filestores': reportFileStores(),
         'nexus-status': reportNexusStatus(),
+        'nexus-node': reportNexusNode(),
         'nexus-license': reportNexusLicense(),
         'nexus-properties': reportObfuscatedProperties(parameters),
         'nexus-configuration': reportNexusConfiguration(),

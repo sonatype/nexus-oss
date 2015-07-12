@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerChangeOrder', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_LDAP_ORDER_TITLE'),
+  title: NX.I18n.get('Ldap_LdapServerChangeOrder_Title'),
 
   /**
    * @override

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -17,13 +17,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import com.sonatype.nexus.repository.nuget.internal.ComponentQuery;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -62,7 +62,7 @@ public class SkipLinkTest
     assertThat(componentQuery.getQuerySuffix(), containsString("OFFSET " + ODataUtils.PAGE_SIZE));
   }
 
-  @NotNull
+  @Nonnull
   private HashMap<String, String> parseLink(final String url) throws Exception {
     List<NameValuePair> params = URLEncodedUtils.parse(new URI(url), "UTF-8");
 

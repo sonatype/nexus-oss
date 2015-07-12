@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -45,11 +45,9 @@ public class BaseUrlManagerImpl
     this.requestProvider = checkNotNull(requestProvider);
   }
 
-  // FIXME: Sort out persistence and synchronization
+  private volatile String url;
 
-  private String url;
-
-  private boolean force;
+  private volatile boolean force;
 
   @Override
   public void setUrl(final String url) {
@@ -99,20 +97,11 @@ public class BaseUrlManagerImpl
     // attempt to detect from HTTP request
     HttpServletRequest request = httpRequest();
     if (request != null) {
-      StringBuilder buff = new StringBuilder();
-      String requestUrl = request.getRequestURL().toString();
-      String pathInfo = request.getPathInfo();
-      if (!Strings.isNullOrEmpty(pathInfo)) {
-        requestUrl = requestUrl.substring(0, requestUrl.length() - pathInfo.length());
-      }
-
-      String servletPath = request.getServletPath();
-      if (!Strings.isNullOrEmpty(servletPath)) {
-        requestUrl = requestUrl.substring(0, requestUrl.length() - servletPath.length());
-      }
-      buff.append(requestUrl);
-
-      return buff.toString();
+      StringBuffer url = request.getRequestURL();
+      String uri = request.getRequestURI();
+      String ctx = request.getContextPath();
+      String base = url.substring(0, url.length() - uri.length() + ctx.length());
+      return base;
     }
 
     // no request in context, non-forced base-url

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -14,14 +14,13 @@ package org.sonatype.nexus.rutauth.internal.capability;
 
 import java.util.Map;
 
+import org.sonatype.nexus.capability.CapabilityConfigurationSupport;
 import org.sonatype.nexus.capability.UniquePerCapabilityType;
-import org.sonatype.nexus.capability.support.CapabilityConfigurationSupport;
 import org.sonatype.nexus.validation.group.Create;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.hibernate.validator.constraints.NotBlank;
-import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,10 +35,8 @@ public class RutAuthCapabilityConfiguration
     extends CapabilityConfigurationSupport
 {
 
-  @NonNls
   public static final String HTTP_HEADER = "httpHeader";
 
-  @NonNls
   public static final String DEFAULT_HTTP_HEADER = "REMOTE_USER";
 
   @NotBlank

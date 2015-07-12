@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -33,6 +33,7 @@ import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
 import org.sonatype.nexus.repository.security.BreadActions
 import org.sonatype.nexus.repository.security.RepositoryAdminPermission
+import org.sonatype.nexus.repository.security.RepositoryViewPermission
 import org.sonatype.nexus.security.SecurityHelper
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.group.Create
@@ -55,7 +56,7 @@ import org.hibernate.validator.constraints.NotEmpty
 @Singleton
 @DirectAction(action = 'coreui_Repository')
 class RepositoryComponent
-extends DirectComponentSupport
+    extends DirectComponentSupport
 {
   @Inject
   RepositoryManager repositoryManager
@@ -184,7 +185,19 @@ extends DirectComponentSupport
       String format = parameters.getFilter('format')
       if (format) {
         repositories = repositories.findResults { Repository repository ->
-          repository.format == format ? repository : null
+          repository.format.value == format ? repository : null
+        }
+      }
+      String type = parameters.getFilter('type')
+      if (type) {
+        repositories = repositories.findResults { Repository repository ->
+          repository.type.value == type ? repository : null
+        }
+      }
+      String applyPermissions = parameters.getFilter('applyPermissions')
+      if (applyPermissions as boolean) {
+        repositories = repositories.findResults { Repository repository ->
+          securityHelper.allPermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE)) ? repository : null
         }
       }
     }

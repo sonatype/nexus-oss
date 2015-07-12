@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -57,9 +57,10 @@ public class ActiveBundlesStateContributor
       @Override
       public String addingBundle(final Bundle bundle, final BundleEvent event) {
         String name = bundle.getSymbolicName();
+        String location = bundle.getLocation();
 
         // ignore wrap bundles, and stop tracking them
-        if (name.startsWith("wrap_mvn")) {
+        if (location.startsWith("wrap:mvn")) {
           return null;
         }
 
@@ -79,9 +80,4 @@ public class ActiveBundlesStateContributor
     return ImmutableMap.of(STATE_ID, (Object)activeBundles);
   }
 
-  @Override
-  @Nullable
-  public Map<String, Object> getCommands() {
-    return null;
-  }
 }

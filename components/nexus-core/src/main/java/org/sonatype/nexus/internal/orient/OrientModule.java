@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -29,9 +29,25 @@ public class OrientModule
 {
   @Override
   protected void configure() {
+    preloadOrientEngine();
+
     // configure default implementations
     bind(DatabaseServer.class).to(DatabaseServerImpl.class);
     bind(DatabaseManager.class).to(DatabaseManagerImpl.class);
     bind(RecordIdObfuscator.class).to(EncryptedRecordIdObfuscator.class);
+  }
+
+  /**
+   * Pre-loads OrientDB using empty (system) TCCL so javax.script engines can be found.
+   */
+  private static void preloadOrientEngine() {
+    ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(null);
+      com.orientechnologies.orient.core.Orient.instance();
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(tccl);
+    }
   }
 }

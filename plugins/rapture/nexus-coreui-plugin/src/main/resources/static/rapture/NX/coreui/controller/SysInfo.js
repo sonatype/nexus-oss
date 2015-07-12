@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SysInfo', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Permissions',
     'NX.util.Url',
@@ -26,9 +26,6 @@ Ext.define('NX.coreui.controller.SysInfo', {
     'NX.Messages',
     'NX.I18n'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'support.SysInfo'
@@ -53,8 +50,8 @@ Ext.define('NX.coreui.controller.SysInfo', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/System Information',
-      text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_TITLE'),
-      description: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_SUBTITLE'),
+      text: NX.I18n.get('SysInfo_Title'),
+      description: NX.I18n.get('SysInfo_Description'),
       view: { xtype: 'nx-coreui-support-sysinfo' },
       iconConfig: {
         file: 'globe_place.png',
@@ -96,7 +93,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
       me.logDebug('Refreshing sysinfo');
       //</if>
 
-      me.getContent().getEl().mask(NX.I18n.get('ADMIN_SYSTEM_INFORMATION_LOAD_MASK'));
+      me.getContent().getEl().mask(NX.I18n.get('SysInfo_Load_Mask'));
       NX.direct.atlas_SystemInformation.read(function (response) {
         me.getContent().getEl().unmask();
         if (Ext.isObject(response) && response.success) {
@@ -107,8 +104,9 @@ Ext.define('NX.coreui.controller.SysInfo', {
   },
 
   /**
-   * @private
    * Download system information report.
+   *
+   * @private
    */
   download: function () {
     NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf('service/siesta/atlas/system-information'));

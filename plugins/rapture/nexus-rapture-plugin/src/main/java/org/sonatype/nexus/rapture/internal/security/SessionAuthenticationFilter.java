@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.rapture.internal.security;
 
 import javax.inject.Named;
@@ -52,6 +51,20 @@ public class SessionAuthenticationFilter
 
   public static final String P_REMEMBER_ME = "rememberMe";
 
+  public static final String DELETE_METHOD = "DELETE";
+
+  /**
+   * Allow if authenticated or if logout request.
+   */
+  @Override
+  protected boolean isAccessAllowed(final ServletRequest request,
+                                    final ServletResponse response,
+                                    final Object mappedValue)
+  {
+    Subject subject = getSubject(request, response);
+    return subject.isAuthenticated() || isLogoutRequest(request, response);
+  }
+
   /**
    * Fill in denied response.
    */
@@ -82,6 +95,11 @@ public class SessionAuthenticationFilter
   protected boolean isLoginRequest(final ServletRequest request, final ServletResponse response) {
     return (request instanceof HttpServletRequest) &&
         WebUtils.toHttp(request).getMethod().equalsIgnoreCase(POST_METHOD);
+  }
+
+  private boolean isLogoutRequest(final ServletRequest request, final ServletResponse response) {
+    return (request instanceof HttpServletRequest) &&
+        WebUtils.toHttp(request).getMethod().equalsIgnoreCase(DELETE_METHOD);
   }
 
   @Override

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,19 +18,23 @@ import java.util.ArrayList;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import org.apache.commons.fileupload.util.Streams;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -48,6 +52,10 @@ public class NugetPushHandlerTest
 
   Repository repository = mock(Repository.class);
 
+  StorageTx tx = mock(StorageTx.class);
+
+  StorageFacet storageFacet = mock(StorageFacet.class);
+
   NugetGalleryFacet nugetGalleryFacet = mock(NugetGalleryFacet.class);
 
   NugetPushHandler underTest = new NugetPushHandler();
@@ -56,6 +64,8 @@ public class NugetPushHandlerTest
   public void setup() throws Exception {
     when(context.getRequest()).thenReturn(request);
     when(context.getRepository()).thenReturn(repository);
+    when(storageFacet.txSupplier()).thenReturn(Suppliers.ofInstance(tx));
+    when(repository.facet(StorageFacet.class)).thenReturn(storageFacet);
     when(repository.facet(NugetGalleryFacet.class)).thenReturn(nugetGalleryFacet);
   }
 
@@ -70,7 +80,7 @@ public class NugetPushHandlerTest
     when(requestPayload.openInputStream()).thenReturn(inputStream);
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.CREATED, "text/html", "<html><body></body></html>");
+    checkResponse(response, HttpStatus.CREATED, ContentTypes.TEXT_HTML, "<html><body></body></html>");
 
     verify(nugetGalleryFacet).put(inputStream);
     verifyNoMoreInteractions(nugetGalleryFacet);
@@ -87,7 +97,7 @@ public class NugetPushHandlerTest
     when(requestPayload.openInputStream()).thenReturn(inputStream);
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.CREATED, "text/html", "<html><body></body></html>");
+    checkResponse(response, HttpStatus.CREATED, ContentTypes.TEXT_HTML, "<html><body></body></html>");
 
     verify(nugetGalleryFacet, times(2)).put(inputStream);
     verifyNoMoreInteractions(nugetGalleryFacet);
@@ -100,7 +110,7 @@ public class NugetPushHandlerTest
     when(request.getMultiparts()).thenReturn(new ArrayList<Payload>());
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.BAD_REQUEST, "application/xml", "No content was provided");
+    checkResponse(response, HttpStatus.BAD_REQUEST, ContentTypes.APPLICATION_XML, "No content was provided");
   }
 
   @Test
@@ -109,17 +119,18 @@ public class NugetPushHandlerTest
     when(request.isMultipart()).thenReturn(false);
 
     Response response = underTest.handle(context);
-    checkResponse(response, HttpStatus.BAD_REQUEST, "application/xml", "Multipart request required");
+    checkResponse(response, HttpStatus.BAD_REQUEST, ContentTypes.APPLICATION_XML, "Multipart request required");
   }
 
-  private void checkResponse(Response response,
-                             int expectedCode,
-                             String expectedContentType,
-                             String expectedSubstring) throws Exception
+  private void checkResponse(final Response response,
+                             final int expectedCode,
+                             final String expectedContentType,
+                             final String expectedSubstring)
+      throws Exception
   {
     assertThat(response.getStatus().getCode(), is(expectedCode));
-    assertThat(response instanceof PayloadResponse, is(true));
-    Payload responsePayload = ((PayloadResponse) response).getPayload();
+    assertThat(response.getPayload(), notNullValue());
+    Payload responsePayload = response.getPayload();
     assertThat(responsePayload.getContentType(), is(expectedContentType));
     String responseBody = Streams.asString(responsePayload.openInputStream());
     assertThat(responseBody.contains(expectedSubstring), is(true));

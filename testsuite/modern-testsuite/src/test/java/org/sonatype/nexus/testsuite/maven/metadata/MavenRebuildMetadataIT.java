@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -12,12 +12,9 @@
  */
 package org.sonatype.nexus.testsuite.maven.metadata;
 
-import javax.inject.Inject;
-
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.MavenHostedFacet;
-import org.sonatype.nexus.repository.maven.internal.maven2.Maven2Format;
+import org.sonatype.nexus.repository.maven.internal.maven2.Maven2MimeRulesSource;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
 
@@ -39,9 +36,6 @@ import static org.hamcrest.Matchers.hasSize;
 public class MavenRebuildMetadataIT
     extends MavenITSupport
 {
-  @Inject
-  private RepositoryManager repositoryManager;
-
   private boolean deployed = false;
 
   private Repository mavenSnapshots;
@@ -68,8 +62,7 @@ public class MavenRebuildMetadataIT
     final String vMetadataPath = "/org/sonatype/nexus/testsuite/testproject/1.0-SNAPSHOT/maven-metadata.xml";
 
     // mvnDeploy did happen, let's corrupt some of those
-    write(mavenSnapshots, gMetadataPath, new StringPayload("rubbish", Maven2Format.METADATA_CONTENT_TYPE));
-    write(mavenSnapshots, gMetadataPath + ".sha1", new StringPayload("aaa", Maven2Format.CHECKSUM_CONTENT_TYPE));
+    write(mavenSnapshots, gMetadataPath, new StringPayload("rubbish", Maven2MimeRulesSource.METADATA_TYPE));
 
     mavenHostedFacet.rebuildMetadata(null, null, null);
 
@@ -97,8 +90,7 @@ public class MavenRebuildMetadataIT
     final String vMetadataPath = "/org/sonatype/nexus/testsuite/testproject/1.0-SNAPSHOT/maven-metadata.xml";
 
     // mvnDeploy did happen, let's corrupt some of those
-    write(mavenSnapshots, gMetadataPath, new StringPayload("rubbish", Maven2Format.METADATA_CONTENT_TYPE));
-    write(mavenSnapshots, gMetadataPath + ".sha1", new StringPayload("aaa", Maven2Format.CHECKSUM_CONTENT_TYPE));
+    write(mavenSnapshots, gMetadataPath, new StringPayload("rubbish", Maven2MimeRulesSource.METADATA_TYPE));
 
     mavenHostedFacet.rebuildMetadata("org.sonatype.nexus.testsuite", null, null); // testproject groupId!
 

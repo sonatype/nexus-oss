@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -35,7 +35,9 @@ import org.elasticsearch.index.query.FilterBuilders
 import org.elasticsearch.index.query.FilteredQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.search.sort.SortOrder
 
+import static org.elasticsearch.search.sort.SortBuilders.fieldSort
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME
@@ -75,7 +77,28 @@ extends DirectComponentSupport
     }
 
     try {
-      SearchResponse response = searchService.search(query, parameters.start, parameters.limit)
+      def sort = parameters?.sort?.get(0)
+      def sortBuilders = []
+      if (sort) {
+        switch (sort.property) {
+          case P_GROUP:
+            sortBuilders << fieldSort("${P_GROUP}.case_insensitive").order(SortOrder.valueOf(sort.direction))
+            sortBuilders << fieldSort("${P_NAME}.case_insensitive").order(SortOrder.ASC)
+            sortBuilders << fieldSort(P_VERSION).order(SortOrder.ASC)
+            break
+          case P_NAME:
+            sortBuilders << fieldSort("${P_NAME}.case_insensitive").order(SortOrder.valueOf(sort.direction))
+            sortBuilders << fieldSort(P_VERSION).order(SortOrder.ASC)
+            sortBuilders << fieldSort("${P_GROUP}.case_insensitive").order(SortOrder.ASC)
+            break
+          case 'repositoryName':
+            sortBuilders = [fieldSort(P_REPOSITORY_NAME).order(SortOrder.valueOf(sort.direction))]
+            break
+          default:
+            sortBuilders = [fieldSort(sort.property).order(SortOrder.valueOf(sort.direction))]
+        }
+      }
+      SearchResponse response = searchService.search(query, sortBuilders, parameters.start, parameters.limit)
       return new PagedResponse<ComponentXO>(
           response.hits.totalHits,
           response.hits.hits?.collect { hit ->

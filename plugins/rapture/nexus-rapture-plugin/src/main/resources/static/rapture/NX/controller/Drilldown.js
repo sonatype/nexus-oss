@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,20 +18,14 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Drilldown', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
-    // many impls use this
-    'NX.view.info.Panel',
-    'NX.view.info.Entry',
     'NX.Conditions',
     'NX.Dialogs',
     'NX.Bookmarks',
     'NX.view.drilldown.Drilldown',
     'NX.view.drilldown.Item'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'drilldown.Drilldown',
@@ -53,13 +47,21 @@ Ext.define('NX.controller.Drilldown', {
   masters: null,
 
   /**
+   * @override
+   * The xtype of the detail panel used by this drilldown. Only needed when no masters exist.
+   */
+  detail: null,
+
+  /**
    * @cfg {Function} optional function to be called on delete
    */
   deleteModel: undefined,
 
+  /**
+   * @override
+   */
   onLaunch: function () {
-    var me = this;
-    me.getApplication().getIconController().addIcons({
+    this.getApplication().getIconController().addIcons({
       'drilldown-info': {
         file: 'information.png',
         variants: ['x16', 'x32']
@@ -81,49 +83,42 @@ Ext.define('NX.controller.Drilldown', {
     // Normalize lists into an array
     if (!me.masters) {
       me.masters = [];
-    } else if (!Ext.isArray(me.masters)) {
-      me.masters = [me.masters];
     }
 
     // Add event handlers to each list
     for (var i = 0; i < me.masters.length; ++i) {
       componentListener[me.masters[i]] = {
-        afterrender: me.onAfterRender,
         selection: me.onSelection,
         cellclick: me.onCellClick
       };
     }
 
-    // If there’s at least one list, add event handlers to buttons and tabs
-    if (me.masters.length > 0) {
-
-      // New button
-      componentListener[me.masters[0] + ' ^ nx-drilldown button[action=new]'] = {
-        afterrender: me.bindNewButton
-      };
-
-      // Detail tabs
-      componentListener[me.masters[0] + ' ^ nx-drilldown nx-drilldown-details > tabpanel'] = {
-        tabchange: function() {
-          // Get the model for the last master
-          var segments = NX.Bookmarks.getBookmark().getSegments().slice(1);
-          var lists = me.getLists();
-          var modelId = segments[lists.length - 1];
-          var model = lists[lists.length - 1].getStore().getById(modelId);
-
-          // Bookmark it. The tab (if selected) will be added automatically
-          me.bookmark(model);
-        }
-      };
-
-      // Delete button
-      if (me.deleteModel) {
-        componentListener[me.masters[0] + ' ^ nx-drilldown button[action=delete]'] = {
-          afterrender: me.bindDeleteButton,
-          click: me.onDelete
-        };
+    // Drilldown
+    componentListener[(me.masters[0] || me.detail) + ' ^ nx-drilldown'] = {
+      syncsize: me.syncSizeToOwner,
+      resetdrilldown: function() {
+        me.currentIndex = 0;
+        me.syncSizeToOwner();
       }
-    }
+    };
+
+    // New button
+    componentListener[me.masters[0] + ' ^ nx-drilldown button[action=new]'] = {
+      afterrender: me.bindNewButton
+    };
+
+    // Delete button
+    componentListener[me.masters[0] + ' ^ nx-drilldown button[action=delete]'] = {
+      afterrender: me.bindDeleteButton,
+      click: me.onDelete
+    };
+
+    // Back button
+    componentListener[(me.masters[0] || me.detail) + ' ^ nx-drilldown nx-addpanel button[action=back]'] = {
+      click: function() {
+        me.showChild(0, true);
+      }
+    };
 
     me.listen({
       component: componentListener,
@@ -132,7 +127,7 @@ Ext.define('NX.controller.Drilldown', {
           navigate: me.navigateTo
         },
         '#Refresh': {
-          refresh: me.refreshList
+          refresh: me.reselect
         }
       }
     });
@@ -147,149 +142,33 @@ Ext.define('NX.controller.Drilldown', {
 
   /**
    * @private
-   * Return references to all of the master views
    */
-  getLists: function() {
-    var me = this,
-      feature = me.getFeature(),
-      lists = [];
-
-    if (feature) {
-      for (var i = 0; i < me.masters.length; ++i) {
-        lists.push(feature.down(me.masters[i]));
-      }
-    }
-
-    return lists;
+  getDrilldown: function() {
+    return Ext.ComponentQuery.query('#nx-drilldown')[0];
   },
 
   /**
    * @private
-   * Whenever the first list loads, trigger a navigation event
    */
-  onAfterRender: function () {
-    var me = this;
-
-    // Start loading the lists
-    me.loadStore(Ext.emptyFn);
-  },
-
-  /**
-   * @public
-   * Prompts a reset/reload of the lists in the drilldown
-   *
-   * @param cb Call this once the store has loaded
-   */
-  loadStore: function (cb) {
-    var me = this,
-      bookmark = NX.Bookmarks.getBookmark().getSegments();
-
-    me.loadStoreAtIndex(0, bookmark, cb);
-  },
-
-  /**
-   * @public
-   * Load the list with the specified index, then load all child lists
-   *
-   * @param index The index of the load to load
-   */
-  loadStoreAtIndex: function(index, bookmark, cb) {
-    var me = this,
-      lists = me.getLists();
-
-    try {
-      if (lists[index]) {
-        lists[index].getStore().clearFilter();
-        if (index < lists.length - 1 && bookmark.length) {
-          lists[index].getStore().load(function(records, operation, success) {
-            me.loadStoreAtIndex(index + 1, bookmark, cb);
-          });
-        } else {
-          lists[index].getStore().load(function(records, operation, success) {
-            if (cb) {
-              cb(records, operation, success);
-            }
-            me.onStoreLoad();
-          });
-        }
-      }
-    }
-    catch (e) {
-      // Ext.data.Store.load() returned an exception, log it here
-      me.logDebug(e);
-    }
-  },
-
-  /**
-   * @public
-   * @param modelId The model to bookmark and/or navigate to
-   * @param navigate Navigate to the model, or just select it?
-   */
-  loadStoreAndSelect: function (modelId, navigate) {
-    var me = this,
-      lists = me.getLists(),
-      model;
-
-    me.loadStore(function(records, operations, success) {
-      // Find the model belonging to this id, and bookmark it
-      for (var i = 0; i < lists.length; ++i) {
-        model = lists[i].getStore().getById(modelId);
-        if (model) {
-          if (navigate) {
-            me.reselect();
-          } else {
-            me.onModelChanged(model);
-          }
-          break;
-        }
-      }
-    });
+  getDrilldownItems: function() {
+    return Ext.ComponentQuery.query('nx-drilldown-item');
   },
 
   /**
    * @private
-   * Once all lists have loaded, navigate to the current bookmark
    */
-  onStoreLoad: function () {
-    var me = this,
-      lists = me.getLists();
-
-    // Return if no lists exist
-    if (!lists.length) {
-      return;
-    }
-
-    // Make sure all lists have loaded
-    for (var i = 0; i < lists.length; ++i) {
-      if (!lists[i]) {
-        return;
-      }
-    }
-
-    me.reselect();
+  getDrilldownDetails: function() {
+    return Ext.ComponentQuery.query('nx-drilldown-details')[0];
   },
 
   /**
    * @public
    */
   reselect: function () {
-    var me = this,
-        lists = me.getLists();
+    var lists = Ext.ComponentQuery.query('nx-drilldown-master');
 
     if (lists.length) {
-      me.navigateTo(NX.Bookmarks.getBookmark());
-    }
-  },
-
-  /**
-   * @private
-   */
-  refreshList: function () {
-    var me = this,
-        lists = me.getLists();
-
-    if (lists.length) {
-      me.loadStore(Ext.emptyFn);
+      this.navigateTo(NX.Bookmarks.getBookmark());
     }
   },
 
@@ -298,68 +177,58 @@ Ext.define('NX.controller.Drilldown', {
    * When a list item is clicked, display the new view and update the bookmark
    */
   onCellClick: function(list, td, cellIndex, model, tr, rowIndex, e) {
-    var me = this;
+    var index = Ext.ComponentQuery.query('nx-drilldown-master').indexOf(list.up('grid'));
 
     //if the cell target is a link, let it do it's thing
     if(e.getTarget('a')) {
       return false;
     }
-    me.loadView(list, model, true);
+    this.loadView(index + 1, true, model);
   },
 
   /**
    * @private
    * A model changed, focus on the new row and update the name of the related drilldown
    */
-  onModelChanged: function (model) {
+  onModelChanged: function (index, model) {
     var me = this,
-        lists = me.getLists(),
+        lists = Ext.ComponentQuery.query('nx-drilldown-master'),
         feature = me.getFeature();
 
-    if (model) {
-      // Find the list to which this model belongs, and focus on it
-      for (var i = 0; i < lists.length; ++i) {
-        if (lists[i].getView().getNode(model)) {
-          lists[i].getSelectionModel().select([model], false, true);
-          feature.setItemName(i + 1, me.getDescription(model));
-          break;
-        }
-      }
-    }
+    lists[index].getSelectionModel().select([model], false, true);
+    me.setItemName(index + 1, me.getDescription(model));
   },
 
   /**
    * @public
-   * Make the detail view appear, update models and bookmarks
+   * Make the detail view appear
+   *
+   * @param index The zero-based view to load
+   * @param animate Whether to animate the panel into view
+   * @param model An optional record to select
    */
-  loadView: function (list, model, animate) {
+  loadView: function (index, animate, model) {
     var me = this,
-      lists = me.getLists(),
-      feature = me.getFeature();
+      lists = Ext.ComponentQuery.query('nx-drilldown-master');
 
-    // No model specified, go to the root view
-    if (!model) {
-      feature.showChild(0, animate);
-      me.bookmark(null);
+    // Don’t load the view if the feature is not ready
+    if (!me.getFeature()) {
+      return;
     }
 
-    // Model specified, find the associated list and show that
-    for (var i = 0; i < lists.length; ++i) {
-      if (list === lists[i].getView() && model) {
-        lists[i].fireEvent("selection", list, model);
-        me.onModelChanged(model);
-
-        // Set all child bookmarks
-        for (var j = 0; j <= i; ++j) {
-          feature.setItemBookmark(j, NX.Bookmarks.fromSegments(NX.Bookmarks.getBookmark().getSegments().slice(0, j + 1)), me);
-        }
-
-        // Show the next view in line
-        feature.showChild(i + 1, animate);
-        me.bookmark(model);
-        break;
-      }
+    // Model specified, select it in the previous list
+    if (model && index > 0) {
+      lists[index - 1].fireEvent('selection', lists[index - 1], model);
+      me.onModelChanged(index - 1, model);
     }
+    // Set all child bookmarks
+    for (var i = 0; i <= index; ++i) {
+      me.setItemBookmark(i, NX.Bookmarks.fromSegments(NX.Bookmarks.getBookmark().getSegments().slice(0, i + 1)), me);
+    }
+
+    // Show the next view in line
+    me.showChild(index, animate);
+    me.bookmark(model);
   },
 
   /**
@@ -371,16 +240,15 @@ Ext.define('NX.controller.Drilldown', {
    * @param cmp An optional component to load
    */
   loadCreateWizard: function (index, animate, cmp) {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Reset all non-root bookmarks
     for (var i = 1; i <= index; ++i) {
-      feature.setItemBookmark(i, null);
+      me.setItemBookmark(i, null);
     }
 
     // Show the specified step in the wizard
-    feature.showCreateWizard(index, animate, cmp);
+    me.showCreateWizard(index, animate, cmp);
   },
 
   /**
@@ -388,42 +256,27 @@ Ext.define('NX.controller.Drilldown', {
    * Bookmark specified model / selected tab.
    */
   bookmark: function (model) {
-    var me = this,
-        lists = me.getLists(),
-        feature = me.getFeature(),
-        tabs = feature.down('nx-drilldown-details'),
+    var lists = Ext.ComponentQuery.query('nx-drilldown-master'),
         bookmark = NX.Bookmarks.getBookmark().getSegments(),
         segments = [],
-        selectedTabBookmark,
-        index;
+        index = 0;
 
     // Add the root element of the bookmark
     segments.push(bookmark.shift());
 
     // Find all parent models and add them to the bookmark array
-    for (index = 0; index < lists.length; ++index) {
-      if (model && !lists[index].getView().getNode(model)) {
-        segments.push(bookmark.shift());
-      } else {
-        // All done adding parents
-        break;
-      }
+    while (index < lists.length && model && !lists[index].getView().getNode(model)) {
+      segments.push(bookmark.shift());
+      ++index;
     }
 
     // Add the currently selected model to the bookmark array
     if (model) {
       segments.push(encodeURIComponent(model.getId()));
-
-      // Is this the last list model? And is a tab selected? If so, add it.
-      if (tabs && index == lists.length - 1) {
-        selectedTabBookmark = tabs.getBookmarkOfSelectedTab();
-        if (selectedTabBookmark) {
-          segments.push(selectedTabBookmark);
-        }
-      }
     }
 
-    NX.Bookmarks.bookmark(NX.Bookmarks.fromSegments(segments), me);
+    // Set the bookmark
+    NX.Bookmarks.bookmark(NX.Bookmarks.fromSegments(segments), this);
   },
 
   /**
@@ -432,88 +285,67 @@ Ext.define('NX.controller.Drilldown', {
    */
   navigateTo: function (bookmark) {
     var me = this,
-        lists = me.getLists(),
-        feature = me.getFeature(),
-        list_ids, tab_id = null, model, modelId, index;
+        lists = Ext.ComponentQuery.query('nx-drilldown-master'),
+        list_ids = bookmark.getSegments().slice(1),
+        index, list_ids, modelId, store;
 
-    if (lists.length && bookmark) {
+    // Don’t navigate if the feature view hasn’t loaded
+    if (!me.getFeature || !me.getFeature()) {
+      return;
+    }
+
+    if (lists.length && list_ids.length) {
       //<if debug>
       me.logDebug('Navigate to: ' + bookmark.getSegments().join(':'));
       //</if>
 
-      list_ids = bookmark.getSegments().slice(1);
+      modelId = decodeURIComponent(list_ids.pop());
+      index = list_ids.length;
+      store = lists[index].getStore();
 
-      if (list_ids.length > lists.length) {
-        // The last ID refers to a tab
-        tab_id = list_ids.pop();
+      if (store.isLoading()) {
+        // The store hasn’t yet loaded, load it when ready
+        me.mon(store, 'load', function() {
+          me.selectModel(index, modelId);
+          me.mun(store, 'load');
+        });
+      } else {
+        me.selectModel(index, modelId);
       }
-
-      if (list_ids.length || tab_id) {
-
-        // Select rows in all parent lists
-        for (index = 0; index < list_ids.length; ++index) {
-          modelId = decodeURIComponent(list_ids[index]);
-
-          // Select rows
-          model = lists[index].getStore().getById(modelId);
-          if (model) {
-            lists[index].fireEvent("selection", lists[index], model);
-            me.onModelChanged(model);
-          }
-
-          // If this is the last list, load its data and attach a callback (if necessary)
-          if (index == list_ids.length - 1) {
-
-            // If the data isn’t loaded yet, return here when it is
-            if (!lists[index].getStore().getById(modelId)) {
-              lists[index].getStore().load(function () {
-                me.dataLoadedCallback(lists[index], modelId, tab_id);
-              });
-            } else {
-              me.dataLoadedCallback(lists[index], modelId, tab_id);
-            }
-            break;
-          }
-        }
-      }
-      else {
-        lists[0].getSelectionModel().deselectAll();
-        me.loadView(lists[0].getView(), null, false);
-      }
+    } else {
+      me.loadView(0, false);
     }
   },
 
   /**
    * @private
-   * Once a model is loaded, call this to display the related view, selecting any tabs as needed
+   * @param index of the list which owns the model
+   * @param model to select
    */
-  dataLoadedCallback: function(list, modelId, tabId) {
+  selectModel: function (index, modelId) {
     var me = this,
-      feature = this.getFeature(),
-      model;
+        lists = Ext.ComponentQuery.query('nx-drilldown-master'),
+        store = lists[index].getStore(),
+        model;
 
-    if (list && list.isVisible() && !list.getStore().isLoading()) {
-      // Show the referenced view
-      modelId = decodeURIComponent(modelId);
-      model = list.getStore().getById(modelId);
-
-      // Is a tab specified?
-      if (tabId) {
-        feature.down('nx-drilldown-details').setActiveTabByBookmark(tabId);
+    // getById() throws an error if a model ID is found, but not cached, check for content first
+    if (store.getCount()) {
+      model = store.getById(modelId);
+      if (model === null) {
+        model = store.getById(parseInt(modelId)); // check for integer model id
       }
-
-      me.loadView(list.getView(), model, false);
+      lists[index].fireEvent('selection', lists[index], model);
+      me.onModelChanged(index, model);
+      me.loadView(index + 1, false, model);
     }
   },
 
   /**
    * @private
-   *
-   * FIXME: wire this to work with multiple list views
    */
   onDelete: function () {
     var me = this,
-        selection = me.getLists()[0].getSelectionModel().getSelection(),
+        selection = Ext.ComponentQuery.query('nx-drilldown-master')[0].getSelectionModel().getSelection(),
         description;
 
     if (Ext.isDefined(selection) && selection.length > 0) {
@@ -532,9 +364,8 @@ Ext.define('NX.controller.Drilldown', {
    * Enable 'New' when user has 'create' permission.
    */
   bindNewButton: function (button) {
-    var me = this;
     button.mon(
-        NX.Conditions.isPermitted(me.permission + ':create'),
+        NX.Conditions.isPermitted(this.permission + ':create'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -548,17 +379,459 @@ Ext.define('NX.controller.Drilldown', {
    * Enable 'Delete' when user has 'delete' permission.
    */
   bindDeleteButton: function (button) {
-    var me = this;
     button.mon(
-        NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission + ':delete')
-        ),
+        NX.Conditions.isPermitted(this.permission + ':delete'),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
           scope: button
         }
     );
-  }
+  },
 
+  // Constants which represent card indexes
+  BROWSE_INDEX: 0,
+  CREATE_INDEX: 1,
+  BLANK_INDEX: 2,
+
+  /**
+   * @private
+   * Given N drilldown items, this panel should have a width of N times the current screen width
+   */
+  syncSizeToOwner: function () {
+    var me = this,
+      drilldown = me.getDrilldown(),
+      owner = drilldown.ownerCt.body.el,
+      container = drilldown.down('container');
+
+    container.setSize(owner.getWidth() * container.items.length, owner.getHeight());
+    me.slidePanels(me.currentIndex, false);
+  },
+
+  /**
+   * @public
+   * Shift this panel to display the referenced step in the create wizard
+   *
+   * @param index The index of the create wizard to display
+   * @param animate Set to “true” if the view should slide into place, “false” if it should just appear
+   * @param cmp An optional component to load into the panel
+   */
+  showCreateWizard: function (index, animate, cmp) {
+    var me = this,
+      drilldown = me.getDrilldown(),
+      items = me.padItems(index), // Pad the drilldown
+      createContainer;
+
+    // Add a component to the specified drilldown item (if specified)
+    if (cmp) {
+      createContainer = drilldown.down('#create' + index);
+      createContainer.removeAll();
+      createContainer.add(cmp);
+    }
+
+    // Show the proper card
+    items[index].setCardIndex(me.CREATE_INDEX);
+
+    me.slidePanels(index, animate);
+  },
+
+  /**
+   * @public
+   * Shift this panel to display the referenced master or detail panel
+   *
+   * @param index The index of the master/detail panel to display
+   * @param animate Set to “true” if the view should slide into place, “false” if it should just appear
+   */
+  showChild: function (index, animate) {
+    var me = this,
+      items = me.getDrilldownItems(),
+      item = items[index],
+      createContainer;
+
+    // Show the proper card
+    item.setCardIndex(me.BROWSE_INDEX);
+
+    // Destroy any create wizard panels
+    for (var i = 0; i < items.length; ++i) {
+      createContainer = items[i].down('#create' + i);
+      createContainer.removeAll();
+    }
+
+    me.slidePanels(index, animate);
+  },
+
+  /**
+   * @private
+   * Hide all except the specified panel. Focus on a default form field, if available.
+   *
+   * This is needed to restrict focus to the visible panel only.
+   */
+  hideAllExceptAndFocus: function (index) {
+    var me = this,
+      items = me.getDrilldownItems(),
+      form;
+
+    // Hide everything that’s not the specified panel, reset forms, etc…
+    for (var i = 0; i < items.length; ++i) {
+      if (i != index) {
+        items[i].getLayout().setActiveItem(me.BLANK_INDEX);
+      }
+
+      // Reset forms and filters on successive drilldown items
+      if (i > index) {
+        Ext.each(items[i].query('nx-settingsform'), function(panel) {
+          if (panel.getForm().isDirty()) {
+            panel.getForm().reset();
+          }
+        });
+      }
+    }
+
+    // Set focus on the default field (if available) or the panel itself
+    form = items[index].down('nx-addpanel[defaultFocus]');
+    if (form) {
+      form.down('[name=' + form.defaultFocus + ']').focus();
+    } else {
+      me.getDrilldown().focus();
+    }
+  },
+
+  /**
+   * @private
+   * Slide the drilldown to reveal the specified panel
+   */
+  slidePanels: function (index, animate) {
+    var me = this,
+      drilldown = me.getDrilldown(),
+      feature = drilldown.up('nx-feature-content'),
+      items = me.getDrilldownItems(),
+      item = items[index];
+
+    if (item && item.el) {
+
+      // Restore the current card
+      me.currentIndex = index;
+      item.getLayout().setActiveItem(item.cardIndex);
+
+      var left = feature.el.getX() - (index * feature.el.getWidth());
+      if (animate) {
+        // Suspend layouts until the drilldown animation is complete
+        Ext.suspendLayouts();
+
+        drilldown.animate({
+          easing: 'easeInOut',
+          duration: 200,
+          to: {
+            x: left
+          },
+          callback: function() {
+            // Update the breadcrumb
+            me.refreshBreadcrumb();
+
+            // Put focus on the panel we’re navigating to
+            me.hideAllExceptAndFocus(me.currentIndex);
+
+            // Destroy any create wizard panels after current
+            for (var i = index + 1; i < items.length; ++i) {
+              items[i].down('#create' + i).removeAll();
+            }
+
+            // Resume layouts
+            Ext.resumeLayouts(true);
+
+            // Resize the breadcrumb to fit the window
+            me.resizeBreadcrumb();
+          }
+        });
+      } else {
+        // Show the requested panel, without animation
+        drilldown.setX(left, false);
+
+        // Update the breadcrumb
+        me.refreshBreadcrumb();
+        me.resizeBreadcrumb();
+
+        // Put focus on the panel we’re navigating to
+        me.hideAllExceptAndFocus(index);
+
+        // Destroy any create wizard panels after current
+        for (var i = index + 1; i < items.length; ++i) {
+          items[i].down('#create' + i).removeAll();
+        }
+      }
+    }
+  },
+
+  /**
+   * @private
+   * Pad the number of items in this drilldown to the specified index
+   */
+  padItems: function (index) {
+    var me = this,
+      drilldown = me.getDrilldown(),
+      items = me.getDrilldownItems(),
+      itemContainer;
+
+    // Create new drilldown items (if needed)
+    if (index > items.length - 1) {
+      itemContainer = drilldown.down('container');
+
+      // Create empty panels if index > items.length
+      for (var i = items.length; i <= index; ++i) {
+        itemContainer.add(drilldown.createDrilldownItem(i, undefined, undefined));
+      }
+
+      // Resize the panel
+      me.syncSizeToOwner();
+    }
+
+    return me.getDrilldownItems();
+  },
+
+  /**
+   * @private
+   * Update the breadcrumb based on the itemName and itemClass of drilldown items
+   */
+  refreshBreadcrumb: function() {
+    var me = this,
+      content = me.getDrilldown().up('#feature-content'),
+      breadcrumb = content.down('#breadcrumb'),
+      items = me.getDrilldownItems(),
+      objs = [];
+
+    if (me.currentIndex == 0) {
+      // Feature's home page, no breadcrumb required
+      content.showRoot();
+    } else {
+      // Make a breadcrumb (including icon and 'home' link)
+      objs.push({
+          xtype: 'button',
+          scale: 'large',
+          ui: 'nx-drilldown',
+          text: content.currentTitle,
+          handler: function() {
+            me.slidePanels(0, true);
+
+            // Set the bookmark
+            var bookmark = items[0].itemBookmark;
+            if (bookmark) {
+              NX.Bookmarks.bookmark(bookmark.obj, bookmark.scope);
+            }
+          }
+        }
+      );
+
+      // Create the rest of the links
+      for (var i = 1; i <= me.currentIndex && i < items.length; ++i) {
+        objs.push(
+          // Separator
+          {
+            xtype: 'label',
+            cls: 'nx-breadcrumb-separator',
+            text: '/'
+          },
+          {
+            xtype: 'image',
+            height: 16,
+            width: 16,
+            cls: 'nx-breadcrumb-icon ' + items[i].itemClass
+          },
+
+          // Create a closure within a closure to decouple 'i' from the current context
+          (function(j) {
+            return {
+              xtype: 'button',
+              scale: 'medium',
+              ui: 'nx-drilldown',
+              disabled: (i === me.currentIndex ? true : false), // Disabled if it’s the last item in the breadcrumb
+              text: items[j].itemName,
+              handler: function() {
+                var bookmark = items[j].itemBookmark;
+                if (bookmark) {
+                  NX.Bookmarks.bookmark(bookmark.obj, bookmark.scope);
+                }
+                me.slidePanels(j, true);
+              }
+            }
+          })(i)
+        );
+      }
+
+      breadcrumb.removeAll();
+      breadcrumb.add(objs);
+    }
+  },
+
+  /*
+   * @private
+   * Resize the breadcrumb, truncate individual elements with ellipses as needed
+   */
+  resizeBreadcrumb: function() {
+    var me = this,
+      padding = 60, // Prevent truncation from happening too late
+      parent = me.getDrilldown().ownerCt,
+      breadcrumb = me.getDrilldown().up('#feature-content').down('#breadcrumb'),
+      buttons, availableWidth, minimumWidth;
+
+    // Is the breadcrumb clipped?
+    if (parent && breadcrumb.getWidth() + padding > parent.getWidth()) {
+
+      // Yes. Take measurements and get a list of buttons sorted by length (longest first)
+      buttons = breadcrumb.query('button').splice(1);
+      availableWidth = parent.getWidth();
+
+      // What is the width of the breadcrumb, sans buttons?
+      minimumWidth = breadcrumb.getWidth() + padding;
+      for (var i = 0; i < buttons.length; ++i) {
+        minimumWidth -= buttons[i].getWidth();
+      }
+
+      // Reduce the size of the longest button, until all buttons fit in the specified width
+      me.reduceButtonWidth(buttons, availableWidth - minimumWidth);
+    }
+  },
+
+  /*
+   * @private
+   * Reduce the width of a set of buttons, longest first, to a specified width
+   *
+   * @param buttons The list of buttons to resize
+   * @param width The desired resize width (sum of all buttons)
+   * @param minPerButton The minimum to resize each button (until all buttons are at this minimum)
+   */
+  reduceButtonWidth: function(buttons, width, minPerButton) {
+    var me = this,
+      currentWidth = 0,
+      setToWidth;
+
+    // Sort the buttons by width
+    buttons = buttons.sort(function(a,b) { return b.getWidth() - a.getWidth() });
+
+    // Calculate the current width of the buttons
+    for (var i = 0; i < buttons.length; ++i) {
+      currentWidth += buttons[i].getWidth();
+    }
+
+    // Find the next button to resize
+    for (var i = 0; i < buttons.length; ++i) {
+
+      // Shorten the longest button
+      if (i < buttons.length - 1 && buttons[i].getWidth() > buttons[i+1].getWidth()) {
+
+        // Will resizing this button make it fit?
+        if (currentWidth - (buttons[i].getWidth() - buttons[i+1].getWidth()) <= width) {
+
+          // Yes.
+          setToWidth = width;
+          for (var j = i + 1; j < buttons.length; ++j) {
+            setToWidth -= buttons[j].getWidth();
+          }
+          buttons[i].setWidth(setToWidth);
+
+          // Exit the algorithm
+          break;
+        }
+        else {
+          // No. Set the width of this button to that of the next button, and re-run the algorithm.
+          buttons[i].setWidth(buttons[i+1].getWidth());
+          me.reduceButtonWidth(buttons, width, minPerButton);
+        }
+      }
+      else {
+        // All buttons are the same length, shorten all by the same length
+        setToWidth = Math.floor(width / buttons.length);
+        for (var j = 0; j < buttons.length; ++j) {
+          buttons[j].setWidth(setToWidth);
+        }
+
+        // Exit the algorithm
+        break;
+      }
+    }
+  },
+
+  /**
+   * @public
+   * Set the name of the referenced drilldown item
+   */
+  setItemName: function (index, text) {
+    var me = this,
+      items = me.padItems(index);
+
+    items[index].setItemName(text);
+  },
+
+  /**
+   * @public
+   * Set the icon class of the referenced drilldown item
+   */
+  setItemClass: function (index, cls) {
+    var me = this,
+      items = me.padItems(index);
+
+    items[index].setItemClass(cls);
+  },
+
+  /**
+   * @public
+   * Set the bookmark of the breadcrumb segment associated with the referenced drilldown item
+   */
+  setItemBookmark: function (index, bookmark, scope) {
+    var me = this,
+      items = me.padItems(index);
+
+    items[index].setItemBookmark(bookmark, scope);
+  },
+
+  /**
+   * @public
+   */
+  showInfo: function (message) {
+    this.getDrilldownDetails().showInfo(message);
+  },
+
+  /**
+   * @public
+   */
+  clearInfo: function () {
+    this.getDrilldownDetails().clearInfo();
+  },
+
+  /**
+   * @public
+   */
+  showWarning: function (message) {
+    this.getDrilldownDetails().showWarning(message);
+  },
+
+  /**
+   * @public
+   */
+  clearWarning: function () {
+    this.getDrilldownDetails().clearWarning();
+  },
+
+  /**
+   * Add a tab to the default detail panel
+   *
+   * Note: this will have no effect if a custom detail panel has been specified
+   */
+  addTab: function (tab) {
+    var me = this;
+    if (!me.detail) {
+      me.getDrilldownDetails().addTab(tab);
+    }
+  },
+
+  /**
+   * Remove a panel from the default detail panel
+   *
+   * Note: this will have no effect if a custom detail panel has been specified
+   */
+  removeTab: function (tab) {
+    var me = this;
+    if (!me.detail) {
+      me.getDrilldownDetails().removeTab(tab);
+    }
+  }
 });

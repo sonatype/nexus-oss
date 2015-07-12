@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,11 +21,10 @@ import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
+import org.sonatype.nexus.repository.proxy.CacheInfo;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
-
-import org.joda.time.DateTime;
 
 /**
  * Maven specific implementation of {@link ProxyFacetSupport}.
@@ -55,22 +54,17 @@ public class MavenProxyFacet
   }
 
   @Override
-  protected DateTime getCachedPayloadLastUpdatedDate(final Context context) throws IOException {
-    return mavenFacet.getLastVerified(mavenPath(context));
+  protected void indicateVerified(final Context context, final CacheInfo cacheInfo) throws IOException {
+    mavenFacet.setCacheInfo(mavenPath(context), cacheInfo);
   }
 
   @Override
-  protected void indicateUpToDate(final Context context) throws IOException {
-    mavenFacet.setLastVerified(mavenPath(context), new DateTime());
-  }
-
-  @Override
-  protected String getUrl(final @Nonnull Context context) {
+  protected String getUrl(@Nonnull final Context context) {
     return context.getRequest().getPath().substring(1); // omit leading slash
   }
 
   @Nonnull
-  private MavenPath mavenPath(final @Nonnull Context context) {
+  private MavenPath mavenPath(@Nonnull final Context context) {
     return context.getAttributes().require(MavenPath.class);
   }
 }

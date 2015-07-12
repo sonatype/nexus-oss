@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,9 +18,9 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SearchMaven', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
-    'NX.I18n',
+    'NX.I18n'
   ],
 
   /**
@@ -32,33 +32,49 @@ Ext.define('NX.coreui.controller.SearchMaven', {
 
     search.registerCriteria([
       {
-        id: 'attributes.maven.groupId',
-        group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
+        id: 'attributes.maven2.groupId',
+        group: NX.I18n.get('SearchMaven_Group'),
         config: {
-          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_GROUP_ID'),
+          fieldLabel: NX.I18n.get('SearchMaven_GroupID_FieldLabel'),
           width: 250
         }
       },
       {
-        id: 'attributes.maven.artifactId',
-        group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
+        id: 'attributes.maven2.artifactId',
+        group: NX.I18n.get('SearchMaven_Group'),
         config: {
-          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_ARTIFACT_ID'),
+          fieldLabel: NX.I18n.get('SearchMaven_ArtifactID_FieldLabel'),
           width: 250
         }
       },
       {
-        id: 'attributes.maven.classifier',
-        group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
+        id: 'attributes.maven2.baseVersion',
+        group: NX.I18n.get('SearchMaven_Group'),
         config: {
-          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_CLASSIFIER')
+          fieldLabel: NX.I18n.get('SearchMaven_BaseVersion_FieldLabel'),
+          width: 250
         }
       },
       {
-        id: 'attributes.maven.packaging',
-        group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_MAVEN'),
+        id: 'attributes.maven2.version',
+        group: NX.I18n.get('SearchMaven_Group'),
         config: {
-          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MAVEN_PACKAGING')
+          fieldLabel: NX.I18n.get('SearchMaven_Version_FieldLabel'),
+          width: 250
+        }
+      },
+      {
+        id: 'assets.attributes.maven2.classifier',
+        group: NX.I18n.get('SearchMaven_Group'),
+        config: {
+          fieldLabel: NX.I18n.get('SearchMaven_Classifier_FieldLabel')
+        }
+      },
+      {
+        id: 'assets.attributes.maven2.extension',
+        group: NX.I18n.get('SearchMaven_Group'),
+        config: {
+          fieldLabel: NX.I18n.get('SearchMaven_Extension_FieldLabel')
         }
       }
     ], me);
@@ -66,16 +82,18 @@ Ext.define('NX.coreui.controller.SearchMaven', {
     search.registerFilter({
       id: 'maven2',
       name: 'Maven',
-      text: NX.I18n.get('BROWSE_SEARCH_MAVEN_TITLE'),
-      description: NX.I18n.get('BROWSE_SEARCH_MAVEN_SUBTITLE'),
+      text: NX.I18n.get('SearchMaven_Text'),
+      description: NX.I18n.get('SearchMaven_Description'),
       readOnly: true,
       criterias: [
         { id: 'format', value: 'maven2', hidden: true },
-        { id: 'attributes.maven.groupId' },
-        { id: 'attributes.maven.artifactId' },
+        { id: 'attributes.maven2.groupId' },
+        { id: 'attributes.maven2.artifactId' },
+        { id: 'attributes.maven2.version' },
+        { id: 'attributes.maven2.baseVersion' },
         { id: 'version' },
-        { id: 'attributes.maven.classifier'},
-        { id: 'attributes.maven.packaging' }
+        { id: 'assets.attributes.maven2.classifier'},
+        { id: 'assets.attributes.maven2.extension' }
       ]
     }, me);
   }

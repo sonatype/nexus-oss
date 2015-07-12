@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -43,7 +43,6 @@ import org.apache.shiro.subject.Subject;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.rapture.internal.state.StateComponent.shouldSend;
 
 /**
  * Security Ext.Direct component.
@@ -161,13 +160,6 @@ public class SecurityComponent
 
   @DirectMethod
   public List<PermissionXO> getPermissions() {
-    List<PermissionXO> permissions = calculatePermissions();
-    // store hash so we do not send later on a command to fetch
-    shouldSend("permissions", permissions);
-    return permissions;
-  }
-
-  public List<PermissionXO> calculatePermissions() {
     List<PermissionXO> permissions = null;
     Subject subject = securitySystem.getSubject();
     if (isLoggedIn(subject)) {
@@ -180,22 +172,11 @@ public class SecurityComponent
   public Map<String, Object> getState() {
     Map<String, Object> state = new HashMap<>();
     state.put("user", getUser());
+    state.put("permissions", getPermissions());
 
     AnonymousConfiguration anonymousConfiguration = anonymousManager.getConfiguration();
     state.put("anonymousUsername", anonymousConfiguration.isEnabled() ? anonymousConfiguration.getUserId() : null);
     return state;
-  }
-
-  @Override
-  public Map<String, Object> getCommands() {
-    HashMap<String, Object> commands = new HashMap<>();
-
-    List<PermissionXO> permissions = calculatePermissions();
-    if (permissions != null && shouldSend("permissions", permissions)) {
-      commands.put("fetchpermissions", null);
-    }
-
-    return commands;
   }
 
   private boolean isLoggedIn(final Subject subject) {

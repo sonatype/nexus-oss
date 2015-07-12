@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,16 +18,13 @@
  * @since 3.0
  */
 Ext.define('NX.controller.State', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.direct.Manager',
     'NX.Dialogs',
     'NX.Messages',
     'NX.I18n'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   models: [
     'State'
@@ -49,11 +46,15 @@ Ext.define('NX.controller.State', {
   maxDisconnectWarnings: 3,
 
   /**
-   * @private
    * True when state is received from server.
+   *
+   * @private
    */
   receiving: false,
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -77,14 +78,26 @@ Ext.define('NX.controller.State', {
 
     me.addEvents(
         /**
-         * @event changed
          * Fires when any of application context values changes.
+         *
+         * @event changed
          */
         'changed'
     );
   },
 
+  /**
+   * Install initial state, primed from app.js
+   *
+   * @override
+   */
   onLaunch: function () {
+    var me = this;
+
+    //<if debug>
+    me.logTrace('Initial state:', NX.app.state);
+    //</if>
+
     var uiSettings = NX.app.state['uiSettings'];
 
     NX.State.setBrowserSupported(
@@ -98,6 +111,10 @@ Ext.define('NX.controller.State', {
     delete NX.app.state['uiSettings'];
     NX.State.setValues(NX.app.state);
     NX.State.setValues({ uiSettings: uiSettings });
+
+    //<if debug>
+    me.logInfo('State primed');
+    //</if>
   },
 
   /**
@@ -109,8 +126,7 @@ Ext.define('NX.controller.State', {
   },
 
   getValue: function(key, defaultValue) {
-    var me = this,
-        model = me.getStateStore().getById(key),
+    var model = this.getStore('State').getById(key),
         value;
 
     if (model) {
@@ -130,11 +146,11 @@ Ext.define('NX.controller.State', {
    */
   setValue: function (key, value, hash) {
     var me = this,
-        model = me.getStateStore().getById(key);
+        model = me.getStore('State').getById(key);
 
     if (!model) {
       if (Ext.isDefined(value)) {
-        me.getStateStore().add(me.getStateModel().create({ key: key, value: value, hash: hash }));
+        me.getStore('State').add(me.getStateModel().create({ key: key, value: value, hash: hash }));
       }
     }
     else {
@@ -147,10 +163,10 @@ Ext.define('NX.controller.State', {
         }
       }
       else {
-        me.getStateStore().remove(model);
+        me.getStore('State').remove(model);
       }
     }
-    me.getStateStore().commitChanges();
+    me.getStore('State').commitChanges();
     if (me.statusProvider) {
       if (Ext.isDefined(value) && hash) {
         me.statusProvider.baseParams[key] = hash;
@@ -191,27 +207,30 @@ Ext.define('NX.controller.State', {
   },
 
   onEntryUpdated: function (store, model, operation, modifiedFieldNames) {
-    var me = this;
     if ((operation === Ext.data.Model.EDIT) && modifiedFieldNames.indexOf('value') > -1) {
-      me.notifyChange(model.get('key'), model.get('value'), model.modified.value);
+      this.notifyChange(model.get('key'), model.get('value'), model.modified.value);
     }
   },
 
   onEntryRemoved: function (store, model) {
-    var me = this;
-    me.notifyChange(model.get('key'), undefined, model.get('value'));
+    this.notifyChange(model.get('key'), undefined, model.get('value'));
   },
 
   notifyChange: function (key, value, oldValue) {
     var me = this;
-    me.logDebug('Changed: ' + key + ' -> ' + (value ? Ext.JSON.encode(value) : '(deleted)'));
+
+    //<if debug>
+    me.logTrace('Changed:', key, '->', (value ? value : '(deleted)'));
+    //</if>
+
     me.fireEvent(key.toLowerCase() + 'changed', value, oldValue);
     me.fireEvent('changed', key, value, oldValue);
   },
 
   /**
-   * @private
    * Reset state pooling when uiSettings.statusInterval changes.
+   *
+   * @private
    */
   onUiSettingsChanged: function (uiSettings, oldUiSettings) {
     var me = this,
@@ -256,7 +275,7 @@ Ext.define('NX.controller.State', {
         });
 
         //<if debug>
-        me.logDebug('State pooling configured for ' + newStatusInterval + ' seconds');
+        me.logDebug('State pooling configured for', newStatusInterval, 'seconds');
         //</if>
       }
     }
@@ -272,16 +291,16 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * On sign-in/sign-out update status interval.
+   *
+   * @private
    */
   onUserChanged: function (user, oldUser) {
-    var me = this,
-        uiSettings;
+    var uiSettings;
 
     if (Ext.isDefined(user) !== Ext.isDefined(oldUser)) {
       uiSettings = NX.State.getValue('uiSettings');
-      me.onUiSettingsChanged(uiSettings, uiSettings);
+      this.onUiSettingsChanged(uiSettings, uiSettings);
     }
   },
 
@@ -301,8 +320,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * Called when state pooling was successful.
+   *
+   * @private
    */
   onSuccess: function (event) {
     var me = this,
@@ -314,7 +334,7 @@ Ext.define('NX.controller.State', {
     // re-enable the UI we are now connected again
     if (me.disconnectedTimes > 0) {
       me.disconnectedTimes = 0;
-      NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_RECONNECTED_SUCCESS'), type: 'success' });
+      NX.Messages.add({text: NX.I18n.get('State_Reconnected_Message'), type: 'success' });
     }
 
     NX.State.setValue('receiving', true);
@@ -322,23 +342,17 @@ Ext.define('NX.controller.State', {
     // propagate event data
     state = event.data.data;
 
-    if (!me.reloadWhenServerIdChanged(serverId, state.values.serverId ? state.values.serverId.value : serverId)) {
-      me.setValues(state.values);
-
-      // fire commands if there are any
-      if (state.commands) {
-        Ext.each(state.commands, function (command) {
-          me.fireEvent('command' + command.type.toLowerCase(), command.data);
-        });
-      }
+    if (!me.reloadWhenServerIdChanged(serverId, state.serverId ? state.serverId.value : serverId)) {
+      me.setValues(state);
     }
 
     // TODO: Fire global refresh event
   },
 
   /**
-   * @private
    * Called when state pooling failed.
+   *
+   * @private
    */
   onError: function (event) {
     var me = this;
@@ -356,16 +370,17 @@ Ext.define('NX.controller.State', {
         NX.State.setValue('receiving', false);
 
         if (me.disconnectedTimes <= me.maxDisconnectWarnings) {
-          NX.Messages.add({ text: NX.I18n.get('GLOBAL_SERVER_DISCONNECTED'), type: 'warning' });
+          NX.Messages.add({ text: NX.I18n.get('State_Disconnected_Message'), type: 'warning' });
         }
 
         // Give up after a few attempts and disable the UI
         if (me.disconnectedTimes > me.maxDisconnectWarnings) {
-          NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_DISCONNECTED'), type: 'danger' });
+          NX.Messages.add({text: NX.I18n.get('State_Disconnected_Message'), type: 'danger' });
 
           // Stop polling
           me.statusProvider.disconnect();
 
+          // FIXME: i18n
           // Show the UI with a modal dialog error
           NX.Dialogs.showError(
               'Server disconnected',
@@ -390,8 +405,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @public
    * Refreshes status from server on demand.
+   *
+   * @public
    */
   refreshNow: function () {
     var me = this;
@@ -402,8 +418,9 @@ Ext.define('NX.controller.State', {
   },
 
   /**
-   * @private
    * Show messages about license.
+   *
+   * @private
    * @param {Object} license
    * @param {Number} license.installed
    * @param {Object} oldLicense
@@ -412,16 +429,17 @@ Ext.define('NX.controller.State', {
   onLicenseChanged: function (license, oldLicense) {
     if (license && oldLicense) {
       if (license.installed && !oldLicense.installed) {
-        NX.Messages.add({ text: NX.I18n.get('GLOBAL_LICENSE_INSTALLED_SUCCESS'), type: 'success' });
+        NX.Messages.add({ text: NX.I18n.get('State_Installed_Message'), type: 'success' });
       }
       else if (!license.installed && oldLicense.installed) {
-        NX.Messages.add({ text: NX.I18n.get('GLOBAL_LICENSE_UNINSTALLED_WARNING'), type: 'warning' });
+        NX.Messages.add({ text: NX.I18n.get('State_Uninstalled_Message'), type: 'warning' });
       }
     }
   },
 
   reloadWhenServerIdChanged: function (serverId, oldServerId) {
     if (oldServerId && (serverId !== oldServerId)) {
+      // FIXME: i18n
       NX.Dialogs.showInfo(
           'Server restarted',
           'Application will be reloaded as server has been restarted',

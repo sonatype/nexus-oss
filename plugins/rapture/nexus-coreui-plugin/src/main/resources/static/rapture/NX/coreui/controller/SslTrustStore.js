@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,15 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SslTrustStore', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Conditions',
     'NX.coreui.controller.SslCertificates'
   ],
-
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'ssl.SslUseTrustStore'
@@ -117,7 +113,7 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
         protocolHint = useTrustStoreConfig.url && Ext.String.startsWith(useTrustStoreConfig.url.getValue(), "https://") ? 'https' : undefined,
         sslCertificates = me.getController('NX.coreui.controller.SslCertificates');
 
-    me.getMain().getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
+    me.getMain().getEl().mask(NX.I18n.get('SslTrustStore_Load_Mask'));
     NX.direct.ssl_Certificate.retrieveFromHost(hostAndPort.host, hostAndPort.port, protocolHint, function(response) {
       me.getMain().getEl().unmask();
       if (Ext.isObject(response) && response.success) {
@@ -131,8 +127,7 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
    * Get host/port out of config.
    */
   getHostAndPort: function(config) {
-    var me = this,
-        sslCertificates = me.getController('NX.coreui.controller.SslCertificates'),
+    var sslCertificates = this.getController('NX.coreui.controller.SslCertificates'),
         valueOf = function(value) {
           if (Ext.isString(value)) {
             return value;

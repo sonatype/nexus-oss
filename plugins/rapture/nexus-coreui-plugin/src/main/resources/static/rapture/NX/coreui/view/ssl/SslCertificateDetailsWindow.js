@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -26,13 +26,13 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
   ],
   ui: 'nx-inset',
 
-  title: NX.I18n.get('ADMIN_SSL_DETAILS_TITLE'),
+  title: NX.I18n.get('Ssl_SslCertificateDetailsWindow_Title'),
 
   items: {
     xtype: 'nx-coreui-sslcertificate-details-form',
     frame: false,
     buttons: [
-      { text: NX.I18n.get('ADMIN_SSL_DETAILS_CANCEL_BUTTON'),
+      { text: NX.I18n.get('Ssl_SslCertificateDetailsWindow_Cancel_Button'),
         handler: function () {
           this.up('window').close();
         }

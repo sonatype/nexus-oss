@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -64,7 +64,8 @@ class LdapServerConnectionXO
   @NotNull(groups = AuthScheme)
   String authPassword
 
-  @Min(0L)
+  @Min(1L)
+  @Max(3600L) // 1 hour
   Integer connectionTimeout
 
   @Min(0L)

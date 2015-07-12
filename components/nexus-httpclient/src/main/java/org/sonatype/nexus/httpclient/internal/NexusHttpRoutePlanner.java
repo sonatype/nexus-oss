@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -13,8 +13,9 @@
 package org.sonatype.nexus.httpclient.internal;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
+
+import javax.annotation.Nullable;
 
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -38,9 +39,9 @@ public class NexusHttpRoutePlanner
     extends DefaultRoutePlanner
 {
   /**
-   * Set of patterns for matching hosts names against. Never null.
+   * Single regexp pattern covering non-proxy-hosts, never {@code null}
    */
-  private final Set<Pattern> patterns;
+  private final Pattern nonProxyHostPattern;
 
   /**
    * Mapping between protocol scheme and proxy to be used
@@ -51,11 +52,11 @@ public class NexusHttpRoutePlanner
    * @since 2.5
    */
   public NexusHttpRoutePlanner(final Map<String, HttpHost> proxies,
-                               final Set<Pattern> patterns)
+                               @Nullable final Pattern nonProxyHostsPattern)
   {
     super(DefaultSchemePortResolver.INSTANCE);
     this.proxies = checkNotNull(proxies);
-    this.patterns = checkNotNull(patterns);
+    this.nonProxyHostPattern = nonProxyHostsPattern;
   }
 
   @Override
@@ -78,11 +79,6 @@ public class NexusHttpRoutePlanner
    * @return true if no proxy should be configured.
    */
   private boolean noProxyFor(final String hostName) {
-    for (Pattern pattern : patterns) {
-      if (pattern.matcher(hostName).matches()) {
-        return true;
-      }
-    }
-    return false;
+    return nonProxyHostPattern != null && nonProxyHostPattern.matcher(hostName).matches();
   }
 }

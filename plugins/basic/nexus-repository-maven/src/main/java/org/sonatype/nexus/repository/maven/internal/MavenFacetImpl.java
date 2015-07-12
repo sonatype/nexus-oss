@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -14,8 +14,6 @@ package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -26,14 +24,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.blobstore.api.BlobRef;
-import org.sonatype.nexus.blobstore.api.BlobStore;
+import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
-import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
-import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.maven.MavenFacet;
@@ -42,7 +36,9 @@ import org.sonatype.nexus.repository.maven.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.MavenPathParser;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
+import org.sonatype.nexus.repository.proxy.CacheInfo;
 import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
@@ -52,13 +48,13 @@ import org.sonatype.nexus.repository.types.ProxyType;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
+import org.sonatype.nexus.transaction.Transactional;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.google.common.hash.HashCode;
-import org.joda.time.DateTime;
+import com.orientechnologies.common.concur.ONeedRetryException;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -82,38 +78,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 public class MavenFacetImpl
     extends FacetSupport
-    implements MavenFacet
+    implements MavenFacet, MavenAttributes
 {
-  // artifact shared properties of both, artifact component and artifact asset
-
-  private static final String P_GROUP_ID = "groupId";
-
-  private static final String P_ARTIFACT_ID = "artifactId";
-
-  private static final String P_VERSION = "version";
-
-  private static final String P_BASE_VERSION = "baseVersion";
-
-  private static final String P_CLASSIFIER = "classifier";
-
-  private static final String P_EXTENSION = "extension";
-
-  // artifact component properties
-
-  private static final String P_COMPONENT_KEY = "key";
-
-  // shared properties for both artifact and metadata assets
-
-  private static final String P_ASSET_KEY = "key";
-
-  private static final String P_CONTENT_LAST_MODIFIED = "contentLastModified";
-
-  private static final String P_CONTENT_ETAG = "etag";
-
-  private static final String P_LAST_VERIFIED = "lastVerified";
-
-  private final MimeSupport mimeSupport;
-
   private final Map<String, MavenPathParser> mavenPathParsers;
 
   @VisibleForTesting
@@ -122,16 +88,13 @@ public class MavenFacetImpl
   @VisibleForTesting
   static class Config
   {
-    public boolean strictContentTypeValidation = false;
-
     @NotNull(groups = {HostedType.ValidationGroup.class, ProxyType.ValidationGroup.class})
     public VersionPolicy versionPolicy;
 
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
-          "strictContentTypeValidation=" + strictContentTypeValidation +
-          ", versionPolicy=" + versionPolicy +
+          "versionPolicy=" + versionPolicy +
           '}';
     }
   }
@@ -143,8 +106,7 @@ public class MavenFacetImpl
   private StorageFacet storageFacet;
 
   @Inject
-  public MavenFacetImpl(final MimeSupport mimeSupport, final Map<String, MavenPathParser> mavenPathParsers) {
-    this.mimeSupport = checkNotNull(mimeSupport);
+  public MavenFacetImpl(final Map<String, MavenPathParser> mavenPathParsers) {
     this.mavenPathParsers = checkNotNull(mavenPathParsers);
   }
 
@@ -188,73 +150,66 @@ public class MavenFacetImpl
 
   @Nullable
   @Override
+  @Transactional(retryOn = IllegalStateException.class)
   public Content get(final MavenPath path) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      return get(tx, path);
-    }
-  }
-
-  @Nullable
-  @Override
-  public Content get(final StorageTx tx, final MavenPath path) throws IOException {
     log.debug("GET {} : {}", getRepository().getName(), path.getPath());
+
+    final StorageTx tx = UnitOfWork.currentTransaction();
+
     final Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
       return null;
     }
-    return toContent(tx, asset);
-  }
-
-  /**
-   * Creates {@link Content} from passed in {@link Asset}.
-   */
-  private Content toContent(final StorageTx tx, final Asset asset) throws IOException {
     final Blob blob = tx.requireBlob(asset.requireBlobRef());
     final String contentType = asset.contentType();
-
-    final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
-    final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
-    for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
-      final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
-      hashCodes.put(algorithm, hashCode);
-    }
-    final NestedAttributesMap attributesMap = asset.formatAttributes();
-    final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-    final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
-    final Content result = new Content(new BlobPayload(blob, contentType));
-    result.getAttributes()
-        .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
-    result.getAttributes().set(Content.CONTENT_ETAG, eTag);
-    result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
-    return result;
+    final Content content = new Content(new BlobPayload(blob, contentType));
+    Content.extractFromAsset(asset, HashType.ALGORITHMS, content.getAttributes());
+    return content;
   }
 
   @Override
-  public Content put(final MavenPath path, final Payload payload)
-      throws IOException, InvalidContentException
-  {
-    try (StorageTx tx = storageFacet.openTx()) {
-      Content content = put(tx, path, payload);
-      tx.commit();
-      return content;
-    }
-  }
-
-  @Override
-  public Content put(final StorageTx tx, final MavenPath path, final Payload payload)
-      throws IOException, InvalidContentException
+  public void put(final MavenPath path, final Payload payload)
+      throws IOException
   {
     log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
-    if (path.getCoordinates() != null) {
-      return putArtifact(tx, path, payload);
-    }
-    else {
-      return putFile(tx, path, payload);
+
+    try (TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
+      doPut(path, payload, streamSupplier);
     }
   }
 
-  private Content putArtifact(final StorageTx tx, final MavenPath path, final Payload payload)
-      throws IOException, InvalidContentException
+  @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
+  protected void doPut(final MavenPath path,
+                       final Payload payload,
+                       final Supplier<InputStream> streamSupplier)
+      throws IOException
+  {
+    final StorageTx tx = UnitOfWork.currentTransaction();
+
+    final AssetBlob assetBlob = tx.createBlob(
+        path.getPath(),
+        streamSupplier.get(),
+        HashType.ALGORITHMS,
+        null,
+        payload.getContentType()
+    );
+    AttributesMap contentAttributes = null;
+    if (payload instanceof Content) {
+      contentAttributes = ((Content) payload).getAttributes();
+    }
+    if (path.getCoordinates() != null) {
+      putArtifact(tx, path, assetBlob, contentAttributes);
+    }
+    else {
+      putFile(tx, path, assetBlob, contentAttributes);
+    }
+  }
+
+  private void putArtifact(final StorageTx tx,
+                           final MavenPath path,
+                           final AssetBlob assetBlob,
+                           @Nullable final AttributesMap contentAttributes)
+      throws IOException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
     Component component = findComponent(tx, tx.getBucket(), path);
@@ -292,13 +247,15 @@ public class MavenFacetImpl
       assetAttributes.set(P_EXTENSION, coordinates.getExtension());
     }
 
-    putAssetPayload(path, tx, asset, payload);
+    putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
-    return toContent(tx, asset);
   }
 
-  private Content putFile(final StorageTx tx, final MavenPath path, final Payload payload)
-      throws IOException, InvalidContentException
+  private void putFile(final StorageTx tx,
+                       final MavenPath path,
+                       final AssetBlob assetBlob,
+                       @Nullable final AttributesMap contentAttributes)
+      throws IOException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
@@ -310,56 +267,25 @@ public class MavenFacetImpl
       assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
     }
 
-    putAssetPayload(path, tx, asset, payload);
+    putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
-    return toContent(tx, asset);
   }
 
-  private void putAssetPayload(final MavenPath path,
-                               final StorageTx tx,
+  private void putAssetPayload(final StorageTx tx,
                                final Asset asset,
-                               final Payload payload) throws IOException
+                               final AssetBlob assetBlob,
+                               @Nullable final AttributesMap contentAttributes)
+      throws IOException
   {
-    // TODO: Figure out created-by header
-    final ImmutableMap<String, String> headers = ImmutableMap.of(
-        BlobStore.BLOB_NAME_HEADER, path.getPath(),
-        BlobStore.CREATED_BY_HEADER, "unknown"
-    );
-
-    try (InputStream inputStream = payload.openInputStream()) {
-      try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
-        final String contentType = determineContentType(path, supplier, payload.getContentType());
-        try (InputStream is = supplier.get()) {
-          tx.setBlob(is, headers, asset, HashType.ALGORITHMS, contentType);
-        }
-      }
-    }
-
-    final NestedAttributesMap formatAttributes = asset.formatAttributes();
-    if (payload instanceof Content) {
-      Content content = (Content) payload;
-      final DateTime lastModified = content.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
-      if (lastModified != null) {
-        formatAttributes.set(P_CONTENT_LAST_MODIFIED, lastModified.toDate());
-      }
-      formatAttributes.set(P_CONTENT_ETAG, content.getAttributes().get(Content.CONTENT_ETAG, String.class));
-    }
-    else {
-      formatAttributes.set(P_CONTENT_LAST_MODIFIED, DateTime.now().toDate());
-    }
+    tx.attachBlob(asset, assetBlob);
+    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
   }
 
   @Override
+  @Transactional
   public boolean delete(final MavenPath... paths) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      boolean result = delete(tx, paths);
-      tx.commit();
-      return result;
-    }
-  }
+    final StorageTx tx = UnitOfWork.currentTransaction();
 
-  @Override
-  public boolean delete(final StorageTx tx, final MavenPath... paths) throws IOException {
     boolean result = false;
     for (MavenPath path : paths) {
       log.debug("DELETE {} : {}", getRepository().getName(), path.getPath());
@@ -373,7 +299,7 @@ public class MavenFacetImpl
     return result;
   }
 
-  private boolean deleteArtifact(final MavenPath path, final StorageTx tx) throws IOException {
+  private boolean deleteArtifact(final MavenPath path, final StorageTx tx) {
     final Component component = findComponent(tx, tx.getBucket(), path);
     if (component == null) {
       return false;
@@ -389,7 +315,7 @@ public class MavenFacetImpl
     return true;
   }
 
-  private boolean deleteFile(final MavenPath path, final StorageTx tx) throws IOException {
+  private boolean deleteFile(final MavenPath path, final StorageTx tx) {
     final Asset asset = findAsset(tx, tx.getBucket(), path);
     if (asset == null) {
       return false;
@@ -399,41 +325,26 @@ public class MavenFacetImpl
   }
 
   @Override
-  public DateTime getLastVerified(final MavenPath path) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      final Asset asset = findAsset(tx, tx.getBucket(), path);
-      if (asset == null) {
-        return null;
-      }
-      final NestedAttributesMap attributes = asset.formatAttributes();
-      final Date date = attributes.get(P_LAST_VERIFIED, Date.class);
-      if (date == null) {
-        return null;
-      }
-      return new DateTime(date);
-    }
-  }
+  @Transactional(retryOn = ONeedRetryException.class)
+  public boolean setCacheInfo(final MavenPath path, final CacheInfo cacheInfo) throws IOException {
+    final StorageTx tx = UnitOfWork.currentTransaction();
 
-  @Override
-  public boolean setLastVerified(final MavenPath path, final DateTime verified) throws IOException {
-    try (StorageTx tx = storageFacet.openTx()) {
-      final Asset asset = findAsset(tx, tx.getBucket(), path);
-      if (asset == null) {
-        return false;
-      }
-      final NestedAttributesMap attributes = asset.formatAttributes();
-      attributes.set(P_LAST_VERIFIED, verified.toDate());
-      tx.saveAsset(asset);
-      tx.commit();
-      return true;
+    final Asset asset = findAsset(tx, tx.getBucket(), path);
+    if (asset == null) {
+      return false;
     }
+
+    log.debug("Updating cacheInfo of {} to {}", path.getPath(), cacheInfo);
+    CacheInfo.applyToAsset(asset, cacheInfo);
+    tx.saveAsset(asset);
+
+    return true;
   }
 
   /**
    * Returns component key based on passed in {@link Coordinates} G:A:V values.
    */
   private String getComponentKey(final Coordinates coordinates) {
-    // TODO: maybe sha1() the resulting string?
     return coordinates.getGroupId()
         + ":" + coordinates.getArtifactId()
         + ":" + coordinates.getVersion();
@@ -443,7 +354,6 @@ public class MavenFacetImpl
    * Returns asset key based on passed in {@link MavenPath} path value.
    */
   private String getAssetKey(final MavenPath mavenPath) {
-    // TODO: maybe sha1() the resulting string?
     return mavenPath.getPath();
   }
 
@@ -489,42 +399,5 @@ public class MavenFacetImpl
     final String assetKeyName =
         StorageFacet.P_ATTRIBUTES + "." + getRepository().getFormat().getValue() + "." + P_ASSET_KEY;
     return tx.findAssetWithProperty(assetKeyName, getAssetKey(mavenPath), bucket);
-  }
-
-  /**
-   * Determines or confirms the content type for the content, or throws {@link InvalidContentException} if it cannot.
-   */
-  @Nonnull
-  private String determineContentType(final MavenPath mavenPath,
-                                      final Supplier<InputStream> inputStreamSupplier,
-                                      final String declaredContentType)
-      throws IOException
-  {
-    String contentType = declaredContentType;
-
-    if (contentType == null) {
-      log.trace("Content PUT to {} has no content type.", mavenPath);
-      try (InputStream is = inputStreamSupplier.get()) {
-        contentType = mimeSupport.detectMimeType(is, mavenPath.getPath());
-      }
-      log.trace("Mime support implies content type {}", contentType);
-
-      if (contentType == null && config.strictContentTypeValidation) {
-        throw new InvalidContentException("Content type could not be determined.");
-      }
-    }
-    else {
-      try (InputStream is = inputStreamSupplier.get()) {
-        final List<String> types = mimeSupport.detectMimeTypes(is, mavenPath.getPath());
-        if (!types.isEmpty() && !types.contains(contentType)) {
-          log.debug("Discovered content type {} ", types);
-          if (config.strictContentTypeValidation) {
-            throw new InvalidContentException(
-                String.format("Declared content type %s, but discovered %s.", contentType, types));
-          }
-        }
-      }
-    }
-    return contentType;
   }
 }

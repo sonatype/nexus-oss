@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -27,7 +27,6 @@ Use this config to create Maven2 hosted repository, use name `maven2-hosted` (or
     "writePolicy" : "ALLOW"
   }
 }
-
 ```
 
 Use this config to create Maven proxy repository, use name `maven2-proxy` (or as you wish, but update accordingly the group configuration below):
@@ -40,7 +39,7 @@ Use this config to create Maven proxy repository, use name `maven2-proxy` (or as
   },
   "proxy" : {
     "remoteUrl" : "http://repo1.maven.org/maven2/",
-    "artifactMaxAge" : 3600
+    "contentMaxAge" : 3600
   },
   "httpclient" : {
     "connection" : {
@@ -121,7 +120,7 @@ Group "maven2-group":
 	</mirrors>
 </settings>
 ```
-* kick of a build and deploy:
+* kick off a build and deploy:
 ```
 mvn -s settings.xml clean deploy -Dtest=void -DfailIfNoTests=false -DaltDeploymentRepository=local-nexus-admin::default::http://localhost:8081/repository/maven2-hosted/ -U
 ```

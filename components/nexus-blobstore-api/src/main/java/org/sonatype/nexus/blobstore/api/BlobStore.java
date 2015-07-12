@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -35,6 +35,11 @@ public interface BlobStore
    * An identifying name for disaster recovery purposes (which isn't required to be strictly unique)
    */
   String BLOB_NAME_HEADER = "BlobStore.blob-name";
+
+  /**
+   * An informational header for disaster recovery purposes (describes what blob contains)
+   */
+  String CONTENT_TYPE_HEADER = "BlobStore.content-type";
 
   /**
    * Audit information (e.g. the name of a principal that created the blob)

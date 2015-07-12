@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,9 +18,9 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SearchRaw', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
-    'NX.I18n',
+    'NX.I18n'
   ],
 
   /**
@@ -33,9 +33,9 @@ Ext.define('NX.coreui.controller.SearchRaw', {
     search.registerCriteria([
       {
         id: 'attributes.raw.path.tree',
-        group: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_RAW'),
+        group: NX.I18n.get('SearchRaw_Group'),
         config: {
-          fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_RAW_PATH'),
+          fieldLabel: NX.I18n.get('SearchRaw_Path_FieldLabel'),
           width: 300
         }
       }
@@ -44,8 +44,8 @@ Ext.define('NX.coreui.controller.SearchRaw', {
     search.registerFilter({
       id: 'raw',
       name: 'Raw',
-      text: NX.I18n.get('BROWSE_SEARCH_RAW_TITLE'),
-      description: NX.I18n.get('BROWSE_SEARCH_RAW_SUBTITLE'),
+      text: NX.I18n.get('SearchRaw_Text'),
+      description: NX.I18n.get('SearchRaw_Description'),
       readOnly: true,
       criterias: [
         { id: 'format', value: 'raw', hidden: true },

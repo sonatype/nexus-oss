@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpStatus;
 
 import com.google.common.io.Files;
+import org.apache.http.entity.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -27,6 +28,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
@@ -71,10 +73,9 @@ public class RawProxyOfHostedIT
   @Test
   public void fetchFromRemote() throws Exception {
     final File testFile = resolveTestFile(TEST_CONTENT);
-    hostedClient.put(TEST_PATH, testFile);
+    hostedClient.put(TEST_PATH, ContentType.TEXT_PLAIN, testFile);
 
-    final byte[] bytes = proxyClient.getBytes(TEST_PATH);
-    assertThat(bytes, is(Files.toByteArray(testFile)));
+    assertThat(bytes(proxyClient.get(TEST_PATH)), is(Files.toByteArray(testFile)));
   }
 
   @Test
@@ -83,7 +84,7 @@ public class RawProxyOfHostedIT
     proxyClient.get(TEST_PATH);
 
     // Put the file in the hosted repo
-    hostedClient.put(TEST_PATH, resolveTestFile(TEST_CONTENT));
+    hostedClient.put(TEST_PATH, ContentType.TEXT_PLAIN, resolveTestFile(TEST_CONTENT));
 
     // The NFC should ensure we still see the 404
     assertThat(status(proxyClient.get(TEST_PATH)), is(HttpStatus.NOT_FOUND));

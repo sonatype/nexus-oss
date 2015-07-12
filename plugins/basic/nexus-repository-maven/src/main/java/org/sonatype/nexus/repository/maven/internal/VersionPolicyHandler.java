@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -39,7 +39,7 @@ public class VersionPolicyHandler
 {
   @Nonnull
   @Override
-  public Response handle(final @Nonnull Context context) throws Exception {
+  public Response handle(@Nonnull final Context context) throws Exception {
     final MavenPath path = context.getAttributes().require(MavenPath.class);
     final MavenFacet mavenFacet = context.getRepository().facet(MavenFacet.class);
     final VersionPolicy versionPolicy = mavenFacet.getVersionPolicy();
