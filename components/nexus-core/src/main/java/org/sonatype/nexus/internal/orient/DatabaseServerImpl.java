@@ -69,16 +69,20 @@ public class DatabaseServerImpl
 
   private final boolean httpListenerEnabled;
 
+  private boolean dynamicPlugins;
+
   private OServer server;
 
   @Inject
   public DatabaseServerImpl(final ApplicationDirectories applicationDirectories,
                             final @Named("${nexus.orient.binaryListenerEnabled:-false}") boolean binaryListenerEnabled,
-                            final @Named("${nexus.orient.httpListenerEnabled:-false}") boolean httpListenerEnabled)
+                            final @Named("${nexus.orient.httpListenerEnabled:-false}") boolean httpListenerEnabled,
+                            final @Named("${nexus.orient.dynamicPlugins:-false}") boolean dynamicPlugins)
   {
     this.applicationDirectories = checkNotNull(applicationDirectories);
     this.binaryListenerEnabled = binaryListenerEnabled;
     this.httpListenerEnabled = httpListenerEnabled;
+    this.dynamicPlugins = dynamicPlugins;
 
     log.info("OrientDB version: {}", OConstants.getVersion());
 
@@ -132,13 +136,13 @@ public class DatabaseServerImpl
     System.setProperty(Orient.ORIENTDB_HOME, homeDir.getPath());
 
     OServerConfiguration config = new OServerConfiguration();
-
     // FIXME: Unsure what this is used for, its apparently assigned to xml location, but forcing it here
     config.location = "DYNAMIC-CONFIGURATION";
 
     File databaseDir = applicationDirectories.getWorkDirectory("db");
     config.properties = new OServerEntryConfiguration[]{
-        new OServerEntryConfiguration("server.database.path", databaseDir.getPath())
+        new OServerEntryConfiguration("server.database.path", databaseDir.getPath()),
+        new OServerEntryConfiguration("plugin.dynamic", String.valueOf(dynamicPlugins))
     };
 
     config.handlers = new ArrayList<>();
