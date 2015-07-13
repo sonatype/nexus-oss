@@ -57,6 +57,13 @@
 }
 
 /**
+ * Styling for the boxlabel of form fields
+ */
+.x-field .nx-boxlabel {
+  font-size: $font-size-utility;
+}
+
+/**
  * IE10 adds a second 'x' icon to text fields. Hide this.
  */
 ::-ms-clear {

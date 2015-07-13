@@ -20,6 +20,17 @@
 Ext.define('NX.ext.form.field.Checkbox', {
   override: 'Ext.form.field.Checkbox',
 
-  width: undefined
+  width: undefined,
+
+  initComponent: function () {
+    var me = this;
+
+    if (me.helpText && ! me.isHelpTextPlaced) {
+      me.boxLabel = '<span class="nx-boxlabel">' + me.helpText + '</span>';
+      me.isHelpTextPlaced = true;
+    }
+
+    me.callParent(arguments);
+  }
 
 });
