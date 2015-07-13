@@ -428,12 +428,36 @@ public class MapdbBlobMetadataStore
   public long getTotalSize() {
     ensureStarted();
 
+    return getMetadataSize() + getBlobSize();
+  }
+
+  @Override
+  public long getMetadataSize() {
+    ensureStarted();
+
     // sum all file bytes in the database root
     long bytes = 0;
     for (File file : listFiles()) {
       bytes += file.length();
     }
     return bytes;
+  }
+
+  @Override
+  public long getBlobSize() {
+    ensureStarted();
+    return database.execute(new Fun.Function1<Long, DB>()
+    {
+      @Override    
+      public Long run(final DB db) {
+        Long totalSize = 0l;
+        HTreeMap<BlobId, MetadataRecord> entries = entries(db);
+        for (MetadataRecord metadataRecord : entries.values()) {
+          totalSize += metadataRecord.size;
+        }
+        return totalSize;
+      }
+    });
   }
 
   @Override
