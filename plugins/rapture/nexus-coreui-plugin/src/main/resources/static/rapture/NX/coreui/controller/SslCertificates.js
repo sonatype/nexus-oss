@@ -289,14 +289,6 @@ Ext.define('NX.coreui.controller.SslCertificates', {
 
   /**
    * @private
-   * Load all of the stores associated with this controller
-   */
-  loadStores: function () {
-    this.getStore('SslCertificate').load();
-  },
-
-  /**
-   * @private
    * @override
    * Deletes an SSL certificate.
    * @param {NX.coreui.model.SslCertificate} model to be deleted

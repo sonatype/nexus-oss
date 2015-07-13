@@ -159,22 +159,6 @@ Ext.define('NX.coreui.controller.Roles', {
 
   /**
    * @private
-   * Load all of the stores associated with this controller
-   */
-  loadStores: function() {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.getStore('Role').load();
-      me.getStore('RoleSource').load();
-      me.getStore('Privilege').load();
-      me.getSettings().down('#roles').getStore().load();
-    }
-  },
-
-  /**
-   * @private
    * (Re)create external role mapping entries.
    */
   onRoleSourceLoad: function(store) {

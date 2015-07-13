@@ -160,14 +160,6 @@ Ext.define('NX.coreui.controller.Privileges', {
 
   /**
    * @private
-   * Load all of the stores associated with this controller
-   */
-  loadStores: function () {
-    this.getStore('Privilege').load();
-  },
-
-  /**
-   * @private
    * @override
    * Deletes a privilege.
    * @param model privilege to be deleted

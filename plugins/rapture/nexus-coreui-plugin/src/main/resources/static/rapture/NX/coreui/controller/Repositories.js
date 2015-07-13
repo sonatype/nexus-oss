@@ -114,7 +114,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       },
       component: {
         'nx-coreui-repository-list': {
-          beforerender: me.loadRelatedStores,
+          beforerender: me.loadStores,
           afterrender: me.startStatusPolling,
           beforedestroy: me.stopStatusPolling
         },
@@ -215,28 +215,6 @@ Ext.define('NX.coreui.controller.Repositories', {
       me.setItemClass(2, NX.Icons.cls('repository-hosted', 'x16'));
       me.loadCreateWizard(2, true, { xtype: 'nx-coreui-repository-add', recipe: model });
     }
-  },
-
-  /**
-   * @private
-   */
-  loadRelatedStores: function() {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.getStore('Blobstore').load();
-      me.getStore('RepositoryRecipe').load();
-    }
-  },
-
-  /**
-   * @private
-   * Load all of the stores associated with this controller
-   */
-  loadStores: function() {
-    this.getStore('Repository').load();
-    this.loadRelatedStores();
   },
 
   /**

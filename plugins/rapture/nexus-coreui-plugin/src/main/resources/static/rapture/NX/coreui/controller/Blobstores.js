@@ -143,15 +143,6 @@ Ext.define('NX.coreui.controller.Blobstores', {
 
   /**
    * @private
-   * Load all of the stores associated with this controller
-   */
-  loadStores: function () {
-    this.getStore('Blobstore').load();
-    this.loadRecipe();
-  },
-
-  /**
-   * @private
    */
   deleteModel: function(model) {
     var me = this,

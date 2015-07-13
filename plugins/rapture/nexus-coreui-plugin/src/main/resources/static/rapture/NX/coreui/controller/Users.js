@@ -285,7 +285,7 @@ Ext.define('NX.coreui.controller.Users', {
   },
 
   /**
-   * @private
+   * @override
    * Load all of the stores associated with this controller
    */
   loadStores: function() {

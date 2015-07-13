@@ -125,7 +125,7 @@ Ext.define('NX.coreui.controller.Search', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.onRefresh
+          refresh: me.loadStores
         }
       },
       component: {
@@ -415,10 +415,10 @@ Ext.define('NX.coreui.controller.Search', {
   },
 
   /**
-   * @private
+   * @overload
    * Search on refresh.
    */
-  onRefresh: function() {
+  loadStores: function() {
     var me = this;
 
     if (me.getFeature()) {

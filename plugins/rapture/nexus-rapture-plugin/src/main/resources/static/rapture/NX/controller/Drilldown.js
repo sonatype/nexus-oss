@@ -156,6 +156,16 @@ Ext.define('NX.controller.Drilldown', {
 
   /**
    * @public
+   * Load all of the stores associated with this controller
+   */
+  loadStores: function () {
+    for (var i = 0; i < this.stores.length; ++i) {
+      this.getStore(this.stores[i]).load();
+    }
+  },
+
+  /**
+   * @public
    */
   reselect: function () {
     var lists = Ext.ComponentQuery.query('nx-drilldown-master');
