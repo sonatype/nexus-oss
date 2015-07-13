@@ -16784,9 +16784,17 @@
 }
 
 /**
- * IE10 adds a second 'x' icon to text fields. Hide this.
+ * Styling for the boxlabel of form fields
  */
 /* line 62, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+.x-field .nx-boxlabel {
+  font-size: 10px;
+}
+
+/**
+ * IE10 adds a second 'x' icon to text fields. Hide this.
+ */
+/* line 69, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
 ::-ms-clear {
   width: 0;
   height: 0;

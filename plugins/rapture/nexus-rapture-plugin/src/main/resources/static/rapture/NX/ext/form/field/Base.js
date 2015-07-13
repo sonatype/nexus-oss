@@ -31,11 +31,15 @@ Ext.define('NX.ext.form.field.Base', {
    */
   hideIfUndefined: false,
 
+  // used to track if helpText has already been placed
+  isHelpTextPlaced: false,
+
   initComponent: function () {
     var me = this;
 
-    if (me.helpText) {
-      me.afterLabelTpl = '<span style="font-size: 10px;">' + me.helpText + '</span>';
+    if (me.helpText && !me.isHelpTextPlaced) {
+      me.beforeSubTpl = '<span class="nx-boxlabel">' + me.helpText + '</span>';
+      me.isHelpTextPlaced = true;
     }
 
     me.callParent(arguments);
