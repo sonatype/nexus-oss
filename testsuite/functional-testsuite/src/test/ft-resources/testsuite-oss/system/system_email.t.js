@@ -14,17 +14,21 @@
  * Tests system email server viewing, updating, discarding.
  */
 StartTest(function(t) {
-  var originalValues;
+  var originalValues, smtpSettingsCQ = '>>nx-coreui-system-smtp-settings', smtpSettingsFormCQ = smtpSettingsCQ +
+          ' nx-settingsform',
+      waitForUnmasked = function() {
+        return !t.cq1(smtpSettingsFormCQ).el.isMasked();
+      };
 
   t.describe('Given an admin administering Email Server', function(t) {
     t.it('Should be able to view the configuration', function(t) {
       t.chain(
           t.openPageAsAdmin('admin/system/emailserver'),
-          {wait: 'CQVisible', args: '>>nx-coreui-system-smtp-settings'},
+          {wait: 'CQVisible', args: smtpSettingsFormCQ},
+          {waitFor: waitForUnmasked},
           // capture the values to use later to verify, discard, and reset form
           function(next) {
-            var settings = t.cq1('nx-coreui-system-smtp-settings'),
-                form = settings.down('form').getForm();
+            var form = t.cq1(smtpSettingsFormCQ).getForm();
             originalValues = form.getFieldValues();
             next();
           }
@@ -33,17 +37,17 @@ StartTest(function(t) {
     t.it('Should be able to discard settings on the form', function(t) {
       t.chain(
           // type in some test strings to empty fields
-          t.selectAndType('_test', '>>nx-coreui-system-smtp-settings field[name=subjectPrefix]'),
-          t.selectAndType('_testUser', '>>nx-coreui-system-smtp-settings field[name=username]'),
-          t.selectAndType('_testPassword', '>>nx-coreui-system-smtp-settings field[name=password]'),
-          {click: '>>nx-coreui-system-smtp-settings button[action=discard]', desc: 'Discard all changes'},
-          // let the UI update
-          function(next) {
-            t.waitForAnimations(next);
+          t.selectAndType('_test', smtpSettingsCQ + ' field[name=subjectPrefix]'),
+          t.selectAndType('_testUser', smtpSettingsCQ + ' field[name=username]'),
+          t.selectAndType('_testPassword', smtpSettingsCQ + ' field[name=password]'),
+          {
+            waitFor: 'Event', args: [smtpSettingsFormCQ, 'load'],
+            trigger: {click: smtpSettingsCQ + ' button[action=discard]', desc: 'Discard all changes'}
           },
+          {waitFor: waitForUnmasked},
           // test that we actually discarded the new values
           function(next) {
-            var form = t.cq1('nx-coreui-system-smtp-settings').down('form').getForm();
+            var form = t.cq1(smtpSettingsFormCQ).getForm();
             t.isDeeply(originalValues, form.getFieldValues(), 'Form should be back in original state');
             next();
           }
@@ -52,41 +56,42 @@ StartTest(function(t) {
     t.it('Should be able to enable the server with test values', function(t) {
       t.chain(
           // type in some test strings to empty fields
-          t.selectAndType('_test', '>>nx-coreui-system-smtp-settings field[name=subjectPrefix]'),
-          t.selectAndType('_testUser', '>>nx-coreui-system-smtp-settings field[name=username]'),
-          t.selectAndType('_testPassword', '>>nx-coreui-system-smtp-settings field[name=password]'),
+          t.selectAndType('_test', smtpSettingsFormCQ + ' field[name=subjectPrefix]'),
+          t.selectAndType('_testUser', smtpSettingsFormCQ + ' field[name=username]'),
+          t.selectAndType('_testPassword', smtpSettingsFormCQ + ' field[name=password]'),
           // press the "Save" button
-          {click: '>>nx-coreui-system-smtp-settings button[action=save]', desc: 'Save new settings'},
-          // let the UI update
-          function(next) {
-            t.waitForAnimations(next);
+          {
+            waitFor: 'Event', args: [smtpSettingsFormCQ, 'submitted'],
+            trigger: {click: '>>nx-coreui-system-smtp-settings button[action=save]', desc: 'Save new settings'},
           },
+          {waitFor: waitForUnmasked},
           // verify new values
           function(next) {
-            var form = t.cq1('nx-coreui-system-smtp-settings').down('form').getForm();
+            var form = t.cq1(smtpSettingsFormCQ).getForm();
             t.isDeeply(Ext.apply(Ext.clone(originalValues), {
-                  subjectPrefix: '_test',
-                  username: '_testUser',
-                  password: '_testPassword'
-                }), form.getFieldValues(), 'Form should be updated');
+              subjectPrefix: '_test',
+              username: '_testUser',
+              password: '_testPassword'
+            }), form.getFieldValues(), 'Form should be updated');
             next();
           }
       )
     });
     t.it('Should accept default values', function(t) {
       t.chain(
-          t.selectAndType(originalValues.host, '>>nx-coreui-system-smtp-settings field[name=host]'),
-          t.selectAndType(originalValues.port, '>>nx-coreui-system-smtp-settings field[name=port]'),
-          t.selectAndType('', '>>nx-coreui-system-smtp-settings field[name=subjectPrefix]'), //value is undefined to start when we dump the fields
-          t.selectAndType(originalValues.username, '>>nx-coreui-system-smtp-settings field[name=username]'),
-          t.selectAndType(originalValues.password, '>>nx-coreui-system-smtp-settings field[name=password]'),
+          t.selectAndType(originalValues.host, smtpSettingsFormCQ + ' field[name=host]'),
+          t.selectAndType(originalValues.port, smtpSettingsFormCQ + ' field[name=port]'),
+          t.selectAndType('', smtpSettingsFormCQ + ' field[name=subjectPrefix]'), //value is undefined to start when we dump the fields
+          t.selectAndType(originalValues.username, smtpSettingsFormCQ + ' field[name=username]'),
+          t.selectAndType(originalValues.password, smtpSettingsFormCQ + ' field[name=password]'),
           // press the "Save" button
-          {click: '>>nx-coreui-system-smtp-settings button[action=save]'},
-          function(next) {
-            t.waitForAnimations(next);
+          {
+            waitFor: 'Event', args: [smtpSettingsFormCQ, 'submitted'],
+            trigger: {click: smtpSettingsCQ + ' button[action=save]', desc: 'Save new settings'},
           },
+          {waitFor: waitForUnmasked},
           function(next) {
-            var form = t.cq1('nx-coreui-system-smtp-settings').down('form').getForm();
+            var form = t.cq1(smtpSettingsFormCQ).getForm();
             t.isDeeply(originalValues, form.getFieldValues(), 'Form should be back in original state');
             next();
           }
