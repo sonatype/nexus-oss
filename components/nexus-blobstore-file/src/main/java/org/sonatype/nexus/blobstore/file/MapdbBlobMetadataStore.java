@@ -450,7 +450,7 @@ public class MapdbBlobMetadataStore
     {
       @Override    
       public Long run(final DB db) {
-        Long totalSize = 0l;
+        Long totalSize = 0L;
         HTreeMap<BlobId, MetadataRecord> entries = entries(db);
         for (MetadataRecord metadataRecord : entries.values()) {
           totalSize += metadataRecord.size;
