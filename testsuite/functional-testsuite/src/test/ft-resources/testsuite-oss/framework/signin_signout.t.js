@@ -13,20 +13,38 @@
 /**
  * Tests that sign-in/sign-out works.
  */
-StartTest(function (t) {
+StartTest(function(t) {
   t.diag('Verify basic sign-in/sign-out');
 
   t.ok(Ext, 'Ext is here');
   t.ok(NX, 'NX is here');
 
-  t.chain(
-      { waitFor: 'stateReceived' },
-      { waitFor: 'userToBeSignedOut' },
+  t.describe('Can login and out of the application', function(t) {
+    var message = t.spyOn(NX.application.getController('Message'), 'addMessage').and.callThrough()
+    
+    t.it('Can login as admin and see a confirmation message', function(t) {
+      t.chain(
+          t.openPageAsAdmin('browse/welcome'),
+          // message will be shown on login
+          function(next) {
+            t.expect(message).toHaveBeenCalled();
+            t.expect(message.calls.mostRecent().args[0].text).toBe('User signed in: admin');
+            next();
+          }
+      );
+    });
 
-      { click: '>>nx-header-signin' },
-      { type: 'admin[TAB]' },
-      { type: 'admin123' },
-      { type: '[ENTER]' },
-      { click: '>>nx-header-signout' }
-  );
+    t.it('Can logout and see a confirmation message', function(t) {
+      t.chain(
+          {click: '>>nx-header-signout'},
+           // message will be shown on logout
+          function(next) {
+            t.expect(message).toHaveBeenCalled();
+            t.expect(message.calls.mostRecent().args[0].text).toBe('User signed out');
+            next();
+          }
+      );
+    });
+  });
+
 });
