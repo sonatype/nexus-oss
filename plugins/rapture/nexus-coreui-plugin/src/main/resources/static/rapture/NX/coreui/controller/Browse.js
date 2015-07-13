@@ -171,7 +171,7 @@ Ext.define('NX.coreui.controller.Browse', {
   },
 
   /**
-   * @overload
+   * @override
    * Load all of the stores associated with this controller
    */
   loadStores: function() {
