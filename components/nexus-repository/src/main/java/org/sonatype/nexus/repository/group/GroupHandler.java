@@ -142,6 +142,7 @@ public class GroupHandler
 
       final ViewFacet view = member.facet(ViewFacet.class);
       final Response response = view.dispatch(request);
+      log.trace("Member {} response {}", member.getName(), response.getStatus());
 
       responses.put(member, response);
     }

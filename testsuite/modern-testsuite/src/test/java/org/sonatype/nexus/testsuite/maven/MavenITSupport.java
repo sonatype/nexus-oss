@@ -101,7 +101,7 @@ public abstract class MavenITSupport
 
   @Before
   public void setupMavenDebugLogging() {
-    logManager.setLoggerLevel("org.sonatype.nexus.repository.maven", LoggerLevel.DEBUG);
+    logManager.setLoggerLevel("org.sonatype.nexus.repository.maven", LoggerLevel.TRACE);
   }
 
   protected void mvnDeploy(final String project, final String version, final String deployRepositoryName)
