@@ -98,6 +98,7 @@ Ext.define('NX.controller.Drilldown', {
       syncsize: me.syncSizeToOwner,
       resetdrilldown: function() {
         me.currentIndex = 0;
+        me.reselect();
         me.syncSizeToOwner();
       }
     };
@@ -121,15 +122,7 @@ Ext.define('NX.controller.Drilldown', {
     };
 
     me.listen({
-      component: componentListener,
-      controller: {
-        '#Bookmarking': {
-          navigate: me.navigateTo
-        },
-        '#Refresh': {
-          refresh: me.reselect
-        }
-      }
+      component: componentListener
     });
 
     if (me.icons) {
@@ -159,6 +152,16 @@ Ext.define('NX.controller.Drilldown', {
    */
   getDrilldownDetails: function() {
     return Ext.ComponentQuery.query('nx-drilldown-details')[0];
+  },
+
+  /**
+   * @public
+   * Load all of the stores associated with this controller
+   */
+  loadStores: function () {
+    for (var i = 0; i < this.stores.length; ++i) {
+      this.getStore(this.stores[i]).load();
+    }
   },
 
   /**
