@@ -18,9 +18,11 @@ StartTest(function(t) {
         waitFor: 'storesToLoad', args: function() {
           return t.cq1('nx-coreui-capability-list').getStore();
         }
-      },
-  // Name of Capability tested
-      name = 'Base URL: Force';
+      };
+
+  // Name/type-id of Capability tested
+  var capabilityTypeName = 'UI: Branding',
+      capabilityTypeId = 'rapture.branding';
 
   t.describe('Given an admin administering Capabilities', function(t) {
     t.it('Should be able to create a new Capability', function(t) {
@@ -38,7 +40,7 @@ StartTest(function(t) {
           // Find the capability and click it
           function(next) {
             var grid = t.cq1('nx-coreui-capability-selecttype'),
-                baseURLRow = t.getRow(grid, grid.getStore().find('name', name));
+                baseURLRow = t.getRow(grid, grid.getStore().find('name', capabilityTypeName));
 
             t.click(baseURLRow, next);
           },
@@ -54,12 +56,12 @@ StartTest(function(t) {
           function(next) {
             var grid = t.cq1('nx-coreui-capability-list'),
                 store = grid.getStore(),
-                model = store.findRecord('typeName', name);
+                model = store.findRecord('typeName', capabilityTypeName);
 
             // we can find the created capability
-            t.ok(model, 'Capability ' + name + ' exists');
+            t.ok(model, 'Capability ' + capabilityTypeName + ' exists');
             // and values correspond
-            t.is(model.get('typeId'), 'baseurl.force');
+            t.is(model.get('typeId'), capabilityTypeId);
 
             // Back to the detail panel view
             t.click(t.getRow(grid, grid.getView().indexOf(model)));
@@ -92,10 +94,10 @@ StartTest(function(t) {
           function(next) {
             var grid = t.cq1('nx-coreui-capability-list'),
                 store = grid.getStore(),
-                model = store.findRecord('typeName', name);
+                model = store.findRecord('typeName', capabilityTypeName);
 
             // we can find the updated record in store
-            t.ok(model, 'Capability ' + name + ' exists');
+            t.ok(model, 'Capability ' + capabilityTypeName + ' exists');
             // and is it disabled
             t.is(model.get('enabled'), false);
 
@@ -115,9 +117,9 @@ StartTest(function(t) {
           function(next) {
             var grid = t.cq1('nx-coreui-capability-list'),
                 store = grid.getStore(),
-                model = store.findRecord('typeName', name);
+                model = store.findRecord('typeName', capabilityTypeName);
 
-            t.ok(!model, 'Capability ' + name + ' has been removed');
+            t.ok(!model, 'Capability ' + capabilityTypeName + ' has been removed');
             t.ok(!grid.getSelectionModel().getSelection().length, 'Grid has no selection');
 
             next();

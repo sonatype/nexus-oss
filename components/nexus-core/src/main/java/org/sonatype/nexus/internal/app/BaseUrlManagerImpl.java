@@ -40,14 +40,17 @@ public class BaseUrlManagerImpl
 {
   private final Provider<HttpServletRequest> requestProvider;
 
-  @Inject
-  public BaseUrlManagerImpl(final Provider<HttpServletRequest> requestProvider) {
-    this.requestProvider = checkNotNull(requestProvider);
-  }
-
   private volatile String url;
 
   private volatile boolean force;
+
+  @Inject
+  public BaseUrlManagerImpl(final Provider<HttpServletRequest> requestProvider,
+                            @Named("${org.sonatype.nexus.internal.app.BaseUrlManagerImpl.force:-false}") final boolean force) {
+    this.requestProvider = checkNotNull(requestProvider);
+    this.force = force;
+    log.debug("Force: {}", force);
+  }
 
   @Override
   public void setUrl(final String url) {

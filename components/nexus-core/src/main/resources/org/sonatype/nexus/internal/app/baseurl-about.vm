@@ -13,5 +13,5 @@
 Specifiy the base URL used by the application server.
 
 <p>
-  This value is used in cases where it otherwise can not be detected, or unless the value is forced.
+  This value is used in cases where it otherwise can not be detected.
 </p>

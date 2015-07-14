@@ -16,15 +16,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.junit.Before;
-
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.mockito.Mockito.when;
 import com.google.inject.Provider;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link BaseUrlManagerImpl}
@@ -46,7 +46,7 @@ public class BaseUrlManagerImplTest
 
   @Before
   public void setUp() {
-    underTest = new BaseUrlManagerImpl(requestProvider);
+    underTest = new BaseUrlManagerImpl(requestProvider, false);
   }
 
   @Test
