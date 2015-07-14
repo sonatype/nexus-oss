@@ -150,9 +150,6 @@ Ext.define('NX.coreui.controller.Search', {
           afterrender: me.bindQuickSearch,
           search: me.onQuickSearch,
           searchcleared: me.onQuickSearch
-        },
-        'nx-coreui-searchfeature nx-coreui-component-assetcontainer': {
-          updated: me.setAssetIcon
         }
       }
     });
@@ -489,20 +486,6 @@ Ext.define('NX.coreui.controller.Search', {
 
     me.getComponentDetails().setComponentModel(model);
     me.getAssets().setComponentModel(model);
-  },
-
-  /**
-   * Set the appropriate breadcrumb icon.
-   *
-   * @private
-   * @param {NX.coreui.view.component.AssetContainer} container asset container
-   * @param {NX.coreui.model.Asset} assetModel selected asset
-   */
-  setAssetIcon: function(container, assetModel) {
-    if (assetModel) {
-      // Set the appropriate breadcrumb icon
-      this.setItemClass(2, container.iconCls);
-    }
   },
 
   /**

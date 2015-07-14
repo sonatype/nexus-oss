@@ -153,9 +153,6 @@ Ext.define('NX.coreui.controller.Repositories', {
     }
     else {
       if (Ext.isDefined(model)) {
-        // Show the correct icon in the breadcrumb
-        me.setItemClass(1, NX.Icons.cls('repository-' + model.get('type'), 'x16'));
-
         // Load the form
         settingsPanel.removeAllSettingsForms();
         settingsPanel.addSettingsForm({ xtype: formCls.xtype, recipe: model });
