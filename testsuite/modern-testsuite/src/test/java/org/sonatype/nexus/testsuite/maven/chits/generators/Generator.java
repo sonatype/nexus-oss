@@ -10,12 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.maven.chits;
+package org.sonatype.nexus.testsuite.maven.chits.generators;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
+import org.sonatype.sisu.goodies.common.ByteSize;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.io.ByteStreams;
+import com.google.common.net.HttpHeaders;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.message.BasicHeader;
 
 /**
  * Content generator.
@@ -23,6 +31,61 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 public abstract class Generator
     extends ComponentSupport
 {
+  /**
+   * HttpClient entity that is backed by a {@link Generator}.
+   */
+  public static HttpEntity generatedEntity(final Generator generator, final ByteSize length) {
+    final long exactContentLength = generator.getExactContentLength(length.toBytes());
+    final Header contentType = new BasicHeader(HttpHeaders.CONTENT_TYPE, generator.getContentType());
+    return new HttpEntity()
+    {
+      @Override
+      public boolean isRepeatable() {
+        return true;
+      }
+
+      @Override
+      public boolean isChunked() {
+        return false;
+      }
+
+      @Override
+      public long getContentLength() {
+        return exactContentLength;
+      }
+
+      @Override
+      public Header getContentType() {
+        return contentType;
+      }
+
+      @Override
+      public Header getContentEncoding() {
+        return null;
+      }
+
+      @Override
+      public InputStream getContent() throws IOException, UnsupportedOperationException {
+        return generator.generate(exactContentLength);
+      }
+
+      @Override
+      public void writeTo(final OutputStream outstream) throws IOException {
+        ByteStreams.copy(getContent(), outstream);
+      }
+
+      @Override
+      public boolean isStreaming() {
+        return false;
+      }
+
+      @Override
+      public void consumeContent() throws IOException {
+        // nop
+      }
+    };
+  }
+
   protected static InputStream exactLength(final byte[] sample, final long length) {
     return new InputStream()
     {

@@ -20,6 +20,10 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
+import org.sonatype.nexus.testsuite.maven.chits.generators.Generator;
+import org.sonatype.nexus.testsuite.maven.chits.generators.GeneratorBehaviour;
+import org.sonatype.nexus.testsuite.maven.chits.generators.XmlGenerator;
+import org.sonatype.nexus.testsuite.maven.chits.generators.ZipGenerator;
 import org.sonatype.sisu.goodies.common.ByteSize;
 import org.sonatype.tests.http.server.fluent.Server;
 

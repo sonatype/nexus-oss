@@ -20,6 +20,9 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
+import org.sonatype.nexus.testsuite.maven.chits.generators.Generator;
+import org.sonatype.nexus.testsuite.maven.chits.generators.XmlGenerator;
+import org.sonatype.nexus.testsuite.maven.chits.generators.ZipGenerator;
 import org.sonatype.sisu.goodies.common.ByteSize;
 
 import com.google.common.base.Supplier;
@@ -33,6 +36,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.sonatype.nexus.testsuite.maven.chits.generators.Generator.generatedEntity;
 
 /**
  * Maven hosted swarm: multiple clients asking, while others are deploying the SAME artifact from a hosted repository.

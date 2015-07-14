@@ -33,6 +33,7 @@ import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.MavenHostedFacet;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
+import org.sonatype.nexus.testsuite.maven.chits.generators.Generator;
 import org.sonatype.sisu.goodies.common.ByteSize;
 
 import com.google.common.base.Function;
@@ -61,6 +62,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.sonatype.nexus.testsuite.maven.chits.generators.Generator.generatedEntity;
 
 /**
  * Maven Concurrency Hotspot IT support.
@@ -180,58 +182,6 @@ public abstract class MavenHotspotITSupport
         description.appendText("HTTP 2xx response code");
       }
     });
-  }
-
-  public static HttpEntity generatedEntity(final Generator generator, final ByteSize length) {
-    final long exactContentLength = generator.getExactContentLength(length.toBytes());
-    final Header contentType = new BasicHeader(HttpHeaders.CONTENT_TYPE, generator.getContentType());
-    return new HttpEntity()
-    {
-      @Override
-      public boolean isRepeatable() {
-        return true;
-      }
-
-      @Override
-      public boolean isChunked() {
-        return false;
-      }
-
-      @Override
-      public long getContentLength() {
-        return exactContentLength;
-      }
-
-      @Override
-      public Header getContentType() {
-        return contentType;
-      }
-
-      @Override
-      public Header getContentEncoding() {
-        return null;
-      }
-
-      @Override
-      public InputStream getContent() throws IOException, UnsupportedOperationException {
-        return generator.generate(exactContentLength);
-      }
-
-      @Override
-      public void writeTo(final OutputStream outstream) throws IOException {
-        ByteStreams.copy(getContent(), outstream);
-      }
-
-      @Override
-      public boolean isStreaming() {
-        return false;
-      }
-
-      @Override
-      public void consumeContent() throws IOException {
-        // nop
-      }
-    };
   }
 
   /**
