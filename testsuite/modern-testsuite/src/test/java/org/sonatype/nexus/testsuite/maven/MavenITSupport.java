@@ -34,6 +34,7 @@ import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
+import org.sonatype.nexus.repository.maven.internal.maven2.Maven2GroupRecipe;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2HostedRecipe;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2ProxyRecipe;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
@@ -200,6 +201,26 @@ public abstract class MavenITSupport
     final NestedAttributesMap proxy = config.attributes("proxy");
     proxy.set("remoteUrl", remoteUrl);
     proxy.set("contentMaxAge", 5);
+
+    NestedAttributesMap storage = config.attributes("storage");
+    storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
+    storage.set("writePolicy", WritePolicy.ALLOW.name());
+
+    return config;
+  }
+
+  @Nonnull
+  protected Configuration groupConfig(final String name, final String... members) {
+    final Configuration config = new Configuration();
+    config.setRepositoryName(name);
+    config.setRecipeName(Maven2GroupRecipe.NAME);
+    config.setOnline(true);
+
+    final NestedAttributesMap maven = config.attributes("maven");
+    maven.set("versionPolicy", VersionPolicy.MIXED.name());
+
+    final NestedAttributesMap group = config.attributes("group");
+    group.set("memberNames", Arrays.asList(members));
 
     NestedAttributesMap storage = config.attributes("storage");
     storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);

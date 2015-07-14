@@ -25,7 +25,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.protocol.BasicHttpContext;
 import org.jboss.resteasy.util.DateUtil;
 
 /**
@@ -82,5 +84,18 @@ public class Maven2Client
     final URI uri = resolve(path);
     final HttpDelete delete = new HttpDelete(uri);
     return execute(delete);
+  }
+
+  /**
+   * Method override needed to make {@link FormatClientSupport} thread safe, as sharing same context with multiple
+   * threads as is needed for concurrent hotspots tests is violating the context access assumptions. Also, this change
+   * does not interferes with "simple" one-threaded executions.
+   */
+  @Override
+  protected HttpResponse execute(final HttpUriRequest request) throws IOException {
+    log.info("Requesting {}", request);
+    final HttpResponse response = httpClient.execute(request, new BasicHttpContext(httpClientContext));
+    log.info("Received {}", response);
+    return response;
   }
 }

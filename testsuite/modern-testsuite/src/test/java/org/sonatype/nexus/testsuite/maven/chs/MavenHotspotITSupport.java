@@ -46,9 +46,6 @@ import com.google.common.net.HttpHeaders;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.hamcrest.BaseMatcher;
@@ -79,12 +76,6 @@ public abstract class MavenHotspotITSupport
     );
   }
 
-  protected static final String RELEASE_XML_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.xml";
-
-  protected static final String RELEASE_ZIP_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.zip";
-
-  protected static final String RELEASE_TXT_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.txt";
-
   @Rule
   public TestName testName = new TestName();
 
@@ -99,7 +90,7 @@ public abstract class MavenHotspotITSupport
     logManager.setLoggerLevel("org.sonatype.nexus.repository.storage", LoggerLevel.DEBUG);
   }
 
-  protected <T> List<T> performSwarm(final List<? extends Callable<T>> clients) throws Exception {
+  protected <T> List<T> performSwarm(final List<Callable<T>> clients) throws Exception {
     final ExecutorService executorService = Executors
         .newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
     final CountDownLatch startLatch = new CountDownLatch(1);
@@ -194,7 +185,8 @@ public abstract class MavenHotspotITSupport
   public static HttpEntity generatedEntity(final Generator generator, final ByteSize length) {
     final long exactContentLength = generator.getExactContentLength(length.toBytes());
     final Header contentType = new BasicHeader(HttpHeaders.CONTENT_TYPE, generator.getContentType());
-    final HttpEntity entity = new HttpEntity() {
+    return new HttpEntity()
+    {
       @Override
       public boolean isRepeatable() {
         return true;
@@ -240,7 +232,6 @@ public abstract class MavenHotspotITSupport
         // nop
       }
     };
-    return entity;
   }
 
   /**
@@ -263,7 +254,7 @@ public abstract class MavenHotspotITSupport
       HttpResponse response = client.get(uri);
       checkState(response.getEntity() != null);
       // consume by actually reading the stream
-      long copied = ByteStreams.copy(response.getEntity().getContent(), ByteStreams.nullOutputStream());
+      ByteStreams.copy(response.getEntity().getContent(), ByteStreams.nullOutputStream());
       EntityUtils.consume(response.getEntity());
       return response;
     }

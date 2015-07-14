@@ -14,6 +14,7 @@ package org.sonatype.nexus.testsuite.maven.chs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -24,6 +25,7 @@ import org.sonatype.sisu.goodies.common.ByteSize;
 import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.PathRecorderBehaviour;
 
+import org.apache.http.HttpResponse;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -44,22 +46,23 @@ import static org.hamcrest.Matchers.hasSize;
 public class MavenProxySwarmIT
     extends MavenHotspotITSupport
 {
-  protected PathRecorderBehaviour pathRecorderBehaviour;
+  private static final String RELEASE_XML_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.xml";
 
-  protected GeneratorBehaviour xmlArtifactGenerator;
+  private static final String RELEASE_ZIP_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.zip";
 
-  protected GeneratorBehaviour zipArtifactGenerator;
+  private PathRecorderBehaviour pathRecorderBehaviour;
 
-  protected GeneratorBehaviour txtArtifactGenerator;
+  private GeneratorBehaviour xmlArtifactGenerator;
 
-  protected Server upstream;
+  private GeneratorBehaviour zipArtifactGenerator;
+
+  private Server upstream;
 
   @Before
   public void prepare() throws Exception {
     pathRecorderBehaviour = new PathRecorderBehaviour();
     xmlArtifactGenerator = new GeneratorBehaviour(new XmlGenerator());
     zipArtifactGenerator = new GeneratorBehaviour(new ZipGenerator());
-    txtArtifactGenerator = new GeneratorBehaviour(new TextGenerator());
 
     upstream = Server.withPort(0)
         .serve("/" + RELEASE_XML_ARTIFACT_PATH).withBehaviours(
@@ -69,10 +72,6 @@ public class MavenProxySwarmIT
         .serve("/" + RELEASE_ZIP_ARTIFACT_PATH).withBehaviours(
             pathRecorderBehaviour,
             zipArtifactGenerator
-        )
-        .serve("/" + RELEASE_TXT_ARTIFACT_PATH).withBehaviours(
-            pathRecorderBehaviour,
-            txtArtifactGenerator
         )
         .start();
   }
@@ -92,7 +91,7 @@ public class MavenProxySwarmIT
     final Maven2Client repositoryClient = createAdminMaven2Client(repository.getName());
 
     // create clients
-    final List<UriGet> clients = new ArrayList<>();
+    final List<Callable<HttpResponse>> clients = new ArrayList<>();
     for (int i = 0; i < 15; i++) {
       clients.add(new UriGet(repositoryClient, path));
     }

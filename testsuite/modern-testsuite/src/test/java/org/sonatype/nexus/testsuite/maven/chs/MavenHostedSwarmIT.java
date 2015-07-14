@@ -41,6 +41,10 @@ import static org.hamcrest.Matchers.equalTo;
 public class MavenHostedSwarmIT
     extends MavenHotspotITSupport
 {
+  private static final String RELEASE_XML_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.xml";
+
+  private static final String RELEASE_ZIP_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.zip";
+
   private void hostedSwarm(final String path,
                            final Generator generator,
                            final Supplier<ByteSize> lengthSupplier) throws Exception
