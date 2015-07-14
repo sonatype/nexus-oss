@@ -20,11 +20,11 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 
 import org.sonatype.nexus.common.io.DirSupport;
+import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
-
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.ops4j.pax.exam.Option;
@@ -41,10 +41,13 @@ public abstract class MavenSiteTestSupport
 {
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
-    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
-        withHttps(),
+    return options(NexusHttpsITSupport.configureNexus(),
         wrappedBundle(maven("org.apache.maven.shared", "maven-verifier").versionAsInProject()),
         wrappedBundle(maven("org.apache.maven.shared", "maven-shared-utils").versionAsInProject()));
+  }
+
+  public MavenSiteTestSupport() {
+    testData.addDirectory(resolveBaseFile("target/it-resources/maven"));
   }
 
   protected void mvn(final String project, final String projectVersion, final String repositoryName,
@@ -82,7 +85,6 @@ public abstract class MavenSiteTestSupport
         output,
         replacements);
   }
-
 
   /**
    * Produces a maven settings file, pointing to the test Nexus instance.

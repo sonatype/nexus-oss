@@ -35,6 +35,7 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmManager;
+import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
 import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport;
 
 import org.apache.commons.io.IOUtils;
@@ -71,11 +72,14 @@ public abstract class NugetITSupport
 
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
-    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
-        withHttps(),
+    return options(NexusHttpsITSupport.configureNexus(),
         wrappedBundle(maven("org.apache.httpcomponents", "httpmime").versionAsInProject()),
         mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject()
     );
+  }
+
+  public NugetITSupport() {
+    testData.addDirectory(resolveBaseFile("target/it-resources/nuget"));
   }
 
   @Nonnull

@@ -41,6 +41,10 @@ public class SSLTrustStoreIT
   @Inject
   private TrustStore trustStore;
 
+  public SSLTrustStoreIT() {
+    testData.addDirectory(resolveBaseFile("target/it-resources/ssl"));
+  }
+
   /**
    * Verify that certificates can be created / removed.
    */
@@ -48,7 +52,7 @@ public class SSLTrustStoreIT
   public void createReadDelete() throws Exception {
     // create a certificate
     final Certificate created = trustStore.importTrustCertificate(
-        FileUtils.readFileToString(testData.resolveFile("pem.txt")), "test");
+        FileUtils.readFileToString(resolveTestFile("pem.txt")), "test");
 
     // check that we can get the created certificate
     final Certificate updated = trustStore.getTrustedCertificate("test");

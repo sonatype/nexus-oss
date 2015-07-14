@@ -57,6 +57,10 @@ extends FunctionalTestSupport
 
   SearchIT(final String executable, final String[] options) {
     super(executable, options)
+
+    testData.addDirectory(resolveBaseFile('target/it-resources/maven'))
+    testData.addDirectory(resolveBaseFile('target/it-resources/nuget'))
+    testData.addDirectory(resolveBaseFile('target/it-resources/raw'))
   }
 
   @org.ops4j.pax.exam.Configuration

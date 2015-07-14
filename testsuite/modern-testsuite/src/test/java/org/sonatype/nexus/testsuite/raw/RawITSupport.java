@@ -41,6 +41,10 @@ public class RawITSupport
   @Inject
   protected LogManager logManager;
 
+  public RawITSupport() {
+    testData.addDirectory(resolveBaseFile("target/it-resources/raw"));
+  }
+
   @Before
   public void debugLoggingStorage() {
     logManager.setLoggerLevel("org.sonatype.nexus.repository.storage", LoggerLevel.DEBUG);
