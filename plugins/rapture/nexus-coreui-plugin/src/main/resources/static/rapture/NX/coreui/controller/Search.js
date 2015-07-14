@@ -399,7 +399,7 @@ Ext.define('NX.coreui.controller.Search', {
 
     searchCriteriaPanel.remove(searchCriteria);
     searchCriteriaPanel.down('menuitem[criteriaId=' + searchCriteria.criteriaId + ']').enable();
-    me.applyFilter({ criteriaId: searchCriteria.criteriaId }, true);
+    this.applyFilter({ criteriaId: searchCriteria.criteriaId }, true);
   },
 
   /**
