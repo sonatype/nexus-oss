@@ -49,6 +49,7 @@ public class BaseUrlManagerImpl
                             @Named("${org.sonatype.nexus.internal.app.BaseUrlManagerImpl.force:-false}") final boolean force) {
     this.requestProvider = checkNotNull(requestProvider);
     this.force = force;
+    log.debug("Force: {}", force);
   }
 
   @Override
