@@ -676,6 +676,7 @@
               <exclude>**/src/test/resources/**</exclude>
               <exclude>**/src/test/filtered-resources/**</exclude>
               <exclude>**/src/test/it-resources/**</exclude>
+              <exclude>**/*-test-data/**/resources/**</exclude>
 
               <!--
               Exclude third-party resources.
