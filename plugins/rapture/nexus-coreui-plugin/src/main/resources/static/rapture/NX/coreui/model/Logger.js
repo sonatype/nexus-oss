@@ -19,6 +19,7 @@
  */
 Ext.define('NX.coreui.model.Logger', {
   extend: 'Ext.data.Model',
+  idProperty: 'name',
   fields: [
     {name: 'name', type: 'string', sortType: 'asText'},
     {name: 'level', type: 'string', sortType: 'asUCText'}

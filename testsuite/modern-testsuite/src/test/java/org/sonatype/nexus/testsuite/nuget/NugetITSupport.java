@@ -36,6 +36,7 @@ import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -43,7 +44,6 @@ import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Before;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.options.WrappedUrlProvisionOption.OverwriteMode;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
@@ -73,8 +73,7 @@ public abstract class NugetITSupport
   public static Option[] configureNexus() {
     return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
         withHttps(),
-        wrappedBundle(maven("org.apache.httpcomponents", "httpmime").versionAsInProject())
-            .overwriteManifest(OverwriteMode.FULL).instructions("DynamicImport-Package=*"),
+        wrappedBundle(maven("org.apache.httpcomponents", "httpmime").versionAsInProject()),
         mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject()
     );
   }

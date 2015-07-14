@@ -172,8 +172,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
         capabilityTypeModel;
 
     if (Ext.isDefined(model)) {
-      me.setItemClass(1, NX.Icons.cls('capability-' + model.get('state'), 'x16'));
-
       capabilityTypeModel = me.getStore('CapabilityType').getById(model.get('typeId'));
 
       me.eventuallyShowWarning(model);

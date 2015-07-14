@@ -29,8 +29,6 @@ Ext.define('NX.coreui.view.browse.BrowseRepositoryList', {
     stateId: 'nx-coreui-browse-repository-list'
   },
 
-  store: 'Repository',
-
   columns: [
     {
       xtype: 'nx-iconcolumn',
@@ -74,6 +72,20 @@ Ext.define('NX.coreui.view.browse.BrowseRepositoryList', {
       ptype: 'gridfilterbox',
       emptyText: NX.I18n.get('Browse_BrowseRepositoryList_EmptyText_Filter')
     }
-  ]
+  ],
+
+  /**
+   * @override
+   */
+  initComponent: function() {
+    var me = this;
+
+    me.store = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
+    me.store.addFilter([
+      { property: 'applyPermissions', value: true }
+    ], false);
+
+    me.callParent(arguments);
+  }
 
 });

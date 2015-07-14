@@ -47,6 +47,12 @@ Ext.define('NX.controller.Drilldown', {
   masters: null,
 
   /**
+   * @override
+   * The xtype of the detail panel used by this drilldown. Only needed when no masters exist.
+   */
+  detail: null,
+
+  /**
    * @cfg {Function} optional function to be called on delete
    */
   deleteModel: undefined,
@@ -88,7 +94,7 @@ Ext.define('NX.controller.Drilldown', {
     }
 
     // Drilldown
-    componentListener[me.masters[0] + ' ^ nx-drilldown'] = {
+    componentListener[(me.masters[0] || me.detail) + ' ^ nx-drilldown'] = {
       syncsize: me.syncSizeToOwner,
       resetdrilldown: function() {
         me.currentIndex = 0;
@@ -108,7 +114,7 @@ Ext.define('NX.controller.Drilldown', {
     };
 
     // Back button
-    componentListener[me.masters[0] + ' ^ nx-drilldown nx-addpanel button[action=back]'] = {
+    componentListener[(me.masters[0] || me.detail) + ' ^ nx-drilldown nx-addpanel button[action=back]'] = {
       click: function() {
         me.showChild(0, true);
       }
@@ -170,8 +176,8 @@ Ext.define('NX.controller.Drilldown', {
    * @private
    * When a list item is clicked, display the new view and update the bookmark
    */
-  onCellClick: function(list, td, cellIndex, model, tr, rowIndex, e) {
-    var index = Ext.ComponentQuery.query('nx-drilldown-master').indexOf(list.up('grid'));
+  onCellClick: function(view, td, cellIndex, model, tr, rowIndex, e) {
+    var index = Ext.ComponentQuery.query('nx-drilldown-master').indexOf(view.up('grid'));
 
     //if the cell target is a link, let it do it's thing
     if(e.getTarget('a')) {
@@ -187,10 +193,15 @@ Ext.define('NX.controller.Drilldown', {
   onModelChanged: function (index, model) {
     var me = this,
         lists = Ext.ComponentQuery.query('nx-drilldown-master'),
-        feature = me.getFeature();
+        view = lists[index].getView(),
+        firstCell = view.getCellByPosition({row:view.getRowId(model), column:0}),
+        firstCellImgs = firstCell.dom.getElementsByTagName('img');
 
     lists[index].getSelectionModel().select([model], false, true);
     me.setItemName(index + 1, me.getDescription(model));
+    if (firstCellImgs.length) {
+      this.setItemClass(index + 1, firstCellImgs[0].className);
+    }
   },
 
   /**
