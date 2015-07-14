@@ -10,11 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.maven.chits;
+package org.sonatype.nexus.testsuite.maven.concurrency;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +30,7 @@ import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.MavenHostedFacet;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
-import org.sonatype.nexus.testsuite.maven.chits.generators.Generator;
+import org.sonatype.nexus.testsuite.maven.concurrency.generators.Generator;
 import org.sonatype.sisu.goodies.common.ByteSize;
 
 import com.google.common.base.Function;
@@ -43,11 +40,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
-import com.google.common.net.HttpHeaders;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -62,7 +56,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.sonatype.nexus.testsuite.maven.chits.generators.Generator.generatedEntity;
+import static org.sonatype.nexus.testsuite.maven.concurrency.generators.Generator.generatedEntity;
 
 /**
  * Maven Concurrency Hotspot IT support.

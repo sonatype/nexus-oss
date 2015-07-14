@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.maven.chits;
+package org.sonatype.nexus.testsuite.maven.concurrency;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +20,8 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
-import org.sonatype.nexus.testsuite.maven.chits.generators.GeneratorBehaviour;
-import org.sonatype.nexus.testsuite.maven.chits.generators.MavenMetadataGenerator;
+import org.sonatype.nexus.testsuite.maven.concurrency.generators.GeneratorBehaviour;
+import org.sonatype.nexus.testsuite.maven.concurrency.generators.MavenMetadataGenerator;
 import org.sonatype.sisu.goodies.common.ByteSize;
 import org.sonatype.tests.http.server.fluent.Server;
 

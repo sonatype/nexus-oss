@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.maven.chits;
+package org.sonatype.nexus.testsuite.maven.concurrency;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,18 +18,19 @@ import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
-import org.sonatype.nexus.testsuite.maven.chits.generators.Generator;
-import org.sonatype.nexus.testsuite.maven.chits.generators.GeneratorBehaviour;
-import org.sonatype.nexus.testsuite.maven.chits.generators.XmlGenerator;
-import org.sonatype.nexus.testsuite.maven.chits.generators.ZipGenerator;
+import org.sonatype.nexus.testsuite.maven.concurrency.generators.GeneratorBehaviour;
+import org.sonatype.nexus.testsuite.maven.concurrency.generators.XmlGenerator;
+import org.sonatype.nexus.testsuite.maven.concurrency.generators.ZipGenerator;
 import org.sonatype.sisu.goodies.common.ByteSize;
 import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.behaviour.PathRecorderBehaviour;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import org.apache.http.HttpResponse;
+import org.joda.time.DateTime;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -37,18 +38,22 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
 
 /**
- * Maven mixed swarm: multiple clients asking via group, while others are deploying the SAME artifact into a hosted
- * repository, and there is a proxy involved too.
+ * Maven proxy swarm: multiple clients asking for SAME artifact from an empty proxy repository.
  */
 @ExamReactorStrategy(PerClass.class)
-public class MavenMixedSwarmIT
+public class MavenProxySwarmIT
     extends MavenHotspotITSupport
 {
   private static final String RELEASE_XML_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.xml";
 
   private static final String RELEASE_ZIP_ARTIFACT_PATH = "groupId/artifactId/1.0/artifactId-1.0.zip";
+
+  private PathRecorderBehaviour pathRecorderBehaviour;
 
   private GeneratorBehaviour xmlArtifactGenerator;
 
@@ -58,77 +63,87 @@ public class MavenMixedSwarmIT
 
   @Before
   public void prepare() throws Exception {
+    pathRecorderBehaviour = new PathRecorderBehaviour();
     xmlArtifactGenerator = new GeneratorBehaviour(new XmlGenerator());
     zipArtifactGenerator = new GeneratorBehaviour(new ZipGenerator());
+
     upstream = Server.withPort(0)
         .serve("/" + RELEASE_XML_ARTIFACT_PATH).withBehaviours(
+            pathRecorderBehaviour,
             xmlArtifactGenerator
         )
         .serve("/" + RELEASE_ZIP_ARTIFACT_PATH).withBehaviours(
+            pathRecorderBehaviour,
             zipArtifactGenerator
         )
         .start();
   }
 
-  private void mixedSwarm(final String path,
-                          final Generator generator,
-                          final Supplier<ByteSize> lengthSupplier) throws Exception
-  {
-    final Configuration hostedConfiguration = hostedConfig(testName.getMethodName() + "-hosted", VersionPolicy.RELEASE);
-    Repository hosted = repositoryManager.create(hostedConfiguration);
-    assertThat(hosted, notNullValue());
-    final Maven2Client hostedRepositoryClient = createAdminMaven2Client(hosted.getName());
+  @After
+  public void cleanup() throws Exception {
+    if (upstream != null) {
+      upstream.stop();
+    }
+  }
 
-    final Configuration proxyConfiguration = proxyConfig(testName.getMethodName() + "-proxy",
+  private void proxySwarm(final String path) throws Exception {
+    final Configuration configuration = proxyConfig(testName.getMethodName(),
         "http://localhost:" + upstream.getPort() + "/", VersionPolicy.RELEASE);
-    Repository proxy = repositoryManager.create(proxyConfiguration);
-    assertThat(proxy, notNullValue());
-
-    final Configuration groupConfiguration = groupConfig(testName.getMethodName() + "-group",
-        proxy.getName(), hosted.getName());
-    Repository group = repositoryManager.create(groupConfiguration);
-    assertThat(group, notNullValue());
-    final Maven2Client groupRepositoryClient = createAdminMaven2Client(group.getName());
+    Repository repository = repositoryManager.create(configuration);
+    assertThat(repository, notNullValue());
+    final Maven2Client repositoryClient = createAdminMaven2Client(repository.getName());
 
     // create clients
     final List<Callable<HttpResponse>> clients = new ArrayList<>();
-    for (int i = 0; i < 10; i++) {
-      clients.add(new UriPut(hostedRepositoryClient, path, generator, lengthSupplier));
-    }
     for (int i = 0; i < 15; i++) {
-      clients.add(new UriGet(groupRepositoryClient, path));
+      clients.add(new UriGet(repositoryClient, path));
     }
 
     assertAllHttpResponseIs2xx(performSwarm(clients));
+
+    // depending on concurrency 1+ clients will go remotely (we use no locking)
+    assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(greaterThanOrEqualTo(1)));
+    pathRecorderBehaviour.clear();
+
+    assertAllHttpResponseIs2xx(performSwarm(clients));
+
+    // warmed cache, no remote fetch should happen anymore
+    assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(equalTo(0)));
   }
 
   @Test
   public void smallZip() throws Exception {
-    mixedSwarm(RELEASE_ZIP_ARTIFACT_PATH, new ZipGenerator(), Suppliers.ofInstance(ByteSize.kiloBytes(1)));
+    zipArtifactGenerator.setContentProperties(ByteSize.kiloBytes(10), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_ZIP_ARTIFACT_PATH);
   }
 
   @Test
   public void mediumZip() throws Exception {
-    mixedSwarm(RELEASE_ZIP_ARTIFACT_PATH, new ZipGenerator(), Suppliers.ofInstance(ByteSize.kiloBytes(100)));
+    zipArtifactGenerator.setContentProperties(ByteSize.kiloBytes(500), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_ZIP_ARTIFACT_PATH);
   }
 
   @Test
   public void largeZip() throws Exception {
-    mixedSwarm(RELEASE_ZIP_ARTIFACT_PATH, new ZipGenerator(), Suppliers.ofInstance(ByteSize.megaBytes(5)));
+    zipArtifactGenerator.setContentProperties(ByteSize.megaBytes(5), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_ZIP_ARTIFACT_PATH);
   }
 
   @Test
   public void smallXml() throws Exception {
-    mixedSwarm(RELEASE_XML_ARTIFACT_PATH, new XmlGenerator(), Suppliers.ofInstance(ByteSize.kiloBytes(1)));
+    xmlArtifactGenerator.setContentProperties(ByteSize.kiloBytes(1), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_XML_ARTIFACT_PATH);
   }
 
   @Test
   public void mediumXml() throws Exception {
-    mixedSwarm(RELEASE_XML_ARTIFACT_PATH, new XmlGenerator(), Suppliers.ofInstance(ByteSize.kiloBytes(10)));
+    xmlArtifactGenerator.setContentProperties(ByteSize.kiloBytes(10), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_XML_ARTIFACT_PATH);
   }
 
   @Test
   public void largeXml() throws Exception {
-    mixedSwarm(RELEASE_XML_ARTIFACT_PATH, new XmlGenerator(), Suppliers.ofInstance(ByteSize.kiloBytes(500)));
+    xmlArtifactGenerator.setContentProperties(ByteSize.kiloBytes(500), true, DateTime.now().minusHours(1), null);
+    proxySwarm(RELEASE_XML_ARTIFACT_PATH);
   }
 }
