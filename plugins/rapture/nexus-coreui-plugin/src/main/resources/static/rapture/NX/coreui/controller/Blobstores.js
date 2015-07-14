@@ -80,7 +80,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRecipe
+          refresh: me.loadStores
         }
       },
       store: {
@@ -96,7 +96,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
           click: me.showAddWindow
         },
         'nx-coreui-blobstore-settings-form': {
-          submitted: me.onSettingsSubmitted
+          submitted: me.loadStores
         }
       }
     });
@@ -139,13 +139,6 @@ Ext.define('NX.coreui.controller.Blobstores', {
     if (list) {
       me.getStore('BlobstoreType').load();
     }
-  },
-
-  /**
-   * @private
-   */
-  onSettingsSubmitted: function(form, action) {
-    this.getStore('Blobstore').load();
   },
 
   /**
