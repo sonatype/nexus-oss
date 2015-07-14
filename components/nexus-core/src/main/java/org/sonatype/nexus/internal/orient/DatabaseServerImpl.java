@@ -75,9 +75,9 @@ public class DatabaseServerImpl
 
   @Inject
   public DatabaseServerImpl(final ApplicationDirectories applicationDirectories,
-                            final @Named("${nexus.orient.binaryListenerEnabled:-false}") boolean binaryListenerEnabled,
-                            final @Named("${nexus.orient.httpListenerEnabled:-false}") boolean httpListenerEnabled,
-                            final @Named("${nexus.orient.dynamicPlugins:-false}") boolean dynamicPlugins)
+                            @Named("${nexus.orient.binaryListenerEnabled:-false}") final boolean binaryListenerEnabled,
+                            @Named("${nexus.orient.httpListenerEnabled:-false}") final boolean httpListenerEnabled,
+                            @Named("${nexus.orient.dynamicPlugins:-false}") final boolean dynamicPlugins)
   {
     this.applicationDirectories = checkNotNull(applicationDirectories);
     this.binaryListenerEnabled = binaryListenerEnabled;
