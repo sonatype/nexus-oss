@@ -450,10 +450,15 @@ public class MapdbBlobMetadataStore
     {
       @Override    
       public Long run(final DB db) {
-        Long totalSize = 0L;
+        long totalSize = 0l;
         HTreeMap<BlobId, MetadataRecord> entries = entries(db);
         for (MetadataRecord metadataRecord : entries.values()) {
-          totalSize += metadataRecord.size;
+          if(metadataRecord.size != null) {
+            totalSize += metadataRecord.size;
+          }
+          else {
+            log.warn("Blob metadata has no size indicated for sha1: {}", metadataRecord.sha1);
+          }
         }
         return totalSize;
       }
