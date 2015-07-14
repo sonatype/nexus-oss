@@ -53,20 +53,21 @@
       <scope>runtime</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.karaf.cellar</groupId>
-      <artifactId>apache-karaf-cellar</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
     <!--
     Nexus features
     -->
     <dependency>
       <groupId>org.sonatype.nexus.assemblies</groupId>
       <artifactId>nexus-boot-feature</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.assemblies</groupId>
+      <artifactId>nexus-distributed-feature</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -339,6 +340,7 @@
             <feature>config</feature>
             <feature>standard</feature>
             <feature>package</feature>
+            <feature>cellar</feature>
             <feature>nexus-boot-feature</feature>
           </bootFeatures>
           <installedFeatures>

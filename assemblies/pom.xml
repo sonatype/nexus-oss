@@ -33,6 +33,7 @@
     <module>nexus-boot-feature</module>
     <module>nexus-base-edition</module>
     <module>nexus-base-template</module>
+    <module>nexus-distributed-feature</module>
   </modules>
 
   <dependencyManagement>
