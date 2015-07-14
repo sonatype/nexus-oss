@@ -45,7 +45,7 @@
     </dependency>
 
     <!--
-    Distribution to be tested
+    Base template bundle to be tested
     -->
     <dependency>
       <groupId>${it.nexus.bundle.groupId}</groupId>
@@ -56,7 +56,7 @@
     </dependency>
 
     <!--
-    Additional dependencies needed to build/run the tests
+    Additional plugins on top of the base template
     -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
@@ -97,7 +97,7 @@
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>
-      <version>1.5</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

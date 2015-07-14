@@ -35,12 +35,18 @@
   </properties>
 
   <dependencies>
+    <!--
+    SiestaJS test driver
+    -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-siestajs-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
 
+    <!--
+    Base template bundle to be tested
+    -->
     <dependency>
       <groupId>${it.nexus.bundle.groupId}</groupId>
       <artifactId>${it.nexus.bundle.artifactId}</artifactId>
@@ -49,6 +55,9 @@
       <scope>test</scope>
     </dependency>
 
+    <!--
+    Additional plugins on top of the base template
+    -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-repository</artifactId>
