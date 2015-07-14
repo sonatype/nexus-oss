@@ -63,18 +63,6 @@ Ext.define('NX.coreui.view.browse.BrowseFeature', {
       header: false,
       flex: 1
     }
-  },
-
-  /**
-   * @override
-   */
-  initComponent: function() {
-    var me = this;
-    me.on('afterrender', function() {
-      // Set default icon for the component version list
-      me.down('nx-coreui-component-asset-list').up('nx-drilldown-item').setItemClass('nx-icon-browse-component-detail-x16');
-    });
-    me.callParent(arguments);
   }
 
 });

@@ -89,9 +89,6 @@ Ext.define('NX.coreui.controller.Browse', {
         }
       },
       component: {
-        'nx-coreui-browsefeature nx-coreui-component-assetcontainer': {
-          updated: me.setAssetIcon
-        },
         'nx-coreui-browsefeature nx-coreui-browse-result-list #filter': {
           search: me.onSearch,
           searchcleared: me.onSearchCleared
@@ -213,19 +210,6 @@ Ext.define('NX.coreui.controller.Browse', {
       else {
         componentStore.clearFilter();
       }
-    }
-  },
-
-  /**
-   * @private
-   * Set the appropriate breadcrumb icon.
-   * @param {NX.coreui.model.Component} componentModel selected asset
-   * @param {NX.coreui.model.Asset} assetModel selected asset
-   */
-  setAssetIcon: function(container, componentModel, assetModel) {
-    if (assetModel) {
-      // Set the appropriate breadcrumb icon
-      this.setItemClass(3, container.iconCls);
     }
   }
 
