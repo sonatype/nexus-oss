@@ -175,9 +175,7 @@ Ext.define('NX.coreui.controller.Browse', {
    * Load all of the stores associated with this controller
    */
   loadStores: function() {
-    var me = this;
-
-    me.getStore('Repository').load();
+    this.getStore('Repository').load();
   },
 
   /**

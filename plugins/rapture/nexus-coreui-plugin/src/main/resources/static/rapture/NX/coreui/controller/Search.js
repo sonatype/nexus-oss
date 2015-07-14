@@ -415,7 +415,7 @@ Ext.define('NX.coreui.controller.Search', {
   },
 
   /**
-   * @overload
+   * @override
    * Search on refresh.
    */
   loadStores: function() {
