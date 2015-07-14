@@ -69,8 +69,7 @@ public class GeneratorBehaviour
   @Override
   public boolean execute(final HttpServletRequest request,
                          final HttpServletResponse response,
-                         final Map<Object, Object> ctx)
-      throws Exception
+                         final Map<Object, Object> ctx) throws Exception
   {
     response.setStatus(HttpServletResponse.SC_OK);
     response.setHeader(HttpHeaders.CONTENT_TYPE, generator.getContentType());

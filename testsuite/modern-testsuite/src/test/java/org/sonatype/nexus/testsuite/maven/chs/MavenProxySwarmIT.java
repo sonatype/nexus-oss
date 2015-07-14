@@ -78,9 +78,7 @@ public class MavenProxySwarmIT
   }
 
   @After
-  public void cleanup()
-      throws Exception
-  {
+  public void cleanup() throws Exception {
     if (upstream != null) {
       upstream.stop();
     }

@@ -26,9 +26,6 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.entity.StringEntity;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
@@ -44,8 +41,9 @@ import static org.hamcrest.Matchers.equalTo;
 public class MavenHostedSwarmIT
     extends MavenHotspotITSupport
 {
-  private void hostedSwarm(final String path, final Generator generator, final Supplier<ByteSize> lengthSupplier)
-      throws Exception
+  private void hostedSwarm(final String path,
+                           final Generator generator,
+                           final Supplier<ByteSize> lengthSupplier) throws Exception
   {
     final Configuration configuration = hostedConfig(testName.getMethodName(), VersionPolicy.RELEASE);
     Repository repository = repositoryManager.create(configuration);
