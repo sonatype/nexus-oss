@@ -29,6 +29,7 @@
 
   <properties>
     <pluginDescription>Next-gen UI framework.</pluginDescription>
+    <sonar.sources>src/main/java,src/main/resources/static/rapture</sonar.sources>
   </properties>
 
   <dependencies>
