@@ -112,7 +112,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.onRefresh
+          refresh: me.loadStores
         }
       },
       store: {
@@ -122,7 +122,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
       },
       component: {
         'nx-coreui-capability-list': {
-          beforerender: me.onRefresh
+          beforerender: me.loadStores
         },
         'nx-coreui-capability-list button[action=new]': {
           click: me.showSelectTypePanel
@@ -286,23 +286,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
   },
 
   /**
-   * @private
-   * (Re)load capability type store && reset all cached combo stores.
-   */
-  onRefresh: function() {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.getStore('CapabilityType').load(
-          function() {
-            me.reselect();
-          }
-      );
-    }
-  },
-
-  /**
    * @override
    * @protected
    * Enable 'New' button when user has 'create' permission and there is at least one capability type.
@@ -378,9 +361,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
                 me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
-          me.getStore('Capability').load(function() {
-            me.reselect();
-          });
+          me.getStore('Capability').load();
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);
@@ -427,9 +408,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         description = me.getDescription(model);
 
     NX.direct.capability_Capability.remove(model.getId(), function(response) {
-      me.getStore('Capability').load(function() {
-        me.reselect();
-      });
+      me.getStore('Capability').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Capabilities_Delete_Success', description),

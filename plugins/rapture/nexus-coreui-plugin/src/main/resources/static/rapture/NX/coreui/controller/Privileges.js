@@ -95,6 +95,11 @@ Ext.define('NX.coreui.controller.Privileges', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadStores
+        }
+      },
       store: {
         '#Privilege': {
           load: me.reselect

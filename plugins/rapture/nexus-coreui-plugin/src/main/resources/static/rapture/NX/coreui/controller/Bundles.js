@@ -73,6 +73,11 @@ Ext.define('NX.coreui.controller.Bundles', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadStores
+        }
+      },
       store: {
         '#Bundle': {
           load: me.reselect
