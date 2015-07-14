@@ -456,7 +456,7 @@ public class MapdbBlobMetadataStore
       public Long run(final DB db) {
         long totalSize = 0L;
         HTreeMap<BlobId, MetadataRecord> entries = entries(db);
-        if(entries.sizeLong() == sizeCache.getNumRecords()) {
+        if (entries.sizeLong() == sizeCache.getNumRecords()) {
           log.debug("Returning cached blob size");
           return sizeCache.getSize();
         }
@@ -464,7 +464,7 @@ public class MapdbBlobMetadataStore
         log.debug("Cached data is invalid, recalculating size of blobs");
 
         for (MetadataRecord metadataRecord : entries.values()) {
-          if(metadataRecord.size != null) {
+          if (metadataRecord.size != null) {
             totalSize += metadataRecord.size;
           }
           else {
@@ -541,7 +541,7 @@ public class MapdbBlobMetadataStore
     /**
      * Update the state of the cached data.
      */
-    public void update(long numRecords, long size) {
+    public void update(final long numRecords, final long size) {
       this.numRecords = numRecords;
       this.size = size;
     }
