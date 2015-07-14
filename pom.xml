@@ -367,6 +367,30 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-maven-test-data</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-nuget-test-data</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-raw-test-data</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-ssl-test-data</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
       <!-- assemblies -->
 
       <dependency>

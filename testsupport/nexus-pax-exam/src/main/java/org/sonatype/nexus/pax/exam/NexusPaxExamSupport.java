@@ -396,10 +396,10 @@ public abstract class NexusPaxExamSupport
   /**
    * @return Pax-Exam option to enable HTTPS support in the Nexus distribution
    */
-  public static Option withHttps() {
+  public static Option withHttps(final File keystore) {
     return composite(
         editConfigurationFileExtend("etc/custom.properties", "nexus-args", "${karaf.base}/etc/jetty-https.xml"),
-        replaceConfigurationFile("etc/ssl/keystore.jks", resolveBaseFile("src/test/it-resources/ssl/nexus.jks")));
+        replaceConfigurationFile("etc/ssl/keystore.jks", keystore));
   }
 
   /**
