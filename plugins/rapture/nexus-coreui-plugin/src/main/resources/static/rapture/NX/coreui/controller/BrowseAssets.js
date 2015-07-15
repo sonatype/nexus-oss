@@ -27,7 +27,7 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
   ],
   masters: [
     'nx-coreui-browseassetfeature nx-coreui-browse-repository-list',
-    'nx-coreui-browse-asset-list'
+    'nx-coreui-browseassetfeature nx-coreui-browse-asset-list'
   ],
   stores: [
     'Asset'
@@ -44,6 +44,7 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
 
   refs: [
     {ref: 'feature', selector: 'nx-coreui-browseassetfeature'},
+    {ref: 'repositoryList', selector: 'nx-coreui-browseassetfeature nx-coreui-browse-repository-list'},
     {ref: 'assetList', selector: 'nx-coreui-browseassetfeature nx-coreui-browse-asset-list'},
     {ref: 'assetFilter', selector: 'nx-coreui-browseassetfeature nx-coreui-browse-asset-list #filter'},
     {ref: 'assetContainer', selector: 'nx-coreui-browseassetfeature nx-coreui-component-assetcontainer'}
@@ -77,6 +78,11 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadStores
+        }
+      },
       store: {
         '#Repository': {
           load: me.reselect
@@ -139,6 +145,21 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
         value: model.get('name')
       }
     ]);
+  },
+
+  /**
+   * @override
+   * Load all of the stores associated with this controller.
+   */
+  loadStores: function() {
+    if (this.getFeature()) {
+      if (this.currentIndex === 0) {
+        this.getRepositoryList().getStore().load();
+      }
+      if (this.currentIndex === 1) {
+        this.getAssetList().getStore().load();
+      }
+    }
   },
 
   /**
