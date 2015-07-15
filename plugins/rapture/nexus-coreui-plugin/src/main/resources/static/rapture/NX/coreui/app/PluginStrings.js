@@ -908,7 +908,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Nuget_NuGetApiKey_Access_Button: 'Access API Key',
     Nuget_NuGetApiKey_Access_HelpText: 'Accessing NuGet API Key requires validation of your credentials.',
     Nuget_NuGetApiKey_Reset_Button: 'Reset API Key',
-    Nuget_NuGetApiKey_Reset_HelpText: 'Resetting NuGet API Key requires validation of your credentials.',
+    Nuget_NuGetApiKey_Reset_HelpText: 'Resetting NuGet API Key requires validation of your credentials.'
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);

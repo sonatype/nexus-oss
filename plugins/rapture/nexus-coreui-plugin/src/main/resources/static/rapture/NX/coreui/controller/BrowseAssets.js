@@ -46,7 +46,7 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
     {ref: 'feature', selector: 'nx-coreui-browseassetfeature'},
     {ref: 'assetList', selector: 'nx-coreui-browseassetfeature nx-coreui-browse-asset-list'},
     {ref: 'assetFilter', selector: 'nx-coreui-browseassetfeature nx-coreui-browse-asset-list #filter'},
-    {ref: 'assetContainer', selector: 'nx-coreui-browseassetfeature nx-coreui-component-assetcontainer'},
+    {ref: 'assetContainer', selector: 'nx-coreui-browseassetfeature nx-coreui-component-assetcontainer'}
   ],
 
   features: {
