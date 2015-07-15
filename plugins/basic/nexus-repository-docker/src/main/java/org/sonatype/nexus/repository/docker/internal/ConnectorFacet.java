@@ -10,28 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+package org.sonatype.nexus.repository.docker.internal;
 
-package org.sonatype.nexus.repository.raw.internal;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.repository.Format;
-import org.sonatype.nexus.repository.security.RepositoryFormatSecurityConfigurationResource;
+import org.sonatype.nexus.repository.Facet;
 
 /**
- * Docker format security resource.
+ * TODO.
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class DockerFormatSecurityConfigurationResource
-    extends RepositoryFormatSecurityConfigurationResource
+@Facet.Exposed
+public interface ConnectorFacet
+    extends Facet
 {
-  @Inject
-  public DockerFormatSecurityConfigurationResource(final @Named(DockerFormat.NAME) Format format) {
-    super(format);
-  }
+
+  int getPort();
+
 }

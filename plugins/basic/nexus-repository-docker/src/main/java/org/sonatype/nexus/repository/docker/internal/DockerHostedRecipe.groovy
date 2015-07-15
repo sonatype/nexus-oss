@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.raw.internal
+package org.sonatype.nexus.repository.docker.internal
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -31,6 +31,7 @@ import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
+import org.sonatype.nexus.repository.view.matchers.LiteralMatcher
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
 /**
@@ -67,6 +68,18 @@ class DockerHostedRecipe
   DiagnoseHandler diagnoseHandler
 
   @Inject
+  RepositoriesHandler repositoriesHandler
+
+  @Inject
+  EndpointHandler endpointHandler
+
+  @Inject
+  ImagesHandler imagesHandler
+
+  @Inject
+  TagsHandler tagsHandler
+
+  @Inject
   DockerHostedRecipe(@Named(HostedType.NAME) final Type type,
                      @Named(DockerFormat.NAME) final Format format)
   {
@@ -87,11 +100,29 @@ class DockerHostedRecipe
     Router.Builder builder = new Router.Builder()
 
     builder.route(new Route.Builder()
-        .matcher(new TokenMatcher('/{name:.+}'))
-        .handler(timingHandler)
-        .handler(securityHandler)
-        .handler(exceptionHandler)
-        .handler(diagnoseHandler)
+        .matcher(new LiteralMatcher('/v1/users/'))
+        .handler(HttpHandlers.ok())
+        .create())
+
+    builder.route(new Route.Builder()
+        .matcher(new TokenMatcher('/v1/repositories/{namespace}/{repository}/tags/{tag:.+}'))
+        .handler(tagsHandler)
+        .create())
+
+    builder.route(new Route.Builder()
+        .matcher(new TokenMatcher('/v1/repositories/{namespace}/{repository}/images'))
+        .handler(repositoriesHandler)
+        .create())
+
+    builder.route(new Route.Builder()
+        .matcher(new TokenMatcher('/v1/repositories/{namespace}/{repository}/'))
+        .handler(endpointHandler)
+        .handler(repositoriesHandler)
+        .create())
+
+    builder.route(new Route.Builder()
+        .matcher(new TokenMatcher('/v1/images/{image}/{type}'))
+        .handler(imagesHandler)
         .create())
 
     builder.defaultHandlers(HttpHandlers.badRequest())

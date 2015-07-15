@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.raw.internal;
+package org.sonatype.nexus.repository.docker.internal;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -61,7 +61,9 @@ public class DiagnoseHandler
     sb.append("Host header: ").append(context.getRequest().getHeaders().get("Host")).append("\n");
     sb.append("X-Forwarded-Host header: ").append(context.getRequest().getHeaders().get("X-Forwarded-Host")).append("\n");
 
-    return HttpResponses.ok(new StringPayload(sb.toString(), MediaType.PLAIN_TEXT_UTF_8.toString()));
+    Response response = HttpResponses.ok(new StringPayload(sb.toString(), MediaType.PLAIN_TEXT_UTF_8.toString()));
+    response.getHeaders().set("X-Docker-Endpoints","192.168.1.105:18081");
+    return response;
   }
 
   /**

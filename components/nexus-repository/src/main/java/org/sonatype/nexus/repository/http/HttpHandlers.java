@@ -27,6 +27,17 @@ public class HttpHandlers
 {
   private HttpHandlers() {}
 
+  public static Handler ok() {
+    return new Handler()
+    {
+      @Nonnull
+      @Override
+      public Response handle(@Nonnull final Context context) throws Exception {
+        return HttpResponses.ok();
+      }
+    };
+  }
+
   public static Handler notFound() {
     return new Handler()
     {
