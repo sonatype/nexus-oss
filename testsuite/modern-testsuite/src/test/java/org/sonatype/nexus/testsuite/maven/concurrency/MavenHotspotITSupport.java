@@ -49,13 +49,11 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
-import org.ops4j.pax.exam.Option;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.sonatype.nexus.testsuite.maven.concurrency.generators.Generator.generatedEntity;
 
 /**
@@ -64,14 +62,6 @@ import static org.sonatype.nexus.testsuite.maven.concurrency.generators.Generato
 public abstract class MavenHotspotITSupport
     extends MavenITSupport
 {
-  @org.ops4j.pax.exam.Configuration
-  public static Option[] configureNexus() {
-    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
-        // set start-level to just after the nexus edition has been installed so we can re-use its dependencies
-        mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject().startLevel(101)
-    );
-  }
-
   @Rule
   public TestName testName = new TestName();
 

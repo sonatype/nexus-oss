@@ -93,10 +93,12 @@ public abstract class MavenITSupport
 
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
-    return options(NexusCoreITSupport.configureNexus(),
+    return options(
+        NexusCoreITSupport.configureNexus(),
         mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject(),
         wrappedBundle(maven("org.apache.maven.shared", "maven-verifier").versionAsInProject()),
-        wrappedBundle(maven("org.apache.maven.shared", "maven-shared-utils").versionAsInProject()));
+        wrappedBundle(maven("org.apache.maven.shared", "maven-shared-utils").versionAsInProject())
+    );
   }
 
   public MavenITSupport() {
@@ -111,7 +113,8 @@ public abstract class MavenITSupport
   protected void mvnDeploy(final String project, final String version, final String deployRepositoryName)
       throws Exception
   {
-    final File mavenBaseDir = resolveBaseFile("target/" + getClass().getSimpleName() + "-" + testName.getMethodName() + "/" + project).getAbsoluteFile();
+    final File mavenBaseDir = resolveBaseFile(
+        "target/" + getClass().getSimpleName() + "-" + testName.getMethodName() + "/" + project).getAbsoluteFile();
     final File mavenSettings = new File(mavenBaseDir, "settings.xml").getAbsoluteFile();
     final File mavenPom = new File(mavenBaseDir, "pom.xml").getAbsoluteFile();
 
