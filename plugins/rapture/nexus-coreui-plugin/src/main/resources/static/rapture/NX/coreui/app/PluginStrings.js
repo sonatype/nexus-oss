@@ -174,7 +174,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Repository_Facet_ProxyFacet_Blocked_FieldLabel: 'Blocked',
     Repository_Facet_ProxyFacet_Blocked_HelpText: 'Block outbound connections on the repository',
     Repository_RepositorySettingsForm_Name_FieldLabel: 'Name',
+    Repository_RepositorySettingsForm_Name_HelpText: 'An identifier used during the construction of the repository URL',
     Repository_RepositorySettingsForm_URL_FieldLabel: 'URL',
+    Repository_RepositorySettingsForm_URL_HelpText: 'The URL used to access this repository',
     Repository_Facet_GroupFacet_Members_FieldLabel: 'Member repositories',
     Repository_Facet_GroupFacet_Members_HelpText: 'Select and order the repositories that are part of this group',
     Repository_Facet_GroupFacet_Members_FromTitle: 'Available',
@@ -197,7 +199,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Maven2Facet_VersionPolicy_ReleaseItem: 'Release',
     Maven2Facet_VersionPolicy_SnapshotItem: 'Snapshot',
     Repository_RepositorySettingsForm_Format_FieldLabel: 'Format',
+    Repository_RepositorySettingsForm_Format_HelpText: 'The format chosen as the recipe for this repository',
     Repository_RepositorySettingsForm_Type_FieldLabel: 'Type',
+    Repository_RepositorySettingsForm_Type_HelpText: 'The type of repository (i.e. group, hosted, or proxy)',
     Repository_RepositorySettingsForm_Online_FieldLabel: 'Online',
     Repository_RepositorySettingsForm_Online_HelpText: 'If checked, the repository accepts incoming requests',
     Repository_Facet_ProxyFacet_ArtifactAge_FieldLabel: 'Maximum artifact age',
@@ -207,7 +211,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Repository_Facet_HttpClientFacet_ConnectionTimeout_FieldLabel: 'Connection timeout',
     Repository_Facet_HttpClientFacet_ConnectionTimeout_HelpText: 'Seconds to wait for activity before stopping and retrying the connection. Leave blank to use the globally defined HTTP timeout.',
     Repository_Facet_StorageFacet_BlobStore_FieldLabel: 'Blobstore',
-    Repository_Facet_StorageFacet_BlobStore_HelpText: 'Blobstore to be used to store asset contents.',
+    Repository_Facet_StorageFacet_BlobStore_HelpText: 'Blobstore used to store asset contents',
     Repository_Facet_StorageFacet_BlobStore_EmptyText: 'Select a blobstore',
     Repository_Facet_StorageFacet_ContentTypeValidation_FieldLabel: 'Strict Content Type Validation',
     Repository_Facet_NegativeCacheFacet_Enabled_FieldLabel: 'Not found cache enabled',
@@ -901,4 +905,3 @@ Ext.define('NX.coreui.app.PluginStrings', {
 }, function(obj) {
   NX.I18n.register(obj.keys);
 });
-
