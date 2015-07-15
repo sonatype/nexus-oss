@@ -100,12 +100,12 @@ Ext.define('NX.coreui.controller.Tasks', {
       },
       controller: {
         '#Refresh': {
-          refresh: me.onRefresh
+          refresh: me.loadStores
         }
       },
       component: {
         'nx-coreui-task-list': {
-          beforerender: me.onRefresh
+          beforerender: me.loadStores
         },
         'nx-coreui-task-list button[action=new]': {
           click: me.showSelectTypePanel
@@ -244,20 +244,6 @@ Ext.define('NX.coreui.controller.Tasks', {
       ]
     }));
     panel.down('nx-settingsform').loadRecord(me.getTaskModel().create({typeId: model.getId(), enabled: true}));
-  },
-
-  /**
-   * @private
-   * (Re)load task type store && reset all cached combo stores.
-   */
-  onRefresh: function() {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.getStore('TaskType').load();
-      me.getStore('Task').load();
-    }
   },
 
   /**

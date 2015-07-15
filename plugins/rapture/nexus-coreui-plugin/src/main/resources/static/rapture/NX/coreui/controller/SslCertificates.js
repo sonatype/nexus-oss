@@ -88,6 +88,11 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadStores
+        }
+      },
       store: {
         '#SslCertificate': {
           load: me.reselect

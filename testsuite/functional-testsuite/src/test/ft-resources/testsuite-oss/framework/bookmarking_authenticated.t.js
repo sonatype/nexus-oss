@@ -21,11 +21,10 @@ StartTest(function(t) {
     '/admin/Support/Logging/Log Viewer', //errors on load?
     '/admin/Support/Support Request', //challenges for Authenticate when logged in already
     '/admin/Security/Realms' //errors on load?
-  ];
+  ], loggedIn = false;
 
   t.ok(Ext, 'Ext is here');
   t.ok(NX, 'NX is here');
-  t.waitForSessionToBeInvalidated();
 
   t.describe('An admin can use bookmarks to navigate the entire UI', function(t) {
     var featureStore = t.Ext().StoreManager.get('Feature');
@@ -33,28 +32,30 @@ StartTest(function(t) {
       return item.get('authenticationRequired') && ignoredFeatures.indexOf(item.get('path')) === -1;
     });
 
-    t.chain(
-        t.signIn(),
-        featureStore.data.each(function(feature) {
-          var path = feature.get('path');
-          t.it('When logged in as admin, can navigate to ' + path, function(t) {
-            t.chain(
-                function(next) {
-                  t.navigateTo(feature.get('bookmark'));
-                  next();
-                },
-                {waitFor: 'bookmark', args: feature.get('bookmark')},
-                {waitFor: 'Feature', args: feature.get('text')},
-                function(next) {
-                  t.waitForFn(function() {
-                    return t.global.location.hash === '#' + feature.get('bookmark');
-                  }, next)
-                }
-            )
+    featureStore.data.each(function(feature) {
+      var path = feature.get('path'),
+          bookmark = feature.get('bookmark'),
+          text = feature.get('text');
 
-          });
-        })
-    )
+      t.it('When logged in as admin, can navigate to ' + path, function(t) {
+        t.chain(
+            !loggedIn ? t.openPageAsAdmin('browse/welcome') : null,
+            function(next) {
+              loggedIn = true;
+              t.navigateTo(bookmark);
+              next();
+            },
+            {waitFor: 'bookmark', args: bookmark, desc: 'waiting for bookmark: ' + bookmark},
+            {waitFor: 'Feature', args: text, desc: 'waiting for text: ' + text},
+            function(next) {
+              t.waitForFn(function() {
+                return t.global.location.hash === '#' + feature.get('bookmark');
+              }, next)
+            }
+        )
+
+      });
+    });
     featureStore.clearFilter(true);
   })
 });

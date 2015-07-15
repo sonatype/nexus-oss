@@ -167,18 +167,6 @@ Class('NX.TestClass', {
       });
     },
 
-    waitForUserToBeSignedIn: function(shouldSignIn, callback, scope, timeout) {
-      var btn = this.cq1('nx-header-signin');
-      if (btn && !btn.isHidden()) {
-        this.clickComponentQuery('nx-header-signin', Ext.emptyFn);
-        this.chain(
-            { type: 'admin[TAB]' },
-            { type: 'admin123' },
-            { type: '[ENTER]' }
-        );
-      }
-    },
-
     waitForUserToBeSignedOut: function(shouldSignOut, callback, scope, timeout) {
       var btn = this.cq1('nx-header-signout');
       if (btn && !btn.isHidden()) {
