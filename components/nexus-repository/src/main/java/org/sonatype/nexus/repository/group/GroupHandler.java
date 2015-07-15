@@ -115,6 +115,7 @@ public class GroupHandler
 
       final ViewFacet view = member.facet(ViewFacet.class);
       final Response response = view.dispatch(request);
+      log.trace("Member {} response {}", member, response.getStatus());
       if (response.getStatus().isSuccessful()) {
         return response;
       }
@@ -142,7 +143,7 @@ public class GroupHandler
 
       final ViewFacet view = member.facet(ViewFacet.class);
       final Response response = view.dispatch(request);
-      log.trace("Member {} response {}", member.getName(), response.getStatus());
+      log.trace("Member {} response {}", member, response.getStatus());
 
       responses.put(member, response);
     }
