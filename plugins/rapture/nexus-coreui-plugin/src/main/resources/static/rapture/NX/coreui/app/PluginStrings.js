@@ -211,7 +211,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Repository_Facet_HttpClientFacet_ConnectionTimeout_FieldLabel: 'Connection timeout',
     Repository_Facet_HttpClientFacet_ConnectionTimeout_HelpText: 'Seconds to wait for activity before stopping and retrying the connection. Leave blank to use the globally defined HTTP timeout.',
     Repository_Facet_StorageFacet_BlobStore_FieldLabel: 'Blobstore',
-    Repository_Facet_StorageFacet_BlobStore_HelpText: 'Blobstore to be used to store asset contents.',
+    Repository_Facet_StorageFacet_BlobStore_HelpText: 'Blobstore used to store asset contents',
     Repository_Facet_StorageFacet_BlobStore_EmptyText: 'Select a blobstore',
     Repository_Facet_StorageFacet_ContentTypeValidation_FieldLabel: 'Strict Content Type Validation',
     Repository_Facet_NegativeCacheFacet_Enabled_FieldLabel: 'Not found cache enabled',
