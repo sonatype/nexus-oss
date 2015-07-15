@@ -29,6 +29,7 @@
 
   <properties>
     <pluginDescription>Provides a Nexus user interface based on Rapture.</pluginDescription>
+    <sonar.sources>src/main/java,src/main/resources/static/rapture</sonar.sources>
   </properties>
 
   <dependencies>

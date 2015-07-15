@@ -45,7 +45,20 @@ public interface BlobMetadataStore
 
   long getBlobCount();
 
+  /**
+   * @return total size in bytes of metadata and blob content
+   */
   long getTotalSize();
+
+  /**
+   * @return total size in bytes used to store metadata
+   */
+  long getMetadataSize();
+
+  /**
+   * @return total size in bytes used to store blobs
+   */
+  long getBlobSize();
 
   void compact();
 }

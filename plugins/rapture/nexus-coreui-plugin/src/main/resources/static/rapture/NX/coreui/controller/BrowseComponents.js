@@ -82,6 +82,11 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadStores
+        }
+      },
       store: {
         '#Repository': {
           load: me.reselect
@@ -162,6 +167,15 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
   },
 
   /**
+   * @override
+   * Load all of the stores associated with this controller
+   */
+  loadStores: function() {
+    this.getStore('Repository').load();
+  },
+
+  /**
+   * @private
    * Filter grid.
    *
    * @private

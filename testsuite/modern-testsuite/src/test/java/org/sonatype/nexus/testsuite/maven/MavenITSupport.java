@@ -92,10 +92,14 @@ public abstract class MavenITSupport
 
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
-    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
+    return options(NexusCoreITSupport.configureNexus(),
         mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject(),
         wrappedBundle(maven("org.apache.maven.shared", "maven-verifier").versionAsInProject()),
         wrappedBundle(maven("org.apache.maven.shared", "maven-shared-utils").versionAsInProject()));
+  }
+
+  public MavenITSupport() {
+    testData.addDirectory(resolveBaseFile("target/it-resources/maven"));
   }
 
   @Before

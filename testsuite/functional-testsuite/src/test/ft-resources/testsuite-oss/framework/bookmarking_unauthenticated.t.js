@@ -28,7 +28,6 @@ StartTest(function(t) {
 
   t.ok(Ext, 'Ext is here');
   t.ok(NX, 'NX is here');
-  t.waitForSessionToBeInvalidated();
 
   t.describe('Can use bookmarks to navigate the UI', function(t) {
     var featureStore = t.Ext().StoreManager.get('Feature');
@@ -37,10 +36,11 @@ StartTest(function(t) {
         filterFn: noAuthRequired
       }
     ]);
-    featureStore.data.each(function(feature) {
+    featureStore.data.each(function(feature, index) {
       var path = feature.get('path');
       t.it('Can navigate anonymously to ' + path, function(t) {
         t.chain(
+            index == 0 ? {waitFor: 'SessionToBeInvalidated'} : null,
             function(next) {
               t.navigateTo(feature.get('bookmark'));
               next();
