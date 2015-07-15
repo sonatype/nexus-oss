@@ -125,9 +125,13 @@ public class Maven2GroupFacet
   }
 
   /**
-   * Merges the contents of passed in metadatas and returns the {@link Content} of the resulting merge. The content
+   * Merges the contents of passed in metadata and returns the {@link Content} of the resulting merge. The content
    * returned by this method is kept in memory, is reusable and should be passed back to caller as is.
+   *
+   * @return {@code null} if no merge possible for various reasons (ie. corrupted metadata). If non-null is returned,
+   * the {@link Content} contains merged metadata and is reusable.
    */
+  @Nullable
   private Content mergeMetadata(final MavenPath mavenPath,
                                 final LinkedHashMap<Repository, Content> metadataContents) throws IOException
   {
