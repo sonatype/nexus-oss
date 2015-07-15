@@ -26,34 +26,87 @@ import com.google.common.base.Supplier;
 public interface StorageFacet
     extends Facet
 {
+  /**
+   * Key of {@link Component} and {@link Asset} attributes nested map.
+   */
+  String P_ATTRIBUTES = "attributes";
 
-  static String P_ATTRIBUTES = "attributes";
+  /**
+   * Key of {@link Asset} blob ref attribute (if asset has backing content).
+   *
+   * @see StorageTx#attachBlob(Asset, AssetBlob)
+   */
+  String P_BLOB_REF = "blob_ref";
 
-  static String P_BLOB_REF = "blob_ref";
+  /**
+   * Key of {@link Component} and {@link Asset} bucket reference attribute.
+   */
+  String P_BUCKET = "bucket";
 
-  static String P_BUCKET = "bucket";
+  /**
+   * Key of {@link Asset} nested map of blob content hashes (if asset has backing content).
+   *
+   * @see StorageTx#attachBlob(Asset, AssetBlob)
+   */
+  String P_CHECKSUM = "checksum";
 
-  static String P_CHECKSUM = "checksum";
+  /**
+   * Key of {@link Asset} component reference attribute (if asset belongs to a component).
+   */
+  String P_COMPONENT = "component";
 
-  static String P_COMPONENT = "component";
+  /**
+   * Key of {@link Asset} for content type attribute (if asset has backing content).
+   *
+   * @see StorageTx#attachBlob(Asset, AssetBlob)
+   */
+  String P_CONTENT_TYPE = "content_type";
 
-  static String P_CONTENT_TYPE = "content_type";
+  /**
+   * Key of {@link Component} and {@link Asset} attribute for format reference.
+   */
+  String P_FORMAT = "format";
 
-  static String P_FORMAT = "format";
+  /**
+   * Key of {@link Component} group coordinate.
+   */
+  String P_GROUP = "group";
 
-  static String P_GROUP = "group";
+  /**
+   * Key of {@link Component} and {@link Asset} attribute denoting when the record was last updated. This denotes a
+   * timestamp when CMA last modified any attribute of the record, and has nothing to do with content change, it's age
+   * or it's last modified attributes. This property is present always on {@link Component} and {@link Asset}.
+   *
+   * @see MetadataNodeEntityAdapter#writeFields(com.orientechnologies.orient.core.record.impl.ODocument, org.sonatype.nexus.repository.storage.MetadataNode)
+   */
+  String P_LAST_UPDATED = "last_updated";
 
-  static String P_LAST_UPDATED = "last_updated";
+  /**
+   * Key of {@link Component} name coordinate.
+   */
+  String P_NAME = "name";
 
-  static String P_NAME = "name";
+  /**
+   * Key of {@link Asset} optional path attribute.
+   */
+  String P_PATH = "path";
 
-  static String P_PATH = "path";
+  /**
+   * Key of {@link Bucket} repository name attribute.
+   */
+  String P_REPOSITORY_NAME = "repository_name";
 
-  static String P_REPOSITORY_NAME = "repository_name";
+  /**
+   * Key of {@link Asset} size attribute (if asset has backing content).
+   *
+   * @see StorageTx#attachBlob(Asset, AssetBlob)
+   */
+  String P_SIZE = "size";
 
-  static String P_SIZE = "size";
-
-  static String P_VERSION = "version";
+  /**
+   * Key of {@link Component} version coordinate.
+   */
+  String P_VERSION = "version";
 
   /**
    * Registers a supplier for {@link StorageTxHook}. Only possible while this facet is

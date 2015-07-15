@@ -33,6 +33,7 @@ import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
 import org.sonatype.nexus.repository.security.BreadActions
 import org.sonatype.nexus.repository.security.RepositoryAdminPermission
+import org.sonatype.nexus.repository.security.RepositoryViewPermission
 import org.sonatype.nexus.security.SecurityHelper
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.group.Create
@@ -55,7 +56,7 @@ import org.hibernate.validator.constraints.NotEmpty
 @Singleton
 @DirectAction(action = 'coreui_Repository')
 class RepositoryComponent
-extends DirectComponentSupport
+    extends DirectComponentSupport
 {
   @Inject
   RepositoryManager repositoryManager
@@ -191,6 +192,12 @@ extends DirectComponentSupport
       if (type) {
         repositories = repositories.findResults { Repository repository ->
           repository.type.value == type ? repository : null
+        }
+      }
+      String applyPermissions = parameters.getFilter('applyPermissions')
+      if (applyPermissions as boolean) {
+        repositories = repositories.findResults { Repository repository ->
+          securityHelper.allPermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE)) ? repository : null
         }
       }
     }

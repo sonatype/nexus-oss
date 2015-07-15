@@ -14,7 +14,6 @@ package org.sonatype.nexus.repository.maven.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -27,7 +26,6 @@ import javax.validation.groups.Default;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
-import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -38,6 +36,7 @@ import org.sonatype.nexus.repository.maven.MavenPath.Coordinates;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.MavenPathParser;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
+import org.sonatype.nexus.repository.proxy.CacheInfo;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -53,13 +52,9 @@ import org.sonatype.nexus.transaction.Transactional;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
-import com.google.common.collect.Maps;
-import com.google.common.hash.HashCode;
 import com.orientechnologies.common.concur.ONeedRetryException;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
-import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -167,22 +162,9 @@ public class MavenFacetImpl
     }
     final Blob blob = tx.requireBlob(asset.requireBlobRef());
     final String contentType = asset.contentType();
-
-    final NestedAttributesMap checksumAttributes = asset.attributes().child(StorageFacet.P_CHECKSUM);
-    final Map<HashAlgorithm, HashCode> hashCodes = Maps.newHashMap();
-    for (HashAlgorithm algorithm : HashType.ALGORITHMS) {
-      final HashCode hashCode = HashCode.fromString(checksumAttributes.require(algorithm.name(), String.class));
-      hashCodes.put(algorithm, hashCode);
-    }
-    final NestedAttributesMap attributesMap = asset.formatAttributes();
-    final Date lastModifiedDate = attributesMap.get(P_CONTENT_LAST_MODIFIED, Date.class);
-    final String eTag = attributesMap.get(P_CONTENT_ETAG, String.class);
-    final Content result = new Content(new BlobPayload(blob, contentType));
-    result.getAttributes()
-        .set(Content.CONTENT_LAST_MODIFIED, lastModifiedDate == null ? null : new DateTime(lastModifiedDate));
-    result.getAttributes().set(Content.CONTENT_ETAG, eTag);
-    result.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
-    return result;
+    final Content content = new Content(new BlobPayload(blob, contentType));
+    Content.extractFromAsset(asset, HashType.ALGORITHMS, content.getAttributes());
+    return content;
   }
 
   @Override
@@ -296,24 +278,7 @@ public class MavenFacetImpl
       throws IOException
   {
     tx.attachBlob(asset, assetBlob);
-
-    final NestedAttributesMap formatAttributes = asset.formatAttributes();
-    if (contentAttributes != null) {
-      final DateTime lastModified = contentAttributes.get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
-      if (lastModified != null) {
-        formatAttributes.set(P_CONTENT_LAST_MODIFIED, lastModified.toDate());
-      }
-      final String etag = contentAttributes.get(Content.CONTENT_ETAG, String.class);
-      if (!Strings.isNullOrEmpty(etag)) {
-        formatAttributes.set(P_CONTENT_ETAG, etag);
-      }
-      else {
-        formatAttributes.remove(P_CONTENT_ETAG);
-      }
-    }
-    if (formatAttributes.get(P_CONTENT_LAST_MODIFIED) == null) {
-      formatAttributes.set(P_CONTENT_LAST_MODIFIED, DateTime.now().toDate());
-    }
+    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
   }
 
   @Override
@@ -360,25 +325,8 @@ public class MavenFacetImpl
   }
 
   @Override
-  @Transactional
-  public DateTime getLastVerified(final MavenPath path) throws IOException {
-    final StorageTx tx = UnitOfWork.currentTransaction();
-
-    final Asset asset = findAsset(tx, tx.getBucket(), path);
-    if (asset == null) {
-      return null;
-    }
-    final NestedAttributesMap attributes = asset.formatAttributes();
-    final Date date = attributes.get(P_LAST_VERIFIED, Date.class);
-    if (date == null) {
-      return null;
-    }
-    return new DateTime(date);
-  }
-
-  @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public boolean setLastVerified(final MavenPath path, final DateTime verified) throws IOException {
+  public boolean setCacheInfo(final MavenPath path, final CacheInfo cacheInfo) throws IOException {
     final StorageTx tx = UnitOfWork.currentTransaction();
 
     final Asset asset = findAsset(tx, tx.getBucket(), path);
@@ -386,8 +334,8 @@ public class MavenFacetImpl
       return false;
     }
 
-    final NestedAttributesMap attributes = asset.formatAttributes();
-    attributes.set(P_LAST_VERIFIED, verified.toDate());
+    log.debug("Updating cacheInfo of {} to {}", path.getPath(), cacheInfo);
+    CacheInfo.applyToAsset(asset, cacheInfo);
     tx.saveAsset(asset);
 
     return true;

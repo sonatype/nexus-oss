@@ -28,6 +28,10 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>nexus-maven-test-data</module>
+    <module>nexus-nuget-test-data</module>
+    <module>nexus-raw-test-data</module>
+    <module>nexus-ssl-test-data</module>
     <module>nexus-test-common</module>
     <module>nexus-pax-exam</module>
   </modules>

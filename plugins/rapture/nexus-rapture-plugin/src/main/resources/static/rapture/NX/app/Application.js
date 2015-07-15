@@ -48,6 +48,7 @@ Ext.define('NX.app.Application', {
     'Ext.patch.Ticket_22557_2',
 
     // direct overrides
+    'NX.ext.direct.RemotingProvider',
     'NX.ext.form.action.DirectLoad',
     'NX.ext.form.action.DirectSubmit',
 

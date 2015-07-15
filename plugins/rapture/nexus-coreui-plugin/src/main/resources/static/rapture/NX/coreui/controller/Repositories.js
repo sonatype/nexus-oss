@@ -102,7 +102,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRelatedStores
+          refresh: me.loadStores
         },
         '#State': {
           receivingchanged: me.onStateReceivingChanged
@@ -115,7 +115,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       },
       component: {
         'nx-coreui-repository-list': {
-          beforerender: me.loadRelatedStores,
+          beforerender: me.loadStores,
           afterrender: me.startStatusPolling,
           beforedestroy: me.stopStatusPolling
         },
@@ -123,7 +123,7 @@ Ext.define('NX.coreui.controller.Repositories', {
           click: me.showSelectRecipePanel
         },
         'nx-coreui-repository-settings-form': {
-          submitted: me.onSettingsSubmitted
+          submitted: me.loadStores
         },
         'nx-coreui-repository-selectrecipe': {
           cellclick: me.showAddRepositoryPanel
@@ -154,9 +154,6 @@ Ext.define('NX.coreui.controller.Repositories', {
     }
     else {
       if (Ext.isDefined(model)) {
-        // Show the correct icon in the breadcrumb
-        me.setItemClass(1, NX.Icons.cls('repository-' + model.get('type'), 'x16'));
-
         // Load the form
         settingsPanel.removeAllSettingsForms();
         settingsPanel.addSettingsForm({ xtype: formCls.xtype, recipe: model });
@@ -216,26 +213,6 @@ Ext.define('NX.coreui.controller.Repositories', {
       me.setItemClass(2, NX.Icons.cls('repository-hosted', 'x16'));
       me.loadCreateWizard(2, true, { xtype: 'nx-coreui-repository-add', recipe: model });
     }
-  },
-
-  /**
-   * @private
-   */
-  loadRelatedStores: function() {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.getStore('Blobstore').load();
-      me.getStore('RepositoryRecipe').load();
-    }
-  },
-
-  /**
-   * @private
-   */
-  onSettingsSubmitted: function(form, action) {
-    this.getStore('Repository').load();
   },
 
   /**

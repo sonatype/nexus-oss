@@ -22,7 +22,11 @@ Ext.define('NX.util.Utf8', {
   singleton: true,
 
   /**
+   * Encode string as UTF-8.
+   *
    * @public
+   * @param {String} string
+   * @return UTF-8 encoded string.
    */
   encode: function (string) {
     var utftext = "",
@@ -52,7 +56,11 @@ Ext.define('NX.util.Utf8', {
   },
 
   /**
+   * Decode UTF-8 string.
+   *
    * @public
+   * @param {String} utftext
+   * @return String.
    */
   decode: function (utftext) {
     var string = "",

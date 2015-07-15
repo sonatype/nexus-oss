@@ -19,7 +19,6 @@
  */
 Ext.define('NX.coreui.model.Bundle', {
   extend: 'Ext.data.Model',
-  idProperty: 'id',
   fields: [
     { name: 'id', type: 'int' },
     { name: 'state', type: 'string' },

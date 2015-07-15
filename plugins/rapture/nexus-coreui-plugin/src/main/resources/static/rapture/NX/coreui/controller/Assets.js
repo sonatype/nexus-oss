@@ -35,7 +35,8 @@ Ext.define('NX.coreui.controller.Assets', {
   refs: [
     {ref: 'assetContainer', selector: 'nx-coreui-component-assetcontainer'},
     {ref: 'assetList', selector: 'nx-coreui-component-asset-list'},
-    {ref: 'assetInfo', selector: 'nx-coreui-component-assetinfo'}
+    {ref: 'assetInfo', selector: 'nx-coreui-component-assetinfo'},
+    {ref: 'deleteAssetButton', selector: 'nx-coreui-component-assetinfo button[action=deleteAsset]'}
   ],
 
   /**
@@ -64,7 +65,6 @@ Ext.define('NX.coreui.controller.Assets', {
           cellclick: me.updateAssetContainer
         },
         'nx-coreui-component-assetinfo button[action=deleteAsset]': {
-          afterrender: me.bindDeleteAssetButton,
           click: me.deleteAsset
         }
       }
@@ -164,9 +164,10 @@ Ext.define('NX.coreui.controller.Assets', {
    * Update asset shown in asset container.
    */
   updateAssetContainer: function(gridView, td, cellIndex, assetModel) {
-    var assetContainer = this.getAssetContainer();
+    var me = this, assetContainer = me.getAssetContainer();
 
     assetContainer.refreshInfo(gridView.up('grid').componentModel, assetModel);
+    me.bindDeleteAssetButton(this.getDeleteAssetButton());
   },
 
   /**
@@ -178,12 +179,13 @@ Ext.define('NX.coreui.controller.Assets', {
     button.mon(
         NX.Conditions.isPermitted('nexus:repository-view:' + component.get('format') + ':' +
             component.get('repositoryName') + ':delete')
-    ),
-    {
-      satisfied: button.enable,
-      unsatisfied: button.disable,
-      scope: button
-    }
+        ,
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
   },
 
   /**                                

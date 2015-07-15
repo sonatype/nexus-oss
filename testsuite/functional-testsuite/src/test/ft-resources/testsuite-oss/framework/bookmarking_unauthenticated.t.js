@@ -26,10 +26,9 @@ StartTest(function(t) {
         return !item.get('authenticationRequired') && ignoredFeatures.indexOf(item.get('path')) === -1;
       };
 
-  t.ok(Ext);
-  t.ok(NX);
-  t.waitForSessionToBeInvalidated();
-  
+  t.ok(Ext, 'Ext is here');
+  t.ok(NX, 'NX is here');
+
   t.describe('Can use bookmarks to navigate the UI', function(t) {
     var featureStore = t.Ext().StoreManager.get('Feature');
     featureStore.filter([
@@ -37,10 +36,11 @@ StartTest(function(t) {
         filterFn: noAuthRequired
       }
     ]);
-    featureStore.data.each(function(feature) {
+    featureStore.data.each(function(feature, index) {
       var path = feature.get('path');
       t.it('Can navigate anonymously to ' + path, function(t) {
         t.chain(
+            index == 0 ? {waitFor: 'SessionToBeInvalidated'} : null,
             function(next) {
               t.navigateTo(feature.get('bookmark'));
               next();

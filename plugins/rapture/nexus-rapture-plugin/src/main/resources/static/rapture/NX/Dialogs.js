@@ -24,6 +24,8 @@ Ext.define('NX.Dialogs', {
   ],
 
   /**
+   * Show information dialog.
+   *
    * @public
    */
   showInfo: function (title, message, options) {
@@ -42,6 +44,8 @@ Ext.define('NX.Dialogs', {
   },
 
   /**
+   * Show error dialog.
+   *
    * @public
    */
   showError: function (title, message, options) {
@@ -60,6 +64,8 @@ Ext.define('NX.Dialogs', {
   },
 
   /**
+   * Show confirmation dialog.
+   *
    * @public
    */
   askConfirmation: function (title, message, onYesFn, options) {

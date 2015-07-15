@@ -38,6 +38,10 @@ Ext.define('NX.util.condition.WatchState', {
    */
   fn: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.WatchState}
+   */
   bind: function () {
     var me = this,
         controller, listeners;
@@ -59,6 +63,9 @@ Ext.define('NX.util.condition.WatchState', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function (value, oldValue) {
     var me = this;
 
@@ -67,9 +74,12 @@ Ext.define('NX.util.condition.WatchState', {
     }
   },
 
+  /**
+   * @override
+   * @returns {String}
+   */
   toString: function () {
-    var me = this;
-    return me.self.getName() + '{ key=' + me.key + ' }';
+    return this.self.getName() + '{ key=' + this.key + ' }';
   }
 
 });

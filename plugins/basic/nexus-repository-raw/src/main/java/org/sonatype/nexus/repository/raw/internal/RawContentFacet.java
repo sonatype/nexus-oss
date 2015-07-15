@@ -18,12 +18,12 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.InvalidContentException;
-import org.sonatype.nexus.repository.raw.RawContent;
-
-import org.joda.time.DateTime;
+import org.sonatype.nexus.repository.proxy.CacheInfo;
+import org.sonatype.nexus.repository.view.Content;
+import org.sonatype.nexus.repository.view.Payload;
 
 /**
- * Provides persistent storage for {@link RawContent}.
+ * Provides persistent storage for {@link Content}.
  *
  * @since 3.0
  */
@@ -32,11 +32,11 @@ public interface RawContentFacet
     extends Facet
 {
   @Nullable
-  RawContent get(String path) throws IOException;
+  Content get(String path) throws IOException;
 
-  void put(String path, RawContent content) throws IOException, InvalidContentException;
+  void put(String path, Payload content) throws IOException, InvalidContentException;
 
-  void updateLastVerified(String path, final DateTime lastUpdated) throws IOException;
+  void setCacheInfo(String path, final CacheInfo cacheInfo) throws IOException;
 
   boolean delete(String path) throws IOException;
 }

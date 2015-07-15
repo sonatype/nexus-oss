@@ -87,7 +87,7 @@ Ext.define('NX.coreui.controller.Roles', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRelatedStores
+          refresh: me.loadStores
         }
       },
       store: {
@@ -100,7 +100,7 @@ Ext.define('NX.coreui.controller.Roles', {
       },
       component: {
         'nx-coreui-role-list': {
-          beforerender: me.loadRelatedStores
+          beforerender: me.loadStores
         },
         'nx-coreui-role-list menuitem[action=newrole]': {
           click: me.showAddWindowRole
@@ -155,21 +155,6 @@ Ext.define('NX.coreui.controller.Roles', {
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(1, NX.I18n.get('Roles_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-role-add', { source: menuItem.source }));
-  },
-
-  /**
-   * @private
-   * (Re)load related stores.
-   */
-  loadRelatedStores: function() {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.getStore('RoleSource').load();
-      me.getStore('Privilege').load();
-      me.getSettings().down('#roles').getStore().load();
-    }
   },
 
   /**

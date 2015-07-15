@@ -37,7 +37,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Browse_BrowseRepositoryList_Name_Column: 'Name',
     Browse_BrowseRepositoryList_Type_Column: 'Type',
     Browse_BrowseRepositoryList_Format_Column: 'Format',
-    Browse_BrowseRepositoryList_EmptyText_View: 'No repositories defined',
+    Browse_BrowseRepositoryList_EmptyText_View: 'No browseable repositories defined',
     Browse_BrowseRepositoryList_EmptyText_Filter: 'No repositories matched "$filter"',
     Browse_BrowseResultList_Name_Column: 'Name',
     Browse_BrowseResultList_Name_Column_Unattached: '-- Unattached assets --',
@@ -102,9 +102,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     HealthCheckSearch_Security_Header: 'Security',
     HealthCheckSearch_License_Header: 'License',
     HealthCheckSearch_Disabled_Tooltip: 'The age and popularity data is only available once Repository Health Check (RHC) has been enabled.',
-    HealthCheckSearch_Error_Tooltip: 'Error retrieving data from Sonatype CLM',
+    HealthCheckSearch_Error_Tooltip: 'Error retrieving component data',
     HealthCheckSearch_Quota_Tooltip: 'The query limit for age and popularity data has been reached. Contact Sonatype support to extend current quota limits.',
-    HealthCheckSearch_Unavailable_Tooltip: 'CLM data is not available for this component.<br/>Internal components are not covered in Sonatype CLM.',
+    HealthCheckSearch_Unavailable_Tooltip: 'No data available for this component',
     Component_AssetInfo_Info_Title: 'Info',
 
     // Browse -> Search -> Raw
@@ -174,7 +174,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Repository_Facet_ProxyFacet_Blocked_FieldLabel: 'Blocked',
     Repository_Facet_ProxyFacet_Blocked_HelpText: 'Block outbound connections on the repository',
     Repository_RepositorySettingsForm_Name_FieldLabel: 'Name',
+    Repository_RepositorySettingsForm_Name_HelpText: 'An identifier used during the construction of the repository URL',
     Repository_RepositorySettingsForm_URL_FieldLabel: 'URL',
+    Repository_RepositorySettingsForm_URL_HelpText: 'The URL used to access this repository',
     Repository_Facet_GroupFacet_Members_FieldLabel: 'Member repositories',
     Repository_Facet_GroupFacet_Members_HelpText: 'Select and order the repositories that are part of this group',
     Repository_Facet_GroupFacet_Members_FromTitle: 'Available',
@@ -197,7 +199,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Maven2Facet_VersionPolicy_ReleaseItem: 'Release',
     Maven2Facet_VersionPolicy_SnapshotItem: 'Snapshot',
     Repository_RepositorySettingsForm_Format_FieldLabel: 'Format',
+    Repository_RepositorySettingsForm_Format_HelpText: 'The format chosen as the recipe for this repository',
     Repository_RepositorySettingsForm_Type_FieldLabel: 'Type',
+    Repository_RepositorySettingsForm_Type_HelpText: 'The type of repository (i.e. group, hosted, or proxy)',
     Repository_RepositorySettingsForm_Online_FieldLabel: 'Online',
     Repository_RepositorySettingsForm_Online_HelpText: 'If checked, the repository accepts incoming requests',
     Repository_Facet_ProxyFacet_ArtifactAge_FieldLabel: 'Maximum artifact age',
@@ -207,7 +211,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Repository_Facet_HttpClientFacet_ConnectionTimeout_FieldLabel: 'Connection timeout',
     Repository_Facet_HttpClientFacet_ConnectionTimeout_HelpText: 'Seconds to wait for activity before stopping and retrying the connection. Leave blank to use the globally defined HTTP timeout.',
     Repository_Facet_StorageFacet_BlobStore_FieldLabel: 'Blobstore',
-    Repository_Facet_StorageFacet_BlobStore_HelpText: 'Blobstore to be used to store asset contents.',
+    Repository_Facet_StorageFacet_BlobStore_HelpText: 'Blobstore used to store asset contents',
     Repository_Facet_StorageFacet_BlobStore_EmptyText: 'Select a blobstore',
     Repository_Facet_StorageFacet_ContentTypeValidation_FieldLabel: 'Strict Content Type Validation',
     Repository_Facet_NegativeCacheFacet_Enabled_FieldLabel: 'Not found cache enabled',
@@ -901,4 +905,3 @@ Ext.define('NX.coreui.app.PluginStrings', {
 }, function(obj) {
   NX.I18n.register(obj.keys);
 });
-

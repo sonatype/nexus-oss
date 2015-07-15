@@ -35,12 +35,18 @@
   </properties>
 
   <dependencies>
+    <!--
+    SiestaJS test driver
+    -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-siestajs-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
 
+    <!--
+    Base template bundle to be tested
+    -->
     <dependency>
       <groupId>${it.nexus.bundle.groupId}</groupId>
       <artifactId>${it.nexus.bundle.artifactId}</artifactId>
@@ -49,6 +55,9 @@
       <scope>test</scope>
     </dependency>
 
+    <!--
+    Additional plugins on top of the base template
+    -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-repository</artifactId>
@@ -101,6 +110,45 @@
             </fileset>
           </filesets>
         </configuration>
+      </plugin>
+
+      <!--
+      Unpack shared test-data
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <outputDirectory>${project.build.directory}/it-resources</outputDirectory>
+          <excludes>META-INF/**</excludes>
+          <artifactItems>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-maven-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-nuget-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-raw-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-ssl-test-data</artifactId>
+            </item>
+          </artifactItems>
+        </configuration>
+        <executions>
+          <execution>
+            <id>unpack-test-data</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <!--

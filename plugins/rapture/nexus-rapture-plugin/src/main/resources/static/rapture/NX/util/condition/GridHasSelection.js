@@ -36,9 +36,13 @@ Ext.define('NX.util.condition.GridHasSelection', {
    */
   fn: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.GridHasSelection}
+   */
   bind: function () {
     var me = this,
-        components = {}, queryResult;
+        components = {};
 
     if (!me.bounded) {
       components[me.grid] = {
@@ -54,6 +58,9 @@ Ext.define('NX.util.condition.GridHasSelection', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function (cmp, selection) {
     var me = this,
         satisfied = false;
@@ -69,9 +76,12 @@ Ext.define('NX.util.condition.GridHasSelection', {
     }
   },
 
+  /**
+   * @override
+   * @returns {String}
+   */
   toString: function () {
-    var me = this;
-    return me.self.getName() + '{ grid=' + me.grid + ' }';
+    return this.self.getName() + '{ grid=' + this.grid + ' }';
   }
 
 });
