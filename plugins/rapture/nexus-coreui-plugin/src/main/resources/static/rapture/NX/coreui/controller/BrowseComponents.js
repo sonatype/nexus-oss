@@ -27,8 +27,8 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
   ],
   masters: [
     'nx-coreui-browsecomponentfeature nx-coreui-browse-repository-list',
-    'nx-coreui-browse-component-list',
-    'nx-coreui-component-asset-list'
+    'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list',
+    'nx-coreui-browsecomponentfeature nx-coreui-component-asset-list'
   ],
   stores: [
     'Component',
@@ -46,13 +46,14 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
 
   refs: [
     {ref: 'feature', selector: 'nx-coreui-browsecomponentfeature'},
+    {ref: 'repositoryList', selector: 'nx-coreui-browsecomponentfeature nx-coreui-browse-repository-list'},
     {ref: 'componentList', selector: 'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list'},
+    {ref: 'assetList', selector: 'nx-coreui-browsecomponentfeature nx-coreui-component-asset-list'},
     {ref: 'componentDetails', selector: 'nx-coreui-browsecomponentfeature nx-coreui-component-details'},
-    {ref: 'assets', selector: 'nx-coreui-browsecomponentfeature nx-coreui-component-asset-list'},
     {ref: 'componentFilter', selector: 'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list #filter'}
   ],
 
-  features:     {
+  features: {
     mode: 'browse',
     path: '/Browse/Components',
     text: NX.I18n.get('Browse_Components_Title_Feature'),
@@ -163,15 +164,25 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
     var me = this;
 
     me.getComponentDetails().setComponentModel(model);
-    me.getAssets().setComponentModel(model);
+    me.getAssetList().setComponentModel(model);
   },
 
   /**
    * @override
-   * Load all of the stores associated with this controller
+   * Load all of the stores associated with this controller.
    */
   loadStores: function() {
-    this.getStore('Repository').load();
+    if (this.getFeature()) {
+      if (this.currentIndex === 0) {
+        this.getRepositoryList().getStore().load();
+      }
+      if (this.currentIndex === 1) {
+        this.getComponentList().getStore().load();
+      }
+      if (this.currentIndex === 2) {
+        this.getAssetList().getStore().load();
+      }
+    }
   },
 
   /**
