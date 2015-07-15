@@ -434,6 +434,8 @@ Ext.define('NX.coreui.controller.Search', {
         store = me.getStore('SearchResult'),
         filter = searchCriteria.filter;
 
+    me.getSearchResult().getSelectionModel().deselectAll();
+
     if (filter && Ext.isFunction(filter) && !(filter instanceof Ext.util.Filter)) {
       filter = searchCriteria.filter();
     }
@@ -583,6 +585,7 @@ Ext.define('NX.coreui.controller.Search', {
       }
     }
     else {
+      me.showChild(0, true);
       searchFeature.down('#criteria component[criteriaId=keyword]').setValue(searchValue);
     }
   }
