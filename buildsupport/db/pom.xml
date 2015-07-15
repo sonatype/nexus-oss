@@ -97,6 +97,19 @@
 
       <dependency>
         <groupId>com.orientechnologies</groupId>
+        <artifactId>orientdb-distributed</artifactId>
+        <version>${orientdb.version}</version>
+        <exclusions>
+          <!-- This is presently a scope=runtime dependency, but should be scope=test -->
+          <exclusion>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-graphdb</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-client</artifactId>
         <version>${orientdb.version}</version>
       </dependency>
