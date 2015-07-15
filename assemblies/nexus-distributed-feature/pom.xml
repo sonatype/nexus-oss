@@ -24,77 +24,87 @@
 
   <artifactId>nexus-distributed-feature</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>pom</packaging>
+  <packaging>feature</packaging>
 
   <dependencies>
     <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jta_1.1_spec</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.karaf.cellar</groupId>
-      <artifactId>apache-karaf-cellar</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
+      <artifactId>org.apache.karaf.cellar.core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.cellar</groupId>
+      <artifactId>org.apache.karaf.cellar.utils</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.cellar</groupId>
+      <artifactId>org.apache.karaf.cellar.hazelcast</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.cellar</groupId>
+      <artifactId>org.apache.karaf.cellar.shell</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.cellar</groupId>
+      <artifactId>org.apache.karaf.cellar.config</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.cellar</groupId>
+      <artifactId>org.apache.karaf.cellar.bundle</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.cellar</groupId>
+      <artifactId>org.apache.karaf.cellar.features</artifactId>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>gmaven-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-dependencies</id>
-            <phase>prepare-package</phase>
+            <id>mvn-coordinates</id>
+            <phase>initialize</phase>
             <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>configure-assembly</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>run</goal>
+              <goal>execute</goal>
             </goals>
             <configuration>
-              <target>
-                <replace file="${project.build.directory}/dependency/apache-karaf-cellar-3.0.3-features.xml">
-                  <replacefilter token="3.4.2" value="3.3.5"/>
-                  <replacefilter token="mvn:org.apache.karaf.cellar/org.apache.karaf.cellar.hazelcast/3.0.3"
-                                 value='wrap:mvn:org.apache.karaf.cellar/org.apache.karaf.cellar.hazelcast/3.0.3$overwrite=merge&amp;amp;Import-Package=com.hazelcast.*;version="[3.3,4)",*'/>
-                </replace>
-              </target>
+              <source>
+                project.artifactMap.each{k,v->
+                  // add 'mvn:artifactId' properties representing Pax-URL path for each transitive artifact
+                  project.properties['mvn:'+v.artifactId]='mvn:'+v.groupId+'/'+v.artifactId+'/'+v.version
+                }
+              </source>
             </configuration>
           </execution>
         </executions>
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-artifact</id>
-            <phase>package</phase>
-            <goals>
-              <goal>attach-artifact</goal>
-            </goals>
-            <configuration>
-              <artifacts>
-                <artifact>
-                  <file>target/dependency/apache-karaf-cellar-3.0.3-features.xml</file>
-                  <type>xml</type>
-                  <classifier>features</classifier>
-                </artifact>
-              </artifacts>
-            </configuration>
-          </execution>
-        </executions>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
+        <configuration>
+          <excludedArtifactIds combine.children="append">
+            <!--
+            Need special wrapping/fragments
+            -->
+            <id>org.apache.karaf.cellar.hazelcast</id>
+          </excludedArtifactIds>
+        </configuration>
       </plugin>
     </plugins>
   </build>
+
 </project>

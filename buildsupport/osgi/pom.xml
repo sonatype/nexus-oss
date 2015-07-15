@@ -31,7 +31,7 @@
     <osgi-spec.version>4.3.1</osgi-spec.version>
     <felix.version>4.4.0</felix.version>
     <karaf.version>3.0.4</karaf.version>
-    <karaf-cellar.version>3.0.3</karaf-cellar.version>
+    <cellar.version>3.0.3</cellar.version>
   </properties>
 
   <dependencyManagement>
@@ -114,10 +114,56 @@
 
       <dependency>
         <groupId>org.apache.karaf.cellar</groupId>
-        <artifactId>apache-karaf-cellar</artifactId>
-        <classifier>features</classifier>
-        <type>xml</type>
-        <version>${karaf-cellar.version}</version>
+        <artifactId>org.apache.karaf.cellar.core</artifactId>
+        <version>${cellar.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.karaf.cellar</groupId>
+        <artifactId>org.apache.karaf.cellar.utils</artifactId>
+        <version>${cellar.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.karaf.cellar</groupId>
+        <artifactId>org.apache.karaf.cellar.hazelcast</artifactId>
+        <version>${cellar.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.karaf.cellar</groupId>
+        <artifactId>org.apache.karaf.cellar.shell</artifactId>
+        <version>${cellar.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.karaf.cellar</groupId>
+        <artifactId>org.apache.karaf.cellar.config</artifactId>
+        <version>${cellar.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.karaf.cellar</groupId>
+        <artifactId>org.apache.karaf.cellar.bundle</artifactId>
+        <version>${cellar.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.karaf.cellar</groupId>
+        <artifactId>org.apache.karaf.cellar.features</artifactId>
+        <version>${cellar.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jta_1.1_spec</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.hazelcast</groupId>
+        <artifactId>hazelcast</artifactId>
+        <version>3.3.5</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

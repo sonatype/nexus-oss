@@ -340,12 +340,11 @@
             <feature>config</feature>
             <feature>standard</feature>
             <feature>package</feature>
-            <feature>cellar</feature>
             <feature>nexus-boot-feature</feature>
           </bootFeatures>
           <installedFeatures>
             <feature>management</feature>
-            <feature>cellar</feature>
+            <feature>nexus-distributed-feature</feature>
             <feature>nexus-oss-edition</feature>
             <feature>nexus-webresources-plugin</feature>
             <feature>nexus-quartz-plugin</feature>
