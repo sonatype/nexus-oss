@@ -43,10 +43,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * group logic too.
  */
 @ExamReactorStrategy(PerClass.class)
-public class MavenMetadataSwarmIT
+public class MavenMetadataMixedSwarmIT
     extends MavenHotspotITSupport
 {
-  private static final String METADATA_PATH = "groupId/maven-metadata.xml";
+  private static final String METADATA_PATH = "org/sonatype/nexus/test/maven-metadata.xml";
 
   private Metadata metadata;
 

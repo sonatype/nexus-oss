@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.http.HttpMethods;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
+import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.concurrency.generators.GeneratorBehaviour;
 import org.sonatype.nexus.testsuite.maven.concurrency.generators.XmlGenerator;
@@ -99,16 +100,22 @@ public class MavenProxySwarmIT
       clients.add(new UriGet(repositoryClient, path));
     }
 
-    assertAllHttpResponseIs2xx(performSwarm(clients));
-
     // depending on concurrency 1+ clients will go remotely (we use no locking)
+    assertAllHttpResponseIs2xx(performSwarm(clients));
     assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(greaterThanOrEqualTo(1)));
     pathRecorderBehaviour.clear();
 
-    assertAllHttpResponseIs2xx(performSwarm(clients));
-
     // warmed cache, no remote fetch should happen anymore
+    assertAllHttpResponseIs2xx(performSwarm(clients));
     assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(equalTo(0)));
+    pathRecorderBehaviour.clear();
+
+    repository.facet(ProxyFacet.class).invalidateProxyCaches();
+
+    // invalidated cache, back to initial assertion
+    assertAllHttpResponseIs2xx(performSwarm(clients));
+    assertThat(pathRecorderBehaviour.getPathsForVerb(HttpMethods.GET), hasSize(greaterThanOrEqualTo(1)));
+    pathRecorderBehaviour.clear();
   }
 
   @Test
