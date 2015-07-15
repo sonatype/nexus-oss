@@ -125,7 +125,7 @@ Ext.define('NX.coreui.controller.Search', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.onRefresh
+          refresh: me.loadStores
         }
       },
       component: {
@@ -399,7 +399,7 @@ Ext.define('NX.coreui.controller.Search', {
 
     searchCriteriaPanel.remove(searchCriteria);
     searchCriteriaPanel.down('menuitem[criteriaId=' + searchCriteria.criteriaId + ']').enable();
-    me.applyFilter({ criteriaId: searchCriteria.criteriaId }, true);
+    this.applyFilter({ criteriaId: searchCriteria.criteriaId }, true);
   },
 
   /**
@@ -412,10 +412,10 @@ Ext.define('NX.coreui.controller.Search', {
   },
 
   /**
-   * @private
+   * @override
    * Search on refresh.
    */
-  onRefresh: function() {
+  loadStores: function() {
     var me = this;
 
     if (me.getFeature()) {
@@ -433,6 +433,8 @@ Ext.define('NX.coreui.controller.Search', {
     var me = this,
         store = me.getStore('SearchResult'),
         filter = searchCriteria.filter;
+
+    me.getSearchResult().getSelectionModel().deselectAll();
 
     if (filter && Ext.isFunction(filter) && !(filter instanceof Ext.util.Filter)) {
       filter = searchCriteria.filter();
@@ -583,6 +585,7 @@ Ext.define('NX.coreui.controller.Search', {
       }
     }
     else {
+      me.showChild(0, true);
       searchFeature.down('#criteria component[criteriaId=keyword]').setValue(searchValue);
     }
   }
