@@ -583,6 +583,7 @@ Ext.define('NX.coreui.controller.Search', {
       }
     }
     else {
+      me.showChild(0, true);
       searchFeature.down('#criteria component[criteriaId=keyword]').setValue(searchValue);
     }
   }
