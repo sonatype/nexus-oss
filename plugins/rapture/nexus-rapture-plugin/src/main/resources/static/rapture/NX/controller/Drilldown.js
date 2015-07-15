@@ -159,8 +159,10 @@ Ext.define('NX.controller.Drilldown', {
    * Load all of the stores associated with this controller
    */
   loadStores: function () {
-    for (var i = 0; i < this.stores.length; ++i) {
-      this.getStore(this.stores[i]).load();
+    if (this.getFeature()) {
+      for (var i = 0; i < this.stores.length; ++i) {
+        this.getStore(this.stores[i]).load();
+      }
     }
   },
 
