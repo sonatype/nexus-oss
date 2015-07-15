@@ -83,7 +83,7 @@ public class RawContentFacetImpl
     final Asset asset = tx.firstAsset(component);
     final Blob blob = tx.requireBlob(asset.requireBlobRef());
 
-    return marshall(asset, blob);
+    return toContent(asset, blob);
   }
 
   @Override
@@ -129,7 +129,7 @@ public class RawContentFacetImpl
         .setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(asset);
 
-    return marshall(asset, assetBlob.getBlob());
+    return toContent(asset, assetBlob.getBlob());
   }
 
   private String getGroup(String path) {
@@ -192,7 +192,7 @@ public class RawContentFacetImpl
     return tx.findComponentWithProperty(property, path, bucket);
   }
 
-  private Content marshall(final Asset asset, final Blob blob) {
+  private Content toContent(final Asset asset, final Blob blob) {
     final Content content = new Content(new BlobPayload(blob, asset.requireContentType()));
     Content.extractFromAsset(asset, hashAlgorithms, content.getAttributes());
     return content;

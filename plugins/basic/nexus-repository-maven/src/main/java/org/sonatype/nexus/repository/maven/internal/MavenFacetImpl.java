@@ -160,11 +160,6 @@ public class MavenFacetImpl
     if (asset == null) {
       return null;
     }
-    return toContent(asset);
-  }
-
-  private Content toContent(final Asset asset) {
-    final StorageTx tx = UnitOfWork.currentTransaction();
     final Blob blob = tx.requireBlob(asset.requireBlobRef());
     return toContent(asset, blob);
   }

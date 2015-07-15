@@ -291,7 +291,6 @@ public abstract class ProxyFacetSupport
 
     // Note: content w/o CacheInfo was not stored by ProxyFacetSupport, see fetch(String, Context, Content)
     final CacheInfo cacheInfo = content.getAttributes().require(CacheInfo.class);
-    ;
     if (cacheToken != null && !cacheToken.equals(cacheInfo.getCacheToken())) {
       log.debug("Content expired (cacheToken)");
       return true;
