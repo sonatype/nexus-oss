@@ -67,6 +67,16 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+
+    <!--
+    HACK: Include orientdb studio plugin.
+    -->
+    <fileSet>
+      <directory>${project.build.directory}/orient-plugins</directory>
+      <outputDirectory>sonatype-work/nexus/orient/plugins</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
   </fileSets>
 
 </assembly>
