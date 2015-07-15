@@ -120,9 +120,18 @@ public class Maven2GroupFacet
     if (content == null) {
       return null;
     }
-    return cacheMetadata(mavenPath, content);
+    cacheMetadata(mavenPath, content);
+    return content; // content is reusable, so just return it
   }
 
+  /**
+   * Merges the contents of passed in metadata and returns the {@link Content} of the resulting merge. The content
+   * returned by this method is kept in memory, is reusable and should be passed back to caller as is.
+   *
+   * @return {@code null} if no merge possible for various reasons (ie. corrupted metadata). If non-null is returned,
+   * the {@link Content} contains merged metadata and is reusable.
+   */
+  @Nullable
   private Content mergeMetadata(final MavenPath mavenPath,
                                 final LinkedHashMap<Repository, Content> metadataContents) throws IOException
   {
@@ -164,7 +173,10 @@ public class Maven2GroupFacet
     return content;
   }
 
-  private Content cacheMetadata(final MavenPath mavenPath, final Content content) throws IOException {
+  /**
+   * Caches the merged metadata and it's Maven2 format required sha1/md5 hashes along.
+   */
+  private void cacheMetadata(final MavenPath mavenPath, final Content content) throws IOException {
     final Map<HashAlgorithm, HashCode> hashCodes = content.getAttributes().require(
         Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
     final DateTime now = content.getAttributes().require(Content.CONTENT_LAST_MODIFIED, DateTime.class);
@@ -179,8 +191,6 @@ public class Maven2GroupFacet
         mavenFacet.put(mavenPath.hash(hashType), hashContent);
       }
     }
-    // reload it from cache
-    return mavenFacet.get(mavenPath);
   }
 
   @Subscribe
