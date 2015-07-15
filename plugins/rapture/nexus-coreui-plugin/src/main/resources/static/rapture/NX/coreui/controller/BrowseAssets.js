@@ -112,7 +112,7 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
     // Figure out what kind of list we’re dealing with
     modelType = model.id.replace(/^.*?model\./, '').replace(/\-.*$/, '');
 
-    if (modelType == "RepositoryReference") {
+    if (modelType === "RepositoryReference") {
       me.onRepositorySelection(model);
     }
   },
