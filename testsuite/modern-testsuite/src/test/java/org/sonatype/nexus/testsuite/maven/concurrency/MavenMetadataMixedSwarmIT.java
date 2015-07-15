@@ -38,8 +38,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Maven metadata swarm: multiple clients asking via group, while others are deploying the SAME artifact into a hosted
- * repository, and there is a proxy involved too. In difference to {@link MavenMixedSwarmIT}, this one excercises
+ * Maven metadata swarm: multiple clients asking via group, while others are deploying the SAME metadata into a hosted
+ * repository, and there is a proxy involved too. In difference to {@link MavenMixedSwarmIT}, this one exercises
  * group logic too.
  */
 @ExamReactorStrategy(PerClass.class)
