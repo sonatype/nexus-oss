@@ -271,7 +271,7 @@ Ext.define('NX.coreui.controller.Search', {
     // Extract the filter object from the URI
     if (bookmarkSegments && bookmarkSegments.length) {
       queryIndex = bookmarkSegments[0].indexOf('=');
-      if (queryIndex != -1) {
+      if (queryIndex !== -1) {
         filterSegments = decodeURIComponent(bookmarkSegments[0].slice(queryIndex + 1)).split(' AND ');
         for (var i = 0; i < filterSegments.length; ++i) {
           pair = filterSegments[i].split('=');
@@ -551,8 +551,8 @@ Ext.define('NX.coreui.controller.Search', {
 
     // Remove any pre-existing query string
     firstSegment = NX.Bookmarks.getBookmark().getSegment(0);
-    if (firstSegment.indexOf('=') != -1) {
-      firstSegment = firstSegment.slice(0, firstSegment.indexOf('='))
+    if (firstSegment.indexOf('=') !== -1) {
+      firstSegment = firstSegment.slice(0, firstSegment.indexOf('='));
     }
 
     // Add each criteria to the filter object
