@@ -120,7 +120,8 @@ public class Maven2GroupFacet
     if (content == null) {
       return null;
     }
-    return cacheMetadata(mavenPath, content);
+    cacheMetadata(mavenPath, content);
+    return content;
   }
 
   private Content mergeMetadata(final MavenPath mavenPath,
@@ -164,7 +165,7 @@ public class Maven2GroupFacet
     return content;
   }
 
-  private Content cacheMetadata(final MavenPath mavenPath, final Content content) throws IOException {
+  private void cacheMetadata(final MavenPath mavenPath, final Content content) throws IOException {
     final Map<HashAlgorithm, HashCode> hashCodes = content.getAttributes().require(
         Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
     final DateTime now = content.getAttributes().require(Content.CONTENT_LAST_MODIFIED, DateTime.class);
@@ -179,8 +180,6 @@ public class Maven2GroupFacet
         mavenFacet.put(mavenPath.hash(hashType), hashContent);
       }
     }
-    // reload it from cache
-    return mavenFacet.get(mavenPath);
   }
 
   @Subscribe
