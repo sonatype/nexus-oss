@@ -159,10 +159,14 @@ Ext.define('NX.controller.Drilldown', {
    * Load all of the stores associated with this controller
    */
   loadStores: function () {
+    var me = this;
     if (this.getFeature()) {
-      for (var i = 0; i < this.stores.length; ++i) {
-        this.getStore(this.stores[i]).load();
-      }
+      Ext.each(this.stores, function(store){
+        //<if debug>
+        me.logDebug('Loading Drilldown store: ', store);
+        //</if>
+        me.getStore(store).load();
+      });
     }
   },
 
