@@ -106,6 +106,14 @@
         <artifactId>orientdb-jdbc</artifactId>
         <version>${orientdb.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>com.orientechnologies</groupId>
+        <artifactId>orientdb-community</artifactId>
+        <classifier>distribution</classifier>
+        <type>zip</type>
+        <version>${orientdb.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
