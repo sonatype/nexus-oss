@@ -42,15 +42,18 @@ public class Maven2GroupMetadataHandler
   {
     final MavenPath mavenPath = context.getAttributes().require(MavenPath.class);
     final Maven2GroupFacet groupFacet = context.getRepository().facet(Maven2GroupFacet.class);
+    log.trace("Incoming request for metadata {} : {}", context.getRepository().getName(), mavenPath.getPath());
     // get cached one
     Content content = groupFacet.getCachedMergedMetadata(mavenPath);
     if (content != null) {
+      log.trace("Serving cached merged metadata {} : {}", context.getRepository().getName(), mavenPath.getPath());
       return HttpResponses.ok(content);
     }
 
     // not have it, let's figure out
     if (mavenPath.isHash()) {
       // hash will be available if corresponding metadata fetched. out of bound request?
+      log.trace("Outbound request for metadata hash {} : {}", context.getRepository().getName(), mavenPath.getPath());
       return HttpResponses.notFound();
     }
     else {
@@ -59,8 +62,10 @@ public class Maven2GroupMetadataHandler
           getAll(context.getRequest(), groupFacet.members(), dispatched);
       content = groupFacet.mergeAndCacheMetadata(mavenPath, responses);
       if (content != null) {
+        log.trace("Metadata merged {} : {}", context.getRepository().getName(), mavenPath.getPath());
         return HttpResponses.ok(content);
       }
+      log.trace("Not found metadata to merge {} : {}", context.getRepository().getName(), mavenPath.getPath());
       return HttpResponses.notFound();
     }
   }
