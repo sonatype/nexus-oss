@@ -32,7 +32,6 @@ import org.sonatype.nexus.repository.view.Response
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
-import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import org.sonatype.nexus.repository.view.matchers.ActionMatcher
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher
@@ -65,9 +64,6 @@ class DockerHostedRecipe
   Provider<ConnectorFacetImpl> connectorFacet
 
   @Inject
-  ExceptionHandler exceptionHandler
-
-  @Inject
   TimingHandler timingHandler
 
   @Inject
@@ -80,13 +76,16 @@ class DockerHostedRecipe
   ImagesHandler imagesHandler
 
   @Inject
-  TagsHandler tagsHandler
+  DockerExceptionHandler exceptionHandler
 
   @Inject
   V1Users v1Users
 
   @Inject
   V1Index v1Index
+
+  @Inject
+  V1Tags v1Tags
 
   @Inject
   DockerHostedRecipe(@Named(HostedType.NAME) final Type type,
@@ -154,9 +153,16 @@ class DockerHostedRecipe
         .handler(v1Index.addRepository.rcurry(false))
         .create())
 
-    builder.route(new Route.Builder()
-        .matcher(new TokenMatcher('/v1/repositories/{namespace}/{repository}/tags/{tag:.+}'))
-        .handler(tagsHandler)
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(PUT),
+            LogicMatchers.or(
+                new TokenMatcher('/v1/repositories/{namespace}/{repository}/tags/{tag}'),
+                new TokenMatcher('/v1/repositories/{repository}/tags/{tag}')
+            )
+        ))
+        .handler(exceptionHandler)
+        .handler(v1Tags.addTag)
         .create())
 
     builder.route(new Route.Builder()
