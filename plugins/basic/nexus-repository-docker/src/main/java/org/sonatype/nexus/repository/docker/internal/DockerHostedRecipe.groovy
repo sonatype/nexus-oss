@@ -77,12 +77,6 @@ class DockerHostedRecipe
   DiagnoseHandler diagnoseHandler
 
   @Inject
-  RepositoriesHandler repositoriesHandler
-
-  @Inject
-  EndpointHandler endpointHandler
-
-  @Inject
   ImagesHandler imagesHandler
 
   @Inject
@@ -90,6 +84,9 @@ class DockerHostedRecipe
 
   @Inject
   V1Users v1Users
+
+  @Inject
+  V1Index v1Index
 
   @Inject
   DockerHostedRecipe(@Named(HostedType.NAME) final Type type,
@@ -111,35 +108,55 @@ class DockerHostedRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    builder.route(new Route.Builder()
-        .matcher(LogicMatchers.and(new ActionMatcher(GET), LogicMatchers.or(new LiteralMatcher('/v1/users'), new LiteralMatcher('/v1/users/'))))
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(GET),
+            LogicMatchers.or(new LiteralMatcher('/v1/users'), new LiteralMatcher('/v1/users/'))
+        ))
         .handler(handler(v1Users.getUsers))
         .create())
 
-    builder.route(new Route.Builder()
-        .matcher(LogicMatchers.and(new ActionMatcher(POST), LogicMatchers.or(new LiteralMatcher('/v1/users'), new LiteralMatcher('/v1/users/'))))
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(POST),
+            LogicMatchers.or(new LiteralMatcher('/v1/users'), new LiteralMatcher('/v1/users/'))
+        ))
         .handler(handler(v1Users.createUser))
         .create())
 
-    builder.route(new Route.Builder()
-        .matcher(LogicMatchers.and(new ActionMatcher(PUT), new TokenMatcher('/v1/users/{username}')))
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(PUT),
+            new TokenMatcher('/v1/users/{username}')
+        ))
         .handler(handler(v1Users.updateUser))
+        .create())
+
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(PUT),
+            LogicMatchers.or(
+                new TokenMatcher('/v1/repositories/{namespace}/{repository}/images'),
+                new TokenMatcher('/v1/repositories/{repository}/images')
+            )
+        ))
+        .handler(v1Index.addRepository.rcurry(true))
+        .create())
+
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(PUT),
+            LogicMatchers.or(
+                new TokenMatcher('/v1/repositories/{namespace}/{repository}/'),
+                new TokenMatcher('/v1/repositories/{repository}/')
+            )
+        ))
+        .handler(v1Index.addRepository.rcurry(false))
         .create())
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher('/v1/repositories/{namespace}/{repository}/tags/{tag:.+}'))
         .handler(tagsHandler)
-        .create())
-
-    builder.route(new Route.Builder()
-        .matcher(new TokenMatcher('/v1/repositories/{namespace}/{repository}/images'))
-        .handler(repositoriesHandler)
-        .create())
-
-    builder.route(new Route.Builder()
-        .matcher(new TokenMatcher('/v1/repositories/{namespace}/{repository}/'))
-        .handler(endpointHandler)
-        .handler(repositoriesHandler)
         .create())
 
     builder.route(new Route.Builder()

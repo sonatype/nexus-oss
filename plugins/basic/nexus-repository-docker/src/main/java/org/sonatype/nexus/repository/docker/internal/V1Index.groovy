@@ -10,32 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.docker.internal;
+package org.sonatype.nexus.repository.docker.internal
 
-import javax.annotation.Nonnull;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import javax.inject.Named
+import javax.inject.Singleton
 
-import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.repository.http.HttpResponses
+import org.sonatype.nexus.repository.view.Context
+import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
+import org.sonatype.sisu.goodies.common.ComponentSupport
 
 /**
  * @since 3.0
  */
 @Named
 @Singleton
-public class EndpointHandler
+class V1Index
     extends ComponentSupport
-    implements Handler
 {
-  @Nonnull
-  @Override
-  public Response handle(final @Nonnull Context context) throws Exception {
-    Response response = context.proceed();
-    response.getHeaders().set("X-Docker-Endpoints", "192.168.1.105:18081");
-    return response;
+
+  Closure addRepository = { Context context, boolean images ->
+    def state = context.attributes.require(TokenMatcher.State)
+    log.info 'PUT tokens: {}', state.tokens
+    def response = images ? HttpResponses.noContent() : HttpResponses.ok()
+    // FIXME endpoints value
+    response.headers.set('X-Docker-Endpoints', '192.168.1.105:18081');
+    return response
   }
 
 }
