@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.joda.time.DateTime;
