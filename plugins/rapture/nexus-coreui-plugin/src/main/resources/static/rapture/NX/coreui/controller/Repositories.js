@@ -114,7 +114,6 @@ Ext.define('NX.coreui.controller.Repositories', {
       },
       component: {
         'nx-coreui-repository-list': {
-          beforerender: me.loadStores,
           afterrender: me.startStatusPolling,
           beforedestroy: me.stopStatusPolling
         },
