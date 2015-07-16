@@ -101,6 +101,13 @@ Ext.define('NX.controller.dev.Logging', {
           change: function (checkbox) {
             sink('remote').setEnabled(checkbox.getValue());
           }
+        },
+
+        'nx-dev-logging button[action=dump]': {
+          click: function (button) {
+            //encode selected rows as JSON and dump to log, intended to facilitate sharing log info (i.e. bug reports)
+            me.logDebug(Ext.encode(Ext.Array.pluck(this.getPanel().getSelectionModel().getSelection(), 'data')));
+          }
         }
       }
     });
