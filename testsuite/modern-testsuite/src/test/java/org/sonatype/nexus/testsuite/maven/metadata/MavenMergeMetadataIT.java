@@ -25,7 +25,6 @@ import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.apache.http.HttpResponse;
@@ -47,7 +46,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Metadata rebuild IT.
+ * Metadata change detection IT.
  */
 @ExamReactorStrategy(PerClass.class)
 public class MavenMergeMetadataIT
