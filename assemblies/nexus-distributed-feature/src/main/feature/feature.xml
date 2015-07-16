@@ -17,6 +17,6 @@
     <!--
     Re-wrap these bundles to fix exports/imports
     -->
-    <bundle>wrap:${mvn:org.apache.karaf.cellar.hazelcast}$overwrite=merge&amp;Import-Package=*</bundle>
+    <!--bundle>wrap:${mvn:org.apache.karaf.cellar.hazelcast}$overwrite=merge&amp;Import-Package=*</bundle-->
   </feature>
 </features>
