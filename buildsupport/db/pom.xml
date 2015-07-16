@@ -28,7 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <orientdb.version>2.1-rc5</orientdb.version>
+    <orientdb.version>2.1-SNAPSHOT</orientdb.version>
   </properties>
 
   <dependencyManagement>
@@ -99,16 +99,6 @@
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-distributed</artifactId>
         <version>${orientdb.version}</version>
-        <exclusions>
-          <!--
-          HACK: This is presently a scope=runtime dependency, but should be scope=test
-          This should be fixed in > 2.1rc5 ( https://github.com/orientechnologies/orientdb/commit/fd8d2b1df3848281cef32761c1256f56fd95773d )
-          -->
-          <exclusion>
-            <groupId>com.orientechnologies</groupId>
-            <artifactId>orientdb-graphdb</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>

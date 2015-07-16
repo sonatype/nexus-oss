@@ -109,6 +109,7 @@ public class DatabaseServerImpl
 
     // instance startup
     OServer server = new OServer();
+    server.setExtensionClassLoader(getClass().getClassLoader());
     OServerConfiguration config = createConfiguration();
     server.startup(config);
 
@@ -129,7 +130,7 @@ public class DatabaseServerImpl
     this.server = server;
   }
 
-  private OServerConfiguration createConfiguration() {
+  private OServerConfiguration createConfiguration() throws Exception {
     // FIXME: Unsure what this directory us used for
     File homeDir = applicationDirectories.getWorkDirectory("orient");
     System.setProperty("orient.home", homeDir.getPath());
@@ -146,6 +147,19 @@ public class DatabaseServerImpl
     };
 
     config.handlers = new ArrayList<>();
+
+    // configure Hazelcast handler
+    File etcDir = new File(applicationDirectories.getInstallDirectory(), "etc");
+    OServerHandlerConfiguration hazelcastHandler = new OServerHandlerConfiguration();
+    hazelcastHandler.clazz = SharedHazelcastPlugin.class.getName();
+    hazelcastHandler.parameters = new OServerParameterConfiguration[] {
+        new OServerParameterConfiguration("enabled", "true"),
+        // HACK: This is apprently needed, have to understand where/why/how this is used
+        new OServerParameterConfiguration("configuration.db.default", new File(etcDir, "default-distributed-db-config.json").getCanonicalPath()),
+        // HACK: stuff in nodeName to avoid pausing on start, replace with local-node-id
+        new OServerParameterConfiguration("nodeName", String.valueOf(System.nanoTime()))
+    };
+    config.handlers.add(hazelcastHandler);
 
     // configure JMX handler
     OServerHandlerConfiguration jmxHandler = new OServerHandlerConfiguration();
