@@ -230,6 +230,23 @@
       <type>xml</type>
       <scope>runtime</scope>
     </dependency>
+
+    <!--
+    HACK: expose orientdb distribution to extract studio.zip plugin
+    -->
+    <dependency>
+      <groupId>com.orientechnologies</groupId>
+      <artifactId>orientdb-community</artifactId>
+      <classifier>distribution</classifier>
+      <type>zip</type>
+      <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 
   <build>
@@ -314,6 +331,17 @@
                   <replacefilter token="${mvn:pax-logging-service}"
                                  value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-access} = 8${line.separator}${mvn:pax-logging-logback}"/>
                 </replace>
+
+                <!--
+                HACK: extract orientdb studio.zip plugin
+                -->
+                <unzip src="${com.orientechnologies:orientdb-community:zip:distribution}"
+                       dest="${project.build.directory}/orient-plugins">
+                  <mergemapper to="studio.zip"/>
+                  <patternset>
+                    <include name="*/plugins/studio-2.0.zip"/>
+                  </patternset>
+                </unzip>
               </target>
             </configuration>
           </execution>
