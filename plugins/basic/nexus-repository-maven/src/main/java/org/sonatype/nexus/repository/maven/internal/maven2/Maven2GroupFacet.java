@@ -28,6 +28,8 @@ import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.hash.Hashes;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.cache.CacheController;
+import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.group.GroupFacetImpl;
 import org.sonatype.nexus.repository.http.HttpStatus;
@@ -72,6 +74,8 @@ public class Maven2GroupFacet
 
   private MavenFacet mavenFacet;
 
+  private CacheController cacheController;
+
   @Inject
   public Maven2GroupFacet(final RepositoryManager repositoryManager) {
     super(repositoryManager);
@@ -84,12 +88,28 @@ public class Maven2GroupFacet
     this.mavenFacet = facet(MavenFacet.class);
   }
 
+  @Override
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    super.doConfigure(configuration);
+    if (cacheController == null) {
+      cacheController = new CacheController(1440, null);
+    }
+    cacheController.invalidateCache();
+  }
+
   /**
    * Fetches cached metadata if exists, or {@code null}.
    */
   @Nullable
   public Content getCachedMergedMetadata(final MavenPath mavenPath) throws IOException {
-    return mavenFacet.get(mavenPath);
+    final Content cached = mavenFacet.get(mavenPath);
+    if (cached != null) {
+      final CacheInfo cacheInfo = cached.getAttributes().require(CacheInfo.class);
+      if (!cacheController.isStale(cacheInfo)) {
+        return cached;
+      }
+    }
+    return null;
   }
 
   /**
@@ -167,9 +187,10 @@ public class Maven2GroupFacet
             byteArray,
             Maven2MimeRulesSource.METADATA_TYPE
         ));
+    content.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
     content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}");
-    content.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
+    content.getAttributes().set(CacheInfo.class, cacheController.current());
     return content;
   }
 
