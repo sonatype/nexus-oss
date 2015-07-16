@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.repository.cache;
 
-import java.io.IOException;
-
 import javax.annotation.Nullable;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -28,6 +26,10 @@ import org.joda.time.DateTime;
 public class CacheController
     extends ComponentSupport
 {
+  public static String newCacheToken() {
+    return Long.toString(System.nanoTime());
+  }
+
   private final int contentMaxAgeMinutes;
 
   private volatile String cacheToken;
@@ -37,15 +39,26 @@ public class CacheController
     this.cacheToken = cacheToken;
   }
 
+  /**
+   * After invoking this method, all {@link #isStale(CacheInfo)} checks will return true that has {@link CacheInfo} not
+   * carrying same token as created in this method.
+   */
   public void invalidateCache() {
-    this.cacheToken = Long.toString(System.nanoTime());
+    this.cacheToken = newCacheToken();
   }
 
+  /**
+   * Returns the currently effective {@link CacheInfo} with "now" timestamp.
+   */
   public CacheInfo current() {
     return new CacheInfo(DateTime.now(), cacheToken);
   }
 
-  public boolean isStale(final CacheInfo cacheInfo) throws IOException {
+  /**
+   * Returns {@code true} if passed in cache info carries stale information, detected either by cache token or
+   * age of the info.
+   */
+  public boolean isStale(final CacheInfo cacheInfo) {
     if (contentMaxAgeMinutes < 0) {
       log.trace("Content max age checking disabled");
       return false;
