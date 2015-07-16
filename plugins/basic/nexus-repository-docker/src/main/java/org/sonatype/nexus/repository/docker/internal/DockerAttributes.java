@@ -18,4 +18,8 @@ package org.sonatype.nexus.repository.docker.internal;
 public interface DockerAttributes
 {
   String P_IN_PROGRESS = "inProgress";
+
+  String P_X_DOCKER_CHECKSUM = "X-Docker-Checksum";
+
+  String P_X_DOCKER_CHECKSUM_PAYLOAD = "X-Docker-Checksum-Payload";
 }

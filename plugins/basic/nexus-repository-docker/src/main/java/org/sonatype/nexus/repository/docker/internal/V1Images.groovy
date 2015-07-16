@@ -66,7 +66,12 @@ class V1Images
 
   Closure putChecksum = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
-    log.info '[putChecksum] tokens: {}', state.tokens
+    def repository = context.repository
+    log.info '[putChecksum] repository: {} tokens: {}', repository.name, state.tokens
+
+    repository.facet(DockerFacet).putChecksum(
+        state.tokens['image'], (String) context.request.headers[DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD]
+    )
 
     return HttpResponses.ok()
   }
