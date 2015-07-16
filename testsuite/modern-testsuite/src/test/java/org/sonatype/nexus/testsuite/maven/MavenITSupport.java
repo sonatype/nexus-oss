@@ -34,6 +34,7 @@ import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
+import org.sonatype.nexus.repository.maven.internal.maven2.Maven2GroupRecipe;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2HostedRecipe;
 import org.sonatype.nexus.repository.maven.internal.maven2.Maven2ProxyRecipe;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
@@ -92,10 +93,12 @@ public abstract class MavenITSupport
 
   @org.ops4j.pax.exam.Configuration
   public static Option[] configureNexus() {
-    return options(NexusCoreITSupport.configureNexus(),
+    return options(
+        NexusCoreITSupport.configureNexus(),
         mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject(),
         wrappedBundle(maven("org.apache.maven.shared", "maven-verifier").versionAsInProject()),
-        wrappedBundle(maven("org.apache.maven.shared", "maven-shared-utils").versionAsInProject()));
+        wrappedBundle(maven("org.apache.maven.shared", "maven-shared-utils").versionAsInProject())
+    );
   }
 
   public MavenITSupport() {
@@ -104,13 +107,14 @@ public abstract class MavenITSupport
 
   @Before
   public void setupMavenDebugLogging() {
-    logManager.setLoggerLevel("org.sonatype.nexus.repository.maven", LoggerLevel.DEBUG);
+    logManager.setLoggerLevel("org.sonatype.nexus.repository.maven", LoggerLevel.TRACE);
   }
 
   protected void mvnDeploy(final String project, final String version, final String deployRepositoryName)
       throws Exception
   {
-    final File mavenBaseDir = resolveBaseFile("target/" + getClass().getSimpleName() + "-" + testName.getMethodName() + "/" + project).getAbsoluteFile();
+    final File mavenBaseDir = resolveBaseFile(
+        "target/" + getClass().getSimpleName() + "-" + testName.getMethodName() + "/" + project).getAbsoluteFile();
     final File mavenSettings = new File(mavenBaseDir, "settings.xml").getAbsoluteFile();
     final File mavenPom = new File(mavenBaseDir, "pom.xml").getAbsoluteFile();
 
@@ -204,6 +208,26 @@ public abstract class MavenITSupport
     final NestedAttributesMap proxy = config.attributes("proxy");
     proxy.set("remoteUrl", remoteUrl);
     proxy.set("contentMaxAge", 5);
+
+    NestedAttributesMap storage = config.attributes("storage");
+    storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
+    storage.set("writePolicy", WritePolicy.ALLOW.name());
+
+    return config;
+  }
+
+  @Nonnull
+  protected Configuration groupConfig(final String name, final String... members) {
+    final Configuration config = new Configuration();
+    config.setRepositoryName(name);
+    config.setRecipeName(Maven2GroupRecipe.NAME);
+    config.setOnline(true);
+
+    final NestedAttributesMap maven = config.attributes("maven");
+    maven.set("versionPolicy", VersionPolicy.MIXED.name());
+
+    final NestedAttributesMap group = config.attributes("group");
+    group.set("memberNames", Arrays.asList(members));
 
     NestedAttributesMap storage = config.attributes("storage");
     storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
