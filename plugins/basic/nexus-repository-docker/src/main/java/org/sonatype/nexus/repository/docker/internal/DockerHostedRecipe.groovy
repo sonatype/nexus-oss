@@ -26,16 +26,25 @@ import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
+import org.sonatype.nexus.repository.view.Context
+import org.sonatype.nexus.repository.view.Handler
+import org.sonatype.nexus.repository.view.Response
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
+import org.sonatype.nexus.repository.view.matchers.ActionMatcher
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher
+import org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
+import static org.sonatype.nexus.repository.http.HttpMethods.GET
+import static org.sonatype.nexus.repository.http.HttpMethods.POST
+import static org.sonatype.nexus.repository.http.HttpMethods.PUT
+
 /**
- * Raw hosted repository recipe.
+ * Docker hosted repository recipe.
  *
  * @since 3.0
  */
@@ -80,6 +89,9 @@ class DockerHostedRecipe
   TagsHandler tagsHandler
 
   @Inject
+  V1Users v1Users
+
+  @Inject
   DockerHostedRecipe(@Named(HostedType.NAME) final Type type,
                      @Named(DockerFormat.NAME) final Format format)
   {
@@ -100,8 +112,18 @@ class DockerHostedRecipe
     Router.Builder builder = new Router.Builder()
 
     builder.route(new Route.Builder()
-        .matcher(new LiteralMatcher('/v1/users/'))
-        .handler(HttpHandlers.ok())
+        .matcher(LogicMatchers.and(new ActionMatcher(GET), LogicMatchers.or(new LiteralMatcher('/v1/users'), new LiteralMatcher('/v1/users/'))))
+        .handler(handler(v1Users.getUsers))
+        .create())
+
+    builder.route(new Route.Builder()
+        .matcher(LogicMatchers.and(new ActionMatcher(POST), LogicMatchers.or(new LiteralMatcher('/v1/users'), new LiteralMatcher('/v1/users/'))))
+        .handler(handler(v1Users.createUser))
+        .create())
+
+    builder.route(new Route.Builder()
+        .matcher(LogicMatchers.and(new ActionMatcher(PUT), new TokenMatcher('/v1/users/{username}')))
+        .handler(handler(v1Users.updateUser))
         .create())
 
     builder.route(new Route.Builder()
@@ -131,4 +153,14 @@ class DockerHostedRecipe
 
     return facet
   }
+
+  private Handler handler(final Closure action) {
+    return new Handler() {
+      @Override
+      Response handle(@Nonnull final Context context) {
+        return action.call(context)
+      }
+    }
+  }
+
 }
