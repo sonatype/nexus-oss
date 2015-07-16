@@ -70,12 +70,6 @@ class DockerHostedRecipe
   SecurityHandler securityHandler
 
   @Inject
-  DiagnoseHandler diagnoseHandler
-
-  @Inject
-  ImagesHandler imagesHandler
-
-  @Inject
   DockerExceptionHandler exceptionHandler
 
   @Inject
@@ -86,6 +80,9 @@ class DockerHostedRecipe
 
   @Inject
   V1Tags v1Tags
+
+  @Inject
+  V1Images v1Images
 
   @Inject
   DockerHostedRecipe(@Named(HostedType.NAME) final Type type,
@@ -165,9 +162,52 @@ class DockerHostedRecipe
         .handler(v1Tags.addTag)
         .create())
 
-    builder.route(new Route.Builder()
-        .matcher(new TokenMatcher('/v1/images/{image}/{type}'))
-        .handler(imagesHandler)
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(GET),
+            new TokenMatcher('/v1/images/{image}/json'),
+        ))
+        .handler(v1Images.getJson)
+        .create())
+
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(PUT),
+            new TokenMatcher('/v1/images/{image}/json'),
+        ))
+        .handler(v1Images.putJson)
+        .create())
+
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(GET),
+            new TokenMatcher('/v1/images/{image}/layer'),
+        ))
+        .handler(v1Images.getLayer)
+        .create())
+
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(PUT),
+            new TokenMatcher('/v1/images/{image}/layer'),
+        ))
+        .handler(v1Images.putLayer)
+        .create())
+
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(PUT),
+            new TokenMatcher('/v1/images/{image}/checksum'),
+        ))
+        .handler(v1Images.putChecksum)
+        .create())
+
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(GET),
+            new TokenMatcher('/v1/images/{image}/ancestry'),
+        ))
+        .handler(v1Images.getAncestry)
         .create())
 
     builder.defaultHandlers(HttpHandlers.badRequest())
