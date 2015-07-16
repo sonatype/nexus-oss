@@ -25,4 +25,5 @@ public interface DockerFacet
     extends Facet
 {
   void putMetadata(String path, Payload payload) throws IOException;
+  void putLayer(String path, Payload payload) throws IOException;
 }

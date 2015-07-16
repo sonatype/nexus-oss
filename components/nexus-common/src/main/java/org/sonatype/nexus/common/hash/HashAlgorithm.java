@@ -28,6 +28,8 @@ public class HashAlgorithm
 
   public static final HashAlgorithm SHA1 = new HashAlgorithm("sha1", Hashing.sha1());
 
+  public static final HashAlgorithm SHA256 = new HashAlgorithm("sha256", Hashing.sha512());
+
   public static final HashAlgorithm SHA512 = new HashAlgorithm("sha512", Hashing.sha512());
 
   private final String name;

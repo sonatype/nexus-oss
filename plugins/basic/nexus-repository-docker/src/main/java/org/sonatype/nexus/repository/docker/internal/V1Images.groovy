@@ -31,7 +31,7 @@ class V1Images
 
   Closure getMetadata = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
-    def repository = context.getRepository();
+    def repository = context.repository
     log.info '[getMetadata] repository: {} tokens: {}', repository.name, state.tokens
 
     return HttpResponses.notFound()
@@ -39,7 +39,7 @@ class V1Images
 
   Closure putMetadata = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
-    def repository = context.getRepository();
+    def repository = context.repository
     log.info '[putMetadata] repository: {} tokens: {}', repository.name, state.tokens
 
     repository.facet(DockerFacet).putMetadata(state.tokens['image'], context.request.payload)
@@ -56,7 +56,10 @@ class V1Images
 
   Closure putLayer = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
-    log.info '[putLayer] tokens: {}', state.tokens
+    def repository = context.repository
+    log.info '[putLayer] repository: {} tokens: {}', repository.name, state.tokens
+
+    repository.facet(DockerFacet).putLayer(state.tokens['image'], context.request.payload)
 
     return HttpResponses.ok()
   }

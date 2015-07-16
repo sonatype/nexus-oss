@@ -44,8 +44,7 @@ import com.google.common.collect.Lists;
 import com.orientechnologies.common.concur.ONeedRetryException;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
-import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
-import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
+import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
 
 /**
  * @since 3.0
@@ -56,7 +55,7 @@ public class DockerFacetImpl
     implements DockerFacet
 {
 
-  private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(MD5, SHA1);
+  private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(SHA256);
 
   private final static ObjectMapper mapper = new ObjectMapper();
 
@@ -87,7 +86,7 @@ public class DockerFacetImpl
     StorageTx tx = UnitOfWork.currentTransaction();
 
     String componentName = imageId;
-    String assetName = componentName + "/json";
+    String assetNameMetadata = componentName + "/json";
 
     Bucket bucket = tx.getBucket();
     Component component = getComponent(tx, componentName, bucket);
@@ -99,13 +98,13 @@ public class DockerFacetImpl
       tx.saveComponent(component);
 
       asset = tx.createAsset(bucket, component);
-      asset.name(assetName);
+      asset.name(assetNameMetadata);
     }
     else {
       if (!Boolean.TRUE.equals(component.formatAttributes().get(DockerAttributes.P_IN_PROGRESS))) {
         throw new V1ApiException("Image already exists", HttpStatus.CONFLICT);
       }
-      asset = findAsset(tx, component, assetName);
+      asset = findAsset(tx, component, assetNameMetadata);
     }
 
     // If we reach that point, it means that this is a new image or a retry on a failed push
@@ -114,7 +113,53 @@ public class DockerFacetImpl
       contentAttributes = ((Content) payload).getAttributes();
     }
     Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
-    tx.setBlob(asset, assetName, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
+    tx.setBlob(asset, assetNameMetadata, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
+    tx.saveAsset(asset);
+  }
+
+  @Override
+  public void putLayer(final String imageId, final Payload content) throws IOException, InvalidContentException {
+    validateImageId(imageId);
+    // TODO check docker client version >= 0.10
+    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
+      doPutLayer(imageId, streamSupplier, content);
+    }
+  }
+
+  @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
+  protected void doPutLayer(final String imageId, final Supplier<InputStream> streamSupplier, final Payload payload)
+      throws IOException
+  {
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    String componentName = imageId;
+    String assetNameMetadata = componentName + "/json";
+    String assetNameLayer = componentName + "/layer";
+
+    Bucket bucket = tx.getBucket();
+    Component component = getComponent(tx, componentName, bucket);
+    if (component == null) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+    if (!Boolean.TRUE.equals(component.formatAttributes().get(DockerAttributes.P_IN_PROGRESS))) {
+      throw new V1ApiException("Image already exists", HttpStatus.CONFLICT);
+    }
+    Asset assetMetadata = findAsset(tx, component, assetNameMetadata);
+    if (assetMetadata == null) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+    Asset asset = findAsset(tx, component, assetNameLayer);
+    if (asset == null) {
+      asset = tx.createAsset(bucket, component);
+      asset.name(assetNameLayer);
+    }
+
+    AttributesMap contentAttributes = null;
+    if (payload instanceof Content) {
+      contentAttributes = ((Content) payload).getAttributes();
+    }
+    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
+    tx.setBlob(asset, assetNameLayer, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(asset);
   }
 

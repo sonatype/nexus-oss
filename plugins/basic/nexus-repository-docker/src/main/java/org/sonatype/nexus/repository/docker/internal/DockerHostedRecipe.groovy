@@ -206,6 +206,8 @@ class DockerHostedRecipe
             new ActionMatcher(PUT),
             new TokenMatcher('/v1/images/{image}/layer'),
         ))
+        .handler(v1ExceptionHandler)
+        .handler(unitOfWorkHandler)
         .handler(v1Images.putLayer)
         .create())
 
