@@ -14,18 +14,18 @@ package org.sonatype.nexus.repository.docker.internal;
 
 import javax.annotation.Nonnull;
 
-import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
+import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * @since 3.0
  */
-public class DockerExceptionHandler
+public class V1ExceptionHandler
     extends ComponentSupport
     implements Handler
 {
@@ -35,15 +35,16 @@ public class DockerExceptionHandler
     try {
       return context.proceed();
     }
-    catch (Exception e) {
+    catch (V1ApiException e) {
       log.warn("Error: {} {}: {}",
           context.getRequest().getAction(),
           context.getRequest().getPath(),
           e.toString());
       // FIXME Use jackson to marshal?
-      return HttpResponses.badRequest(
-          new StringPayload("{'error':'" + e.getMessage() + "'}", ContentTypes.APPLICATION_JSON)
-      );
+      return new Response.Builder()
+          .status(Status.failure(e.getHttpCode()))
+          .payload(new StringPayload("{\"error\":\"" + e.getMessage() + "\"}", ContentTypes.APPLICATION_JSON))
+          .build();
     }
   }
 }

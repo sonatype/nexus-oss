@@ -29,16 +29,20 @@ class V1Images
     extends ComponentSupport
 {
 
-  Closure getJson = { Context context ->
+  Closure getMetadata = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
-    log.info '[getJson] tokens: {}', state.tokens
+    def repository = context.getRepository();
+    log.info '[getMetadata] repository: {} tokens: {}', repository.name, state.tokens
 
     return HttpResponses.notFound()
   }
 
-  Closure putJson = { Context context ->
+  Closure putMetadata = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
-    log.info '[putJson] tokens: {}', state.tokens
+    def repository = context.getRepository();
+    log.info '[putMetadata] repository: {} tokens: {}', repository.name, state.tokens
+
+    repository.facet(DockerFacet).putMetadata(state.tokens['image'], context.request.payload)
 
     return HttpResponses.ok()
   }

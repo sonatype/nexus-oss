@@ -29,7 +29,7 @@ class V1Tags
     extends ComponentSupport
 {
 
-  def static RE_VALID_TAG = ~/^[\w][\w.-]{0,127}$/
+  static final VALID_TAG = ~/^[\w][\w.-]{0,127}$/
 
 
   Closure addTag = { Context context ->
@@ -38,8 +38,8 @@ class V1Tags
 
     def tag = state.tokens.get('tag')
 
-    if (!RE_VALID_TAG.matcher(tag).matches()) {
-      throw new Exception("Invalid tag name (must match ${RE_VALID_TAG})")
+    if (!VALID_TAG.matcher(tag).matches()) {
+      throw new V1ApiException("Invalid tag name (must match ${VALID_TAG})")
     }
 
     return HttpResponses.ok()

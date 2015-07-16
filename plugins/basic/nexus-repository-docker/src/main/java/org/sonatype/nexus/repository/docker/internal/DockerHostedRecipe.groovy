@@ -24,6 +24,8 @@ import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.security.SecurityHandler
+import org.sonatype.nexus.repository.storage.StorageFacetImpl
+import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Context
@@ -64,13 +66,22 @@ class DockerHostedRecipe
   Provider<ConnectorFacetImpl> connectorFacet
 
   @Inject
+  Provider<DockerFacet> dockerFacet
+
+  @Inject
+  Provider<StorageFacetImpl> storageFacet
+
+  @Inject
   TimingHandler timingHandler
 
   @Inject
   SecurityHandler securityHandler
 
   @Inject
-  DockerExceptionHandler exceptionHandler
+  UnitOfWorkHandler unitOfWorkHandler
+
+  @Inject
+  V1ExceptionHandler v1ExceptionHandler
 
   @Inject
   V1Users v1Users
@@ -96,6 +107,8 @@ class DockerHostedRecipe
     repository.attach(securityFacet.get())
     repository.attach(configure(viewFacet.get()))
     repository.attach(connectorFacet.get())
+    repository.attach(dockerFacet.get())
+    repository.attach(storageFacet.get())
   }
 
   /**
@@ -158,7 +171,7 @@ class DockerHostedRecipe
                 new TokenMatcher('/v1/repositories/{repository}/tags/{tag}')
             )
         ))
-        .handler(exceptionHandler)
+        .handler(v1ExceptionHandler)
         .handler(v1Tags.addTag)
         .create())
 
@@ -167,7 +180,7 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             new TokenMatcher('/v1/images/{image}/json'),
         ))
-        .handler(v1Images.getJson)
+        .handler(v1Images.getMetadata)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -175,7 +188,9 @@ class DockerHostedRecipe
             new ActionMatcher(PUT),
             new TokenMatcher('/v1/images/{image}/json'),
         ))
-        .handler(v1Images.putJson)
+        .handler(v1ExceptionHandler)
+        .handler(unitOfWorkHandler)
+        .handler(v1Images.putMetadata)
         .create())
 
     builder.route(new Route.Builder().matcher(
