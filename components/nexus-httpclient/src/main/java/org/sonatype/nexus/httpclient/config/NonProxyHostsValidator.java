@@ -14,6 +14,7 @@ package org.sonatype.nexus.httpclient.config;
 
 import java.util.regex.Pattern;
 
+import javax.inject.Named;
 import javax.validation.ConstraintValidatorContext;
 
 import org.sonatype.nexus.common.text.Strings2;
@@ -24,6 +25,7 @@ import org.sonatype.nexus.validation.ConstraintValidatorSupport;
  *
  * @since 3.0
  */
+@Named
 public class NonProxyHostsValidator
     extends ConstraintValidatorSupport<NonProxyHosts, String[]>
 {
