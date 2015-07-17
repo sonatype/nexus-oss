@@ -23,7 +23,7 @@ import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacet;
 import com.sonatype.nexus.repository.nuget.odata.ODataConsumer;
 
 import org.sonatype.nexus.repository.InvalidContentException;
-import org.sonatype.nexus.repository.proxy.CacheInfo;
+import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;

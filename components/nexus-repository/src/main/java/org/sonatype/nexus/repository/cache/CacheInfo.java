@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.proxy;
+package org.sonatype.nexus.repository.cache;
 
 import java.util.Date;
 
@@ -27,8 +27,8 @@ import static org.sonatype.nexus.common.time.DateHelper.toDate;
 import static org.sonatype.nexus.common.time.DateHelper.toDateTime;
 
 /**
- * Maintains cache details for proxied resources. {@link ProxyFacetSupport} relies on information provided by this
- * class to implement "aging" and proxy cache invalidation.
+ * Maintains cache details for cached resources. {@link CacheController} relies on information provided by this
+ * class to implement "aging" and cache invalidation.
  *
  * @since 3.0
  */
@@ -45,14 +45,14 @@ public class CacheInfo
   }
 
   /**
-   * Returns the {@link DateTime} when this item was last checked remotely for updates.
+   * Returns the {@link DateTime} when this item was last verified and detected as "fresh".
    */
   public DateTime getLastVerified() {
     return lastVerified;
   }
 
   /**
-   * Returns the "cache token" that was in effect when this item was last checked remotely for updates.
+   * Returns the "cache token" that was in effect when this item was last verified.
    */
   @Nullable
   public String getCacheToken() {
@@ -73,7 +73,7 @@ public class CacheInfo
    * Key of the nested map on {@link Asset} attributes carrying cache info related attributes.
    */
   @VisibleForTesting
-  static final String P_PROXY_CACHE = "proxy_cache";
+  static final String P_CACHE = "cache";
 
   /**
    * Last verified {@link Date}.
@@ -93,7 +93,7 @@ public class CacheInfo
   @Nullable
   public static CacheInfo extractFromAsset(final Asset asset) {
     checkNotNull(asset);
-    final NestedAttributesMap proxyCache = asset.attributes().child(P_PROXY_CACHE);
+    final NestedAttributesMap proxyCache = asset.attributes().child(P_CACHE);
     final DateTime lastVerified = toDateTime(proxyCache.get(P_LAST_VERIFIED, Date.class));
     if (lastVerified == null) {
       return null;
@@ -108,7 +108,7 @@ public class CacheInfo
   public static void applyToAsset(final Asset asset, final CacheInfo cacheInfo) {
     checkNotNull(asset);
     checkNotNull(cacheInfo);
-    final NestedAttributesMap proxyCache = asset.attributes().child(P_PROXY_CACHE);
+    final NestedAttributesMap proxyCache = asset.attributes().child(P_CACHE);
     proxyCache.set(P_LAST_VERIFIED, toDate(cacheInfo.getLastVerified()));
     proxyCache.set(P_CACHE_TOKEN, cacheInfo.getCacheToken());
   }
