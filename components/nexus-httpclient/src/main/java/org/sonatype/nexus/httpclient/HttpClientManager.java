@@ -13,6 +13,7 @@
 package org.sonatype.nexus.httpclient;
 
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 
 import org.sonatype.nexus.httpclient.HttpClientPlan.Customizer;
 import org.sonatype.nexus.httpclient.config.HttpClientConfiguration;
@@ -36,7 +37,7 @@ public interface HttpClientManager
   /**
    * Installs new global HTTP-client configuration.
    */
-  void setConfiguration(HttpClientConfiguration configuration);
+  void setConfiguration(@Valid HttpClientConfiguration configuration);
 
   /**
    * Create customized HTTP-client.
