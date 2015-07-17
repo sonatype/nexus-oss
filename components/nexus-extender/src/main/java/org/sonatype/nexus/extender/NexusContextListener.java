@@ -125,6 +125,8 @@ public class NexusContextListener
 
     log.debug("Injector: {}", injector);
 
+    registerInjectorService(injector.getProvider(BeanLocator.class));
+
     extender.doStart(); // start tracking nexus bundles
 
     try {
@@ -171,8 +173,6 @@ public class NexusContextListener
       final Filter filter = injector.getInstance(GuiceFilter.class);
       final Dictionary<String, ?> filterProperties = new Hashtable<>(singletonMap("name", "nexus"));
       registration = bundleContext.registerService(Filter.class, filter, filterProperties);
-
-      registerInjectorService(injector.getProvider(BeanLocator.class));
 
       if (HAS_PAX_EXAM) {
         registerLocatorWithPaxExam(injector.getProvider(BeanLocator.class));
