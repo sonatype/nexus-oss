@@ -38,6 +38,7 @@ class V1Index
     Response response = HttpResponses.ok(repository.facet(DockerFacet).getImagesIndex(
         state.tokens['namespace'] ?: 'library', state.tokens['repository']
     ))
+    // TODO set value based on request params
     response.headers.set('X-Docker-Endpoints', '192.168.1.105:18081');
     return response
   }
@@ -52,6 +53,7 @@ class V1Index
     )
 
     Response response = images ? HttpResponses.noContent() : HttpResponses.ok()
+    // TODO set value based on request params
     response.headers.set('X-Docker-Endpoints', '192.168.1.105:18081');
     return response
   }
