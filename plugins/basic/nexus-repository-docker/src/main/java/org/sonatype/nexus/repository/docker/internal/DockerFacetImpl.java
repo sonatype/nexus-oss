@@ -106,7 +106,7 @@ public class DockerFacetImpl
   public void putMetadata(final String imageId, final Payload content) throws IOException {
     validateImageId(imageId);
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      Map<String, Object> data = readJson(streamSupplier);
+      Map<String, Object> data = readMetadata(streamSupplier);
       if (!data.containsKey("id")) {
         throw new V1ApiException("Missing key 'id' in JSON");
       }
@@ -316,7 +316,7 @@ public class DockerFacetImpl
     return null;
   }
 
-  private Map<String, Object> readJson(final Supplier<InputStream> streamSupplier) {
+  private Map<String, Object> readMetadata(final Supplier<InputStream> streamSupplier) {
     TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {};
     try {
       return mapper.readValue(streamSupplier.get(), typeRef);
