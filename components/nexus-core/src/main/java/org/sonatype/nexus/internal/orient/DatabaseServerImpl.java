@@ -15,6 +15,7 @@ package org.sonatype.nexus.internal.orient;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,15 +32,21 @@ import com.orientechnologies.orient.core.OConstants;
 import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.server.OServer;
+import com.orientechnologies.orient.server.config.OServerCommandConfiguration;
 import com.orientechnologies.orient.server.config.OServerConfiguration;
 import com.orientechnologies.orient.server.config.OServerEntryConfiguration;
+import com.orientechnologies.orient.server.config.OServerHandlerConfiguration;
 import com.orientechnologies.orient.server.config.OServerNetworkConfiguration;
 import com.orientechnologies.orient.server.config.OServerNetworkListenerConfiguration;
 import com.orientechnologies.orient.server.config.OServerNetworkProtocolConfiguration;
+import com.orientechnologies.orient.server.config.OServerParameterConfiguration;
 import com.orientechnologies.orient.server.config.OServerSecurityConfiguration;
 import com.orientechnologies.orient.server.config.OServerStorageConfiguration;
 import com.orientechnologies.orient.server.config.OServerUserConfiguration;
+import com.orientechnologies.orient.server.handler.OJMXPlugin;
 import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProtocolBinary;
+import com.orientechnologies.orient.server.network.protocol.http.ONetworkProtocolHttpDb;
+import com.orientechnologies.orient.server.network.protocol.http.command.get.OServerCommandGetStaticContent;
 import org.apache.commons.io.output.WriterOutputStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -58,16 +65,24 @@ public class DatabaseServerImpl
 {
   private final ApplicationDirectories applicationDirectories;
 
-  private final boolean listenerEnabled;
+  private final boolean binaryListenerEnabled;
+
+  private final boolean httpListenerEnabled;
+
+  private boolean dynamicPlugins;
 
   private OServer server;
 
   @Inject
   public DatabaseServerImpl(final ApplicationDirectories applicationDirectories,
-                            final @Named("${nexus.orient.listenerEnabled:-false}") boolean listenerEnabled)
+                            @Named("${nexus.orient.binaryListenerEnabled:-false}") final boolean binaryListenerEnabled,
+                            @Named("${nexus.orient.httpListenerEnabled:-false}") final boolean httpListenerEnabled,
+                            @Named("${nexus.orient.dynamicPlugins:-false}") final boolean dynamicPlugins)
   {
     this.applicationDirectories = checkNotNull(applicationDirectories);
-    this.listenerEnabled = listenerEnabled;
+    this.binaryListenerEnabled = binaryListenerEnabled;
+    this.httpListenerEnabled = httpListenerEnabled;
+    this.dynamicPlugins = dynamicPlugins;
 
     log.info("OrientDB version: {}", OConstants.getVersion());
 
@@ -76,9 +91,16 @@ public class DatabaseServerImpl
   }
 
   @ManagedAttribute
-  public boolean isListenerEnabled() {
-    return listenerEnabled;
+  public boolean isBinaryListenerEnabled() {
+    return binaryListenerEnabled;
   }
+
+  @ManagedAttribute
+  public boolean isHttpListenerEnabled() {
+    return httpListenerEnabled;
+  }
+
+  // FIXME: May need to revisit embedded configuration strategy, this is quite nasty
 
   @Override
   protected void doStart() throws Exception {
@@ -114,35 +136,72 @@ public class DatabaseServerImpl
     System.setProperty(Orient.ORIENTDB_HOME, homeDir.getPath());
 
     OServerConfiguration config = new OServerConfiguration();
-
     // FIXME: Unsure what this is used for, its apparently assigned to xml location, but forcing it here
     config.location = "DYNAMIC-CONFIGURATION";
 
     File databaseDir = applicationDirectories.getWorkDirectory("db");
     config.properties = new OServerEntryConfiguration[]{
-        new OServerEntryConfiguration("server.database.path", databaseDir.getPath())
+        new OServerEntryConfiguration("server.database.path", databaseDir.getPath()),
+        new OServerEntryConfiguration("plugin.dynamic", String.valueOf(dynamicPlugins))
     };
 
-    config.handlers = Lists.newArrayList();
+    config.handlers = new ArrayList<>();
 
-    config.hooks = Lists.newArrayList();
+    // configure JMX handler
+    OServerHandlerConfiguration jmxHandler = new OServerHandlerConfiguration();
+    jmxHandler.clazz = OJMXPlugin.class.getName();
+    jmxHandler.parameters = new OServerParameterConfiguration[] {
+        new OServerParameterConfiguration("enabled", "true"),
+        new OServerParameterConfiguration("profilerManaged", "true")
+    };
+    config.handlers.add(jmxHandler);
+
+    config.hooks = new ArrayList<>();
 
     config.network = new OServerNetworkConfiguration();
     config.network.protocols = Lists.newArrayList(
-        new OServerNetworkProtocolConfiguration("binary", ONetworkProtocolBinary.class.getName())
+        new OServerNetworkProtocolConfiguration("binary", ONetworkProtocolBinary.class.getName()),
+        new OServerNetworkProtocolConfiguration("http", ONetworkProtocolHttpDb.class.getName())
     );
 
-    config.network.listeners = Lists.newArrayList();
+    config.network.listeners = new ArrayList<>();
 
     // HACK: Optionally enable the binary listener
-    if (listenerEnabled) {
-      OServerNetworkListenerConfiguration binaryListener = new OServerNetworkListenerConfiguration();
-      binaryListener.ipAddress = "0.0.0.0";
-      binaryListener.portRange = "2424-2430";
-      binaryListener.protocol = "binary";
-      binaryListener.socket = "default";
-      config.network.listeners.add(binaryListener);
-      log.info("Listener enabled: {}:[{}]", binaryListener.ipAddress, binaryListener.portRange);
+    if (binaryListenerEnabled) {
+      OServerNetworkListenerConfiguration listener = new OServerNetworkListenerConfiguration();
+      listener.ipAddress = "0.0.0.0";
+      listener.portRange = "2424-2430";
+      listener.protocol = "binary";
+      listener.socket = "default";
+      config.network.listeners.add(listener);
+      log.info("Binary listener enabled: {}:[{}]", listener.ipAddress, listener.portRange);
+    }
+
+    // HACK: Optionally enable the http listener
+    if (httpListenerEnabled) {
+      OServerNetworkListenerConfiguration listener = new OServerNetworkListenerConfiguration();
+      listener.ipAddress = "0.0.0.0";
+      listener.portRange = "2480-2490";
+      listener.protocol = "http";
+      listener.socket = "default";
+      listener.parameters = new OServerParameterConfiguration[] {
+          new OServerParameterConfiguration("network.http.charset", "UTF-8"),
+          new OServerParameterConfiguration("network.http.jsonResponseError", "true")
+      };
+
+      OServerCommandConfiguration getCommand = new OServerCommandConfiguration();
+      getCommand.implementation = OServerCommandGetStaticContent.class.getName();
+      getCommand.pattern = "GET|www GET|studio/ GET| GET|*.htm GET|*.html GET|*.xml GET|*.jpeg GET|*.jpg GET|*.png GET|*.gif GET|*.js GET|*.css GET|*.swf GET|*.ico GET|*.txt GET|*.otf GET|*.pjs GET|*.svg GET|*.json GET|*.woff GET|*.ttf GET|*.svgz";
+      getCommand.parameters = new OServerEntryConfiguration[] {
+          new OServerEntryConfiguration("http.cache:*.htm *.html", "Cache-Control: no-cache, no-store, max-age=0, must-revalidate\\r\\nPragma: no-cache"),
+          new OServerEntryConfiguration("http.cache:default", "Cache-Control: max-age=120")
+      };
+      listener.commands = new OServerCommandConfiguration[] {
+          getCommand
+      };
+
+      config.network.listeners.add(listener);
+      log.info("HTTP listener enabled: {}:[{}]", listener.ipAddress, listener.portRange);
     }
 
     config.storages = new OServerStorageConfiguration[]{};
@@ -152,8 +211,8 @@ public class DatabaseServerImpl
     };
 
     config.security = new OServerSecurityConfiguration();
-    config.security.users = Lists.newArrayList();
-    config.security.resources = Lists.newArrayList();
+    config.security.users = new ArrayList<>();
+    config.security.resources = new ArrayList<>();
 
     // latest advice is to disable DB compression as it doesn't buy much,
     // also snappy has issues with use of native lib (unpacked under tmp)
