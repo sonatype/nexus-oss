@@ -180,6 +180,8 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             new TokenMatcher('/v1/images/{image}/json'),
         ))
+        .handler(v1ExceptionHandler)
+        .handler(unitOfWorkHandler)
         .handler(v1Images.getMetadata)
         .create())
 

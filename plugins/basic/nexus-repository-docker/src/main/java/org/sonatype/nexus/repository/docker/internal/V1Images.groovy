@@ -16,9 +16,14 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import org.sonatype.nexus.repository.http.HttpResponses
+import org.sonatype.nexus.repository.view.Content
 import org.sonatype.nexus.repository.view.Context
+import org.sonatype.nexus.repository.view.Response
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 import org.sonatype.sisu.goodies.common.ComponentSupport
+
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_SIZE
 
 /**
  * @since 3.0
@@ -34,7 +39,11 @@ class V1Images
     def repository = context.repository
     log.info '[getMetadata] repository: {} tokens: {}', repository.name, state.tokens
 
-    return HttpResponses.notFound()
+    Content metadata = repository.facet(DockerFacet).getMetadata(state.tokens['image'])
+    Response response = HttpResponses.ok(metadata)
+    response.headers.set(P_X_DOCKER_SIZE, metadata.attributes.get(P_X_DOCKER_SIZE) as String)
+    response.headers.set(P_X_DOCKER_CHECKSUM_PAYLOAD, metadata.attributes.get(P_X_DOCKER_CHECKSUM_PAYLOAD) as String)
+    return response
   }
 
   Closure putMetadata = { Context context ->
@@ -70,7 +79,7 @@ class V1Images
     log.info '[putChecksum] repository: {} tokens: {}', repository.name, state.tokens
 
     repository.facet(DockerFacet).putChecksum(
-        state.tokens['image'], (String) context.request.headers[DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD]
+        state.tokens['image'], (String) context.request.headers[P_X_DOCKER_CHECKSUM_PAYLOAD]
     )
 
     return HttpResponses.ok()

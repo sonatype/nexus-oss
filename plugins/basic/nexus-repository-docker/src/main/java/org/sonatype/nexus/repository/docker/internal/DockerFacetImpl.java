@@ -23,7 +23,9 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
+import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.AttributesMap;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
@@ -36,6 +38,7 @@ import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.nexus.transaction.Transactional;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
@@ -53,9 +56,8 @@ import org.apache.commons.lang.StringUtils;
 
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IN_PROGRESS;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_CHECKSUM;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_CHECKSUM;
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_SIZE;
 
 /**
  * @since 3.0
@@ -71,6 +73,35 @@ public class DockerFacetImpl
   private final static ObjectMapper mapper = new ObjectMapper();
 
   private final static Pattern validImageId = Pattern.compile("^([a-f0-9]{16}|[a-f0-9]{64})$");
+
+  @Override
+  @Transactional(retryOn = IllegalStateException.class)
+  public Content getMetadata(final String imageId) throws IOException {
+    validateImageId(imageId);
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    String componentName = imageId;
+    String metadataAssetName = componentName + "/json";
+    String layerAssetName = componentName + "/layer";
+
+    Bucket bucket = tx.getBucket();
+    Component component = getComponent(tx, componentName, bucket);
+    if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+    Asset metadataAsset = findAsset(tx, component, metadataAssetName);
+    if (metadataAsset == null) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+
+    Content content = marshall(metadataAsset, tx.requireBlob(metadataAsset.requireBlobRef()));
+
+    NestedAttributesMap componentAttributes = component.formatAttributes();
+    content.getAttributes().set(P_X_DOCKER_SIZE, componentAttributes.get(P_X_DOCKER_SIZE));
+    content.getAttributes().set(P_X_DOCKER_CHECKSUM_PAYLOAD, componentAttributes.get(P_X_DOCKER_CHECKSUM_PAYLOAD));
+
+    return content;
+  }
 
   @Override
   public void putMetadata(final String imageId, final Payload content) throws IOException {
@@ -101,7 +132,7 @@ public class DockerFacetImpl
 
     Bucket bucket = tx.getBucket();
     Component component = getComponent(tx, componentName, bucket);
-    Asset asset = null;
+    Asset metadataAsset = null;
     if (component == null) {
       component = tx.createComponent(bucket, getRepository().getFormat()).name(componentName);
 
@@ -112,25 +143,26 @@ public class DockerFacetImpl
       if (!Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
         throw new V1ApiException("Image already exists", HttpStatus.CONFLICT);
       }
-      asset = findAsset(tx, component, assetNameMetadata);
+      metadataAsset = findAsset(tx, component, assetNameMetadata);
 
       // cleanup checksums as we have potentially new metadata/layer
       component.formatAttributes().remove(P_X_DOCKER_CHECKSUM_PAYLOAD);
       tx.saveComponent(component);
     }
-    if (asset == null) {
-      asset = tx.createAsset(bucket, component);
-      asset.name(assetNameMetadata);
+    if (metadataAsset == null) {
+      metadataAsset = tx.createAsset(bucket, component);
+      metadataAsset.name(assetNameMetadata);
     }
 
     // If we reach that point, it means that this is a new image or a retry on a failed push
+    // TODO Put attributes in component/asset based on parsed metadata json file
     AttributesMap contentAttributes = null;
     if (payload instanceof Content) {
       contentAttributes = ((Content) payload).getAttributes();
     }
-    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
-    tx.setBlob(asset, assetNameMetadata, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
-    tx.saveAsset(asset);
+    Content.applyToAsset(metadataAsset, Content.maintainLastModified(metadataAsset, contentAttributes));
+    tx.setBlob(metadataAsset, assetNameMetadata, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
+    tx.saveAsset(metadataAsset);
 
     // TODO generate ancestry (maybe not in transaction?)
   }
@@ -190,6 +222,9 @@ public class DockerFacetImpl
     try (InputStream in = tx.requireBlob(layerAsset.requireBlobRef()).getInputStream()) {
       ByteStreams.copy(in, output);
     }
+
+    // set extra component attributes
+    component.formatAttributes().set(P_X_DOCKER_SIZE, layerAsset.size());
     component.formatAttributes().set(P_X_DOCKER_CHECKSUM_PAYLOAD, SHA256.name() + ":" + hasher.hash());
     tx.saveComponent(component);
   }
@@ -272,6 +307,12 @@ public class DockerFacetImpl
     if (!validImageId.matcher(imageId).matches()) {
       throw new V1ApiException("Invalid image ID", HttpStatus.NOT_FOUND);
     }
+  }
+
+  private Content marshall(final Asset asset, final Blob blob) {
+    final Content content = new Content(new BlobPayload(blob, asset.requireContentType()));
+    Content.extractFromAsset(asset, hashAlgorithms, content.getAttributes());
+    return content;
   }
 
 }

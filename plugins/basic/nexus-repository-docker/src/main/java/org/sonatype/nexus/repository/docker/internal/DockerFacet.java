@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.docker.internal;
 import java.io.IOException;
 
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 
 /**
@@ -24,6 +25,8 @@ import org.sonatype.nexus.repository.view.Payload;
 public interface DockerFacet
     extends Facet
 {
+  Content getMetadata(String imageId) throws IOException;
+
   void putMetadata(String imageId, Payload payload) throws IOException;
 
   void putLayer(String imageId, Payload payload) throws IOException;
