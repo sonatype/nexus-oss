@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -59,6 +60,7 @@ import org.apache.commons.lang.StringUtils;
 
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IN_PROGRESS;
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_TAG;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_TAGS;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_SIZE;
@@ -376,17 +378,25 @@ public class DockerFacetImpl
   }
 
   @Override
-  public void putTag(final String namespace, final String name, final String tag, final Payload content)
+  public void putTag(final String namespace,
+                     final String name,
+                     final String tag,
+                     final Map<String, String> metadata,
+                     final Payload content)
       throws IOException
   {
     validateTagName(tag);
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      doPutTag(namespace, name, tag, readImageId(streamSupplier));
+      doPutTag(namespace, name, tag, readImageId(streamSupplier), metadata);
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutTag(final String namespace, final String name, final String tag, final String imageId)
+  protected void doPutTag(final String namespace,
+                          final String name,
+                          final String tag,
+                          final String imageId,
+                          final Map<String, String> metadata)
       throws IOException
   {
     StorageTx tx = UnitOfWork.currentTransaction();
@@ -410,11 +420,16 @@ public class DockerFacetImpl
     }
 
     // add tag to image index asset
-    NestedAttributesMap tags = imageIndexAsset.formatAttributes().child(P_TAGS);
-    tags.set(tag, imageId);
+    imageIndexAsset.formatAttributes().child(P_TAGS).set(tag, imageId);
+    // add metadata to image index asset
+    // FIXME would be nicer to have the child tag above have as value image id and metadata
+    NestedAttributesMap metadataTag = imageIndexAsset.formatAttributes().child(P_TAG + "_" + tag);
+    metadataTag.clear();
+    for (Entry<String, String> entry : metadata.entrySet()) {
+      metadataTag.set(entry.getKey(), entry.getValue());
+    }
     tx.saveAsset(imageIndexAsset);
   }
-
 
   private Component findComponent(final StorageTx tx, final Bucket bucket, final String imageId) {
     return tx.findComponentWithProperty(StorageFacet.P_NAME, imageId, bucket);

@@ -13,8 +13,7 @@
 package org.sonatype.nexus.repository.docker.internal;
 
 import java.io.IOException;
-
-import javax.annotation.Nullable;
+import java.util.Map;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.view.Content;
@@ -41,5 +40,6 @@ public interface DockerFacet
 
   void putChecksum(String imageId, String checksum) throws IOException;
 
-  void putTag(String namespace, String name, String tag, Payload payload) throws IOException;
+  void putTag(String namespace, String name, String tag, Map<String, String> metadata, Payload payload)
+      throws IOException;
 }

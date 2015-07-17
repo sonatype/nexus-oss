@@ -25,5 +25,7 @@ public interface DockerAttributes
 
   String P_X_DOCKER_SIZE = "X-Docker-Size";
 
+  String P_TAG = "tag";
+
   String P_TAGS = "tags";
 }

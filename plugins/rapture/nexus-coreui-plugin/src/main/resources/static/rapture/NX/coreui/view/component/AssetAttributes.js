@@ -85,7 +85,7 @@ Ext.define('NX.coreui.view.component.AssetAttributes', {
     store.removeAll();
     Ext.iterate(me.assetModel.get('attributes'), function(facet, facetValues) {
       Ext.iterate(facetValues, function(key, value) {
-        store.add({facet: facet, label: key, value: value});
+        store.add({facet: facet, label: key, value: Ext.isObject(value) ? Ext.encode(value) : value});
       })
     });
   }
