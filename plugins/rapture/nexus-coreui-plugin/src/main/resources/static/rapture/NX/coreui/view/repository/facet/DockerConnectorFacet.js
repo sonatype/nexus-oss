@@ -41,6 +41,11 @@ Ext.define('NX.coreui.view.repository.facet.DockerConnectorFacet', {
 
         items: [
           {
+            xtype: 'numberfield',
+            name: 'attributes.connector.port',
+            fieldLabel: 'Port'
+          },
+          {
             xtype: 'combo',
             name: 'attributes.connector.strategy',
             fieldLabel: 'Strategy',

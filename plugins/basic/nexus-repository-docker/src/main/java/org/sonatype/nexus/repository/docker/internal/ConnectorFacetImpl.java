@@ -42,12 +42,16 @@ public class ConnectorFacetImpl
   static class Config
   {
     @NotNull
+    public int port;
+
+    @NotNull
     public Strategy strategy;
 
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
-          "strategy=" + strategy +
+          "port=" + port +
+          ", strategy=" + strategy +
           '}';
     }
   }
@@ -63,7 +67,7 @@ public class ConnectorFacetImpl
 
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
-    // empty
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
   }
 
   @Override
@@ -77,6 +81,7 @@ public class ConnectorFacetImpl
     Server server = JettyServer.getServer();
     if (server != null) {
       jettyConnector = new ServerConnector(server);
+      jettyConnector.setPort(config.port);
       server.addConnector(jettyConnector);
       jettyConnector.start();
       dockerFilter.addRepository(getPort(), getRepository().getName(), config.strategy);
