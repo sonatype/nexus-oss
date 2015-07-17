@@ -120,7 +120,7 @@ public class DockerFacetImpl
       indexStream = streamSupplier.get();
     }
     else {
-      // TODO merge existing content with new content instead returning
+      // merge existing images index with the new one
       String existingIndex;
       try (InputStream in = tx.requireBlob(asset.requireBlobRef()).getInputStream()) {
         existingIndex = new String(ByteStreams.toByteArray(in), Charsets.UTF_8);
