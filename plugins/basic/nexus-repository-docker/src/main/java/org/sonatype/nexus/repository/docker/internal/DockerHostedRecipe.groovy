@@ -143,13 +143,28 @@ class DockerHostedRecipe
 
     builder.route(new Route.Builder().matcher(
         LogicMatchers.and(
+            new ActionMatcher(GET),
+            LogicMatchers.or(
+                new TokenMatcher('/v1/repositories/{namespace}/{repository}/images'),
+                new TokenMatcher('/v1/repositories/{repository}/images')
+            )
+        ))
+        .handler(v1ExceptionHandler)
+        .handler(unitOfWorkHandler)
+        .handler(v1Index.getImagesIndex)
+        .create())
+
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
             new ActionMatcher(PUT),
             LogicMatchers.or(
                 new TokenMatcher('/v1/repositories/{namespace}/{repository}/images'),
                 new TokenMatcher('/v1/repositories/{repository}/images')
             )
         ))
-        .handler(v1Index.addRepository.rcurry(true))
+        .handler(v1ExceptionHandler)
+        .handler(unitOfWorkHandler)
+        .handler(v1Index.putImagesIndex.rcurry(true))
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -162,7 +177,7 @@ class DockerHostedRecipe
         ))
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
-        .handler(v1Index.addRepository.rcurry(false))
+        .handler(v1Index.putImagesIndex.rcurry(false))
         .create())
 
     builder.route(new Route.Builder().matcher(

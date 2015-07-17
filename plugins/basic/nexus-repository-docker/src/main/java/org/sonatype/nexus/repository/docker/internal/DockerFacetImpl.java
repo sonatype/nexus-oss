@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.docker.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,6 +32,7 @@ import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.nexus.repository.search.JsonUtils;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -44,6 +46,7 @@ import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.google.common.hash.Funnels;
@@ -75,9 +78,24 @@ public class DockerFacetImpl
   private final static Pattern validImageId = Pattern.compile("^([a-f0-9]{16}|[a-f0-9]{64})$");
 
   @Override
+  @Transactional(retryOn = IllegalStateException.class)
+  public Content getImagesIndex(final String namespace, final String name) throws IOException {
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    String assetName = namespace + "/" + name + "/index_images";
+    Asset asset = findAsset(tx, tx.getBucket(), assetName);
+    if (asset == null) {
+      throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
+    }
+
+    return marshall(asset, tx.requireBlob(asset.requireBlobRef()));
+  }
+
+  @Override
   public void putImagesIndex(final String namespace, final String name, final Payload content) throws IOException {
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      List<Map<String, Object>> data = readImagesIndex(streamSupplier);
+      // TODO apply checksum algorithm?
+      validateImagesIndex(streamSupplier);
       doPutImagesIndex(namespace, name, streamSupplier, content);
     }
   }
@@ -91,11 +109,28 @@ public class DockerFacetImpl
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String assetName = namespace + "/" + name;
+    InputStream indexStream;
+
+    String assetName = namespace + "/" + name + "/index_images";
     Asset asset = findAsset(tx, tx.getBucket(), assetName);
     if (asset == null) {
       asset = tx.createAsset(tx.getBucket(), getRepository().getFormat());
       asset.name(assetName);
+
+      indexStream = streamSupplier.get();
+    }
+    else {
+      // TODO merge existing content with new content instead returning
+      String existingIndex;
+      try (InputStream in = tx.requireBlob(asset.requireBlobRef()).getInputStream()) {
+        existingIndex = new String(ByteStreams.toByteArray(in), Charsets.UTF_8);
+      }
+      String newIndex;
+      try (InputStream in = streamSupplier.get()) {
+        newIndex = new String(ByteStreams.toByteArray(in), Charsets.UTF_8);
+      }
+      String mergedIndex = JsonUtils.merge(existingIndex, newIndex);
+      indexStream = new ByteArrayInputStream(mergedIndex.getBytes(Charsets.UTF_8));
     }
 
     AttributesMap contentAttributes = null;
@@ -104,7 +139,7 @@ public class DockerFacetImpl
     }
     Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
     // FIXME Nexus is changing content type from application/json to text/plain even if is a json file
-    tx.setBlob(asset, assetName, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
+    tx.setBlob(asset, assetName, indexStream, hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(asset);
   }
 
@@ -354,10 +389,10 @@ public class DockerFacetImpl
     return null;
   }
 
-  private List<Map<String, Object>> readImagesIndex(final Supplier<InputStream> streamSupplier) {
+  private void validateImagesIndex(final Supplier<InputStream> streamSupplier) {
     TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {};
     try {
-      return mapper.readValue(streamSupplier.get(), typeRef);
+      mapper.readValue(streamSupplier.get(), typeRef);
     }
     catch (Exception e) {
       throw new V1ApiException("Invalid data");

@@ -17,6 +17,7 @@ import javax.inject.Singleton
 
 import org.sonatype.nexus.repository.http.HttpResponses
 import org.sonatype.nexus.repository.view.Context
+import org.sonatype.nexus.repository.view.Response
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
@@ -29,17 +30,28 @@ class V1Index
     extends ComponentSupport
 {
 
-  Closure addRepository = { Context context, boolean images ->
+  Closure getImagesIndex = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[addRepository] repository: {} tokens: {}', repository.name, state.tokens
+    log.info '[getImagesIndex] repository: {} tokens: {}', repository.name, state.tokens
+
+    Response response = HttpResponses.ok(repository.facet(DockerFacet).getImagesIndex(
+        state.tokens['namespace'] ?: 'library', state.tokens['repository']
+    ))
+    response.headers.set('X-Docker-Endpoints', '192.168.1.105:18081');
+    return response
+  }
+
+  Closure putImagesIndex = { Context context, boolean images ->
+    def state = context.attributes.require(TokenMatcher.State)
+    def repository = context.repository
+    log.info '[putImagesIndex] repository: {} tokens: {}', repository.name, state.tokens
 
     repository.facet(DockerFacet).putImagesIndex(
         state.tokens['namespace'] ?: 'library', state.tokens['repository'], context.request.payload
     )
 
-    def response = images ? HttpResponses.noContent() : HttpResponses.ok()
-    // FIXME endpoints value
+    Response response = images ? HttpResponses.noContent() : HttpResponses.ok()
     response.headers.set('X-Docker-Endpoints', '192.168.1.105:18081');
     return response
   }
