@@ -126,6 +126,7 @@ Ext.define('NX.controller.Menu', {
       },
       component: {
         'nx-feature-menu': {
+          select: me.onSelection,
           itemclick: me.onItemClick,
           afterrender: me.onAfterRender,
           beforecellclick: me.warnBeforeMenuSelect
@@ -231,6 +232,29 @@ Ext.define('NX.controller.Menu', {
   /**
    * @private
    */
+  onSelection: function (panel, featureMenuModel) {
+    var me = this,
+      path = featureMenuModel.get('path');
+
+    if ((path !== me.currentSelectedPath) || featureMenuModel.get('group')) {
+      me.currentSelectedPath = path;
+      me.currentSelectedPath = path;
+
+      //<if debug>
+      me.logInfo('Selected feature:', path);
+      //</if>
+
+      if (me.bookmarkingEnabled) {
+        me.bookmark(featureMenuModel);
+      }
+      me.selectFeature(me.getStore('Feature').getById(featureMenuModel.get('path')));
+      me.populateFeatureGroupStore(featureMenuModel);
+    }
+  },
+
+  /**
+   * @private
+   */
   selectFeature: function (featureModel) {
     var path;
 
@@ -312,7 +336,6 @@ Ext.define('NX.controller.Menu', {
         me.bookmarkingEnabled = me.navigateToFirstFeature;
         me.navigateToFirstFeature = false;
         me.getFeatureMenu().selectPath(node.getPath('text'), 'text', undefined, function () {
-          me.getFeatureMenu().fireEvent('itemclick', me.getFeatureMenu(), node);
           me.bookmarkingEnabled = true;
         });
       }
