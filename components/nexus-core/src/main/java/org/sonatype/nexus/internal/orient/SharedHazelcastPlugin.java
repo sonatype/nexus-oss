@@ -13,13 +13,14 @@
 package org.sonatype.nexus.internal.orient;
 
 import java.io.FileNotFoundException;
-import java.util.Set;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.orientechnologies.orient.server.hazelcast.OHazelcastPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * {@link OHazelcastPlugin} using a shared {@link HazelcastInstance}.
@@ -33,16 +34,8 @@ public class SharedHazelcastPlugin
 
   @Override
   protected HazelcastInstance configureHazelcast() throws FileNotFoundException {
-    Set<HazelcastInstance> instances = Hazelcast.getAllHazelcastInstances();
-    log.info("Instances: {}", instances);
-
-    // TODO: Should probably expose the instance-name in config (is that possible),
-    // TODO: ... and then look up return that, and configure the cellar to set an appopriate instance-name
-    // TODO: ... may need to customize HazelcastConfigurationManager to do this?
-    //HazelcastInstance instance = Hazelcast.getHazelcastInstanceByName("nexus");
-    //checkState(instance != null);
-
-    // HACK: For now pick the first instance, pending something saner
-    return instances.iterator().next();
+    HazelcastInstance instance = Hazelcast.getHazelcastInstanceByName("nexus");
+    checkState(instance != null);
+    return instance;
   }
 }

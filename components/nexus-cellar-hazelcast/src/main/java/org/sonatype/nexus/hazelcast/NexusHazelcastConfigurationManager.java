@@ -25,6 +25,8 @@ public final class NexusHazelcastConfigurationManager
   @Override
   public Config getHazelcastConfig() {
     log.info("******** Intercepted Hazelcast Configuration! ********");
-    return super.getHazelcastConfig();
+    Config config = super.getHazelcastConfig();
+    config.setInstanceName("nexus");
+    return config;
   }
 }
