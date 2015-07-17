@@ -29,6 +29,7 @@ Ext.define('NX.view.dev.Logging', {
     // allow browser text selection
     enableTextSelection: true
   },
+  multiSelect: true,
 
   stateful: true,
   stateId: 'nx-dev-logging',
@@ -104,6 +105,12 @@ Ext.define('NX.view.dev.Logging', {
       xtype: 'checkbox',
       itemId: 'remote',
       boxLabel: 'Remote events'
+    },
+    {
+      xtype: 'button',
+      text: 'Dump rows to console',
+      action: 'dump',
+      glyph: 'xf121@FontAwesome' /* fa-code */
     }
   ],
 
