@@ -24,4 +24,6 @@ public interface DockerAttributes
   String P_X_DOCKER_CHECKSUM_PAYLOAD = "X-Docker-Checksum-Payload";
 
   String P_X_DOCKER_SIZE = "X-Docker-Size";
+
+  String P_TAGS = "tags";
 }

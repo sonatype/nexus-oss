@@ -29,18 +29,15 @@ class V1Tags
     extends ComponentSupport
 {
 
-  static final VALID_TAG = ~/^[\w][\w.-]{0,127}$/
-
-
-  Closure addTag = { Context context ->
+  Closure putTag = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
-    log.info '[addTag] tokens: {}', state.tokens
+    def repository = context.repository
+    log.info '[putTag] repository: {} tokens: {}', repository.name, state.tokens
 
-    def tag = state.tokens.get('tag')
-
-    if (!VALID_TAG.matcher(tag).matches()) {
-      throw new V1ApiException("Invalid tag name (must match ${VALID_TAG})")
-    }
+    repository.facet(DockerFacet).putTag(
+        state.tokens['namespace'] ?: 'library', state.tokens['repository'], state.tokens['tag'],
+        context.request.payload
+    )
 
     return HttpResponses.ok()
   }

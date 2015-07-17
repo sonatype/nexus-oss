@@ -189,7 +189,8 @@ class DockerHostedRecipe
             )
         ))
         .handler(v1ExceptionHandler)
-        .handler(v1Tags.addTag)
+        .handler(unitOfWorkHandler)
+        .handler(v1Tags.putTag)
         .create())
 
     builder.route(new Route.Builder().matcher(

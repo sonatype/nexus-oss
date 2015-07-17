@@ -59,6 +59,7 @@ import org.apache.commons.lang.StringUtils;
 
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IN_PROGRESS;
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_TAGS;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_SIZE;
 
@@ -77,6 +78,9 @@ public class DockerFacetImpl
 
   private final static Pattern validImageId = Pattern.compile("^([a-f0-9]{16}|[a-f0-9]{64})$");
 
+  private final static Pattern validTag = Pattern.compile("^[\\w][\\w.-]{0,127}$");
+
+
   @Override
   @Transactional(retryOn = IllegalStateException.class)
   public Content getImagesIndex(final String namespace, final String name) throws IOException {
@@ -94,7 +98,6 @@ public class DockerFacetImpl
   @Override
   public void putImagesIndex(final String namespace, final String name, final Payload content) throws IOException {
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      // TODO apply checksum algorithm?
       validateImagesIndex(streamSupplier);
       doPutImagesIndex(namespace, name, streamSupplier, content);
     }
@@ -112,9 +115,11 @@ public class DockerFacetImpl
     InputStream indexStream;
 
     String assetName = namespace + "/" + name + "/index_images";
-    Asset asset = findAsset(tx, tx.getBucket(), assetName);
+
+    Bucket bucket = tx.getBucket();
+    Asset asset = findAsset(tx, bucket, assetName);
     if (asset == null) {
-      asset = tx.createAsset(tx.getBucket(), getRepository().getFormat());
+      asset = tx.createAsset(bucket, getRepository().getFormat());
       asset.name(assetName);
 
       indexStream = streamSupplier.get();
@@ -370,6 +375,47 @@ public class DockerFacetImpl
     tx.saveComponent(component);
   }
 
+  @Override
+  public void putTag(final String namespace, final String name, final String tag, final Payload content)
+      throws IOException
+  {
+    validateTagName(tag);
+    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
+      doPutTag(namespace, name, tag, readImageId(streamSupplier));
+    }
+  }
+
+  @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
+  protected void doPutTag(final String namespace, final String name, final String tag, final String imageId)
+      throws IOException
+  {
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    String imageIndexAssetName = namespace + "/" + name + "/index_images";
+    String componentName = imageId;
+    String metadataAssetName = componentName + "/json";
+
+    Bucket bucket = tx.getBucket();
+    Asset imageIndexAsset = findAsset(tx, bucket, imageIndexAssetName);
+    if (imageIndexAsset == null) {
+      throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
+    }
+    Component component = findComponent(tx, bucket, componentName);
+    if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+    Asset metadataAsset = findAsset(tx, component, metadataAssetName);
+    if (metadataAsset == null) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+
+    // add tag to image index asset
+    NestedAttributesMap tags = imageIndexAsset.formatAttributes().child(P_TAGS);
+    tags.set(tag, imageId);
+    tx.saveAsset(imageIndexAsset);
+  }
+
+
   private Component findComponent(final StorageTx tx, final Bucket bucket, final String imageId) {
     return tx.findComponentWithProperty(StorageFacet.P_NAME, imageId, bucket);
   }
@@ -409,9 +455,25 @@ public class DockerFacetImpl
     }
   }
 
-  private void validateImageId(final String imageId) {
+  private String validateImageId(final String imageId) {
     if (!validImageId.matcher(imageId).matches()) {
       throw new V1ApiException("Invalid image ID", HttpStatus.NOT_FOUND);
+    }
+    return imageId;
+  }
+
+  private void validateTagName(final String tag) {
+    if (!validTag.matcher(tag).matches()) {
+      throw new V1ApiException("Invalid tag name (must match ${VALID_TAG})");
+    }
+  }
+
+  private String readImageId(final Supplier<InputStream> streamSupplier) {
+    try {
+      return validateImageId(mapper.readValue(streamSupplier.get(), String.class));
+    }
+    catch (Exception e) {
+      throw new V1ApiException("Invalid data");
     }
   }
 

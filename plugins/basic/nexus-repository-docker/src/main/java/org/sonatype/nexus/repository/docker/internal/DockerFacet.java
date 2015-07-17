@@ -40,4 +40,6 @@ public interface DockerFacet
   void putLayer(String imageId, Payload payload) throws IOException;
 
   void putChecksum(String imageId, String checksum) throws IOException;
+
+  void putTag(String namespace, String name, String tag, Payload payload) throws IOException;
 }
