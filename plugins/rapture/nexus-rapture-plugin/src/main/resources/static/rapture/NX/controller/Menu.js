@@ -210,6 +210,8 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
+   * Select a feature when the associated menu item is clicked
+   *
    * @private
    */
   onItemClick: function (panel, featureMenuModel) {
@@ -230,6 +232,9 @@ Ext.define('NX.controller.Menu', {
   },
 
   /**
+   * Select a feature when the associated menu item is selected. This differs
+   * from onItemClick in that an already selected feature will not be reselected.
+   *
    * @private
    */
   onSelection: function (panel, featureMenuModel) {
@@ -237,6 +242,31 @@ Ext.define('NX.controller.Menu', {
       path = featureMenuModel.get('path');
 
     if ((path !== me.currentSelectedPath) || featureMenuModel.get('group')) {
+      me.currentSelectedPath = path;
+      me.currentSelectedPath = path;
+
+      //<if debug>
+      me.logInfo('Selected feature:', path);
+      //</if>
+
+      if (me.bookmarkingEnabled) {
+        me.bookmark(featureMenuModel);
+      }
+      me.selectFeature(me.getStore('Feature').getById(featureMenuModel.get('path')));
+      me.populateFeatureGroupStore(featureMenuModel);
+    }
+  },
+
+  /**
+   * (Re)select a feature
+   *
+   * @private
+   */
+  selectMenuItem: function (featureMenuModel, reselect) {
+    var me = this,
+      path = featureMenuModel.get('path');
+
+    if (reselect || path !== me.currentSelectedPath || featureMenuModel.get('group')) {
       me.currentSelectedPath = path;
       me.currentSelectedPath = path;
 
