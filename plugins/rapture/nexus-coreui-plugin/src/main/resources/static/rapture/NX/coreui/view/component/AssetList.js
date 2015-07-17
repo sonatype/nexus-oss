@@ -29,7 +29,10 @@ Ext.define('NX.coreui.view.component.AssetList', {
    */
   componentModel: undefined,
 
-  store: 'Asset',
+  store: 'ComponentAsset',
+
+  // Marker for source of targets to be shown in container assets
+  assetContainerSource: true,
 
   // Prevent the store from automatically loading
   loadStore: Ext.emptyFn,

@@ -35,7 +35,12 @@ Ext.define('NX.coreui.store.Asset', {
     }
   },
 
+  buffered: true,
+  pageSize: 50,
+
   remoteFilter: true,
+  remoteSort: true,
+
   sorters: { property: 'name', direction: 'ASC' }
 
 });
