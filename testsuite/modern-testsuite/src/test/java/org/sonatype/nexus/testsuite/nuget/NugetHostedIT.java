@@ -75,10 +75,10 @@ public class NugetHostedIT
     waitFor(calmPeriod());
 
     // Visual Studio-style queries
-    int count = nuget.count(VISUAL_STUDIO_INITIAL_COUNT_QUERY);
+    int count = nuget.vsCount();
     assertThat("count", count, is(1));
 
-    String feed = nuget.feedXml(VISUAL_STUDIO_INITIAL_FEED_QUERY);
+    String feed = nuget.vsSearchFeedXml();
     final List<Map<String, String>> entries = parseFeedXml(feed);
 
     assertThat("entry count", entries.size(), is(1));
@@ -87,9 +87,9 @@ public class NugetHostedIT
     assertThat(status(nuget.delete("SONATYPE.TEST", "1.0")), is(HttpStatus.NO_CONTENT));
 
     // Now ensure that the item has been deleted
-    assertThat("count after deletion", nuget.count(VISUAL_STUDIO_INITIAL_COUNT_QUERY), is(0));
+    assertThat("count after deletion", nuget.vsCount(), is(0));
 
-    final List<Map<String, String>> remainingEntries = parseFeedXml(nuget.feedXml(VISUAL_STUDIO_INITIAL_FEED_QUERY));
+    final List<Map<String, String>> remainingEntries = parseFeedXml(nuget.vsSearchFeedXml());
     assertThat("entries after deletion", remainingEntries.size(), is(0));
   }
 

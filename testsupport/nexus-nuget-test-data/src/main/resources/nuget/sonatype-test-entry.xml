@@ -35,5 +35,6 @@
     <d:Tags>sonatype example</d:Tags>
     <d:Title>SONATYPE.TEST</d:Title>
     <d:VersionDownloadCount m:type="Edm.Int32">0</d:VersionDownloadCount>
+    <d:LicenseNames>Beerware</d:LicenseNames>
   </m:properties>
 </entry>
