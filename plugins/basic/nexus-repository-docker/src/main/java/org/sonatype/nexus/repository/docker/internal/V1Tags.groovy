@@ -64,4 +64,14 @@ class V1Tags
     return HttpResponses.ok()
   }
 
+  Closure getTags = { Context context ->
+    def state = context.attributes.require(TokenMatcher.State)
+    def repository = context.repository
+    log.info '[getTags] repository: {} tokens: {}', repository.name, state.tokens
+
+    return HttpResponses.ok(repository.facet(DockerFacet).getTags(
+        state.tokens['namespace'] ?: 'library', state.tokens['repository']
+    ))
+  }
+
 }

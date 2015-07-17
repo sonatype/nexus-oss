@@ -182,6 +182,19 @@ class DockerHostedRecipe
 
     builder.route(new Route.Builder().matcher(
         LogicMatchers.and(
+            new ActionMatcher(GET),
+            LogicMatchers.or(
+                new TokenMatcher('/v1/repositories/{namespace}/{repository}/tags'),
+                new TokenMatcher('/v1/repositories/{repository}/tags')
+            )
+        ))
+        .handler(v1ExceptionHandler)
+        .handler(unitOfWorkHandler)
+        .handler(v1Tags.getTags)
+        .create())
+
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
             new ActionMatcher(PUT),
             LogicMatchers.or(
                 new TokenMatcher('/v1/repositories/{namespace}/{repository}/tags/{tag}'),

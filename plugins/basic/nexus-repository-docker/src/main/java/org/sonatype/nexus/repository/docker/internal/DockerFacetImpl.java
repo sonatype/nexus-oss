@@ -33,15 +33,16 @@ import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.http.HttpStatus;
-import org.sonatype.nexus.repository.search.JsonUtils;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Content;
+import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
+import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.nexus.transaction.Transactional;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
@@ -85,7 +86,7 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Content getImagesIndex(final String namespace, final String name) throws IOException {
+  public Payload getImagesIndex(final String namespace, final String name) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
     String assetName = namespace + "/" + name + "/index_images";
@@ -127,7 +128,6 @@ public class DockerFacetImpl
       indexStream = streamSupplier.get();
     }
     else {
-      // merge existing images index with the new one
       String existingIndex;
       try (InputStream in = tx.requireBlob(asset.requireBlobRef()).getInputStream()) {
         existingIndex = new String(ByteStreams.toByteArray(in), Charsets.UTF_8);
@@ -136,7 +136,8 @@ public class DockerFacetImpl
       try (InputStream in = streamSupplier.get()) {
         newIndex = new String(ByteStreams.toByteArray(in), Charsets.UTF_8);
       }
-      String mergedIndex = JsonUtils.merge(existingIndex, newIndex);
+      // TODO merge existing images index with the new one
+      String mergedIndex = existingIndex;
       indexStream = new ByteArrayInputStream(mergedIndex.getBytes(Charsets.UTF_8));
     }
 
@@ -152,7 +153,7 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Content getMetadata(final String imageId) throws IOException {
+  public Payload getMetadata(final String imageId) throws IOException {
     validateImageId(imageId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
@@ -198,7 +199,7 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Content getLayer(final String imageId) throws IOException {
+  public Payload getLayer(final String imageId) throws IOException {
     validateImageId(imageId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
@@ -375,6 +376,22 @@ public class DockerFacetImpl
     }
     component.formatAttributes().remove(P_IN_PROGRESS);
     tx.saveComponent(component);
+  }
+
+  @Override
+  @Transactional(retryOn = IllegalStateException.class)
+  public Payload getTags(final String namespace, final String name) throws IOException {
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    String imageIndexAssetName = namespace + "/" + name + "/index_images";
+    Bucket bucket = tx.getBucket();
+    Asset imageIndexAsset = findAsset(tx, bucket, imageIndexAssetName);
+    if (imageIndexAsset == null) {
+      throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
+    }
+    NestedAttributesMap tagsMap = imageIndexAsset.formatAttributes().child(P_TAGS);
+    String tags = mapper.writeValueAsString(tagsMap.backing());
+    return new StringPayload(tags, Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
   }
 
   @Override
