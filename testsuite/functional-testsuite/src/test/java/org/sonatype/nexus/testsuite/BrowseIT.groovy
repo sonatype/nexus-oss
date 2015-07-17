@@ -57,6 +57,8 @@ class BrowseIT
 
   BrowseIT(final String executable, final String[] options) {
     super(executable, options)
+
+    testData.addDirectory(resolveBaseFile('target/it-resources/maven'))
   }
 
   @org.ops4j.pax.exam.Configuration
