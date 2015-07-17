@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.coreui
 
+import org.sonatype.nexus.httpclient.config.NonProxyHosts
+
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
@@ -84,5 +86,6 @@ class HttpSettingsXO
 
   // HTTP[S] non-proxy hosts
 
+  @NonProxyHosts
   Set<String> nonProxyHosts
 }
