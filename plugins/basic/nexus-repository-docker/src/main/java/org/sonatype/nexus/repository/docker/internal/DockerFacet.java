@@ -29,6 +29,8 @@ public interface DockerFacet
 
   void putMetadata(String imageId, Payload payload) throws IOException;
 
+  Content getLayer(String imageId) throws IOException;
+
   void putLayer(String imageId, Payload payload) throws IOException;
 
   void putChecksum(String imageId, String checksum) throws IOException;

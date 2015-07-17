@@ -200,6 +200,8 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             new TokenMatcher('/v1/images/{image}/layer'),
         ))
+        .handler(v1ExceptionHandler)
+        .handler(unitOfWorkHandler)
         .handler(v1Images.getLayer)
         .create())
 

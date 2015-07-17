@@ -82,7 +82,6 @@ public class DockerFacetImpl
 
     String componentName = imageId;
     String metadataAssetName = componentName + "/json";
-    String layerAssetName = componentName + "/layer";
 
     Bucket bucket = tx.getBucket();
     Component component = getComponent(tx, componentName, bucket);
@@ -119,6 +118,28 @@ public class DockerFacetImpl
       // TODO check parent is accessible via authorisation
       doPutMetadata(imageId, streamSupplier, content);
     }
+  }
+
+  @Override
+  @Transactional(retryOn = IllegalStateException.class)
+  public Content getLayer(final String imageId) throws IOException {
+    validateImageId(imageId);
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    String componentName = imageId;
+    String layerAssetName = componentName + "/layer";
+
+    Bucket bucket = tx.getBucket();
+    Component component = getComponent(tx, componentName, bucket);
+    if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+    Asset layerAsset = findAsset(tx, component, layerAssetName);
+    if (layerAsset == null) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+
+    return marshall(layerAsset, tx.requireBlob(layerAsset.requireBlobRef()));
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
@@ -161,6 +182,7 @@ public class DockerFacetImpl
       contentAttributes = ((Content) payload).getAttributes();
     }
     Content.applyToAsset(metadataAsset, Content.maintainLastModified(metadataAsset, contentAttributes));
+    // FIXME Nexus is changing content type from application/json to text/plain even if is a json file
     tx.setBlob(metadataAsset, assetNameMetadata, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(metadataAsset);
 
@@ -209,6 +231,7 @@ public class DockerFacetImpl
       contentAttributes = ((Content) payload).getAttributes();
     }
     Content.applyToAsset(layerAsset, Content.maintainLastModified(layerAsset, contentAttributes));
+    // FIXME Nexus is changing content type from application/octet-stream to application/gzip
     tx.setBlob(layerAsset, layerAssetName, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(layerAsset);
 

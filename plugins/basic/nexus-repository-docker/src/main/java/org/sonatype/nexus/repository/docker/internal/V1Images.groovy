@@ -41,8 +41,8 @@ class V1Images
 
     Content metadata = repository.facet(DockerFacet).getMetadata(state.tokens['image'])
     Response response = HttpResponses.ok(metadata)
-    response.headers.set(P_X_DOCKER_SIZE, metadata.attributes.get(P_X_DOCKER_SIZE) as String)
-    response.headers.set(P_X_DOCKER_CHECKSUM_PAYLOAD, metadata.attributes.get(P_X_DOCKER_CHECKSUM_PAYLOAD) as String)
+    copyAttributeAsHeader(metadata, response, P_X_DOCKER_SIZE)
+    copyAttributeAsHeader(metadata, response, P_X_DOCKER_CHECKSUM_PAYLOAD)
     return response
   }
 
@@ -58,9 +58,10 @@ class V1Images
 
   Closure getLayer = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
-    log.info '[getLayer] tokens: {}', state.tokens
+    def repository = context.repository
+    log.info '[getLayer] repository: {} tokens: {}', repository.name, state.tokens
 
-    return HttpResponses.notFound()
+    return HttpResponses.ok(repository.facet(DockerFacet).getLayer(state.tokens['image']))
   }
 
   Closure putLayer = { Context context ->
@@ -90,6 +91,13 @@ class V1Images
     log.info '[getAncestry] tokens: {}', state.tokens
 
     return HttpResponses.notFound()
+  }
+
+  private void copyAttributeAsHeader(final Content content, final Response response, final String name) {
+    def value = content.attributes.get(name)
+    if (value) {
+      response.headers.set(P_X_DOCKER_SIZE, value as String)
+    }
   }
 
 }
