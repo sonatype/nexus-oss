@@ -31,7 +31,13 @@ class V1Index
 
   Closure addRepository = { Context context, boolean images ->
     def state = context.attributes.require(TokenMatcher.State)
-    log.info '[addRepository] tokens: {}', state.tokens
+    def repository = context.repository
+    log.info '[addRepository] repository: {} tokens: {}', repository.name, state.tokens
+
+    repository.facet(DockerFacet).putImagesIndex(
+        state.tokens['namespace'] ?: 'library', state.tokens['repository'], context.request.payload
+    )
+
     def response = images ? HttpResponses.noContent() : HttpResponses.ok()
     // FIXME endpoints value
     response.headers.set('X-Docker-Endpoints', '192.168.1.105:18081');

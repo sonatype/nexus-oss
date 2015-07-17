@@ -25,6 +25,8 @@ import org.sonatype.nexus.repository.view.Payload;
 public interface DockerFacet
     extends Facet
 {
+  void putImagesIndex(String namespace, String name, Payload payload) throws IOException;
+
   Content getMetadata(String imageId) throws IOException;
 
   void putMetadata(String imageId, Payload payload) throws IOException;

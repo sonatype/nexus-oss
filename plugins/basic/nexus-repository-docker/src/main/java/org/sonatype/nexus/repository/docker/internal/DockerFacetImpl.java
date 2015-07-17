@@ -75,6 +75,40 @@ public class DockerFacetImpl
   private final static Pattern validImageId = Pattern.compile("^([a-f0-9]{16}|[a-f0-9]{64})$");
 
   @Override
+  public void putImagesIndex(final String namespace, final String name, final Payload content) throws IOException {
+    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
+      List<Map<String, Object>> data = readImagesIndex(streamSupplier);
+      doPutImagesIndex(namespace, name, streamSupplier, content);
+    }
+  }
+
+  @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
+  protected void doPutImagesIndex(final String namespace,
+                                  final String name,
+                                  final Supplier<InputStream> streamSupplier,
+                                  final Payload payload)
+      throws IOException
+  {
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    String assetName = namespace + "/" + name;
+    Asset asset = findAsset(tx, tx.getBucket(), assetName);
+    if (asset == null) {
+      asset = tx.createAsset(tx.getBucket(), getRepository().getFormat());
+      asset.name(assetName);
+    }
+
+    AttributesMap contentAttributes = null;
+    if (payload instanceof Content) {
+      contentAttributes = ((Content) payload).getAttributes();
+    }
+    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
+    // FIXME Nexus is changing content type from application/json to text/plain even if is a json file
+    tx.setBlob(asset, assetName, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
+    tx.saveAsset(asset);
+  }
+
+  @Override
   @Transactional(retryOn = IllegalStateException.class)
   public Content getMetadata(final String imageId) throws IOException {
     validateImageId(imageId);
@@ -84,7 +118,7 @@ public class DockerFacetImpl
     String metadataAssetName = componentName + "/json";
 
     Bucket bucket = tx.getBucket();
-    Component component = getComponent(tx, componentName, bucket);
+    Component component = findComponent(tx, bucket, componentName);
     if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
@@ -113,9 +147,9 @@ public class DockerFacetImpl
       if (!data.get("id").equals(imageId)) {
         throw new V1ApiException("JSON data contains invalid id");
       }
-      // TODO check image belongs to repository
+      // TODO check image belongs to repository?
       // TODO check parent exists
-      // TODO check parent is accessible via authorisation
+      // TODO check parent is accessible via authorisation?
       doPutMetadata(imageId, streamSupplier, content);
     }
   }
@@ -130,7 +164,7 @@ public class DockerFacetImpl
     String layerAssetName = componentName + "/layer";
 
     Bucket bucket = tx.getBucket();
-    Component component = getComponent(tx, componentName, bucket);
+    Component component = findComponent(tx, bucket, componentName);
     if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
@@ -149,10 +183,10 @@ public class DockerFacetImpl
     StorageTx tx = UnitOfWork.currentTransaction();
 
     String componentName = imageId;
-    String assetNameMetadata = componentName + "/json";
+    String metadataAssetName = componentName + "/json";
 
     Bucket bucket = tx.getBucket();
-    Component component = getComponent(tx, componentName, bucket);
+    Component component = findComponent(tx, bucket, componentName);
     Asset metadataAsset = null;
     if (component == null) {
       component = tx.createComponent(bucket, getRepository().getFormat()).name(componentName);
@@ -164,7 +198,7 @@ public class DockerFacetImpl
       if (!Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
         throw new V1ApiException("Image already exists", HttpStatus.CONFLICT);
       }
-      metadataAsset = findAsset(tx, component, assetNameMetadata);
+      metadataAsset = findAsset(tx, component, metadataAssetName);
 
       // cleanup checksums as we have potentially new metadata/layer
       component.formatAttributes().remove(P_X_DOCKER_CHECKSUM_PAYLOAD);
@@ -172,7 +206,7 @@ public class DockerFacetImpl
     }
     if (metadataAsset == null) {
       metadataAsset = tx.createAsset(bucket, component);
-      metadataAsset.name(assetNameMetadata);
+      metadataAsset.name(metadataAssetName);
     }
 
     // If we reach that point, it means that this is a new image or a retry on a failed push
@@ -183,7 +217,7 @@ public class DockerFacetImpl
     }
     Content.applyToAsset(metadataAsset, Content.maintainLastModified(metadataAsset, contentAttributes));
     // FIXME Nexus is changing content type from application/json to text/plain even if is a json file
-    tx.setBlob(metadataAsset, assetNameMetadata, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
+    tx.setBlob(metadataAsset, metadataAssetName, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(metadataAsset);
 
     // TODO generate ancestry (maybe not in transaction?)
@@ -209,7 +243,7 @@ public class DockerFacetImpl
     String layerAssetName = componentName + "/layer";
 
     Bucket bucket = tx.getBucket();
-    Component component = getComponent(tx, componentName, bucket);
+    Component component = findComponent(tx, bucket, componentName);
     if (component == null) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
@@ -281,7 +315,7 @@ public class DockerFacetImpl
     String metadataAssetName = componentName + "/json";
 
     Bucket bucket = tx.getBucket();
-    Component component = getComponent(tx, componentName, bucket);
+    Component component = findComponent(tx, bucket, componentName);
     if (component == null) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
@@ -301,8 +335,12 @@ public class DockerFacetImpl
     tx.saveComponent(component);
   }
 
-  private Component getComponent(final StorageTx tx, final String imageId, final Bucket bucket) {
+  private Component findComponent(final StorageTx tx, final Bucket bucket, final String imageId) {
     return tx.findComponentWithProperty(StorageFacet.P_NAME, imageId, bucket);
+  }
+
+  private Asset findAsset(final StorageTx tx, final Bucket bucket, final String assetName) {
+    return tx.findAssetWithProperty(StorageFacet.P_NAME, assetName, bucket);
   }
 
   @Nullable
@@ -314,6 +352,16 @@ public class DockerFacetImpl
       }
     }
     return null;
+  }
+
+  private List<Map<String, Object>> readImagesIndex(final Supplier<InputStream> streamSupplier) {
+    TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {};
+    try {
+      return mapper.readValue(streamSupplier.get(), typeRef);
+    }
+    catch (Exception e) {
+      throw new V1ApiException("Invalid data");
+    }
   }
 
   private Map<String, Object> readMetadata(final Supplier<InputStream> streamSupplier) {

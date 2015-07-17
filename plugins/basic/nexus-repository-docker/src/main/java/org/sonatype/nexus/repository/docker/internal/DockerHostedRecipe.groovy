@@ -160,6 +160,8 @@ class DockerHostedRecipe
                 new TokenMatcher('/v1/repositories/{repository}/')
             )
         ))
+        .handler(v1ExceptionHandler)
+        .handler(unitOfWorkHandler)
         .handler(v1Index.addRepository.rcurry(false))
         .create())
 
