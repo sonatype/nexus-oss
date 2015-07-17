@@ -46,7 +46,8 @@ public class CacheController
    * @return the new cache Token that is in-effect after this method returns.
    */
   public String invalidateCache() {
-    return this.cacheToken = newCacheToken();
+    this.cacheToken = newCacheToken();
+    return this.cacheToken;
   }
 
   /**

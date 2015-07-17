@@ -96,8 +96,6 @@ public class Maven2GroupFacet
 
   private final Maven2MetadataMerger metadataMerger;
 
-  private Config config;
-
   private MavenFacet mavenFacet;
 
   private CacheController cacheController;
@@ -123,7 +121,7 @@ public class Maven2GroupFacet
   @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
     super.doConfigure(configuration);
-    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+    Config config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
 
     if (cacheController == null) {
       cacheController = new CacheController(config.contentMaxAge, config.cacheToken);

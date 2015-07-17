@@ -26,7 +26,6 @@ import javax.validation.Validator;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.validation.ConstraintViolations;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -45,7 +44,7 @@ public class ConfigurationFacetImpl
     implements ConfigurationFacet
 {
   private static final TypeReference<Map<String, Object>> MAP_STRING_OBJECT =
-      new TypeReference<Map<String, Object>>() {};
+      new TypeReference<Map<String, Object>>() { };
 
   private final ConfigurationStore store;
 
@@ -118,7 +117,7 @@ public class ConfigurationFacetImpl
   {
     @SuppressWarnings("unused")
     @Valid
-    private Map<String,Object> attributes;
+    private Map<String, Object> attributes;
 
     public SectionWrapper(final String name, final Object value) {
       this.attributes = Collections.singletonMap(name, value);
