@@ -32,19 +32,23 @@ Ext.define('NX.coreui.app.PluginStrings', {
 
   keys: {
     // Browse -> Browse
-    Browse_Title_Feature: 'Browse',
-    Browse_Description_Feature: 'Browse components and assets',
+    Browse_Assets_Title_Feature: 'Assets',
+    Browse_Assets_Description_Feature: 'Browse assets',
+    Browse_Components_Title_Feature: 'Components',
+    Browse_Components_Description_Feature: 'Browse components and assets',
     Browse_BrowseRepositoryList_Name_Column: 'Name',
     Browse_BrowseRepositoryList_Type_Column: 'Type',
     Browse_BrowseRepositoryList_Format_Column: 'Format',
     Browse_BrowseRepositoryList_EmptyText_View: 'No browseable repositories defined',
     Browse_BrowseRepositoryList_EmptyText_Filter: 'No repositories matched "$filter"',
-    Browse_BrowseResultList_Name_Column: 'Name',
-    Browse_BrowseResultList_Name_Column_Unattached: '-- Unattached assets --',
-    Browse_BrowseResultList_Group_Column: 'Group',
-    Browse_BrowseResultList_Version_Column: 'Version',
-    Browse_BrowseResultList_EmptyText_View: 'No components found in repository',
-    Browse_BrowseResultList_EmptyText_Filter: 'No components matched "$filter"',
+    Browse_BrowseComponentList_Name_Column: 'Name',
+    Browse_BrowseComponentList_Group_Column: 'Group',
+    Browse_BrowseComponentList_Version_Column: 'Version',
+    Browse_BrowseComponentList_EmptyText_View: 'No components found in repository',
+    Browse_BrowseComponentList_EmptyText_Filter: 'No components matched "$filter"',
+    Browse_BrowseAssetList_Name_Column: 'Name',
+    Browse_BrowseAssetList_EmptyText_View: 'No assets found in repository',
+    Browse_BrowseAssetList_EmptyText_Filter: 'No assets matched "$filter"',
     Assets_Info_Path: 'Path',
     Assets_Info_ContentType: 'Content Type',
     Assets_Info_FileSize: 'File size',
@@ -133,6 +137,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Feed_FeedFeature_List_Title: 'Events',
     Feed_FeedEntryList_Title_Header: 'Title',
     Feed_FeedEntryList_Date_Header: 'Date',
+
+    // Browse -> Browse
+    FeatureGroups_Browse_Text: 'Browse',
+    FeatureGroups_Browse_Description: 'Browse assets and components',
 
     // Browse -> Upload
     FeatureGroups_Upload_Text: 'Upload',
@@ -900,7 +908,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Nuget_NuGetApiKey_Access_Button: 'Access API Key',
     Nuget_NuGetApiKey_Access_HelpText: 'Accessing NuGet API Key requires validation of your credentials.',
     Nuget_NuGetApiKey_Reset_Button: 'Reset API Key',
-    Nuget_NuGetApiKey_Reset_HelpText: 'Resetting NuGet API Key requires validation of your credentials.',
+    Nuget_NuGetApiKey_Reset_HelpText: 'Resetting NuGet API Key requires validation of your credentials.'
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);

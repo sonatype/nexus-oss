@@ -73,9 +73,8 @@ Ext.define('NX.coreui.view.component.AssetAttributes', {
   /**
    * @public
    * @param {Object} assetModel the asset to display
-   * @param {String} format the format for the asset
    */
-  setAssetModel: function(assetModel, format) {
+  setAssetModel: function(assetModel) {
     var me = this,
       store = me.getStore();
     me.assetModel = assetModel;

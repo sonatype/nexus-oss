@@ -77,6 +77,17 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       },
       {
         mode: 'browse',
+        path: '/Browse',
+        text: NX.I18n.get('FeatureGroups_Browse_Text'),
+        description: NX.I18n.get('FeatureGroups_Browse_Description'),
+        group: true,
+        iconConfig: {
+          file: 'box_front.png',
+          variants: ['x16', 'x32']
+        }
+      },
+      {
+        mode: 'browse',
         path: '/Upload',
         text: NX.I18n.get('FeatureGroups_Upload_Text'),
         description: NX.I18n.get('FeatureGroups_Upload_Description'),

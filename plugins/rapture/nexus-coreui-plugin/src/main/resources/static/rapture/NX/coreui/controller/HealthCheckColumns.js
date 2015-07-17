@@ -31,8 +31,8 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
     'Component'
   ],
   stores: [
-    'Asset',
-    'SearchResult'
+    'SearchResult',
+    'ComponentAsset'
   ],
   refs: [
     { ref: 'healthcheckResult', selector: 'grid[healthCheckColumnsTarget=true]' },

@@ -13,34 +13,35 @@
 /*global Ext, NX*/
 
 /**
- * Asset store.
+ * Browse assets feature.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.store.Asset', {
-  extend: 'Ext.data.Store',
-  model: 'NX.coreui.model.Asset',
+Ext.define('NX.coreui.view.browse.BrowseAssetFeature', {
+  extend: 'NX.view.drilldown.Drilldown',
+  alias: 'widget.nx-coreui-browseassetfeature',
 
-  proxy: {
-    type: 'direct',
+  iconName: 'browse-asset-default',
 
-    api: {
-      read: 'NX.direct.coreui_Component.readAssets'
+  masters: [
+    {xtype: 'nx-coreui-browse-repository-list'},
+    {xtype: 'nx-coreui-browse-asset-list'}
+  ],
+
+  detail: {
+    xtype: 'panel',
+
+    layout: {
+      type: 'vbox',
+      align: 'stretch',
+      pack: 'start'
     },
 
-    reader: {
-      type: 'json',
-      root: 'data',
-      successProperty: 'success'
+    items: {
+      xtype: 'nx-coreui-component-assetcontainer',
+      header: false,
+      flex: 1
     }
-  },
-
-  buffered: true,
-  pageSize: 50,
-
-  remoteFilter: true,
-  remoteSort: true,
-
-  sorters: { property: 'name', direction: 'ASC' }
+  }
 
 });

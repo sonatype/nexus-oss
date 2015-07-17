@@ -61,7 +61,9 @@ Ext.define('NX.coreui.controller.Assets', {
           updated: me.showComponentDetails
         },
         'nx-coreui-component-asset-list': {
-          updated: me.loadAssets,
+          updated: me.loadAssets
+        },
+        'grid[assetContainerSource=true]': {
           cellclick: me.updateAssetContainer
         },
         'nx-coreui-component-assetinfo button[action=deleteAsset]': {
@@ -72,10 +74,13 @@ Ext.define('NX.coreui.controller.Assets', {
   },
 
   /**
-   * @private
    * Shows information about selected component/asset.
+   *
+   * @private
+   * @param {NX.coreui.view.component.AssetContainer} container asset container
+   * @param {NX.coreui.model.Asset} assetModel selected asset
    */
-  showAssetInfo: function(container, componentModel, assetModel) {
+  showAssetInfo: function(container, assetModel) {
     var info = container.down('nx-coreui-component-assetinfo'),
       attributes = container.down('nx-coreui-component-assetattributes'),
       panel;
@@ -83,10 +88,9 @@ Ext.define('NX.coreui.controller.Assets', {
     if (!info) {
       info = container.add({xtype: 'nx-coreui-component-assetinfo', weight: 10});
     }
-    info.setAssetModel(assetModel, componentModel.get('format'));
+    info.setAssetModel(assetModel);
 
     if (!attributes) {
-
       attributes = Ext.create('widget.nx-coreui-component-assetattributes');
       panel = Ext.create('Ext.Panel', {
         ui: 'nx-inset',
@@ -95,7 +99,7 @@ Ext.define('NX.coreui.controller.Assets', {
       panel.add(attributes);
       container.add(panel);
     }
-    attributes.setAssetModel(assetModel, componentModel.get('format'));
+    attributes.setAssetModel(assetModel);
   },
 
   showComponentDetails: function(container, componentModel) {
@@ -159,27 +163,26 @@ Ext.define('NX.coreui.controller.Assets', {
   },
 
   /**
-   * @private
-   *
    * Update asset shown in asset container.
+   *
+   * @private
    */
   updateAssetContainer: function(gridView, td, cellIndex, assetModel) {
-    var me = this, assetContainer = me.getAssetContainer();
-
-    assetContainer.refreshInfo(gridView.up('grid').componentModel, assetModel);
-    me.bindDeleteAssetButton(this.getDeleteAssetButton());
+    this.getAssetContainer().refreshInfo(assetModel);
+    this.bindDeleteAssetButton(this.getDeleteAssetButton());
   },
 
   /**
-   * @protected
    * Enable 'Delete' when user has 'delete' permission.
+   *
+   * @protected
    */
   bindDeleteAssetButton: function(button) {
-    var component = this.getAssetList().componentModel;
+    var assetModel = this.getAssetContainer().assetModel;
     button.mon(
-        NX.Conditions.isPermitted('nexus:repository-view:' + component.get('format') + ':' +
-            component.get('repositoryName') + ':delete')
-        ,
+        NX.Conditions.isPermitted(
+            'nexus:repository-view:' + assetModel.get('format') + ':' + assetModel.get('repositoryName') + ':delete'
+        ),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
@@ -188,7 +191,7 @@ Ext.define('NX.coreui.controller.Assets', {
     );
   },
 
-  /**                                
+  /**
    * @private
    * Remove selected asset.
    */

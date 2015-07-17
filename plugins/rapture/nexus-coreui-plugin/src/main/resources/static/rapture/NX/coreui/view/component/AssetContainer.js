@@ -33,30 +33,24 @@ Ext.define('NX.coreui.view.component.AssetContainer', {
   },
 
   /**
-   * Currently shown component model.
-   */
-  componentModel: undefined,
-
-  /**
    * Currently shown asset model.
    */
   assetModel: undefined,
 
   /**
-   * @public
    * Shows an asset in container.
-   * @param {NX.coreui.model.Component} componentModel parent component of asset fo be shown
+   *
+   * @public
    * @param {NX.coreui.model.Asset} assetModel asset to be shown
    */
-  refreshInfo: function(componentModel, assetModel) {
+  refreshInfo: function(assetModel) {
     var me = this,
         iconName = 'asset-type-default',
         contentType;
 
-    me.componentModel = componentModel;
     me.assetModel = assetModel;
 
-    if (me.componentModel && me.assetModel) {
+    if (me.assetModel) {
       if (me.hidden) {
         me.show();
       }
@@ -67,7 +61,7 @@ Ext.define('NX.coreui.view.component.AssetContainer', {
       me.setIconCls(NX.Icons.cls(iconName, 'x16'));
       me.setTitle(me.assetModel.get('name'));
 
-      me.fireEvent('updated', me, me.componentModel, me.assetModel);
+      me.fireEvent('updated', me, me.assetModel);
     }
     else {
       me.hide();

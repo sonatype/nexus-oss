@@ -13,23 +13,23 @@
 /*global Ext, NX*/
 
 /**
- * Assets grid.
+ * Browse assets grid.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.component.AssetList', {
+Ext.define('NX.coreui.view.browse.BrowseAssetList', {
   extend: 'NX.view.drilldown.Master',
-  alias: 'widget.nx-coreui-component-asset-list',
+  alias: 'widget.nx-coreui-browse-asset-list',
   requires: [
     'NX.I18n'
   ],
 
-  /**
-   * Currently shown component model.
-   */
-  componentModel: undefined,
+  config: {
+    stateful: true,
+    stateId: 'nx-coreui-browse-asset-list'
+  },
 
-  store: 'ComponentAsset',
+  store: 'Asset',
 
   // Marker for source of targets to be shown in container assets
   assetContainerSource: true,
@@ -37,10 +37,13 @@ Ext.define('NX.coreui.view.component.AssetList', {
   // Prevent the store from automatically loading
   loadStore: Ext.emptyFn,
 
-  allowDeselect: true,
+  style: {
+    'background-color': '#F4F4F4'
+  },
 
   viewConfig: {
-    emptyText: 'No assets found',
+    emptyText: NX.I18n.get('Browse_BrowseAssetList_EmptyText_View'),
+    emptyTextFilter: NX.I18n.get('Browse_BrowseAssetList_EmptyText_Filter'),
     deferEmptyText: false
   },
 
@@ -64,23 +67,26 @@ Ext.define('NX.coreui.view.component.AssetList', {
       }
     },
     {
-      text: NX.I18n.get('SearchResultAssetList_Name_Header'),
+      text: NX.I18n.get('Browse_BrowseAssetList_Name_Column'),
       dataIndex: 'name',
-      flex: 2.5
+      stateId: 'name',
+      flex: 1
     }
   ],
 
-  /**
-   * @public
-   *
-   * Sets owning component.
-   * @param {NX.coreui.model.Component} componentModel owning component
-   */
-  setComponentModel: function(componentModel) {
-    var me = this;
-
-    me.componentModel = componentModel;
-    me.fireEvent('updated', me, me.componentModel);
-  }
+  dockedItems: [{
+    xtype: 'toolbar',
+    dock: 'top',
+    cls: 'nx-actions nx-borderless',
+    items: [
+      '->',
+      {
+        xtype: 'nx-searchbox',
+        itemId: 'filter',
+        emptyText: NX.I18n.get('Grid_Plugin_FilterBox_Empty'),
+        width: 200
+      }
+    ]
+  }]
 
 });

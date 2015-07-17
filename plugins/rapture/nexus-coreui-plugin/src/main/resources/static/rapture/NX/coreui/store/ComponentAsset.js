@@ -17,7 +17,7 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.store.Asset', {
+Ext.define('NX.coreui.store.ComponentAsset', {
   extend: 'Ext.data.Store',
   model: 'NX.coreui.model.Asset',
 
@@ -25,7 +25,7 @@ Ext.define('NX.coreui.store.Asset', {
     type: 'direct',
 
     api: {
-      read: 'NX.direct.coreui_Component.readAssets'
+      read: 'NX.direct.coreui_Component.readComponentAssets'
     },
 
     reader: {
@@ -35,12 +35,7 @@ Ext.define('NX.coreui.store.Asset', {
     }
   },
 
-  buffered: true,
-  pageSize: 50,
-
   remoteFilter: true,
-  remoteSort: true,
-
   sorters: { property: 'name', direction: 'ASC' }
 
 });

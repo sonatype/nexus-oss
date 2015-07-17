@@ -13,11 +13,11 @@
 /*global Ext, NX*/
 
 /**
- * Browse controller.
+ * Browse components controller.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.controller.Browse', {
+Ext.define('NX.coreui.controller.BrowseComponents', {
   extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Bookmarks',
@@ -26,38 +26,39 @@ Ext.define('NX.coreui.controller.Browse', {
     'NX.I18n'
   ],
   masters: [
-    'nx-coreui-browse-repository-list',
-    'nx-coreui-browse-result-list',
-    'nx-coreui-component-asset-list'
+    'nx-coreui-browsecomponentfeature nx-coreui-browse-repository-list',
+    'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list',
+    'nx-coreui-browsecomponentfeature nx-coreui-component-asset-list'
   ],
   stores: [
-    'Asset',
-    'Component'
+    'Component',
+    'ComponentAsset'
   ],
   models: [
     'Component'
   ],
 
   views: [
-    'browse.BrowseFeature',
-    'browse.BrowseRepositoryList',
-    'browse.BrowseResultList'
+    'browse.BrowseComponentFeature',
+    'browse.BrowseComponentList',
+    'browse.BrowseRepositoryList'
   ],
 
   refs: [
-    {ref: 'feature', selector: 'nx-coreui-browsefeature'},
-    {ref: 'results', selector: 'nx-coreui-browsefeature nx-coreui-browse-result-list'},
-    {ref: 'componentDetails', selector: 'nx-coreui-browsefeature nx-coreui-component-details'},
-    {ref: 'assets', selector: 'nx-coreui-browsefeature nx-coreui-component-asset-list'},
-    {ref: 'componentFilter', selector: 'nx-coreui-browsefeature nx-coreui-browse-result-list #filter'}
+    {ref: 'feature', selector: 'nx-coreui-browsecomponentfeature'},
+    {ref: 'repositoryList', selector: 'nx-coreui-browsecomponentfeature nx-coreui-browse-repository-list'},
+    {ref: 'componentList', selector: 'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list'},
+    {ref: 'assetList', selector: 'nx-coreui-browsecomponentfeature nx-coreui-component-asset-list'},
+    {ref: 'componentDetails', selector: 'nx-coreui-browsecomponentfeature nx-coreui-component-details'},
+    {ref: 'componentFilter', selector: 'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list #filter'}
   ],
 
   features: {
     mode: 'browse',
-    path: '/Browse',
-    text: NX.I18n.get('Browse_Title_Feature'),
-    description: NX.I18n.get('Browse_Description_Feature'),
-    view: 'NX.coreui.view.browse.BrowseFeature',
+    path: '/Browse/Components',
+    text: NX.I18n.get('Browse_Components_Title_Feature'),
+    description: NX.I18n.get('Browse_Components_Description_Feature'),
+    view: 'NX.coreui.view.browse.BrowseComponentFeature',
     iconConfig: {
       file: 'plugin.png',
       variants: ['x16', 'x32']
@@ -68,10 +69,9 @@ Ext.define('NX.coreui.controller.Browse', {
   },
 
   icons: {
-    'browse-default': {file: 'database.png', variants: ['x16', 'x32']},
+    'browse-component-default': {file: 'database.png', variants: ['x16', 'x32']},
     'browse-component': {file: 'box_front.png', variants: ['x16', 'x32']},
-    'browse-component-detail': {file: 'box_front_open.png', variants: ['x16', 'x32']},
-    'browse-unattached': {file: 'file_extension_default.png', variants: ['x16', 'x32']}
+    'browse-component-detail': {file: 'box_front_open.png', variants: ['x16', 'x32']}
   },
 
   /**
@@ -94,7 +94,7 @@ Ext.define('NX.coreui.controller.Browse', {
         }
       },
       component: {
-        'nx-coreui-browsefeature nx-coreui-browse-result-list #filter': {
+        'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list #filter': {
           search: me.onSearch,
           searchcleared: me.onSearchCleared
         }
@@ -120,10 +120,10 @@ Ext.define('NX.coreui.controller.Browse', {
     // Figure out what kind of list we’re dealing with
     modelType = model.id.replace(/^.*?model\./, '').replace(/\-.*$/, '');
 
-    if (modelType == "RepositoryReference") {
+    if (modelType === "RepositoryReference") {
       me.onRepositorySelection(model);
     }
-    else if (modelType == "Component") {
+    else if (modelType === "Component") {
       me.onComponentSelection(model);
     }
   },
@@ -138,12 +138,12 @@ Ext.define('NX.coreui.controller.Browse', {
   onRepositorySelection: function(model) {
     var me = this,
         componentStore = me.getStore('Component'),
-        results = me.getResults(),
+        componentList = me.getComponentList(),
         componentFilter = me.getComponentFilter();
 
     componentStore.filters.removeAtKey('filter');
     componentFilter.clearSearch();
-    results.getSelectionModel().deselectAll();
+    componentList.getSelectionModel().deselectAll();
     componentStore.addFilter([
       {
         id: 'repositoryName',
@@ -164,36 +164,46 @@ Ext.define('NX.coreui.controller.Browse', {
     var me = this;
 
     me.getComponentDetails().setComponentModel(model);
-    me.getAssets().setComponentModel(model);
+    me.getAssetList().setComponentModel(model);
   },
 
   /**
    * @override
-   * Load all of the stores associated with this controller
+   * Load all of the stores associated with this controller.
    */
   loadStores: function() {
-    this.getStore('Repository').load();
+    if (this.getFeature()) {
+      if (this.currentIndex === 0) {
+        this.getRepositoryList().getStore().load();
+      }
+      if (this.currentIndex === 1) {
+        this.getComponentList().getStore().load();
+      }
+      if (this.currentIndex === 2) {
+        this.getAssetList().getStore().load();
+      }
+    }
   },
 
   /**
    * @private
    * Filter grid.
    *
+   * @private
    * @param {NX.ext.SearchBox} searchBox component
    * @param {String} value to be searched
    */
   onSearch: function(searchBox, value) {
-    var me = this,
-        componentStore = me.getStore('Component'),
-        results = me.getResults(),
-        emptyText = NX.I18n.get('Browse_BrowseResultList_EmptyText_Filter');
+    var grid = searchBox.up('grid'),
+        store = grid.getStore(),
+        emptyText = grid.getView().emptyTextFilter;
 
-    if (!results.emptyText) {
-      results.emptyText = results.getView().emptyText;
+    if (!grid.emptyText) {
+      grid.emptyText = grid.getView().emptyText;
     }
-    results.getView().emptyText = '<div class="x-grid-empty">' + emptyText.replace(/\$filter/, value) + '</div>';
-    results.getSelectionModel().deselectAll();
-    componentStore.addFilter([
+    grid.getView().emptyText = '<div class="x-grid-empty">' + emptyText.replace(/\$filter/, value) + '</div>';
+    grid.getSelectionModel().deselectAll();
+    store.addFilter([
       {
         id: 'filter',
         property: 'filter',
@@ -203,25 +213,26 @@ Ext.define('NX.coreui.controller.Browse', {
   },
 
   /**
-   * @private
    * Clear filtering on grid.
+   *
+   * @private
+   * @param {NX.ext.SearchBox} searchBox component
    */
-  onSearchCleared: function() {
-    var me = this,
-        componentStore = me.getStore('Component'),
-        results = me.getResults();
+  onSearchCleared: function(searchBox) {
+    var grid = searchBox.up('grid'),
+        store = grid.getStore();
 
-    if (results.emptyText) {
-      results.getView().emptyText = results.emptyText;
+    if (grid.emptyText) {
+      grid.getView().emptyText = grid.emptyText;
     }
-    results.getSelectionModel().deselectAll();
+    grid.getSelectionModel().deselectAll();
     // we have to remove filter directly as store#removeFilter() does not work when store#remoteFilter = true
-    if (componentStore.filters.removeAtKey('filter')) {
-      if (componentStore.filters.length) {
-        componentStore.filter();
+    if (store.filters.removeAtKey('filter')) {
+      if (store.filters.length) {
+        store.filter();
       }
       else {
-        componentStore.clearFilter();
+        store.clearFilter();
       }
     }
   }

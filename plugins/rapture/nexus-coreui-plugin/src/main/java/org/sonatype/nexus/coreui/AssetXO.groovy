@@ -32,6 +32,9 @@ class AssetXO
   String name
 
   @NotEmpty
+  String format
+
+  @NotEmpty
   String contentType
 
   @NotEmpty
