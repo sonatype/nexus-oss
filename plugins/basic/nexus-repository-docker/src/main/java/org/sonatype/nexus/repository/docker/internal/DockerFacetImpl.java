@@ -113,6 +113,10 @@ public class DockerFacetImpl
         throw new V1ApiException("Image already exists", HttpStatus.CONFLICT);
       }
       asset = findAsset(tx, component, assetNameMetadata);
+
+      // cleanup checksums as we have potentially new metadata/layer
+      component.formatAttributes().remove(P_X_DOCKER_CHECKSUM_PAYLOAD);
+      tx.saveComponent(component);
     }
     if (asset == null) {
       asset = tx.createAsset(bucket, component);
@@ -127,6 +131,8 @@ public class DockerFacetImpl
     Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
     tx.setBlob(asset, assetNameMetadata, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(asset);
+
+    // TODO generate ancestry (maybe not in transaction?)
   }
 
   @Override
