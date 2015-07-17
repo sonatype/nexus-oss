@@ -22,6 +22,8 @@ import javax.validation.constraints.NotNull;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.MissingFacetException;
+import org.sonatype.nexus.repository.cache.CacheController;
+import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
@@ -86,7 +88,7 @@ public abstract class ProxyFacetSupport
 
   private boolean remoteUrlChanged;
 
-  private volatile String cacheToken;
+  private CacheController cacheController;
 
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
@@ -97,6 +99,8 @@ public abstract class ProxyFacetSupport
   protected void doConfigure(final Configuration configuration) throws Exception {
     config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
 
+    // current we do not persist cacheToken but we might in the future
+    cacheController = new CacheController(config.contentMaxAge, null);
     // normalize URL path to contain trailing slash
     if (!config.remoteUrl.getPath().endsWith("/")) {
       config.remoteUrl = config.remoteUrl.resolve(config.remoteUrl.getPath() + "/");
@@ -149,7 +153,7 @@ public abstract class ProxyFacetSupport
 
     Content content = getCachedPayload(context);
 
-    if (isStale(context, content)) {
+    if (isStale(content)) {
       try {
         final Content remote = fetch(context, content);
         if (remote != null) {
@@ -168,7 +172,7 @@ public abstract class ProxyFacetSupport
   @Override
   public void invalidateProxyCaches() {
     log.info("Invalidating proxy caches of {}", getRepository().getName());
-    this.cacheToken = Long.toString(System.nanoTime());
+    cacheController.invalidateCache();
   }
 
   /**
@@ -210,7 +214,7 @@ public abstract class ProxyFacetSupport
     StatusLine status = response.getStatusLine();
     log.debug("Status: {}", status);
 
-    final CacheInfo cacheInfo = new CacheInfo(DateTime.now(), cacheToken);
+    final CacheInfo cacheInfo = cacheController.current();
 
     if (status.getStatusCode() == HttpStatus.SC_OK) {
       HttpEntity entity = response.getEntity();
@@ -279,27 +283,12 @@ public abstract class ProxyFacetSupport
    */
   protected abstract String getUrl(final @Nonnull Context context);
 
-  private boolean isStale(final Context context, final Content content) throws IOException {
+  private boolean isStale(final Content content) throws IOException {
     if (content == null) {
-      // not in cache
+      // not in cache, consider it stale
       return true;
     }
-
-    if (config.contentMaxAge < 0) {
-      log.trace("Content max age checking disabled");
-      return false;
-    }
-
-    // Note: content w/o CacheInfo was not stored by ProxyFacetSupport, see fetch(String, Context, Content)
-    final CacheInfo cacheInfo = content.getAttributes().require(CacheInfo.class);;
-    if (cacheToken != null && !cacheToken.equals(cacheInfo.getCacheToken())) {
-      log.debug("Content expired (cacheToken)");
-      return true;
-    }
-    if (cacheInfo.getLastVerified().isBefore(new DateTime().minusMinutes(config.contentMaxAge))) {
-      log.debug("Content expired (age)");
-      return true;
-    }
-    return false;
+    final CacheInfo cacheInfo = content.getAttributes().require(CacheInfo.class);
+    return cacheController.isStale(cacheInfo);
   }
 }

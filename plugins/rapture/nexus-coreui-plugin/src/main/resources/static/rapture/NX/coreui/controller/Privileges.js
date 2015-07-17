@@ -95,6 +95,11 @@ Ext.define('NX.coreui.controller.Privileges', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadStores
+        }
+      },
       store: {
         '#Privilege': {
           load: me.reselect
@@ -115,8 +120,6 @@ Ext.define('NX.coreui.controller.Privileges', {
         info = {};
 
     if (Ext.isDefined(model)) {
-      me.setItemClass(1, NX.Icons.cls('privilege-' + model.get('type'), 'x16'));
-
       info[NX.I18n.get('Privileges_Summary_ID')] = model.getId();
       info[NX.I18n.get('Privileges_Summary_Type')] = model.get('type');
       info[NX.I18n.get('Privileges_Summary_Name')] = model.get('name');

@@ -73,6 +73,18 @@ NX.TestHarness.start(
     },
 
     {
+      group: 'Browse',
+      items: [
+        {
+          group: 'FT',
+          items: [
+            { url: 'testsuite-oss/browse/browse_assets.t.js' }
+          ]
+        }
+      ]
+    },
+
+    {
       group: 'Security',
       items: [
         {

@@ -31,8 +31,8 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
     'Component'
   ],
   stores: [
-    'Asset',
-    'SearchResult'
+    'SearchResult',
+    'ComponentAsset'
   ],
   refs: [
     { ref: 'healthcheckResult', selector: 'grid[healthCheckColumnsTarget=true]' },
@@ -114,7 +114,9 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
       });
       if (success) {
         Ext.Array.each(response.data, function(entry) {
-          var model = store.getById(entry.id);
+          var model = Ext.Array.findBy(records, function(record) {
+            return record.getId() === entry.id;
+          });
           if (model) {
             model.beginEdit();
             Ext.Object.each(entry['healthCheck'], function(key, value) {

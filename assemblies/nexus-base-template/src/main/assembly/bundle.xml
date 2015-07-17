@@ -60,6 +60,23 @@
         <exclude>bin/*.bat</exclude>
       </excludes>
     </fileSet>
+
+    <fileSet>
+      <directory>${project.basedir}/src/main/resources/sonatype-work</directory>
+      <outputDirectory>sonatype-work</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+
+    <!--
+    HACK: Include orientdb studio plugin.
+    -->
+    <fileSet>
+      <directory>${project.build.directory}/orient-plugins</directory>
+      <outputDirectory>${project.build.finalName}/data/orient/plugins</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
   </fileSets>
 
 </assembly>
