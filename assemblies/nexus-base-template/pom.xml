@@ -333,10 +333,10 @@
                 </replace>
 
                 <!--
-                HACK: extract orientdb studio.zip plugin
+                HACK: Include orientdb-studio plugin.
                 -->
                 <unzip src="${com.orientechnologies:orientdb-community:zip:distribution}"
-                       dest="${project.build.directory}/orient-plugins">
+                       dest="${project.build.directory}/assembly/data/orient/plugins">
                   <mergemapper to="studio.zip"/>
                   <patternset>
                     <include name="*/plugins/studio-2.0.zip"/>
