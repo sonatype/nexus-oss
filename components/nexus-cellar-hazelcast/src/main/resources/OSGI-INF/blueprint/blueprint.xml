@@ -29,8 +29,12 @@
                                   update-method="update"/>
     </bean>
 
+    <reference id="injectorService" interface="org.sonatype.nexus.common.guice.InjectorService"
+               availability="mandatory"/>
+
     <bean id="hazelcastConfigurationManager" class="org.sonatype.nexus.hazelcast.NexusHazelcastConfigurationManager" >
         <property name="discoveryServices" ref="discoveryServices"/>
+        <property name="injectorService" ref="injectorService"/>
     </bean>
 
     <!-- Discovery Task -->

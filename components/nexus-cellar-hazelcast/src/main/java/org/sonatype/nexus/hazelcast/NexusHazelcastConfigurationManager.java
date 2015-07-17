@@ -12,6 +12,11 @@
  */
 package org.sonatype.nexus.hazelcast;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.sonatype.nexus.common.guice.InjectorService;
+
 import com.hazelcast.config.Config;
 import org.apache.karaf.cellar.hazelcast.factory.HazelcastConfigurationManager;
 import org.slf4j.Logger;
@@ -21,12 +26,24 @@ public final class NexusHazelcastConfigurationManager
     extends HazelcastConfigurationManager
 {
   private static final Logger log = LoggerFactory.getLogger(NexusHazelcastConfigurationManager.class);
+  private ClassLoader nexusUberClassloader;
 
   @Override
   public Config getHazelcastConfig() {
     log.info("******** Intercepted Hazelcast Configuration! ********");
     Config config = super.getHazelcastConfig();
     config.setInstanceName("nexus");
+    config.setClassLoader(nexusUberClassloader);
     return config;
+  }
+
+  public void setInjectorService(InjectorService injectorService) {
+    injectorService.injectMembers(this);
+  }
+
+  @Inject
+  public void setNexusUberClassloader(@Named("nexus-uber") final ClassLoader nexusUberClassloader) {
+    log.info("********** setNexusUberClassloader **********");
+    this.nexusUberClassloader = nexusUberClassloader;
   }
 }
