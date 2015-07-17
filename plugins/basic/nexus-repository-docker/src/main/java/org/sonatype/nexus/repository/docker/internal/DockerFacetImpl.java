@@ -174,11 +174,7 @@ public class DockerFacetImpl
     tx.setBlob(layerAsset, layerAssetName, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(layerAsset);
 
-    component.formatAttributes().set(
-        P_X_DOCKER_CHECKSUM,
-        "tarsum+" + SHA256.name() + ":" + metadataAsset.attributes().child(P_CHECKSUM).get(SHA256.name())
-    );
-    // calculate sha256 of metadata + "\n" + layer
+    // calculate sha256 of /json + "\n" + /layer
     Hasher hasher = Hashing.sha256().newHasher();
     OutputStream output = Funnels.asOutputStream(hasher);
     try (InputStream in = tx.requireBlob(metadataAsset.requireBlobRef()).getInputStream()) {
@@ -188,9 +184,7 @@ public class DockerFacetImpl
     try (InputStream in = tx.requireBlob(layerAsset.requireBlobRef()).getInputStream()) {
       ByteStreams.copy(in, output);
     }
-    component.formatAttributes().set(
-        P_X_DOCKER_CHECKSUM_PAYLOAD, SHA256.name() + ":" + hasher.hash()
-    );
+    component.formatAttributes().set(P_X_DOCKER_CHECKSUM_PAYLOAD, SHA256.name() + ":" + hasher.hash());
     tx.saveComponent(component);
   }
 
