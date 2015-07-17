@@ -73,11 +73,18 @@ public abstract class ProxyFacetSupport
     @NotNull
     public int contentMaxAge;
 
+    /**
+     * Cache token used by {@link CacheController}.
+     */
+    @NotNull
+    public String cacheToken = CacheController.newCacheToken();
+
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
           "remoteUrl=" + remoteUrl +
           ", contentMaxAge=" + contentMaxAge +
+          ", cacheToken=" + cacheToken +
           '}';
     }
   }
@@ -99,8 +106,7 @@ public abstract class ProxyFacetSupport
   protected void doConfigure(final Configuration configuration) throws Exception {
     config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
 
-    // current we do not persist cacheToken but we might in the future
-    cacheController = new CacheController(config.contentMaxAge, null);
+    cacheController = new CacheController(config.contentMaxAge, config.cacheToken);
     // normalize URL path to contain trailing slash
     if (!config.remoteUrl.getPath().endsWith("/")) {
       config.remoteUrl = config.remoteUrl.resolve(config.remoteUrl.getPath() + "/");
@@ -172,7 +178,8 @@ public abstract class ProxyFacetSupport
   @Override
   public void invalidateProxyCaches() {
     log.info("Invalidating proxy caches of {}", getRepository().getName());
-    cacheController.invalidateCache();
+    config.cacheToken = cacheController.invalidateCache();
+    facet(ConfigurationFacet.class).writeSection(getRepository().getConfiguration(), CONFIG_KEY, config);
   }
 
   /**

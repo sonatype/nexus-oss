@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.constraints.NotNull;
 
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.hash.Hashes;
@@ -31,6 +32,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.cache.CacheController;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.group.GroupFacetImpl;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
@@ -47,6 +49,7 @@ import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -70,7 +73,30 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class Maven2GroupFacet
     extends GroupFacetImpl
 {
+  @VisibleForTesting
+  static final String CONFIG_KEY = "maven2group";
+
+  @VisibleForTesting
+  static class Config
+  {
+    @NotNull
+    public int contentMaxAge = 1440;
+
+    @NotNull
+    public String cacheToken = CacheController.newCacheToken();
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "contentMaxAge=" + contentMaxAge +
+          ", cacheToken=" + cacheToken +
+          '}';
+    }
+  }
+
   private final Maven2MetadataMerger metadataMerger;
+
+  private Config config;
 
   private MavenFacet mavenFacet;
 
@@ -89,12 +115,23 @@ public class Maven2GroupFacet
   }
 
   @Override
+  protected void doValidate(final Configuration configuration) throws Exception {
+    super.doValidate(configuration);
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
+  }
+
+  @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
     super.doConfigure(configuration);
+    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+
     if (cacheController == null) {
-      cacheController = new CacheController(1440, null);
+      cacheController = new CacheController(config.contentMaxAge, config.cacheToken);
     }
-    cacheController.invalidateCache();
+    else {
+      config.cacheToken = cacheController.invalidateCache();
+      facet(ConfigurationFacet.class).writeSection(getRepository().getConfiguration(), CONFIG_KEY, config);
+    }
   }
 
   /**

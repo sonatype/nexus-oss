@@ -26,8 +26,10 @@ import javax.validation.Validator;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.validation.ConstraintViolations;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -42,6 +44,9 @@ public class ConfigurationFacetImpl
     extends FacetSupport
     implements ConfigurationFacet
 {
+  private static final TypeReference<Map<String, Object>> MAP_STRING_OBJECT =
+      new TypeReference<Map<String, Object>>() {};
+
   private final ConfigurationStore store;
 
   private final ObjectMapper objectMapper;
@@ -79,6 +84,17 @@ public class ConfigurationFacetImpl
     log.trace("Reading section: {}", section);
     AttributesMap attributes = configuration.attributes(section);
     return convert(attributes.backing(), type);
+  }
+
+  @Override
+  public void writeSection(final Configuration configuration, final String section, final Object object) {
+    checkNotNull(configuration);
+    checkNotNull(section);
+    checkNotNull(object);
+    log.trace("Writing section: {}", section);
+    Map<String, Object> objectMap = objectMapper.convertValue(object, MAP_STRING_OBJECT);
+    configuration.attributes(section).backing().clear();
+    configuration.attributes(section).backing().putAll(objectMap);
   }
 
   @Override

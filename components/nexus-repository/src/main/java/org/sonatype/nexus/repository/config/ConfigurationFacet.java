@@ -41,6 +41,11 @@ public interface ConfigurationFacet
   <T> T readSection(Configuration configuration, String section, Class<T> type);
 
   /**
+   * Write object of given type to named configuration section.
+   */
+  void writeSection(Configuration configuration, String section, Object object);
+
+  /**
    * Validate given object.
    *
    * @throws ValidationException
