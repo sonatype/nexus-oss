@@ -70,6 +70,14 @@
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
+        <configuration>
+          <excludedArtifactIds combine.children="append">
+            <!--
+            hazelcast is included as part of nexus-distributed-feature
+            -->
+            <id>hazelcast-all</id>
+          </excludedArtifactIds>
+        </configuration>
       </plugin>
     </plugins>
   </build>
