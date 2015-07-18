@@ -10,6 +10,7 @@
   <management-center enabled="true">http://localhost:8080/</management-center>
 
   <properties>
+    <property name="hazelcast.logging.type">slf4j</property>
     <property name="hazelcast.jmx">true</property>
   </properties>
 
