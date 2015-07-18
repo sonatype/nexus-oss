@@ -12,13 +12,12 @@
  */
 package org.sonatype.nexus.internal.orient;
 
-import com.hazelcast.core.Hazelcast;
+import org.sonatype.nexus.internal.hazelcast.HazelcastInstanceProvider;
+
 import com.hazelcast.core.HazelcastInstance;
 import com.orientechnologies.orient.server.hazelcast.OHazelcastPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * {@link OHazelcastPlugin} using a shared {@link HazelcastInstance}.
@@ -30,16 +29,9 @@ public class SharedHazelcastPlugin
 {
   private static final Logger log = LoggerFactory.getLogger(SharedHazelcastPlugin.class);
 
-  /**
-   * The name of the shared {@link HazelcastInstance} we expose to OrientDB.
-   */
-  private static final String INSTANCE_NAME = "nexus";
-
   @Override
   protected HazelcastInstance configureHazelcast() {
-    HazelcastInstance instance = Hazelcast.getHazelcastInstanceByName(INSTANCE_NAME);
-    checkState(instance != null, "Missing shared Hazelcast instance named: %s", INSTANCE_NAME);
-    log.info("Instance: {}", instance);
-    return instance;
+    // HACK: this is not a proper component, but share the provider lookup
+    return new HazelcastInstanceProvider().get();
   }
 }
