@@ -3,8 +3,8 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://www.hazelcast.com/schema/config http://hazelcast.com/schema/config/hazelcast-config-3.3.xsd">
   <group>
-    <name>cellar</name>
-    <password>pass</password>
+    <name>nexus</name>
+    <password>nexus123</password>
   </group>
 
   <management-center enabled="true">http://localhost:8080/</management-center>
