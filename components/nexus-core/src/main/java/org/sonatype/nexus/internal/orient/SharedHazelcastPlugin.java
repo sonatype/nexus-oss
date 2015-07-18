@@ -32,10 +32,16 @@ public class SharedHazelcastPlugin
 {
   private static final Logger log = LoggerFactory.getLogger(SharedHazelcastPlugin.class);
 
+  /**
+   * The name of the shared {@link HazelcastInstance} we expose to OrientDB.
+   */
+  private static final String INSTANCE_NAME = "nexus";
+
   @Override
   protected HazelcastInstance configureHazelcast() throws FileNotFoundException {
-    HazelcastInstance instance = Hazelcast.getHazelcastInstanceByName("nexus");
-    checkState(instance != null);
+    HazelcastInstance instance = Hazelcast.getHazelcastInstanceByName(INSTANCE_NAME);
+    checkState(instance != null, "Missing shared Hazelcast instance named: %s", INSTANCE_NAME);
+    log.info("Instance: {}", instance);
     return instance;
   }
 }
