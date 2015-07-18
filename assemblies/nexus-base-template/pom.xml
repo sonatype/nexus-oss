@@ -339,7 +339,7 @@
                        dest="${project.build.directory}/assembly/data/orient/plugins">
                   <mergemapper to="studio.zip"/>
                   <patternset>
-                    <include name="*/plugins/studio-2.0.zip"/>
+                    <include name="*/plugins/studio-*.zip"/>
                   </patternset>
                 </unzip>
               </target>
