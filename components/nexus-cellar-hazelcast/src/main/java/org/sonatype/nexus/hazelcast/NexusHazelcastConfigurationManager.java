@@ -18,6 +18,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.common.guice.InjectorService;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.MemberAttributeConfig;
 import com.hazelcast.core.HazelcastInstance;
 import org.apache.karaf.cellar.hazelcast.factory.HazelcastConfigurationManager;
 import org.slf4j.Logger;
@@ -42,14 +43,7 @@ public final class NexusHazelcastConfigurationManager
 
   private ClassLoader classLoader;
 
-  @Override
-  public Config getHazelcastConfig() {
-    Config config = super.getHazelcastConfig();
-    config.setInstanceName(INSTANCE_NAME);
-    config.setClassLoader(classLoader);
-    log.debug("Config: {}", config);
-    return config;
-  }
+  //private LocalNodeAccess localNodeAccess;
 
   // blueprint injection-point
   public void setInjectorService(final InjectorService injectorService) {
@@ -61,5 +55,25 @@ public final class NexusHazelcastConfigurationManager
   public void setClassLoader(@Named("nexus-uber") final ClassLoader classLoader) {
     this.classLoader = checkNotNull(classLoader);
     log.info("Class-loader: {}", classLoader);
+  }
+
+  //@Inject
+  //public void setLocalNodeAccess(final LocalNodeAccess localNodeAccess) {
+  //  this.localNodeAccess = checkNotNull(localNodeAccess);
+  //}
+
+  @Override
+  public Config getHazelcastConfig() {
+    Config config = super.getHazelcastConfig();
+    config.setInstanceName(INSTANCE_NAME);
+    config.setClassLoader(classLoader);
+
+    // HACK: Testing exposing local node identity to member config
+    MemberAttributeConfig attributes = new MemberAttributeConfig();
+    attributes.setStringAttribute("node.identity", "PLACE-HOLDER"); // localNodeAccess.getId());
+    config.setMemberAttributeConfig(attributes);
+
+    log.debug("Config: {}", config);
+    return config;
   }
 }
