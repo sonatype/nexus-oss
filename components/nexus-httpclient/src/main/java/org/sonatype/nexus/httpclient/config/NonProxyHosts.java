@@ -31,7 +31,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @since 3.0
  */
-@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
+@Target({METHOD, FIELD, PARAMETER})
 @Retention(RUNTIME)
 @Constraint(validatedBy = NonProxyHostsValidator.class)
 @Documented

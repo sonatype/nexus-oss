@@ -28,11 +28,11 @@ Ext.define('NX.coreui.controller.Search', {
     'NX.I18n'
   ],
   masters: [
-    'nx-coreui-search-result-list',
-    'nx-coreui-component-asset-list'
+    'nx-coreui-searchfeature nx-coreui-search-result-list',
+    'nx-coreui-searchfeature nx-coreui-component-asset-list'
   ],
   stores: [
-    'Asset',
+    'ComponentAsset',
     'SearchFilter',
     'SearchCriteria',
     'SearchResult'
@@ -50,9 +50,9 @@ Ext.define('NX.coreui.controller.Search', {
 
   refs: [
     { ref: 'feature', selector: 'nx-coreui-searchfeature' },
-    { ref: 'searchResult', selector: 'nx-coreui-search-result-list' },
+    { ref: 'searchResult', selector: 'nx-coreui-searchfeature nx-coreui-search-result-list' },
     { ref: 'componentDetails', selector: 'nx-coreui-searchfeature nx-coreui-component-details' },
-    { ref: 'assets', selector: 'nx-coreui-searchfeature nx-coreui-component-asset-list' },
+    { ref: 'assetList', selector: 'nx-coreui-searchfeature nx-coreui-component-asset-list' },
     { ref: 'quickSearch', selector: 'nx-header-panel #quicksearch' }
   ],
 
@@ -271,7 +271,7 @@ Ext.define('NX.coreui.controller.Search', {
     // Extract the filter object from the URI
     if (bookmarkSegments && bookmarkSegments.length) {
       queryIndex = bookmarkSegments[0].indexOf('=');
-      if (queryIndex != -1) {
+      if (queryIndex !== -1) {
         filterSegments = decodeURIComponent(bookmarkSegments[0].slice(queryIndex + 1)).split(' AND ');
         for (var i = 0; i < filterSegments.length; ++i) {
           pair = filterSegments[i].split('=');
@@ -416,10 +416,13 @@ Ext.define('NX.coreui.controller.Search', {
    * Search on refresh.
    */
   loadStores: function() {
-    var me = this;
-
-    if (me.getFeature()) {
-      me.getStore('SearchResult').filter();
+    if (this.getFeature()) {
+      if (this.currentIndex === 0) {
+        this.getSearchResult().getStore().load();
+      }
+      if (this.currentIndex === 1) {
+        this.getAssetList().getStore().load();
+      }
     }
   },
 
@@ -487,7 +490,7 @@ Ext.define('NX.coreui.controller.Search', {
     var me = this;
 
     me.getComponentDetails().setComponentModel(model);
-    me.getAssets().setComponentModel(model);
+    me.getAssetList().setComponentModel(model);
   },
 
   /**
@@ -551,8 +554,8 @@ Ext.define('NX.coreui.controller.Search', {
 
     // Remove any pre-existing query string
     firstSegment = NX.Bookmarks.getBookmark().getSegment(0);
-    if (firstSegment.indexOf('=') != -1) {
-      firstSegment = firstSegment.slice(0, firstSegment.indexOf('='))
+    if (firstSegment.indexOf('=') !== -1) {
+      firstSegment = firstSegment.slice(0, firstSegment.indexOf('='));
     }
 
     // Add each criteria to the filter object

@@ -51,12 +51,12 @@ import org.hibernate.validator.constraints.NotEmpty
 class ComponentComponent
     extends DirectComponentSupport
 {
-  private static String UNATTACHED = "unattached";
 
   private static final Closure ASSET_CONVERTER = { Asset asset, String componentName, String repositoryName ->
     new AssetXO(
         id: asset.entityMetadata.id,
         name: asset.name() ?: componentName,
+        format: asset.format(),
         contentType: asset.contentType() ?: 'unknown',
         size: asset.size() ?: 0,
         repositoryName: repositoryName,
@@ -71,7 +71,7 @@ class ComponentComponent
 
   @Inject
   RepositoryManager repositoryManager
-  
+
   @DirectMethod
   PagedResponse<ComponentXO> read(final StoreLoadParameters parameters) {
     Repository repository = repositoryManager.get(parameters.getFilter('repositoryName'))
@@ -118,8 +118,8 @@ class ComponentComponent
       if (filter) {
         whereClause = "${StorageFacet.P_NAME} LIKE :nameFilter OR ${StorageFacet.P_GROUP} LIKE :groupFilter OR ${StorageFacet.P_VERSION} LIKE :versionFilter"
         queryParams = [
-            'nameFilter': "%${filter}%",
-            'groupFilter': "%${filter}%",
+            'nameFilter'   : "%${filter}%",
+            'groupFilter'  : "%${filter}%",
             'versionFilter': "%${filter}%"
         ]
       }
@@ -135,20 +135,10 @@ class ComponentComponent
             format: component.format()
         )
       }
-      if (parameters.start == 0 && !filter && readUnattachedAssets(storageTx, repositories, repository.name)) {
-        results = new ArrayList<>(results)
-        results.add(0, new ComponentXO(
-            id: UNATTACHED,
-            repositoryName: repository.name,
-            format: repository.format.getValue()
-        ))
-      }
       return new PagedResponse<ComponentXO>(
           (results.size() < parameters.limit ? 0 : parameters.limit) + results.size() + parameters.start,
           results
       )
-
-      storageTx.commit();
     }
     finally {
       storageTx.close()
@@ -156,7 +146,7 @@ class ComponentComponent
   }
 
   @DirectMethod
-  List<AssetXO> readAssets(final StoreLoadParameters parameters) {
+  List<AssetXO> readComponentAssets(final StoreLoadParameters parameters) {
     String repositoryName = parameters.getFilter('repositoryName')
     Repository repository = repositoryManager.get(repositoryName)
     securityHelper.ensurePermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))
@@ -179,10 +169,7 @@ class ComponentComponent
         repositories = ImmutableList.of(repository)
       }
 
-      if (componentId == UNATTACHED) {
-        return readUnattachedAssets(storageTx, repositories, repositoryName)
-      }
-      else if (repositories.size() == 1) {
+      if (repositories.size() == 1) {
         Component component = storageTx.findComponent(new EntityId(componentId), storageTx.getBucket())
         if (component == null) {
           log.warn 'Component {} not found', componentId
@@ -213,7 +200,64 @@ class ComponentComponent
         }
       }
 
-      storageTx.commit();
+      return null
+    }
+    finally {
+      storageTx.close()
+    }
+  }
+
+  @DirectMethod
+  PagedResponse<AssetXO> readAssets(final StoreLoadParameters parameters) {
+    Repository repository = repositoryManager.get(parameters.getFilter('repositoryName'))
+    securityHelper.ensurePermitted(new RepositoryViewPermission(repository, BreadActions.BROWSE))
+
+    if (!repository.configuration.online) {
+      return null
+    }
+
+    def sort = parameters.sort?.get(0)
+    def querySuffix = ''
+    if (sort) {
+      querySuffix += " ORDER BY ${sort.property} ${sort.direction}"
+    }
+    if (parameters.start) {
+      querySuffix += " SKIP ${parameters.start}"
+    }
+    if (parameters.limit) {
+      querySuffix += " LIMIT ${parameters.limit}"
+    }
+
+    StorageTx storageTx = repository.facet(StorageFacet).txSupplier().get()
+    try {
+      storageTx.begin();
+
+      def repositories
+      try {
+        repositories = repository.facet(GroupFacet).leafMembers()
+        querySuffix = " GROUP BY ${StorageFacet.P_NAME}" + querySuffix
+      }
+      catch (MissingFacetException e) {
+        repositories = ImmutableList.of(repository)
+      }
+
+      def whereClause = null
+      def queryParams = null
+      def filter = parameters.getFilter('filter')
+      if (filter) {
+        whereClause = "${StorageFacet.P_NAME} LIKE :nameFilter"
+        queryParams = [
+            'nameFilter': "%${filter}%"
+        ]
+      }
+
+      List<AssetXO> results = storageTx.findAssets(whereClause, queryParams, repositories, querySuffix)
+          .collect(ASSET_CONVERTER.rcurry(null, repository.name))
+
+      return new PagedResponse<AssetXO>(
+          (results.size() < parameters.limit ? 0 : parameters.limit) + results.size() + parameters.start,
+          results
+      )
     }
     finally {
       storageTx.close()
@@ -239,10 +283,4 @@ class ComponentComponent
     }
   }
 
-  private List<AssetXO> readUnattachedAssets(final StorageTx storageTx, final Iterable<Repository> repositories,
-                                             String requestedRepositoryName)
-  {
-    return storageTx.findAssets("${StorageFacet.P_COMPONENT} IS NULL", null, repositories, null).
-        collect(ASSET_CONVERTER.rcurry(null, requestedRepositoryName))
-  }
 }
