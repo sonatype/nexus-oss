@@ -12,6 +12,10 @@
   <properties>
     <property name="hazelcast.logging.type">slf4j</property>
     <property name="hazelcast.jmx">true</property>
+    <!--<property name="hazelcast.jmx.detailed">false</property>-->
+    <property name="hazelcast.version.check.enabled">false</property>
+    <property name="hazelcast.prefer.ipv4.stack">true</property>
+    <property name="hazelcast.health.monitoring.level">SILENT</property>
   </properties>
 
   <network>
