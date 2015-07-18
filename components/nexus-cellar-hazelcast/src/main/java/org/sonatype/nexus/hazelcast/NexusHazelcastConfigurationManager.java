@@ -47,7 +47,7 @@ public final class NexusHazelcastConfigurationManager
     Config config = super.getHazelcastConfig();
     config.setInstanceName(INSTANCE_NAME);
     config.setClassLoader(classLoader);
-    log.info("Configuration: {}", config);
+    log.debug("Config: {}", config);
     return config;
   }
 
