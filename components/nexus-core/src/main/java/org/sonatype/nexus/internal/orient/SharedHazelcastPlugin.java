@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.internal.orient;
 
-import java.io.FileNotFoundException;
-
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.orientechnologies.orient.server.hazelcast.OHazelcastPlugin;
@@ -38,7 +36,7 @@ public class SharedHazelcastPlugin
   private static final String INSTANCE_NAME = "nexus";
 
   @Override
-  protected HazelcastInstance configureHazelcast() throws FileNotFoundException {
+  protected HazelcastInstance configureHazelcast() {
     HazelcastInstance instance = Hazelcast.getHazelcastInstanceByName(INSTANCE_NAME);
     checkState(instance != null, "Missing shared Hazelcast instance named: %s", INSTANCE_NAME);
     log.info("Instance: {}", instance);
