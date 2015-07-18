@@ -31,7 +31,7 @@ public class SharedHazelcastPlugin
 
   @Override
   protected HazelcastInstance configureHazelcast() {
-    // HACK: this is not a proper component, but share the provider lookup
+    // HACK: Orient-components are not proper Sisu-components, but share the provider lookup
     return new HazelcastInstanceProvider().get();
   }
 }
