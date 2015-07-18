@@ -41,7 +41,7 @@ class NodeComponent
   @RequiresPermissions('nexus:nodes:read')
   List<NodeXO> read() {
     def result = []
-    hazelcastInstance.getCluster().getMembers().each {
+    hazelcastInstance.cluster.members.each {
       result << new NodeXO(
           uuid: it.uuid,
           local: it.localMember(),
