@@ -29,9 +29,15 @@
                                   update-method="update"/>
     </bean>
 
+    <!--
+    SONATYPE: expose sisu injection services
+    -->
     <reference id="injectorService" interface="org.sonatype.nexus.common.guice.InjectorService"
                availability="mandatory"/>
 
+    <!--
+    SONATYPE: customize HazelcastConfigurationManager implementation
+    -->
     <bean id="hazelcastConfigurationManager" class="org.sonatype.nexus.hazelcast.NexusHazelcastConfigurationManager" >
         <property name="discoveryServices" ref="discoveryServices"/>
         <property name="injectorService" ref="injectorService"/>
