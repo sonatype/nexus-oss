@@ -28,7 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <orientdb.version>2.1-SNAPSHOT</orientdb.version>
+    <orientdb.version>2.1.SONATYPE-SNAPSHOT</orientdb.version>
   </properties>
 
   <dependencyManagement>
