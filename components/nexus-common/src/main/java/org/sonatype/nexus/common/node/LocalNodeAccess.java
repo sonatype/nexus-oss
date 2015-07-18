@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.common.node;
 
+import java.security.cert.Certificate;
+
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
+
 /**
  * Provides access to the certificate-based node identifier.
  * <p/>
@@ -23,8 +27,11 @@ package org.sonatype.nexus.common.node;
  * @since 3.0
  */
 public interface LocalNodeAccess
+  extends Lifecycle
 {
+  Certificate getCertificate();
+
   String getId();
 
-  void reset();
+  String getFingerprint();
 }

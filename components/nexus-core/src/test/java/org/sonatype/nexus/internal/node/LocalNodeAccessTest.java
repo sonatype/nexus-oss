@@ -25,7 +25,6 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
 
 /**
  * Tests for {@link LocalNodeAccess}.
@@ -54,23 +53,5 @@ public class LocalNodeAccessTest
   public void idEqualToIdentityCertificate() throws Exception {
     Certificate cert = keyStoreManager.getCertificate();
     assertThat(localNodeAccess.getId(), equalTo(NodeIdEncoding.nodeIdForCertificate(cert)));
-  }
-
-  @Test
-  public void idResets() throws Exception {
-    Certificate cert1 = keyStoreManager.getCertificate();
-    assertThat(localNodeAccess.getId(), equalTo(NodeIdEncoding.nodeIdForCertificate(cert1)));
-
-    // Now replace the identity
-    keyStoreManager.removePrivateKey();
-    keyStoreManager.generateAndStoreKeyPair("a", "b", "c", "d", "e", "f");
-    localNodeAccess.reset();
-
-    // Ensure the certificate has changed
-    Certificate cert2 = keyStoreManager.getCertificate();
-    assertThat(cert2, not(cert1));
-
-    // And the node id has changed too
-    assertThat(localNodeAccess.getId(), equalTo(NodeIdEncoding.nodeIdForCertificate(cert2)));
   }
 }

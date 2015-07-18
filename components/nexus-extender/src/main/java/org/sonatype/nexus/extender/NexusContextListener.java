@@ -25,6 +25,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
@@ -95,6 +96,8 @@ public class NexusContextListener
 
   private Injector injector;
 
+  private LocalNodeAccess localNodeAccess;
+
   private LogManager logManager;
 
   private Lifecycle application;
@@ -127,6 +130,10 @@ public class NexusContextListener
     extender.doStart(); // start tracking nexus bundles
 
     try {
+      localNodeAccess = injector.getInstance(LocalNodeAccess.class);
+      log.debug("Local-node access: {}", localNodeAccess);
+      localNodeAccess.start();
+
       logManager = injector.getInstance(LogManager.class);
       log.debug("Log manager: {}", logManager);
       logManager.start();
@@ -203,6 +210,16 @@ public class NexusContextListener
         log.error("Failed to stop log-manager", e);
       }
       logManager = null;
+    }
+
+    if (localNodeAccess != null) {
+      try {
+        localNodeAccess.stop();
+      }
+      catch (final Exception e) {
+        log.error("Failed to stop local-node-access", e);
+      }
+      localNodeAccess = null;
     }
 
     extender.doStop(); // stop tracking bundles

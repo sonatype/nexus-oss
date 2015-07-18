@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.nexus.common.stateguard.StateGuardModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.security.WebSecurityModule;
@@ -69,6 +70,7 @@ public class NexusContextModule
     // key components we expect to be able to find after booting nexus
     requireBinding(Key.get(Lifecycle.class, Names.named("NxApplication")));
     requireBinding(GuiceFilter.class);
+    requireBinding(LocalNodeAccess.class);
     requireBinding(LogManager.class);
 
     bind(ServletContext.class).toInstance(servletContext);
