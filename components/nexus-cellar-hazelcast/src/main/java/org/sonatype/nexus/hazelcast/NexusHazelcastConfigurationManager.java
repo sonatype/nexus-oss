@@ -18,32 +18,48 @@ import javax.inject.Named;
 import org.sonatype.nexus.common.guice.InjectorService;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.core.HazelcastInstance;
 import org.apache.karaf.cellar.hazelcast.factory.HazelcastConfigurationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Customized {@link HazelcastConfigurationManager} to augment configuration.
+ *
+ * @since 3.0
+ */
 public final class NexusHazelcastConfigurationManager
     extends HazelcastConfigurationManager
 {
   private static final Logger log = LoggerFactory.getLogger(NexusHazelcastConfigurationManager.class);
-  private ClassLoader nexusUberClassloader;
+
+  /**
+   * Shared {@link HazelcastInstance} name.
+   */
+  private static final String INSTANCE_NAME = "nexus";
+
+  private ClassLoader classLoader;
 
   @Override
   public Config getHazelcastConfig() {
-    log.info("******** Intercepted Hazelcast Configuration! ********");
     Config config = super.getHazelcastConfig();
-    config.setInstanceName("nexus");
-    config.setClassLoader(nexusUberClassloader);
+    config.setInstanceName(INSTANCE_NAME);
+    config.setClassLoader(classLoader);
+    log.info("Configuration: {}", config);
     return config;
   }
 
-  public void setInjectorService(InjectorService injectorService) {
+  // blueprint injection-point
+  public void setInjectorService(final InjectorService injectorService) {
+    checkNotNull(injectorService);
     injectorService.injectMembers(this);
   }
 
   @Inject
-  public void setNexusUberClassloader(@Named("nexus-uber") final ClassLoader nexusUberClassloader) {
-    log.info("********** setNexusUberClassloader **********");
-    this.nexusUberClassloader = nexusUberClassloader;
+  public void setClassLoader(@Named("nexus-uber") final ClassLoader classLoader) {
+    this.classLoader = checkNotNull(classLoader);
+    log.info("Class-loader: {}", classLoader);
   }
 }
