@@ -65,7 +65,8 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
     },
     visible: function() {
       return NX.Permissions.checkExistsWithPrefix('nexus:repository-view');
-    }
+    },
+    authenticationRequired: false
   },
 
   icons: {
