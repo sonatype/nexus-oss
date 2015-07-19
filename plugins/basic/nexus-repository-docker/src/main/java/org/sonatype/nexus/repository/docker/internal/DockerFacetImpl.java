@@ -197,28 +197,6 @@ public class DockerFacetImpl
     }
   }
 
-  @Override
-  @Transactional(retryOn = IllegalStateException.class)
-  public Payload getLayer(final String imageId) throws IOException {
-    validateImageId(imageId);
-    StorageTx tx = UnitOfWork.currentTransaction();
-
-    String componentName = imageId;
-    String layerAssetName = componentName + "/layer";
-
-    Bucket bucket = tx.getBucket();
-    Component component = findComponent(tx, bucket, componentName);
-    if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
-    }
-    Asset layerAsset = findAsset(tx, component, layerAssetName);
-    if (layerAsset == null) {
-      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
-    }
-
-    return marshall(layerAsset, tx.requireBlob(layerAsset.requireBlobRef()));
-  }
-
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
   protected void doPutMetadata(final String imageId, final Supplier<InputStream> streamSupplier, final Payload payload)
       throws IOException
@@ -264,6 +242,28 @@ public class DockerFacetImpl
     tx.saveAsset(metadataAsset);
 
     // TODO generate ancestry (maybe not in transaction?)
+  }
+
+  @Override
+  @Transactional(retryOn = IllegalStateException.class)
+  public Payload getLayer(final String imageId) throws IOException {
+    validateImageId(imageId);
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    String componentName = imageId;
+    String layerAssetName = componentName + "/layer";
+
+    Bucket bucket = tx.getBucket();
+    Component component = findComponent(tx, bucket, componentName);
+    if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+    Asset layerAsset = findAsset(tx, component, layerAssetName);
+    if (layerAsset == null) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+
+    return marshall(layerAsset, tx.requireBlob(layerAsset.requireBlobRef()));
   }
 
   @Override
