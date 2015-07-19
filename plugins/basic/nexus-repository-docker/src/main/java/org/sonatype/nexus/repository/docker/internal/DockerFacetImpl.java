@@ -38,6 +38,7 @@ import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.util.TypeTokens;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.ContentTypes;
 import org.sonatype.nexus.repository.view.Payload;
@@ -60,6 +61,7 @@ import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import org.apache.commons.lang.StringUtils;
 
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_ANCESTRY;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IN_PROGRESS;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_TAG;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_TAGS;
@@ -183,37 +185,50 @@ public class DockerFacetImpl
   public void putMetadata(final String imageId, final Payload content) throws IOException {
     validateImageId(imageId);
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      Map<String, Object> data = readMetadata(streamSupplier);
-      if (!data.containsKey("id")) {
-        throw new V1ApiException("Missing key 'id' in JSON");
-      }
-      if (!data.get("id").equals(imageId)) {
-        throw new V1ApiException("JSON data contains invalid id");
-      }
-      // TODO check image belongs to repository?
-      // TODO check parent exists
-      // TODO check parent is accessible via authorisation?
       doPutMetadata(imageId, streamSupplier, content);
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutMetadata(final String imageId, final Supplier<InputStream> streamSupplier, final Payload payload)
+  protected void doPutMetadata(final String imageId,
+                               final Supplier<InputStream> streamSupplier,
+                               final Payload payload)
       throws IOException
   {
+    Map<String, Object> data = readMetadata(streamSupplier);
+    if (!data.containsKey("id")) {
+      throw new V1ApiException("Missing key 'id' in JSON");
+    }
+    if (!data.get("id").equals(imageId)) {
+      throw new V1ApiException("JSON data contains invalid id");
+    }
+    // TODO check image belongs to repository?
+    // TODO check parent is accessible via authorisation?
     StorageTx tx = UnitOfWork.currentTransaction();
 
     String componentName = imageId;
     String metadataAssetName = componentName + "/json";
+    String parentId = (String) data.get(DockerAttributes.P_PARENT);
 
     Bucket bucket = tx.getBucket();
+    Component parentComponent = null;
+    List<String> ancestry;
+    if (parentId != null && (parentComponent = findComponent(tx, bucket, parentId)) == null) {
+      throw new V1ApiException("Image depends on a non existing parent");
+    }
+    if (parentComponent == null) {
+      ancestry = Lists.newArrayList(imageId);
+    }
+    else {
+      ancestry = parentComponent.formatAttributes().get(P_ANCESTRY, TypeTokens.LIST_STRING);
+      ancestry.add(0, imageId);
+    }
     Component component = findComponent(tx, bucket, componentName);
     Asset metadataAsset = null;
     if (component == null) {
       component = tx.createComponent(bucket, getRepository().getFormat()).name(componentName);
 
       component.formatAttributes().set(P_IN_PROGRESS, true);
-      tx.saveComponent(component);
     }
     else {
       if (!Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
@@ -223,8 +238,9 @@ public class DockerFacetImpl
 
       // cleanup checksums as we have potentially new metadata/layer
       component.formatAttributes().remove(P_X_DOCKER_CHECKSUM_PAYLOAD);
-      tx.saveComponent(component);
     }
+    component.formatAttributes().set(P_ANCESTRY, ancestry);
+    tx.saveComponent(component);
     if (metadataAsset == null) {
       metadataAsset = tx.createAsset(bucket, component);
       metadataAsset.name(metadataAssetName);
@@ -240,8 +256,6 @@ public class DockerFacetImpl
     // FIXME Nexus is changing content type from application/json to text/plain even if is a json file
     tx.setBlob(metadataAsset, metadataAssetName, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(metadataAsset);
-
-    // TODO generate ancestry (maybe not in transaction?)
   }
 
   @Override
@@ -347,6 +361,24 @@ public class DockerFacetImpl
       throw new V1ApiException("Invalid checksum format");
     }
     doPutChecksum(imageId, checksum);
+  }
+
+  @Override
+  @Transactional(retryOn = IllegalStateException.class)
+  public Payload getAncestry(final String imageId) throws IOException {
+    validateImageId(imageId);
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    String componentName = imageId;
+
+    Bucket bucket = tx.getBucket();
+    Component component = findComponent(tx, bucket, componentName);
+    if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+
+    String ancestry = mapper.writeValueAsString(component.formatAttributes().get(P_ANCESTRY));
+    return new StringPayload(ancestry, Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})

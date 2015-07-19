@@ -28,4 +28,8 @@ public interface DockerAttributes
   String P_TAG = "tag";
 
   String P_TAGS = "tags";
+
+  String P_PARENT = "parent";
+
+  String P_ANCESTRY = "ancestry";
 }

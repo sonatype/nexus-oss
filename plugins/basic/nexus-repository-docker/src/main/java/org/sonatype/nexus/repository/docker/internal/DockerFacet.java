@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 
 /**
@@ -39,6 +38,8 @@ public interface DockerFacet
   void putLayer(String imageId, Payload payload) throws IOException;
 
   void putChecksum(String imageId, String checksum) throws IOException;
+
+  Payload getAncestry(String imageId) throws IOException;
 
   Payload getTags(String namespace, String name) throws IOException;
 

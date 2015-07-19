@@ -88,9 +88,10 @@ class V1Images
 
   Closure getAncestry = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
-    log.info '[getAncestry] tokens: {}', state.tokens
+    def repository = context.repository
+    log.info '[getAncestry] repository: {} tokens: {}', repository.name, state.tokens
 
-    return HttpResponses.notFound()
+    return HttpResponses.ok(repository.facet(DockerFacet).getAncestry(state.tokens['image']))
   }
 
   private void copyAttributeAsHeader(final Content content, final Response response, final String name) {
