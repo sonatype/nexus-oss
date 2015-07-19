@@ -159,11 +159,10 @@ public class DockerFacetImpl
     validateImageId(imageId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String componentName = imageId;
-    String metadataAssetName = componentName + "/json";
+    String metadataAssetName = imageId + "/json";
 
     Bucket bucket = tx.getBucket();
-    Component component = findComponent(tx, bucket, componentName);
+    Component component = findComponent(tx, bucket, imageId);
     if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
@@ -206,27 +205,28 @@ public class DockerFacetImpl
     // TODO check parent is accessible via authorisation?
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String componentName = imageId;
-    String metadataAssetName = componentName + "/json";
+    String metadataAssetName = imageId + "/json";
     String parentId = (String) data.get(DockerAttributes.P_PARENT);
 
     Bucket bucket = tx.getBucket();
+
     Component parentComponent = null;
-    List<String> ancestry;
+    List<String> ancestry = null;
     if (parentId != null && (parentComponent = findComponent(tx, bucket, parentId)) == null) {
       throw new V1ApiException("Image depends on a non existing parent");
     }
-    if (parentComponent == null) {
-      ancestry = Lists.newArrayList(imageId);
-    }
-    else {
+    if (parentComponent != null) {
       ancestry = parentComponent.formatAttributes().get(P_ANCESTRY, TypeTokens.LIST_STRING);
-      ancestry.add(0, imageId);
     }
-    Component component = findComponent(tx, bucket, componentName);
+    if (ancestry == null) {
+      ancestry = Lists.newArrayList();
+    }
+    ancestry.add(0, imageId);
+
+    Component component = findComponent(tx, bucket, imageId);
     Asset metadataAsset = null;
     if (component == null) {
-      component = tx.createComponent(bucket, getRepository().getFormat()).name(componentName);
+      component = tx.createComponent(bucket, getRepository().getFormat()).name(imageId);
 
       component.formatAttributes().set(P_IN_PROGRESS, true);
     }
@@ -264,11 +264,10 @@ public class DockerFacetImpl
     validateImageId(imageId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String componentName = imageId;
-    String layerAssetName = componentName + "/layer";
+    String layerAssetName = imageId + "/layer";
 
     Bucket bucket = tx.getBucket();
-    Component component = findComponent(tx, bucket, componentName);
+    Component component = findComponent(tx, bucket, imageId);
     if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
@@ -295,12 +294,11 @@ public class DockerFacetImpl
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String componentName = imageId;
-    String metadataAssetName = componentName + "/json";
-    String layerAssetName = componentName + "/layer";
+    String metadataAssetName = imageId + "/json";
+    String layerAssetName = imageId + "/layer";
 
     Bucket bucket = tx.getBucket();
-    Component component = findComponent(tx, bucket, componentName);
+    Component component = findComponent(tx, bucket, imageId);
     if (component == null) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
@@ -369,10 +367,8 @@ public class DockerFacetImpl
     validateImageId(imageId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String componentName = imageId;
-
     Bucket bucket = tx.getBucket();
-    Component component = findComponent(tx, bucket, componentName);
+    Component component = findComponent(tx, bucket, imageId);
     if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
@@ -386,11 +382,10 @@ public class DockerFacetImpl
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String componentName = imageId;
-    String metadataAssetName = componentName + "/json";
+    String metadataAssetName = imageId + "/json";
 
     Bucket bucket = tx.getBucket();
-    Component component = findComponent(tx, bucket, componentName);
+    Component component = findComponent(tx, bucket, imageId);
     if (component == null) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
@@ -451,15 +446,14 @@ public class DockerFacetImpl
     StorageTx tx = UnitOfWork.currentTransaction();
 
     String imageIndexAssetName = namespace + "/" + name + "/index_images";
-    String componentName = imageId;
-    String metadataAssetName = componentName + "/json";
+    String metadataAssetName = imageId + "/json";
 
     Bucket bucket = tx.getBucket();
     Asset imageIndexAsset = findAsset(tx, bucket, imageIndexAssetName);
     if (imageIndexAsset == null) {
       throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
     }
-    Component component = findComponent(tx, bucket, componentName);
+    Component component = findComponent(tx, bucket, imageId);
     if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
