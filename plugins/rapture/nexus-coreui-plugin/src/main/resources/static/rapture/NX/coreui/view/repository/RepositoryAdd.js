@@ -38,6 +38,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
       api: {
         submit: 'NX.direct.coreui_Repository.create'
       },
+      trackResetOnLoad: true,
       settingsFormSuccessMessage: function(data) {
         return NX.I18n.get('Repository_RepositoryAdd_Create_Success') + data['name'];
       },
