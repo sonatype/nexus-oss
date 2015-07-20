@@ -33,7 +33,6 @@ import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.sonatype.nexus.testsuite.maven.concurrency.generators.Generator.generatedEntity;
@@ -55,7 +54,6 @@ public class MavenHostedSwarmIT
   {
     final Configuration configuration = hostedConfig(testName.getMethodName(), VersionPolicy.RELEASE);
     Repository repository = repositoryManager.create(configuration);
-    assertThat(repository, notNullValue());
     final Maven2Client repositoryClient = createAdminMaven2Client(repository.getName());
 
     // create clients

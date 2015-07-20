@@ -34,9 +34,6 @@ import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 /**
  * Maven metadata swarm: multiple clients asking via group, while others are deploying the SAME metadata into a hosted
  * repository, and there is a proxy involved too. In difference to {@link MavenMixedSwarmIT}, this one exercises
@@ -78,18 +75,15 @@ public class MavenMetadataMixedSwarmIT
   {
     final Configuration hostedConfiguration = hostedConfig(testName.getMethodName() + "-hosted", VersionPolicy.RELEASE);
     Repository hosted = repositoryManager.create(hostedConfiguration);
-    assertThat(hosted, notNullValue());
     final Maven2Client hostedRepositoryClient = createAdminMaven2Client(hosted.getName());
 
     final Configuration proxyConfiguration = proxyConfig(testName.getMethodName() + "-proxy",
         "http://localhost:" + upstream.getPort() + "/", VersionPolicy.RELEASE);
     Repository proxy = repositoryManager.create(proxyConfiguration);
-    assertThat(proxy, notNullValue());
 
     final Configuration groupConfiguration = groupConfig(testName.getMethodName() + "-group",
         proxy.getName(), hosted.getName());
     Repository group = repositoryManager.create(groupConfiguration);
-    assertThat(group, notNullValue());
     final Maven2Client groupRepositoryClient = createAdminMaven2Client(group.getName());
 
     // create clients

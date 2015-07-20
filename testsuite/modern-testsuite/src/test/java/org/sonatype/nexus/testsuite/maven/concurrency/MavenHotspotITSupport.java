@@ -22,11 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
-import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
-import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.maven.MavenHostedFacet;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
@@ -47,8 +43,6 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -62,15 +56,6 @@ import static org.sonatype.nexus.testsuite.maven.concurrency.generators.Generato
 public abstract class MavenHotspotITSupport
     extends MavenITSupport
 {
-  @Rule
-  public TestName testName = new TestName();
-
-  @Inject
-  protected RepositoryManager repositoryManager;
-
-  @Inject
-  private LogManager logManager;
-
   @Before
   public void setupMavenDebugStorage() {
     logManager.setLoggerLevel("org.sonatype.nexus.repository.storage", LoggerLevel.DEBUG);

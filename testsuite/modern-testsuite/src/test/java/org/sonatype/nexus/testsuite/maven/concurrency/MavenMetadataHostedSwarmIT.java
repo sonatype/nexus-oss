@@ -36,7 +36,6 @@ import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.sonatype.nexus.testsuite.maven.concurrency.generators.Generator.generatedEntity;
@@ -54,7 +53,6 @@ public class MavenMetadataHostedSwarmIT
   {
     final Configuration configuration = hostedConfig(testName.getMethodName(), VersionPolicy.RELEASE);
     Repository repository = repositoryManager.create(configuration);
-    assertThat(repository, notNullValue());
     final Maven2Client repositoryClient = createAdminMaven2Client(repository.getName());
 
     // create clients
@@ -105,7 +103,8 @@ public class MavenMetadataHostedSwarmIT
     versioning.addVersion("0.0.9");
     versioning.setLastUpdated("20150715120000");
     metadata.setVersioning(versioning);
-    hostedMetadataSwarm("org/sonatype/nexus/test/test-artifact/maven-metadata.xml", new MavenMetadataGenerator(metadata));
+    hostedMetadataSwarm("org/sonatype/nexus/test/test-artifact/maven-metadata.xml",
+        new MavenMetadataGenerator(metadata));
   }
 
   @Test
@@ -121,22 +120,23 @@ public class MavenMetadataHostedSwarmIT
     snapshot.setBuildNumber(1);
     versioning.setSnapshot(snapshot);
     final List<SnapshotVersion> snapshotVersions = new ArrayList<>();
-    SnapshotVersion snapshotVersion = new SnapshotVersion();
-    snapshotVersion.setExtension("pom");
-    snapshotVersion.setUpdated("20150715120000");
-    snapshotVersion.setVersion("1.0-20150715.120000-1");
-    snapshotVersions.add(snapshotVersion);
-    snapshotVersion = new SnapshotVersion();
-    snapshotVersion.setExtension("jar");
-    snapshotVersion.setUpdated("20150715120000");
-    snapshotVersion.setVersion("1.0-20150715.120000-1");
-    snapshotVersions.add(snapshotVersion);
-    snapshotVersion = new SnapshotVersion();
-    snapshotVersion.setExtension("jar");
-    snapshotVersion.setClassifier("javadoc");
-    snapshotVersion.setUpdated("20150715120000");
-    snapshotVersion.setVersion("1.0-20150715.120000-1");
-    snapshotVersions.add(snapshotVersion);
+
+    SnapshotVersion pom = new SnapshotVersion();
+    pom.setExtension("pom");
+    pom.setUpdated("20150715120000");
+    pom.setVersion("1.0-20150715.120000-1");
+    snapshotVersions.add(pom);
+    SnapshotVersion jar = new SnapshotVersion();
+    jar.setExtension("jar");
+    jar.setUpdated("20150715120000");
+    jar.setVersion("1.0-20150715.120000-1");
+    snapshotVersions.add(jar);
+    SnapshotVersion javadoc = new SnapshotVersion();
+    javadoc.setExtension("jar");
+    javadoc.setClassifier("javadoc");
+    javadoc.setUpdated("20150715120000");
+    javadoc.setVersion("1.0-20150715.120000-1");
+    snapshotVersions.add(javadoc);
 
     versioning.setSnapshotVersions(snapshotVersions);
     versioning.setLastUpdated("20150715120000");
