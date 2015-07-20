@@ -17,11 +17,11 @@
         xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
     <bean id="hazelcast" class="com.hazelcast.core.Hazelcast" factory-ref="instanceFactory"
-          factory-method="getInstance" destroy-method="shutdown"/>
+          factory-method="getInstance"/>
     <service ref="hazelcast" interface="com.hazelcast.core.HazelcastInstance"/>
 
     <bean id="instanceFactory" class="org.apache.karaf.cellar.hazelcast.factory.HazelcastServiceFactory"
-          init-method="init" destroy-method="destroy">
+          init-method="init">
         <property name="combinedClassLoader" ref="combinedClassLoader"/>
         <property name="configurationManager" ref="hazelcastConfigurationManager"/>
         <property name="bundleContext" ref="blueprintBundleContext"/>
