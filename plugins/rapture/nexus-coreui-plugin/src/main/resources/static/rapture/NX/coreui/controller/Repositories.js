@@ -126,6 +126,9 @@ Ext.define('NX.coreui.controller.Repositories', {
         },
         'nx-coreui-repository-selectrecipe': {
           cellclick: me.showAddRepositoryPanel
+        },
+        'nx-coreui-repository-add #blobStoreName': {
+          afterrender: me.selectDefaultBlobstore
         }
       }
     });
@@ -227,6 +230,27 @@ Ext.define('NX.coreui.controller.Repositories', {
         NX.Messages.add({ text: 'Repository deleted: ' + description, type: 'success' });
       }
     });
+  },
+
+  /**
+   * @private
+   * When creating a new repository, select the ‘default’ blobstore by default (if it exists)
+   */
+  selectDefaultBlobstore: function(combo) {
+    var me = this;
+
+    // If there is only one blobstore defined, select it
+    if (combo.getStore().getCount() === 1) {
+      combo.up('form').getForm().setValues({
+        'attributes.storage.blobStoreName': combo.getStore().getAt(0).get('name')
+      });
+    }
+    else if (combo.findRecord('name', 'default')) {
+      // Else if there is a blobstore named ‘default’, select it
+      combo.up('form').getForm().setValues({
+        'attributes.storage.blobStoreName': 'default'
+      });
+    }
   },
 
   /**
