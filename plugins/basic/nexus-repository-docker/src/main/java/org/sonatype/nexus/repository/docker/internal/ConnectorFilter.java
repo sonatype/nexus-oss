@@ -40,7 +40,7 @@ import org.eclipse.jetty.proxy.ProxyServlet;
 
 @Named
 @Singleton
-public class DockerFilter
+public class ConnectorFilter
     implements Filter
 {
 
@@ -51,7 +51,7 @@ public class DockerFilter
   private TransparentReverseProxyServlet reverseProxy = new TransparentReverseProxyServlet();
 
   @Inject
-  public DockerFilter(final BaseUrlManager baseUrlManager) {this.baseUrlManager = baseUrlManager;}
+  public ConnectorFilter(final BaseUrlManager baseUrlManager) {this.baseUrlManager = baseUrlManager;}
 
   @Override
   public void init(final FilterConfig config) throws ServletException {

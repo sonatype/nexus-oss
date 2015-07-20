@@ -34,7 +34,7 @@ public class DockerModule
     {
       @Override
       protected void configureServlets() {
-        filter("/*").through(DockerFilter.class);
+        filter("/*").through(ConnectorFilter.class);
       }
     });
     bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0));

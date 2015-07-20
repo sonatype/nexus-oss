@@ -35,28 +35,15 @@ public class ConnectorFacetImpl
 {
   static final String CONFIG_KEY = "connector";
 
-  private final DockerFilter dockerFilter;
-
-  static class Config
-  {
-    @NotNull
-    public int port;
-
-    @Override
-    public String toString() {
-      return getClass().getSimpleName() + "{" +
-          "port=" + port +
-          '}';
-    }
-  }
+  private final ConnectorFilter connectorFilter;
 
   private Config config;
 
   private ServerConnector jettyConnector;
 
   @Inject
-  public ConnectorFacetImpl(final DockerFilter dockerFilter) {
-    this.dockerFilter = dockerFilter;
+  public ConnectorFacetImpl(final ConnectorFilter connectorFilter) {
+    this.connectorFilter = connectorFilter;
   }
 
   @Override
@@ -83,7 +70,7 @@ public class ConnectorFacetImpl
           jettyConnector.setPort(config.port);
           server.addConnector(jettyConnector);
           jettyConnector.start();
-          dockerFilter.addRepository(getPort(), getRepository().getName());
+          connectorFilter.addRepository(getPort(), getRepository().getName());
         }
         catch (Exception e) {
           throw Throwables.propagate(e);
@@ -95,7 +82,7 @@ public class ConnectorFacetImpl
   @Override
   protected void doStop() throws Exception {
     if (jettyConnector != null) {
-      dockerFilter.removeRepository(getPort());
+      connectorFilter.removeRepository(getPort());
       jettyConnector.stop();
       Server server = JettyServer.getServer();
       server.removeConnector(jettyConnector);
@@ -105,5 +92,18 @@ public class ConnectorFacetImpl
   @Override
   public int getPort() {
     return jettyConnector.getLocalPort();
+  }
+
+  static class Config
+  {
+    @NotNull
+    public int port;
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "port=" + port +
+          '}';
+    }
   }
 }
