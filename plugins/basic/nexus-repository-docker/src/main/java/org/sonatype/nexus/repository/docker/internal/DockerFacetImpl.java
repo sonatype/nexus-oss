@@ -91,7 +91,7 @@ public class DockerFacetImpl
   public Payload getImagesIndex(final String namespace, final String name) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String assetName = namespace + "/" + name + "/index_images";
+    String assetName = namespace + "/" + name + "/images";
     Asset asset = findAsset(tx, tx.getBucket(), assetName);
     if (asset == null) {
       throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
@@ -119,7 +119,7 @@ public class DockerFacetImpl
 
     InputStream indexStream;
 
-    String assetName = namespace + "/" + name + "/index_images";
+    String assetName = namespace + "/" + name + "/images";
 
     Bucket bucket = tx.getBucket();
     Asset asset = findAsset(tx, bucket, assetName);
@@ -410,7 +410,7 @@ public class DockerFacetImpl
   public Payload getTags(final String namespace, final String name) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String imageIndexAssetName = namespace + "/" + name + "/index_images";
+    String imageIndexAssetName = namespace + "/" + name + "/images";
     Bucket bucket = tx.getBucket();
     Asset imageIndexAsset = findAsset(tx, bucket, imageIndexAssetName);
     if (imageIndexAsset == null) {
@@ -445,7 +445,7 @@ public class DockerFacetImpl
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String imageIndexAssetName = namespace + "/" + name + "/index_images";
+    String imageIndexAssetName = namespace + "/" + name + "/images";
     String metadataAssetName = imageId + "/json";
 
     Bucket bucket = tx.getBucket();
