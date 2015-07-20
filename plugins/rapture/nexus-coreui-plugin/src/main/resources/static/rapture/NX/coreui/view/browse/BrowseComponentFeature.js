@@ -17,15 +17,15 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.browse.BrowseFeature', {
+Ext.define('NX.coreui.view.browse.BrowseComponentFeature', {
   extend: 'NX.view.drilldown.Drilldown',
-  alias: 'widget.nx-coreui-browsefeature',
+  alias: 'widget.nx-coreui-browsecomponentfeature',
 
-  iconName: 'browse-default',
+  iconName: 'browse-component-default',
 
   masters: [
     {xtype: 'nx-coreui-browse-repository-list'},
-    {xtype: 'nx-coreui-browse-result-list'},
+    {xtype: 'nx-coreui-browse-component-list'},
     {
       xtype: 'panel',
       region: 'center',

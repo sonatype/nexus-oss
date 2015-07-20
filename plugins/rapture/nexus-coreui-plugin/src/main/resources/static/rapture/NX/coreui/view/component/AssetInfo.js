@@ -58,9 +58,8 @@ Ext.define('NX.coreui.view.component.AssetInfo', {
   /**
    * @public
    * @param {Object} assetModel the asset to display
-   * @param {String} format the format for the asset
    */
-  setAssetModel: function(assetModel, format) {
+  setAssetModel: function(assetModel) {
     var me = this,
         info = {};
     me.assetModel = assetModel;
@@ -68,7 +67,7 @@ Ext.define('NX.coreui.view.component.AssetInfo', {
     // display common data
     var contentType = assetModel.get('contentType');
     var size = assetModel.get('size');
-    info[NX.I18n.get('Assets_Info_Path')] = NX.coreui.util.RepositoryUrls.asRepositoryLink(assetModel, format);
+    info[NX.I18n.get('Assets_Info_Path')] = NX.coreui.util.RepositoryUrls.asRepositoryLink(assetModel, assetModel.get('format'));
     info[NX.I18n.get('Assets_Info_ContentType')] = contentType;
     info[NX.I18n.get('Assets_Info_FileSize')] = Ext.util.Format.fileSize(size);
     info[NX.I18n.get('Assets_Info_Last_Updated')] = new Date(assetModel.get('lastUpdated')) ;
