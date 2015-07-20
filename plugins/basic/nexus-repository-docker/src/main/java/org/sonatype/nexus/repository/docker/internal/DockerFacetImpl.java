@@ -417,8 +417,27 @@ public class DockerFacetImpl
       throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
     }
     NestedAttributesMap tagsMap = imageIndexAsset.formatAttributes().child(P_TAGS);
-    String tags = mapper.writeValueAsString(tagsMap.backing());
-    return new StringPayload(tags, Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
+    return new StringPayload(
+        mapper.writeValueAsString(tagsMap.backing()), Charsets.UTF_8, ContentTypes.APPLICATION_JSON
+    );
+  }
+
+  @Override
+  @Transactional(retryOn = IllegalStateException.class)
+  public Payload getTag(final String namespace, final String name, final String tag) throws IOException {
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    String imageIndexAssetName = namespace + "/" + name + "/images";
+    Bucket bucket = tx.getBucket();
+    Asset imageIndexAsset = findAsset(tx, bucket, imageIndexAssetName);
+    if (imageIndexAsset == null) {
+      throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
+    }
+    String imageId = imageIndexAsset.formatAttributes().child(P_TAGS).get(tag, String.class);
+    if (imageId == null) {
+      throw new V1ApiException("Tag not found", HttpStatus.NOT_FOUND);
+    }
+    return new StringPayload(mapper.writeValueAsString(imageId), Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
   }
 
   @Override

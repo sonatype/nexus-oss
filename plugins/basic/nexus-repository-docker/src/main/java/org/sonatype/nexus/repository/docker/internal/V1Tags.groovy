@@ -32,6 +32,16 @@ class V1Tags
 {
   def final static USER_AGENT_PATTERN = ~/([^\s\/]+)\/([^\s\/]+)/
 
+  Closure getTag = { Context context ->
+    def state = context.attributes.require(TokenMatcher.State)
+    def repository = context.repository
+    log.info '[getTag] repository: {} tokens: {}', repository.name, state.tokens
+
+    return HttpResponses.ok(repository.facet(DockerFacet).getTag(
+        state.tokens['namespace'] ?: 'library', state.tokens['repository'], state.tokens['tag']
+    ))
+  }
+
   Closure putTag = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository

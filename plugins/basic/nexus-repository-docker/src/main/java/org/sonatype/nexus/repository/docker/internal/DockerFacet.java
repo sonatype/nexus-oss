@@ -41,6 +41,8 @@ public interface DockerFacet
 
   Payload getAncestry(String imageId) throws IOException;
 
+  Payload getTag(String namespace, String name, String tag) throws IOException;
+
   Payload getTags(String namespace, String name) throws IOException;
 
   void putTag(String namespace, String name, String tag, Map<String, String> metadata, Payload payload)
