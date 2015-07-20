@@ -24,14 +24,12 @@ import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.common.app.BaseUrlHolder;
@@ -48,7 +46,7 @@ public class DockerFilter
 
   private final BaseUrlManager baseUrlManager;
 
-  private Map<Integer, Config> configs = new ConcurrentHashMap<>();
+  private Map<Integer, String> portMappings = new ConcurrentHashMap<>();
 
   private TransparentReverseProxyServlet reverseProxy = new TransparentReverseProxyServlet();
 
@@ -92,33 +90,16 @@ public class DockerFilter
   {
     if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
       HttpServletRequest httpRequest = (HttpServletRequest) request;
-      Config config = configs.get(request.getLocalPort());
-      if (config != null) {
+      String repositoryName = portMappings.get(request.getLocalPort());
+      if (repositoryName != null) {
         String uri = httpRequest.getRequestURI();
         if (httpRequest.getQueryString() != null) {
           uri = uri + "?" + httpRequest.getQueryString();
         }
         if (!uri.startsWith("/static")
             && !uri.startsWith("/error.html")
-            && !uri.startsWith("/repository/" + config.repositoryName)) {
-          if (Strategy.REDIRECT == config.strategy) {
-            String baseUrl = baseUrlManager.getUrl();
-            if (baseUrl == null) {
-              baseUrl = "";
-            }
-            ((HttpServletResponse) response).sendRedirect(((HttpServletResponse) response).encodeRedirectURL(
-                baseUrl + "/repository/" + config.repositoryName + uri
-            ));
-          }
-          else if (Strategy.FORWARD == config.strategy) {
-            RequestDispatcher requestDispatcher = httpRequest.getRequestDispatcher(
-                "/repository/" + config.repositoryName + uri
-            );
-            requestDispatcher.forward(new RequestHack(httpRequest), response);
-          }
-          else if (Strategy.REVERSE_PROXY == config.strategy) {
-            reverseProxy.service(request, response);
-          }
+            && !uri.startsWith("/repository/" + repositoryName)) {
+          reverseProxy.service(request, response);
           return;
         }
       }
@@ -126,41 +107,12 @@ public class DockerFilter
     chain.doFilter(request, response);
   }
 
-  void addRepository(Integer port, String repositoryName, final Strategy strategy) {
-    configs.put(port, new Config(repositoryName, strategy));
+  void addRepository(Integer port, String repositoryName) {
+    portMappings.put(port, repositoryName);
   }
 
   void removeRepository(Integer port) {
-    configs.remove(port);
-  }
-
-  private static class Config
-  {
-    private final String repositoryName;
-
-    private final Strategy strategy;
-
-    private Config(final String repositoryName, final Strategy strategy) {
-      this.repositoryName = repositoryName;
-      this.strategy = strategy;
-    }
-  }
-
-  private static class RequestHack
-      extends HttpServletRequestWrapper
-  {
-
-    public RequestHack(final HttpServletRequest request) {
-      super(request);
-    }
-
-    @Override
-    public void setAttribute(final String name, final Object o) {
-      if ("javax.servlet.forward.servlet_path".equals(name)) {
-        return;
-      }
-      super.setAttribute(name, o);
-    }
+    portMappings.remove(port);
   }
 
   private class TransparentReverseProxyServlet
@@ -168,18 +120,18 @@ public class DockerFilter
   {
     @Override
     protected String rewriteTarget(final HttpServletRequest httpRequest) {
-      Config config = configs.get(httpRequest.getLocalPort());
-      if (config != null) {
+      String repositoryName = portMappings.get(httpRequest.getLocalPort());
+      if (repositoryName != null) {
         String uri = httpRequest.getRequestURI();
         if (httpRequest.getQueryString() != null) {
           uri = uri + "?" + httpRequest.getQueryString();
         }
-        if (!uri.startsWith("/repository/" + config.repositoryName)) {
+        if (!uri.startsWith("/repository/" + repositoryName)) {
           String baseUrl = baseUrlManager.getUrl();
           if (baseUrl == null) {
             baseUrl = BaseUrlHolder.get();
           }
-          return baseUrl + "/repository/" + config.repositoryName + uri;
+          return baseUrl + "/repository/" + repositoryName + uri;
         }
       }
       return null;
@@ -190,6 +142,5 @@ public class DockerFilter
       // avoid adding X-Forwarded headers
     }
   }
-
 
 }

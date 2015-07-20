@@ -26,8 +26,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 
 /**
- * A {@link ConnectorFacet} that persists to a {@link StorageFacet}.
- *
  * @since 3.0
  */
 @Named
@@ -44,14 +42,10 @@ public class ConnectorFacetImpl
     @NotNull
     public int port;
 
-    @NotNull
-    public Strategy strategy;
-
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
           "port=" + port +
-          ", strategy=" + strategy +
           '}';
     }
   }
@@ -84,7 +78,7 @@ public class ConnectorFacetImpl
       jettyConnector.setPort(config.port);
       server.addConnector(jettyConnector);
       jettyConnector.start();
-      dockerFilter.addRepository(getPort(), getRepository().getName(), config.strategy);
+      dockerFilter.addRepository(getPort(), getRepository().getName());
     }
   }
 

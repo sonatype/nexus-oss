@@ -44,18 +44,6 @@ Ext.define('NX.coreui.view.repository.facet.DockerConnectorFacet', {
             xtype: 'numberfield',
             name: 'attributes.connector.port',
             fieldLabel: 'Port'
-          },
-          {
-            xtype: 'combo',
-            name: 'attributes.connector.strategy',
-            fieldLabel: 'Strategy',
-            editable: false,
-            store: [
-              ['REDIRECT', 'Redirect'],
-              ['FORWARD', 'Forward'],
-              ['REVERSE_PROXY', 'Transparent Reverse proxy']
-            ],
-            queryMode: 'local'
           }
         ]
       }
