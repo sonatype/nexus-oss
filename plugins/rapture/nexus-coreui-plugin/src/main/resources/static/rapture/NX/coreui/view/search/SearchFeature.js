@@ -96,9 +96,6 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
     items: [
       {
-        xtype: 'nx-actions'
-      },
-      {
         xtype: 'nx-coreui-component-assetcontainer',
         header: false,
         flex: 1
