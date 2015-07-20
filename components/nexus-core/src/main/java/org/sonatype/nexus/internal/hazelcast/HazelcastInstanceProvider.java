@@ -20,6 +20,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.util.ExceptionUtil;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -35,6 +36,10 @@ public class HazelcastInstanceProvider
   implements Provider<HazelcastInstance>
 {
   public static final String INSTANCE_NAME = "nexus";
+
+  static {
+    ExceptionUtil.class.toString(); // workaround https://github.com/orientechnologies/orientdb/pull/4609
+  }
 
   @Override
   public HazelcastInstance get() {
