@@ -16,9 +16,9 @@ import org.sonatype.nexus.blobstore.api.BlobStoreManager
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.http.HttpStatus
-import org.sonatype.tests.http.server.fluent.Behaviours
 
 import com.google.common.io.Files
+import groovy.util.slurpersupport.GPathResult
 import org.apache.http.HttpResponse
 import org.junit.Before
 import org.junit.Test
@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.is
 import static org.sonatype.nexus.testsuite.nuget.dispatch.ChainedRequestMatcher.forOperation
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.bytes
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status
-import static org.sonatype.tests.http.server.fluent.Behaviours.*
+import static org.sonatype.tests.http.server.fluent.Behaviours.file
 
 /**
  * Test NuGet group repository behaviour
@@ -221,7 +221,33 @@ class NugetGroupIT
     assertThat(groupSearch.size(), is(2))
     assertThat(groupSearch.collect { it.VERSION }, containsInAnyOrder('1.1', '1.0'))
     assertThat(groupSearch.collect { it.ISLATESTVERSION }, containsInAnyOrder(true, false))
-    // TODO - KR failure condition here, but also hamcrest doesn't like this?
+    // TODO - KR failure condition here as both aggregated feeds claim to have the latest version, but also hamcrest doesn't like this?
+  }
+  
+  @Test
+  void 'Order of group member repositories is respected'() {
+    // make same component available from both proxy and hosted repo
+    // TODO - KR proxy must contain the package first or vs queries do not work, expected or not?
+    final HttpResponse proxyResponse = proxy.packageContent(SONATYPE_COMPONENT.id, SONATYPE_COMPONENT.version)
+    assertThat(status(proxyResponse), is(HttpStatus.OK))
+    hosted.publish(resolveTestFile(SONATYPE_COMPONENT.nupkg))
+
+    XmlSlurper xmlSlurper = new XmlSlurper()
+    final GPathResult proxyEntry = xmlSlurper.parseText(
+        proxy.entryXml(SONATYPE_COMPONENT.id, SONATYPE_COMPONENT.version))
+    final GPathResult hostedEntry = xmlSlurper.parseText(
+        hosted.entryXml(SONATYPE_COMPONENT.id, SONATYPE_COMPONENT.version))
+    final GPathResult proxyFirstEntry = xmlSlurper.parseText(
+        proxyFirstGroup.entryXml(SONATYPE_COMPONENT.id, SONATYPE_COMPONENT.version))
+    final GPathResult hostedFirstEntry = xmlSlurper.parseText(
+        hostedFirstGroup.entryXml(SONATYPE_COMPONENT.id, SONATYPE_COMPONENT.version))
+
+    // compare updated value to see if we're getting the expected feed based on group member ordering
+    assertThat('proxy repo content should be returned when proxy is first in group', proxyEntry.updated.text(),
+        is(proxyFirstEntry.updated.text()))
+    // TODO - KR presently failing as repo order is not respected
+    assertThat('hosted repo content should be returned when hosted is first in group', hostedEntry.updated.text(),
+        is(hostedFirstEntry.updated.text()))
   }
 
   private byte[] expectedTestBytes(String file = 'SONATYPE.TEST.1.0.nupkg') {
