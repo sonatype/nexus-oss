@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.docker.internal
 import javax.inject.Named
 import javax.inject.Singleton
 
+import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.http.HttpResponses
 import org.sonatype.nexus.repository.view.Context
 import org.sonatype.nexus.repository.view.Response
@@ -35,12 +36,12 @@ class V1Index
     def repository = context.repository
     log.info '[getImagesIndex] repository: {} tokens: {}', repository.name, state.tokens
 
-    Response response = HttpResponses.ok(repository.facet(DockerFacet).getImagesIndex(
-        state.tokens['namespace'] ?: 'library', state.tokens['repository']
-    ))
-    // TODO set value based on request params
-    response.headers.set('X-Docker-Endpoints', '192.168.1.105:18081');
-    return response
+    return addHeaders(
+        repository,
+        HttpResponses.ok(repository.facet(DockerFacet).getImagesIndex(
+            state.tokens['namespace'] ?: 'library', state.tokens['repository']
+        ))
+    )
   }
 
   Closure putImagesIndex = { Context context, boolean images ->
@@ -52,9 +53,20 @@ class V1Index
         state.tokens['namespace'] ?: 'library', state.tokens['repository'], context.request.payload
     )
 
-    Response response = images ? HttpResponses.noContent() : HttpResponses.ok()
-    // TODO set value based on request params
-    response.headers.set('X-Docker-Endpoints', '192.168.1.105:18081');
+    return addHeaders(
+        repository,
+        images ? HttpResponses.noContent() : HttpResponses.ok()
+    )
+  }
+
+  private Response addHeaders(final Repository repository, final Response response) {
+    // endpoint should not have the protocol (e.g. http://)
+    def url = new URL(repository.url)
+    def endpoint = url.toExternalForm()
+    if (url.protocol) {
+      endpoint = endpoint.substring(url.protocol.length() + 3)
+    }
+    response.headers.set('X-Docker-Endpoints', endpoint)
     return response
   }
 
