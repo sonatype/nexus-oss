@@ -93,9 +93,8 @@ Ext.define('NX.view.SettingsForm', {
 
   buttons: [
     { 
-      text: NX.I18n.get('SettingsForm_Save_Button'), 
-      formBind: true, 
-      action: 'save', 
+      text: NX.I18n.get('SettingsForm_Save_Button'),
+      action: 'save',
       ui: 'nx-primary', 
       bindToEnter: false 
     },
@@ -134,6 +133,12 @@ Ext.define('NX.view.SettingsForm', {
     me.on('recordloaded', me.resetDirtyState);
     me.on('loaded', me.resetDirtyState);
     me.on('submitted', me.resetDirtyState);
+    me.on('dirtychange', function() {
+      me.updateButtonState(me);
+    });
+    me.on('validitychange', function() {
+      me.updateButtonState(me);
+    });
 
     me.callParent(arguments);
 
@@ -187,6 +192,20 @@ Ext.define('NX.view.SettingsForm', {
   resetDirtyState: function (form) {
     var realform = form.getForm();
     realform.setValues(realform.getValues());
+  },
+
+  /**
+   * Update the state of the save button
+   *
+   * @private
+   */
+  updateButtonState: function (form) {
+    var dirty = form.isDirty(),
+        valid = form.isValid();
+
+    if (form.down('button[action=save]')) {
+      form.down('button[action=save]').setDisabled(!valid || !dirty);
+    }
   },
 
   /**
