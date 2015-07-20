@@ -64,7 +64,15 @@ public class MapdbBlobMetadataStore
 
   private TxMaker database;
 
-  private final SizeCache sizeCache = new SizeCache();
+  /**
+   * The number of records counted when last cacheing size
+   */
+  private long numRecords = 0L;
+
+  /**
+   * The cached number of bytes stored.
+   */
+  private long cachedSize = 0L;
 
   private MapdbBlobMetadataStore(final File directory) {
     checkNotNull(directory);
@@ -456,9 +464,9 @@ public class MapdbBlobMetadataStore
       public Long run(final DB db) {
         long totalSize = 0L;
         HTreeMap<BlobId, MetadataRecord> entries = entries(db);
-        if (entries.sizeLong() == sizeCache.getNumRecords()) {
+        if (entries.sizeLong() == numRecords) {
           log.debug("Returning cached blob size");
-          return sizeCache.getSize();
+          return cachedSize;
         }
 
         log.debug("Cached data is invalid, recalculating size of blobs");
@@ -471,8 +479,9 @@ public class MapdbBlobMetadataStore
             log.warn("Blob metadata has no size indicated for sha1: {}", metadataRecord.sha1);
           }
         }
-        sizeCache.update(entries.sizeLong(), totalSize);
-        return totalSize;
+        numRecords = entries.sizeLong();
+        cachedSize = totalSize;
+        return cachedSize;
       }
     });
   }
@@ -512,38 +521,6 @@ public class MapdbBlobMetadataStore
       finally {
         Thread.currentThread().setContextClassLoader(originalClassLoader);
       }
-    }
-  }
-
-  /**
-   * Simple construct to store calculated value of blob size for a given number of metadata records.
-   */
-  private static class SizeCache
-  {
-    /**
-     * The number of records counted when last cacheing size
-     */
-    private long numRecords = 0L;
-
-    /**
-     * The number of bytes stored.
-     */
-    private long size = 0L;
-
-    public long getNumRecords() {
-      return numRecords;
-    }
-
-    public long getSize() {
-      return size;
-    }
-
-    /**
-     * Update the state of the cached data.
-     */
-    public void update(final long numRecords, final long size) {
-      this.numRecords = numRecords;
-      this.size = size;
     }
   }
 }
