@@ -50,7 +50,7 @@ public class DiagnoseHandler
     Repository repository = context.getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
-    ConnectorFacet connector = repository.facet(ConnectorFacet.class);
+    RepositoryReverseProxyFacet connector = repository.facet(RepositoryReverseProxyFacet.class);
 
     StringBuilder sb = new StringBuilder();
 

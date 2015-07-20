@@ -63,7 +63,7 @@ class DockerHostedRecipe
   Provider<ConfigurableViewFacet> viewFacet
 
   @Inject
-  Provider<ConnectorFacetImpl> connectorFacet
+  Provider<RepositoryReverseProxyFacetImpl> repositoryReverseProxyFacet
 
   @Inject
   Provider<DockerFacet> dockerFacet
@@ -106,7 +106,7 @@ class DockerHostedRecipe
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
     repository.attach(configure(viewFacet.get()))
-    repository.attach(connectorFacet.get())
+    repository.attach(repositoryReverseProxyFacet.get())
     repository.attach(dockerFacet.get())
     repository.attach(storageFacet.get())
   }

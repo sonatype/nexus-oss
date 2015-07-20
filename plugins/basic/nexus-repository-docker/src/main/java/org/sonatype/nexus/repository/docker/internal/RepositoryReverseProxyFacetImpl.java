@@ -29,21 +29,21 @@ import org.eclipse.jetty.server.ServerConnector;
  * @since 3.0
  */
 @Named
-public class ConnectorFacetImpl
+public class RepositoryReverseProxyFacetImpl
     extends FacetSupport
-    implements ConnectorFacet
+    implements RepositoryReverseProxyFacet
 {
   static final String CONFIG_KEY = "connector";
 
-  private final ConnectorFilter connectorFilter;
+  private final RepositoryReverseProxyFilter repositoryReverseProxyFilter;
 
   private Config config;
 
   private ServerConnector jettyConnector;
 
   @Inject
-  public ConnectorFacetImpl(final ConnectorFilter connectorFilter) {
-    this.connectorFilter = connectorFilter;
+  public RepositoryReverseProxyFacetImpl(final RepositoryReverseProxyFilter repositoryReverseProxyFilter) {
+    this.repositoryReverseProxyFilter = repositoryReverseProxyFilter;
   }
 
   @Override
@@ -70,7 +70,7 @@ public class ConnectorFacetImpl
           jettyConnector.setPort(config.port);
           server.addConnector(jettyConnector);
           jettyConnector.start();
-          connectorFilter.addRepository(getPort(), getRepository().getName());
+          repositoryReverseProxyFilter.addRepository(getPort(), getRepository().getName());
         }
         catch (Exception e) {
           throw Throwables.propagate(e);
@@ -82,7 +82,7 @@ public class ConnectorFacetImpl
   @Override
   protected void doStop() throws Exception {
     if (jettyConnector != null) {
-      connectorFilter.removeRepository(getPort());
+      repositoryReverseProxyFilter.removeRepository(getPort());
       jettyConnector.stop();
       Server server = JettyServer.getServer();
       server.removeConnector(jettyConnector);
