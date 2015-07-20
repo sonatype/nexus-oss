@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Jetty server.
- * 
+ *
  * @since 2.8
  */
 public class JettyServer
@@ -49,6 +49,7 @@ public class JettyServer
 
   private final String[] args;
 
+  // FIXME remove once adding docker connectors properly implemented
   private static JettyMainThread thread;
 
   public JettyServer(final ClassLoader classLoader, final Map<String, String> properties, final String[] args) {
@@ -204,13 +205,16 @@ public class JettyServer
     log.info("Stopped");
   }
 
-  public static Server getServer() {
+  // FIXME remove once adding docker connectors properly implemented
+  public static Server getServer() throws Exception {
+    thread.started.await();
     return thread.server;
+
   }
 
   /**
    * Jetty thread used to start components, wait for the server's threads to join and stop components.
-   * 
+   *
    * Needed so that once {@link JettyServer#stop()} returns that we know that the server has actually stopped,
    * which is required for embedding.
    */

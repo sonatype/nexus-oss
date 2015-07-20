@@ -20,8 +20,8 @@ import org.sonatype.nexus.bootstrap.jetty.JettyServer;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
-import org.sonatype.nexus.repository.storage.StorageFacet;
 
+import com.google.common.base.Throwables;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 
@@ -72,14 +72,24 @@ public class ConnectorFacetImpl
 
   @Override
   protected void doStart() throws Exception {
-    Server server = JettyServer.getServer();
-    if (server != null) {
-      jettyConnector = new ServerConnector(server);
-      jettyConnector.setPort(config.port);
-      server.addConnector(jettyConnector);
-      jettyConnector.start();
-      dockerFilter.addRepository(getPort(), getRepository().getName());
-    }
+    // FIXME remove once adding docker connectors properly implemented
+    new Thread(new Runnable()
+    {
+      @Override
+      public void run() {
+        try {
+          Server server = JettyServer.getServer();
+          jettyConnector = new ServerConnector(server);
+          jettyConnector.setPort(config.port);
+          server.addConnector(jettyConnector);
+          jettyConnector.start();
+          dockerFilter.addRepository(getPort(), getRepository().getName());
+        }
+        catch (Exception e) {
+          throw Throwables.propagate(e);
+        }
+      }
+    }, "start-connector-" + getRepository().getName()).start();
   }
 
   @Override
