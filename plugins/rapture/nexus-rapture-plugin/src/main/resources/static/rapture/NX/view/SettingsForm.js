@@ -192,6 +192,7 @@ Ext.define('NX.view.SettingsForm', {
   resetDirtyState: function (form) {
     var realform = form.getForm();
     realform.setValues(realform.getValues());
+    form.updateButtonState(form);
   },
 
   /**
