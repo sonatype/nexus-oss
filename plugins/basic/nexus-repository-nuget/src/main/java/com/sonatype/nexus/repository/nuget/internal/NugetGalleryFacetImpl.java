@@ -24,7 +24,8 @@ import java.util.SortedSet;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
-import com.sonatype.nexus.repository.nuget.internal.ComponentQuery.Builder;
+import org.sonatype.nexus.repository.storage.ComponentQuery;
+import org.sonatype.nexus.repository.storage.ComponentQuery.Builder;
 import com.sonatype.nexus.repository.nuget.odata.NugetPackageUtils;
 import com.sonatype.nexus.repository.nuget.odata.ODataFeedUtils;
 import com.sonatype.nexus.repository.nuget.odata.ODataTemplates;

@@ -32,10 +32,4 @@ public interface MavenAttributes
   String P_CLASSIFIER = "classifier";
 
   String P_EXTENSION = "extension";
-
-  // keys
-
-  String P_COMPONENT_KEY = "key";
-
-  String P_ASSET_KEY = "key";
 }
