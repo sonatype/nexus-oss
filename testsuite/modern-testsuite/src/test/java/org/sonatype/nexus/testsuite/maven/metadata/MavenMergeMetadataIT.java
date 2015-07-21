@@ -187,7 +187,7 @@ public class MavenMergeMetadataIT
   }
 
   @Test
-  public void mergeMetadataOnChange() throws Exception {
+  public void mergeMetadataOnContentChange() throws Exception {
     Metadata metadata = get(mavenGroup);
     assertThat(metadata.getVersioning().getVersions(), contains("1.0-hosted", "1.0-proxy"));
 
