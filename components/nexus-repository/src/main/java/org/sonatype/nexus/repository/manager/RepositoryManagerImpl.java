@@ -33,6 +33,7 @@ import org.sonatype.nexus.repository.config.ConfigurationStore;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
@@ -251,8 +252,15 @@ public class RepositoryManagerImpl
 
     log.debug("Creating repository: {} -> {}", repositoryName, configuration);
 
-    Repository repository = newRepository(configuration);
-    store.create(configuration);
+    Repository repository;
+    try {
+      store.create(configuration);
+      repository = newRepository(configuration);
+    }
+    catch (Exception e) {
+      store.delete(configuration);
+      throw e;
+    }
     track(repository);
 
     repository.start();
