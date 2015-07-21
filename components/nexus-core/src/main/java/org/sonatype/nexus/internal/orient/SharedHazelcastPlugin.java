@@ -12,12 +12,16 @@
  */
 package org.sonatype.nexus.internal.orient;
 
-import org.sonatype.nexus.internal.hazelcast.HazelcastInstanceProvider;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
+import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.orientechnologies.orient.server.hazelcast.OHazelcastPlugin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link OHazelcastPlugin} using a shared {@link HazelcastInstance}.
@@ -27,11 +31,25 @@ import org.slf4j.LoggerFactory;
 public class SharedHazelcastPlugin
     extends OHazelcastPlugin
 {
-  private static final Logger log = LoggerFactory.getLogger(SharedHazelcastPlugin.class);
+  public static final String INSTANCE_NAME = "nexus";
 
   @Override
   protected HazelcastInstance configureHazelcast() {
-    // HACK: Orient-components are not proper Sisu-components, but share the provider lookup
-    return new HazelcastInstanceProvider().get();
+    return (HazelcastInstance) Proxy.newProxyInstance(HazelcastInstance.class.getClassLoader(),
+        new Class<?>[] { HazelcastInstance.class }, new InvocationHandler()
+        {
+          private Object delegate = checkNotNull(Hazelcast.getHazelcastInstanceByName(INSTANCE_NAME));
+
+          public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            if ("shutdown".equals(method.getName())) {
+              delegate = null; // detach proxy, but keep delegate alive
+              return null;
+            }
+            if (delegate == null) {
+              throw new HazelcastInstanceNotActiveException();
+            }
+            return method.invoke(delegate, args);
+          }
+        });
   }
 }

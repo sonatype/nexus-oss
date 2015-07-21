@@ -208,16 +208,13 @@
     <dependency>
       <groupId>com.orientechnologies</groupId>
       <artifactId>orientdb-distributed</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>com.hazelcast</groupId>
       <artifactId>hazelcast</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jta_1.1_spec</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -275,8 +272,19 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <!-- include the OSGi JDBC compendium package as it's needed by H2 -->
-            <Export-Package>{local-packages},org.osgi.service.jdbc</Export-Package>
+            <!--
+            include OSGi JDBC compendium package as it's needed by H2
+            -->
+            <Export-Package>
+              {local-packages},org.osgi.service.jdbc
+            </Export-Package>
+            <!--
+            these packages are optional and might appear at any time
+            -->
+            <DynamicImport-Package>
+              com.hazelcast.core,
+              com.orientechnologies.orient.server.hazelcast
+            </DynamicImport-Package>
           </instructions>
         </configuration>
       </plugin>

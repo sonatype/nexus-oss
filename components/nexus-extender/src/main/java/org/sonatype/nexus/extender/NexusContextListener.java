@@ -25,7 +25,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.sonatype.nexus.common.guice.InjectorService;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
@@ -124,8 +123,6 @@ public class NexusContextListener
         new NexusContextModule(bundleContext, servletContext, nexusProperties)));
 
     log.debug("Injector: {}", injector);
-
-    registerInjectorService(injector.getProvider(BeanLocator.class));
 
     extender.doStart(); // start tracking nexus bundles
 
@@ -254,33 +251,6 @@ public class NexusContextListener
     }
 
     log.info("Installed {} features", features.size());
-  }
-
-  /**
-   * Registers our locator service with OSGi to handle injection of external classes.
-   */
-  private void registerInjectorService(final Provider<BeanLocator> locatorProvider) {
-    bundleContext.registerService(InjectorService.class, new InjectorService()
-    {
-      public void injectMembers(final Object instance) {
-        Guice.createInjector(new WireModule(new AbstractModule()
-        {
-          @Override
-          protected void configure() {
-            // support injection of application components by wiring via shared locator
-            // (use provider to avoid auto-publishing test-instance to the application)
-            bind(BeanLocator.class).toProvider(locatorProvider);
-
-            // support injection of application properties
-            bind(ParameterKeys.PROPERTIES).toInstance(
-                locatorProvider.get().locate(ParameterKeys.PROPERTIES).iterator().next().getValue());
-
-            // inject the test-instance
-            requestInjection(instance);
-          }
-        }));
-      }
-    }, null);
   }
 
   /**

@@ -148,18 +148,26 @@ public class DatabaseServerImpl
 
     config.handlers = new ArrayList<>();
 
-    // configure Hazelcast handler
-    File etcDir = new File(applicationDirectories.getInstallDirectory(), "etc");
-    OServerHandlerConfiguration hazelcastHandler = new OServerHandlerConfiguration();
-    hazelcastHandler.clazz = SharedHazelcastPlugin.class.getName();
-    hazelcastHandler.parameters = new OServerParameterConfiguration[] {
-        new OServerParameterConfiguration("enabled", "true"),
-        // HACK: This is apprently needed, have to understand where/why/how this is used
-        new OServerParameterConfiguration("configuration.db.default", new File(etcDir, "default-distributed-db-config.json").getCanonicalPath()),
-        // HACK: stuff in nodeName to avoid pausing on start, replace with local-node-id
-        new OServerParameterConfiguration("nodeName", String.valueOf(System.nanoTime()))
-    };
-    config.handlers.add(hazelcastHandler);
+    try {
+      // is hazelcast available? use reflection to avoid caching negative result
+      getClass().getClassLoader().loadClass("com.hazelcast.core.Hazelcast");
+
+      // configure Hazelcast handler if we are currently running in distributed mode
+      File etcDir = new File(applicationDirectories.getInstallDirectory(), "etc");
+      OServerHandlerConfiguration hazelcastHandler = new OServerHandlerConfiguration();
+      hazelcastHandler.clazz = SharedHazelcastPlugin.class.getName();
+      hazelcastHandler.parameters = new OServerParameterConfiguration[] {
+          new OServerParameterConfiguration("enabled", "true"),
+          // HACK: This is apparently needed, have to understand where/why/how this is used
+          new OServerParameterConfiguration("configuration.db.default", new File(etcDir, "default-distributed-db-config.json").getCanonicalPath()),
+          // HACK: stuff in nodeName to avoid pausing on start, replace with local-node-id
+          new OServerParameterConfiguration("nodeName", String.valueOf(System.nanoTime()))
+      };
+      config.handlers.add(hazelcastHandler);
+    }
+    catch (final ClassNotFoundException | LinkageError e) {
+      log.debug("Skipping optional Hazelcast handler: {}", e.toString());
+    }
 
     // configure JMX handler
     OServerHandlerConfiguration jmxHandler = new OServerHandlerConfiguration();

@@ -66,6 +66,11 @@
       <groupId>org.apache.karaf.cellar</groupId>
       <artifactId>org.apache.karaf.cellar.features</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>com.orientechnologies</groupId>
+      <artifactId>orientdb-distributed</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
