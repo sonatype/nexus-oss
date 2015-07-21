@@ -146,8 +146,8 @@ public class MavenMergeMetadataIT
       return defaultMetadata();
     }
     else {
-      // this should fail the test too
-      throw new IllegalStateException("Unexpected response: " + response.getStatusLine());
+      // this should fail the test
+      throw new AssertionError("Unexpected response: " + response.getStatusLine());
     }
   }
 
