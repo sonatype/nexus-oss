@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.sonatype.nexus.common.app.ApplicationDirectories;
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.hazelcast.config.Config;
@@ -57,9 +58,11 @@ public class HazelcastInstanceProvider
     ExceptionUtil.class.toString(); // workaround https://github.com/orientechnologies/orientdb/pull/4609
   }
 
+  private final BundleContext bundleContext;
+
   private final ApplicationDirectories directories;
 
-  private final BundleContext bundleContext;
+  private final LocalNodeAccess localNodeAccess;
 
   private final CombinedClassLoader combinedClassLoader;
 
@@ -68,9 +71,13 @@ public class HazelcastInstanceProvider
   private ServiceRegistration<?> registration;
 
   @Inject
-  public HazelcastInstanceProvider(final ApplicationDirectories directories, final BundleContext bundleContext) {
-    this.directories = checkNotNull(directories);
+  public HazelcastInstanceProvider(final BundleContext bundleContext,
+                                   final ApplicationDirectories directories,
+                                   final LocalNodeAccess localNodeAccess)
+  {
     this.bundleContext = checkNotNull(bundleContext);
+    this.directories = checkNotNull(directories);
+    this.localNodeAccess = checkNotNull(localNodeAccess);
 
     combinedClassLoader = new CombinedClassLoader();
 
@@ -109,7 +116,6 @@ public class HazelcastInstanceProvider
   }
 
   private Config getHazelcastConfig() {
-
     Config config;
     File hazelcastXml = new File(new File(directories.getInstallDirectory(), "etc"), "hazelcast.xml");
     try (InputStream in = new BufferedInputStream(new FileInputStream(hazelcastXml))) {
@@ -123,9 +129,10 @@ public class HazelcastInstanceProvider
     config.setInstanceName(INSTANCE_NAME);
     config.setClassLoader(combinedClassLoader);
 
-    // HACK: Testing exposing local node identity to member config
+    // Customize member attributes
+    // FIXME: Change to contributor model, to make this easier to extend with components
     MemberAttributeConfig attributes = new MemberAttributeConfig();
-    attributes.setStringAttribute("node.identity", "PLACE-HOLDER"); // localNodeAccess.getId());
+    attributes.setStringAttribute("node.identity", localNodeAccess.getId());
     config.setMemberAttributeConfig(attributes);
 
     log.debug("Config: {}", config);

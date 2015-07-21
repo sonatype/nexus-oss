@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.app.ApplicationDirectories;
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
 import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.nexus.orient.DatabaseServer;
@@ -65,6 +66,8 @@ public class DatabaseServerImpl
 {
   private final ApplicationDirectories applicationDirectories;
 
+  private final LocalNodeAccess localNodeAccess;
+
   private final boolean binaryListenerEnabled;
 
   private final boolean httpListenerEnabled;
@@ -75,11 +78,13 @@ public class DatabaseServerImpl
 
   @Inject
   public DatabaseServerImpl(final ApplicationDirectories applicationDirectories,
+                            final LocalNodeAccess localNodeAccess,
                             @Named("${nexus.orient.binaryListenerEnabled:-false}") final boolean binaryListenerEnabled,
                             @Named("${nexus.orient.httpListenerEnabled:-false}") final boolean httpListenerEnabled,
                             @Named("${nexus.orient.dynamicPlugins:-false}") final boolean dynamicPlugins)
   {
     this.applicationDirectories = checkNotNull(applicationDirectories);
+    this.localNodeAccess = checkNotNull(localNodeAccess);
     this.binaryListenerEnabled = binaryListenerEnabled;
     this.httpListenerEnabled = httpListenerEnabled;
     this.dynamicPlugins = dynamicPlugins;
@@ -158,10 +163,9 @@ public class DatabaseServerImpl
       hazelcastHandler.clazz = SharedHazelcastPlugin.class.getName();
       hazelcastHandler.parameters = new OServerParameterConfiguration[] {
           new OServerParameterConfiguration("enabled", "true"),
+          new OServerParameterConfiguration("nodeName", localNodeAccess.getId()),
           // HACK: This is apparently needed, have to understand where/why/how this is used
-          new OServerParameterConfiguration("configuration.db.default", new File(etcDir, "default-distributed-db-config.json").getCanonicalPath()),
-          // HACK: stuff in nodeName to avoid pausing on start, replace with local-node-id
-          new OServerParameterConfiguration("nodeName", String.valueOf(System.nanoTime()))
+          new OServerParameterConfiguration("configuration.db.default", new File(etcDir, "default-distributed-db-config.json").getCanonicalPath())
       };
       config.handlers.add(hazelcastHandler);
     }
