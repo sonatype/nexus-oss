@@ -175,6 +175,11 @@ public class MavenMergeMetadataIT
     metadata = get(mavenGroup);
     assertThat(metadata.getVersioning().getVersions(), contains("1.0-hosted"));
 
+    mavenGroup = updateGroup(mavenGroup, proxyRepository);
+
+    metadata = get(mavenGroup);
+    assertThat(metadata.getVersioning().getVersions(), contains("1.0-proxy"));
+
     mavenGroup = updateGroup(mavenGroup, hostedRepository, proxyRepository);
 
     metadata = get(mavenGroup);
@@ -189,7 +194,6 @@ public class MavenMergeMetadataIT
     deployMetadataWithVersionTo("1.1-hosted", hostedRepository);
 
     metadata = get(mavenGroup);
-    System.out.println(metadata.getVersioning().getVersions());
     assertThat(metadata.getVersioning().getVersions(), contains("1.0-hosted", "1.0-proxy", "1.1-hosted"));
 
     createAdminMaven2Client(hostedRepository.getName()).delete(METADATA_PATH);
