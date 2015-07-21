@@ -39,7 +39,7 @@ StartTest(function(t) {
             next();
           }
       )
-    });
+    }, 60000);
     t.it('Maven search finds maven components', function(t) {
       t.chain(
           t.navigateTo('browse/search/maven'),
