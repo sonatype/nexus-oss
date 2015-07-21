@@ -46,6 +46,7 @@ import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
@@ -226,14 +227,15 @@ public class NugetGalleryFacetImpl
   }
 
   @Override
-  public void putContent(final String id, final String version, final Content content) throws IOException {
+  public Content putContent(final String id, final String version, final Content content) throws IOException {
     try (TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      doPutContent(id, version, streamSupplier, content.getAttributes());
+      return doPutContent(id, version, streamSupplier, content.getAttributes());
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutContent(final String id, final String version, final Supplier<InputStream> streamSupplier, final AttributesMap contentAttributes)
+  protected Content doPutContent(final String id, final String version, final Supplier<InputStream> streamSupplier,
+                                 final AttributesMap contentAttributes)
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
@@ -242,7 +244,7 @@ public class NugetGalleryFacetImpl
         component != null && tx.browseAssets(component).iterator().hasNext(),
         "Component metadata does not exist yet"
     );
-    createOrUpdateAssetAndContents(tx, component, streamSupplier.get(), null, contentAttributes);
+    return createOrUpdateAssetAndContents(tx, component, streamSupplier.get(), null, contentAttributes);
   }
 
   @VisibleForTesting
@@ -347,6 +349,10 @@ public class NugetGalleryFacetImpl
       return null;
     }
     final Blob blob = tx.requireBlob(blobRef);
+    return toContent(asset, blob);
+  }
+
+  private Content toContent(final Asset asset, final Blob blob) {
     String contentType = asset.contentType();
 
     final Content content = new Content(new BlobPayload(blob, contentType));
@@ -531,18 +537,21 @@ public class NugetGalleryFacetImpl
     return tx.findComponents(whereClause, parameters, getRepositories(), null);
   }
 
-  private void createOrUpdateAssetAndContents(final StorageTx tx,
-                                              final Component component,
-                                              final InputStream in,
-                                              final Map<String, String> data,
-                                              @Nullable final AttributesMap contentAttributes)
+  private Content createOrUpdateAssetAndContents(final StorageTx tx,
+                                                 final Component component,
+                                                 final InputStream in,
+                                                 final Map<String, String> data,
+                                                 @Nullable final AttributesMap contentAttributes)
   {
     try {
       Asset asset = findOrCreateAsset(tx, component);
       updateAssetMetadata(asset, data, component.isNew());
       Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
-      tx.setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
+      final AssetBlob assetBlob = tx
+          .setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
       tx.saveAsset(asset);
+
+      return toContent(asset, assetBlob.getBlob());
     }
     catch (IOException e) {
       throw Throwables.propagate(e);

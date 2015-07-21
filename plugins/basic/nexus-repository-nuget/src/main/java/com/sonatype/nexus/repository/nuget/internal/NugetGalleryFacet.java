@@ -44,7 +44,7 @@ public interface NugetGalleryFacet
   /**
    * Attach content to pre-existing metadata.
    */
-  void putContent(String id, String version, Content content) throws IOException;
+  Content putContent(String id, String version, Content content) throws IOException;
 
   /**
    * Get a package, or {@code null} if not found.

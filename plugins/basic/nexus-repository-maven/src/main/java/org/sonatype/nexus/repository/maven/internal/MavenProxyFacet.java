@@ -49,8 +49,8 @@ public class MavenProxyFacet
   }
 
   @Override
-  protected void store(final Context context, final Content payload) throws IOException, InvalidContentException {
-    mavenFacet.put(mavenPath(context), payload);
+  protected Content store(final Context context, final Content payload) throws IOException, InvalidContentException {
+   return mavenFacet.put(mavenPath(context), payload);
   }
 
   @Override

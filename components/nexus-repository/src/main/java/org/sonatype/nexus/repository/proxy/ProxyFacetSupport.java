@@ -157,8 +157,7 @@ public abstract class ProxyFacetSupport
       try {
         final Content remote = fetch(context, content);
         if (remote != null) {
-          store(context, remote);
-          content = getCachedPayload(context);
+          return store(context, remote);
         }
       }
       catch (IOException e) {
@@ -184,7 +183,7 @@ public abstract class ProxyFacetSupport
    * Store a new Payload, freshly fetched from the remote URL. The Context indicates which component
    * was being requested.
    */
-  protected abstract void store(final Context context, final Content content)
+  protected abstract Content store(final Context context, final Content content)
       throws IOException, InvalidContentException;
 
   @Nullable
