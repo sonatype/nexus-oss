@@ -12,7 +12,7 @@
  *###
 <h4>Node ID</h4>
 <div>
-    <pre>${nodeId}</pre>
+    <pre>$nodeId</pre>
 </div>
 
 <h4>Fingerprint</h4>
