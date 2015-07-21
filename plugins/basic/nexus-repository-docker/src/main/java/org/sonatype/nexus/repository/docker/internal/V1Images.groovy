@@ -97,7 +97,7 @@ class V1Images
   private void copyAttributeAsHeader(final Content content, final Response response, final String name) {
     def value = content.attributes.get(name)
     if (value) {
-      response.headers.set(P_X_DOCKER_SIZE, value as String)
+      response.headers.set(name, value as String)
     }
   }
 
