@@ -99,6 +99,12 @@
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-distributed</artifactId>
         <version>${orientdb.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-all</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>

@@ -16,38 +16,10 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
         xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
-    <bean id="hazelcast" class="com.hazelcast.core.Hazelcast" factory-ref="instanceFactory"
-          factory-method="getInstance"/>
-    <service ref="hazelcast" interface="com.hazelcast.core.HazelcastInstance"/>
-
-    <bean id="instanceFactory" class="org.apache.karaf.cellar.hazelcast.factory.HazelcastServiceFactory"
-          init-method="init">
-        <property name="combinedClassLoader" ref="combinedClassLoader"/>
-        <property name="configurationManager" ref="hazelcastConfigurationManager"/>
-        <property name="bundleContext" ref="blueprintBundleContext"/>
-        <cm:managed-properties persistent-id="org.apache.karaf.cellar.discovery" update-strategy="component-managed"
-                                  update-method="update"/>
-    </bean>
-
     <!--
-    SONATYPE: expose sisu injection services
+    SONATYPE: expose our Hazelcast instance
     -->
-    <reference id="injectorService" interface="org.sonatype.nexus.common.guice.InjectorService"
-               availability="mandatory"/>
-
-    <!--
-    SONATYPE: customize HazelcastConfigurationManager implementation
-    -->
-    <bean id="hazelcastConfigurationManager" class="org.sonatype.nexus.hazelcast.NexusHazelcastConfigurationManager" >
-        <property name="discoveryServices" ref="discoveryServices"/>
-        <property name="injectorService" ref="injectorService"/>
-    </bean>
-
-    <!-- Discovery Task -->
-    <bean id="discoveryTask" class="org.apache.karaf.cellar.core.discovery.DiscoveryTask" init-method="init" destroy-method="destroy">
-        <property name="discoveryServices" ref="discoveryServices"/>
-        <property name="configurationAdmin" ref="configurationAdmin"/>
-    </bean>
+    <reference id="hazelcast" availability="mandatory" interface="com.hazelcast.core.HazelcastInstance"/>
 
     <!-- Members Listener -->
     <bean id="membershipListener" class="org.apache.karaf.cellar.hazelcast.CellarMembershipListener">
@@ -197,8 +169,6 @@
     <reference id="configurationAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"/>
     <reference id="proxyManager" interface="org.apache.aries.proxy.ProxyManager"/>
 
-    <reference-list id="discoveryServices" availability="optional"
-               interface="org.apache.karaf.cellar.core.discovery.DiscoveryService"/>
     <reference-list id="groupEventProducers" availability="optional" interface="org.apache.karaf.cellar.core.event.EventProducer"
           filter="(type = group)"/>
     <reference-list id="groupEventConsumers" availability="optional" interface="org.apache.karaf.cellar.core.event.EventConsumer"
