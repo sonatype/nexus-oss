@@ -121,15 +121,16 @@ public class Maven2GroupFacet
   @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
     super.doConfigure(configuration);
-    Config config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
-
+    final ConfigurationFacet configurationFacet = facet(ConfigurationFacet.class);
+    Config config = configurationFacet.readSection(configuration, CONFIG_KEY, Config.class);
     if (cacheController == null) {
       cacheController = new CacheController(config.contentMaxAge, config.cacheToken);
     }
     else {
       config.cacheToken = cacheController.invalidateCache();
-      facet(ConfigurationFacet.class).writeSection(getRepository().getConfiguration(), CONFIG_KEY, config);
     }
+    configurationFacet.writeSection(getRepository().getConfiguration(), CONFIG_KEY, config);
+    configurationFacet.save();
   }
 
   /**

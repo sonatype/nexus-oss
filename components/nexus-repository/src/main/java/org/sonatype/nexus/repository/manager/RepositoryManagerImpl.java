@@ -217,7 +217,6 @@ public class RepositoryManagerImpl
     for (Repository repository : repositories.values()) {
       log.debug("Stopping repository: {}", repository);
       repository.stop();
-      store.update(repository.getConfiguration());
     }
 
     log.debug("Destroying {} repositories", repositories.size());

@@ -35,6 +35,7 @@ import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.net.HttpHeaders;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -179,7 +180,14 @@ public abstract class ProxyFacetSupport
   public void invalidateProxyCaches() {
     log.info("Invalidating proxy caches of {}", getRepository().getName());
     config.cacheToken = cacheController.invalidateCache();
-    facet(ConfigurationFacet.class).writeSection(getRepository().getConfiguration(), CONFIG_KEY, config);
+    final ConfigurationFacet configurationFacet = facet(ConfigurationFacet.class);
+    configurationFacet.writeSection(getRepository().getConfiguration(), CONFIG_KEY, config);
+    try {
+      configurationFacet.save();
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   /**

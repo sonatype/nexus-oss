@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.config;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -92,8 +93,9 @@ public class ConfigurationFacetImpl
     checkNotNull(object);
     log.trace("Writing section: {}", section);
     Map<String, Object> objectMap = objectMapper.convertValue(object, MAP_STRING_OBJECT);
-    configuration.attributes(section).backing().clear();
-    configuration.attributes(section).backing().putAll(objectMap);
+    for (Entry<String, Object> entry : objectMap.entrySet()) {
+      configuration.attributes(section).set(entry.getKey(), entry.getValue());
+    }
   }
 
   @Override
