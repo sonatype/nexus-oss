@@ -21,10 +21,14 @@ StartTest(function(t) {
 
   t.describe('Can login and out of the application', function(t) {
     var message = t.spyOn(NX.application.getController('Message'), 'addMessage').and.callThrough()
-    
+    t.beforeEach(function() {
+      message.reset();
+    });
+
     t.it('Can login as admin and see a confirmation message', function(t) {
       t.chain(
           t.openPageAsAdmin('browse/welcome'),
+          {waitForSpyToBeCalled: message},
           // message will be shown on login
           function(next) {
             t.expect(message).toHaveBeenCalled();
@@ -37,6 +41,7 @@ StartTest(function(t) {
     t.it('Can logout and see a confirmation message', function(t) {
       t.chain(
           {click: '>>nx-header-signout'},
+          {waitForSpyToBeCalled: message},
            // message will be shown on logout
           function(next) {
             t.expect(message).toHaveBeenCalled();

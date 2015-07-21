@@ -23,6 +23,11 @@ StartTest(function(t) {
       };
 
   t.describe('Repository administration', function(t) {
+    var message = t.spyOn(NX.application.getController('Message'), 'addMessage').and.callThrough();
+    t.beforeEach(function(){
+      message.reset();
+    });
+
     t.it('Default repositories are populated', function(t) {
       t.chain(
           t.openPageAsAdmin('admin/repository/repositories'),
@@ -34,7 +39,6 @@ StartTest(function(t) {
                 nugetRepos = store.query('format', 'nuget').collect('name', 'data');
             ['maven-central', 'maven-public', 'maven-releases', 'maven-snapshots'].forEach(
                 function(element, index, array) {
-                  
                   t.expect(mavenRepos).toContain(element);
                 });
             ['nuget-group', 'nuget-hosted', 'nuget.org-proxy'].forEach(
@@ -46,7 +50,6 @@ StartTest(function(t) {
       )
     });
     t.it('Repository creation', function(t) {
-      var message = t.spyOn(NX.application.getController('Message'), 'addMessage').and.callThrough();
       t.chain(
           {click: '>>nx-coreui-repository-list button[text=Create repository]'},
           {waitForCQVisible: '>>nx-coreui-repository-selectrecipe'},
@@ -73,6 +76,7 @@ StartTest(function(t) {
           Ext.apply(Ext.clone(waitForStoreToLoad),
               {trigger: {click: '>>nx-coreui-repository-add button[action=add]'}}
           ),
+          {waitForSpyToBeCalled: message},
           function(next) {
             var grid = t.cq1('nx-coreui-repository-list'),
                 store = grid.getStore(),
@@ -82,7 +86,7 @@ StartTest(function(t) {
             t.expect(model.get('url')).toBe(t.anyStringLike('repository/' + name + '/'));
             t.is(model.get('attributes').storage.writePolicy, 'ALLOW');
             t.is(model.get('attributes').storage.strictContentTypeValidation, true);
-            
+
             t.expect(message).toHaveBeenCalled();
             var lastMessage = message.calls.mostRecent().args[0];
             t.expect(lastMessage.text).toBe('Repository created: ' + name);
@@ -122,8 +126,6 @@ StartTest(function(t) {
       );
     });
     t.it('Repository update', function(t) {
-      var message = t.spyOn(NX.application.getController('Message'), 'addMessage').and.callThrough();
-
       t.chain(
           //update the writePolicy
           {click: '#writePolicy => .x-form-text'},
@@ -131,12 +133,13 @@ StartTest(function(t) {
           Ext.apply(Ext.clone(waitForStoreToLoad),
               {trigger: {click: '>>nx-coreui-repository-settings button[action=save]'}}
           ),
+          {waitForSpyToBeCalled: message},
           function(next) {
             var grid = t.cq1('nx-coreui-repository-list'),
                 store = grid.getStore(),
                 model = store.findRecord('name', name);
             t.is(model.get('attributes').storage.writePolicy, 'ALLOW_ONCE');
-            
+
             t.expect(message).toHaveBeenCalled();
             var lastMessage = message.calls.mostRecent().args[0];
             t.expect(lastMessage.text).toBe('Repository updated: ' + name);
@@ -146,13 +149,12 @@ StartTest(function(t) {
       );
     });
     t.it('Repository delete', function(t) {
-      var message = t.spyOn(NX.application.getController('Message'), 'addMessage').and.callThrough();
-
       t.chain(
           {click: '>>nx-actions button[text=Delete repository] => .x-btn-inner'},
           Ext.apply(Ext.clone(waitForStoreToLoad),
               {trigger: {click: '>>button[text=Yes]'}}
           ),
+          {waitForSpyToBeCalled: message},
           function(next) {
             var grid = t.cq1('nx-coreui-repository-list'),
                 store = grid.getStore(),

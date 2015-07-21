@@ -64,6 +64,16 @@ public class MapdbBlobMetadataStore
 
   private TxMaker database;
 
+  /**
+   * The number of records counted when last cacheing size
+   */
+  private long numRecords = 0L;
+
+  /**
+   * The cached number of bytes stored.
+   */
+  private long cachedSize = 0L;
+
   private MapdbBlobMetadataStore(final File directory) {
     checkNotNull(directory);
     this.file = new File(directory, directory.getName() + ".db");
@@ -109,7 +119,9 @@ public class MapdbBlobMetadataStore
   }
 
   private HTreeMap<BlobId, MetadataRecord> entries(final DB db) {
-    return db.getHashMap("entries");
+    return db.createHashMap("entries")
+        .counterEnable()
+        .makeOrGet();
   }
 
   private NavigableSet<BlobId> states(final DB db, final BlobState state) {
@@ -448,19 +460,28 @@ public class MapdbBlobMetadataStore
     ensureStarted();
     return database.execute(new Fun.Function1<Long, DB>()
     {
-      @Override    
+      @Override
       public Long run(final DB db) {
         long totalSize = 0L;
         HTreeMap<BlobId, MetadataRecord> entries = entries(db);
+        if (entries.sizeLong() == numRecords) {
+          log.debug("Returning cached blob size");
+          return cachedSize;
+        }
+
+        log.debug("Cached data is invalid, recalculating size of blobs");
+
         for (MetadataRecord metadataRecord : entries.values()) {
-          if(metadataRecord.size != null) {
+          if (metadataRecord.size != null) {
             totalSize += metadataRecord.size;
           }
           else {
             log.warn("Blob metadata has no size indicated for sha1: {}", metadataRecord.sha1);
           }
         }
-        return totalSize;
+        numRecords = entries.sizeLong();
+        cachedSize = totalSize;
+        return cachedSize;
       }
     });
   }
