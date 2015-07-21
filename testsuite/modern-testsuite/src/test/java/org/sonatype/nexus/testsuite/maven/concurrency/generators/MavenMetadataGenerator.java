@@ -26,17 +26,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
- * Content generator for Maven metadata files.
+ * Content generator for Maven metadata files. This generator once created is immutable, as holds the byte array
+ * of metadata created by {@link MetadataXpp3Writer}. This also means that {@link Metadata} instance used by
+ * caller to create this instance may be mutated to create more instances of this generator.
  */
 public class MavenMetadataGenerator
     extends Generator
 {
   private static final MetadataXpp3Writer writer = new MetadataXpp3Writer();
 
-  private final Metadata metadata;
+  private byte[] metadata;
 
   public MavenMetadataGenerator(final Metadata metadata) {
-    this.metadata = checkNotNull(metadata);
+    checkNotNull(metadata);
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    try {
+      writer.write(byteArrayOutputStream, metadata);
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
+    this.metadata = byteArrayOutputStream.toByteArray();
   }
 
   @Override
@@ -46,26 +56,11 @@ public class MavenMetadataGenerator
 
   @Override
   public long getExactContentLength(final long length) {
-    return asByteArray().length;
+    return metadata.length;
   }
 
   @Override
   public InputStream generate(final long length) {
-    return new ByteArrayInputStream(asByteArray());
-  }
-
-  private byte[] asByteArray() {
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    try {
-      writer.write(byteArrayOutputStream, generate());
-    }
-    catch (IOException e) {
-      throw Throwables.propagate(e);
-    }
-    return byteArrayOutputStream.toByteArray();
-  }
-
-  private Metadata generate() {
-    return metadata;
+    return new ByteArrayInputStream(metadata);
   }
 }
