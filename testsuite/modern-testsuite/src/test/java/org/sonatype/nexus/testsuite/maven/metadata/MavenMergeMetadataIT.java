@@ -57,7 +57,7 @@ public class MavenMergeMetadataIT
 
   private static final String ARTIFACT_ID = "artifact";
 
-  private static final String METADATA_PATH = GROUP_ID.replace('.', '/') + "/" + ARTIFACT_ID + "/maven-metadata.xml";
+  private static final String METADATA_PATH = GROUP_ID + "/" + ARTIFACT_ID + "/maven-metadata.xml";
 
   private static final MetadataXpp3Writer writer = new MetadataXpp3Writer();
 
