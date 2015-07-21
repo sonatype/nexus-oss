@@ -12,7 +12,7 @@
  *###
 <h4>Node ID</h4>
 <div>
-    <pre>${nodeId}</pre>
+    <pre>$nodeId</pre>
 </div>
 
 <h4>Fingerprint</h4>
@@ -20,12 +20,12 @@
     <pre>$fingerprint</pre>
 </div>
 
-<h4>Certificate</h4>
+<h4>Certificate PEM</h4>
 <div>
     <pre>$pem</pre>
 </div>
 
-<h4>Detail</h4>
+<h4>Certificate Details</h4>
 <div>
     <pre>$detail</pre>
 </div>

@@ -13,17 +13,16 @@
 package org.sonatype.nexus.internal.node;
 
 import java.security.cert.Certificate;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.node.LocalNodeAccess;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
-import org.sonatype.sisu.goodies.common.TestAccessible;
+import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
+import org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil;
 import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManager;
-
-import com.google.common.base.Throwables;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -35,43 +34,72 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class LocalNodeAccessImpl
-    extends ComponentSupport
+    extends LifecycleSupport
     implements LocalNodeAccess
 {
   private final KeyStoreManager keyStoreManager;
 
-  private volatile String id;
+  private Certificate certificate;
+
+  private String id;
+
+  private String fingerprint;
 
   @Inject
   public LocalNodeAccessImpl(final @Named(KeyStoreManagerImpl.NAME) KeyStoreManager keyStoreManager) {
     this.keyStoreManager = checkNotNull(keyStoreManager);
   }
 
-  @TestAccessible
-  protected String loadId() {
-    try {
-      Certificate cert = keyStoreManager.getCertificate();
-      return NodeIdEncoding.nodeIdForCertificate(cert);
+  @Override
+  protected void doStart() throws Exception {
+    // Generate identity key-pair if not already created
+    if (!keyStoreManager.isKeyPairInitialized()) {
+      log.info("Generating certificate");
+
+      // For now give something unique to the cert for additional identification purposes
+      UUID cn = UUID.randomUUID();
+      keyStoreManager.generateAndStoreKeyPair(
+          cn.toString(),
+          "Nexus",
+          "Sonatype",
+          "Silver Spring",
+          "MD",
+          "US");
     }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+
+    certificate = keyStoreManager.getCertificate();
+    log.trace("Certificate:\n{}", certificate);
+
+    id = NodeIdEncoding.nodeIdForCertificate(certificate);
+    log.info("ID: {}", id);
+
+    fingerprint = CertificateUtil.calculateFingerprint(certificate);
+    log.debug("Fingerprint: {}", fingerprint);
+  }
+
+  @Override
+  protected void doStop() throws Exception {
+    certificate = null;
+    id = null;
+    fingerprint = null;
+  }
+
+  @Override
+  public Certificate getCertificate() {
+    ensureStarted();
+    return certificate;
   }
 
   @Override
   public String getId() {
-    // id is volatile, but we don't care if we duplicate load, so avoid explicit synchronized block
-    if (id == null) {
-      id = loadId();
-      log.info("Node-ID: {}", id);
-    }
+    ensureStarted();
     return id;
   }
 
   @Override
-  public void reset() {
-    id = null;
-    log.debug("Reset");
+  public String getFingerprint() {
+    ensureStarted();
+    return fingerprint;
   }
 
   @Override

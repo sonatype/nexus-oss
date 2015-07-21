@@ -25,6 +25,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
@@ -53,6 +54,7 @@ import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Collections.singletonMap;
 import static org.apache.karaf.features.FeaturesService.Option.ContinueBatchOnFailure;
@@ -97,16 +99,20 @@ public class NexusContextListener
 
   private LogManager logManager;
 
+  private LocalNodeAccess localNodeAccess;
+
   private Lifecycle application;
 
   private ServiceRegistration<Filter> registration;
 
   public NexusContextListener(final NexusBundleExtender extender) {
-    this.extender = extender;
+    this.extender = checkNotNull(extender);
   }
 
   @Override
   public void contextInitialized(final ServletContextEvent event) {
+    checkNotNull(event);
+
     SharedMetricRegistries.getOrCreate("nexus");
 
     bundleContext = extender.getBundleContext();
@@ -130,6 +136,10 @@ public class NexusContextListener
       logManager = injector.getInstance(LogManager.class);
       log.debug("Log manager: {}", logManager);
       logManager.start();
+
+      localNodeAccess = injector.getInstance(LocalNodeAccess.class);
+      log.debug("Local-node access: {}", localNodeAccess);
+      localNodeAccess.start();
 
       application = injector.getInstance(Key.get(Lifecycle.class, Names.named("NxApplication")));
       log.debug("Application: {}", application);
@@ -155,6 +165,8 @@ public class NexusContextListener
   }
 
   public void frameworkEvent(final FrameworkEvent event) {
+    checkNotNull(event);
+
     if (event.getType() == FrameworkEvent.STARTLEVEL_CHANGED) {
       // any local Nexus plugins have now been activated
 
@@ -179,6 +191,8 @@ public class NexusContextListener
 
   @Override
   public void contextDestroyed(final ServletContextEvent event) {
+    // event is ignored, apparently can also be null
+
     // remove our dynamic filter
     if (registration != null) {
       registration.unregister();
@@ -193,6 +207,16 @@ public class NexusContextListener
         log.error("Failed to stop application", e);
       }
       application = null;
+    }
+
+    if (localNodeAccess != null) {
+      try {
+        localNodeAccess.stop();
+      }
+      catch (final Exception e) {
+        log.error("Failed to stop local-node-access", e);
+      }
+      localNodeAccess = null;
     }
 
     if (logManager != null) {
@@ -257,7 +281,6 @@ public class NexusContextListener
    * Registers our locator service with Pax-Exam to handle injection of test classes.
    */
   private void registerLocatorWithPaxExam(final Provider<BeanLocator> locatorProvider) {
-
     // ensure this service is ranked higher than the Pax-Exam one
     final Dictionary<String, Object> examProperties = new Hashtable<>();
     examProperties.put(Constants.SERVICE_RANKING, Integer.MAX_VALUE);
