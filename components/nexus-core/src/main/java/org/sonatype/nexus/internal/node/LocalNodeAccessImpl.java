@@ -54,7 +54,7 @@ public class LocalNodeAccessImpl
   protected void doStart() throws Exception {
     // Generate identity key-pair if not already created
     if (!keyStoreManager.isKeyPairInitialized()) {
-      log.info("Generating identity certificate");
+      log.info("Generating certificate");
 
       // For now give something unique to the cert for additional identification purposes
       UUID cn = UUID.randomUUID();
@@ -71,7 +71,7 @@ public class LocalNodeAccessImpl
     log.trace("Certificate:\n{}", certificate);
 
     id = NodeIdEncoding.nodeIdForCertificate(certificate);
-    log.info("Node-ID: {}", id);
+    log.info("ID: {}", id);
 
     fingerprint = CertificateUtil.calculateFingerprint(certificate);
     log.debug("Fingerprint: {}", fingerprint);
