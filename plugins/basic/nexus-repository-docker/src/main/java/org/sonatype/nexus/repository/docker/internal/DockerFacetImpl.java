@@ -67,6 +67,7 @@ import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_T
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_TAGS;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_SIZE;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
 
 /**
  * @since 3.0
@@ -126,6 +127,7 @@ public class DockerFacetImpl
     if (asset == null) {
       asset = tx.createAsset(bucket, getRepository().getFormat());
       asset.name(assetName);
+      asset.formatAttributes().set(P_PATH, "/v1/repositories/" + assetName);
 
       indexStream = streamSupplier.get();
     }
@@ -244,6 +246,7 @@ public class DockerFacetImpl
     if (metadataAsset == null) {
       metadataAsset = tx.createAsset(bucket, component);
       metadataAsset.name(metadataAssetName);
+      metadataAsset.formatAttributes().set(P_PATH, "/v1/images/" + metadataAssetName);
     }
 
     // If we reach that point, it means that this is a new image or a retry on a failed push
@@ -313,6 +316,7 @@ public class DockerFacetImpl
     if (layerAsset == null) {
       layerAsset = tx.createAsset(bucket, component);
       layerAsset.name(layerAssetName);
+      layerAsset.formatAttributes().set(P_PATH, "/v1/images/" + layerAssetName);
     }
 
     AttributesMap contentAttributes = null;
