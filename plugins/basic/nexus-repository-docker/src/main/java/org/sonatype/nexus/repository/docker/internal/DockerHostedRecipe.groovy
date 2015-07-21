@@ -35,6 +35,7 @@ import org.sonatype.nexus.repository.view.Response
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
+import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import org.sonatype.nexus.repository.view.matchers.ActionMatcher
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher
@@ -82,6 +83,9 @@ class DockerHostedRecipe
   PartialFetchHandler partialFetchHandler
 
   @Inject
+  ConditionalRequestHandler conditionalRequestHandler
+
+  @Inject
   UnitOfWorkHandler unitOfWorkHandler
 
   @Inject
@@ -126,6 +130,7 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             LogicMatchers.or(new LiteralMatcher('/v1/users'), new LiteralMatcher('/v1/users/'))
         ))
+        .handler(conditionalRequestHandler)
         .handler(handler(v1Users.getUsers))
         .create())
 
@@ -153,6 +158,7 @@ class DockerHostedRecipe
                 new TokenMatcher('/v1/repositories/{repository}/images')
             )
         ))
+        .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Index.getImagesIndex)
@@ -192,6 +198,7 @@ class DockerHostedRecipe
                 new TokenMatcher('/v1/repositories/{repository}/tags')
             )
         ))
+        .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Tags.getTags)
@@ -205,6 +212,7 @@ class DockerHostedRecipe
                 new TokenMatcher('/v1/repositories/{repository}/tags/{tag}')
             )
         ))
+        .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Tags.getTag)
@@ -228,6 +236,7 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             new TokenMatcher('/v1/images/{image}/json'),
         ))
+        .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Images.getMetadata)
@@ -248,6 +257,7 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             new TokenMatcher('/v1/images/{image}/layer'),
         ))
+        .handler(conditionalRequestHandler)
         .handler(partialFetchHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
@@ -279,6 +289,7 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             new TokenMatcher('/v1/images/{image}/ancestry'),
         ))
+        .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Images.getAncestry)
