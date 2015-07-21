@@ -33,7 +33,6 @@ import org.sonatype.nexus.repository.config.ConfigurationStore;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
