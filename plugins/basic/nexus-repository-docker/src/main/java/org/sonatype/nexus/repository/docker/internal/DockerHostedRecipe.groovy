@@ -130,6 +130,7 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             LogicMatchers.or(new LiteralMatcher('/v1/users'), new LiteralMatcher('/v1/users/'))
         ))
+        .handler(timingHandler)
         .handler(conditionalRequestHandler)
         .handler(handler(v1Users.getUsers))
         .create())
@@ -139,6 +140,7 @@ class DockerHostedRecipe
             new ActionMatcher(POST),
             LogicMatchers.or(new LiteralMatcher('/v1/users'), new LiteralMatcher('/v1/users/'))
         ))
+        .handler(timingHandler)
         .handler(handler(v1Users.createUser))
         .create())
 
@@ -147,6 +149,7 @@ class DockerHostedRecipe
             new ActionMatcher(PUT),
             new TokenMatcher('/v1/users/{username}')
         ))
+        .handler(timingHandler)
         .handler(handler(v1Users.updateUser))
         .create())
 
@@ -158,6 +161,7 @@ class DockerHostedRecipe
                 new TokenMatcher('/v1/repositories/{repository}/images')
             )
         ))
+        .handler(timingHandler)
         .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
@@ -172,6 +176,7 @@ class DockerHostedRecipe
                 new TokenMatcher('/v1/repositories/{repository}/images')
             )
         ))
+        .handler(timingHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Index.putImagesIndex.rcurry(true))
@@ -185,6 +190,7 @@ class DockerHostedRecipe
                 new TokenMatcher('/v1/repositories/{repository}/')
             )
         ))
+        .handler(timingHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Index.putImagesIndex.rcurry(false))
@@ -198,6 +204,7 @@ class DockerHostedRecipe
                 new TokenMatcher('/v1/repositories/{repository}/tags')
             )
         ))
+        .handler(timingHandler)
         .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
@@ -212,6 +219,7 @@ class DockerHostedRecipe
                 new TokenMatcher('/v1/repositories/{repository}/tags/{tag}')
             )
         ))
+        .handler(timingHandler)
         .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
@@ -226,6 +234,7 @@ class DockerHostedRecipe
                 new TokenMatcher('/v1/repositories/{repository}/tags/{tag}')
             )
         ))
+        .handler(timingHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Tags.putTag)
@@ -236,6 +245,7 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             new TokenMatcher('/v1/images/{image}/json'),
         ))
+        .handler(timingHandler)
         .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
@@ -247,6 +257,7 @@ class DockerHostedRecipe
             new ActionMatcher(PUT),
             new TokenMatcher('/v1/images/{image}/json'),
         ))
+        .handler(timingHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Images.putMetadata)
@@ -257,6 +268,7 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             new TokenMatcher('/v1/images/{image}/layer'),
         ))
+        .handler(timingHandler)
         .handler(conditionalRequestHandler)
         .handler(partialFetchHandler)
         .handler(v1ExceptionHandler)
@@ -269,6 +281,7 @@ class DockerHostedRecipe
             new ActionMatcher(PUT),
             new TokenMatcher('/v1/images/{image}/layer'),
         ))
+        .handler(timingHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Images.putLayer)
@@ -279,6 +292,7 @@ class DockerHostedRecipe
             new ActionMatcher(PUT),
             new TokenMatcher('/v1/images/{image}/checksum'),
         ))
+        .handler(timingHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Images.putChecksum)
@@ -289,6 +303,7 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             new TokenMatcher('/v1/images/{image}/ancestry'),
         ))
+        .handler(timingHandler)
         .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
