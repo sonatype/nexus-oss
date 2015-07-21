@@ -98,7 +98,7 @@
         <configuration>
           <excludedArtifactIds combine.children="append">
             <!--
-            Need special wrapping/fragments
+            Replaced by nexus-cellar-hazelcast
             -->
             <id>org.apache.karaf.cellar.hazelcast</id>
           </excludedArtifactIds>
