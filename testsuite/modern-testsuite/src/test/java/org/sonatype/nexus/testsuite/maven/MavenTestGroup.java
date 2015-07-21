@@ -10,11 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.nuget;
+package org.sonatype.nexus.testsuite.maven;
 
 /**
- * Marker interface to group Nuget Integration Tests
+ * Marker interface to group Maven Integration Tests
  */
-public interface NugetIT
+public interface MavenTestGroup
 {
 }

@@ -78,7 +78,7 @@ import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 /**
  * Maven IT support.
  */
-@Category(MavenIT.class)
+@Category(MavenTestGroup.class)
 public abstract class MavenITSupport
     extends NexusCoreITSupport
 {

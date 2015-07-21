@@ -54,7 +54,7 @@ import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 /**
  * Support for Nuget ITs
  */
-@Category(NugetIT.class)
+@Category(NugetTestGroup.class)
 public abstract class NugetITSupport
     extends RepositoryTestSupport
 {

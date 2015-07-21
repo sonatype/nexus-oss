@@ -36,7 +36,7 @@ import static java.util.Arrays.asList;
 /**
  * Support class for raw ITs.
  */
-@Category(RawIT.class)
+@Category(RawTestGroup.class)
 public class RawITSupport
     extends RepositoryTestSupport
 {
