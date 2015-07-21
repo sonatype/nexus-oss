@@ -105,13 +105,20 @@ public abstract class ProxyFacetSupport
 
   @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
-    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+    final ConfigurationFacet configurationFacet = facet(ConfigurationFacet.class);
+    config = configurationFacet.readSection(configuration, CONFIG_KEY, Config.class);
 
-    cacheController = new CacheController(config.contentMaxAge, config.cacheToken);
     // normalize URL path to contain trailing slash
     if (!config.remoteUrl.getPath().endsWith("/")) {
       config.remoteUrl = config.remoteUrl.resolve(config.remoteUrl.getPath() + "/");
     }
+
+    if (cacheController == null) {
+      // first config, persist the defaults too
+      configurationFacet.writeSection(getRepository().getConfiguration(), CONFIG_KEY, config);
+      configurationFacet.save();
+    }
+    cacheController = new CacheController(config.contentMaxAge, config.cacheToken);
 
     log.debug("Config: {}", config);
   }
