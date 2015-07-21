@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
+import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
@@ -76,6 +77,9 @@ class DockerHostedRecipe
 
   @Inject
   SecurityHandler securityHandler
+
+  @Inject
+  PartialFetchHandler partialFetchHandler
 
   @Inject
   UnitOfWorkHandler unitOfWorkHandler
@@ -244,6 +248,7 @@ class DockerHostedRecipe
             new ActionMatcher(GET),
             new TokenMatcher('/v1/images/{image}/layer'),
         ))
+        .handler(partialFetchHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
         .handler(v1Images.getLayer)
