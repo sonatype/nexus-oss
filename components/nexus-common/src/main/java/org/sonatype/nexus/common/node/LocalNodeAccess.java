@@ -29,9 +29,22 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 public interface LocalNodeAccess
   extends Lifecycle
 {
+  /**
+   * Returns the local-node certificate.
+   */
   Certificate getCertificate();
 
+  /**
+   * Returns the local-node identifier.
+   *
+   * This is a variant format of the fingerprint.
+   */
   String getId();
 
+  /**
+   * Returns the local-node fingerprint.
+   *
+   * This is the SHA1 of the certificate.
+   */
   String getFingerprint();
 }
