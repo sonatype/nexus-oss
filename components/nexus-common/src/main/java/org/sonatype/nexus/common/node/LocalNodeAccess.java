@@ -16,6 +16,8 @@ import java.security.cert.Certificate;
 
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
+// TODO: rename to LocalNodeIdentity ?
+
 /**
  * Provides access to the certificate-based node identifier.
  * <p/>
