@@ -16,13 +16,14 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 import org.sonatype.nexus.testsuite.maven.MavenITSupport;
+import org.sonatype.nexus.testsuite.maven.concurrency.generators.GeneratorBehaviour;
+import org.sonatype.nexus.testsuite.maven.concurrency.generators.MavenMetadataGenerator;
+import org.sonatype.tests.http.server.fluent.Server;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -35,15 +36,15 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 
 /**
  * Metadata change detection IT.
@@ -62,45 +63,70 @@ public class MavenMergeMetadataIT
 
   private static final MetadataXpp3Reader reader = new MetadataXpp3Reader();
 
-  private Repository mr1;
+  private Server upstream;
 
-  private Repository mr2;
+  private Repository hostedRepository;
 
-  private Repository mr3;
-
-  private Repository mr4;
+  private Repository proxyRepository;
 
   private Repository mavenGroup;
 
   @Before
   public void prepare() throws Exception {
-    if ((mr1 = repositoryManager.get("mr1")) == null) {
-      mr1 = repositoryManager.create(hostedConfig("mr1", VersionPolicy.RELEASE));
-    }
-    if ((mr2 = repositoryManager.get("mr2")) == null) {
-      mr2 = repositoryManager.create(hostedConfig("mr2", VersionPolicy.RELEASE));
-    }
-    if ((mr3 = repositoryManager.get("mr3")) == null) {
-      mr3 = repositoryManager.create(hostedConfig("mr3", VersionPolicy.RELEASE));
-    }
-    if ((mr4 = repositoryManager.get("mr4")) == null) {
-      mr4 = repositoryManager.create(hostedConfig("mr4", VersionPolicy.RELEASE));
-    }
-    if (repositoryManager.get("mavenGroup") != null) {
-      repositoryManager.delete("mavenGroup");
-    }
+    upstream = Server.withPort(0)
+        .serve("/" + METADATA_PATH).withBehaviours(
+            new GeneratorBehaviour(new MavenMetadataGenerator(defaultMetadata("1.0-proxy")))
+        )
+        .start();
+
+    hostedRepository = repositoryManager.create(
+        hostedConfig("hosted", VersionPolicy.RELEASE)
+    );
+    proxyRepository = repositoryManager.create(
+        proxyConfig("proxy", "http://localhost:" + upstream.getPort() + "/", VersionPolicy.RELEASE)
+    );
+
+    deployMetadataWithVersionTo("1.0-hosted", hostedRepository);
+    mavenGroup = repositoryManager.create(
+        groupConfig(
+            "mavenGroup",
+            hostedRepository.getName(),
+            proxyRepository.getName()
+        )
+    );
+  }
+
+  @After
+  public void cleanup() throws Exception {
+    repositoryManager.delete(mavenGroup.getName());
+    repositoryManager.delete(proxyRepository.getName());
+    repositoryManager.delete(hostedRepository.getName());
+    upstream.stop();
+  }
+
+  private Metadata defaultMetadata() {
+    Metadata metadata = new Metadata();
+    metadata.setModelVersion("1.1.0");
+    metadata.setGroupId(GROUP_ID);
+    metadata.setArtifactId(ARTIFACT_ID);
+    metadata.setVersioning(new Versioning());
+    return metadata;
+  }
+
+  private Metadata defaultMetadata(String version) {
+    Metadata metadata = defaultMetadata();
+    metadata.getVersioning().getVersions().add(version);
+    return metadata;
   }
 
   private void deployMetadataWithVersionTo(String version, Repository repository) throws Exception {
     Metadata metadata = get(repository);
     if (metadata == null) {
-      metadata = new Metadata();
-      metadata.setModelVersion("1.1.0");
-      metadata.setGroupId(GROUP_ID);
-      metadata.setArtifactId(ARTIFACT_ID);
-      metadata.setVersioning(new Versioning());
+      metadata = defaultMetadata(version);
     }
-    metadata.getVersioning().addVersion(version);
+    else if (!metadata.getVersioning().getVersions().contains(version)) {
+      metadata.getVersioning().addVersion(version);
+    }
     StringWriter sw = new StringWriter();
     writer.write(sw, metadata);
     final Maven2Client client = createAdminMaven2Client(repository.getName());
@@ -108,7 +134,6 @@ public class MavenMergeMetadataIT
     assertThat(response.getStatusLine().getStatusCode(), equalTo(201));
   }
 
-  @Nullable
   private Metadata get(final Repository repository) throws Exception {
     final Maven2Client client = createAdminMaven2Client(repository.getName());
     HttpResponse response = client.get(METADATA_PATH);
@@ -117,7 +142,13 @@ public class MavenMergeMetadataIT
       EntityUtils.consume(response.getEntity());
       return metadata;
     }
-    return null;
+    else if (response.getStatusLine().getStatusCode() == 404) {
+      return defaultMetadata();
+    }
+    else {
+      // this should fail the test too
+      throw new IllegalStateException("Unexpected response: " + response.getStatusLine());
+    }
   }
 
   private Repository updateGroup(Repository group, Repository... members) throws Exception {
@@ -136,79 +167,34 @@ public class MavenMergeMetadataIT
 
   @Test
   public void mergeMetadataOnMemberChange() throws Exception {
-    deployMetadataWithVersionTo("1.0", mr1);
-    deployMetadataWithVersionTo("2.0", mr2);
-    deployMetadataWithVersionTo("3.0", mr3);
-    deployMetadataWithVersionTo("4.0", mr4);
-    mavenGroup = repositoryManager.create(
-        groupConfig(
-            "mavenGroup",
-            mr1.getName(),
-            mr2.getName(),
-            mr3.getName(),
-            mr4.getName()
-        )
-    );
     Metadata metadata = get(mavenGroup);
-    assertThat(metadata, notNullValue());
-    assertThat(metadata.getVersioning(), notNullValue());
-    assertThat(metadata.getVersioning().getVersions(), hasItems("1.0", "2.0", "3.0", "4.0"));
+    assertThat(metadata.getVersioning().getVersions(), contains("1.0-hosted", "1.0-proxy"));
 
-    mavenGroup = updateGroup(mavenGroup, mr1, mr3);
+    mavenGroup = updateGroup(mavenGroup, hostedRepository);
 
     metadata = get(mavenGroup);
-    assertThat(metadata, notNullValue());
-    assertThat(metadata.getVersioning(), notNullValue());
-    assertThat(metadata.getVersioning().getVersions(), hasItems("1.0", "3.0"));
+    assertThat(metadata.getVersioning().getVersions(), contains("1.0-hosted"));
 
-    mavenGroup = updateGroup(mavenGroup, mr1, mr2, mr3);
+    mavenGroup = updateGroup(mavenGroup, hostedRepository, proxyRepository);
 
     metadata = get(mavenGroup);
-    assertThat(metadata, notNullValue());
-    assertThat(metadata.getVersioning(), notNullValue());
-    assertThat(metadata.getVersioning().getVersions(), hasItems("1.0", "2.0", "3.0"));
+    assertThat(metadata.getVersioning().getVersions(), contains("1.0-hosted", "1.0-proxy"));
   }
 
   @Test
   public void mergeMetadataOnChange() throws Exception {
-    deployMetadataWithVersionTo("1.0", mr1);
-    deployMetadataWithVersionTo("2.0", mr2);
-    deployMetadataWithVersionTo("3.0", mr3);
-    deployMetadataWithVersionTo("4.0", mr4);
-    mavenGroup = repositoryManager.create(
-        groupConfig(
-            "mavenGroup",
-            mr1.getName(),
-            mr2.getName(),
-            mr3.getName(),
-            mr4.getName()
-        )
-    );
-
     Metadata metadata = get(mavenGroup);
-    assertThat(metadata, notNullValue());
-    assertThat(metadata.getVersioning(), notNullValue());
-    assertThat(metadata.getVersioning().getVersions(), hasItems("1.0", "2.0", "3.0", "4.0"));
+    assertThat(metadata.getVersioning().getVersions(), contains("1.0-hosted", "1.0-proxy"));
 
-    deployMetadataWithVersionTo("1.1", mr1);
+    deployMetadataWithVersionTo("1.1-hosted", hostedRepository);
 
     metadata = get(mavenGroup);
-    assertThat(metadata, notNullValue());
-    assertThat(metadata.getVersioning(), notNullValue());
-    assertThat(metadata.getVersioning().getVersions(), hasItems("1.0", "1.1", "2.0", "3.0", "4.0"));
+    System.out.println(metadata.getVersioning().getVersions());
+    assertThat(metadata.getVersioning().getVersions(), contains("1.0-hosted", "1.0-proxy", "1.1-hosted"));
 
-    deployMetadataWithVersionTo("4.1", mr4);
-
-    metadata = get(mavenGroup);
-    assertThat(metadata, notNullValue());
-    assertThat(metadata.getVersioning(), notNullValue());
-    assertThat(metadata.getVersioning().getVersions(), hasItems("1.1", "2.0", "3.0", "4.0", "4.1"));
-
-    createAdminMaven2Client(mr3.getName()).delete(METADATA_PATH);
+    createAdminMaven2Client(hostedRepository.getName()).delete(METADATA_PATH);
 
     metadata = get(mavenGroup);
-    assertThat(metadata, notNullValue());
-    assertThat(metadata.getVersioning(), notNullValue());
-    assertThat(metadata.getVersioning().getVersions(), hasItems("1.1", "2.0", "4.0", "4.1"));
+    assertThat(metadata.getVersioning().getVersions(), contains("1.0-proxy"));
   }
 }
