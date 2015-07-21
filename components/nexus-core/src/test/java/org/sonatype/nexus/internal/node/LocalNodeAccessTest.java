@@ -20,6 +20,7 @@ import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
 import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManager;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,7 +39,7 @@ public class LocalNodeAccessTest
   private LocalNodeAccess localNodeAccess;
 
   @Before
-  public void prepare() throws Exception {
+  public void setUp() throws Exception {
     File dir = util.createTempDir("keystores");
     KeyStoreManagerConfigurationImpl config = new KeyStoreManagerConfigurationImpl(dir);
     // use lower strength for faster test execution
@@ -47,6 +48,14 @@ public class LocalNodeAccessTest
     keyStoreManager.generateAndStoreKeyPair("a", "b", "c", "d", "e", "f");
 
     localNodeAccess = new LocalNodeAccessImpl(keyStoreManager);
+    localNodeAccess.start();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    if (localNodeAccess != null) {
+      localNodeAccess.stop();
+    }
   }
 
   @Test
