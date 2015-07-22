@@ -25,9 +25,9 @@ import org.sonatype.nexus.repository.view.Payload;
 public interface DockerFacet
     extends Facet
 {
-  Payload getImagesIndex(String namespace, String name) throws IOException;
+  Payload getImagesIndex(String name) throws IOException;
 
-  void putImagesIndex(String namespace, String name, Payload payload) throws IOException;
+  void putImagesIndex(String name, Payload payload) throws IOException;
 
   Payload getMetadata(String imageId) throws IOException;
 
@@ -41,10 +41,10 @@ public interface DockerFacet
 
   Payload getAncestry(String imageId) throws IOException;
 
-  Payload getTag(String namespace, String name, String tag) throws IOException;
+  Payload getTag(String name, String tag) throws IOException;
 
-  Payload getTags(String namespace, String name) throws IOException;
+  Payload getTags(String name) throws IOException;
 
-  void putTag(String namespace, String name, String tag, Map<String, String> metadata, Payload payload)
+  void putTag(String name, String tag, Map<String, String> metadata, Payload payload)
       throws IOException;
 }
