@@ -19,6 +19,10 @@
  */
 Ext.define('NX.controller.dev.Logging', {
   extend: 'NX.app.Controller',
+  requires: [
+    'Ext.util.Format',
+    'NX.Windows'
+  ],
 
   stores: [
     'LogEvent',
@@ -103,13 +107,39 @@ Ext.define('NX.controller.dev.Logging', {
           }
         },
 
-        'nx-dev-logging button[action=dump]': {
-          click: function (button) {
-            //encode selected rows as JSON and dump to log, intended to facilitate sharing log info (i.e. bug reports)
-            me.logDebug(Ext.encode(Ext.Array.pluck(this.getPanel().getSelectionModel().getSelection(), 'data')));
-          }
+        'nx-dev-logging button[action=export]': {
+          click: me.exportSelection
         }
       }
     });
+  },
+
+  /**
+   * Export selected rows to window.
+   *
+   * @private
+   */
+  exportSelection: function() {
+    var win,
+        doc,
+        selected;
+
+    win = NX.Windows.open('', '', 'width=640,height=480');
+    if (win !== null) {
+      doc = win.document;
+      selected = Ext.Array.pluck(this.getPanel().getSelectionModel().getSelection(), 'data');
+
+      doc.write('<html><head>');
+      doc.write('<title>' + Ext.util.Format.plural(selected.length, 'Logging Event') + '</title>');
+      doc.write('</head><body>');
+      doc.write('<pre>');
+
+      Ext.Array.each(selected, function(data) {
+        doc.write(data.timestamp + ' ' + data.level + ' ' + data.logger + ' ' + data.message.join(' ') + '<br/>');
+      });
+
+      doc.write('<pre>');
+      doc.write('</body></html>');
+    }
   }
 });
