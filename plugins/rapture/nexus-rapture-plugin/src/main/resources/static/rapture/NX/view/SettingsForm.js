@@ -105,11 +105,7 @@ Ext.define('NX.view.SettingsForm', {
         var form = this.up('form'),
             record = form.getRecord();
 
-        if (record) {
-          form.loadRecord(record);
-          form.isValid();
-        }
-        else if (form.api && form.api.load) {
+        if (form.api && form.api.load) {
           form.fireEvent('load', form);
         }
         else {
