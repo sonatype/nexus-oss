@@ -70,6 +70,7 @@ import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_A
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IMAGE_ID;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IN_PROGRESS;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_METADATA;
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_REPOSITORY;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_SIZE;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP;
@@ -483,6 +484,7 @@ public class DockerFacetImpl
           .version(tag);
     }
 
+    tagComponent.formatAttributes().set(P_REPOSITORY, namespace + "/" + name);
     // set layer reference
     tagComponent.formatAttributes().set(P_IMAGE_ID, imageId);
     // set metadata

@@ -161,6 +161,15 @@ class DockerHostedRecipe
     builder.route(new Route.Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET),
+            new LiteralMatcher('/v1/search')
+        ))
+        .handler(timingHandler)
+        .handler(handler(v1Index.search))
+        .create())
+
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(GET),
             LogicMatchers.or(
                 new TokenMatcher('/v1/repositories/{namespace}/{repository}/images'),
                 new TokenMatcher('/v1/repositories/{repository}/images')
