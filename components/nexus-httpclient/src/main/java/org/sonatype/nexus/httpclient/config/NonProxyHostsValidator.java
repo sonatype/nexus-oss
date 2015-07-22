@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.httpclient.config;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 import javax.validation.ConstraintValidatorContext;
@@ -25,8 +27,20 @@ import org.sonatype.nexus.validation.ConstraintValidatorSupport;
  * @since 3.0
  */
 public class NonProxyHostsValidator
-    extends ConstraintValidatorSupport<NonProxyHosts, String[]>
+    extends ConstraintValidatorSupport<NonProxyHosts, Collection<String>>
 {
+  /**
+   * Adapter for validating array fields.
+   */
+  public static class ForArray
+      extends ConstraintValidatorSupport<NonProxyHosts, String[]>
+  {
+    @Override
+    public boolean isValid(final String[] values, final ConstraintValidatorContext context) {
+      return values != null ? NonProxyHostsValidator.isValid(Arrays.asList(values)) : true;
+    }
+  }
+
   /**
    * Pattern checking for allowed characters, best we can do, as input may be:
    * <ul>
@@ -44,7 +58,11 @@ public class NonProxyHostsValidator
       .compile("\\*?[\\p{IsAlphabetic}|\\d|\\-|\\_|\\.|\\:|\\[|\\]]+\\*?");
 
   @Override
-  public boolean isValid(final String[] values, final ConstraintValidatorContext context) {
+  public boolean isValid(final Collection<String> values, final ConstraintValidatorContext context) {
+    return values != null ? isValid(values) : true;
+  }
+
+  static boolean isValid(Collection<String> values) {
     for (String value : values) {
       if (!isValid(value)) {
         return false;
@@ -57,7 +75,7 @@ public class NonProxyHostsValidator
    * Returns {@code true} if value is considered as valid nonProxyHosts expression. This is NOT validating the
    * single-string used to set system property (where expressions are delimited with "|")!
    */
-  private boolean isValid(String value) {
+  private static boolean isValid(String value) {
     // A value should be a non-empty string optionally prefixed or suffixed with an asterisk
     // must be non-empty, non-blank
     if (Strings2.isBlank(value)) {

@@ -34,7 +34,7 @@ class NonProxyHostsValidatorTest
   NonProxyHostsValidator validator = new NonProxyHostsValidator()
 
   private validateAndExpect(String expression, boolean expected) {
-    assertThat(validator.isValid([expression].toArray(new String[0]), context), equalTo(expected))
+    assertThat(validator.isValid([expression] as Set, context), equalTo(expected))
   }
 
   @Test
