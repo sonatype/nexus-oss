@@ -14,7 +14,7 @@ package com.sonatype.nexus.repository.nuget.odata;
 
 import java.util.Map;
 
-import com.sonatype.nexus.repository.nuget.internal.ComponentQuery;
+import org.sonatype.nexus.repository.storage.ComponentQuery;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;

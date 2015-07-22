@@ -46,10 +46,22 @@ Ext.define('NX.coreui.controller.Assets', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'asset-type-default': {file: 'file_extension_default.png', variants: ['x16', 'x32']},
-      'asset-type-application-java-archive': {file: 'file_extension_jar.png', variants: ['x16', 'x32']},
-      'asset-type-text-xml': {file: 'file_extension_xml.png', variants: ['x16', 'x32']},
-      'asset-type-application-xml': {file: 'file_extension_xml.png', variants: ['x16', 'x32']}
+      'asset-type-default': {
+        file: 'page_white.png',
+        variants: ['x16', 'x32']
+      },
+      'asset-type-application-java-archive': {
+        file: 'file_extension_jar.png',
+        variants: ['x16', 'x32']
+      },
+      'asset-type-text-xml': {
+        file: 'page_white_code.png',
+        variants: ['x16', 'x32']
+      },
+      'asset-type-application-xml': {
+        file: 'page_white_code.png',
+        variants: ['x16', 'x32']
+      }
     });
 
     me.listen({

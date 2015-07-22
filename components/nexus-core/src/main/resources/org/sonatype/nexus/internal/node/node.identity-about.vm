@@ -16,7 +16,3 @@
 <p>
   This capability is generally configured once and never changed.
 </p>
-<p>
-  Removing and re-adding this capability will effectivly reset the server's identity.
-  This is an advanced operation and could negatively affect the stability of the server.
-</p>

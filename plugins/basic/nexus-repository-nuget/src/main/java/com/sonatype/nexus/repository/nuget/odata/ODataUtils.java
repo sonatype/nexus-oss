@@ -19,7 +19,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import com.sonatype.nexus.repository.nuget.internal.ComponentQuery;
+import org.sonatype.nexus.repository.storage.ComponentQuery;
 import com.google.common.collect.Maps;
 
 import org.codehaus.plexus.util.StringUtils;

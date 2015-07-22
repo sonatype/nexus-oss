@@ -12,9 +12,7 @@
  */
 package org.sonatype.nexus.internal.node;
 
-import java.security.cert.Certificate;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,14 +22,12 @@ import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 import org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil;
-import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManager;
-import org.sonatype.sisu.goodies.ssl.keystore.KeystoreException;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Capability for generating identity key-pair.
+ * Capability for exposing identity details.
  *
  * @since 3.0
  */
@@ -48,17 +44,10 @@ public class IdentityCapability
 
   private static final Messages messages = I18N.create(Messages.class);
 
-  private final KeyStoreManager keyStoreManager;
-
   private final LocalNodeAccess localNode;
 
-  private String fingerprint;
-
   @Inject
-  public IdentityCapability(final @Named(KeyStoreManagerImpl.NAME) KeyStoreManager keyStoreManager,
-                            final LocalNodeAccess localNode)
-  {
-    this.keyStoreManager = checkNotNull(keyStoreManager);
+  public IdentityCapability(final LocalNodeAccess localNode) {
     this.localNode = checkNotNull(localNode);
   }
 
@@ -67,61 +56,12 @@ public class IdentityCapability
     return new IdentityCapabilityConfiguration(properties);
   }
 
-  public Certificate certificate() throws KeystoreException {
-    return keyStoreManager.getCertificate();
-  }
-
-  public String certificateAsPem() throws Exception {
-    return CertificateUtil.serializeCertificateInPEM(certificate());
-  }
-
-  public String certificateFingerprint() throws Exception {
-    return fingerprint;
-  }
-
-  @Override
-  protected void configure(final IdentityCapabilityConfiguration config) throws Exception {
-    // Generate identity key-pair if not already created
-    if (!keyStoreManager.isKeyPairInitialized()) {
-      log.info("Generating identity certificate");
-
-      // For now give something unique to the cert for additional identification purposes
-      UUID cn = UUID.randomUUID();
-      keyStoreManager.generateAndStoreKeyPair(
-          cn.toString(),
-          "Nexus",
-          "Sonatype",
-          "Silver Spring",
-          "MD",
-          "US");
-    }
-
-    Certificate cert = certificate();
-    log.trace("Certificate:\n{}", cert);
-
-    fingerprint = CertificateUtil.calculateFingerprint(cert);
-    log.debug("Fingerprint: {}", fingerprint);
-  }
-
-  @Override
-  protected void onActivate(final IdentityCapabilityConfiguration config) throws Exception {
-    // prime local node-id now
-    localNode.getId();
-  }
-
-  @Override
-  protected void onPassivate(final IdentityCapabilityConfiguration config) throws Exception {
-    localNode.reset();
-  }
-
-  @Override
-  protected void onRemove(final IdentityCapabilityConfiguration config) throws Exception {
-    if (keyStoreManager.isKeyPairInitialized()) {
-      log.debug("Clearing identity keys");
-      keyStoreManager.removePrivateKey();
-    }
-    fingerprint = null;
-  }
+  // FIXME: This does not actually work, will have to add some sort of hook/condition/magic
+  //@Override
+  //protected void onRemove(final IdentityCapabilityConfiguration config) throws Exception {
+  //  // HACK: until we have a condition to prevent this
+  //  throw new IllegalStateException("Capability can not be removed");
+  //}
 
   @Override
   protected String renderDescription() throws Exception {
@@ -132,9 +72,9 @@ public class IdentityCapability
   protected String renderStatus() throws Exception {
     return render(IdentityCapabilityDescriptor.TYPE_ID + "-status.vm", new TemplateParameters()
         .set("nodeId", localNode.getId())
-        .set("fingerprint", fingerprint)
-        .set("pem", certificateAsPem())
-        .set("detail", certificate().toString())
+        .set("fingerprint", localNode.getFingerprint())
+        .set("pem", CertificateUtil.serializeCertificateInPEM(localNode.getCertificate()))
+        .set("detail", localNode.getCertificate().toString())
     );
   }
 }
