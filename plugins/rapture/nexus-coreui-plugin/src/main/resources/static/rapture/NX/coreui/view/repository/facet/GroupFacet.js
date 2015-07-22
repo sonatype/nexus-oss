@@ -24,16 +24,6 @@ Ext.define('NX.coreui.view.repository.facet.GroupFacet', {
     'NX.I18n',
     'NX.coreui.store.RepositoryReference'
   ],
-
-  defaults: {
-    allowBlank: false,
-    delimiter: null,
-    forceSelection: true,
-    queryMode: 'local',
-    triggerAction: 'all',
-    selectOnFocus: false,
-    itemCls: 'required-field'
-  },
   
   /**
    * @cfg String 
@@ -84,7 +74,14 @@ Ext.define('NX.coreui.view.repository.facet.GroupFacet', {
           toTitle: NX.I18n.get('Repository_Facet_GroupFacet_Members_ToTitle'),
           store: me.repositoryStore,
           valueField: 'id',
-          displayField: 'name'
+          displayField: 'name',
+          allowBlank: false,
+          delimiter: null,
+          forceSelection: true,
+          queryMode: 'local',
+          triggerAction: 'all',
+          selectOnFocus: false,
+          itemCls: 'required-field'
         }
       }
     ];
