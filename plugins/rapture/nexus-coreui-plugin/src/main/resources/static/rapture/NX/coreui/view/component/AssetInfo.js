@@ -40,7 +40,6 @@ Ext.define('NX.coreui.view.component.AssetInfo', {
       xtype: 'nx-actions',
 
       items: [
-        '->',
         {
           xtype: 'button',
           text: NX.I18n.get('AssetInfo_Delete_Button'),
