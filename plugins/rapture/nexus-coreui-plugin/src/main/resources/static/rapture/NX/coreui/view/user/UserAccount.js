@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.user.UserAccount', {
     me.callParent(arguments);
 
     me.down('nx-settingsform').getDockedItems('toolbar[dock="bottom"]')[0].add({
-      xtype: 'button', text: NX.I18n.get('User_UserAccount_Password_Button'), action: 'changepassword', ui: 'nx-danger', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true
+      xtype: 'button', text: NX.I18n.get('User_UserAccount_Password_Button'), action: 'changepassword', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true
     });
   }
 
