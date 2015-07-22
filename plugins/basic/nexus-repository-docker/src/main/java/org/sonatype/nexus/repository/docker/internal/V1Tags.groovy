@@ -38,7 +38,7 @@ class V1Tags
     log.info '[getTag] repository: {} tokens: {}', repository.name, state.tokens
 
     return HttpResponses.ok(repository.facet(DockerFacet).getTag(
-        (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository'], state.tokens['tag']
+        state.tokens['namespace'] ?: 'library', state.tokens['repository'], state.tokens['tag']
     ))
   }
 
@@ -67,7 +67,7 @@ class V1Tags
     }
 
     repository.facet(DockerFacet).putTag(
-        (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository'], state.tokens['tag'], metadata,
+        state.tokens['namespace'] ?: 'library', state.tokens['repository'], state.tokens['tag'], metadata,
         context.request.payload
     )
 
@@ -80,7 +80,7 @@ class V1Tags
     log.info '[getTags] repository: {} tokens: {}', repository.name, state.tokens
 
     return HttpResponses.ok(repository.facet(DockerFacet).getTags(
-        (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository']
+        state.tokens['namespace'] ?: 'library', state.tokens['repository']
     ))
   }
 

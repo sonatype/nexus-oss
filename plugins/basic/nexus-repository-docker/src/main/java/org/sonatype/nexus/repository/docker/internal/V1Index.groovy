@@ -39,7 +39,7 @@ class V1Index
     return addHeaders(
         repository,
         HttpResponses.ok(repository.facet(DockerFacet).getImagesIndex(
-            (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository']
+            state.tokens['namespace'] ?: 'library', state.tokens['repository']
         ))
     )
   }
@@ -50,7 +50,7 @@ class V1Index
     log.info '[putImagesIndex] repository: {} tokens: {}', repository.name, state.tokens
 
     repository.facet(DockerFacet).putImagesIndex(
-        (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository'], context.request.payload
+        state.tokens['namespace'] ?: 'library', state.tokens['repository'], context.request.payload
     )
 
     return addHeaders(

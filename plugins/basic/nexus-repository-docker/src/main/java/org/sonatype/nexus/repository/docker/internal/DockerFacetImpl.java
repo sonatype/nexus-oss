@@ -65,11 +65,12 @@ import org.apache.commons.lang.StringUtils;
 import static java.util.Collections.singletonList;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_ANCESTRY;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IN_PROGRESS;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IMAGE_ID;
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IN_PROGRESS;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_METADATA;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_SIZE;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
@@ -94,10 +95,10 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getImagesIndex(final String name) throws IOException {
+  public Payload getImagesIndex(final String namespace, final String name) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String imagesIndexAssetName = name + "/images";
+    String imagesIndexAssetName = namespace + "/" + name + "/images";
     Bucket bucket = tx.getBucket();
     Asset asset = findAsset(tx, bucket, imagesIndexAssetName);
     if (asset == null) {
@@ -108,15 +109,16 @@ public class DockerFacetImpl
   }
 
   @Override
-  public void putImagesIndex(final String name, final Payload content) throws IOException {
+  public void putImagesIndex(final String namespace, final String name, final Payload content) throws IOException {
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
       validateImagesIndex(streamSupplier);
-      doPutImagesIndex(name, streamSupplier, content);
+      doPutImagesIndex(namespace, name, streamSupplier, content);
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutImagesIndex(final String name,
+  protected void doPutImagesIndex(final String namespace,
+                                  final String name,
                                   final Supplier<InputStream> streamSupplier,
                                   final Payload payload)
       throws IOException
@@ -125,10 +127,10 @@ public class DockerFacetImpl
 
     InputStream indexStream;
 
-    String imagesIndexAssetName = name + "/images";
+    String imagesIndexAssetName = namespace + "/" + name + "/images";
 
     Bucket bucket = tx.getBucket();
-    Asset imagesIndexAsset = imagesIndexAsset = findAsset(tx, bucket, imagesIndexAssetName);
+    Asset imagesIndexAsset = findAsset(tx, bucket, imagesIndexAssetName);
     if (imagesIndexAsset == null) {
       imagesIndexAsset = tx.createAsset(bucket, getRepository().getFormat());
       imagesIndexAsset.name(imagesIndexAssetName);
@@ -399,10 +401,10 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getTags(final String name) throws IOException {
+  public Payload getTags(final String namespace, final String name) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    Iterable<Component> tagComponents = findComponents(tx, name);
+    Iterable<Component> tagComponents = findComponents(tx, namespace, name);
     Map<String, String> tags = new HashMap<>();
     for (Component tagComponent : tagComponents) {
       tags.put(tagComponent.version(), tagComponent.formatAttributes().get(P_IMAGE_ID, String.class));
@@ -415,10 +417,10 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getTag(final String name, final String tag) throws IOException {
+  public Payload getTag(final String namespace, final String name, final String tag) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    Component tagComponent = findComponent(tx, name, tag);
+    Component tagComponent = findComponent(tx, namespace, name, tag);
     if (tagComponent == null) {
       throw new V1ApiException("Tag not found", HttpStatus.NOT_FOUND);
     }
@@ -427,7 +429,8 @@ public class DockerFacetImpl
   }
 
   @Override
-  public void putTag(final String name,
+  public void putTag(final String namespace,
+                     final String name,
                      final String tag,
                      final Map<String, String> metadata,
                      final Payload content)
@@ -435,12 +438,13 @@ public class DockerFacetImpl
   {
     validateTagName(tag);
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      doPutTag(name, tag, readLayer(streamSupplier), metadata);
+      doPutTag(namespace, name, tag, readLayer(streamSupplier), metadata);
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutTag(final String name,
+  protected void doPutTag(final String namespace,
+                          final String name,
                           final String tag,
                           final String imageId,
                           final Map<String, String> metadata)
@@ -448,7 +452,7 @@ public class DockerFacetImpl
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String imageIndexAssetName = name + "/images";
+    String imageIndexAssetName = namespace + "/" + name + "/images";
     String metadataAssetName = imageId + "/json";
 
     Bucket bucket = tx.getBucket();
@@ -461,10 +465,11 @@ public class DockerFacetImpl
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
 
-    Component tagComponent = findComponent(tx, name, tag);
+    Component tagComponent = findComponent(tx, namespace, name, tag);
     if (tagComponent == null) {
       tagComponent = tx.createComponent(bucket, getRepository().getFormat())
           .name(name)
+          .group(namespace)
           .version(tag);
     }
 
@@ -479,10 +484,11 @@ public class DockerFacetImpl
     tx.saveComponent(tagComponent);
   }
 
-  private Component findComponent(final StorageTx tx, final String name, final String version) {
+  private Component findComponent(final StorageTx tx, final String namespace, final String name, final String version) {
     final ComponentQuery query = new Builder()
         .where(P_NAME + "=").param(name)
-        .where(" and " + P_VERSION + "=").param(version)
+        .where(" AND " + P_GROUP + "=").param(namespace)
+        .where(" AND " + P_VERSION + "=").param(version)
         .build();
     final Iterable<Component> components = tx.findComponents(
         query.getWhere(), query.getParameters(), singletonList(getRepository()), null
@@ -493,9 +499,10 @@ public class DockerFacetImpl
     return null;
   }
 
-  private Iterable<Component> findComponents(final StorageTx tx, final String name) {
+  private Iterable<Component> findComponents(final StorageTx tx, final String namespace, final String name) {
     final ComponentQuery query = new Builder()
         .where(P_NAME + "=").param(name)
+        .where(" AND " + P_GROUP + "=").param(namespace)
         .build();
     return tx.findComponents(
         query.getWhere(), query.getParameters(), singletonList(getRepository()), null
