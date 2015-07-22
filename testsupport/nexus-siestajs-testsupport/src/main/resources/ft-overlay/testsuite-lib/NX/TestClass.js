@@ -336,6 +336,27 @@ Class('NX.TestClass', {
         assertionName: 'waitForFeature',
         description: ' feature to be set to "' + title + '"'
       });
+    },
+
+    /**
+     * Wait for a spy to have been called
+     * @param {@link Siesta.Test.BDD.Spy} the spy to inspect
+     * @param {Function} callback
+     * @param {Object} scope
+     * @param {Number} timeout
+     * @returns {*}
+     */
+    waitForSpyToBeCalled: function(spy, callback, scope, timeout) {
+      return this.waitFor({
+        method: function() {
+          return spy.calls.count() > 0;
+        },
+        callback: callback,
+        scope: scope,
+        timeout: timeout,
+        assertionName: 'waitForSpyToBeCalled',
+        description: 'wait for spy to be called'
+      });
     }
   }
 });

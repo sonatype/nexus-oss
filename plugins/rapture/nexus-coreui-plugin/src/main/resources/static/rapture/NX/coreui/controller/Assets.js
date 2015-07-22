@@ -34,7 +34,7 @@ Ext.define('NX.coreui.controller.Assets', {
 
   refs: [
     {ref: 'assetContainer', selector: 'nx-coreui-component-assetcontainer'},
-    {ref: 'assetList', selector: 'nx-coreui-component-asset-list'},
+    {ref: 'assetList', selector: 'grid[assetContainerSource=true]'},
     {ref: 'assetInfo', selector: 'nx-coreui-component-assetinfo'},
     {ref: 'deleteAssetButton', selector: 'nx-coreui-component-assetinfo button[action=deleteAsset]'}
   ],
@@ -46,10 +46,22 @@ Ext.define('NX.coreui.controller.Assets', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'asset-type-default': {file: 'file_extension_default.png', variants: ['x16', 'x32']},
-      'asset-type-application-java-archive': {file: 'file_extension_jar.png', variants: ['x16', 'x32']},
-      'asset-type-text-xml': {file: 'file_extension_xml.png', variants: ['x16', 'x32']},
-      'asset-type-application-xml': {file: 'file_extension_xml.png', variants: ['x16', 'x32']}
+      'asset-type-default': {
+        file: 'page_white.png',
+        variants: ['x16', 'x32']
+      },
+      'asset-type-application-java-archive': {
+        file: 'file_extension_jar.png',
+        variants: ['x16', 'x32']
+      },
+      'asset-type-text-xml': {
+        file: 'page_white_code.png',
+        variants: ['x16', 'x32']
+      },
+      'asset-type-application-xml': {
+        file: 'page_white_code.png',
+        variants: ['x16', 'x32']
+      }
     });
 
     me.listen({
@@ -197,14 +209,16 @@ Ext.define('NX.coreui.controller.Assets', {
    */
   deleteAsset: function () {
     var me = this,
-        info = me.getAssetInfo();
+        assetList = me.getAssetList(),
+        assetInfo = me.getAssetInfo();
 
-    if (info) {
-      var asset = info.assetModel;
+    if (assetInfo) {
+      var asset = assetInfo.assetModel;
       NX.Dialogs.askConfirmation(NX.I18n.get('AssetInfo_Delete_Title'), asset.get('name'), function () {
         NX.direct.coreui_Component.deleteAsset(asset.getId(), asset.get('repositoryName'), function (response) {
           if (Ext.isObject(response) && response.success) {
-            me.getAssetList().getStore().load();
+            assetList.getSelectionModel().deselectAll();
+            assetList.getStore().load();
             Ext.util.History.back();
             NX.Messages.add({ text: NX.I18n.format('AssetInfo_Delete_Success', asset.get('name')), type: 'success' });
           }

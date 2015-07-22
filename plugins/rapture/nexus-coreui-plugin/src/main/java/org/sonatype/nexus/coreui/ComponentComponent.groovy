@@ -136,7 +136,7 @@ class ComponentComponent
         )
       }
       return new PagedResponse<ComponentXO>(
-          (results.size() < parameters.limit ? 0 : parameters.limit) + results.size() + parameters.start,
+          (results.size() <= parameters.limit ? 0 : parameters.limit) + results.size() + parameters.start,
           results
       )
     }
@@ -255,7 +255,7 @@ class ComponentComponent
           .collect(ASSET_CONVERTER.rcurry(null, repository.name))
 
       return new PagedResponse<AssetXO>(
-          (results.size() < parameters.limit ? 0 : parameters.limit) + results.size() + parameters.start,
+          (results.size() <= parameters.limit ? 0 : parameters.limit) + results.size() + parameters.start,
           results
       )
     }

@@ -57,16 +57,20 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
     description: NX.I18n.get('Browse_Assets_Description_Feature'),
     view: 'NX.coreui.view.browse.BrowseAssetFeature',
     iconConfig: {
-      file: 'script_binary.png',
+      file: 'page_white_stack.png',
       variants: ['x16', 'x32']
     },
     visible: function() {
       return NX.Permissions.checkExistsWithPrefix('nexus:repository-view');
-    }
+    },
+    authenticationRequired: false
   },
 
   icons: {
-    'browse-asset-default': {file: 'script_binary.png', variants: ['x16', 'x32']}
+    'browse-asset-default': {
+      file: 'page_white.png',
+      variants: ['x16', 'x32']
+    }
   },
 
   /**

@@ -39,10 +39,10 @@ StartTest(function(t) {
             next();
           }
       )
-    });
+    }, 60000);
     t.it('Maven search finds maven components', function(t) {
       t.chain(
-          t.openPageAsAdmin('browse/search/maven'),
+          t.navigateTo('browse/search/maven'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
           {type: 'aopalliance', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.maven2.artifactId]'},
           Ext.clone(waitForStoreToLoad),
@@ -60,7 +60,7 @@ StartTest(function(t) {
     });
     t.it('Keyword search finds nuget components', function(t) {
       t.chain(
-          t.openPageAsAdmin('browse/search'),
+          t.navigateTo('browse/search'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
           {type: 'name:SONATYPE.TEST', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
           Ext.clone(waitForStoreToLoad),
@@ -78,7 +78,7 @@ StartTest(function(t) {
     });
     t.it('Nuget search finds nuget components', function(t) {
       t.chain(
-          t.openPageAsAdmin('browse/search/nuget'),
+          t.navigateTo('browse/search/nuget'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
           {type: 'SONATYPE.TEST', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.nuget.id]'},
           Ext.clone(waitForStoreToLoad),
@@ -96,7 +96,7 @@ StartTest(function(t) {
     });
     t.it('Keyword search finds raw components', function(t) {
       t.chain(
-          t.openPageAsAdmin('browse/search'),
+          t.navigateTo('browse/search'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
           {type: 'name:alphabet.txt', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
           Ext.clone(waitForStoreToLoad),
@@ -114,7 +114,7 @@ StartTest(function(t) {
     });
     t.it('Raw search finds raw components', function(t) {
       t.chain(
-          t.openPageAsAdmin('browse/search/raw'),
+          t.navigateTo('browse/search/raw'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
           {type: 'alphabet.txt', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.raw.path.tree]'},
           Ext.clone(waitForStoreToLoad),
