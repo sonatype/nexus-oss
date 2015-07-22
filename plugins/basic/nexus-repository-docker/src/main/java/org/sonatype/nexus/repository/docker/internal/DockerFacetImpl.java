@@ -120,20 +120,29 @@ public class DockerFacetImpl
 
     InputStream indexStream;
 
-    String assetName = namespace + "/" + name + "/images";
+    String imageComponentName = namespace + "/" + name;
+    String imagesIndexAssetName = imageComponentName + "/images";
 
     Bucket bucket = tx.getBucket();
-    Asset asset = findAsset(tx, bucket, assetName);
-    if (asset == null) {
-      asset = tx.createAsset(bucket, getRepository().getFormat());
-      asset.name(assetName);
-      asset.formatAttributes().set(P_PATH, "/v1/repositories/" + assetName);
+    Component imageComponent = findComponent(tx, bucket, imageComponentName);
+    Asset imagesIndexAsset = null;
+    if (imageComponent == null) {
+      imageComponent = tx.createComponent(bucket, getRepository().getFormat()).name(imageComponentName);
+      tx.saveComponent(imageComponent);
+    }
+    else {
+      imagesIndexAsset = findAsset(tx, bucket, imagesIndexAssetName);
+    }
+    if (imagesIndexAsset == null) {
+      imagesIndexAsset = tx.createAsset(bucket, imageComponent);
+      imagesIndexAsset.name(imagesIndexAssetName);
+      imagesIndexAsset.formatAttributes().set(P_PATH, "/v1/repositories/" + imagesIndexAssetName);
 
       indexStream = streamSupplier.get();
     }
     else {
       String existingIndex;
-      try (InputStream in = tx.requireBlob(asset.requireBlobRef()).getInputStream()) {
+      try (InputStream in = tx.requireBlob(imagesIndexAsset.requireBlobRef()).getInputStream()) {
         existingIndex = new String(ByteStreams.toByteArray(in), Charsets.UTF_8);
       }
       String newIndex;
@@ -149,10 +158,10 @@ public class DockerFacetImpl
     if (payload instanceof Content) {
       contentAttributes = ((Content) payload).getAttributes();
     }
-    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
+    Content.applyToAsset(imagesIndexAsset, Content.maintainLastModified(imagesIndexAsset, contentAttributes));
     // FIXME Nexus is changing content type from application/json to text/plain even if is a json file
-    tx.setBlob(asset, assetName, indexStream, hashAlgorithms, null, payload.getContentType());
-    tx.saveAsset(asset);
+    tx.setBlob(imagesIndexAsset, imagesIndexAssetName, indexStream, hashAlgorithms, null, payload.getContentType());
+    tx.saveAsset(imagesIndexAsset);
   }
 
   @Override
