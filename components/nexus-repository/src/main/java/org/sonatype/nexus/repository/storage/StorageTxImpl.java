@@ -161,7 +161,7 @@ public class StorageTxImpl
   }
 
   @Override
-  @Guarded(by = ACTIVE)
+  @Guarded(by = {OPEN, ACTIVE})
   public Iterable<ODocument> browse(final String selectSql, @Nullable final Map<String, Object> params) {
     return OrientAsyncHelper.asyncIterable(db, selectSql, params);
   }
