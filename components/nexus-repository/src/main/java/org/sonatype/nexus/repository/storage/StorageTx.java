@@ -27,6 +27,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.transaction.Transaction;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
  * A storage transaction.
@@ -37,12 +38,22 @@ public interface StorageTx
     extends Transaction
 {
   /**
-   * Provides the underlying graph transaction.
+   * Provides the underlying document transaction.
    *
-   * Note: The caller may use this to directly query or manipulate the OrientDB graph, if needed, but should not
+   * Note: The caller may use this to directly query or manipulate the Orient document DB, if needed, but should not
    * directly commit, rollback, or close the underlying transaction.
    */
   ODatabaseDocumentTx getDb();
+
+  /**
+   * A lower level but still safe access to SQL SELECT queries, that allows caller to "browse" potentially
+   * huge result sets without worry about paging or OOMs.
+   *
+   * @param selectSql The SELECT SQL in full, optionally with named parameters.
+   * @param params The map holding named parameters of SELECT SQL.
+   * @return Iterable of SELECTed {@link ODocument}s.
+   */
+  Iterable<ODocument> browse(String selectSql, @Nullable Map<String, Object> params);
 
   /**
    * Begins the transaction.
