@@ -125,7 +125,6 @@ Ext.define('NX.coreui.view.support.SupportZip', {
           text: NX.I18n.get('Support_SupportZip_Create_Button'),
           formBind: true,
           glyph: 'xf019@FontAwesome' /* fa-download */,
-          formBind: true,
           action: 'add',
           ui: 'nx-primary'
         },
