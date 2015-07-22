@@ -34,6 +34,9 @@ import org.sonatype.nexus.repository.manager.RepositoryManager
 import org.sonatype.nexus.repository.security.BreadActions
 import org.sonatype.nexus.repository.security.RepositoryAdminPermission
 import org.sonatype.nexus.repository.security.RepositoryViewPermission
+import org.sonatype.nexus.scheduling.TaskConfiguration
+import org.sonatype.nexus.scheduling.TaskInfo
+import org.sonatype.nexus.scheduling.TaskScheduler
 import org.sonatype.nexus.security.SecurityHelper
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.group.Create
@@ -66,6 +69,9 @@ class RepositoryComponent
 
   @Inject
   Map<String, Recipe> recipes
+
+  @Inject
+  TaskScheduler taskScheduler
 
   @DirectMethod
   List<RepositoryXO> read() {
@@ -130,6 +136,20 @@ class RepositoryComponent
     Repository repository = repositoryManager.get(name)
     securityHelper.ensurePermitted(adminPermission(repository, BreadActions.DELETE))
     repositoryManager.delete(name)
+  }
+
+  @DirectMethod
+  @RequiresAuthentication
+  @Validate
+  String rebuildIndex(final @NotEmpty String name) {
+    Repository repository = repositoryManager.get(name)
+    // TODO: for now same permission as repo remove. Do we want separate permission for "rebuild index"?
+    securityHelper.ensurePermitted(adminPermission(repository, BreadActions.DELETE))
+
+    TaskConfiguration taskConfiguration = taskScheduler.createTaskConfigurationInstance(RebuildIndexTask.class)
+    taskConfiguration.setString(RebuildIndexTask.REPOSITORY_NAME_FIELD_ID, repository.name)
+    TaskInfo taskInfo = taskScheduler.submit(taskConfiguration)
+    return taskInfo.id
   }
 
   RepositoryXO asRepository(Repository input) {
