@@ -1,10 +1,14 @@
-node.name: nexus
 cluster.name: nexus
-http.enabled: false
-node.local: true
-discovery.zen.ping.multicast.enabled: false
 path.data: ${nexus-work}/elasticsearch
+
+# Disable groovy script integration
 script.groovy.sandbox.enabled: false
+
+# Disable networking
+node.local: true
+http.enabled: false
+discovery.zen.ping.multicast.enabled: false
+
 
 ##################### Elasticsearch Configuration Example #####################
 

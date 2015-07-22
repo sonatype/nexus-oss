@@ -14,7 +14,6 @@ package org.sonatype.nexus.elasticsearch.internal;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Map;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -23,11 +22,12 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.app.ApplicationDirectories;
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.script.NativeScriptFactory;
+import org.elasticsearch.node.NodeBuilder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -46,13 +46,16 @@ public class NodeProvider
 {
   private final ApplicationDirectories directories;
 
+  private final LocalNodeAccess localNodeAccess;
+
   private Node node;
 
   @Inject
   public NodeProvider(final ApplicationDirectories directories,
-                      final Map<String, NativeScriptFactory> scripts)
+                      final LocalNodeAccess localNodeAccess)
   {
     this.directories = checkNotNull(directories);
+    this.localNodeAccess = checkNotNull(localNodeAccess);
   }
 
   @Override
@@ -80,11 +83,15 @@ public class NodeProvider
     URL url = file.toURI().toURL();
     log.info("Creating node with config: {}", url);
 
-    ImmutableSettings.Builder builder = ImmutableSettings.settingsBuilder()
+    ImmutableSettings.Builder settings = ImmutableSettings.settingsBuilder()
         .classLoader(NodeProvider.class.getClassLoader())
         .loadFromUrl(url);
 
-    return nodeBuilder().settings(builder).node();
+    // assign node.name to local node-id
+    settings.put("node.name", localNodeAccess.getId());
+
+    NodeBuilder builder = nodeBuilder().settings(settings);
+    return builder.node();
   }
 
   @PreDestroy
