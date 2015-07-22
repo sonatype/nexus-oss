@@ -48,6 +48,9 @@ Ext.define('NX.controller.SettingsForm', {
         'form[settingsForm=true][settingsFormSubmit=true] button[action=add]': {
           click: me.submitForm
         },
+        'form[settingsForm=true][settingsFormSubmit=true] button[action=submit]': {
+          click: me.submitForm
+        },
         'form[settingsForm=true][settingsFormSubmit=true] button[action=save]': {
           click: me.submitForm
         },
