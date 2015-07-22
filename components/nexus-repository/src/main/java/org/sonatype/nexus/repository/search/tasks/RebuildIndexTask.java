@@ -19,9 +19,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.search.SearchFacet;
-import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.scheduling.TaskSupport;
-import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.base.Strings;
 
@@ -49,13 +47,7 @@ public class RebuildIndexTask
   @Override
   protected Object execute() throws Exception {
     final Repository repository = getRepository();
-    UnitOfWork.begin(repository.facet(StorageFacet.class).txSupplier());
-    try {
-      repository.facet(SearchFacet.class).rebuildIndex();
-    }
-    finally {
-      UnitOfWork.end();
-    }
+    repository.facet(SearchFacet.class).rebuildIndex();
     return null;
   }
 

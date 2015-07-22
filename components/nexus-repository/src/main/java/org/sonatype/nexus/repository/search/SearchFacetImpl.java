@@ -80,7 +80,6 @@ public class SearchFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  @Transactional
   public void rebuildIndex() {
     rebuildIndexLock.writeLock().lock();
     log.info("Rebuilding index of repository {}", getRepository().getName());
@@ -88,13 +87,15 @@ public class SearchFacetImpl
       searchService.deleteIndex(getRepository());
       searchService.createIndex(getRepository());
 
-      final StorageTx tx = UnitOfWork.currentTransaction();
-      for (Component component : tx.browseComponents(tx.getBucket())) {
-        try {
-          put(component, tx.browseAssets(component));
-        }
-        catch (IOException e) {
-          log.warn("Could not reindex component: {}", component, e);
+      try (final StorageTx tx = getRepository().facet(StorageFacet.class).txSupplier().get()) {
+        tx.begin();
+        for (Component component : tx.browseComponents(tx.getBucket())) {
+          try {
+            put(component, tx.browseAssets(component));
+          }
+          catch (IOException e) {
+            log.warn("Could not reindex component: {}", component, e);
+          }
         }
       }
     }
