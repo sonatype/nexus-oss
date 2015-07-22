@@ -25,9 +25,9 @@ public interface DockerAttributes
 
   String P_X_DOCKER_SIZE = "X-Docker-Size";
 
-  String P_TAG = "tag";
+  String P_METADATA = "metadata";
 
-  String P_TAGS = "tags";
+  String P_IMAGE_ID = "layer";
 
   String P_PARENT = "parent";
 

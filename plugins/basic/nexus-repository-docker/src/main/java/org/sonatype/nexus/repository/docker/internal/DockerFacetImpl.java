@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +36,8 @@ import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.ComponentQuery;
+import org.sonatype.nexus.repository.storage.ComponentQuery.Builder;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.TypeTokens;
@@ -59,14 +62,17 @@ import com.orientechnologies.common.concur.ONeedRetryException;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import org.apache.commons.lang.StringUtils;
 
+import static java.util.Collections.singletonList;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_ANCESTRY;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IN_PROGRESS;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_TAG;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_TAGS;
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IMAGE_ID;
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_METADATA;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_SIZE;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
 
 /**
  * @since 3.0
@@ -91,8 +97,9 @@ public class DockerFacetImpl
   public Payload getImagesIndex(final String name) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String assetName = name + "/images";
-    Asset asset = findAsset(tx, tx.getBucket(), assetName);
+    String imagesIndexAssetName = name + "/images";
+    Bucket bucket = tx.getBucket();
+    Asset asset = findAsset(tx, bucket, imagesIndexAssetName);
     if (asset == null) {
       throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
     }
@@ -121,17 +128,9 @@ public class DockerFacetImpl
     String imagesIndexAssetName = name + "/images";
 
     Bucket bucket = tx.getBucket();
-    Component imageComponent = findComponent(tx, bucket, name);
-    Asset imagesIndexAsset = null;
-    if (imageComponent == null) {
-      imageComponent = tx.createComponent(bucket, getRepository().getFormat()).name(name);
-      tx.saveComponent(imageComponent);
-    }
-    else {
-      imagesIndexAsset = findAsset(tx, bucket, imagesIndexAssetName);
-    }
+    Asset imagesIndexAsset = imagesIndexAsset = findAsset(tx, bucket, imagesIndexAssetName);
     if (imagesIndexAsset == null) {
-      imagesIndexAsset = tx.createAsset(bucket, imageComponent);
+      imagesIndexAsset = tx.createAsset(bucket, getRepository().getFormat());
       imagesIndexAsset.name(imagesIndexAssetName);
       imagesIndexAsset.formatAttributes().set(P_PATH, "/v1/repositories/" + imagesIndexAssetName);
 
@@ -403,16 +402,15 @@ public class DockerFacetImpl
   public Payload getTags(final String name) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String imageIndexAssetName = name + "/images";
-    Bucket bucket = tx.getBucket();
-    Asset imageIndexAsset = findAsset(tx, bucket, imageIndexAssetName);
-    if (imageIndexAsset == null) {
+    Iterable<Component> tagComponents = findComponents(tx, name);
+    Map<String, String> tags = new HashMap<>();
+    for (Component tagComponent : tagComponents) {
+      tags.put(tagComponent.version(), tagComponent.formatAttributes().get(P_IMAGE_ID, String.class));
+    }
+    if (tags.isEmpty()) {
       throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
     }
-    NestedAttributesMap tagsMap = imageIndexAsset.formatAttributes().child(P_TAGS);
-    return new StringPayload(
-        mapper.writeValueAsString(tagsMap.backing()), Charsets.UTF_8, ContentTypes.APPLICATION_JSON
-    );
+    return new StringPayload(mapper.writeValueAsString(tags), Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
   }
 
   @Override
@@ -420,16 +418,11 @@ public class DockerFacetImpl
   public Payload getTag(final String name, final String tag) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String imageIndexAssetName = name + "/images";
-    Bucket bucket = tx.getBucket();
-    Asset imageIndexAsset = findAsset(tx, bucket, imageIndexAssetName);
-    if (imageIndexAsset == null) {
-      throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
-    }
-    String imageId = imageIndexAsset.formatAttributes().child(P_TAGS).get(tag, String.class);
-    if (imageId == null) {
+    Component tagComponent = findComponent(tx, name, tag);
+    if (tagComponent == null) {
       throw new V1ApiException("Tag not found", HttpStatus.NOT_FOUND);
     }
+    String imageId = tagComponent.formatAttributes().get(P_IMAGE_ID, String.class);
     return new StringPayload(mapper.writeValueAsString(imageId), Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
   }
 
@@ -442,7 +435,7 @@ public class DockerFacetImpl
   {
     validateTagName(tag);
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      doPutTag(name, tag, readImageId(streamSupplier), metadata);
+      doPutTag(name, tag, readLayer(streamSupplier), metadata);
     }
   }
 
@@ -468,20 +461,45 @@ public class DockerFacetImpl
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
 
-    // add tag to image index asset
-    imageIndexAsset.formatAttributes().child(P_TAGS).set(tag, imageId);
-    // add metadata to image index asset
-    // FIXME would be nicer to have the child tag above have as value image id and metadata
-    NestedAttributesMap metadataTag = imageIndexAsset.formatAttributes().child(P_TAG + "_" + tag);
+    Component tagComponent = findComponent(tx, name, tag);
+    if (tagComponent == null) {
+      tagComponent = tx.createComponent(bucket, getRepository().getFormat())
+          .name(name)
+          .version(tag);
+    }
+
+    // set layer reference
+    tagComponent.formatAttributes().set(P_IMAGE_ID, imageId);
+    // set metadata
+    NestedAttributesMap metadataTag = tagComponent.formatAttributes().child(P_METADATA);
     metadataTag.clear();
     for (Entry<String, String> entry : metadata.entrySet()) {
       metadataTag.set(entry.getKey(), entry.getValue());
     }
-    tx.saveAsset(imageIndexAsset);
+    tx.saveComponent(tagComponent);
   }
 
-  private Component findComponent(final StorageTx tx, final Bucket bucket, final String imageId) {
-    return tx.findComponentWithProperty(StorageFacet.P_NAME, imageId, bucket);
+  private Component findComponent(final StorageTx tx, final String name, final String version) {
+    final ComponentQuery query = new Builder()
+        .where(P_NAME + "=").param(name)
+        .where(" and " + P_VERSION + "=").param(version)
+        .build();
+    final Iterable<Component> components = tx.findComponents(
+        query.getWhere(), query.getParameters(), singletonList(getRepository()), null
+    );
+    if (components.iterator().hasNext()) {
+      return components.iterator().next();
+    }
+    return null;
+  }
+
+  private Iterable<Component> findComponents(final StorageTx tx, final String name) {
+    final ComponentQuery query = new Builder()
+        .where(P_NAME + "=").param(name)
+        .build();
+    return tx.findComponents(
+        query.getWhere(), query.getParameters(), singletonList(getRepository()), null
+    );
   }
 
   private Asset findAsset(final StorageTx tx, final Bucket bucket, final String assetName) {
@@ -521,7 +539,7 @@ public class DockerFacetImpl
     }
   }
 
-  private String readImageId(final Supplier<InputStream> streamSupplier) {
+  private String readLayer(final Supplier<InputStream> streamSupplier) {
     try {
       return validateImageId(mapper.readValue(streamSupplier.get(), String.class));
     }
