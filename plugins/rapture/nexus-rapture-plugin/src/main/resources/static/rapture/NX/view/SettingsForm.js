@@ -203,10 +203,14 @@ Ext.define('NX.view.SettingsForm', {
   updateButtonState: function (form) {
     var dirty = form.isDirty(),
         valid = form.isValid(),
-        saveButton = form.down('button[action=save]');
+        saveButton = form.down('button[action=save]'),
+        discardButton = form.down('button[action=discard]');
 
     if (saveButton) {
       saveButton.setDisabled(!valid || !dirty);
+    }
+    if (discardButton) {
+      discardButton.setDisabled(!dirty);
     }
   },
 
