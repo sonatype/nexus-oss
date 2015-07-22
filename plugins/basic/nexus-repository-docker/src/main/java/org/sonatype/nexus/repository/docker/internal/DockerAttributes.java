@@ -32,4 +32,14 @@ public interface DockerAttributes
   String P_PARENT = "parent";
 
   String P_ANCESTRY = "ancestry";
+
+  String P_DOCKER_VERSION = "docker_version";
+
+  String P_DOCKER_GO_VERSION = "docker_go_version";
+
+  String P_ARCH = "arch";
+
+  String P_OS = "os";
+
+  String P_KERNEL = "kernel";
 }

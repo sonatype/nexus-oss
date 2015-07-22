@@ -55,12 +55,12 @@ class V1Tags
     }
     def metadata = [:]
     if (userAgentEntries['docker']) {
-      metadata['docker_version'] = userAgentEntries['docker']
+      metadata[DockerAttributes.P_DOCKER_VERSION] = userAgentEntries['docker']
     }
     if (userAgentEntries['go']) {
-      metadata['docker_go_version'] = userAgentEntries['go']
+      metadata[DockerAttributes.P_DOCKER_GO_VERSION] = userAgentEntries['go']
     }
-    ['arch', 'kernel', 'os'].each {
+    [DockerAttributes.P_ARCH, DockerAttributes.P_KERNEL, DockerAttributes.P_OS].each {
       if (userAgentEntries[it]) {
         metadata[it] = userAgentEntries[it]
       }
